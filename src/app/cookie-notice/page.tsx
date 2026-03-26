@@ -114,8 +114,7 @@ export default function CookieNoticePage() {
               <div className="grid sm:grid-cols-2 gap-4">
                 {[
                   { name: "Google Analytics", purpose: "Website traffic analysis and user behavior insights" },
-                  { name: "Stripe", purpose: "Secure payment processing" },
-                  { name: "PayPal", purpose: "Payment processing and buyer protection" },
+                  { name: "PayPal", purpose: "Secure payment processing and buyer protection" },
                   { name: "Trustpilot", purpose: "Customer review collection and display" },
                 ].map((service) => (
                   <div key={service.name} className="bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md transition-shadow">

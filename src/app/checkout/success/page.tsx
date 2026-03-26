@@ -274,9 +274,7 @@ export default function CheckoutSuccessPage() {
               </div>
               <p className="text-sm text-muted-foreground mt-1">
                 Paid via{" "}
-                {order.paymentMethod === "stripe"
-                  ? "Credit Card"
-                  : order.paymentMethod === "paypal"
+                {order.paymentMethod === "paypal"
                   ? "PayPal"
                   : "Bank Transfer"}
               </p>
