@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { createHash, randomBytes } from 'crypto';
 
 // Admin credentials from environment variables
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'lamialiuart@gmail.com';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@alternusart.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Alternus333#';
 const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || 'alternus-admin-secret-key-change-in-production';
 
