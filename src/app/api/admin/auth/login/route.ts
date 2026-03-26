@@ -2,17 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createHash, randomBytes } from 'crypto';
 
-// Admin credentials from environment variables
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@alternusart.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Alternus333#';
-const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || 'alternus-admin-secret-key-change-in-production';
+export const dynamic = 'force-dynamic';
 
 // Generate a secure session token
 function generateSessionToken(): string {
+  const secret = process.env.ADMIN_SESSION_SECRET || 'alternus-admin-secret-key-change-in-production';
   const randomPart = randomBytes(32).toString('hex');
   const timestamp = Date.now().toString();
   const hash = createHash('sha256')
-    .update(randomPart + timestamp + ADMIN_SESSION_SECRET)
+    .update(randomPart + timestamp + secret)
     .digest('hex');
   return `${hash}.${timestamp}`;
 }
@@ -21,6 +19,10 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { email, password } = body;
+
+    // Read credentials at runtime (not build time)
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@alternusart.com';
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Alternus333#';
 
     // Validate credentials
     const inputEmail = email?.trim().toLowerCase();
