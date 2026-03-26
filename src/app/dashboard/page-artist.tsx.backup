@@ -1,0 +1,1435 @@
+"use client";
+
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { paintings as initialPaintings, categories, type Painting } from "@/lib/paintings";
+import { useLanguage } from "@/components/providers";
+
+type Tab = "overview" | "artworks" | "orders";
+
+interface NewArtwork {
+  title: string;
+  image: string;
+  price: string;
+  medium: string;
+  dimensions: string;
+  width: string;
+  height: string;
+  category: string;
+  year: string;
+  description: string;
+  tags: string[];
+}
+
+const initialFormState: NewArtwork = {
+  title: "",
+  image: "",
+  price: "",
+  medium: "Oil on Canvas",
+  dimensions: "",
+  width: "",
+  height: "",
+  category: categories[0],
+  year: new Date().getFullYear().toString(),
+  description: "",
+  tags: [],
+};
+
+function DashboardContent() {
+  const { formatPrice } = useLanguage();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab") as Tab | null;
+  const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const [isAddArtworkOpen, setIsAddArtworkOpen] = useState(false);
+  const [formStep, setFormStep] = useState(1);
+  const [newArtwork, setNewArtwork] = useState<NewArtwork>(initialFormState);
+  const [userArtworks, setUserArtworks] = useState<Painting[]>([]);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [tagInput, setTagInput] = useState("");
+  const [imageError, setImageError] = useState(false);
+
+  // Combine initial paintings with user-added artworks
+  const allArtworks = [...initialPaintings, ...userArtworks];
+
+  useEffect(() => {
+    if (tabParam && ["overview", "artworks", "orders"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  // Auto-generate dimensions from width and height
+  useEffect(() => {
+    if (newArtwork.width && newArtwork.height) {
+      setNewArtwork(prev => ({
+        ...prev,
+        dimensions: `${prev.width} x ${prev.height} cm`
+      }));
+    }
+  }, [newArtwork.width, newArtwork.height]);
+
+  const handleAddTag = () => {
+    if (tagInput.trim() && !newArtwork.tags.includes(tagInput.trim())) {
+      setNewArtwork(prev => ({
+        ...prev,
+        tags: [...prev.tags, tagInput.trim()]
+      }));
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setNewArtwork(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }));
+  };
+
+  const isValidImageUrl = (url: string): boolean => {
+    return url.trim() !== "" && url.startsWith("http");
+  };
+
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        return isValidImageUrl(newArtwork.image) && !imageError;
+      case 2:
+        return newArtwork.title.trim() !== "" && newArtwork.category !== "";
+      case 3:
+        return newArtwork.price !== "" && parseFloat(newArtwork.price) > 0;
+      default:
+        return true;
+    }
+  };
+
+  const handleNextStep = () => {
+    if (validateStep(formStep)) {
+      setFormStep(prev => prev + 1);
+    }
+  };
+
+  const handlePrevStep = () => {
+    setFormStep(prev => prev - 1);
+  };
+
+  const resetForm = () => {
+    setNewArtwork(initialFormState);
+    setFormStep(1);
+    setTagInput("");
+    setImageError(false);
+  };
+
+  const handleAddArtwork = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Create new artwork object
+    const artwork: Painting = {
+      id: `user-${Date.now()}`,
+      title: newArtwork.title,
+      image: newArtwork.image,
+      price: parseFloat(newArtwork.price),
+      medium: newArtwork.medium,
+      dimensions: newArtwork.dimensions || `${newArtwork.width} x ${newArtwork.height} cm`,
+      year: parseInt(newArtwork.year),
+      category: newArtwork.category,
+      available: true,
+      description: newArtwork.description,
+    };
+
+    // Add to user artworks
+    setUserArtworks(prev => [artwork, ...prev]);
+
+    // Close modal and show success
+    setIsAddArtworkOpen(false);
+    setShowSuccess(true);
+
+    // Reset form
+    resetForm();
+
+    // Hide success after 3 seconds
+    setTimeout(() => setShowSuccess(false), 3000);
+  };
+
+  const handleCloseModal = () => {
+    setIsAddArtworkOpen(false);
+    resetForm();
+  };
+
+  const handleDeleteArtwork = (artworkId: string) => {
+    if (confirm("Are you sure you want to delete this artwork?")) {
+      setUserArtworks(prev => prev.filter(art => art.id !== artworkId));
+    }
+  };
+
+  const handleEditArtwork = (artwork: Painting) => {
+    setEditingArtwork(artwork);
+    setNewArtwork({
+      title: artwork.title,
+      image: artwork.image,
+      price: artwork.price.toString(),
+      medium: artwork.medium,
+      dimensions: artwork.dimensions,
+      width: "",
+      height: "",
+      category: artwork.category,
+      year: artwork.year.toString(),
+      description: artwork.description || "",
+      tags: [],
+    });
+    setIsEditOpen(true);
+  };
+
+  const handleUpdateArtwork = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingArtwork) return;
+
+    const updatedArtwork: Painting = {
+      ...editingArtwork,
+      title: newArtwork.title,
+      image: newArtwork.image,
+      price: parseFloat(newArtwork.price),
+      medium: newArtwork.medium,
+      dimensions: newArtwork.dimensions || `${newArtwork.width} x ${newArtwork.height} cm`,
+      year: parseInt(newArtwork.year),
+      category: newArtwork.category,
+      description: newArtwork.description,
+    };
+
+    setUserArtworks(prev => prev.map(art =>
+      art.id === editingArtwork.id ? updatedArtwork : art
+    ));
+
+    setIsEditOpen(false);
+    setEditingArtwork(null);
+    resetForm();
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 3000);
+  };
+
+  // Statistics
+  const totalWorks = allArtworks.length;
+  const availableWorks = allArtworks.filter((p) => p.available).length;
+  const soldWorks = allArtworks.filter((p) => !p.available).length;
+  const totalRevenue = allArtworks.filter((p) => !p.available).reduce((sum, p) => sum + p.price, 0);
+
+  // Mock orders data with full details
+  const recentOrders = [
+    {
+      id: "ORD-001",
+      artwork: "Dawn of Hope",
+      artworkImage: "https://images.unsplash.com/photo-1549490349-8643362247b5?w=200&q=80",
+      buyer: "Marie L.",
+      buyerEmail: "marie.l@email.com",
+      buyerAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80",
+      price: 2400,
+      status: "pending",
+      date: "2024-12-28",
+      shippingAddress: "123 Art Street, New York, NY 10001, USA",
+      services: [
+        { task: "Confirm order receipt", completed: false },
+        { task: "Prepare artwork for shipping", completed: false },
+        { task: "Package with protective materials", completed: false },
+        { task: "Schedule courier pickup", completed: false },
+        { task: "Upload tracking number", completed: false },
+      ],
+    },
+    {
+      id: "ORD-002",
+      artwork: "Autumn Dreams",
+      artworkImage: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=200&q=80",
+      buyer: "Thomas K.",
+      buyerEmail: "thomas.k@email.com",
+      buyerAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80",
+      price: 1800,
+      status: "processing",
+      date: "2024-12-27",
+      shippingAddress: "456 Gallery Ave, Los Angeles, CA 90001, USA",
+      services: [
+        { task: "Confirm order receipt", completed: true },
+        { task: "Prepare artwork for shipping", completed: true },
+        { task: "Package with protective materials", completed: false },
+        { task: "Schedule courier pickup", completed: false },
+        { task: "Upload tracking number", completed: false },
+      ],
+    },
+    {
+      id: "ORD-003",
+      artwork: "Mediterranean Light",
+      artworkImage: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=200&q=80",
+      buyer: "Sophie M.",
+      buyerEmail: "sophie.m@email.com",
+      buyerAvatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=80",
+      price: 3200,
+      status: "shipped",
+      date: "2024-12-25",
+      shippingAddress: "789 Canvas Blvd, Miami, FL 33101, USA",
+      trackingNumber: "TRK123456789",
+      services: [
+        { task: "Confirm order receipt", completed: true },
+        { task: "Prepare artwork for shipping", completed: true },
+        { task: "Package with protective materials", completed: true },
+        { task: "Schedule courier pickup", completed: true },
+        { task: "Upload tracking number", completed: true },
+      ],
+    },
+  ];
+
+  const [selectedOrder, setSelectedOrder] = useState<typeof recentOrders[0] | null>(null);
+  const [editingArtwork, setEditingArtwork] = useState<Painting | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+
+  const tabs = [
+    { id: "overview" as Tab, label: "Overview", icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect width="7" height="9" x="3" y="3" rx="1" />
+        <rect width="7" height="5" x="14" y="3" rx="1" />
+        <rect width="7" height="9" x="14" y="12" rx="1" />
+        <rect width="7" height="5" x="3" y="16" rx="1" />
+      </svg>
+    )},
+    { id: "artworks" as Tab, label: "Artworks", icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 19l7-7 3 3-7 7-3-3z" />
+        <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+        <path d="M2 2l7.586 7.586" />
+        <circle cx="11" cy="11" r="2" />
+      </svg>
+    )},
+    { id: "orders" as Tab, label: "Orders", icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m7.5 4.27 9 5.15" />
+        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+        <path d="m3.3 7 8.7 5 8.7-5" />
+        <path d="M12 22V12" />
+      </svg>
+    )},
+  ];
+
+  return (
+    <div className="min-h-screen bg-muted/30">
+      {/* Dashboard Header */}
+      <div className="bg-background border-b">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-xl font-bold text-primary">EM</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">Welcome back, Elena</h1>
+                <p className="text-muted-foreground">Manage your artworks and orders</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" asChild>
+                <Link href="/gallery">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                    <polyline points="10 17 15 12 10 7" />
+                    <line x1="15" x2="3" y1="12" y2="12" />
+                  </svg>
+                  View Gallery
+                </Link>
+              </Button>
+              <Button onClick={() => setIsAddArtworkOpen(true)}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                  <path d="M5 12h14" />
+                  <path d="M12 5v14" />
+                </svg>
+                Add Artwork
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar */}
+          <aside className="lg:w-64 flex-shrink-0">
+            <nav className="bg-background rounded-xl p-2 shadow-sm">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                    activeTab === tab.id
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab.icon}
+                  <span className="font-medium">{tab.label}</span>
+                </button>
+              ))}
+            </nav>
+
+            <Separator className="my-6" />
+
+            {/* Quick Stats Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">This Month</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">&euro;{(totalRevenue * 0.3).toLocaleString()}</div>
+                <p className="text-xs text-green-600 flex items-center gap-1 mt-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m18 15-6-6-6 6"/>
+                  </svg>
+                  +12% from last month
+                </p>
+              </CardContent>
+            </Card>
+          </aside>
+
+          {/* Main Content */}
+          <main className="flex-1">
+            {activeTab === "overview" && (
+              <div className="space-y-6">
+                {/* Stats Grid */}
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Total Artworks</p>
+                          <p className="text-3xl font-bold">{totalWorks}</p>
+                        </div>
+                        <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                            <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Available</p>
+                          <p className="text-3xl font-bold">{availableWorks}</p>
+                        </div>
+                        <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                            <polyline points="22 4 12 14.01 9 11.01" />
+                          </svg>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Sold</p>
+                          <p className="text-3xl font-bold">{soldWorks}</p>
+                        </div>
+                        <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-600">
+                            <circle cx="8" cy="21" r="1" />
+                            <circle cx="19" cy="21" r="1" />
+                            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                          </svg>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Revenue</p>
+                          <p className="text-3xl font-bold">&euro;{totalRevenue.toLocaleString()}</p>
+                        </div>
+                        <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
+                            <path d="M12 18V6" />
+                          </svg>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Recent Orders */}
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Recent Orders</CardTitle>
+                    <Button variant="ghost" size="sm" onClick={() => setActiveTab("orders")}>
+                      View All
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {recentOrders.map((order) => (
+                        <div key={order.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                                <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                <circle cx="9" cy="9" r="2" />
+                                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="font-medium">{order.artwork}</p>
+                              <p className="text-sm text-muted-foreground">{order.buyer} • {order.date}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <Badge variant={
+                              order.status === "completed" ? "default" :
+                              order.status === "shipped" ? "secondary" : "outline"
+                            }>
+                              {order.status}
+                            </Badge>
+                            <p className="font-semibold">{formatPrice(order.price)}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Recent Artworks */}
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Recent Artworks</CardTitle>
+                    <Button variant="ghost" size="sm" onClick={() => setActiveTab("artworks")}>
+                      View All
+                    </Button>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {allArtworks.slice(0, 3).map((painting) => (
+                        <div key={painting.id} className="group relative aspect-square rounded-lg overflow-hidden">
+                          <Image
+                            src={painting.image}
+                            alt={painting.title}
+                            fill
+                            className="object-cover transition-transform group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                            <div>
+                              <p className="text-white font-medium">{painting.title}</p>
+                              <p className="text-white/70 text-sm">{formatPrice(painting.price)}</p>
+                            </div>
+                          </div>
+                          {!painting.available && (
+                            <Badge className="absolute top-2 right-2" variant="secondary">Sold</Badge>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {activeTab === "artworks" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold">My Artworks</h2>
+                  <Button onClick={() => setIsAddArtworkOpen(true)}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                      <path d="M5 12h14" />
+                      <path d="M12 5v14" />
+                    </svg>
+                    Add New
+                  </Button>
+                </div>
+
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {allArtworks.map((painting) => (
+                    <Card key={painting.id} className="overflow-hidden">
+                      <div className="relative aspect-[4/3]">
+                        <Image
+                          src={painting.image}
+                          alt={painting.title}
+                          fill
+                          className="object-cover"
+                        />
+                        <Badge className="absolute top-2 right-2" variant={painting.available ? "default" : "secondary"}>
+                          {painting.available ? "Available" : "Sold"}
+                        </Badge>
+                      </div>
+                      <CardContent className="p-4">
+                        <h3 className="font-semibold">{painting.title}</h3>
+                        <p className="text-sm text-muted-foreground">{painting.medium}</p>
+                        <div className="flex items-center justify-between mt-3">
+                          <p className="font-bold">{formatPrice(painting.price)}</p>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => handleEditArtwork(painting)}>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                                <path d="m15 5 4 4" />
+                              </svg>
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => handleDeleteArtwork(painting.id)}>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 6h18" />
+                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                              </svg>
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === "orders" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold">Orders</h2>
+                    <p className="text-muted-foreground">{recentOrders.filter(o => o.status === "pending").length} orders need attention</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline">Export</Button>
+                  </div>
+                </div>
+
+                {/* Orders List */}
+                <div className="space-y-3">
+                  {recentOrders.map((order) => (
+                    <Card
+                      key={order.id}
+                      className={`cursor-pointer hover:shadow-md transition-all ${order.status === "pending" ? "border-amber-300 bg-amber-50/50" : ""}`}
+                      onClick={() => setSelectedOrder(order)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-4">
+                          {/* Artwork Image */}
+                          <div className="relative flex-shrink-0">
+                            <img
+                              src={order.artworkImage}
+                              alt={order.artwork}
+                              className="w-20 h-20 rounded-lg object-cover"
+                            />
+                            {order.status === "pending" && (
+                              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                            )}
+                          </div>
+
+                          {/* Order Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold truncate">{order.artwork}</h3>
+                              <Badge variant={
+                                order.status === "pending" ? "destructive" :
+                                order.status === "processing" ? "default" :
+                                order.status === "shipped" ? "secondary" : "outline"
+                              }>
+                                {order.status === "pending" ? "New Order" : order.status === "processing" ? "In Progress" : "Shipped"}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <img src={order.buyerAvatar} alt={order.buyer} className="w-5 h-5 rounded-full" />
+                              <span>{order.buyer}</span>
+                              <span>•</span>
+                              <span>{order.date}</span>
+                            </div>
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="text-lg font-bold">{formatPrice(order.price)}</span>
+                              <span className="text-xs text-muted-foreground font-mono">{order.id}</span>
+                            </div>
+                          </div>
+
+                          {/* Progress */}
+                          <div className="hidden md:flex flex-col items-end gap-1">
+                            <span className="text-xs text-muted-foreground">Progress</span>
+                            <div className="flex gap-1">
+                              {order.services.map((s, idx) => (
+                                <div
+                                  key={idx}
+                                  className={`w-6 h-2 rounded-full ${s.completed ? "bg-green-500" : "bg-gray-200"}`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-xs font-medium">
+                              {order.services.filter(s => s.completed).length}/{order.services.length} steps
+                            </span>
+                          </div>
+
+                          {/* Arrow */}
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground">
+                            <path d="m9 18 6-6-6-6"/>
+                          </svg>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+          </main>
+        </div>
+      </div>
+
+      {/* Success Notification */}
+      {showSuccess && (
+        <div className="fixed top-20 right-4 z-50 animate-in slide-in-from-top-2 fade-in duration-300">
+          <div className="bg-green-600 text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-semibold">Artwork Added Successfully!</p>
+              <p className="text-sm text-white/80">Your artwork is now visible in the gallery.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Artwork Modal - Professional Multi-Step Form */}
+      <Dialog open={isAddArtworkOpen} onOpenChange={handleCloseModal}>
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-hidden p-0">
+          {/* Modal Header with Steps */}
+          <div className="bg-muted/30 px-6 py-4 border-b">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold">Add New Artwork</DialogTitle>
+            </DialogHeader>
+
+            {/* Step Indicator */}
+            <div className="flex items-center gap-2 mt-4">
+              {[
+                { num: 1, label: "Upload Image" },
+                { num: 2, label: "Artwork Details" },
+                { num: 3, label: "Pricing & Publish" },
+              ].map((step, index) => (
+                <div key={step.num} className="flex items-center">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
+                        formStep === step.num
+                          ? "bg-primary text-primary-foreground"
+                          : formStep > step.num
+                          ? "bg-green-600 text-white"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {formStep > step.num ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      ) : (
+                        step.num
+                      )}
+                    </div>
+                    <span className={`text-sm hidden sm:block ${formStep === step.num ? "font-medium" : "text-muted-foreground"}`}>
+                      {step.label}
+                    </span>
+                  </div>
+                  {index < 2 && (
+                    <div className={`w-8 sm:w-16 h-0.5 mx-2 ${formStep > step.num ? "bg-green-600" : "bg-muted"}`} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <form onSubmit={handleAddArtwork} className="flex flex-col h-[calc(90vh-180px)]">
+            {/* Step Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {/* Step 1: Upload Image */}
+              {formStep === 1 && (
+                <div className="space-y-6">
+                  <div className="text-center mb-6">
+                    <h3 className="text-lg font-semibold">Upload Your Artwork</h3>
+                    <p className="text-muted-foreground text-sm">Add a high-quality image of your artwork</p>
+                  </div>
+
+                  <div
+                    className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
+                      newArtwork.image && newArtwork.image.startsWith("http")
+                        ? "border-green-500 bg-green-50 dark:bg-green-900/10"
+                        : "border-muted-foreground/30 hover:border-primary/50"
+                    }`}
+                  >
+                    {newArtwork.image && newArtwork.image.startsWith("http") && !imageError ? (
+                      <div className="space-y-4">
+                        <div className="relative aspect-[4/3] max-w-md mx-auto rounded-xl overflow-hidden shadow-lg">
+                          <Image
+                            src={newArtwork.image}
+                            alt="Preview"
+                            fill
+                            className="object-cover"
+                            onError={() => setImageError(true)}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNewArtwork({ ...newArtwork, image: "" });
+                              setImageError(false);
+                            }}
+                            className="absolute top-3 right-3 bg-black/60 text-white p-2 rounded-full hover:bg-black/80 transition-colors"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M18 6 6 18" />
+                              <path d="m6 6 12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        <p className="text-sm text-green-600 font-medium flex items-center justify-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                            <polyline points="22 4 12 14.01 9 11.01" />
+                          </svg>
+                          Image loaded successfully
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                            <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                            <circle cx="9" cy="9" r="2" />
+                            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-lg">Drag and drop your image here</p>
+                          <p className="text-muted-foreground">or paste an image URL below</p>
+                        </div>
+                        {imageError && (
+                          <p className="text-red-500 text-sm">Failed to load image. Please check the URL.</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Image URL</label>
+                    <div className="flex gap-2">
+                      <Input
+                        type="url"
+                        placeholder="https://example.com/your-artwork.jpg"
+                        value={newArtwork.image}
+                        onChange={(e) => {
+                          setNewArtwork({ ...newArtwork, image: e.target.value });
+                          setImageError(false);
+                        }}
+                        className="flex-1"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Supported formats: JPG, PNG, WebP. For best results, use images at least 1200x1200 pixels.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Artwork Details */}
+              {formStep === 2 && (
+                <div className="space-y-6">
+                  <div className="text-center mb-6">
+                    <h3 className="text-lg font-semibold">Artwork Details</h3>
+                    <p className="text-muted-foreground text-sm">Tell us about your artwork</p>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    {/* Preview thumbnail */}
+                    <div className="sm:col-span-2 flex items-center gap-4 p-4 bg-muted/30 rounded-xl">
+                      <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                        {newArtwork.image && newArtwork.image.startsWith("http") ? (
+                          <Image src={newArtwork.image} alt="Preview" fill className="object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                              <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                              <circle cx="9" cy="9" r="2" />
+                              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{newArtwork.title || "Untitled Artwork"}</p>
+                        <p className="text-sm text-muted-foreground">{newArtwork.medium}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Title <span className="text-red-500">*</span></label>
+                      <Input
+                        type="text"
+                        placeholder="Enter artwork title"
+                        value={newArtwork.title}
+                        onChange={(e) => setNewArtwork({ ...newArtwork, title: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Category <span className="text-red-500">*</span></label>
+                      <select
+                        value={newArtwork.category}
+                        onChange={(e) => setNewArtwork({ ...newArtwork, category: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-lg bg-background"
+                      >
+                        {categories.map((cat) => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Medium <span className="text-red-500">*</span></label>
+                      <select
+                        value={newArtwork.medium}
+                        onChange={(e) => setNewArtwork({ ...newArtwork, medium: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-lg bg-background"
+                      >
+                        <option value="Oil on Canvas">Oil on Canvas</option>
+                        <option value="Acrylic on Canvas">Acrylic on Canvas</option>
+                        <option value="Watercolor">Watercolor</option>
+                        <option value="Mixed Media">Mixed Media</option>
+                        <option value="Digital Art">Digital Art</option>
+                        <option value="Charcoal">Charcoal</option>
+                        <option value="Pastel">Pastel</option>
+                        <option value="Gouache">Gouache</option>
+                        <option value="Ink">Ink</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Year Created</label>
+                      <Input
+                        type="number"
+                        min="1900"
+                        max={new Date().getFullYear()}
+                        placeholder={new Date().getFullYear().toString()}
+                        value={newArtwork.year}
+                        onChange={(e) => setNewArtwork({ ...newArtwork, year: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Width (cm)</label>
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="60"
+                        value={newArtwork.width}
+                        onChange={(e) => setNewArtwork({ ...newArtwork, width: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Height (cm)</label>
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="80"
+                        value={newArtwork.height}
+                        onChange={(e) => setNewArtwork({ ...newArtwork, height: e.target.value })}
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2 space-y-2">
+                      <label className="text-sm font-medium">Description</label>
+                      <textarea
+                        rows={4}
+                        placeholder="Describe your artwork, inspiration, technique, story behind the piece..."
+                        value={newArtwork.description}
+                        onChange={(e) => setNewArtwork({ ...newArtwork, description: e.target.value })}
+                        className="w-full px-3 py-2 border rounded-lg bg-background resize-none"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2 space-y-2">
+                      <label className="text-sm font-medium">Tags</label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="text"
+                          placeholder="Add a tag (e.g., abstract, nature, portrait)"
+                          value={tagInput}
+                          onChange={(e) => setTagInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleAddTag();
+                            }
+                          }}
+                        />
+                        <Button type="button" variant="outline" onClick={handleAddTag}>
+                          Add
+                        </Button>
+                      </div>
+                      {newArtwork.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {newArtwork.tags.map((tag) => (
+                            <Badge key={tag} variant="secondary" className="px-3 py-1">
+                              {tag}
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveTag(tag)}
+                                className="ml-2 hover:text-red-500"
+                              >
+                                ×
+                              </button>
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Pricing & Publish */}
+              {formStep === 3 && (
+                <div className="space-y-6">
+                  <div className="text-center mb-6">
+                    <h3 className="text-lg font-semibold">Set Your Price</h3>
+                    <p className="text-muted-foreground text-sm">Review and publish your artwork</p>
+                  </div>
+
+                  {/* Preview Card */}
+                  <div className="bg-muted/30 rounded-2xl p-6">
+                    <div className="flex flex-col sm:flex-row gap-6">
+                      <div className="relative w-full sm:w-48 aspect-[4/5] rounded-xl overflow-hidden flex-shrink-0 bg-muted">
+                        {newArtwork.image && newArtwork.image.startsWith("http") ? (
+                          <Image src={newArtwork.image} alt="Preview" fill className="object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                              <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                              <circle cx="9" cy="9" r="2" />
+                              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-3">
+                        <h4 className="text-xl font-bold">{newArtwork.title || "Untitled"}</h4>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge>{newArtwork.category}</Badge>
+                          <Badge variant="outline">{newArtwork.medium}</Badge>
+                          {newArtwork.year && <Badge variant="outline">{newArtwork.year}</Badge>}
+                        </div>
+                        {(newArtwork.width && newArtwork.height) && (
+                          <p className="text-sm text-muted-foreground">
+                            Dimensions: {newArtwork.width} × {newArtwork.height} cm
+                          </p>
+                        )}
+                        {newArtwork.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-3">{newArtwork.description}</p>
+                        )}
+                        {newArtwork.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {newArtwork.tags.map((tag) => (
+                              <span key={tag} className="text-xs text-muted-foreground">#{tag}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pricing Section */}
+                  <div className="bg-background border rounded-2xl p-6 space-y-4">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
+                        <path d="M12 18V6" />
+                      </svg>
+                      Pricing
+                    </h4>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Sale Price (€) <span className="text-red-500">*</span></label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-semibold">€</span>
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="0.00"
+                          value={newArtwork.price}
+                          onChange={(e) => setNewArtwork({ ...newArtwork, price: e.target.value })}
+                          className="pl-8 text-2xl font-bold h-14"
+                        />
+                      </div>
+                    </div>
+
+                    {newArtwork.price && parseFloat(newArtwork.price) > 0 && (
+                      <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Your earnings (after 10% fee)</span>
+                          <span className="font-semibold">€{(parseFloat(newArtwork.price) * 0.9).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Publish Checklist */}
+                  <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 rounded-2xl p-4">
+                    <h4 className="font-semibold text-green-800 dark:text-green-400 mb-3">Ready to publish?</h4>
+                    <ul className="space-y-2">
+                      {[
+                        { check: !!newArtwork.image, label: "Artwork image uploaded" },
+                        { check: !!newArtwork.title, label: "Title added" },
+                        { check: !!newArtwork.category, label: "Category selected" },
+                        { check: parseFloat(newArtwork.price) > 0, label: "Price set" },
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-center gap-2 text-sm">
+                          {item.check ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600">
+                              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                              <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                              <circle cx="12" cy="12" r="10" />
+                            </svg>
+                          )}
+                          <span className={item.check ? "text-green-800 dark:text-green-400" : "text-muted-foreground"}>
+                            {item.label}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer Actions */}
+            <div className="border-t p-4 bg-background flex items-center justify-between gap-4">
+              <div>
+                {formStep > 1 && (
+                  <Button type="button" variant="ghost" onClick={handlePrevStep}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                      <path d="m15 18-6-6 6-6" />
+                    </svg>
+                    Back
+                  </Button>
+                )}
+              </div>
+
+              <div className="flex gap-3">
+                <Button type="button" variant="outline" onClick={handleCloseModal}>
+                  Cancel
+                </Button>
+
+                {formStep < 3 ? (
+                  <Button
+                    type="button"
+                    onClick={handleNextStep}
+                    disabled={!validateStep(formStep)}
+                  >
+                    Continue
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2">
+                      <path d="m9 18 6-6-6-6" />
+                    </svg>
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    disabled={!validateStep(3)}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                    Publish Artwork
+                  </Button>
+                )}
+              </div>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Artwork Modal */}
+      <Dialog open={isEditOpen} onOpenChange={() => { setIsEditOpen(false); setEditingArtwork(null); resetForm(); }}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Edit Artwork</DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleUpdateArtwork} className="space-y-6 py-4">
+            {/* Basic Info */}
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Artwork Title</label>
+                <Input
+                  value={newArtwork.title}
+                  onChange={(e) => setNewArtwork(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Enter artwork title"
+                  required
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">Image URL</label>
+                <Input
+                  value={newArtwork.image}
+                  onChange={(e) => setNewArtwork(prev => ({ ...prev, image: e.target.value }))}
+                  placeholder="https://example.com/image.jpg"
+                  required
+                  className="mt-1"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Price (€)</label>
+                  <Input
+                    type="number"
+                    value={newArtwork.price}
+                    onChange={(e) => setNewArtwork(prev => ({ ...prev, price: e.target.value }))}
+                    placeholder="2500"
+                    required
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Year</label>
+                  <Input
+                    type="number"
+                    value={newArtwork.year}
+                    onChange={(e) => setNewArtwork(prev => ({ ...prev, year: e.target.value }))}
+                    placeholder="2024"
+                    required
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Medium</label>
+                  <Input
+                    value={newArtwork.medium}
+                    onChange={(e) => setNewArtwork(prev => ({ ...prev, medium: e.target.value }))}
+                    placeholder="Oil on Canvas"
+                    required
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Category</label>
+                  <select
+                    value={newArtwork.category}
+                    onChange={(e) => setNewArtwork(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full mt-1 px-3 py-2 border rounded-lg"
+                    required
+                  >
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">Dimensions</label>
+                <Input
+                  value={newArtwork.dimensions}
+                  onChange={(e) => setNewArtwork(prev => ({ ...prev, dimensions: e.target.value }))}
+                  placeholder="100 x 80 cm"
+                  required
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium">Description (Optional)</label>
+                <textarea
+                  value={newArtwork.description}
+                  onChange={(e) => setNewArtwork(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Describe your artwork..."
+                  className="w-full mt-1 px-3 py-2 border rounded-lg min-h-[100px]"
+                />
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-4">
+              <Button type="submit" className="flex-1">
+                Save Changes
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => { setIsEditOpen(false); setEditingArtwork(null); resetForm(); }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Order Details Modal */}
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setSelectedOrder(null)}
+          />
+
+          {/* Modal */}
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10">
+              <div>
+                <h3 className="font-semibold text-gray-900">Order Details</h3>
+                <p className="text-xs text-gray-500">{selectedOrder.id}</p>
+              </div>
+              <button
+                onClick={() => setSelectedOrder(null)}
+                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 6 6 18"/>
+                  <path d="m6 6 12 12"/>
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {/* Artwork & Buyer Info */}
+              <div className="flex gap-4">
+                <img
+                  src={selectedOrder.artworkImage}
+                  alt={selectedOrder.artwork}
+                  className="w-24 h-24 rounded-xl object-cover"
+                />
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900">{selectedOrder.artwork}</h4>
+                  <p className="text-xl font-bold text-gray-900 mt-1">{formatPrice(selectedOrder.price)}</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <img src={selectedOrder.buyerAvatar} alt={selectedOrder.buyer} className="w-6 h-6 rounded-full" />
+                    <div>
+                      <span className="text-sm text-gray-700">{selectedOrder.buyer}</span>
+                      <p className="text-xs text-gray-400">{selectedOrder.buyerEmail}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Shipping Address */}
+              <div className="bg-gray-50 rounded-xl p-4">
+                <h5 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  Shipping Address
+                </h5>
+                <p className="text-sm text-gray-600">{selectedOrder.shippingAddress}</p>
+              </div>
+
+              {/* Services Checklist */}
+              <div>
+                <h5 className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 11l3 3L22 4"/>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                  </svg>
+                  Services to Complete
+                </h5>
+                <div className="space-y-2">
+                  {selectedOrder.services.map((service, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex items-center gap-3 p-3 rounded-lg border ${service.completed ? "bg-green-50 border-green-200" : "bg-white border-gray-200"}`}
+                    >
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${service.completed ? "bg-green-500" : "bg-gray-200"}`}>
+                        {service.completed ? (
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                            <polyline points="20 6 9 17 4 12"/>
+                          </svg>
+                        ) : (
+                          <span className="text-xs font-medium text-gray-500">{idx + 1}</span>
+                        )}
+                      </div>
+                      <span className={`text-sm ${service.completed ? "text-green-700 line-through" : "text-gray-700"}`}>
+                        {service.task}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tracking Number (if shipped) */}
+              {selectedOrder.status === "shipped" && selectedOrder.trackingNumber && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                  <h5 className="text-sm font-medium text-green-800 mb-1 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 12h14"/>
+                      <path d="M12 5l7 7-7 7"/>
+                    </svg>
+                    Tracking Number
+                  </h5>
+                  <p className="text-sm font-mono text-green-700">{selectedOrder.trackingNumber}</p>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-2">
+                {selectedOrder.status !== "shipped" && (
+                  <Button className="flex-1">
+                    Mark Next Step Complete
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedOrder(null)}
+                  className={selectedOrder.status === "shipped" ? "flex-1" : ""}
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <DashboardContent />
+    </Suspense>
+  );
+}
