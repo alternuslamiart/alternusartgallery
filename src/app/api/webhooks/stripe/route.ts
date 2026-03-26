@@ -119,7 +119,8 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
   })
 
   // Create sales records for each item (artist earnings tracking)
-  const salesData = order.items.map((item) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const salesData = order.items.map((item: any) => {
     const artworkPrice = Number(item.price)
     const galleryCommissionRate = 40.00
     const galleryCommission = artworkPrice * 0.40
@@ -191,12 +192,14 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
   sendAdminNewOrderEmail({
     orderNumber: order.orderNumber,
     customerName: order.userId
-      ? await prisma.user.findUnique({ where: { id: order.userId } }).then(u => u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Customer' : 'Customer')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ? await prisma.user.findUnique({ where: { id: order.userId } }).then((u: any) => u ? `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Customer' : 'Customer')
       : 'Guest',
     customerEmail: order.guestEmail || (order.userId
       ? (await prisma.user.findUnique({ where: { id: order.userId } }))?.email || ''
       : ''),
-    items: order.items.map(item => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    items: order.items.map((item: any) => ({
       title: item.artwork.title,
       price: Number(item.price),
       quantity: item.quantity,

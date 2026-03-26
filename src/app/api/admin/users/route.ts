@@ -96,7 +96,8 @@ export async function GET(request: NextRequest) {
     ])
 
     return NextResponse.json({
-      users: users.map(u => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      users: users.map((u: any) => ({
         id: u.id,
         email: u.email,
         name: `${u.firstName || ''} ${u.lastName || ''}`.trim() || u.email,

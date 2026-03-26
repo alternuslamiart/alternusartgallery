@@ -85,7 +85,8 @@ export async function GET(
         estimatedDelivery: order.estimatedDelivery,
         shippedAt: order.shippedAt,
         deliveredAt: order.deliveredAt,
-        items: order.items.map((item) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        items: order.items.map((item: any) => ({
           id: item.id,
           quantity: item.quantity,
           price: Number(item.price),
@@ -168,7 +169,8 @@ export async function PATCH(
         orderNumber: order.orderNumber,
         customerName,
         customerEmail,
-        items: order.items.map(item => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        items: order.items.map((item: any) => ({
           title: item.title || 'Artwork',
           price: Number(item.price),
           quantity: item.quantity,

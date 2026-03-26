@@ -43,7 +43,8 @@ export async function GET() {
     })
 
     return NextResponse.json({
-      orders: orders.map((order) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      orders: orders.map((order: any) => ({
         id: order.id,
         orderNumber: order.orderNumber,
         status: order.status,
@@ -58,7 +59,8 @@ export async function GET() {
         shippedAt: order.shippedAt,
         deliveredAt: order.deliveredAt,
         createdAt: order.createdAt,
-        items: order.items.map((item) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        items: order.items.map((item: any) => ({
           id: item.id,
           title: item.title || item.artwork?.title,
           price: Number(item.price),

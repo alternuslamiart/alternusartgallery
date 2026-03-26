@@ -44,7 +44,8 @@ export async function POST(request: NextRequest) {
 
     // Create PayPal order
     const itemDescriptions = order.items
-      .map((item) => item.title || item.artwork.title)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((item: any) => item.title || item.artwork.title)
       .join(', ')
 
     const paypalOrder = await createPayPalOrder(

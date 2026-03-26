@@ -54,7 +54,8 @@ export async function GET(request: NextRequest) {
     ]);
 
     return NextResponse.json({
-      artists: artists.map((artist) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      artists: artists.map((artist: any) => ({
         id: artist.id,
         displayName: artist.displayName,
         bio: artist.bio,

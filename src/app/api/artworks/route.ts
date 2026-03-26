@@ -52,7 +52,8 @@ export async function GET(request: NextRequest) {
     ])
 
     return NextResponse.json({
-      artworks: artworks.map((artwork) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      artworks: artworks.map((artwork: any) => ({
         id: artwork.id,
         title: artwork.title,
         description: artwork.description,

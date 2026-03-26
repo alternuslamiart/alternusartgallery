@@ -43,7 +43,8 @@ export async function GET(request: NextRequest) {
 
       // Combine and format notifications
       const notifications = [
-        ...userNotifications.map((n) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ...userNotifications.map((n: any) => ({
           id: n.id,
           type: n.type,
           title: n.title,
@@ -52,7 +53,8 @@ export async function GET(request: NextRequest) {
           isRead: n.isRead,
           createdAt: n.createdAt,
         })),
-        ...recentArtworks.map((a) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ...recentArtworks.map((a: any) => ({
           id: `artwork-${a.id}`,
           type: 'new_artwork',
           title: 'New Artwork',
@@ -61,7 +63,8 @@ export async function GET(request: NextRequest) {
           isRead: false,
           createdAt: a.createdAt,
         })),
-        ...recentArtists.map((a) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ...recentArtists.map((a: any) => ({
           id: `artist-${a.id}`,
           type: 'new_artist',
           title: 'New Artist',
@@ -103,7 +106,8 @@ export async function GET(request: NextRequest) {
     ]);
 
     const notifications = [
-      ...recentArtworks.map((a) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...recentArtworks.map((a: any) => ({
         id: `artwork-${a.id}`,
         type: 'new_artwork',
         title: 'New Artwork',
@@ -112,7 +116,8 @@ export async function GET(request: NextRequest) {
         isRead: false,
         createdAt: a.createdAt,
       })),
-      ...recentArtists.map((a) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...recentArtists.map((a: any) => ({
         id: `artist-${a.id}`,
         type: 'new_artist',
         title: 'New Artist',

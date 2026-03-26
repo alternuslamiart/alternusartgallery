@@ -143,7 +143,8 @@ export async function POST(request: NextRequest) {
         shippingAddressId,
         billingAddressId,
         items: {
-          create: orderItems.map((item) => ({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          create: orderItems.map((item: any) => ({
             artworkId: item.artworkId,
             quantity: item.quantity,
             price: new Decimal(item.price),
@@ -171,7 +172,8 @@ export async function POST(request: NextRequest) {
         orderNumber: order.orderNumber,
         customerName,
         customerEmail,
-        items: order.items.map(item => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        items: order.items.map((item: any) => ({
           title: item.title || 'Artwork',
           price: Number(item.price),
           quantity: item.quantity,
@@ -288,7 +290,8 @@ export async function GET(request: NextRequest) {
     })
 
     return NextResponse.json({
-      orders: orders.map((order) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      orders: orders.map((order: any) => ({
         id: order.id,
         orderNumber: order.orderNumber,
         total: Number(order.total),

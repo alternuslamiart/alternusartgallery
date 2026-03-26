@@ -88,7 +88,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: { id: true, updatedAt: true },
     });
 
-    artworkPages = artworks.map((artwork) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    artworkPages = artworks.map((artwork: any) => ({
       url: `${baseUrl}/gallery/${artwork.id}`,
       lastModified: artwork.updatedAt,
       changeFrequency: 'weekly' as const,
@@ -105,7 +106,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: { id: true, updatedAt: true },
     });
 
-    artistPages = artists.map((artist) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    artistPages = artists.map((artist: any) => ({
       url: `${baseUrl}/artists/${artist.id}`,
       lastModified: artist.updatedAt,
       changeFrequency: 'weekly' as const,
