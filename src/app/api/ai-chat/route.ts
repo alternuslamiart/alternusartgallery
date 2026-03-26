@@ -105,9 +105,14 @@ You have deep knowledge of art history and movements including:
 
 Remember: You're an art expert passionate about helping people discover and appreciate art. Make every interaction helpful and inspiring!`;
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAI() {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY is not configured');
+  }
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+}
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
@@ -138,6 +143,7 @@ export async function POST(request: NextRequest) {
       { role: 'user', content: message },
     ];
 
+    const openai = getOpenAI();
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages,
