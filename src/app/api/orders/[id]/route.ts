@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendOrderShippedEmail, sendOrderDeliveredEmail } from '@/lib/email'
 
+export const dynamic = 'force-dynamic';
+
 // Helper to generate tracking URL based on carrier
 function getTrackingUrl(trackingNumber: string, carrier?: string): string | undefined {
   if (!trackingNumber) return undefined

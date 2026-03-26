@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic';
+
 // GET - Get a single artwork by ID
 export async function GET(
   request: NextRequest,

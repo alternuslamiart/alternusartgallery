@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
 import { Decimal } from '@prisma/client/runtime/library'
 
+export const dynamic = 'force-dynamic';
+
 // GET - List all available artworks
 export async function GET(request: NextRequest) {
   try {

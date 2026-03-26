@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic';
+
 // PATCH - Update artwork (admin only, no user check required)
 export async function PATCH(
   request: NextRequest,

@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma'
 import { Decimal } from '@prisma/client/runtime/library'
 import { sendOrderConfirmationEmail } from '@/lib/email'
 
+export const dynamic = 'force-dynamic';
+
 // Generate unique order number
 function generateOrderNumber(): string {
   const timestamp = Date.now().toString(36).toUpperCase()

@@ -3,6 +3,8 @@ import { headers } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { verifyWebhookSignature } from '@/lib/paypal'
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   const body = await request.text()
   const headersList = await headers()

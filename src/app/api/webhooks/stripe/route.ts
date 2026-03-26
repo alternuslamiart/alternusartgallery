@@ -6,6 +6,8 @@ import { sendAdminNewOrderEmail } from '@/lib/email'
 import { Decimal } from '@prisma/client/runtime/library'
 import Stripe from 'stripe'
 
+export const dynamic = 'force-dynamic';
+
 // Generate unique transaction ID
 function generateTransactionId(): string {
   const timestamp = Date.now().toString(36).toUpperCase()
