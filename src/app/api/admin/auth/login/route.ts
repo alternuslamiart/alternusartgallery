@@ -26,7 +26,19 @@ export async function POST(request: NextRequest) {
 
     // Validate credentials
     const inputEmail = email?.trim().toLowerCase();
-    const inputPassword = password;
+    const inputPassword = password?.toString() || '';
+
+    // Debug logging (temporary)
+    console.log('Admin login attempt:', {
+      inputEmail,
+      expectedEmail: ADMIN_EMAIL.toLowerCase(),
+      emailMatch: inputEmail === ADMIN_EMAIL.toLowerCase(),
+      inputPwdLength: inputPassword.length,
+      expectedPwdLength: ADMIN_PASSWORD.length,
+      pwdMatch: inputPassword === ADMIN_PASSWORD,
+      envEmailSet: !!process.env.ADMIN_EMAIL,
+      envPwdSet: !!process.env.ADMIN_PASSWORD,
+    });
 
     if (inputEmail !== ADMIN_EMAIL.toLowerCase() || inputPassword !== ADMIN_PASSWORD) {
       return NextResponse.json(
