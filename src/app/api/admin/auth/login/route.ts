@@ -20,43 +20,27 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password } = body;
 
-    // Read credentials at runtime (not build time)
-    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@alternusart.com';
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Alternus333#';
-
     // Validate credentials
-    const inputEmail = email?.trim().toLowerCase();
-    const inputPassword = password?.toString() || '';
+    const inputEmail = (email || '').trim().toLowerCase();
+    const inputPassword = (password || '').toString();
 
-    // Debug logging (temporary)
-    console.log('Admin login attempt:', {
-      inputEmail,
-      expectedEmail: ADMIN_EMAIL.toLowerCase(),
-      emailMatch: inputEmail === ADMIN_EMAIL.toLowerCase(),
-      inputPwdLength: inputPassword.length,
-      expectedPwdLength: ADMIN_PASSWORD.length,
-      pwdMatch: inputPassword === ADMIN_PASSWORD,
-      envEmailSet: !!process.env.ADMIN_EMAIL,
-      envPwdSet: !!process.env.ADMIN_PASSWORD,
-    });
+    // Check against env vars first, then fallback hardcoded credentials
+    const envEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+    const envPassword = (process.env.ADMIN_PASSWORD || '').trim();
 
-    if (inputEmail !== ADMIN_EMAIL.toLowerCase() || inputPassword !== ADMIN_PASSWORD) {
+    // Hardcoded fallback credentials
+    const fallbackEmail = 'admin@alternusart.com';
+    const fallbackPassword = 'Alternus333#';
+
+    const matchesEnv = envEmail && envPassword &&
+      inputEmail === envEmail && inputPassword === envPassword;
+
+    const matchesFallback =
+      inputEmail === fallbackEmail && inputPassword === fallbackPassword;
+
+    if (!matchesEnv && !matchesFallback) {
       return NextResponse.json(
-        {
-          error: 'Invalid email or password',
-          debug: {
-            inputEmail,
-            expectedEmail: ADMIN_EMAIL.toLowerCase(),
-            emailMatch: inputEmail === ADMIN_EMAIL.toLowerCase(),
-            inputPwdLength: inputPassword.length,
-            expectedPwdLength: ADMIN_PASSWORD.length,
-            pwdMatch: inputPassword === ADMIN_PASSWORD,
-            envEmailSet: !!process.env.ADMIN_EMAIL,
-            envPwdSet: !!process.env.ADMIN_PASSWORD,
-            expectedPwdFirst3: ADMIN_PASSWORD.substring(0, 3) + '***',
-            inputPwdFirst3: inputPassword.substring(0, 3) + '***',
-          }
-        },
+        { error: 'Invalid email or password' },
         { status: 401 }
       );
     }
