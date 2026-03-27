@@ -386,6 +386,255 @@ export default function ReportsPage() {
     printWindow.document.close();
   };
 
+  const handleExportCOA = () => {
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    const reportDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    const reportYear = new Date().getFullYear();
+    const certNumber = "AAG-COA-" + reportYear + "-" + String(Math.floor(Math.random() * 9000) + 1000);
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Certificate of Authenticity - ${certNumber}</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: 'Georgia', 'Times New Roman', serif; color: #1a1a1a; background: #fff; }
+            .page {
+              width: 100%; min-height: 100vh; padding: 40px;
+              display: flex; align-items: center; justify-content: center;
+            }
+            .certificate {
+              width: 100%; max-width: 720px; position: relative;
+              border: 3px solid #111; padding: 8px;
+            }
+            .certificate-inner {
+              border: 1px solid #999; padding: 48px 52px;
+              position: relative;
+            }
+
+            /* Corner ornaments */
+            .corner { position: absolute; width: 32px; height: 32px; }
+            .corner-tl { top: 8px; left: 8px; border-top: 2px solid #8B7355; border-left: 2px solid #8B7355; }
+            .corner-tr { top: 8px; right: 8px; border-top: 2px solid #8B7355; border-right: 2px solid #8B7355; }
+            .corner-bl { bottom: 8px; left: 8px; border-bottom: 2px solid #8B7355; border-left: 2px solid #8B7355; }
+            .corner-br { bottom: 8px; right: 8px; border-bottom: 2px solid #8B7355; border-right: 2px solid #8B7355; }
+
+            /* Header */
+            .cert-header { text-align: center; margin-bottom: 36px; }
+            .cert-logo { font-family: 'Segoe UI', Arial, sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 6px; color: #111; }
+            .cert-logo-sub { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; letter-spacing: 5px; color: #888; margin-top: 2px; }
+            .cert-divider { width: 80px; height: 1px; background: #8B7355; margin: 20px auto; }
+            .cert-title {
+              font-size: 26px; font-weight: 400; letter-spacing: 4px;
+              text-transform: uppercase; color: #111; margin-bottom: 4px;
+            }
+            .cert-subtitle { font-size: 11px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
+
+            /* Body */
+            .cert-body { text-align: center; margin-bottom: 32px; }
+            .cert-statement {
+              font-size: 12px; color: #444; line-height: 1.9;
+              max-width: 540px; margin: 0 auto 28px;
+            }
+
+            /* Details grid */
+            .details-grid {
+              display: grid; grid-template-columns: 1fr 1fr;
+              gap: 0; margin: 28px 0;
+              border: 1px solid #ddd; border-radius: 4px; overflow: hidden;
+            }
+            .detail-item {
+              padding: 14px 18px;
+              border-bottom: 1px solid #eee;
+            }
+            .detail-item:nth-child(odd) { border-right: 1px solid #eee; }
+            .detail-item:nth-last-child(-n+2) { border-bottom: none; }
+            .detail-label {
+              font-family: 'Segoe UI', Arial, sans-serif;
+              font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px;
+              color: #999; font-weight: 600; margin-bottom: 4px;
+            }
+            .detail-value {
+              font-size: 13px; color: #111; font-weight: 500;
+            }
+            .detail-value.placeholder {
+              color: #bbb; border-bottom: 1px dashed #ccc;
+              display: inline-block; min-width: 160px; padding-bottom: 2px;
+            }
+
+            /* Warranty */
+            .warranty {
+              background: #fafaf8; border: 1px solid #e8e6e0; border-radius: 4px;
+              padding: 16px 20px; margin: 24px 0; text-align: left;
+            }
+            .warranty-title {
+              font-family: 'Segoe UI', Arial, sans-serif;
+              font-size: 9px; font-weight: 700; text-transform: uppercase;
+              letter-spacing: 1.5px; color: #8B7355; margin-bottom: 6px;
+            }
+            .warranty-text { font-size: 10px; color: #666; line-height: 1.7; }
+
+            /* Signatures */
+            .signatures {
+              display: grid; grid-template-columns: 1fr 1fr 1fr;
+              gap: 32px; margin-top: 36px; text-align: center;
+            }
+            .sig-block { padding-top: 8px; }
+            .sig-line { border-bottom: 1px solid #333; margin-bottom: 8px; height: 40px; }
+            .sig-name { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; font-weight: 600; color: #333; }
+            .sig-role { font-family: 'Segoe UI', Arial, sans-serif; font-size: 8px; color: #999; margin-top: 2px; }
+
+            /* Footer */
+            .cert-footer {
+              text-align: center; margin-top: 28px; padding-top: 16px;
+              border-top: 1px solid #eee;
+            }
+            .cert-number {
+              font-family: 'Segoe UI', Arial, sans-serif;
+              font-size: 9px; letter-spacing: 2px; color: #999;
+            }
+            .cert-url {
+              font-family: 'Segoe UI', Arial, sans-serif;
+              font-size: 8px; color: #bbb; margin-top: 4px;
+            }
+
+            /* Seal */
+            .seal {
+              width: 72px; height: 72px; border: 2px solid #8B7355;
+              border-radius: 50%; margin: 0 auto 16px;
+              display: flex; align-items: center; justify-content: center;
+              flex-direction: column;
+            }
+            .seal-text {
+              font-family: 'Segoe UI', Arial, sans-serif;
+              font-size: 7px; text-transform: uppercase; letter-spacing: 1.5px;
+              color: #8B7355; font-weight: 700;
+            }
+            .seal-year { font-size: 16px; font-weight: 800; color: #8B7355; }
+
+            @media print {
+              .page { padding: 20px; }
+              .certificate { max-width: 100%; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="page">
+            <div class="certificate">
+              <div class="certificate-inner">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+
+                <div class="cert-header">
+                  <div class="cert-logo">ALTERNUS</div>
+                  <div class="cert-logo-sub">ART GALLERY</div>
+                  <div class="cert-divider"></div>
+                  <div class="cert-title">Certificate of Authenticity</div>
+                  <div class="cert-subtitle">Original Artwork Verification</div>
+                </div>
+
+                <div class="cert-body">
+                  <div class="seal">
+                    <div class="seal-text">AAG</div>
+                    <div class="seal-year">${reportYear}</div>
+                    <div class="seal-text">Verified</div>
+                  </div>
+
+                  <div class="cert-statement">
+                    This document certifies that the artwork described below is an authentic,
+                    original work of art. Alternus Art Gallery guarantees the provenance,
+                    authenticity, and originality of this piece as represented by the artist
+                    and verified through the Gallery's authentication process.
+                  </div>
+
+                  <div class="details-grid">
+                    <div class="detail-item">
+                      <div class="detail-label">Title of Artwork</div>
+                      <div class="detail-value placeholder">&nbsp;</div>
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">Artist Name</div>
+                      <div class="detail-value placeholder">&nbsp;</div>
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">Medium</div>
+                      <div class="detail-value placeholder">&nbsp;</div>
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">Dimensions</div>
+                      <div class="detail-value placeholder">&nbsp;</div>
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">Year of Creation</div>
+                      <div class="detail-value placeholder">&nbsp;</div>
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">Edition</div>
+                      <div class="detail-value">Original — 1 of 1</div>
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">Date of Sale</div>
+                      <div class="detail-value placeholder">&nbsp;</div>
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">Certificate Number</div>
+                      <div class="detail-value">${certNumber}</div>
+                    </div>
+                  </div>
+
+                  <div class="warranty">
+                    <div class="warranty-title">Guarantee of Authenticity</div>
+                    <div class="warranty-text">
+                      Alternus Art Gallery warrants that this artwork is an original creation by the named artist.
+                      This certificate serves as a permanent record of authenticity and provenance. The Gallery has
+                      conducted due diligence to verify the artwork's originality, condition, and attribution.
+                      This certificate is non-transferable without the artwork and should be stored securely
+                      alongside proof of purchase. In the event of a dispute regarding authenticity, AAG will
+                      conduct a review and, if the work is found to be inauthentic, a full refund will be issued
+                      in accordance with the Gallery's W-7 Policy Document.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="signatures">
+                  <div class="sig-block">
+                    <div class="sig-line"></div>
+                    <div class="sig-name">Artist Signature</div>
+                    <div class="sig-role">Creator</div>
+                  </div>
+                  <div class="sig-block">
+                    <div class="sig-line"></div>
+                    <div class="sig-name">Gallery Director</div>
+                    <div class="sig-role">Alternus Art Gallery</div>
+                  </div>
+                  <div class="sig-block">
+                    <div class="sig-line"></div>
+                    <div class="sig-name">Date of Issue</div>
+                    <div class="sig-role">${reportDate}</div>
+                  </div>
+                </div>
+
+                <div class="cert-footer">
+                  <div class="cert-number">Certificate No. ${certNumber}</div>
+                  <div class="cert-url">alternusart.com — Exclusive Original Artworks</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <script>window.onload = function() { window.print(); }</script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50">
       {/* Navigation */}
@@ -553,6 +802,23 @@ export default function ReportsPage() {
                   <polyline points="10 9 9 9 8 9" />
                 </svg>
                 Export PDF
+              </Button>
+              <Button onClick={handleExportCOA} variant="outline" className="gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+                Certificate (COA)
               </Button>
             </div>
           </div>
