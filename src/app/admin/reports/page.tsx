@@ -61,182 +61,322 @@ export default function ReportsPage() {
   };
 
   const handleExportPDF = () => {
-    // Create a printable version of the report
     const printWindow = window.open("", "_blank");
     if (!printWindow) return;
+
+    const reportDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    const reportYear = new Date().getFullYear();
 
     const html = `
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Financial Report - ${new Date().toLocaleDateString()}</title>
+          <title>AAG Report - ${reportDate}</title>
           <style>
-            body {
-              font-family: Arial, sans-serif;
-              padding: 40px;
-              color: #000;
-            }
-            h1 {
-              color: #000;
-              border-bottom: 3px solid #000;
-              padding-bottom: 10px;
-            }
-            h2 {
-              color: #333;
-              margin-top: 30px;
-              border-bottom: 2px solid #eee;
-              padding-bottom: 8px;
-            }
-            .stats-grid {
-              display: grid;
-              grid-template-columns: repeat(3, 1fr);
-              gap: 20px;
-              margin: 20px 0;
-            }
-            .stat-card {
-              border: 1px solid #ddd;
-              padding: 20px;
-              border-radius: 8px;
-            }
-            .stat-label {
-              font-size: 12px;
-              color: #666;
-            }
-            .stat-value {
-              font-size: 24px;
-              font-weight: bold;
-              margin: 5px 0;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              margin: 20px 0;
-            }
-            th, td {
-              border: 1px solid #ddd;
-              padding: 12px;
-              text-align: left;
-            }
-            th {
-              background-color: #f5f5f5;
-              font-weight: bold;
-            }
-            .footer {
-              margin-top: 40px;
-              padding-top: 20px;
-              border-top: 1px solid #ddd;
-              font-size: 12px;
-              color: #666;
-            }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a1a; font-size: 11px; line-height: 1.5; }
+            .page { width: 100%; min-height: 100vh; padding: 48px 56px; position: relative; page-break-after: always; }
+            .page:last-child { page-break-after: auto; }
+
+            /* Header bar */
+            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 2px solid #111; }
+            .logo { font-size: 22px; font-weight: 800; letter-spacing: 3px; color: #111; }
+            .logo-sub { font-size: 9px; letter-spacing: 4px; color: #666; margin-top: 2px; }
+            .doc-info { text-align: right; font-size: 9px; color: #666; line-height: 1.6; }
+            .doc-title { font-size: 13px; font-weight: 700; color: #111; }
+
+            /* Sections */
+            .section { margin-bottom: 22px; }
+            .section-title { font-size: 13px; font-weight: 700; color: #111; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+            .section-text { font-size: 10.5px; color: #333; line-height: 1.7; margin-bottom: 8px; text-align: justify; }
+            .subsection { font-size: 11px; font-weight: 700; color: #222; margin: 12px 0 6px 0; }
+
+            /* Policy list */
+            .policy-list { padding-left: 18px; margin-bottom: 10px; }
+            .policy-list li { font-size: 10.5px; color: #333; line-height: 1.7; margin-bottom: 4px; }
+            .policy-list li strong { color: #111; }
+
+            /* Stats grid */
+            .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
+            .stat-card { border: 1px solid #e0e0e0; border-radius: 6px; padding: 14px; background: #fafafa; }
+            .stat-label { font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.8px; color: #888; font-weight: 600; }
+            .stat-value { font-size: 20px; font-weight: 800; color: #111; margin: 4px 0 2px; }
+            .stat-sub { font-size: 8.5px; color: #999; }
+
+            /* Tables */
+            table { width: 100%; border-collapse: collapse; margin: 10px 0 16px; font-size: 10px; }
+            th { background: #111; color: #fff; padding: 8px 10px; text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+            td { padding: 7px 10px; border-bottom: 1px solid #eee; }
+            tr:nth-child(even) td { background: #f9f9f9; }
+            .text-right { text-align: right; }
+            .text-center { text-align: center; }
+            .font-bold { font-weight: 700; }
+
+            /* Summary row */
+            .summary-row td { background: #f0f0f0 !important; font-weight: 700; border-top: 2px solid #111; }
+
+            /* Footer */
+            .page-footer { position: absolute; bottom: 32px; left: 56px; right: 56px; display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #ddd; font-size: 8px; color: #999; }
+
+            /* Two column */
+            .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+            /* Signature */
+            .signature-block { margin-top: 24px; padding-top: 16px; border-top: 1px solid #ddd; }
+            .sig-line { width: 200px; border-bottom: 1px solid #333; margin: 24px 0 6px; }
+            .sig-label { font-size: 9px; color: #666; }
+
+            /* Badge */
+            .badge { display: inline-block; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 3px 8px; border-radius: 3px; }
+            .badge-dark { background: #111; color: #fff; }
+            .badge-outline { border: 1px solid #999; color: #666; }
+
             @media print {
-              body { padding: 20px; }
-              .no-print { display: none; }
+              .page { padding: 36px 44px; }
+              .page-footer { bottom: 24px; left: 44px; right: 44px; }
             }
           </style>
         </head>
         <body>
-          <h1>Alternus Art Gallery (AAG) - Financial Report</h1>
-          <p>Generated on: ${new Date().toLocaleString()}</p>
 
-          <h2>Key Metrics</h2>
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-label">Total Revenue</div>
-              <div class="stat-value">€${stats.totalRevenue.toLocaleString()}</div>
-              <div class="stat-label">${stats.totalSales} total sales</div>
+          <!-- PAGE 1: W-7 GALLERY POLICY -->
+          <div class="page">
+            <div class="header">
+              <div>
+                <div class="logo">ALTERNUS</div>
+                <div class="logo-sub">ART GALLERY</div>
+              </div>
+              <div class="doc-info">
+                <div class="doc-title">W-7 Gallery Policy Document</div>
+                <div>Document No: AAG-W7-${reportYear}-001</div>
+                <div>Effective Date: January 1, ${reportYear}</div>
+                <div>Last Revised: ${reportDate}</div>
+                <div style="margin-top:4px"><span class="badge badge-dark">CONFIDENTIAL</span></div>
+              </div>
             </div>
-            <div class="stat-card">
-              <div class="stat-label">Gallery Commission (40%)</div>
-              <div class="stat-value">€${stats.totalCommission.toLocaleString()}</div>
-              <div class="stat-label">Avg €${stats.avgCommission}/sale</div>
+
+            <div class="section">
+              <div class="section-title">1. Purpose & Scope</div>
+              <div class="section-text">
+                This W-7 Policy Document establishes the comprehensive governance framework for Alternus Art Gallery (hereinafter "AAG" or "the Gallery"). It defines the terms, conditions, and operational standards governing all commercial activities between the Gallery, its represented artists, buyers, and affiliated third parties. This policy applies to all original artworks, prints, commissions, and digital art transactions facilitated through the Gallery's physical and digital platforms, including alternusart.com.
+              </div>
             </div>
-            <div class="stat-card">
-              <div class="stat-label">Artist Earnings (60%)</div>
-              <div class="stat-value">€${stats.totalArtistEarnings.toLocaleString()}</div>
-              <div class="stat-label">Paid to artists</div>
+
+            <div class="section">
+              <div class="section-title">2. Commission Structure & Revenue Distribution</div>
+              <div class="section-text">
+                All sales conducted through the Gallery shall be subject to the following commission framework, applicable to original artworks, prints, and commissioned pieces:
+              </div>
+              <ul class="policy-list">
+                <li><strong>Gallery Commission:</strong> 40% of the final sale price, retained by AAG to cover operational costs, marketing, platform maintenance, secure payment processing, and international logistics coordination.</li>
+                <li><strong>Artist Earnings:</strong> 60% of the final sale price, disbursed to the artist within 14 business days following confirmed receipt of payment and expiration of the buyer's return window.</li>
+                <li><strong>Custom Commissions:</strong> Commission rates for bespoke or commissioned works shall be negotiated on a case-by-case basis, with a minimum gallery share of 25%.</li>
+                <li><strong>Promotional Sales:</strong> During gallery-initiated promotions or seasonal campaigns, adjusted commission splits may apply as mutually agreed upon in writing.</li>
+              </ul>
+            </div>
+
+            <div class="section">
+              <div class="section-title">3. Artist Representation & Obligations</div>
+              <div class="section-text">
+                Artists represented by AAG are required to adhere to the following standards and obligations throughout the duration of their partnership:
+              </div>
+              <ul class="policy-list">
+                <li><strong>Authenticity Guarantee:</strong> All submitted artworks must be original creations. Artists warrant full intellectual property ownership and grant AAG non-exclusive rights to display, market, and sell their work through Gallery channels.</li>
+                <li><strong>Quality Standards:</strong> Artworks must meet professional standards regarding material quality, presentation, and packaging. The Gallery reserves the right to decline works that do not meet established quality criteria.</li>
+                <li><strong>Exclusivity:</strong> Unless otherwise stated in the artist's agreement, works listed on AAG may be simultaneously offered through other channels, provided pricing remains consistent to protect market integrity.</li>
+                <li><strong>Tax Compliance:</strong> Artists are solely responsible for reporting earnings and complying with applicable local, national, and international tax regulations. AAG may issue summary earning statements upon request.</li>
+              </ul>
+            </div>
+
+            <div class="section">
+              <div class="section-title">4. Buyer Terms & Conditions</div>
+              <ul class="policy-list">
+                <li><strong>Pricing:</strong> All prices listed on the Gallery are in EUR (€) unless otherwise indicated. Prices include the artwork only; framing, shipping, and applicable taxes are calculated separately at checkout.</li>
+                <li><strong>Returns:</strong> Buyers may return an artwork within 14 days of confirmed delivery, provided it is in its original condition and packaging. Custom commissions and pre-orders are non-refundable once production has commenced.</li>
+                <li><strong>Shipping:</strong> AAG offers complimentary worldwide shipping on original artworks. Delivery timelines range from 5–15 business days depending on destination. All shipments are insured and tracked.</li>
+                <li><strong>Authentication:</strong> Each original artwork sold through AAG is accompanied by a Certificate of Authenticity (COA) signed by the artist, verifying provenance and originality.</li>
+                <li><strong>Payment:</strong> The Gallery accepts payments via PayPal and major credit/debit cards through secure, PCI-compliant payment processing infrastructure.</li>
+              </ul>
+            </div>
+
+            <div class="section">
+              <div class="section-title">5. Privacy, Data Protection & Intellectual Property</div>
+              <div class="section-text">
+                AAG is committed to safeguarding the personal data of all users in compliance with the General Data Protection Regulation (GDPR) and applicable data protection laws. Personal information collected during transactions is processed solely for order fulfillment, communication, and service improvement. Data is never sold to third parties. All artwork images, descriptions, and branding materials on the Gallery's platforms are protected by copyright law and may not be reproduced without express written consent from AAG.
+              </div>
+            </div>
+
+            <div class="two-col">
+              <div class="signature-block">
+                <div class="sig-line"></div>
+                <div class="sig-label">Authorized Signature — Gallery Director</div>
+                <div style="font-size:9px;color:#999;margin-top:4px">Alternus Art Gallery</div>
+              </div>
+              <div class="signature-block">
+                <div class="sig-line"></div>
+                <div class="sig-label">Date</div>
+              </div>
+            </div>
+
+            <div class="page-footer">
+              <div>Alternus Art Gallery (AAG) — W-7 Policy Document — Confidential</div>
+              <div>Page 1 of 2</div>
             </div>
           </div>
 
-          <h2>Monthly Revenue Trend</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Month</th>
-                <th>Sales</th>
-                <th>Revenue</th>
-                <th>Commission (40%)</th>
-                <th>Artist Earnings (60%)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${monthlyData.map(d => `
-                <tr>
-                  <td>${d.month}</td>
-                  <td>${d.sales}</td>
-                  <td>€${d.revenue.toLocaleString()}</td>
-                  <td>€${d.commission.toLocaleString()}</td>
-                  <td>€${(d.revenue - d.commission).toLocaleString()}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+          <!-- PAGE 2: FINANCIAL REPORT -->
+          <div class="page">
+            <div class="header">
+              <div>
+                <div class="logo">ALTERNUS</div>
+                <div class="logo-sub">ART GALLERY</div>
+              </div>
+              <div class="doc-info">
+                <div class="doc-title">Financial Performance Report</div>
+                <div>Report Period: FY ${reportYear}</div>
+                <div>Generated: ${reportDate}</div>
+                <div style="margin-top:4px"><span class="badge badge-outline">INTERNAL USE</span></div>
+              </div>
+            </div>
 
-          <h2>Top Performing Artists</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Artist</th>
-                <th>Sales</th>
-                <th>Revenue</th>
-                <th>Commission</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${topArtists.map((artist, i) => `
-                <tr>
-                  <td>${i + 1}</td>
-                  <td>${artist.name}</td>
-                  <td>${artist.sales}</td>
-                  <td>€${artist.revenue.toLocaleString()}</td>
-                  <td>€${artist.commission.toLocaleString()}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+            <div class="section">
+              <div class="section-title">Executive Summary</div>
+              <div class="section-text">
+                This report provides a comprehensive overview of Alternus Art Gallery's financial performance for the fiscal year ${reportYear}. It includes key revenue metrics, commission analysis, artist performance rankings, and category-level sales distribution. All figures are reported in EUR (€) and reflect the Gallery's standard 40/60 commission model.
+              </div>
+            </div>
 
-          <h2>Sales by Category</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Category</th>
-                <th>Sales</th>
-                <th>Percentage</th>
-                <th>Revenue</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${categoryBreakdown.map(cat => `
-                <tr>
-                  <td>${cat.category}</td>
-                  <td>${cat.sales}</td>
-                  <td>${cat.percentage}%</td>
-                  <td>€${cat.revenue.toLocaleString()}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
+            <div class="section">
+              <div class="section-title">Key Financial Metrics</div>
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-label">Gross Revenue</div>
+                  <div class="stat-value">€${stats.totalRevenue.toLocaleString()}</div>
+                  <div class="stat-sub">${stats.totalSales} transactions</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Gallery Commission (40%)</div>
+                  <div class="stat-value">€${stats.totalCommission.toLocaleString()}</div>
+                  <div class="stat-sub">Avg €${stats.avgCommission}/transaction</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Artist Disbursements (60%)</div>
+                  <div class="stat-value">€${stats.totalArtistEarnings.toLocaleString()}</div>
+                  <div class="stat-sub">Net paid to artists</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Avg. Transaction Value</div>
+                  <div class="stat-value">€${stats.avgSalePrice.toLocaleString()}</div>
+                  <div class="stat-sub">Per sale average</div>
+                </div>
+              </div>
+            </div>
 
-          <div class="footer">
-            <p><strong>Alternus Art Gallery (AAG)</strong> | Commission Model: 40% Gallery / 60% Artist</p>
-            <p>This is an automatically generated financial report.</p>
+            <div class="section">
+              <div class="section-title">Monthly Revenue Breakdown</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Month</th>
+                    <th class="text-center">Transactions</th>
+                    <th class="text-right">Gross Revenue</th>
+                    <th class="text-right">Commission (40%)</th>
+                    <th class="text-right">Artist Payout (60%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${monthlyData.length > 0 ? monthlyData.map(d => \`
+                    <tr>
+                      <td class="font-bold">\${d.month}</td>
+                      <td class="text-center">\${d.sales}</td>
+                      <td class="text-right">€\${d.revenue.toLocaleString()}</td>
+                      <td class="text-right">€\${d.commission.toLocaleString()}</td>
+                      <td class="text-right">€\${(d.revenue - d.commission).toLocaleString()}</td>
+                    </tr>
+                  \`).join('') : \`
+                    <tr><td colspan="5" class="text-center" style="color:#999;padding:16px;">No transaction data recorded for this period.</td></tr>
+                  \`}
+                  ${monthlyData.length > 0 ? \`
+                    <tr class="summary-row">
+                      <td>TOTAL</td>
+                      <td class="text-center">\${stats.totalSales}</td>
+                      <td class="text-right">€\${stats.totalRevenue.toLocaleString()}</td>
+                      <td class="text-right">€\${stats.totalCommission.toLocaleString()}</td>
+                      <td class="text-right">€\${stats.totalArtistEarnings.toLocaleString()}</td>
+                    </tr>
+                  \` : ''}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="two-col">
+              <div class="section">
+                <div class="section-title">Top Performing Artists</div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Artist</th>
+                      <th class="text-center">Sales</th>
+                      <th class="text-right">Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${topArtists.length > 0 ? topArtists.map((artist, i) => \`
+                      <tr>
+                        <td class="font-bold">\${i + 1}</td>
+                        <td>\${artist.name}</td>
+                        <td class="text-center">\${artist.sales}</td>
+                        <td class="text-right">€\${artist.revenue.toLocaleString()}</td>
+                      </tr>
+                    \`).join('') : \`
+                      <tr><td colspan="4" class="text-center" style="color:#999;padding:12px;">No artist data available.</td></tr>
+                    \`}
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="section">
+                <div class="section-title">Sales by Category</div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th class="text-center">Sales</th>
+                      <th class="text-center">Share</th>
+                      <th class="text-right">Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${categoryBreakdown.length > 0 ? categoryBreakdown.map(cat => \`
+                      <tr>
+                        <td class="font-bold">\${cat.category}</td>
+                        <td class="text-center">\${cat.sales}</td>
+                        <td class="text-center">\${cat.percentage}%</td>
+                        <td class="text-right">€\${cat.revenue.toLocaleString()}</td>
+                      </tr>
+                    \`).join('') : \`
+                      <tr><td colspan="4" class="text-center" style="color:#999;padding:12px;">No category data available.</td></tr>
+                    \`}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div style="margin-top:16px;padding:12px 16px;background:#f5f5f5;border-radius:6px;border-left:3px solid #111;">
+              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#666;margin-bottom:4px;">Disclaimer</div>
+              <div style="font-size:9px;color:#666;line-height:1.6;">
+                This financial report is generated automatically from the Gallery's transaction database and is intended for internal administrative use only. Figures are subject to reconciliation and may not reflect pending transactions, refunds in process, or adjusted commission agreements. For audited financial statements, please consult the Gallery's accounting department.
+              </div>
+            </div>
+
+            <div class="page-footer">
+              <div>Alternus Art Gallery (AAG) — Financial Report FY ${reportYear} — Internal Use Only</div>
+              <div>Page 2 of 2</div>
+            </div>
           </div>
 
-          <script>
-            window.onload = function() {
-              window.print();
-            }
-          </script>
+          <script>window.onload = function() { window.print(); }</script>
         </body>
       </html>
     `;
