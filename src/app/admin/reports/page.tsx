@@ -67,6 +67,43 @@ export default function ReportsPage() {
     const reportDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
     const reportYear = new Date().getFullYear();
 
+    // Pre-build dynamic table rows
+    const monthlyRows = monthlyData.length > 0
+      ? monthlyData.map(d =>
+          "<tr><td class='font-bold'>" + d.month + "</td>" +
+          "<td class='text-center'>" + d.sales + "</td>" +
+          "<td class='text-right'>€" + d.revenue.toLocaleString() + "</td>" +
+          "<td class='text-right'>€" + d.commission.toLocaleString() + "</td>" +
+          "<td class='text-right'>€" + (d.revenue - d.commission).toLocaleString() + "</td></tr>"
+        ).join("")
+      : "<tr><td colspan='5' class='text-center' style='color:#999;padding:16px;'>No transaction data recorded for this period.</td></tr>";
+
+    const monthlySummary = monthlyData.length > 0
+      ? "<tr class='summary-row'><td>TOTAL</td>" +
+        "<td class='text-center'>" + stats.totalSales + "</td>" +
+        "<td class='text-right'>€" + stats.totalRevenue.toLocaleString() + "</td>" +
+        "<td class='text-right'>€" + stats.totalCommission.toLocaleString() + "</td>" +
+        "<td class='text-right'>€" + stats.totalArtistEarnings.toLocaleString() + "</td></tr>"
+      : "";
+
+    const artistRows = topArtists.length > 0
+      ? topArtists.map((artist, i) =>
+          "<tr><td class='font-bold'>" + (i + 1) + "</td>" +
+          "<td>" + artist.name + "</td>" +
+          "<td class='text-center'>" + artist.sales + "</td>" +
+          "<td class='text-right'>€" + artist.revenue.toLocaleString() + "</td></tr>"
+        ).join("")
+      : "<tr><td colspan='4' class='text-center' style='color:#999;padding:12px;'>No artist data available.</td></tr>";
+
+    const categoryRows = categoryBreakdown.length > 0
+      ? categoryBreakdown.map(cat =>
+          "<tr><td class='font-bold'>" + cat.category + "</td>" +
+          "<td class='text-center'>" + cat.sales + "</td>" +
+          "<td class='text-center'>" + cat.percentage + "%</td>" +
+          "<td class='text-right'>€" + cat.revenue.toLocaleString() + "</td></tr>"
+        ).join("")
+      : "<tr><td colspan='4' class='text-center' style='color:#999;padding:12px;'>No category data available.</td></tr>";
+
     const html = `
       <!DOCTYPE html>
       <html>
@@ -285,26 +322,8 @@ export default function ReportsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  ${monthlyData.length > 0 ? monthlyData.map(d => \`
-                    <tr>
-                      <td class="font-bold">\${d.month}</td>
-                      <td class="text-center">\${d.sales}</td>
-                      <td class="text-right">€\${d.revenue.toLocaleString()}</td>
-                      <td class="text-right">€\${d.commission.toLocaleString()}</td>
-                      <td class="text-right">€\${(d.revenue - d.commission).toLocaleString()}</td>
-                    </tr>
-                  \`).join('') : \`
-                    <tr><td colspan="5" class="text-center" style="color:#999;padding:16px;">No transaction data recorded for this period.</td></tr>
-                  \`}
-                  ${monthlyData.length > 0 ? \`
-                    <tr class="summary-row">
-                      <td>TOTAL</td>
-                      <td class="text-center">\${stats.totalSales}</td>
-                      <td class="text-right">€\${stats.totalRevenue.toLocaleString()}</td>
-                      <td class="text-right">€\${stats.totalCommission.toLocaleString()}</td>
-                      <td class="text-right">€\${stats.totalArtistEarnings.toLocaleString()}</td>
-                    </tr>
-                  \` : ''}
+                  ${monthlyRows}
+                  ${monthlySummary}
                 </tbody>
               </table>
             </div>
@@ -322,16 +341,7 @@ export default function ReportsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    ${topArtists.length > 0 ? topArtists.map((artist, i) => \`
-                      <tr>
-                        <td class="font-bold">\${i + 1}</td>
-                        <td>\${artist.name}</td>
-                        <td class="text-center">\${artist.sales}</td>
-                        <td class="text-right">€\${artist.revenue.toLocaleString()}</td>
-                      </tr>
-                    \`).join('') : \`
-                      <tr><td colspan="4" class="text-center" style="color:#999;padding:12px;">No artist data available.</td></tr>
-                    \`}
+                    ${artistRows}
                   </tbody>
                 </table>
               </div>
@@ -348,16 +358,7 @@ export default function ReportsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    ${categoryBreakdown.length > 0 ? categoryBreakdown.map(cat => \`
-                      <tr>
-                        <td class="font-bold">\${cat.category}</td>
-                        <td class="text-center">\${cat.sales}</td>
-                        <td class="text-center">\${cat.percentage}%</td>
-                        <td class="text-right">€\${cat.revenue.toLocaleString()}</td>
-                      </tr>
-                    \`).join('') : \`
-                      <tr><td colspan="4" class="text-center" style="color:#999;padding:12px;">No category data available.</td></tr>
-                    \`}
+                    ${categoryRows}
                   </tbody>
                 </table>
               </div>
