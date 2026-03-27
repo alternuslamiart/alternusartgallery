@@ -108,6 +108,7 @@ export function Footer() {
                 </svg>
               </a>
             </div>
+            <p className="text-xs text-muted-foreground pt-2">&copy; {new Date().getFullYear()} Alternus Art Gallery. {t("allRights")}</p>
           </div>
 
           {/* Quick Links */}
@@ -273,11 +274,6 @@ export function Footer() {
 
         </div>
 
-        <Separator className="my-6" />
-
-        <div className="text-center text-xs text-muted-foreground pb-2">
-          <p>&copy; {new Date().getFullYear()} Alternus Art Gallery. {t("allRights")}</p>
-        </div>
       </div>
 
       {/* TrustBox script */}
