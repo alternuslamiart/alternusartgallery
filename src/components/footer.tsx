@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Script from "next/script";
-import { Separator } from "@/components/ui/separator";
 import { useLanguage } from "@/components/providers";
 
 export function Footer() {
