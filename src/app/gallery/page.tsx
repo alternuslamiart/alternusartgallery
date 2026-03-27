@@ -465,23 +465,6 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Marquee Section */}
-      <div className="overflow-hidden bg-white border-t">
-        <div className="animate-marquee">
-          <span className="text-[256px] font-bold text-black mx-16 leading-none whitespace-nowrap">
-            Alternus
-          </span>
-          <span className="text-[256px] font-bold text-black mx-16 leading-none whitespace-nowrap">
-            Alternus
-          </span>
-          <span className="text-[256px] font-bold text-black mx-16 leading-none whitespace-nowrap">
-            Alternus
-          </span>
-          <span className="text-[256px] font-bold text-black mx-16 leading-none whitespace-nowrap">
-            Alternus
-          </span>
-        </div>
-      </div>
     </div>
   );
 }

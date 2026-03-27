@@ -9,6 +9,7 @@ export function Footer() {
   const { t } = useLanguage();
 
   return (
+    <>
     <footer className="border-t bg-muted/30">
       {/* Main Footer */}
       <div className="container mx-auto px-4 py-12">
@@ -360,5 +361,24 @@ export function Footer() {
         strategy="lazyOnload"
       />
     </footer>
+
+    {/* Marquee Section */}
+    <div className="overflow-hidden bg-white border-t">
+      <div className="animate-marquee">
+        <span className="text-[256px] font-bold text-black mx-16 leading-none whitespace-nowrap">
+          Alternus
+        </span>
+        <span className="text-[256px] font-bold text-black mx-16 leading-none whitespace-nowrap">
+          Alternus
+        </span>
+        <span className="text-[256px] font-bold text-black mx-16 leading-none whitespace-nowrap">
+          Alternus
+        </span>
+        <span className="text-[256px] font-bold text-black mx-16 leading-none whitespace-nowrap">
+          Alternus
+        </span>
+      </div>
+    </div>
+    </>
   );
 }
