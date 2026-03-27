@@ -164,22 +164,24 @@ export default function PaintingPage({ params }: PaintingPageProps) {
   // Loading state
   if (isLoading) {
     return (
-      <div className="py-16">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50/80 via-white to-gray-50/50 py-16">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-            <div className="flex gap-4">
-              <div className="flex flex-col gap-3 w-20">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="aspect-[4/5] rounded-lg bg-muted animate-pulse" />
-                ))}
+            <div className="bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-sm p-3 sm:p-4">
+              <div className="flex gap-4">
+                <div className="flex flex-col gap-3 w-20">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="aspect-[4/5] rounded-xl bg-gray-100/80 animate-pulse" />
+                  ))}
+                </div>
+                <div className="flex-1 aspect-[4/5] rounded-2xl bg-gray-100/80 animate-pulse" />
               </div>
-              <div className="flex-1 aspect-[4/5] rounded-lg bg-muted animate-pulse" />
             </div>
-            <div className="space-y-4">
-              <div className="h-8 w-24 bg-muted rounded animate-pulse" />
-              <div className="h-12 w-3/4 bg-muted rounded animate-pulse" />
-              <div className="h-6 w-1/2 bg-muted rounded animate-pulse" />
-              <div className="h-10 w-1/3 bg-muted rounded animate-pulse" />
+            <div className="bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-sm p-6 sm:p-8 space-y-4">
+              <div className="h-8 w-24 bg-gray-100/80 rounded-xl animate-pulse" />
+              <div className="h-12 w-3/4 bg-gray-100/80 rounded-xl animate-pulse" />
+              <div className="h-6 w-1/2 bg-gray-100/80 rounded-xl animate-pulse" />
+              <div className="h-10 w-1/3 bg-gray-100/80 rounded-xl animate-pulse" />
             </div>
           </div>
         </div>
@@ -190,10 +192,10 @@ export default function PaintingPage({ params }: PaintingPageProps) {
   // Not found state
   if (notFound || !painting) {
     return (
-      <div className="py-16">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50/80 via-white to-gray-50/50 py-16">
         <div className="container mx-auto px-4 text-center">
-          <div className="max-w-md mx-auto">
-            <div className="w-32 h-32 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="max-w-md mx-auto bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-sm p-10">
+            <div className="w-32 h-32 bg-gray-100/60 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
                 <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
                 <circle cx="9" cy="9" r="2" />
@@ -219,7 +221,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
   }
 
   return (
-    <div className="py-16">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50/80 via-white to-gray-50/50 py-16">
       {/* Hidden file input for room image upload */}
       <input
         ref={setRoomImageInput}
@@ -240,13 +242,14 @@ export default function PaintingPage({ params }: PaintingPageProps) {
 
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Image */}
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-sm p-3 sm:p-4">
           <div className="flex gap-2 sm:gap-4">
             {/* Thumbnail Preview Column */}
             <div className="flex flex-col gap-2 sm:gap-3 w-16 sm:w-20 flex-shrink-0">
               {/* Original Thumbnail */}
               <button
                 onClick={() => setViewMode("original")}
-                className={`relative aspect-[4/5] rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
+                className={`relative aspect-[4/5] rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
                   viewMode === "original"
                     ? "border-primary ring-2 ring-primary ring-offset-2"
                     : "border-transparent hover:border-primary/50"
@@ -263,7 +266,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
               {/* Black Frame Thumbnail */}
               <button
                 onClick={() => setViewMode("black-frame")}
-                className={`relative aspect-[4/5] rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
+                className={`relative aspect-[4/5] rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
                   viewMode === "black-frame"
                     ? "border-primary ring-2 ring-primary ring-offset-2"
                     : "border-transparent hover:border-primary/50"
@@ -284,7 +287,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
               {/* White Frame Thumbnail */}
               <button
                 onClick={() => setViewMode("white-frame")}
-                className={`relative aspect-[4/5] rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
+                className={`relative aspect-[4/5] rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
                   viewMode === "white-frame"
                     ? "border-primary ring-2 ring-primary ring-offset-2"
                     : "border-transparent hover:border-primary/50"
@@ -305,7 +308,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
               {/* In Room Thumbnail */}
               <button
                 onClick={() => setViewMode("room")}
-                className={`relative aspect-[4/5] rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
+                className={`relative aspect-[4/5] rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
                   viewMode === "room"
                     ? "border-primary ring-2 ring-primary ring-offset-2"
                     : "border-transparent hover:border-primary/50"
@@ -339,7 +342,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
 
             {/* Main Image Display */}
             <div className="flex-1 space-y-4">
-            <div className="relative aspect-[4/5] rounded-lg overflow-hidden bg-muted group">
+            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-gray-100/50 shadow-sm group">
               {viewMode === "original" && (
                 <Image
                   src={painting.image}
@@ -453,7 +456,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
             </div>
 
             {/* View Counter */}
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground bg-muted/50 px-3 sm:px-4 py-2.5 rounded-lg">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground bg-white/60 backdrop-blur-sm border border-gray-200/60 px-3 sm:px-4 py-2.5 rounded-xl">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -481,10 +484,11 @@ export default function PaintingPage({ params }: PaintingPageProps) {
             </div>
             </div>
           </div>
+          </div>
 
           {/* Details */}
-          <div className="flex flex-col">
-            <Badge variant="outline" className="w-fit mb-3 sm:mb-4">
+          <div className="flex flex-col bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-sm p-6 sm:p-8">
+            <Badge variant="outline" className="w-fit mb-3 sm:mb-4 rounded-xl border-gray-200">
               {painting.category}
             </Badge>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
@@ -517,32 +521,32 @@ export default function PaintingPage({ params }: PaintingPageProps) {
               {formatPrice(painting.price)}
             </p>
 
-            <Separator className="my-6" />
+            <Separator className="my-6 bg-gray-100/80" />
 
-            <div className="grid grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider mb-1">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+              <div className="bg-gray-50/80 rounded-xl p-3 sm:p-4 border border-gray-100">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
                   {t("medium")}
                 </p>
-                <p className="font-medium text-sm sm:text-base">{painting.medium}</p>
+                <p className="font-semibold text-sm sm:text-base">{painting.medium}</p>
               </div>
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider mb-1">
+              <div className="bg-gray-50/80 rounded-xl p-3 sm:p-4 border border-gray-100">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
                   {t("dimensions")}
                 </p>
-                <p className="font-medium text-sm sm:text-base">{painting.dimensions}</p>
+                <p className="font-semibold text-sm sm:text-base">{painting.dimensions}</p>
               </div>
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider mb-1">
+              <div className="bg-gray-50/80 rounded-xl p-3 sm:p-4 border border-gray-100">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
                   {t("year")}
                 </p>
-                <p className="font-medium text-sm sm:text-base">{painting.year}</p>
+                <p className="font-semibold text-sm sm:text-base">{painting.year}</p>
               </div>
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider mb-1">
+              <div className="bg-gray-50/80 rounded-xl p-3 sm:p-4 border border-gray-100">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
                   Status
                 </p>
-                <p className="font-medium text-sm sm:text-base">
+                <p className="font-semibold text-sm sm:text-base">
                   {painting.available ? (
                     <span className="text-green-600">{t("available")}</span>
                   ) : (
@@ -552,7 +556,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
               </div>
             </div>
 
-            <Separator className="my-6" />
+            <Separator className="my-6 bg-gray-100/80" />
 
             <div className="mb-6 sm:mb-8">
               <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">
@@ -577,8 +581,8 @@ export default function PaintingPage({ params }: PaintingPageProps) {
               <div className="space-y-6 mt-auto">
                 {/* Size Display */}
                 <div>
-                  <label className="block text-sm font-semibold mb-3">Size</label>
-                  <div className="p-4 rounded-lg border-2 border-primary bg-primary/5">
+                  <label className="block text-xs font-medium text-gray-600 mb-3">Size</label>
+                  <div className="p-4 rounded-xl border border-primary/30 bg-primary/5 shadow-sm transition-all duration-200">
                     <p className="font-semibold text-sm">Original Size</p>
                     <p className="text-xs text-muted-foreground">{painting.dimensions}</p>
                     <p className="text-sm font-bold mt-1">{formatPrice(painting.price)}</p>
@@ -587,15 +591,15 @@ export default function PaintingPage({ params }: PaintingPageProps) {
 
                 {/* Frame Selection */}
                 <div>
-                  <label className="block text-sm font-semibold mb-3">Frame Options</label>
+                  <label className="block text-xs font-medium text-gray-600 mb-3">Frame Options</label>
                   <div className="grid grid-cols-3 gap-3">
                     {frameOptions.map((frame) => (
                       <button
                         key={frame.id}
                         onClick={() => setSelectedFrame(frame.id as "none" | "black" | "white")}
-                        className={`p-4 rounded-lg border-2 transition-all ${
+                        className={`p-4 rounded-xl border transition-all duration-200 ${
                           selectedFrame === frame.id
-                            ? "border-primary bg-primary/5"
+                            ? "border-primary/60 bg-primary/5 shadow-sm"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                       >
@@ -610,7 +614,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
 
                 {/* Pre-Order Information */}
                 {painting.isPreOrder && (
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 p-4 rounded-lg">
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/60 p-4 rounded-xl shadow-sm">
                     <div className="flex items-center gap-2 mb-2">
                       <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
                         Pre-Order Available
@@ -631,12 +635,12 @@ export default function PaintingPage({ params }: PaintingPageProps) {
                 )}
 
                 {/* Total Price */}
-                <div className="bg-muted/30 p-4 rounded-lg">
+                <div className="bg-gray-50/80 border border-gray-200/60 p-4 rounded-xl shadow-sm backdrop-blur-sm">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-muted-foreground">Frame:</span>
                     <span className="font-medium">{selectedFrameOption?.label}</span>
                   </div>
-                  <div className="border-t pt-2 mt-2">
+                  <div className="border-t border-gray-200/60 pt-2 mt-2">
                     <div className="flex justify-between items-center">
                       <span className="font-semibold">Total Price:</span>
                       <span className="text-2xl font-bold">{formatPrice(totalPrice)}</span>
@@ -647,7 +651,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
                 <div className="flex gap-3">
                   <Button
                     size="lg"
-                    className="flex-1 text-lg"
+                    className="flex-1 text-lg rounded-xl transition-all duration-200"
                     onClick={() => addToCart(painting, selectedFrameOption)}
                   >
                     {painting.isPreOrder ? "Pre-Order Now" : t("addToCart")}
@@ -662,7 +666,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
                         addToWishlist(painting);
                       }
                     }}
-                    className="px-4"
+                    className="px-4 rounded-xl transition-all duration-200"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -679,7 +683,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
                     </svg>
                   </Button>
                 </div>
-                <Button asChild variant="outline" size="lg" className="w-full">
+                <Button asChild variant="outline" size="lg" className="w-full rounded-xl transition-all duration-200">
                   <Link href={`/support?painting=${painting.id}`}>
                     {t("inquire")}
                   </Link>
@@ -690,7 +694,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
                 </p>
               </div>
             ) : (
-              <div className="bg-muted p-6 rounded-lg text-center mt-auto">
+              <div className="bg-gray-50/80 border border-gray-200/60 p-6 rounded-xl text-center mt-auto shadow-sm">
                 <p className="text-muted-foreground mb-4">
                   This piece has been sold, but you can commission a similar work.
                 </p>
@@ -702,13 +706,13 @@ export default function PaintingPage({ params }: PaintingPageProps) {
           </div>
 
           {/* Shipping Calculator - Desktop Only (moved below main content on mobile) */}
-          <div className="hidden lg:block lg:col-span-2 mt-8">
+          <div className="hidden lg:block lg:col-span-2 mt-8 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-sm p-6">
             <ShippingCalculator paintingPrice={painting.price} />
           </div>
         </div>
 
         {/* Shipping Calculator - Mobile */}
-        <div className="lg:hidden mt-8">
+        <div className="lg:hidden mt-8 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-sm p-6">
           <ShippingCalculator paintingPrice={painting.price} />
         </div>
 
@@ -745,10 +749,10 @@ export default function PaintingPage({ params }: PaintingPageProps) {
             {relatedPaintings.map((relatedPainting) => (
                 <Card
                   key={relatedPainting.id}
-                  className="group overflow-hidden border-0 shadow-none bg-transparent"
+                  className="group overflow-hidden border border-gray-200/60 shadow-sm bg-white/60 backdrop-blur-sm rounded-2xl transition-all duration-200 hover:shadow-md"
                 >
                   <Link href={`/gallery/${relatedPainting.id}`}>
-                    <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-muted mb-3">
+                    <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-gray-100/50 mb-3">
                       <Image
                         src={relatedPainting.image}
                         alt={relatedPainting.title}
@@ -756,7 +760,7 @@ export default function PaintingPage({ params }: PaintingPageProps) {
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
-                    <CardContent className="p-0">
+                    <CardContent className="p-3 pt-0">
                       <h3 className="font-medium group-hover:underline">
                         {relatedPainting.title}
                       </h3>
