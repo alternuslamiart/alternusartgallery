@@ -42,7 +42,21 @@ export async function POST(request: NextRequest) {
 
     if (inputEmail !== ADMIN_EMAIL.toLowerCase() || inputPassword !== ADMIN_PASSWORD) {
       return NextResponse.json(
-        { error: 'Invalid email or password' },
+        {
+          error: 'Invalid email or password',
+          debug: {
+            inputEmail,
+            expectedEmail: ADMIN_EMAIL.toLowerCase(),
+            emailMatch: inputEmail === ADMIN_EMAIL.toLowerCase(),
+            inputPwdLength: inputPassword.length,
+            expectedPwdLength: ADMIN_PASSWORD.length,
+            pwdMatch: inputPassword === ADMIN_PASSWORD,
+            envEmailSet: !!process.env.ADMIN_EMAIL,
+            envPwdSet: !!process.env.ADMIN_PASSWORD,
+            expectedPwdFirst3: ADMIN_PASSWORD.substring(0, 3) + '***',
+            inputPwdFirst3: inputPassword.substring(0, 3) + '***',
+          }
+        },
         { status: 401 }
       );
     }
