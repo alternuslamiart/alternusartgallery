@@ -401,123 +401,96 @@ export default function ReportsPage() {
           <title>Certificate of Authenticity - ${certNumber}</title>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
+            @page { size: A4 portrait; margin: 0; }
             body { font-family: 'Georgia', 'Times New Roman', serif; color: #1a1a1a; background: #fff; }
             .page {
-              width: 100%; min-height: 100vh; padding: 40px;
+              width: 210mm; height: 297mm; padding: 14mm 18mm;
               display: flex; align-items: center; justify-content: center;
+              margin: 0 auto;
             }
             .certificate {
-              width: 100%; max-width: 720px; position: relative;
-              border: 3px solid #111; padding: 8px;
+              width: 100%; position: relative;
+              border: 2.5px solid #111; padding: 6px;
             }
             .certificate-inner {
-              border: 1px solid #999; padding: 48px 52px;
+              border: 1px solid #999; padding: 28px 32px 22px;
               position: relative;
             }
+            .corner { position: absolute; width: 24px; height: 24px; }
+            .corner-tl { top: 6px; left: 6px; border-top: 2px solid #8B7355; border-left: 2px solid #8B7355; }
+            .corner-tr { top: 6px; right: 6px; border-top: 2px solid #8B7355; border-right: 2px solid #8B7355; }
+            .corner-bl { bottom: 6px; left: 6px; border-bottom: 2px solid #8B7355; border-left: 2px solid #8B7355; }
+            .corner-br { bottom: 6px; right: 6px; border-bottom: 2px solid #8B7355; border-right: 2px solid #8B7355; }
 
-            /* Corner ornaments */
-            .corner { position: absolute; width: 32px; height: 32px; }
-            .corner-tl { top: 8px; left: 8px; border-top: 2px solid #8B7355; border-left: 2px solid #8B7355; }
-            .corner-tr { top: 8px; right: 8px; border-top: 2px solid #8B7355; border-right: 2px solid #8B7355; }
-            .corner-bl { bottom: 8px; left: 8px; border-bottom: 2px solid #8B7355; border-left: 2px solid #8B7355; }
-            .corner-br { bottom: 8px; right: 8px; border-bottom: 2px solid #8B7355; border-right: 2px solid #8B7355; }
+            .cert-header { text-align: center; margin-bottom: 16px; }
+            .cert-logo { font-family: 'Segoe UI', Arial, sans-serif; font-size: 24px; font-weight: 800; letter-spacing: 6px; color: #111; }
+            .cert-logo-sub { font-family: 'Segoe UI', Arial, sans-serif; font-size: 8px; letter-spacing: 5px; color: #888; margin-top: 1px; }
+            .cert-divider { width: 60px; height: 1px; background: #8B7355; margin: 12px auto; }
+            .cert-title { font-size: 20px; font-weight: 400; letter-spacing: 3px; text-transform: uppercase; color: #111; margin-bottom: 2px; }
+            .cert-subtitle { font-size: 9px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
 
-            /* Header */
-            .cert-header { text-align: center; margin-bottom: 36px; }
-            .cert-logo { font-family: 'Segoe UI', Arial, sans-serif; font-size: 28px; font-weight: 800; letter-spacing: 6px; color: #111; }
-            .cert-logo-sub { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; letter-spacing: 5px; color: #888; margin-top: 2px; }
-            .cert-divider { width: 80px; height: 1px; background: #8B7355; margin: 20px auto; }
-            .cert-title {
-              font-size: 26px; font-weight: 400; letter-spacing: 4px;
-              text-transform: uppercase; color: #111; margin-bottom: 4px;
+            .cert-body { text-align: center; }
+
+            .seal-row { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 14px 0; }
+            .seal {
+              width: 56px; height: 56px; border: 2px solid #8B7355;
+              border-radius: 50%; display: flex; align-items: center; justify-content: center;
+              flex-direction: column; flex-shrink: 0;
             }
-            .cert-subtitle { font-size: 11px; color: #888; letter-spacing: 2px; text-transform: uppercase; }
+            .seal-text { font-family: 'Segoe UI', Arial, sans-serif; font-size: 6px; text-transform: uppercase; letter-spacing: 1.2px; color: #8B7355; font-weight: 700; }
+            .seal-year { font-size: 14px; font-weight: 800; color: #8B7355; line-height: 1; }
 
-            /* Body */
-            .cert-body { text-align: center; margin-bottom: 32px; }
             .cert-statement {
-              font-size: 12px; color: #444; line-height: 1.9;
-              max-width: 540px; margin: 0 auto 28px;
+              font-size: 10.5px; color: #444; line-height: 1.7;
+              max-width: 480px; text-align: center;
             }
 
-            /* Details grid */
             .details-grid {
               display: grid; grid-template-columns: 1fr 1fr;
-              gap: 0; margin: 28px 0;
-              border: 1px solid #ddd; border-radius: 4px; overflow: hidden;
+              gap: 0; margin: 14px 0;
+              border: 1px solid #ddd; border-radius: 3px; overflow: hidden;
             }
-            .detail-item {
-              padding: 14px 18px;
-              border-bottom: 1px solid #eee;
-            }
+            .detail-item { padding: 8px 14px; border-bottom: 1px solid #eee; }
             .detail-item:nth-child(odd) { border-right: 1px solid #eee; }
             .detail-item:nth-last-child(-n+2) { border-bottom: none; }
             .detail-label {
               font-family: 'Segoe UI', Arial, sans-serif;
-              font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px;
-              color: #999; font-weight: 600; margin-bottom: 4px;
+              font-size: 7px; text-transform: uppercase; letter-spacing: 1.2px;
+              color: #999; font-weight: 600; margin-bottom: 2px;
             }
-            .detail-value {
-              font-size: 13px; color: #111; font-weight: 500;
-            }
+            .detail-value { font-size: 11px; color: #111; font-weight: 500; }
             .detail-value.placeholder {
               color: #bbb; border-bottom: 1px dashed #ccc;
-              display: inline-block; min-width: 160px; padding-bottom: 2px;
+              display: inline-block; min-width: 140px; padding-bottom: 1px;
             }
 
-            /* Warranty */
             .warranty {
-              background: #fafaf8; border: 1px solid #e8e6e0; border-radius: 4px;
-              padding: 16px 20px; margin: 24px 0; text-align: left;
+              background: #fafaf8; border: 1px solid #e8e6e0; border-radius: 3px;
+              padding: 10px 14px; margin: 12px 0; text-align: left;
             }
             .warranty-title {
               font-family: 'Segoe UI', Arial, sans-serif;
-              font-size: 9px; font-weight: 700; text-transform: uppercase;
-              letter-spacing: 1.5px; color: #8B7355; margin-bottom: 6px;
+              font-size: 8px; font-weight: 700; text-transform: uppercase;
+              letter-spacing: 1.2px; color: #8B7355; margin-bottom: 4px;
             }
-            .warranty-text { font-size: 10px; color: #666; line-height: 1.7; }
+            .warranty-text { font-size: 9px; color: #666; line-height: 1.6; }
 
-            /* Signatures */
             .signatures {
               display: grid; grid-template-columns: 1fr 1fr 1fr;
-              gap: 32px; margin-top: 36px; text-align: center;
+              gap: 24px; margin-top: 18px; text-align: center;
             }
-            .sig-block { padding-top: 8px; }
-            .sig-line { border-bottom: 1px solid #333; margin-bottom: 8px; height: 40px; }
-            .sig-name { font-family: 'Segoe UI', Arial, sans-serif; font-size: 9px; font-weight: 600; color: #333; }
-            .sig-role { font-family: 'Segoe UI', Arial, sans-serif; font-size: 8px; color: #999; margin-top: 2px; }
+            .sig-block { padding-top: 4px; }
+            .sig-line { border-bottom: 1px solid #333; margin-bottom: 5px; height: 28px; }
+            .sig-name { font-family: 'Segoe UI', Arial, sans-serif; font-size: 8px; font-weight: 600; color: #333; }
+            .sig-role { font-family: 'Segoe UI', Arial, sans-serif; font-size: 7px; color: #999; margin-top: 1px; }
 
-            /* Footer */
-            .cert-footer {
-              text-align: center; margin-top: 28px; padding-top: 16px;
-              border-top: 1px solid #eee;
-            }
-            .cert-number {
-              font-family: 'Segoe UI', Arial, sans-serif;
-              font-size: 9px; letter-spacing: 2px; color: #999;
-            }
-            .cert-url {
-              font-family: 'Segoe UI', Arial, sans-serif;
-              font-size: 8px; color: #bbb; margin-top: 4px;
-            }
-
-            /* Seal */
-            .seal {
-              width: 72px; height: 72px; border: 2px solid #8B7355;
-              border-radius: 50%; margin: 0 auto 16px;
-              display: flex; align-items: center; justify-content: center;
-              flex-direction: column;
-            }
-            .seal-text {
-              font-family: 'Segoe UI', Arial, sans-serif;
-              font-size: 7px; text-transform: uppercase; letter-spacing: 1.5px;
-              color: #8B7355; font-weight: 700;
-            }
-            .seal-year { font-size: 16px; font-weight: 800; color: #8B7355; }
+            .cert-footer { text-align: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid #eee; }
+            .cert-number { font-family: 'Segoe UI', Arial, sans-serif; font-size: 8px; letter-spacing: 2px; color: #999; }
+            .cert-url { font-family: 'Segoe UI', Arial, sans-serif; font-size: 7px; color: #bbb; margin-top: 2px; }
 
             @media print {
-              .page { padding: 20px; }
-              .certificate { max-width: 100%; }
+              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              .page { padding: 12mm 16mm; }
             }
           </style>
         </head>
@@ -539,17 +512,18 @@ export default function ReportsPage() {
                 </div>
 
                 <div class="cert-body">
-                  <div class="seal">
-                    <div class="seal-text">AAG</div>
-                    <div class="seal-year">${reportYear}</div>
-                    <div class="seal-text">Verified</div>
-                  </div>
-
-                  <div class="cert-statement">
-                    This document certifies that the artwork described below is an authentic,
-                    original work of art. Alternus Art Gallery guarantees the provenance,
-                    authenticity, and originality of this piece as represented by the artist
-                    and verified through the Gallery's authentication process.
+                  <div class="seal-row">
+                    <div class="seal">
+                      <div class="seal-text">AAG</div>
+                      <div class="seal-year">${reportYear}</div>
+                      <div class="seal-text">Verified</div>
+                    </div>
+                    <div class="cert-statement">
+                      This document certifies that the artwork described below is an authentic,
+                      original work of art. Alternus Art Gallery guarantees the provenance,
+                      authenticity, and originality of this piece as represented by the artist
+                      and verified through the Gallery's authentication process.
+                    </div>
                   </div>
 
                   <div class="details-grid">
