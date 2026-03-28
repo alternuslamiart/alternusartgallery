@@ -1323,25 +1323,122 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About Preview Section - Artistic Statement */}
-      <section className="py-32 md:py-40 bg-white overflow-hidden relative">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-stone-200 to-transparent" />
-        <div className="container mx-auto px-6 md:px-12">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="mb-16">
-              <p className="text-xs uppercase tracking-[0.5em] text-stone-400 mb-6">Our Philosophy</p>
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[0.95] text-gray-900 mb-6">
+      {/* About Preview Section - Immersive Split */}
+      <section className="py-0 overflow-hidden relative">
+        <div className="grid lg:grid-cols-2 min-h-[600px] md:min-h-[700px]">
+          {/* Left - Dark Content Side */}
+          <div className="bg-stone-900 py-20 md:py-28 px-6 md:px-16 lg:px-20 flex flex-col justify-center relative">
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-stone-800/30 to-transparent pointer-events-none" />
+            <div className="relative">
+              <p className="text-xs uppercase tracking-[0.5em] text-amber-500/60 mb-6">Our Philosophy</p>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[0.95] text-white mb-6">
                 Art that
-                <span className="block">speaks.</span>
+                <span className="block text-stone-400">speaks.</span>
               </h2>
-              <p className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-2xl">
+              <p className="text-lg md:text-xl text-stone-400 leading-relaxed max-w-lg mb-10">
                 A curated platform connecting exceptional artists with passionate collectors worldwide.
               </p>
-              <div className="w-20 h-px bg-gradient-to-r from-amber-600/60 to-transparent mt-8" />
-            </div>
+              <div className="w-16 h-px bg-gradient-to-r from-amber-500/50 to-transparent mb-10" />
 
-            <AccordionSection />
+              {/* Key Points */}
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                      <path d="m9 12 2 2 4-4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold mb-1">Verified Artists</h3>
+                    <p className="text-stone-500 text-sm leading-relaxed">Every artist is carefully vetted for authenticity and quality</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400">
+                      <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                      <circle cx="9" cy="9" r="2" />
+                      <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold mb-1">Museum Quality</h3>
+                    <p className="text-stone-500 text-sm leading-relaxed">Premium materials and archival-grade standards for every piece</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M2 12h20" />
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold mb-1">Global Reach</h3>
+                    <p className="text-stone-500 text-sm leading-relaxed">Secure worldwide shipping with professional packaging</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-10">
+                <Link href="/about" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-stone-900 rounded-full text-sm font-medium hover:bg-stone-100 transition-colors">
+                  Learn More About Us
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Right - Image Collage */}
+          <div className="relative bg-stone-100 hidden lg:block">
+            <div className="absolute inset-0 grid grid-cols-2 gap-3 p-6">
+              <div className="relative rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+                <Image
+                  src="https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800&q=80"
+                  alt="Gallery Art 1"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="relative rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)] mt-12">
+                <Image
+                  src="https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&q=80"
+                  alt="Gallery Art 2"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="relative rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)] -mt-12">
+                <Image
+                  src="https://images.unsplash.com/photo-1549289524-06cf8837ace5?w=800&q=80"
+                  alt="Gallery Art 3"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="relative rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+                <Image
+                  src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80"
+                  alt="Gallery Art 4"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          </div>
+          {/* Mobile Image */}
+          <div className="lg:hidden relative h-[300px]">
+            <Image
+              src="https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1200&q=80"
+              alt="Gallery Art"
+              fill
+              className="object-cover"
+            />
           </div>
         </div>
       </section>
