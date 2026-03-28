@@ -1396,7 +1396,7 @@ export default function Home() {
           {/* Right - Single Featured Image */}
           <div className="relative bg-stone-900 hidden lg:block">
             <Image
-              src="https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1200&q=80"
+              src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200&q=80"
               alt="Art Gallery"
               fill
               className="object-cover opacity-60"
@@ -1421,7 +1421,7 @@ export default function Home() {
           {/* Mobile Image */}
           <div className="lg:hidden relative h-[300px] bg-stone-900">
             <Image
-              src="https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1200&q=80"
+              src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200&q=80"
               alt="Art Gallery"
               fill
               className="object-cover opacity-60"
