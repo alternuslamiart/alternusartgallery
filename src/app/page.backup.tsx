@@ -714,24 +714,29 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Gallery Collection Section - Dark Museum Wall */}
-      <section className="gallery-wall-dark py-20 md:py-32">
+      {/* Decorative Divider */}
+      <div className="flex items-center justify-center py-2">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-stone-300" />
+        <div className="w-1.5 h-1.5 rotate-45 bg-stone-300 mx-3" />
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-stone-300" />
+      </div>
+
+      {/* Featured Works Section - Grid Layout */}
+      <section className="py-28 bg-gradient-to-b from-white via-stone-50/30 to-white">
         <div className="container mx-auto px-4">
-          {/* Elegant section header */}
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 md:mb-16">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-6">
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-stone-500 mb-3">
+              <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">
                 Collection
               </p>
-              <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight">
+              <h2 className="text-3xl md:text-4xl font-bold">
                 {t("featuredWorks")}
               </h2>
-              <div className="w-16 h-px bg-gradient-to-r from-amber-600/60 to-transparent mt-4" />
             </div>
             {visiblePaintings < artworks.length && (
               <button
                 onClick={() => setVisiblePaintings(prev => Math.min(prev + 4, artworks.length))}
-                className="mt-6 md:mt-0 group inline-flex items-center gap-2 px-6 py-2.5 bg-transparent border border-stone-600 text-stone-300 rounded-full text-sm font-medium hover:bg-white/5 hover:border-stone-400 hover:text-white transition-all"
+                className="mt-4 md:mt-0 group inline-flex items-center gap-2 px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors"
               >
                 <span>See More</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-y-1 transition-transform">
@@ -741,60 +746,60 @@ export default function Home() {
             )}
           </div>
 
-          {/* Price Filters */}
-          <div className="mb-10">
-            <p className="text-sm text-stone-500 italic mb-3">Shop by your budget</p>
+          {/* Price Buttons */}
+          <div className="mb-8">
+            <p className="text-sm text-gray-500 italic mb-3">Shop by your budget</p>
             <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory md:flex-wrap" style={{ scrollbarWidth: "thin" }}>
               <button
                 onClick={() => router.push('/gallery?maxPrice=500')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-full border border-stone-700 bg-transparent text-stone-300 hover:bg-white/5 hover:border-stone-500 hover:text-white transition-all snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
               >
-                Under &euro;500
+                Under €500
               </button>
               <button
                 onClick={() => router.push('/gallery?minPrice=1000&maxPrice=3000')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-full border border-stone-700 bg-transparent text-stone-300 hover:bg-white/5 hover:border-stone-500 hover:text-white transition-all snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
               >
-                &euro;1000 - &euro;3000
+                €1000 - €3000
               </button>
               <button
                 onClick={() => router.push('/gallery?minPrice=3000&maxPrice=5000')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-full border border-stone-700 bg-transparent text-stone-300 hover:bg-white/5 hover:border-stone-500 hover:text-white transition-all snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
               >
-                &euro;3000 - &euro;5000
+                €3000 - €5000
               </button>
               <button
                 onClick={() => router.push('/gallery?minPrice=5000&maxPrice=10000')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-full border border-stone-700 bg-transparent text-stone-300 hover:bg-white/5 hover:border-stone-500 hover:text-white transition-all snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
               >
-                &euro;5000 - &euro;10000
+                €5000 - €10000
               </button>
             </div>
           </div>
 
-          {/* Gallery Grid */}
+          {/* Grid Container */}
           {isLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="rounded-lg overflow-hidden animate-pulse">
-                  <div className="aspect-[4/5] bg-stone-800" />
-                  <div className="pt-4 space-y-2">
-                    <div className="h-4 bg-stone-800 rounded w-3/4" />
-                    <div className="h-3 bg-stone-800 rounded w-1/2" />
-                    <div className="h-5 bg-stone-800 rounded w-1/3" />
+                <div key={i} className="bg-white rounded-2xl border border-stone-200/60 overflow-hidden animate-pulse shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+                  <div className="aspect-[4/5] bg-gray-200" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-200 rounded w-1/2" />
+                    <div className="h-5 bg-gray-200 rounded w-1/3" />
                   </div>
                 </div>
               ))}
             </div>
           ) : featuredPaintings.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredPaintings.map((painting) => (
                 <div
                   key={painting.id}
-                  className="group gallery-card-frame rounded-lg overflow-hidden"
+                  className="group bg-white rounded-2xl border border-stone-200/60 overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-shadow"
                 >
                   <Link href={`/gallery/${painting.id}`}>
-                    <div className="relative aspect-[4/5] overflow-hidden bg-stone-900 rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+                    <div className="relative aspect-[4/5] overflow-hidden bg-muted">
                       <Image
                         src={painting.image}
                         alt={painting.title}
@@ -803,7 +808,7 @@ export default function Home() {
                       />
                       {/* Style Badge - Top Left */}
                       <div className="absolute top-3 left-3 flex flex-col gap-2">
-                        <Badge variant="secondary" className="text-xs bg-black/50 text-white border-0 backdrop-blur-sm">
+                        <Badge variant="secondary" className="text-xs">
                           {painting.style}
                         </Badge>
                       </div>
@@ -820,7 +825,7 @@ export default function Home() {
                             });
                           }
                         }}
-                        className="absolute top-3 right-3 p-1.5 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm shadow-lg transition-all hover:scale-110"
+                        className="absolute top-3 right-3 p-1.5 rounded-full bg-white/90 hover:bg-white shadow-lg transition-all hover:scale-110"
                         aria-label={isInWishlist(painting.id) ? "Remove from wishlist" : "Add to wishlist"}
                       >
                         <svg
@@ -829,7 +834,7 @@ export default function Home() {
                           height="16"
                           viewBox="0 0 24 24"
                           fill={isInWishlist(painting.id) ? "red" : "none"}
-                          stroke={isInWishlist(painting.id) ? "red" : "white"}
+                          stroke={isInWishlist(painting.id) ? "red" : "currentColor"}
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -866,29 +871,29 @@ export default function Home() {
                       )}
                     </div>
                   </Link>
-                  <div className="pt-4 pb-2">
+                  <div className="p-4">
                     <Link href={`/gallery/${painting.id}`}>
-                      <h3 className="font-semibold text-white group-hover:text-stone-300 transition-colors">
+                      <h3 className="font-semibold text-gray-900 group-hover:text-gray-700 transition-colors">
                         {painting.title}
                       </h3>
                     </Link>
                     {painting.artist && (
                       <Link
                         href={`/artists/${painting.artist.id}`}
-                        className="text-xs text-stone-500 hover:text-stone-300 transition-colors mt-0.5 inline-block"
+                        className="text-xs text-gray-400 hover:text-gray-600 transition-colors mt-0.5 inline-block"
                       >
                         by {painting.artist.displayName}
                       </Link>
                     )}
-                    <p className="text-sm text-stone-500 mt-1">{painting.medium}</p>
-                    <p className="text-sm text-stone-600">{painting.dimensions}</p>
+                    <p className="text-sm text-gray-500 mt-1">{painting.medium}</p>
+                    <p className="text-sm text-gray-500">{painting.dimensions}</p>
                     <div className="flex items-center justify-between mt-3">
                       {painting.available ? (
                         <>
-                          <p className="text-lg font-bold text-white">
+                          <p className="text-lg font-bold text-gray-900">
                             {formatPrice(painting.price)}
                           </p>
-                          <Badge variant="outline" className="text-emerald-400 border-emerald-400/40 text-xs">
+                          <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
                             {t("available")}
                           </Badge>
                         </>
@@ -904,15 +909,15 @@ export default function Home() {
             </div>
           ) : (
             <div className="text-center py-16">
-              <div className="w-20 h-20 bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-stone-500">
+              <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
                   <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
                   <circle cx="9" cy="9" r="2" />
                   <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-white">No artworks yet</h3>
-              <p className="text-stone-400 mb-6">Check back soon for new artwork additions!</p>
+              <h3 className="text-xl font-semibold mb-2">No artworks yet</h3>
+              <p className="text-muted-foreground mb-6">Check back soon for new artwork additions!</p>
               <Button asChild>
                 <Link href="/gallery">Browse Gallery</Link>
               </Button>
@@ -921,61 +926,37 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Gallery Statement - Full Width Quote */}
-      <section className="py-20 md:py-28 bg-[#faf8f5] relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }} />
-        <div className="container mx-auto px-4 text-center relative">
-          <p className="text-xs uppercase tracking-[0.5em] text-stone-400 mb-6">The Gallery Experience</p>
-          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-stone-900 leading-tight max-w-4xl mx-auto mb-6">
-            Every artwork tells a story worth living with
-          </h2>
-          <p className="text-lg md:text-xl text-stone-500 max-w-2xl mx-auto">
-            We curate only the finest original works from verified artists worldwide, ensuring each piece meets museum-quality standards.
-          </p>
-          <div className="flex items-center justify-center gap-8 md:gap-16 mt-12">
-            <div className="text-center">
-              <p className="text-3xl md:text-4xl font-bold text-stone-900">50+</p>
-              <p className="text-xs uppercase tracking-widest text-stone-400 mt-1">Original Works</p>
-            </div>
-            <div className="w-px h-12 bg-stone-300" />
-            <div className="text-center">
-              <p className="text-3xl md:text-4xl font-bold text-stone-900">12</p>
-              <p className="text-xs uppercase tracking-widest text-stone-400 mt-1">Countries</p>
-            </div>
-            <div className="w-px h-12 bg-stone-300" />
-            <div className="text-center">
-              <p className="text-3xl md:text-4xl font-bold text-stone-900">100%</p>
-              <p className="text-xs uppercase tracking-widest text-stone-400 mt-1">Authentic</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Ad Banner */}
       <div className="container mx-auto px-4">
         <AdBanner />
       </div>
 
-      {/* Curated Artist Section - Warm Gallery Wall */}
-      <section className="gallery-wall-warm py-20 md:py-28 overflow-hidden">
+      {/* Decorative Divider */}
+      <div className="flex items-center justify-center py-2">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-stone-300" />
+        <div className="w-1.5 h-1.5 rotate-45 bg-stone-300 mx-3" />
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-stone-300" />
+      </div>
+
+      {/* Favorite Artist Section - Horizontal Scroll */}
+      <section className="py-28 bg-stone-50/50 overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-stone-400 mb-3">
+              <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">
                 Curated Selection
               </p>
-              <h2 className="text-3xl md:text-5xl font-bold text-stone-900 leading-tight">
+              <h2 className="text-3xl md:text-4xl font-bold">
                 {t("favoriteArtist")}
               </h2>
-              <p className="text-stone-500 mt-3 max-w-md">
+              <p className="text-muted-foreground mt-2 max-w-md">
                 {t("favoriteArtistSubtitle")}
               </p>
-              <div className="w-16 h-px bg-gradient-to-r from-amber-600/60 to-transparent mt-4" />
             </div>
-            <div className="flex items-center gap-3 mt-6 md:mt-0">
+            <div className="flex items-center gap-3 mt-4 md:mt-0">
               <Link
                 href="/gallery"
-                className="px-6 py-2.5 bg-transparent border border-stone-300 text-stone-600 rounded-full text-sm font-medium hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all"
+                className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors"
               >
                 See More
               </Link>
@@ -983,7 +964,7 @@ export default function Home() {
                 variant="outline"
                 size="icon"
                 onClick={scrollLeft}
-                className="rounded-full h-10 w-10 border-stone-300 hover:bg-stone-900 hover:text-white hover:border-stone-900"
+                className="rounded-full h-10 w-10"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="m15 18-6-6 6-6" />
@@ -993,7 +974,7 @@ export default function Home() {
                 variant="outline"
                 size="icon"
                 onClick={scrollRight}
-                className="rounded-full h-10 w-10 border-stone-300 hover:bg-stone-900 hover:text-white hover:border-stone-900"
+                className="rounded-full h-10 w-10"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="m9 18 6-6-6-6" />
@@ -1012,10 +993,10 @@ export default function Home() {
             {artworks.map((painting) => (
               <div
                 key={painting.id}
-                className="group flex-shrink-0 w-[200px] md:w-[280px] snap-start gallery-card-frame rounded-lg overflow-hidden"
+                className="group flex-shrink-0 w-[200px] md:w-[260px] snap-start bg-white rounded-2xl border border-stone-200/60 overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-shadow"
               >
                 <Link href={`/gallery/${painting.id}`}>
-                  <div className="relative aspect-[4/5] overflow-hidden bg-stone-200 rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-muted">
                     <Image
                       src={painting.image}
                       alt={painting.title}
@@ -1087,26 +1068,26 @@ export default function Home() {
                     )}
                   </div>
                 </Link>
-                <div className="pt-4 pb-2">
+                <div className="p-4">
                   <Link href={`/gallery/${painting.id}`}>
-                    <h3 className="font-semibold text-stone-900 group-hover:text-stone-600 transition-colors">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-gray-700 transition-colors">
                       {painting.title}
                     </h3>
                   </Link>
                   {painting.artist && (
                     <Link
                       href={`/artists/${painting.artist.id}`}
-                      className="text-xs text-stone-400 hover:text-stone-600 transition-colors mt-0.5 inline-block"
+                      className="text-xs text-gray-400 hover:text-gray-600 transition-colors mt-0.5 inline-block"
                     >
                       by {painting.artist.displayName}
                     </Link>
                   )}
-                  <p className="text-sm text-stone-500 mt-1">{painting.medium}</p>
-                  <p className="text-sm text-stone-400">{painting.dimensions}</p>
+                  <p className="text-sm text-gray-500 mt-1">{painting.medium}</p>
+                  <p className="text-sm text-gray-500">{painting.dimensions}</p>
                   <div className="flex items-center justify-between mt-3">
                     {painting.available ? (
                       <>
-                        <p className="text-lg font-bold text-stone-900">
+                        <p className="text-lg font-bold text-gray-900">
                           {formatPrice(painting.price)}
                         </p>
                         <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
@@ -1127,106 +1108,112 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Gallery Promise - Dark Elegant Section */}
-      <section className="py-20 md:py-24 bg-stone-900 relative overflow-hidden">
-        <div className="absolute inset-0 gallery-shimmer" />
-        <div className="container mx-auto px-4 relative">
-          <div className="text-center mb-12">
-            <p className="text-xs uppercase tracking-[0.4em] text-amber-500/70 mb-3">
-              Trust &amp; Quality
+      {/* Decorative Divider */}
+      <div className="flex items-center justify-center py-2">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-stone-300" />
+        <div className="w-1.5 h-1.5 rotate-45 bg-stone-300 mx-3" />
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-stone-300" />
+      </div>
+
+      {/* Why Shop at Alternus Section */}
+      <section className="py-20 bg-gradient-to-b from-white to-stone-50/40">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-1">
+              Trust & Quality
             </p>
-            <h2 className="text-2xl md:text-4xl font-bold mb-3 text-white">
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">
               {t("whyShopTitle")}
             </h2>
-            <p className="text-stone-400 text-sm max-w-xl mx-auto">
+            <p className="text-muted-foreground text-sm max-w-xl mx-auto">
               {t("whyShopSubtitle")}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {/* Secure Shipping */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                   <polyline points="3.29 7 12 12 20.71 7" />
                   <line x1="12" x2="12" y1="22" y2="12" />
                 </svg>
               </div>
-              <h3 className="text-sm font-semibold mb-1 text-white">{t("secureShipping")}</h3>
-              <p className="text-stone-400 text-xs leading-relaxed line-clamp-2">
+              <h3 className="text-sm font-semibold mb-1">{t("secureShipping")}</h3>
+              <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
                 {t("secureShippingDesc")}
               </p>
             </div>
 
             {/* 100% Authentic */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
                   <path d="m9 12 2 2 4-4" />
                 </svg>
               </div>
-              <h3 className="text-sm font-semibold mb-1 text-white">{t("authenticArt")}</h3>
-              <p className="text-stone-400 text-xs leading-relaxed line-clamp-2">
+              <h3 className="text-sm font-semibold mb-1">{t("authenticArt")}</h3>
+              <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
                 {t("authenticArtDesc")}
               </p>
             </div>
 
             {/* 14-Day Returns */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                   <path d="M3 3v5h5" />
                   <path d="M12 7v5l4 2" />
                 </svg>
               </div>
-              <h3 className="text-sm font-semibold mb-1 text-white">{t("easyReturns")}</h3>
-              <p className="text-stone-400 text-xs leading-relaxed line-clamp-2">
+              <h3 className="text-sm font-semibold mb-1">{t("easyReturns")}</h3>
+              <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
                 {t("easyReturnsDesc")}
               </p>
             </div>
 
             {/* Secure Payment */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <rect width="20" height="14" x="2" y="5" rx="2" />
                   <line x1="2" x2="22" y1="10" y2="10" />
                 </svg>
               </div>
-              <h3 className="text-sm font-semibold mb-1 text-white">{t("securePayment")}</h3>
-              <p className="text-stone-400 text-xs leading-relaxed line-clamp-2">
+              <h3 className="text-sm font-semibold mb-1">{t("securePayment")}</h3>
+              <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
                 {t("securePaymentDesc")}
               </p>
             </div>
 
             {/* Direct from Artist */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <path d="M12 19l7-7 3 3-7 7-3-3z" />
                   <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
                   <path d="M2 2l7.586 7.586" />
                   <circle cx="11" cy="11" r="2" />
                 </svg>
               </div>
-              <h3 className="text-sm font-semibold mb-1 text-white">{t("directFromArtist")}</h3>
-              <p className="text-stone-400 text-xs leading-relaxed line-clamp-2">
+              <h3 className="text-sm font-semibold mb-1">{t("directFromArtist")}</h3>
+              <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
                 {t("directFromArtistDesc")}
               </p>
             </div>
 
             {/* Expert Support */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
                 </svg>
               </div>
-              <h3 className="text-sm font-semibold mb-1 text-white">{t("expertSupport")}</h3>
-              <p className="text-stone-400 text-xs leading-relaxed line-clamp-2">
+              <h3 className="text-sm font-semibold mb-1">{t("expertSupport")}</h3>
+              <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
                 {t("expertSupportDesc")}
               </p>
             </div>
@@ -1234,87 +1221,102 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Collector Voices - Premium Testimonials */}
-      <section className="py-20 md:py-28 bg-[#faf8f5] overflow-hidden">
+      {/* Decorative Divider */}
+      <div className="flex items-center justify-center py-2">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-stone-300" />
+        <div className="w-1.5 h-1.5 rotate-45 bg-stone-300 mx-3" />
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-stone-300" />
+      </div>
+
+      {/* Testimonials Section */}
+      <section className="py-28 bg-gradient-to-b from-stone-50/50 to-white overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <p className="text-xs uppercase tracking-[0.4em] text-stone-400 mb-3">
-              Collector Voices
+            <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">
+              Testimonials
             </p>
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-stone-900">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
               What Collectors Say
             </h2>
-            <p className="text-stone-500 text-lg max-w-2xl mx-auto">
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Discover why art enthusiasts around the world choose Alternus
             </p>
-            <div className="w-16 h-px bg-gradient-to-r from-transparent via-amber-600/40 to-transparent mx-auto mt-6" />
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             {/* Testimonial 1 */}
-            <div className="bg-white rounded-2xl p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-stone-100 transition-all duration-500 relative group">
-              <div className="absolute top-0 left-8 w-8 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-b-full" />
-              <div className="pt-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-stone-200 mb-4">
-                  <path d="M11.192 15.757c0-.88-.23-1.618-.69-2.217-.326-.412-.768-.683-1.327-.812-.55-.128-1.07-.137-1.54-.028-.16-.95.1-1.956.76-3.022.66-1.065 1.515-1.867 2.558-2.403L9.373 5c-.8.396-1.56.898-2.26 1.505-.71.607-1.34 1.305-1.9 2.094s-.98 1.68-1.25 2.69-.346 2.04-.217 3.1c.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l.002.003zm9.124 0c0-.88-.23-1.618-.69-2.217-.326-.42-.77-.692-1.327-.817-.56-.124-1.074-.13-1.54-.022-.16-.94.09-1.95.75-3.02.66-1.06 1.514-1.86 2.557-2.4L18.49 5c-.8.396-1.555.898-2.26 1.505-.708.607-1.34 1.305-1.894 2.094-.556.79-.97 1.68-1.24 2.69-.273 1-.345 2.04-.217 3.1.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l-.007.006z"/>
-                </svg>
-                <p className="text-stone-600 mb-6 leading-relaxed italic">
+            <div className="bg-white rounded-2xl p-8 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow relative">
+              <div className="absolute -top-4 left-8">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-primary-foreground">
+                    <path d="M11.192 15.757c0-.88-.23-1.618-.69-2.217-.326-.412-.768-.683-1.327-.812-.55-.128-1.07-.137-1.54-.028-.16-.95.1-1.956.76-3.022.66-1.065 1.515-1.867 2.558-2.403L9.373 5c-.8.396-1.56.898-2.26 1.505-.71.607-1.34 1.305-1.9 2.094s-.98 1.68-1.25 2.69-.346 2.04-.217 3.1c.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l.002.003zm9.124 0c0-.88-.23-1.618-.69-2.217-.326-.42-.77-.692-1.327-.817-.56-.124-1.074-.13-1.54-.022-.16-.94.09-1.95.75-3.02.66-1.06 1.514-1.86 2.557-2.4L18.49 5c-.8.396-1.555.898-2.26 1.505-.708.607-1.34 1.305-1.894 2.094-.556.79-.97 1.68-1.24 2.69-.273 1-.345 2.04-.217 3.1.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l-.007.006z"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="pt-6">
+                <p className="text-muted-foreground mb-6 leading-relaxed">
                   &quot;The artwork I purchased exceeded all my expectations. The quality is outstanding
                   and the customer service was impeccable from start to finish.&quot;
                 </p>
-                <div className="flex items-center gap-4 pt-4 border-t border-stone-100">
-                  <div className="w-10 h-10 bg-gradient-to-br from-stone-700 to-stone-900 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
                     SM
                   </div>
                   <div>
-                    <p className="font-semibold text-stone-900 text-sm">Sarah Mitchell</p>
-                    <p className="text-xs text-stone-400">Art Collector, London</p>
+                    <p className="font-semibold">Sarah Mitchell</p>
+                    <p className="text-sm text-muted-foreground">Art Collector, London</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Testimonial 2 */}
-            <div className="bg-white rounded-2xl p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-stone-100 transition-all duration-500 relative group">
-              <div className="absolute top-0 left-8 w-8 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-b-full" />
-              <div className="pt-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-stone-200 mb-4">
-                  <path d="M11.192 15.757c0-.88-.23-1.618-.69-2.217-.326-.412-.768-.683-1.327-.812-.55-.128-1.07-.137-1.54-.028-.16-.95.1-1.956.76-3.022.66-1.065 1.515-1.867 2.558-2.403L9.373 5c-.8.396-1.56.898-2.26 1.505-.71.607-1.34 1.305-1.9 2.094s-.98 1.68-1.25 2.69-.346 2.04-.217 3.1c.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l.002.003zm9.124 0c0-.88-.23-1.618-.69-2.217-.326-.42-.77-.692-1.327-.817-.56-.124-1.074-.13-1.54-.022-.16-.94.09-1.95.75-3.02.66-1.06 1.514-1.86 2.557-2.4L18.49 5c-.8.396-1.555.898-2.26 1.505-.708.607-1.34 1.305-1.894 2.094-.556.79-.97 1.68-1.24 2.69-.273 1-.345 2.04-.217 3.1.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l-.007.006z"/>
-                </svg>
-                <p className="text-stone-600 mb-6 leading-relaxed italic">
+            <div className="bg-white rounded-2xl p-8 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow relative">
+              <div className="absolute -top-4 left-8">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-primary-foreground">
+                    <path d="M11.192 15.757c0-.88-.23-1.618-.69-2.217-.326-.412-.768-.683-1.327-.812-.55-.128-1.07-.137-1.54-.028-.16-.95.1-1.956.76-3.022.66-1.065 1.515-1.867 2.558-2.403L9.373 5c-.8.396-1.56.898-2.26 1.505-.71.607-1.34 1.305-1.9 2.094s-.98 1.68-1.25 2.69-.346 2.04-.217 3.1c.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l.002.003zm9.124 0c0-.88-.23-1.618-.69-2.217-.326-.42-.77-.692-1.327-.817-.56-.124-1.074-.13-1.54-.022-.16-.94.09-1.95.75-3.02.66-1.06 1.514-1.86 2.557-2.4L18.49 5c-.8.396-1.555.898-2.26 1.505-.708.607-1.34 1.305-1.894 2.094-.556.79-.97 1.68-1.24 2.69-.273 1-.345 2.04-.217 3.1.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l-.007.006z"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="pt-6">
+                <p className="text-muted-foreground mb-6 leading-relaxed">
                   &quot;Alternus made buying art online feel personal and trustworthy.
                   The piece arrived beautifully packaged and now sits proudly in my living room.&quot;
                 </p>
-                <div className="flex items-center gap-4 pt-4 border-t border-stone-100">
-                  <div className="w-10 h-10 bg-gradient-to-br from-stone-700 to-stone-900 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-semibold">
                     JK
                   </div>
                   <div>
-                    <p className="font-semibold text-stone-900 text-sm">James Kowalski</p>
-                    <p className="text-xs text-stone-400">Interior Designer, New York</p>
+                    <p className="font-semibold">James Kowalski</p>
+                    <p className="text-sm text-muted-foreground">Interior Designer, New York</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Testimonial 3 */}
-            <div className="bg-white rounded-2xl p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-stone-100 transition-all duration-500 relative group">
-              <div className="absolute top-0 left-8 w-8 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-b-full" />
-              <div className="pt-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-stone-200 mb-4">
-                  <path d="M11.192 15.757c0-.88-.23-1.618-.69-2.217-.326-.412-.768-.683-1.327-.812-.55-.128-1.07-.137-1.54-.028-.16-.95.1-1.956.76-3.022.66-1.065 1.515-1.867 2.558-2.403L9.373 5c-.8.396-1.56.898-2.26 1.505-.71.607-1.34 1.305-1.9 2.094s-.98 1.68-1.25 2.69-.346 2.04-.217 3.1c.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l.002.003zm9.124 0c0-.88-.23-1.618-.69-2.217-.326-.42-.77-.692-1.327-.817-.56-.124-1.074-.13-1.54-.022-.16-.94.09-1.95.75-3.02.66-1.06 1.514-1.86 2.557-2.4L18.49 5c-.8.396-1.555.898-2.26 1.505-.708.607-1.34 1.305-1.894 2.094-.556.79-.97 1.68-1.24 2.69-.273 1-.345 2.04-.217 3.1.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l-.007.006z"/>
-                </svg>
-                <p className="text-stone-600 mb-6 leading-relaxed italic">
+            <div className="bg-white rounded-2xl p-8 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow relative">
+              <div className="absolute -top-4 left-8">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-primary-foreground">
+                    <path d="M11.192 15.757c0-.88-.23-1.618-.69-2.217-.326-.412-.768-.683-1.327-.812-.55-.128-1.07-.137-1.54-.028-.16-.95.1-1.956.76-3.022.66-1.065 1.515-1.867 2.558-2.403L9.373 5c-.8.396-1.56.898-2.26 1.505-.71.607-1.34 1.305-1.9 2.094s-.98 1.68-1.25 2.69-.346 2.04-.217 3.1c.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l.002.003zm9.124 0c0-.88-.23-1.618-.69-2.217-.326-.42-.77-.692-1.327-.817-.56-.124-1.074-.13-1.54-.022-.16-.94.09-1.95.75-3.02.66-1.06 1.514-1.86 2.557-2.4L18.49 5c-.8.396-1.555.898-2.26 1.505-.708.607-1.34 1.305-1.894 2.094-.556.79-.97 1.68-1.24 2.69-.273 1-.345 2.04-.217 3.1.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l-.007.006z"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="pt-6">
+                <p className="text-muted-foreground mb-6 leading-relaxed">
                   &quot;As a first-time art buyer, I was nervous about investing. The Alternus team
                   guided me through the process and helped me find the perfect piece.&quot;
                 </p>
-                <div className="flex items-center gap-4 pt-4 border-t border-stone-100">
-                  <div className="w-10 h-10 bg-gradient-to-br from-stone-700 to-stone-900 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
                     AR
                   </div>
                   <div>
-                    <p className="font-semibold text-stone-900 text-sm">Ana Rodriguez</p>
-                    <p className="text-xs text-stone-400">Entrepreneur, Madrid</p>
+                    <p className="font-semibold">Ana Rodriguez</p>
+                    <p className="text-sm text-muted-foreground">Entrepreneur, Madrid</p>
                   </div>
                 </div>
               </div>
@@ -1323,14 +1325,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About Preview Section - Artistic Statement */}
-      <section className="py-32 md:py-40 bg-white overflow-hidden relative">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-stone-200 to-transparent" />
+      {/* About Preview Section - Apple Accordion Style */}
+      <section className="py-32 md:py-40 bg-gradient-to-b from-white to-stone-50/30 overflow-hidden">
         <div className="container mx-auto px-6 md:px-12">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
             <div className="mb-16">
-              <p className="text-xs uppercase tracking-[0.5em] text-stone-400 mb-6">Our Philosophy</p>
               <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[0.95] text-gray-900 mb-6">
                 Art that
                 <span className="block">speaks.</span>
@@ -1338,7 +1338,6 @@ export default function Home() {
               <p className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-2xl">
                 A curated platform connecting exceptional artists with passionate collectors worldwide.
               </p>
-              <div className="w-20 h-px bg-gradient-to-r from-amber-600/60 to-transparent mt-8" />
             </div>
 
             <AccordionSection />
@@ -1346,24 +1345,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials Carousel Section */}
+      {/* Testimonials Section */}
       <TestimonialsSection />
-
-      {/* Gallery Name Marquee - Artistic Touch */}
-      <section className="py-12 bg-stone-900 overflow-hidden">
-        <div className="animate-marquee-slow">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center gap-12 md:gap-20 px-6 md:px-10">
-              <span className="text-6xl md:text-8xl font-bold text-stone-800 whitespace-nowrap select-none">Alternus</span>
-              <span className="text-stone-700 text-2xl select-none">&bull;</span>
-              <span className="text-6xl md:text-8xl font-bold text-stone-800 whitespace-nowrap select-none">Art Gallery</span>
-              <span className="text-stone-700 text-2xl select-none">&bull;</span>
-              <span className="text-6xl md:text-8xl font-bold text-stone-800 whitespace-nowrap select-none">Since 2024</span>
-              <span className="text-stone-700 text-2xl select-none">&bull;</span>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* Ad Banner */}
       <div className="container mx-auto px-4">

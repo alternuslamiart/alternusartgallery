@@ -81,11 +81,11 @@ export default function TestimonialsSection() {
           <svg
             key={star}
             xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
+            width="20"
+            height="20"
             viewBox="0 0 24 24"
-            fill={star <= rating ? "#d4a574" : "none"}
-            stroke={star <= rating ? "#d4a574" : "#d1d5db"}
+            fill={star <= rating ? "#fbbf24" : "none"}
+            stroke={star <= rating ? "#fbbf24" : "#d1d5db"}
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -104,21 +104,19 @@ export default function TestimonialsSection() {
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-stone-900 relative overflow-hidden">
-      <div className="absolute inset-0 gallery-shimmer" />
-      <div className="container mx-auto px-4 relative">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-white to-gray-50/80">
+      <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
-          <p className="text-xs uppercase tracking-[0.4em] text-amber-500/60 mb-3">
+          <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-3">
             Testimonials
           </p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             What Our Clients Say
           </h2>
-          <p className="text-stone-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Join thousands of satisfied customers who have found their perfect artwork with Alternus
           </p>
-          <div className="w-16 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent mx-auto mt-6" />
         </div>
 
         {/* Testimonials Grid */}
@@ -127,21 +125,21 @@ export default function TestimonialsSection() {
             {visibleTestimonials.map((testimonial, idx) => (
               <div
                 key={testimonial.id}
-                className={`bg-white/5 backdrop-blur-sm rounded-2xl p-6 lg:p-8 border border-white/10 hover:border-white/20 transition-all duration-500 ${
-                  idx === 1 ? "md:scale-105 md:z-10 md:bg-white/8" : ""
+                className={`bg-white rounded-2xl p-6 lg:p-8 shadow-lg hover:shadow-xl transition-all duration-300 ${
+                  idx === 1 ? "md:scale-105 md:z-10" : ""
                 }`}
               >
                 {/* Stars */}
                 <div className="mb-4">{renderStars(testimonial.rating)}</div>
 
                 {/* Comment */}
-                <p className="text-stone-300 mb-6 leading-relaxed italic text-sm md:text-base">
+                <p className="text-gray-700 mb-6 leading-relaxed italic">
                   &ldquo;{testimonial.comment}&rdquo;
                 </p>
 
                 {/* Author */}
-                <div className="flex items-center gap-4 pt-4 border-t border-white/10">
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-amber-500/20">
+                <div className="flex items-center gap-4 pt-4 border-t">
+                  <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                     <Image
                       src={testimonial.image}
                       alt={testimonial.name}
@@ -150,8 +148,8 @@ export default function TestimonialsSection() {
                     />
                   </div>
                   <div>
-                    <p className="font-semibold text-white text-sm">{testimonial.name}</p>
-                    <p className="text-xs text-stone-400">{testimonial.role}</p>
+                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
+                    <p className="text-sm text-gray-500">{testimonial.role}</p>
                   </div>
                 </div>
               </div>
@@ -159,10 +157,10 @@ export default function TestimonialsSection() {
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex items-center justify-center gap-4 mt-10">
+          <div className="flex items-center justify-center gap-4 mt-8">
             <button
               onClick={prevTestimonial}
-              className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all"
+              className="p-3 rounded-full bg-white border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm"
               aria-label="Previous testimonial"
             >
               <svg
@@ -175,7 +173,6 @@ export default function TestimonialsSection() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-stone-300"
               >
                 <path d="m15 18-6-6 6-6" />
               </svg>
@@ -187,10 +184,10 @@ export default function TestimonialsSection() {
                 <button
                   key={idx}
                   onClick={() => setActiveIndex(idx)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                  className={`w-2 h-2 rounded-full transition-all ${
                     idx === activeIndex
-                      ? "bg-amber-500 w-8"
-                      : "bg-stone-600 w-1.5 hover:bg-stone-500"
+                      ? "bg-gray-900 w-8"
+                      : "bg-gray-300 hover:bg-gray-400"
                   }`}
                   aria-label={`Go to testimonial ${idx + 1}`}
                 />
@@ -199,7 +196,7 @@ export default function TestimonialsSection() {
 
             <button
               onClick={nextTestimonial}
-              className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all"
+              className="p-3 rounded-full bg-white border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm"
               aria-label="Next testimonial"
             >
               <svg
@@ -212,7 +209,6 @@ export default function TestimonialsSection() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-stone-300"
               >
                 <path d="m9 18 6-6-6-6" />
               </svg>
@@ -221,23 +217,23 @@ export default function TestimonialsSection() {
         </div>
 
         {/* Trust Badges */}
-        <div className="mt-16 pt-12 border-t border-white/10">
+        <div className="mt-16 pt-12 border-t border-gray-200">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <p className="text-3xl md:text-4xl font-bold text-white mb-2">120+</p>
-              <p className="text-xs uppercase tracking-widest text-stone-500">Happy Customers</p>
+              <p className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">120+</p>
+              <p className="text-sm text-gray-600">Happy Customers</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-bold text-white mb-2">98%</p>
-              <p className="text-xs uppercase tracking-widest text-stone-500">Satisfaction Rate</p>
+              <p className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">98%</p>
+              <p className="text-sm text-gray-600">Satisfaction Rate</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-bold text-white mb-2">50+</p>
-              <p className="text-xs uppercase tracking-widest text-stone-500">Original Artworks</p>
+              <p className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">50+</p>
+              <p className="text-sm text-gray-600">Original Artworks</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-bold text-white mb-2">10+</p>
-              <p className="text-xs uppercase tracking-widest text-stone-500">Featured Artists</p>
+              <p className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">10+</p>
+              <p className="text-sm text-gray-600">Featured Artists</p>
             </div>
           </div>
         </div>

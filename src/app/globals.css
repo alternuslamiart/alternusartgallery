@@ -105,3 +105,109 @@
 .font-roboto {
   font-family: var(--font-roboto), 'Roboto', sans-serif;
 }
+
+/* Gallery Premium Styles */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.gallery-fade-in {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.gallery-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.gallery-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Elegant gallery divider */
+.gallery-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.gallery-divider::before,
+.gallery-divider::after {
+  content: '';
+  height: 1px;
+  width: 80px;
+  background: linear-gradient(90deg, transparent, #c4b5a4, transparent);
+}
+
+/* Dark gallery wall texture */
+.gallery-wall-dark {
+  background-color: #1a1a1a;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(40,35,30,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 50%, rgba(40,35,30,0.3) 0%, transparent 60%);
+}
+
+/* Warm gallery wall */
+.gallery-wall-warm {
+  background-color: #faf8f5;
+  background-image:
+    radial-gradient(ellipse at 30% 0%, rgba(200,180,160,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 100%, rgba(200,180,160,0.06) 0%, transparent 50%);
+}
+
+/* Museum card hover frame effect */
+.gallery-card-frame {
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gallery-card-frame::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 1px solid transparent;
+  border-radius: inherit;
+  transition: border-color 0.5s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gallery-card-frame:hover::before {
+  border-color: rgba(196, 181, 164, 0.4);
+}
+
+/* Marquee for gallery names */
+@keyframes marquee-slow {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee-slow {
+  display: flex;
+  animation: marquee-slow 40s linear infinite;
+  width: fit-content;
+}
+
+.animate-marquee-slow:hover {
+  animation-play-state: paused;
+}
