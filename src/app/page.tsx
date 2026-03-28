@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage, useCart, useWishlist } from "@/components/providers";
-import AccordionSection from "@/components/accordion-section";
 import TestimonialsSection from "@/components/testimonials-section";
 import { AdBanner } from "@/components/adsense";
 
