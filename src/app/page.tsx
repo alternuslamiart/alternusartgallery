@@ -1448,16 +1448,16 @@ export default function Home() {
       <TestimonialsSection />
 
       {/* Gallery Name Marquee - Artistic Touch */}
-      <section className="py-12 bg-stone-900 overflow-hidden">
+      <section className="h-[124px] flex items-center bg-stone-900 overflow-hidden">
         <div className="animate-marquee-slow">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center gap-12 md:gap-20 px-6 md:px-10">
-              <span className="text-6xl md:text-8xl font-bold text-stone-800 whitespace-nowrap select-none">Alternus</span>
-              <span className="text-stone-700 text-2xl select-none">&bull;</span>
-              <span className="text-6xl md:text-8xl font-bold text-stone-800 whitespace-nowrap select-none">Art Gallery</span>
-              <span className="text-stone-700 text-2xl select-none">&bull;</span>
-              <span className="text-6xl md:text-8xl font-bold text-stone-800 whitespace-nowrap select-none">Since 2026</span>
-              <span className="text-stone-700 text-2xl select-none">&bull;</span>
+            <div key={i} className="flex items-center gap-8 md:gap-14 px-4 md:px-8">
+              <span className="text-4xl md:text-5xl font-bold text-stone-800 whitespace-nowrap select-none">Alternus</span>
+              <span className="text-stone-700 text-xl select-none">&bull;</span>
+              <span className="text-4xl md:text-5xl font-bold text-stone-800 whitespace-nowrap select-none">Art Gallery</span>
+              <span className="text-stone-700 text-xl select-none">&bull;</span>
+              <span className="text-4xl md:text-5xl font-bold text-stone-800 whitespace-nowrap select-none">Since 2026</span>
+              <span className="text-stone-700 text-xl select-none">&bull;</span>
             </div>
           ))}
         </div>
