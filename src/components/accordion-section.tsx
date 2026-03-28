@@ -52,7 +52,7 @@ export default function AccordionSection() {
           return (
             <div
               key={item.id}
-              className={`rounded-xl transition-all duration-500 ${
+              className={`rounded-lg transition-all duration-500 ${
                 isActive ? "bg-stone-50" : "bg-transparent hover:bg-stone-50/50"
               }`}
             >
@@ -114,7 +114,7 @@ export default function AccordionSection() {
       {/* Image Display */}
       <div className="relative">
         <div className="sticky top-8">
-          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-stone-100 to-stone-200 shadow-[0_20px_60px_rgba(0,0,0,0.12)]">
+          <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gradient-to-br from-stone-100 to-stone-200 shadow-[0_20px_60px_rgba(0,0,0,0.12)]">
             {/* Frame effect */}
             <div className="absolute inset-0 border border-stone-200/50 rounded-2xl pointer-events-none z-10" />
             <Image

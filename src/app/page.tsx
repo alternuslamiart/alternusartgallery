@@ -157,31 +157,31 @@ export default function Home() {
             <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory md:flex-wrap" style={{ scrollbarWidth: "thin" }}>
               <button
                 onClick={() => router.push('/gallery?category=Baroque')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
               >
                 Baroque
               </button>
               <button
                 onClick={() => router.push('/gallery?category=Expressionism')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
               >
                 Expressionism
               </button>
               <button
                 onClick={() => router.push('/gallery?category=Impressionism')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
               >
                 Impressionism
               </button>
               <button
                 onClick={() => router.push('/gallery?category=Abstract')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
               >
                 Abstract
               </button>
               <button
                 onClick={() => router.push('/gallery?category=Photography')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
               >
                 Photography
               </button>
@@ -217,7 +217,7 @@ export default function Home() {
                     {/* Content Inside Frame */}
                     <div className="relative z-10 h-full flex flex-col justify-between p-4">
                       {/* Top Section - Badge */}
-                      <div className="inline-flex items-center gap-1.5 bg-amber-900/60 backdrop-blur-sm text-amber-100 px-2.5 py-1 rounded-full text-[10px] font-medium w-fit border border-amber-600/30">
+                      <div className="inline-flex items-center gap-1.5 bg-amber-900/60 backdrop-blur-sm text-amber-100 px-2.5 py-1 rounded-lg text-[10px] font-medium w-fit border border-amber-600/30">
                         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M12 19l7-7 3 3-7 7-3-3z" />
                           <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
@@ -286,7 +286,7 @@ export default function Home() {
                   {/* Content */}
                   <div className="relative z-10 h-full flex flex-col justify-center p-12">
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium mb-6 w-fit">
+                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium mb-6 w-fit">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 19l7-7 3 3-7 7-3-3z" />
                         <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
@@ -362,7 +362,7 @@ export default function Home() {
 
                     <div className="relative z-10 h-full flex flex-col justify-between p-4">
                       {/* Top Section - Badge */}
-                      <div className="inline-flex items-center gap-1.5 bg-emerald-900/60 backdrop-blur-sm text-emerald-100 px-2.5 py-1 rounded-full text-[10px] font-medium w-fit border border-emerald-600/30">
+                      <div className="inline-flex items-center gap-1.5 bg-emerald-900/60 backdrop-blur-sm text-emerald-100 px-2.5 py-1 rounded-lg text-[10px] font-medium w-fit border border-emerald-600/30">
                         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
                           <path d="m3.3 7 8.7 5 8.7-5" />
@@ -421,7 +421,7 @@ export default function Home() {
                     />
                   </div>
                   <div className="relative z-10 h-full flex flex-col justify-center p-12">
-                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium mb-6 w-fit">
+                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium mb-6 w-fit">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
                         <path d="m3.3 7 8.7 5 8.7-5" />
@@ -484,7 +484,7 @@ export default function Home() {
 
                     <div className="relative z-10 h-full flex flex-col justify-between p-4">
                       {/* Top Section - Badge */}
-                      <div className="inline-flex items-center gap-1.5 bg-orange-900/60 backdrop-blur-sm text-orange-100 px-2.5 py-1 rounded-full text-[10px] font-medium w-fit border border-orange-600/30">
+                      <div className="inline-flex items-center gap-1.5 bg-orange-900/60 backdrop-blur-sm text-orange-100 px-2.5 py-1 rounded-lg text-[10px] font-medium w-fit border border-orange-600/30">
                         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <circle cx="12" cy="12" r="10" />
                           <path d="M12 16v-4" />
@@ -543,7 +543,7 @@ export default function Home() {
                     />
                   </div>
                   <div className="relative z-10 h-full flex flex-col justify-center p-12">
-                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium mb-6 w-fit">
+                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium mb-6 w-fit">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="12" r="10" />
                         <path d="M12 16v-4" />
@@ -606,7 +606,7 @@ export default function Home() {
 
                     <div className="relative z-10 h-full flex flex-col justify-between p-4">
                       {/* Top Section - Badge */}
-                      <div className="inline-flex items-center gap-1.5 bg-purple-900/60 backdrop-blur-sm text-purple-100 px-2.5 py-1 rounded-full text-[10px] font-medium w-fit border border-purple-600/30">
+                      <div className="inline-flex items-center gap-1.5 bg-purple-900/60 backdrop-blur-sm text-purple-100 px-2.5 py-1 rounded-lg text-[10px] font-medium w-fit border border-purple-600/30">
                         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                           <circle cx="12" cy="7" r="4" />
@@ -664,7 +664,7 @@ export default function Home() {
                     />
                   </div>
                   <div className="relative z-10 h-full flex flex-col justify-center p-12">
-                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium mb-6 w-fit">
+                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium mb-6 w-fit">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                         <circle cx="12" cy="7" r="4" />
@@ -730,7 +730,7 @@ export default function Home() {
             {visiblePaintings < artworks.length && (
               <button
                 onClick={() => setVisiblePaintings(prev => Math.min(prev + 4, artworks.length))}
-                className="mt-6 md:mt-0 group inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-stone-300 text-stone-600 rounded-full text-sm font-medium hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all"
+                className="mt-6 md:mt-0 group inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-stone-300 text-stone-600 rounded-lg text-sm font-medium hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all"
               >
                 <span>See More</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-y-1 transition-transform">
@@ -746,25 +746,25 @@ export default function Home() {
             <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory md:flex-wrap" style={{ scrollbarWidth: "thin" }}>
               <button
                 onClick={() => router.push('/gallery?maxPrice=500')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-full border border-stone-300 bg-white text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all snap-start"
+                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all snap-start"
               >
                 Under &euro;500
               </button>
               <button
                 onClick={() => router.push('/gallery?minPrice=1000&maxPrice=3000')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-full border border-stone-300 bg-white text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all snap-start"
+                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all snap-start"
               >
                 &euro;1000 - &euro;3000
               </button>
               <button
                 onClick={() => router.push('/gallery?minPrice=3000&maxPrice=5000')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-full border border-stone-300 bg-white text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all snap-start"
+                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all snap-start"
               >
                 &euro;3000 - &euro;5000
               </button>
               <button
                 onClick={() => router.push('/gallery?minPrice=5000&maxPrice=10000')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-full border border-stone-300 bg-white text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all snap-start"
+                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all snap-start"
               >
                 &euro;5000 - &euro;10000
               </button>
@@ -775,7 +775,7 @@ export default function Home() {
           {isLoading ? (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl overflow-hidden animate-pulse shadow-[0_2px_16px_rgba(0,0,0,0.06)] border border-stone-200/60">
+                <div key={i} className="bg-white rounded-lg overflow-hidden animate-pulse shadow-[0_2px_16px_rgba(0,0,0,0.06)] border border-stone-200/60">
                   <div className="aspect-[4/5] bg-stone-100" />
                   <div className="p-4 space-y-2">
                     <div className="h-4 bg-stone-100 rounded w-3/4" />
@@ -790,7 +790,7 @@ export default function Home() {
               {featuredPaintings.map((painting) => (
                 <div
                   key={painting.id}
-                  className="group bg-white rounded-xl overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-stone-200/60 transition-all duration-500"
+                  className="group bg-white rounded-lg overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-stone-200/60 transition-all duration-500"
                 >
                   <Link href={`/gallery/${painting.id}`}>
                     <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
@@ -974,7 +974,7 @@ export default function Home() {
             <div className="flex items-center gap-3 mt-6 md:mt-0">
               <Link
                 href="/gallery"
-                className="px-6 py-2.5 bg-transparent border border-stone-300 text-stone-600 rounded-full text-sm font-medium hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all"
+                className="px-6 py-2.5 bg-transparent border border-stone-300 text-stone-600 rounded-lg text-sm font-medium hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all"
               >
                 See More
               </Link>
@@ -1144,8 +1144,8 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
             {/* Secure Shipping */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
+              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                   <polyline points="3.29 7 12 12 20.71 7" />
@@ -1159,8 +1159,8 @@ export default function Home() {
             </div>
 
             {/* 100% Authentic */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
+              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
                   <path d="m9 12 2 2 4-4" />
@@ -1173,8 +1173,8 @@ export default function Home() {
             </div>
 
             {/* 14-Day Returns */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
+              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
                   <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                   <path d="M3 3v5h5" />
@@ -1188,8 +1188,8 @@ export default function Home() {
             </div>
 
             {/* Secure Payment */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
+              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
                   <rect width="20" height="14" x="2" y="5" rx="2" />
                   <line x1="2" x2="22" y1="10" y2="10" />
@@ -1202,8 +1202,8 @@ export default function Home() {
             </div>
 
             {/* Direct from Artist */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
+              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
                   <path d="M12 19l7-7 3 3-7 7-3-3z" />
                   <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
@@ -1218,8 +1218,8 @@ export default function Home() {
             </div>
 
             {/* Expert Support */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
+              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
                   <path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
                 </svg>
@@ -1251,7 +1251,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-6 md:gap-8">
             {/* Testimonial 1 */}
-            <div className="bg-white rounded-2xl p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-stone-100 transition-all duration-500 relative group">
+            <div className="bg-white rounded-lg p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-stone-100 transition-all duration-500 relative group">
               <div className="absolute top-0 left-8 w-8 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-b-full" />
               <div className="pt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-stone-200 mb-4">
@@ -1274,7 +1274,7 @@ export default function Home() {
             </div>
 
             {/* Testimonial 2 */}
-            <div className="bg-white rounded-2xl p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-stone-100 transition-all duration-500 relative group">
+            <div className="bg-white rounded-lg p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-stone-100 transition-all duration-500 relative group">
               <div className="absolute top-0 left-8 w-8 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-b-full" />
               <div className="pt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-stone-200 mb-4">
@@ -1297,7 +1297,7 @@ export default function Home() {
             </div>
 
             {/* Testimonial 3 */}
-            <div className="bg-white rounded-2xl p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-stone-100 transition-all duration-500 relative group">
+            <div className="bg-white rounded-lg p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-stone-100 transition-all duration-500 relative group">
               <div className="absolute top-0 left-8 w-8 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-b-full" />
               <div className="pt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-stone-200 mb-4">
@@ -1382,7 +1382,7 @@ export default function Home() {
               </div>
 
               <div className="mt-10">
-                <Link href="/about" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-stone-900 rounded-full text-sm font-medium hover:bg-stone-100 transition-colors">
+                <Link href="/about" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-stone-900 rounded-lg text-sm font-medium hover:bg-stone-100 transition-colors">
                   Learn More About Us
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12h14" />
@@ -1404,15 +1404,15 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-l from-transparent via-stone-900/30 to-stone-900/80" />
             {/* Floating stat cards */}
             <div className="absolute bottom-10 left-10 right-10 flex gap-4">
-              <div className="bg-white/10 backdrop-blur-md rounded-xl px-5 py-4 border border-white/10">
+              <div className="bg-white/10 backdrop-blur-md rounded-lg px-5 py-4 border border-white/10">
                 <p className="text-2xl font-bold text-white">50+</p>
                 <p className="text-xs text-stone-400 uppercase tracking-wider">Artworks</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-xl px-5 py-4 border border-white/10">
+              <div className="bg-white/10 backdrop-blur-md rounded-lg px-5 py-4 border border-white/10">
                 <p className="text-2xl font-bold text-white">12</p>
                 <p className="text-xs text-stone-400 uppercase tracking-wider">Countries</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-xl px-5 py-4 border border-white/10">
+              <div className="bg-white/10 backdrop-blur-md rounded-lg px-5 py-4 border border-white/10">
                 <p className="text-2xl font-bold text-white">100%</p>
                 <p className="text-xs text-stone-400 uppercase tracking-wider">Original</p>
               </div>
@@ -1475,7 +1475,7 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8 md:gap-6 max-w-5xl mx-auto">
             {/* Step 1 */}
             <div className="text-center relative">
-              <div className="w-16 h-16 bg-stone-900 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+              <div className="w-16 h-16 bg-stone-900 rounded-lg flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white">
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.3-4.3" />
@@ -1487,7 +1487,7 @@ export default function Home() {
             </div>
             {/* Step 2 */}
             <div className="text-center relative">
-              <div className="w-16 h-16 bg-stone-900 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+              <div className="w-16 h-16 bg-stone-900 rounded-lg flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white">
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                 </svg>
@@ -1498,7 +1498,7 @@ export default function Home() {
             </div>
             {/* Step 3 */}
             <div className="text-center relative">
-              <div className="w-16 h-16 bg-stone-900 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+              <div className="w-16 h-16 bg-stone-900 rounded-lg flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                   <polyline points="3.29 7 12 12 20.71 7" />
@@ -1511,7 +1511,7 @@ export default function Home() {
             </div>
             {/* Step 4 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-stone-900 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+              <div className="w-16 h-16 bg-stone-900 rounded-lg flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white">
                   <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
                   <circle cx="9" cy="9" r="2" />
@@ -1534,7 +1534,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold text-stone-900">Find Your Style</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <Link href="/gallery?category=Baroque" className="group relative aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+            <Link href="/gallery?category=Baroque" className="group relative aspect-[3/4] rounded-lg overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
               <Image src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&q=80" alt="Baroque" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
@@ -1542,7 +1542,7 @@ export default function Home() {
                 <p className="text-white/70 text-xs mt-1">Classical elegance</p>
               </div>
             </Link>
-            <Link href="/gallery?category=Impressionism" className="group relative aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+            <Link href="/gallery?category=Impressionism" className="group relative aspect-[3/4] rounded-lg overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
               <Image src="https://images.unsplash.com/photo-1549289524-06cf8837ace5?w=600&q=80" alt="Impressionism" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
@@ -1550,7 +1550,7 @@ export default function Home() {
                 <p className="text-white/70 text-xs mt-1">Light and color</p>
               </div>
             </Link>
-            <Link href="/gallery?category=Abstract" className="group relative aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+            <Link href="/gallery?category=Abstract" className="group relative aspect-[3/4] rounded-lg overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
               <Image src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=600&q=80" alt="Abstract" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
@@ -1558,7 +1558,7 @@ export default function Home() {
                 <p className="text-white/70 text-xs mt-1">Bold expression</p>
               </div>
             </Link>
-            <Link href="/gallery?category=Photography" className="group relative aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+            <Link href="/gallery?category=Photography" className="group relative aspect-[3/4] rounded-lg overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
               <Image src="https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=600&q=80" alt="Photography" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">

@@ -127,7 +127,7 @@ export default function TestimonialsSection() {
             {visibleTestimonials.map((testimonial, idx) => (
               <div
                 key={testimonial.id}
-                className={`bg-white/5 backdrop-blur-sm rounded-2xl p-6 lg:p-8 border border-white/10 hover:border-white/20 transition-all duration-500 ${
+                className={`bg-white/5 backdrop-blur-sm rounded-lg p-6 lg:p-8 border border-white/10 hover:border-white/20 transition-all duration-500 ${
                   idx === 1 ? "md:scale-105 md:z-10 md:bg-white/8" : ""
                 }`}
               >
@@ -141,7 +141,7 @@ export default function TestimonialsSection() {
 
                 {/* Author */}
                 <div className="flex items-center gap-4 pt-4 border-t border-white/10">
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-amber-500/20">
+                  <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-amber-500/20 rounded-lg">
                     <Image
                       src={testimonial.image}
                       alt={testimonial.name}
