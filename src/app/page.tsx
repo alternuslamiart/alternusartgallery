@@ -1481,7 +1481,6 @@ export default function Home() {
                   <path d="m21 21-4.3-4.3" />
                 </svg>
               </div>
-              <div className="hidden md:block absolute top-8 left-[60%] w-[80%] h-px bg-gradient-to-r from-stone-300 to-transparent" />
               <p className="text-xs uppercase tracking-widest text-stone-400 mb-2">Step 1</p>
               <h3 className="font-semibold text-stone-900 mb-2">Discover</h3>
               <p className="text-sm text-stone-500">Browse our curated collection of original artworks from verified artists</p>
@@ -1493,7 +1492,6 @@ export default function Home() {
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                 </svg>
               </div>
-              <div className="hidden md:block absolute top-8 left-[60%] w-[80%] h-px bg-gradient-to-r from-stone-300 to-transparent" />
               <p className="text-xs uppercase tracking-widest text-stone-400 mb-2">Step 2</p>
               <h3 className="font-semibold text-stone-900 mb-2">Select</h3>
               <p className="text-sm text-stone-500">Choose the piece that speaks to you with detailed views and artist stories</p>
@@ -1507,7 +1505,6 @@ export default function Home() {
                   <line x1="12" x2="12" y1="22" y2="12" />
                 </svg>
               </div>
-              <div className="hidden md:block absolute top-8 left-[60%] w-[80%] h-px bg-gradient-to-r from-stone-300 to-transparent" />
               <p className="text-xs uppercase tracking-widest text-stone-400 mb-2">Step 3</p>
               <h3 className="font-semibold text-stone-900 mb-2">Deliver</h3>
               <p className="text-sm text-stone-500">Secure worldwide shipping with professional packaging and tracking</p>
