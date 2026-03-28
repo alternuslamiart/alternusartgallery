@@ -121,7 +121,7 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section - Horizontal Scroll Frame */}
-      <section className="pt-3 pb-5 md:py-12 bg-muted/30">
+      <section className="pt-6 pb-8 md:py-16 bg-gradient-to-b from-stone-50 to-white">
         <div className="container mx-auto px-4">
           {/* Navigation Header */}
           <div className="flex items-center justify-between mb-2 md:mb-4">
@@ -714,8 +714,15 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Decorative Divider */}
+      <div className="flex items-center justify-center py-2">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-stone-300" />
+        <div className="w-1.5 h-1.5 rotate-45 bg-stone-300 mx-3" />
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-stone-300" />
+      </div>
+
       {/* Featured Works Section - Grid Layout */}
-      <section className="py-24 bg-background">
+      <section className="py-28 bg-gradient-to-b from-white via-stone-50/30 to-white">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-6">
             <div>
@@ -774,7 +781,7 @@ export default function Home() {
           {isLoading ? (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
+                <div key={i} className="bg-white rounded-2xl border border-stone-200/60 overflow-hidden animate-pulse shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
                   <div className="aspect-[4/5] bg-gray-200" />
                   <div className="p-4 space-y-2">
                     <div className="h-4 bg-gray-200 rounded w-3/4" />
@@ -789,7 +796,7 @@ export default function Home() {
               {featuredPaintings.map((painting) => (
                 <div
                   key={painting.id}
-                  className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow"
+                  className="group bg-white rounded-2xl border border-stone-200/60 overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-shadow"
                 >
                   <Link href={`/gallery/${painting.id}`}>
                     <div className="relative aspect-[4/5] overflow-hidden bg-muted">
@@ -924,8 +931,15 @@ export default function Home() {
         <AdBanner />
       </div>
 
+      {/* Decorative Divider */}
+      <div className="flex items-center justify-center py-2">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-stone-300" />
+        <div className="w-1.5 h-1.5 rotate-45 bg-stone-300 mx-3" />
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-stone-300" />
+      </div>
+
       {/* Favorite Artist Section - Horizontal Scroll */}
-      <section className="py-24 bg-background overflow-hidden">
+      <section className="py-28 bg-stone-50/50 overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
             <div>
@@ -979,7 +993,7 @@ export default function Home() {
             {artworks.map((painting) => (
               <div
                 key={painting.id}
-                className="group flex-shrink-0 w-[200px] md:w-[260px] snap-start bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow"
+                className="group flex-shrink-0 w-[200px] md:w-[260px] snap-start bg-white rounded-2xl border border-stone-200/60 overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-shadow"
               >
                 <Link href={`/gallery/${painting.id}`}>
                   <div className="relative aspect-[4/5] overflow-hidden bg-muted">
@@ -1094,8 +1108,15 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Decorative Divider */}
+      <div className="flex items-center justify-center py-2">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-stone-300" />
+        <div className="w-1.5 h-1.5 rotate-45 bg-stone-300 mx-3" />
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-stone-300" />
+      </div>
+
       {/* Why Shop at Alternus Section */}
-      <section className="py-12 bg-muted/50">
+      <section className="py-20 bg-gradient-to-b from-white to-stone-50/40">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-1">
@@ -1111,8 +1132,8 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {/* Secure Shipping */}
-            <div className="bg-background rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-center">
-              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3 mx-auto">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                   <polyline points="3.29 7 12 12 20.71 7" />
@@ -1126,8 +1147,8 @@ export default function Home() {
             </div>
 
             {/* 100% Authentic */}
-            <div className="bg-background rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-center">
-              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3 mx-auto">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
                   <path d="m9 12 2 2 4-4" />
@@ -1140,8 +1161,8 @@ export default function Home() {
             </div>
 
             {/* 14-Day Returns */}
-            <div className="bg-background rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-center">
-              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3 mx-auto">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                   <path d="M3 3v5h5" />
@@ -1155,8 +1176,8 @@ export default function Home() {
             </div>
 
             {/* Secure Payment */}
-            <div className="bg-background rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-center">
-              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3 mx-auto">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <rect width="20" height="14" x="2" y="5" rx="2" />
                   <line x1="2" x2="22" y1="10" y2="10" />
@@ -1169,8 +1190,8 @@ export default function Home() {
             </div>
 
             {/* Direct from Artist */}
-            <div className="bg-background rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-center">
-              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3 mx-auto">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <path d="M12 19l7-7 3 3-7 7-3-3z" />
                   <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
@@ -1185,8 +1206,8 @@ export default function Home() {
             </div>
 
             {/* Expert Support */}
-            <div className="bg-background rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow text-center">
-              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3 mx-auto">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
                 </svg>
@@ -1200,8 +1221,15 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Decorative Divider */}
+      <div className="flex items-center justify-center py-2">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-stone-300" />
+        <div className="w-1.5 h-1.5 rotate-45 bg-stone-300 mx-3" />
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-stone-300" />
+      </div>
+
       {/* Testimonials Section */}
-      <section className="py-20 bg-muted/30 overflow-hidden">
+      <section className="py-28 bg-gradient-to-b from-stone-50/50 to-white overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">
@@ -1217,7 +1245,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Testimonial 1 */}
-            <div className="bg-background rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow relative">
+            <div className="bg-white rounded-2xl p-8 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow relative">
               <div className="absolute -top-4 left-8">
                 <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-primary-foreground">
@@ -1243,7 +1271,7 @@ export default function Home() {
             </div>
 
             {/* Testimonial 2 */}
-            <div className="bg-background rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow relative">
+            <div className="bg-white rounded-2xl p-8 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow relative">
               <div className="absolute -top-4 left-8">
                 <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-primary-foreground">
@@ -1269,7 +1297,7 @@ export default function Home() {
             </div>
 
             {/* Testimonial 3 */}
-            <div className="bg-background rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow relative">
+            <div className="bg-white rounded-2xl p-8 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow relative">
               <div className="absolute -top-4 left-8">
                 <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-primary-foreground">
@@ -1298,7 +1326,7 @@ export default function Home() {
       </section>
 
       {/* About Preview Section - Apple Accordion Style */}
-      <section className="py-32 md:py-40 bg-white overflow-hidden">
+      <section className="py-32 md:py-40 bg-gradient-to-b from-white to-stone-50/30 overflow-hidden">
         <div className="container mx-auto px-6 md:px-12">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
