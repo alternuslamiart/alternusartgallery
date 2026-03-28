@@ -1393,51 +1393,53 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right - Image Collage */}
-          <div className="relative bg-stone-100 hidden lg:block">
-            <div className="absolute inset-0 grid grid-cols-2 gap-3 p-6">
-              <div className="relative rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
-                <Image
-                  src="https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800&q=80"
-                  alt="Gallery Art 1"
-                  fill
-                  className="object-cover"
-                />
+          {/* Right - Single Featured Image */}
+          <div className="relative bg-stone-900 hidden lg:block">
+            <Image
+              src="https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1200&q=80"
+              alt="Art Gallery"
+              fill
+              className="object-cover opacity-60"
+            />
+            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-stone-900/30 to-stone-900/80" />
+            {/* Floating stat cards */}
+            <div className="absolute bottom-10 left-10 right-10 flex gap-4">
+              <div className="bg-white/10 backdrop-blur-md rounded-xl px-5 py-4 border border-white/10">
+                <p className="text-2xl font-bold text-white">50+</p>
+                <p className="text-xs text-stone-400 uppercase tracking-wider">Artworks</p>
               </div>
-              <div className="relative rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)] mt-12">
-                <Image
-                  src="https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&q=80"
-                  alt="Gallery Art 2"
-                  fill
-                  className="object-cover"
-                />
+              <div className="bg-white/10 backdrop-blur-md rounded-xl px-5 py-4 border border-white/10">
+                <p className="text-2xl font-bold text-white">12</p>
+                <p className="text-xs text-stone-400 uppercase tracking-wider">Countries</p>
               </div>
-              <div className="relative rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)] -mt-12">
-                <Image
-                  src="https://images.unsplash.com/photo-1549289524-06cf8837ace5?w=800&q=80"
-                  alt="Gallery Art 3"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="relative rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
-                <Image
-                  src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80"
-                  alt="Gallery Art 4"
-                  fill
-                  className="object-cover"
-                />
+              <div className="bg-white/10 backdrop-blur-md rounded-xl px-5 py-4 border border-white/10">
+                <p className="text-2xl font-bold text-white">100%</p>
+                <p className="text-xs text-stone-400 uppercase tracking-wider">Original</p>
               </div>
             </div>
           </div>
           {/* Mobile Image */}
-          <div className="lg:hidden relative h-[300px]">
+          <div className="lg:hidden relative h-[300px] bg-stone-900">
             <Image
               src="https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1200&q=80"
-              alt="Gallery Art"
+              alt="Art Gallery"
               fill
-              className="object-cover"
+              className="object-cover opacity-60"
             />
+            <div className="absolute bottom-6 left-6 right-6 flex gap-3">
+              <div className="bg-white/10 backdrop-blur-md rounded-lg px-4 py-3 border border-white/10">
+                <p className="text-lg font-bold text-white">50+</p>
+                <p className="text-[10px] text-stone-400 uppercase">Artworks</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-md rounded-lg px-4 py-3 border border-white/10">
+                <p className="text-lg font-bold text-white">12</p>
+                <p className="text-[10px] text-stone-400 uppercase">Countries</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-md rounded-lg px-4 py-3 border border-white/10">
+                <p className="text-lg font-bold text-white">100%</p>
+                <p className="text-[10px] text-stone-400 uppercase">Original</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
