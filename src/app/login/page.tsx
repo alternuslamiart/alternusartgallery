@@ -112,70 +112,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Side - Decorative Panel */}
-      <div className="hidden lg:flex lg:w-[480px] xl:w-[540px] relative overflow-hidden bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900">
-        <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage: `radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                           radial-gradient(circle at 75% 75%, rgba(255,255,255,0.08) 0%, transparent 50%)`,
-        }} />
-
-        <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
-          {/* Logo */}
-          <div>
-            <Link href="/" className="inline-block group">
-              <h1 className="text-2xl font-bold tracking-[0.2em] group-hover:tracking-[0.25em] transition-all duration-500">ALTERNUS</h1>
-              <p className="text-xs tracking-[0.3em] text-white/50 mt-1">ART GALLERY</p>
-            </Link>
-          </div>
-
-          {/* Center content */}
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                <Palette className="w-6 h-6 text-white/80" />
-              </div>
-              <h2 className="text-4xl font-light leading-tight">
-                Welcome<br />
-                <span className="font-semibold">Back</span>
-              </h2>
-              <p className="text-white/60 text-base leading-relaxed max-w-sm">
-                Sign in to continue exploring extraordinary artworks and managing your collection.
-              </p>
-            </div>
-
-            {/* Feature highlights */}
-            <div className="space-y-4">
-              {[
-                { icon: Palette, text: "Access your curated art collection" },
-                { icon: Heart, text: "View your saved favorites and wishlist" },
-                { icon: ShieldCheck, text: "Manage orders and track deliveries" },
-              ].map((feature, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                    <feature.icon className="w-4 h-4 text-white/70" />
-                  </div>
-                  <span className="text-sm text-white/70">{feature.text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Bottom quote */}
-          <div className="border-t border-white/10 pt-6">
-            <p className="text-sm text-white/40 italic">
-              &ldquo;Art is not what you see, but what you make others see.&rdquo;
-            </p>
-            <p className="text-xs text-white/30 mt-1">Edgar Degas</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50/80 via-white to-gray-50/50 px-6 py-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50/80 via-white to-gray-50/50 px-6 py-10">
         <div className="w-full max-w-[440px]">
-          {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-8">
+          {/* Logo */}
+          <div className="text-center mb-8">
             <Link href="/" className="inline-block">
               <h1 className="text-2xl font-bold tracking-[0.2em]">ALTERNUS</h1>
               <p className="text-[10px] tracking-[0.3em] text-muted-foreground mt-0.5">ART GALLERY</p>
@@ -335,7 +275,6 @@ export default function LoginPage() {
             </p>
           </div>
         </div>
-      </div>
 
       {/* Forgot Password Dialog */}
       <Dialog open={showForgotPassword} onOpenChange={closeForgotPasswordDialog}>
