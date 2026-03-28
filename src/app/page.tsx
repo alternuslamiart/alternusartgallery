@@ -157,31 +157,31 @@ export default function Home() {
             <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory md:flex-wrap" style={{ scrollbarWidth: "thin" }}>
               <button
                 onClick={() => router.push('/gallery?category=Baroque')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-none border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
               >
                 Baroque
               </button>
               <button
                 onClick={() => router.push('/gallery?category=Expressionism')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-none border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
               >
                 Expressionism
               </button>
               <button
                 onClick={() => router.push('/gallery?category=Impressionism')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-none border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
               >
                 Impressionism
               </button>
               <button
                 onClick={() => router.push('/gallery?category=Abstract')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-none border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
               >
                 Abstract
               </button>
               <button
                 onClick={() => router.push('/gallery?category=Photography')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-none border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
               >
                 Photography
               </button>
@@ -714,23 +714,25 @@ export default function Home() {
       </section>
 
       {/* Gallery Collection Section */}
-      <section className="py-20 md:py-28 gallery-wall-warm">
+      <section className="py-20 md:py-28 bg-white">
         <div className="container mx-auto px-4">
-          {/* Elegant section header */}
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 md:mb-16">
-            <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-stone-400 mb-3">
-                Collection
-              </p>
-              <h2 className="text-3xl md:text-5xl font-bold text-stone-900 leading-tight">
-                {t("featuredWorks")}
-              </h2>
-              <div className="w-16 h-px bg-gradient-to-r from-stone-400 to-transparent mt-4" />
-            </div>
+          {/* Section header */}
+          <div className="text-center mb-16 md:mb-20">
+            <p className="text-xs uppercase tracking-[0.3em] text-stone-400 mb-4 font-mono">
+              Here are our
+            </p>
+            <h2 className="font-playfair text-4xl md:text-5xl lg:text-6xl font-bold text-black leading-tight mb-6">
+              {t("featuredWorks")}
+            </h2>
+            <p className="text-stone-500 max-w-2xl mx-auto leading-relaxed">
+              The role that curators play, like the art they care for, is constantly evolving. Each piece is carefully selected for its exceptional quality and artistic merit.
+            </p>
+          </div>
+          <div className="flex justify-center mb-12">
             {visiblePaintings < artworks.length && (
               <button
                 onClick={() => setVisiblePaintings(prev => Math.min(prev + 4, artworks.length))}
-                className="mt-6 md:mt-0 group inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-stone-300 text-stone-600 rounded-lg text-sm font-medium hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all"
+                className="mt-6 md:mt-0 group inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-stone-300 text-stone-600 rounded-none text-xs uppercase tracking-widest font-medium hover:bg-black hover:text-white hover:border-black transition-all"
               >
                 <span>See More</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-y-1 transition-transform">
@@ -746,25 +748,25 @@ export default function Home() {
             <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory md:flex-wrap" style={{ scrollbarWidth: "thin" }}>
               <button
                 onClick={() => router.push('/gallery?maxPrice=500')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all snap-start"
+                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-none border border-stone-300 bg-white text-stone-600 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
               >
                 Under &euro;500
               </button>
               <button
                 onClick={() => router.push('/gallery?minPrice=1000&maxPrice=3000')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all snap-start"
+                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-none border border-stone-300 bg-white text-stone-600 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
               >
                 &euro;1000 - &euro;3000
               </button>
               <button
                 onClick={() => router.push('/gallery?minPrice=3000&maxPrice=5000')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all snap-start"
+                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-none border border-stone-300 bg-white text-stone-600 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
               >
                 &euro;3000 - &euro;5000
               </button>
               <button
                 onClick={() => router.push('/gallery?minPrice=5000&maxPrice=10000')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all snap-start"
+                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-none border border-stone-300 bg-white text-stone-600 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
               >
                 &euro;5000 - &euro;10000
               </button>
@@ -775,7 +777,7 @@ export default function Home() {
           {isLoading ? (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg overflow-hidden animate-pulse shadow-[0_2px_16px_rgba(0,0,0,0.06)] border border-stone-200/60">
+                <div key={i} className="bg-white overflow-hidden animate-pulse border border-stone-200">
                   <div className="aspect-[4/5] bg-stone-100" />
                   <div className="p-4 space-y-2">
                     <div className="h-4 bg-stone-100 rounded w-3/4" />
@@ -790,7 +792,7 @@ export default function Home() {
               {featuredPaintings.map((painting) => (
                 <div
                   key={painting.id}
-                  className="group bg-white rounded-lg overflow-hidden shadow-[0_2px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.12)] border border-stone-200/60 transition-all duration-500"
+                  className="group bg-white overflow-hidden border border-stone-200 hover:border-stone-400 transition-all duration-500"
                 >
                   <Link href={`/gallery/${painting.id}`}>
                     <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
@@ -920,31 +922,28 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Gallery Statement - Full Width Quote */}
-      <section className="py-20 md:py-28 bg-[#faf8f5] relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }} />
-        <div className="container mx-auto px-4 text-center relative">
-          <p className="text-xs uppercase tracking-[0.5em] text-stone-400 mb-6">The Gallery Experience</p>
-          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-stone-900 leading-tight max-w-4xl mx-auto mb-6">
-            Every artwork tells a story worth living with
+      {/* Gallery Statement - Editorial Quote */}
+      <section className="py-24 md:py-32 bg-white border-t border-stone-200">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="font-playfair text-2xl md:text-4xl lg:text-5xl font-bold text-black leading-snug max-w-4xl mx-auto mb-10">
+            The Art Gallery with its unique collection is among those museums that attracts a wide array of people and is among the rare that have residencies.
           </h2>
-          <p className="text-lg md:text-xl text-stone-500 max-w-2xl mx-auto">
-            We curate only the finest original works from verified artists worldwide, ensuring each piece meets museum-quality standards.
-          </p>
-          <div className="flex items-center justify-center gap-8 md:gap-16 mt-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto mt-16">
             <div className="text-center">
-              <p className="text-3xl md:text-4xl font-bold text-stone-900">50+</p>
-              <p className="text-xs uppercase tracking-widest text-stone-400 mt-1">Original Works</p>
+              <p className="font-playfair text-3xl md:text-4xl font-bold text-black">50+</p>
+              <p className="text-xs uppercase tracking-widest text-stone-400 mt-2 font-mono">Artworks</p>
             </div>
-            <div className="w-px h-12 bg-stone-300" />
             <div className="text-center">
-              <p className="text-3xl md:text-4xl font-bold text-stone-900">12</p>
-              <p className="text-xs uppercase tracking-widest text-stone-400 mt-1">Countries</p>
+              <p className="font-playfair text-3xl md:text-4xl font-bold text-black">12</p>
+              <p className="text-xs uppercase tracking-widest text-stone-400 mt-2 font-mono">Countries</p>
             </div>
-            <div className="w-px h-12 bg-stone-300" />
             <div className="text-center">
-              <p className="text-3xl md:text-4xl font-bold text-stone-900">100%</p>
-              <p className="text-xs uppercase tracking-widest text-stone-400 mt-1">Authentic</p>
+              <p className="font-playfair text-3xl md:text-4xl font-bold text-black">100%</p>
+              <p className="text-xs uppercase tracking-widest text-stone-400 mt-2 font-mono">Original</p>
+            </div>
+            <div className="text-center">
+              <p className="font-playfair text-3xl md:text-4xl font-bold text-black">120+</p>
+              <p className="text-xs uppercase tracking-widest text-stone-400 mt-2 font-mono">Collectors</p>
             </div>
           </div>
         </div>
@@ -955,26 +954,25 @@ export default function Home() {
         <AdBanner />
       </div>
 
-      {/* Curated Artist Section - Warm Gallery Wall */}
-      <section className="gallery-wall-warm py-20 md:py-28 overflow-hidden">
+      {/* Curated Artist Section */}
+      <section className="py-20 md:py-28 bg-white border-t border-stone-200 overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
             <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-stone-400 mb-3">
+              <p className="text-xs uppercase tracking-[0.3em] text-stone-400 mb-4 font-mono">
                 Curated Selection
               </p>
-              <h2 className="text-3xl md:text-5xl font-bold text-stone-900 leading-tight">
+              <h2 className="font-playfair text-3xl md:text-5xl font-bold text-black leading-tight">
                 {t("favoriteArtist")}
               </h2>
               <p className="text-stone-500 mt-3 max-w-md">
                 {t("favoriteArtistSubtitle")}
               </p>
-              <div className="w-16 h-px bg-gradient-to-r from-amber-600/60 to-transparent mt-4" />
             </div>
             <div className="flex items-center gap-3 mt-6 md:mt-0">
               <Link
                 href="/gallery"
-                className="px-6 py-2.5 bg-transparent border border-stone-300 text-stone-600 rounded-lg text-sm font-medium hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all"
+                className="px-6 py-2.5 bg-transparent border border-stone-300 text-stone-600 rounded-none text-xs uppercase tracking-widest font-medium hover:bg-black hover:text-white hover:border-black transition-all"
               >
                 See More
               </Link>
@@ -982,7 +980,7 @@ export default function Home() {
                 variant="outline"
                 size="icon"
                 onClick={scrollLeft}
-                className="rounded-full h-10 w-10 border-stone-300 hover:bg-stone-900 hover:text-white hover:border-stone-900"
+                className="rounded-none h-10 w-10 border-stone-300 hover:bg-black hover:text-white hover:border-black"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="m15 18-6-6 6-6" />
@@ -992,7 +990,7 @@ export default function Home() {
                 variant="outline"
                 size="icon"
                 onClick={scrollRight}
-                className="rounded-full h-10 w-10 border-stone-300 hover:bg-stone-900 hover:text-white hover:border-stone-900"
+                className="rounded-none h-10 w-10 border-stone-300 hover:bg-black hover:text-white hover:border-black"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="m9 18 6-6-6-6" />
@@ -1011,10 +1009,10 @@ export default function Home() {
             {artworks.map((painting) => (
               <div
                 key={painting.id}
-                className="group flex-shrink-0 w-[200px] md:w-[280px] snap-start gallery-card-frame rounded-lg overflow-hidden"
+                className="group flex-shrink-0 w-[200px] md:w-[280px] snap-start overflow-hidden"
               >
                 <Link href={`/gallery/${painting.id}`}>
-                  <div className="relative aspect-[4/5] overflow-hidden bg-stone-200 rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
                     <Image
                       src={painting.image}
                       alt={painting.title}
@@ -1126,27 +1124,26 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Gallery Promise - Dark Elegant Section */}
-      <section className="py-20 md:py-24 bg-stone-900 relative overflow-hidden">
-        <div className="absolute inset-0 gallery-shimmer" />
+      {/* Gallery Promise Section */}
+      <section className="py-20 md:py-24 bg-black relative overflow-hidden">
         <div className="container mx-auto px-4 relative">
-          <div className="text-center mb-12">
-            <p className="text-xs uppercase tracking-[0.4em] text-amber-500/70 mb-3">
+          <div className="text-center mb-16">
+            <p className="text-xs uppercase tracking-[0.3em] text-white/40 mb-4 font-mono">
               Trust &amp; Quality
             </p>
-            <h2 className="text-2xl md:text-4xl font-bold mb-3 text-white">
+            <h2 className="font-playfair text-3xl md:text-5xl font-bold mb-4 text-white">
               {t("whyShopTitle")}
             </h2>
-            <p className="text-stone-400 text-sm max-w-xl mx-auto">
+            <p className="text-white/50 text-sm max-w-xl mx-auto">
               {t("whyShopSubtitle")}
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
             {/* Secure Shipping */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group">
+              <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                   <polyline points="3.29 7 12 12 20.71 7" />
                   <line x1="12" x2="12" y1="22" y2="12" />
@@ -1159,9 +1156,9 @@ export default function Home() {
             </div>
 
             {/* 100% Authentic */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group">
+              <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
                   <path d="m9 12 2 2 4-4" />
                 </svg>
@@ -1173,9 +1170,9 @@ export default function Home() {
             </div>
 
             {/* 14-Day Returns */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group">
+              <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                   <path d="M3 3v5h5" />
                   <path d="M12 7v5l4 2" />
@@ -1188,9 +1185,9 @@ export default function Home() {
             </div>
 
             {/* Secure Payment */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group">
+              <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <rect width="20" height="14" x="2" y="5" rx="2" />
                   <line x1="2" x2="22" y1="10" y2="10" />
                 </svg>
@@ -1202,9 +1199,9 @@ export default function Home() {
             </div>
 
             {/* Direct from Artist */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group">
+              <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M12 19l7-7 3 3-7 7-3-3z" />
                   <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
                   <path d="M2 2l7.586 7.586" />
@@ -1218,9 +1215,9 @@ export default function Home() {
             </div>
 
             {/* Expert Support */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/10 hover:border-white/20 hover:bg-white/8 transition-all text-center group">
-              <div className="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-amber-500/20 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group">
+              <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
                 </svg>
               </div>
@@ -1233,25 +1230,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Collector Voices - Premium Testimonials */}
-      <section className="py-20 md:py-28 bg-[#faf8f5] overflow-hidden">
+      {/* Collector Voices - Testimonials */}
+      <section className="py-20 md:py-28 bg-white border-t border-stone-200 overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <p className="text-xs uppercase tracking-[0.4em] text-stone-400 mb-3">
-              Collector Voices
+            <p className="text-xs uppercase tracking-[0.3em] text-stone-400 mb-4 font-mono">
+              Testimonials
             </p>
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-stone-900">
+            <h2 className="font-playfair text-3xl md:text-5xl font-bold mb-4 text-black">
               What Collectors Say
             </h2>
             <p className="text-stone-500 text-lg max-w-2xl mx-auto">
               Discover why art enthusiasts around the world choose Alternus
             </p>
-            <div className="w-16 h-px bg-gradient-to-r from-transparent via-amber-600/40 to-transparent mx-auto mt-6" />
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 md:gap-8">
             {/* Testimonial 1 */}
-            <div className="bg-white rounded-lg p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-stone-100 transition-all duration-500 relative group">
+            <div className="bg-white p-8 border border-stone-200 hover:border-stone-400 transition-all duration-500 relative group">
               <div className="absolute top-0 left-8 w-8 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-b-full" />
               <div className="pt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-stone-200 mb-4">
@@ -1274,7 +1270,7 @@ export default function Home() {
             </div>
 
             {/* Testimonial 2 */}
-            <div className="bg-white rounded-lg p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-stone-100 transition-all duration-500 relative group">
+            <div className="bg-white p-8 border border-stone-200 hover:border-stone-400 transition-all duration-500 relative group">
               <div className="absolute top-0 left-8 w-8 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-b-full" />
               <div className="pt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-stone-200 mb-4">
@@ -1297,7 +1293,7 @@ export default function Home() {
             </div>
 
             {/* Testimonial 3 */}
-            <div className="bg-white rounded-lg p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.08)] border border-stone-100 transition-all duration-500 relative group">
+            <div className="bg-white p-8 border border-stone-200 hover:border-stone-400 transition-all duration-500 relative group">
               <div className="absolute top-0 left-8 w-8 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-b-full" />
               <div className="pt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-stone-200 mb-4">
@@ -1329,10 +1325,10 @@ export default function Home() {
           <div className="bg-stone-900 py-20 md:py-28 px-6 md:px-16 lg:px-20 flex flex-col justify-center relative">
             <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-stone-800/30 to-transparent pointer-events-none" />
             <div className="relative">
-              <p className="text-xs uppercase tracking-[0.5em] text-amber-500/60 mb-6">Our Philosophy</p>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[0.95] text-white mb-6">
+              <p className="text-xs uppercase tracking-[0.3em] text-white/40 mb-6 font-mono">Our Philosophy</p>
+              <h2 className="font-playfair text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[0.95] text-white mb-6">
                 Art that
-                <span className="block text-stone-400">speaks.</span>
+                <span className="block text-white/50">speaks.</span>
               </h2>
               <p className="text-lg md:text-xl text-stone-400 leading-relaxed max-w-lg mb-10">
                 A curated platform connecting exceptional artists with passionate collectors worldwide.
@@ -1343,7 +1339,7 @@ export default function Home() {
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/70">
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
                       <path d="m9 12 2 2 4-4" />
                     </svg>
@@ -1355,7 +1351,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/70">
                       <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
                       <circle cx="9" cy="9" r="2" />
                       <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
@@ -1368,7 +1364,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-amber-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/70">
                       <circle cx="12" cy="12" r="10" />
                       <path d="M2 12h20" />
                       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
@@ -1448,34 +1444,33 @@ export default function Home() {
       <TestimonialsSection />
 
       {/* Gallery Name Marquee - Artistic Touch */}
-      <section className="h-[124px] flex items-center bg-stone-900 overflow-hidden">
+      <section className="h-[100px] flex items-center bg-black overflow-hidden border-t border-b border-stone-800">
         <div className="animate-marquee-slow">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex items-center gap-8 md:gap-14 px-4 md:px-8">
-              <span className="text-4xl md:text-5xl font-bold text-stone-800 whitespace-nowrap select-none">Alternus</span>
-              <span className="text-stone-700 text-xl select-none">&bull;</span>
-              <span className="text-4xl md:text-5xl font-bold text-stone-800 whitespace-nowrap select-none">Art Gallery</span>
-              <span className="text-stone-700 text-xl select-none">&bull;</span>
-              <span className="text-4xl md:text-5xl font-bold text-stone-800 whitespace-nowrap select-none">Since 2026</span>
-              <span className="text-stone-700 text-xl select-none">&bull;</span>
+              <span className="font-playfair text-4xl md:text-5xl font-bold text-white/10 whitespace-nowrap select-none">Alternus</span>
+              <span className="text-white/10 text-xl select-none">&bull;</span>
+              <span className="font-playfair text-4xl md:text-5xl font-bold text-white/10 whitespace-nowrap select-none">Art Gallery</span>
+              <span className="text-white/10 text-xl select-none">&bull;</span>
+              <span className="font-playfair text-4xl md:text-5xl font-bold text-white/10 whitespace-nowrap select-none">Since 2026</span>
+              <span className="text-white/10 text-xl select-none">&bull;</span>
             </div>
           ))}
         </div>
       </section>
 
       {/* How It Works - Gallery Process */}
-      <section className="py-20 md:py-28 bg-white relative">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-stone-200 to-transparent" />
+      <section className="py-20 md:py-28 bg-white border-t border-stone-200">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <p className="text-xs uppercase tracking-[0.4em] text-stone-400 mb-3">Simple Process</p>
-            <h2 className="text-3xl md:text-5xl font-bold text-stone-900 mb-4">How It Works</h2>
+            <p className="text-xs uppercase tracking-[0.3em] text-stone-400 mb-4 font-mono">Simple Process</p>
+            <h2 className="font-playfair text-3xl md:text-5xl font-bold text-black mb-4">How It Works</h2>
             <p className="text-stone-500 text-lg max-w-2xl mx-auto">From discovery to display, we make collecting art effortless</p>
           </div>
           <div className="grid md:grid-cols-4 gap-8 md:gap-6 max-w-5xl mx-auto">
             {/* Step 1 */}
             <div className="text-center relative">
-              <div className="w-16 h-16 bg-stone-900 rounded-lg flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+              <div className="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white">
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.3-4.3" />
@@ -1487,7 +1482,7 @@ export default function Home() {
             </div>
             {/* Step 2 */}
             <div className="text-center relative">
-              <div className="w-16 h-16 bg-stone-900 rounded-lg flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+              <div className="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white">
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                 </svg>
@@ -1498,7 +1493,7 @@ export default function Home() {
             </div>
             {/* Step 3 */}
             <div className="text-center relative">
-              <div className="w-16 h-16 bg-stone-900 rounded-lg flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+              <div className="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                   <polyline points="3.29 7 12 12 20.71 7" />
@@ -1511,7 +1506,7 @@ export default function Home() {
             </div>
             {/* Step 4 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-stone-900 rounded-lg flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
+              <div className="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white">
                   <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
                   <circle cx="9" cy="9" r="2" />
@@ -1527,14 +1522,14 @@ export default function Home() {
       </section>
 
       {/* Art Categories Showcase */}
-      <section className="py-16 md:py-24 bg-[#faf8f5]">
+      <section className="py-16 md:py-24 bg-white border-t border-stone-200">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <p className="text-xs uppercase tracking-[0.4em] text-stone-400 mb-3">Explore Styles</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-stone-900">Find Your Style</h2>
+            <p className="text-xs uppercase tracking-[0.3em] text-stone-400 mb-4 font-mono">Explore Styles</p>
+            <h2 className="font-playfair text-3xl md:text-4xl font-bold text-black">Find Your Style</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <Link href="/gallery?category=Baroque" className="group relative aspect-[3/4] rounded-lg overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+            <Link href="/gallery?category=Baroque" className="group relative aspect-[3/4] overflow-hidden">
               <Image src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&q=80" alt="Baroque" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
@@ -1542,7 +1537,7 @@ export default function Home() {
                 <p className="text-white/70 text-xs mt-1">Classical elegance</p>
               </div>
             </Link>
-            <Link href="/gallery?category=Impressionism" className="group relative aspect-[3/4] rounded-lg overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+            <Link href="/gallery?category=Impressionism" className="group relative aspect-[3/4] overflow-hidden">
               <Image src="https://images.unsplash.com/photo-1549289524-06cf8837ace5?w=600&q=80" alt="Impressionism" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
@@ -1550,7 +1545,7 @@ export default function Home() {
                 <p className="text-white/70 text-xs mt-1">Light and color</p>
               </div>
             </Link>
-            <Link href="/gallery?category=Abstract" className="group relative aspect-[3/4] rounded-lg overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+            <Link href="/gallery?category=Abstract" className="group relative aspect-[3/4] overflow-hidden">
               <Image src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=600&q=80" alt="Abstract" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
@@ -1558,7 +1553,7 @@ export default function Home() {
                 <p className="text-white/70 text-xs mt-1">Bold expression</p>
               </div>
             </Link>
-            <Link href="/gallery?category=Photography" className="group relative aspect-[3/4] rounded-lg overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+            <Link href="/gallery?category=Photography" className="group relative aspect-[3/4] overflow-hidden">
               <Image src="https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=600&q=80" alt="Photography" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">

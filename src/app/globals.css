@@ -106,6 +106,10 @@
   font-family: var(--font-roboto), 'Roboto', sans-serif;
 }
 
+.font-playfair {
+  font-family: var(--font-playfair), 'Playfair Display', Georgia, serif;
+}
+
 /* Gallery Premium Styles */
 @keyframes fadeInUp {
   from {

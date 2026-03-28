@@ -84,8 +84,8 @@ export default function TestimonialsSection() {
             width="16"
             height="16"
             viewBox="0 0 24 24"
-            fill={star <= rating ? "#d4a574" : "none"}
-            stroke={star <= rating ? "#d4a574" : "#d1d5db"}
+            fill={star <= rating ? "#ffffff" : "none"}
+            stroke={star <= rating ? "#ffffff" : "#555555"}
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -104,21 +104,19 @@ export default function TestimonialsSection() {
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-stone-900 relative overflow-hidden">
-      <div className="absolute inset-0 gallery-shimmer" />
+    <section className="py-16 md:py-24 bg-black relative overflow-hidden">
       <div className="container mx-auto px-4 relative">
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
-          <p className="text-xs uppercase tracking-[0.4em] text-amber-500/60 mb-3">
+          <p className="text-xs uppercase tracking-[0.3em] text-white/40 mb-4 font-mono">
             Testimonials
           </p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+          <h2 className="font-playfair text-3xl md:text-4xl font-bold mb-4 text-white">
             What Our Clients Say
           </h2>
-          <p className="text-stone-400 text-lg max-w-2xl mx-auto">
+          <p className="text-white/50 text-lg max-w-2xl mx-auto">
             Join thousands of satisfied customers who have found their perfect artwork with Alternus
           </p>
-          <div className="w-16 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent mx-auto mt-6" />
         </div>
 
         {/* Testimonials Grid */}
@@ -127,7 +125,7 @@ export default function TestimonialsSection() {
             {visibleTestimonials.map((testimonial, idx) => (
               <div
                 key={testimonial.id}
-                className={`bg-white/5 backdrop-blur-sm rounded-lg p-6 lg:p-8 border border-white/10 hover:border-white/20 transition-all duration-500 ${
+                className={`bg-white/5 p-6 lg:p-8 border border-white/10 hover:border-white/30 transition-all duration-500 ${
                   idx === 1 ? "md:scale-105 md:z-10 md:bg-white/8" : ""
                 }`}
               >
