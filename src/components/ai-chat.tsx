@@ -171,21 +171,26 @@ export function AIChat() {
   return (
     <>
       {/* Floating Chat Button */}
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="hidden md:flex fixed bottom-6 right-6 z-50 items-center gap-3 bg-stone-900 text-white pl-5 pr-4 py-3 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.3)] hover:scale-105 transition-all duration-300 group"
-          aria-label="Open AI Chat"
+      <button
+        onClick={() => setIsOpen(true)}
+        className="hidden md:flex fixed bottom-6 right-6 z-50 w-14 h-14 bg-black text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 items-center justify-center"
+        aria-label="Open AI Chat"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <span className="text-sm font-medium">Chat with us</span>
-          <div className="w-10 h-10 bg-white/15 rounded-full flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
-            </svg>
-          </div>
-          <span className="absolute top-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-stone-900 animate-pulse" />
-        </button>
-      )}
+          <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
+        </svg>
+        <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+      </button>
 
       {/* Chat Window */}
       {isOpen && (
