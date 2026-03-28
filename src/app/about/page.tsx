@@ -67,7 +67,7 @@ export default function AboutPage() {
           <div className="max-w-5xl mx-auto">
             <div className="relative aspect-[16/9] rounded-3xl overflow-hidden">
               <Image
-                src="https://images.unsplash.com/photo-1577720643272-265f09367456?w=1920&q=80"
+                src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1920&q=80"
                 alt="Alternus Art Gallery"
                 fill
                 className="object-cover"
