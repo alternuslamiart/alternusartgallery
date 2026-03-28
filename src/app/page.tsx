@@ -1358,7 +1358,7 @@ export default function Home() {
               <span className="text-stone-700 text-2xl select-none">&bull;</span>
               <span className="text-6xl md:text-8xl font-bold text-stone-800 whitespace-nowrap select-none">Art Gallery</span>
               <span className="text-stone-700 text-2xl select-none">&bull;</span>
-              <span className="text-6xl md:text-8xl font-bold text-stone-800 whitespace-nowrap select-none">Since 2024</span>
+              <span className="text-6xl md:text-8xl font-bold text-stone-800 whitespace-nowrap select-none">Since 2026</span>
               <span className="text-stone-700 text-2xl select-none">&bull;</span>
             </div>
           ))}
