@@ -1443,22 +1443,6 @@ export default function Home() {
       {/* Testimonials Carousel Section */}
       <TestimonialsSection />
 
-      {/* Gallery Name Marquee - Artistic Touch */}
-      <section className="h-[100px] flex items-center bg-coffee overflow-hidden border-t border-b border-coffee">
-        <div className="animate-marquee-slow">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center gap-8 md:gap-14 px-4 md:px-8">
-              <span className="font-playfair text-4xl md:text-5xl font-bold text-white/10 whitespace-nowrap select-none">Alternus</span>
-              <span className="text-white/10 text-xl select-none">&bull;</span>
-              <span className="font-playfair text-4xl md:text-5xl font-bold text-white/10 whitespace-nowrap select-none">Art Gallery</span>
-              <span className="text-white/10 text-xl select-none">&bull;</span>
-              <span className="font-playfair text-4xl md:text-5xl font-bold text-white/10 whitespace-nowrap select-none">Since 2026</span>
-              <span className="text-white/10 text-xl select-none">&bull;</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* How It Works - Gallery Process */}
       <section className="py-20 md:py-28 bg-white border-t border-stone-200">
         <div className="container mx-auto px-4">
