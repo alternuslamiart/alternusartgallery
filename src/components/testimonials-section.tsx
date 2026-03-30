@@ -84,8 +84,8 @@ export default function TestimonialsSection() {
             width="16"
             height="16"
             viewBox="0 0 24 24"
-            fill={star <= rating ? "#ffffff" : "none"}
-            stroke={star <= rating ? "#ffffff" : "#555555"}
+            fill={star <= rating ? "#f59e0b" : "none"}
+            stroke={star <= rating ? "#f59e0b" : "#d1d5db"}
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -104,17 +104,17 @@ export default function TestimonialsSection() {
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-black relative overflow-hidden">
+    <section className="py-16 md:py-24 bg-white relative overflow-hidden">
       <div className="container mx-auto px-4 relative">
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/40 mb-4 font-mono">
+          <p className="text-xs uppercase tracking-[0.3em] text-stone-400 mb-4 font-mono">
             Testimonials
           </p>
-          <h2 className="font-playfair text-3xl md:text-4xl font-bold mb-4 text-white">
+          <h2 className="font-playfair text-3xl md:text-4xl font-bold mb-4 text-stone-900">
             What Our Clients Say
           </h2>
-          <p className="text-white/50 text-lg max-w-2xl mx-auto">
+          <p className="text-stone-500 text-lg max-w-2xl mx-auto">
             Join thousands of satisfied customers who have found their perfect artwork with Alternus
           </p>
         </div>
@@ -125,20 +125,20 @@ export default function TestimonialsSection() {
             {visibleTestimonials.map((testimonial, idx) => (
               <div
                 key={testimonial.id}
-                className={`bg-white/5 p-6 lg:p-8 border border-white/10 hover:border-white/30 transition-all duration-500 rounded-lg ${
-                  idx === 1 ? "md:scale-105 md:z-10 md:bg-white/8" : ""
+                className={`bg-white p-6 lg:p-8 border border-stone-200 hover:border-stone-400 transition-all duration-500 rounded-lg ${
+                  idx === 1 ? "md:scale-105 md:z-10" : ""
                 }`}
               >
                 {/* Stars */}
                 <div className="mb-4">{renderStars(testimonial.rating)}</div>
 
                 {/* Comment */}
-                <p className="text-stone-300 mb-6 leading-relaxed italic text-sm md:text-base">
+                <p className="text-stone-600 mb-6 leading-relaxed italic text-sm md:text-base">
                   &ldquo;{testimonial.comment}&rdquo;
                 </p>
 
                 {/* Author */}
-                <div className="flex items-center gap-4 pt-4 border-t border-white/10">
+                <div className="flex items-center gap-4 pt-4 border-t border-stone-100">
                   <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-amber-500/20 rounded-lg">
                     <Image
                       src={testimonial.image}
@@ -148,7 +148,7 @@ export default function TestimonialsSection() {
                     />
                   </div>
                   <div>
-                    <p className="font-semibold text-white text-sm">{testimonial.name}</p>
+                    <p className="font-semibold text-stone-900 text-sm">{testimonial.name}</p>
                     <p className="text-xs text-stone-400">{testimonial.role}</p>
                   </div>
                 </div>
@@ -160,7 +160,7 @@ export default function TestimonialsSection() {
           <div className="flex items-center justify-center gap-4 mt-10">
             <button
               onClick={prevTestimonial}
-              className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all"
+              className="p-3 rounded-full bg-stone-100 border border-stone-200 hover:bg-stone-200 hover:border-stone-300 transition-all"
               aria-label="Previous testimonial"
             >
               <svg
@@ -173,7 +173,7 @@ export default function TestimonialsSection() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-stone-300"
+                className="text-stone-500"
               >
                 <path d="m15 18-6-6 6-6" />
               </svg>
@@ -188,7 +188,7 @@ export default function TestimonialsSection() {
                   className={`h-1.5 rounded-full transition-all duration-300 ${
                     idx === activeIndex
                       ? "bg-amber-500 w-8"
-                      : "bg-stone-600 w-1.5 hover:bg-stone-500"
+                      : "bg-stone-300 w-1.5 hover:bg-stone-400"
                   }`}
                   aria-label={`Go to testimonial ${idx + 1}`}
                 />
@@ -197,7 +197,7 @@ export default function TestimonialsSection() {
 
             <button
               onClick={nextTestimonial}
-              className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all"
+              className="p-3 rounded-full bg-stone-100 border border-stone-200 hover:bg-stone-200 hover:border-stone-300 transition-all"
               aria-label="Next testimonial"
             >
               <svg
@@ -210,7 +210,7 @@ export default function TestimonialsSection() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-stone-300"
+                className="text-stone-500"
               >
                 <path d="m9 18 6-6-6-6" />
               </svg>
@@ -219,23 +219,23 @@ export default function TestimonialsSection() {
         </div>
 
         {/* Trust Badges */}
-        <div className="mt-16 pt-12 border-t border-white/10">
+        <div className="mt-16 pt-12 border-t border-stone-200">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <p className="text-3xl md:text-4xl font-bold text-white mb-2">120+</p>
-              <p className="text-xs uppercase tracking-widest text-stone-500">Happy Customers</p>
+              <p className="text-3xl md:text-4xl font-bold text-stone-900 mb-2">120+</p>
+              <p className="text-xs uppercase tracking-widest text-stone-400">Happy Customers</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-bold text-white mb-2">98%</p>
-              <p className="text-xs uppercase tracking-widest text-stone-500">Satisfaction Rate</p>
+              <p className="text-3xl md:text-4xl font-bold text-stone-900 mb-2">98%</p>
+              <p className="text-xs uppercase tracking-widest text-stone-400">Satisfaction Rate</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-bold text-white mb-2">50+</p>
-              <p className="text-xs uppercase tracking-widest text-stone-500">Original Artworks</p>
+              <p className="text-3xl md:text-4xl font-bold text-stone-900 mb-2">50+</p>
+              <p className="text-xs uppercase tracking-widest text-stone-400">Original Artworks</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-bold text-white mb-2">10+</p>
-              <p className="text-xs uppercase tracking-widest text-stone-500">Featured Artists</p>
+              <p className="text-3xl md:text-4xl font-bold text-stone-900 mb-2">10+</p>
+              <p className="text-xs uppercase tracking-widest text-stone-400">Featured Artists</p>
             </div>
           </div>
         </div>

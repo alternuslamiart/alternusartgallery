@@ -9,7 +9,7 @@ export function Footer() {
 
   return (
     <>
-    <footer className="border-t bg-gray-600 text-white">
+    <footer className="border-t bg-[#060411] text-white">
       {/* Main Footer */}
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-8">
@@ -283,7 +283,7 @@ export function Footer() {
     </footer>
 
     {/* Marquee Section */}
-    <div className="overflow-hidden bg-gray-600 border-t border-gray-500">
+    <div className="overflow-hidden bg-[#060411] border-t border-[#060411]">
       <div className="animate-marquee">
         <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
           Alternus

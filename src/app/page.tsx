@@ -157,31 +157,31 @@ export default function Home() {
             <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory md:flex-wrap" style={{ scrollbarWidth: "thin" }}>
               <button
                 onClick={() => router.push('/gallery?category=Baroque')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-none border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-coffee hover:text-white hover:border-coffee transition-all snap-start"
               >
                 Baroque
               </button>
               <button
                 onClick={() => router.push('/gallery?category=Expressionism')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-none border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-coffee hover:text-white hover:border-coffee transition-all snap-start"
               >
                 Expressionism
               </button>
               <button
                 onClick={() => router.push('/gallery?category=Impressionism')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-none border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-coffee hover:text-white hover:border-coffee transition-all snap-start"
               >
                 Impressionism
               </button>
               <button
                 onClick={() => router.push('/gallery?category=Abstract')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-none border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-coffee hover:text-white hover:border-coffee transition-all snap-start"
               >
                 Abstract
               </button>
               <button
                 onClick={() => router.push('/gallery?category=Photography')}
-                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-none border border-gray-300 bg-white text-gray-700 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-coffee hover:text-white hover:border-coffee transition-all snap-start"
               >
                 Photography
               </button>
@@ -748,25 +748,25 @@ export default function Home() {
             <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory md:flex-wrap" style={{ scrollbarWidth: "thin" }}>
               <button
                 onClick={() => router.push('/gallery?maxPrice=500')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-none border border-stone-300 bg-white text-stone-600 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
+                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-600 hover:bg-coffee hover:text-white hover:border-coffee transition-all snap-start"
               >
                 Under &euro;500
               </button>
               <button
                 onClick={() => router.push('/gallery?minPrice=1000&maxPrice=3000')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-none border border-stone-300 bg-white text-stone-600 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
+                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-600 hover:bg-coffee hover:text-white hover:border-coffee transition-all snap-start"
               >
                 &euro;1000 - &euro;3000
               </button>
               <button
                 onClick={() => router.push('/gallery?minPrice=3000&maxPrice=5000')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-none border border-stone-300 bg-white text-stone-600 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
+                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-600 hover:bg-coffee hover:text-white hover:border-coffee transition-all snap-start"
               >
                 &euro;3000 - &euro;5000
               </button>
               <button
                 onClick={() => router.push('/gallery?minPrice=5000&maxPrice=10000')}
-                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-none border border-stone-300 bg-white text-stone-600 hover:bg-black hover:text-white hover:border-black transition-all snap-start"
+                className="flex-shrink-0 px-5 py-2 text-sm font-medium rounded-lg border border-stone-300 bg-white text-stone-600 hover:bg-coffee hover:text-white hover:border-coffee transition-all snap-start"
               >
                 &euro;5000 - &euro;10000
               </button>
