@@ -299,6 +299,22 @@ export function Footer() {
         </span>
       </div>
     </div>
+
+    {/* Small Marquee Strip */}
+    <div className="h-[64px] flex items-center bg-coffee overflow-hidden">
+      <div className="animate-marquee-slow">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="flex items-center gap-8 md:gap-14 px-4 md:px-8">
+            <span className="font-playfair text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap select-none">Alternus</span>
+            <span className="text-white/20 text-lg select-none">&bull;</span>
+            <span className="font-playfair text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap select-none">Art Gallery</span>
+            <span className="text-white/20 text-lg select-none">&bull;</span>
+            <span className="font-playfair text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap select-none">Since 2026</span>
+            <span className="text-white/20 text-lg select-none">&bull;</span>
+          </div>
+        ))}
+      </div>
+    </div>
     </>
   );
 }
