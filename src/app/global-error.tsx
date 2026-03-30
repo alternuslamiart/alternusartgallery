@@ -40,7 +40,7 @@ export default function GlobalError({
 
             <button
               onClick={reset}
-              className="inline-flex items-center justify-center px-8 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
+              className="inline-flex items-center justify-center px-8 py-3 bg-coffee text-white rounded-lg hover:bg-coffee/90 transition-colors font-medium"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mr-2">
                 <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>

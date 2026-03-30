@@ -732,7 +732,7 @@ export default function Home() {
             {visiblePaintings < artworks.length && (
               <button
                 onClick={() => setVisiblePaintings(prev => Math.min(prev + 4, artworks.length))}
-                className="mt-6 md:mt-0 group inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-stone-300 text-stone-600 rounded-none text-xs uppercase tracking-widest font-medium hover:bg-black hover:text-white hover:border-black transition-all"
+                className="mt-6 md:mt-0 group inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-stone-300 text-stone-600 rounded-lg text-xs uppercase tracking-widest font-medium hover:bg-coffee hover:text-white hover:border-coffee transition-all"
               >
                 <span>See More</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-y-1 transition-transform">
@@ -972,7 +972,7 @@ export default function Home() {
             <div className="flex items-center gap-3 mt-6 md:mt-0">
               <Link
                 href="/gallery"
-                className="px-6 py-2.5 bg-transparent border border-stone-300 text-stone-600 rounded-none text-xs uppercase tracking-widest font-medium hover:bg-black hover:text-white hover:border-black transition-all"
+                className="px-6 py-2.5 bg-transparent border border-stone-300 text-stone-600 rounded-lg text-xs uppercase tracking-widest font-medium hover:bg-coffee hover:text-white hover:border-coffee transition-all"
               >
                 See More
               </Link>
@@ -980,7 +980,7 @@ export default function Home() {
                 variant="outline"
                 size="icon"
                 onClick={scrollLeft}
-                className="rounded-none h-10 w-10 border-stone-300 hover:bg-black hover:text-white hover:border-black"
+                className="rounded-lg h-10 w-10 border-stone-300 hover:bg-coffee hover:text-white hover:border-coffee"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="m15 18-6-6 6-6" />
@@ -990,7 +990,7 @@ export default function Home() {
                 variant="outline"
                 size="icon"
                 onClick={scrollRight}
-                className="rounded-none h-10 w-10 border-stone-300 hover:bg-black hover:text-white hover:border-black"
+                className="rounded-lg h-10 w-10 border-stone-300 hover:bg-coffee hover:text-white hover:border-coffee"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="m9 18 6-6-6-6" />

@@ -428,7 +428,7 @@ export default function CheckoutSuccessPage() {
           <Button
             asChild
             size="lg"
-            className="flex-1 h-14 text-base bg-black hover:bg-gray-800"
+            className="flex-1 h-14 text-base bg-coffee hover:bg-coffee/90"
           >
             <Link href="/gallery">
               {t("continueShopping")}
