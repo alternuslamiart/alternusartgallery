@@ -9,14 +9,14 @@ export function Footer() {
 
   return (
     <>
-    <footer className="border-t bg-muted/30">
+    <footer className="border-t bg-gray-600 text-white">
       {/* Main Footer */}
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-8">
           {/* Brand */}
           <div className="col-span-1 sm:col-span-2 md:col-span-1 space-y-4">
             <h3 className="text-3xl font-black font-roboto">Alternus</h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-300">
               An exclusive art gallery where every piece tells a unique story.
             </p>
             {/* Social Icons */}
@@ -25,7 +25,7 @@ export function Footer() {
                 href="https://www.facebook.com/alternusart"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#1877F2] transition-colors"
+                className="text-gray-300 hover:text-[#1877F2] transition-colors"
                 aria-label="Facebook"
               >
                 <svg
@@ -42,7 +42,7 @@ export function Footer() {
                 href="https://www.instagram.com/alternusart/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#E4405F] transition-colors"
+                className="text-gray-300 hover:text-[#E4405F] transition-colors"
                 aria-label="Instagram"
               >
                 <svg
@@ -59,7 +59,7 @@ export function Footer() {
                 href="https://x.com/Alternusart"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-black transition-colors"
+                className="text-gray-300 hover:text-white transition-colors"
                 aria-label="X (Twitter)"
               >
                 <svg
@@ -76,7 +76,7 @@ export function Footer() {
                 href="https://www.youtube.com/@alternusart"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#FF0000] transition-colors"
+                className="text-gray-300 hover:text-[#FF0000] transition-colors"
                 aria-label="YouTube"
               >
                 <svg
@@ -93,7 +93,7 @@ export function Footer() {
                 href="https://www.tiktok.com/@alternusart"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-black transition-colors"
+                className="text-gray-300 hover:text-white transition-colors"
                 aria-label="TikTok"
               >
                 <svg
@@ -107,40 +107,40 @@ export function Footer() {
                 </svg>
               </a>
             </div>
-            <p className="text-xs text-muted-foreground pt-2">&copy; {new Date().getFullYear()} Alternus Art Gallery. {t("allRights")}</p>
+            <p className="text-xs text-gray-300 pt-2">&copy; {new Date().getFullYear()} Alternus Art Gallery. {t("allRights")}</p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
             <h4 className="font-semibold tracking-wider">{t("quickLinks")}</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="/" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/" className="inline-block py-1 hover:text-white transition-colors">
                   {t("home")}
                 </Link>
               </li>
               <li>
-                <Link href="/gallery" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/gallery" className="inline-block py-1 hover:text-white transition-colors">
                   {t("gallery")}
                 </Link>
               </li>
               <li>
-                <Link href="/virtual-gallery" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/virtual-gallery" className="inline-block py-1 hover:text-white transition-colors">
                   Virtual Gallery
                 </Link>
               </li>
               <li>
-                <Link href="/pre-order" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/pre-order" className="inline-block py-1 hover:text-white transition-colors">
                   Pre-Order
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/about" className="inline-block py-1 hover:text-white transition-colors">
                   {t("about")}
                 </Link>
               </li>
               <li>
-                <Link href="/support" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/support" className="inline-block py-1 hover:text-white transition-colors">
                   Support
                 </Link>
               </li>
@@ -150,24 +150,24 @@ export function Footer() {
           {/* Services */}
           <div className="space-y-4">
             <h4 className="font-semibold tracking-wider">{t("customerService")}</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="/commissions" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/commissions" className="inline-block py-1 hover:text-white transition-colors">
                   {t("commissions")}
                 </Link>
               </li>
               <li>
-                <Link href="/gift-cards" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/gift-cards" className="inline-block py-1 hover:text-white transition-colors">
                   {t("giftCards")}
                 </Link>
               </li>
               <li>
-                <Link href="/care-guide" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/care-guide" className="inline-block py-1 hover:text-white transition-colors">
                   {t("careGuide")}
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/faq" className="inline-block py-1 hover:text-white transition-colors">
                   {t("faq")}
                 </Link>
               </li>
@@ -177,24 +177,24 @@ export function Footer() {
           {/* Policies */}
           <div className="space-y-4">
             <h4 className="font-semibold tracking-wider">{t("shipping")}</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="/shipping" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/shipping" className="inline-block py-1 hover:text-white transition-colors">
                   {t("shipping")}
                 </Link>
               </li>
               <li>
-                <Link href="/returns" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/returns" className="inline-block py-1 hover:text-white transition-colors">
                   {t("returns")}
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/privacy" className="inline-block py-1 hover:text-white transition-colors">
                   {t("privacyPolicy")}
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/terms" className="inline-block py-1 hover:text-white transition-colors">
                   {t("termsOfService")}
                 </Link>
               </li>
@@ -204,24 +204,24 @@ export function Footer() {
           {/* Legal */}
           <div className="space-y-4">
             <h4 className="font-semibold tracking-wider">Legal</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="/accessibility" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/accessibility" className="inline-block py-1 hover:text-white transition-colors">
                   Accessibility
                 </Link>
               </li>
               <li>
-                <Link href="/cookie-notice" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/cookie-notice" className="inline-block py-1 hover:text-white transition-colors">
                   Cookie Notice
                 </Link>
               </li>
               <li>
-                <Link href="/copyright" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/copyright" className="inline-block py-1 hover:text-white transition-colors">
                   Copyright Policy
                 </Link>
               </li>
               <li>
-                <Link href="/support" className="inline-block py-1 hover:text-foreground transition-colors">
+                <Link href="/support" className="inline-block py-1 hover:text-white transition-colors">
                   Support
                 </Link>
               </li>
@@ -231,9 +231,9 @@ export function Footer() {
           {/* Help Center */}
           <div className="space-y-4">
             <h4 className="font-semibold tracking-wider">{t("helpCenter")}</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="/help" className="inline-block py-1 hover:text-foreground transition-colors flex items-center gap-2">
+                <Link href="/help" className="inline-block py-1 hover:text-white transition-colors flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                   </svg>
@@ -241,7 +241,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="inline-block py-1 hover:text-foreground transition-colors flex items-center gap-2">
+                <Link href="/faq" className="inline-block py-1 hover:text-white transition-colors flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10"/>
                     <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
@@ -251,7 +251,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/support" className="inline-block py-1 hover:text-foreground transition-colors flex items-center gap-2">
+                <Link href="/support" className="inline-block py-1 hover:text-white transition-colors flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                     <polyline points="22,6 12,13 2,6"/>
@@ -260,7 +260,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/help" className="inline-block py-1 hover:text-foreground transition-colors flex items-center gap-2">
+                <Link href="/help" className="inline-block py-1 hover:text-white transition-colors flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10"/>
                     <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
@@ -283,18 +283,18 @@ export function Footer() {
     </footer>
 
     {/* Marquee Section */}
-    <div className="overflow-hidden bg-white border-t">
+    <div className="overflow-hidden bg-gray-600 border-t border-gray-500">
       <div className="animate-marquee">
-        <span className="text-[256px] font-bold text-black mx-16 leading-none whitespace-nowrap">
+        <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
           Alternus
         </span>
-        <span className="text-[256px] font-bold text-black mx-16 leading-none whitespace-nowrap">
+        <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
           Alternus
         </span>
-        <span className="text-[256px] font-bold text-black mx-16 leading-none whitespace-nowrap">
+        <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
           Alternus
         </span>
-        <span className="text-[256px] font-bold text-black mx-16 leading-none whitespace-nowrap">
+        <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
           Alternus
         </span>
       </div>

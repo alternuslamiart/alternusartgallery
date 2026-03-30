@@ -777,7 +777,7 @@ export default function Home() {
           {isLoading ? (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-white overflow-hidden animate-pulse border border-stone-200">
+                <div key={i} className="bg-white overflow-hidden animate-pulse border border-stone-200 rounded-lg">
                   <div className="aspect-[4/5] bg-stone-100" />
                   <div className="p-4 space-y-2">
                     <div className="h-4 bg-stone-100 rounded w-3/4" />
@@ -792,7 +792,7 @@ export default function Home() {
               {featuredPaintings.map((painting) => (
                 <div
                   key={painting.id}
-                  className="group bg-white overflow-hidden border border-stone-200 hover:border-stone-400 transition-all duration-500"
+                  className="group bg-white overflow-hidden border border-stone-200 hover:border-stone-400 transition-all duration-500 rounded-lg"
                 >
                   <Link href={`/gallery/${painting.id}`}>
                     <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
@@ -1141,7 +1141,7 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
             {/* Secure Shipping */}
-            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group">
+            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group rounded-lg">
               <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
@@ -1156,7 +1156,7 @@ export default function Home() {
             </div>
 
             {/* 100% Authentic */}
-            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group">
+            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group rounded-lg">
               <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
@@ -1170,7 +1170,7 @@ export default function Home() {
             </div>
 
             {/* 14-Day Returns */}
-            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group">
+            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group rounded-lg">
               <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
@@ -1185,7 +1185,7 @@ export default function Home() {
             </div>
 
             {/* Secure Payment */}
-            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group">
+            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group rounded-lg">
               <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <rect width="20" height="14" x="2" y="5" rx="2" />
@@ -1199,7 +1199,7 @@ export default function Home() {
             </div>
 
             {/* Direct from Artist */}
-            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group">
+            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group rounded-lg">
               <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M12 19l7-7 3 3-7 7-3-3z" />
@@ -1215,7 +1215,7 @@ export default function Home() {
             </div>
 
             {/* Expert Support */}
-            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group">
+            <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group rounded-lg">
               <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
@@ -1247,7 +1247,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-6 md:gap-8">
             {/* Testimonial 1 */}
-            <div className="bg-white p-8 border border-stone-200 hover:border-stone-400 transition-all duration-500 relative group">
+            <div className="bg-white p-8 border border-stone-200 hover:border-stone-400 transition-all duration-500 relative group rounded-lg">
               <div className="absolute top-0 left-8 w-8 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-b-full" />
               <div className="pt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-stone-200 mb-4">
@@ -1270,7 +1270,7 @@ export default function Home() {
             </div>
 
             {/* Testimonial 2 */}
-            <div className="bg-white p-8 border border-stone-200 hover:border-stone-400 transition-all duration-500 relative group">
+            <div className="bg-white p-8 border border-stone-200 hover:border-stone-400 transition-all duration-500 relative group rounded-lg">
               <div className="absolute top-0 left-8 w-8 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-b-full" />
               <div className="pt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-stone-200 mb-4">
@@ -1293,7 +1293,7 @@ export default function Home() {
             </div>
 
             {/* Testimonial 3 */}
-            <div className="bg-white p-8 border border-stone-200 hover:border-stone-400 transition-all duration-500 relative group">
+            <div className="bg-white p-8 border border-stone-200 hover:border-stone-400 transition-all duration-500 relative group rounded-lg">
               <div className="absolute top-0 left-8 w-8 h-1 bg-gradient-to-r from-amber-500 to-amber-300 rounded-b-full" />
               <div className="pt-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-stone-200 mb-4">

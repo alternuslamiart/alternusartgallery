@@ -125,7 +125,7 @@ export default function TestimonialsSection() {
             {visibleTestimonials.map((testimonial, idx) => (
               <div
                 key={testimonial.id}
-                className={`bg-white/5 p-6 lg:p-8 border border-white/10 hover:border-white/30 transition-all duration-500 ${
+                className={`bg-white/5 p-6 lg:p-8 border border-white/10 hover:border-white/30 transition-all duration-500 rounded-lg ${
                   idx === 1 ? "md:scale-105 md:z-10 md:bg-white/8" : ""
                 }`}
               >

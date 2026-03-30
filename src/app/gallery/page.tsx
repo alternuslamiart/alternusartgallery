@@ -280,7 +280,7 @@ export default function GalleryPage() {
           {filteredPaintings.map((painting) => (
             <div
               key={painting.id}
-              className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow"
+              className="group bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow"
             >
               <Link href={`/gallery/${painting.id}`}>
                 <div className="relative aspect-[4/5] overflow-hidden bg-muted">
