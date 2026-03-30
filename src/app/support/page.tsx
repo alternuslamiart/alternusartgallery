@@ -24,9 +24,9 @@ export default function SupportPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero */}
-      <div className="bg-gray-900 text-white py-12 sm:py-16 md:py-20">
+      <div className="bg-coffee text-white py-12 sm:py-16 md:py-20">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-gray-400 mb-3 sm:mb-4">
+          <p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-orange-400 mb-3 sm:mb-4">
             How Can We Help?
           </p>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">

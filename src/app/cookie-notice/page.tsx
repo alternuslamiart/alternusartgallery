@@ -7,9 +7,9 @@ export default function CookieNoticePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
-      <div className="bg-gray-900 text-white py-16 sm:py-20">
+      <div className="bg-coffee text-white py-16 sm:py-20">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-gray-400 mb-3 sm:mb-4">
+          <p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-orange-400 mb-3 sm:mb-4">
             Legal
           </p>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">

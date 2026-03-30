@@ -165,7 +165,7 @@
 
 /* Dark gallery wall texture */
 .gallery-wall-dark {
-  background-color: #1a1a1a;
+  background-color: #3B2314;
   background-image:
     radial-gradient(ellipse at 20% 50%, rgba(40,35,30,0.4) 0%, transparent 60%),
     radial-gradient(ellipse at 80% 50%, rgba(40,35,30,0.3) 0%, transparent 60%);

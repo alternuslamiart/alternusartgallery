@@ -7,9 +7,9 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
-      <div className="bg-gray-900 text-white py-20">
+      <div className="bg-coffee text-white py-20">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-sm uppercase tracking-[0.3em] text-gray-400 mb-4">Legal</p>
+          <p className="text-sm uppercase tracking-[0.3em] text-orange-400 mb-4">Legal</p>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Privacy Policy</h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             Your privacy matters to us. Learn how we collect, use, and protect your personal information.

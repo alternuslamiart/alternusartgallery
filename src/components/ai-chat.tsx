@@ -202,7 +202,7 @@ export function AIChat() {
           <div className="relative w-[380px] h-[580px] max-h-[85vh] bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300">
 
             {/* Header */}
-            <div className="bg-stone-900 px-5 py-4 flex items-center justify-between rounded-t-3xl">
+            <div className="bg-coffee px-5 py-4 flex items-center justify-between rounded-t-3xl">
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border border-white/20">
@@ -214,7 +214,7 @@ export function AIChat() {
                       className="object-cover"
                     />
                   </div>
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-stone-900" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-coffee" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-white text-sm">Alternus AI</h3>
@@ -243,14 +243,14 @@ export function AIChat() {
                   className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   {message.role === "assistant" && (
-                    <div className="w-7 h-7 rounded-full bg-stone-900 flex items-center justify-center overflow-hidden flex-shrink-0 mr-2 mt-1">
+                    <div className="w-7 h-7 rounded-full bg-coffee flex items-center justify-center overflow-hidden flex-shrink-0 mr-2 mt-1">
                       <Image src="/logo.png" alt="AI" width={20} height={20} className="object-cover" />
                     </div>
                   )}
                   <div
                     className={`max-w-[75%] px-4 py-2.5 text-[13px] leading-relaxed ${
                       message.role === "user"
-                        ? "bg-stone-900 text-white rounded-2xl rounded-br-md"
+                        ? "bg-coffee text-white rounded-2xl rounded-br-md"
                         : "bg-white text-stone-800 rounded-2xl rounded-bl-md shadow-[0_1px_4px_rgba(0,0,0,0.06)]"
                     }`}
                   >
@@ -262,7 +262,7 @@ export function AIChat() {
               {/* Typing Indicator */}
               {isTyping && (
                 <div className="flex justify-start">
-                  <div className="w-7 h-7 rounded-full bg-stone-900 flex items-center justify-center overflow-hidden flex-shrink-0 mr-2 mt-1">
+                  <div className="w-7 h-7 rounded-full bg-coffee flex items-center justify-center overflow-hidden flex-shrink-0 mr-2 mt-1">
                     <Image src="/logo.png" alt="AI" width={20} height={20} className="object-cover" />
                   </div>
                   <div className="bg-white rounded-2xl rounded-bl-md px-4 py-3 shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
@@ -311,7 +311,7 @@ export function AIChat() {
                 <button
                   onClick={handleSend}
                   disabled={!input.trim() || isTyping}
-                  className="w-9 h-9 bg-stone-900 hover:bg-stone-800 text-white rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+                  className="w-9 h-9 bg-coffee hover:bg-stone-800 text-white rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>

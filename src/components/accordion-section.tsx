@@ -63,7 +63,7 @@ export default function AccordionSection() {
                 {/* Number Badge */}
                 <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 ${
                   isActive
-                    ? "bg-stone-900 text-white"
+                    ? "bg-coffee text-white"
                     : "bg-stone-200 text-stone-400 group-hover:bg-stone-300 group-hover:text-stone-600"
                 }`}>
                   {index + 1}

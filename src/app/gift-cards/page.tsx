@@ -48,9 +48,9 @@ export default function GiftCardsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gray-900 text-white py-16 md:py-20">
+      <div className="bg-coffee text-white py-16 md:py-20">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-sm uppercase tracking-[0.3em] text-gray-400 mb-4">Give the Gift of Art</p>
+          <p className="text-sm uppercase tracking-[0.3em] text-orange-400 mb-4">Give the Gift of Art</p>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Gift Cards</h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             The perfect present for art lovers. Let them choose their favorite masterpiece.

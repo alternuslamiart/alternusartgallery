@@ -1125,10 +1125,10 @@ export default function Home() {
       </section>
 
       {/* Gallery Promise Section */}
-      <section className="py-20 md:py-24 bg-black relative overflow-hidden">
+      <section className="py-20 md:py-24 bg-coffee relative overflow-hidden">
         <div className="container mx-auto px-4 relative">
           <div className="text-center mb-16">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/40 mb-4 font-mono">
+            <p className="text-xs uppercase tracking-[0.3em] text-orange-400 mb-4 font-mono">
               Trust &amp; Quality
             </p>
             <h2 className="font-playfair text-3xl md:text-5xl font-bold mb-4 text-white">
@@ -1322,13 +1322,13 @@ export default function Home() {
       <section className="py-0 overflow-hidden relative">
         <div className="grid lg:grid-cols-2 min-h-[600px] md:min-h-[700px]">
           {/* Left - Dark Content Side */}
-          <div className="bg-stone-900 py-20 md:py-28 px-6 md:px-16 lg:px-20 flex flex-col justify-center relative">
-            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-stone-800/30 to-transparent pointer-events-none" />
+          <div className="bg-coffee py-20 md:py-28 px-6 md:px-16 lg:px-20 flex flex-col justify-center relative">
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-coffee/30 to-transparent pointer-events-none" />
             <div className="relative">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/40 mb-6 font-mono">Our Philosophy</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-orange-400 mb-6 font-mono">Our Philosophy</p>
               <h2 className="font-playfair text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[0.95] text-white mb-6">
                 Art that
-                <span className="block text-white/50">speaks.</span>
+                <span className="block text-orange-400">speaks.</span>
               </h2>
               <p className="text-lg md:text-xl text-stone-400 leading-relaxed max-w-lg mb-10">
                 A curated platform connecting exceptional artists with passionate collectors worldwide.
@@ -1390,14 +1390,14 @@ export default function Home() {
           </div>
 
           {/* Right - Single Featured Image */}
-          <div className="relative bg-stone-900 hidden lg:block">
+          <div className="relative bg-coffee hidden lg:block">
             <Image
               src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200&q=80"
               alt="Art Gallery"
               fill
               className="object-cover opacity-60"
             />
-            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-stone-900/30 to-stone-900/80" />
+            <div className="absolute inset-0 bg-gradient-to-l from-transparent via-coffee/30 to-coffee/80" />
             {/* Floating stat cards */}
             <div className="absolute bottom-10 left-10 right-10 flex gap-4">
               <div className="bg-white/10 backdrop-blur-md rounded-lg px-5 py-4 border border-white/10">
@@ -1415,7 +1415,7 @@ export default function Home() {
             </div>
           </div>
           {/* Mobile Image */}
-          <div className="lg:hidden relative h-[300px] bg-stone-900">
+          <div className="lg:hidden relative h-[300px] bg-coffee">
             <Image
               src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200&q=80"
               alt="Art Gallery"
@@ -1444,7 +1444,7 @@ export default function Home() {
       <TestimonialsSection />
 
       {/* Gallery Name Marquee - Artistic Touch */}
-      <section className="h-[100px] flex items-center bg-black overflow-hidden border-t border-b border-stone-800">
+      <section className="h-[100px] flex items-center bg-coffee overflow-hidden border-t border-b border-coffee">
         <div className="animate-marquee-slow">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex items-center gap-8 md:gap-14 px-4 md:px-8">
@@ -1470,7 +1470,7 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8 md:gap-6 max-w-5xl mx-auto">
             {/* Step 1 */}
             <div className="text-center relative">
-              <div className="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-5">
+              <div className="w-16 h-16 bg-coffee rounded-lg flex items-center justify-center mx-auto mb-5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white">
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.3-4.3" />
@@ -1482,7 +1482,7 @@ export default function Home() {
             </div>
             {/* Step 2 */}
             <div className="text-center relative">
-              <div className="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-5">
+              <div className="w-16 h-16 bg-coffee rounded-lg flex items-center justify-center mx-auto mb-5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white">
                   <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                 </svg>
@@ -1493,7 +1493,7 @@ export default function Home() {
             </div>
             {/* Step 3 */}
             <div className="text-center relative">
-              <div className="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-5">
+              <div className="w-16 h-16 bg-coffee rounded-lg flex items-center justify-center mx-auto mb-5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                   <polyline points="3.29 7 12 12 20.71 7" />
@@ -1506,7 +1506,7 @@ export default function Home() {
             </div>
             {/* Step 4 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-black flex items-center justify-center mx-auto mb-5">
+              <div className="w-16 h-16 bg-coffee rounded-lg flex items-center justify-center mx-auto mb-5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white">
                   <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
                   <circle cx="9" cy="9" r="2" />
