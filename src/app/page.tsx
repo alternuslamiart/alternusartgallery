@@ -1142,7 +1142,7 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
             {/* Secure Shipping */}
             <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group rounded-lg">
-              <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
+              <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-gray-700 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                   <polyline points="3.29 7 12 12 20.71 7" />
@@ -1157,7 +1157,7 @@ export default function Home() {
 
             {/* 100% Authentic */}
             <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group rounded-lg">
-              <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
+              <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-gray-700 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
                   <path d="m9 12 2 2 4-4" />
@@ -1171,7 +1171,7 @@ export default function Home() {
 
             {/* 14-Day Returns */}
             <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group rounded-lg">
-              <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
+              <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-gray-700 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                   <path d="M3 3v5h5" />
@@ -1186,7 +1186,7 @@ export default function Home() {
 
             {/* Secure Payment */}
             <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group rounded-lg">
-              <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
+              <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-gray-700 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <rect width="20" height="14" x="2" y="5" rx="2" />
                   <line x1="2" x2="22" y1="10" y2="10" />
@@ -1200,7 +1200,7 @@ export default function Home() {
 
             {/* Direct from Artist */}
             <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group rounded-lg">
-              <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
+              <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-gray-700 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M12 19l7-7 3 3-7 7-3-3z" />
                   <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
@@ -1216,7 +1216,7 @@ export default function Home() {
 
             {/* Expert Support */}
             <div className="bg-white/5 p-5 md:p-6 border border-white/10 hover:border-white/30 transition-all text-center group rounded-lg">
-              <div className="w-12 h-12 bg-white/10 flex items-center justify-center mb-4 mx-auto group-hover:bg-white/20 transition-colors">
+              <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:bg-gray-700 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-white/70">
                   <path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
                 </svg>
@@ -1513,7 +1513,7 @@ export default function Home() {
             <h2 className="font-playfair text-3xl md:text-4xl font-bold text-black">Find Your Style</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <Link href="/gallery?category=Baroque" className="group relative aspect-[3/4] overflow-hidden">
+            <Link href="/gallery?category=Baroque" className="group relative aspect-[3/4] overflow-hidden rounded-lg">
               <Image src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&q=80" alt="Baroque" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
@@ -1521,7 +1521,7 @@ export default function Home() {
                 <p className="text-white/70 text-xs mt-1">Classical elegance</p>
               </div>
             </Link>
-            <Link href="/gallery?category=Impressionism" className="group relative aspect-[3/4] overflow-hidden">
+            <Link href="/gallery?category=Impressionism" className="group relative aspect-[3/4] overflow-hidden rounded-lg">
               <Image src="https://images.unsplash.com/photo-1549289524-06cf8837ace5?w=600&q=80" alt="Impressionism" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
@@ -1529,7 +1529,7 @@ export default function Home() {
                 <p className="text-white/70 text-xs mt-1">Light and color</p>
               </div>
             </Link>
-            <Link href="/gallery?category=Abstract" className="group relative aspect-[3/4] overflow-hidden">
+            <Link href="/gallery?category=Abstract" className="group relative aspect-[3/4] overflow-hidden rounded-lg">
               <Image src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=600&q=80" alt="Abstract" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
@@ -1537,7 +1537,7 @@ export default function Home() {
                 <p className="text-white/70 text-xs mt-1">Bold expression</p>
               </div>
             </Link>
-            <Link href="/gallery?category=Photography" className="group relative aspect-[3/4] overflow-hidden">
+            <Link href="/gallery?category=Photography" className="group relative aspect-[3/4] overflow-hidden rounded-lg">
               <Image src="https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=600&q=80" alt="Photography" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
