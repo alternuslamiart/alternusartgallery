@@ -301,7 +301,7 @@ export function Footer() {
     </div>
 
     {/* Small Marquee Strip */}
-    <div className="h-[64px] flex items-center bg-coffee overflow-hidden">
+    <div className="h-[64px] flex items-center bg-[#060411] overflow-hidden">
       <div className="animate-marquee-slow">
         {[...Array(6)].map((_, i) => (
           <div key={i} className="flex items-center gap-8 md:gap-14 px-4 md:px-8">
