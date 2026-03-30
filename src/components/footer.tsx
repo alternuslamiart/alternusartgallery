@@ -9,7 +9,7 @@ export function Footer() {
 
   return (
     <>
-    <footer className="border-t bg-[#060411] text-white">
+    <footer className="border-t bg-[#060411] text-white rounded-t-[48px]">
       {/* Main Footer */}
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-8">
