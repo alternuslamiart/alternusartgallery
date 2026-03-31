@@ -492,7 +492,7 @@ export function Header() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="hidden sm:flex px-4 py-2 hover:bg-gray-100 hover:text-gray-900"
+                  className="hidden sm:flex px-4 py-2"
                 >
                   {t("login")}
                 </Button>
