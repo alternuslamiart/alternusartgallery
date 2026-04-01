@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { WELCOME_MESSAGE, SUGGESTED_QUESTIONS } from "@/lib/ai-assistant";
 
@@ -14,8 +13,16 @@ interface Message {
   imageUrl?: string;
 }
 
+const QUICK_ACTIONS = [
+  { label: "Explore art styles", prompt: "Tell me about different art styles and movements" },
+  { label: "Create an image", prompt: "Create a beautiful impressionist painting of a sunset over the sea" },
+  { label: "Get art advice", prompt: "I want to start an art collection. What advice do you have?" },
+  { label: "Learn art history", prompt: "Tell me about the Renaissance period and its most famous artists" },
+];
+
 export function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -29,7 +36,7 @@ export function AIChat() {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
+  const expandedInputRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -40,10 +47,12 @@ export function AIChat() {
   }, [messages]);
 
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
+    if (isOpen && inputRef.current) inputRef.current.focus();
   }, [isOpen]);
+
+  useEffect(() => {
+    if (isExpanded && expandedInputRef.current) expandedInputRef.current.focus();
+  }, [isExpanded]);
 
   const sendMessage = async (text: string) => {
     const userMessage: Message = {
@@ -103,28 +112,35 @@ export function AIChat() {
     }
   };
 
+  const closeAll = () => {
+    setIsOpen(false);
+    setIsExpanded(false);
+  };
+
   const lastMessage = messages[messages.length - 1];
   const currentSuggestions = lastMessage?.suggestedQuestions || SUGGESTED_QUESTIONS.en;
+  const hasConversation = messages.length > 1;
 
   return (
     <>
       {/* Floating Chat Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="hidden md:flex fixed bottom-6 right-6 z-50 w-14 h-14 bg-coffee text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 items-center justify-center"
-        aria-label="Open AI Chat"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
-        </svg>
-        <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse" />
-      </button>
+      {!isOpen && !isExpanded && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="hidden md:flex fixed bottom-6 right-6 z-50 w-14 h-14 bg-coffee text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 items-center justify-center"
+          aria-label="Open AI Chat"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
+          </svg>
+          <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+        </button>
+      )}
 
-      {/* Chat Window */}
-      {isOpen && (
+      {/* ==================== MINI CHAT WINDOW ==================== */}
+      {isOpen && !isExpanded && (
         <div className="hidden md:flex fixed inset-0 z-50 items-end justify-end p-6">
-          <div className="absolute inset-0" onClick={() => setIsOpen(false)} />
-
+          <div className="absolute inset-0" onClick={closeAll} />
           <div className="relative w-[380px] h-[580px] max-h-[85vh] bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300">
 
             {/* Header */}
@@ -145,11 +161,10 @@ export function AIChat() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                {/* Expand to full page button */}
                 <button
-                  onClick={() => { setIsOpen(false); router.push("/ai"); }}
+                  onClick={() => { setIsOpen(false); setIsExpanded(true); }}
                   className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors"
-                  title="Open full view"
+                  title="Expand"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="15 3 21 3 21 9" />
@@ -158,14 +173,9 @@ export function AIChat() {
                     <line x1="3" x2="10" y1="21" y2="14" />
                   </svg>
                 </button>
-                {/* Close button */}
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors"
-                >
+                <button onClick={closeAll} className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 6 6 18" />
-                    <path d="m6 6 12 12" />
+                    <path d="M18 6 6 18" /><path d="m6 6 12 12" />
                   </svg>
                 </button>
               </div>
@@ -194,7 +204,6 @@ export function AIChat() {
                   </div>
                 </div>
               ))}
-
               {isTyping && (
                 <div className="flex justify-start">
                   <div className="w-7 h-7 rounded-full bg-coffee flex items-center justify-center overflow-hidden flex-shrink-0 mr-2 mt-1">
@@ -218,11 +227,8 @@ export function AIChat() {
                 <p className="text-[11px] text-stone-400 mb-2">Suggested questions:</p>
                 <div className="flex flex-wrap gap-1.5">
                   {currentSuggestions.map((question) => (
-                    <button
-                      key={question}
-                      onClick={() => sendMessage(question)}
-                      className="px-3 py-1.5 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-full text-[11px] text-stone-600 transition-colors"
-                    >
+                    <button key={question} onClick={() => sendMessage(question)}
+                      className="px-3 py-1.5 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-full text-[11px] text-stone-600 transition-colors">
                       {question}
                     </button>
                   ))}
@@ -233,29 +239,188 @@ export function AIChat() {
             {/* Input */}
             <div className="px-4 py-3 bg-white border-t border-stone-100">
               <div className="flex items-center gap-2 bg-stone-50 rounded-full px-4 py-1 border border-stone-200 focus-within:border-stone-400 transition-colors">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Ask me anything about art..."
-                  className="flex-1 py-2.5 bg-transparent text-[13px] text-stone-900 placeholder:text-stone-400 focus:outline-none"
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim() || isTyping}
-                  className="w-9 h-9 bg-coffee hover:bg-stone-800 text-white rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
-                >
+                <input ref={inputRef} type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={handleKeyPress}
+                  placeholder="Ask me anything about art..." className="flex-1 py-2.5 bg-transparent text-[13px] text-stone-900 placeholder:text-stone-400 focus:outline-none" />
+                <button onClick={handleSend} disabled={!input.trim() || isTyping}
+                  className="w-9 h-9 bg-coffee hover:bg-stone-800 text-white rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                   </svg>
                 </button>
               </div>
-              <p className="text-[10px] text-stone-300 text-center mt-2">
-                Powered by Alternus AI
-              </p>
+              <p className="text-[10px] text-stone-300 text-center mt-2">Powered by Alternus AI</p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== EXPANDED OVERLAY (Copilot-style) ==================== */}
+      {isExpanded && (
+        <div className="hidden md:flex fixed inset-0 z-50">
+          {/* Semi-transparent backdrop */}
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeAll} />
+
+          {/* Expanded Panel - centered overlay */}
+          <div className="relative mx-auto my-6 w-full max-w-3xl h-[calc(100vh-48px)] bg-gradient-to-b from-stone-50 to-white rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+
+            {/* Top Bar */}
+            <div className="flex items-center justify-between px-5 py-3 border-b border-stone-200 bg-white/80 backdrop-blur-sm rounded-t-2xl">
+              <div className="flex items-center gap-2.5">
+                <div className="relative">
+                  <div className="w-9 h-9 rounded-full bg-coffee flex items-center justify-center overflow-hidden">
+                    <Image src="/logo.png" alt="Alternus AI" width={26} height={26} className="object-cover" />
+                  </div>
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-white" />
+                </div>
+                <div>
+                  <h1 className="text-sm font-semibold text-stone-900">Alternus AI</h1>
+                  <p className="text-[10px] text-stone-400">Art Assistant & Image Creator</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                {/* Minimize back to small chat */}
+                <button
+                  onClick={() => { setIsExpanded(false); setIsOpen(true); }}
+                  className="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors"
+                  title="Minimize"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-500">
+                    <polyline points="4 14 10 14 10 20" />
+                    <polyline points="20 10 14 10 14 4" />
+                    <line x1="14" x2="21" y1="10" y2="3" />
+                    <line x1="3" x2="10" y1="21" y2="14" />
+                  </svg>
+                </button>
+                {/* Close */}
+                <button onClick={closeAll} className="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-500">
+                    <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {!hasConversation ? (
+              /* ---- Welcome State ---- */
+              <div className="flex-1 flex flex-col items-center justify-center px-6">
+                <div className="relative mb-5">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-coffee to-stone-700 flex items-center justify-center shadow-lg">
+                    <Image src="/logo.png" alt="Alternus AI" width={40} height={40} className="object-cover" />
+                  </div>
+                </div>
+
+                <h2 className="text-xl font-bold text-stone-900 mb-1">Good afternoon!</h2>
+                <p className="text-stone-500 text-sm mb-8">What can I help you with today?</p>
+
+                {/* Input */}
+                <div className="w-full max-w-xl mb-6">
+                  <div className="flex items-end gap-3 bg-white rounded-2xl border border-stone-200 shadow-sm px-4 py-3 focus-within:border-stone-400 focus-within:shadow-md transition-all">
+                    <textarea
+                      ref={expandedInputRef}
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyPress}
+                      placeholder="Ask anything about art..."
+                      rows={1}
+                      className="flex-1 resize-none bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none min-h-[24px] max-h-[120px]"
+                      style={{ height: "24px" }}
+                      onInput={(e) => {
+                        const t = e.target as HTMLTextAreaElement;
+                        t.style.height = "24px";
+                        t.style.height = t.scrollHeight + "px";
+                      }}
+                    />
+                    <button onClick={handleSend} disabled={!input.trim() || isTyping}
+                      className="w-10 h-10 bg-coffee hover:bg-stone-800 text-white rounded-xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {QUICK_ACTIONS.map((action) => (
+                    <button key={action.label} onClick={() => sendMessage(action.prompt)}
+                      className="px-4 py-2 bg-white rounded-full border border-stone-200 hover:border-stone-300 hover:shadow-sm text-sm text-stone-600 transition-all">
+                      {action.label}
+                    </button>
+                  ))}
+                </div>
+
+                <p className="text-[11px] text-stone-400 mt-6">Powered by Claude AI & DALL-E</p>
+              </div>
+            ) : (
+              /* ---- Chat State ---- */
+              <>
+                <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
+                  {messages.filter(m => m.id !== "welcome").map((message) => (
+                    <div key={message.id} className={`flex gap-3 ${message.role === "user" ? "justify-end" : ""}`}>
+                      {message.role === "assistant" && (
+                        <div className="w-8 h-8 rounded-lg bg-coffee flex items-center justify-center overflow-hidden flex-shrink-0 mt-0.5">
+                          <Image src="/logo.png" alt="AI" width={22} height={22} className="object-cover" />
+                        </div>
+                      )}
+                      <div className={`max-w-[65%] px-4 py-3 text-sm leading-relaxed ${
+                        message.role === "user"
+                          ? "bg-coffee text-white rounded-2xl rounded-br-sm"
+                          : "bg-white text-stone-800 rounded-2xl rounded-bl-sm shadow-sm border border-stone-100"
+                      }`}>
+                        {message.imageUrl && (
+                          <div className="mb-3 rounded-xl overflow-hidden">
+                            <img src={message.imageUrl} alt="AI Generated Art" className="w-full h-auto rounded-xl" />
+                          </div>
+                        )}
+                        <p className="whitespace-pre-wrap">{message.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {isTyping && (
+                    <div className="flex gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-coffee flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <Image src="/logo.png" alt="AI" width={22} height={22} className="object-cover" />
+                      </div>
+                      <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm border border-stone-100">
+                        <div className="flex gap-1.5">
+                          <span className="w-2 h-2 bg-stone-300 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                          <span className="w-2 h-2 bg-stone-300 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                          <span className="w-2 h-2 bg-stone-300 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Input */}
+                <div className="border-t border-stone-200 bg-white/80 backdrop-blur-sm px-6 py-4 rounded-b-2xl">
+                  <div className="max-w-xl mx-auto flex items-end gap-3 bg-stone-50 rounded-2xl border border-stone-200 px-4 py-3 focus-within:border-stone-400 transition-all">
+                    <textarea
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyPress}
+                      placeholder="Ask anything about art..."
+                      rows={1}
+                      className="flex-1 resize-none bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none min-h-[24px] max-h-[120px]"
+                      style={{ height: "24px" }}
+                      onInput={(e) => {
+                        const t = e.target as HTMLTextAreaElement;
+                        t.style.height = "24px";
+                        t.style.height = t.scrollHeight + "px";
+                      }}
+                    />
+                    <button onClick={handleSend} disabled={!input.trim() || isTyping}
+                      className="w-10 h-10 bg-coffee hover:bg-stone-800 text-white rounded-xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-stone-400 text-center mt-2">Powered by Claude AI & DALL-E</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
