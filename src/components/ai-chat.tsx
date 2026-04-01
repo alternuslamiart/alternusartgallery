@@ -102,12 +102,13 @@ export function AIChat() {
         timestamp: new Date(),
         imageUrl: data.imageUrl || undefined,
       }]);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("AI Chat error:", error);
+      const errMsg = error instanceof Error ? error.message : "Unknown error";
       setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "I apologize, but I'm having trouble connecting right now. Please try again in a moment, or contact us at info@alternusart.com for assistance.",
+        content: `I'm having trouble connecting right now. Error: ${errMsg}\n\nPlease try again or contact us at info@alternusart.com for assistance.`,
         timestamp: new Date(),
       }]);
     } finally {

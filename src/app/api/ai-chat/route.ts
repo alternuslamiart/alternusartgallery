@@ -143,6 +143,8 @@ async function generateImage(prompt: string): Promise<string | null> {
 
 // Try Claude first, then fallback to OpenAI
 async function getAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
+  const errors: string[] = [];
+
   // Try Claude
   if (process.env.ANTHROPIC_API_KEY) {
     try {
@@ -156,7 +158,7 @@ async function getAIResponse(message: string, conversationHistory: Array<{ role:
       ];
 
       const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-3-5-sonnet-20241022',
         max_tokens: 1024,
         system: SYSTEM_PROMPT,
         messages: claudeMessages,
@@ -164,11 +166,15 @@ async function getAIResponse(message: string, conversationHistory: Array<{ role:
 
       const textBlock = response.content.find(block => block.type === 'text');
       if (textBlock && 'text' in textBlock) {
-        return textBlock.text;
+        return { text: textBlock.text, error: null };
       }
-    } catch (claudeError) {
-      console.error('Claude error, falling back to OpenAI:', claudeError);
+    } catch (claudeError: unknown) {
+      const errMsg = claudeError instanceof Error ? claudeError.message : String(claudeError);
+      console.error('Claude error:', errMsg);
+      errors.push(`Claude: ${errMsg}`);
     }
+  } else {
+    errors.push('Claude: ANTHROPIC_API_KEY not set');
   }
 
   // Fallback to OpenAI
@@ -191,13 +197,20 @@ async function getAIResponse(message: string, conversationHistory: Array<{ role:
         temperature: 0.7,
       });
 
-      return completion.choices?.[0]?.message?.content || null;
-    } catch (openaiError) {
-      console.error('OpenAI error:', openaiError);
+      const content = completion.choices?.[0]?.message?.content;
+      if (content) {
+        return { text: content, error: null };
+      }
+    } catch (openaiError: unknown) {
+      const errMsg = openaiError instanceof Error ? openaiError.message : String(openaiError);
+      console.error('OpenAI error:', errMsg);
+      errors.push(`OpenAI: ${errMsg}`);
     }
+  } else {
+    errors.push('OpenAI: OPENAI_API_KEY not set');
   }
 
-  return null;
+  return { text: null, error: errors.join('; ') };
 }
 
 export async function POST(request: NextRequest) {
@@ -210,20 +223,20 @@ export async function POST(request: NextRequest) {
     }
 
     if (!process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY) {
-      return NextResponse.json({ error: 'AI service not configured' }, { status: 500 });
+      return NextResponse.json({ error: 'AI service not configured. Please set ANTHROPIC_API_KEY or OPENAI_API_KEY in environment variables.' }, { status: 500 });
     }
 
-    const responseContent = await getAIResponse(message, conversationHistory);
+    const result = await getAIResponse(message, conversationHistory);
 
-    if (!responseContent) {
+    if (!result.text) {
       return NextResponse.json(
-        { error: 'Failed to get AI response. Please try again.' },
+        { error: `AI providers failed: ${result.error || 'Unknown error'}` },
         { status: 500 }
       );
     }
 
     // Check if AI wants to generate an image
-    let finalContent = responseContent;
+    let finalContent = result.text;
     let imageUrl: string | null = null;
 
     if (finalContent.includes('[GENERATE_IMAGE]')) {
