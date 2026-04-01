@@ -189,10 +189,10 @@ export default function Home() {
           </div>
 
           {/* Horizontal Scroll Container */}
-          <div className="relative -mx-4 md:mx-0">
+          <div className="relative">
             <div
               ref={heroScrollRef}
-              className="flex gap-6 overflow-x-auto pb-0 md:pb-4 snap-x snap-mandatory px-4 md:px-0"
+              className="flex gap-6 overflow-x-auto pb-0 md:pb-4 snap-x snap-mandatory"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
               {/* Main Hero Card */}
@@ -714,7 +714,7 @@ export default function Home() {
       </section>
 
       {/* Gallery Collection Section */}
-      <section className="py-20 md:py-28 bg-white">
+      <section className="py-12 md:py-28 bg-white">
         <div className="container mx-auto px-4">
           {/* Section header */}
           <div className="text-center mb-16 md:mb-20">
@@ -923,7 +923,7 @@ export default function Home() {
       </section>
 
       {/* Gallery Statement - Editorial Quote */}
-      <section className="py-24 md:py-32 bg-white border-t border-stone-200">
+      <section className="py-16 md:py-32 bg-white border-t border-stone-200">
         <div className="container mx-auto px-4 text-center">
           <h2 className="font-playfair text-2xl md:text-4xl lg:text-5xl font-bold text-black leading-snug max-w-4xl mx-auto mb-10">
             The Art Gallery with its unique collection is among those museums that attracts a wide array of people and is among the rare that have residencies.
@@ -1322,7 +1322,7 @@ export default function Home() {
       <section className="py-0 overflow-hidden relative">
         <div className="grid lg:grid-cols-2 min-h-[600px] md:min-h-[700px]">
           {/* Left - Dark Content Side */}
-          <div className="bg-coffee py-20 md:py-28 px-6 md:px-16 lg:px-20 flex flex-col justify-center relative">
+          <div className="bg-coffee py-20 md:py-28 px-4 md:px-16 lg:px-20 flex flex-col justify-center relative">
             <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-coffee/30 to-transparent pointer-events-none" />
             <div className="relative">
               <p className="text-xs uppercase tracking-[0.3em] text-orange-400 mb-6 font-mono">Our Philosophy</p>
@@ -1451,7 +1451,7 @@ export default function Home() {
             <h2 className="font-playfair text-3xl md:text-5xl font-bold text-black mb-4">How It Works</h2>
             <p className="text-stone-500 text-lg max-w-2xl mx-auto">From discovery to display, we make collecting art effortless</p>
           </div>
-          <div className="grid md:grid-cols-4 gap-8 md:gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {/* Step 1 */}
             <div className="text-center relative">
               <div className="w-16 h-16 bg-coffee rounded-lg flex items-center justify-center mx-auto mb-5">
