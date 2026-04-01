@@ -122,30 +122,45 @@ Remember: You're an art expert passionate about helping people discover and appr
 
 export const dynamic = 'force-dynamic';
 
-// Generate image using DALL-E 3
-async function generateImage(prompt: string): Promise<string | null> {
-  try {
-    if (!process.env.OPENAI_API_KEY) return null;
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const response = await openai.images.generate({
-      model: 'dall-e-3',
-      prompt: prompt,
-      n: 1,
-      size: '1024x1024',
-      quality: 'standard',
-    });
-    return response.data?.[0]?.url || null;
-  } catch (error) {
-    console.error('DALL-E image generation error:', error);
-    return null;
-  }
-}
-
-// Try Claude first, then fallback to OpenAI
+// Try DeepSeek first, then Claude, then OpenAI
 async function getAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
   const errors: string[] = [];
 
-  // Try Claude
+  // 1. Try DeepSeek (primary - cheapest and fast)
+  if (process.env.DEEPSEEK_API_KEY) {
+    try {
+      const deepseek = new OpenAI({
+        apiKey: process.env.DEEPSEEK_API_KEY,
+        baseURL: 'https://api.deepseek.com',
+      });
+      const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...conversationHistory.map((msg) => ({
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content,
+        })),
+        { role: 'user', content: message },
+      ];
+
+      const completion = await deepseek.chat.completions.create({
+        model: 'deepseek-chat',
+        messages,
+        max_tokens: 1024,
+        temperature: 0.7,
+      });
+
+      const content = completion.choices?.[0]?.message?.content;
+      if (content) return { text: content, error: null };
+    } catch (dsError: unknown) {
+      const errMsg = dsError instanceof Error ? dsError.message : String(dsError);
+      console.error('DeepSeek error:', errMsg);
+      errors.push(`DeepSeek: ${errMsg}`);
+    }
+  } else {
+    errors.push('DeepSeek: DEEPSEEK_API_KEY not set');
+  }
+
+  // 2. Try Claude (fallback)
   if (process.env.ANTHROPIC_API_KEY) {
     try {
       const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -177,7 +192,7 @@ async function getAIResponse(message: string, conversationHistory: Array<{ role:
     errors.push('Claude: ANTHROPIC_API_KEY not set');
   }
 
-  // Fallback to OpenAI
+  // 3. Try OpenAI (last fallback)
   if (process.env.OPENAI_API_KEY) {
     try {
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -198,9 +213,7 @@ async function getAIResponse(message: string, conversationHistory: Array<{ role:
       });
 
       const content = completion.choices?.[0]?.message?.content;
-      if (content) {
-        return { text: content, error: null };
-      }
+      if (content) return { text: content, error: null };
     } catch (openaiError: unknown) {
       const errMsg = openaiError instanceof Error ? openaiError.message : String(openaiError);
       console.error('OpenAI error:', errMsg);
@@ -213,6 +226,25 @@ async function getAIResponse(message: string, conversationHistory: Array<{ role:
   return { text: null, error: errors.join('; ') };
 }
 
+// Generate image using DALL-E 3 (requires OpenAI key)
+async function generateImage(prompt: string): Promise<string | null> {
+  try {
+    if (!process.env.OPENAI_API_KEY) return null;
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const response = await openai.images.generate({
+      model: 'dall-e-3',
+      prompt: prompt,
+      n: 1,
+      size: '1024x1024',
+      quality: 'standard',
+    });
+    return response.data?.[0]?.url || null;
+  } catch (error) {
+    console.error('DALL-E image generation error:', error);
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -222,8 +254,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    if (!process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY) {
-      return NextResponse.json({ error: 'AI service not configured. Please set ANTHROPIC_API_KEY or OPENAI_API_KEY in environment variables.' }, { status: 500 });
+    if (!process.env.DEEPSEEK_API_KEY && !process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ error: 'AI service not configured. Please set DEEPSEEK_API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY in environment variables.' }, { status: 500 });
     }
 
     const result = await getAIResponse(message, conversationHistory);
