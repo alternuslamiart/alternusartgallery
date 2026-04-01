@@ -10,6 +10,7 @@ interface Message {
   content: string;
   timestamp: Date;
   suggestedQuestions?: string[];
+  imageUrl?: string;
 }
 
 export function AIChat() {
@@ -86,6 +87,7 @@ export function AIChat() {
         role: "assistant",
         content: data.content,
         timestamp: new Date(),
+        imageUrl: data.imageUrl || undefined,
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
@@ -149,6 +151,7 @@ export function AIChat() {
         role: "assistant",
         content: data.content,
         timestamp: new Date(),
+        imageUrl: data.imageUrl || undefined,
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
@@ -254,6 +257,15 @@ export function AIChat() {
                         : "bg-white text-stone-800 rounded-2xl rounded-bl-md shadow-[0_1px_4px_rgba(0,0,0,0.06)]"
                     }`}
                   >
+                    {message.imageUrl && (
+                      <div className="mb-2 rounded-lg overflow-hidden">
+                        <img
+                          src={message.imageUrl}
+                          alt="AI Generated Art"
+                          className="w-full h-auto rounded-lg"
+                        />
+                      </div>
+                    )}
                     <p className="whitespace-pre-wrap">{message.content}</p>
                   </div>
                 </div>
