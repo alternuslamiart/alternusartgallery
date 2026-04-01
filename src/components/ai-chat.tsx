@@ -170,7 +170,7 @@ export function AIChat() {
       {!isOpen && !isExpanded && (
         <button
           onClick={() => setIsOpen(true)}
-          className="hidden md:flex fixed bottom-6 right-6 z-50 w-14 h-14 bg-coffee text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 items-center justify-center"
+          className="flex fixed bottom-20 right-5 md:bottom-6 md:right-6 z-50 w-14 h-14 bg-coffee text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 items-center justify-center"
           aria-label="Open AI Chat"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -182,9 +182,9 @@ export function AIChat() {
 
       {/* ==================== MINI CHAT WINDOW ==================== */}
       {isOpen && !isExpanded && (
-        <div className="hidden md:flex fixed inset-0 z-50 items-end justify-end p-6">
+        <div className="flex fixed inset-0 z-50 items-end justify-center md:justify-end px-5 pb-5 md:p-6">
           <div className="absolute inset-0" onClick={closeAll} />
-          <div className="relative w-[380px] h-[580px] max-h-[85vh] bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300">
+          <div className="relative w-full md:w-[380px] h-[85vh] md:h-[580px] max-h-[85vh] bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300">
 
             {/* Header */}
             <div className="bg-coffee px-5 py-4 flex items-center justify-between rounded-t-3xl">
@@ -299,12 +299,12 @@ export function AIChat() {
 
       {/* ==================== EXPANDED OVERLAY (Copilot-style) ==================== */}
       {isExpanded && (
-        <div className="hidden md:flex fixed inset-0 z-50">
+        <div className="flex fixed inset-0 z-50">
           {/* Semi-transparent backdrop */}
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeAll} />
 
           {/* Expanded Panel */}
-          <div className="relative mx-auto my-10 w-full max-w-5xl h-[calc(100vh-80px)] bg-gradient-to-b from-stone-50 to-white rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.25)] flex overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="relative mx-5 md:mx-auto my-5 md:my-10 w-full max-w-5xl h-[calc(100vh-40px)] md:h-[calc(100vh-80px)] bg-gradient-to-b from-stone-50 to-white rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.25)] flex overflow-hidden animate-in fade-in zoom-in-95 duration-200">
 
             {/* Sidebar */}
             <div className={`${isSidebarOpen ? "w-64" : "w-0"} transition-all duration-200 overflow-hidden border-r border-stone-200 bg-white flex flex-col flex-shrink-0`}>
@@ -399,7 +399,7 @@ export function AIChat() {
 
             {!hasConversation ? (
               /* ---- Welcome State ---- */
-              <div className="flex-1 flex flex-col items-center justify-center px-6">
+              <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-6">
                 <div className="relative mb-5">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-coffee to-stone-700 flex items-center justify-center shadow-lg">
                     <Image src="/logo.png" alt="Alternus AI" width={40} height={40} className="object-cover" />
@@ -437,7 +437,7 @@ export function AIChat() {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="flex flex-wrap gap-2 justify-center">
+                <div className="flex flex-wrap gap-2 justify-center px-2 max-w-xl">
                   {QUICK_ACTIONS.map((action) => (
                     <button key={action.label} onClick={() => {
                       if ('link' in action && action.link) { closeAll(); router.push(action.link); }
