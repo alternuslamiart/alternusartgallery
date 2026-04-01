@@ -162,8 +162,11 @@ export function middleware(request: NextRequest) {
     let limit = 100; // Default: 100 requests per minute
     const windowMs = 60 * 1000;
 
-    // Stricter limits for sensitive endpoints
-    if (pathname.includes("/auth") || pathname.includes("/login")) {
+    // Skip strict rate limiting for OAuth callbacks (Google, GitHub)
+    const isOAuthCallback = pathname.startsWith("/api/auth/callback/");
+
+    // Stricter limits for login endpoints (but not OAuth callbacks)
+    if (!isOAuthCallback && (pathname.includes("/auth") || pathname.includes("/login"))) {
       // Check brute-force lockout
       const lockStatus = checkLoginBlocked(ip);
       if (lockStatus.blocked) {
