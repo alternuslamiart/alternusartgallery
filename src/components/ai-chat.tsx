@@ -25,9 +25,18 @@ const QUICK_ACTIONS = [
   { label: "Commission artwork", prompt: "How can I commission a custom artwork from an artist?" },
 ];
 
+interface ChatSession {
+  id: string;
+  title: string;
+  timestamp: Date;
+  messages: Message[];
+}
+
 export function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -121,6 +130,33 @@ export function AIChat() {
   const closeAll = () => {
     setIsOpen(false);
     setIsExpanded(false);
+    setIsSidebarOpen(false);
+  };
+
+  const startNewChat = () => {
+    // Save current conversation to history if it has messages
+    if (messages.length > 1) {
+      const firstUserMsg = messages.find(m => m.role === "user");
+      const title = firstUserMsg?.content.slice(0, 40) || "New Chat";
+      setChatHistory(prev => [{
+        id: Date.now().toString(),
+        title: title + (title.length >= 40 ? "..." : ""),
+        timestamp: new Date(),
+        messages: [...messages],
+      }, ...prev]);
+    }
+    setMessages([{
+      id: "welcome",
+      role: "assistant",
+      content: WELCOME_MESSAGE.en,
+      timestamp: new Date(),
+      suggestedQuestions: SUGGESTED_QUESTIONS.en,
+    }]);
+  };
+
+  const loadChat = (session: ChatSession) => {
+    setMessages(session.messages);
+    setIsSidebarOpen(false);
   };
 
   const lastMessage = messages[messages.length - 1];
@@ -266,41 +302,79 @@ export function AIChat() {
           {/* Semi-transparent backdrop */}
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeAll} />
 
-          {/* Expanded Panel - centered overlay */}
-          <div className="relative mx-auto my-6 w-full max-w-3xl h-[calc(100vh-48px)] bg-gradient-to-b from-stone-50 to-white rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          {/* Expanded Panel */}
+          <div className="relative mx-auto my-10 w-full max-w-5xl h-[calc(100vh-80px)] bg-gradient-to-b from-stone-50 to-white rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.25)] flex overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+
+            {/* Sidebar */}
+            <div className={`${isSidebarOpen ? "w-64" : "w-0"} transition-all duration-200 overflow-hidden border-r border-stone-200 bg-white flex flex-col flex-shrink-0`}>
+              <div className="p-3 border-b border-stone-100">
+                <button onClick={startNewChat}
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-coffee/5 hover:bg-coffee/10 text-coffee text-sm font-medium transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                  New Chat
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-2">
+                {chatHistory.length === 0 ? (
+                  <p className="text-xs text-stone-400 text-center mt-4 px-2">No previous chats yet</p>
+                ) : (
+                  <div className="space-y-1">
+                    {chatHistory.map((session) => (
+                      <button key={session.id} onClick={() => loadChat(session)}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-stone-100 transition-colors group">
+                        <p className="text-xs font-medium text-stone-700 truncate">{session.title}</p>
+                        <p className="text-[10px] text-stone-400">{session.timestamp.toLocaleDateString()}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col min-w-0">
 
             {/* Top Bar */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-stone-200 bg-white/80 backdrop-blur-sm rounded-t-2xl">
-              <div className="flex items-center gap-2.5">
-                <div className="relative">
-                  <div className="w-9 h-9 rounded-full bg-coffee flex items-center justify-center overflow-hidden">
-                    <Image src="/logo.png" alt="Alternus AI" width={26} height={26} className="object-cover" />
+            <div className="flex items-center justify-between px-5 py-3 border-b border-stone-200 bg-white/80 backdrop-blur-sm rounded-tr-2xl">
+              <div className="flex items-center gap-2">
+                {/* Sidebar toggle */}
+                <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                  className="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors" title="Chat history">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-500">
+                    <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>
+                  </svg>
+                </button>
+                <div className="flex items-center gap-2.5">
+                  <div className="relative">
+                    <div className="w-8 h-8 rounded-full bg-coffee flex items-center justify-center overflow-hidden">
+                      <Image src="/logo.png" alt="Alternus AI" width={22} height={22} className="object-cover" />
+                    </div>
+                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-white" />
                   </div>
-                  <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-white" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-stone-900">Alternus AI</h1>
-                  <p className="text-[10px] text-stone-400">Art Assistant & Image Creator</p>
+                  <div>
+                    <h1 className="text-sm font-semibold text-stone-900">Alternus AI</h1>
+                    <p className="text-[10px] text-stone-400">Art Assistant & Image Creator</p>
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                {/* Minimize back to small chat */}
-                <button
-                  onClick={() => { setIsExpanded(false); setIsOpen(true); }}
-                  className="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors"
-                  title="Minimize"
-                >
+                {/* New chat */}
+                <button onClick={startNewChat} className="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors" title="New chat">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-500">
-                    <polyline points="4 14 10 14 10 20" />
-                    <polyline points="20 10 14 10 14 4" />
-                    <line x1="14" x2="21" y1="10" y2="3" />
-                    <line x1="3" x2="10" y1="21" y2="14" />
+                    <path d="M12 5v14"/><path d="M5 12h14"/>
+                  </svg>
+                </button>
+                {/* Minimize */}
+                <button onClick={() => { setIsExpanded(false); setIsOpen(true); setIsSidebarOpen(false); }}
+                  className="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors" title="Minimize">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-500">
+                    <polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" x2="21" y1="10" y2="3"/><line x1="3" x2="10" y1="21" y2="14"/>
                   </svg>
                 </button>
                 {/* Close */}
                 <button onClick={closeAll} className="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-500">
-                    <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+                    <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
                   </svg>
                 </button>
               </div>
@@ -437,7 +511,8 @@ export function AIChat() {
                 </div>
               </>
             )}
-          </div>
+          </div>{/* end main content */}
+          </div>{/* end panel */}
         </div>
       )}
     </>
