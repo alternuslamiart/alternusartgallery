@@ -321,11 +321,21 @@ export function AIChat() {
                 ) : (
                   <div className="space-y-1">
                     {chatHistory.map((session) => (
-                      <button key={session.id} onClick={() => loadChat(session)}
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-stone-100 transition-colors group">
-                        <p className="text-xs font-medium text-stone-700 truncate">{session.title}</p>
-                        <p className="text-[10px] text-stone-400">{session.timestamp.toLocaleDateString()}</p>
-                      </button>
+                      <div key={session.id} className="flex items-center gap-1 rounded-lg hover:bg-stone-100 transition-colors group">
+                        <button onClick={() => loadChat(session)} className="flex-1 text-left px-3 py-2 min-w-0">
+                          <p className="text-xs font-medium text-stone-700 truncate">{session.title}</p>
+                          <p className="text-[10px] text-stone-400">{session.timestamp.toLocaleDateString()}</p>
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setChatHistory(prev => prev.filter(s => s.id !== session.id)); }}
+                          className="opacity-0 group-hover:opacity-100 p-1.5 mr-1 rounded-md hover:bg-stone-200 transition-all flex-shrink-0"
+                          title="Delete chat"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-400 hover:text-red-500">
+                            <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                          </svg>
+                        </button>
+                      </div>
                     ))}
                   </div>
                 )}
