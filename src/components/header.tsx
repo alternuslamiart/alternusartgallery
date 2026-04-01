@@ -437,26 +437,14 @@ export function Header() {
                   </DropdownMenuItem>
 
                   {/* Verification CTA */}
-                  <div className="px-2 py-2 mt-1">
+                  <div className="px-2 py-1.5 mt-1">
                     <Link href="/apply" className="block">
-                      <div className="relative overflow-hidden rounded-lg bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-[1px]">
-                        <div className="relative bg-white dark:bg-gray-900 rounded-[7px] px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
-                                <path d="m9 12 2 2 4-4"/>
-                              </svg>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-gray-900 dark:text-white">Get Verified</p>
-                              <p className="text-[10px] text-gray-500 dark:text-gray-400">Boost your credibility</p>
-                            </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
-                              <path d="m9 18 6-6-6-6"/>
-                            </svg>
-                          </div>
-                        </div>
+                      <div className="flex items-center gap-2.5 rounded-lg px-3 py-2 bg-blue-50 dark:bg-blue-950/30 hover:bg-blue-100 dark:hover:bg-blue-950/50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500 flex-shrink-0">
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+                          <path d="m9 12 2 2 4-4"/>
+                        </svg>
+                        <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Get Verified</span>
                       </div>
                     </Link>
                   </div>
