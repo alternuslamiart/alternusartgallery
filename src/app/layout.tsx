@@ -3,15 +3,12 @@ import localFont from "next/font/local";
 import { Roboto, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Providers } from "@/components/providers";
 import { CartModal } from "@/components/cart-modal";
 import { ArtLoverModal } from "@/components/art-lover-modal";
 import { CookieModal } from "@/components/cookie-modal";
 import { AIChat } from "@/components/ai-chat";
-import { MobileNav } from "@/components/mobile-nav";
-import { CategoryBar } from "@/components/category-bar";
+import { LayoutShell } from "@/components/layout-shell";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -189,15 +186,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} ${playfair.variable} antialiased min-h-screen flex flex-col`}
       >
         <Providers>
-          <Header />
-          <CategoryBar />
-          <main className="flex-1 pb-20 md:pb-0">{children}</main>
-          <Footer />
+          <LayoutShell>{children}</LayoutShell>
           <CartModal />
           <CookieModal />
           <ArtLoverModal />
           <AIChat />
-          <MobileNav />
         </Providers>
       </body>
     </html>
