@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { WELCOME_MESSAGE, SUGGESTED_QUESTIONS } from "@/lib/ai-assistant";
 
@@ -14,10 +15,14 @@ interface Message {
 }
 
 const QUICK_ACTIONS = [
-  { label: "Explore art styles", prompt: "Tell me about different art styles and movements" },
+  { label: "Browse Gallery", link: "/gallery" },
+  { label: "View Artists", link: "/artists" },
   { label: "Create an image", prompt: "Create a beautiful impressionist painting of a sunset over the sea" },
-  { label: "Get art advice", prompt: "I want to start an art collection. What advice do you have?" },
-  { label: "Learn art history", prompt: "Tell me about the Renaissance period and its most famous artists" },
+  { label: "How to buy art?", prompt: "How do I buy art on Alternus? Walk me through the process." },
+  { label: "Sell your Art", link: "/apply" },
+  { label: "Shipping & Returns", prompt: "What are your shipping times and return policy?" },
+  { label: "Art styles guide", prompt: "Tell me about different art styles and movements available on Alternus" },
+  { label: "Commission artwork", prompt: "How can I commission a custom artwork from an artist?" },
 ];
 
 export function AIChat() {
@@ -37,6 +42,7 @@ export function AIChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const expandedInputRef = useRef<HTMLTextAreaElement>(null);
+  const router = useRouter();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -342,8 +348,18 @@ export function AIChat() {
                 {/* Quick Actions */}
                 <div className="flex flex-wrap gap-2 justify-center">
                   {QUICK_ACTIONS.map((action) => (
-                    <button key={action.label} onClick={() => sendMessage(action.prompt)}
-                      className="px-4 py-2 bg-white rounded-full border border-stone-200 hover:border-stone-300 hover:shadow-sm text-sm text-stone-600 transition-all">
+                    <button key={action.label} onClick={() => {
+                      if ('link' in action && action.link) { closeAll(); router.push(action.link); }
+                      else if ('prompt' in action && action.prompt) { sendMessage(action.prompt); }
+                    }}
+                      className={`px-4 py-2 rounded-full border text-sm transition-all ${
+                        'link' in action && action.link
+                          ? "bg-coffee/5 border-coffee/20 text-coffee hover:bg-coffee/10 font-medium"
+                          : "bg-white border-stone-200 hover:border-stone-300 hover:shadow-sm text-stone-600"
+                      }`}>
+                      {'link' in action && action.link && (
+                        <span className="mr-1.5">→</span>
+                      )}
                       {action.label}
                     </button>
                   ))}
