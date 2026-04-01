@@ -33,6 +33,7 @@ const plans = [
       "Unlimited favorites",
       "Early access to new collections",
       "HD artwork previews",
+      "AI Art Assistant chat",
       "Priority support",
       "Exclusive newsletter",
     ],
@@ -49,6 +50,7 @@ const plans = [
     description: "The ultimate experience for serious art collectors.",
     features: [
       "Everything in Best Plan",
+      "Advanced AI art advisor",
       "Exclusive collections access",
       "Private virtual gallery tours",
       "Commission requests",
