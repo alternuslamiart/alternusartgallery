@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import {
   Dialog,
@@ -99,6 +101,12 @@ export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [showDialog, setShowDialog] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"paypal" | "bank">("paypal");
+  const [bankForm, setBankForm] = useState({
+    fullName: "",
+    iban: "",
+    bankName: "",
+  });
+  const [bankSubmitted, setBankSubmitted] = useState(false);
 
   const handleSelectPlan = (plan: Plan) => {
     if (plan.priceValue === 0) {
@@ -249,7 +257,13 @@ export default function PricingPage() {
       </div>
 
       {/* Subscription Payment Dialog */}
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+      <Dialog open={showDialog} onOpenChange={(open) => {
+        setShowDialog(open);
+        if (!open) {
+          setBankSubmitted(false);
+          setBankForm({ fullName: "", iban: "", bankName: "" });
+        }
+      }}>
         <DialogContent className="sm:max-w-[440px] p-0 overflow-hidden rounded-2xl border-gray-200">
           {selectedPlan && (
             <div className="bg-gradient-to-br from-gray-50/80 via-white to-gray-50/50">
@@ -371,31 +385,92 @@ export default function PricingPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    <div className="bg-gray-50 rounded-xl p-4 space-y-2.5">
-                      <p className="text-xs font-medium text-gray-700 mb-2">Bank Transfer Details</p>
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-500">Bank</span>
-                          <span className="text-gray-700 font-medium">Raiffeisen Bank</span>
+                  <div className="space-y-4">
+                    {!bankSubmitted ? (
+                      <>
+                        {/* User Bank Info Form */}
+                        <div className="space-y-3">
+                          <div className="space-y-1.5">
+                            <Label htmlFor="fullName" className="text-xs font-medium text-gray-600">Full Name *</Label>
+                            <Input
+                              id="fullName"
+                              placeholder="John Doe"
+                              value={bankForm.fullName}
+                              onChange={(e) => setBankForm({ ...bankForm, fullName: e.target.value })}
+                              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 focus:bg-white focus:border-gray-400 transition-all text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="iban" className="text-xs font-medium text-gray-600">IBAN *</Label>
+                            <Input
+                              id="iban"
+                              placeholder="AL00 0000 0000 0000 0000 0000 0000"
+                              value={bankForm.iban}
+                              onChange={(e) => setBankForm({ ...bankForm, iban: e.target.value })}
+                              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 focus:bg-white focus:border-gray-400 transition-all text-sm font-mono"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="bankName" className="text-xs font-medium text-gray-600">Bank Name *</Label>
+                            <Input
+                              id="bankName"
+                              placeholder="e.g. Raiffeisen Bank"
+                              value={bankForm.bankName}
+                              onChange={(e) => setBankForm({ ...bankForm, bankName: e.target.value })}
+                              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 focus:bg-white focus:border-gray-400 transition-all text-sm"
+                            />
+                          </div>
                         </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-500">IBAN</span>
-                          <span className="text-gray-700 font-mono text-[11px] font-medium">AL35 2021 1109 0000 0000 1234 5678</span>
+
+                        {/* Transfer To Info */}
+                        <div className="bg-gray-50 rounded-xl p-3.5">
+                          <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider mb-2">Transfer to</p>
+                          <div className="space-y-1.5">
+                            <div className="flex justify-between text-xs">
+                              <span className="text-gray-400">Bank</span>
+                              <span className="text-gray-700 font-medium">Raiffeisen Bank</span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                              <span className="text-gray-400">IBAN</span>
+                              <span className="text-gray-700 font-mono text-[11px]">AL35 2021 1109 0000 0000 1234 5678</span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                              <span className="text-gray-400">Amount</span>
+                              <span className="text-gray-700 font-medium">{selectedPlan.price}/month</span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                              <span className="text-gray-400">Reference</span>
+                              <span className="text-gray-700 font-mono text-[11px]">ALT-{selectedPlan.name.toUpperCase().replace(" ", "-")}</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-500">Amount</span>
-                          <span className="text-gray-700 font-medium">{selectedPlan.price}/month</span>
+
+                        <Button
+                          onClick={() => {
+                            if (bankForm.fullName && bankForm.iban && bankForm.bankName) {
+                              setBankSubmitted(true);
+                            }
+                          }}
+                          disabled={!bankForm.fullName || !bankForm.iban || !bankForm.bankName}
+                          className="w-full h-11 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium text-sm transition-all disabled:opacity-40"
+                        >
+                          Confirm Bank Transfer
+                        </Button>
+                      </>
+                    ) : (
+                      /* Success state */
+                      <div className="text-center py-4">
+                        <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-600">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
                         </div>
-                        <div className="flex justify-between text-xs">
-                          <span className="text-gray-500">Reference</span>
-                          <span className="text-gray-700 font-mono text-[11px] font-medium">ALT-{selectedPlan.name.toUpperCase().replace(" ", "-")}</span>
-                        </div>
+                        <h4 className="text-base font-semibold text-gray-900 mb-1">Transfer Details Submitted</h4>
+                        <p className="text-xs text-gray-500 leading-relaxed max-w-xs mx-auto">
+                          Please complete the transfer of <strong>{selectedPlan.price}</strong> to our bank account. Your subscription will be activated within 1-3 business days after payment is confirmed.
+                        </p>
                       </div>
-                    </div>
-                    <p className="text-[11px] text-center text-gray-400">
-                      Your subscription will be activated within 1-3 business days after payment is confirmed.
-                    </p>
+                    )}
                   </div>
                 )}
               </div>
