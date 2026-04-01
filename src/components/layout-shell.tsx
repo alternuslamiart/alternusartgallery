@@ -6,7 +6,7 @@ import { Footer } from "@/components/footer";
 import { CategoryBar } from "@/components/category-bar";
 import { MobileNav } from "@/components/mobile-nav";
 
-const STANDALONE_ROUTES = ["/login", "/signup", "/ai"];
+const STANDALONE_ROUTES = ["/login", "/signup", "/ai", "/admin/login"];
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
