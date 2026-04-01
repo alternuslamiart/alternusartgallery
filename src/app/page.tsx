@@ -792,7 +792,7 @@ export default function Home() {
               {featuredPaintings.map((painting) => (
                 <div
                   key={painting.id}
-                  className="group bg-white overflow-hidden border border-stone-200 hover:border-stone-400 transition-all duration-500 rounded-lg"
+                  className="group bg-white overflow-hidden border border-stone-200 hover:border-stone-400 transition-all duration-500 rounded-xl"
                 >
                   <Link href={`/gallery/${painting.id}`}>
                     <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
@@ -1009,7 +1009,7 @@ export default function Home() {
             {artworks.map((painting) => (
               <div
                 key={painting.id}
-                className="group flex-shrink-0 w-[200px] md:w-[280px] snap-start overflow-hidden"
+                className="group flex-shrink-0 w-[200px] md:w-[280px] snap-start overflow-hidden rounded-xl"
               >
                 <Link href={`/gallery/${painting.id}`}>
                   <div className="relative aspect-[4/5] overflow-hidden bg-stone-100">
