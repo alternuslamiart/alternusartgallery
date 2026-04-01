@@ -346,16 +346,17 @@ export function AIChat() {
             <div className="flex-1 flex flex-col min-w-0">
 
             {/* Top Bar */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-stone-200 bg-white/80 backdrop-blur-sm rounded-tr-2xl">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-stone-200 bg-white/80 backdrop-blur-sm rounded-tr-2xl">
               <div className="flex items-center gap-2">
                 {/* Sidebar toggle */}
                 <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                  className="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors" title="Chat history">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-500">
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-150 ${isSidebarOpen ? "bg-stone-200 text-stone-700" : "hover:bg-stone-100 text-stone-500 hover:text-stone-700"}`}
+                  title="Chat history">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>
                   </svg>
                 </button>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 ml-1">
                   <div className="relative">
                     <div className="w-8 h-8 rounded-full bg-coffee flex items-center justify-center overflow-hidden">
                       <Image src="/logo.png" alt="Alternus AI" width={22} height={22} className="object-cover" />
@@ -368,23 +369,28 @@ export function AIChat() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5">
                 {/* New chat */}
-                <button onClick={startNewChat} className="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors" title="New chat">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-500">
+                <button onClick={startNewChat}
+                  className="w-9 h-9 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-all duration-150 text-stone-400 hover:text-stone-700"
+                  title="New chat">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 5v14"/><path d="M5 12h14"/>
                   </svg>
                 </button>
                 {/* Minimize */}
                 <button onClick={() => { setIsExpanded(false); setIsOpen(true); setIsSidebarOpen(false); }}
-                  className="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors" title="Minimize">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-500">
+                  className="w-9 h-9 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-all duration-150 text-stone-400 hover:text-stone-700"
+                  title="Minimize">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" x2="21" y1="10" y2="3"/><line x1="3" x2="10" y1="21" y2="14"/>
                   </svg>
                 </button>
                 {/* Close */}
-                <button onClick={closeAll} className="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-stone-500">
+                <button onClick={closeAll}
+                  className="w-9 h-9 rounded-lg hover:bg-red-50 flex items-center justify-center transition-all duration-150 text-stone-400 hover:text-red-500"
+                  title="Close">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
                   </svg>
                 </button>
