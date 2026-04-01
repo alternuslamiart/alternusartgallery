@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { auth } from '@/lib/auth'
+import { verifyAdminRequest } from '@/lib/admin-auth'
 import { sendOrderShippedEmail, sendOrderDeliveredEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic';
@@ -71,6 +73,19 @@ export async function GET(
       )
     }
 
+    // Verify ownership: user must own the order, or be an admin
+    const session = await auth();
+    const isAdmin = (await verifyAdminRequest()).authorized;
+
+    if (!isAdmin) {
+      if (!session?.user?.id) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      if (order.userId !== session.user.id) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+    }
+
     return NextResponse.json({
       order: {
         id: order.id,
@@ -112,12 +127,16 @@ export async function GET(
   }
 }
 
-// PATCH - Update order status
+// PATCH - Update order status (admin only)
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Verify admin session
+    const authResult = await verifyAdminRequest();
+    if (!authResult.authorized) return authResult.error!;
+
     const { id } = await params
     const body = await request.json()
     const { status, trackingNumber, notes } = body

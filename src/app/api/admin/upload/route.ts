@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { v2 as cloudinary } from 'cloudinary'
+import { verifyAdminRequest } from '@/lib/admin-auth'
 
 // Configure Cloudinary
 cloudinary.config({
@@ -8,8 +9,16 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
+// Allowed image MIME types
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+
 export async function POST(request: NextRequest) {
   try {
+    // Verify admin session
+    const authResult = await verifyAdminRequest();
+    if (!authResult.authorized) return authResult.error!;
+
     const formData = await request.formData()
     const file = formData.get('file') as File
 
@@ -17,6 +26,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'No file provided' },
         { status: 400 }
+      )
+    }
+
+    // Validate file type
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: 'Invalid file type. Allowed: JPEG, PNG, WebP, GIF' },
+        { status: 400 }
+      )
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: 'File too large. Maximum size: 10MB' },
+        { status: 413 }
       )
     }
 
@@ -29,6 +54,7 @@ export async function POST(request: NextRequest) {
     const result = await cloudinary.uploader.upload(base64, {
       folder: 'artworks',
       resource_type: 'image',
+      allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
     })
 
     return NextResponse.json({

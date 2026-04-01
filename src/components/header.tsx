@@ -53,22 +53,8 @@ export function Header() {
   const { wishlistCount } = useWishlist();
   const { data: session, status } = useSession();
 
-  // Check both NextAuth session and localStorage for CEO login
-  const [localUser, setLocalUser] = useState<{ name: string; email: string; role: string } | null>(null);
-
-  useEffect(() => {
-    const userAuth = localStorage.getItem("userAuth");
-    if (userAuth === "true") {
-      setLocalUser({
-        name: localStorage.getItem("userName") || "User",
-        email: localStorage.getItem("userEmail") || "",
-        role: localStorage.getItem("userRole") || "USER",
-      });
-    }
-  }, []);
-
-  const isLoggedIn = status === "authenticated" || localUser !== null;
-  const user = session?.user || localUser;
+  const isLoggedIn = status === "authenticated";
+  const user = session?.user || null;
 
   // Filter results based on search query
   const filteredPaintings = paintings.filter(p =>
@@ -860,12 +846,6 @@ export function Header() {
               type="button"
               className="flex-1 h-12 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-medium shadow-lg transition-all duration-200"
               onClick={() => {
-                // Clear localStorage
-                localStorage.removeItem("userAuth");
-                localStorage.removeItem("userEmail");
-                localStorage.removeItem("userName");
-                localStorage.removeItem("userRole");
-                // Also sign out from NextAuth
                 signOut({ callbackUrl: "/" });
                 setShowLogoutConfirm(false);
               }}

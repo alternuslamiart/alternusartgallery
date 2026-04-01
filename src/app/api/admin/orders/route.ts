@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { verifyAdminRequest } from "@/lib/admin-auth";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    // Verify admin session
+    const authResult = await verifyAdminRequest();
+    if (!authResult.authorized) return authResult.error!;
+
     const orders = await prisma.order.findMany({
       orderBy: { createdAt: "desc" },
       include: {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { Decimal } from '@prisma/client/runtime/library'
 import { sendOrderConfirmationEmail } from '@/lib/email'
+import { auth } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic';
 
@@ -25,13 +26,16 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const {
-      userId,
       guestEmail,
       items,
       shippingAddress,
       billingAddress,
       currency = 'EUR',
     } = body
+
+    // Use authenticated user's ID from session (never trust client-provided userId)
+    const session = await auth();
+    const userId = session?.user?.id || null;
 
     // Validate items
     if (!items || items.length === 0) {
@@ -44,7 +48,7 @@ export async function POST(request: NextRequest) {
     // Validate user or guest email
     if (!userId && !guestEmail) {
       return NextResponse.json(
-        { error: 'Either userId or guestEmail is required' },
+        { error: 'Authentication or guest email is required' },
         { status: 400 }
       )
     }
@@ -226,15 +230,26 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET - List orders (for authenticated user)
+// GET - List orders (for authenticated user only)
 export async function GET(request: NextRequest) {
   try {
+    const session = await auth();
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId')
-    const email = searchParams.get('email')
     const orderNumber = searchParams.get('orderNumber')
 
-    // If searching by order number
+    // Only allow authenticated users to list orders
+    // Use their session ID, not client-provided params
+    const userId = session?.user?.id || null;
+    const email = session?.user?.email || null;
+
+    if (!userId && !orderNumber) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
+    // If searching by order number (allow for order tracking)
     if (orderNumber) {
       const order = await prisma.order.findUnique({
         where: { orderNumber },

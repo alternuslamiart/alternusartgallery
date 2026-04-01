@@ -2,12 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { Decimal } from '@prisma/client/runtime/library'
 import { auth } from '@/lib/auth'
+import { verifyAdminRequest } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic';
 
 // GET - List all artworks for admin (including pending, rejected)
 export async function GET(request: NextRequest) {
   try {
+    // Verify admin session
+    const authResult = await verifyAdminRequest();
+    if (!authResult.authorized) return authResult.error!;
+
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
     const limit = parseInt(searchParams.get('limit') || '100')
@@ -160,9 +165,13 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-// POST - Create artwork from admin panel (no Google auth required)
+// POST - Create artwork from admin panel
 export async function POST(request: NextRequest) {
   try {
+    // Verify admin session
+    const authResult = await verifyAdminRequest();
+    if (!authResult.authorized) return authResult.error!;
+
     const body = await request.json()
     const {
       title,

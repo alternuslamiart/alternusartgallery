@@ -35,22 +35,8 @@ export default function SettingsPage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
-  // Check localStorage for CEO login
-  const [localUser, setLocalUser] = useState<{ name: string; email: string; role: string } | null>(null);
-
-  useEffect(() => {
-    const userAuth = localStorage.getItem("userAuth");
-    if (userAuth === "true") {
-      setLocalUser({
-        name: localStorage.getItem("userName") || "User",
-        email: localStorage.getItem("userEmail") || "",
-        role: localStorage.getItem("userRole") || "USER",
-      });
-    }
-  }, []);
-
-  const isLoggedIn = status === "authenticated" || localUser !== null;
-  const user = session?.user || localUser;
+  const isLoggedIn = status === "authenticated";
+  const user = session?.user || null;
 
   // Profile form state
   const [profileForm, setProfileForm] = useState({
@@ -97,10 +83,10 @@ export default function SettingsPage() {
 
   // Redirect if not logged in
   useEffect(() => {
-    if (status === "unauthenticated" && !localUser) {
+    if (status === "unauthenticated") {
       router.push("/login");
     }
-  }, [status, localUser, router]);
+  }, [status, router]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();

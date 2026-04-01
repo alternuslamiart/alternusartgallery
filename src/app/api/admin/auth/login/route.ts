@@ -1,18 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { createHash, randomBytes } from 'crypto';
+import { createHmac, randomBytes, timingSafeEqual } from 'crypto';
 
 export const dynamic = 'force-dynamic';
 
-// Generate a secure session token
+// Generate a cryptographically secure session token with HMAC signature
 function generateSessionToken(): string {
-  const secret = process.env.ADMIN_SESSION_SECRET || 'alternus-admin-secret-key-change-in-production';
-  const randomPart = randomBytes(32).toString('hex');
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!secret) {
+    throw new Error('ADMIN_SESSION_SECRET environment variable is required');
+  }
+
   const timestamp = Date.now().toString();
-  const hash = createHash('sha256')
-    .update(randomPart + timestamp + secret)
+  const nonce = randomBytes(16).toString('hex');
+  const payload = `${timestamp}.${nonce}`;
+  const signature = createHmac('sha256', secret)
+    .update(payload)
     .digest('hex');
-  return `${hash}.${timestamp}`;
+
+  return `${signature}.${timestamp}.${nonce}`;
+}
+
+// Verify HMAC signature of admin session token (used internally)
+function verifyAdminSessionToken(token: string): boolean {
+  if (!token) return false;
+
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!secret) return false;
+
+  const parts = token.split('.');
+  if (parts.length !== 3) return false;
+
+  const [providedSignature, timestamp, nonce] = parts;
+  const timestampNum = parseInt(timestamp, 10);
+  if (isNaN(timestampNum)) return false;
+
+  // Check if token is expired (24 hours)
+  const maxAge = 24 * 60 * 60 * 1000;
+  if (Date.now() - timestampNum > maxAge) return false;
+
+  // Verify HMAC signature
+  const payload = `${timestamp}.${nonce}`;
+  const expectedSignature = createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+
+  try {
+    return timingSafeEqual(
+      Buffer.from(providedSignature, 'hex'),
+      Buffer.from(expectedSignature, 'hex')
+    );
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -20,32 +60,42 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password } = body;
 
-    // Validate credentials
+    // Validate input
     const inputEmail = (email || '').trim().toLowerCase();
     const inputPassword = (password || '').toString();
 
-    // Check against env vars first, then fallback hardcoded credentials
+    if (!inputEmail || !inputPassword) {
+      return NextResponse.json(
+        { error: 'Email and password are required' },
+        { status: 400 }
+      );
+    }
+
+    // Only check against environment variables — no hardcoded fallbacks
     const envEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
-    const envPassword = (process.env.ADMIN_PASSWORD || '').trim();
+    const envPassword = process.env.ADMIN_PASSWORD || '';
 
-    // Hardcoded fallback credentials
-    const fallbackEmail = 'admin@alternusart.com';
-    const fallbackPassword = 'Alternus333#';
+    if (!envEmail || !envPassword) {
+      console.error('ADMIN_EMAIL or ADMIN_PASSWORD not configured');
+      return NextResponse.json(
+        { error: 'Admin login is not configured' },
+        { status: 500 }
+      );
+    }
 
-    const matchesEnv = envEmail && envPassword &&
-      inputEmail === envEmail && inputPassword === envPassword;
+    // Constant-time comparison to prevent timing attacks
+    const emailMatch = inputEmail === envEmail;
+    const passwordMatch = inputPassword.length === envPassword.length &&
+      timingSafeEqual(Buffer.from(inputPassword), Buffer.from(envPassword));
 
-    const matchesFallback =
-      inputEmail === fallbackEmail && inputPassword === fallbackPassword;
-
-    if (!matchesEnv && !matchesFallback) {
+    if (!emailMatch || !passwordMatch) {
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
       );
     }
 
-    // Generate session token
+    // Generate HMAC-signed session token
     const sessionToken = generateSessionToken();
 
     // Set HTTP-only secure cookie
@@ -53,7 +103,7 @@ export async function POST(request: NextRequest) {
     cookieStore.set('admin-session', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'strict',
       maxAge: 60 * 60 * 24, // 24 hours
       path: '/',
     });

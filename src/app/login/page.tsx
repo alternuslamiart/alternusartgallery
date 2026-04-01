@@ -72,14 +72,6 @@ export default function LoginPage() {
         return;
       }
 
-      const CEO_EMAIL = "lamialiuart@gmail.com";
-      if (inputEmail === CEO_EMAIL.toLowerCase()) {
-        localStorage.setItem("userAuth", "true");
-        localStorage.setItem("userEmail", CEO_EMAIL);
-        localStorage.setItem("userName", "Lamiart CEO");
-        localStorage.setItem("userRole", "CEO");
-      }
-
       window.location.href = "/";
     } catch (error) {
       console.error("Login error:", error);

@@ -397,14 +397,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   // User Artworks State - stored per user
   const [userArtworks, setUserArtworks] = useState<Painting[]>([]);
 
-  // Get user-specific storage key (works for both localStorage auth and NextAuth session)
+  // Get user-specific storage key
   const getUserArtworksKey = useCallback(() => {
-    // Check localStorage first (for CEO and local auth)
-    if (typeof window !== "undefined") {
-      const localEmail = localStorage.getItem("userEmail");
-      if (localEmail) return `userArtworks_${localEmail}`;
-    }
-    // Fallback to user context (for OAuth users)
     if (user?.email) return `userArtworks_${user.email}`;
     return null;
   }, [user?.email]);

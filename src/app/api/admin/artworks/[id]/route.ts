@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { verifyAdminRequest } from '@/lib/admin-auth'
 
 export const dynamic = 'force-dynamic';
 
-// PATCH - Update artwork (admin only, no user check required)
+// PATCH - Update artwork (admin only)
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Verify admin session
+    const authResult = await verifyAdminRequest();
+    if (!authResult.authorized) return authResult.error!;
+
     const { id } = await params
     const body = await request.json()
     const { title, description, price, status, isAvailable } = body
@@ -21,8 +26,11 @@ export async function PATCH(
     if (price !== undefined) updateData.price = price
 
     if (status !== undefined) {
+      const validStatuses = ['PENDING', 'APPROVED', 'REJECTED', 'SOLD']
+      if (!validStatuses.includes(status)) {
+        return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+      }
       updateData.status = status
-      // If marking as SOLD, set isAvailable to false
       if (status === 'SOLD') {
         updateData.isAvailable = false
       } else if (status === 'APPROVED') {
@@ -71,9 +79,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Verify admin session
+    const authResult = await verifyAdminRequest();
+    if (!authResult.authorized) return authResult.error!;
+
     const { id } = await params
 
-    // Get artwork to find artist
     const artwork = await prisma.artwork.findUnique({
       where: { id },
     })
@@ -85,12 +96,10 @@ export async function DELETE(
       )
     }
 
-    // Delete the artwork
     await prisma.artwork.delete({
       where: { id },
     })
 
-    // Update artist's total artworks count
     await prisma.artist.update({
       where: { id: artwork.artistId },
       data: {
