@@ -239,41 +239,43 @@ export default function AlternusOS() {
       >
         {/* Subtle ambient */}
         <div
-          className="absolute w-[500px] h-[500px] rounded-full opacity-[0.04]"
+          className="absolute w-[500px] h-[500px] rounded-full opacity-[0.04] pointer-events-none"
           style={{ background: c.accent, filter: "blur(120px)", top: "20%", left: "30%" }}
         />
 
-        <p style={{ color: c.text }} className="text-6xl font-extralight tracking-wide mb-1">
-          {fmt(time)}
-        </p>
-        <p style={{ color: c.textMuted }} className="text-sm mb-12">
-          {fmtDate(time)}
-        </p>
+        <div className="relative z-10 flex flex-col items-center">
+          <p style={{ color: c.text }} className="text-6xl font-extralight tracking-wide mb-1">
+            {fmt(time)}
+          </p>
+          <p style={{ color: c.textMuted }} className="text-sm mb-12">
+            {fmtDate(time)}
+          </p>
 
-        {/* Avatar */}
-        <div
-          className="w-16 h-16 rounded-full flex items-center justify-center mb-3"
-          style={{ background: c.accentSoft }}
-        >
-          <span style={{ color: c.accentText }} className="text-xl font-semibold">
-            A
-          </span>
+          {/* Avatar */}
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mb-3"
+            style={{ background: c.accentSoft }}
+          >
+            <span style={{ color: c.accentText }} className="text-xl font-semibold">
+              A
+            </span>
+          </div>
+          <p style={{ color: c.text }} className="text-sm font-medium mb-6">
+            Alternus OS
+          </p>
+
+          <button
+            onClick={() => setIsLocked(false)}
+            className="px-8 py-2.5 rounded-xl text-sm font-medium text-white transition-all hover:opacity-90 active:scale-[0.97] cursor-pointer"
+            style={{ background: c.accent }}
+          >
+            Unlock
+          </button>
+
+          <p style={{ color: c.textMuted }} className="text-xs mt-4">
+            Click to enter
+          </p>
         </div>
-        <p style={{ color: c.text }} className="text-sm font-medium mb-6">
-          Alternus OS
-        </p>
-
-        <button
-          onClick={() => setIsLocked(false)}
-          className="px-8 py-2.5 rounded-xl text-sm font-medium text-white transition-all hover:opacity-90 active:scale-[0.97]"
-          style={{ background: c.accent }}
-        >
-          Unlock
-        </button>
-
-        <p style={{ color: c.textMuted }} className="text-xs mt-4">
-          Click to enter
-        </p>
       </div>
     );
   }
