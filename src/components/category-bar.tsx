@@ -173,27 +173,27 @@ const categories = [
   },
   {
     name: "Prints",
-    href: "/gallery?category=Prints",
+    href: "/prints",
     dropdown: {
       columns: [
         {
           title: "By Type",
           links: [
-            { name: "Lithography", href: "/gallery?category=Prints&style=Lithography" },
-            { name: "Screen Print", href: "/gallery?category=Prints&style=Screen+Print" },
-            { name: "Etching", href: "/gallery?category=Prints&style=Etching" },
-            { name: "Woodcut", href: "/gallery?category=Prints&style=Woodcut" },
-            { name: "Giclée", href: "/gallery?category=Prints&style=Giclee" },
+            { name: "Lithography", href: "/prints?type=Lithography" },
+            { name: "Screen Print", href: "/prints?type=Screen+Print" },
+            { name: "Etching", href: "/prints?type=Etching" },
+            { name: "Woodcut", href: "/prints?type=Woodcut" },
+            { name: "Giclée", href: "/prints?type=Giclee" },
           ],
         },
         {
           title: "By Subject",
           links: [
-            { name: "Abstract", href: "/gallery?category=Prints&style=Abstract" },
-            { name: "Landscape", href: "/gallery?category=Prints&style=Landscape" },
-            { name: "Botanical", href: "/gallery?category=Prints&style=Botanical" },
-            { name: "Figurative", href: "/gallery?category=Prints&style=Figurative" },
-            { name: "Geometric", href: "/gallery?category=Prints&style=Geometric" },
+            { name: "Abstract", href: "/prints?subject=Abstract" },
+            { name: "Landscape", href: "/prints?subject=Landscape" },
+            { name: "Botanical", href: "/prints?subject=Botanical" },
+            { name: "Figurative", href: "/prints?subject=Figurative" },
+            { name: "Geometric", href: "/prints?subject=Geometric" },
           ],
         },
       ],
@@ -201,7 +201,7 @@ const categories = [
         title: "Art Prints",
         subtitle: "Limited edition prints from top artists.",
         cta: "Explore Prints",
-        href: "/gallery?category=Prints",
+        href: "/prints",
         image: "https://images.unsplash.com/photo-1582201942988-13e60e4556ee?w=600&q=80",
       },
     },
