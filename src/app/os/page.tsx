@@ -464,7 +464,7 @@ function WeatherApp({ c }: { c: typeof palette.dark }) {
 }
 
 function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void }) {
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState("Network");
   const items = [
     { icon: ic.wifi, label: "Network", desc: "Connected · 5GHz" },
     { icon: ic.user, label: "Account", desc: "admin@alternus.art" },
@@ -473,139 +473,111 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
     { icon: ic.settings, label: "System", desc: "Alternus OS v1.0" },
   ];
 
-  if (activeSection === "Network") {
-    return (
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
-          <button onClick={() => setActiveSection(null)} className="p-1 rounded-md" style={{ color: c.textSec }}><I d={ic.chevL} s={14} /></button>
-          <span className="text-sm font-medium" style={{ color: c.text }}>Network</span>
-        </div>
-        <div className="p-5 space-y-4">
-          <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: c.cardAlt }}>
-            <div><p className="text-sm font-medium" style={{ color: c.text }}>Wi-Fi</p><p className="text-xs" style={{ color: c.textMuted }}>Connected to AlternusNet · 5GHz</p></div>
-            <div className="w-10 h-5 rounded-full flex items-center px-0.5" style={{ background: c.accent }}><div className="w-4 h-4 rounded-full bg-white ml-auto" /></div>
+  const renderContent = () => {
+    switch (activeSection) {
+      case "Network":
+        return (
+          <div className="p-5 space-y-4 overflow-y-auto h-full">
+            <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: c.cardAlt }}>
+              <div><p className="text-sm font-medium" style={{ color: c.text }}>Wi-Fi</p><p className="text-xs" style={{ color: c.textMuted }}>Connected to AlternusNet · 5GHz</p></div>
+              <div className="w-10 h-5 rounded-full flex items-center px-0.5" style={{ background: c.accent }}><div className="w-4 h-4 rounded-full bg-white ml-auto" /></div>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-medium px-1 mb-2" style={{ color: c.textMuted }}>Available Networks</p>
+              {["AlternusNet", "Guest_WiFi", "Office_5G"].map((net, i) => (
+                <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl transition-colors" style={{ background: i === 0 ? c.cardAlt : "transparent" }}
+                  onMouseEnter={e => { if (i !== 0) e.currentTarget.style.background = c.cardAlt; }} onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = "transparent"; }}>
+                  <div className="flex items-center gap-3"><I d={ic.wifi} s={16} c={c.textSec} /><span className="text-sm" style={{ color: c.text }}>{net}</span></div>
+                  {i === 0 && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>Connected</span>}
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="space-y-1">
-            <p className="text-xs font-medium px-1 mb-2" style={{ color: c.textMuted }}>Available Networks</p>
-            {["AlternusNet", "Guest_WiFi", "Office_5G"].map((net, i) => (
-              <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl transition-colors" style={{ background: i === 0 ? c.cardAlt : "transparent" }}
-                onMouseEnter={e => { if (i !== 0) e.currentTarget.style.background = c.cardAlt; }} onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = "transparent"; }}>
-                <div className="flex items-center gap-3"><I d={ic.wifi} s={16} c={c.textSec} /><span className="text-sm" style={{ color: c.text }}>{net}</span></div>
-                {i === 0 && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>Connected</span>}
+        );
+      case "Account":
+        return (
+          <div className="p-5 space-y-4 overflow-y-auto h-full">
+            <div className="flex items-center gap-4 p-4 rounded-xl" style={{ background: c.cardAlt }}>
+              <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: c.accentSoft, color: c.accentText }}><I d={ic.user} s={28} /></div>
+              <div><p className="text-sm font-medium" style={{ color: c.text }}>Admin</p><p className="text-xs" style={{ color: c.textMuted }}>admin@alternus.art</p></div>
+            </div>
+            {[{ l: "Display Name", v: "Admin" }, { l: "Email", v: "admin@alternus.art" }, { l: "Role", v: "Administrator" }].map((f, i) => (
+              <div key={i} className="px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
+                <p className="text-[10px] mb-1" style={{ color: c.textMuted }}>{f.l}</p>
+                <p className="text-sm" style={{ color: c.text }}>{f.v}</p>
               </div>
             ))}
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (activeSection === "Account") {
-    return (
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
-          <button onClick={() => setActiveSection(null)} className="p-1 rounded-md" style={{ color: c.textSec }}><I d={ic.chevL} s={14} /></button>
-          <span className="text-sm font-medium" style={{ color: c.text }}>Account</span>
-        </div>
-        <div className="p-5 space-y-4">
-          <div className="flex items-center gap-4 p-4 rounded-xl" style={{ background: c.cardAlt }}>
-            <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: c.accentSoft, color: c.accentText }}><I d={ic.user} s={28} /></div>
-            <div><p className="text-sm font-medium" style={{ color: c.text }}>Admin</p><p className="text-xs" style={{ color: c.textMuted }}>admin@alternus.art</p></div>
-          </div>
-          {[{ l: "Display Name", v: "Admin" }, { l: "Email", v: "admin@alternus.art" }, { l: "Role", v: "Administrator" }].map((f, i) => (
-            <div key={i} className="px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
-              <p className="text-[10px] mb-1" style={{ color: c.textMuted }}>{f.l}</p>
-              <p className="text-sm" style={{ color: c.text }}>{f.v}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (activeSection === "Appearance") {
-    return (
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
-          <button onClick={() => setActiveSection(null)} className="p-1 rounded-md" style={{ color: c.textSec }}><I d={ic.chevL} s={14} /></button>
-          <span className="text-sm font-medium" style={{ color: c.text }}>Appearance</span>
-        </div>
-        <div className="p-5 space-y-4">
-          <p className="text-xs font-medium px-1" style={{ color: c.textMuted }}>Theme</p>
-          <div className="flex gap-3">
-            {(["dark", "light"] as ThemeMode[]).map(m => (
-              <button key={m} onClick={() => setMode(m)} className="flex-1 p-4 rounded-xl text-center transition-all"
-                style={{ background: mode === m ? c.accentSoft : c.cardAlt, border: `2px solid ${mode === m ? c.accent : "transparent"}` }}>
-                <I d={m === "dark" ? ic.moon : ic.sun} s={24} c={mode === m ? c.accentText : c.textSec} />
-                <p className="text-xs mt-2 capitalize" style={{ color: mode === m ? c.accentText : c.text }}>{m}</p>
+        );
+      case "Language":
+        return (
+          <div className="p-5 space-y-1 overflow-y-auto h-full">
+            {["English (US)", "Shqip", "Deutsch", "Français", "Español", "日本語"].map((lang, i) => (
+              <button key={i} className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left transition-colors"
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <span className="text-sm" style={{ color: c.text }}>{lang}</span>
+                {i === 0 && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>Active</span>}
               </button>
             ))}
           </div>
-          <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Accent Color</p>
-          <div className="flex gap-2 px-1">
-            {["#3B82F6", "#8B5CF6", "#10B981", "#F59E0B", "#EF4444", "#EC4899"].map(col => (
-              <div key={col} className="w-8 h-8 rounded-full cursor-pointer transition-transform hover:scale-110" style={{ background: col, border: col === c.accent ? "3px solid " + c.text : "3px solid transparent" }} />
+        );
+      case "Appearance":
+        return (
+          <div className="p-5 space-y-4 overflow-y-auto h-full">
+            <p className="text-xs font-medium px-1" style={{ color: c.textMuted }}>Theme</p>
+            <div className="flex gap-3">
+              {(["dark", "light"] as ThemeMode[]).map(m => (
+                <button key={m} onClick={() => setMode(m)} className="flex-1 p-4 rounded-xl text-center transition-all"
+                  style={{ background: mode === m ? c.accentSoft : c.cardAlt, border: `2px solid ${mode === m ? c.accent : "transparent"}` }}>
+                  <I d={m === "dark" ? ic.moon : ic.sun} s={24} c={mode === m ? c.accentText : c.textSec} />
+                  <p className="text-xs mt-2 capitalize" style={{ color: mode === m ? c.accentText : c.text }}>{m}</p>
+                </button>
+              ))}
+            </div>
+            <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Accent Color</p>
+            <div className="flex gap-2 px-1">
+              {["#3B82F6", "#8B5CF6", "#10B981", "#F59E0B", "#EF4444", "#EC4899"].map(col => (
+                <div key={col} className="w-8 h-8 rounded-full cursor-pointer transition-transform hover:scale-110" style={{ background: col, border: col === c.accent ? "3px solid " + c.text : "3px solid transparent" }} />
+              ))}
+            </div>
+          </div>
+        );
+      case "System":
+        return (
+          <div className="p-5 space-y-3 overflow-y-auto h-full">
+            {[{ l: "OS Version", v: "Alternus OS v1.0" }, { l: "Kernel", v: "AlternusKernel 6.2" }, { l: "Architecture", v: "x86_64" }, { l: "Uptime", v: "3h 24m" }, { l: "Memory", v: "16 GB DDR5" }, { l: "Storage", v: "512 GB SSD — 234 GB free" }].map((info, i) => (
+              <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
+                <span className="text-xs" style={{ color: c.textMuted }}>{info.l}</span>
+                <span className="text-xs font-medium" style={{ color: c.text }}>{info.v}</span>
+              </div>
             ))}
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (activeSection === "Language") {
-    return (
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
-          <button onClick={() => setActiveSection(null)} className="p-1 rounded-md" style={{ color: c.textSec }}><I d={ic.chevL} s={14} /></button>
-          <span className="text-sm font-medium" style={{ color: c.text }}>Language</span>
-        </div>
-        <div className="p-5 space-y-1">
-          {["English (US)", "Shqip", "Deutsch", "Français", "Español", "日本語"].map((lang, i) => (
-            <button key={i} className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left transition-colors"
-              onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-              <span className="text-sm" style={{ color: c.text }}>{lang}</span>
-              {i === 0 && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>Active</span>}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (activeSection === "System") {
-    return (
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
-          <button onClick={() => setActiveSection(null)} className="p-1 rounded-md" style={{ color: c.textSec }}><I d={ic.chevL} s={14} /></button>
-          <span className="text-sm font-medium" style={{ color: c.text }}>System</span>
-        </div>
-        <div className="p-5 space-y-3">
-          {[{ l: "OS Version", v: "Alternus OS v1.0" }, { l: "Kernel", v: "AlternusKernel 6.2" }, { l: "Architecture", v: "x86_64" }, { l: "Uptime", v: "3h 24m" }, { l: "Memory", v: "16 GB DDR5" }, { l: "Storage", v: "512 GB SSD — 234 GB free" }].map((info, i) => (
-            <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
-              <span className="text-xs" style={{ color: c.textMuted }}>{info.l}</span>
-              <span className="text-xs font-medium" style={{ color: c.text }}>{info.v}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="p-4">
-      {items.map((it, i) => (
-        <button key={i} className="w-full flex items-center gap-4 px-4 py-4 rounded-xl text-left transition-colors"
-          onClick={() => { if (it.label === "Appearance") setMode(mode === "dark" ? "light" : "dark"); setActiveSection(it.label); }}
-          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-          <span style={{ color: c.textSec }}><I d={it.icon} s={20} /></span>
-          <div className="flex-1">
-            <p className="text-sm font-medium" style={{ color: c.text }}>{it.label}</p>
-            <p className="text-xs" style={{ color: c.textMuted }}>{it.desc}</p>
-          </div>
-          <I d={ic.chevR} s={14} c={c.textMuted} />
-        </button>
-      ))}
+    <div className="flex h-full">
+      {/* Sidebar */}
+      <div className="w-[170px] flex-shrink-0 flex flex-col py-3 px-2 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}` }}>
+        <p className="text-sm font-semibold px-3 mb-3" style={{ color: c.accentText }}>Settings</p>
+        {items.map((it, i) => (
+          <button key={i} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors mb-0.5"
+            onClick={() => setActiveSection(it.label)}
+            style={{ background: activeSection === it.label ? c.accentSoft : "transparent" }}
+            onMouseEnter={e => { if (activeSection !== it.label) e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { if (activeSection !== it.label) e.currentTarget.style.background = "transparent"; }}>
+            <I d={it.icon} s={16} c={activeSection === it.label ? c.accentText : c.textSec} />
+            <span className="text-xs font-medium" style={{ color: activeSection === it.label ? c.accentText : c.text }}>{it.label}</span>
+          </button>
+        ))}
+      </div>
+      {/* Content */}
+      <div className="flex-1 overflow-hidden">
+        {renderContent()}
+      </div>
     </div>
   );
 }
@@ -825,7 +797,7 @@ export default function AlternusOS() {
     { id: "terminal", title: "Terminal", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 60, w: 550, h: 380 },
     { id: "code", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 150, y: 50, w: 650, h: 450 },
     { id: "files", title: "Files", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 80, w: 400, h: 380 },
-    { id: "settings", title: "Settings", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 250, y: 50, w: 480, h: 500 },
+    { id: "settings", title: "Settings", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 50, w: 560, h: 440 },
     { id: "music", title: "Music", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 250, y: 50, w: 340, h: 420 },
     { id: "weather", title: "Weather", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 400, y: 60, w: 360, h: 400 },
     { id: "calendar", title: "Calendar", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 450, y: 80, w: 320, h: 380 },
@@ -1117,27 +1089,29 @@ export default function AlternusOS() {
               </svg>
             </button>
 
-            {/* Apps panel - slides down */}
+            {/* Apps panel - slides down, horizontal scroll */}
             <div
               className="mt-2 overflow-hidden transition-all duration-300 ease-in-out"
               style={{
-                maxHeight: showApps ? 120 : 0,
+                maxHeight: showApps ? 80 : 0,
                 opacity: showApps ? 1 : 0,
               }}
             >
-              <div className="flex items-center gap-2 px-4 py-3 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 20px rgba(0,0,0,0.3)" : "0 4px 20px rgba(0,0,0,0.08)" }}>
+              <div
+                className="flex items-center gap-1.5 px-3 py-2 rounded-2xl overflow-x-auto"
+                style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 20px rgba(0,0,0,0.3)" : "0 4px 20px rgba(0,0,0,0.08)", scrollbarWidth: "none", msOverflowStyle: "none" }}
+                onWheel={e => { e.currentTarget.scrollLeft += e.deltaY; }}
+              >
                 {dockApps.map(app => (
                   <button
                     key={app.id}
                     onClick={() => { openWin(app.id); setShowApps(false); }}
-                    className="flex flex-col items-center gap-1 w-14 py-1.5 rounded-xl transition-all hover:scale-105 active:scale-95"
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                    className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+                    style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}
+                    onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.borderColor = c.border; }}
                   >
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-                      <I d={app.icon} s={17} c={app.color} />
-                    </div>
-                    <span className="text-[9px] font-medium" style={{ color: c.textMuted }}>{app.label}</span>
+                    <I d={app.icon} s={16} c={app.color} />
                   </button>
                 ))}
               </div>
