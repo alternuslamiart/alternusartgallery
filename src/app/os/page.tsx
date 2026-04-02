@@ -432,9 +432,10 @@ function CalendarContent({ theme }: { theme: typeof themes.dark }) {
   const daysInMonth = new Date(year, currentDate.getMonth() + 1, 0).getDate();
   const firstDay = new Date(year, currentDate.getMonth(), 1).getDay();
 
-  const days = Array.from({ length: firstDay }, () => null).concat(
-    Array.from({ length: daysInMonth }, (_, i) => i + 1)
-  );
+  const days: (number | null)[] = [
+    ...Array.from({ length: firstDay }, () => null as null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ];
 
   return (
     <div className="p-4">
