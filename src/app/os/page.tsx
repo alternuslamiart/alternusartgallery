@@ -876,10 +876,70 @@ export default function AlternusOS() {
 
       {/* Desktop Area - fixed, no scroll */}
       <div className="flex-1 relative overflow-hidden">
+        {/* Apps button - top center, circular */}
+        {!wins.some(w => w.isOpen && !w.isMinimized) && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[2] flex flex-col items-center">
+            <button
+              onClick={() => setShowApps(!showApps)}
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+              style={{
+                background: showApps ? c.accent : c.surface,
+                border: `1px solid ${showApps ? c.accent : c.border}`,
+                color: showApps ? "#fff" : c.textSec,
+              }}
+              onMouseEnter={e => {
+                if (!showApps) {
+                  e.currentTarget.style.background = c.accent;
+                  e.currentTarget.style.borderColor = c.accent;
+                  e.currentTarget.style.color = "#fff";
+                }
+              }}
+              onMouseLeave={e => {
+                if (!showApps) {
+                  e.currentTarget.style.background = c.surface;
+                  e.currentTarget.style.borderColor = c.border;
+                  e.currentTarget.style.color = c.textSec;
+                }
+              }}
+            >
+              <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+                style={{ transform: showApps ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s ease" }}>
+                <path d="M18 15l-6-6-6 6" />
+              </svg>
+            </button>
+
+            {/* Apps panel - slides down */}
+            <div
+              className="mt-2 overflow-hidden transition-all duration-300 ease-in-out"
+              style={{
+                maxHeight: showApps ? 120 : 0,
+                opacity: showApps ? 1 : 0,
+              }}
+            >
+              <div className="flex items-center gap-2 px-4 py-3 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 20px rgba(0,0,0,0.3)" : "0 4px 20px rgba(0,0,0,0.08)" }}>
+                {dockApps.map(app => (
+                  <button
+                    key={app.id}
+                    onClick={() => { openWin(app.id); setShowApps(false); }}
+                    className="flex flex-col items-center gap-1 w-14 py-1.5 rounded-xl transition-all hover:scale-105 active:scale-95"
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+                      <I d={app.icon} s={17} c={app.color} />
+                    </div>
+                    <span className="text-[9px] font-medium" style={{ color: c.textMuted }}>{app.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Center: Alternus branding + AI Search */}
         {!wins.some(w => w.isOpen && !w.isMinimized) && (
-          <div className="absolute inset-0 flex flex-col items-center z-[0]" style={{ paddingTop: "12vh" }}>
-            {/* Alternus gradient text - LARGER */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-[0]">
+            {/* Alternus gradient text */}
             <h1
               className="text-8xl md:text-9xl font-semibold mb-4 select-none"
               style={{
@@ -899,14 +959,14 @@ export default function AlternusOS() {
               Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}. What would you like to create today?
             </p>
 
-            {/* AI Search Bar - LARGER, lower */}
+            {/* AI Search Bar - centered, wider enter button */}
             <div
-              className="w-full max-w-2xl flex items-center gap-3 px-6 py-4 rounded-2xl transition-all"
+              className="w-full max-w-2xl flex items-center gap-2 pl-5 pr-2 py-2 rounded-2xl transition-all"
               style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)" }}
             >
               <I d={ic.search} s={20} c={c.textMuted} />
               <input
-                className="flex-1 bg-transparent outline-none text-base"
+                className="flex-1 bg-transparent outline-none text-base py-2"
                 style={{ color: c.text }}
                 placeholder="Search or ask AI anything..."
                 onKeyDown={(e) => {
@@ -917,50 +977,11 @@ export default function AlternusOS() {
               />
               <button
                 onClick={() => openWin("ai")}
-                className="p-2 rounded-xl transition-all hover:opacity-90 active:scale-95"
+                className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90 active:scale-95 flex items-center gap-2"
                 style={{ background: c.accent }}
               >
                 <I d={ic.send} s={16} c="#fff" />
               </button>
-            </div>
-
-            {/* Arrow up to show apps */}
-            <button
-              onClick={() => setShowApps(!showApps)}
-              className="mt-6 flex flex-col items-center gap-1 transition-all hover:opacity-80"
-              style={{ color: c.textMuted }}
-            >
-              <span className="text-[11px]">{showApps ? "Hide Apps" : "Apps"}</span>
-              <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-                style={{ transform: showApps ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s ease" }}>
-                <path d="M18 15l-6-6-6 6" />
-              </svg>
-            </button>
-
-            {/* Apps panel - horizontal, slides in */}
-            <div
-              className="mt-2 overflow-hidden transition-all duration-300 ease-in-out"
-              style={{
-                maxHeight: showApps ? 120 : 0,
-                opacity: showApps ? 1 : 0,
-              }}
-            >
-              <div className="flex items-center gap-2 px-4 py-3 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-                {dockApps.map(app => (
-                  <button
-                    key={app.id}
-                    onClick={() => { openWin(app.id); setShowApps(false); }}
-                    className="flex flex-col items-center gap-1 w-14 py-1.5 rounded-xl transition-all hover:scale-105 active:scale-95"
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-                  >
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-                      <I d={app.icon} s={17} c={app.color} />
-                    </div>
-                    <span className="text-[9px] font-medium" style={{ color: c.textMuted }}>{app.label}</span>
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
         )}
