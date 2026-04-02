@@ -725,6 +725,11 @@ export default function AlternusOS() {
               Alternus<span className="text-lg align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
             </h1>
 
+            {/* Welcome message */}
+            <p className="text-base font-light mb-8" style={{ color: c.textSec }}>
+              Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}. What would you like to create today?
+            </p>
+
             {/* AI Search Bar */}
             <div
               className="w-full max-w-xl flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all"
@@ -746,17 +751,17 @@ export default function AlternusOS() {
               </div>
             </div>
 
-            {/* Quick app launcher row */}
-            <div className="flex items-center gap-3 mt-8">
-              {dockApps.slice(0, 6).map(app => (
+            {/* Quick app launcher grid */}
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-8 max-w-2xl">
+              {dockApps.map(app => (
                 <button
                   key={app.id}
                   onClick={() => openWin(app.id)}
-                  className="flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-all hover:scale-105 active:scale-95"
-                  onMouseEnter={e => (e.currentTarget.style.background = c.surface)}
+                  className="flex flex-col items-center gap-1.5 w-16 py-2 rounded-xl transition-all hover:scale-105 active:scale-95"
+                  onMouseEnter={e => (e.currentTarget.style.background = mode === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                 >
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                  <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
                     <I d={app.icon} s={18} c={app.color} />
                   </div>
                   <span className="text-[10px] font-medium" style={{ color: c.textMuted }}>{app.label}</span>
