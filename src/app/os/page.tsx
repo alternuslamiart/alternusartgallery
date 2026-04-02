@@ -27,6 +27,54 @@ interface WinState {
 type BootPhase = "bios" | "hardware" | "kernel" | "services" | "desktop" | "done";
 type SystemModal = { type: "error" | "warning" | "info"; title: string; message: string } | null;
 
+interface AINotification {
+  id: string;
+  title: string;
+  message: string;
+  icon: string;
+  time: string;
+  type: "security" | "suggestion" | "cleanup" | "summary" | "system";
+  actions?: { label: string; handler: string }[];
+  read?: boolean;
+}
+
+interface TimelineEvent {
+  time: string;
+  action: string;
+  app: string;
+  icon: string;
+}
+
+// ━━━━ AI Engine ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const aiWorkspaceRules: Record<string, WinId[]> = {
+  code: ["terminal", "browser"],
+  word: ["browser", "notes"],
+  terminal: ["code", "files"],
+  browser: ["notes"],
+};
+
+const aiContextualApps: Record<string, { combo: WinId[]; suggest: WinId; label: string }[]> = {
+  snap: [
+    { combo: ["word", "browser"], suggest: "ai", label: "Open AI Assistant for research?" },
+    { combo: ["code", "terminal"], suggest: "browser", label: "Open docs browser?" },
+    { combo: ["notes", "browser"], suggest: "word", label: "Open Word for formal writing?" },
+    { combo: ["code", "browser"], suggest: "terminal", label: "Open Terminal for testing?" },
+  ],
+};
+
+const aiFileIndex = [
+  { name: "Budget Report Q1.docx", path: "Documents", content: "budget expenses quarterly revenue financial analysis may june", tags: ["finance", "report"] },
+  { name: "Project Proposal.docx", path: "Documents", content: "project proposal timeline milestones deliverables team allocation", tags: ["project", "proposal"] },
+  { name: "Meeting Notes.md", path: "Documents", content: "meeting discussion decisions action items follow up team sync", tags: ["meeting", "notes"] },
+  { name: "Invoice_March.pdf", path: "Documents", content: "invoice payment amount due billing march services rendered", tags: ["finance", "invoice"] },
+  { name: "Contract_2025.pdf", path: "Documents", content: "contract agreement terms conditions parties obligations legal binding", tags: ["legal", "contract"] },
+  { name: "Design System.fig", path: "Projects", content: "design system components colors typography spacing layout grid", tags: ["design", "ui"] },
+  { name: "API Documentation.md", path: "Projects", content: "api endpoints authentication requests responses status codes", tags: ["dev", "api"] },
+  { name: "Personal Notes.txt", path: "Documents", content: "personal ideas thoughts reminders goals new year resolution", tags: ["personal"] },
+  { name: "Invoice_April.pdf", path: "Documents", content: "invoice payment billing april consulting hours rate total", tags: ["finance", "invoice"] },
+  { name: "NDA_Agreement.pdf", path: "Documents", content: "non disclosure agreement confidential information parties nda", tags: ["legal", "contract"] },
+];
+
 // ━━━━ Colors ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const palette = {
   dark: {
@@ -998,6 +1046,15 @@ export default function AlternusOS() {
   const [aiInput, setAiInput] = useState("");
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [aiActions, setAiActions] = useState<{ label: string; action: WinId }[]>([]);
+  // AI features
+  const [aiNotifications, setAiNotifications] = useState<AINotification[]>([]);
+  const [aiSuggestion, setAiSuggestion] = useState<{ message: string; actions: { label: string; action: () => void }[] } | null>(null);
+  const [closeChain, setCloseChain] = useState<{ appId: WinId; title: string } | null>(null);
+  const [smartDND, setSmartDND] = useState(false);
+  const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
+  const [showTimeline, setShowTimeline] = useState(false);
+  const [biometricPhase, setBiometricPhase] = useState<"idle" | "scanning" | "recognized" | null>(null);
+  const lastMouseMove = useRef(Date.now());
 
   const c = palette[mode];
 
@@ -1052,6 +1109,49 @@ export default function AlternusOS() {
 
   const fmt = (d: Date) => d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
 
+  // ━━━━ AI ADAPTIVE AUTHENTICATION ━━━━━━━━━━━━━━━━━━━━━━━
+  useEffect(() => {
+    if (isLocked || isBooting) return;
+    const hour = new Date().getHours();
+    if (hour >= 1 && hour <= 5) {
+      const timer = setTimeout(() => {
+        if (!smartDND) {
+          addAINotification("security", "Adaptive Security", `It's ${hour}:${new Date().getMinutes().toString().padStart(2, "0")} AM. Unusual activity detected. AI is monitoring this session.`, ic.shield);
+        }
+      }, 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLocked, isBooting, smartDND]);
+
+  // ━━━━ SMART DO NOT DISTURB ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  useEffect(() => {
+    if (isLocked || isBooting) return;
+    const handler = () => { lastMouseMove.current = Date.now(); };
+    window.addEventListener("mousemove", handler);
+    const interval = setInterval(() => {
+      const idle = Date.now() - lastMouseMove.current;
+      if (idle > 30000 && !smartDND) {
+        setSmartDND(true);
+        addAINotification("system", "Focus Mode", "AI detected you're focused. Do Not Disturb enabled. All non-critical notifications paused.", ic.shield);
+      } else if (idle < 5000 && smartDND) {
+        setSmartDND(false);
+      }
+    }, 10000);
+    return () => { window.removeEventListener("mousemove", handler); clearInterval(interval); };
+  }, [isLocked, isBooting, smartDND]);
+
+  // ━━━━ AI HELPERS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const addAINotification = useCallback((type: AINotification["type"], title: string, message: string, icon: string, actions?: AINotification["actions"]) => {
+    const notif: AINotification = { id: Date.now().toString(), title, message, icon, time: "Just now", type, actions, read: false };
+    setAiNotifications(prev => [notif, ...prev.slice(0, 19)]);
+  }, []);
+
+  const addTimelineEvent = useCallback((action: string, app: string, icon: string) => {
+    const now = new Date();
+    const t = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
+    setTimeline(prev => [{ time: t, action, app, icon }, ...prev.slice(0, 49)]);
+  }, []);
+
   const openWin = useCallback((id: WinId) => {
     setZCounter(z => z + 1);
     setWins(p => p.map(w => {
@@ -1101,6 +1201,53 @@ export default function AlternusOS() {
     setTimeout(() => setSystemModal(null), 3000);
   }, []);
 
+  // ━━━━ PREDICTIVE WORKSPACE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const openWinWithAI = useCallback((id: WinId) => {
+    openWin(id);
+    addTimelineEvent("Opened", id, (ic as Record<string, string>)[id] || ic.sparkle);
+
+    const related = aiWorkspaceRules[id];
+    if (related) {
+      const openIds = wins.filter(w => w.isOpen).map(w => w.id);
+      const suggestions = related.filter(r => !openIds.includes(r));
+      if (suggestions.length > 0 && !smartDND) {
+        setTimeout(() => {
+          const names = suggestions.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" & ");
+          setAiSuggestion({
+            message: `AI: Opening ${id}. Want me to also open ${names}?`,
+            actions: [
+              { label: `Open ${names}`, action: () => { suggestions.forEach(s => openWin(s)); setAiSuggestion(null); } },
+              { label: "No thanks", action: () => setAiSuggestion(null) },
+            ],
+          });
+        }, 1500);
+      }
+    }
+
+    // Contextual snapping
+    const openApps = [...wins.filter(w => w.isOpen && !w.isMinimized).map(w => w.id), id];
+    for (const rule of aiContextualApps.snap) {
+      if (rule.combo.every(cid => openApps.includes(cid)) && !openApps.includes(rule.suggest)) {
+        setTimeout(() => {
+          if (!smartDND) addAINotification("suggestion", "Contextual Suggestion", rule.label, ic.sparkle, [{ label: `Open ${rule.suggest}`, handler: rule.suggest }]);
+        }, 3000);
+        break;
+      }
+    }
+  }, [openWin, wins, smartDND, addTimelineEvent, addAINotification]);
+
+  // ━━━━ ACTION CHAINING (Smart Close) ━━━━━━━━━━━━━━━━━━━
+  const closeWinWithAI = useCallback((id: WinId) => {
+    const win = wins.find(w => w.id === id);
+    if (!win || !win.isOpen) return;
+    if (["word", "notes", "code"].includes(id) && !smartDND) {
+      setCloseChain({ appId: id, title: win.title });
+    } else {
+      closeWin(id);
+      addTimelineEvent("Closed", id, (ic as Record<string, string>)[id] || ic.sparkle);
+    }
+  }, [wins, closeWin, smartDND, addTimelineEvent]);
+
   // Alt+Tab task switcher
   useEffect(() => {
     const openWins = wins.filter(w => w.isOpen && !w.isMinimized);
@@ -1133,8 +1280,48 @@ export default function AlternusOS() {
   const handleDesktopSearch = () => {
     const q = aiInput.trim().toLowerCase();
     if (!q) return;
+    addTimelineEvent("Searched", `"${aiInput.trim()}"`, ic.search);
 
-    // Smart search - find apps, files, or respond with AI
+    // ━━━ SEMANTIC SEARCH — search file content, not just names ━━━
+    const fileMatches = aiFileIndex.filter(f => f.content.split(" ").some(w => q.includes(w)) || f.name.toLowerCase().includes(q) || f.tags.some(t => q.includes(t)));
+    if (fileMatches.length > 0) {
+      const fileList = fileMatches.map(f => `• ${f.name} (${f.path})`).join("\n");
+      // Auto-tag & cluster
+      const tags = [...new Set(fileMatches.flatMap(f => f.tags))];
+      const clusterInfo = tags.length > 0 ? `\n\nAI auto-grouped by: ${tags.join(", ")}` : "";
+      setAiResponse(`AI found ${fileMatches.length} file${fileMatches.length > 1 ? "s" : ""} matching your search:\n\n${fileList}${clusterInfo}`);
+      setAiActions([{ label: "Open Files", action: "files" }]);
+      return;
+    }
+
+    // ━━━ PREDICTIVE CLEANUP ━━━
+    if (q.includes("cleanup") || q.includes("clean") || q.includes("archive") || q.includes("unused")) {
+      setAiResponse("AI Predictive Cleanup found:\n\n• design_old.fig — not opened in 6 months\n• backup_jan.zip — 45 MB, created 8 months ago\n• draft_v1.docx — superseded by v3\n\nWant me to move these to Archive or delete them?");
+      setAiActions([{ label: "Archive All", action: "files" }, { label: "Open Files", action: "files" }]);
+      return;
+    }
+
+    // ━━━ NOTIFICATION SUMMARY ━━━
+    if (q.includes("notification") || q.includes("summary") || q.includes("missed")) {
+      const count = aiNotifications.length;
+      const unread = aiNotifications.filter(n => !n.read).length;
+      const byType = aiNotifications.reduce((acc, n) => { acc[n.type] = (acc[n.type] || 0) + 1; return acc; }, {} as Record<string, number>);
+      const summary = Object.entries(byType).map(([t, c]) => `${c} ${t}`).join(", ");
+      setAiResponse(`AI Notification Summary:\n\nYou have ${count} notifications (${unread} unread).\nBreakdown: ${summary || "none"}.\n\nWant to see them all?`);
+      setAiActions([]);
+      setShowNotifications(true);
+      return;
+    }
+
+    // ━━━ TIMELINE ━━━
+    if (q.includes("timeline") || q.includes("history") || q.includes("activity")) {
+      setShowTimeline(true);
+      setAiResponse("Opening your Unified Timeline — a chronological view of all your actions.");
+      setAiActions([]);
+      return;
+    }
+
+    // Standard app-based search
     if (q.includes("file") || q.includes("document") || q.includes("folder")) {
       setAiResponse("I found your files. Would you like to open the file manager?");
       setAiActions([{ label: "Open Files", action: "files" }]);
@@ -1163,14 +1350,11 @@ export default function AlternusOS() {
       setAiResponse(`Today is ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.`);
       setAiActions([{ label: "Open Calendar", action: "calendar" }]);
     } else if (q.includes("hello") || q.includes("hi") || q.includes("hey")) {
-      setAiResponse("Hello! I'm Alternus AI. I can open apps, find files, write code, or answer questions. Try asking me anything.");
+      setAiResponse("Hello! I'm Alternus AI. I can open apps, find files by content, manage your workspace, and answer questions. Try: 'budget', 'cleanup', 'timeline'.");
       setAiActions([]);
-    } else if (q.includes("create") || q.includes("build") || q.includes("make")) {
-      setAiResponse("I can help you build that. Let me set up the code editor and terminal for your project.");
-      setAiActions([{ label: "Open Code", action: "code" }, { label: "Open Terminal", action: "terminal" }]);
     } else {
-      setAiResponse(`I understand "${aiInput.trim()}". Here's what I can help with: open apps, find files, write code, browse the web, check weather, or manage settings.`);
-      setAiActions([{ label: "Open Files", action: "files" }, { label: "Open Browser", action: "browser" }, { label: "Open Code", action: "code" }]);
+      setAiResponse(`AI searched for "${aiInput.trim()}" across files, apps, and system.\n\nNo exact matches found. Try:\n• Search by content: "budget", "invoice", "contract"\n• Predictive cleanup: "cleanup"\n• Activity timeline: "timeline"\n• Notification summary: "notifications"`);
+      setAiActions([{ label: "Open Files", action: "files" }, { label: "Open Browser", action: "browser" }]);
     }
   };
 
@@ -1360,18 +1544,39 @@ export default function AlternusOS() {
             ))}
           </div>
 
-          {/* Skip login button */}
-          <button
-            onClick={() => { setIsLocked(false); setLoginPin(""); }}
-            className="flex items-center gap-2 px-6 py-2 rounded-xl text-xs transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-            style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.textSec }}
-            onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}
-          >
-            <I d={ic.lock} s={13} />
-            Skip Login
-          </button>
-          <p className="text-[9px] mt-2" style={{ color: c.textMuted }}>PIN: 1234 or press Skip</p>
+          {/* Biometric + Skip login */}
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                setBiometricPhase("scanning");
+                setTimeout(() => { setBiometricPhase("recognized"); setTimeout(() => { setIsLocked(false); setLoginPin(""); setBiometricPhase(null); }, 800); }, 1500);
+              }}
+              className="flex items-center gap-2 px-5 py-2 rounded-xl text-xs transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+              style={{ background: biometricPhase === "recognized" ? c.success : biometricPhase === "scanning" ? c.accent : c.surface, border: `1px solid ${biometricPhase ? "transparent" : c.border}`, color: biometricPhase ? "#fff" : c.textSec }}
+            >
+              <I d={ic.user} s={13} />
+              {biometricPhase === "scanning" ? "Scanning..." : biometricPhase === "recognized" ? "Recognized!" : "Face + Voice"}
+            </button>
+            <button
+              onClick={() => { setIsLocked(false); setLoginPin(""); }}
+              className="flex items-center gap-2 px-5 py-2 rounded-xl text-xs transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+              style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.textSec }}
+              onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}
+            >
+              <I d={ic.lock} s={13} />
+              Skip
+            </button>
+          </div>
+          <p className="text-[9px] mt-2" style={{ color: c.textMuted }}>PIN: 1234 · Face+Voice · Smartwatch proximity</p>
+
+          {/* Zero-interaction login simulation */}
+          {biometricPhase === null && (
+            <div className="flex items-center gap-2 mt-3 px-3 py-1.5 rounded-lg" style={{ background: c.cardAlt }}>
+              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: c.success }} />
+              <p className="text-[9px]" style={{ color: c.textMuted }}>AI: Smartwatch detected nearby. Auto-unlock available.</p>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -1464,7 +1669,7 @@ export default function AlternusOS() {
                 {dockApps.map(app => (
                   <button
                     key={app.id}
-                    onClick={() => { openWin(app.id); setShowApps(false); }}
+                    onClick={() => { openWinWithAI(app.id); setShowApps(false); }}
                     className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
                     style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}
                     onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; }}
@@ -1564,7 +1769,7 @@ export default function AlternusOS() {
             key={w.id}
             win={w}
             c={c}
-            onClose={() => closeWin(w.id)}
+            onClose={() => closeWinWithAI(w.id)}
             onMinimize={() => minimizeWin(w.id)}
             onMaximize={() => maximizeWin(w.id)}
             onFocus={() => focusWin(w.id)}
@@ -1618,11 +1823,69 @@ export default function AlternusOS() {
           </div>
         )}
 
-        {/* Notification Sidebar */}
+        {/* ━━━━ AI Suggestion Bar ━━━━ */}
+        {aiSuggestion && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[150] flex items-center gap-3 px-5 py-3 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.accent}`, boxShadow: `0 4px 24px rgba(59,130,246,0.2)` }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: c.accentSoft }}><I d={ic.sparkle} s={16} c={c.accentText} /></div>
+            <p className="text-xs" style={{ color: c.text }}>{aiSuggestion.message}</p>
+            <div className="flex gap-2 ml-2">
+              {aiSuggestion.actions.map((a, i) => (
+                <button key={i} onClick={a.action} className="px-3 py-1 rounded-lg text-[10px] font-medium whitespace-nowrap"
+                  style={{ background: i === 0 ? c.accent : c.cardAlt, color: i === 0 ? "#fff" : c.text }}>{a.label}</button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ━━━━ Action Chain Dialog ━━━━ */}
+        {closeChain && (
+          <div className="absolute inset-0 flex items-center justify-center z-[300]" style={{ background: "rgba(0,0,0,0.3)" }}>
+            <div className="w-96 p-5 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 16px 48px rgba(0,0,0,0.4)" }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.accentSoft }}><I d={ic.sparkle} s={20} c={c.accentText} /></div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: c.text }}>AI: Closing {closeChain.title}</p>
+                  <p className="text-xs" style={{ color: c.textMuted }}>I&apos;ve auto-saved your changes.</p>
+                </div>
+              </div>
+              <p className="text-xs mb-4 px-1" style={{ color: c.textSec }}>Want me to open a related app or perform any other action?</p>
+              <div className="flex gap-2">
+                <button onClick={() => { closeWin(closeChain.appId); addTimelineEvent("Closed (saved)", closeChain.appId, ic.close); setCloseChain(null); }} className="px-4 py-1.5 rounded-lg text-xs font-medium" style={{ background: c.accent, color: "#fff" }}>Save & Close</button>
+                <button onClick={() => { closeWin(closeChain.appId); addTimelineEvent("Closed (no save)", closeChain.appId, ic.close); setCloseChain(null); }} className="px-4 py-1.5 rounded-lg text-xs" style={{ background: c.cardAlt, color: c.text }}>Close Without Saving</button>
+                <button onClick={() => setCloseChain(null)} className="px-4 py-1.5 rounded-lg text-xs" style={{ color: c.textMuted }}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ━━━━ Unified Timeline Panel ━━━━ */}
+        {showTimeline && (
+          <div className="absolute inset-0 flex items-center justify-center z-[250]" style={{ background: "rgba(0,0,0,0.3)" }}>
+            <div className="w-[400px] max-h-[500px] rounded-2xl flex flex-col" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 16px 48px rgba(0,0,0,0.4)" }}>
+              <div className="flex items-center justify-between px-5 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+                <div className="flex items-center gap-2"><I d={ic.refresh} s={16} c={c.accentText} /><p className="text-sm font-semibold" style={{ color: c.text }}>Unified Timeline</p></div>
+                <button onClick={() => setShowTimeline(false)} className="p-1 rounded-md" style={{ color: c.textMuted }}><I d={ic.close} s={14} /></button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4 space-y-1">
+                {timeline.length === 0 ? (
+                  <p className="text-xs text-center py-8" style={{ color: c.textMuted }}>No activity recorded yet. Start using apps to see your timeline.</p>
+                ) : timeline.map((ev, i) => (
+                  <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg" style={{ background: i === 0 ? c.accentSoft : "transparent" }}>
+                    <span className="text-[10px] font-mono w-10 flex-shrink-0" style={{ color: c.textMuted }}>{ev.time}</span>
+                    <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: c.cardAlt }}><I d={ev.icon} s={12} c={c.textSec} /></div>
+                    <span className="text-xs" style={{ color: c.text }}>{ev.action} <span style={{ color: c.accentText }}>{ev.app}</span></span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ━━━━ AI Notification Sidebar ━━━━ */}
         <div
           className="absolute top-0 right-0 h-full z-[100] transition-transform duration-300 ease-in-out"
           style={{
-            width: 320,
+            width: 340,
             transform: showNotifications ? "translateX(0)" : "translateX(100%)",
             background: c.surface,
             borderLeft: `1px solid ${c.border}`,
@@ -1630,24 +1893,59 @@ export default function AlternusOS() {
           }}
         >
           <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
-            <p className="text-sm font-semibold" style={{ color: c.text }}>Notifications</p>
-            <button onClick={() => setShowNotifications(false)} className="p-1 rounded-md" style={{ color: c.textMuted }}><I d={ic.close} s={14} /></button>
+            <div className="flex items-center gap-2">
+              <I d={ic.sparkle} s={14} c={c.accentText} />
+              <p className="text-sm font-semibold" style={{ color: c.text }}>AI Notifications</p>
+              {smartDND && <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: c.warningSoft, color: c.warning }}>DND</span>}
+            </div>
+            <div className="flex items-center gap-1">
+              {aiNotifications.length > 3 && (
+                <button onClick={() => {
+                  const types = aiNotifications.reduce((a, n) => { a[n.type] = (a[n.type] || 0) + 1; return a; }, {} as Record<string, number>);
+                  const sum = Object.entries(types).map(([t, cnt]) => `${cnt} ${t}`).join(", ");
+                  setAiNotifications([{ id: "summary", title: "AI Summary", message: `You had ${aiNotifications.length} notifications: ${sum}. All caught up!`, icon: ic.sparkle, time: "Now", type: "summary", read: false }]);
+                }} className="p-1 rounded-md text-[9px]" style={{ color: c.accentText }}>Summarize</button>
+              )}
+              <button onClick={() => setShowNotifications(false)} className="p-1 rounded-md" style={{ color: c.textMuted }}><I d={ic.close} s={14} /></button>
+            </div>
           </div>
           <div className="p-3 space-y-2 overflow-y-auto" style={{ height: "calc(100% - 48px)" }}>
+            {/* AI notifications */}
+            {aiNotifications.map((n) => (
+              <div key={n.id} className="flex items-start gap-3 p-3 rounded-xl transition-colors"
+                style={{ background: !n.read ? c.accentSoft : "transparent" }}
+                onMouseEnter={e => { if (n.read) e.currentTarget.style.background = c.cardAlt; }}
+                onMouseLeave={e => { if (n.read) e.currentTarget.style.background = "transparent"; }}
+                onClick={() => { setAiNotifications(prev => prev.map(p => p.id === n.id ? { ...p, read: true } : p)); }}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: n.type === "security" ? "rgba(239,68,68,0.15)" : n.type === "suggestion" ? c.accentSoft : c.cardAlt }}>
+                  <I d={n.icon} s={14} c={n.type === "security" ? c.danger : n.type === "suggestion" ? c.accentText : c.textSec} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium" style={{ color: c.text }}>{n.title}</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: c.textMuted }}>{n.message}</p>
+                  {n.actions && (
+                    <div className="flex gap-1 mt-2">
+                      {n.actions.map((a, j) => (
+                        <button key={j} onClick={(e) => { e.stopPropagation(); openWin(a.handler as WinId); setAiNotifications(prev => prev.filter(p => p.id !== n.id)); }}
+                          className="px-2 py-0.5 rounded text-[9px] font-medium" style={{ background: c.accent, color: "#fff" }}>{a.label}</button>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-[9px] mt-1" style={{ color: c.textMuted }}>{n.time}</p>
+                </div>
+              </div>
+            ))}
+            {/* Static system notifications */}
             {[
               { title: "System Update", desc: "Alternus OS v1.1 is available", time: "2 min ago", icon: ic.settings },
               { title: "Welcome", desc: "Welcome to Alternus OS! Explore your new desktop.", time: "5 min ago", icon: ic.sparkle },
               { title: "Network", desc: "Connected to AlternusNet · 5GHz", time: "10 min ago", icon: ic.wifi },
-              { title: "Store", desc: "3 new apps available in the Store", time: "15 min ago", icon: ic.store },
-              { title: "Calendar", desc: "Team meeting tomorrow at 10:00 AM", time: "30 min ago", icon: ic.calendar },
-              { title: "Security", desc: "Your system is protected and up to date", time: "1 hr ago", icon: ic.user },
             ].map((n, i) => (
-              <div key={i} className="flex items-start gap-3 p-3 rounded-xl transition-colors"
-                style={{ background: i < 2 ? c.accentSoft : "transparent" }}
-                onMouseEnter={e => { if (i >= 2) e.currentTarget.style.background = c.cardAlt; }}
-                onMouseLeave={e => { if (i >= 2) e.currentTarget.style.background = "transparent"; }}>
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: i < 2 ? c.accent : c.cardAlt }}>
-                  <I d={n.icon} s={14} c={i < 2 ? "#fff" : c.textSec} />
+              <div key={`sys-${i}`} className="flex items-start gap-3 p-3 rounded-xl transition-colors"
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: c.cardAlt }}>
+                  <I d={n.icon} s={14} c={c.textSec} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium" style={{ color: c.text }}>{n.title}</p>
