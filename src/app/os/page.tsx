@@ -21,7 +21,11 @@ interface WinState {
   y: number;
   w: number;
   h: number;
+  isFrozen?: boolean;
 }
+
+type BootPhase = "bios" | "hardware" | "kernel" | "services" | "desktop" | "done";
+type SystemModal = { type: "error" | "warning" | "info"; title: string; message: string } | null;
 
 // ━━━━ Colors ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const palette = {
@@ -124,6 +128,13 @@ const ic = {
   monitor: "M2 3h20v14H2zM8 21h8M12 17v4",
   mouse: "M12 2a5 5 0 00-5 5v10a5 5 0 0010 0V7a5 5 0 00-5-5zM12 2v6",
   volume: "M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07",
+  alertTriangle: "M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01",
+  shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+  lock: "M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2zM7 11V7a5 5 0 0110 0v4",
+  battery: "M17 6H3a2 2 0 00-2 2v8a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2zM23 13v-2",
+  cpu: "M18 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2zM9 9h6v6H9zM9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3",
+  hdd: "M22 12H2M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11zM6 16h.01M10 16h.01",
+  refresh: "M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15",
 };
 
 // ━━━━ Window Title Bar ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -134,6 +145,9 @@ function TitleBar({
   onMinimize,
   onMaximize,
   onMouseDown,
+  isFrozen,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onForceQuit,
 }: {
   title: string;
   c: typeof palette.dark;
@@ -141,6 +155,8 @@ function TitleBar({
   onMinimize: () => void;
   onMaximize: () => void;
   onMouseDown: (e: React.MouseEvent) => void;
+  isFrozen?: boolean;
+  onForceQuit?: () => void;
 }) {
   return (
     <div
@@ -148,7 +164,9 @@ function TitleBar({
       className="flex items-center justify-between h-9 px-3 select-none cursor-move flex-shrink-0"
       style={{ background: c.titlebar, borderBottom: `1px solid ${c.titlebarBorder}` }}
     >
-      <span style={{ color: c.textSec }} className="text-xs font-medium">{title}</span>
+      <span style={{ color: isFrozen ? c.warning : c.textSec }} className="text-xs font-medium">
+        {title}{isFrozen ? " (Not Responding)" : ""}
+      </span>
       <div className="flex items-center gap-1">
         <button
           onMouseDown={e => e.stopPropagation()}
@@ -194,6 +212,9 @@ function AppWindow({
   onMaximize,
   onFocus,
   onMove,
+  onResize,
+  onSnap,
+  onForceQuit,
 }: {
   win: WinState;
   c: typeof palette.dark;
@@ -203,6 +224,9 @@ function AppWindow({
   onMaximize: () => void;
   onFocus: () => void;
   onMove: (x: number, y: number) => void;
+  onResize?: (w: number, h: number) => void;
+  onSnap?: (side: "left" | "right") => void;
+  onForceQuit?: () => void;
 }) {
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
@@ -213,16 +237,48 @@ function AppWindow({
     offset.current = { x: e.clientX - win.x, y: e.clientY - win.y };
     onFocus();
 
-    const move = (e: MouseEvent) => {
+    const move = (ev: MouseEvent) => {
       if (dragging.current) {
-        onMove(e.clientX - offset.current.x, e.clientY - offset.current.y);
+        onMove(ev.clientX - offset.current.x, ev.clientY - offset.current.y);
       }
     };
-    const up = () => {
+    const up = (ev: MouseEvent) => {
       dragging.current = false;
+      // Snap to edges
+      if (onSnap) {
+        if (ev.clientX <= 5) onSnap("left");
+        else if (ev.clientX >= window.innerWidth - 5) onSnap("right");
+      }
       document.removeEventListener("mousemove", move);
       document.removeEventListener("mouseup", up);
     };
+    document.addEventListener("mousemove", move);
+    document.addEventListener("mouseup", up);
+  };
+
+  const handleResizeMouseDown = (e: React.MouseEvent, corner: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onFocus();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startW = win.w;
+    const startH = win.h;
+    const startPosX = win.x;
+    const startPosY = win.y;
+
+    const move = (ev: MouseEvent) => {
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+      let newW = startW, newH = startH, newX = startPosX, newY = startPosY;
+      if (corner.includes("r")) newW = Math.max(280, startW + dx);
+      if (corner.includes("b")) newH = Math.max(200, startH + dy);
+      if (corner.includes("l")) { newW = Math.max(280, startW - dx); newX = startPosX + dx; }
+      if (corner.includes("t")) { newH = Math.max(200, startH - dy); newY = startPosY + dy; }
+      if (onResize) onResize(newW, newH);
+      if (corner.includes("l") || corner.includes("t")) onMove(newX, newY);
+    };
+    const up = () => { document.removeEventListener("mousemove", move); document.removeEventListener("mouseup", up); };
     document.addEventListener("mousemove", move);
     document.addEventListener("mouseup", up);
   };
@@ -254,8 +310,38 @@ function AppWindow({
         onMinimize={onMinimize}
         onMaximize={onMaximize}
         onMouseDown={handleMouseDown}
+        isFrozen={win.isFrozen}
+        onForceQuit={onForceQuit}
       />
-      <div style={{ flex: 1, overflow: "auto" }}>{children}</div>
+      <div style={{ flex: 1, overflow: "auto", position: "relative" }}>
+        {children}
+        {/* Frozen overlay */}
+        {win.isFrozen && (
+          <div className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.5)", zIndex: 999 }}>
+            <div className="text-center p-6 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+              <I d={ic.alertTriangle} s={32} c={c.warning} />
+              <p className="text-sm font-medium mt-3" style={{ color: c.text }}>Application Not Responding</p>
+              <p className="text-xs mt-1 mb-4" style={{ color: c.textMuted }}>{win.title} has stopped responding</p>
+              <div className="flex gap-2 justify-center">
+                <button onClick={() => { if (onForceQuit) onForceQuit(); }} className="px-4 py-1.5 rounded-lg text-xs font-medium" style={{ background: c.danger, color: "#fff" }}>Force Quit</button>
+                <button className="px-4 py-1.5 rounded-lg text-xs" style={{ background: c.cardAlt, color: c.text }}>Wait</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      {/* Resize handles */}
+      {!win.isMaximized && (
+        <>
+          <div onMouseDown={e => handleResizeMouseDown(e, "r")} className="absolute top-2 right-0 bottom-2 w-1.5 cursor-ew-resize" />
+          <div onMouseDown={e => handleResizeMouseDown(e, "b")} className="absolute bottom-0 left-2 right-2 h-1.5 cursor-ns-resize" />
+          <div onMouseDown={e => handleResizeMouseDown(e, "l")} className="absolute top-2 left-0 bottom-2 w-1.5 cursor-ew-resize" />
+          <div onMouseDown={e => handleResizeMouseDown(e, "br")} className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize" />
+          <div onMouseDown={e => handleResizeMouseDown(e, "bl")} className="absolute bottom-0 left-0 w-4 h-4 cursor-nesw-resize" />
+          <div onMouseDown={e => handleResizeMouseDown(e, "tr")} className="absolute top-0 right-0 w-4 h-4 cursor-nesw-resize" />
+          <div onMouseDown={e => handleResizeMouseDown(e, "tl")} className="absolute top-0 left-0 w-4 h-4 cursor-nwse-resize" />
+        </>
+      )}
     </div>
   );
 }
@@ -900,9 +986,15 @@ export default function AlternusOS() {
   const [isLocked, setIsLocked] = useState(true);
   const [isBooting, setIsBooting] = useState(true);
   const [bootProgress, setBootProgress] = useState(0);
+  const [bootPhase, setBootPhase] = useState<BootPhase>("bios");
   const [zCounter, setZCounter] = useState(10);
   const [showApps, setShowApps] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showTaskSwitcher, setShowTaskSwitcher] = useState(false);
+  const [taskSwitcherIdx, setTaskSwitcherIdx] = useState(0);
+  const [loginPin, setLoginPin] = useState("");
+  const [loginError, setLoginError] = useState(false);
+  const [systemModal, setSystemModal] = useState<SystemModal>(null);
   const [aiInput, setAiInput] = useState("");
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [aiActions, setAiActions] = useState<{ label: string; action: WinId }[]>([]);
@@ -932,19 +1024,27 @@ export default function AlternusOS() {
     return () => clearInterval(iv);
   }, []);
 
-  // Boot animation
+  // Boot animation with phases
   useEffect(() => {
     if (!isBooting) return;
+    setBootPhase("bios");
+    setBootProgress(0);
     const start = Date.now();
-    const duration = 2500;
+    const duration = 4500;
     const animate = () => {
       const elapsed = Date.now() - start;
       const progress = Math.min(elapsed / duration, 1);
       setBootProgress(progress);
+      if (progress < 0.15) setBootPhase("bios");
+      else if (progress < 0.35) setBootPhase("hardware");
+      else if (progress < 0.6) setBootPhase("kernel");
+      else if (progress < 0.85) setBootPhase("services");
+      else if (progress < 1) setBootPhase("desktop");
+      else setBootPhase("done");
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        setTimeout(() => setIsBooting(false), 300);
+        setTimeout(() => setIsBooting(false), 400);
       }
     };
     requestAnimationFrame(animate);
@@ -984,6 +1084,51 @@ export default function AlternusOS() {
   const moveWin = useCallback((id: WinId, x: number, y: number) => {
     setWins(p => p.map(w => w.id === id ? { ...w, x, y } : w));
   }, []);
+
+  const resizeWin = useCallback((id: WinId, w: number, h: number) => {
+    setWins(p => p.map(win => win.id === id ? { ...win, w, h } : win));
+  }, []);
+
+  const snapWin = useCallback((id: WinId, side: "left" | "right") => {
+    const hw = Math.floor(window.innerWidth / 2);
+    const fh = window.innerHeight - 36; // minus top bar
+    setWins(p => p.map(w => w.id === id ? { ...w, x: side === "left" ? 0 : hw, y: 0, w: hw, h: fh, isMaximized: false } : w));
+  }, []);
+
+  const forceQuitWin = useCallback((id: WinId) => {
+    setWins(p => p.map(w => w.id === id ? { ...w, isOpen: false, isFrozen: false, isMinimized: false, isMaximized: false } : w));
+    setSystemModal({ type: "info", title: "App Terminated", message: `The application was force quit successfully.` });
+    setTimeout(() => setSystemModal(null), 3000);
+  }, []);
+
+  // Alt+Tab task switcher
+  useEffect(() => {
+    const openWins = wins.filter(w => w.isOpen && !w.isMinimized);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && e.key === "Tab") {
+        e.preventDefault();
+        if (openWins.length === 0) return;
+        if (!showTaskSwitcher) {
+          setShowTaskSwitcher(true);
+          setTaskSwitcherIdx(0);
+        } else {
+          setTaskSwitcherIdx(prev => (prev + 1) % openWins.length);
+        }
+      }
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === "Alt" && showTaskSwitcher) {
+        setShowTaskSwitcher(false);
+        const openW = wins.filter(w => w.isOpen && !w.isMinimized);
+        if (openW[taskSwitcherIdx]) {
+          focusWin(openW[taskSwitcherIdx].id);
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => { window.removeEventListener("keydown", handleKeyDown); window.removeEventListener("keyup", handleKeyUp); };
+  }, [wins, showTaskSwitcher, taskSwitcherIdx, focusWin]);
 
   const handleDesktopSearch = () => {
     const q = aiInput.trim().toLowerCase();
@@ -1088,38 +1233,59 @@ export default function AlternusOS() {
 
   // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   if (isBooting) {
-    return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden" style={{ background: "#000" }}>
-        {/* Alternus logo */}
-        <h1
-          className="text-7xl md:text-8xl font-semibold mb-12 select-none bg-clip-text"
-          style={{
-            backgroundImage: "linear-gradient(90deg, #666 0%, #eee 50%, #666 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            color: "transparent",
-            opacity: 0.6 + bootProgress * 0.4,
-          }}
-        >
-          Alternus
-        </h1>
+    const bootMessages: Record<BootPhase, string[]> = {
+      bios: ["BIOS v2.4 — Alternus Systems", "Checking hardware integrity..."],
+      hardware: ["CPU: AlternusCore x86_64 @ 4.2GHz — OK", "RAM: 16 GB DDR5 — OK", "GPU: Integrated — OK", "Storage: 512 GB NVMe — OK"],
+      kernel: ["Loading AlternusKernel 6.2...", "Initializing file system...", "Mounting partitions...", "Loading AI Engine v3.0..."],
+      services: ["Starting network services...", "Starting display manager...", "Loading user preferences...", "Starting Alternus Shell..."],
+      desktop: ["Preparing desktop environment...", "Ready"],
+      done: ["Ready"],
+    };
+    const phaseIdx = ["bios", "hardware", "kernel", "services", "desktop", "done"].indexOf(bootPhase);
+    const visibleLines = Object.entries(bootMessages).slice(0, phaseIdx + 1).flatMap(([, msgs]) => msgs);
 
-        {/* Neon blue progress bar */}
-        <div className="w-64 h-[3px] rounded-full overflow-hidden" style={{ background: "#1a1a1a" }}>
-          <div
-            className="h-full rounded-full"
+    return (
+      <div className="fixed inset-0 flex flex-col overflow-hidden" style={{ background: "#0a0a0a" }}>
+        {/* Terminal-style boot log at top */}
+        <div className="flex-1 p-6 overflow-hidden font-mono text-[11px] leading-5" style={{ color: "#4ade80" }}>
+          {visibleLines.map((line, i) => (
+            <p key={i} style={{ opacity: i === visibleLines.length - 1 ? 0.7 : 1 }}>
+              {line.includes("OK") || line === "Ready" ? (
+                <><span style={{ color: "#666" }}>[</span><span style={{ color: "#4ade80" }}> OK </span><span style={{ color: "#666" }}>]</span> {line.replace(" — OK", "").replace("Ready", "")}</>
+              ) : (
+                <><span style={{ color: "#666" }}>[</span><span style={{ color: "#3B82F6" }}> .. </span><span style={{ color: "#666" }}>]</span> <span style={{ color: "#aaa" }}>{line}</span></>
+              )}
+            </p>
+          ))}
+          {bootPhase !== "done" && <span className="inline-block w-2 h-4 ml-1 animate-pulse" style={{ background: "#4ade80" }} />}
+        </div>
+
+        {/* Bottom: Logo + Progress */}
+        <div className="flex flex-col items-center pb-12">
+          <h1
+            className="text-5xl font-semibold mb-6 select-none bg-clip-text"
             style={{
+              backgroundImage: "linear-gradient(90deg, #666 0%, #eee 50%, #666 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              color: "transparent",
+              opacity: 0.6 + bootProgress * 0.4,
+            }}
+          >
+            Alternus
+          </h1>
+          <div className="w-64 h-[3px] rounded-full overflow-hidden" style={{ background: "#1a1a1a" }}>
+            <div className="h-full rounded-full" style={{
               width: `${bootProgress * 100}%`,
               background: "linear-gradient(90deg, #7C3AED, #3B82F6, #06B6D4)",
               boxShadow: "0 0 12px #3B82F6, 0 0 24px rgba(59,130,246,0.4)",
               transition: "width 0.1s linear",
-            }}
-          />
+            }} />
+          </div>
+          <p className="mt-3 text-[10px] font-mono" style={{ color: "#555" }}>
+            {bootPhase === "bios" ? "POST check" : bootPhase === "hardware" ? "Hardware scan" : bootPhase === "kernel" ? "Loading kernel" : bootPhase === "services" ? "Starting services" : "Welcome"}
+          </p>
         </div>
-
-        <p className="mt-4 text-xs" style={{ color: "#555" }}>
-          {bootProgress < 0.3 ? "Initializing..." : bootProgress < 0.7 ? "Loading AI Engine..." : bootProgress < 1 ? "Starting Desktop..." : "Ready"}
-        </p>
       </div>
     );
   }
@@ -1131,48 +1297,81 @@ export default function AlternusOS() {
         style={{ background: c.bg }}
         className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
       >
-        {/* Top-right icons: WiFi + Settings */}
-        <div className="absolute top-4 right-4 flex items-center gap-3">
-          <span style={{ color: c.textMuted }}><I d={ic.wifi} s={16} /></span>
-          <span style={{ color: c.textMuted }}><I d={ic.settings} s={16} /></span>
+        {/* Top bar */}
+        <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+          <span className="text-[10px] font-medium" style={{ color: c.textMuted }}>Alternus OS</span>
+          <div className="flex items-center gap-3">
+            <span style={{ color: c.textMuted }}><I d={ic.wifi} s={14} /></span>
+            <span style={{ color: c.textMuted }}><I d={ic.battery} s={14} /></span>
+            <span className="text-[10px]" style={{ color: c.textMuted }}>{fmt(time)}</span>
+          </div>
         </div>
 
         {/* Clock + Date — shifted up */}
-        <div className="absolute top-[18%] left-1/2 -translate-x-1/2 flex flex-col items-center">
+        <div className="absolute top-[15%] left-1/2 -translate-x-1/2 flex flex-col items-center">
           <p style={{ color: c.text }} className="text-7xl font-bold tracking-wide mb-1">{fmt(time)}</p>
           <p style={{ color: c.textMuted }} className="text-sm">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
         </div>
 
-        {/* Bottom content: Welcome + Button + Profile */}
-        <div className="absolute bottom-[15%] left-1/2 -translate-x-1/2 flex flex-col items-center">
-          <p style={{ color: c.textSec }} className="text-sm font-light mb-6">
-            Welcome to Alternus OS
-          </p>
-
-          {/* Round profile icon */}
+        {/* Center: Profile + PIN + Login */}
+        <div className="flex flex-col items-center">
+          {/* Profile avatar */}
           <div
-            className="w-12 h-12 rounded-full flex items-center justify-center mb-6"
-            style={{ border: `2px solid ${c.border}`, color: c.textMuted }}
+            className="w-20 h-20 rounded-full flex items-center justify-center mb-4"
+            style={{ background: c.accentSoft, border: `3px solid ${c.border}`, color: c.accentText }}
           >
-            <I d={ic.user} s={22} />
+            <I d={ic.user} s={36} />
+          </div>
+          <p className="text-sm font-medium mb-1" style={{ color: c.text }}>Admin</p>
+          <p className="text-xs mb-6" style={{ color: c.textMuted }}>admin@alternus.art</p>
+
+          {/* PIN input */}
+          <div className="flex gap-2 mb-4">
+            {[0, 1, 2, 3].map(i => (
+              <div key={i} className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold"
+                style={{ background: c.surface, border: `1px solid ${loginError ? c.danger : i < loginPin.length ? c.accent : c.border}`, color: c.text }}>
+                {i < loginPin.length ? "•" : ""}
+              </div>
+            ))}
           </div>
 
+          {loginError && <p className="text-xs mb-3" style={{ color: c.danger }}>Incorrect PIN. Try again.</p>}
+
+          {/* Number pad */}
+          <div className="grid grid-cols-3 gap-2 mb-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, null, 0, "del"].map((n, i) => (
+              n === null ? <div key={i} /> :
+              <button key={i}
+                onClick={() => {
+                  if (n === "del") { setLoginPin(p => p.slice(0, -1)); }
+                  else if (loginPin.length < 4) {
+                    const newPin = loginPin + n;
+                    setLoginPin(newPin);
+                    if (newPin.length === 4) { setTimeout(() => { if (newPin === "1234") { setIsLocked(false); setLoginPin(""); setLoginError(false); } else { setLoginError(true); setLoginPin(""); setTimeout(() => setLoginError(false), 2000); } }, 200); }
+                  }
+                }}
+                className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-medium transition-all active:scale-95"
+                style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }}
+                onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                onMouseLeave={e => { e.currentTarget.style.background = c.surface; }}
+              >
+                {n === "del" ? <I d={ic.chevL} s={16} /> : n}
+              </button>
+            ))}
+          </div>
+
+          {/* Skip login button */}
           <button
-            onClick={() => setIsLocked(false)}
-            className="group flex items-center gap-3 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-            style={{
-              background: c.surface,
-              border: `1px solid ${c.border}`,
-              color: c.text,
-            }}
+            onClick={() => { setIsLocked(false); setLoginPin(""); }}
+            className="flex items-center gap-2 px-6 py-2 rounded-xl text-xs transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+            style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.textSec }}
             onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.text; }}
+            onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}
           >
-            <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-            </svg>
-            Open Desktop
+            <I d={ic.lock} s={13} />
+            Skip Login
           </button>
+          <p className="text-[9px] mt-2" style={{ color: c.textMuted }}>PIN: 1234 or press Skip</p>
         </div>
       </div>
     );
@@ -1370,10 +1569,54 @@ export default function AlternusOS() {
             onMaximize={() => maximizeWin(w.id)}
             onFocus={() => focusWin(w.id)}
             onMove={(x, y) => moveWin(w.id, x, y)}
+            onResize={(nw, nh) => resizeWin(w.id, nw, nh)}
+            onSnap={(side) => snapWin(w.id, side)}
+            onForceQuit={() => forceQuitWin(w.id)}
           >
             {winContent[w.id]}
           </AppWindow>
         ))}
+
+        {/* Alt+Tab Task Switcher */}
+        {showTaskSwitcher && (() => {
+          const openW = wins.filter(w => w.isOpen && !w.isMinimized);
+          if (openW.length === 0) return null;
+          return (
+            <div className="absolute inset-0 flex items-center justify-center z-[200]" style={{ background: "rgba(0,0,0,0.4)" }}>
+              <div className="flex gap-3 px-6 py-4 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 16px 48px rgba(0,0,0,0.4)" }}>
+                {openW.map((w, i) => (
+                  <div key={w.id} className="flex flex-col items-center gap-2 px-4 py-3 rounded-xl transition-all"
+                    style={{ background: i === taskSwitcherIdx ? c.accentSoft : "transparent", border: i === taskSwitcherIdx ? `2px solid ${c.accent}` : "2px solid transparent" }}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: c.cardAlt }}>
+                      <I d={(ic as Record<string,string>)[w.id] || ic.sparkle} s={22} c={i === taskSwitcherIdx ? c.accentText : c.textSec} />
+                    </div>
+                    <span className="text-[10px] font-medium" style={{ color: i === taskSwitcherIdx ? c.accentText : c.textMuted }}>{w.title}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* System Modal */}
+        {systemModal && (
+          <div className="absolute inset-0 flex items-center justify-center z-[300]" style={{ background: "rgba(0,0,0,0.3)" }}>
+            <div className="w-80 p-5 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 16px 48px rgba(0,0,0,0.4)" }}>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: systemModal.type === "error" ? "rgba(239,68,68,0.15)" : systemModal.type === "warning" ? c.warningSoft : c.accentSoft }}>
+                  <I d={systemModal.type === "error" ? ic.alertTriangle : systemModal.type === "warning" ? ic.alertTriangle : ic.shield} s={20} c={systemModal.type === "error" ? c.danger : systemModal.type === "warning" ? c.warning : c.accentText} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: c.text }}>{systemModal.title}</p>
+                  <p className="text-xs" style={{ color: c.textMuted }}>{systemModal.message}</p>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setSystemModal(null)} className="px-4 py-1.5 rounded-lg text-xs font-medium" style={{ background: c.accent, color: "#fff" }}>OK</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Notification Sidebar */}
         <div
