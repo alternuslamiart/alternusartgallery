@@ -274,14 +274,16 @@ export async function POST(request: NextRequest) {
     }
 
     if (!process.env.GROQ_API_KEY && !process.env.DEEPSEEK_API_KEY && !process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY) {
-      return NextResponse.json({ error: 'AI service not configured. Please set at least one: GROQ_API_KEY, DEEPSEEK_API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY.' }, { status: 500 });
+      console.error('No AI API keys configured');
+      return NextResponse.json({ error: 'Our AI assistant is temporarily unavailable. Please try again later or contact us at info@alternusart.com.' }, { status: 500 });
     }
 
     const result = await getAIResponse(message, conversationHistory);
 
     if (!result.text) {
+      console.error('All AI providers failed:', result.error);
       return NextResponse.json(
-        { error: `AI providers failed: ${result.error || 'Unknown error'}` },
+        { error: 'Our AI assistant is temporarily unavailable. Please try again later or contact us at info@alternusart.com.' },
         { status: 500 }
       );
     }
