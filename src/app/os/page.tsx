@@ -693,6 +693,9 @@ export default function AlternusOS() {
   const [bootProgress, setBootProgress] = useState(0);
   const [zCounter, setZCounter] = useState(10);
   const [showApps, setShowApps] = useState(false);
+  const [aiInput, setAiInput] = useState("");
+  const [aiResponse, setAiResponse] = useState<string | null>(null);
+  const [aiActions, setAiActions] = useState<{ label: string; action: WinId }[]>([]);
 
   const c = palette[mode];
 
@@ -769,6 +772,50 @@ export default function AlternusOS() {
     setWins(p => p.map(w => w.id === id ? { ...w, x, y } : w));
   }, []);
 
+  const handleDesktopSearch = () => {
+    const q = aiInput.trim().toLowerCase();
+    if (!q) return;
+
+    // Smart search - find apps, files, or respond with AI
+    if (q.includes("file") || q.includes("document") || q.includes("folder")) {
+      setAiResponse("I found your files. Would you like to open the file manager?");
+      setAiActions([{ label: "Open Files", action: "files" }]);
+    } else if (q.includes("code") || q.includes("edit") || q.includes("program")) {
+      setAiResponse("Ready to code. I can open the code editor for you.");
+      setAiActions([{ label: "Open Code Editor", action: "code" }]);
+    } else if (q.includes("terminal") || q.includes("command") || q.includes("shell")) {
+      setAiResponse("Opening terminal for command line access.");
+      setAiActions([{ label: "Open Terminal", action: "terminal" }]);
+    } else if (q.includes("browse") || q.includes("web") || q.includes("search") || q.includes("google")) {
+      setAiResponse("I can open the browser for you. What would you like to search?");
+      setAiActions([{ label: "Open Browser", action: "browser" }]);
+    } else if (q.includes("music") || q.includes("song") || q.includes("play")) {
+      setAiResponse("Let me open the music player for you.");
+      setAiActions([{ label: "Open Music", action: "music" }]);
+    } else if (q.includes("weather") || q.includes("temperature")) {
+      setAiResponse("Currently 17° and partly cloudy. Would you like more details?");
+      setAiActions([{ label: "Open Weather", action: "weather" }]);
+    } else if (q.includes("note") || q.includes("write") || q.includes("memo")) {
+      setAiResponse("I can open Notes for you to start writing.");
+      setAiActions([{ label: "Open Notes", action: "notes" }]);
+    } else if (q.includes("setting") || q.includes("config") || q.includes("theme")) {
+      setAiResponse("Opening settings. You can change theme, language, and more.");
+      setAiActions([{ label: "Open Settings", action: "settings" }]);
+    } else if (q.includes("calendar") || q.includes("date") || q.includes("schedule")) {
+      setAiResponse(`Today is ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.`);
+      setAiActions([{ label: "Open Calendar", action: "calendar" }]);
+    } else if (q.includes("hello") || q.includes("hi") || q.includes("hey")) {
+      setAiResponse("Hello! I'm Alternus AI. I can open apps, find files, write code, or answer questions. Try asking me anything.");
+      setAiActions([]);
+    } else if (q.includes("create") || q.includes("build") || q.includes("make")) {
+      setAiResponse("I can help you build that. Let me set up the code editor and terminal for your project.");
+      setAiActions([{ label: "Open Code", action: "code" }, { label: "Open Terminal", action: "terminal" }]);
+    } else {
+      setAiResponse(`I understand "${aiInput.trim()}". Here's what I can help with: open apps, find files, write code, browse the web, check weather, or manage settings.`);
+      setAiActions([{ label: "Open Files", action: "files" }, { label: "Open Browser", action: "browser" }, { label: "Open Code", action: "code" }]);
+    }
+  };
+
   const winContent: Record<WinId, React.ReactNode> = {
     ai: <AIChat c={c} />,
     terminal: <TerminalApp c={c} />,
@@ -783,7 +830,6 @@ export default function AlternusOS() {
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
-    { id: "ai", icon: ic.sparkle, label: "AI", color: c.accentText },
     { id: "terminal", icon: ic.terminal, label: "Terminal", color: c.success },
     { id: "code", icon: ic.code, label: "Code", color: c.purple },
     { id: "files", icon: ic.folder, label: "Files", color: c.warning },
@@ -836,19 +882,31 @@ export default function AlternusOS() {
   // ━━━━ LOCK SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   if (isLocked) {
     return (
-      <div style={{ background: c.bg }} className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden">
-        <div className="absolute w-[500px] h-[500px] rounded-full opacity-[0.04] pointer-events-none" style={{ background: c.accent, filter: "blur(120px)", top: "20%", left: "30%" }} />
-        <div className="relative z-10 flex flex-col items-center">
-          <p style={{ color: c.text }} className="text-6xl font-extralight tracking-wide mb-1">{fmt(time)}</p>
-          <p style={{ color: c.textMuted }} className="text-sm mb-12">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: c.accentSoft }}>
-            <span style={{ color: c.accentText }} className="text-xl font-semibold">A</span>
-          </div>
-          <p style={{ color: c.text }} className="text-sm font-medium mb-6">Alternus OS</p>
-          <button onClick={() => setIsLocked(false)} className="px-8 py-2.5 rounded-xl text-sm font-medium text-white transition-all hover:opacity-90 active:scale-[0.97] cursor-pointer" style={{ background: c.accent }}>
-            Unlock
-          </button>
-        </div>
+      <div
+        style={{ background: c.bg }}
+        className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden cursor-pointer"
+        onClick={() => setIsLocked(false)}
+      >
+        <p style={{ color: c.text }} className="text-7xl font-extralight tracking-wide mb-1">{fmt(time)}</p>
+        <p style={{ color: c.textMuted }} className="text-sm mb-16">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
+
+        <h1
+          className="text-4xl font-semibold mb-6 select-none"
+          style={{
+            background: mode === "dark"
+              ? "linear-gradient(90deg, #555 0%, #fff 50%, #555 100%)"
+              : "linear-gradient(90deg, #aaa 0%, #333 50%, #aaa 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
+          Alternus
+        </h1>
+
+        <p style={{ color: c.textMuted }} className="text-xs">
+          Click anywhere to unlock
+        </p>
       </div>
     );
   }
@@ -876,9 +934,8 @@ export default function AlternusOS() {
 
       {/* Desktop Area - fixed, no scroll */}
       <div className="flex-1 relative overflow-hidden">
-        {/* Apps button - top center, circular */}
-        {!wins.some(w => w.isOpen && !w.isMinimized) && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[2] flex flex-col items-center">
+        {/* Apps button - top center, always visible */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center">
             <button
               onClick={() => setShowApps(!showApps)}
               className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
@@ -934,34 +991,33 @@ export default function AlternusOS() {
               </div>
             </div>
           </div>
-        )}
 
-        {/* Center: Alternus branding + AI Search */}
-        {!wins.some(w => w.isOpen && !w.isMinimized) && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-[0]">
-            {/* Alternus gradient text */}
-            <h1
-              className="text-8xl md:text-9xl font-semibold mb-4 select-none"
-              style={{
-                background: mode === "dark"
-                  ? "linear-gradient(90deg, #555 0%, #fff 50%, #555 100%)"
-                  : "linear-gradient(90deg, #aaa 0%, #333 50%, #aaa 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
-            </h1>
+        {/* Center: Alternus branding + AI Search - always visible behind windows */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-[0]">
+          {/* Alternus gradient text */}
+          <h1
+            className="text-8xl md:text-9xl font-semibold mb-4 select-none"
+            style={{
+              background: mode === "dark"
+                ? "linear-gradient(90deg, #555 0%, #fff 50%, #555 100%)"
+                : "linear-gradient(90deg, #aaa 0%, #333 50%, #aaa 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
+          </h1>
 
-            {/* Welcome message */}
-            <p className="text-base font-light mb-10" style={{ color: c.textSec }}>
-              Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}. What would you like to create today?
-            </p>
+          {/* Welcome message */}
+          <p className="text-base font-light mb-10" style={{ color: c.textSec }}>
+            Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}. What would you like to create today?
+          </p>
 
-            {/* AI Search Bar - centered, wider enter button */}
+          {/* AI Search Bar with inline response */}
+          <div className="w-full max-w-2xl">
             <div
-              className="w-full max-w-2xl flex items-center gap-2 pl-5 pr-2 py-2 rounded-2xl transition-all"
+              className="flex items-center gap-2 pl-5 pr-2 py-2 rounded-2xl transition-all"
               style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)" }}
             >
               <I d={ic.search} s={20} c={c.textMuted} />
@@ -969,22 +1025,55 @@ export default function AlternusOS() {
                 className="flex-1 bg-transparent outline-none text-base py-2"
                 style={{ color: c.text }}
                 placeholder="Search or ask AI anything..."
+                value={aiInput}
+                onChange={e => setAiInput(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
-                    openWin("ai");
+                  if (e.key === "Enter" && aiInput.trim()) {
+                    handleDesktopSearch();
                   }
                 }}
               />
               <button
-                onClick={() => openWin("ai")}
-                className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90 active:scale-95 flex items-center gap-2"
+                onClick={() => aiInput.trim() && handleDesktopSearch()}
+                className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90 active:scale-95"
                 style={{ background: c.accent }}
               >
                 <I d={ic.send} s={16} c="#fff" />
               </button>
             </div>
+
+            {/* Inline AI response */}
+            {aiResponse && (
+              <div
+                className="mt-3 px-5 py-4 rounded-2xl text-[13px] leading-relaxed"
+                style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text, boxShadow: mode === "dark" ? "0 4px 20px rgba(0,0,0,0.2)" : "0 4px 20px rgba(0,0,0,0.06)" }}
+              >
+                <pre className="whitespace-pre-wrap font-sans">{aiResponse}</pre>
+                {aiActions.length > 0 && (
+                  <div className="flex gap-2 mt-3">
+                    {aiActions.map((a, i) => (
+                      <button
+                        key={i}
+                        onClick={() => { openWin(a.action); setAiResponse(null); setAiActions([]); setAiInput(""); }}
+                        className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:opacity-80"
+                        style={{ background: c.accentSoft, color: c.accentText }}
+                      >
+                        {a.label}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => { setAiResponse(null); setAiActions([]); }}
+                      className="px-3 py-1.5 rounded-lg text-xs transition-colors"
+                      style={{ color: c.textMuted }}
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Windows */}
         {wins.map(w => (
