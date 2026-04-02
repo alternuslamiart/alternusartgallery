@@ -847,12 +847,12 @@ export default function AlternusOS() {
       <div className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden" style={{ background: "#000" }}>
         {/* Alternus logo */}
         <h1
-          className="text-7xl md:text-8xl font-semibold mb-12 select-none"
+          className="text-7xl md:text-8xl font-semibold mb-12 select-none bg-clip-text"
           style={{
-            background: "linear-gradient(90deg, #666 0%, #eee 50%, #666 100%)",
+            backgroundImage: "linear-gradient(90deg, #666 0%, #eee 50%, #666 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
+            color: "transparent",
             opacity: 0.6 + bootProgress * 0.4,
           }}
         >
@@ -887,12 +887,12 @@ export default function AlternusOS() {
         className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
       >
         <h1
-          className="text-6xl font-semibold mb-12 select-none"
+          className="text-6xl font-semibold mb-12 select-none bg-clip-text"
           style={{
-            background: `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`,
+            backgroundImage: `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
+            color: "transparent",
           }}
         >
           Alternus
@@ -1009,14 +1009,12 @@ export default function AlternusOS() {
         <div className="absolute inset-0 flex flex-col items-center justify-center z-[0]">
           {/* Alternus gradient text */}
           <h1
-            className="text-8xl md:text-9xl font-semibold mb-4 select-none"
+            className="text-8xl md:text-9xl font-semibold mb-4 select-none bg-clip-text"
             style={{
-              background: mode === "dark"
-                ? "linear-gradient(90deg, #555 0%, #fff 50%, #555 100%)"
-                : "linear-gradient(90deg, #aaa 0%, #333 50%, #aaa 100%)",
+              backgroundImage: `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
+              color: "transparent",
             }}
           >
             Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
