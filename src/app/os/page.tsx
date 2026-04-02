@@ -849,7 +849,7 @@ export default function AlternusOS() {
         <h1
           className="text-7xl md:text-8xl font-semibold mb-12 select-none"
           style={{
-            background: "linear-gradient(90deg, #555 0%, #fff 50%, #555 100%)",
+            background: "linear-gradient(90deg, #666 0%, #eee 50%, #666 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
@@ -889,9 +889,7 @@ export default function AlternusOS() {
         <h1
           className="text-6xl font-semibold mb-12 select-none"
           style={{
-            background: mode === "dark"
-              ? "linear-gradient(90deg, #555 0%, #fff 50%, #555 100%)"
-              : "linear-gradient(90deg, #aaa 0%, #333 50%, #aaa 100%)",
+            background: `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
