@@ -884,14 +884,13 @@ export default function AlternusOS() {
     return (
       <div
         style={{ background: c.bg }}
-        className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden cursor-pointer"
-        onClick={() => setIsLocked(false)}
+        className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
       >
         <p style={{ color: c.text }} className="text-7xl font-extralight tracking-wide mb-1">{fmt(time)}</p>
         <p style={{ color: c.textMuted }} className="text-sm mb-16">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
 
         <h1
-          className="text-4xl font-semibold mb-6 select-none"
+          className="text-5xl font-semibold mb-10 select-none"
           style={{
             background: mode === "dark"
               ? "linear-gradient(90deg, #555 0%, #fff 50%, #555 100%)"
@@ -904,9 +903,22 @@ export default function AlternusOS() {
           Alternus
         </h1>
 
-        <p style={{ color: c.textMuted }} className="text-xs">
-          Click anywhere to unlock
-        </p>
+        <button
+          onClick={() => setIsLocked(false)}
+          className="group flex items-center gap-3 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+          style={{
+            background: c.surface,
+            border: `1px solid ${c.border}`,
+            color: c.text,
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = "#fff"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.text; }}
+        >
+          <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+          </svg>
+          Open Desktop
+        </button>
       </div>
     );
   }

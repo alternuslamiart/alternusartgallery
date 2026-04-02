@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { WELCOME_MESSAGE, SUGGESTED_QUESTIONS } from "@/lib/ai-assistant";
 
@@ -33,6 +33,7 @@ interface ChatSession {
 }
 
 export function AIChat() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -198,6 +199,9 @@ export function AIChat() {
   const lastMessage = messages[messages.length - 1];
   const currentSuggestions = lastMessage?.suggestedQuestions || SUGGESTED_QUESTIONS.en;
   const hasConversation = messages.length > 1;
+
+  // Hide on OS page
+  if (pathname === "/os") return null;
 
   return (
     <>
