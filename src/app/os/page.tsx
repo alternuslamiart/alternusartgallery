@@ -1287,7 +1287,7 @@ export default function AlternusOS() {
     if (fileMatches.length > 0) {
       const fileList = fileMatches.map(f => `• ${f.name} (${f.path})`).join("\n");
       // Auto-tag & cluster
-      const tags = [...new Set(fileMatches.flatMap(f => f.tags))];
+      const tags = Array.from(new Set(fileMatches.flatMap(f => f.tags)));
       const clusterInfo = tags.length > 0 ? `\n\nAI auto-grouped by: ${tags.join(", ")}` : "";
       setAiResponse(`AI found ${fileMatches.length} file${fileMatches.length > 1 ? "s" : ""} matching your search:\n\n${fileList}${clusterInfo}`);
       setAiActions([{ label: "Open Files", action: "files" }]);
