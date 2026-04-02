@@ -1024,9 +1024,17 @@ export default function AlternusOS() {
             Welcome to Alternus OS
           </p>
 
+          {/* Round profile icon */}
+          <div
+            className="w-12 h-12 rounded-full flex items-center justify-center mb-6"
+            style={{ border: `2px solid ${c.border}`, color: c.textMuted }}
+          >
+            <I d={ic.user} s={22} />
+          </div>
+
           <button
             onClick={() => setIsLocked(false)}
-            className="group flex items-center gap-3 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer mb-6"
+            className="group flex items-center gap-3 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
             style={{
               background: c.surface,
               border: `1px solid ${c.border}`,
@@ -1040,14 +1048,6 @@ export default function AlternusOS() {
             </svg>
             Open Desktop
           </button>
-
-          {/* Round profile icon */}
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center"
-            style={{ border: `2px solid ${c.border}`, color: c.textMuted }}
-          >
-            <I d={ic.user} s={22} />
-          </div>
         </div>
       </div>
     );
