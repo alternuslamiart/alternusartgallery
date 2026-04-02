@@ -300,7 +300,7 @@ function AIChat({ c }: { c: typeof palette.dark }) {
   );
 }
 
-function TerminalApp({ c }: { c: typeof palette.dark }) {
+function TerminalApp({ c: _c }: { c: typeof palette.dark }) {
   const [lines, setLines] = useState(["Alternus OS Terminal v1.0", "Type 'help' for commands.", ""]);
   const [input, setInput] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
@@ -311,7 +311,7 @@ function TerminalApp({ c }: { c: typeof palette.dark }) {
     const cmd = input.trim();
     setInput("");
     if (!cmd) return;
-    let output = [`$ ${cmd}`];
+    const output = [`$ ${cmd}`];
     const l = cmd.toLowerCase();
     if (l === "help") output.push("Commands: help, clear, date, whoami, ls, echo <text>, neofetch");
     else if (l === "clear") { setLines([]); return; }
@@ -549,7 +549,7 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
-function CodeApp({ c }: { c: typeof palette.dark }) {
+function CodeApp({ c: _c }: { c: typeof palette.dark }) {
   const [code, setCode] = useState(`// Alternus Code Editor\n\nfunction greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nconst result = greet("World");\nconsole.log(result);`);
   return (
     <div className="flex flex-col h-full" style={{ background: "#1e1e1e" }}>
