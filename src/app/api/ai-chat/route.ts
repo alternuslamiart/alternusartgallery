@@ -122,29 +122,56 @@ Remember: You're an art expert passionate about helping people discover and appr
 
 export const dynamic = 'force-dynamic';
 
-// Try DeepSeek first, then Claude, then OpenAI
+// Try Groq first (free), then DeepSeek, then Claude, then OpenAI
 async function getAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
   const errors: string[] = [];
 
-  // 1. Try DeepSeek (primary - cheapest and fast)
+  const chatMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...conversationHistory.map((msg) => ({
+      role: msg.role as 'user' | 'assistant',
+      content: msg.content,
+    })),
+    { role: 'user', content: message },
+  ];
+
+  // 1. Try Groq (FREE and very fast)
+  if (process.env.GROQ_API_KEY) {
+    try {
+      const groq = new OpenAI({
+        apiKey: process.env.GROQ_API_KEY,
+        baseURL: 'https://api.groq.com/openai/v1',
+      });
+
+      const completion = await groq.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
+        messages: chatMessages,
+        max_tokens: 1024,
+        temperature: 0.7,
+      });
+
+      const content = completion.choices?.[0]?.message?.content;
+      if (content) return { text: content, error: null };
+    } catch (groqError: unknown) {
+      const errMsg = groqError instanceof Error ? groqError.message : String(groqError);
+      console.error('Groq error:', errMsg);
+      errors.push(`Groq: ${errMsg}`);
+    }
+  } else {
+    errors.push('Groq: GROQ_API_KEY not set');
+  }
+
+  // 2. Try DeepSeek (cheapest paid option)
   if (process.env.DEEPSEEK_API_KEY) {
     try {
       const deepseek = new OpenAI({
         apiKey: process.env.DEEPSEEK_API_KEY,
         baseURL: 'https://api.deepseek.com',
       });
-      const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-        { role: 'system', content: SYSTEM_PROMPT },
-        ...conversationHistory.map((msg) => ({
-          role: msg.role as 'user' | 'assistant',
-          content: msg.content,
-        })),
-        { role: 'user', content: message },
-      ];
 
       const completion = await deepseek.chat.completions.create({
         model: 'deepseek-chat',
-        messages,
+        messages: chatMessages,
         max_tokens: 1024,
         temperature: 0.7,
       });
@@ -160,7 +187,7 @@ async function getAIResponse(message: string, conversationHistory: Array<{ role:
     errors.push('DeepSeek: DEEPSEEK_API_KEY not set');
   }
 
-  // 2. Try Claude (fallback)
+  // 3. Try Claude (fallback)
   if (process.env.ANTHROPIC_API_KEY) {
     try {
       const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -173,7 +200,7 @@ async function getAIResponse(message: string, conversationHistory: Array<{ role:
       ];
 
       const response = await anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
         system: SYSTEM_PROMPT,
         messages: claudeMessages,
@@ -192,22 +219,14 @@ async function getAIResponse(message: string, conversationHistory: Array<{ role:
     errors.push('Claude: ANTHROPIC_API_KEY not set');
   }
 
-  // 3. Try OpenAI (last fallback)
+  // 4. Try OpenAI (last fallback)
   if (process.env.OPENAI_API_KEY) {
     try {
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-      const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-        { role: 'system', content: SYSTEM_PROMPT },
-        ...conversationHistory.map((msg) => ({
-          role: msg.role as 'user' | 'assistant',
-          content: msg.content,
-        })),
-        { role: 'user', content: message },
-      ];
 
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
-        messages,
+        messages: chatMessages,
         max_tokens: 1000,
         temperature: 0.7,
       });
@@ -254,8 +273,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    if (!process.env.DEEPSEEK_API_KEY && !process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY) {
-      return NextResponse.json({ error: 'AI service not configured. Please set DEEPSEEK_API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY in environment variables.' }, { status: 500 });
+    if (!process.env.GROQ_API_KEY && !process.env.DEEPSEEK_API_KEY && !process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ error: 'AI service not configured. Please set at least one: GROQ_API_KEY, DEEPSEEK_API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY.' }, { status: 500 });
     }
 
     const result = await getAIResponse(message, conversationHistory);
