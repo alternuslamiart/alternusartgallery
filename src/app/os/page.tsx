@@ -489,30 +489,91 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
   );
 }
 
-function FilesApp({ c }: { c: typeof palette.dark }) {
-  const files = [
-    { name: "Documents", icon: "📁", size: "12 items" },
-    { name: "Projects", icon: "💼", size: "7 items" },
-    { name: "Images", icon: "🖼️", size: "48 items" },
-    { name: "Downloads", icon: "📥", size: "23 items" },
-    { name: "report.pdf", icon: "📄", size: "2.4 MB" },
-    { name: "design.fig", icon: "🎨", size: "18 MB" },
-  ];
-  return (
-    <div className="p-2">
-      <div className="px-3 py-2 mb-1 flex items-center gap-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-        <I d={ic.search} s={14} c={c.textMuted} />
-        <input className="flex-1 bg-transparent outline-none text-xs" style={{ color: c.text }} placeholder="Search files..." />
+function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: WinId) => void }) {
+  const [currentPath, setCurrentPath] = useState("Home");
+  const [fileContent, setFileContent] = useState<string | null>(null);
+
+  const folders: Record<string, { name: string; icon: string; size: string; action?: WinId | string }[]> = {
+    Home: [
+      { name: "Documents", icon: "📁", size: "12 items", action: "Documents" },
+      { name: "Projects", icon: "💼", size: "7 items", action: "Projects" },
+      { name: "Images", icon: "🖼️", size: "48 items", action: "Images" },
+      { name: "Downloads", icon: "📥", size: "23 items", action: "Downloads" },
+      { name: "report.pdf", icon: "📄", size: "2.4 MB", action: "file" },
+      { name: "design.fig", icon: "🎨", size: "18 MB", action: "file" },
+    ],
+    Documents: [
+      { name: "notes.md", icon: "📝", size: "4 KB", action: "notes" },
+      { name: "todo.txt", icon: "📄", size: "1 KB", action: "file" },
+      { name: "meeting-notes.md", icon: "📝", size: "8 KB", action: "notes" },
+    ],
+    Projects: [
+      { name: "alternus-os/", icon: "📂", size: "24 files" },
+      { name: "website/", icon: "📂", size: "18 files" },
+      { name: "README.md", icon: "📄", size: "2 KB", action: "file" },
+    ],
+    Images: [
+      { name: "screenshot.png", icon: "🖼️", size: "1.2 MB" },
+      { name: "logo.svg", icon: "🎨", size: "4 KB" },
+      { name: "wallpaper.jpg", icon: "🖼️", size: "3.8 MB" },
+    ],
+    Downloads: [
+      { name: "installer.dmg", icon: "💿", size: "120 MB" },
+      { name: "archive.zip", icon: "📦", size: "45 MB" },
+      { name: "font-pack.zip", icon: "📦", size: "12 MB" },
+    ],
+  };
+
+  const currentFiles = folders[currentPath] || folders.Home;
+
+  if (fileContent) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="flex items-center gap-2 px-3 py-2" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <button onClick={() => setFileContent(null)} className="p-1 rounded-md" style={{ color: c.textSec }}>
+            <I d={ic.chevL} s={14} />
+          </button>
+          <span className="text-xs" style={{ color: c.textSec }}>File Preview</span>
+        </div>
+        <div className="flex-1 p-4 overflow-y-auto">
+          <pre className="text-xs whitespace-pre-wrap font-mono leading-relaxed" style={{ color: c.text }}>{fileContent}</pre>
+        </div>
       </div>
-      {files.map((f, i) => (
-        <button key={i} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors"
-          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-          <span className="text-lg">{f.icon}</span>
-          <p className="flex-1 text-xs" style={{ color: c.text }}>{f.name}</p>
-          <span className="text-[10px]" style={{ color: c.textMuted }}>{f.size}</span>
-        </button>
-      ))}
+    );
+  }
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Search + path */}
+      <div className="p-2 space-y-1">
+        <div className="px-3 py-2 flex items-center gap-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+          <I d={ic.search} s={14} c={c.textMuted} />
+          <input className="flex-1 bg-transparent outline-none text-xs" style={{ color: c.text }} placeholder="Search files..." />
+        </div>
+        {currentPath !== "Home" && (
+          <button onClick={() => setCurrentPath("Home")} className="flex items-center gap-1 px-2 py-1 text-xs rounded-md" style={{ color: c.accentText }}>
+            <I d={ic.chevL} s={12} c={c.accentText} /> Back to Home
+          </button>
+        )}
+      </div>
+      {/* Files */}
+      <div className="flex-1 overflow-y-auto px-2">
+        {currentFiles.map((f, i) => (
+          <button key={i} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors"
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+            onClick={() => {
+              if (f.action === "notes") { onOpenApp("notes"); }
+              else if (f.action === "file") { setFileContent(`# ${f.name}\n\nFile size: ${f.size}\nType: ${f.name.split('.').pop()?.toUpperCase()}\nModified: ${new Date().toLocaleDateString()}\n\n--- Content Preview ---\n\nThis is a preview of ${f.name}.\nFull file editing available in Code Editor.`); }
+              else if (folders[f.action || ""]) { setCurrentPath(f.action as string); }
+            }}>
+            <span className="text-lg">{f.icon}</span>
+            <p className="flex-1 text-xs" style={{ color: c.text }}>{f.name}</p>
+            <span className="text-[10px]" style={{ color: c.textMuted }}>{f.size}</span>
+            <I d={ic.chevR} s={12} c={c.textMuted} />
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -532,19 +593,68 @@ function NotesApp({ c }: { c: typeof palette.dark }) {
 }
 
 function BrowserApp({ c }: { c: typeof palette.dark }) {
+  const [url, setUrl] = useState("https://alternus.art");
+  const [isLoading, setIsLoading] = useState(false);
+  const [history, setHistory] = useState<string[]>(["https://alternus.art"]);
+  const [bookmarks] = useState([
+    { name: "Alternus Art", url: "https://alternus.art" },
+    { name: "GitHub", url: "https://github.com" },
+    { name: "Google", url: "https://google.com" },
+    { name: "Stack Overflow", url: "https://stackoverflow.com" },
+  ]);
+
+  const navigate = (newUrl: string) => {
+    let finalUrl = newUrl;
+    if (!finalUrl.startsWith("http")) finalUrl = "https://" + finalUrl;
+    setUrl(finalUrl);
+    setHistory(p => [...p, finalUrl]);
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 1000);
+  };
+
   return (
     <div className="flex flex-col h-full">
+      {/* URL Bar */}
       <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <div className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: c.cardAlt }}>
-          <I d={ic.globe} s={12} c={c.textMuted} />
-          <span className="text-xs" style={{ color: c.textSec }}>alternus.art</span>
+        <button onClick={() => { if (history.length > 1) { const h = [...history]; h.pop(); setHistory(h); setUrl(h[h.length - 1]); } }} style={{ color: c.textMuted }} className="p-1">
+          <I d={ic.chevL} s={14} />
+        </button>
+        <div className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+          {isLoading ? (
+            <div className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${c.accent} transparent ${c.accent} ${c.accent}` }} />
+          ) : (
+            <I d={ic.globe} s={12} c={c.textMuted} />
+          )}
+          <input
+            className="flex-1 bg-transparent outline-none text-xs"
+            style={{ color: c.text }}
+            value={url}
+            onChange={e => setUrl(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") navigate(url); }}
+          />
         </div>
       </div>
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-2xl font-light mb-2" style={{ color: c.text }}>Alternus Browser</p>
-          <p className="text-xs" style={{ color: c.textMuted }}>Built-in web browser coming soon</p>
-        </div>
+
+      {/* Bookmarks */}
+      <div className="flex items-center gap-1 px-3 py-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        {bookmarks.map((b, i) => (
+          <button key={i} onClick={() => navigate(b.url)} className="px-2 py-0.5 rounded-md text-[10px] transition-colors"
+            style={{ color: c.textSec }}
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            {b.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-hidden">
+        <iframe
+          src={url}
+          className="w-full h-full border-0"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+          title="Browser"
+        />
       </div>
     </div>
   );
@@ -642,7 +752,7 @@ export default function AlternusOS() {
     ai: <AIChat c={c} />,
     terminal: <TerminalApp c={c} />,
     code: <CodeApp c={c} />,
-    files: <FilesApp c={c} />,
+    files: <FilesApp c={c} onOpenApp={openWin} />,
     settings: <SettingsApp c={c} mode={mode} setMode={setMode} />,
     music: <MusicApp c={c} />,
     weather: <WeatherApp c={c} />,
@@ -690,7 +800,7 @@ export default function AlternusOS() {
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 h-9 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
         <div className="flex items-center gap-3">
-          <span style={{ color: c.accentText }} className="text-[11px] font-bold tracking-wider">ALTERNUS</span>
+          <span style={{ color: c.text }} className="text-[11px] font-bold tracking-wider">ALTERNUS</span>
           <span style={{ color: c.textMuted }} className="text-[10px]">OS</span>
         </div>
         <span style={{ color: c.textSec }} className="text-xs">{fmt(time)} · {time.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
@@ -788,36 +898,6 @@ export default function AlternusOS() {
         ))}
       </div>
 
-      {/* Bottom: Minimal open windows indicator (only shows when windows are open) */}
-      {wins.some(w => w.isOpen) && (
-        <div className="flex-shrink-0 flex items-center justify-center py-1.5">
-          <div className="flex items-center gap-0.5 px-2 py-1 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-            {dockApps.filter(app => wins.find(w => w.id === app.id)?.isOpen).map(app => {
-              const w = wins.find(w => w.id === app.id);
-              return (
-                <div key={app.id} className="relative group">
-                  <button
-                    onClick={() => {
-                      if (w?.isMinimized) {
-                        openWin(app.id);
-                      } else {
-                        focusWin(app.id);
-                      }
-                    }}
-                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-                    style={{ background: w?.isMinimized ? "transparent" : c.accentSoft }}
-                  >
-                    <I d={app.icon} s={17} c={app.color} />
-                  </button>
-                  {!w?.isMinimized && <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full" style={{ background: c.accent }} />}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded-md text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap"
-                    style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}` }}>{app.label}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
