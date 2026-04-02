@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word";
 
 interface WinState {
   id: WinId;
@@ -109,6 +109,21 @@ const ic = {
   bell: "M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0",
   store: "M3 3h18l-2 13H5L3 3zM16 16a2 2 0 100 4 2 2 0 000-4zM9 16a2 2 0 100 4 2 2 0 000-4z",
   film: "M2 2h20v20H2zM7 2v20M17 2v20M2 7h5M2 12h20M2 17h5M17 7h5M17 17h5",
+  fileText: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8",
+  type: "M4 7V4h16v3M9 20h6M12 4v16",
+  pen: "M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z",
+  upload: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12",
+  share: "M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13",
+  plus: "M12 5v14M5 12h14",
+  alignLeft: "M17 10H3M21 6H3M21 14H3M17 18H3",
+  alignCenter: "M18 10H6M21 6H3M21 14H3M18 18H6",
+  alignRight: "M21 10H7M21 6H3M21 14H3M21 18H7",
+  alignJustify: "M21 10H3M21 6H3M21 14H3M21 18H3",
+  bluetooth: "M6.5 6.5l11 11L12 23V1l5.5 5.5-11 11",
+  mic: "M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2",
+  monitor: "M2 3h20v14H2zM8 21h8M12 17v4",
+  mouse: "M12 2a5 5 0 00-5 5v10a5 5 0 0010 0V7a5 5 0 00-5-5zM12 2v6",
+  volume: "M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07",
 };
 
 // ━━━━ Window Title Bar ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -547,13 +562,40 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
         );
       case "System":
         return (
-          <div className="p-5 space-y-3 overflow-y-auto h-full">
-            {[{ l: "OS Version", v: "Alternus OS v1.0" }, { l: "Kernel", v: "AlternusKernel 6.2" }, { l: "Architecture", v: "x86_64" }, { l: "Uptime", v: "3h 24m" }, { l: "Memory", v: "16 GB DDR5" }, { l: "Storage", v: "512 GB SSD — 234 GB free" }].map((info, i) => (
-              <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
-                <span className="text-xs" style={{ color: c.textMuted }}>{info.l}</span>
-                <span className="text-xs font-medium" style={{ color: c.text }}>{info.v}</span>
+          <div className="p-5 space-y-5 overflow-y-auto h-full">
+            {/* Quick Toggles */}
+            <div className="flex gap-2">
+              {[{ icon: ic.wifi, label: "Wi-Fi", active: true }, { icon: ic.bluetooth, label: "Bluetooth", active: true }, { icon: ic.moon, label: "Night", active: false }, { icon: ic.sun, label: "Bright", active: false }].map((t, i) => (
+                <button key={i} className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all"
+                  style={{ background: t.active ? c.accent : c.cardAlt, color: t.active ? "#fff" : c.textSec }}>
+                  <I d={t.icon} s={18} />
+                  <span className="text-[9px] font-medium">{t.label}</span>
+                </button>
+              ))}
+            </div>
+            {/* Sliders */}
+            {[{ label: "Sound", icon: ic.volume, value: 72 }, { label: "Display", icon: ic.monitor, value: 85 }, { label: "Microphone", icon: ic.mic, value: 60 }, { label: "Mouse", icon: ic.mouse, value: 50 }].map((s, i) => (
+              <div key={i} className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <I d={s.icon} s={13} c={c.textMuted} />
+                  <span className="text-xs" style={{ color: c.textSec }}>{s.label}</span>
+                </div>
+                <div className="relative h-2 rounded-full" style={{ background: c.cardAlt }}>
+                  <div className="absolute top-0 left-0 h-full rounded-full" style={{ width: `${s.value}%`, background: i === 3 ? `linear-gradient(90deg, ${c.accent}, ${c.purple}, ${c.warning}, ${c.danger})` : c.accent }} />
+                  <div className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-2" style={{ left: `calc(${s.value}% - 7px)`, background: c.surface, borderColor: i === 3 ? c.danger : c.accent }} />
+                </div>
               </div>
             ))}
+            {/* System Info */}
+            <div className="pt-2 space-y-2">
+              <p className="text-[10px] font-medium px-1" style={{ color: c.textMuted }}>System Info</p>
+              {[{ l: "OS Version", v: "Alternus OS v1.0" }, { l: "Kernel", v: "AlternusKernel 6.2" }, { l: "Memory", v: "16 GB DDR5" }, { l: "Storage", v: "512 GB — 234 GB free" }].map((info, i) => (
+                <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: c.cardAlt }}>
+                  <span className="text-[10px]" style={{ color: c.textMuted }}>{info.l}</span>
+                  <span className="text-[10px] font-medium" style={{ color: c.text }}>{info.v}</span>
+                </div>
+              ))}
+            </div>
           </div>
         );
       default:
@@ -580,6 +622,77 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
       {/* Content */}
       <div className="flex-1 overflow-hidden">
         {renderContent()}
+      </div>
+    </div>
+  );
+}
+
+function WordApp({ c }: { c: typeof palette.dark }) {
+  const [docTitle, setDocTitle] = useState("Untitled Document");
+  const [docContent, setDocContent] = useState("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Turpis sit eget faucibus eget. Pulvinar amet varius elementum bibendum massa tristique varius ultrices. Ornare vitae duis non in. Id tortor cras nisl mollis nibh est. Socis tortor id orci vitae nulla eget sed nisi.\n\nUt nisl aliquam dignissim mauris nunc ut diam nec sed. Neque urna vitae velit morbi tristique. Nulla tristique urna gravida orci sagittis vel mauris amet. Ipsum urna id elit volutpat. Enem posuere dictum sed sagittis. In tortor aliquam posuere ultrices fringilla. Magna dictum faucibus praesent ultrices feugiat nec. Vitae tempor augue suscipit sed eget purus.\n\nPraesent urna ante nam mattis dolor imperdiet vitae pellentesque vitae. Leo dapibus non egestas commodo urna tincidunt vitae. Consequat gravida netus fames viverra orci. Vel in sed nec enim hendrerit faucibus. Laoreet tincidunt eget neque dignissim sit egestas adipiscing. Euismod facilisis vestibulum ut in faucibus sed.");
+  const [wordCount, setWordCount] = useState(0);
+  const sidebarItems = [
+    { icon: ic.fileText, label: "File Document" },
+    { icon: ic.type, label: "Typography" },
+    { icon: ic.pen, label: "Edit" },
+    { icon: ic.upload, label: "Export" },
+    { icon: ic.share, label: "Share" },
+    { icon: ic.plus, label: "New" },
+  ];
+  const [activeSidebar, setActiveSidebar] = useState(0);
+
+  useEffect(() => {
+    setWordCount(docContent.trim().split(/\s+/).filter(Boolean).length);
+  }, [docContent]);
+
+  return (
+    <div className="flex h-full">
+      {/* Left sidebar with icons */}
+      <div className="w-12 flex-shrink-0 flex flex-col items-center py-3 gap-1" style={{ background: c.bg, borderRight: `1px solid ${c.border}` }}>
+        {sidebarItems.map((item, i) => (
+          <button key={i} onClick={() => setActiveSidebar(i)}
+            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+            style={{ background: activeSidebar === i ? c.accentSoft : "transparent", color: activeSidebar === i ? c.accentText : c.textMuted }}
+            onMouseEnter={e => { if (activeSidebar !== i) e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { if (activeSidebar !== i) e.currentTarget.style.background = "transparent"; }}>
+            <I d={item.icon} s={16} />
+          </button>
+        ))}
+      </div>
+      {/* Document area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Document content */}
+        <div className="flex-1 overflow-y-auto p-6" style={{ background: c.bg }}>
+          <div className="max-w-[640px] mx-auto rounded-xl p-8 min-h-full" style={{ background: c.surface, boxShadow: `0 1px 4px rgba(0,0,0,0.08)` }}>
+            <input
+              value={docTitle}
+              onChange={e => setDocTitle(e.target.value)}
+              className="w-full text-2xl font-bold mb-6 bg-transparent border-none outline-none"
+              style={{ color: c.text }}
+              placeholder="Document Title"
+            />
+            <textarea
+              value={docContent}
+              onChange={e => setDocContent(e.target.value)}
+              className="w-full bg-transparent border-none outline-none resize-none text-sm leading-relaxed"
+              style={{ color: c.text, minHeight: 300 }}
+              placeholder="Start writing..."
+            />
+          </div>
+        </div>
+        {/* Bottom status bar */}
+        <div className="flex items-center justify-between px-4 h-8 flex-shrink-0" style={{ background: c.surface, borderTop: `1px solid ${c.border}` }}>
+          <div className="flex items-center gap-4">
+            <span className="text-[10px]" style={{ color: c.textMuted }}>Page: 1</span>
+            <span className="text-[10px]" style={{ color: c.textMuted }}>Words: {wordCount}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="p-0.5 rounded" style={{ color: c.textMuted }}><I d={ic.alignLeft} s={12} /></button>
+            <button className="p-0.5 rounded" style={{ color: c.textMuted }}><I d={ic.alignCenter} s={12} /></button>
+            <button className="p-0.5 rounded" style={{ color: c.textMuted }}><I d={ic.alignRight} s={12} /></button>
+            <button className="p-0.5 rounded" style={{ color: c.textMuted }}><I d={ic.alignJustify} s={12} /></button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -809,6 +922,7 @@ export default function AlternusOS() {
     { id: "browser", title: "Browser", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 40, w: 700, h: 480 },
     { id: "store", title: "Store", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 180, y: 60, w: 550, h: 420 },
     { id: "movies", title: "Movies", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 50, w: 600, h: 450 },
+    { id: "word", title: "Alternus Word", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 40, w: 700, h: 500 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -926,6 +1040,7 @@ export default function AlternusOS() {
     calendar: <CalendarApp c={c} />,
     notes: <NotesApp c={c} />,
     browser: <BrowserApp c={c} />,
+    word: <WordApp c={c} />,
     store: (
       <div className="p-5 space-y-4 overflow-y-auto h-full">
         <p className="text-lg font-semibold" style={{ color: c.text }}>Alternus Store</p>
@@ -966,6 +1081,7 @@ export default function AlternusOS() {
     { id: "music", icon: ic.music, label: "Music", color: "#F472B6" },
     { id: "calendar", icon: ic.calendar, label: "Calendar", color: "#60A5FA" },
     { id: "weather", icon: ic.cloud, label: "Weather", color: "#22D3EE" },
+    { id: "word", icon: ic.fileText, label: "Word", color: c.accentText },
     { id: "notes", icon: ic.note, label: "Notes", color: "#FBBF24" },
     { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec },
   ];
