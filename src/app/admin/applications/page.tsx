@@ -23,6 +23,7 @@ interface Application {
 
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -33,6 +34,26 @@ export default function ApplicationsPage() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Fetch applications from API
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
+  const fetchApplications = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/applications');
+      const data = await res.json();
+      if (res.ok) {
+        setApplications(data.applications);
+      }
+    } catch (err) {
+      console.error('Failed to fetch applications:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -51,35 +72,54 @@ export default function ApplicationsPage() {
     };
   }, [isUserMenuOpen]);
 
-  const handleApprove = (id: string) => {
-    setApplications(
-      applications.map((app) =>
-        app.id === id ? { ...app, status: "approved" as const } : app
-      )
-    );
+  const handleApprove = async (id: string) => {
+    try {
+      const res = await fetch('/api/admin/applications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ artistId: id, action: 'approve' }),
+      });
+      if (res.ok) {
+        setApplications(
+          applications.map((app) =>
+            app.id === id ? { ...app, status: "approved" as const } : app
+          )
+        );
+      }
+    } catch (err) {
+      console.error('Failed to approve application:', err);
+    }
     setSelectedApp(null);
-    // In production: API call to approve artist
   };
 
-  const handleReject = (id: string) => {
+  const handleReject = async (id: string) => {
     if (!rejectionReason.trim()) {
       alert("Please provide a rejection reason");
       return;
     }
-    setApplications(
-      applications.map((app) =>
-        app.id === id ? { ...app, status: "rejected" as const } : app
-      )
-    );
+    try {
+      const res = await fetch('/api/admin/applications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ artistId: id, action: 'reject', rejectionReason }),
+      });
+      if (res.ok) {
+        setApplications(
+          applications.map((app) =>
+            app.id === id ? { ...app, status: "rejected" as const } : app
+          )
+        );
+      }
+    } catch (err) {
+      console.error('Failed to reject application:', err);
+    }
     setSelectedApp(null);
     setRejectionReason("");
-    // In production: API call to reject artist + send email
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _handleSendMessage = () => {
     if (!message.trim()) return;
-    // In production: API call to send message
     setMessage("");
     setShowMessageModal(false);
   };
@@ -444,8 +484,16 @@ export default function ApplicationsPage() {
           ))}
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="bg-white rounded-2xl border border-zinc-200 p-12 text-center">
+            <div className="animate-spin w-8 h-8 border-4 border-zinc-300 border-t-black rounded-full mx-auto mb-4"></div>
+            <p className="text-zinc-600">Loading applications...</p>
+          </div>
+        )}
+
         {/* Empty State */}
-        {applications.length === 0 && (
+        {!loading && applications.length === 0 && (
           <div className="bg-white rounded-2xl border border-zinc-200 p-12 text-center">
             <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg

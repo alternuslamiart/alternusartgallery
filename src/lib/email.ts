@@ -426,6 +426,228 @@ export async function sendAdminNewOrderEmail(data: AdminOrderNotificationData): 
   });
 }
 
+// Admin notification when a new artist application is submitted
+interface ArtistApplicationNotificationData {
+  applicantName: string;
+  applicantEmail: string;
+  location: string;
+  memberType: string;
+  bio: string;
+  artStyles: string[];
+  yearsExperience: string;
+  portfolioUrl?: string;
+}
+
+export async function sendAdminNewArtistApplicationEmail(data: ArtistApplicationNotificationData): Promise<boolean> {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) {
+    console.error('ADMIN_EMAIL not set — cannot send artist application notification');
+    return false;
+  }
+
+  const stylesHtml = data.artStyles.map(s => `<span style="display: inline-block; padding: 4px 12px; background: #f3f4f6; border-radius: 20px; font-size: 13px; color: #374151; margin: 2px;">${s}</span>`).join(' ');
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+        <div style="background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #000;">Alternus Art Gallery</h1>
+          </div>
+
+          <div style="text-align: center; margin-bottom: 20px;">
+            <div style="width: 60px; height: 60px; background: #f59e0b; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+              <span style="color: white; font-size: 28px;">&#9998;</span>
+            </div>
+          </div>
+
+          <h2 style="margin: 0 0 5px; font-size: 22px; font-weight: 700; color: #1a1a1a; text-align: center;">
+            New Artist Application!
+          </h2>
+          <p style="margin: 0 0 25px; color: #666; font-size: 14px; text-align: center;">
+            A new artist has applied to join the gallery.
+          </p>
+
+          <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 4px 0; color: #92400e; font-size: 14px;">Name</td>
+                <td style="padding: 4px 0; text-align: right; font-weight: 700; color: #92400e; font-size: 14px;">${data.applicantName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 4px 0; color: #92400e; font-size: 14px;">Email</td>
+                <td style="padding: 4px 0; text-align: right; font-weight: 600; color: #92400e; font-size: 14px;">${data.applicantEmail}</td>
+              </tr>
+              <tr>
+                <td style="padding: 4px 0; color: #92400e; font-size: 14px;">Location</td>
+                <td style="padding: 4px 0; text-align: right; font-weight: 600; color: #92400e; font-size: 14px;">${data.location}</td>
+              </tr>
+              <tr>
+                <td style="padding: 4px 0; color: #92400e; font-size: 14px;">Member Type</td>
+                <td style="padding: 4px 0; text-align: right; font-weight: 600; color: #92400e; font-size: 14px;">${data.memberType}</td>
+              </tr>
+              <tr>
+                <td style="padding: 4px 0; color: #92400e; font-size: 14px;">Experience</td>
+                <td style="padding: 4px 0; text-align: right; font-weight: 600; color: #92400e; font-size: 14px;">${data.yearsExperience} years</td>
+              </tr>
+            </table>
+          </div>
+
+          <h3 style="margin: 0 0 10px; font-size: 14px; font-weight: 600; color: #1a1a1a;">Bio</h3>
+          <div style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+            <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.6;">${data.bio}</p>
+          </div>
+
+          <h3 style="margin: 0 0 10px; font-size: 14px; font-weight: 600; color: #1a1a1a;">Art Styles</h3>
+          <div style="margin-bottom: 25px;">
+            ${stylesHtml}
+          </div>
+
+          <div style="text-align: center;">
+            <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/applications" style="display: inline-block; padding: 14px 32px; background: #000; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+              Review Application
+            </a>
+          </div>
+
+          <div style="margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee; text-align: center;">
+            <p style="margin: 0; color: #999; font-size: 12px;">
+              This is an automated notification from Alternus Art Gallery.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const text = `NEW ARTIST APPLICATION\nName: ${data.applicantName}\nEmail: ${data.applicantEmail}\nLocation: ${data.location}\nType: ${data.memberType}\nExperience: ${data.yearsExperience} years\nStyles: ${data.artStyles.join(', ')}\nBio: ${data.bio}`;
+
+  return sendEmail({
+    to: adminEmail,
+    subject: `New Artist Application — ${data.applicantName}`,
+    html,
+    text,
+  });
+}
+
+export async function sendArtistApprovalEmail(email: string, name: string): Promise<boolean> {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+        <div style="background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+          <h1 style="margin: 0 0 20px; font-size: 28px; font-weight: 700; color: #000; text-align: center;">
+            Alternus Art Gallery
+          </h1>
+
+          <div style="text-align: center; margin-bottom: 20px;">
+            <div style="width: 60px; height: 60px; background: #10b981; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+              <span style="color: white; font-size: 30px;">&#10003;</span>
+            </div>
+          </div>
+
+          <h2 style="margin: 0 0 10px; font-size: 24px; font-weight: 600; color: #1a1a1a; text-align: center;">
+            Application Approved!
+          </h2>
+          <p style="margin: 0 0 20px; color: #666; font-size: 16px; line-height: 1.6;">
+            Hi ${name},
+          </p>
+          <p style="margin: 0 0 20px; color: #666; font-size: 16px; line-height: 1.6;">
+            Congratulations! Your artist application has been approved. You are now an official artist on Alternus Art Gallery.
+          </p>
+          <p style="margin: 0 0 30px; color: #666; font-size: 16px; line-height: 1.6;">
+            You can now start uploading your artworks and reach collectors from around the world.
+          </p>
+          <div style="text-align: center;">
+            <a href="${process.env.NEXT_PUBLIC_APP_URL}/gallery" style="display: inline-block; padding: 14px 32px; background: #000; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+              Go to Gallery
+            </a>
+          </div>
+
+          <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+            <p style="margin: 0; color: #999; font-size: 12px;">
+              &copy; ${new Date().getFullYear()} Alternus Art Gallery. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: email,
+    subject: 'Welcome to Alternus Art Gallery — Application Approved!',
+    html,
+  });
+}
+
+export async function sendArtistRejectionEmail(email: string, name: string, reason: string): Promise<boolean> {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+        <div style="background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+          <h1 style="margin: 0 0 20px; font-size: 28px; font-weight: 700; color: #000; text-align: center;">
+            Alternus Art Gallery
+          </h1>
+
+          <h2 style="margin: 0 0 10px; font-size: 24px; font-weight: 600; color: #1a1a1a; text-align: center;">
+            Application Update
+          </h2>
+          <p style="margin: 0 0 20px; color: #666; font-size: 16px; line-height: 1.6;">
+            Hi ${name},
+          </p>
+          <p style="margin: 0 0 20px; color: #666; font-size: 16px; line-height: 1.6;">
+            Thank you for your interest in joining Alternus Art Gallery. After careful review, we were unable to approve your application at this time.
+          </p>
+
+          <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+            <p style="margin: 0 0 5px; font-weight: 600; color: #991b1b; font-size: 14px;">Reason:</p>
+            <p style="margin: 0; color: #991b1b; font-size: 14px;">${reason}</p>
+          </div>
+
+          <p style="margin: 0 0 30px; color: #666; font-size: 16px; line-height: 1.6;">
+            We encourage you to update your portfolio and reapply in the future. We would love to reconsider your application.
+          </p>
+          <div style="text-align: center;">
+            <a href="${process.env.NEXT_PUBLIC_APP_URL}/apply" style="display: inline-block; padding: 14px 32px; background: #000; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+              Reapply
+            </a>
+          </div>
+
+          <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+            <p style="margin: 0; color: #999; font-size: 12px;">
+              &copy; ${new Date().getFullYear()} Alternus Art Gallery. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: email,
+    subject: 'Alternus Art Gallery — Application Update',
+    html,
+  });
+}
+
 export async function sendOrderShippedEmail(data: OrderEmailData): Promise<boolean> {
   const html = `
     <!DOCTYPE html>
