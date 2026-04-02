@@ -48,7 +48,7 @@ const palette = {
     titlebarBorder: "#3A3A3A",
   },
   light: {
-    bg: "#F0F0F0",
+    bg: "#EFEFEF",
     surface: "#FFFFFF",
     card: "#FFFFFF",
     cardAlt: "#F5F5F5",
@@ -707,17 +707,64 @@ export default function AlternusOS() {
 
       {/* Desktop Area - fixed, no scroll */}
       <div className="flex-1 relative overflow-hidden">
-        {/* Desktop Icons */}
-        <div className="absolute top-4 left-4 grid grid-cols-1 gap-2 z-[1]">
-          {dockApps.slice(0, 5).map(app => (
-            <button key={app.id} onDoubleClick={() => openWin(app.id)} className="flex flex-col items-center gap-1 w-14 py-2 rounded-xl transition-colors hover:bg-white/5">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-                <I d={app.icon} s={18} c={app.color} />
+        {/* Center: Alternus branding + AI Search */}
+        {!wins.some(w => w.isOpen && !w.isMinimized) && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-[0]">
+            {/* Alternus gradient text */}
+            <h1
+              className="text-7xl md:text-8xl font-semibold mb-8 select-none"
+              style={{
+                background: mode === "dark"
+                  ? "linear-gradient(90deg, #555 0%, #fff 50%, #555 100%)"
+                  : "linear-gradient(90deg, #aaa 0%, #333 50%, #aaa 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Alternus<span className="text-lg align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
+            </h1>
+
+            {/* AI Search Bar */}
+            <div
+              className="w-full max-w-xl flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all"
+              style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)" }}
+            >
+              <I d={ic.search} s={18} c={c.textMuted} />
+              <input
+                className="flex-1 bg-transparent outline-none text-sm"
+                style={{ color: c.text }}
+                placeholder="Search or ask AI anything..."
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
+                    openWin("ai");
+                  }
+                }}
+              />
+              <div className="flex items-center gap-1.5">
+                <span className="px-2 py-0.5 rounded-md text-[10px] font-medium" style={{ background: c.cardAlt, color: c.textMuted, border: `1px solid ${c.border}` }}>⌘K</span>
               </div>
-              <span className="text-[9px] font-medium" style={{ color: c.textSec }}>{app.label}</span>
-            </button>
-          ))}
-        </div>
+            </div>
+
+            {/* Quick app launcher row */}
+            <div className="flex items-center gap-3 mt-8">
+              {dockApps.slice(0, 6).map(app => (
+                <button
+                  key={app.id}
+                  onClick={() => openWin(app.id)}
+                  className="flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-all hover:scale-105 active:scale-95"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.surface)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                >
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                    <I d={app.icon} s={18} c={app.color} />
+                  </div>
+                  <span className="text-[10px] font-medium" style={{ color: c.textMuted }}>{app.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Windows */}
         {wins.map(w => (
@@ -736,28 +783,36 @@ export default function AlternusOS() {
         ))}
       </div>
 
-      {/* Dock */}
-      <div className="flex-shrink-0 flex items-center justify-center py-1.5">
-        <div className="flex items-center gap-0.5 px-2 py-1 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-          {dockApps.map(app => {
-            const w = wins.find(w => w.id === app.id);
-            return (
-              <div key={app.id} className="relative group">
-                <button
-                  onClick={() => openWin(app.id)}
-                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-                  style={{ background: w?.isOpen ? c.accentSoft : "transparent" }}
-                >
-                  <I d={app.icon} s={17} c={app.color} />
-                </button>
-                {w?.isOpen && <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full" style={{ background: c.accent }} />}
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded-md text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap"
-                  style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}` }}>{app.label}</div>
-              </div>
-            );
-          })}
+      {/* Bottom: Minimal open windows indicator (only shows when windows are open) */}
+      {wins.some(w => w.isOpen) && (
+        <div className="flex-shrink-0 flex items-center justify-center py-1.5">
+          <div className="flex items-center gap-0.5 px-2 py-1 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            {dockApps.filter(app => wins.find(w => w.id === app.id)?.isOpen).map(app => {
+              const w = wins.find(w => w.id === app.id);
+              return (
+                <div key={app.id} className="relative group">
+                  <button
+                    onClick={() => {
+                      if (w?.isMinimized) {
+                        openWin(app.id);
+                      } else {
+                        focusWin(app.id);
+                      }
+                    }}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+                    style={{ background: w?.isMinimized ? "transparent" : c.accentSoft }}
+                  >
+                    <I d={app.icon} s={17} c={app.color} />
+                  </button>
+                  {!w?.isMinimized && <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full" style={{ background: c.accent }} />}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded-md text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap"
+                    style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}` }}>{app.label}</div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
