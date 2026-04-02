@@ -886,27 +886,26 @@ export default function AlternusOS() {
         style={{ background: c.bg }}
         className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
       >
-        <h1
-          className="text-6xl font-semibold mb-12 select-none bg-clip-text"
-          style={{
-            backgroundImage: `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`,
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            color: "transparent",
-          }}
-        >
-          Alternus
-        </h1>
+        {/* Top-right icons: WiFi + Settings */}
+        <div className="absolute top-4 right-4 flex items-center gap-3">
+          <span style={{ color: c.textMuted }}><I d={ic.wifi} s={16} /></span>
+          <span style={{ color: c.textMuted }}><I d={ic.settings} s={16} /></span>
+        </div>
 
-        <p style={{ color: c.text }} className="text-7xl font-extralight tracking-wide mb-1">{fmt(time)}</p>
-        <p style={{ color: c.textMuted }} className="text-sm mb-4">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
-        <p style={{ color: c.textSec }} className="text-sm font-light mb-10">
+        {/* Clock + Date — shifted up */}
+        <div className="absolute top-[18%] left-1/2 -translate-x-1/2 flex flex-col items-center">
+          <p style={{ color: c.text }} className="text-7xl font-extralight tracking-wide mb-1">{fmt(time)}</p>
+          <p style={{ color: c.textMuted }} className="text-sm">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
+        </div>
+
+        {/* Center content: Welcome + Button */}
+        <p style={{ color: c.textSec }} className="text-sm font-light mb-6">
           Welcome to Alternus OS
         </p>
 
         <button
           onClick={() => setIsLocked(false)}
-          className="group flex items-center gap-3 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+          className="group flex items-center gap-3 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer mb-10"
           style={{
             background: c.surface,
             border: `1px solid ${c.border}`,
@@ -920,6 +919,14 @@ export default function AlternusOS() {
           </svg>
           Open Desktop
         </button>
+
+        {/* Round profile icon at bottom */}
+        <div
+          className="w-12 h-12 rounded-full flex items-center justify-center"
+          style={{ border: `2px solid ${c.border}`, color: c.textMuted }}
+        >
+          <I d={ic.user} s={22} />
+        </div>
       </div>
     );
   }
