@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
       email,
       phone,
       location,
-      passportNumber,
       memberType,
       website,
       instagram,

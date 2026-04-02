@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import Image from "next/image";
 
 // ─── Types ───────────────────────────────────────────────
 type WindowId =
@@ -226,30 +225,6 @@ function IconSkip({ size = 16, direction = "forward" }: { size?: number; directi
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={{ transform: direction === "backward" ? "scaleX(-1)" : undefined }}>
       <polygon points="5 4 15 12 5 20 5 4" />
       <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  );
-}
-
-function IconX({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 6 6 18" /><path d="m6 6 12 12" />
-    </svg>
-  );
-}
-
-function IconMinus({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 12h14" />
-    </svg>
-  );
-}
-
-function IconMaximize({ size = 14 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect width="18" height="18" x="3" y="3" rx="2" />
     </svg>
   );
 }
