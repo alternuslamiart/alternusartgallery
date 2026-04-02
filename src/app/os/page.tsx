@@ -886,11 +886,8 @@ export default function AlternusOS() {
         style={{ background: c.bg }}
         className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
       >
-        <p style={{ color: c.text }} className="text-7xl font-extralight tracking-wide mb-1">{fmt(time)}</p>
-        <p style={{ color: c.textMuted }} className="text-sm mb-16">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
-
         <h1
-          className="text-5xl font-semibold mb-10 select-none"
+          className="text-6xl font-semibold mb-12 select-none"
           style={{
             background: mode === "dark"
               ? "linear-gradient(90deg, #555 0%, #fff 50%, #555 100%)"
@@ -902,6 +899,12 @@ export default function AlternusOS() {
         >
           Alternus
         </h1>
+
+        <p style={{ color: c.text }} className="text-7xl font-extralight tracking-wide mb-1">{fmt(time)}</p>
+        <p style={{ color: c.textMuted }} className="text-sm mb-4">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
+        <p style={{ color: c.textSec }} className="text-sm font-light mb-10">
+          Welcome to Alternus OS
+        </p>
 
         <button
           onClick={() => setIsLocked(false)}
