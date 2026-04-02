@@ -57,6 +57,41 @@ export function AIChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const hydratedRef = useRef(false);
+
+  // Load chat history and current messages from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedHistory = localStorage.getItem("alternus_ai_chat_history");
+      if (savedHistory) {
+        const parsed = JSON.parse(savedHistory) as ChatSession[];
+        setChatHistory(parsed.map(s => ({
+          ...s,
+          timestamp: new Date(s.timestamp),
+          messages: s.messages.map(m => ({ ...m, timestamp: new Date(m.timestamp) })),
+        })));
+      }
+      const savedMessages = localStorage.getItem("alternus_ai_current_chat");
+      if (savedMessages) {
+        const parsed = JSON.parse(savedMessages) as Message[];
+        setMessages(parsed.map(m => ({ ...m, timestamp: new Date(m.timestamp) })));
+      }
+    } catch {}
+    hydratedRef.current = true;
+  }, []);
+
+  // Persist chat history to localStorage
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    localStorage.setItem("alternus_ai_chat_history", JSON.stringify(chatHistory));
+  }, [chatHistory]);
+
+  // Persist current messages to localStorage
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    localStorage.setItem("alternus_ai_current_chat", JSON.stringify(messages));
+  }, [messages]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
