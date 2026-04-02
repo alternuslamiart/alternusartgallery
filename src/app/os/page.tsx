@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies";
 
 interface WinState {
   id: WinId;
@@ -106,6 +106,9 @@ const ic = {
   close: "M18 6L6 18M6 6l12 12",
   search: "M11 3a8 8 0 100 16 8 8 0 000-16zM21 21l-4.3-4.3",
   power: "M12 2v10M16.24 7.76a6 6 0 11-8.49 0",
+  bell: "M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0",
+  store: "M3 3h18l-2 13H5L3 3zM16 16a2 2 0 100 4 2 2 0 000-4zM9 16a2 2 0 100 4 2 2 0 000-4z",
+  film: "M2 2h20v20H2zM7 2v20M17 2v20M2 7h5M2 12h20M2 17h5M17 7h5M17 17h5",
 };
 
 // ━━━━ Window Title Bar ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -786,6 +789,7 @@ export default function AlternusOS() {
   const [bootProgress, setBootProgress] = useState(0);
   const [zCounter, setZCounter] = useState(10);
   const [showApps, setShowApps] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [aiInput, setAiInput] = useState("");
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [aiActions, setAiActions] = useState<{ label: string; action: WinId }[]>([]);
@@ -803,6 +807,8 @@ export default function AlternusOS() {
     { id: "calendar", title: "Calendar", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 450, y: 80, w: 320, h: 380 },
     { id: "notes", title: "Notes", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 180, y: 90, w: 450, h: 380 },
     { id: "browser", title: "Browser", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 40, w: 700, h: 480 },
+    { id: "store", title: "Store", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 180, y: 60, w: 550, h: 420 },
+    { id: "movies", title: "Movies", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 50, w: 600, h: 450 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -920,6 +926,34 @@ export default function AlternusOS() {
     calendar: <CalendarApp c={c} />,
     notes: <NotesApp c={c} />,
     browser: <BrowserApp c={c} />,
+    store: (
+      <div className="p-5 space-y-4 overflow-y-auto h-full">
+        <p className="text-lg font-semibold" style={{ color: c.text }}>Alternus Store</p>
+        <p className="text-xs" style={{ color: c.textMuted }}>Discover apps for Alternus OS</p>
+        {[{ name: "Alternus Paint", desc: "Digital art & drawing", cat: "Creative" }, { name: "Alternus Docs", desc: "Document editor", cat: "Productivity" }, { name: "Alternus Chat", desc: "Messaging app", cat: "Social" }, { name: "Alternus Maps", desc: "Navigation & maps", cat: "Utilities" }, { name: "Alternus Photos", desc: "Photo gallery & editor", cat: "Creative" }].map((app, i) => (
+          <div key={i} className="flex items-center gap-4 p-3 rounded-xl transition-colors" style={{ background: c.cardAlt }}
+            onMouseEnter={e => (e.currentTarget.style.background = c.accentSoft)} onMouseLeave={e => (e.currentTarget.style.background = c.cardAlt)}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.accentSoft, color: c.accentText }}><I d={ic.sparkle} s={20} /></div>
+            <div className="flex-1"><p className="text-sm font-medium" style={{ color: c.text }}>{app.name}</p><p className="text-[10px]" style={{ color: c.textMuted }}>{app.desc}</p></div>
+            <span className="text-[10px] px-3 py-1 rounded-full" style={{ background: c.accent, color: "#fff" }}>Get</span>
+          </div>
+        ))}
+      </div>
+    ),
+    movies: (
+      <div className="p-5 space-y-4 overflow-y-auto h-full">
+        <p className="text-lg font-semibold" style={{ color: c.text }}>Movies</p>
+        <p className="text-xs" style={{ color: c.textMuted }}>Watch & discover</p>
+        {[{ name: "The Last Algorithm", genre: "Sci-Fi", year: "2025", rating: "8.7" }, { name: "Digital Dreams", genre: "Drama", year: "2024", rating: "7.9" }, { name: "Code Runner", genre: "Action", year: "2025", rating: "8.2" }, { name: "Neural Path", genre: "Thriller", year: "2024", rating: "8.5" }, { name: "Pixel World", genre: "Animation", year: "2025", rating: "9.1" }].map((m, i) => (
+          <div key={i} className="flex items-center gap-4 p-3 rounded-xl transition-colors" style={{ background: c.cardAlt }}
+            onMouseEnter={e => (e.currentTarget.style.background = c.accentSoft)} onMouseLeave={e => (e.currentTarget.style.background = c.cardAlt)}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.purpleSoft, color: c.purple }}><I d={ic.film} s={20} /></div>
+            <div className="flex-1"><p className="text-sm font-medium" style={{ color: c.text }}>{m.name}</p><p className="text-[10px]" style={{ color: c.textMuted }}>{m.genre} · {m.year}</p></div>
+            <span className="text-xs font-medium" style={{ color: c.warning }}>{m.rating}</span>
+          </div>
+        ))}
+      </div>
+    ),
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
@@ -927,6 +961,8 @@ export default function AlternusOS() {
     { id: "code", icon: ic.code, label: "Code", color: c.purple },
     { id: "files", icon: ic.folder, label: "Files", color: c.warning },
     { id: "browser", icon: ic.globe, label: "Browser", color: c.accentText },
+    { id: "store", icon: ic.store, label: "Store", color: c.accent },
+    { id: "movies", icon: ic.film, label: "Movies", color: c.purple },
     { id: "music", icon: ic.music, label: "Music", color: "#F472B6" },
     { id: "calendar", icon: ic.calendar, label: "Calendar", color: "#60A5FA" },
     { id: "weather", icon: ic.cloud, label: "Weather", color: "#22D3EE" },
@@ -1013,7 +1049,7 @@ export default function AlternusOS() {
               border: `1px solid ${c.border}`,
               color: c.text,
             }}
-            onMouseEnter={e => { const hoverBg = mode === "light" ? "#EFEFEF" : c.accent; const hoverColor = mode === "light" ? c.text : "#fff"; e.currentTarget.style.background = hoverBg; e.currentTarget.style.borderColor = hoverBg; e.currentTarget.style.color = hoverColor; }}
+            onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = "#fff"; }}
             onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.text; }}
           >
             <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1037,22 +1073,30 @@ export default function AlternusOS() {
         </div>
         <span style={{ color: c.textSec }} className="text-xs">{fmt(time)} · {time.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
         <div className="flex items-center gap-2">
-          <button onClick={() => openWin("browser")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}><I d={ic.globe} s={13} /></button>
-          <button onClick={() => openWin("settings")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}><I d={ic.settings} s={13} /></button>
-          <button onClick={() => openWin("code")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}><I d={ic.code} s={13} /></button>
-          <button onClick={() => openWin("terminal")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}><I d={ic.terminal} s={13} /></button>
-          <button onClick={() => openWin("weather")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}><I d={ic.cloud} s={13} /></button>
-          <button onClick={() => openWin("calendar")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}><I d={ic.calendar} s={13} /></button>
-          <span style={{ color: "#FFFFFF" }}><I d={ic.wifi} s={13} /></span>
-          <button onClick={() => setMode(mode === "dark" ? "light" : "dark")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}>
-            <I d={mode === "dark" ? ic.sun : ic.moon} s={13} />
-          </button>
-          <button onClick={() => setIsLocked(true)} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}>
-            <I d={ic.user} s={13} />
-          </button>
-          <button onClick={() => { setIsBooting(true); setIsLocked(true); }} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}>
-            <I d={ic.power} s={13} />
-          </button>
+          {(() => { const ic_ = mode === "dark" ? "#FFFFFF" : "#444444"; return (<>
+            <button onClick={() => openWin("browser")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.globe} s={13} /></button>
+            <button onClick={() => openWin("settings")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.settings} s={13} /></button>
+            <button onClick={() => openWin("code")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.code} s={13} /></button>
+            <button onClick={() => openWin("terminal")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.terminal} s={13} /></button>
+            <button onClick={() => openWin("weather")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.cloud} s={13} /></button>
+            <button onClick={() => openWin("calendar")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.calendar} s={13} /></button>
+            <button onClick={() => openWin("store")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.store} s={13} /></button>
+            <button onClick={() => openWin("movies")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.film} s={13} /></button>
+            <button onClick={() => setShowNotifications(!showNotifications)} className="p-1 rounded-md relative" style={{ color: ic_ }}>
+              <I d={ic.bell} s={13} />
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full" style={{ background: c.danger }} />
+            </button>
+            <span style={{ color: ic_ }}><I d={ic.wifi} s={13} /></span>
+            <button onClick={() => setMode(mode === "dark" ? "light" : "dark")} className="p-1 rounded-md" style={{ color: ic_ }}>
+              <I d={mode === "dark" ? ic.sun : ic.moon} s={13} />
+            </button>
+            <button onClick={() => setIsLocked(true)} className="p-1 rounded-md" style={{ color: ic_ }}>
+              <I d={ic.user} s={13} />
+            </button>
+            <button onClick={() => { setIsBooting(true); setIsLocked(true); }} className="p-1 rounded-md" style={{ color: ic_ }}>
+              <I d={ic.power} s={13} />
+            </button>
+          </>); })()}
         </div>
       </div>
 
@@ -1214,6 +1258,47 @@ export default function AlternusOS() {
             {winContent[w.id]}
           </AppWindow>
         ))}
+
+        {/* Notification Sidebar */}
+        <div
+          className="absolute top-0 right-0 h-full z-[100] transition-transform duration-300 ease-in-out"
+          style={{
+            width: 320,
+            transform: showNotifications ? "translateX(0)" : "translateX(100%)",
+            background: c.surface,
+            borderLeft: `1px solid ${c.border}`,
+            boxShadow: showNotifications ? (mode === "dark" ? "-4px 0 20px rgba(0,0,0,0.4)" : "-4px 0 20px rgba(0,0,0,0.1)") : "none",
+          }}
+        >
+          <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
+            <p className="text-sm font-semibold" style={{ color: c.text }}>Notifications</p>
+            <button onClick={() => setShowNotifications(false)} className="p-1 rounded-md" style={{ color: c.textMuted }}><I d={ic.close} s={14} /></button>
+          </div>
+          <div className="p-3 space-y-2 overflow-y-auto" style={{ height: "calc(100% - 48px)" }}>
+            {[
+              { title: "System Update", desc: "Alternus OS v1.1 is available", time: "2 min ago", icon: ic.settings },
+              { title: "Welcome", desc: "Welcome to Alternus OS! Explore your new desktop.", time: "5 min ago", icon: ic.sparkle },
+              { title: "Network", desc: "Connected to AlternusNet · 5GHz", time: "10 min ago", icon: ic.wifi },
+              { title: "Store", desc: "3 new apps available in the Store", time: "15 min ago", icon: ic.store },
+              { title: "Calendar", desc: "Team meeting tomorrow at 10:00 AM", time: "30 min ago", icon: ic.calendar },
+              { title: "Security", desc: "Your system is protected and up to date", time: "1 hr ago", icon: ic.user },
+            ].map((n, i) => (
+              <div key={i} className="flex items-start gap-3 p-3 rounded-xl transition-colors"
+                style={{ background: i < 2 ? c.accentSoft : "transparent" }}
+                onMouseEnter={e => { if (i >= 2) e.currentTarget.style.background = c.cardAlt; }}
+                onMouseLeave={e => { if (i >= 2) e.currentTarget.style.background = "transparent"; }}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: i < 2 ? c.accent : c.cardAlt }}>
+                  <I d={n.icon} s={14} c={i < 2 ? "#fff" : c.textSec} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium" style={{ color: c.text }}>{n.title}</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: c.textMuted }}>{n.desc}</p>
+                  <p className="text-[9px] mt-1" style={{ color: c.textMuted }}>{n.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
     </div>
