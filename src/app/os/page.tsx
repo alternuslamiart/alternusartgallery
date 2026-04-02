@@ -801,7 +801,7 @@ export default function AlternusOS() {
       <div className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden" style={{ background: "#000" }}>
         {/* Alternus logo */}
         <h1
-          className="text-5xl md:text-6xl font-semibold mb-12 select-none"
+          className="text-7xl md:text-8xl font-semibold mb-12 select-none"
           style={{
             background: "linear-gradient(90deg, #555 0%, #fff 50%, #555 100%)",
             WebkitBackgroundClip: "text",
