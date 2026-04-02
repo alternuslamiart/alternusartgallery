@@ -105,6 +105,7 @@ const ic = {
   maximize: "M3 3h18v18H3z",
   close: "M18 6L6 18M6 6l12 12",
   search: "M11 3a8 8 0 100 16 8 8 0 000-16zM21 21l-4.3-4.3",
+  power: "M12 2v10M16.24 7.76a6 6 0 11-8.49 0",
 };
 
 // ━━━━ Window Title Bar ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1064,12 +1065,21 @@ export default function AlternusOS() {
         </div>
         <span style={{ color: c.textSec }} className="text-xs">{fmt(time)} · {time.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
         <div className="flex items-center gap-2">
-          <button onClick={() => setMode(mode === "dark" ? "light" : "dark")} className="p-1 rounded-md" style={{ color: c.textSec }}>
+          <button onClick={() => openWin("browser")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}><I d={ic.globe} s={13} /></button>
+          <button onClick={() => openWin("settings")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}><I d={ic.settings} s={13} /></button>
+          <button onClick={() => openWin("code")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}><I d={ic.code} s={13} /></button>
+          <button onClick={() => openWin("terminal")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}><I d={ic.terminal} s={13} /></button>
+          <button onClick={() => openWin("weather")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}><I d={ic.cloud} s={13} /></button>
+          <button onClick={() => openWin("calendar")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}><I d={ic.calendar} s={13} /></button>
+          <span style={{ color: "#FFFFFF" }}><I d={ic.wifi} s={13} /></span>
+          <button onClick={() => setMode(mode === "dark" ? "light" : "dark")} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}>
             <I d={mode === "dark" ? ic.sun : ic.moon} s={13} />
           </button>
-          <span style={{ color: c.textSec }}><I d={ic.wifi} s={13} /></span>
-          <button onClick={() => setIsLocked(true)} className="p-1 rounded-md" style={{ color: c.textMuted }}>
+          <button onClick={() => setIsLocked(true)} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}>
             <I d={ic.user} s={13} />
+          </button>
+          <button onClick={() => { setIsBooting(true); setIsLocked(true); }} className="p-1 rounded-md" style={{ color: "#FFFFFF" }}>
+            <I d={ic.power} s={13} />
           </button>
         </div>
       </div>
