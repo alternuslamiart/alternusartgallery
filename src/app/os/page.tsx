@@ -689,7 +689,10 @@ export default function AlternusOS() {
   const [mode, setMode] = useState<ThemeMode>("dark");
   const [time, setTime] = useState(new Date());
   const [isLocked, setIsLocked] = useState(true);
+  const [isBooting, setIsBooting] = useState(true);
+  const [bootProgress, setBootProgress] = useState(0);
   const [zCounter, setZCounter] = useState(10);
+  const [showApps, setShowApps] = useState(false);
 
   const c = palette[mode];
 
@@ -712,6 +715,24 @@ export default function AlternusOS() {
     const iv = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(iv);
   }, []);
+
+  // Boot animation
+  useEffect(() => {
+    if (!isBooting) return;
+    const start = Date.now();
+    const duration = 2500;
+    const animate = () => {
+      const elapsed = Date.now() - start;
+      const progress = Math.min(elapsed / duration, 1);
+      setBootProgress(progress);
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setTimeout(() => setIsBooting(false), 300);
+      }
+    };
+    requestAnimationFrame(animate);
+  }, [isBooting]);
 
   const fmt = (d: Date) => d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
 
@@ -774,6 +795,44 @@ export default function AlternusOS() {
     { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec },
   ];
 
+  // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  if (isBooting) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden" style={{ background: "#000" }}>
+        {/* Alternus logo */}
+        <h1
+          className="text-5xl md:text-6xl font-semibold mb-12 select-none"
+          style={{
+            background: "linear-gradient(90deg, #555 0%, #fff 50%, #555 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            opacity: 0.6 + bootProgress * 0.4,
+          }}
+        >
+          Alternus
+        </h1>
+
+        {/* Neon blue progress bar */}
+        <div className="w-64 h-[3px] rounded-full overflow-hidden" style={{ background: "#1a1a1a" }}>
+          <div
+            className="h-full rounded-full"
+            style={{
+              width: `${bootProgress * 100}%`,
+              background: "linear-gradient(90deg, #7C3AED, #3B82F6, #06B6D4)",
+              boxShadow: "0 0 12px #3B82F6, 0 0 24px rgba(59,130,246,0.4)",
+              transition: "width 0.1s linear",
+            }}
+          />
+        </div>
+
+        <p className="mt-4 text-xs" style={{ color: "#555" }}>
+          {bootProgress < 0.3 ? "Initializing..." : bootProgress < 0.7 ? "Loading AI Engine..." : bootProgress < 1 ? "Starting Desktop..." : "Ready"}
+        </p>
+      </div>
+    );
+  }
+
   // ━━━━ LOCK SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   if (isLocked) {
     return (
@@ -819,10 +878,10 @@ export default function AlternusOS() {
       <div className="flex-1 relative overflow-hidden">
         {/* Center: Alternus branding + AI Search */}
         {!wins.some(w => w.isOpen && !w.isMinimized) && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-[0]">
-            {/* Alternus gradient text */}
+          <div className="absolute inset-0 flex flex-col items-center z-[0]" style={{ paddingTop: "12vh" }}>
+            {/* Alternus gradient text - LARGER */}
             <h1
-              className="text-7xl md:text-8xl font-semibold mb-8 select-none"
+              className="text-8xl md:text-9xl font-semibold mb-4 select-none"
               style={{
                 background: mode === "dark"
                   ? "linear-gradient(90deg, #555 0%, #fff 50%, #555 100%)"
@@ -832,22 +891,22 @@ export default function AlternusOS() {
                 backgroundClip: "text",
               }}
             >
-              Alternus<span className="text-lg align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
+              Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
             </h1>
 
             {/* Welcome message */}
-            <p className="text-base font-light mb-8" style={{ color: c.textSec }}>
+            <p className="text-base font-light mb-10" style={{ color: c.textSec }}>
               Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}. What would you like to create today?
             </p>
 
-            {/* AI Search Bar */}
+            {/* AI Search Bar - LARGER, lower */}
             <div
-              className="w-full max-w-xl flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all"
+              className="w-full max-w-2xl flex items-center gap-3 px-6 py-4 rounded-2xl transition-all"
               style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)" }}
             >
-              <I d={ic.search} s={18} c={c.textMuted} />
+              <I d={ic.search} s={20} c={c.textMuted} />
               <input
-                className="flex-1 bg-transparent outline-none text-sm"
+                className="flex-1 bg-transparent outline-none text-base"
                 style={{ color: c.text }}
                 placeholder="Search or ask AI anything..."
                 onKeyDown={(e) => {
@@ -856,27 +915,52 @@ export default function AlternusOS() {
                   }
                 }}
               />
-              <div className="flex items-center gap-1.5">
-                <span className="px-2 py-0.5 rounded-md text-[10px] font-medium" style={{ background: c.cardAlt, color: c.textMuted, border: `1px solid ${c.border}` }}>⌘K</span>
-              </div>
+              <button
+                onClick={() => openWin("ai")}
+                className="p-2 rounded-xl transition-all hover:opacity-90 active:scale-95"
+                style={{ background: c.accent }}
+              >
+                <I d={ic.send} s={16} c="#fff" />
+              </button>
             </div>
 
-            {/* Quick app launcher grid */}
-            <div className="flex flex-wrap items-center justify-center gap-3 mt-8 max-w-2xl">
-              {dockApps.map(app => (
-                <button
-                  key={app.id}
-                  onClick={() => openWin(app.id)}
-                  className="flex flex-col items-center gap-1.5 w-16 py-2 rounded-xl transition-all hover:scale-105 active:scale-95"
-                  onMouseEnter={e => (e.currentTarget.style.background = mode === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)")}
-                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-                >
-                  <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-                    <I d={app.icon} s={18} c={app.color} />
-                  </div>
-                  <span className="text-[10px] font-medium" style={{ color: c.textMuted }}>{app.label}</span>
-                </button>
-              ))}
+            {/* Arrow up to show apps */}
+            <button
+              onClick={() => setShowApps(!showApps)}
+              className="mt-6 flex flex-col items-center gap-1 transition-all hover:opacity-80"
+              style={{ color: c.textMuted }}
+            >
+              <span className="text-[11px]">{showApps ? "Hide Apps" : "Apps"}</span>
+              <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+                style={{ transform: showApps ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s ease" }}>
+                <path d="M18 15l-6-6-6 6" />
+              </svg>
+            </button>
+
+            {/* Apps panel - horizontal, slides in */}
+            <div
+              className="mt-2 overflow-hidden transition-all duration-300 ease-in-out"
+              style={{
+                maxHeight: showApps ? 120 : 0,
+                opacity: showApps ? 1 : 0,
+              }}
+            >
+              <div className="flex items-center gap-2 px-4 py-3 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                {dockApps.map(app => (
+                  <button
+                    key={app.id}
+                    onClick={() => { openWin(app.id); setShowApps(false); }}
+                    className="flex flex-col items-center gap-1 w-14 py-1.5 rounded-xl transition-all hover:scale-105 active:scale-95"
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+                      <I d={app.icon} s={17} c={app.color} />
+                    </div>
+                    <span className="text-[9px] font-medium" style={{ color: c.textMuted }}>{app.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
