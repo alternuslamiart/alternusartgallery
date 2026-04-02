@@ -11,26 +11,26 @@ type ThemeMode = "dark" | "light";
 
 const t = {
   dark: {
-    bg: "#0B0F19",
-    surface: "#111827",
-    card: "#1A2233",
-    cardAlt: "#151D2E",
-    border: "#1E293B",
-    borderLight: "#243044",
+    bg: "#242424",
+    surface: "#2C2C2C",
+    card: "#2C2C2C",
+    cardAlt: "#333333",
+    border: "#3A3A3A",
+    borderLight: "#404040",
     text: "#F1F5F9",
     textSec: "#94A3B8",
     textMuted: "#64748B",
     accent: "#3B82F6",
-    accentSoft: "rgba(59,130,246,0.12)",
+    accentSoft: "rgba(59,130,246,0.15)",
     accentText: "#60A5FA",
     success: "#34D399",
-    successSoft: "rgba(52,211,153,0.12)",
+    successSoft: "rgba(52,211,153,0.15)",
     warning: "#FBBF24",
-    warningSoft: "rgba(251,191,36,0.12)",
+    warningSoft: "rgba(251,191,36,0.15)",
     danger: "#F87171",
-    dangerSoft: "rgba(248,113,113,0.12)",
+    dangerSoft: "rgba(248,113,113,0.15)",
     purple: "#A78BFA",
-    purpleSoft: "rgba(167,139,250,0.12)",
+    purpleSoft: "rgba(167,139,250,0.15)",
   },
   light: {
     bg: "#F8FAFC",
@@ -335,7 +335,7 @@ export default function AlternusOS() {
 
       {/* ── Main Content: Bento Grid ──────────────────── */}
       <div className="flex-1 overflow-y-auto p-4 md:p-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-12 gap-3 md:gap-4 auto-rows-min">
+        <div className="grid grid-cols-12 gap-3 md:gap-4 auto-rows-min">
           {/* ─── AI Assistant (Main Card) ─────────────── */}
           <div
             className="col-span-12 lg:col-span-8 row-span-2 flex flex-col overflow-hidden"
