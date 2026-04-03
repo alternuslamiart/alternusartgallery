@@ -617,12 +617,31 @@ function WeatherApp({ c }: { c: typeof palette.dark }) {
 
 function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void }) {
   const [activeSection, setActiveSection] = useState("Network");
+  const [wifiOn, setWifiOn] = useState(true);
+  const [btOn, setBtOn] = useState(true);
+  const [dndOn, setDndOn] = useState(false);
+  const [locOn, setLocOn] = useState(true);
+  const [autoUpdate, setAutoUpdate] = useState(true);
+  const [activeLang, setActiveLang] = useState(0);
+  const [connectedNet, setConnectedNet] = useState(0);
+
+  const Toggle = ({ on, onToggle }: { on: boolean; onToggle: () => void }) => (
+    <button onClick={onToggle} className="w-10 h-5 rounded-full flex items-center px-0.5 transition-colors" style={{ background: on ? c.accent : c.cardAlt }}>
+      <div className="w-4 h-4 rounded-full bg-white transition-all" style={{ marginLeft: on ? "18px" : "0px" }} />
+    </button>
+  );
+
   const items = [
-    { icon: ic.wifi, label: "Network", desc: "Connected · 5GHz" },
-    { icon: ic.user, label: "Account", desc: "admin@alternus.art" },
-    { icon: ic.globe, label: "Language", desc: "English (US)" },
-    { icon: ic.moon, label: "Appearance", desc: mode === "dark" ? "Dark" : "Light" },
-    { icon: ic.settings, label: "System", desc: "Alternus OS v1.0" },
+    { icon: ic.wifi, label: "Network" },
+    { icon: ic.bluetooth, label: "Bluetooth" },
+    { icon: ic.user, label: "Account" },
+    { icon: ic.bell, label: "Notifications" },
+    { icon: ic.globe, label: "Language" },
+    { icon: ic.moon, label: "Appearance" },
+    { icon: ic.hdd, label: "Storage" },
+    { icon: ic.battery, label: "Battery" },
+    { icon: ic.shield, label: "Privacy" },
+    { icon: ic.settings, label: "System" },
   ];
 
   const renderContent = () => {
@@ -631,32 +650,130 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
         return (
           <div className="p-5 space-y-4 overflow-y-auto h-full">
             <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: c.cardAlt }}>
-              <div><p className="text-sm font-medium" style={{ color: c.text }}>Wi-Fi</p><p className="text-xs" style={{ color: c.textMuted }}>Connected to AlternusNet · 5GHz</p></div>
-              <div className="w-10 h-5 rounded-full flex items-center px-0.5" style={{ background: c.accent }}><div className="w-4 h-4 rounded-full bg-white ml-auto" /></div>
+              <div><p className="text-sm font-medium" style={{ color: c.text }}>Wi-Fi</p><p className="text-xs" style={{ color: c.textMuted }}>{wifiOn ? "Connected to AlternusNet · 5GHz" : "Disabled"}</p></div>
+              <Toggle on={wifiOn} onToggle={() => setWifiOn(!wifiOn)} />
             </div>
-            <div className="space-y-1">
-              <p className="text-xs font-medium px-1 mb-2" style={{ color: c.textMuted }}>Available Networks</p>
-              {["AlternusNet", "Guest_WiFi", "Office_5G"].map((net, i) => (
-                <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl transition-colors" style={{ background: i === 0 ? c.cardAlt : "transparent" }}
-                  onMouseEnter={e => { if (i !== 0) e.currentTarget.style.background = c.cardAlt; }} onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = "transparent"; }}>
-                  <div className="flex items-center gap-3"><I d={ic.wifi} s={16} c={c.textSec} /><span className="text-sm" style={{ color: c.text }}>{net}</span></div>
-                  {i === 0 && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>Connected</span>}
+            {wifiOn && (
+              <>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium px-1 mb-2" style={{ color: c.textMuted }}>Available Networks</p>
+                  {["AlternusNet", "Guest_WiFi", "Office_5G", "Neighbors_Net", "CafeHotspot"].map((net, i) => (
+                    <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl transition-colors cursor-pointer"
+                      style={{ background: i === connectedNet ? c.cardAlt : "transparent" }}
+                      onClick={() => setConnectedNet(i)}
+                      onMouseEnter={e => { if (i !== connectedNet) e.currentTarget.style.background = c.cardAlt; }}
+                      onMouseLeave={e => { if (i !== connectedNet) e.currentTarget.style.background = "transparent"; }}>
+                      <div className="flex items-center gap-3">
+                        <I d={ic.wifi} s={16} c={i <= 2 ? c.textSec : c.textMuted} />
+                        <div>
+                          <span className="text-sm" style={{ color: c.text }}>{net}</span>
+                          {i <= 2 && <p className="text-[9px]" style={{ color: c.textMuted }}>{i === 0 ? "5GHz · Excellent" : i === 1 ? "2.4GHz · Good" : "5GHz · Fair"}</p>}
+                        </div>
+                      </div>
+                      {i === connectedNet && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>Connected</span>}
+                    </div>
+                  ))}
                 </div>
-              ))}
+                <div className="pt-2">
+                  <p className="text-xs font-medium px-1 mb-2" style={{ color: c.textMuted }}>Network Info</p>
+                  {[{ l: "IP Address", v: "192.168.1.42" }, { l: "DNS", v: "1.1.1.1" }, { l: "Speed", v: "866 Mbps" }, { l: "Security", v: "WPA3" }].map((info, i) => (
+                    <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg mb-1" style={{ background: c.cardAlt }}>
+                      <span className="text-[10px]" style={{ color: c.textMuted }}>{info.l}</span>
+                      <span className="text-[10px] font-medium" style={{ color: c.text }}>{info.v}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        );
+      case "Bluetooth":
+        return (
+          <div className="p-5 space-y-4 overflow-y-auto h-full">
+            <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: c.cardAlt }}>
+              <div><p className="text-sm font-medium" style={{ color: c.text }}>Bluetooth</p><p className="text-xs" style={{ color: c.textMuted }}>{btOn ? "On · 2 devices connected" : "Disabled"}</p></div>
+              <Toggle on={btOn} onToggle={() => setBtOn(!btOn)} />
             </div>
+            {btOn && (
+              <>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium px-1 mb-2" style={{ color: c.textMuted }}>Connected Devices</p>
+                  {[{ name: "Alternus Keyboard", type: "Input", battery: 85 }, { name: "AirPods Pro", type: "Audio", battery: 62 }].map((dev, i) => (
+                    <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
+                      <div className="flex items-center gap-3">
+                        <I d={ic.bluetooth} s={16} c={c.accent} />
+                        <div>
+                          <span className="text-sm" style={{ color: c.text }}>{dev.name}</span>
+                          <p className="text-[9px]" style={{ color: c.textMuted }}>{dev.type}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <I d={ic.battery} s={12} c={dev.battery > 50 ? c.success : c.warning} />
+                          <span className="text-[10px]" style={{ color: c.textSec }}>{dev.battery}%</span>
+                        </div>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>Connected</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium px-1 mb-2" style={{ color: c.textMuted }}>Available Devices</p>
+                  {["Magic Mouse", "JBL Speaker", "Samsung TV"].map((dev, i) => (
+                    <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl transition-colors cursor-pointer"
+                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <div className="flex items-center gap-3">
+                        <I d={ic.bluetooth} s={16} c={c.textMuted} />
+                        <span className="text-sm" style={{ color: c.text }}>{dev}</span>
+                      </div>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full cursor-pointer" style={{ background: c.cardAlt, color: c.textSec }}>Pair</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         );
       case "Account":
         return (
           <div className="p-5 space-y-4 overflow-y-auto h-full">
             <div className="flex items-center gap-4 p-4 rounded-xl" style={{ background: c.cardAlt }}>
-              <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: c.accentSoft, color: c.accentText }}><I d={ic.user} s={28} /></div>
-              <div><p className="text-sm font-medium" style={{ color: c.text }}>Admin</p><p className="text-xs" style={{ color: c.textMuted }}>admin@alternus.art</p></div>
+              <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: c.accentSoft, color: c.accentText }}><I d={ic.user} s={32} /></div>
+              <div>
+                <p className="text-sm font-medium" style={{ color: c.text }}>Admin</p>
+                <p className="text-xs" style={{ color: c.textMuted }}>admin@alternus.art</p>
+                <p className="text-[10px] mt-1 px-2 py-0.5 rounded-full inline-block" style={{ background: c.accentSoft, color: c.accentText }}>Administrator</p>
+              </div>
             </div>
-            {[{ l: "Display Name", v: "Admin" }, { l: "Email", v: "admin@alternus.art" }, { l: "Role", v: "Administrator" }].map((f, i) => (
+            {[{ l: "Display Name", v: "Admin" }, { l: "Email", v: "admin@alternus.art" }, { l: "Role", v: "Administrator" }, { l: "Created", v: "January 15, 2025" }, { l: "Last Login", v: "Today at 03:06" }].map((f, i) => (
               <div key={i} className="px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
                 <p className="text-[10px] mb-1" style={{ color: c.textMuted }}>{f.l}</p>
                 <p className="text-sm" style={{ color: c.text }}>{f.v}</p>
+              </div>
+            ))}
+            <div className="flex gap-2 pt-2">
+              <button className="flex-1 py-2.5 rounded-xl text-xs font-medium" style={{ background: c.cardAlt, color: c.text }}>Edit Profile</button>
+              <button className="flex-1 py-2.5 rounded-xl text-xs font-medium" style={{ background: c.cardAlt, color: c.danger }}>Sign Out</button>
+            </div>
+          </div>
+        );
+      case "Notifications":
+        return (
+          <div className="p-5 space-y-4 overflow-y-auto h-full">
+            <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: c.cardAlt }}>
+              <div><p className="text-sm font-medium" style={{ color: c.text }}>Do Not Disturb</p><p className="text-xs" style={{ color: c.textMuted }}>{dndOn ? "All notifications muted" : "Notifications enabled"}</p></div>
+              <Toggle on={dndOn} onToggle={() => setDndOn(!dndOn)} />
+            </div>
+            <p className="text-xs font-medium px-1" style={{ color: c.textMuted }}>App Notifications</p>
+            {[{ app: "AI Assistant", icon: ic.sparkle, on: true }, { app: "Calendar", icon: ic.calendar, on: true }, { app: "Browser", icon: ic.globe, on: false }, { app: "Music", icon: ic.music, on: false }, { app: "System Updates", icon: ic.refresh, on: true }].map((n, i) => (
+              <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
+                <div className="flex items-center gap-3">
+                  <I d={n.icon} s={16} c={c.textSec} />
+                  <span className="text-sm" style={{ color: c.text }}>{n.app}</span>
+                </div>
+                <div className="w-8 h-4 rounded-full flex items-center px-0.5" style={{ background: n.on ? c.accent : c.cardAlt, border: n.on ? "none" : `1px solid ${c.border}` }}>
+                  <div className="w-3 h-3 rounded-full bg-white transition-all" style={{ marginLeft: n.on ? "12px" : "0px" }} />
+                </div>
               </div>
             ))}
           </div>
@@ -664,11 +781,15 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
       case "Language":
         return (
           <div className="p-5 space-y-1 overflow-y-auto h-full">
-            {["English (US)", "Shqip", "Deutsch", "Français", "Español", "日本語"].map((lang, i) => (
+            <p className="text-xs font-medium px-1 mb-3" style={{ color: c.textMuted }}>Select Language</p>
+            {["English (US)", "Shqip", "Deutsch", "Français", "Español", "Italiano", "Português", "中文", "日本語", "العربية", "한국어", "Türkçe"].map((lang, i) => (
               <button key={i} className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-left transition-colors"
-                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                <span className="text-sm" style={{ color: c.text }}>{lang}</span>
-                {i === 0 && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>Active</span>}
+                onClick={() => setActiveLang(i)}
+                style={{ background: activeLang === i ? c.accentSoft : "transparent" }}
+                onMouseEnter={e => { if (activeLang !== i) e.currentTarget.style.background = c.cardAlt; }}
+                onMouseLeave={e => { if (activeLang !== i) e.currentTarget.style.background = "transparent"; }}>
+                <span className="text-sm" style={{ color: activeLang === i ? c.accentText : c.text }}>{lang}</span>
+                {activeLang === i && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>Active</span>}
               </button>
             ))}
           </div>
@@ -692,6 +813,117 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
                 <div key={col} className="w-8 h-8 rounded-full cursor-pointer transition-transform hover:scale-110" style={{ background: col, border: col === c.accent ? "3px solid " + c.text : "3px solid transparent" }} />
               ))}
             </div>
+            <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Wallpaper</p>
+            <div className="grid grid-cols-3 gap-2">
+              {["#1a1a2e", "#16213e", "#0f3460", "#242424", "#1b1b2f", "#162447"].map((col, i) => (
+                <div key={i} className="h-16 rounded-xl cursor-pointer transition-transform hover:scale-105" style={{ background: col, border: i === 3 ? `2px solid ${c.accent}` : `2px solid transparent` }} />
+              ))}
+            </div>
+            <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Font Size</p>
+            <div className="flex gap-2">
+              {["Small", "Medium", "Large"].map((s, i) => (
+                <button key={s} className="flex-1 py-2 rounded-xl text-xs font-medium transition-all"
+                  style={{ background: i === 1 ? c.accentSoft : c.cardAlt, color: i === 1 ? c.accentText : c.textSec, border: i === 1 ? `1px solid ${c.accent}` : `1px solid transparent` }}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      case "Storage":
+        return (
+          <div className="p-5 space-y-4 overflow-y-auto h-full">
+            <div className="p-4 rounded-xl" style={{ background: c.cardAlt }}>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium" style={{ color: c.text }}>Internal Storage</p>
+                <p className="text-xs" style={{ color: c.textMuted }}>278 GB / 512 GB used</p>
+              </div>
+              <div className="h-3 rounded-full overflow-hidden flex" style={{ background: c.border }}>
+                <div style={{ width: "30%", background: c.accent }} />
+                <div style={{ width: "15%", background: c.purple }} />
+                <div style={{ width: "8%", background: c.warning }} />
+                <div style={{ width: "2%", background: c.danger }} />
+              </div>
+              <div className="flex gap-4 mt-3 flex-wrap">
+                {[{ label: "Apps", color: c.accent, size: "154 GB" }, { label: "Media", color: c.purple, size: "77 GB" }, { label: "Documents", color: c.warning, size: "41 GB" }, { label: "Other", color: c.danger, size: "6 GB" }].map((cat, i) => (
+                  <div key={i} className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: cat.color }} />
+                    <span className="text-[10px]" style={{ color: c.textSec }}>{cat.label} · {cat.size}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="text-xs font-medium px-1" style={{ color: c.textMuted }}>Storage Breakdown</p>
+            {[{ name: "Applications", size: "154 GB", icon: ic.store }, { name: "Photos & Videos", size: "52 GB", icon: ic.film }, { name: "Music", size: "25 GB", icon: ic.music }, { name: "Documents", size: "41 GB", icon: ic.fileText }, { name: "System", size: "12 GB", icon: ic.settings }, { name: "Cache", size: "3.2 GB", icon: ic.refresh }].map((item, i) => (
+              <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
+                <div className="flex items-center gap-3">
+                  <I d={item.icon} s={16} c={c.textSec} />
+                  <span className="text-sm" style={{ color: c.text }}>{item.name}</span>
+                </div>
+                <span className="text-xs" style={{ color: c.textMuted }}>{item.size}</span>
+              </div>
+            ))}
+          </div>
+        );
+      case "Battery":
+        return (
+          <div className="p-5 space-y-4 overflow-y-auto h-full">
+            <div className="p-4 rounded-xl text-center" style={{ background: c.cardAlt }}>
+              <p className="text-4xl font-bold mb-1" style={{ color: c.success }}>87%</p>
+              <p className="text-xs" style={{ color: c.textMuted }}>Estimated 6h 42m remaining</p>
+              <div className="h-2 rounded-full mt-3 overflow-hidden" style={{ background: c.border }}>
+                <div className="h-full rounded-full" style={{ width: "87%", background: c.success }} />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button className="flex-1 py-3 rounded-xl text-xs font-medium text-center" style={{ background: c.cardAlt, color: c.text }}>Power Saver</button>
+              <button className="flex-1 py-3 rounded-xl text-xs font-medium text-center" style={{ background: c.accentSoft, color: c.accentText, border: `1px solid ${c.accent}` }}>Balanced</button>
+              <button className="flex-1 py-3 rounded-xl text-xs font-medium text-center" style={{ background: c.cardAlt, color: c.text }}>Performance</button>
+            </div>
+            <p className="text-xs font-medium px-1" style={{ color: c.textMuted }}>Battery Usage</p>
+            {[{ app: "Browser", pct: 34, icon: ic.globe }, { app: "Code Editor", pct: 22, icon: ic.code }, { app: "AI Assistant", pct: 18, icon: ic.sparkle }, { app: "Display", pct: 15, icon: ic.monitor }, { app: "System", pct: 11, icon: ic.settings }].map((item, i) => (
+              <div key={i} className="px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2"><I d={item.icon} s={14} c={c.textSec} /><span className="text-xs" style={{ color: c.text }}>{item.app}</span></div>
+                  <span className="text-xs" style={{ color: c.textMuted }}>{item.pct}%</span>
+                </div>
+                <div className="h-1.5 rounded-full" style={{ background: c.border }}>
+                  <div className="h-full rounded-full" style={{ width: `${item.pct}%`, background: c.accent }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      case "Privacy":
+        return (
+          <div className="p-5 space-y-4 overflow-y-auto h-full">
+            <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: c.cardAlt }}>
+              <div><p className="text-sm font-medium" style={{ color: c.text }}>Location Services</p><p className="text-xs" style={{ color: c.textMuted }}>{locOn ? "Enabled for 3 apps" : "Disabled"}</p></div>
+              <Toggle on={locOn} onToggle={() => setLocOn(!locOn)} />
+            </div>
+            <p className="text-xs font-medium px-1" style={{ color: c.textMuted }}>App Permissions</p>
+            {[{ app: "Browser", perms: ["Camera", "Location", "Mic"] }, { app: "AI Assistant", perms: ["Files", "Mic"] }, { app: "Weather", perms: ["Location"] }, { app: "Music", perms: ["Storage"] }].map((item, i) => (
+              <div key={i} className="px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-sm" style={{ color: c.text }}>{item.app}</span>
+                  <span className="text-[10px]" style={{ color: c.textMuted }}>{item.perms.length} permissions</span>
+                </div>
+                <div className="flex gap-1.5 flex-wrap">
+                  {item.perms.map(p => (
+                    <span key={p} className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>{p}</span>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className="pt-2 space-y-2">
+              <p className="text-xs font-medium px-1" style={{ color: c.textMuted }}>Security</p>
+              {[{ l: "Firewall", v: "Active" }, { l: "Encryption", v: "AES-256" }, { l: "Last Scan", v: "Today, 02:14" }, { l: "Threats Found", v: "0" }].map((info, i) => (
+                <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: c.cardAlt }}>
+                  <span className="text-[10px]" style={{ color: c.textMuted }}>{info.l}</span>
+                  <span className="text-[10px] font-medium" style={{ color: info.l === "Threats Found" ? c.success : c.text }}>{info.v}</span>
+                </div>
+              ))}
+            </div>
           </div>
         );
       case "System":
@@ -699,7 +931,7 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
           <div className="p-5 space-y-5 overflow-y-auto h-full">
             {/* Quick Toggles */}
             <div className="flex gap-2">
-              {[{ icon: ic.wifi, label: "Wi-Fi", active: true }, { icon: ic.bluetooth, label: "Bluetooth", active: true }, { icon: ic.moon, label: "Night", active: false }, { icon: ic.sun, label: "Bright", active: false }].map((t, i) => (
+              {[{ icon: ic.wifi, label: "Wi-Fi", active: wifiOn }, { icon: ic.bluetooth, label: "Bluetooth", active: btOn }, { icon: ic.moon, label: "Night", active: false }, { icon: ic.sun, label: "Bright", active: false }].map((t, i) => (
                 <button key={i} className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all"
                   style={{ background: t.active ? c.accent : c.cardAlt, color: t.active ? "#fff" : c.textSec }}>
                   <I d={t.icon} s={18} />
@@ -720,10 +952,15 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
                 </div>
               </div>
             ))}
+            {/* Updates */}
+            <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: c.cardAlt }}>
+              <div><p className="text-sm font-medium" style={{ color: c.text }}>Auto Updates</p><p className="text-xs" style={{ color: c.textMuted }}>{autoUpdate ? "Keep system up to date" : "Manual updates only"}</p></div>
+              <Toggle on={autoUpdate} onToggle={() => setAutoUpdate(!autoUpdate)} />
+            </div>
             {/* System Info */}
             <div className="pt-2 space-y-2">
               <p className="text-[10px] font-medium px-1" style={{ color: c.textMuted }}>System Info</p>
-              {[{ l: "OS Version", v: "Alternus OS v1.0" }, { l: "Kernel", v: "AlternusKernel 6.2" }, { l: "Memory", v: "16 GB DDR5" }, { l: "Storage", v: "512 GB — 234 GB free" }].map((info, i) => (
+              {[{ l: "OS Version", v: "Alternus OS v1.0" }, { l: "Kernel", v: "AlternusKernel 6.2" }, { l: "CPU", v: "AlternusCPU 12-Core" }, { l: "GPU", v: "AlternusGPU Pro 16GB" }, { l: "Memory", v: "16 GB DDR5" }, { l: "Storage", v: "512 GB — 234 GB free" }, { l: "Uptime", v: "2h 14m" }].map((info, i) => (
                 <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: c.cardAlt }}>
                   <span className="text-[10px]" style={{ color: c.textMuted }}>{info.l}</span>
                   <span className="text-[10px] font-medium" style={{ color: c.text }}>{info.v}</span>
@@ -743,13 +980,13 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
       <div className="w-[170px] flex-shrink-0 flex flex-col py-3 px-2 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}` }}>
         <p className="text-sm font-semibold px-3 mb-3" style={{ color: c.accentText }}>Settings</p>
         {items.map((it, i) => (
-          <button key={i} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors mb-0.5"
+          <button key={i} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-colors mb-0.5"
             onClick={() => setActiveSection(it.label)}
             style={{ background: activeSection === it.label ? c.accentSoft : "transparent" }}
             onMouseEnter={e => { if (activeSection !== it.label) e.currentTarget.style.background = c.cardAlt; }}
             onMouseLeave={e => { if (activeSection !== it.label) e.currentTarget.style.background = "transparent"; }}>
-            <I d={it.icon} s={16} c={activeSection === it.label ? c.accentText : c.textSec} />
-            <span className="text-xs font-medium" style={{ color: activeSection === it.label ? c.accentText : c.text }}>{it.label}</span>
+            <I d={it.icon} s={15} c={activeSection === it.label ? c.accentText : c.textSec} />
+            <span className="text-[11px] font-medium" style={{ color: activeSection === it.label ? c.accentText : c.text }}>{it.label}</span>
           </button>
         ))}
       </div>
