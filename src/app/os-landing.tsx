@@ -4,25 +4,49 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 // ━━━━ Palette (matches /os page) ━━━━━━━━━━━━━━━━━━━━━━━━━━
-const c = {
-  bg: "#242424",
-  bgDeep: "#1a1a1a",
-  surface: "#2C2C2C",
-  card: "#2C2C2C",
-  cardAlt: "#333333",
-  border: "#3A3A3A",
-  text: "#F1F5F9",
-  textSec: "#A0A0A0",
-  textMuted: "#707070",
-  accent: "#3B82F6",
-  accentHover: "#2563EB",
-  accentSoft: "rgba(59,130,246,0.15)",
-  accentText: "#60A5FA",
-  success: "#34D399",
-  warning: "#FBBF24",
-  danger: "#F87171",
-  purple: "#A78BFA",
+const themes = {
+  dark: {
+    bg: "#242424",
+    bgDeep: "#1a1a1a",
+    surface: "#2C2C2C",
+    card: "#2C2C2C",
+    cardAlt: "#333333",
+    border: "#3A3A3A",
+    text: "#F1F5F9",
+    textSec: "#A0A0A0",
+    textMuted: "#707070",
+    accent: "#3B82F6",
+    accentHover: "#2563EB",
+    accentSoft: "rgba(59,130,246,0.15)",
+    accentText: "#60A5FA",
+    success: "#34D399",
+    warning: "#FBBF24",
+    danger: "#F87171",
+    purple: "#A78BFA",
+  },
+  light: {
+    bg: "#F5F5F7",
+    bgDeep: "#FFFFFF",
+    surface: "#FFFFFF",
+    card: "#FFFFFF",
+    cardAlt: "#F0F0F2",
+    border: "#D4D4D8",
+    text: "#18181B",
+    textSec: "#52525B",
+    textMuted: "#A1A1AA",
+    accent: "#3B82F6",
+    accentHover: "#2563EB",
+    accentSoft: "rgba(59,130,246,0.1)",
+    accentText: "#2563EB",
+    success: "#10B981",
+    warning: "#F59E0B",
+    danger: "#EF4444",
+    purple: "#8B5CF6",
+  },
 };
+
+// Default for static references (overridden by theme state at runtime)
+const c = themes.dark;
 
 // ━━━━ SVG Icon helper ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function I({ d, s = 16, color }: { d: string; s?: number; color?: string }) {
@@ -135,6 +159,8 @@ function Section({ children, id, className = "" }: { children: React.ReactNode; 
 export default function OSLandingPage() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const t = themes[theme];
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 20);
@@ -151,42 +177,42 @@ export default function OSLandingPage() {
   ];
 
   return (
-    <div style={{ background: c.bg, color: c.text, minHeight: "100vh" }} className="font-[family-name:var(--font-geist-sans)]">
+    <div style={{ background: t.bg, color: t.text, minHeight: "100vh" }} className="font-[family-name:var(--font-geist-sans)]">
       {/* ── Nav ── */}
       <nav
         style={{
-          background: scrolled ? "rgba(36,36,36,0.95)" : "transparent",
+          background: scrolled ? (theme === "dark" ? "rgba(36,36,36,0.95)" : "rgba(245,245,247,0.95)") : "transparent",
           backdropFilter: scrolled ? "blur(12px)" : "none",
-          borderBottom: scrolled ? `1px solid ${c.border}` : "1px solid transparent",
+          borderBottom: scrolled ? `1px solid ${t.border}` : "1px solid transparent",
           transition: "all 0.3s ease",
         }}
         className="fixed top-0 left-0 right-0 z-50 px-6 h-14 flex items-center justify-between"
       >
         <Link href="/" className="flex items-center gap-2 no-underline">
-          <span style={{ color: c.text }} className="text-sm font-bold tracking-widest">ALTERNUS</span>
-          <span style={{ color: c.textMuted }} className="text-sm font-light tracking-widest">OS</span>
+          <span style={{ color: t.text }} className="text-sm font-bold tracking-widest">ALTERNUS</span>
+          <span style={{ color: t.textMuted }} className="text-sm font-light tracking-widest">OS</span>
         </Link>
 
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-6">
           {navLinks.map(l => (
-            <a key={l.label} href={l.href} style={{ color: c.textSec }} className="text-sm no-underline hover:opacity-80 transition-opacity">
+            <a key={l.label} href={l.href} style={{ color: t.textSec }} className="text-sm no-underline hover:opacity-80 transition-opacity">
               {l.label}
             </a>
           ))}
           <Link
             href="/os"
             className="text-sm font-medium no-underline px-4 py-1.5 rounded-lg transition-all"
-            style={{ background: c.accent, color: "#fff" }}
-            onMouseEnter={e => (e.currentTarget.style.background = c.accentHover)}
-            onMouseLeave={e => (e.currentTarget.style.background = c.accent)}
+            style={{ background: t.accent, color: "#fff" }}
+            onMouseEnter={e => (e.currentTarget.style.background = t.accentHover)}
+            onMouseLeave={e => (e.currentTarget.style.background = t.accent)}
           >
             Try OS
           </Link>
         </div>
 
         {/* Mobile hamburger */}
-        <button className="md:hidden" style={{ color: c.textSec }} onClick={() => setMobileMenu(!mobileMenu)}>
+        <button className="md:hidden" style={{ color: t.textSec }} onClick={() => setMobileMenu(!mobileMenu)}>
           <I d={mobileMenu ? ic.close : ic.menu} s={22} />
         </button>
       </nav>
@@ -195,7 +221,7 @@ export default function OSLandingPage() {
       {mobileMenu && (
         <div
           className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-6 md:hidden"
-          style={{ background: "rgba(26,26,26,0.97)", backdropFilter: "blur(8px)" }}
+          style={{ background: theme === "dark" ? "rgba(26,26,26,0.97)" : "rgba(245,245,247,0.97)", backdropFilter: "blur(8px)" }}
         >
           {navLinks.map(l => (
             <a
@@ -203,7 +229,7 @@ export default function OSLandingPage() {
               href={l.href}
               onClick={() => setMobileMenu(false)}
               className="text-xl no-underline"
-              style={{ color: c.text }}
+              style={{ color: t.text }}
             >
               {l.label}
             </a>
@@ -212,7 +238,7 @@ export default function OSLandingPage() {
             href="/os"
             onClick={() => setMobileMenu(false)}
             className="text-lg font-medium no-underline px-6 py-2 rounded-lg mt-4"
-            style={{ background: c.accent, color: "#fff" }}
+            style={{ background: t.accent, color: "#fff" }}
           >
             Try OS
           </Link>
@@ -227,18 +253,18 @@ export default function OSLandingPage() {
           style={{ background: "radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)" }}
         />
 
-        <p style={{ color: c.textMuted }} className="text-xs tracking-[0.3em] uppercase mb-4">
+        <p style={{ color: t.textMuted }} className="text-xs tracking-[0.3em] uppercase mb-4">
           The Future of Desktop Computing
         </p>
 
         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-center mb-4">
-          <span style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #A0A0A0 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+          <span style={{ background: theme === "dark" ? "linear-gradient(180deg, #FFFFFF 0%, #A0A0A0 100%)" : "linear-gradient(180deg, #18181B 0%, #52525B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             ALTERNUS
           </span>
-          <span style={{ color: c.textMuted }} className="font-light ml-3">OS</span>
+          <span style={{ color: t.textMuted }} className="font-light ml-3">OS</span>
         </h1>
 
-        <p style={{ color: c.textSec }} className="text-lg md:text-xl text-center max-w-xl mb-8">
+        <p style={{ color: t.textSec }} className="text-lg md:text-xl text-center max-w-xl mb-8">
           AI-powered desktop operating system in your browser. Window management, 13+ apps, and an assistant that understands your workflow.
         </p>
 
@@ -246,211 +272,199 @@ export default function OSLandingPage() {
           <Link
             href="/os"
             className="px-7 py-3 rounded-lg text-sm font-medium no-underline flex items-center gap-2 transition-all"
-            style={{ background: c.accent, color: "#fff" }}
-            onMouseEnter={e => (e.currentTarget.style.background = c.accentHover)}
-            onMouseLeave={e => (e.currentTarget.style.background = c.accent)}
+            style={{ background: t.accent, color: "#fff" }}
+            onMouseEnter={e => (e.currentTarget.style.background = t.accentHover)}
+            onMouseLeave={e => (e.currentTarget.style.background = t.accent)}
           >
             Try Alternus OS <I d={ic.arrowRight} s={14} />
           </Link>
           <a
             href="#pricing"
             className="px-7 py-3 rounded-lg text-sm font-medium no-underline transition-all text-center"
-            style={{ border: `1px solid ${c.border}`, color: c.text }}
-            onMouseEnter={e => (e.currentTarget.style.borderColor = c.accent)}
-            onMouseLeave={e => (e.currentTarget.style.borderColor = c.border)}
+            style={{ border: `1px solid ${t.border}`, color: t.text }}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = t.accent)}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = t.border)}
           >
             View Pricing
           </a>
         </div>
 
-        {/* OS Mockup */}
-        <div
-          className="relative w-full max-w-4xl mx-auto rounded-xl overflow-hidden"
-          style={{ border: `1px solid ${c.border}`, background: c.bgDeep, boxShadow: "0 24px 80px rgba(0,0,0,0.5)" }}
-        >
-          {/* Taskbar */}
-          <div className="flex items-center justify-between px-4 h-8" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
-            <div className="flex items-center gap-3">
-              <span style={{ color: c.text }} className="text-[10px] font-bold tracking-widest">ALTERNUS</span>
-              <span style={{ color: c.textMuted }} className="text-[10px] font-light tracking-wider">OS</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <span style={{ color: c.textMuted }} className="text-[10px] font-mono">02:22 - Apr 3</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span style={{ color: c.success }} className="text-[9px] font-mono">GPU 0%</span>
-              <span style={{ color: c.accentText }} className="text-[9px] font-mono">CPU 2%</span>
-              <span style={{ color: c.textMuted }} className="text-[9px] font-mono">46°C</span>
-            </div>
-          </div>
-
-          {/* Desktop area */}
-          <div className="relative h-[280px] sm:h-[340px] md:h-[400px] p-3">
-            {/* Browser window */}
-            <div
-              className="absolute rounded-lg overflow-hidden"
-              style={{
-                top: "12px", left: "12px", width: "45%", height: "65%",
-                background: c.surface, border: `1px solid ${c.border}`,
-                boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
-              }}
-            >
-              <div className="flex items-center justify-between px-2 h-6" style={{ background: c.card, borderBottom: `1px solid ${c.border}` }}>
-                <span style={{ color: c.textSec }} className="text-[9px]">Browser</span>
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full" style={{ background: c.textMuted }} />
-                  <div className="w-2 h-2 rounded-full" style={{ background: c.textMuted }} />
-                  <div className="w-2 h-2 rounded-full" style={{ background: c.danger }} />
-                </div>
-              </div>
-              <div className="px-2 py-1.5">
-                <div className="rounded h-4 mb-2" style={{ background: c.cardAlt, width: "80%" }} />
-                <div className="flex gap-2 mb-3">
-                  <div className="rounded h-2.5 px-1" style={{ background: c.accentSoft, width: "18%" }}>
-                    <span style={{ color: c.accentText }} className="text-[7px]">Alternus Art</span>
+        {/* 3D Monitor Mockup */}
+        <div className="relative w-full max-w-4xl mx-auto" style={{ perspective: "1200px" }}>
+          {/* Monitor frame */}
+          <div
+            className="relative rounded-2xl overflow-hidden"
+            style={{
+              border: `3px solid ${theme === "dark" ? "#444" : "#ccc"}`,
+              background: theme === "dark" ? "#1a1a1a" : "#222",
+              boxShadow: theme === "dark"
+                ? "0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset"
+                : "0 30px 80px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.3) inset",
+              transform: "rotateX(2deg)",
+              transformOrigin: "center bottom",
+            }}
+          >
+            {/* Screen bezel */}
+            <div className="p-1.5">
+              {/* Actual screen content */}
+              <div className="rounded-lg overflow-hidden" style={{ background: t.bgDeep }}>
+                {/* Taskbar */}
+                <div className="flex items-center justify-between px-4 h-7" style={{ background: t.surface, borderBottom: `1px solid ${t.border}` }}>
+                  <div className="flex items-center gap-3">
+                    <span style={{ color: t.text }} className="text-[9px] font-bold tracking-widest">ALTERNUS</span>
+                    <span style={{ color: t.textMuted }} className="text-[9px] font-light tracking-wider">OS</span>
                   </div>
-                  <div className="rounded h-2.5" style={{ background: c.cardAlt, width: "12%" }} />
-                  <div className="rounded h-2.5" style={{ background: c.cardAlt, width: "15%" }} />
+                  <span style={{ color: t.textMuted }} className="text-[9px] font-mono">02:22 - Apr 3</span>
+                  <div className="flex items-center gap-3">
+                    <span style={{ color: t.success }} className="text-[8px] font-mono">GPU 0%</span>
+                    <span style={{ color: t.accentText }} className="text-[8px] font-mono">CPU 2%</span>
+                    <span style={{ color: t.textMuted }} className="text-[8px] font-mono">46°C</span>
+                  </div>
                 </div>
-                <div className="rounded" style={{ background: c.cardAlt, width: "100%", height: "60%" }} />
-              </div>
-            </div>
 
-            {/* Weather window */}
-            <div
-              className="absolute rounded-lg overflow-hidden"
-              style={{
-                top: "12px", right: "12px", width: "28%", height: "55%",
-                background: c.surface, border: `1px solid ${c.border}`,
-                boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
-              }}
-            >
-              <div className="flex items-center justify-between px-2 h-6" style={{ background: c.card, borderBottom: `1px solid ${c.border}` }}>
-                <span style={{ color: c.textSec }} className="text-[9px]">Weather</span>
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full" style={{ background: c.textMuted }} />
-                  <div className="w-2 h-2 rounded-full" style={{ background: c.textMuted }} />
-                  <div className="w-2 h-2 rounded-full" style={{ background: c.danger }} />
-                </div>
-              </div>
-              <div className="flex flex-col items-center py-3">
-                <span style={{ color: c.text }} className="text-2xl font-light">17°</span>
-                <span style={{ color: c.textMuted }} className="text-[9px]">Partly Cloudy</span>
-                <div className="flex gap-3 mt-3">
-                  {["Mon", "Tue", "Wed", "Thu"].map((d, i) => (
-                    <div key={d} className="flex flex-col items-center gap-0.5">
-                      <span style={{ color: c.textMuted }} className="text-[7px]">{d}</span>
-                      <span style={{ color: i === 2 ? c.accent : c.textSec }} className="text-[8px]">{14 + i}°</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Code Editor window */}
-            <div
-              className="absolute rounded-lg overflow-hidden"
-              style={{
-                bottom: "12px", left: "12px", width: "42%", height: "48%",
-                background: c.surface, border: `1px solid ${c.border}`,
-                boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
-              }}
-            >
-              <div className="flex items-center justify-between px-2 h-6" style={{ background: c.card, borderBottom: `1px solid ${c.border}` }}>
-                <span style={{ color: c.textSec }} className="text-[9px]">Code Editor</span>
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full" style={{ background: c.textMuted }} />
-                  <div className="w-2 h-2 rounded-full" style={{ background: c.textMuted }} />
-                  <div className="w-2 h-2 rounded-full" style={{ background: c.danger }} />
-                </div>
-              </div>
-              <div className="px-2 py-1.5 font-mono text-[8px] leading-relaxed">
-                <div><span style={{ color: c.textMuted }}>1</span> <span style={{ color: c.textSec }}>{"// Alternus Code Editor"}</span></div>
-                <div><span style={{ color: c.textMuted }}>2</span></div>
-                <div><span style={{ color: c.textMuted }}>3</span> <span style={{ color: c.purple }}>function</span> <span style={{ color: c.accentText }}>greet</span><span style={{ color: c.textSec }}>(name) {"{"}</span></div>
-                <div><span style={{ color: c.textMuted }}>4</span>   <span style={{ color: c.purple }}>return</span> <span style={{ color: c.success }}>{"`Hello, ${name}!`"}</span></div>
-                <div><span style={{ color: c.textMuted }}>5</span> <span style={{ color: c.textSec }}>{"}"}</span></div>
-              </div>
-            </div>
-
-            {/* Settings window */}
-            <div
-              className="absolute rounded-lg overflow-hidden"
-              style={{
-                bottom: "12px", right: "12px", width: "30%", height: "55%",
-                background: c.surface, border: `1px solid ${c.border}`,
-                boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
-              }}
-            >
-              <div className="flex items-center justify-between px-2 h-6" style={{ background: c.card, borderBottom: `1px solid ${c.border}` }}>
-                <span style={{ color: c.textSec }} className="text-[9px]">Settings</span>
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full" style={{ background: c.textMuted }} />
-                  <div className="w-2 h-2 rounded-full" style={{ background: c.textMuted }} />
-                  <div className="w-2 h-2 rounded-full" style={{ background: c.danger }} />
-                </div>
-              </div>
-              <div className="flex h-full">
-                <div className="w-[40%] py-2 px-1.5" style={{ borderRight: `1px solid ${c.border}` }}>
-                  {["Network", "Account", "Language", "Appearance", "System"].map((s, i) => (
-                    <div
-                      key={s}
-                      className="px-1.5 py-1 rounded text-[7px] mb-0.5"
-                      style={{
-                        background: i === 4 ? c.accentSoft : "transparent",
-                        color: i === 4 ? c.accentText : c.textSec,
-                      }}
-                    >
-                      {s}
-                    </div>
-                  ))}
-                </div>
-                <div className="flex-1 py-2 px-2">
-                  {["Wi-Fi", "Bluetooth", "Sound", "Display"].map((s, i) => (
-                    <div key={s} className="flex items-center justify-between mb-1.5">
-                      <span style={{ color: c.textSec }} className="text-[7px]">{s}</span>
-                      <div className="w-8 h-2 rounded-full" style={{ background: i === 1 ? c.accent : c.cardAlt }}>
-                        <div
-                          className="w-2 h-2 rounded-full transition-all"
-                          style={{
-                            background: i === 1 ? "#fff" : c.textMuted,
-                            marginLeft: i === 1 ? "16px" : "0px",
-                          }}
-                        />
+                {/* Desktop */}
+                <div className="relative h-[240px] sm:h-[300px] md:h-[380px] p-2.5">
+                  {/* Browser */}
+                  <div className="absolute rounded-lg overflow-hidden" style={{ top: 10, left: 10, width: "46%", height: "62%", background: t.surface, border: `1px solid ${t.border}`, boxShadow: "0 4px 20px rgba(0,0,0,0.25)" }}>
+                    <div className="flex items-center justify-between px-2 h-5" style={{ background: t.card, borderBottom: `1px solid ${t.border}` }}>
+                      <span style={{ color: t.textSec }} className="text-[8px]">Browser</span>
+                      <div className="flex gap-0.5">
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.textMuted }} />
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.textMuted }} />
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.danger }} />
                       </div>
                     </div>
-                  ))}
+                    <div className="px-2 py-1">
+                      <div className="rounded h-3 mb-1.5" style={{ background: t.cardAlt, width: "75%" }} />
+                      <div className="flex gap-1.5 mb-2">
+                        <div className="rounded h-2 px-1" style={{ background: t.accentSoft, width: "20%" }}>
+                          <span style={{ color: t.accentText }} className="text-[6px]">Alternus</span>
+                        </div>
+                        <div className="rounded h-2" style={{ background: t.cardAlt, width: "14%" }} />
+                        <div className="rounded h-2" style={{ background: t.cardAlt, width: "14%" }} />
+                      </div>
+                      <div className="rounded h-16" style={{ background: t.cardAlt }} />
+                    </div>
+                  </div>
+
+                  {/* Weather */}
+                  <div className="absolute rounded-lg overflow-hidden" style={{ top: 10, right: 10, width: "27%", height: "50%", background: t.surface, border: `1px solid ${t.border}`, boxShadow: "0 4px 20px rgba(0,0,0,0.25)" }}>
+                    <div className="flex items-center justify-between px-2 h-5" style={{ background: t.card, borderBottom: `1px solid ${t.border}` }}>
+                      <span style={{ color: t.textSec }} className="text-[8px]">Weather</span>
+                      <div className="flex gap-0.5">
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.textMuted }} />
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.textMuted }} />
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.danger }} />
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center py-2">
+                      <span style={{ color: t.text }} className="text-xl font-light">17°</span>
+                      <span style={{ color: t.textMuted }} className="text-[8px]">Partly Cloudy</span>
+                      <div className="flex gap-2 mt-2">
+                        {["Mon", "Tue", "Wed", "Thu"].map((d, i) => (
+                          <div key={d} className="flex flex-col items-center">
+                            <span style={{ color: t.textMuted }} className="text-[6px]">{d}</span>
+                            <span style={{ color: i === 2 ? t.accent : t.textSec }} className="text-[7px]">{14 + i}°</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Code Editor */}
+                  <div className="absolute rounded-lg overflow-hidden" style={{ bottom: 10, left: 10, width: "43%", height: "48%", background: t.surface, border: `1px solid ${t.border}`, boxShadow: "0 4px 20px rgba(0,0,0,0.25)" }}>
+                    <div className="flex items-center justify-between px-2 h-5" style={{ background: t.card, borderBottom: `1px solid ${t.border}` }}>
+                      <span style={{ color: t.textSec }} className="text-[8px]">Code Editor</span>
+                      <div className="flex gap-0.5">
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.textMuted }} />
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.textMuted }} />
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.danger }} />
+                      </div>
+                    </div>
+                    <div className="px-2 py-1 font-mono text-[7px] leading-relaxed">
+                      <div><span style={{ color: t.textMuted }}>1</span> <span style={{ color: t.textSec }}>{"// Alternus Code Editor"}</span></div>
+                      <div><span style={{ color: t.textMuted }}>2</span></div>
+                      <div><span style={{ color: t.textMuted }}>3</span> <span style={{ color: t.purple }}>function</span> <span style={{ color: t.accentText }}>greet</span><span style={{ color: t.textSec }}>(name) {"{"}</span></div>
+                      <div><span style={{ color: t.textMuted }}>4</span>   <span style={{ color: t.purple }}>return</span> <span style={{ color: t.success }}>{"`Hello, ${name}!`"}</span></div>
+                      <div><span style={{ color: t.textMuted }}>5</span> <span style={{ color: t.textSec }}>{"}"}</span></div>
+                    </div>
+                  </div>
+
+                  {/* Settings */}
+                  <div className="absolute rounded-lg overflow-hidden" style={{ bottom: 10, right: 10, width: "29%", height: "52%", background: t.surface, border: `1px solid ${t.border}`, boxShadow: "0 4px 20px rgba(0,0,0,0.25)" }}>
+                    <div className="flex items-center justify-between px-2 h-5" style={{ background: t.card, borderBottom: `1px solid ${t.border}` }}>
+                      <span style={{ color: t.textSec }} className="text-[8px]">Settings</span>
+                      <div className="flex gap-0.5">
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.textMuted }} />
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.textMuted }} />
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: t.danger }} />
+                      </div>
+                    </div>
+                    <div className="flex h-[calc(100%-20px)]">
+                      <div className="w-[42%] py-1.5 px-1" style={{ borderRight: `1px solid ${t.border}` }}>
+                        {["Network", "Account", "Language", "Appearance", "System"].map((s, i) => (
+                          <div key={s} className="px-1 py-0.5 rounded text-[6px] mb-0.5" style={{ background: i === 4 ? t.accentSoft : "transparent", color: i === 4 ? t.accentText : t.textSec }}>{s}</div>
+                        ))}
+                      </div>
+                      <div className="flex-1 py-1.5 px-1.5">
+                        {["Wi-Fi", "Bluetooth", "Sound", "Display"].map((s, i) => (
+                          <div key={s} className="flex items-center justify-between mb-1">
+                            <span style={{ color: t.textSec }} className="text-[6px]">{s}</span>
+                            <div className="w-6 h-1.5 rounded-full" style={{ background: i === 1 ? t.accent : t.cardAlt }}>
+                              <div className="w-1.5 h-1.5 rounded-full" style={{ background: i === 1 ? "#fff" : t.textMuted, marginLeft: i === 1 ? "12px" : "0px" }} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* AI Bar */}
+                <div className="flex items-center justify-center px-3 h-8" style={{ background: t.surface, borderTop: `1px solid ${t.border}` }}>
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full max-w-sm w-full" style={{ background: t.accentSoft, border: `1px solid ${t.accent}30` }}>
+                    <I d={ic.sparkle} s={10} color={t.accent} />
+                    <span style={{ color: t.textSec }} className="text-[9px] flex-1">AI: Opening browser. Want me to also open Notes?</span>
+                    <span className="text-[8px] px-2 py-0.5 rounded-md font-medium" style={{ background: t.accent, color: "#fff" }}>Open Notes</span>
+                    <span className="text-[8px] px-2 py-0.5 rounded-md" style={{ background: t.cardAlt, color: t.textSec }}>No thanks</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* AI Bar */}
-          <div className="flex items-center justify-center px-4 h-10" style={{ background: c.surface, borderTop: `1px solid ${c.border}` }}>
+          {/* Monitor stand */}
+          <div className="flex flex-col items-center">
+            {/* Neck */}
             <div
-              className="flex items-center gap-3 px-4 py-1.5 rounded-full max-w-md w-full"
-              style={{ background: c.accentSoft, border: `1px solid ${c.accent}30` }}
-            >
-              <I d={ic.sparkle} s={12} color={c.accent} />
-              <span style={{ color: c.textSec }} className="text-[10px] flex-1">
-                AI: Opening browser. Want me to also open Notes?
-              </span>
-              <button className="text-[9px] px-2.5 py-0.5 rounded-md font-medium" style={{ background: c.accent, color: "#fff" }}>
-                Open Notes
-              </button>
-              <button className="text-[9px] px-2.5 py-0.5 rounded-md" style={{ background: c.cardAlt, color: c.textSec }}>
-                No thanks
-              </button>
-            </div>
+              className="w-16 h-8 rounded-b-md"
+              style={{
+                background: theme === "dark"
+                  ? "linear-gradient(180deg, #3a3a3a, #2a2a2a)"
+                  : "linear-gradient(180deg, #d4d4d8, #a1a1aa)",
+              }}
+            />
+            {/* Base */}
+            <div
+              className="w-40 h-2.5 rounded-full"
+              style={{
+                background: theme === "dark"
+                  ? "linear-gradient(180deg, #333, #252525)"
+                  : "linear-gradient(180deg, #c4c4c8, #9a9a9e)",
+                boxShadow: theme === "dark"
+                  ? "0 4px 16px rgba(0,0,0,0.4)"
+                  : "0 4px 16px rgba(0,0,0,0.15)",
+              }}
+            />
           </div>
         </div>
       </div>
 
       {/* ── Features ── */}
       <Section id="features" className="px-6 py-24 max-w-6xl mx-auto">
-        <p style={{ color: c.accent }} className="text-xs tracking-[0.2em] uppercase text-center mb-3">Features</p>
-        <h2 style={{ color: c.text }} className="text-3xl md:text-4xl font-bold text-center mb-4">Everything you need, built in.</h2>
-        <p style={{ color: c.textSec }} className="text-center max-w-lg mx-auto mb-14">
+        <p style={{ color: t.accent }} className="text-xs tracking-[0.2em] uppercase text-center mb-3">Features</p>
+        <h2 style={{ color: t.text }} className="text-3xl md:text-4xl font-bold text-center mb-4">Everything you need, built in.</h2>
+        <p style={{ color: t.textSec }} className="text-center max-w-lg mx-auto mb-14">
           A complete desktop experience that runs entirely in your browser. No downloads, no installation.
         </p>
 
@@ -458,19 +472,19 @@ export default function OSLandingPage() {
           {[
             {
               icon: ic.sparkle,
-              color: c.accent,
+              color: t.accent,
               title: "AI Assistant",
               desc: "Context-aware AI that understands what you're working on and suggests helpful actions. Opens relevant apps, finds files, and assists your workflow.",
             },
             {
               icon: ic.monitor,
-              color: c.purple,
+              color: t.purple,
               title: "Window Management",
               desc: "Drag, resize, minimize, maximize, and snap windows. Full desktop window management with edge snapping and keyboard shortcuts.",
             },
             {
               icon: ic.folder,
-              color: c.warning,
+              color: t.warning,
               title: "13+ Built-in Apps",
               desc: "Browser, Code Editor, Terminal, Weather, Music, Calendar, Notes, Word Processor, File Manager, Settings, and more.",
             },
@@ -478,15 +492,15 @@ export default function OSLandingPage() {
             <div
               key={f.title}
               className="rounded-xl p-6 transition-all"
-              style={{ background: c.surface, border: `1px solid ${c.border}` }}
+              style={{ background: t.surface, border: `1px solid ${t.border}` }}
               onMouseEnter={e => (e.currentTarget.style.borderColor = f.color)}
-              onMouseLeave={e => (e.currentTarget.style.borderColor = c.border)}
+              onMouseLeave={e => (e.currentTarget.style.borderColor = t.border)}
             >
               <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-4" style={{ background: `${f.color}15` }}>
                 <I d={f.icon} s={20} color={f.color} />
               </div>
               <h3 className="text-base font-semibold mb-2">{f.title}</h3>
-              <p style={{ color: c.textSec }} className="text-sm leading-relaxed">{f.desc}</p>
+              <p style={{ color: t.textSec }} className="text-sm leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -496,9 +510,9 @@ export default function OSLandingPage() {
       <Section id="ai" className="px-6 py-24 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
-            <p style={{ color: c.accent }} className="text-xs tracking-[0.2em] uppercase mb-3">Smart Assistant</p>
-            <h2 style={{ color: c.text }} className="text-3xl md:text-4xl font-bold mb-4">AI That Works With You</h2>
-            <p style={{ color: c.textSec }} className="text-sm leading-relaxed mb-6">
+            <p style={{ color: t.accent }} className="text-xs tracking-[0.2em] uppercase mb-3">Smart Assistant</p>
+            <h2 style={{ color: t.text }} className="text-3xl md:text-4xl font-bold mb-4">AI That Works With You</h2>
+            <p style={{ color: t.textSec }} className="text-sm leading-relaxed mb-6">
               The built-in AI assistant observes your workflow and proactively offers help. It suggests relevant apps, finds files, and adapts to your work patterns.
             </p>
             <div className="flex flex-col gap-3">
@@ -509,8 +523,8 @@ export default function OSLandingPage() {
                 "System monitoring and optimization tips",
               ].map(item => (
                 <div key={item} className="flex items-start gap-2">
-                  <div className="mt-0.5"><I d={ic.check} s={14} color={c.success} /></div>
-                  <span style={{ color: c.textSec }} className="text-sm">{item}</span>
+                  <div className="mt-0.5"><I d={ic.check} s={14} color={t.success} /></div>
+                  <span style={{ color: t.textSec }} className="text-sm">{item}</span>
                 </div>
               ))}
             </div>
@@ -527,22 +541,22 @@ export default function OSLandingPage() {
                 key={i}
                 className="rounded-xl p-4 transition-all"
                 style={{
-                  background: c.surface,
-                  border: `1px solid ${c.border}`,
+                  background: t.surface,
+                  border: `1px solid ${t.border}`,
                   opacity: 0.7 + i * 0.15,
                 }}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: c.accentSoft }}>
-                    <I d={ic.sparkle} s={13} color={c.accent} />
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: t.accentSoft }}>
+                    <I d={ic.sparkle} s={13} color={t.accent} />
                   </div>
-                  <span style={{ color: c.textSec }} className="text-xs flex-1">{n.msg}</span>
+                  <span style={{ color: t.textSec }} className="text-xs flex-1">{n.msg}</span>
                 </div>
                 <div className="flex gap-2 mt-3 ml-10">
-                  <span className="text-[10px] px-3 py-1 rounded-md font-medium cursor-pointer" style={{ background: c.accent, color: "#fff" }}>
+                  <span className="text-[10px] px-3 py-1 rounded-md font-medium cursor-pointer" style={{ background: t.accent, color: "#fff" }}>
                     {n.actions[0]}
                   </span>
-                  <span className="text-[10px] px-3 py-1 rounded-md cursor-pointer" style={{ background: c.cardAlt, color: c.textSec }}>
+                  <span className="text-[10px] px-3 py-1 rounded-md cursor-pointer" style={{ background: t.cardAlt, color: t.textSec }}>
                     {n.actions[1]}
                   </span>
                 </div>
@@ -554,9 +568,9 @@ export default function OSLandingPage() {
 
       {/* ── Apps Showcase ── */}
       <Section id="apps" className="px-6 py-24 max-w-6xl mx-auto">
-        <p style={{ color: c.accent }} className="text-xs tracking-[0.2em] uppercase text-center mb-3">Applications</p>
-        <h2 style={{ color: c.text }} className="text-3xl md:text-4xl font-bold text-center mb-4">Built-in Apps</h2>
-        <p style={{ color: c.textSec }} className="text-center max-w-lg mx-auto mb-14">
+        <p style={{ color: t.accent }} className="text-xs tracking-[0.2em] uppercase text-center mb-3">Applications</p>
+        <h2 style={{ color: t.text }} className="text-3xl md:text-4xl font-bold text-center mb-4">Built-in Apps</h2>
+        <p style={{ color: t.textSec }} className="text-center max-w-lg mx-auto mb-14">
           Everything from productivity to entertainment, ready to use from day one.
         </p>
 
@@ -566,32 +580,32 @@ export default function OSLandingPage() {
             <div
               key={app.name}
               className="rounded-2xl overflow-hidden transition-all group"
-              style={{ background: c.surface, border: `1px solid ${c.border}` }}
+              style={{ background: t.surface, border: `1px solid ${t.border}` }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = app.color; e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = `0 12px 40px ${app.color}15`; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = t.border; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
             >
               {/* Icon area */}
               <div className="flex items-center justify-center py-8" style={{ background: `${app.color}08` }}>
                 <div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center"
-                  style={{ background: c.cardAlt, boxShadow: `0 4px 16px rgba(0,0,0,0.3)` }}
+                  style={{ background: t.cardAlt, boxShadow: `0 4px 16px rgba(0,0,0,0.3)` }}
                 >
                   <I d={app.icon} s={28} color={app.color} />
                 </div>
               </div>
               {/* Content */}
-              <div className="p-5" style={{ borderTop: `1px solid ${c.border}` }}>
+              <div className="p-5" style={{ borderTop: `1px solid ${t.border}` }}>
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="text-sm font-semibold">{app.name}</h4>
-                  <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>{app.tag}</span>
+                  <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: t.accentSoft, color: t.accentText }}>{app.tag}</span>
                 </div>
-                <p style={{ color: c.textSec }} className="text-xs leading-relaxed mb-4">{app.desc}</p>
-                <div className="flex flex-col gap-1.5" style={{ borderTop: `1px solid ${c.border}`, paddingTop: "12px" }}>
-                  <Link href="/os" className="flex items-center gap-1.5 text-xs no-underline" style={{ color: c.accentText }}>
-                    <I d={ic.arrowRight} s={11} color={c.accentText} /> Launch in OS
+                <p style={{ color: t.textSec }} className="text-xs leading-relaxed mb-4">{app.desc}</p>
+                <div className="flex flex-col gap-1.5" style={{ borderTop: `1px solid ${t.border}`, paddingTop: "12px" }}>
+                  <Link href="/os" className="flex items-center gap-1.5 text-xs no-underline" style={{ color: t.accentText }}>
+                    <I d={ic.arrowRight} s={11} color={t.accentText} /> Launch in OS
                   </Link>
-                  <a href="#" className="flex items-center gap-1.5 text-xs no-underline" style={{ color: c.accentText }}>
-                    <I d={ic.fileText} s={11} color={c.accentText} /> Learn more
+                  <a href="#" className="flex items-center gap-1.5 text-xs no-underline" style={{ color: t.accentText }}>
+                    <I d={ic.fileText} s={11} color={t.accentText} /> Learn more
                   </a>
                 </div>
               </div>
@@ -600,17 +614,17 @@ export default function OSLandingPage() {
         </div>
 
         {/* All other apps - compact row */}
-        <div className="rounded-2xl p-6" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+        <div className="rounded-2xl p-6" style={{ background: t.surface, border: `1px solid ${t.border}` }}>
           <div className="flex items-center justify-between mb-5">
             <h4 className="text-sm font-semibold">All Apps</h4>
-            <span style={{ color: c.textMuted }} className="text-xs">{appsAll.length + appsFeatured.length} apps included</span>
+            <span style={{ color: t.textMuted }} className="text-xs">{appsAll.length + appsFeatured.length} apps included</span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
             {appsAll.map(app => (
               <div
                 key={app.name}
                 className="flex items-center gap-3 p-2.5 rounded-xl transition-all cursor-default"
-                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseEnter={e => (e.currentTarget.style.background = t.cardAlt)}
                 onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
               >
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${app.color}15` }}>
@@ -625,9 +639,9 @@ export default function OSLandingPage() {
 
       {/* ── Pricing ── */}
       <Section id="pricing" className="px-6 py-24 max-w-5xl mx-auto">
-        <p style={{ color: c.accent }} className="text-xs tracking-[0.2em] uppercase text-center mb-3">Pricing</p>
-        <h2 style={{ color: c.text }} className="text-3xl md:text-4xl font-bold text-center mb-4">Get Alternus OS</h2>
-        <p style={{ color: c.textSec }} className="text-center max-w-lg mx-auto mb-14">
+        <p style={{ color: t.accent }} className="text-xs tracking-[0.2em] uppercase text-center mb-3">Pricing</p>
+        <h2 style={{ color: t.text }} className="text-3xl md:text-4xl font-bold text-center mb-4">Get Alternus OS</h2>
+        <p style={{ color: t.textSec }} className="text-center max-w-lg mx-auto mb-14">
           Choose the edition that fits your needs.
         </p>
 
@@ -637,15 +651,15 @@ export default function OSLandingPage() {
               key={tier.name}
               className="rounded-xl p-6 flex flex-col transition-all"
               style={{
-                background: c.surface,
-                border: `1px solid ${tier.highlighted ? c.accent : c.border}`,
-                boxShadow: tier.highlighted ? `0 0 40px ${c.accent}15` : "none",
+                background: t.surface,
+                border: `1px solid ${tier.highlighted ? t.accent : t.border}`,
+                boxShadow: tier.highlighted ? `0 0 40px ${t.accent}15` : "none",
               }}
             >
               {tier.highlighted && (
                 <span
                   className="text-[10px] font-medium px-2.5 py-0.5 rounded-full self-start mb-4"
-                  style={{ background: c.accentSoft, color: c.accentText }}
+                  style={{ background: t.accentSoft, color: t.accentText }}
                 >
                   Recommended
                 </span>
@@ -653,14 +667,14 @@ export default function OSLandingPage() {
               <h3 className="text-lg font-semibold mb-1">{tier.name}</h3>
               <div className="mb-1">
                 <span className="text-3xl font-bold">{tier.price}</span>
-                <span style={{ color: c.textMuted }} className="text-sm ml-1">{tier.period}</span>
+                <span style={{ color: t.textMuted }} className="text-sm ml-1">{tier.period}</span>
               </div>
-              <p style={{ color: c.textSec }} className="text-sm mb-6">{tier.desc}</p>
+              <p style={{ color: t.textSec }} className="text-sm mb-6">{tier.desc}</p>
               <div className="flex flex-col gap-2.5 mb-8 flex-1">
                 {tier.features.map(f => (
                   <div key={f} className="flex items-center gap-2">
-                    <I d={ic.check} s={13} color={tier.highlighted ? c.accent : c.success} />
-                    <span style={{ color: c.textSec }} className="text-sm">{f}</span>
+                    <I d={ic.check} s={13} color={tier.highlighted ? t.accent : t.success} />
+                    <span style={{ color: t.textSec }} className="text-sm">{f}</span>
                   </div>
                 ))}
               </div>
@@ -668,17 +682,17 @@ export default function OSLandingPage() {
                 href="/os"
                 className="w-full py-2.5 rounded-lg text-sm font-medium text-center no-underline transition-all block"
                 style={{
-                  background: tier.highlighted ? c.accent : "transparent",
-                  color: tier.highlighted ? "#fff" : c.text,
-                  border: tier.highlighted ? "none" : `1px solid ${c.border}`,
+                  background: tier.highlighted ? t.accent : "transparent",
+                  color: tier.highlighted ? "#fff" : t.text,
+                  border: tier.highlighted ? "none" : `1px solid ${t.border}`,
                 }}
                 onMouseEnter={e => {
-                  if (tier.highlighted) e.currentTarget.style.background = c.accentHover;
-                  else e.currentTarget.style.borderColor = c.accent;
+                  if (tier.highlighted) e.currentTarget.style.background = t.accentHover;
+                  else e.currentTarget.style.borderColor = t.accent;
                 }}
                 onMouseLeave={e => {
-                  if (tier.highlighted) e.currentTarget.style.background = c.accent;
-                  else e.currentTarget.style.borderColor = c.border;
+                  if (tier.highlighted) e.currentTarget.style.background = t.accent;
+                  else e.currentTarget.style.borderColor = t.border;
                 }}
               >
                 {tier.cta}
@@ -692,15 +706,15 @@ export default function OSLandingPage() {
       <Section className="px-6 py-24 text-center">
         <div className="max-w-2xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to try Alternus OS?</h2>
-          <p style={{ color: c.textSec }} className="mb-8">
+          <p style={{ color: t.textSec }} className="mb-8">
             No download required. Launch the full desktop experience in your browser right now.
           </p>
           <Link
             href="/os"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg text-sm font-medium no-underline transition-all"
-            style={{ background: c.accent, color: "#fff" }}
-            onMouseEnter={e => (e.currentTarget.style.background = c.accentHover)}
-            onMouseLeave={e => (e.currentTarget.style.background = c.accent)}
+            style={{ background: t.accent, color: "#fff" }}
+            onMouseEnter={e => (e.currentTarget.style.background = t.accentHover)}
+            onMouseLeave={e => (e.currentTarget.style.background = t.accent)}
           >
             Launch Alternus OS <I d={ic.arrowRight} s={14} />
           </Link>
@@ -709,19 +723,19 @@ export default function OSLandingPage() {
 
       {/* ── Support CTA ── */}
       <Section id="support" className="px-6 py-20 max-w-4xl mx-auto text-center">
-        <div className="rounded-2xl p-10" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4" style={{ background: c.accentSoft }}>
-            <I d={ic.shield} s={22} color={c.accent} />
+        <div className="rounded-2xl p-10" style={{ background: t.surface, border: `1px solid ${t.border}` }}>
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4" style={{ background: t.accentSoft }}>
+            <I d={ic.shield} s={22} color={t.accent} />
           </div>
           <h3 className="text-xl font-semibold mb-2">Need Help?</h3>
-          <p style={{ color: c.textSec }} className="text-sm mb-6 max-w-md mx-auto">
+          <p style={{ color: t.textSec }} className="text-sm mb-6 max-w-md mx-auto">
             Our support team is here to help you get the most out of Alternus OS. Browse docs, join the community, or contact us directly.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="#" className="px-5 py-2.5 rounded-lg text-sm font-medium no-underline" style={{ background: c.accent, color: "#fff" }}>
+            <a href="#" className="px-5 py-2.5 rounded-lg text-sm font-medium no-underline" style={{ background: t.accent, color: "#fff" }}>
               Documentation
             </a>
-            <a href="/contact" className="px-5 py-2.5 rounded-lg text-sm font-medium no-underline" style={{ border: `1px solid ${c.border}`, color: c.text }}>
+            <a href="/contact" className="px-5 py-2.5 rounded-lg text-sm font-medium no-underline" style={{ border: `1px solid ${t.border}`, color: t.text }}>
               Contact Support
             </a>
           </div>
@@ -729,32 +743,64 @@ export default function OSLandingPage() {
       </Section>
 
       {/* ── Footer ── */}
-      <footer className="px-6 pt-16 pb-8" style={{ borderTop: `1px solid ${c.border}` }}>
+      <footer className="px-6 pt-16 pb-8" style={{ borderTop: `1px solid ${t.border}` }}>
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-3">
-                <span style={{ color: c.text }} className="text-sm font-bold tracking-widest">ALTERNUS</span>
-                <span style={{ color: c.textMuted }} className="text-sm font-light tracking-widest">OS</span>
+                <span style={{ color: t.text }} className="text-sm font-bold tracking-widest">ALTERNUS</span>
+                <span style={{ color: t.textMuted }} className="text-sm font-light tracking-widest">OS</span>
               </div>
-              <p style={{ color: c.textMuted }} className="text-xs leading-relaxed mb-3">
+              <p style={{ color: t.textMuted }} className="text-xs leading-relaxed mb-3">
                 The AI-powered desktop operating system in your browser.
               </p>
-              <div className="flex items-center gap-2">
-                <span style={{ color: c.textMuted }} className="text-[10px]">Mode:</span>
-                <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md" style={{ background: c.cardAlt, color: c.textSec }}>
-                  <I d={ic.sparkle} s={9} color={c.textSec} /> Dark
-                </span>
-                <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md" style={{ background: "transparent", color: c.textMuted }}>
+              {/* Theme toggle */}
+              <div className="flex items-center gap-1 mb-4">
+                <span style={{ color: t.textMuted }} className="text-[10px] mr-1">Mode:</span>
+                <button
+                  onClick={() => setTheme("dark")}
+                  className="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-md transition-all cursor-pointer"
+                  style={{ background: theme === "dark" ? t.accent : "transparent", color: theme === "dark" ? "#fff" : t.textMuted }}
+                >
+                  Dark
+                </button>
+                <button
+                  onClick={() => setTheme("light")}
+                  className="flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-md transition-all cursor-pointer"
+                  style={{ background: theme === "light" ? t.accent : "transparent", color: theme === "light" ? "#fff" : t.textMuted }}
+                >
                   Light
-                </span>
+                </button>
+              </div>
+              {/* Social media */}
+              <div className="flex items-center gap-2.5">
+                {[
+                  { label: "GitHub", d: "M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22", href: "https://github.com" },
+                  { label: "Twitter", d: "M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z", href: "https://twitter.com" },
+                  { label: "Instagram", d: "M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5zM16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zM17.5 6.5h.01", href: "https://instagram.com" },
+                  { label: "YouTube", d: "M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.33zM9.75 15.02V8.48l5.75 3.27-5.75 3.27z", href: "https://youtube.com" },
+                ].map(s => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-all no-underline"
+                    style={{ background: t.cardAlt, color: t.textMuted }}
+                    onMouseEnter={e => { e.currentTarget.style.background = t.accent; e.currentTarget.style.color = "#fff"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = t.cardAlt; e.currentTarget.style.color = t.textMuted; }}
+                    aria-label={s.label}
+                  >
+                    <I d={s.d} s={13} />
+                  </a>
+                ))}
               </div>
             </div>
 
             {/* Operating System */}
             <div>
-              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Operating System</h4>
+              <h4 style={{ color: t.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Operating System</h4>
               <div className="flex flex-col gap-2">
                 {[
                   { label: "Try Alternus OS", href: "/os" },
@@ -764,7 +810,7 @@ export default function OSLandingPage() {
                   { label: "Release Notes", href: "#" },
                   { label: "What's New", href: "#" },
                 ].map(l => (
-                  <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
+                  <a key={l.label} href={l.href} style={{ color: t.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
                     {l.label}
                   </a>
                 ))}
@@ -773,7 +819,7 @@ export default function OSLandingPage() {
 
             {/* Download & Support */}
             <div>
-              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Download & Support</h4>
+              <h4 style={{ color: t.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Download & Support</h4>
               <div className="flex flex-col gap-2">
                 {[
                   { label: "Download OS", href: "/os" },
@@ -783,7 +829,7 @@ export default function OSLandingPage() {
                   { label: "Feature Requests", href: "#" },
                   { label: "Status Page", href: "#" },
                 ].map(l => (
-                  <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
+                  <a key={l.label} href={l.href} style={{ color: t.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
                     {l.label}
                   </a>
                 ))}
@@ -792,7 +838,7 @@ export default function OSLandingPage() {
 
             {/* Developers */}
             <div>
-              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Developers</h4>
+              <h4 style={{ color: t.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Developers</h4>
               <div className="flex flex-col gap-2">
                 {[
                   { label: "Documentation", href: "#" },
@@ -802,7 +848,7 @@ export default function OSLandingPage() {
                   { label: "Open Source", href: "#" },
                   { label: "Community Forum", href: "#" },
                 ].map(l => (
-                  <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
+                  <a key={l.label} href={l.href} style={{ color: t.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
                     {l.label}
                   </a>
                 ))}
@@ -811,7 +857,7 @@ export default function OSLandingPage() {
 
             {/* Legal & Company */}
             <div>
-              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Company</h4>
+              <h4 style={{ color: t.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Company</h4>
               <div className="flex flex-col gap-2">
                 {[
                   { label: "About Alternus", href: "/about" },
@@ -821,7 +867,7 @@ export default function OSLandingPage() {
                   { label: "Cookie Policy", href: "/cookie-notice" },
                   { label: "Security", href: "#" },
                 ].map(l => (
-                  <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
+                  <a key={l.label} href={l.href} style={{ color: t.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
                     {l.label}
                   </a>
                 ))}
@@ -830,12 +876,12 @@ export default function OSLandingPage() {
           </div>
 
           {/* Bottom bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6" style={{ borderTop: `1px solid ${c.border}` }}>
-            <span style={{ color: c.textMuted }} className="text-xs">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6" style={{ borderTop: `1px solid ${t.border}` }}>
+            <span style={{ color: t.textMuted }} className="text-xs">
               &copy; {new Date().getFullYear()} Alternus. All rights reserved.
             </span>
             <div className="flex items-center gap-4">
-              <span style={{ color: c.textMuted }} className="text-xs">Alternus ART &middot; Alternus Ultra &middot; Alternus OS v1.0</span>
+              <span style={{ color: t.textMuted }} className="text-xs">Alternus ART &middot; Alternus Ultra &middot; Alternus OS v1.0</span>
             </div>
           </div>
         </div>
@@ -846,14 +892,14 @@ export default function OSLandingPage() {
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         className="fixed bottom-6 right-6 w-12 h-12 rounded-full flex items-center justify-center z-50 transition-all shadow-lg"
         style={{
-          background: c.accent,
+          background: t.accent,
           color: "#fff",
           opacity: scrolled ? 1 : 0,
           pointerEvents: scrolled ? "auto" : "none",
           transform: scrolled ? "translateY(0)" : "translateY(16px)",
         }}
-        onMouseEnter={e => (e.currentTarget.style.background = c.accentHover)}
-        onMouseLeave={e => (e.currentTarget.style.background = c.accent)}
+        onMouseEnter={e => (e.currentTarget.style.background = t.accentHover)}
+        onMouseLeave={e => (e.currentTarget.style.background = t.accent)}
         aria-label="Scroll to top"
       >
         <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
