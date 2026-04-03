@@ -1040,8 +1040,6 @@ export default function AlternusOS() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showTaskSwitcher, setShowTaskSwitcher] = useState(false);
   const [taskSwitcherIdx, setTaskSwitcherIdx] = useState(0);
-  const [loginPin, setLoginPin] = useState("");
-  const [loginError, setLoginError] = useState(false);
   const [systemModal, setSystemModal] = useState<SystemModal>(null);
   const [aiInput, setAiInput] = useState("");
   const [aiResponse, setAiResponse] = useState<string | null>(null);
@@ -1053,7 +1051,6 @@ export default function AlternusOS() {
   const [smartDND, setSmartDND] = useState(false);
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   const [showTimeline, setShowTimeline] = useState(false);
-  const [biometricPhase, setBiometricPhase] = useState<"idle" | "scanning" | "recognized" | null>(null);
   const lastMouseMove = useRef(Date.now());
 
   const c = palette[mode];
@@ -1509,7 +1506,7 @@ export default function AlternusOS() {
 
           {/* Open Desktop button */}
           <button
-            onClick={() => { setIsLocked(false); setLoginPin(""); }}
+            onClick={() => { setIsLocked(false); }}
             className="flex items-center gap-2.5 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer mb-5"
             style={{ background: c.accent, color: "#fff", boxShadow: `0 4px 20px ${c.accent}40` }}
             onMouseEnter={e => { e.currentTarget.style.background = "#2563EB"; }}
