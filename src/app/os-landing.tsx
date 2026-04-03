@@ -58,20 +58,23 @@ const ic = {
 };
 
 // ━━━━ Apps data ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const apps = [
-  { name: "AI Assistant", icon: ic.sparkle, desc: "Context-aware AI helper", color: c.accent },
-  { name: "Terminal", icon: ic.terminal, desc: "Full command line", color: c.success },
-  { name: "Code Editor", icon: ic.code, desc: "Syntax highlighting & editing", color: c.purple },
-  { name: "File Manager", icon: ic.folder, desc: "Browse & organize files", color: c.warning },
-  { name: "Settings", icon: ic.settings, desc: "System configuration", color: c.textSec },
-  { name: "Music", icon: ic.music, desc: "Audio player", color: "#F472B6" },
-  { name: "Weather", icon: ic.cloud, desc: "Real-time forecasts", color: c.accentText },
-  { name: "Calendar", icon: ic.calendar, desc: "Schedule & events", color: c.danger },
-  { name: "Notes", icon: ic.note, desc: "Quick note-taking", color: c.warning },
-  { name: "Browser", icon: ic.globe, desc: "Web browsing", color: c.accent },
-  { name: "App Store", icon: ic.store, desc: "Discover new apps", color: c.success },
-  { name: "Movies", icon: ic.film, desc: "Video player", color: c.purple },
-  { name: "Word", icon: ic.fileText, desc: "Document editor", color: c.accentText },
+const appsFeatured = [
+  { name: "AI Assistant", icon: ic.sparkle, desc: "Context-aware intelligence that adapts to your workflow. Get suggestions, automate tasks, and find files instantly.", color: c.accent, tag: "Included" },
+  { name: "Code Editor", icon: ic.code, desc: "Professional code editing with syntax highlighting, autocomplete, and integrated terminal support.", color: c.purple, tag: "Pro" },
+  { name: "Browser", icon: ic.globe, desc: "Built-in web browser with tab management, bookmarks, and seamless integration with other OS apps.", color: c.accentText, tag: "Included" },
+];
+
+const appsAll = [
+  { name: "Terminal", icon: ic.terminal, color: c.success },
+  { name: "File Manager", icon: ic.folder, color: c.warning },
+  { name: "Settings", icon: ic.settings, color: c.textSec },
+  { name: "Music", icon: ic.music, color: "#F472B6" },
+  { name: "Weather", icon: ic.cloud, color: c.accentText },
+  { name: "Calendar", icon: ic.calendar, color: c.danger },
+  { name: "Notes", icon: ic.note, color: c.warning },
+  { name: "App Store", icon: ic.store, color: c.success },
+  { name: "Movies", icon: ic.film, color: c.purple },
+  { name: "Word", icon: ic.fileText, color: c.accentText },
 ];
 
 // ━━━━ Pricing tiers ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -144,7 +147,7 @@ export default function OSLandingPage() {
     { label: "Apps", href: "#apps" },
     { label: "AI", href: "#ai" },
     { label: "Pricing", href: "#pricing" },
-    { label: "Gallery", href: "/gallery" },
+    { label: "Support", href: "#support" },
   ];
 
   return (
@@ -549,7 +552,7 @@ export default function OSLandingPage() {
         </div>
       </Section>
 
-      {/* ── Apps Grid ── */}
+      {/* ── Apps Showcase ── */}
       <Section id="apps" className="px-6 py-24 max-w-6xl mx-auto">
         <p style={{ color: c.accent }} className="text-xs tracking-[0.2em] uppercase text-center mb-3">Applications</p>
         <h2 style={{ color: c.text }} className="text-3xl md:text-4xl font-bold text-center mb-4">Built-in Apps</h2>
@@ -557,28 +560,66 @@ export default function OSLandingPage() {
           Everything from productivity to entertainment, ready to use from day one.
         </p>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {apps.map(app => (
+        {/* Featured apps - large cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+          {appsFeatured.map(app => (
             <div
               key={app.name}
-              className="rounded-xl p-4 text-center transition-all cursor-default"
+              className="rounded-2xl overflow-hidden transition-all group"
               style={{ background: c.surface, border: `1px solid ${c.border}` }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = app.color;
-                e.currentTarget.style.transform = "translateY(-2px)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = c.border;
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = app.color; e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = `0 12px 40px ${app.color}15`; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
             >
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-3" style={{ background: `${app.color}15` }}>
-                <I d={app.icon} s={20} color={app.color} />
+              {/* Icon area */}
+              <div className="flex items-center justify-center py-8" style={{ background: `${app.color}08` }}>
+                <div
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                  style={{ background: c.cardAlt, boxShadow: `0 4px 16px rgba(0,0,0,0.3)` }}
+                >
+                  <I d={app.icon} s={28} color={app.color} />
+                </div>
               </div>
-              <h4 className="text-xs font-semibold mb-1">{app.name}</h4>
-              <p style={{ color: c.textMuted }} className="text-[10px]">{app.desc}</p>
+              {/* Content */}
+              <div className="p-5" style={{ borderTop: `1px solid ${c.border}` }}>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-semibold">{app.name}</h4>
+                  <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>{app.tag}</span>
+                </div>
+                <p style={{ color: c.textSec }} className="text-xs leading-relaxed mb-4">{app.desc}</p>
+                <div className="flex flex-col gap-1.5" style={{ borderTop: `1px solid ${c.border}`, paddingTop: "12px" }}>
+                  <Link href="/os" className="flex items-center gap-1.5 text-xs no-underline" style={{ color: c.accentText }}>
+                    <I d={ic.arrowRight} s={11} color={c.accentText} /> Launch in OS
+                  </Link>
+                  <a href="#" className="flex items-center gap-1.5 text-xs no-underline" style={{ color: c.accentText }}>
+                    <I d={ic.fileText} s={11} color={c.accentText} /> Learn more
+                  </a>
+                </div>
+              </div>
             </div>
           ))}
+        </div>
+
+        {/* All other apps - compact row */}
+        <div className="rounded-2xl p-6" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+          <div className="flex items-center justify-between mb-5">
+            <h4 className="text-sm font-semibold">All Apps</h4>
+            <span style={{ color: c.textMuted }} className="text-xs">{appsAll.length + appsFeatured.length} apps included</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            {appsAll.map(app => (
+              <div
+                key={app.name}
+                className="flex items-center gap-3 p-2.5 rounded-xl transition-all cursor-default"
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+              >
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${app.color}15` }}>
+                  <I d={app.icon} s={16} color={app.color} />
+                </div>
+                <span className="text-xs font-medium">{app.name}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </Section>
 
@@ -666,6 +707,27 @@ export default function OSLandingPage() {
         </div>
       </Section>
 
+      {/* ── Support CTA ── */}
+      <Section id="support" className="px-6 py-20 max-w-4xl mx-auto text-center">
+        <div className="rounded-2xl p-10" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4" style={{ background: c.accentSoft }}>
+            <I d={ic.shield} s={22} color={c.accent} />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Need Help?</h3>
+          <p style={{ color: c.textSec }} className="text-sm mb-6 max-w-md mx-auto">
+            Our support team is here to help you get the most out of Alternus OS. Browse docs, join the community, or contact us directly.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="#" className="px-5 py-2.5 rounded-lg text-sm font-medium no-underline" style={{ background: c.accent, color: "#fff" }}>
+              Documentation
+            </a>
+            <a href="/contact" className="px-5 py-2.5 rounded-lg text-sm font-medium no-underline" style={{ border: `1px solid ${c.border}`, color: c.text }}>
+              Contact Support
+            </a>
+          </div>
+        </div>
+      </Section>
+
       {/* ── Footer ── */}
       <footer className="px-6 pt-16 pb-8" style={{ borderTop: `1px solid ${c.border}` }}>
         <div className="max-w-6xl mx-auto">
@@ -676,22 +738,31 @@ export default function OSLandingPage() {
                 <span style={{ color: c.text }} className="text-sm font-bold tracking-widest">ALTERNUS</span>
                 <span style={{ color: c.textMuted }} className="text-sm font-light tracking-widest">OS</span>
               </div>
-              <p style={{ color: c.textMuted }} className="text-xs leading-relaxed">
+              <p style={{ color: c.textMuted }} className="text-xs leading-relaxed mb-3">
                 The AI-powered desktop operating system in your browser.
               </p>
+              <div className="flex items-center gap-2">
+                <span style={{ color: c.textMuted }} className="text-[10px]">Mode:</span>
+                <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md" style={{ background: c.cardAlt, color: c.textSec }}>
+                  <I d={ic.sparkle} s={9} color={c.textSec} /> Dark
+                </span>
+                <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md" style={{ background: "transparent", color: c.textMuted }}>
+                  Light
+                </span>
+              </div>
             </div>
 
-            {/* Product */}
+            {/* Operating System */}
             <div>
-              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Product</h4>
+              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Operating System</h4>
               <div className="flex flex-col gap-2">
                 {[
-                  { label: "Try OS", href: "/os" },
-                  { label: "Features", href: "#features" },
-                  { label: "Apps", href: "#apps" },
-                  { label: "Pricing", href: "#pricing" },
+                  { label: "Try Alternus OS", href: "/os" },
+                  { label: "Alternus ART", href: "#pricing" },
+                  { label: "Alternus Ultra", href: "#pricing" },
                   { label: "System Requirements", href: "#" },
                   { label: "Release Notes", href: "#" },
+                  { label: "What's New", href: "#" },
                 ].map(l => (
                   <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
                     {l.label}
@@ -700,17 +771,36 @@ export default function OSLandingPage() {
               </div>
             </div>
 
-            {/* Resources */}
+            {/* Download & Support */}
             <div>
-              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Resources</h4>
+              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Download & Support</h4>
+              <div className="flex flex-col gap-2">
+                {[
+                  { label: "Download OS", href: "/os" },
+                  { label: "Installation Guide", href: "#" },
+                  { label: "Help Center", href: "#" },
+                  { label: "Report a Bug", href: "#" },
+                  { label: "Feature Requests", href: "#" },
+                  { label: "Status Page", href: "#" },
+                ].map(l => (
+                  <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
+                    {l.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Developers */}
+            <div>
+              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Developers</h4>
               <div className="flex flex-col gap-2">
                 {[
                   { label: "Documentation", href: "#" },
                   { label: "API Reference", href: "#" },
-                  { label: "Help Center", href: "/help" },
-                  { label: "Community", href: "#" },
-                  { label: "Blog", href: "/blog" },
-                  { label: "FAQ", href: "/faq" },
+                  { label: "Developer Tools", href: "#" },
+                  { label: "Extensions & Plugins", href: "#" },
+                  { label: "Open Source", href: "#" },
+                  { label: "Community Forum", href: "#" },
                 ].map(l => (
                   <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
                     {l.label}
@@ -719,33 +809,16 @@ export default function OSLandingPage() {
               </div>
             </div>
 
-            {/* Company */}
+            {/* Legal & Company */}
             <div>
               <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Company</h4>
               <div className="flex flex-col gap-2">
                 {[
-                  { label: "About", href: "/about" },
-                  { label: "Gallery", href: "/gallery" },
+                  { label: "About Alternus", href: "/about" },
                   { label: "Contact", href: "/contact" },
-                  { label: "Careers", href: "#" },
-                  { label: "Press", href: "#" },
-                ].map(l => (
-                  <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
-                    {l.label}
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Legal */}
-            <div>
-              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Legal</h4>
-              <div className="flex flex-col gap-2">
-                {[
                   { label: "Terms of Service", href: "/terms" },
                   { label: "Privacy Policy", href: "/privacy" },
                   { label: "Cookie Policy", href: "/cookie-notice" },
-                  { label: "Licenses", href: "#" },
                   { label: "Security", href: "#" },
                 ].map(l => (
                   <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
@@ -762,7 +835,7 @@ export default function OSLandingPage() {
               &copy; {new Date().getFullYear()} Alternus. All rights reserved.
             </span>
             <div className="flex items-center gap-4">
-              <span style={{ color: c.textMuted }} className="text-xs">Alternus ART &middot; Alternus Ultra</span>
+              <span style={{ color: c.textMuted }} className="text-xs">Alternus ART &middot; Alternus Ultra &middot; Alternus OS v1.0</span>
             </div>
           </div>
         </div>
