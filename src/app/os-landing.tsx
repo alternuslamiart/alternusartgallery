@@ -77,28 +77,22 @@ const apps = [
 // ━━━━ Pricing tiers ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const tiers = [
   {
-    name: "Free",
-    price: "$0",
-    period: "forever",
-    desc: "Try the OS experience",
-    features: ["Basic apps", "Window management", "Dark & light themes", "Limited AI suggestions"],
+    name: "Alternus ART",
+    price: "$59.99",
+    period: "",
+    desc: "Essential desktop experience",
+    features: ["All built-in apps", "Window management", "Dark & light themes", "AI assistant", "File management", "Regular updates"],
     highlighted: false,
+    cta: "Get ART",
   },
   {
-    name: "Pro",
-    price: "$9",
-    period: "/month",
-    desc: "Full power, unlimited access",
-    features: ["All 13+ apps", "Unlimited AI assistant", "Cloud sync & backup", "Priority support", "Custom themes"],
+    name: "Alternus Ultra",
+    price: "$79.99",
+    period: "",
+    desc: "The complete Alternus experience",
+    features: ["Everything in ART", "Unlimited AI assistant", "Cloud sync & backup", "Priority support", "Custom themes", "Early access to new features"],
     highlighted: true,
-  },
-  {
-    name: "Enterprise",
-    price: "$29",
-    period: "/month",
-    desc: "For teams & organizations",
-    features: ["Everything in Pro", "Team workspaces", "Admin controls", "Custom branding", "SSO & security", "Dedicated support"],
-    highlighted: false,
+    cta: "Get Ultra",
   },
 ];
 
@@ -235,10 +229,10 @@ export default function OSLandingPage() {
         </p>
 
         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-center mb-4">
-          <span style={{ background: "linear-gradient(135deg, #3B82F6, #A78BFA)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+          <span style={{ background: "linear-gradient(180deg, #FFFFFF 0%, #A0A0A0 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
             ALTERNUS
           </span>
-          <span style={{ color: c.textSec }} className="font-light ml-3">OS</span>
+          <span style={{ color: c.textMuted }} className="font-light ml-3">OS</span>
         </h1>
 
         <p style={{ color: c.textSec }} className="text-lg md:text-xl text-center max-w-xl mb-8">
@@ -593,10 +587,10 @@ export default function OSLandingPage() {
         <p style={{ color: c.accent }} className="text-xs tracking-[0.2em] uppercase text-center mb-3">Pricing</p>
         <h2 style={{ color: c.text }} className="text-3xl md:text-4xl font-bold text-center mb-4">Get Alternus OS</h2>
         <p style={{ color: c.textSec }} className="text-center max-w-lg mx-auto mb-14">
-          Start free, upgrade when you need more power.
+          Choose the edition that fits your needs.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl mx-auto">
           {tiers.map(tier => (
             <div
               key={tier.name}
@@ -612,7 +606,7 @@ export default function OSLandingPage() {
                   className="text-[10px] font-medium px-2.5 py-0.5 rounded-full self-start mb-4"
                   style={{ background: c.accentSoft, color: c.accentText }}
                 >
-                  Most Popular
+                  Recommended
                 </span>
               )}
               <h3 className="text-lg font-semibold mb-1">{tier.name}</h3>
@@ -646,7 +640,7 @@ export default function OSLandingPage() {
                   else e.currentTarget.style.borderColor = c.border;
                 }}
               >
-                {tier.name === "Free" ? "Try Free" : tier.name === "Enterprise" ? "Contact Sales" : "Get Pro"}
+                {tier.cta}
               </Link>
             </div>
           ))}
@@ -673,30 +667,126 @@ export default function OSLandingPage() {
       </Section>
 
       {/* ── Footer ── */}
-      <footer className="px-6 py-8" style={{ borderTop: `1px solid ${c.border}` }}>
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span style={{ color: c.textSec }} className="text-xs font-bold tracking-widest">ALTERNUS</span>
-            <span style={{ color: c.textMuted }} className="text-xs font-light tracking-widest">OS</span>
+      <footer className="px-6 pt-16 pb-8" style={{ borderTop: `1px solid ${c.border}` }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+            {/* Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 mb-3">
+                <span style={{ color: c.text }} className="text-sm font-bold tracking-widest">ALTERNUS</span>
+                <span style={{ color: c.textMuted }} className="text-sm font-light tracking-widest">OS</span>
+              </div>
+              <p style={{ color: c.textMuted }} className="text-xs leading-relaxed">
+                The AI-powered desktop operating system in your browser.
+              </p>
+            </div>
+
+            {/* Product */}
+            <div>
+              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Product</h4>
+              <div className="flex flex-col gap-2">
+                {[
+                  { label: "Try OS", href: "/os" },
+                  { label: "Features", href: "#features" },
+                  { label: "Apps", href: "#apps" },
+                  { label: "Pricing", href: "#pricing" },
+                  { label: "System Requirements", href: "#" },
+                  { label: "Release Notes", href: "#" },
+                ].map(l => (
+                  <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
+                    {l.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Resources</h4>
+              <div className="flex flex-col gap-2">
+                {[
+                  { label: "Documentation", href: "#" },
+                  { label: "API Reference", href: "#" },
+                  { label: "Help Center", href: "/help" },
+                  { label: "Community", href: "#" },
+                  { label: "Blog", href: "/blog" },
+                  { label: "FAQ", href: "/faq" },
+                ].map(l => (
+                  <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
+                    {l.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Company</h4>
+              <div className="flex flex-col gap-2">
+                {[
+                  { label: "About", href: "/about" },
+                  { label: "Gallery", href: "/gallery" },
+                  { label: "Contact", href: "/contact" },
+                  { label: "Careers", href: "#" },
+                  { label: "Press", href: "#" },
+                ].map(l => (
+                  <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
+                    {l.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h4 style={{ color: c.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Legal</h4>
+              <div className="flex flex-col gap-2">
+                {[
+                  { label: "Terms of Service", href: "/terms" },
+                  { label: "Privacy Policy", href: "/privacy" },
+                  { label: "Cookie Policy", href: "/cookie-notice" },
+                  { label: "Licenses", href: "#" },
+                  { label: "Security", href: "#" },
+                ].map(l => (
+                  <a key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
+                    {l.label}
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-5">
-            {[
-              { label: "Gallery", href: "/gallery" },
-              { label: "OS", href: "/os" },
-              { label: "Contact", href: "/contact" },
-              { label: "Terms", href: "/terms" },
-              { label: "Privacy", href: "/privacy" },
-            ].map(l => (
-              <Link key={l.label} href={l.href} style={{ color: c.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
-                {l.label}
-              </Link>
-            ))}
+
+          {/* Bottom bar */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6" style={{ borderTop: `1px solid ${c.border}` }}>
+            <span style={{ color: c.textMuted }} className="text-xs">
+              &copy; {new Date().getFullYear()} Alternus. All rights reserved.
+            </span>
+            <div className="flex items-center gap-4">
+              <span style={{ color: c.textMuted }} className="text-xs">Alternus ART &middot; Alternus Ultra</span>
+            </div>
           </div>
-          <span style={{ color: c.textMuted }} className="text-xs">
-            &copy; {new Date().getFullYear()} Alternus. All rights reserved.
-          </span>
         </div>
       </footer>
+
+      {/* ── Scroll to top button (replaces chat) ── */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        className="fixed bottom-6 right-6 w-12 h-12 rounded-full flex items-center justify-center z-50 transition-all shadow-lg"
+        style={{
+          background: c.accent,
+          color: "#fff",
+          opacity: scrolled ? 1 : 0,
+          pointerEvents: scrolled ? "auto" : "none",
+          transform: scrolled ? "translateY(0)" : "translateY(16px)",
+        }}
+        onMouseEnter={e => (e.currentTarget.style.background = c.accentHover)}
+        onMouseLeave={e => (e.currentTarget.style.background = c.accent)}
+        aria-label="Scroll to top"
+      >
+        <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M18 15l-6-6-6 6" />
+        </svg>
+      </button>
     </div>
   );
 }

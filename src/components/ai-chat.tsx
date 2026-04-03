@@ -201,7 +201,7 @@ export function AIChat() {
   const hasConversation = messages.length > 1;
 
   // Hide on OS page
-  if (pathname === "/os") return null;
+  if (pathname === "/os" || pathname === "/") return null;
 
   return (
     <>
