@@ -257,11 +257,21 @@ export default function OSLandingPage() {
           The Future of Desktop Computing
         </p>
 
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-center mb-4">
-          <span style={{ background: theme === "dark" ? "linear-gradient(180deg, #FFFFFF 0%, #A0A0A0 100%)" : "linear-gradient(180deg, #18181B 0%, #52525B 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            ALTERNUS
+        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight text-center mb-4 relative">
+          <span
+            className="font-semibold"
+            style={{
+              background: theme === "dark"
+                ? "linear-gradient(135deg, #6B6B6B 0%, #9CA3AF 40%, #D1D5DB 70%, #9CA3AF 100%)"
+                : "linear-gradient(135deg, #374151 0%, #6B7280 40%, #9CA3AF 70%, #6B7280 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Alternus
           </span>
-          <span style={{ color: t.textMuted }} className="font-light ml-3">OS</span>
+          <sup style={{ color: t.textMuted, fontSize: "0.25em", verticalAlign: "super", position: "relative", top: "-0.6em" }}>&copy;</sup>
         </h1>
 
         <p style={{ color: t.textSec }} className="text-lg md:text-xl text-center max-w-xl mb-8">
