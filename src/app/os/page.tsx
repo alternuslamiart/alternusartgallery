@@ -1488,26 +1488,28 @@ export default function AlternusOS() {
           </div>
         </div>
 
-        {/* Center content */}
-        <div className="flex flex-col items-center">
-          {/* Clock + Date */}
-          <p style={{ color: c.text }} className="text-7xl font-bold tracking-wide mb-1">{fmt(time)}</p>
-          <p style={{ color: c.textMuted }} className="text-sm mb-12">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
+        {/* Clock + Date — upper area */}
+        <div className="absolute top-[12%] left-1/2 -translate-x-1/2 flex flex-col items-center">
+          <p style={{ color: c.text }} className="text-8xl font-bold tracking-wide mb-2">{fmt(time)}</p>
+          <p style={{ color: c.textMuted }} className="text-base">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
+        </div>
 
+        {/* Profile + Button — lower center */}
+        <div className="absolute bottom-[18%] left-1/2 -translate-x-1/2 flex flex-col items-center">
           {/* Profile avatar */}
           <div
-            className="w-24 h-24 rounded-full flex items-center justify-center mb-4"
-            style={{ background: c.accentSoft, border: `3px solid ${c.border}`, color: c.accentText }}
+            className="w-16 h-16 rounded-full flex items-center justify-center mb-3"
+            style={{ background: c.accentSoft, border: `2px solid ${c.border}`, color: c.accentText }}
           >
-            <I d={ic.user} s={42} />
+            <I d={ic.user} s={28} />
           </div>
-          <p className="text-base font-medium mb-0.5" style={{ color: c.text }}>Admin</p>
-          <p className="text-xs mb-8" style={{ color: c.textMuted }}>admin@alternus.art</p>
+          <p className="text-sm font-medium mb-0.5" style={{ color: c.text }}>Admin</p>
+          <p className="text-[11px] mb-6" style={{ color: c.textMuted }}>admin@alternus.art</p>
 
           {/* Open Desktop button */}
           <button
             onClick={() => { setIsLocked(false); }}
-            className="flex items-center gap-2.5 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer mb-5"
+            className="flex items-center gap-2.5 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer mb-4"
             style={{ background: c.accent, color: "#fff", boxShadow: `0 4px 20px ${c.accent}40` }}
             onMouseEnter={e => { e.currentTarget.style.background = "#2563EB"; }}
             onMouseLeave={e => { e.currentTarget.style.background = c.accent; }}
