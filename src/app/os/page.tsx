@@ -1491,92 +1491,36 @@ export default function AlternusOS() {
           </div>
         </div>
 
-        {/* Clock + Date — shifted up */}
-        <div className="absolute top-[15%] left-1/2 -translate-x-1/2 flex flex-col items-center">
-          <p style={{ color: c.text }} className="text-7xl font-bold tracking-wide mb-1">{fmt(time)}</p>
-          <p style={{ color: c.textMuted }} className="text-sm">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
-        </div>
-
-        {/* Center: Profile + PIN + Login */}
+        {/* Center content */}
         <div className="flex flex-col items-center">
+          {/* Clock + Date */}
+          <p style={{ color: c.text }} className="text-7xl font-bold tracking-wide mb-1">{fmt(time)}</p>
+          <p style={{ color: c.textMuted }} className="text-sm mb-12">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
+
           {/* Profile avatar */}
           <div
-            className="w-20 h-20 rounded-full flex items-center justify-center mb-4"
+            className="w-24 h-24 rounded-full flex items-center justify-center mb-4"
             style={{ background: c.accentSoft, border: `3px solid ${c.border}`, color: c.accentText }}
           >
-            <I d={ic.user} s={36} />
+            <I d={ic.user} s={42} />
           </div>
-          <p className="text-sm font-medium mb-1" style={{ color: c.text }}>Admin</p>
-          <p className="text-xs mb-6" style={{ color: c.textMuted }}>admin@alternus.art</p>
+          <p className="text-base font-medium mb-0.5" style={{ color: c.text }}>Admin</p>
+          <p className="text-xs mb-8" style={{ color: c.textMuted }}>admin@alternus.art</p>
 
-          {/* PIN input */}
-          <div className="flex gap-2 mb-4">
-            {[0, 1, 2, 3].map(i => (
-              <div key={i} className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold"
-                style={{ background: c.surface, border: `1px solid ${loginError ? c.danger : i < loginPin.length ? c.accent : c.border}`, color: c.text }}>
-                {i < loginPin.length ? "•" : ""}
-              </div>
-            ))}
-          </div>
+          {/* Open Desktop button */}
+          <button
+            onClick={() => { setIsLocked(false); setLoginPin(""); }}
+            className="flex items-center gap-2.5 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer mb-5"
+            style={{ background: c.accent, color: "#fff", boxShadow: `0 4px 20px ${c.accent}40` }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#2563EB"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = c.accent; }}
+          >
+            <I d={ic.monitor} s={16} />
+            Open Desktop
+          </button>
 
-          {loginError && <p className="text-xs mb-3" style={{ color: c.danger }}>Incorrect PIN. Try again.</p>}
-
-          {/* Number pad */}
-          <div className="grid grid-cols-3 gap-2 mb-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, null, 0, "del"].map((n, i) => (
-              n === null ? <div key={i} /> :
-              <button key={i}
-                onClick={() => {
-                  if (n === "del") { setLoginPin(p => p.slice(0, -1)); }
-                  else if (loginPin.length < 4) {
-                    const newPin = loginPin + n;
-                    setLoginPin(newPin);
-                    if (newPin.length === 4) { setTimeout(() => { if (newPin === "1234") { setIsLocked(false); setLoginPin(""); setLoginError(false); } else { setLoginError(true); setLoginPin(""); setTimeout(() => setLoginError(false), 2000); } }, 200); }
-                  }
-                }}
-                className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-medium transition-all active:scale-95"
-                style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }}
-                onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
-                onMouseLeave={e => { e.currentTarget.style.background = c.surface; }}
-              >
-                {n === "del" ? <I d={ic.chevL} s={16} /> : n}
-              </button>
-            ))}
-          </div>
-
-          {/* Biometric + Skip login */}
-          <div className="flex gap-3">
-            <button
-              onClick={() => {
-                setBiometricPhase("scanning");
-                setTimeout(() => { setBiometricPhase("recognized"); setTimeout(() => { setIsLocked(false); setLoginPin(""); setBiometricPhase(null); }, 800); }, 1500);
-              }}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl text-xs transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-              style={{ background: biometricPhase === "recognized" ? c.success : biometricPhase === "scanning" ? c.accent : c.surface, border: `1px solid ${biometricPhase ? "transparent" : c.border}`, color: biometricPhase ? "#fff" : c.textSec }}
-            >
-              <I d={ic.user} s={13} />
-              {biometricPhase === "scanning" ? "Scanning..." : biometricPhase === "recognized" ? "Recognized!" : "Face + Voice"}
-            </button>
-            <button
-              onClick={() => { setIsLocked(false); setLoginPin(""); }}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl text-xs transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
-              style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.textSec }}
-              onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = "#fff"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}
-            >
-              <I d={ic.lock} s={13} />
-              Skip
-            </button>
-          </div>
-          <p className="text-[9px] mt-2" style={{ color: c.textMuted }}>PIN: 1234 · Face+Voice · Smartwatch proximity</p>
-
-          {/* Zero-interaction login simulation */}
-          {biometricPhase === null && (
-            <div className="flex items-center gap-2 mt-3 px-3 py-1.5 rounded-lg" style={{ background: c.cardAlt }}>
-              <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: c.success }} />
-              <p className="text-[9px]" style={{ color: c.textMuted }}>AI: Smartwatch detected nearby. Auto-unlock available.</p>
-            </div>
-          )}
+          {/* Welcome message */}
+          <p className="text-xs" style={{ color: c.textMuted }}>Welcome back. Your desktop is ready.</p>
         </div>
       </div>
     );
