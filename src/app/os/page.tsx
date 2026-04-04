@@ -1896,126 +1896,92 @@ export default function AlternusOS() {
     browser: <BrowserApp c={c} />,
     word: <WordApp c={c} />,
     store: (() => {
-      const storeSections = [
+      const cats = [
         { icon: ic.sparkle, label: "Discover" },
         { icon: ic.play, label: "Games" },
         { icon: ic.store, label: "Apps" },
-        { icon: ic.film, label: "Videos" },
-        { icon: ic.music, label: "Music" },
+        { icon: ic.settings, label: "Categories" },
       ];
-      const featuredApps = [
-        { name: "Alternus Paint", desc: "Digital art & illustration studio", icon: ic.pen, iconBg: "#8B5CF6", price: "Free" },
-        { name: "Alternus Code", desc: "AI-powered code editor", icon: ic.code, iconBg: "#3B82F6", price: "Free" },
-        { name: "CloudSync Pro", desc: "Sync files across all devices", icon: ic.cloud, iconBg: "#06B6D4", price: "$4.99" },
-        { name: "Alternus Chat", desc: "Encrypted messaging app", icon: ic.send, iconBg: "#10B981", price: "Free" },
-        { name: "MindMap AI", desc: "AI brainstorming & mind maps", icon: ic.sparkle, iconBg: "#F59E0B", price: "$2.99" },
-        { name: "Alternus Photos", desc: "Photo gallery & AI editor", icon: ic.image, iconBg: "#EC4899", price: "Free" },
-      ];
-      const games = [
-        { name: "Pixel Quest", desc: "Retro adventure platformer", icon: ic.play, iconBg: "#EF4444", price: "Free" },
-        { name: "Neural Racer", desc: "AI-powered racing game", icon: ic.cpu, iconBg: "#8B5CF6", price: "$9.99" },
-        { name: "Code Breaker", desc: "Logic & puzzle game", icon: ic.lock, iconBg: "#3B82F6", price: "Free" },
-        { name: "Galaxy Wars", desc: "Space strategy multiplayer", icon: ic.sparkle, iconBg: "#F59E0B", price: "$5.99" },
-      ];
-      const videos = [
-        { name: "AlternusTV", desc: "Stream movies & series", icon: ic.film, iconBg: "#EF4444", price: "Free" },
-        { name: "VideoEdit Pro", desc: "Professional video editing", icon: ic.film, iconBg: "#8B5CF6", price: "$14.99" },
-        { name: "ScreenCast", desc: "Screen recording & sharing", icon: ic.monitor, iconBg: "#10B981", price: "Free" },
+      const allApps = [
+        { name: "Alternus Paint", desc: "Digital art & illustration", icon: ic.pen, iconBg: "#8B5CF6", price: "Free" },
+        { name: "CloudSync Pro", desc: "Sync files across devices", icon: ic.cloud, iconBg: "#06B6D4", price: "$4.99" },
+        { name: "Alternus Chat", desc: "Encrypted messaging", icon: ic.send, iconBg: "#10B981", price: "Free" },
+        { name: "MindMap AI", desc: "AI brainstorming tool", icon: ic.sparkle, iconBg: "#F59E0B", price: "$2.99" },
+        { name: "Pixel Quest", desc: "Retro platformer", icon: ic.play, iconBg: "#EF4444", price: "Free" },
+        { name: "Neural Racer", desc: "AI racing game", icon: ic.cpu, iconBg: "#8B5CF6", price: "$9.99" },
       ];
       return (
         <div className="flex h-full overflow-hidden">
           {/* Sidebar */}
-          <div className="w-[120px] flex-shrink-0 flex flex-col py-1 px-1.5 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
-            {storeSections.map((s, i) => (
+          <div className="w-[110px] flex-shrink-0 flex flex-col py-1 px-1.5" style={{ borderRight: `1px solid ${c.border}` }}>
+            {cats.map((s, i) => (
               <button key={i} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors"
                 style={{ background: i === 0 ? c.accentSoft : "transparent" }}
                 onMouseEnter={e => { if (i !== 0) e.currentTarget.style.background = c.cardAlt; }}
                 onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = i === 0 ? c.accentSoft : "transparent"; }}>
                 <I d={s.icon} s={14} c={i === 0 ? c.accentText : c.textMuted} />
-                <span className="text-[11px] font-medium" style={{ color: i === 0 ? c.accentText : c.text }}>{s.label}</span>
+                <span className="text-[10px] font-medium" style={{ color: i === 0 ? c.accentText : c.text }}>{s.label}</span>
               </button>
             ))}
           </div>
-          {/* Main content */}
-          <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-            {/* Featured banner */}
-            <div className="mx-3 mt-3 p-4 rounded-xl" style={{ background: `linear-gradient(135deg, ${c.accent}20, ${c.accent}05)`, border: `1px solid ${c.accent}30` }}>
-              <p className="text-xs font-semibold mb-1" style={{ color: c.accentText }}>Featured</p>
-              <p className="text-sm font-bold" style={{ color: c.text }}>Alternus Paint 2.0</p>
-              <p className="text-[10px] mt-1" style={{ color: c.textMuted }}>New AI brushes, layer effects & vector tools</p>
-              <button className="mt-2 px-4 py-1 rounded-full text-[10px] font-medium" style={{ background: c.accent, color: "#fff" }}>Get Free</button>
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto px-4 py-3" style={{ scrollbarWidth: "none" }}>
+            {/* Section: Best Apps and Games */}
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-bold" style={{ color: c.text }}>Best Apps and Games</p>
+              <span className="text-[10px] font-medium" style={{ color: c.accentText }}>See All</span>
+            </div>
+            {/* 2-column grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              {allApps.map((app, i) => (
+                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl transition-colors"
+                  style={{ background: c.cardAlt }}
+                  onMouseEnter={e => (e.currentTarget.style.background = c.border)}
+                  onMouseLeave={e => (e.currentTarget.style.background = c.cardAlt)}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: app.iconBg + "20" }}>
+                    <I d={app.icon} s={18} c={app.iconBg} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>{app.name}</p>
+                    <p className="text-[8px]" style={{ color: c.textMuted }}>{app.desc}</p>
+                  </div>
+                  <button className="text-[9px] px-2.5 py-1 rounded-full font-semibold flex-shrink-0"
+                    style={{ background: app.price === "Free" ? c.accent : c.cardAlt, color: app.price === "Free" ? "#fff" : c.accentText, border: app.price !== "Free" ? `1px solid ${c.accent}` : "none" }}>
+                    {app.price === "Free" ? "Free" : app.price}
+                  </button>
+                </div>
+              ))}
             </div>
 
-            {/* Popular Apps */}
-            <div className="px-3 mt-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-semibold" style={{ color: c.text }}>Popular Apps</p>
-                <span className="text-[10px]" style={{ color: c.accentText }}>See All</span>
-              </div>
-              <div className="space-y-1">
-                {featuredApps.map((app, i) => (
-                  <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: app.iconBg + "20" }}>
-                      <I d={app.icon} s={16} c={app.iconBg} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-medium truncate" style={{ color: c.text }}>{app.name}</p>
-                      <p className="text-[9px]" style={{ color: c.textMuted }}>{app.desc}</p>
-                    </div>
-                    <button className="text-[9px] px-3 py-1 rounded-full font-medium flex-shrink-0" style={{ background: c.accent, color: "#fff" }}>{app.price === "Free" ? "Get" : app.price}</button>
-                  </div>
-                ))}
-              </div>
+            {/* Section: Trending */}
+            <div className="flex items-center justify-between mt-5 mb-3">
+              <p className="text-xs font-bold" style={{ color: c.text }}>Trending Now</p>
+              <span className="text-[10px] font-medium" style={{ color: c.accentText }}>See All</span>
             </div>
-
-            {/* Games */}
-            <div className="px-3 mt-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-semibold" style={{ color: c.text }}>Games</p>
-                <span className="text-[10px]" style={{ color: c.accentText }}>See All</span>
-              </div>
-              <div className="space-y-1">
-                {games.map((g, i) => (
-                  <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: g.iconBg + "20" }}>
-                      <I d={g.icon} s={16} c={g.iconBg} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-medium truncate" style={{ color: c.text }}>{g.name}</p>
-                      <p className="text-[9px]" style={{ color: c.textMuted }}>{g.desc}</p>
-                    </div>
-                    <button className="text-[9px] px-3 py-1 rounded-full font-medium flex-shrink-0" style={{ background: g.price === "Free" ? c.accent : c.cardAlt, color: g.price === "Free" ? "#fff" : c.text }}>{g.price === "Free" ? "Get" : g.price}</button>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              {[
+                { name: "Code Breaker", desc: "Logic puzzle game", icon: ic.lock, iconBg: "#3B82F6", price: "Free" },
+                { name: "Galaxy Wars", desc: "Space strategy", icon: ic.sparkle, iconBg: "#F59E0B", price: "$5.99" },
+                { name: "AlternusTV", desc: "Stream movies", icon: ic.film, iconBg: "#EF4444", price: "Free" },
+                { name: "Alternus Photos", desc: "AI photo editor", icon: ic.image, iconBg: "#EC4899", price: "Free" },
+              ].map((app, i) => (
+                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl transition-colors"
+                  style={{ background: c.cardAlt }}
+                  onMouseEnter={e => (e.currentTarget.style.background = c.border)}
+                  onMouseLeave={e => (e.currentTarget.style.background = c.cardAlt)}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: app.iconBg + "20" }}>
+                    <I d={app.icon} s={18} c={app.iconBg} />
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Videos & Streaming */}
-            <div className="px-3 mt-4 pb-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-semibold" style={{ color: c.text }}>Videos & Streaming</p>
-                <span className="text-[10px]" style={{ color: c.accentText }}>See All</span>
-              </div>
-              <div className="space-y-1">
-                {videos.map((v, i) => (
-                  <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: v.iconBg + "20" }}>
-                      <I d={v.icon} s={16} c={v.iconBg} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-medium truncate" style={{ color: c.text }}>{v.name}</p>
-                      <p className="text-[9px]" style={{ color: c.textMuted }}>{v.desc}</p>
-                    </div>
-                    <button className="text-[9px] px-3 py-1 rounded-full font-medium flex-shrink-0" style={{ background: v.price === "Free" ? c.accent : c.cardAlt, color: v.price === "Free" ? "#fff" : c.text }}>{v.price === "Free" ? "Get" : v.price}</button>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>{app.name}</p>
+                    <p className="text-[8px]" style={{ color: c.textMuted }}>{app.desc}</p>
                   </div>
-                ))}
-              </div>
+                  <button className="text-[9px] px-2.5 py-1 rounded-full font-semibold flex-shrink-0"
+                    style={{ background: app.price === "Free" ? c.accent : c.cardAlt, color: app.price === "Free" ? "#fff" : c.accentText, border: app.price !== "Free" ? `1px solid ${c.accent}` : "none" }}>
+                    {app.price === "Free" ? "Free" : app.price}
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         </div>
