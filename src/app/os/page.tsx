@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts";
 
 interface WinState {
   id: WinId;
@@ -184,6 +184,10 @@ const ic = {
   hdd: "M22 12H2M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11zM6 16h.01M10 16h.01",
   refresh: "M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15",
   home: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0v-6a1 1 0 011-1h2a1 1 0 011 1v6m-6 0h6",
+  clock: "M12 2a10 10 0 100 20 10 10 0 000-20zM12 6v6l4 2",
+  calc: "M4 2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zM8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01M8 6h8",
+  key: "M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4",
+  menu: "M3 12h18M3 6h18M3 18h18",
   // Filled icon variants
   settingsF: "M12 8a4 4 0 100 8 4 4 0 000-8zM12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z",
   wifiF: "M12 20h.01M8.5 16.5a5 5 0 017 0M5 13a10 10 0 0114 0M2 8.82a15 15 0 0120 0",
@@ -1969,6 +1973,217 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
+// ━━━━ CLOCK APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function ClockApp({ c }: { c: typeof palette.dark }) {
+  const [tab, setTab] = useState<"clock" | "alarm" | "timer" | "stopwatch">("clock");
+  const [time, setTime] = useState(new Date());
+  const [timerSec, setTimerSec] = useState(300);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [stopwatchMs, setStopwatchMs] = useState(0);
+  const [swRunning, setSwRunning] = useState(false);
+  const [alarms, setAlarms] = useState([{ time: "07:00", label: "Morning", on: true }, { time: "12:30", label: "Lunch", on: false }]);
+
+  useEffect(() => { const iv = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(iv); }, []);
+  useEffect(() => { if (!timerRunning || timerSec <= 0) return; const iv = setInterval(() => setTimerSec(s => { if (s <= 1) { setTimerRunning(false); return 0; } return s - 1; }), 1000); return () => clearInterval(iv); }, [timerRunning, timerSec]);
+  useEffect(() => { if (!swRunning) return; const iv = setInterval(() => setStopwatchMs(s => s + 10), 10); return () => clearInterval(iv); }, [swRunning]);
+
+  const fmtTimer = (s: number) => `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
+  const fmtSw = (ms: number) => { const m = Math.floor(ms / 60000); const s = Math.floor((ms % 60000) / 1000); const cs = Math.floor((ms % 1000) / 10); return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}.${cs.toString().padStart(2, "0")}`; };
+
+  const worldTimes = [
+    { city: "New York", tz: "America/New_York" }, { city: "London", tz: "Europe/London" },
+    { city: "Tokyo", tz: "Asia/Tokyo" }, { city: "Tirana", tz: "Europe/Tirane" },
+  ];
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center gap-0 px-3 py-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        {(["clock", "alarm", "timer", "stopwatch"] as const).map(t => (
+          <button key={t} onClick={() => setTab(t)} className="px-3 py-1 text-[10px] font-medium capitalize"
+            style={{ color: tab === t ? c.accentText : c.textMuted, borderBottom: tab === t ? `2px solid ${c.accent}` : "2px solid transparent" }}>{t}</button>
+        ))}
+      </div>
+      <div className="flex-1 overflow-y-auto p-4" style={{ scrollbarWidth: "none" }}>
+        {tab === "clock" && (
+          <div className="flex flex-col items-center gap-6">
+            <div className="text-center">
+              <p className="text-5xl font-bold" style={{ color: c.text }}>{time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}</p>
+              <p className="text-xs mt-2" style={{ color: c.textMuted }}>{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</p>
+            </div>
+            <div className="w-full space-y-2 mt-2">
+              <p className="text-[10px] font-medium" style={{ color: c.textMuted }}>World Clock</p>
+              {worldTimes.map((wt, i) => (
+                <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: c.cardAlt }}>
+                  <span className="text-[11px]" style={{ color: c.text }}>{wt.city}</span>
+                  <span className="text-[11px] font-mono" style={{ color: c.textSec }}>{new Date().toLocaleTimeString("en-US", { timeZone: wt.tz, hour: "2-digit", minute: "2-digit", hour12: false })}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {tab === "alarm" && (
+          <div className="space-y-2">
+            {alarms.map((a, i) => (
+              <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
+                <div><p className="text-lg font-bold" style={{ color: c.text }}>{a.time}</p><p className="text-[10px]" style={{ color: c.textMuted }}>{a.label}</p></div>
+                <button onClick={() => setAlarms(p => p.map((al, j) => j === i ? { ...al, on: !al.on } : al))}
+                  className="w-10 h-5 rounded-full flex items-center px-0.5 transition-colors" style={{ background: a.on ? c.accent : c.cardAlt }}>
+                  <div className="w-4 h-4 rounded-full bg-white transition-all" style={{ marginLeft: a.on ? "18px" : "0px" }} />
+                </button>
+              </div>
+            ))}
+            <button onClick={() => setAlarms(p => [...p, { time: "08:00", label: "New Alarm", on: true }])}
+              className="w-full py-2 rounded-xl text-xs font-medium" style={{ background: c.cardAlt, color: c.accentText }}>+ Add Alarm</button>
+          </div>
+        )}
+        {tab === "timer" && (
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-5xl font-bold font-mono" style={{ color: c.text }}>{fmtTimer(timerSec)}</p>
+            <div className="flex gap-2">
+              <button onClick={() => setTimerRunning(!timerRunning)} className="px-4 py-2 rounded-xl text-xs font-medium" style={{ background: timerRunning ? c.cardAlt : c.accent, color: timerRunning ? c.text : "#fff" }}>{timerRunning ? "Pause" : "Start"}</button>
+              <button onClick={() => { setTimerRunning(false); setTimerSec(300); }} className="px-4 py-2 rounded-xl text-xs font-medium" style={{ background: c.cardAlt, color: c.text }}>Reset</button>
+            </div>
+            <div className="flex gap-2 mt-2">
+              {[60, 300, 600, 1800].map(s => (
+                <button key={s} onClick={() => { setTimerSec(s); setTimerRunning(false); }}
+                  className="px-3 py-1.5 rounded-lg text-[10px]" style={{ background: timerSec === s ? c.accentSoft : c.cardAlt, color: timerSec === s ? c.accentText : c.textMuted }}>{fmtTimer(s)}</button>
+              ))}
+            </div>
+          </div>
+        )}
+        {tab === "stopwatch" && (
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-4xl font-bold font-mono" style={{ color: c.text }}>{fmtSw(stopwatchMs)}</p>
+            <div className="flex gap-2">
+              <button onClick={() => setSwRunning(!swRunning)} className="px-4 py-2 rounded-xl text-xs font-medium" style={{ background: swRunning ? c.cardAlt : c.accent, color: swRunning ? c.text : "#fff" }}>{swRunning ? "Stop" : "Start"}</button>
+              <button onClick={() => { setSwRunning(false); setStopwatchMs(0); }} className="px-4 py-2 rounded-xl text-xs font-medium" style={{ background: c.cardAlt, color: c.text }}>Reset</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ━━━━ CALCULATOR APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function CalculatorApp({ c }: { c: typeof palette.dark }) {
+  const [display, setDisplay] = useState("0");
+  const [prev, setPrev] = useState<number | null>(null);
+  const [op, setOp] = useState<string | null>(null);
+  const [history, setHistory] = useState<string[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  const input = (val: string) => setDisplay(d => d === "0" || d === "Error" ? val : d + val);
+  const clear = () => { setDisplay("0"); setPrev(null); setOp(null); };
+  const operate = (nextOp: string) => { const n = parseFloat(display); if (prev !== null && op) { const r = op === "+" ? prev + n : op === "-" ? prev - n : op === "×" ? prev * n : op === "÷" ? (n === 0 ? NaN : prev / n) : n; setDisplay(isNaN(r) ? "Error" : String(r)); setPrev(r); } else { setPrev(n); } setOp(nextOp); setDisplay("0"); };
+  const equals = () => { const n = parseFloat(display); if (prev !== null && op) { const r = op === "+" ? prev + n : op === "-" ? prev - n : op === "×" ? prev * n : op === "÷" ? (n === 0 ? NaN : prev / n) : n; const expr = `${prev} ${op} ${n} = ${isNaN(r) ? "Error" : r}`; setHistory(p => [expr, ...p.slice(0, 19)]); setDisplay(isNaN(r) ? "Error" : String(r)); setPrev(null); setOp(null); } };
+  const percent = () => setDisplay(String(parseFloat(display) / 100));
+  const negate = () => setDisplay(String(-parseFloat(display)));
+
+  const Btn = ({ label, wide, accent: isAccent, onClick }: { label: string; wide?: boolean; accent?: boolean; onClick: () => void }) => (
+    <button onClick={onClick}
+      className={`${wide ? "col-span-2" : ""} h-10 rounded-xl text-sm font-medium transition-colors`}
+      style={{ background: isAccent ? c.accent : c.cardAlt, color: isAccent ? "#fff" : c.text }}
+      onMouseEnter={e => (e.currentTarget.style.opacity = "0.8")}
+      onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>{label}</button>
+  );
+
+  return (
+    <div className="flex h-full">
+      <div className="flex-1 flex flex-col">
+        {/* Display */}
+        <div className="px-4 pt-4 pb-2 flex-shrink-0">
+          {op && <p className="text-[10px] text-right" style={{ color: c.textMuted }}>{prev} {op}</p>}
+          <p className="text-3xl font-bold text-right truncate" style={{ color: c.text }}>{display}</p>
+        </div>
+        {/* Buttons */}
+        <div className="grid grid-cols-4 gap-1.5 p-3 flex-1">
+          <Btn label="C" onClick={clear} />
+          <Btn label="±" onClick={negate} />
+          <Btn label="%" onClick={percent} />
+          <Btn label="÷" accent onClick={() => operate("÷")} />
+          <Btn label="7" onClick={() => input("7")} />
+          <Btn label="8" onClick={() => input("8")} />
+          <Btn label="9" onClick={() => input("9")} />
+          <Btn label="×" accent onClick={() => operate("×")} />
+          <Btn label="4" onClick={() => input("4")} />
+          <Btn label="5" onClick={() => input("5")} />
+          <Btn label="6" onClick={() => input("6")} />
+          <Btn label="-" accent onClick={() => operate("-")} />
+          <Btn label="1" onClick={() => input("1")} />
+          <Btn label="2" onClick={() => input("2")} />
+          <Btn label="3" onClick={() => input("3")} />
+          <Btn label="+" accent onClick={() => operate("+")} />
+          <Btn label="0" wide onClick={() => input("0")} />
+          <Btn label="." onClick={() => { if (!display.includes(".")) input("."); }} />
+          <Btn label="=" accent onClick={equals} />
+        </div>
+      </div>
+      {/* History sidebar toggle */}
+      {showHistory && (
+        <div className="w-[140px] flex-shrink-0 flex flex-col overflow-y-auto py-2 px-2" style={{ borderLeft: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+          <p className="text-[9px] font-medium px-2 mb-2" style={{ color: c.textMuted }}>History</p>
+          {history.length === 0 && <p className="text-[9px] px-2" style={{ color: c.textMuted }}>No history yet</p>}
+          {history.map((h, i) => (
+            <div key={i} className="px-2 py-1 text-[9px] rounded-md" style={{ color: c.textSec }}>{h}</div>
+          ))}
+        </div>
+      )}
+      <button onClick={() => setShowHistory(!showHistory)} className="absolute top-1 right-1 p-1 rounded-md" style={{ color: c.textMuted }} title="History">
+        <I d={ic.menu} s={12} />
+      </button>
+    </div>
+  );
+}
+
+// ━━━━ ACCOUNTS APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function AccountsApp({ c }: { c: typeof palette.dark }) {
+  const [accounts, setAccounts] = useState([
+    { name: "Google", user: "admin@gmail.com", icon: ic.globe, color: "#4285F4" },
+    { name: "GitHub", user: "alternuslamiart", icon: ic.code, color: "#8B5CF6" },
+    { name: "Alternus Cloud", user: "admin@alternus.art", icon: ic.cloud, color: "#06B6D4" },
+    { name: "Microsoft", user: "admin@outlook.com", icon: ic.monitor, color: "#00A4EF" },
+  ]);
+  const [showAdd, setShowAdd] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newUser, setNewUser] = useState("");
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between px-4 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <p className="text-xs font-semibold" style={{ color: c.text }}>Saved Accounts</p>
+        <button onClick={() => setShowAdd(!showAdd)} className="p-1 rounded-md" style={{ color: c.accentText }}><I d={ic.plus} s={14} /></button>
+      </div>
+      <div className="flex-1 overflow-y-auto px-2 py-2" style={{ scrollbarWidth: "none" }}>
+        {showAdd && (
+          <div className="p-3 rounded-xl mb-2 space-y-2" style={{ background: c.cardAlt }}>
+            <input className="w-full px-3 py-1.5 rounded-lg text-[11px] bg-transparent outline-none" style={{ color: c.text, border: `1px solid ${c.border}` }} placeholder="Service name..." value={newName} onChange={e => setNewName(e.target.value)} />
+            <input className="w-full px-3 py-1.5 rounded-lg text-[11px] bg-transparent outline-none" style={{ color: c.text, border: `1px solid ${c.border}` }} placeholder="Username/Email..." value={newUser} onChange={e => setNewUser(e.target.value)} />
+            <button onClick={() => { if (newName && newUser) { setAccounts(p => [...p, { name: newName, user: newUser, icon: ic.key, color: c.accentText }]); setNewName(""); setNewUser(""); setShowAdd(false); } }}
+              className="w-full py-1.5 rounded-lg text-[10px] font-medium" style={{ background: c.accent, color: "#fff" }}>Save Account</button>
+          </div>
+        )}
+        {accounts.map((acc, i) => (
+          <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors mb-0.5"
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: acc.color + "20" }}>
+              <I d={acc.icon} s={16} c={acc.color} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] font-medium truncate" style={{ color: c.text }}>{acc.name}</p>
+              <p className="text-[9px]" style={{ color: c.textMuted }}>{acc.user}</p>
+            </div>
+            <button onClick={() => setAccounts(p => p.filter((_, j) => j !== i))} className="p-1 rounded-md opacity-0 group-hover:opacity-100" style={{ color: c.textMuted }} title="Remove">
+              <I d={ic.close} s={10} />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ MAIN OS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function AlternusOS() {
   const [mode, setMode] = useState<ThemeMode>("dark");
@@ -2015,6 +2230,9 @@ export default function AlternusOS() {
     { id: "store", title: "Store", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 40, y: 40, w: 540, h: 460 },
     { id: "movies", title: "Movies", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 260, y: 50, w: 480, h: 380 },
     { id: "word", title: "Alternus Word", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 140, y: 50, w: 540, h: 400 },
+    { id: "clock", title: "Clock", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 400, y: 100, w: 360, h: 420 },
+    { id: "calculator", title: "Calculator", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 500, y: 80, w: 320, h: 440 },
+    { id: "accounts", title: "Accounts", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 90, w: 360, h: 400 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -2114,6 +2332,9 @@ export default function AlternusOS() {
       store: { w: 680, h: 500 },
       movies: { w: 560, h: 440 },
       word: { w: 760, h: 520 },
+      clock: { w: 380, h: 460 },
+      calculator: { w: 320, h: 460 },
+      accounts: { w: 380, h: 440 },
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
@@ -2270,8 +2491,17 @@ export default function AlternusOS() {
       { keys: ["weather", "temperature", "rain", "sunny", "cloudy", "forecast", "storm", "snow", "wind", "humidity", "celsius", "fahrenheit", "climate"],
         response: `Currently 17° and partly cloudy in your area. Opening weather for details.`, actions: [{ label: "Open Weather", action: "weather" }] },
       // Calendar & Time
-      { keys: ["calendar", "schedule", "event", "meeting", "appointment", "reminder", "alarm", "clock", "time", "date", "today", "tomorrow", "week", "month", "birthday", "deadline", "planner", "agenda"],
+      { keys: ["calendar", "schedule", "event", "meeting", "appointment", "date", "today", "tomorrow", "week", "month", "birthday", "deadline", "planner", "agenda"],
         response: `Today is ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}. Opening calendar.`, actions: [{ label: "Open Calendar", action: "calendar" }] },
+      // Clock
+      { keys: ["alarm", "clock", "timer", "stopwatch", "time", "reminder", "world clock", "countdown"],
+        response: "Opening Clock app.", actions: [{ label: "Open Clock", action: "clock" }] },
+      // Calculator
+      { keys: ["calculator", "calculate", "math", "add", "subtract", "multiply", "divide", "sum", "percentage", "convert"],
+        response: "Opening Calculator.", actions: [{ label: "Open Calculator", action: "calculator" }] },
+      // Accounts
+      { keys: ["account", "login", "password", "credential", "saved account", "sign in", "profile", "username"],
+        response: "Opening your saved accounts.", actions: [{ label: "Open Accounts", action: "accounts" }] },
       // Notes & Writing
       { keys: ["note", "write", "memo", "todo", "checklist", "list", "journal", "diary", "scratch", "jot", "brainstorm", "idea"],
         response: "Opening Notes for you.", actions: [{ label: "Open Notes", action: "notes" }] },
@@ -2503,6 +2733,9 @@ export default function AlternusOS() {
         ))}
       </div>
     ),
+    clock: <ClockApp c={c} />,
+    calculator: <CalculatorApp c={c} />,
+    accounts: <AccountsApp c={c} />,
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
@@ -2517,6 +2750,9 @@ export default function AlternusOS() {
     { id: "weather", icon: ic.cloud, label: "Weather", color: "#22D3EE" },
     { id: "word", icon: ic.fileText, label: "Word", color: c.accentText },
     { id: "notes", icon: ic.note, label: "Notes", color: "#FBBF24" },
+    { id: "clock", icon: ic.clock, label: "Clock", color: "#F472B6" },
+    { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A" },
+    { id: "accounts", icon: ic.key, label: "Accounts", color: "#F59E0B" },
     { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec },
   ];
 
