@@ -1244,7 +1244,7 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
         {/* Quick Access header for Home */}
         {curPath === "Home" && !searchQuery && (
           <div className="px-4 pt-3 pb-1 flex-shrink-0">
-            <p className="text-[11px] font-medium" style={{ color: c.textMuted }}>Quick access</p>
+            <p className="text-[11px] font-medium" style={{ color: c.textMuted }}>Pinned</p>
           </div>
         )}
 
@@ -1280,10 +1280,10 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
         {/* Bottom bar - Recent / Favorites / Shared */}
         {curPath === "Home" && !searchQuery && (
           <div className="flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-            <div className="flex items-center gap-1 px-3 py-1.5">
+            <div className="flex items-center gap-0 px-3 py-1.5">
               {(["recent", "favorites", "shared"] as const).map(tab => (
                 <button key={tab} onClick={() => setActiveTab(tab)}
-                  className="px-3 py-1 rounded-full text-[10px] font-medium capitalize transition-colors"
+                  className="px-4 py-1 rounded-full text-[11px] font-medium capitalize transition-colors"
                   style={{ background: activeTab === tab ? c.accent : "transparent", color: activeTab === tab ? "#fff" : c.textMuted }}>
                   {tab}
                 </button>
@@ -1471,19 +1471,19 @@ export default function AlternusOS() {
   const c = palette[mode];
 
   const defaultWins: WinState[] = [
-    { id: "ai", title: "Alternus AI", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 40, w: 600, h: 450 },
-    { id: "terminal", title: "Terminal", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 60, w: 550, h: 380 },
-    { id: "code", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 150, y: 50, w: 650, h: 450 },
-    { id: "files", title: "Files", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 80, w: 400, h: 380 },
-    { id: "settings", title: "Settings", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 50, w: 560, h: 440 },
-    { id: "music", title: "Music", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 250, y: 50, w: 340, h: 420 },
-    { id: "weather", title: "Weather", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 400, y: 60, w: 360, h: 400 },
-    { id: "calendar", title: "Calendar", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 450, y: 80, w: 320, h: 380 },
-    { id: "notes", title: "Notes", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 180, y: 90, w: 450, h: 380 },
-    { id: "browser", title: "Browser", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 40, w: 700, h: 480 },
-    { id: "store", title: "Store", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 180, y: 60, w: 550, h: 420 },
-    { id: "movies", title: "Movies", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 50, w: 600, h: 450 },
-    { id: "word", title: "Alternus Word", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 40, w: 700, h: 500 },
+    { id: "ai", title: "Alternus AI", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 60, w: 480, h: 380 },
+    { id: "terminal", title: "Terminal", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 80, w: 460, h: 340 },
+    { id: "code", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 520, h: 400 },
+    { id: "files", title: "Files", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 240, y: 70, w: 520, h: 400 },
+    { id: "settings", title: "Settings", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 180, y: 60, w: 500, h: 380 },
+    { id: "music", title: "Music", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 80, w: 340, h: 360 },
+    { id: "weather", title: "Weather", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 350, y: 70, w: 340, h: 360 },
+    { id: "calendar", title: "Calendar", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 380, y: 90, w: 320, h: 340 },
+    { id: "notes", title: "Notes", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 80, w: 400, h: 340 },
+    { id: "browser", title: "Browser", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 540, h: 400 },
+    { id: "store", title: "Store", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 60, w: 460, h: 380 },
+    { id: "movies", title: "Movies", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 260, y: 50, w: 480, h: 380 },
+    { id: "word", title: "Alternus Word", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 140, y: 50, w: 540, h: 400 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
