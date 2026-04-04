@@ -2013,16 +2013,16 @@ export default function AlternusOS() {
           </div>
         </div>
 
-        {/* Main content - centered vertically in remaining space */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-12 pb-8">
-          {/* Clock + Date */}
-          <div className="flex flex-col items-center">
+        {/* Main content */}
+        <div className="flex-1 relative">
+          {/* Clock + Date — upper area */}
+          <div className="absolute top-[15%] left-1/2 -translate-x-1/2 flex flex-col items-center">
             <p style={{ color: c.text }} className="text-8xl font-bold tracking-wide mb-2">{fmt(time)}</p>
             <p style={{ color: c.textMuted }} className="text-base">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
           </div>
 
-          {/* Profile + Button */}
-          <div className="flex flex-col items-center">
+          {/* Profile + Button — lower area */}
+          <div className="absolute bottom-[18%] left-1/2 -translate-x-1/2 flex flex-col items-center">
             {/* Profile avatar */}
             <div
               className="w-16 h-16 rounded-full flex items-center justify-center mb-3"
