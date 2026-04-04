@@ -215,3 +215,8 @@
 .animate-marquee-slow:hover {
   animation-play-state: paused;
 }
+
+/* Safe area padding for mobile devices */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}

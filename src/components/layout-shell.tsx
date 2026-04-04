@@ -20,9 +20,11 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <Header />
-      {!hideCategoryBar && <CategoryBar />}
-      <main className="flex-1 pb-20 md:pb-0">{children}</main>
+      <div className="sticky top-0 z-50">
+        <Header />
+        {!hideCategoryBar && <CategoryBar />}
+      </div>
+      <main className="flex-1 pb-16 md:pb-0 overflow-x-hidden">{children}</main>
       <Footer />
       <MobileNav />
     </>

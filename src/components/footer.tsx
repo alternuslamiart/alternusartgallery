@@ -8,8 +8,7 @@ export function Footer() {
   const { t } = useLanguage();
 
   return (
-    <>
-    <footer className="border-t bg-[#060411] text-white rounded-t-[48px]">
+    <footer className="border-t bg-[#060411] text-white rounded-t-[24px] md:rounded-t-[32px] lg:rounded-t-[48px]">
       {/* Main Footer */}
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-8">
@@ -280,41 +279,40 @@ export function Footer() {
         src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
         strategy="lazyOnload"
       />
+
+      {/* Marquee Section */}
+      <div className="overflow-hidden border-t border-white/5">
+        <div className="animate-marquee">
+          <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
+            Alternus
+          </span>
+          <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
+            Alternus
+          </span>
+          <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
+            Alternus
+          </span>
+          <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
+            Alternus
+          </span>
+        </div>
+      </div>
+
+      {/* Small Marquee Strip */}
+      <div className="h-[64px] flex items-center overflow-hidden">
+        <div className="animate-marquee-slow">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="flex items-center gap-8 md:gap-14 px-4 md:px-8">
+              <span className="font-playfair text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap select-none">Alternus</span>
+              <span className="text-white/20 text-lg select-none">&bull;</span>
+              <span className="font-playfair text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap select-none">Art Gallery</span>
+              <span className="text-white/20 text-lg select-none">&bull;</span>
+              <span className="font-playfair text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap select-none">Since 2026</span>
+              <span className="text-white/20 text-lg select-none">&bull;</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </footer>
-
-    {/* Marquee Section */}
-    <div className="overflow-hidden bg-[#060411] border-t border-[#060411]">
-      <div className="animate-marquee">
-        <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
-          Alternus
-        </span>
-        <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
-          Alternus
-        </span>
-        <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
-          Alternus
-        </span>
-        <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
-          Alternus
-        </span>
-      </div>
-    </div>
-
-    {/* Small Marquee Strip */}
-    <div className="h-[64px] flex items-center bg-[#060411] overflow-hidden">
-      <div className="animate-marquee-slow">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="flex items-center gap-8 md:gap-14 px-4 md:px-8">
-            <span className="font-playfair text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap select-none">Alternus</span>
-            <span className="text-white/20 text-lg select-none">&bull;</span>
-            <span className="font-playfair text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap select-none">Art Gallery</span>
-            <span className="text-white/20 text-lg select-none">&bull;</span>
-            <span className="font-playfair text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap select-none">Since 2026</span>
-            <span className="text-white/20 text-lg select-none">&bull;</span>
-          </div>
-        ))}
-      </div>
-    </div>
-    </>
   );
 }

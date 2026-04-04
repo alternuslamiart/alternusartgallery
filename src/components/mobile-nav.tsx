@@ -56,7 +56,7 @@ export function MobileNav() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 md:hidden pb-safe">
         <div className="flex justify-around items-center h-16 px-2">
           {navItems.slice(0, 2).map((item) => {
             const isActive = pathname === item.href ||
@@ -116,8 +116,6 @@ export function MobileNav() {
             );
           })}
         </div>
-        {/* Safe area padding for iPhone notch */}
-        <div className="h-safe-area-inset-bottom bg-white" />
       </nav>
 
       {/* Mobile Chat Window */}

@@ -361,7 +361,7 @@ export function CategoryBar() {
   return (
     <div
       ref={barRef}
-      className="hidden lg:block w-full border-b border-gray-100 bg-white relative z-40"
+      className="hidden lg:block w-full border-b border-gray-100 bg-white relative"
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center gap-1 h-10 overflow-x-auto scrollbar-hide">
