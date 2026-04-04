@@ -439,29 +439,29 @@ function AIChat({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp?: (id: Win
   return (
     <div className="flex h-full">
       {/* Sidebar tools */}
-      <div className="w-[48px] flex-shrink-0 flex flex-col items-center py-3 gap-1" style={{ borderRight: `1px solid ${c.border}` }}>
+      <div className="w-[40px] flex-shrink-0 flex flex-col items-center py-2 gap-0.5" style={{ borderRight: `1px solid ${c.border}` }}>
         {sideTools.map((tool, i) => (
           <button key={i} onClick={() => {
             if (tool.action && onOpenApp) onOpenApp(tool.action);
             else { setMsgs(p => [...p, { role: "user", text: tool.label }, { role: "ai", text: `${tool.label} mode activated. Describe what you'd like to create.` }]); }
           }}
-            className="w-9 h-9 rounded-lg flex items-center justify-center transition-all"
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
             style={{ color: c.textMuted }}
             title={tool.label}
             onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.accentText; }}
             onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-            <I d={tool.icon} s={16} />
+            <I d={tool.icon} s={14} />
           </button>
         ))}
         <div className="flex-1" />
         {/* Search web button */}
         <button onClick={() => { if (onOpenApp) onOpenApp("browser"); }}
-          className="w-9 h-9 rounded-lg flex items-center justify-center transition-all mb-1"
+          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
           style={{ background: c.accentSoft, color: c.accentText }}
           title="Search Web"
           onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.color = "#fff"; }}
           onMouseLeave={e => { e.currentTarget.style.background = c.accentSoft; e.currentTarget.style.color = c.accentText; }}>
-          <I d={ic.globe} s={16} />
+          <I d={ic.globe} s={14} />
         </button>
       </div>
 
@@ -1538,7 +1538,7 @@ export default function AlternusOS() {
   const c = palette[mode];
 
   const defaultWins: WinState[] = [
-    { id: "ai", title: "Alternus AI", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 60, w: 480, h: 380 },
+    { id: "ai", title: "Alternus AI", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 8, y: 44, w: 320, h: 520 },
     { id: "terminal", title: "Terminal", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 80, w: 460, h: 340 },
     { id: "code", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 520, h: 400 },
     { id: "files", title: "Files", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 240, y: 70, w: 520, h: 400 },
