@@ -1538,11 +1538,56 @@ export default function AlternusOS() {
     if (!q) return;
     addTimelineEvent("Searched", `"${aiInput.trim()}"`, ic.search);
 
-    // ━━━ SEMANTIC SEARCH — search file content, not just names ━━━
+    // ━━━ APP KEYWORD MAP — every keyword opens the right app ━━━
+    const appMap: { keys: string[]; response: string; actions: { label: string; action: WinId }[] }[] = [
+      // Browser & Web
+      { keys: ["google", "browse", "browser", "web", "search", "internet", "url", "website", "http", "youtube", "facebook", "instagram", "twitter", "reddit", "wikipedia", "linkedin", "amazon", "ebay", "netflix", "spotify", "tiktok", "pinterest", "stackoverflow", "github"],
+        response: "Opening browser for you.", actions: [{ label: "Open Browser", action: "browser" }] },
+      // Code & Development
+      { keys: ["code", "program", "develop", "javascript", "python", "html", "css", "react", "typescript", "debug", "compile", "script", "function", "variable", "api", "claude", "ai code", "copilot", "vscode", "editor", "ide", "git", "npm", "node"],
+        response: "Ready to code. Opening the code editor.", actions: [{ label: "Open Code Editor", action: "code" }] },
+      // Terminal
+      { keys: ["terminal", "command", "shell", "bash", "cmd", "console", "cli", "ssh", "ping", "npm run", "yarn", "pip"],
+        response: "Opening terminal for command line access.", actions: [{ label: "Open Terminal", action: "terminal" }] },
+      // Files & Documents
+      { keys: ["file", "document", "folder", "directory", "explorer", "download", "upload", "pdf", "docx", "xlsx", "zip", "rar", "copy", "paste", "move", "rename", "delete file"],
+        response: "Opening the file manager.", actions: [{ label: "Open Files", action: "files" }] },
+      // Music & Audio
+      { keys: ["music", "song", "play", "playlist", "album", "artist", "spotify", "audio", "mp3", "radio", "podcast", "beats", "dj", "sound", "volume"],
+        response: "Opening the music player.", actions: [{ label: "Open Music", action: "music" }] },
+      // Weather
+      { keys: ["weather", "temperature", "rain", "sunny", "cloudy", "forecast", "storm", "snow", "wind", "humidity", "celsius", "fahrenheit", "climate"],
+        response: `Currently 17° and partly cloudy in your area. Opening weather for details.`, actions: [{ label: "Open Weather", action: "weather" }] },
+      // Calendar & Time
+      { keys: ["calendar", "schedule", "event", "meeting", "appointment", "reminder", "alarm", "clock", "time", "date", "today", "tomorrow", "week", "month", "birthday", "deadline", "planner", "agenda"],
+        response: `Today is ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}. Opening calendar.`, actions: [{ label: "Open Calendar", action: "calendar" }] },
+      // Notes & Writing
+      { keys: ["note", "write", "memo", "todo", "checklist", "list", "journal", "diary", "scratch", "jot", "brainstorm", "idea"],
+        response: "Opening Notes for you.", actions: [{ label: "Open Notes", action: "notes" }] },
+      // Word & Documents
+      { keys: ["word", "document", "letter", "essay", "report", "resume", "cv", "thesis", "article", "blog", "paper", "manuscript", "format", "paragraph", "font", "bold", "italic", "heading"],
+        response: "Opening Alternus Word for document editing.", actions: [{ label: "Open Word", action: "word" }] },
+      // Settings & System
+      { keys: ["setting", "config", "theme", "dark mode", "light mode", "wifi", "bluetooth", "network", "display", "brightness", "language", "notification", "privacy", "security", "update", "system", "preference", "account", "password", "storage", "battery"],
+        response: "Opening settings.", actions: [{ label: "Open Settings", action: "settings" }] },
+      // Store & Shopping
+      { keys: ["store", "shop", "buy", "purchase", "app store", "download app", "install", "marketplace", "shopping", "cart", "order", "product", "price", "deal", "sale", "discount", "ecommerce"],
+        response: "Opening the Store for you.", actions: [{ label: "Open Store", action: "store" }] },
+      // Movies & Video
+      { keys: ["movie", "film", "video", "watch", "stream", "cinema", "series", "tv show", "anime", "documentary", "trailer", "imdb", "popcorn", "subtitle", "episode", "season"],
+        response: "Opening Movies. What would you like to watch?", actions: [{ label: "Open Movies", action: "movies" }] },
+      // AI Chat
+      { keys: ["ai", "chat", "assistant", "help me", "ask", "question", "explain", "translate", "summarize", "generate", "create", "analyze", "solve", "calculate", "math", "gpt", "claude", "chatbot", "conversation"],
+        response: "I'm here to help! Opening AI Chat.", actions: [{ label: "Open AI Chat", action: "ai" }] },
+      // Design & Illustration
+      { keys: ["illustrator", "design", "draw", "paint", "sketch", "art", "photoshop", "figma", "canvas", "graphic", "logo", "icon", "illustration", "vector", "pixel", "color", "gradient", "brush", "layer"],
+        response: "For design work, I recommend opening the Code Editor for SVG/CSS design, or the Browser for Figma.", actions: [{ label: "Open Code Editor", action: "code" }, { label: "Open Browser", action: "browser" }] },
+    ];
+
+    // ━━━ SEMANTIC FILE SEARCH ━━━
     const fileMatches = aiFileIndex.filter(f => f.content.split(" ").some(w => q.includes(w)) || f.name.toLowerCase().includes(q) || f.tags.some(t => q.includes(t)));
     if (fileMatches.length > 0) {
       const fileList = fileMatches.map(f => `• ${f.name} (${f.path})`).join("\n");
-      // Auto-tag & cluster
       const tags = Array.from(new Set(fileMatches.flatMap(f => f.tags)));
       const clusterInfo = tags.length > 0 ? `\n\nAI auto-grouped by: ${tags.join(", ")}` : "";
       setAiResponse(`AI found ${fileMatches.length} file${fileMatches.length > 1 ? "s" : ""} matching your search:\n\n${fileList}${clusterInfo}`);
@@ -1557,18 +1602,6 @@ export default function AlternusOS() {
       return;
     }
 
-    // ━━━ NOTIFICATION SUMMARY ━━━
-    if (q.includes("notification") || q.includes("summary") || q.includes("missed")) {
-      const count = aiNotifications.length;
-      const unread = aiNotifications.filter(n => !n.read).length;
-      const byType = aiNotifications.reduce((acc, n) => { acc[n.type] = (acc[n.type] || 0) + 1; return acc; }, {} as Record<string, number>);
-      const summary = Object.entries(byType).map(([t, c]) => `${c} ${t}`).join(", ");
-      setAiResponse(`AI Notification Summary:\n\nYou have ${count} notifications (${unread} unread).\nBreakdown: ${summary || "none"}.\n\nWant to see them all?`);
-      setAiActions([]);
-      setShowNotifications(true);
-      return;
-    }
-
     // ━━━ TIMELINE ━━━
     if (q.includes("timeline") || q.includes("history") || q.includes("activity")) {
       setShowTimeline(true);
@@ -1577,41 +1610,26 @@ export default function AlternusOS() {
       return;
     }
 
-    // Standard app-based search
-    if (q.includes("file") || q.includes("document") || q.includes("folder")) {
-      setAiResponse("I found your files. Would you like to open the file manager?");
-      setAiActions([{ label: "Open Files", action: "files" }]);
-    } else if (q.includes("code") || q.includes("edit") || q.includes("program")) {
-      setAiResponse("Ready to code. I can open the code editor for you.");
-      setAiActions([{ label: "Open Code Editor", action: "code" }]);
-    } else if (q.includes("terminal") || q.includes("command") || q.includes("shell")) {
-      setAiResponse("Opening terminal for command line access.");
-      setAiActions([{ label: "Open Terminal", action: "terminal" }]);
-    } else if (q.includes("browse") || q.includes("web") || q.includes("search") || q.includes("google")) {
-      setAiResponse("I can open the browser for you. What would you like to search?");
-      setAiActions([{ label: "Open Browser", action: "browser" }]);
-    } else if (q.includes("music") || q.includes("song") || q.includes("play")) {
-      setAiResponse("Let me open the music player for you.");
-      setAiActions([{ label: "Open Music", action: "music" }]);
-    } else if (q.includes("weather") || q.includes("temperature")) {
-      setAiResponse("Currently 17° and partly cloudy. Would you like more details?");
-      setAiActions([{ label: "Open Weather", action: "weather" }]);
-    } else if (q.includes("note") || q.includes("write") || q.includes("memo")) {
-      setAiResponse("I can open Notes for you to start writing.");
-      setAiActions([{ label: "Open Notes", action: "notes" }]);
-    } else if (q.includes("setting") || q.includes("config") || q.includes("theme")) {
-      setAiResponse("Opening settings. You can change theme, language, and more.");
-      setAiActions([{ label: "Open Settings", action: "settings" }]);
-    } else if (q.includes("calendar") || q.includes("date") || q.includes("schedule")) {
-      setAiResponse(`Today is ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}.`);
-      setAiActions([{ label: "Open Calendar", action: "calendar" }]);
-    } else if (q.includes("hello") || q.includes("hi") || q.includes("hey")) {
-      setAiResponse("Hello! I'm Alternus AI. I can open apps, find files by content, manage your workspace, and answer questions. Try: 'budget', 'cleanup', 'timeline'.");
+    // ━━━ GREETINGS ━━━
+    if (q.match(/^(hello|hi|hey|yo|sup|good morning|good afternoon|good evening|whats up|what's up)$/)) {
+      setAiResponse("Hello! I'm Alternus AI. Try searching for anything:\n\n• Apps: \"browser\", \"code\", \"music\", \"movies\"\n• Services: \"google\", \"youtube\", \"github\"\n• Tasks: \"write a letter\", \"design a logo\"\n• System: \"settings\", \"wifi\", \"dark mode\"\n• Files: \"budget\", \"invoice\", \"contract\"");
       setAiActions([]);
-    } else {
-      setAiResponse(`AI searched for "${aiInput.trim()}" across files, apps, and system.\n\nNo exact matches found. Try:\n• Search by content: "budget", "invoice", "contract"\n• Predictive cleanup: "cleanup"\n• Activity timeline: "timeline"\n• Notification summary: "notifications"`);
-      setAiActions([{ label: "Open Files", action: "files" }, { label: "Open Browser", action: "browser" }]);
+      return;
     }
+
+    // ━━━ MATCH APP KEYWORDS ━━━
+    for (const entry of appMap) {
+      const match = entry.keys.some(k => q.includes(k));
+      if (match) {
+        setAiResponse(entry.response);
+        setAiActions(entry.actions);
+        return;
+      }
+    }
+
+    // ━━━ FALLBACK — open browser to search ━━━
+    setAiResponse(`No app found for "${aiInput.trim()}". I can search the web for you.`);
+    setAiActions([{ label: "Search on Google", action: "browser" }, { label: "Open AI Chat", action: "ai" }]);
   };
 
   const winContent: Record<WinId, React.ReactNode> = {
