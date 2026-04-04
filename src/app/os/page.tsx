@@ -598,13 +598,13 @@ function TerminalApp({ c }: { c: typeof palette.dark }) {
   };
 
   return (
-    <div className="flex flex-col h-full font-mono" style={{ background: "#0D0D12" }} onClick={() => inputRef.current?.focus()}>
+    <div className="flex flex-col h-full font-mono" style={{ background: "#0A0A0C" }} onClick={() => inputRef.current?.focus()}>
       {/* Tab bar */}
-      <div className="flex items-center flex-shrink-0" style={{ background: "#15151D", borderBottom: "1px solid #2A2A35" }}>
+      <div className="flex items-center flex-shrink-0" style={{ background: "#101014", borderBottom: "1px solid #2A2A35" }}>
         {tabs.map(t => (
           <div key={t.id} className="flex items-center group"
-            style={{ background: t.id === activeTab ? "#0D0D12" : "transparent", borderBottom: t.id === activeTab ? "2px solid #4ade80" : "2px solid transparent" }}>
-            <button onClick={() => setActiveTab(t.id)} className="px-3 py-1.5 text-[10px]" style={{ color: t.id === activeTab ? "#4ade80" : "#555" }}>
+            style={{ background: t.id === activeTab ? "#0A0A0C" : "transparent", borderBottom: t.id === activeTab ? "2px solid #5A8A5A" : "2px solid transparent" }}>
+            <button onClick={() => setActiveTab(t.id)} className="px-3 py-1.5 text-[10px]" style={{ color: t.id === activeTab ? "#7AAF7A" : "#444" }}>
               {t.name}
             </button>
             {tabs.length > 1 && <button onClick={() => closeTab(t.id)} className="pr-2 opacity-0 group-hover:opacity-100" style={{ color: "#555" }}><I d={ic.close} s={8} /></button>}
@@ -620,7 +620,7 @@ function TerminalApp({ c }: { c: typeof palette.dark }) {
           const isError = l.startsWith("bash:") || l.startsWith("✗");
           const isSuccess = l.startsWith("✓") || l.startsWith("✓");
           return (
-            <div key={i} className="whitespace-pre-wrap" style={{ color: isPrompt ? "#4ade80" : isError ? "#f87171" : isSuccess ? "#4ade80" : "#B0B0B8" }}>
+            <div key={i} className="whitespace-pre-wrap" style={{ color: isPrompt ? "#7AAF7A" : isError ? "#BF6A6A" : isSuccess ? "#7AAF7A" : "#808088" }}>
               {l}
             </div>
           );
@@ -630,8 +630,8 @@ function TerminalApp({ c }: { c: typeof palette.dark }) {
 
       {/* Input */}
       <div className="flex items-center gap-1 px-3 py-2 flex-shrink-0" style={{ borderTop: "1px solid #2A2A35" }}>
-        <span className="text-[10px]" style={{ color: "#4ade80" }}>admin@alternus</span>
-        <span className="text-[10px]" style={{ color: "#6C63FF" }}>:{cwd}$</span>
+        <span className="text-[10px]" style={{ color: "#7AAF7A" }}>admin@alternus</span>
+        <span className="text-[10px]" style={{ color: "#6A6A75" }}>:{cwd}$</span>
         <input ref={inputRef}
           className="flex-1 bg-transparent outline-none text-[11px] ml-1"
           style={{ color: "#E4E4E7" }}
@@ -1894,7 +1894,7 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
 
           {/* Terminal */}
           {showTerminal && (
-            <div className="flex flex-col" style={{ height: 130, borderTop: `1px solid ${br}`, background: "#0D0D12" }}>
+            <div className="flex flex-col" style={{ height: 130, borderTop: `1px solid ${br}`, background: "#0A0A0C" }}>
               <div className="flex items-center justify-between px-3 py-1 flex-shrink-0" style={{ borderBottom: `1px solid ${br}` }}>
                 <div className="flex items-center gap-2">
                   <span className="text-[9px] font-bold" style={{ color: "#8ABF8A" }}>Terminal</span>
