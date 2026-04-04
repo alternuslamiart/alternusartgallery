@@ -1620,41 +1620,72 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function CodeApp({ c }: { c: typeof palette.dark }) {
-  const bg = "#1e1e1e"; const bg2 = "#252526"; const br = "#333";
-  const files = [
-    { name: "main.js", lang: "JavaScript", content: `// Alternus Code Editor\n\nfunction greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nconst result = greet("World");\nconsole.log(result);` },
-    { name: "style.css", lang: "CSS", content: `/* Styles */\nbody {\n  margin: 0;\n  font-family: 'Arial', sans-serif;\n  background: #1e1e1e;\n  color: #d4d4d4;\n}` },
-    { name: "index.html", lang: "HTML", content: `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <title>Alternus App</title>\n</head>\n<body>\n  <div id="app"></div>\n  <script src="main.js"></script>\n</body>\n</html>` },
+  const bg = "#111116"; const bg2 = "#18181E"; const bg3 = "#1E1E26"; const br = "#2A2A35"; const accent = "#6C63FF";
+  const fileTree = [
+    { name: "src", type: "folder" as const, open: true, children: [
+      { name: "main.js", type: "file" as const, lang: "JavaScript" },
+      { name: "app.jsx", type: "file" as const, lang: "React" },
+      { name: "utils.js", type: "file" as const, lang: "JavaScript" },
+    ]},
+    { name: "public", type: "folder" as const, open: false, children: [
+      { name: "index.html", type: "file" as const, lang: "HTML" },
+    ]},
+    { name: "style.css", type: "file" as const, lang: "CSS" },
+    { name: "package.json", type: "file" as const, lang: "JSON" },
   ];
-  const [activeFile, setActiveFile] = useState(0);
-  const [code, setCode] = useState(files[0].content);
+  const fileContents: Record<string, { lang: string; code: string }> = {
+    "main.js": { lang: "JavaScript", code: `// Alternus Code Editor — AI Integrated\n\nimport { createApp } from './app.jsx';\nimport { formatDate, capitalize } from './utils.js';\n\nfunction greet(name) {\n  return \`Hello, \${capitalize(name)}!\`;\n}\n\nconst app = createApp('Alternus');\nconsole.log(greet("World"));\nconsole.log(formatDate(new Date()));` },
+    "app.jsx": { lang: "React", code: `import { useState } from 'react';\n\nexport function createApp(name) {\n  return { name, version: '1.0.0' };\n}\n\nexport default function App() {\n  const [count, setCount] = useState(0);\n\n  return (\n    <div className="app">\n      <h1>Alternus App</h1>\n      <button onClick={() => setCount(c => c + 1)}>\n        Count: {count}\n      </button>\n    </div>\n  );\n}` },
+    "utils.js": { lang: "JavaScript", code: `export function formatDate(date) {\n  return date.toLocaleDateString('en-US', {\n    weekday: 'long',\n    year: 'numeric',\n    month: 'long',\n    day: 'numeric'\n  });\n}\n\nexport function capitalize(str) {\n  return str.charAt(0).toUpperCase() + str.slice(1);\n}\n\nexport function debounce(fn, ms) {\n  let timer;\n  return (...args) => {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}` },
+    "index.html": { lang: "HTML", code: `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width">\n  <title>Alternus App</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <div id="root"></div>\n  <script type="module" src="src/main.js"></script>\n</body>\n</html>` },
+    "style.css": { lang: "CSS", code: `* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\nbody {\n  font-family: 'Inter', sans-serif;\n  background: #0a0a0f;\n  color: #e4e4e7;\n  min-height: 100vh;\n}\n\n.app {\n  max-width: 800px;\n  margin: 0 auto;\n  padding: 2rem;\n}\n\nbutton {\n  padding: 0.5rem 1rem;\n  border-radius: 8px;\n  border: 1px solid #333;\n  background: #1a1a2e;\n  color: #fff;\n  cursor: pointer;\n}` },
+    "package.json": { lang: "JSON", code: `{\n  "name": "alternus-app",\n  "version": "1.0.0",\n  "type": "module",\n  "scripts": {\n    "dev": "vite",\n    "build": "vite build",\n    "preview": "vite preview"\n  },\n  "dependencies": {\n    "react": "^19.0.0",\n    "react-dom": "^19.0.0"\n  },\n  "devDependencies": {\n    "vite": "^6.0.0"\n  }\n}` },
+  };
+  const files = Object.keys(fileContents);
+  const [activeFile, setActiveFile] = useState("main.js");
+  const [openTabs, setOpenTabs] = useState(["main.js"]);
+  const [codes, setCodes] = useState<Record<string, string>>(Object.fromEntries(Object.entries(fileContents).map(([k, v]) => [k, v.code])));
   const [output, setOutput] = useState<string[]>([]);
   const [showTerminal, setShowTerminal] = useState(false);
-  const [showAI, setShowAI] = useState(false);
+  const [showAI, setShowAI] = useState(true);
+  const [showExplorer, setShowExplorer] = useState(true);
   const [aiInput, setAiInput] = useState("");
   const [aiMsgs, setAiMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([
-    { role: "ai", text: "Hi! I'm your AI coding assistant. Ask me to write code, fix bugs, or explain anything." },
+    { role: "ai", text: "Hi! I'm your AI coding partner. I can:\n• Write & generate code\n• Fix bugs & errors\n• Explain code logic\n• Refactor & optimize\n\nAsk me anything!" },
   ]);
   const aiEndRef = useRef<HTMLDivElement>(null);
+  const code = codes[activeFile] || "";
+  const lang = fileContents[activeFile]?.lang || "Text";
 
   useEffect(() => { aiEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [aiMsgs]);
 
-  const switchFile = (i: number) => { setActiveFile(i); setCode(files[i].content); };
+  const openFile = (name: string) => {
+    setActiveFile(name);
+    if (!openTabs.includes(name)) setOpenTabs(p => [...p, name]);
+  };
+  const closeTab = (name: string) => {
+    const t = openTabs.filter(n => n !== name);
+    setOpenTabs(t);
+    if (activeFile === name) setActiveFile(t[t.length - 1] || "main.js");
+  };
+  const setCode = (val: string | ((prev: string) => string)) => {
+    setCodes(p => ({ ...p, [activeFile]: typeof val === "function" ? val(p[activeFile] || "") : val }));
+  };
 
   const runCode = () => {
     setShowTerminal(true);
-    setOutput(prev => [...prev, `$ node ${files[activeFile].name}`, "Running..."]);
+    setOutput(prev => [...prev, `\n$ node ${activeFile}`, "Compiling..."]);
     setTimeout(() => {
       try {
         const lines: string[] = [];
         const fakeConsole = { log: (...args: unknown[]) => lines.push(args.map(String).join(" ")) };
         const fn = new Function("console", code);
         fn(fakeConsole);
-        setOutput(prev => [...prev, ...lines, "✓ Process exited (0)"]);
+        setOutput(prev => [...prev, ...lines, `✓ Done in 0.${Math.floor(Math.random() * 9)}s`]);
       } catch (err) {
-        setOutput(prev => [...prev, `✗ Error: ${(err as Error).message}`, "✗ Process exited (1)"]);
+        setOutput(prev => [...prev, `✗ ${(err as Error).message}`, "✗ Process exited (1)"]);
       }
-    }, 300);
+    }, 400);
   };
 
   const sendAI = () => {
@@ -1662,108 +1693,170 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
     const q = aiInput.trim(); setAiInput("");
     setAiMsgs(p => [...p, { role: "user", text: q }]);
     setTimeout(() => {
-      let r = "I can help with that. Here's my suggestion:";
+      let r = "";
       const l = q.toLowerCase();
-      if (l.includes("sort") || l.includes("array")) r = "Here's a sort function:\n\n```js\nconst sorted = arr.sort((a, b) => a - b);\n```";
-      else if (l.includes("fetch") || l.includes("api")) r = "Here's a fetch example:\n\n```js\nconst res = await fetch(url);\nconst data = await res.json();\n```";
-      else if (l.includes("fix") || l.includes("bug") || l.includes("error")) r = "I've analyzed your code. The issue might be a missing return statement or undefined variable. Check line references.";
-      else if (l.includes("component") || l.includes("react")) r = "Here's a React component:\n\n```jsx\nfunction App() {\n  const [count, setCount] = useState(0);\n  return <button onClick={() => setCount(c => c+1)}>{count}</button>;\n}\n```";
-      else if (l.includes("explain")) r = "This code defines a greet function that takes a name parameter and returns a greeting string using template literals. It then calls the function with 'World' and logs the result.";
-      else if (l.includes("write") || l.includes("create") || l.includes("generate")) r = "```js\n// Generated by Alternus AI\nclass App {\n  constructor(name) {\n    this.name = name;\n  }\n  run() {\n    console.log(`${this.name} is running`);\n  }\n}\n\nconst app = new App('MyApp');\napp.run();\n```\n\nClick 'Insert' to add this to your code.";
-      else r = `I understand your question about "${q}". Let me help you with that. Try describing the specific function or feature you need.`;
+      if (l.includes("sort") || l.includes("array")) r = "Here's an optimized sort:\n\n```js\nconst sorted = [...arr].sort((a, b) => a - b);\n// For objects: arr.sort((a, b) => a.key.localeCompare(b.key));\n```\n\nClick 'Insert Code' to add to your file.";
+      else if (l.includes("fetch") || l.includes("api")) r = "Async fetch with error handling:\n\n```js\nasync function fetchData(url) {\n  try {\n    const res = await fetch(url);\n    if (!res.ok) throw new Error(res.statusText);\n    return await res.json();\n  } catch (err) {\n    console.error('Fetch failed:', err);\n  }\n}\n```\n\nClick 'Insert Code' to add.";
+      else if (l.includes("fix") || l.includes("bug") || l.includes("error")) r = `I've analyzed \`${activeFile}\`:\n\n• Line count: ${code.split("\n").length}\n• No syntax errors detected\n• Suggestion: Add error handling for edge cases\n• Consider adding type checks for function params`;
+      else if (l.includes("component") || l.includes("react") || l.includes("button")) r = "```js\nfunction Button({ label, onClick, variant = 'primary' }) {\n  const styles = {\n    primary: 'bg-blue-500 text-white',\n    secondary: 'bg-gray-200 text-gray-800',\n  };\n  return (\n    <button\n      className={`px-4 py-2 rounded-lg ${styles[variant]}`}\n      onClick={onClick}\n    >\n      {label}\n    </button>\n  );\n}\n```\n\nClick 'Insert Code' to add.";
+      else if (l.includes("explain")) r = `Explaining \`${activeFile}\`:\n\nThis file contains ${code.split("\n").length} lines of ${lang} code. It ${activeFile.includes("main") ? "serves as the entry point, importing modules and initializing the app" : activeFile.includes("app") ? "defines the main React component with state management" : activeFile.includes("util") ? "provides utility helper functions for formatting and string manipulation" : "handles configuration and styling"}.`;
+      else if (l.includes("write") || l.includes("create") || l.includes("generate")) r = "```js\n// Generated by Alternus AI\nclass DataService {\n  #cache = new Map();\n\n  async get(key) {\n    if (this.#cache.has(key)) return this.#cache.get(key);\n    const data = await fetchData(`/api/${key}`);\n    this.#cache.set(key, data);\n    return data;\n  }\n\n  clear() {\n    this.#cache.clear();\n  }\n}\n\nexport default new DataService();\n```\n\nClick 'Insert Code' to add to your file.";
+      else if (l.includes("refactor") || l.includes("optimize") || l.includes("improve")) r = `Optimization suggestions for \`${activeFile}\`:\n\n1. Extract repeated logic into helper functions\n2. Use const instead of let where possible\n3. Add JSDoc comments for better documentation\n4. Consider memoization for expensive operations\n\nWant me to apply these changes?`;
+      else r = `I'll help with "${q}". Could you be more specific? For example:\n\n• "create a login form"\n• "fix the error on line 5"\n• "explain this code"\n• "write a fetch utility"`;
       setAiMsgs(p => [...p, { role: "ai", text: r }]);
-    }, 500);
+    }, 600);
   };
+
+  const SideIcon = ({ icon, label, active, onClick }: { icon: string; label: string; active?: boolean; onClick: () => void }) => (
+    <button title={label} onClick={onClick} className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+      style={{ color: active ? "#fff" : "#555", background: active ? "#ffffff10" : "transparent" }}
+      onMouseEnter={e => { if (!active) e.currentTarget.style.color = "#aaa"; }}
+      onMouseLeave={e => { if (!active) e.currentTarget.style.color = "#555"; }}>
+      <I d={icon} s={16} />
+    </button>
+  );
 
   return (
     <div className="flex flex-col h-full" style={{ background: bg }}>
-      {/* Top bar: tabs + actions */}
-      <div className="flex items-center flex-shrink-0" style={{ background: bg2, borderBottom: `1px solid ${br}` }}>
-        <div className="flex items-center flex-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-          {files.map((f, i) => (
-            <button key={i} onClick={() => switchFile(i)}
-              className="px-3 py-1.5 text-[10px] font-medium border-r transition-colors whitespace-nowrap"
-              style={{ background: i === activeFile ? bg : bg2, color: i === activeFile ? "#fff" : "#888", borderColor: br, borderBottom: i === activeFile ? `2px solid ${c.accent}` : "2px solid transparent" }}>
-              {f.name}
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-1 px-2">
-          <button onClick={runCode} title="Run Code" className="px-2 py-1 rounded text-[9px] font-medium flex items-center gap-1" style={{ background: "#2ea04370", color: "#4ade80" }}>
-            <I d={ic.play} s={10} c="#4ade80" /> Run
-          </button>
-          <button onClick={() => setShowTerminal(!showTerminal)} title="Terminal" className="p-1 rounded transition-colors" style={{ color: showTerminal ? "#4ade80" : "#888" }}
-            onMouseEnter={e => (e.currentTarget.style.background = "#333")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-            <I d={ic.terminal} s={12} />
-          </button>
-          <button onClick={() => setShowAI(!showAI)} title="AI Assistant"
-            className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105"
-            style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)", boxShadow: showAI ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
-            <I d={ic.sparkle} s={10} c="#fff" />
-          </button>
-        </div>
-      </div>
-
       {/* Main area */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Editor */}
+        {/* Activity bar */}
+        <div className="w-10 flex-shrink-0 flex flex-col items-center py-2 gap-1" style={{ background: bg, borderRight: `1px solid ${br}` }}>
+          <SideIcon icon={ic.folder} label="Explorer" active={showExplorer} onClick={() => setShowExplorer(!showExplorer)} />
+          <SideIcon icon={ic.search} label="Search" active={false} onClick={() => {}} />
+          <SideIcon icon={ic.code} label="Source Control" active={false} onClick={() => {}} />
+          <SideIcon icon={ic.terminal} label="Terminal" active={showTerminal} onClick={() => setShowTerminal(!showTerminal)} />
+          <div className="flex-1" />
+          <button title="AI Copilot" onClick={() => setShowAI(!showAI)}
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-105"
+            style={{ background: showAI ? "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" : "transparent", boxShadow: showAI ? "0 0 8px rgba(139,92,246,0.3)" : "none" }}>
+            <I d={ic.sparkle} s={14} c={showAI ? "#fff" : "#555"} />
+          </button>
+          <SideIcon icon={ic.settings} label="Settings" active={false} onClick={() => {}} />
+        </div>
+
+        {/* File Explorer */}
+        {showExplorer && (
+          <div className="w-[140px] flex-shrink-0 flex flex-col overflow-y-auto py-1" style={{ background: bg2, borderRight: `1px solid ${br}`, scrollbarWidth: "none" }}>
+            <p className="text-[9px] font-semibold uppercase tracking-wider px-3 py-1.5" style={{ color: "#666" }}>Explorer</p>
+            {fileTree.map((item, i) => (
+              <div key={i}>
+                {item.type === "folder" ? (
+                  <>
+                    <div className="flex items-center gap-1.5 px-3 py-1 text-[10px]" style={{ color: "#aaa" }}>
+                      <I d={ic.chevR} s={10} c="#666" /><I d={ic.folder} s={12} c="#E8A838" /><span>{item.name}</span>
+                    </div>
+                    {item.open && item.children?.map((child, j) => (
+                      <button key={j} onClick={() => openFile(child.name)}
+                        className="w-full flex items-center gap-1.5 pl-7 pr-3 py-1 text-[10px] text-left transition-colors"
+                        style={{ color: activeFile === child.name ? "#fff" : "#888", background: activeFile === child.name ? "#ffffff10" : "transparent" }}
+                        onMouseEnter={e => { if (activeFile !== child.name) e.currentTarget.style.background = "#ffffff08"; }}
+                        onMouseLeave={e => { if (activeFile !== child.name) e.currentTarget.style.background = "transparent"; }}>
+                        <I d={ic.fileText} s={11} c={child.lang === "React" ? "#61DAFB" : child.lang === "JavaScript" ? "#F7DF1E" : "#888"} /><span>{child.name}</span>
+                      </button>
+                    ))}
+                  </>
+                ) : (
+                  <button onClick={() => openFile(item.name)}
+                    className="w-full flex items-center gap-1.5 px-3 py-1 text-[10px] text-left transition-colors"
+                    style={{ color: activeFile === item.name ? "#fff" : "#888", background: activeFile === item.name ? "#ffffff10" : "transparent" }}
+                    onMouseEnter={e => { if (activeFile !== item.name) e.currentTarget.style.background = "#ffffff08"; }}
+                    onMouseLeave={e => { if (activeFile !== item.name) e.currentTarget.style.background = "transparent"; }}>
+                    <I d={ic.fileText} s={11} c={item.lang === "CSS" ? "#56B6C2" : item.lang === "JSON" ? "#CF8E6D" : "#888"} /><span>{item.name}</span>
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Editor panel */}
         <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Tabs */}
+          <div className="flex items-center flex-shrink-0" style={{ background: bg2, borderBottom: `1px solid ${br}` }}>
+            <div className="flex items-center flex-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+              {openTabs.map(name => (
+                <div key={name} className="flex items-center group"
+                  style={{ background: name === activeFile ? bg : "transparent", borderBottom: name === activeFile ? `2px solid ${accent}` : "2px solid transparent" }}>
+                  <button onClick={() => setActiveFile(name)}
+                    className="px-3 py-1.5 text-[10px] whitespace-nowrap"
+                    style={{ color: name === activeFile ? "#fff" : "#666" }}>
+                    {name}
+                  </button>
+                  <button onClick={e => { e.stopPropagation(); closeTab(name); }}
+                    className="pr-2 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: "#555" }}>
+                    <I d={ic.close} s={8} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-1 px-2">
+              <button onClick={runCode} title="Run (Ctrl+Enter)" className="px-2.5 py-1 rounded-md text-[9px] font-semibold flex items-center gap-1.5" style={{ background: "#22C55E20", color: "#4ade80" }}>
+                <I d={ic.play} s={10} c="#4ade80" /> Run
+              </button>
+            </div>
+          </div>
+
+          {/* Code editor */}
           <div className="flex flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-            {/* Line numbers */}
-            <div className="w-10 flex-shrink-0 pt-2 text-right pr-3 select-none" style={{ color: "#555", background: bg }}>
+            <div className="w-10 flex-shrink-0 pt-2 text-right pr-3 select-none" style={{ color: "#444", background: bg }}>
               {code.split("\n").map((_, i) => <div key={i} className="text-[11px] leading-5 font-mono">{i + 1}</div>)}
             </div>
-            {/* Code area */}
             <textarea
-              className="flex-1 pt-2 pr-3 bg-transparent outline-none resize-none text-[12px] leading-5 font-mono"
-              style={{ color: "#d4d4d4", tabSize: 2 }}
+              className="flex-1 pt-2 pr-4 bg-transparent outline-none resize-none text-[12px] leading-5 font-mono"
+              style={{ color: "#D4D4D4", tabSize: 2 }}
               value={code}
               onChange={e => setCode(e.target.value)}
               spellCheck={false}
               onKeyDown={e => {
                 if (e.key === "Tab") { e.preventDefault(); const t = e.currentTarget; const s = t.selectionStart; setCode(code.substring(0, s) + "  " + code.substring(t.selectionEnd)); setTimeout(() => { t.selectionStart = t.selectionEnd = s + 2; }, 0); }
+                if (e.key === "Enter" && e.ctrlKey) { e.preventDefault(); runCode(); }
               }}
             />
           </div>
 
-          {/* Terminal panel */}
+          {/* Terminal */}
           {showTerminal && (
-            <div className="flex flex-col" style={{ height: 120, borderTop: `1px solid ${br}`, background: "#1a1a1a" }}>
+            <div className="flex flex-col" style={{ height: 130, borderTop: `1px solid ${br}`, background: "#0D0D12" }}>
               <div className="flex items-center justify-between px-3 py-1 flex-shrink-0" style={{ borderBottom: `1px solid ${br}` }}>
-                <span className="text-[9px] font-medium" style={{ color: "#4ade80" }}>Terminal</span>
-                <button onClick={() => setOutput([])} className="text-[9px] px-1.5 py-0.5 rounded" style={{ color: "#888" }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "#333")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>Clear</button>
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-bold" style={{ color: "#4ade80" }}>Terminal</span>
+                  <span className="text-[8px]" style={{ color: "#444" }}>bash</span>
+                </div>
+                <button onClick={() => setOutput([])} className="text-[8px] px-1.5 py-0.5 rounded" style={{ color: "#555" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "#aaa")} onMouseLeave={e => (e.currentTarget.style.color = "#555")}>Clear</button>
               </div>
               <div className="flex-1 overflow-y-auto px-3 py-1 font-mono text-[10px] leading-4" style={{ color: "#ccc", scrollbarWidth: "none" }}>
-                {output.length === 0 && <span style={{ color: "#555" }}>$ Ready</span>}
+                {output.length === 0 && <span style={{ color: "#444" }}>$ _</span>}
                 {output.map((line, i) => (
-                  <div key={i} style={{ color: line.startsWith("✓") ? "#4ade80" : line.startsWith("✗") ? "#f87171" : line.startsWith("$") ? "#60a5fa" : "#ccc" }}>{line}</div>
+                  <div key={i} style={{ color: line.startsWith("✓") ? "#4ade80" : line.startsWith("✗") ? "#f87171" : line.startsWith("$") ? "#6C63FF" : "#aaa" }}>{line}</div>
                 ))}
               </div>
             </div>
           )}
         </div>
 
-        {/* AI Sidebar */}
+        {/* AI Copilot */}
         {showAI && (
-          <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${br}`, background: bg2 }}>
+          <div className="w-[230px] flex-shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${br}`, background: bg2 }}>
             <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${br}` }}>
-              <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
-                <I d={ic.sparkle} s={8} c="#fff" />
+              <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+                <I d={ic.sparkle} s={10} c="#fff" />
               </div>
-              <span className="text-[10px] font-semibold" style={{ color: "#ccc" }}>AI Copilot</span>
+              <span className="text-[10px] font-bold" style={{ color: "#ccc" }}>AI Copilot</span>
+              <span className="text-[8px] px-1.5 py-0.5 rounded-full ml-auto" style={{ background: "#4ade8020", color: "#4ade80" }}>Online</span>
             </div>
             <div className="flex-1 overflow-y-auto px-2 py-2 space-y-2" style={{ scrollbarWidth: "none" }}>
               {aiMsgs.map((m, i) => (
                 <div key={i} className={m.role === "user" ? "flex justify-end" : ""}>
-                  <div className="max-w-[95%] px-2.5 py-1.5 rounded-lg text-[10px] leading-relaxed"
-                    style={m.role === "user" ? { background: c.accent, color: "#fff" } : { background: "#333", color: "#d4d4d4" }}>
+                  <div className="max-w-[95%] px-3 py-2 rounded-xl text-[10px] leading-relaxed"
+                    style={m.role === "user" ? { background: accent, color: "#fff" } : { background: bg3, color: "#ccc", border: `1px solid ${br}` }}>
                     <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
                     {m.role === "ai" && m.text.includes("```") && (
                       <button onClick={() => {
-                        const codeMatch = m.text.match(/```(?:js|jsx|javascript)?\n([\s\S]*?)```/);
-                        if (codeMatch) setCode(prev => prev + "\n\n" + codeMatch[1].trim());
-                      }} className="mt-1 px-2 py-0.5 rounded text-[8px] font-medium" style={{ background: c.accent, color: "#fff" }}>Insert Code</button>
+                        const match = m.text.match(/```(?:js|jsx|javascript)?\n([\s\S]*?)```/);
+                        if (match) setCode(prev => prev + "\n\n" + match[1].trim());
+                      }} className="mt-2 px-2.5 py-1 rounded-md text-[9px] font-semibold" style={{ background: accent, color: "#fff" }}>Insert Code</button>
                     )}
                   </div>
                 </div>
@@ -1771,12 +1864,12 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
               <div ref={aiEndRef} />
             </div>
             <div className="px-2 py-2 flex-shrink-0" style={{ borderTop: `1px solid ${br}` }}>
-              <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg" style={{ background: "#333", border: `1px solid ${br}` }}>
-                <input className="flex-1 bg-transparent outline-none text-[10px] font-mono" style={{ color: "#d4d4d4" }}
+              <div className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl" style={{ background: bg3, border: `1px solid ${br}` }}>
+                <input className="flex-1 bg-transparent outline-none text-[10px]" style={{ color: "#ccc" }}
                   placeholder="Ask AI to code..."
                   value={aiInput} onChange={e => setAiInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter") sendAI(); }} />
-                <button onClick={sendAI} className="p-1 rounded" style={{ background: c.accent }}><I d={ic.send} s={9} c="#fff" /></button>
+                <button onClick={sendAI} className="p-1.5 rounded-lg" style={{ background: accent }}><I d={ic.send} s={10} c="#fff" /></button>
               </div>
             </div>
           </div>
@@ -1784,15 +1877,15 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
       </div>
 
       {/* Status bar */}
-      <div className="flex items-center justify-between px-3 h-6 flex-shrink-0" style={{ background: c.accent }}>
+      <div className="flex items-center justify-between px-3 h-6 flex-shrink-0" style={{ background: accent }}>
         <div className="flex items-center gap-3">
-          <span className="text-[9px] text-white/80">{files[activeFile].lang}</span>
-          <span className="text-[9px] text-white/80">Ln {code.split("\n").length}</span>
-          <span className="text-[9px] text-white/80">{code.length} chars</span>
+          <span className="text-[9px] text-white/90 font-medium">{lang}</span>
+          <span className="text-[9px] text-white/70">Ln {code.split("\n").length}</span>
+          <span className="text-[9px] text-white/70">{code.length} chars</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[9px] text-white/80">UTF-8</span>
-          <span className="text-[9px] text-white/80">Spaces: 2</span>
+          <span className="text-[9px] text-white/70">UTF-8</span>
+          <span className="text-[9px] text-white/70">Spaces: 2</span>
         </div>
       </div>
     </div>
