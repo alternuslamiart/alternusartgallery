@@ -1240,7 +1240,7 @@ function WordApp({ c }: { c: typeof palette.dark }) {
               value={docContent}
               onChange={e => setDocContent(e.target.value)}
               className="w-full bg-transparent border-none outline-none resize-none leading-relaxed"
-              style={{ color: c.text, minHeight: 400, fontSize, fontWeight: isBold ? "bold" : "normal", fontStyle: isItalic ? "italic" : "normal", textDecoration: isUnderline ? "underline" : "none" }}
+              style={{ color: c.text, minHeight: 400, fontSize, fontWeight: isBold ? "bold" : "normal", fontStyle: isItalic ? "italic" : "normal", textDecoration: isUnderline ? "underline" : "none", scrollbarWidth: "none" as never }}
               placeholder="Start writing..."
             />
           </div>
