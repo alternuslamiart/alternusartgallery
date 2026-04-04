@@ -1410,6 +1410,11 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
       { name: "API Documentation.md", type: "file", icon: ic.fileText, iconColor: c.textSec, size: "12 KB", modified: "Mar 28", action: "code" },
       { name: "Design System.fig", type: "file", icon: ic.pen, iconColor: "#A78BFA", size: "18 MB", modified: "Mar 15" },
     ],
+    Trash: [
+      { name: "old-backup.zip", type: "file", icon: ic.folder, iconColor: c.textMuted, size: "34 MB", modified: "Mar 1" },
+      { name: "draft-v1.docx", type: "file", icon: ic.fileText, iconColor: c.textMuted, size: "120 KB", modified: "Feb 15" },
+      { name: "temp-screenshot.png", type: "file", icon: ic.image, iconColor: c.textMuted, size: "2.1 MB", modified: "Feb 10" },
+    ],
   };
 
   const sidebarItems = [
@@ -1421,6 +1426,7 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
     { icon: ic.music, label: "Music", path: "Music" },
     { icon: ic.film, label: "Videos", path: "Videos" },
     { icon: ic.folder, label: "Projects", path: "Projects" },
+    { icon: ic.close, label: "Trash", path: "Trash" },
   ];
 
   const recentFiles: FileItem[] = [
@@ -1478,15 +1484,15 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
   return (
     <div className="flex h-full overflow-hidden">
       {/* Sidebar */}
-      <div className="w-[160px] flex-shrink-0 flex flex-col py-1 px-1.5 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+      <div className="w-[150px] flex-shrink-0 flex flex-col py-1 px-1.5 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
         {sidebarItems.map((item, i) => (
           <button key={i} onClick={() => { setCurrentPath([item.path]); setSelectedFile(null); setSearchQuery(""); }}
-            className="w-full flex items-center gap-4 px-3 py-1.5 rounded-lg text-left transition-colors"
-            style={{ background: curPath === item.path ? c.accentSoft : "transparent", minHeight: 34 }}
+            className="w-full flex items-center gap-4 px-3 py-2 rounded-lg text-left transition-colors"
+            style={{ background: curPath === item.path ? c.accent : "transparent", minHeight: 36 }}
             onMouseEnter={e => { if (curPath !== item.path) e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { if (curPath !== item.path) e.currentTarget.style.background = "transparent"; }}>
-            <I d={item.icon} s={14} c={curPath === item.path ? c.accentText : c.textMuted} />
-            <span className="text-[11px]" style={{ color: curPath === item.path ? c.accentText : c.text }}>{item.label}</span>
+            onMouseLeave={e => { if (curPath !== item.path) e.currentTarget.style.background = curPath === item.path ? c.accent : "transparent"; }}>
+            <I d={item.icon} s={15} c={curPath === item.path ? "#fff" : c.textMuted} />
+            <span className="text-[11px] font-medium" style={{ color: curPath === item.path ? "#fff" : c.text }}>{item.label}</span>
           </button>
         ))}
       </div>
@@ -2930,14 +2936,14 @@ export default function AlternusOS() {
           </div>
           <div className="flex flex-1 overflow-hidden">
           {/* Sidebar */}
-          <div className="w-[110px] flex-shrink-0 flex flex-col py-1 px-1.5" style={{ borderRight: `1px solid ${c.border}` }}>
+          <div className="w-[130px] flex-shrink-0 flex flex-col py-1 px-1.5" style={{ borderRight: `1px solid ${c.border}` }}>
             {cats.map((s, i) => (
               <button key={i} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors"
-                style={{ background: i === 0 ? c.accentSoft : "transparent" }}
+                style={{ background: i === 0 ? c.accent : "transparent" }}
                 onMouseEnter={e => { if (i !== 0) e.currentTarget.style.background = c.cardAlt; }}
-                onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = i === 0 ? c.accentSoft : "transparent"; }}>
-                <I d={s.icon} s={14} c={i === 0 ? c.accentText : c.textMuted} />
-                <span className="text-[10px] font-medium" style={{ color: i === 0 ? c.accentText : c.text }}>{s.label}</span>
+                onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = "transparent"; }}>
+                <I d={s.icon} s={15} c={i === 0 ? "#fff" : c.textMuted} />
+                <span className="text-[11px] font-medium" style={{ color: i === 0 ? "#fff" : c.text }}>{s.label}</span>
               </button>
             ))}
           </div>
@@ -3028,14 +3034,14 @@ export default function AlternusOS() {
       return (
         <div className="flex h-full overflow-hidden">
           {/* Sidebar */}
-          <div className="w-[100px] flex-shrink-0 flex flex-col py-1 px-1.5" style={{ borderRight: `1px solid ${c.border}` }}>
+          <div className="w-[120px] flex-shrink-0 flex flex-col py-1 px-1.5" style={{ borderRight: `1px solid ${c.border}` }}>
             {cats.map((s, i) => (
-              <button key={i} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors"
-                style={{ background: i === 0 ? c.accentSoft : "transparent" }}
+              <button key={i} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors"
+                style={{ background: i === 0 ? c.accent : "transparent" }}
                 onMouseEnter={e => { if (i !== 0) e.currentTarget.style.background = c.cardAlt; }}
-                onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = i === 0 ? c.accentSoft : "transparent"; }}>
-                <I d={s.icon} s={13} c={i === 0 ? c.accentText : c.textMuted} />
-                <span className="text-[10px] font-medium" style={{ color: i === 0 ? c.accentText : c.text }}>{s.label}</span>
+                onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = "transparent"; }}>
+                <I d={s.icon} s={15} c={i === 0 ? "#fff" : c.textMuted} />
+                <span className="text-[11px] font-medium" style={{ color: i === 0 ? "#fff" : c.text }}>{s.label}</span>
               </button>
             ))}
           </div>
