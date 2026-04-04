@@ -771,8 +771,8 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
                   <I d={n.icon} s={16} c={c.textSec} />
                   <span className="text-sm" style={{ color: c.text }}>{n.app}</span>
                 </div>
-                <div className="w-8 h-4 rounded-full flex items-center px-0.5" style={{ background: n.on ? c.accent : c.cardAlt, border: n.on ? "none" : `1px solid ${c.border}` }}>
-                  <div className="w-3 h-3 rounded-full bg-white transition-all" style={{ marginLeft: n.on ? "12px" : "0px" }} />
+                <div className="w-10 h-5 rounded-full flex items-center px-0.5 transition-colors" style={{ background: n.on ? c.accent : c.cardAlt, border: n.on ? "none" : `1px solid ${c.border}` }}>
+                  <div className="w-4 h-4 rounded-full bg-white transition-all" style={{ marginLeft: n.on ? "18px" : "0px" }} />
                 </div>
               </div>
             ))}
@@ -975,12 +975,12 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
   };
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full overflow-hidden">
       {/* Sidebar */}
-      <div className="w-[170px] flex-shrink-0 flex flex-col py-3 px-2 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}` }}>
-        <p className="text-sm font-semibold px-3 mb-3" style={{ color: c.accentText }}>Settings</p>
+      <div className="w-[170px] flex-shrink-0 flex flex-col py-3 px-2 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none", msOverflowStyle: "none" }}>
+        <p className="text-xs font-semibold px-3 mb-3 uppercase tracking-wider" style={{ color: c.textMuted }}>Settings</p>
         {items.map((it, i) => (
-          <button key={i} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-colors mb-0.5"
+          <button key={i} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors mb-0.5"
             onClick={() => setActiveSection(it.label)}
             style={{ background: activeSection === it.label ? c.accentSoft : "transparent" }}
             onMouseEnter={e => { if (activeSection !== it.label) e.currentTarget.style.background = c.cardAlt; }}
@@ -1174,7 +1174,9 @@ function NotesApp({ c }: { c: typeof palette.dark }) {
 
 function BrowserApp({ c }: { c: typeof palette.dark }) {
   const [url, setUrl] = useState("https://alternus.art");
+  const [displayUrl, setDisplayUrl] = useState("https://alternus.art");
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [history, setHistory] = useState<string[]>(["https://alternus.art"]);
   const [bookmarks] = useState([
     { name: "Alternus Art", url: "https://alternus.art" },
@@ -1186,39 +1188,41 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
   const navigate = (newUrl: string) => {
     let finalUrl = newUrl;
     if (!finalUrl.startsWith("http")) finalUrl = "https://" + finalUrl;
+    setDisplayUrl(finalUrl);
     setUrl(finalUrl);
     setHistory(p => [...p, finalUrl]);
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1000);
+    setLoadError(false);
+    setTimeout(() => setIsLoading(false), 1500);
   };
 
   return (
     <div className="flex flex-col h-full">
       {/* URL Bar */}
-      <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <button onClick={() => { if (history.length > 1) { const h = [...history]; h.pop(); setHistory(h); setUrl(h[h.length - 1]); } }} style={{ color: c.textMuted }} className="p-1">
+      <div className="flex items-center gap-2 px-3 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <button onClick={() => { if (history.length > 1) { const h = [...history]; h.pop(); setHistory(h); setUrl(h[h.length - 1]); setDisplayUrl(h[h.length - 1]); } }} style={{ color: c.textMuted }} className="p-1 rounded-md hover:bg-white/10 transition-colors">
           <I d={ic.chevL} s={14} />
         </button>
-        <div className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+        <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
           {isLoading ? (
-            <div className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${c.accent} transparent ${c.accent} ${c.accent}` }} />
+            <div className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin flex-shrink-0" style={{ borderColor: `${c.accent} transparent ${c.accent} ${c.accent}` }} />
           ) : (
             <I d={ic.globe} s={12} c={c.textMuted} />
           )}
           <input
             className="flex-1 bg-transparent outline-none text-xs"
             style={{ color: c.text }}
-            value={url}
-            onChange={e => setUrl(e.target.value)}
-            onKeyDown={e => { if (e.key === "Enter") navigate(url); }}
+            value={displayUrl}
+            onChange={e => setDisplayUrl(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") navigate(displayUrl); }}
           />
         </div>
       </div>
 
       {/* Bookmarks */}
-      <div className="flex items-center gap-1 px-3 py-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+      <div className="flex items-center gap-1 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
         {bookmarks.map((b, i) => (
-          <button key={i} onClick={() => navigate(b.url)} className="px-2 py-0.5 rounded-md text-[10px] transition-colors"
+          <button key={i} onClick={() => navigate(b.url)} className="px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors"
             style={{ color: c.textSec }}
             onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
             onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
@@ -1228,13 +1232,31 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-hidden">
-        <iframe
-          src={url}
-          className="w-full h-full border-0"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-          title="Browser"
-        />
+      <div className="flex-1 overflow-hidden relative" style={{ background: c.cardAlt }}>
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center h-full gap-3">
+            <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${c.accent} transparent ${c.accent} ${c.accent}` }} />
+            <p className="text-xs" style={{ color: c.textMuted }}>Loading {displayUrl}...</p>
+          </div>
+        ) : (
+          <>
+            <iframe
+              src={url}
+              className="w-full h-full border-0"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              title="Browser"
+              onError={() => setLoadError(true)}
+            />
+            {loadError && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3" style={{ background: c.cardAlt }}>
+                <I d={ic.globe} s={32} c={c.textMuted} />
+                <p className="text-sm font-medium" style={{ color: c.text }}>Cannot display this page</p>
+                <p className="text-xs" style={{ color: c.textMuted }}>{url} refused to connect</p>
+                <button onClick={() => navigate(url)} className="mt-2 px-4 py-1.5 rounded-lg text-xs font-medium" style={{ background: c.accent, color: "#fff" }}>Retry</button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
@@ -1713,10 +1735,10 @@ export default function AlternusOS() {
     return (
       <div
         style={{ background: c.bg }}
-        className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
+        className="fixed inset-0 flex flex-col items-center overflow-hidden"
       >
         {/* Top bar */}
-        <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+        <div className="w-full flex items-center justify-between px-5 py-3 flex-shrink-0">
           <span className="text-[10px] font-medium" style={{ color: c.textMuted }}>Alternus OS</span>
           <div className="flex items-center gap-3">
             <span style={{ color: c.textMuted }}><I d={ic.wifi} s={14} /></span>
@@ -1725,38 +1747,41 @@ export default function AlternusOS() {
           </div>
         </div>
 
-        {/* Clock + Date — upper area */}
-        <div className="absolute top-[12%] left-1/2 -translate-x-1/2 flex flex-col items-center">
-          <p style={{ color: c.text }} className="text-8xl font-bold tracking-wide mb-2">{fmt(time)}</p>
-          <p style={{ color: c.textMuted }} className="text-base">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
-        </div>
-
-        {/* Profile + Button — lower center */}
-        <div className="absolute bottom-[18%] left-1/2 -translate-x-1/2 flex flex-col items-center">
-          {/* Profile avatar */}
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center mb-3"
-            style={{ background: c.accentSoft, border: `2px solid ${c.border}`, color: c.accentText }}
-          >
-            <I d={ic.user} s={28} />
+        {/* Main content - centered vertically in remaining space */}
+        <div className="flex-1 flex flex-col items-center justify-center gap-12 pb-8">
+          {/* Clock + Date */}
+          <div className="flex flex-col items-center">
+            <p style={{ color: c.text }} className="text-8xl font-bold tracking-wide mb-2">{fmt(time)}</p>
+            <p style={{ color: c.textMuted }} className="text-base">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
           </div>
-          <p className="text-sm font-medium mb-0.5" style={{ color: c.text }}>Admin</p>
-          <p className="text-[11px] mb-6" style={{ color: c.textMuted }}>admin@alternus.art</p>
 
-          {/* Open Desktop button */}
-          <button
-            onClick={() => { setIsLocked(false); }}
-            className="flex items-center gap-2.5 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer mb-4"
-            style={{ background: c.accent, color: "#fff", boxShadow: `0 4px 20px ${c.accent}40` }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#2563EB"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = c.accent; }}
-          >
-            <I d={ic.monitor} s={16} />
-            Open Desktop
-          </button>
+          {/* Profile + Button */}
+          <div className="flex flex-col items-center">
+            {/* Profile avatar */}
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center mb-3"
+              style={{ background: c.accentSoft, border: `2px solid ${c.border}`, color: c.accentText }}
+            >
+              <I d={ic.user} s={28} />
+            </div>
+            <p className="text-sm font-medium mb-0.5" style={{ color: c.text }}>Admin</p>
+            <p className="text-[11px] mb-5" style={{ color: c.textMuted }}>admin@alternus.art</p>
 
-          {/* Welcome message */}
-          <p className="text-xs" style={{ color: c.textMuted }}>Welcome back. Your desktop is ready.</p>
+            {/* Open Desktop button */}
+            <button
+              onClick={() => { setIsLocked(false); }}
+              className="flex items-center gap-2.5 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer mb-3"
+              style={{ background: c.accent, color: "#fff", boxShadow: `0 4px 20px ${c.accent}40` }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#2563EB"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = c.accent; }}
+            >
+              <I d={ic.monitor} s={16} />
+              Open Desktop
+            </button>
+
+            {/* Welcome message */}
+            <p className="text-xs" style={{ color: c.textMuted }}>Welcome back. Your desktop is ready.</p>
+          </div>
         </div>
       </div>
     );
@@ -1767,33 +1792,39 @@ export default function AlternusOS() {
     <div style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 h-9 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <span style={{ color: c.text }} className="text-[11px] font-bold tracking-wider">ALTERNUS</span>
           <span style={{ color: c.textMuted }} className="text-[10px]">OS</span>
         </div>
-        <span style={{ color: c.textSec }} className="text-xs">{fmt(time)} · {time.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
-        <div className="flex items-center gap-2">
+        <span style={{ color: c.textSec }} className="text-xs font-medium">{fmt(time)} · {time.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+        <div className="flex items-center gap-1">
           {(() => { const ic_ = mode === "dark" ? "#FFFFFF" : "#444444"; return (<>
-            <button onClick={() => openWin("browser")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.globe} s={13} /></button>
-            <button onClick={() => openWin("settings")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.settings} s={13} /></button>
-            <button onClick={() => openWin("code")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.code} s={13} /></button>
-            <button onClick={() => openWin("terminal")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.terminal} s={13} /></button>
-            <button onClick={() => openWin("weather")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.cloud} s={13} /></button>
-            <button onClick={() => openWin("calendar")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.calendar} s={13} /></button>
-            <button onClick={() => openWin("store")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.store} s={13} /></button>
-            <button onClick={() => openWin("movies")} className="p-1 rounded-md" style={{ color: ic_ }}><I d={ic.film} s={13} /></button>
-            <button onClick={() => setShowNotifications(!showNotifications)} className="p-1 rounded-md relative" style={{ color: ic_ }}>
+            {/* Quick launch apps */}
+            <button onClick={() => openWin("browser")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.globe} s={13} /></button>
+            <button onClick={() => openWin("settings")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.settings} s={13} /></button>
+            <button onClick={() => openWin("code")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.code} s={13} /></button>
+            <button onClick={() => openWin("terminal")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.terminal} s={13} /></button>
+            <button onClick={() => openWin("weather")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.cloud} s={13} /></button>
+            <button onClick={() => openWin("calendar")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.calendar} s={13} /></button>
+            <button onClick={() => openWin("store")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.store} s={13} /></button>
+            <button onClick={() => openWin("movies")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.film} s={13} /></button>
+            {/* Separator */}
+            <div className="w-px h-4 mx-1" style={{ background: c.border }} />
+            {/* System tray */}
+            <button onClick={() => setShowNotifications(!showNotifications)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors relative" style={{ color: ic_ }}>
               <I d={ic.bell} s={13} />
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full" style={{ background: c.danger }} />
+              <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full" style={{ background: c.danger }} />
             </button>
-            <span style={{ color: ic_ }}><I d={ic.wifi} s={13} /></span>
-            <button onClick={() => setMode(mode === "dark" ? "light" : "dark")} className="p-1 rounded-md" style={{ color: ic_ }}>
+            <span className="p-1.5" style={{ color: ic_ }}><I d={ic.wifi} s={13} /></span>
+            <button onClick={() => setMode(mode === "dark" ? "light" : "dark")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
               <I d={mode === "dark" ? ic.sun : ic.moon} s={13} />
             </button>
-            <button onClick={() => setIsLocked(true)} className="p-1 rounded-md" style={{ color: ic_ }}>
+            {/* Separator */}
+            <div className="w-px h-4 mx-1" style={{ background: c.border }} />
+            <button onClick={() => setIsLocked(true)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
               <I d={ic.user} s={13} />
             </button>
-            <button onClick={() => { setIsBooting(true); setIsLocked(true); }} className="p-1 rounded-md" style={{ color: ic_ }}>
+            <button onClick={() => { setIsBooting(true); setIsLocked(true); }} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
               <I d={ic.power} s={13} />
             </button>
           </>); })()}
@@ -1835,27 +1866,27 @@ export default function AlternusOS() {
 
             {/* Apps panel - slides down, horizontal scroll */}
             <div
-              className="mt-2 overflow-hidden transition-all duration-300 ease-in-out"
+              className="mt-3 overflow-hidden transition-all duration-300 ease-in-out"
               style={{
-                maxHeight: showApps ? 80 : 0,
+                maxHeight: showApps ? 90 : 0,
                 opacity: showApps ? 1 : 0,
               }}
             >
               <div
-                className="flex items-center gap-1.5 px-3 py-2 rounded-2xl overflow-x-auto"
-                style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 20px rgba(0,0,0,0.3)" : "0 4px 20px rgba(0,0,0,0.08)", scrollbarWidth: "none", msOverflowStyle: "none" }}
+                className="flex items-center gap-2 px-4 py-3 rounded-2xl overflow-x-auto"
+                style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.35)" : "0 4px 24px rgba(0,0,0,0.1)", scrollbarWidth: "none", msOverflowStyle: "none" }}
                 onWheel={e => { e.currentTarget.scrollLeft += e.deltaY; }}
               >
                 {dockApps.map(app => (
                   <button
                     key={app.id}
                     onClick={() => { openWinWithAI(app.id); setShowApps(false); }}
-                    className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+                    className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
                     style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}
                     onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; }}
                     onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.borderColor = c.border; }}
                   >
-                    <I d={app.icon} s={16} c={app.color} />
+                    <I d={app.icon} s={18} c={app.color} />
                   </button>
                 ))}
               </div>
@@ -2072,10 +2103,10 @@ export default function AlternusOS() {
             boxShadow: showNotifications ? (mode === "dark" ? "-4px 0 20px rgba(0,0,0,0.4)" : "-4px 0 20px rgba(0,0,0,0.1)") : "none",
           }}
         >
-          <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <div className="flex items-center justify-between px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
             <div className="flex items-center gap-2">
               <I d={ic.sparkle} s={14} c={c.accentText} />
-              <p className="text-sm font-semibold" style={{ color: c.text }}>AI Notifications</p>
+              <p className="text-sm font-semibold" style={{ color: c.text }}>Notifications</p>
               {smartDND && <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: c.warningSoft, color: c.warning }}>DND</span>}
             </div>
             <div className="flex items-center gap-1">
@@ -2084,12 +2115,12 @@ export default function AlternusOS() {
                   const types = aiNotifications.reduce((a, n) => { a[n.type] = (a[n.type] || 0) + 1; return a; }, {} as Record<string, number>);
                   const sum = Object.entries(types).map(([t, cnt]) => `${cnt} ${t}`).join(", ");
                   setAiNotifications([{ id: "summary", title: "AI Summary", message: `You had ${aiNotifications.length} notifications: ${sum}. All caught up!`, icon: ic.sparkle, time: "Now", type: "summary", read: false }]);
-                }} className="p-1 rounded-md text-[9px]" style={{ color: c.accentText }}>Summarize</button>
+                }} className="px-2 py-1 rounded-md text-[10px] font-medium hover:bg-white/10 transition-colors" style={{ color: c.accentText }}>Summarize</button>
               )}
-              <button onClick={() => setShowNotifications(false)} className="p-1 rounded-md" style={{ color: c.textMuted }}><I d={ic.close} s={14} /></button>
+              <button onClick={() => setShowNotifications(false)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: c.textMuted }}><I d={ic.close} s={14} /></button>
             </div>
           </div>
-          <div className="p-3 space-y-2 overflow-y-auto" style={{ height: "calc(100% - 48px)" }}>
+          <div className="p-3 space-y-2 overflow-y-auto" style={{ height: "calc(100% - 52px)", scrollbarWidth: "none", msOverflowStyle: "none" }}>
             {/* AI notifications */}
             {aiNotifications.map((n) => (
               <div key={n.id} className="flex items-start gap-3 p-3 rounded-xl transition-colors"
