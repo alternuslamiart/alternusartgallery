@@ -232,29 +232,29 @@ function TitleBar({
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onMinimize}
-          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors group"
-          onMouseEnter={e => { e.currentTarget.style.background = "#D4A844"; }}
+          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
+          onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
         >
-          <svg width={10} height={10} viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke={c.textMuted} strokeWidth="1.5" className="group-hover:stroke-white" /></svg>
+          <svg width={10} height={10} viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
         </button>
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onMaximize}
-          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors group"
-          onMouseEnter={e => { e.currentTarget.style.background = "#5BA3E6"; }}
+          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
+          onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
         >
-          <svg width={10} height={10} viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1" fill="none" stroke={c.textMuted} strokeWidth="1.5" className="group-hover:stroke-white" /></svg>
+          <svg width={10} height={10} viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
         </button>
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onClose}
-          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors group"
-          onMouseEnter={e => { e.currentTarget.style.background = "#E06060"; }}
+          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
+          onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
         >
-          <svg width={10} height={10} viewBox="0 0 10 10"><polygon points="5,1.5 9,8.5 1,8.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" strokeLinejoin="round" className="group-hover:stroke-white" /></svg>
+          <svg width={10} height={10} viewBox="0 0 10 10"><polygon points="5,1.5 9,8.5 1,8.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" strokeLinejoin="round" /></svg>
         </button>
       </div>
     </div>
@@ -2760,20 +2760,105 @@ export default function AlternusOS() {
         </div>
       );
     })(),
-    movies: (
-      <div className="p-5 space-y-4 overflow-y-auto h-full">
-        <p className="text-lg font-semibold" style={{ color: c.text }}>Movies</p>
-        <p className="text-xs" style={{ color: c.textMuted }}>Watch & discover</p>
-        {[{ name: "The Last Algorithm", genre: "Sci-Fi", year: "2025", rating: "8.7" }, { name: "Digital Dreams", genre: "Drama", year: "2024", rating: "7.9" }, { name: "Code Runner", genre: "Action", year: "2025", rating: "8.2" }, { name: "Neural Path", genre: "Thriller", year: "2024", rating: "8.5" }, { name: "Pixel World", genre: "Animation", year: "2025", rating: "9.1" }].map((m, i) => (
-          <div key={i} className="flex items-center gap-4 p-3 rounded-xl transition-colors" style={{ background: c.cardAlt }}
-            onMouseEnter={e => (e.currentTarget.style.background = c.accentSoft)} onMouseLeave={e => (e.currentTarget.style.background = c.cardAlt)}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.purpleSoft, color: c.purple }}><I d={ic.film} s={20} /></div>
-            <div className="flex-1"><p className="text-sm font-medium" style={{ color: c.text }}>{m.name}</p><p className="text-[10px]" style={{ color: c.textMuted }}>{m.genre} · {m.year}</p></div>
-            <span className="text-xs font-medium" style={{ color: c.warning }}>{m.rating}</span>
+    movies: (() => {
+      const cats = [
+        { icon: ic.play, label: "For You" },
+        { icon: ic.film, label: "Movies" },
+        { icon: ic.monitor, label: "Series" },
+        { icon: ic.sparkle, label: "New" },
+      ];
+      const featured = { name: "The Last Algorithm", genre: "Sci-Fi", year: "2025", rating: "9.2", desc: "In a world run by AI, one programmer discovers the code that controls reality." };
+      const trending = [
+        { name: "Digital Dreams", genre: "Drama", year: "2024", rating: "7.9", color: "#6366F1" },
+        { name: "Code Runner", genre: "Action", year: "2025", rating: "8.2", color: "#EC4899" },
+        { name: "Neural Path", genre: "Thriller", year: "2024", rating: "8.5", color: "#06B6D4" },
+        { name: "Pixel World", genre: "Animation", year: "2025", rating: "9.1", color: "#F59E0B" },
+      ];
+      const topRated = [
+        { name: "Binary Love", genre: "Romance", year: "2025", rating: "8.8", color: "#EC4899" },
+        { name: "Kernel Panic", genre: "Horror", year: "2024", rating: "7.6", color: "#EF4444" },
+        { name: "Cloud Atlas II", genre: "Sci-Fi", year: "2025", rating: "8.9", color: "#8B5CF6" },
+        { name: "The Compiler", genre: "Mystery", year: "2024", rating: "8.1", color: "#10B981" },
+      ];
+      return (
+        <div className="flex h-full overflow-hidden">
+          {/* Sidebar */}
+          <div className="w-[100px] flex-shrink-0 flex flex-col py-1 px-1.5" style={{ borderRight: `1px solid ${c.border}` }}>
+            {cats.map((s, i) => (
+              <button key={i} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors"
+                style={{ background: i === 0 ? c.accentSoft : "transparent" }}
+                onMouseEnter={e => { if (i !== 0) e.currentTarget.style.background = c.cardAlt; }}
+                onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = i === 0 ? c.accentSoft : "transparent"; }}>
+                <I d={s.icon} s={13} c={i === 0 ? c.accentText : c.textMuted} />
+                <span className="text-[10px] font-medium" style={{ color: i === 0 ? c.accentText : c.text }}>{s.label}</span>
+              </button>
+            ))}
           </div>
-        ))}
-      </div>
-    ),
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto px-3 py-3" style={{ scrollbarWidth: "none" }}>
+            {/* Featured */}
+            <div className="p-4 rounded-xl mb-4" style={{ background: `linear-gradient(135deg, #6366F120, #EC489920)`, border: `1px solid ${c.border}` }}>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[8px] px-2 py-0.5 rounded-full font-semibold" style={{ background: "#F59E0B", color: "#000" }}>★ {featured.rating}</span>
+                <span className="text-[9px]" style={{ color: c.textMuted }}>{featured.genre} · {featured.year}</span>
+              </div>
+              <p className="text-sm font-bold mb-1" style={{ color: c.text }}>{featured.name}</p>
+              <p className="text-[10px] mb-3" style={{ color: c.textMuted }}>{featured.desc}</p>
+              <div className="flex gap-2">
+                <button className="px-3 py-1.5 rounded-lg text-[10px] font-semibold flex items-center gap-1.5" style={{ background: c.accent, color: "#fff" }}><I d={ic.play} s={10} c="#fff" /> Watch</button>
+                <button className="px-3 py-1.5 rounded-lg text-[10px] font-medium" style={{ background: c.cardAlt, color: c.text }}>+ Watchlist</button>
+              </div>
+            </div>
+
+            {/* Trending */}
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-bold" style={{ color: c.text }}>Trending Now</p>
+              <span className="text-[10px] font-medium" style={{ color: c.accentText }}>See All</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }} className="mb-4">
+              {trending.map((m, i) => (
+                <div key={i} className="flex items-center gap-2.5 p-2.5 rounded-xl transition-all"
+                  style={{ background: c.cardAlt, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)"; }}>
+                  <div className="w-9 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: m.color + "20" }}>
+                    <I d={ic.film} s={16} c={m.color} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-semibold truncate" style={{ color: c.text }}>{m.name}</p>
+                    <p className="text-[8px]" style={{ color: c.textMuted }}>{m.genre} · {m.year}</p>
+                    <span className="text-[8px] font-bold" style={{ color: "#F59E0B" }}>★ {m.rating}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Top Rated */}
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-bold" style={{ color: c.text }}>Top Rated</p>
+              <span className="text-[10px] font-medium" style={{ color: c.accentText }}>See All</span>
+            </div>
+            <div className="space-y-1">
+              {topRated.map((m, i) => (
+                <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <span className="text-[10px] font-bold w-4 text-center" style={{ color: c.textMuted }}>{i + 1}</span>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: m.color + "15" }}>
+                    <I d={ic.film} s={14} c={m.color} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-medium truncate" style={{ color: c.text }}>{m.name}</p>
+                    <p className="text-[8px]" style={{ color: c.textMuted }}>{m.genre} · {m.year}</p>
+                  </div>
+                  <span className="text-[9px] font-bold" style={{ color: "#F59E0B" }}>★ {m.rating}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    })(),
     clock: <ClockApp c={c} />,
     calculator: <CalculatorApp c={c} />,
     accounts: <AccountsApp c={c} />,
