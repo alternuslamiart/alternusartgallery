@@ -3117,13 +3117,9 @@ export default function AlternusOS() {
     { id: "movies", icon: ic.film, label: "Movies", color: c.purple },
     { id: "music", icon: ic.music, label: "Music", color: "#F472B6" },
     { id: "calendar", icon: ic.calendar, label: "Calendar", color: "#60A5FA" },
-    { id: "weather", icon: ic.cloud, label: "Weather", color: "#22D3EE" },
     { id: "word", icon: ic.fileText, label: "Word", color: c.accentText },
-    { id: "notes", icon: ic.note, label: "Notes", color: "#FBBF24" },
-    { id: "clock", icon: ic.clock, label: "Clock", color: "#F472B6" },
-    { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A" },
-    { id: "accounts", icon: ic.key, label: "Accounts", color: "#F59E0B" },
     { id: "downloads", icon: ic.download, label: "Downloads", color: "#34D399" },
+    { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A" },
     { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec },
   ];
 
