@@ -124,9 +124,9 @@ const palette = {
 };
 
 // ━━━━ Simple SVG Icon ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function I({ d, s = 16, c, w }: { d: string; s?: number; c?: string; w?: number }) {
+function I({ d, s = 16, c, w, f }: { d: string; s?: number; c?: string; w?: number; f?: boolean }) {
   return (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c || "currentColor"} strokeWidth={w || 2} strokeLinecap="round" strokeLinejoin="round">
+    <svg width={s} height={s} viewBox="0 0 24 24" fill={f ? (c || "currentColor") : "none"} stroke={f ? "none" : (c || "currentColor")} strokeWidth={f ? 0 : (w || 2)} strokeLinecap="round" strokeLinejoin="round">
       <path d={d} />
     </svg>
   );
@@ -184,6 +184,12 @@ const ic = {
   hdd: "M22 12H2M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11zM6 16h.01M10 16h.01",
   refresh: "M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15",
   home: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0v-6a1 1 0 011-1h2a1 1 0 011 1v6m-6 0h6",
+  // Filled icon variants
+  settingsF: "M12 8a4 4 0 100 8 4 4 0 000-8zM12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z",
+  wifiF: "M12 20h.01M8.5 16.5a5 5 0 017 0M5 13a10 10 0 0114 0M2 8.82a15 15 0 0120 0",
+  batteryF: "M17 6H3a2 2 0 00-2 2v8a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2zM23 13v-2M7 10v4M10 10v4M13 10v4",
+  moonF: "M12 3a6 6 0 009 9 9 9 0 11-9-9z",
+  sunF: "M12 7a5 5 0 100 10 5 5 0 000-10zM12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42",
   download: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3",
   image: "M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zM8.5 10a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM21 15l-5-5L5 21",
 };
@@ -2238,8 +2244,8 @@ export default function AlternusOS() {
         <div className="w-full flex items-center justify-between px-5 py-3 flex-shrink-0">
           <span className="text-[10px] font-medium" style={{ color: c.textMuted }}>Alternus OS</span>
           <div className="flex items-center gap-3">
-            <span style={{ color: c.textMuted }}><I d={ic.wifi} s={14} /></span>
-            <span style={{ color: c.textMuted }}><I d={ic.battery} s={14} /></span>
+            <span style={{ color: c.textMuted }}><I d={ic.wifiF} s={14} f /></span>
+            <span style={{ color: c.textMuted }}><I d={ic.batteryF} s={14} /></span>
             <span className="text-[10px]" style={{ color: c.textMuted }}>{fmt(time)}</span>
           </div>
         </div>
@@ -2298,7 +2304,7 @@ export default function AlternusOS() {
           {(() => { const ic_ = mode === "dark" ? "#FFFFFF" : "#444444"; return (<>
             {/* Quick launch apps */}
             <button title="Browser" onClick={() => openWin("browser")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.globe} s={13} /></button>
-            <button title="Settings" onClick={() => openWin("settings")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.settings} s={13} /></button>
+            <button title="Settings" onClick={() => openWin("settings")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.settingsF} s={13} /></button>
             <button title="Code Editor" onClick={() => openWin("code")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.code} s={13} /></button>
             <button title="Terminal" onClick={() => openWin("terminal")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.terminal} s={13} /></button>
             <button title="Weather" onClick={() => openWin("weather")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.cloud} s={13} /></button>
@@ -2313,7 +2319,7 @@ export default function AlternusOS() {
               <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full" style={{ background: c.danger }} />
             </button>
             <div className="relative">
-              <button onClick={() => { setShowWifiPanel(!showWifiPanel); setShowProfilePanel(false); }} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.wifi} s={13} /></button>
+              <button onClick={() => { setShowWifiPanel(!showWifiPanel); setShowProfilePanel(false); }} title="Wi-Fi" className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.wifiF} s={13} f /></button>
               {/* WiFi Panel */}
               {showWifiPanel && (
                 <div className="absolute top-full right-0 mt-2 w-[280px] rounded-xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 4px 16px rgba(0,0,0,0.12)", zIndex: 999 }}
@@ -2352,7 +2358,7 @@ export default function AlternusOS() {
               )}
             </div>
             <button onClick={() => setMode(mode === "dark" ? "light" : "dark")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
-              <I d={mode === "dark" ? ic.sun : ic.moon} s={13} />
+              <I d={mode === "dark" ? ic.sunF : ic.moonF} s={13} f />
             </button>
             {/* Separator */}
             <div className="w-px h-4 mx-1" style={{ background: c.border }} />
