@@ -189,6 +189,7 @@ const ic = {
   key: "M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4",
   menu: "M3 12h18M3 6h18M3 18h18",
   trash: "M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6",
+  voice: "M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8",
   // Filled icon variants
   settingsF: "M12 8a4 4 0 100 8 4 4 0 000-8zM12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z",
   wifiF: "M12 20h.01M8.5 16.5a5 5 0 017 0M5 13a10 10 0 0114 0M2 8.82a15 15 0 0120 0",
@@ -1133,7 +1134,21 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
     <div className="flex h-full overflow-hidden">
       {/* Sidebar */}
       <div className="w-[170px] flex-shrink-0 flex flex-col py-3 px-2 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none", msOverflowStyle: "none" }}>
-        <p className="text-xs font-semibold px-3 mb-3 uppercase tracking-wider" style={{ color: c.textMuted }}>Settings</p>
+        <div className="flex items-center justify-between px-3 mb-3">
+          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: c.textMuted }}>Settings</p>
+          <div className="flex items-center gap-1">
+            <button title="AI Assistant" className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105"
+              style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+              <I d={ic.sparkle} s={10} c="#fff" />
+            </button>
+            <button title="Voice" className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
+              style={{ color: c.textMuted }}
+              onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.accentText; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
+              <I d={ic.voice} s={12} />
+            </button>
+          </div>
+        </div>
         {items.map((it, i) => (
           <button key={i} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors mb-0.5"
             onClick={() => setActiveSection(it.label)}
@@ -1529,6 +1544,13 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
             title="AI File Manager"
           >
             <I d={ic.sparkle} s={12} c="#fff" />
+          </button>
+          {/* Voice */}
+          <button title="Voice Command" className="p-1.5 rounded-lg transition-all hover:scale-105 active:scale-95 flex-shrink-0"
+            style={{ color: c.textMuted }}
+            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.accentText; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
+            <I d={ic.voice} s={14} />
           </button>
           {/* Search */}
           <div className="flex items-center gap-2 px-2 py-1 rounded-lg w-[140px]" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
@@ -2290,7 +2312,7 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Tabs */}
+      {/* Tabs + AI/Voice */}
       <div className="flex items-center px-2 py-1 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
         {(["downloads", "uploads", "install"] as const).map(t => (
           <button key={t} onClick={() => { setTab(t); if (t === "install") { setInstallStep(0); setSelectedApp(null); setPolicyAccepted(false); } }}
@@ -2299,6 +2321,18 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
             {t === "install" ? "Install App" : t}
           </button>
         ))}
+        <div className="flex items-center gap-1 ml-auto">
+          <button title="AI Assistant" className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105"
+            style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+            <I d={ic.sparkle} s={10} c="#fff" />
+          </button>
+          <button title="Voice" className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
+            style={{ color: c.textMuted }}
+            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.accentText; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
+            <I d={ic.voice} s={12} />
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-3" style={{ scrollbarWidth: "none" }}>
