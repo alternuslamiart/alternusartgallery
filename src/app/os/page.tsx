@@ -1522,6 +1522,7 @@ export default function AlternusOS() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showWifiPanel, setShowWifiPanel] = useState(false);
   const [showProfilePanel, setShowProfilePanel] = useState(false);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [connectedWifi, setConnectedWifi] = useState(0);
   const [showTaskSwitcher, setShowTaskSwitcher] = useState(false);
   const [taskSwitcherIdx, setTaskSwitcherIdx] = useState(0);
@@ -2147,18 +2148,18 @@ export default function AlternusOS() {
         <div className="flex items-center gap-1">
           {(() => { const ic_ = mode === "dark" ? "#FFFFFF" : "#444444"; return (<>
             {/* Quick launch apps */}
-            <button onClick={() => openWin("browser")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.globe} s={13} /></button>
-            <button onClick={() => openWin("settings")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.settings} s={13} /></button>
-            <button onClick={() => openWin("code")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.code} s={13} /></button>
-            <button onClick={() => openWin("terminal")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.terminal} s={13} /></button>
-            <button onClick={() => openWin("weather")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.cloud} s={13} /></button>
-            <button onClick={() => openWin("calendar")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.calendar} s={13} /></button>
-            <button onClick={() => openWin("store")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.store} s={13} /></button>
-            <button onClick={() => openWin("movies")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.film} s={13} /></button>
+            <button title="Browser" onClick={() => openWin("browser")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.globe} s={13} /></button>
+            <button title="Settings" onClick={() => openWin("settings")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.settings} s={13} /></button>
+            <button title="Code Editor" onClick={() => openWin("code")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.code} s={13} /></button>
+            <button title="Terminal" onClick={() => openWin("terminal")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.terminal} s={13} /></button>
+            <button title="Weather" onClick={() => openWin("weather")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.cloud} s={13} /></button>
+            <button title="Calendar" onClick={() => openWin("calendar")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.calendar} s={13} /></button>
+            <button title="Store" onClick={() => openWin("store")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.store} s={13} /></button>
+            <button title="Movies" onClick={() => openWin("movies")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.film} s={13} /></button>
             {/* Separator */}
             <div className="w-px h-4 mx-1" style={{ background: c.border }} />
             {/* System tray */}
-            <button onClick={() => setShowNotifications(!showNotifications)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors relative" style={{ color: ic_ }}>
+            <button title="Notifications" onClick={() => setShowNotifications(!showNotifications)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors relative" style={{ color: ic_ }}>
               <I d={ic.bell} s={13} />
               <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full" style={{ background: c.danger }} />
             </button>
@@ -2269,7 +2270,9 @@ export default function AlternusOS() {
       </div>
 
       {/* Desktop Area - fixed, no scroll */}
-      <div className="flex-1 relative overflow-hidden" onClick={() => { if (showApps) setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); }}>
+      <div className="flex-1 relative overflow-hidden"
+        onClick={() => { if (showApps) setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setContextMenu(null); }}
+        onContextMenu={e => { e.preventDefault(); setContextMenu({ x: e.clientX, y: e.clientY - 36 }); setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); }}>
         {/* Apps button - top center, always visible */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center" onClick={e => e.stopPropagation()}>
             <button
@@ -2534,6 +2537,80 @@ export default function AlternusOS() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ━━━━ Right-Click Context Menu ━━━━ */}
+        {contextMenu && (
+          <div className="absolute z-[200] w-[220px] rounded-xl overflow-hidden py-1.5"
+            style={{ left: contextMenu.x, top: contextMenu.y, background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 32px rgba(0,0,0,0.35)" }}
+            onClick={e => e.stopPropagation()}>
+            {/* Quick actions row */}
+            <div className="flex items-center gap-1 px-3 py-2" style={{ borderBottom: `1px solid ${c.border}` }}>
+              {[
+                { icon: ic.fileText, label: "Paste", action: () => setContextMenu(null) },
+                { icon: ic.pen, label: "Rename", action: () => setContextMenu(null) },
+                { icon: ic.share, label: "Share", action: () => setContextMenu(null) },
+              ].map((a, i) => (
+                <button key={i} title={a.label} onClick={a.action}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+                  style={{ color: c.textMuted }}
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={a.icon} s={14} />
+                </button>
+              ))}
+            </div>
+            {/* Menu items */}
+            <div className="py-1 px-1.5">
+              {[
+                { icon: ic.alignLeft, label: "View", shortcut: "›" },
+                { icon: ic.alignJustify, label: "Sort by", shortcut: "›" },
+                { icon: ic.refresh, label: "Refresh", shortcut: "" },
+              ].map((item, i) => (
+                <button key={i} onClick={() => setContextMenu(null)}
+                  className="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-left transition-colors"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={item.icon} s={14} c={c.textMuted} />
+                  <span className="flex-1 text-[11px]" style={{ color: c.text }}>{item.label}</span>
+                  {item.shortcut && <span className="text-[10px]" style={{ color: c.textMuted }}>{item.shortcut}</span>}
+                </button>
+              ))}
+            </div>
+            <div className="my-1 mx-3 h-px" style={{ background: c.border }} />
+            <div className="py-1 px-1.5">
+              {[
+                { icon: ic.plus, label: "New", shortcut: "›" },
+                { icon: ic.folder, label: "New Folder", shortcut: "" },
+              ].map((item, i) => (
+                <button key={i} onClick={() => setContextMenu(null)}
+                  className="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-left transition-colors"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={item.icon} s={14} c={c.textMuted} />
+                  <span className="flex-1 text-[11px]" style={{ color: c.text }}>{item.label}</span>
+                  {item.shortcut && <span className="text-[10px]" style={{ color: c.textMuted }}>{item.shortcut}</span>}
+                </button>
+              ))}
+            </div>
+            <div className="my-1 mx-3 h-px" style={{ background: c.border }} />
+            <div className="py-1 px-1.5">
+              {[
+                { icon: ic.image, label: "Change wallpaper", action: () => setContextMenu(null) },
+                { icon: ic.monitor, label: "Display settings", action: () => { openWin("settings"); setContextMenu(null); } },
+                { icon: ic.pen, label: "Personalize", action: () => { openWin("settings"); setContextMenu(null); } },
+                { icon: ic.terminal, label: "Open in Terminal", action: () => { openWin("terminal"); setContextMenu(null); } },
+              ].map((item, i) => (
+                <button key={i} onClick={item.action}
+                  className="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-left transition-colors"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={item.icon} s={14} c={c.textMuted} />
+                  <span className="flex-1 text-[11px]" style={{ color: c.text }}>{item.label}</span>
+                </button>
+              ))}
             </div>
           </div>
         )}
