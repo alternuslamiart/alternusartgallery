@@ -1881,7 +1881,7 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
             </div>
             <textarea
               className="flex-1 pt-2 pr-4 bg-transparent outline-none resize-none text-[12px] leading-5 font-mono"
-              style={{ color: "#D4D4D4", tabSize: 2 }}
+              style={{ color: "#D4D4D4", tabSize: 2, scrollbarWidth: "none" as never }}
               value={code}
               onChange={e => setCode(e.target.value)}
               spellCheck={false}
