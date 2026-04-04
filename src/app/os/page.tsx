@@ -1248,7 +1248,40 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
       <div className="flex-1 overflow-hidden">
         {renderContent()}
       </div>
-      {showAIPanel && <div className="w-[180px] flex-shrink-0"><AIPanel c={c} context="Settings" /></div>}
+      {showAIPanel && (
+        <div className="w-[180px] flex-shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${c.border}`, background: c.bg }}>
+          <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+              <I d={ic.sparkle} s={10} c="#fff" />
+            </div>
+            <span className="text-[10px] font-bold" style={{ color: c.text }}>AI Assistant</span>
+          </div>
+          <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1" style={{ scrollbarWidth: "none" }}>
+            {[
+              { label: "Fix Problem", desc: "Diagnose & fix issues" },
+              { label: "Check Updates", desc: "Find latest versions" },
+              { label: "New Version", desc: "Upgrade Alternus OS" },
+              { label: "Optimize", desc: "Speed up your system" },
+              { label: "Backup", desc: "Save your settings" },
+              { label: "Reset", desc: "Restore defaults" },
+            ].map((item, i) => (
+              <button key={i} className="w-full text-left px-3 py-2 rounded-xl transition-colors"
+                style={{ background: "transparent" }}
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <p className="text-[10px] font-semibold" style={{ color: c.text }}>{item.label}</p>
+                <p className="text-[8px]" style={{ color: c.textMuted }}>{item.desc}</p>
+              </button>
+            ))}
+          </div>
+          <div className="px-2 py-1.5 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+            <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+              <input className="flex-1 bg-transparent outline-none text-[9px]" style={{ color: c.text }} placeholder="Ask AI..." />
+              <button className="p-1 rounded-lg" style={{ background: c.accent }}><I d={ic.send} s={8} c="#fff" /></button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1456,6 +1489,7 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"recent" | "favorites" | "shared">("recent");
+  const [showAIPanel, setShowAIPanel] = useState(false);
 
   type FileItem = { name: string; type: "folder" | "file"; icon: string; iconColor: string; size: string; modified: string; action?: WinId | string };
 
@@ -1619,13 +1653,9 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
           </div>
           {/* AI classify button */}
           <button
-            onClick={() => {
-              setSearchQuery("");
-              setSelectedFile(null);
-              onOpenApp("ai");
-            }}
+            onClick={() => setShowAIPanel(!showAIPanel)}
             className="w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 flex-shrink-0"
-            style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)", boxShadow: "0 0 6px rgba(139,92,246,0.25)" }}
+            style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)", boxShadow: showAIPanel ? "0 0 10px rgba(139,92,246,0.4)" : "0 0 6px rgba(139,92,246,0.25)" }}
             title="AI File Manager"
           >
             <I d={ic.sparkle} s={12} c="#fff" />
@@ -1818,6 +1848,39 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
           </>
         )}
       </div>
+      {showAIPanel && (
+        <div className="w-[180px] flex-shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${c.border}`, background: c.bg }}>
+          <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+              <I d={ic.sparkle} s={10} c="#fff" />
+            </div>
+            <span className="text-[10px] font-bold" style={{ color: c.text }}>AI Files</span>
+          </div>
+          <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1" style={{ scrollbarWidth: "none" }}>
+            {[
+              { label: "Classify Files", desc: "Auto-organize by type" },
+              { label: "Find Duplicates", desc: "Scan for copies" },
+              { label: "Clean Up", desc: "Archive old files" },
+              { label: "Smart Search", desc: "Search by content" },
+              { label: "Tag Files", desc: "Auto-tag documents" },
+              { label: "Storage Report", desc: "Analyze disk usage" },
+            ].map((item, i) => (
+              <button key={i} className="w-full text-left px-3 py-2 rounded-xl transition-colors"
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <p className="text-[10px] font-semibold" style={{ color: c.text }}>{item.label}</p>
+                <p className="text-[8px]" style={{ color: c.textMuted }}>{item.desc}</p>
+              </button>
+            ))}
+          </div>
+          <div className="px-2 py-1.5 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+            <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+              <input className="flex-1 bg-transparent outline-none text-[9px]" style={{ color: c.text }} placeholder="Ask AI..." />
+              <button className="p-1 rounded-lg" style={{ background: c.accent }}><I d={ic.send} s={8} c="#fff" /></button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -3020,7 +3083,7 @@ export default function AlternusOS() {
   };
 
   const winContent: Record<WinId, React.ReactNode> = {
-    ai: <AIChat c={c} onOpenApp={openWin} />,
+    ai: <AIPanel c={c} context="Alternus AI" />,
     terminal: <TerminalApp c={c} />,
     code: <CodeApp c={c} />,
     files: <FilesApp c={c} onOpenApp={openWin} />,
