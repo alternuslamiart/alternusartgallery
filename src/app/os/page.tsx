@@ -347,7 +347,7 @@ function AppWindow({
         background: c.surface,
         border: `1px solid ${c.border}`,
         borderRadius: win.isMaximized ? 0 : 12,
-        boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
@@ -1956,10 +1956,10 @@ export default function AlternusOS() {
             {/* 2-column grid */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
               {allApps.map((app, i) => (
-                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl transition-colors"
-                  style={{ background: c.cardAlt }}
-                  onMouseEnter={e => (e.currentTarget.style.background = c.border)}
-                  onMouseLeave={e => (e.currentTarget.style.background = c.cardAlt)}>
+                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl transition-all"
+                  style={{ background: c.cardAlt, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+                  onMouseEnter={e => { e.currentTarget.style.boxShadow = mode === "dark" ? "0 2px 8px rgba(0,0,0,0.2)" : "0 2px 8px rgba(0,0,0,0.08)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}>
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: app.iconBg + "20" }}>
                     <I d={app.icon} s={18} c={app.iconBg} />
                   </div>
@@ -1987,10 +1987,10 @@ export default function AlternusOS() {
                 { name: "AlternusTV", desc: "Stream movies", icon: ic.film, iconBg: "#EF4444", price: "Free" },
                 { name: "Alternus Photos", desc: "AI photo editor", icon: ic.image, iconBg: "#EC4899", price: "Free" },
               ].map((app, i) => (
-                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl transition-colors"
-                  style={{ background: c.cardAlt }}
-                  onMouseEnter={e => (e.currentTarget.style.background = c.border)}
-                  onMouseLeave={e => (e.currentTarget.style.background = c.cardAlt)}>
+                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl transition-all"
+                  style={{ background: c.cardAlt, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
+                  onMouseEnter={e => { e.currentTarget.style.boxShadow = mode === "dark" ? "0 2px 8px rgba(0,0,0,0.2)" : "0 2px 8px rgba(0,0,0,0.08)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}>
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: app.iconBg + "20" }}>
                     <I d={app.icon} s={18} c={app.iconBg} />
                   </div>
@@ -2189,7 +2189,7 @@ export default function AlternusOS() {
               <button onClick={() => { setShowWifiPanel(!showWifiPanel); setShowProfilePanel(false); }} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.wifi} s={13} /></button>
               {/* WiFi Panel */}
               {showWifiPanel && (
-                <div className="absolute top-full right-0 mt-2 w-[280px] rounded-xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 32px rgba(0,0,0,0.3)", zIndex: 999 }}
+                <div className="absolute top-full right-0 mt-2 w-[280px] rounded-xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 4px 16px rgba(0,0,0,0.12)", zIndex: 999 }}
                   onClick={e => e.stopPropagation()}>
                   <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
                     <p className="text-xs font-semibold" style={{ color: c.text }}>Wi-Fi</p>
@@ -2235,7 +2235,7 @@ export default function AlternusOS() {
               </button>
               {/* Profile Panel */}
               {showProfilePanel && (
-                <div className="absolute top-full right-0 mt-2 w-[240px] rounded-xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 32px rgba(0,0,0,0.3)", zIndex: 999 }}
+                <div className="absolute top-full right-0 mt-2 w-[240px] rounded-xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 4px 16px rgba(0,0,0,0.12)", zIndex: 999 }}
                   onClick={e => e.stopPropagation()}>
                   {/* User info */}
                   <div className="flex items-center gap-3 px-4 py-4" style={{ borderBottom: `1px solid ${c.border}` }}>
@@ -2470,7 +2470,7 @@ export default function AlternusOS() {
           if (openW.length === 0) return null;
           return (
             <div className="absolute inset-0 flex items-center justify-center z-[200]" style={{ background: "rgba(0,0,0,0.4)" }}>
-              <div className="flex gap-3 px-6 py-4 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 16px 48px rgba(0,0,0,0.4)" }}>
+              <div className="flex gap-3 px-6 py-4 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}>
                 {openW.map((w, i) => (
                   <div key={w.id} className="flex flex-col items-center gap-2 px-4 py-3 rounded-xl transition-all"
                     style={{ background: i === taskSwitcherIdx ? c.accentSoft : "transparent", border: i === taskSwitcherIdx ? `2px solid ${c.accent}` : "2px solid transparent" }}>
@@ -2488,7 +2488,7 @@ export default function AlternusOS() {
         {/* System Modal */}
         {systemModal && (
           <div className="absolute inset-0 flex items-center justify-center z-[300]" style={{ background: "rgba(0,0,0,0.3)" }}>
-            <div className="w-80 p-5 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 16px 48px rgba(0,0,0,0.4)" }}>
+            <div className="w-80 p-5 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: systemModal.type === "error" ? "rgba(239,68,68,0.15)" : systemModal.type === "warning" ? c.warningSoft : c.accentSoft }}>
                   <I d={systemModal.type === "error" ? ic.alertTriangle : systemModal.type === "warning" ? ic.alertTriangle : ic.shield} s={20} c={systemModal.type === "error" ? c.danger : systemModal.type === "warning" ? c.warning : c.accentText} />
@@ -2522,7 +2522,7 @@ export default function AlternusOS() {
         {/* ━━━━ Action Chain Dialog ━━━━ */}
         {closeChain && (
           <div className="absolute inset-0 flex items-center justify-center z-[300]" style={{ background: "rgba(0,0,0,0.3)" }}>
-            <div className="w-96 p-5 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 16px 48px rgba(0,0,0,0.4)" }}>
+            <div className="w-96 p-5 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.accentSoft }}><I d={ic.sparkle} s={20} c={c.accentText} /></div>
                 <div>
@@ -2543,7 +2543,7 @@ export default function AlternusOS() {
         {/* ━━━━ Unified Timeline Panel ━━━━ */}
         {showTimeline && (
           <div className="absolute inset-0 flex items-center justify-center z-[250]" style={{ background: "rgba(0,0,0,0.3)" }}>
-            <div className="w-[400px] max-h-[500px] rounded-2xl flex flex-col" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 16px 48px rgba(0,0,0,0.4)" }}>
+            <div className="w-[400px] max-h-[500px] rounded-2xl flex flex-col" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}>
               <div className="flex items-center justify-between px-5 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
                 <div className="flex items-center gap-2"><I d={ic.refresh} s={16} c={c.accentText} /><p className="text-sm font-semibold" style={{ color: c.text }}>Unified Timeline</p></div>
                 <button onClick={() => setShowTimeline(false)} className="p-1 rounded-md" style={{ color: c.textMuted }}><I d={ic.close} s={14} /></button>
