@@ -2057,12 +2057,12 @@ export default function AlternusOS() {
   return (
     <div style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
       {/* Top Bar */}
-      <div className="flex items-center justify-between px-4 h-9 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
+      <div className="relative flex items-center justify-between px-4 h-9 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
         <div className="flex items-center gap-2">
           <span style={{ color: c.text }} className="text-[11px] font-bold tracking-wider">ALTERNUS</span>
           <span style={{ color: c.textMuted }} className="text-[10px]">OS</span>
         </div>
-        <span style={{ color: c.textSec }} className="text-xs font-medium">{fmt(time)} · {time.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+        <span className="absolute left-1/2 -translate-x-1/2 text-xs font-medium" style={{ color: c.textSec }}>{fmt(time)} · {time.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
         <div className="flex items-center gap-1">
           {(() => { const ic_ = mode === "dark" ? "#FFFFFF" : "#444444"; return (<>
             {/* Quick launch apps */}
