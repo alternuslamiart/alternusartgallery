@@ -1064,6 +1064,10 @@ function WordApp({ c }: { c: typeof palette.dark }) {
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const [activeTab, setActiveTab] = useState("Home");
+  const [showAI, setShowAI] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiResult, setAiResult] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     setWordCount(docContent.trim().split(/\s+/).filter(Boolean).length);
@@ -1127,26 +1131,107 @@ function WordApp({ c }: { c: typeof palette.dark }) {
         <ToolBtn icon={ic.search} label="Find & Replace" />
         <ToolBtn icon={ic.download} label="Save" />
         <ToolBtn icon={ic.upload} label="Export" />
+        <div className="w-px h-5 mx-1" style={{ background: c.border }} />
+        <button title="AI Assistant" onClick={() => setShowAI(!showAI)}
+          className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+          style={{ background: showAI ? c.accent : c.accentSoft, color: showAI ? "#fff" : c.accentText }}>
+          <I d={ic.sparkle} s={13} />
+        </button>
       </div>
 
-      {/* Document area */}
-      <div className="flex-1 overflow-y-auto p-4" style={{ background: c.bg, scrollbarWidth: "none" }}>
-        <div className="max-w-[640px] mx-auto rounded-lg p-8 min-h-full" style={{ background: c.surface, boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-          <input
-            value={docTitle}
-            onChange={e => setDocTitle(e.target.value)}
-            className="w-full text-xl font-bold mb-4 bg-transparent border-none outline-none"
-            style={{ color: c.text }}
-            placeholder="Document Title"
-          />
-          <textarea
-            value={docContent}
-            onChange={e => setDocContent(e.target.value)}
-            className="w-full bg-transparent border-none outline-none resize-none leading-relaxed"
-            style={{ color: c.text, minHeight: 400, fontSize, fontWeight: isBold ? "bold" : "normal", fontStyle: isItalic ? "italic" : "normal", textDecoration: isUnderline ? "underline" : "none" }}
-            placeholder="Start writing..."
-          />
+      {/* Document + AI sidebar */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Document area */}
+        <div className="flex-1 overflow-y-auto p-4" style={{ background: c.bg, scrollbarWidth: "none" }}>
+          <div className="max-w-[640px] mx-auto rounded-lg p-8 min-h-full" style={{ background: c.surface, boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+            <input
+              value={docTitle}
+              onChange={e => setDocTitle(e.target.value)}
+              className="w-full text-xl font-bold mb-4 bg-transparent border-none outline-none"
+              style={{ color: c.text }}
+              placeholder="Document Title"
+            />
+            <textarea
+              value={docContent}
+              onChange={e => setDocContent(e.target.value)}
+              className="w-full bg-transparent border-none outline-none resize-none leading-relaxed"
+              style={{ color: c.text, minHeight: 400, fontSize, fontWeight: isBold ? "bold" : "normal", fontStyle: isItalic ? "italic" : "normal", textDecoration: isUnderline ? "underline" : "none" }}
+              placeholder="Start writing..."
+            />
+          </div>
         </div>
+
+        {/* AI Sidebar */}
+        {showAI && (
+          <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${c.border}`, background: c.surface }}>
+            <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+              <I d={ic.sparkle} s={14} c={c.accentText} />
+              <span className="text-[11px] font-semibold" style={{ color: c.text }}>AI Writer</span>
+            </div>
+            {/* Quick actions */}
+            <div className="px-2 py-2 space-y-0.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+              {[
+                { label: "Summarize", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Summary: This document contains a placeholder text discussing various topics in 3 paragraphs with 144 words."); setAiLoading(false); }, 800); }},
+                { label: "Fix Grammar", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Grammar check complete. 3 corrections applied:\n• \"Enem\" → \"Enim\"\n• Comma added after \"purus\"\n• Period consistency fixed"); setAiLoading(false); }, 600); }},
+                { label: "Make Shorter", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Shortened version ready. Reduced from 144 to ~80 words while keeping key points. Click 'Apply' to replace."); setAiLoading(false); }, 700); }},
+                { label: "Make Longer", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Expanded version ready. Added details and transitions. Word count increased to ~220 words. Click 'Apply' to replace."); setAiLoading(false); }, 700); }},
+                { label: "Translate", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Translation ready (Albanian):\n\nLorem ipsum → Teksti placeholder per dokumentin tuaj..."); setAiLoading(false); }, 900); }},
+                { label: "Change Tone", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Tone options:\n• Professional\n• Casual\n• Academic\n• Creative\n\nSelect a tone to rewrite the document."); setAiLoading(false); }, 500); }},
+              ].map((item, i) => (
+                <button key={i} onClick={item.action}
+                  className="w-full text-left px-3 py-1.5 rounded-lg text-[10px] font-medium transition-colors"
+                  style={{ color: c.text }}
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            {/* AI result */}
+            <div className="flex-1 overflow-y-auto px-3 py-2" style={{ scrollbarWidth: "none" }}>
+              {aiLoading && (
+                <div className="flex items-center gap-2 py-4 justify-center">
+                  <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${c.accent} transparent ${c.accent} ${c.accent}` }} />
+                  <span className="text-[10px]" style={{ color: c.textMuted }}>AI thinking...</span>
+                </div>
+              )}
+              {aiResult && !aiLoading && (
+                <div className="space-y-2">
+                  <pre className="text-[10px] leading-relaxed whitespace-pre-wrap font-sans" style={{ color: c.text }}>{aiResult}</pre>
+                  <div className="flex gap-1">
+                    <button onClick={() => { setDocContent(prev => prev + "\n\n" + aiResult); setAiResult(null); }}
+                      className="flex-1 py-1.5 rounded-lg text-[9px] font-medium" style={{ background: c.accent, color: "#fff" }}>Apply</button>
+                    <button onClick={() => setAiResult(null)}
+                      className="flex-1 py-1.5 rounded-lg text-[9px] font-medium" style={{ background: c.cardAlt, color: c.text }}>Dismiss</button>
+                  </div>
+                </div>
+              )}
+              {!aiResult && !aiLoading && (
+                <p className="text-[10px] text-center py-4" style={{ color: c.textMuted }}>Select an action or ask AI below</p>
+              )}
+            </div>
+            {/* Custom prompt */}
+            <div className="px-2 py-2 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+              <div className="flex items-center gap-1 px-2 py-1.5 rounded-lg" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+                <input className="flex-1 bg-transparent outline-none text-[10px]" style={{ color: c.text }}
+                  placeholder="Ask AI..."
+                  value={aiPrompt} onChange={e => setAiPrompt(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === "Enter" && aiPrompt.trim()) {
+                      const q = aiPrompt; setAiPrompt(""); setAiLoading(true);
+                      setTimeout(() => { setAiResult(`AI response to "${q}":\n\nI've analyzed your document and here's my suggestion based on your request.`); setAiLoading(false); }, 800);
+                    }
+                  }} />
+                <button onClick={() => {
+                  if (aiPrompt.trim()) {
+                    const q = aiPrompt; setAiPrompt(""); setAiLoading(true);
+                    setTimeout(() => { setAiResult(`AI response to "${q}":\n\nI've analyzed your document and here's my suggestion.`); setAiLoading(false); }, 800);
+                  }
+                }} className="p-1 rounded" style={{ background: c.accent }}><I d={ic.send} s={10} c="#fff" /></button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Status bar */}
