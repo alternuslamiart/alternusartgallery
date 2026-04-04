@@ -440,7 +440,7 @@ function AIPanel({ c, context, onAction }: { c: typeof palette.dark; context: st
     <div className="flex flex-col h-full" style={{ borderLeft: `1px solid ${c.border}`, background: c.bg }}>
       {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+        <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "#3B82F6" }}>
           <I d={ic.sparkle} s={10} c="#fff" />
         </div>
         <span className="text-[10px] font-bold flex-1" style={{ color: c.text }}>AI</span>
@@ -1223,7 +1223,7 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
           <div className="flex items-center gap-1">
             <button title="AI Assistant" onClick={() => setShowAIPanel(!showAIPanel)}
               className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105"
-              style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)", boxShadow: showAIPanel ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
+              style={{ background: "#3B82F6", boxShadow: showAIPanel ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
               <I d={ic.sparkle} s={10} c="#fff" />
             </button>
             <button title="Voice" className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
@@ -1252,10 +1252,16 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
       {showAIPanel && (
         <div className="w-[180px] flex-shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${c.border}`, background: c.bg }}>
           <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "#3B82F6" }}>
               <I d={ic.sparkle} s={10} c="#fff" />
             </div>
-            <span className="text-[10px] font-bold" style={{ color: c.text }}>AI Assistant</span>
+            <span className="text-[10px] font-bold flex-1" style={{ color: c.text }}>AI Assistant</span>
+            <button title="Voice" className="w-5 h-5 rounded-full flex items-center justify-center transition-colors"
+              style={{ color: c.textMuted }}
+              onMouseEnter={e => { e.currentTarget.style.color = c.accentText; }}
+              onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; }}>
+              <I d={ic.voice} s={11} />
+            </button>
           </div>
           <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1" style={{ scrollbarWidth: "none" }}>
             {[
@@ -1366,7 +1372,7 @@ function WordApp({ c }: { c: typeof palette.dark }) {
         <div className="w-px h-5 mx-1" style={{ background: c.border }} />
         <button title="AI Assistant" onClick={() => setShowAI(!showAI)}
           className="w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95"
-          style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)", boxShadow: showAI ? "0 0 12px rgba(139,92,246,0.5)" : "0 0 6px rgba(139,92,246,0.25)" }}>
+          style={{ background: "#3B82F6", boxShadow: showAI ? "0 0 12px rgba(139,92,246,0.5)" : "0 0 6px rgba(139,92,246,0.25)" }}>
           <I d={ic.sparkle} s={12} c="#fff" />
         </button>
       </div>
@@ -1397,7 +1403,7 @@ function WordApp({ c }: { c: typeof palette.dark }) {
         {showAI && (
           <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${c.border}`, background: c.surface }}>
             <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-              <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+              <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "#3B82F6" }}>
                 <I d={ic.sparkle} s={10} c="#fff" />
               </div>
               <span className="text-[11px] font-semibold" style={{ color: c.text }}>AI Writer</span>
@@ -1656,7 +1662,7 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
           <button
             onClick={() => setShowAIPanel(!showAIPanel)}
             className="w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 flex-shrink-0"
-            style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)", boxShadow: showAIPanel ? "0 0 10px rgba(139,92,246,0.4)" : "0 0 6px rgba(139,92,246,0.25)" }}
+            style={{ background: "#3B82F6", boxShadow: showAIPanel ? "0 0 10px rgba(139,92,246,0.4)" : "0 0 6px rgba(139,92,246,0.25)" }}
             title="AI File Manager"
           >
             <I d={ic.sparkle} s={12} c="#fff" />
@@ -2075,7 +2081,7 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
         {showAI && (
           <div className="w-[230px] flex-shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${br}`, background: bg2 }}>
             <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${br}` }}>
-              <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+              <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "#3B82F6" }}>
                 <I d={ic.sparkle} s={10} c="#fff" />
               </div>
               <span className="text-[10px] font-bold" style={{ color: "#ccc" }}>AI Copilot</span>
@@ -2163,7 +2169,7 @@ function ClockApp({ c }: { c: typeof palette.dark }) {
         ))}
         <button title="AI" onClick={() => setShowAIPanel(!showAIPanel)}
           className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105 ml-1 flex-shrink-0"
-          style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)", boxShadow: showAIPanel ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
+          style={{ background: "#3B82F6", boxShadow: showAIPanel ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
           <I d={ic.sparkle} s={9} c="#fff" />
         </button>
       </div>
@@ -2452,7 +2458,7 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
         <div className="flex items-center gap-1 ml-auto">
           <button title="AI Assistant" onClick={() => setShowAIPanel(!showAIPanel)}
             className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105"
-            style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+            style={{ background: "#3B82F6" }}>
             <I d={ic.sparkle} s={10} c="#fff" />
           </button>
           <button title="Voice" className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
