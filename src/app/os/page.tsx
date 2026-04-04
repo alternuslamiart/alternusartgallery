@@ -124,9 +124,9 @@ const palette = {
 };
 
 // ━━━━ Simple SVG Icon ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function I({ d, s = 16, c }: { d: string; s?: number; c?: string }) {
+function I({ d, s = 16, c, w }: { d: string; s?: number; c?: string; w?: number }) {
   return (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c || "currentColor"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c || "currentColor"} strokeWidth={w || 2} strokeLinecap="round" strokeLinejoin="round">
       <path d={d} />
     </svg>
   );
