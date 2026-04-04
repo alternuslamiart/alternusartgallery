@@ -1233,8 +1233,21 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
               </div>
             ))}
           </div>
+          {/* AI classify button */}
+          <button
+            onClick={() => {
+              setSearchQuery("");
+              setSelectedFile(null);
+              onOpenApp("ai");
+            }}
+            className="p-1.5 rounded-lg transition-all hover:scale-105 active:scale-95 flex-shrink-0"
+            style={{ background: c.accentSoft, color: c.accentText }}
+            title="AI File Manager"
+          >
+            <I d={ic.sparkle} s={14} />
+          </button>
           {/* Search */}
-          <div className="flex items-center gap-2 px-2 py-1 rounded-lg w-[160px]" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+          <div className="flex items-center gap-2 px-2 py-1 rounded-lg w-[140px]" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
             <I d={ic.search} s={11} c={c.textMuted} />
             <input className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: c.text }}
               placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
@@ -2131,19 +2144,6 @@ export default function AlternusOS() {
                   }
                 }}
               />
-              {/* AI classify/manage button */}
-              <button
-                onClick={() => {
-                  setAiInput("");
-                  setAiResponse("AI File Assistant ready. What can I help with?\n\n• \"classify my files\" — auto-organize by type\n• \"find duplicates\" — scan for duplicate files\n• \"cleanup downloads\" — archive old downloads\n• \"sort by date\" — organize files chronologically\n• \"tag documents\" — auto-tag by content\n• \"storage report\" — analyze disk usage");
-                  setAiActions([{ label: "Open Files", action: "files" }]);
-                }}
-                className="p-2 rounded-lg transition-all hover:scale-105 active:scale-95"
-                style={{ background: c.accentSoft, color: c.accentText }}
-                title="AI File Manager"
-              >
-                <I d={ic.sparkle} s={16} />
-              </button>
               <button
                 onClick={() => aiInput.trim() && handleDesktopSearch()}
                 className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90 active:scale-95"
