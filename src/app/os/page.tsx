@@ -490,6 +490,7 @@ function AIPanel({ c, context, onAction }: { c: typeof palette.dark; context: st
 }
 
 // ━━━━ App Contents ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function AIChat({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp?: (id: WinId) => void }) {
   const [input, setInput] = useState("");
   const [msgs, setMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([
