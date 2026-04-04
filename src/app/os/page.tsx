@@ -1059,67 +1059,106 @@ function WordApp({ c }: { c: typeof palette.dark }) {
   const [docTitle, setDocTitle] = useState("Untitled Document");
   const [docContent, setDocContent] = useState("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Turpis sit eget faucibus eget. Pulvinar amet varius elementum bibendum massa tristique varius ultrices. Ornare vitae duis non in. Id tortor cras nisl mollis nibh est. Socis tortor id orci vitae nulla eget sed nisi.\n\nUt nisl aliquam dignissim mauris nunc ut diam nec sed. Neque urna vitae velit morbi tristique. Nulla tristique urna gravida orci sagittis vel mauris amet. Ipsum urna id elit volutpat. Enem posuere dictum sed sagittis. In tortor aliquam posuere ultrices fringilla. Magna dictum faucibus praesent ultrices feugiat nec. Vitae tempor augue suscipit sed eget purus.\n\nPraesent urna ante nam mattis dolor imperdiet vitae pellentesque vitae. Leo dapibus non egestas commodo urna tincidunt vitae. Consequat gravida netus fames viverra orci. Vel in sed nec enim hendrerit faucibus. Laoreet tincidunt eget neque dignissim sit egestas adipiscing. Euismod facilisis vestibulum ut in faucibus sed.");
   const [wordCount, setWordCount] = useState(0);
-  const sidebarItems = [
-    { icon: ic.fileText, label: "File Document" },
-    { icon: ic.type, label: "Typography" },
-    { icon: ic.pen, label: "Edit" },
-    { icon: ic.upload, label: "Export" },
-    { icon: ic.share, label: "Share" },
-    { icon: ic.plus, label: "New" },
-  ];
-  const [activeSidebar, setActiveSidebar] = useState(0);
+  const [fontSize, setFontSize] = useState(14);
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [isUnderline, setIsUnderline] = useState(false);
+  const [activeTab, setActiveTab] = useState("Home");
 
   useEffect(() => {
     setWordCount(docContent.trim().split(/\s+/).filter(Boolean).length);
   }, [docContent]);
 
+  const ToolBtn = ({ icon, label, active, onClick }: { icon: string; label: string; active?: boolean; onClick?: () => void }) => (
+    <button title={label} onClick={onClick}
+      className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+      style={{ background: active ? c.accentSoft : "transparent", color: active ? c.accentText : c.textMuted }}
+      onMouseEnter={e => { if (!active) e.currentTarget.style.background = c.cardAlt; }}
+      onMouseLeave={e => { if (!active) e.currentTarget.style.background = active ? c.accentSoft : "transparent"; }}>
+      <I d={icon} s={13} />
+    </button>
+  );
+
   return (
-    <div className="flex h-full">
-      {/* Left sidebar with icons */}
-      <div className="w-12 flex-shrink-0 flex flex-col items-center py-3 gap-1" style={{ background: c.bg, borderRight: `1px solid ${c.border}` }}>
-        {sidebarItems.map((item, i) => (
-          <button key={i} onClick={() => setActiveSidebar(i)}
-            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
-            style={{ background: activeSidebar === i ? c.accentSoft : "transparent", color: activeSidebar === i ? c.accentText : c.textMuted }}
-            onMouseEnter={e => { if (activeSidebar !== i) e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { if (activeSidebar !== i) e.currentTarget.style.background = "transparent"; }}>
-            <I d={item.icon} s={16} />
+    <div className="flex flex-col h-full">
+      {/* Tab bar */}
+      <div className="flex items-center gap-0 px-3 py-1 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        {["File", "Home", "Insert", "Layout", "View"].map(tab => (
+          <button key={tab} onClick={() => setActiveTab(tab)}
+            className="px-3 py-1 text-[10px] font-medium transition-colors"
+            style={{ color: activeTab === tab ? c.accentText : c.textMuted, borderBottom: activeTab === tab ? `2px solid ${c.accent}` : "2px solid transparent" }}>
+            {tab}
           </button>
         ))}
       </div>
+
+      {/* Toolbar */}
+      <div className="flex items-center gap-1 px-3 py-1.5 flex-shrink-0 flex-wrap" style={{ borderBottom: `1px solid ${c.border}` }}>
+        {/* Clipboard */}
+        <ToolBtn icon={ic.fileText} label="Paste" />
+        <ToolBtn icon={ic.note} label="Copy" />
+        <ToolBtn icon={ic.close} label="Cut" />
+        <div className="w-px h-5 mx-1" style={{ background: c.border }} />
+        {/* Font */}
+        <select className="text-[10px] px-1.5 py-1 rounded-md outline-none" style={{ background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}>
+          <option>Arial</option><option>Times New Roman</option><option>Helvetica</option><option>Georgia</option><option>Courier</option>
+        </select>
+        <select value={fontSize} onChange={e => setFontSize(Number(e.target.value))}
+          className="text-[10px] w-10 px-1 py-1 rounded-md outline-none" style={{ background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}>
+          {[10, 11, 12, 14, 16, 18, 20, 24, 28, 36].map(s => <option key={s}>{s}</option>)}
+        </select>
+        <div className="w-px h-5 mx-1" style={{ background: c.border }} />
+        {/* Format */}
+        <ToolBtn icon="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6zM6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z" label="Bold" active={isBold} onClick={() => setIsBold(!isBold)} />
+        <ToolBtn icon="M19 4h-9M14 20H5M15 4L9 20" label="Italic" active={isItalic} onClick={() => setIsItalic(!isItalic)} />
+        <ToolBtn icon="M6 3v7a6 6 0 0012 0V3M4 21h16" label="Underline" active={isUnderline} onClick={() => setIsUnderline(!isUnderline)} />
+        <ToolBtn icon="M17.5 4.5l-15 15M7 4V2M17 4V2M2 7h5M2 17h5M22 7h-5M22 17h-5M17 20v2M7 20v2" label="Strikethrough" />
+        <div className="w-px h-5 mx-1" style={{ background: c.border }} />
+        {/* Paragraph */}
+        <ToolBtn icon={ic.alignLeft} label="Align Left" />
+        <ToolBtn icon={ic.alignCenter} label="Align Center" />
+        <ToolBtn icon={ic.alignRight} label="Align Right" />
+        <ToolBtn icon={ic.alignJustify} label="Justify" />
+        <div className="w-px h-5 mx-1" style={{ background: c.border }} />
+        {/* Actions */}
+        <ToolBtn icon={ic.refresh} label="Undo" />
+        <ToolBtn icon="M1 20v-6h6M23 4v6h-6M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15" label="Redo" />
+        <div className="w-px h-5 mx-1" style={{ background: c.border }} />
+        <ToolBtn icon={ic.search} label="Find & Replace" />
+        <ToolBtn icon={ic.download} label="Save" />
+        <ToolBtn icon={ic.upload} label="Export" />
+      </div>
+
       {/* Document area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Document content */}
-        <div className="flex-1 overflow-y-auto p-6" style={{ background: c.bg }}>
-          <div className="max-w-[640px] mx-auto rounded-xl p-8 min-h-full" style={{ background: c.surface, boxShadow: `0 1px 4px rgba(0,0,0,0.08)` }}>
-            <input
-              value={docTitle}
-              onChange={e => setDocTitle(e.target.value)}
-              className="w-full text-2xl font-bold mb-6 bg-transparent border-none outline-none"
-              style={{ color: c.text }}
-              placeholder="Document Title"
-            />
-            <textarea
-              value={docContent}
-              onChange={e => setDocContent(e.target.value)}
-              className="w-full bg-transparent border-none outline-none resize-none text-sm leading-relaxed"
-              style={{ color: c.text, minHeight: 300 }}
-              placeholder="Start writing..."
-            />
-          </div>
+      <div className="flex-1 overflow-y-auto p-4" style={{ background: c.bg, scrollbarWidth: "none" }}>
+        <div className="max-w-[640px] mx-auto rounded-lg p-8 min-h-full" style={{ background: c.surface, boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+          <input
+            value={docTitle}
+            onChange={e => setDocTitle(e.target.value)}
+            className="w-full text-xl font-bold mb-4 bg-transparent border-none outline-none"
+            style={{ color: c.text }}
+            placeholder="Document Title"
+          />
+          <textarea
+            value={docContent}
+            onChange={e => setDocContent(e.target.value)}
+            className="w-full bg-transparent border-none outline-none resize-none leading-relaxed"
+            style={{ color: c.text, minHeight: 400, fontSize, fontWeight: isBold ? "bold" : "normal", fontStyle: isItalic ? "italic" : "normal", textDecoration: isUnderline ? "underline" : "none" }}
+            placeholder="Start writing..."
+          />
         </div>
-        {/* Bottom status bar */}
-        <div className="flex items-center justify-between px-4 h-8 flex-shrink-0" style={{ background: c.surface, borderTop: `1px solid ${c.border}` }}>
-          <div className="flex items-center gap-4">
-            <span className="text-[10px]" style={{ color: c.textMuted }}>Page: 1</span>
-            <span className="text-[10px]" style={{ color: c.textMuted }}>Words: {wordCount}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="p-0.5 rounded" style={{ color: c.textMuted }}><I d={ic.alignLeft} s={12} /></button>
-            <button className="p-0.5 rounded" style={{ color: c.textMuted }}><I d={ic.alignCenter} s={12} /></button>
-            <button className="p-0.5 rounded" style={{ color: c.textMuted }}><I d={ic.alignRight} s={12} /></button>
-            <button className="p-0.5 rounded" style={{ color: c.textMuted }}><I d={ic.alignJustify} s={12} /></button>
-          </div>
+      </div>
+
+      {/* Status bar */}
+      <div className="flex items-center justify-between px-4 h-7 flex-shrink-0" style={{ background: c.surface, borderTop: `1px solid ${c.border}` }}>
+        <div className="flex items-center gap-4">
+          <span className="text-[9px]" style={{ color: c.textMuted }}>Page 1 of 1</span>
+          <span className="text-[9px]" style={{ color: c.textMuted }}>{wordCount} words</span>
+          <span className="text-[9px]" style={{ color: c.textMuted }}>{docContent.length} characters</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-[9px]" style={{ color: c.textMuted }}>Font: {fontSize}px</span>
+          <span className="text-[9px]" style={{ color: c.textMuted }}>UTF-8</span>
         </div>
       </div>
     </div>
