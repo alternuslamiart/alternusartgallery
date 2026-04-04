@@ -758,7 +758,7 @@ function WeatherApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
-function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void }) {
+function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; wallpaper: number; setWallpaper: (w: number) => void }) {
   const [activeSection, setActiveSection] = useState("Network");
   const [wifiOn, setWifiOn] = useState(true);
   const [btOn, setBtOn] = useState(true);
@@ -958,8 +958,21 @@ function SettingsApp({ c, mode, setMode }: { c: typeof palette.dark; mode: Theme
             </div>
             <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Wallpaper</p>
             <div className="grid grid-cols-3 gap-2">
-              {["#1a1a2e", "#16213e", "#0f3460", "#242424", "#1b1b2f", "#162447"].map((col, i) => (
-                <div key={i} className="h-16 rounded-xl cursor-pointer transition-transform hover:scale-105" style={{ background: col, border: i === 3 ? `2px solid ${c.accent}` : `2px solid transparent` }} />
+              {[
+                { bg: "linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)", label: "Default" },
+                { bg: "linear-gradient(135deg, #0f0c29, #302b63, #24243e)", label: "Aurora" },
+                { bg: "linear-gradient(160deg, #0a0a1a 0%, #1e3a5f 40%, #0a2540 70%, #0a0a1a 100%)", label: "Ocean" },
+                { bg: "radial-gradient(ellipse at 30% 50%, #1a0a2e 0%, #0a0a1a 50%, #0f1a2e 100%)", label: "Nebula" },
+                { bg: "linear-gradient(135deg, #0a1628 0%, #1a0a28 50%, #0a1a20 100%)", label: "Midnight" },
+                { bg: "radial-gradient(circle at 70% 30%, #1a2a1a 0%, #0a0f0a 40%, #0a0a12 100%)", label: "Forest" },
+              ].map((wp, i) => (
+                <div key={i} onClick={() => setWallpaper(i)}
+                  className="h-16 rounded-xl cursor-pointer transition-all hover:scale-105 relative overflow-hidden"
+                  style={{ background: wp.bg, border: wallpaper === i ? `2px solid ${c.accent}` : `2px solid transparent`, boxShadow: wallpaper === i ? `0 0 8px ${c.accent}40` : "none" }}>
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(circle at 50% 50%, rgba(100,130,255,0.15) 0%, transparent 70%)" }} />
+                  <span className="absolute bottom-1 left-2 text-[7px] font-medium" style={{ color: "rgba(255,255,255,0.4)" }}>{wp.label}</span>
+                </div>
               ))}
             </div>
             <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Font Size</p>
@@ -2253,6 +2266,7 @@ export default function AlternusOS() {
   const [smartDND, setSmartDND] = useState(false);
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   const [showTimeline, setShowTimeline] = useState(false);
+  const [wallpaper, setWallpaper] = useState(0);
   const lastMouseMove = useRef(Date.now());
 
   const c = palette[mode];
@@ -2639,7 +2653,7 @@ export default function AlternusOS() {
     terminal: <TerminalApp c={c} />,
     code: <CodeApp c={c} />,
     files: <FilesApp c={c} onOpenApp={openWin} />,
-    settings: <SettingsApp c={c} mode={mode} setMode={setMode} />,
+    settings: <SettingsApp c={c} mode={mode} setMode={setMode} wallpaper={wallpaper} setWallpaper={setWallpaper} />,
     music: <MusicApp c={c} />,
     weather: <WeatherApp c={c} />,
     calendar: <CalendarApp c={c} />,
@@ -2999,6 +3013,16 @@ export default function AlternusOS() {
   }
 
   // ━━━━ DESKTOP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const wallpapers = [
+    "linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)",
+    "linear-gradient(135deg, #0f0c29, #302b63, #24243e)",
+    "linear-gradient(160deg, #0a0a1a 0%, #1e3a5f 40%, #0a2540 70%, #0a0a1a 100%)",
+    "radial-gradient(ellipse at 30% 50%, #1a0a2e 0%, #0a0a1a 50%, #0f1a2e 100%)",
+    "linear-gradient(135deg, #0a1628 0%, #1a0a28 50%, #0a1a20 100%)",
+    "radial-gradient(circle at 70% 30%, #1a2a1a 0%, #0a0f0a 40%, #0a0a12 100%)",
+  ];
+  const desktopBg = mode === "dark" ? wallpapers[wallpaper] || wallpapers[0] : c.bg;
+
   return (
     <div style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
       {/* Top Bar */}
@@ -3134,6 +3158,7 @@ export default function AlternusOS() {
 
       {/* Desktop Area - fixed, no scroll */}
       <div className="flex-1 relative overflow-hidden"
+        style={{ background: desktopBg }}
         onClick={() => { if (showApps) setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setContextMenu(null); }}
         onContextMenu={e => { e.preventDefault(); setContextMenu({ x: e.clientX, y: e.clientY - 36 }); setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); }}>
         {/* Apps button - top center, always visible */}
