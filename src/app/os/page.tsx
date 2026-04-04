@@ -2266,7 +2266,7 @@ export default function AlternusOS() {
             <button
               onClick={() => { setIsLocked(false); }}
               className="flex items-center gap-2.5 px-8 py-3 rounded-2xl text-sm font-medium whitespace-nowrap transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer mb-3"
-              style={{ background: c.accent, color: "#fff", boxShadow: `0 4px 20px ${c.accent}40` }}
+              style={{ background: c.accent, color: "#fff" }}
               onMouseEnter={e => { e.currentTarget.style.background = "#2563EB"; }}
               onMouseLeave={e => { e.currentTarget.style.background = c.accent; }}
             >
