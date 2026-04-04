@@ -2718,19 +2718,19 @@ export default function AlternusOS() {
             {/* 2-column grid */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
               {allApps.map((app, i) => (
-                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl transition-all"
-                  style={{ background: c.cardAlt, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
-                  onMouseEnter={e => { e.currentTarget.style.boxShadow = mode === "dark" ? "0 2px 8px rgba(0,0,0,0.2)" : "0 2px 8px rgba(0,0,0,0.08)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}>
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: app.iconBg + "20" }}>
-                    <I d={app.icon} s={18} c={app.iconBg} />
+                <div key={i} className="flex items-center gap-3 p-3 rounded-2xl transition-all"
+                  style={{ background: c.cardAlt }}
+                  onMouseEnter={e => { e.currentTarget.style.background = c.border; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; }}>
+                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: app.iconBg + "15" }}>
+                    <I d={app.icon} s={20} c={app.iconBg} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>{app.name}</p>
-                    <p className="text-[8px]" style={{ color: c.textMuted }}>{app.desc}</p>
+                    <p className="text-[8px] mt-0.5" style={{ color: c.textMuted }}>{app.desc}</p>
                   </div>
-                  <button className="text-[9px] px-2.5 py-1 rounded-full font-semibold flex-shrink-0"
-                    style={{ background: app.price === "Free" ? c.accent : c.cardAlt, color: app.price === "Free" ? "#fff" : c.accentText, border: app.price !== "Free" ? `1px solid ${c.accent}` : "none" }}>
+                  <button className="text-[9px] px-3 py-1 rounded-full font-semibold flex-shrink-0"
+                    style={{ background: app.price === "Free" ? c.accent : "transparent", color: app.price === "Free" ? "#fff" : c.accentText, border: app.price !== "Free" ? `1px solid ${c.accent}` : "none" }}>
                     {app.price === "Free" ? "Free" : app.price}
                   </button>
                 </div>
@@ -2749,19 +2749,19 @@ export default function AlternusOS() {
                 { name: "AlternusTV", desc: "Stream movies", icon: ic.film, iconBg: "#EF4444", price: "Free" },
                 { name: "Alternus Photos", desc: "AI photo editor", icon: ic.image, iconBg: "#EC4899", price: "Free" },
               ].map((app, i) => (
-                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl transition-all"
-                  style={{ background: c.cardAlt, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
-                  onMouseEnter={e => { e.currentTarget.style.boxShadow = mode === "dark" ? "0 2px 8px rgba(0,0,0,0.2)" : "0 2px 8px rgba(0,0,0,0.08)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}>
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: app.iconBg + "20" }}>
-                    <I d={app.icon} s={18} c={app.iconBg} />
+                <div key={i} className="flex items-center gap-3 p-3 rounded-2xl transition-all"
+                  style={{ background: c.cardAlt }}
+                  onMouseEnter={e => { e.currentTarget.style.background = c.border; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; }}>
+                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: app.iconBg + "15" }}>
+                    <I d={app.icon} s={20} c={app.iconBg} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>{app.name}</p>
-                    <p className="text-[8px]" style={{ color: c.textMuted }}>{app.desc}</p>
+                    <p className="text-[8px] mt-0.5" style={{ color: c.textMuted }}>{app.desc}</p>
                   </div>
-                  <button className="text-[9px] px-2.5 py-1 rounded-full font-semibold flex-shrink-0"
-                    style={{ background: app.price === "Free" ? c.accent : c.cardAlt, color: app.price === "Free" ? "#fff" : c.accentText, border: app.price !== "Free" ? `1px solid ${c.accent}` : "none" }}>
+                  <button className="text-[9px] px-3 py-1 rounded-full font-semibold flex-shrink-0"
+                    style={{ background: app.price === "Free" ? c.accent : "transparent", color: app.price === "Free" ? "#fff" : c.accentText, border: app.price !== "Free" ? `1px solid ${c.accent}` : "none" }}>
                     {app.price === "Free" ? "Free" : app.price}
                   </button>
                 </div>
@@ -2809,16 +2809,16 @@ export default function AlternusOS() {
           {/* Content */}
           <div className="flex-1 overflow-y-auto px-3 py-3" style={{ scrollbarWidth: "none" }}>
             {/* Featured */}
-            <div className="p-4 rounded-xl mb-4" style={{ background: `linear-gradient(135deg, #6366F120, #EC489920)`, border: `1px solid ${c.border}` }}>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[8px] px-2 py-0.5 rounded-full font-semibold" style={{ background: "#F59E0B", color: "#000" }}>★ {featured.rating}</span>
+            <div className="p-4 rounded-2xl mb-4" style={{ background: c.cardAlt }}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[8px] px-2 py-0.5 rounded-full font-bold" style={{ background: "#F59E0B", color: "#000" }}>★ {featured.rating}</span>
                 <span className="text-[9px]" style={{ color: c.textMuted }}>{featured.genre} · {featured.year}</span>
               </div>
-              <p className="text-sm font-bold mb-1" style={{ color: c.text }}>{featured.name}</p>
-              <p className="text-[10px] mb-3" style={{ color: c.textMuted }}>{featured.desc}</p>
+              <p className="text-base font-bold mb-1" style={{ color: c.text }}>{featured.name}</p>
+              <p className="text-[10px] mb-3 leading-relaxed" style={{ color: c.textSec }}>{featured.desc}</p>
               <div className="flex gap-2">
-                <button className="px-3 py-1.5 rounded-lg text-[10px] font-semibold flex items-center gap-1.5" style={{ background: c.accent, color: "#fff" }}><I d={ic.play} s={10} c="#fff" /> Watch</button>
-                <button className="px-3 py-1.5 rounded-lg text-[10px] font-medium" style={{ background: c.cardAlt, color: c.text }}>+ Watchlist</button>
+                <button className="px-4 py-2 rounded-xl text-[10px] font-semibold flex items-center gap-1.5" style={{ background: c.accent, color: "#fff" }}><I d={ic.play} s={10} c="#fff" /> Watch</button>
+                <button className="px-4 py-2 rounded-xl text-[10px] font-medium" style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}` }}>+ Watchlist</button>
               </div>
             </div>
 
@@ -2827,18 +2827,18 @@ export default function AlternusOS() {
               <p className="text-xs font-bold" style={{ color: c.text }}>Trending Now</p>
               <span className="text-[10px] font-medium" style={{ color: c.accentText }}>See All</span>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }} className="mb-4">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }} className="mb-4">
               {trending.map((m, i) => (
-                <div key={i} className="flex items-center gap-2.5 p-2.5 rounded-xl transition-all"
-                  style={{ background: c.cardAlt, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)"; }}>
-                  <div className="w-9 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: m.color + "20" }}>
-                    <I d={ic.film} s={16} c={m.color} />
+                <div key={i} className="flex items-center gap-3 p-3 rounded-2xl transition-all"
+                  style={{ background: c.cardAlt }}
+                  onMouseEnter={e => { e.currentTarget.style.background = c.border; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; }}>
+                  <div className="w-10 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: m.color + "15" }}>
+                    <I d={ic.film} s={18} c={m.color} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-semibold truncate" style={{ color: c.text }}>{m.name}</p>
-                    <p className="text-[8px]" style={{ color: c.textMuted }}>{m.genre} · {m.year}</p>
+                    <p className="text-[8px] mt-0.5" style={{ color: c.textMuted }}>{m.genre} · {m.year}</p>
                     <span className="text-[8px] font-bold" style={{ color: "#F59E0B" }}>★ {m.rating}</span>
                   </div>
                 </div>
