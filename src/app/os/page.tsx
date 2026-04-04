@@ -1134,9 +1134,9 @@ function WordApp({ c }: { c: typeof palette.dark }) {
         <ToolBtn icon={ic.upload} label="Export" />
         <div className="w-px h-5 mx-1" style={{ background: c.border }} />
         <button title="AI Assistant" onClick={() => setShowAI(!showAI)}
-          className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
-          style={{ background: showAI ? c.accent : c.accentSoft, color: showAI ? "#fff" : c.accentText }}>
-          <I d={ic.sparkle} s={13} />
+          className="w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+          style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)", boxShadow: showAI ? "0 0 12px rgba(139,92,246,0.5)" : "0 0 6px rgba(139,92,246,0.25)" }}>
+          <I d={ic.sparkle} s={12} c="#fff" />
         </button>
       </div>
 
@@ -1166,7 +1166,9 @@ function WordApp({ c }: { c: typeof palette.dark }) {
         {showAI && (
           <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${c.border}`, background: c.surface }}>
             <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-              <I d={ic.sparkle} s={14} c={c.accentText} />
+              <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+                <I d={ic.sparkle} s={10} c="#fff" />
+              </div>
               <span className="text-[11px] font-semibold" style={{ color: c.text }}>AI Writer</span>
             </div>
             {/* Quick actions */}
@@ -1419,11 +1421,11 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
               setSelectedFile(null);
               onOpenApp("ai");
             }}
-            className="p-1.5 rounded-lg transition-all hover:scale-105 active:scale-95 flex-shrink-0"
-            style={{ background: c.accentSoft, color: c.accentText }}
+            className="w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 flex-shrink-0"
+            style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)", boxShadow: "0 0 6px rgba(139,92,246,0.25)" }}
             title="AI File Manager"
           >
-            <I d={ic.sparkle} s={14} />
+            <I d={ic.sparkle} s={12} c="#fff" />
           </button>
           {/* Search */}
           <div className="flex items-center gap-2 px-2 py-1 rounded-lg w-[140px]" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
