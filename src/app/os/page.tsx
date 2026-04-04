@@ -183,6 +183,9 @@ const ic = {
   cpu: "M18 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2zM9 9h6v6H9zM9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3",
   hdd: "M22 12H2M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11zM6 16h.01M10 16h.01",
   refresh: "M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15",
+  home: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0v-6a1 1 0 011-1h2a1 1 0 011 1v6m-6 0h6",
+  download: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3",
+  image: "M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zM8.5 10a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM21 15l-5-5L5 21",
 };
 
 // ━━━━ Window Title Bar ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1070,52 +1073,125 @@ function WordApp({ c }: { c: typeof palette.dark }) {
 }
 
 function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: WinId) => void }) {
-  const [currentPath, setCurrentPath] = useState("Home");
+  const [currentPath, setCurrentPath] = useState<string[]>(["Home"]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"recent" | "favorites" | "shared">("recent");
 
-  const folders: Record<string, { name: string; icon: string; size: string; action?: WinId | string }[]> = {
+  type FileItem = { name: string; type: "folder" | "file"; icon: string; iconColor: string; size: string; modified: string; action?: WinId | string };
+
+  const fileSystem: Record<string, FileItem[]> = {
     Home: [
-      { name: "Documents", icon: "📁", size: "12 items", action: "Documents" },
-      { name: "Projects", icon: "💼", size: "7 items", action: "Projects" },
-      { name: "Images", icon: "🖼️", size: "48 items", action: "Images" },
-      { name: "Downloads", icon: "📥", size: "23 items", action: "Downloads" },
-      { name: "report.pdf", icon: "📄", size: "2.4 MB", action: "file" },
-      { name: "design.fig", icon: "🎨", size: "18 MB", action: "file" },
+      { name: "Desktop", type: "folder", icon: ic.monitor, iconColor: "#60A5FA", size: "8 items", modified: "Today", action: "Desktop" },
+      { name: "Downloads", type: "folder", icon: ic.download, iconColor: "#34D399", size: "23 items", modified: "Today", action: "Downloads" },
+      { name: "Documents", type: "folder", icon: ic.fileText, iconColor: "#FBBF24", size: "12 items", modified: "Yesterday", action: "Documents" },
+      { name: "Pictures", type: "folder", icon: ic.image, iconColor: "#A78BFA", size: "48 items", modified: "Apr 2", action: "Pictures" },
+      { name: "Music", type: "folder", icon: ic.music, iconColor: "#F472B6", size: "156 items", modified: "Mar 28", action: "Music" },
+      { name: "Videos", type: "folder", icon: ic.film, iconColor: "#FB923C", size: "34 items", modified: "Mar 25", action: "Videos" },
+      { name: "Projects", type: "folder", icon: ic.folder, iconColor: "#22D3EE", size: "7 items", modified: "Today", action: "Projects" },
+    ],
+    Desktop: [
+      { name: "Baroque Composition", type: "folder", icon: ic.folder, iconColor: "#FBBF24", size: "3 items", modified: "Today", action: "Desktop" },
+      { name: "screenshot.png", type: "file", icon: ic.image, iconColor: "#A78BFA", size: "1.2 MB", modified: "Today" },
+      { name: "notes.txt", type: "file", icon: ic.fileText, iconColor: c.textSec, size: "2 KB", modified: "Yesterday" },
     ],
     Documents: [
-      { name: "notes.md", icon: "📝", size: "4 KB", action: "notes" },
-      { name: "todo.txt", icon: "📄", size: "1 KB", action: "file" },
-      { name: "meeting-notes.md", icon: "📝", size: "8 KB", action: "notes" },
-    ],
-    Projects: [
-      { name: "alternus-os/", icon: "📂", size: "24 files" },
-      { name: "website/", icon: "📂", size: "18 files" },
-      { name: "README.md", icon: "📄", size: "2 KB", action: "file" },
-    ],
-    Images: [
-      { name: "screenshot.png", icon: "🖼️", size: "1.2 MB" },
-      { name: "logo.svg", icon: "🎨", size: "4 KB" },
-      { name: "wallpaper.jpg", icon: "🖼️", size: "3.8 MB" },
+      { name: "Budget Report Q1.docx", type: "file", icon: ic.fileText, iconColor: "#3B82F6", size: "245 KB", modified: "Mar 15" },
+      { name: "Project Proposal.docx", type: "file", icon: ic.fileText, iconColor: "#3B82F6", size: "180 KB", modified: "Mar 10" },
+      { name: "Meeting Notes.md", type: "file", icon: ic.note, iconColor: "#FBBF24", size: "8 KB", modified: "Today", action: "notes" },
+      { name: "Invoice_March.pdf", type: "file", icon: ic.fileText, iconColor: "#EF4444", size: "120 KB", modified: "Mar 30" },
+      { name: "Contract_2025.pdf", type: "file", icon: ic.fileText, iconColor: "#EF4444", size: "340 KB", modified: "Jan 15" },
+      { name: "Personal Notes.txt", type: "file", icon: ic.note, iconColor: c.textSec, size: "4 KB", modified: "Feb 20", action: "notes" },
+      { name: "todo.txt", type: "file", icon: ic.note, iconColor: c.textSec, size: "1 KB", modified: "Today", action: "notes" },
     ],
     Downloads: [
-      { name: "installer.dmg", icon: "💿", size: "120 MB" },
-      { name: "archive.zip", icon: "📦", size: "45 MB" },
-      { name: "font-pack.zip", icon: "📦", size: "12 MB" },
+      { name: "AlternusOS-installer.dmg", type: "file", icon: ic.download, iconColor: "#34D399", size: "120 MB", modified: "Today" },
+      { name: "font-pack.zip", type: "file", icon: ic.folder, iconColor: "#FBBF24", size: "12 MB", modified: "Yesterday" },
+      { name: "archive-backup.zip", type: "file", icon: ic.folder, iconColor: "#FBBF24", size: "45 MB", modified: "Mar 28" },
+      { name: "design-assets.zip", type: "file", icon: ic.folder, iconColor: "#FBBF24", size: "8 MB", modified: "Mar 20" },
+    ],
+    Pictures: [
+      { name: "Screenshots", type: "folder", icon: ic.folder, iconColor: "#FBBF24", size: "24 items", modified: "Today", action: "Pictures" },
+      { name: "wallpaper.jpg", type: "file", icon: ic.image, iconColor: "#A78BFA", size: "3.8 MB", modified: "Mar 15" },
+      { name: "logo.svg", type: "file", icon: ic.pen, iconColor: "#F472B6", size: "4 KB", modified: "Feb 10" },
+      { name: "avatar.png", type: "file", icon: ic.image, iconColor: "#A78BFA", size: "256 KB", modified: "Jan 20" },
+    ],
+    Music: [
+      { name: "Favorites", type: "folder", icon: ic.folder, iconColor: "#FBBF24", size: "32 songs", modified: "Today", action: "Music" },
+      { name: "Chill Vibes.mp3", type: "file", icon: ic.music, iconColor: "#F472B6", size: "8.4 MB", modified: "Mar 20" },
+      { name: "Focus Flow.mp3", type: "file", icon: ic.music, iconColor: "#F472B6", size: "6.2 MB", modified: "Mar 18" },
+    ],
+    Videos: [
+      { name: "Screen Recording.mp4", type: "file", icon: ic.film, iconColor: "#FB923C", size: "48 MB", modified: "Today" },
+      { name: "Tutorial.mp4", type: "file", icon: ic.film, iconColor: "#FB923C", size: "120 MB", modified: "Mar 10" },
+    ],
+    Projects: [
+      { name: "alternus-os", type: "folder", icon: ic.folder, iconColor: "#22D3EE", size: "24 files", modified: "Today", action: "Projects" },
+      { name: "website", type: "folder", icon: ic.folder, iconColor: "#22D3EE", size: "18 files", modified: "Yesterday", action: "Projects" },
+      { name: "README.md", type: "file", icon: ic.fileText, iconColor: c.textSec, size: "2 KB", modified: "Today", action: "code" },
+      { name: "API Documentation.md", type: "file", icon: ic.fileText, iconColor: c.textSec, size: "12 KB", modified: "Mar 28", action: "code" },
+      { name: "Design System.fig", type: "file", icon: ic.pen, iconColor: "#A78BFA", size: "18 MB", modified: "Mar 15" },
     ],
   };
 
-  const currentFiles = folders[currentPath] || folders.Home;
+  const sidebarItems = [
+    { icon: ic.home, label: "Home", path: "Home" },
+    { icon: ic.monitor, label: "Desktop", path: "Desktop" },
+    { icon: ic.download, label: "Downloads", path: "Downloads" },
+    { icon: ic.fileText, label: "Documents", path: "Documents" },
+    { icon: ic.image, label: "Pictures", path: "Pictures" },
+    { icon: ic.music, label: "Music", path: "Music" },
+    { icon: ic.film, label: "Videos", path: "Videos" },
+    { icon: ic.folder, label: "Projects", path: "Projects" },
+  ];
+
+  const recentFiles: FileItem[] = [
+    { name: "Budget Report Q1.docx", type: "file", icon: ic.fileText, iconColor: "#3B82F6", size: "245 KB", modified: "2 min ago" },
+    { name: "Meeting Notes.md", type: "file", icon: ic.note, iconColor: "#FBBF24", size: "8 KB", modified: "15 min ago", action: "notes" },
+    { name: "Design System.fig", type: "file", icon: ic.pen, iconColor: "#A78BFA", size: "18 MB", modified: "1 hour ago" },
+    { name: "screenshot.png", type: "file", icon: ic.image, iconColor: "#A78BFA", size: "1.2 MB", modified: "3 hours ago" },
+  ];
+
+  const curPath = currentPath[currentPath.length - 1];
+  const currentFiles = fileSystem[curPath] || fileSystem.Home;
+  const filteredFiles = searchQuery
+    ? Object.values(fileSystem).flat().filter(f => f.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    : currentFiles;
+
+  const navigateTo = (path: string) => {
+    setCurrentPath(prev => [...prev, path]);
+    setSelectedFile(null);
+    setSearchQuery("");
+  };
+
+  const goBack = () => {
+    if (currentPath.length > 1) {
+      setCurrentPath(prev => prev.slice(0, -1));
+      setSelectedFile(null);
+    }
+  };
+
+  const handleFileClick = (f: FileItem) => {
+    if (f.type === "folder" && f.action && fileSystem[f.action]) {
+      navigateTo(f.action);
+    } else if (f.action === "notes") {
+      onOpenApp("notes");
+    } else if (f.action === "code") {
+      onOpenApp("code");
+    } else if (f.type === "file") {
+      setFileContent(`# ${f.name}\n\nSize: ${f.size}\nType: ${f.name.split('.').pop()?.toUpperCase()}\nModified: ${f.modified}\nLocation: ${curPath}\n\n--- Content Preview ---\n\nThis is a preview of ${f.name}.\nFull editing available in the appropriate app.`);
+    }
+  };
 
   if (fileContent) {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2 px-3 py-2" style={{ borderBottom: `1px solid ${c.border}` }}>
-          <button onClick={() => setFileContent(null)} className="p-1 rounded-md" style={{ color: c.textSec }}>
-            <I d={ic.chevL} s={14} />
-          </button>
-          <span className="text-xs" style={{ color: c.textSec }}>File Preview</span>
+        <div className="flex items-center gap-4 px-4 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, minHeight: 40 }}>
+          <button onClick={() => setFileContent(null)} className="p-1 rounded-md" style={{ color: c.textSec }}><I d={ic.chevL} s={14} /></button>
+          <span className="text-xs font-medium" style={{ color: c.textSec }}>File Preview</span>
         </div>
-        <div className="flex-1 p-4 overflow-y-auto">
+        <div className="flex-1 px-4 py-3 overflow-y-auto">
           <pre className="text-xs whitespace-pre-wrap font-mono leading-relaxed" style={{ color: c.text }}>{fileContent}</pre>
         </div>
       </div>
@@ -1123,36 +1199,116 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Search + path */}
-      <div className="p-2 space-y-1">
-        <div className="px-3 py-2 flex items-center gap-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-          <I d={ic.search} s={14} c={c.textMuted} />
-          <input className="flex-1 bg-transparent outline-none text-xs" style={{ color: c.text }} placeholder="Search files..." />
-        </div>
-        {currentPath !== "Home" && (
-          <button onClick={() => setCurrentPath("Home")} className="flex items-center gap-1 px-2 py-1 text-xs rounded-md" style={{ color: c.accentText }}>
-            <I d={ic.chevL} s={12} c={c.accentText} /> Back to Home
-          </button>
-        )}
-      </div>
-      {/* Files */}
-      <div className="flex-1 overflow-y-auto px-2">
-        {currentFiles.map((f, i) => (
-          <button key={i} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors"
-            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-            onClick={() => {
-              if (f.action === "notes") { onOpenApp("notes"); }
-              else if (f.action === "file") { setFileContent(`# ${f.name}\n\nFile size: ${f.size}\nType: ${f.name.split('.').pop()?.toUpperCase()}\nModified: ${new Date().toLocaleDateString()}\n\n--- Content Preview ---\n\nThis is a preview of ${f.name}.\nFull file editing available in Code Editor.`); }
-              else if (folders[f.action || ""]) { setCurrentPath(f.action as string); }
-            }}>
-            <span className="text-lg">{f.icon}</span>
-            <p className="flex-1 text-xs" style={{ color: c.text }}>{f.name}</p>
-            <span className="text-[10px]" style={{ color: c.textMuted }}>{f.size}</span>
-            <I d={ic.chevR} s={12} c={c.textMuted} />
+    <div className="flex h-full overflow-hidden">
+      {/* Sidebar */}
+      <div className="w-[160px] flex-shrink-0 flex flex-col py-2 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+        {sidebarItems.map((item, i) => (
+          <button key={i} onClick={() => { setCurrentPath([item.path]); setSelectedFile(null); setSearchQuery(""); }}
+            className="w-full flex items-center gap-3 px-4 py-1.5 text-left transition-colors"
+            style={{ background: curPath === item.path ? c.accentSoft : "transparent", minHeight: 32 }}
+            onMouseEnter={e => { if (curPath !== item.path) e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { if (curPath !== item.path) e.currentTarget.style.background = "transparent"; }}>
+            <I d={item.icon} s={14} c={curPath === item.path ? c.accentText : c.textMuted} />
+            <span className="text-[11px]" style={{ color: curPath === item.path ? c.accentText : c.text }}>{item.label}</span>
           </button>
         ))}
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Toolbar */}
+        <div className="flex items-center gap-1 px-3 py-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <button onClick={goBack} className="p-1.5 rounded-md" style={{ color: currentPath.length > 1 ? c.textSec : c.textMuted, opacity: currentPath.length > 1 ? 1 : 0.4 }}><I d={ic.chevL} s={13} /></button>
+          <button onClick={() => setCurrentPath(["Home"])} className="p-1.5 rounded-md" style={{ color: c.textSec }}><I d={ic.home} s={13} /></button>
+          <div className="w-px h-4 mx-1" style={{ background: c.border }} />
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-1 flex-1 min-w-0">
+            {currentPath.map((p, i) => (
+              <div key={i} className="flex items-center gap-1">
+                {i > 0 && <I d={ic.chevR} s={10} c={c.textMuted} />}
+                <button onClick={() => setCurrentPath(currentPath.slice(0, i + 1))} className="text-[11px] px-1.5 py-0.5 rounded-md truncate"
+                  style={{ color: i === currentPath.length - 1 ? c.text : c.textMuted }}
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>{p}</button>
+              </div>
+            ))}
+          </div>
+          {/* Search */}
+          <div className="flex items-center gap-2 px-2 py-1 rounded-lg w-[160px]" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+            <I d={ic.search} s={11} c={c.textMuted} />
+            <input className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: c.text }}
+              placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+          </div>
+        </div>
+
+        {/* Quick Access header for Home */}
+        {curPath === "Home" && !searchQuery && (
+          <div className="px-4 pt-3 pb-1 flex-shrink-0">
+            <p className="text-[11px] font-medium" style={{ color: c.textMuted }}>Quick access</p>
+          </div>
+        )}
+
+        {/* File list */}
+        <div className="flex-1 overflow-y-auto px-2 py-1" style={{ scrollbarWidth: "none" }}>
+          {/* Column header */}
+          <div className="flex items-center gap-4 px-4 py-1.5 mb-0.5">
+            <span className="flex-1 text-[10px] font-medium" style={{ color: c.textMuted }}>Name</span>
+            <span className="w-16 text-[10px] font-medium text-right" style={{ color: c.textMuted }}>Size</span>
+            <span className="w-20 text-[10px] font-medium text-right" style={{ color: c.textMuted }}>Modified</span>
+          </div>
+
+          {filteredFiles.map((f, i) => (
+            <button key={i} className="w-full flex items-center gap-4 px-4 py-2 rounded-lg text-left transition-colors"
+              style={{ background: selectedFile === f.name ? c.accentSoft : "transparent", minHeight: 40 }}
+              onMouseEnter={e => { if (selectedFile !== f.name) e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { if (selectedFile !== f.name) e.currentTarget.style.background = "transparent"; }}
+              onClick={() => setSelectedFile(f.name)}
+              onDoubleClick={() => handleFileClick(f)}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: f.type === "folder" ? "transparent" : c.cardAlt }}>
+                <I d={f.icon} s={f.type === "folder" ? 20 : 16} c={f.iconColor} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs truncate" style={{ color: c.text }}>{f.name}</p>
+                {f.type === "folder" && <p className="text-[9px]" style={{ color: c.textMuted }}>{f.size}</p>}
+              </div>
+              <span className="w-16 text-[10px] text-right flex-shrink-0" style={{ color: c.textMuted }}>{f.type === "file" ? f.size : ""}</span>
+              <span className="w-20 text-[10px] text-right flex-shrink-0" style={{ color: c.textMuted }}>{f.modified}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Bottom bar - Recent / Favorites / Shared */}
+        {curPath === "Home" && !searchQuery && (
+          <div className="flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+            <div className="flex items-center gap-1 px-3 py-1.5">
+              {(["recent", "favorites", "shared"] as const).map(tab => (
+                <button key={tab} onClick={() => setActiveTab(tab)}
+                  className="px-3 py-1 rounded-full text-[10px] font-medium capitalize transition-colors"
+                  style={{ background: activeTab === tab ? c.accent : "transparent", color: activeTab === tab ? "#fff" : c.textMuted }}>
+                  {tab}
+                </button>
+              ))}
+            </div>
+            <div className="px-2 pb-2 max-h-[120px] overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+              {recentFiles.map((f, i) => (
+                <button key={i} className="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-left transition-colors"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                  onDoubleClick={() => handleFileClick(f)}>
+                  <I d={f.icon} s={14} c={f.iconColor} />
+                  <span className="flex-1 text-[11px] truncate" style={{ color: c.text }}>{f.name}</span>
+                  <span className="text-[9px]" style={{ color: c.textMuted }}>{f.modified}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Status bar */}
+        <div className="flex items-center justify-between px-4 py-1 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+          <span className="text-[9px]" style={{ color: c.textMuted }}>{filteredFiles.length} items</span>
+          <span className="text-[9px]" style={{ color: c.textMuted }}>{curPath}</span>
+        </div>
       </div>
     </div>
   );
