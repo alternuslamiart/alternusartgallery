@@ -1927,14 +1927,33 @@ export default function AlternusOS() {
 
   const openWin = useCallback((id: WinId) => {
     setZCounter(z => z + 1);
+    const sw = typeof window !== "undefined" ? window.innerWidth : 1400;
+    const sh = typeof window !== "undefined" ? window.innerHeight - 40 : 700;
+    // Per-app ideal sizes
+    const sizes: Record<WinId, { w: number; h: number }> = {
+      ai: { w: 360, h: sh },
+      terminal: { w: 560, h: 360 },
+      code: { w: 700, h: 480 },
+      files: { w: 600, h: 420 },
+      settings: { w: 580, h: 420 },
+      music: { w: 360, h: 400 },
+      weather: { w: 360, h: 400 },
+      calendar: { w: 340, h: 380 },
+      notes: { w: 440, h: 380 },
+      browser: { w: 680, h: 460 },
+      store: { w: 600, h: 460 },
+      movies: { w: 520, h: 400 },
+      word: { w: 680, h: 480 },
+    };
     setWins(p => p.map(w => {
       if (w.id === id) {
-        // AI snaps to left edge, full height
-        if (id === "ai" && !w.isOpen) {
-          const fh = typeof window !== "undefined" ? window.innerHeight - 40 : 700;
-          return { ...w, isOpen: true, isMinimized: false, zIndex: zCounter + 1, x: 0, y: 0, w: 360, h: fh };
+        if (!w.isOpen) {
+          const s = sizes[id];
+          // AI snaps left, others center
+          const x = id === "ai" ? 0 : Math.max(0, Math.floor((sw - s.w) / 2));
+          const y = id === "ai" ? 0 : Math.max(0, Math.floor((sh - s.h) / 2));
+          return { ...w, isOpen: true, isMinimized: false, zIndex: zCounter + 1, x, y, w: s.w, h: s.h };
         }
-        if (!w.isOpen) return { ...w, isOpen: true, isMinimized: false, zIndex: zCounter + 1 };
         if (w.isMinimized) return { ...w, isMinimized: false, zIndex: zCounter + 1 };
         return { ...w, zIndex: zCounter + 1 };
       }
