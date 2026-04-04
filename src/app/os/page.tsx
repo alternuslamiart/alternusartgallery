@@ -1745,6 +1745,7 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
           <span className="text-[9px]" style={{ color: c.textMuted }}>{curPath}</span>
         </div>
       </div>
+      {showAIPanel && <div className="w-[170px] flex-shrink-0"><AIPanel c={c} context="Files" /></div>}
     </div>
   );
 }
@@ -1849,39 +1850,6 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
           </>
         )}
       </div>
-      {showAIPanel && (
-        <div className="w-[180px] flex-shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${c.border}`, background: c.bg }}>
-          <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
-              <I d={ic.sparkle} s={10} c="#fff" />
-            </div>
-            <span className="text-[10px] font-bold" style={{ color: c.text }}>AI Files</span>
-          </div>
-          <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1" style={{ scrollbarWidth: "none" }}>
-            {[
-              { label: "Classify Files", desc: "Auto-organize by type" },
-              { label: "Find Duplicates", desc: "Scan for copies" },
-              { label: "Clean Up", desc: "Archive old files" },
-              { label: "Smart Search", desc: "Search by content" },
-              { label: "Tag Files", desc: "Auto-tag documents" },
-              { label: "Storage Report", desc: "Analyze disk usage" },
-            ].map((item, i) => (
-              <button key={i} className="w-full text-left px-3 py-2 rounded-xl transition-colors"
-                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                <p className="text-[10px] font-semibold" style={{ color: c.text }}>{item.label}</p>
-                <p className="text-[8px]" style={{ color: c.textMuted }}>{item.desc}</p>
-              </button>
-            ))}
-          </div>
-          <div className="px-2 py-1.5 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-            <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-              <input className="flex-1 bg-transparent outline-none text-[9px]" style={{ color: c.text }} placeholder="Ask AI..." />
-              <button className="p-1 rounded-lg" style={{ background: c.accent }}><I d={ic.send} s={8} c="#fff" /></button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
