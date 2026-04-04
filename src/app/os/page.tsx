@@ -218,35 +218,30 @@ function TitleBar({
       <span style={{ color: isFrozen ? c.warning : c.textSec }} className="text-xs font-medium">
         {title}{isFrozen ? " (Not Responding)" : ""}
       </span>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onMinimize}
-          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          style={{ color: c.textMuted }}
-          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+          className="w-5 h-5 rounded-full flex items-center justify-center transition-opacity hover:opacity-80"
+          style={{ background: "#D4A844" }}
         >
-          <I d={ic.minimize} s={12} />
+          <I d={ic.minimize} s={9} c="#fff" w={2.5} />
         </button>
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onMaximize}
-          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          style={{ color: c.textMuted }}
-          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+          className="w-5 h-5 rounded-full flex items-center justify-center transition-opacity hover:opacity-80"
+          style={{ background: "#5BA3E6" }}
         >
-          <I d={ic.maximize} s={11} />
+          <I d={ic.maximize} s={9} c="#fff" w={2.5} />
         </button>
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onClose}
-          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = c.danger; (e.currentTarget.firstChild as HTMLElement).style.color = "#fff"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; (e.currentTarget.firstChild as HTMLElement).style.color = c.textMuted; }}
+          className="w-5 h-5 rounded-full flex items-center justify-center transition-opacity hover:opacity-80"
+          style={{ background: "#E06060" }}
         >
-          <span style={{ color: c.textMuted }}><I d={ic.close} s={12} /></span>
+          <I d={ic.close} s={9} c="#fff" w={2.5} />
         </button>
       </div>
     </div>
