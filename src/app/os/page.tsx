@@ -1698,7 +1698,7 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function CodeApp({ c }: { c: typeof palette.dark }) {
-  const bg = "#111116"; const bg2 = "#18181E"; const bg3 = "#1E1E26"; const br = "#2A2A35"; const accent = "#6C63FF";
+  const bg = "#1A1A1F"; const bg2 = "#212126"; const bg3 = "#28282E"; const br = "#333338"; const accent = "#5A5A65";
   const fileTree = [
     { name: "src", type: "folder" as const, open: true, children: [
       { name: "main.js", type: "file" as const, lang: "JavaScript" },
@@ -1868,8 +1868,8 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
               ))}
             </div>
             <div className="flex items-center gap-1 px-2">
-              <button onClick={runCode} title="Run (Ctrl+Enter)" className="px-2.5 py-1 rounded-md text-[9px] font-semibold flex items-center gap-1.5" style={{ background: "#22C55E20", color: "#4ade80" }}>
-                <I d={ic.play} s={10} c="#4ade80" /> Run
+              <button onClick={runCode} title="Run (Ctrl+Enter)" className="px-2.5 py-1 rounded-md text-[9px] font-semibold flex items-center gap-1.5" style={{ background: "#3A4A3F", color: "#8ABF8A" }}>
+                <I d={ic.play} s={10} c="#8ABF8A" /> Run
               </button>
             </div>
           </div>
@@ -1897,7 +1897,7 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
             <div className="flex flex-col" style={{ height: 130, borderTop: `1px solid ${br}`, background: "#0D0D12" }}>
               <div className="flex items-center justify-between px-3 py-1 flex-shrink-0" style={{ borderBottom: `1px solid ${br}` }}>
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-bold" style={{ color: "#4ade80" }}>Terminal</span>
+                  <span className="text-[9px] font-bold" style={{ color: "#8ABF8A" }}>Terminal</span>
                   <span className="text-[8px]" style={{ color: "#444" }}>bash</span>
                 </div>
                 <button onClick={() => setOutput([])} className="text-[8px] px-1.5 py-0.5 rounded" style={{ color: "#555" }}
@@ -1921,19 +1921,19 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
                 <I d={ic.sparkle} s={10} c="#fff" />
               </div>
               <span className="text-[10px] font-bold" style={{ color: "#ccc" }}>AI Copilot</span>
-              <span className="text-[8px] px-1.5 py-0.5 rounded-full ml-auto" style={{ background: "#4ade8020", color: "#4ade80" }}>Online</span>
+              <span className="text-[8px] px-1.5 py-0.5 rounded-full ml-auto" style={{ background: "#3A3A4210", color: "#7A7A85" }}>Active</span>
             </div>
             <div className="flex-1 overflow-y-auto px-2 py-2 space-y-2" style={{ scrollbarWidth: "none" }}>
               {aiMsgs.map((m, i) => (
                 <div key={i} className={m.role === "user" ? "flex justify-end" : ""}>
                   <div className="max-w-[95%] px-3 py-2 rounded-xl text-[10px] leading-relaxed"
-                    style={m.role === "user" ? { background: accent, color: "#fff" } : { background: bg3, color: "#ccc", border: `1px solid ${br}` }}>
+                    style={m.role === "user" ? { background: "#3A3A42", color: "#E4E4E7" } : { background: bg3, color: "#9A9AA5", border: `1px solid ${br}` }}>
                     <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
                     {m.role === "ai" && m.text.includes("```") && (
                       <button onClick={() => {
                         const match = m.text.match(/```(?:js|jsx|javascript)?\n([\s\S]*?)```/);
                         if (match) setCode(prev => prev + "\n\n" + match[1].trim());
-                      }} className="mt-2 px-2.5 py-1 rounded-md text-[9px] font-semibold" style={{ background: accent, color: "#fff" }}>Insert Code</button>
+                      }} className="mt-2 px-2.5 py-1 rounded-md text-[9px] font-semibold" style={{ background: "#4A4A55", color: "#E4E4E7" }}>Insert Code</button>
                     )}
                   </div>
                 </div>
@@ -1946,7 +1946,7 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
                   placeholder="Ask AI to code..."
                   value={aiInput} onChange={e => setAiInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter") sendAI(); }} />
-                <button onClick={sendAI} className="p-1.5 rounded-lg" style={{ background: accent }}><I d={ic.send} s={10} c="#fff" /></button>
+                <button onClick={sendAI} className="p-1.5 rounded-lg" style={{ background: "#4A4A55" }}><I d={ic.send} s={10} c="#D4D4D8" /></button>
               </div>
             </div>
           </div>
@@ -1954,15 +1954,15 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
       </div>
 
       {/* Status bar */}
-      <div className="flex items-center justify-between px-3 h-6 flex-shrink-0" style={{ background: accent }}>
+      <div className="flex items-center justify-between px-3 h-6 flex-shrink-0" style={{ background: bg2, borderTop: `1px solid ${br}` }}>
         <div className="flex items-center gap-3">
-          <span className="text-[9px] text-white/90 font-medium">{lang}</span>
-          <span className="text-[9px] text-white/70">Ln {code.split("\n").length}</span>
-          <span className="text-[9px] text-white/70">{code.length} chars</span>
+          <span className="text-[9px] font-medium" style={{ color: "#8A8A95" }}>{lang}</span>
+          <span className="text-[9px]" style={{ color: "#5A5A65" }}>Ln {code.split("\n").length}</span>
+          <span className="text-[9px]" style={{ color: "#5A5A65" }}>{code.length} chars</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[9px] text-white/70">UTF-8</span>
-          <span className="text-[9px] text-white/70">Spaces: 2</span>
+          <span className="text-[9px]" style={{ color: "#5A5A65" }}>UTF-8</span>
+          <span className="text-[9px]" style={{ color: "#5A5A65" }}>Spaces: 2</span>
         </div>
       </div>
     </div>
