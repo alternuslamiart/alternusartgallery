@@ -2344,15 +2344,17 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
         {tab === "install" && (
           <>
             {/* Step indicator */}
-            <div className="flex items-center gap-2 mb-4 px-2">
+            <div className="flex items-center mb-5 px-1">
               {["Select", "Policy", "Install", "Done"].map((s, i) => (
-                <div key={i} className="flex items-center gap-2 flex-1">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold"
-                    style={{ background: installStep >= i ? c.accent : c.cardAlt, color: installStep >= i ? "#fff" : c.textMuted }}>
-                    {installStep > i ? "✓" : i + 1}
+                <div key={i} className="flex items-center flex-1">
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bold"
+                      style={{ background: installStep >= i ? c.accent : c.cardAlt, color: installStep >= i ? "#fff" : c.textMuted }}>
+                      {installStep > i ? "✓" : i + 1}
+                    </div>
+                    <span className="text-[8px] font-semibold" style={{ color: installStep >= i ? c.text : c.textMuted }}>{s}</span>
                   </div>
-                  <span className="text-[8px] font-medium" style={{ color: installStep >= i ? c.text : c.textMuted }}>{s}</span>
-                  {i < 3 && <div className="flex-1 h-px" style={{ background: installStep > i ? c.accent : c.border }} />}
+                  {i < 3 && <div className="flex-1 h-0.5 mx-1 rounded-full" style={{ background: installStep > i ? c.accent : c.border }} />}
                 </div>
               ))}
             </div>
@@ -2421,20 +2423,20 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
 
             {/* Step 2: Installing */}
             {installStep === 2 && (
-              <div className="flex flex-col items-center justify-center py-8">
-                <div className="relative mb-4">
-                  <svg width={100} height={100} viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="42" fill="none" stroke={c.border} strokeWidth="4" />
-                    <circle cx="50" cy="50" r="42" fill="none" stroke={c.accent} strokeWidth="4" strokeLinecap="round"
-                      strokeDasharray={2 * Math.PI * 42} strokeDashoffset={2 * Math.PI * 42 * (1 - Math.min(installProgress, 100) / 100)}
-                      transform="rotate(-90 50 50)" style={{ transition: "stroke-dashoffset 0.2s" }} />
+              <div className="flex flex-col items-center justify-center py-6">
+                <div className="relative mb-6">
+                  <svg width={140} height={140} viewBox="0 0 140 140">
+                    <circle cx="70" cy="70" r="58" fill="none" stroke={c.border} strokeWidth="5" />
+                    <circle cx="70" cy="70" r="58" fill="none" stroke={c.accent} strokeWidth="5" strokeLinecap="round"
+                      strokeDasharray={2 * Math.PI * 58} strokeDashoffset={2 * Math.PI * 58 * (1 - Math.min(installProgress, 100) / 100)}
+                      transform="rotate(-90 70 70)" style={{ transition: "stroke-dashoffset 0.2s" }} />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-lg font-bold" style={{ color: c.text }}>{Math.min(Math.round(installProgress), 100)}%</span>
+                    <span className="text-2xl font-bold" style={{ color: c.accent }}>{Math.min(Math.round(installProgress), 100)}%</span>
                   </div>
                 </div>
-                <p className="text-xs font-semibold mb-1" style={{ color: c.text }}>Installing {selectedApp}...</p>
-                <p className="text-[9px]" style={{ color: c.textMuted }}>
+                <p className="text-sm font-semibold mb-1" style={{ color: c.text }}>Installing {selectedApp}...</p>
+                <p className="text-[10px]" style={{ color: c.textMuted }}>
                   {installProgress < 20 ? "Preparing files..." : installProgress < 50 ? "Extracting components..." : installProgress < 80 ? "Configuring application..." : "Finalizing installation..."}
                 </p>
               </div>
