@@ -1201,11 +1201,11 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
   return (
     <div className="flex h-full overflow-hidden">
       {/* Sidebar */}
-      <div className="w-[160px] flex-shrink-0 flex flex-col overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+      <div className="w-[160px] flex-shrink-0 flex flex-col py-1 px-1.5 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
         {sidebarItems.map((item, i) => (
           <button key={i} onClick={() => { setCurrentPath([item.path]); setSelectedFile(null); setSearchQuery(""); }}
-            className="w-full flex items-center gap-4 px-4 py-2 text-left transition-colors"
-            style={{ background: curPath === item.path ? c.accentSoft : "transparent", minHeight: 36 }}
+            className="w-full flex items-center gap-4 px-3 py-1.5 rounded-lg text-left transition-colors"
+            style={{ background: curPath === item.path ? c.accentSoft : "transparent", minHeight: 34 }}
             onMouseEnter={e => { if (curPath !== item.path) e.currentTarget.style.background = c.cardAlt; }}
             onMouseLeave={e => { if (curPath !== item.path) e.currentTarget.style.background = "transparent"; }}>
             <I d={item.icon} s={14} c={curPath === item.path ? c.accentText : c.textMuted} />
