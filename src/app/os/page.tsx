@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads";
 
 interface WinState {
   id: WinId;
@@ -2236,6 +2236,232 @@ function AccountsApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
+// ━━━━ DOWNLOADS APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function DownloadsApp({ c }: { c: typeof palette.dark }) {
+  const [tab, setTab] = useState<"downloads" | "uploads" | "install">("downloads");
+  const [installStep, setInstallStep] = useState(0); // 0=select, 1=policy, 2=installing, 3=done
+  const [policyAccepted, setPolicyAccepted] = useState(false);
+  const [installProgress, setInstallProgress] = useState(0);
+  const [selectedApp, setSelectedApp] = useState<string | null>(null);
+
+  const downloads = [
+    { name: "AlternusOS-v2.0.dmg", size: "1.2 GB", progress: 100, speed: "", status: "Complete" },
+    { name: "font-pack-pro.zip", size: "45 MB", progress: 100, speed: "", status: "Complete" },
+    { name: "design-assets-v3.zip", size: "120 MB", progress: 67, speed: "4.2 MB/s", status: "Downloading" },
+    { name: "neural-engine-sdk.tar.gz", size: "340 MB", progress: 23, speed: "8.1 MB/s", status: "Downloading" },
+  ];
+
+  const uploads = [
+    { name: "project-backup.zip", size: "89 MB", progress: 100, status: "Uploaded" },
+    { name: "report-final.pdf", size: "2.4 MB", progress: 100, status: "Uploaded" },
+    { name: "screenshots.zip", size: "15 MB", progress: 45, status: "Uploading" },
+  ];
+
+  const installApps = [
+    { name: "Alternus Code Pro", desc: "AI-powered IDE with cloud sync", size: "280 MB", icon: ic.code, color: "#3B82F6" },
+    { name: "Alternus Paint Studio", desc: "Professional illustration suite", size: "420 MB", icon: ic.pen, color: "#8B5CF6" },
+    { name: "CloudSync Enterprise", desc: "Enterprise file synchronization", size: "85 MB", icon: ic.cloud, color: "#06B6D4" },
+    { name: "Neural Engine SDK", desc: "AI/ML development toolkit", size: "340 MB", icon: ic.cpu, color: "#F59E0B" },
+  ];
+
+  useEffect(() => {
+    if (installStep === 2) {
+      const iv = setInterval(() => {
+        setInstallProgress(p => {
+          if (p >= 100) { clearInterval(iv); setInstallStep(3); return 100; }
+          return p + Math.random() * 8 + 2;
+        });
+      }, 200);
+      return () => clearInterval(iv);
+    }
+  }, [installStep]);
+
+  const startInstall = () => {
+    setInstallProgress(0);
+    setInstallStep(2);
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Tabs */}
+      <div className="flex items-center px-2 py-1 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        {(["downloads", "uploads", "install"] as const).map(t => (
+          <button key={t} onClick={() => { setTab(t); if (t === "install") { setInstallStep(0); setSelectedApp(null); setPolicyAccepted(false); } }}
+            className="flex-1 py-1.5 text-[10px] font-semibold capitalize text-center rounded-lg transition-colors"
+            style={{ color: tab === t ? c.text : c.textMuted, background: tab === t ? c.cardAlt : "transparent" }}>
+            {t === "install" ? "Install App" : t}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-3 py-3" style={{ scrollbarWidth: "none" }}>
+        {/* DOWNLOADS LIST */}
+        {tab === "downloads" && (
+          <div className="space-y-2">
+            {downloads.map((d, i) => (
+              <div key={i} className="p-3 rounded-2xl" style={{ background: c.cardAlt }}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <I d={ic.download} s={14} c={d.progress === 100 ? c.success : c.accentText} />
+                    <p className="text-[11px] font-medium truncate" style={{ color: c.text }}>{d.name}</p>
+                  </div>
+                  <span className="text-[9px] ml-2" style={{ color: c.textMuted }}>{d.size}</span>
+                </div>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.border }}>
+                  <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(d.progress, 100)}%`, background: d.progress === 100 ? c.success : c.accent }} />
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="text-[8px]" style={{ color: d.progress === 100 ? c.success : c.accentText }}>{d.status}</span>
+                  <span className="text-[8px]" style={{ color: c.textMuted }}>{d.speed || `${d.progress}%`}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* UPLOADS LIST */}
+        {tab === "uploads" && (
+          <div className="space-y-2">
+            {uploads.map((u, i) => (
+              <div key={i} className="p-3 rounded-2xl" style={{ background: c.cardAlt }}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <I d={ic.upload} s={14} c={u.progress === 100 ? c.success : c.accentText} />
+                    <p className="text-[11px] font-medium truncate" style={{ color: c.text }}>{u.name}</p>
+                  </div>
+                  <span className="text-[9px] ml-2" style={{ color: c.textMuted }}>{u.size}</span>
+                </div>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.border }}>
+                  <div className="h-full rounded-full" style={{ width: `${u.progress}%`, background: u.progress === 100 ? c.success : c.accent }} />
+                </div>
+                <span className="text-[8px]" style={{ color: u.progress === 100 ? c.success : c.accentText }}>{u.status}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* INSTALL WIZARD */}
+        {tab === "install" && (
+          <>
+            {/* Step indicator */}
+            <div className="flex items-center gap-2 mb-4 px-2">
+              {["Select", "Policy", "Install", "Done"].map((s, i) => (
+                <div key={i} className="flex items-center gap-2 flex-1">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold"
+                    style={{ background: installStep >= i ? c.accent : c.cardAlt, color: installStep >= i ? "#fff" : c.textMuted }}>
+                    {installStep > i ? "✓" : i + 1}
+                  </div>
+                  <span className="text-[8px] font-medium" style={{ color: installStep >= i ? c.text : c.textMuted }}>{s}</span>
+                  {i < 3 && <div className="flex-1 h-px" style={{ background: installStep > i ? c.accent : c.border }} />}
+                </div>
+              ))}
+            </div>
+
+            {/* Step 0: Select App */}
+            {installStep === 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold mb-2" style={{ color: c.text }}>Select Application</p>
+                {installApps.map((app, i) => (
+                  <button key={i} onClick={() => setSelectedApp(app.name)}
+                    className="w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-colors"
+                    style={{ background: selectedApp === app.name ? c.accentSoft : c.cardAlt, border: selectedApp === app.name ? `1px solid ${c.accent}` : `1px solid transparent` }}
+                    onMouseEnter={e => { if (selectedApp !== app.name) e.currentTarget.style.background = c.border; }}
+                    onMouseLeave={e => { if (selectedApp !== app.name) e.currentTarget.style.background = selectedApp === app.name ? c.accentSoft : c.cardAlt; }}>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: app.color + "15" }}>
+                      <I d={app.icon} s={18} c={app.color} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-[11px] font-semibold" style={{ color: c.text }}>{app.name}</p>
+                      <p className="text-[8px]" style={{ color: c.textMuted }}>{app.desc}</p>
+                    </div>
+                    <span className="text-[9px]" style={{ color: c.textMuted }}>{app.size}</span>
+                  </button>
+                ))}
+                <button onClick={() => { if (selectedApp) setInstallStep(1); }}
+                  className="w-full py-2.5 rounded-xl text-xs font-semibold mt-3"
+                  style={{ background: selectedApp ? c.accent : c.cardAlt, color: selectedApp ? "#fff" : c.textMuted }}>
+                  Next →
+                </button>
+              </div>
+            )}
+
+            {/* Step 1: Policy */}
+            {installStep === 1 && (
+              <div className="space-y-3">
+                <p className="text-xs font-semibold" style={{ color: c.text }}>License Agreement</p>
+                <div className="p-3 rounded-xl text-[9px] leading-relaxed max-h-[180px] overflow-y-auto" style={{ background: c.cardAlt, color: c.textSec, scrollbarWidth: "none" }}>
+                  <p className="font-semibold mb-2">Alternus Software License Agreement</p>
+                  <p>By installing this software, you agree to the following terms:</p>
+                  <p className="mt-2">1. This software is provided &quot;as is&quot; without warranty of any kind.</p>
+                  <p>2. You may use this software for personal and commercial purposes.</p>
+                  <p>3. Redistribution requires written permission from Alternus.</p>
+                  <p>4. The software may collect anonymous usage analytics.</p>
+                  <p>5. Updates will be provided automatically unless disabled.</p>
+                  <p className="mt-2">6. You agree not to reverse-engineer or decompile the software.</p>
+                  <p>7. Alternus reserves the right to modify these terms.</p>
+                  <p className="mt-2">For full terms, visit alternus.art/legal</p>
+                </div>
+                <label className="flex items-center gap-3 px-2 cursor-pointer" onClick={() => setPolicyAccepted(!policyAccepted)}>
+                  <div className="w-5 h-5 rounded-md flex items-center justify-center transition-colors"
+                    style={{ background: policyAccepted ? c.accent : "transparent", border: `2px solid ${policyAccepted ? c.accent : c.border}` }}>
+                    {policyAccepted && <I d="M20 6L9 17l-5-5" s={12} c="#fff" />}
+                  </div>
+                  <span className="text-[10px]" style={{ color: c.text }}>I accept the license agreement</span>
+                </label>
+                <div className="flex gap-2">
+                  <button onClick={() => setInstallStep(0)} className="flex-1 py-2.5 rounded-xl text-xs font-medium" style={{ background: c.cardAlt, color: c.text }}>← Back</button>
+                  <button onClick={() => { if (policyAccepted) startInstall(); }}
+                    className="flex-1 py-2.5 rounded-xl text-xs font-semibold"
+                    style={{ background: policyAccepted ? c.accent : c.cardAlt, color: policyAccepted ? "#fff" : c.textMuted }}>
+                    Install →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Installing */}
+            {installStep === 2 && (
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="relative mb-4">
+                  <svg width={100} height={100} viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="42" fill="none" stroke={c.border} strokeWidth="4" />
+                    <circle cx="50" cy="50" r="42" fill="none" stroke={c.accent} strokeWidth="4" strokeLinecap="round"
+                      strokeDasharray={2 * Math.PI * 42} strokeDashoffset={2 * Math.PI * 42 * (1 - Math.min(installProgress, 100) / 100)}
+                      transform="rotate(-90 50 50)" style={{ transition: "stroke-dashoffset 0.2s" }} />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-lg font-bold" style={{ color: c.text }}>{Math.min(Math.round(installProgress), 100)}%</span>
+                  </div>
+                </div>
+                <p className="text-xs font-semibold mb-1" style={{ color: c.text }}>Installing {selectedApp}...</p>
+                <p className="text-[9px]" style={{ color: c.textMuted }}>
+                  {installProgress < 20 ? "Preparing files..." : installProgress < 50 ? "Extracting components..." : installProgress < 80 ? "Configuring application..." : "Finalizing installation..."}
+                </p>
+              </div>
+            )}
+
+            {/* Step 3: Done */}
+            {installStep === 3 && (
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: c.success + "20" }}>
+                  <I d="M20 6L9 17l-5-5" s={28} c={c.success} />
+                </div>
+                <p className="text-sm font-bold mb-1" style={{ color: c.text }}>Installation Complete</p>
+                <p className="text-[10px] mb-4" style={{ color: c.textMuted }}>{selectedApp} has been installed successfully.</p>
+                <div className="flex gap-2">
+                  <button onClick={() => { setInstallStep(0); setSelectedApp(null); setPolicyAccepted(false); }}
+                    className="px-4 py-2 rounded-xl text-[10px] font-medium" style={{ background: c.cardAlt, color: c.text }}>Install Another</button>
+                  <button className="px-4 py-2 rounded-xl text-[10px] font-semibold" style={{ background: c.accent, color: "#fff" }}>Open App</button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ MAIN OS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function AlternusOS() {
   const [mode, setMode] = useState<ThemeMode>("dark");
@@ -2286,6 +2512,7 @@ export default function AlternusOS() {
     { id: "clock", title: "Clock", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 400, y: 100, w: 360, h: 420 },
     { id: "calculator", title: "Calculator", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 500, y: 80, w: 320, h: 440 },
     { id: "accounts", title: "Accounts", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 90, w: 360, h: 400 },
+    { id: "downloads", title: "Downloads", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 350, y: 80, w: 440, h: 480 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -2388,6 +2615,7 @@ export default function AlternusOS() {
       clock: { w: 380, h: 460 },
       calculator: { w: 320, h: 460 },
       accounts: { w: 380, h: 440 },
+      downloads: { w: 440, h: 480 },
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
@@ -2555,6 +2783,9 @@ export default function AlternusOS() {
       // Accounts
       { keys: ["account", "login", "password", "credential", "saved account", "sign in", "profile", "username"],
         response: "Opening your saved accounts.", actions: [{ label: "Open Accounts", action: "accounts" }] },
+      // Downloads
+      { keys: ["download", "upload", "install", "update", "package", "setup", "installer", "transfer"],
+        response: "Opening Downloads & Install manager.", actions: [{ label: "Open Downloads", action: "downloads" }] },
       // Notes & Writing
       { keys: ["note", "write", "memo", "todo", "checklist", "list", "journal", "diary", "scratch", "jot", "brainstorm", "idea"],
         response: "Opening Notes for you.", actions: [{ label: "Open Notes", action: "notes" }] },
@@ -2874,6 +3105,7 @@ export default function AlternusOS() {
     clock: <ClockApp c={c} />,
     calculator: <CalculatorApp c={c} />,
     accounts: <AccountsApp c={c} />,
+    downloads: <DownloadsApp c={c} />,
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
@@ -2891,6 +3123,7 @@ export default function AlternusOS() {
     { id: "clock", icon: ic.clock, label: "Clock", color: "#F472B6" },
     { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A" },
     { id: "accounts", icon: ic.key, label: "Accounts", color: "#F59E0B" },
+    { id: "downloads", icon: ic.download, label: "Downloads", color: "#34D399" },
     { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec },
   ];
 
