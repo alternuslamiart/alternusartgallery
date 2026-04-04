@@ -398,7 +398,7 @@ function AppWindow({
 }
 
 // ━━━━ App Contents ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function AIChat({ c }: { c: typeof palette.dark }) {
+function AIChat({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp?: (id: WinId) => void }) {
   const [input, setInput] = useState("");
   const [msgs, setMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([
     { role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant. Ask me to create apps, write code, or design anything." },
@@ -418,38 +418,92 @@ function AIChat({ c }: { c: typeof palette.dark }) {
       if (l.includes("create") || l.includes("build")) r = "I can build that. Let me generate the code. Which framework: React, Python, or something else?";
       else if (l.includes("code") || l.includes("function")) r = "Here's an approach:\n\n```js\nfunction solve(data) {\n  return data.map(process);\n}\n```\n\nShall I expand this?";
       else if (l.includes("hello") || l.includes("hi")) r = "Hello! I'm Alternus AI. What would you like to build today?";
+      else if (l.includes("illustrat") || l.includes("draw") || l.includes("design") || l.includes("sketch")) r = "I can help with design! Describe what you'd like to create and I'll generate a concept or open the design tools.";
+      else if (l.includes("video") || l.includes("edit video") || l.includes("clip")) r = "I can help with video editing. Describe the video you want to create or edit.";
+      else if (l.includes("image") || l.includes("photo") || l.includes("picture")) r = "I can help with images. Describe the image you want or I can edit an existing one.";
+      else if (l.includes("search") || l.includes("find") || l.includes("google")) r = "I'll search for that. What exactly would you like to find?";
+      else if (l.includes("classify") || l.includes("organize") || l.includes("sort")) r = "AI Classification complete:\n\n📁 Documents → 12 files\n📁 Media → 8 files\n📁 Code → 6 files\n📁 Archives → 4 files\n\nAll files tagged and sorted.";
+      else if (l.includes("file") || l.includes("document")) r = "I can help manage your files. Want me to classify, find duplicates, or clean up?";
       setMsgs(p => [...p, { role: "ai", text: r }]);
     }, 600);
   };
 
+  const sideTools = [
+    { icon: ic.settings, label: "Settings", action: "settings" as WinId },
+    { icon: ic.user, label: "Profile", action: "settings" as WinId },
+    { icon: ic.pen, label: "Illustrate", action: null },
+    { icon: ic.film, label: "Video", action: null },
+    { icon: ic.image, label: "Image", action: null },
+  ];
+
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {msgs.map((m, i) => (
-          <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div
-              className="max-w-[80%] px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed"
-              style={m.role === "user" ? { background: c.accent, color: "#fff" } : { background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}
-            >
-              <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
-            </div>
-          </div>
-        ))}
-        <div ref={endRef} />
-      </div>
-      <div className="p-3" style={{ borderTop: `1px solid ${c.border}` }}>
-        <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-          <input
-            className="flex-1 bg-transparent outline-none text-sm"
-            style={{ color: c.text }}
-            placeholder="Ask AI anything..."
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && send()}
-          />
-          <button onClick={send} className="p-1.5 rounded-lg" style={{ background: c.accent }}>
-            <I d={ic.send} s={14} c="#fff" />
+    <div className="flex h-full">
+      {/* Sidebar tools */}
+      <div className="w-[48px] flex-shrink-0 flex flex-col items-center py-3 gap-1" style={{ borderRight: `1px solid ${c.border}` }}>
+        {sideTools.map((tool, i) => (
+          <button key={i} onClick={() => {
+            if (tool.action && onOpenApp) onOpenApp(tool.action);
+            else { setMsgs(p => [...p, { role: "user", text: tool.label }, { role: "ai", text: `${tool.label} mode activated. Describe what you'd like to create.` }]); }
+          }}
+            className="w-9 h-9 rounded-lg flex items-center justify-center transition-all"
+            style={{ color: c.textMuted }}
+            title={tool.label}
+            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.accentText; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
+            <I d={tool.icon} s={16} />
           </button>
+        ))}
+        <div className="flex-1" />
+        {/* Search web button */}
+        <button onClick={() => { if (onOpenApp) onOpenApp("browser"); }}
+          className="w-9 h-9 rounded-lg flex items-center justify-center transition-all mb-1"
+          style={{ background: c.accentSoft, color: c.accentText }}
+          title="Search Web"
+          onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.color = "#fff"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = c.accentSoft; e.currentTarget.style.color = c.accentText; }}>
+          <I d={ic.globe} s={16} />
+        </button>
+      </div>
+
+      {/* Chat area */}
+      <div className="flex-1 flex flex-col">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
+          {msgs.map((m, i) => (
+            <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+              <div
+                className="max-w-[85%] px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed"
+                style={m.role === "user" ? { background: c.accent, color: "#fff" } : { background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}
+              >
+                <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
+              </div>
+            </div>
+          ))}
+          <div ref={endRef} />
+        </div>
+        {/* Input bar */}
+        <div className="px-3 py-2" style={{ borderTop: `1px solid ${c.border}` }}>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+            <input
+              className="flex-1 bg-transparent outline-none text-sm"
+              style={{ color: c.text }}
+              placeholder="Ask AI anything..."
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && send()}
+            />
+            {/* Attach file */}
+            <button onClick={() => { if (onOpenApp) onOpenApp("files"); }}
+              className="p-1.5 rounded-lg transition-all"
+              style={{ color: c.textMuted }}
+              title="Attach file"
+              onMouseEnter={e => (e.currentTarget.style.color = c.text)}
+              onMouseLeave={e => (e.currentTarget.style.color = c.textMuted)}>
+              <I d={ic.fileText} s={14} />
+            </button>
+            <button onClick={send} className="p-1.5 rounded-lg" style={{ background: c.accent }}>
+              <I d={ic.send} s={14} c="#fff" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1822,7 +1876,7 @@ export default function AlternusOS() {
   };
 
   const winContent: Record<WinId, React.ReactNode> = {
-    ai: <AIChat c={c} />,
+    ai: <AIChat c={c} onOpenApp={openWin} />,
     terminal: <TerminalApp c={c} />,
     code: <CodeApp c={c} />,
     files: <FilesApp c={c} onOpenApp={openWin} />,
