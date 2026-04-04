@@ -2115,8 +2115,6 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
               }}
             />
           </div>
-
-          </div>
           )}
 
           {/* Terminal */}
