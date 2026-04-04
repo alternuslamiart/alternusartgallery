@@ -959,19 +959,17 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
             <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Wallpaper</p>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { bg: "linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)", label: "Default" },
-                { bg: "linear-gradient(135deg, #0f0c29, #302b63, #24243e)", label: "Aurora" },
-                { bg: "linear-gradient(160deg, #0a0a1a 0%, #1e3a5f 40%, #0a2540 70%, #0a0a1a 100%)", label: "Ocean" },
-                { bg: "radial-gradient(ellipse at 30% 50%, #1a0a2e 0%, #0a0a1a 50%, #0f1a2e 100%)", label: "Nebula" },
-                { bg: "linear-gradient(135deg, #0a1628 0%, #1a0a28 50%, #0a1a20 100%)", label: "Midnight" },
-                { bg: "radial-gradient(circle at 70% 30%, #1a2a1a 0%, #0a0f0a 40%, #0a0a12 100%)", label: "Forest" },
+                { bg: c.bg, label: "Default" },
+                { bg: "linear-gradient(135deg, #1a3a6e, #4a8fe7, #8b5cf6, #c77dba, #4ac1e0)", label: "Flow" },
+                { bg: "linear-gradient(160deg, #0c1445, #1e40af, #7c3aed, #c026d3)", label: "Aurora" },
+                { bg: "radial-gradient(ellipse at 30% 40%, #60a5fa, #3b82f6, #1e3a8a, #0c1445)", label: "Ocean" },
+                { bg: "linear-gradient(135deg, #065f46, #10b981, #34d399, #06b6d4, #0e7490)", label: "Emerald" },
+                { bg: "linear-gradient(160deg, #1e1b4b, #4338ca, #7c3aed, #a855f7, #c084fc)", label: "Violet" },
               ].map((wp, i) => (
                 <div key={i} onClick={() => setWallpaper(i)}
                   className="h-16 rounded-xl cursor-pointer transition-all hover:scale-105 relative overflow-hidden"
                   style={{ background: wp.bg, border: wallpaper === i ? `2px solid ${c.accent}` : `2px solid transparent`, boxShadow: wallpaper === i ? `0 0 8px ${c.accent}40` : "none" }}>
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(circle at 50% 50%, rgba(100,130,255,0.15) 0%, transparent 70%)" }} />
-                  <span className="absolute bottom-1 left-2 text-[7px] font-medium" style={{ color: "rgba(255,255,255,0.4)" }}>{wp.label}</span>
+                  <span className="absolute bottom-1 left-2 text-[7px] font-semibold" style={{ color: i === 0 ? c.textMuted : "rgba(255,255,255,0.6)" }}>{wp.label}</span>
                 </div>
               ))}
             </div>
@@ -3014,14 +3012,14 @@ export default function AlternusOS() {
 
   // ━━━━ DESKTOP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const wallpapers = [
-    "linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)",
-    "linear-gradient(135deg, #0f0c29, #302b63, #24243e)",
-    "linear-gradient(160deg, #0a0a1a 0%, #1e3a5f 40%, #0a2540 70%, #0a0a1a 100%)",
-    "radial-gradient(ellipse at 30% 50%, #1a0a2e 0%, #0a0a1a 50%, #0f1a2e 100%)",
-    "linear-gradient(135deg, #0a1628 0%, #1a0a28 50%, #0a1a20 100%)",
-    "radial-gradient(circle at 70% 30%, #1a2a1a 0%, #0a0f0a 40%, #0a0a12 100%)",
+    "", // 0: Default — uses c.bg solid color
+    "linear-gradient(135deg, #1a3a6e 0%, #4a8fe7 25%, #8b5cf6 50%, #c77dba 75%, #4ac1e0 100%)",
+    "linear-gradient(160deg, #0c1445 0%, #1e40af 30%, #7c3aed 60%, #c026d3 100%)",
+    "radial-gradient(ellipse at 30% 40%, #60a5fa 0%, #3b82f6 30%, #1e3a8a 60%, #0c1445 100%)",
+    "linear-gradient(135deg, #065f46 0%, #10b981 30%, #34d399 50%, #06b6d4 70%, #0e7490 100%)",
+    "linear-gradient(160deg, #1e1b4b 0%, #4338ca 30%, #7c3aed 50%, #a855f7 70%, #c084fc 100%)",
   ];
-  const desktopBg = mode === "dark" ? wallpapers[wallpaper] || wallpapers[0] : c.bg;
+  const desktopBg = wallpaper === 0 ? c.bg : (mode === "dark" ? wallpapers[wallpaper] : wallpapers[wallpaper]) || c.bg;
 
   return (
     <div style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
