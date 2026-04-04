@@ -218,30 +218,36 @@ function TitleBar({
       <span style={{ color: isFrozen ? c.warning : c.textSec }} className="text-xs font-medium">
         {title}{isFrozen ? " (Not Responding)" : ""}
       </span>
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1">
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onMinimize}
-          className="w-5 h-5 rounded-full flex items-center justify-center transition-opacity hover:opacity-80"
-          style={{ background: "#D4A844" }}
+          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
+          style={{ color: c.textMuted }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#D4A844"; e.currentTarget.style.color = "#fff"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}
         >
-          <I d={ic.minimize} s={9} c="#fff" w={2.5} />
+          <I d={ic.minimize} s={12} />
         </button>
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onMaximize}
-          className="w-5 h-5 rounded-full flex items-center justify-center transition-opacity hover:opacity-80"
-          style={{ background: "#5BA3E6" }}
+          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
+          style={{ color: c.textMuted }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#5BA3E6"; e.currentTarget.style.color = "#fff"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}
         >
-          <I d={ic.maximize} s={9} c="#fff" w={2.5} />
+          <I d={ic.maximize} s={11} />
         </button>
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onClose}
-          className="w-5 h-5 rounded-full flex items-center justify-center transition-opacity hover:opacity-80"
-          style={{ background: "#E06060" }}
+          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
+          style={{ color: c.textMuted }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#E06060"; e.currentTarget.style.color = "#fff"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}
         >
-          <I d={ic.close} s={9} c="#fff" w={2.5} />
+          <I d={ic.close} s={12} />
         </button>
       </div>
     </div>
