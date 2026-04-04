@@ -2174,15 +2174,14 @@ export default function AlternusOS() {
             Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}. What would you like to create today?
           </p>
 
-          {/* AI Search Bar with inline response */}
+          {/* AI Search Bar */}
           <div className="w-full max-w-2xl">
             <div
-              className="flex items-center gap-2 pl-5 pr-2 py-2 transition-all"
+              className="flex items-center gap-2 pl-5 pr-2 py-2 rounded-2xl transition-all"
               style={{
                 background: c.surface,
                 border: `1px solid ${c.border}`,
-                borderRadius: aiResponse ? "16px 16px 0 0" : 16,
-                boxShadow: aiResponse ? "none" : (mode === "dark" ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)"),
+                boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)",
               }}
             >
               <I d={ic.search} s={20} c={c.textMuted} />
@@ -2207,17 +2206,15 @@ export default function AlternusOS() {
               </button>
             </div>
 
-            {/* Inline AI response */}
+            {/* AI response - separate below */}
             {aiResponse && (
               <div
-                className="px-5 py-4 text-[13px] leading-relaxed"
+                className="mt-3 px-5 py-4 rounded-2xl text-[13px] leading-relaxed"
                 style={{
-                  background: c.cardAlt,
+                  background: c.surface,
                   border: `1px solid ${c.border}`,
-                  borderTop: `1px solid ${c.border}`,
-                  borderRadius: "0 0 16px 16px",
                   color: c.text,
-                  boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)",
+                  boxShadow: mode === "dark" ? "0 4px 20px rgba(0,0,0,0.2)" : "0 4px 20px rgba(0,0,0,0.06)",
                 }}
               >
                 <pre className="whitespace-pre-wrap font-sans">{aiResponse}</pre>
