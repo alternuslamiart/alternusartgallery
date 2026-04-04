@@ -1719,7 +1719,6 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
     "style.css": { lang: "CSS", code: `* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\nbody {\n  font-family: 'Inter', sans-serif;\n  background: #0a0a0f;\n  color: #e4e4e7;\n  min-height: 100vh;\n}\n\n.app {\n  max-width: 800px;\n  margin: 0 auto;\n  padding: 2rem;\n}\n\nbutton {\n  padding: 0.5rem 1rem;\n  border-radius: 8px;\n  border: 1px solid #333;\n  background: #1a1a2e;\n  color: #fff;\n  cursor: pointer;\n}` },
     "package.json": { lang: "JSON", code: `{\n  "name": "alternus-app",\n  "version": "1.0.0",\n  "type": "module",\n  "scripts": {\n    "dev": "vite",\n    "build": "vite build",\n    "preview": "vite preview"\n  },\n  "dependencies": {\n    "react": "^19.0.0",\n    "react-dom": "^19.0.0"\n  },\n  "devDependencies": {\n    "vite": "^6.0.0"\n  }\n}` },
   };
-  const files = Object.keys(fileContents);
   const [activeFile, setActiveFile] = useState("main.js");
   const [openTabs, setOpenTabs] = useState(["main.js"]);
   const [codes, setCodes] = useState<Record<string, string>>(Object.fromEntries(Object.entries(fileContents).map(([k, v]) => [k, v.code])));
@@ -2053,6 +2052,18 @@ export default function AlternusOS() {
 
   const fmt = (d: Date) => d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
 
+  // ━━━━ AI HELPERS (defined before useEffects that need them) ━━━━
+  const addAINotification = useCallback((type: AINotification["type"], title: string, message: string, icon: string, actions?: AINotification["actions"]) => {
+    const notif: AINotification = { id: Date.now().toString(), title, message, icon, time: "Just now", type, actions, read: false };
+    setAiNotifications(prev => [notif, ...prev.slice(0, 19)]);
+  }, []);
+
+  const addTimelineEvent = useCallback((action: string, app: string, icon: string) => {
+    const now = new Date();
+    const t = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
+    setTimeline(prev => [{ time: t, action, app, icon }, ...prev.slice(0, 49)]);
+  }, []);
+
   // ━━━━ AI ADAPTIVE AUTHENTICATION ━━━━━━━━━━━━━━━━━━━━━━━
   useEffect(() => {
     if (isLocked || isBooting) return;
@@ -2065,7 +2076,7 @@ export default function AlternusOS() {
       }, 8000);
       return () => clearTimeout(timer);
     }
-  }, [isLocked, isBooting, smartDND]);
+  }, [isLocked, isBooting, smartDND, addAINotification]);
 
   // ━━━━ SMART DO NOT DISTURB ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   useEffect(() => {
@@ -2082,19 +2093,7 @@ export default function AlternusOS() {
       }
     }, 10000);
     return () => { window.removeEventListener("mousemove", handler); clearInterval(interval); };
-  }, [isLocked, isBooting, smartDND]);
-
-  // ━━━━ AI HELPERS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  const addAINotification = useCallback((type: AINotification["type"], title: string, message: string, icon: string, actions?: AINotification["actions"]) => {
-    const notif: AINotification = { id: Date.now().toString(), title, message, icon, time: "Just now", type, actions, read: false };
-    setAiNotifications(prev => [notif, ...prev.slice(0, 19)]);
-  }, []);
-
-  const addTimelineEvent = useCallback((action: string, app: string, icon: string) => {
-    const now = new Date();
-    const t = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
-    setTimeline(prev => [{ time: t, action, app, icon }, ...prev.slice(0, 49)]);
-  }, []);
+  }, [isLocked, isBooting, smartDND, addAINotification]);
 
   const openWin = useCallback((id: WinId) => {
     setZCounter(z => z + 1);
