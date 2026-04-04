@@ -2073,7 +2073,7 @@ export default function AlternusOS() {
         {/* Center: Logo + Progress */}
         <div className="flex flex-col items-center">
           <h1
-            className="text-5xl font-semibold mb-6 select-none bg-clip-text"
+            className="text-7xl font-semibold mb-6 select-none bg-clip-text"
             style={{
               backgroundImage: "linear-gradient(90deg, #666 0%, #eee 50%, #666 100%)",
               WebkitBackgroundClip: "text",
@@ -2382,7 +2382,7 @@ export default function AlternusOS() {
               style={{
                 background: c.surface,
                 border: `1px solid ${c.border}`,
-                boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)",
+                boxShadow: mode === "dark" ? "0 2px 16px rgba(0,0,0,0.15)" : "0 2px 16px rgba(0,0,0,0.06)",
               }}
             >
               <I d={ic.search} s={20} c={c.textMuted} />
@@ -2415,7 +2415,7 @@ export default function AlternusOS() {
                   background: c.surface,
                   border: `1px solid ${c.border}`,
                   color: c.text,
-                  boxShadow: mode === "dark" ? "0 4px 20px rgba(0,0,0,0.2)" : "0 4px 20px rgba(0,0,0,0.06)",
+                  boxShadow: mode === "dark" ? "0 2px 12px rgba(0,0,0,0.12)" : "0 2px 12px rgba(0,0,0,0.04)",
                 }}
               >
                 <pre className="whitespace-pre-wrap font-sans">{aiResponse}</pre>
@@ -2566,13 +2566,15 @@ export default function AlternusOS() {
         {/* ━━━━ Right-Click Context Menu ━━━━ */}
         {contextMenu && (
           <div className="absolute z-[200] w-[220px] rounded-xl overflow-hidden py-1.5"
-            style={{ left: contextMenu.x, top: contextMenu.y, background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 32px rgba(0,0,0,0.35)" }}
+            style={{ left: contextMenu.x, top: contextMenu.y, background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 20px rgba(0,0,0,0.25)" : "0 4px 20px rgba(0,0,0,0.08)" }}
             onClick={e => e.stopPropagation()}>
             {/* Quick actions row */}
             <div className="flex items-center gap-1 px-3 py-2" style={{ borderBottom: `1px solid ${c.border}` }}>
               {[
-                { icon: ic.fileText, label: "Paste", action: () => setContextMenu(null) },
+                { icon: ic.fileText, label: "Copy", action: () => setContextMenu(null) },
+                { icon: ic.note, label: "Paste", action: () => setContextMenu(null) },
                 { icon: ic.pen, label: "Rename", action: () => setContextMenu(null) },
+                { icon: ic.close, label: "Delete", action: () => setContextMenu(null) },
                 { icon: ic.share, label: "Share", action: () => setContextMenu(null) },
               ].map((a, i) => (
                 <button key={i} title={a.label} onClick={a.action}
