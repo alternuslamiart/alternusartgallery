@@ -519,47 +519,125 @@ function AIChat({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp?: (id: Win
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function TerminalApp({ c }: { c: typeof palette.dark }) {
-  const [lines, setLines] = useState(["Alternus OS Terminal v1.0", "Type 'help' for commands.", ""]);
+  const [tabs, setTabs] = useState([{ id: 0, name: "bash", lines: ["Welcome to Alternus OS Terminal v2.0", "AI-powered shell · Type 'help' for commands", ""] }]);
+  const [activeTab, setActiveTab] = useState(0);
   const [input, setInput] = useState("");
+  const [history, setHistory] = useState<string[]>([]);
+  const [histIdx, setHistIdx] = useState(-1);
+  const [cwd, setCwd] = useState("~");
   const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
+  const lines = tabs.find(t => t.id === activeTab)?.lines || [];
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [lines]);
+
+  const addTab = () => {
+    const id = Date.now();
+    setTabs(p => [...p, { id, name: "bash", lines: ["New terminal session", ""] }]);
+    setActiveTab(id);
+  };
+  const closeTab = (id: number) => {
+    const t = tabs.filter(t => t.id !== id);
+    setTabs(t.length ? t : [{ id: 0, name: "bash", lines: [""] }]);
+    if (activeTab === id) setActiveTab(t[0]?.id || 0);
+  };
+
+  const pushLines = (newLines: string[]) => {
+    setTabs(p => p.map(t => t.id === activeTab ? { ...t, lines: [...t.lines, ...newLines] } : t));
+  };
 
   const exec = () => {
     const cmd = input.trim();
     setInput("");
-    if (!cmd) return;
-    const output = [`$ ${cmd}`];
+    if (!cmd) { pushLines([`\x1b[32madmin@alternus\x1b[0m:\x1b[34m${cwd}\x1b[0m$ `]); return; }
+    setHistory(p => [...p, cmd]);
+    setHistIdx(-1);
+    const prompt = `admin@alternus:${cwd}$ ${cmd}`;
+    const output = [prompt];
     const l = cmd.toLowerCase();
-    if (l === "help") output.push("Commands: help, clear, date, whoami, ls, echo <text>, neofetch");
-    else if (l === "clear") { setLines([]); return; }
+    const args = cmd.split(" ").slice(1).join(" ");
+
+    if (l === "help") output.push("Built-in commands:\n  help       Show this message\n  clear      Clear terminal\n  date       Current date/time\n  whoami     Current user\n  hostname   System hostname\n  pwd        Print working directory\n  ls         List files\n  cd <dir>   Change directory\n  cat <file> View file contents\n  echo <txt> Print text\n  mkdir <n>  Create directory\n  touch <n>  Create file\n  rm <file>  Remove file\n  grep <pat> Search text\n  neofetch   System info\n  uptime     System uptime\n  ping <h>   Ping host\n  curl <url> Fetch URL\n  npm <cmd>  Package manager\n  git <cmd>  Version control\n  python     Python REPL\n  node       Node.js REPL\n  ai <query> Ask AI assistant");
+    else if (l === "clear") { setTabs(p => p.map(t => t.id === activeTab ? { ...t, lines: [] } : t)); return; }
     else if (l === "date") output.push(new Date().toString());
-    else if (l === "whoami") output.push("admin@alternus-os");
-    else if (l === "ls") output.push("Documents/  Projects/  Downloads/  Desktop/  .config/");
-    else if (l === "neofetch") output.push("Alternus OS v1.0\nKernel: AlternusCore 6.1\nShell: atsh 1.0\nResolution: " + window.innerWidth + "x" + window.innerHeight + "\nTheme: Alternus Dark\nCPU: Virtual (AI-Powered)\nMemory: Unlimited");
-    else if (l.startsWith("echo ")) output.push(cmd.slice(5));
-    else output.push(`Command not found: ${cmd}`);
-    setLines(p => [...p, ...output]);
+    else if (l === "whoami") output.push("admin");
+    else if (l === "hostname") output.push("alternus-os");
+    else if (l === "pwd") output.push(`/home/admin${cwd === "~" ? "" : cwd.replace("~", "")}`);
+    else if (l === "uptime") output.push(`up ${Math.floor(Math.random() * 12)}h ${Math.floor(Math.random() * 59)}m, 1 user, load average: 0.${Math.floor(Math.random() * 99)}`);
+    else if (l === "ls" || l === "ls -la") output.push(cwd === "~" ? "Documents/  Projects/  Downloads/  Desktop/  Pictures/  .config/  .ssh/" : ".");
+    else if (l.startsWith("cd ")) { const d = args || "~"; setCwd(d === ".." ? "~" : d === "~" ? "~" : `~/${d}`); }
+    else if (l.startsWith("cat ")) output.push(`Contents of ${args}:\n[file contents would appear here]`);
+    else if (l.startsWith("echo ")) output.push(args);
+    else if (l.startsWith("mkdir ")) output.push(`Created directory: ${args}`);
+    else if (l.startsWith("touch ")) output.push(`Created file: ${args}`);
+    else if (l.startsWith("rm ")) output.push(`Removed: ${args}`);
+    else if (l.startsWith("grep ")) output.push(`Searching for "${args}"...\nNo matches found.`);
+    else if (l === "neofetch") output.push(`  ╭─────────╮\n  │ Alternus │   admin@alternus-os\n  │   OS     │   OS: Alternus OS v2.0\n  ╰─────────╯   Kernel: AlternusCore 6.2\n                Shell: atsh 2.0\n                Resolution: ${window.innerWidth}x${window.innerHeight}\n                Theme: ${c === palette.dark ? "Dark" : "Light"}\n                CPU: AlternusCPU 12-Core\n                Memory: 16 GB DDR5\n                GPU: AlternusGPU Pro\n                Uptime: ${Math.floor(Math.random() * 12)}h ${Math.floor(Math.random() * 59)}m`);
+    else if (l.startsWith("ping ")) { output.push(`PING ${args} (${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.1):`); for (let i = 0; i < 3; i++) output.push(`  64 bytes: time=${Math.floor(Math.random()*50)+5}ms`); output.push(`3 packets, 0% loss, avg ${Math.floor(Math.random()*30)+10}ms`); }
+    else if (l.startsWith("curl ")) output.push(`Fetching ${args}...\nHTTP/1.1 200 OK\nContent-Type: text/html\n[Response body]`);
+    else if (l.startsWith("npm ")) output.push(l.includes("install") ? `Installing packages...\nadded ${Math.floor(Math.random()*200)+50} packages in ${Math.floor(Math.random()*5)+1}s` : l.includes("run") ? `> Running script...\n✓ Done` : `npm v10.0.0`);
+    else if (l.startsWith("git ")) output.push(l.includes("status") ? "On branch main\nnothing to commit, working tree clean" : l.includes("log") ? `commit abc${Math.floor(Math.random()*9999)} (HEAD -> main)\nAuthor: Admin\nDate: ${new Date().toLocaleDateString()}\n\n  Latest commit` : `git version 2.42.0`);
+    else if (l === "python" || l === "python3") output.push("Python 3.12.0 (Alternus)\n>>> Use Ctrl+C to exit");
+    else if (l === "node") output.push("Node.js v22.0.0 (Alternus)\n> Use Ctrl+C to exit");
+    else if (l.startsWith("ai ")) { output.push(`AI: Processing "${args}"...`); setTimeout(() => pushLines([`AI: I'd suggest using a modular approach. Would you like me to generate code for that?`]), 500); }
+    else output.push(`bash: ${cmd.split(" ")[0]}: command not found\nTry 'help' for available commands`);
+    pushLines(output);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") exec();
+    else if (e.key === "ArrowUp" && history.length) {
+      const idx = histIdx < history.length - 1 ? histIdx + 1 : histIdx;
+      setHistIdx(idx);
+      setInput(history[history.length - 1 - idx]);
+    } else if (e.key === "ArrowDown") {
+      if (histIdx > 0) { setHistIdx(histIdx - 1); setInput(history[history.length - histIdx]); }
+      else { setHistIdx(-1); setInput(""); }
+    } else if (e.key === "l" && e.ctrlKey) { e.preventDefault(); setTabs(p => p.map(t => t.id === activeTab ? { ...t, lines: [] } : t)); }
+    else if (e.key === "c" && e.ctrlKey) { e.preventDefault(); pushLines([`admin@alternus:${cwd}$ ${input}^C`]); setInput(""); }
   };
 
   return (
-    <div className="flex flex-col h-full font-mono text-xs" style={{ background: "#1a1a1a" }}>
-      <div className="flex-1 overflow-y-auto p-3 space-y-0.5">
-        {lines.map((l, i) => (
-          <div key={i} style={{ color: l.startsWith("$") ? "#34D399" : "#ccc" }} className="leading-relaxed">
-            <pre className="whitespace-pre-wrap">{l}</pre>
+    <div className="flex flex-col h-full font-mono" style={{ background: "#0D0D12" }} onClick={() => inputRef.current?.focus()}>
+      {/* Tab bar */}
+      <div className="flex items-center flex-shrink-0" style={{ background: "#15151D", borderBottom: "1px solid #2A2A35" }}>
+        {tabs.map(t => (
+          <div key={t.id} className="flex items-center group"
+            style={{ background: t.id === activeTab ? "#0D0D12" : "transparent", borderBottom: t.id === activeTab ? "2px solid #4ade80" : "2px solid transparent" }}>
+            <button onClick={() => setActiveTab(t.id)} className="px-3 py-1.5 text-[10px]" style={{ color: t.id === activeTab ? "#4ade80" : "#555" }}>
+              {t.name}
+            </button>
+            {tabs.length > 1 && <button onClick={() => closeTab(t.id)} className="pr-2 opacity-0 group-hover:opacity-100" style={{ color: "#555" }}><I d={ic.close} s={8} /></button>}
           </div>
         ))}
+        <button onClick={addTab} className="px-2 py-1.5" style={{ color: "#555" }} title="New Tab"><I d={ic.plus} s={12} /></button>
+      </div>
+
+      {/* Output */}
+      <div className="flex-1 overflow-y-auto px-3 py-2 text-[11px] leading-5" style={{ scrollbarWidth: "none" }}>
+        {lines.map((l, i) => {
+          const isPrompt = l.includes("admin@alternus");
+          const isError = l.startsWith("bash:") || l.startsWith("✗");
+          const isSuccess = l.startsWith("✓") || l.startsWith("✓");
+          return (
+            <div key={i} className="whitespace-pre-wrap" style={{ color: isPrompt ? "#4ade80" : isError ? "#f87171" : isSuccess ? "#4ade80" : "#B0B0B8" }}>
+              {l}
+            </div>
+          );
+        })}
         <div ref={endRef} />
       </div>
-      <div className="flex items-center gap-2 px-3 py-2" style={{ borderTop: "1px solid #333" }}>
-        <span style={{ color: "#34D399" }}>$</span>
-        <input
-          className="flex-1 bg-transparent outline-none text-xs"
-          style={{ color: "#fff" }}
+
+      {/* Input */}
+      <div className="flex items-center gap-1 px-3 py-2 flex-shrink-0" style={{ borderTop: "1px solid #2A2A35" }}>
+        <span className="text-[10px]" style={{ color: "#4ade80" }}>admin@alternus</span>
+        <span className="text-[10px]" style={{ color: "#6C63FF" }}>:{cwd}$</span>
+        <input ref={inputRef}
+          className="flex-1 bg-transparent outline-none text-[11px] ml-1"
+          style={{ color: "#E4E4E7" }}
           value={input}
           onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && exec()}
+          onKeyDown={handleKeyDown}
           autoFocus
         />
       </div>
@@ -2024,19 +2102,19 @@ export default function AlternusOS() {
     const sh = typeof window !== "undefined" ? window.innerHeight - 40 : 700;
     // Per-app ideal sizes
     const sizes: Record<WinId, { w: number; h: number }> = {
-      ai: { w: 360, h: sh },
-      terminal: { w: 560, h: 360 },
-      code: { w: 700, h: 480 },
-      files: { w: 600, h: 420 },
-      settings: { w: 580, h: 420 },
-      music: { w: 360, h: 400 },
-      weather: { w: 360, h: 400 },
-      calendar: { w: 340, h: 380 },
-      notes: { w: 440, h: 380 },
-      browser: { w: 680, h: 460 },
-      store: { w: 600, h: 460 },
-      movies: { w: 520, h: 400 },
-      word: { w: 680, h: 480 },
+      ai: { w: 380, h: sh },
+      terminal: { w: 620, h: 400 },
+      code: { w: 900, h: 560 },
+      files: { w: 640, h: 460 },
+      settings: { w: 660, h: 480 },
+      music: { w: 380, h: 420 },
+      weather: { w: 380, h: 420 },
+      calendar: { w: 360, h: 400 },
+      notes: { w: 480, h: 400 },
+      browser: { w: 820, h: 540 },
+      store: { w: 680, h: 500 },
+      movies: { w: 560, h: 440 },
+      word: { w: 760, h: 520 },
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
