@@ -1911,8 +1911,29 @@ export default function AlternusOS() {
         { name: "Pixel Quest", desc: "Retro platformer", icon: ic.play, iconBg: "#EF4444", price: "Free" },
         { name: "Neural Racer", desc: "AI racing game", icon: ic.cpu, iconBg: "#8B5CF6", price: "$9.99" },
       ];
+      const tabs = ["Featured", "Top", "My Apps", "Updates", "Settings"];
       return (
-        <div className="flex h-full overflow-hidden">
+        <div className="flex flex-col h-full overflow-hidden">
+          {/* Top nav bar */}
+          <div className="flex items-center gap-1 px-4 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+            <div className="flex items-center gap-1 flex-1">
+              {tabs.map((tab, i) => (
+                <button key={i} className="px-3 py-1 rounded-full text-[10px] font-medium transition-colors relative"
+                  style={{ background: i === 0 ? c.accent : "transparent", color: i === 0 ? "#fff" : c.textMuted }}
+                  onMouseEnter={e => { if (i !== 0) e.currentTarget.style.background = c.cardAlt; }}
+                  onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = "transparent"; }}>
+                  {tab}
+                  {tab === "Updates" && <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full" style={{ background: c.danger }} />}
+                </button>
+              ))}
+            </div>
+            {/* Search */}
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg w-[120px]" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+              <I d={ic.search} s={11} c={c.textMuted} />
+              <input className="flex-1 bg-transparent outline-none text-[10px]" style={{ color: c.text }} placeholder="Search" />
+            </div>
+          </div>
+          <div className="flex flex-1 overflow-hidden">
           {/* Sidebar */}
           <div className="w-[110px] flex-shrink-0 flex flex-col py-1 px-1.5" style={{ borderRight: `1px solid ${c.border}` }}>
             {cats.map((s, i) => (
@@ -1984,6 +2005,7 @@ export default function AlternusOS() {
                 </div>
               ))}
             </div>
+          </div>
           </div>
         </div>
       );
