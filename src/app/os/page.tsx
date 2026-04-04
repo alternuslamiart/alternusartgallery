@@ -2018,14 +2018,14 @@ export default function AlternusOS() {
 
         {/* Main content */}
         <div className="flex-1 relative">
-          {/* Clock + Date — upper area */}
-          <div className="absolute top-[15%] left-1/2 -translate-x-1/2 flex flex-col items-center">
+          {/* Clock + Date — 160px from top */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center" style={{ top: 160 }}>
             <p style={{ color: c.text }} className="text-8xl font-bold tracking-wide mb-2">{fmt(time)}</p>
             <p style={{ color: c.textMuted }} className="text-base">{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
           </div>
 
-          {/* Profile + Button — lower area */}
-          <div className="absolute bottom-[18%] left-1/2 -translate-x-1/2 flex flex-col items-center">
+          {/* Profile + Button — 160px from bottom */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center" style={{ bottom: 160 }}>
             {/* Profile avatar */}
             <div
               className="w-16 h-16 rounded-full flex items-center justify-center mb-3"
@@ -2039,7 +2039,7 @@ export default function AlternusOS() {
             {/* Open Desktop button */}
             <button
               onClick={() => { setIsLocked(false); }}
-              className="flex items-center gap-2.5 px-8 py-3 rounded-2xl text-sm font-medium transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer mb-3"
+              className="flex items-center gap-2.5 px-8 py-3 rounded-2xl text-sm font-medium whitespace-nowrap transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer mb-3"
               style={{ background: c.accent, color: "#fff", boxShadow: `0 4px 20px ${c.accent}40` }}
               onMouseEnter={e => { e.currentTarget.style.background = "#2563EB"; }}
               onMouseLeave={e => { e.currentTarget.style.background = c.accent; }}
@@ -2096,10 +2096,10 @@ export default function AlternusOS() {
                       <div className="w-4 h-4 rounded-full bg-white" style={{ marginLeft: 16 }} />
                     </div>
                   </div>
-                  <div className="py-1">
+                  <div className="py-1 px-1.5">
                     {["AlternusNet", "Guest_WiFi", "Office_5G", "Neighbors_Net"].map((net, i) => (
                       <button key={i} onClick={() => setConnectedWifi(i)}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors"
+                        className="w-full flex items-center gap-4 px-3 py-2 rounded-lg text-left transition-colors"
                         style={{ background: i === connectedWifi ? c.accentSoft : "transparent" }}
                         onMouseEnter={e => { if (i !== connectedWifi) e.currentTarget.style.background = c.cardAlt; }}
                         onMouseLeave={e => { if (i !== connectedWifi) e.currentTarget.style.background = i === connectedWifi ? c.accentSoft : "transparent"; }}>
