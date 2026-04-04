@@ -1992,71 +1992,94 @@ function ClockApp({ c }: { c: typeof palette.dark }) {
     { city: "Tokyo", tz: "Asia/Tokyo" }, { city: "Tirana", tz: "Europe/Tirane" },
   ];
 
+  const timerMax = 1800;
+
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-0 px-3 py-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+      {/* Tabs */}
+      <div className="flex items-center px-2 py-1 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
         {(["clock", "alarm", "timer", "stopwatch"] as const).map(t => (
-          <button key={t} onClick={() => setTab(t)} className="px-3 py-1 text-[10px] font-medium capitalize"
-            style={{ color: tab === t ? c.accentText : c.textMuted, borderBottom: tab === t ? `2px solid ${c.accent}` : "2px solid transparent" }}>{t}</button>
+          <button key={t} onClick={() => setTab(t)} className="flex-1 py-1.5 text-[10px] font-semibold capitalize text-center rounded-lg transition-colors"
+            style={{ color: tab === t ? c.text : c.textMuted, background: tab === t ? c.cardAlt : "transparent" }}>{t}</button>
         ))}
       </div>
-      <div className="flex-1 overflow-y-auto p-4" style={{ scrollbarWidth: "none" }}>
-        {tab === "clock" && (
-          <div className="flex flex-col items-center gap-6">
-            <div className="text-center">
-              <p className="text-5xl font-bold" style={{ color: c.text }}>{time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}</p>
-              <p className="text-xs mt-2" style={{ color: c.textMuted }}>{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</p>
-            </div>
-            <div className="w-full space-y-2 mt-2">
-              <p className="text-[10px] font-medium" style={{ color: c.textMuted }}>World Clock</p>
-              {worldTimes.map((wt, i) => (
-                <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg" style={{ background: c.cardAlt }}>
-                  <span className="text-[11px]" style={{ color: c.text }}>{wt.city}</span>
-                  <span className="text-[11px] font-mono" style={{ color: c.textSec }}>{new Date().toLocaleTimeString("en-US", { timeZone: wt.tz, hour: "2-digit", minute: "2-digit", hour12: false })}</span>
-                </div>
-              ))}
-            </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center overflow-y-auto px-4 pb-4" style={{ scrollbarWidth: "none" }}>
+        {/* CLOCK */}
+        {tab === "clock" && (<>
+          <p className="text-6xl font-black font-mono tracking-tight" style={{ color: c.text }}>{time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })}</p>
+          <p className="text-xs mt-2 mb-6" style={{ color: c.accentText }}>{time.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</p>
+          <div className="w-full space-y-1.5">
+            <p className="text-[9px] font-semibold uppercase tracking-wider mb-1" style={{ color: c.textMuted }}>World Clock</p>
+            {worldTimes.map((wt, i) => (
+              <div key={i} className="flex items-center justify-between px-4 py-2.5 rounded-xl" style={{ background: c.cardAlt }}>
+                <span className="text-xs font-medium" style={{ color: c.text }}>{wt.city}</span>
+                <span className="text-xs font-mono font-bold" style={{ color: c.textSec }}>{new Date().toLocaleTimeString("en-US", { timeZone: wt.tz, hour: "2-digit", minute: "2-digit", hour12: false })}</span>
+              </div>
+            ))}
           </div>
-        )}
+        </>)}
+
+        {/* ALARM */}
         {tab === "alarm" && (
-          <div className="space-y-2">
+          <div className="w-full space-y-2">
             {alarms.map((a, i) => (
               <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
-                <div><p className="text-lg font-bold" style={{ color: c.text }}>{a.time}</p><p className="text-[10px]" style={{ color: c.textMuted }}>{a.label}</p></div>
+                <div>
+                  <p className="text-2xl font-bold font-mono" style={{ color: a.on ? c.text : c.textMuted }}>{a.time}</p>
+                  <p className="text-[10px]" style={{ color: c.textMuted }}>{a.label}</p>
+                </div>
                 <button onClick={() => setAlarms(p => p.map((al, j) => j === i ? { ...al, on: !al.on } : al))}
-                  className="w-10 h-5 rounded-full flex items-center px-0.5 transition-colors" style={{ background: a.on ? c.accent : c.cardAlt }}>
-                  <div className="w-4 h-4 rounded-full bg-white transition-all" style={{ marginLeft: a.on ? "18px" : "0px" }} />
+                  className="w-11 h-6 rounded-full flex items-center px-0.5 transition-colors" style={{ background: a.on ? c.accent : c.border }}>
+                  <div className="w-5 h-5 rounded-full bg-white transition-all" style={{ marginLeft: a.on ? "18px" : "0px" }} />
                 </button>
               </div>
             ))}
             <button onClick={() => setAlarms(p => [...p, { time: "08:00", label: "New Alarm", on: true }])}
-              className="w-full py-2 rounded-xl text-xs font-medium" style={{ background: c.cardAlt, color: c.accentText }}>+ Add Alarm</button>
+              className="w-full py-2.5 rounded-xl text-xs font-medium transition-colors"
+              style={{ border: `1px dashed ${c.border}`, color: c.accentText }}
+              onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>+ Add Alarm</button>
           </div>
         )}
-        {tab === "timer" && (
-          <div className="flex flex-col items-center gap-4">
-            <p className="text-5xl font-bold font-mono" style={{ color: c.text }}>{fmtTimer(timerSec)}</p>
-            <div className="flex gap-2">
-              <button onClick={() => setTimerRunning(!timerRunning)} className="px-4 py-2 rounded-xl text-xs font-medium" style={{ background: timerRunning ? c.cardAlt : c.accent, color: timerRunning ? c.text : "#fff" }}>{timerRunning ? "Pause" : "Start"}</button>
-              <button onClick={() => { setTimerRunning(false); setTimerSec(300); }} className="px-4 py-2 rounded-xl text-xs font-medium" style={{ background: c.cardAlt, color: c.text }}>Reset</button>
-            </div>
-            <div className="flex gap-2 mt-2">
-              {[60, 300, 600, 1800].map(s => (
-                <button key={s} onClick={() => { setTimerSec(s); setTimerRunning(false); }}
-                  className="px-3 py-1.5 rounded-lg text-[10px]" style={{ background: timerSec === s ? c.accentSoft : c.cardAlt, color: timerSec === s ? c.accentText : c.textMuted }}>{fmtTimer(s)}</button>
-              ))}
-            </div>
-          </div>
-        )}
-        {tab === "stopwatch" && (
-          <div className="flex flex-col items-center gap-4">
-            <p className="text-4xl font-bold font-mono" style={{ color: c.text }}>{fmtSw(stopwatchMs)}</p>
-            <div className="flex gap-2">
-              <button onClick={() => setSwRunning(!swRunning)} className="px-4 py-2 rounded-xl text-xs font-medium" style={{ background: swRunning ? c.cardAlt : c.accent, color: swRunning ? c.text : "#fff" }}>{swRunning ? "Stop" : "Start"}</button>
-              <button onClick={() => { setSwRunning(false); setStopwatchMs(0); }} className="px-4 py-2 rounded-xl text-xs font-medium" style={{ background: c.cardAlt, color: c.text }}>Reset</button>
+
+        {/* TIMER */}
+        {tab === "timer" && (<>
+          {/* Circle progress */}
+          <div className="relative mb-4">
+            <svg width={160} height={160} viewBox="0 0 160 160">
+              <circle cx="80" cy="80" r="70" fill="none" stroke={c.border} strokeWidth="6" />
+              <circle cx="80" cy="80" r="70" fill="none" stroke={c.accent} strokeWidth="6" strokeLinecap="round"
+                strokeDasharray={2 * Math.PI * 70} strokeDashoffset={2 * Math.PI * 70 * (1 - timerSec / timerMax)}
+                transform="rotate(-90 80 80)" style={{ transition: "stroke-dashoffset 0.3s" }} />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <p className="text-3xl font-bold font-mono" style={{ color: c.text }}>{fmtTimer(timerSec)}</p>
+              <p className="text-[9px]" style={{ color: c.textMuted }}>{timerRunning ? "Running" : "Paused"}</p>
             </div>
           </div>
-        )}
+          <div className="flex gap-2 mb-4">
+            <button onClick={() => setTimerRunning(!timerRunning)} className="px-5 py-2 rounded-xl text-xs font-semibold" style={{ background: timerRunning ? c.cardAlt : c.accent, color: timerRunning ? c.text : "#fff" }}>{timerRunning ? "Pause" : "Start"}</button>
+            <button onClick={() => { setTimerRunning(false); setTimerSec(300); }} className="px-5 py-2 rounded-xl text-xs font-semibold" style={{ background: c.cardAlt, color: c.text }}>Reset</button>
+          </div>
+          <div className="flex gap-1.5">
+            {[{ l: "1m", s: 60 }, { l: "5m", s: 300 }, { l: "10m", s: 600 }, { l: "30m", s: 1800 }].map(p => (
+              <button key={p.s} onClick={() => { setTimerSec(p.s); setTimerRunning(false); }}
+                className="px-3 py-1.5 rounded-full text-[10px] font-medium transition-colors"
+                style={{ background: timerSec === p.s ? c.accentSoft : c.cardAlt, color: timerSec === p.s ? c.accentText : c.textMuted }}>{p.l}</button>
+            ))}
+          </div>
+        </>)}
+
+        {/* STOPWATCH */}
+        {tab === "stopwatch" && (<>
+          <p className="text-5xl font-black font-mono tracking-tight mb-2" style={{ color: c.text }}>{fmtSw(stopwatchMs)}</p>
+          <p className="text-[10px] mb-6" style={{ color: c.textMuted }}>{swRunning ? "Running..." : stopwatchMs > 0 ? "Stopped" : "Ready"}</p>
+          <div className="flex gap-2">
+            <button onClick={() => setSwRunning(!swRunning)} className="px-6 py-2.5 rounded-xl text-xs font-semibold" style={{ background: swRunning ? c.cardAlt : c.accent, color: swRunning ? c.text : "#fff" }}>{swRunning ? "Stop" : "Start"}</button>
+            <button onClick={() => { setSwRunning(false); setStopwatchMs(0); }} className="px-6 py-2.5 rounded-xl text-xs font-semibold" style={{ background: c.cardAlt, color: c.text }}>Reset</button>
+          </div>
+        </>)}
       </div>
     </div>
   );
@@ -2077,58 +2100,79 @@ function CalculatorApp({ c }: { c: typeof palette.dark }) {
   const percent = () => setDisplay(String(parseFloat(display) / 100));
   const negate = () => setDisplay(String(-parseFloat(display)));
 
-  const Btn = ({ label, wide, accent: isAccent, onClick }: { label: string; wide?: boolean; accent?: boolean; onClick: () => void }) => (
+  const Btn = ({ label, wide, type, onClick }: { label: string; wide?: boolean; type?: "op" | "fn" | "eq"; onClick: () => void }) => (
     <button onClick={onClick}
-      className={`${wide ? "col-span-2" : ""} h-10 rounded-xl text-sm font-medium transition-colors`}
-      style={{ background: isAccent ? c.accent : c.cardAlt, color: isAccent ? "#fff" : c.text }}
-      onMouseEnter={e => (e.currentTarget.style.opacity = "0.8")}
+      className={`${wide ? "col-span-2" : ""} rounded-2xl text-sm font-semibold transition-all active:scale-95`}
+      style={{
+        height: 48,
+        background: type === "op" ? c.accent : type === "eq" ? c.accent : type === "fn" ? c.cardAlt : c.surface,
+        color: type === "op" || type === "eq" ? "#fff" : type === "fn" ? c.textSec : c.text,
+        border: type === "op" || type === "eq" ? "none" : `1px solid ${c.border}`,
+      }}
+      onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
       onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>{label}</button>
   );
 
   return (
     <div className="flex h-full">
-      <div className="flex-1 flex flex-col">
-        {/* Display */}
-        <div className="px-4 pt-4 pb-2 flex-shrink-0">
-          {op && <p className="text-[10px] text-right" style={{ color: c.textMuted }}>{prev} {op}</p>}
-          <p className="text-3xl font-bold text-right truncate" style={{ color: c.text }}>{display}</p>
+      {/* History sidebar */}
+      {showHistory && (
+        <div className="w-[130px] flex-shrink-0 flex flex-col py-2 px-1.5" style={{ borderRight: `1px solid ${c.border}`, background: c.bg }}>
+          <div className="flex items-center justify-between px-2 mb-2">
+            <p className="text-[9px] font-semibold" style={{ color: c.textMuted }}>History</p>
+            <button onClick={() => setHistory([])} className="text-[8px]" style={{ color: c.textMuted }}>Clear</button>
+          </div>
+          <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+            {history.length === 0 && <p className="text-[9px] px-2 py-4 text-center" style={{ color: c.textMuted }}>No calculations yet</p>}
+            {history.map((h, i) => (
+              <div key={i} className="px-2 py-1.5 mb-0.5 rounded-lg text-[9px] font-mono transition-colors"
+                style={{ color: c.textSec }}
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>{h}</div>
+            ))}
+          </div>
         </div>
-        {/* Buttons */}
-        <div className="grid grid-cols-4 gap-1.5 p-3 flex-1">
-          <Btn label="C" onClick={clear} />
-          <Btn label="±" onClick={negate} />
-          <Btn label="%" onClick={percent} />
-          <Btn label="÷" accent onClick={() => operate("÷")} />
+      )}
+
+      {/* Calculator */}
+      <div className="flex-1 flex flex-col">
+        {/* Menu button */}
+        <div className="flex items-center justify-between px-4 pt-2 flex-shrink-0">
+          <button onClick={() => setShowHistory(!showHistory)} className="p-1.5 rounded-lg transition-colors"
+            style={{ color: showHistory ? c.accentText : c.textMuted, background: showHistory ? c.accentSoft : "transparent" }}
+            onMouseEnter={e => { if (!showHistory) e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { if (!showHistory) e.currentTarget.style.background = "transparent"; }}>
+            <I d={ic.menu} s={14} />
+          </button>
+        </div>
+        {/* Display */}
+        <div className="px-5 pt-2 pb-4 flex-shrink-0">
+          {op && <p className="text-[11px] text-right mb-1 font-mono" style={{ color: c.textMuted }}>{prev} {op}</p>}
+          <p className="text-4xl font-bold text-right truncate font-mono" style={{ color: c.text }}>{display}</p>
+        </div>
+        {/* Buttons grid */}
+        <div className="grid grid-cols-4 gap-2 px-3 pb-3 flex-1 content-end">
+          <Btn label="C" type="fn" onClick={clear} />
+          <Btn label="±" type="fn" onClick={negate} />
+          <Btn label="%" type="fn" onClick={percent} />
+          <Btn label="÷" type="op" onClick={() => operate("÷")} />
           <Btn label="7" onClick={() => input("7")} />
           <Btn label="8" onClick={() => input("8")} />
           <Btn label="9" onClick={() => input("9")} />
-          <Btn label="×" accent onClick={() => operate("×")} />
+          <Btn label="×" type="op" onClick={() => operate("×")} />
           <Btn label="4" onClick={() => input("4")} />
           <Btn label="5" onClick={() => input("5")} />
           <Btn label="6" onClick={() => input("6")} />
-          <Btn label="-" accent onClick={() => operate("-")} />
+          <Btn label="-" type="op" onClick={() => operate("-")} />
           <Btn label="1" onClick={() => input("1")} />
           <Btn label="2" onClick={() => input("2")} />
           <Btn label="3" onClick={() => input("3")} />
-          <Btn label="+" accent onClick={() => operate("+")} />
+          <Btn label="+" type="op" onClick={() => operate("+")} />
           <Btn label="0" wide onClick={() => input("0")} />
           <Btn label="." onClick={() => { if (!display.includes(".")) input("."); }} />
-          <Btn label="=" accent onClick={equals} />
+          <Btn label="=" type="eq" onClick={equals} />
         </div>
       </div>
-      {/* History sidebar toggle */}
-      {showHistory && (
-        <div className="w-[140px] flex-shrink-0 flex flex-col overflow-y-auto py-2 px-2" style={{ borderLeft: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
-          <p className="text-[9px] font-medium px-2 mb-2" style={{ color: c.textMuted }}>History</p>
-          {history.length === 0 && <p className="text-[9px] px-2" style={{ color: c.textMuted }}>No history yet</p>}
-          {history.map((h, i) => (
-            <div key={i} className="px-2 py-1 text-[9px] rounded-md" style={{ color: c.textSec }}>{h}</div>
-          ))}
-        </div>
-      )}
-      <button onClick={() => setShowHistory(!showHistory)} className="absolute top-1 right-1 p-1 rounded-md" style={{ color: c.textMuted }} title="History">
-        <I d={ic.menu} s={12} />
-      </button>
     </div>
   );
 }
