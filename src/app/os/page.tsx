@@ -1538,7 +1538,7 @@ export default function AlternusOS() {
   const c = palette[mode];
 
   const defaultWins: WinState[] = [
-    { id: "ai", title: "Alternus AI", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 8, y: 44, w: 320, h: 520 },
+    { id: "ai", title: "Alternus AI", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 0, y: 0, w: 360, h: 800 },
     { id: "terminal", title: "Terminal", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 80, w: 460, h: 340 },
     { id: "code", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 520, h: 400 },
     { id: "files", title: "Files", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 240, y: 70, w: 520, h: 400 },
@@ -1635,6 +1635,11 @@ export default function AlternusOS() {
     setZCounter(z => z + 1);
     setWins(p => p.map(w => {
       if (w.id === id) {
+        // AI snaps to left edge, full height
+        if (id === "ai" && !w.isOpen) {
+          const fh = typeof window !== "undefined" ? window.innerHeight - 40 : 700;
+          return { ...w, isOpen: true, isMinimized: false, zIndex: zCounter + 1, x: 0, y: 0, w: 360, h: fh };
+        }
         if (!w.isOpen) return { ...w, isOpen: true, isMinimized: false, zIndex: zCounter + 1 };
         if (w.isMinimized) return { ...w, isMinimized: false, zIndex: zCounter + 1 };
         return { ...w, zIndex: zCounter + 1 };
