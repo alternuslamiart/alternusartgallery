@@ -407,6 +407,88 @@ function AppWindow({
   );
 }
 
+// ━━━━ Universal AI Panel ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function AIPanel({ c, context, onAction }: { c: typeof palette.dark; context: string; onAction?: (cmd: string) => void }) {
+  const [input, setInput] = useState("");
+  const [msgs, setMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([
+    { role: "ai", text: `AI ready for ${context}. How can I help?` },
+  ]);
+  const [listening, setListening] = useState(false);
+  const endRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
+
+  const send = (text?: string) => {
+    const q = (text || input).trim();
+    if (!q) return;
+    setInput("");
+    setMsgs(p => [...p, { role: "user", text: q }]);
+    setTimeout(() => {
+      let r = `I'll help with that in ${context}.`;
+      const l = q.toLowerCase();
+      if (l.includes("help")) r = `In ${context}, I can:\n• Automate tasks\n• Search & organize\n• Generate content\n• Answer questions\n• Voice commands`;
+      else if (l.includes("organize") || l.includes("sort")) r = "Done! I've organized everything by date and category.";
+      else if (l.includes("find") || l.includes("search")) r = `Searching ${context}... Found 3 relevant results.`;
+      else if (l.includes("create") || l.includes("new")) r = "Created! The new item is ready.";
+      else if (l.includes("delete") || l.includes("remove")) r = "Removed. You can undo this in the next 30 seconds.";
+      else if (l.includes("explain")) r = `This ${context} section manages your data and preferences. Everything is synced with Alternus Cloud.`;
+      if (onAction) onAction(q);
+      setMsgs(p => [...p, { role: "ai", text: r }]);
+    }, 400);
+  };
+
+  return (
+    <div className="flex flex-col h-full" style={{ borderLeft: `1px solid ${c.border}`, background: c.bg }}>
+      {/* Header */}
+      <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+          <I d={ic.sparkle} s={10} c="#fff" />
+        </div>
+        <span className="text-[10px] font-bold flex-1" style={{ color: c.text }}>AI</span>
+        <button onClick={() => { setListening(!listening); if (!listening) setTimeout(() => { send("help"); setListening(false); }, 1500); }}
+          className="w-6 h-6 rounded-full flex items-center justify-center transition-all"
+          style={{ background: listening ? "#EF444420" : "transparent", color: listening ? "#EF4444" : c.textMuted }}
+          title="Voice">
+          <I d={ic.voice} s={12} />
+          {listening && <span className="absolute w-6 h-6 rounded-full animate-ping opacity-30" style={{ background: "#EF4444" }} />}
+        </button>
+      </div>
+      {/* Quick chips */}
+      <div className="flex flex-wrap gap-1 px-2 py-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        {["Organize", "Search", "Create", "Help"].map(chip => (
+          <button key={chip} onClick={() => send(chip.toLowerCase())}
+            className="px-2 py-0.5 rounded-full text-[8px] font-medium transition-colors"
+            style={{ background: c.cardAlt, color: c.textSec }}
+            onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.textSec; }}>
+            {chip}
+          </button>
+        ))}
+      </div>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1.5" style={{ scrollbarWidth: "none" }}>
+        {msgs.map((m, i) => (
+          <div key={i} className={m.role === "user" ? "flex justify-end" : ""}>
+            <div className="max-w-[92%] px-2.5 py-1.5 rounded-xl text-[9px] leading-relaxed"
+              style={m.role === "user" ? { background: c.accent, color: "#fff" } : { background: c.cardAlt, color: c.text }}>
+              <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
+            </div>
+          </div>
+        ))}
+        <div ref={endRef} />
+      </div>
+      {/* Input */}
+      <div className="px-2 py-1.5 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+        <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+          <input className="flex-1 bg-transparent outline-none text-[9px]" style={{ color: c.text }}
+            placeholder="Ask AI..." value={input} onChange={e => setInput(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") send(); }} />
+          <button onClick={() => send()} className="p-1 rounded-lg" style={{ background: c.accent }}><I d={ic.send} s={8} c="#fff" /></button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ App Contents ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AIChat({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp?: (id: WinId) => void }) {
   const [input, setInput] = useState("");
@@ -762,6 +844,7 @@ function WeatherApp({ c }: { c: typeof palette.dark }) {
 
 function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; wallpaper: number; setWallpaper: (w: number) => void }) {
   const [activeSection, setActiveSection] = useState("Network");
+  const [showAIPanel, setShowAIPanel] = useState(false);
   const [wifiOn, setWifiOn] = useState(true);
   const [btOn, setBtOn] = useState(true);
   const [dndOn, setDndOn] = useState(false);
@@ -1137,8 +1220,9 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
         <div className="flex items-center justify-between px-3 mb-3">
           <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: c.textMuted }}>Settings</p>
           <div className="flex items-center gap-1">
-            <button title="AI Assistant" className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105"
-              style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
+            <button title="AI Assistant" onClick={() => setShowAIPanel(!showAIPanel)}
+              className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105"
+              style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)", boxShadow: showAIPanel ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
               <I d={ic.sparkle} s={10} c="#fff" />
             </button>
             <button title="Voice" className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
@@ -1164,6 +1248,7 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
       <div className="flex-1 overflow-hidden">
         {renderContent()}
       </div>
+      {showAIPanel && <div className="w-[180px] flex-shrink-0"><AIPanel c={c} context="Settings" /></div>}
     </div>
   );
 }
@@ -2012,6 +2097,7 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
 
 // ━━━━ CLOCK APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function ClockApp({ c }: { c: typeof palette.dark }) {
+  const [showAIPanel, setShowAIPanel] = useState(false);
   const [tab, setTab] = useState<"clock" | "alarm" | "timer" | "stopwatch">("clock");
   const [time, setTime] = useState(new Date());
   const [timerSec, setTimerSec] = useState(300);
@@ -2035,13 +2121,19 @@ function ClockApp({ c }: { c: typeof palette.dark }) {
   const timerMax = 1800;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full">
+    <div className="flex-1 flex flex-col overflow-hidden">
       {/* Tabs */}
       <div className="flex items-center px-2 py-1 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
         {(["clock", "alarm", "timer", "stopwatch"] as const).map(t => (
           <button key={t} onClick={() => setTab(t)} className="flex-1 py-1.5 text-[10px] font-semibold capitalize text-center rounded-lg transition-colors"
             style={{ color: tab === t ? c.text : c.textMuted, background: tab === t ? c.cardAlt : "transparent" }}>{t}</button>
         ))}
+        <button title="AI" onClick={() => setShowAIPanel(!showAIPanel)}
+          className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105 ml-1 flex-shrink-0"
+          style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)", boxShadow: showAIPanel ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
+          <I d={ic.sparkle} s={9} c="#fff" />
+        </button>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center overflow-y-auto px-4 pb-4" style={{ scrollbarWidth: "none" }}>
@@ -2121,6 +2213,8 @@ function ClockApp({ c }: { c: typeof palette.dark }) {
           </div>
         </>)}
       </div>
+    </div>
+    {showAIPanel && <div className="w-[160px] flex-shrink-0"><AIPanel c={c} context="Clock" /></div>}
     </div>
   );
 }
@@ -2267,6 +2361,7 @@ function AccountsApp({ c }: { c: typeof palette.dark }) {
 
 // ━━━━ DOWNLOADS APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function DownloadsApp({ c }: { c: typeof palette.dark }) {
+  const [showAIPanel, setShowAIPanel] = useState(false);
   const [tab, setTab] = useState<"downloads" | "uploads" | "install">("downloads");
   const [installStep, setInstallStep] = useState(0); // 0=select, 1=policy, 2=installing, 3=done
   const [policyAccepted, setPolicyAccepted] = useState(false);
@@ -2311,7 +2406,8 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full">
+    <div className="flex-1 flex flex-col overflow-hidden">
       {/* Tabs + AI/Voice */}
       <div className="flex items-center px-2 py-1 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
         {(["downloads", "uploads", "install"] as const).map(t => (
@@ -2322,7 +2418,8 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
           </button>
         ))}
         <div className="flex items-center gap-1 ml-auto">
-          <button title="AI Assistant" className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105"
+          <button title="AI Assistant" onClick={() => setShowAIPanel(!showAIPanel)}
+            className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105"
             style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}>
             <I d={ic.sparkle} s={10} c="#fff" />
           </button>
@@ -2501,6 +2598,8 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
           </>
         )}
       </div>
+    </div>
+    {showAIPanel && <div className="w-[180px] flex-shrink-0"><AIPanel c={c} context="Downloads" /></div>}
     </div>
   );
 }
