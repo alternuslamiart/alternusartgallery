@@ -233,8 +233,8 @@ function TitleBar({
           onMouseDown={e => e.stopPropagation()}
           onClick={onMinimize}
           className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#D4A844"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#D4A844"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", "#fff"); }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", c.textMuted); }}
         >
           <svg width={10} height={10} viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
         </button>
@@ -242,8 +242,8 @@ function TitleBar({
           onMouseDown={e => e.stopPropagation()}
           onClick={onMaximize}
           className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#5BA3E6"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#5BA3E6"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", "#fff"); }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", c.textMuted); }}
         >
           <svg width={10} height={10} viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
         </button>
@@ -251,8 +251,8 @@ function TitleBar({
           onMouseDown={e => e.stopPropagation()}
           onClick={onClose}
           className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#E06060"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#E06060"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", "#fff"); }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", c.textMuted); }}
         >
           <svg width={10} height={10} viewBox="0 0 10 10"><polygon points="5,1.5 9,8.5 1,8.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" strokeLinejoin="round" /></svg>
         </button>
@@ -3033,23 +3033,23 @@ export default function AlternusOS() {
         <div className="flex items-center gap-1">
           {(() => { const ic_ = mode === "dark" ? "#FFFFFF" : "#444444"; return (<>
             {/* Quick launch apps */}
-            <button title="Browser" onClick={() => openWin("browser")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.globe} s={13} /></button>
-            <button title="Settings" onClick={() => openWin("settings")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.settingsF} s={13} /></button>
-            <button title="Code Editor" onClick={() => openWin("code")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.code} s={13} /></button>
-            <button title="Terminal" onClick={() => openWin("terminal")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.terminal} s={13} /></button>
-            <button title="Weather" onClick={() => openWin("weather")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.cloud} s={13} /></button>
-            <button title="Calendar" onClick={() => openWin("calendar")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.calendar} s={13} /></button>
-            <button title="Store" onClick={() => openWin("store")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.store} s={13} /></button>
-            <button title="Movies" onClick={() => openWin("movies")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.film} s={13} /></button>
+            <button title="Browser" onClick={() => openWin("browser")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.globe} s={15} /></button>
+            <button title="Settings" onClick={() => openWin("settings")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.settingsF} s={15} /></button>
+            <button title="Code Editor" onClick={() => openWin("code")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.code} s={15} /></button>
+            <button title="Terminal" onClick={() => openWin("terminal")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.terminal} s={15} /></button>
+            <button title="Weather" onClick={() => openWin("weather")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.cloud} s={15} /></button>
+            <button title="Calendar" onClick={() => openWin("calendar")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.calendar} s={15} /></button>
+            <button title="Store" onClick={() => openWin("store")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.store} s={15} /></button>
+            <button title="Movies" onClick={() => openWin("movies")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.film} s={15} /></button>
             {/* Separator */}
             <div className="w-px h-4 mx-1" style={{ background: c.border }} />
             {/* System tray */}
             <button title="Notifications" onClick={() => setShowNotifications(!showNotifications)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors relative" style={{ color: ic_ }}>
-              <I d={ic.bell} s={13} />
+              <I d={ic.bell} s={15} />
               <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full" style={{ background: c.danger }} />
             </button>
             <div className="relative">
-              <button onClick={() => { setShowWifiPanel(!showWifiPanel); setShowProfilePanel(false); }} title="Wi-Fi" className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.wifiF} s={13} f /></button>
+              <button onClick={() => { setShowWifiPanel(!showWifiPanel); setShowProfilePanel(false); }} title="Wi-Fi" className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.wifiF} s={15} f /></button>
               {/* WiFi Panel */}
               {showWifiPanel && (
                 <div className="absolute top-full right-0 mt-2 w-[280px] rounded-xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 4px 16px rgba(0,0,0,0.12)", zIndex: 999 }}
@@ -3088,13 +3088,13 @@ export default function AlternusOS() {
               )}
             </div>
             <button onClick={() => setMode(mode === "dark" ? "light" : "dark")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
-              <I d={mode === "dark" ? ic.sunF : ic.moonF} s={13} f />
+              <I d={mode === "dark" ? ic.sunF : ic.moonF} s={15} f />
             </button>
             {/* Separator */}
             <div className="w-px h-4 mx-1" style={{ background: c.border }} />
             <div className="relative">
               <button onClick={() => { setShowProfilePanel(!showProfilePanel); setShowWifiPanel(false); }} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
-                <I d={ic.user} s={13} />
+                <I d={ic.user} s={15} />
               </button>
               {/* Profile Panel */}
               {showProfilePanel && (
@@ -3148,7 +3148,7 @@ export default function AlternusOS() {
               )}
             </div>
             <button onClick={() => { setIsBooting(true); setIsLocked(true); }} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
-              <I d={ic.power} s={13} />
+              <I d={ic.power} s={15} />
             </button>
           </>); })()}
         </div>
