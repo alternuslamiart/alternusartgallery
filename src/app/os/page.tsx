@@ -1751,10 +1751,30 @@ export default function AlternusOS() {
       return;
     }
 
-    // ━━━ PREDICTIVE CLEANUP ━━━
+    // ━━━ AI FILE MANAGEMENT ━━━
     if (q.includes("cleanup") || q.includes("clean") || q.includes("archive") || q.includes("unused")) {
       setAiResponse("AI Predictive Cleanup found:\n\n• design_old.fig — not opened in 6 months\n• backup_jan.zip — 45 MB, created 8 months ago\n• draft_v1.docx — superseded by v3\n\nWant me to move these to Archive or delete them?");
       setAiActions([{ label: "Archive All", action: "files" }, { label: "Open Files", action: "files" }]);
+      return;
+    }
+    if (q.includes("classify") || q.includes("organize") || q.includes("sort files") || q.includes("categorize")) {
+      setAiResponse("AI Classification complete:\n\n📁 Documents → 12 files (contracts, reports, notes)\n📁 Media → 8 files (images, videos)\n📁 Code → 6 files (scripts, configs)\n📁 Archives → 4 files (zips, backups)\n\nAll files tagged and sorted automatically.");
+      setAiActions([{ label: "Open Files", action: "files" }]);
+      return;
+    }
+    if (q.includes("duplicate") || q.includes("find duplicate")) {
+      setAiResponse("AI Duplicate Scan:\n\n• report_v2.docx ↔ report_final.docx (98% match)\n• screenshot.png ↔ screenshot_copy.png (identical)\n• backup.zip ↔ backup_old.zip (same content)\n\nTotal: 14 MB can be freed.");
+      setAiActions([{ label: "Review in Files", action: "files" }]);
+      return;
+    }
+    if (q.includes("storage") || q.includes("disk") || q.includes("space") || q.includes("usage")) {
+      setAiResponse("Storage Report:\n\n💾 Total: 512 GB\n📊 Used: 278 GB (54%)\n📁 Apps: 154 GB\n🎬 Media: 77 GB\n📄 Documents: 41 GB\n🗑️ Cache: 6 GB (clearable)\n\nRecommendation: Clear cache to free 6 GB.");
+      setAiActions([{ label: "Open Settings", action: "settings" }, { label: "Open Files", action: "files" }]);
+      return;
+    }
+    if (q.includes("tag") || q.includes("label") || q.includes("auto-tag")) {
+      setAiResponse("AI Auto-Tagging complete:\n\n• 5 files tagged as \"Finance\" (invoices, budget)\n• 3 files tagged as \"Legal\" (contracts, NDA)\n• 4 files tagged as \"Project\" (proposals, docs)\n• 2 files tagged as \"Personal\" (notes, ideas)");
+      setAiActions([{ label: "Open Files", action: "files" }]);
       return;
     }
 
@@ -2090,8 +2110,13 @@ export default function AlternusOS() {
           {/* AI Search Bar with inline response */}
           <div className="w-full max-w-2xl">
             <div
-              className="flex items-center gap-2 pl-5 pr-2 py-2 rounded-2xl transition-all"
-              style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)" }}
+              className="flex items-center gap-2 pl-5 pr-2 py-2 transition-all"
+              style={{
+                background: c.surface,
+                border: `1px solid ${c.border}`,
+                borderRadius: aiResponse ? "16px 16px 0 0" : 16,
+                boxShadow: aiResponse ? "none" : (mode === "dark" ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)"),
+              }}
             >
               <I d={ic.search} s={20} c={c.textMuted} />
               <input
@@ -2106,6 +2131,19 @@ export default function AlternusOS() {
                   }
                 }}
               />
+              {/* AI classify/manage button */}
+              <button
+                onClick={() => {
+                  setAiInput("");
+                  setAiResponse("AI File Assistant ready. What can I help with?\n\n• \"classify my files\" — auto-organize by type\n• \"find duplicates\" — scan for duplicate files\n• \"cleanup downloads\" — archive old downloads\n• \"sort by date\" — organize files chronologically\n• \"tag documents\" — auto-tag by content\n• \"storage report\" — analyze disk usage");
+                  setAiActions([{ label: "Open Files", action: "files" }]);
+                }}
+                className="p-2 rounded-lg transition-all hover:scale-105 active:scale-95"
+                style={{ background: c.accentSoft, color: c.accentText }}
+                title="AI File Manager"
+              >
+                <I d={ic.sparkle} s={16} />
+              </button>
               <button
                 onClick={() => aiInput.trim() && handleDesktopSearch()}
                 className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90 active:scale-95"
@@ -2118,8 +2156,15 @@ export default function AlternusOS() {
             {/* Inline AI response */}
             {aiResponse && (
               <div
-                className="mt-3 px-5 py-4 rounded-2xl text-[13px] leading-relaxed"
-                style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text, boxShadow: mode === "dark" ? "0 4px 20px rgba(0,0,0,0.2)" : "0 4px 20px rgba(0,0,0,0.06)" }}
+                className="px-5 py-4 text-[13px] leading-relaxed"
+                style={{
+                  background: c.cardAlt,
+                  border: `1px solid ${c.border}`,
+                  borderTop: `1px solid ${c.border}`,
+                  borderRadius: "0 0 16px 16px",
+                  color: c.text,
+                  boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)",
+                }}
               >
                 <pre className="whitespace-pre-wrap font-sans">{aiResponse}</pre>
                 {aiActions.length > 0 && (
