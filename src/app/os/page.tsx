@@ -233,7 +233,7 @@ function TitleBar({
           onMouseDown={e => e.stopPropagation()}
           onClick={onMinimize}
           className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#D4A844"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
         >
           <svg width={10} height={10} viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
@@ -242,7 +242,7 @@ function TitleBar({
           onMouseDown={e => e.stopPropagation()}
           onClick={onMaximize}
           className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#5BA3E6"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
         >
           <svg width={10} height={10} viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
@@ -251,7 +251,7 @@ function TitleBar({
           onMouseDown={e => e.stopPropagation()}
           onClick={onClose}
           className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#E06060"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
         >
           <svg width={10} height={10} viewBox="0 0 10 10"><polygon points="5,1.5 9,8.5 1,8.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" strokeLinejoin="round" /></svg>
