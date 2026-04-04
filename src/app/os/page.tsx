@@ -1889,8 +1889,8 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
     "style.css": { lang: "CSS", code: `* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\nbody {\n  font-family: 'Inter', sans-serif;\n  background: #0a0a0f;\n  color: #e4e4e7;\n  min-height: 100vh;\n}\n\n.app {\n  max-width: 800px;\n  margin: 0 auto;\n  padding: 2rem;\n}\n\nbutton {\n  padding: 0.5rem 1rem;\n  border-radius: 8px;\n  border: 1px solid #333;\n  background: #1a1a2e;\n  color: #fff;\n  cursor: pointer;\n}` },
     "package.json": { lang: "JSON", code: `{\n  "name": "alternus-app",\n  "version": "1.0.0",\n  "type": "module",\n  "scripts": {\n    "dev": "vite",\n    "build": "vite build",\n    "preview": "vite preview"\n  },\n  "dependencies": {\n    "react": "^19.0.0",\n    "react-dom": "^19.0.0"\n  },\n  "devDependencies": {\n    "vite": "^6.0.0"\n  }\n}` },
   };
-  const [activeFile, setActiveFile] = useState("main.js");
-  const [openTabs, setOpenTabs] = useState(["main.js"]);
+  const [activeFile, setActiveFile] = useState("welcome");
+  const [openTabs, setOpenTabs] = useState(["welcome", "main.js"]);
   const [codes, setCodes] = useState<Record<string, string>>(Object.fromEntries(Object.entries(fileContents).map(([k, v]) => [k, v.code])));
   const [output, setOutput] = useState<string[]>([]);
   const [showTerminal, setShowTerminal] = useState(false);
@@ -2044,7 +2044,61 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
             </div>
           </div>
 
-          {/* Code editor */}
+          {/* Welcome / Code editor */}
+          {activeFile === "welcome" ? (
+            <div className="flex-1 overflow-y-auto px-8 py-6" style={{ background: bg }}>
+              <h1 className="text-2xl font-bold mb-1" style={{ color: "#E4E4E7" }}>Alternus Code v2.0</h1>
+              <p className="text-[10px] mb-6" style={{ color: "#666" }}>AI-Integrated Development Environment</p>
+
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-2 h-2 rounded-full" style={{ background: "#3B82F6" }} />
+                <span className="text-xs font-semibold" style={{ color: "#999" }}>What&apos;s New</span>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                {[
+                  { title: "AI Copilot", desc: "Write code with AI assistance. Generate functions, fix bugs, and refactor with natural language.", color: "#3B82F6" },
+                  { title: "Multi-file Editor", desc: "Work across multiple files with tabbed editing. Support for JS, JSX, CSS, HTML, and JSON.", color: "#8B5CF6" },
+                  { title: "Integrated Terminal", desc: "Run code directly with Ctrl+Enter. View output with colored status messages.", color: "#10B981" },
+                  { title: "Voice Commands", desc: "Use voice to dictate code, ask questions, or navigate files hands-free.", color: "#F59E0B" },
+                  { title: "Smart File Explorer", desc: "Browse project files with syntax-aware icons and folder tree navigation.", color: "#EC4899" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-xl" style={{ background: bg3 }}>
+                    <div className="w-1 h-8 rounded-full flex-shrink-0 mt-0.5" style={{ background: item.color }} />
+                    <div>
+                      <p className="text-[11px] font-semibold" style={{ color: "#D4D4D8" }}>{item.title}</p>
+                      <p className="text-[9px] mt-0.5 leading-relaxed" style={{ color: "#777" }}>{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 rounded-full" style={{ background: "#10B981" }} />
+                <span className="text-xs font-semibold" style={{ color: "#999" }}>Quick Start</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: "New File", desc: "Create empty file", icon: ic.plus },
+                  { label: "Open Project", desc: "Browse files", icon: ic.folder },
+                  { label: "Ask AI", desc: "Get coding help", icon: ic.sparkle },
+                  { label: "Run Code", desc: "Execute current file", icon: ic.play },
+                ].map((item, i) => (
+                  <button key={i} onClick={() => { if (i === 0 || i === 1) openFile("main.js"); else if (i === 2) setShowAI(true); }}
+                    className="flex items-center gap-3 p-3 rounded-xl text-left transition-colors"
+                    style={{ background: bg3 }}
+                    onMouseEnter={e => (e.currentTarget.style.background = br)}
+                    onMouseLeave={e => (e.currentTarget.style.background = bg3)}>
+                    <I d={item.icon} s={16} c="#666" />
+                    <div>
+                      <p className="text-[10px] font-semibold" style={{ color: "#D4D4D8" }}>{item.label}</p>
+                      <p className="text-[8px]" style={{ color: "#555" }}>{item.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
           <div className="flex flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
             <div className="w-10 flex-shrink-0 pt-2 text-right pr-3 select-none" style={{ color: "#444", background: bg }}>
               {code.split("\n").map((_, i) => <div key={i} className="text-[11px] leading-5 font-mono">{i + 1}</div>)}
@@ -2061,6 +2115,9 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
               }}
             />
           </div>
+
+          </div>
+          )}
 
           {/* Terminal */}
           {showTerminal && (
@@ -2121,6 +2178,11 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
                   placeholder="Ask AI to code..."
                   value={aiInput} onChange={e => setAiInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter") sendAI(); }} />
+                <button title="Attach file" className="p-1 rounded transition-colors" style={{ color: "#555" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "#999")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "#555")}>
+                  <I d={ic.fileText} s={10} />
+                </button>
                 <button onClick={sendAI} className="p-1.5 rounded-lg" style={{ background: "#4A4A55" }}><I d={ic.send} s={10} c="#D4D4D8" /></button>
               </div>
             </div>
