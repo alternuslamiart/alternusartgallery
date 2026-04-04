@@ -3329,7 +3329,7 @@ export default function AlternusOS() {
         {/* Center: Logo + Progress */}
         <div className="flex flex-col items-center">
           <h1
-            className="text-7xl font-semibold mb-6 select-none bg-clip-text"
+            className="text-8xl font-semibold mb-6 select-none bg-clip-text"
             style={{
               backgroundImage: "linear-gradient(90deg, #666 0%, #eee 50%, #666 100%)",
               WebkitBackgroundClip: "text",
@@ -3426,6 +3426,7 @@ export default function AlternusOS() {
 
   return (
     <div style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
+      <style>{`* { scrollbar-width: none !important; -ms-overflow-style: none !important; } *::-webkit-scrollbar { display: none !important; }`}</style>
       {/* Top Bar */}
       <div className="relative flex items-center justify-between px-4 h-9 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
         <div className="flex items-center gap-2">
