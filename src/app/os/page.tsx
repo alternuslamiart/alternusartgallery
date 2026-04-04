@@ -1551,7 +1551,7 @@ export default function AlternusOS() {
     { id: "calendar", title: "Calendar", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 380, y: 90, w: 320, h: 340 },
     { id: "notes", title: "Notes", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 80, w: 400, h: 340 },
     { id: "browser", title: "Browser", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 540, h: 400 },
-    { id: "store", title: "Store", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 60, w: 460, h: 380 },
+    { id: "store", title: "Store", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 40, y: 40, w: 540, h: 460 },
     { id: "movies", title: "Movies", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 260, y: 50, w: 480, h: 380 },
     { id: "word", title: "Alternus Word", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 140, y: 50, w: 540, h: 400 },
   ];
@@ -2225,7 +2225,7 @@ export default function AlternusOS() {
                     </div>
                   </div>
                   {/* Actions */}
-                  <div className="py-1">
+                  <div className="py-1 px-1.5">
                     {[
                       { icon: ic.user, label: "My Profile", action: () => { openWin("settings"); setShowProfilePanel(false); } },
                       { icon: ic.settings, label: "Settings", action: () => { openWin("settings"); setShowProfilePanel(false); } },
@@ -2233,7 +2233,7 @@ export default function AlternusOS() {
                       { icon: ic.shield, label: "Privacy & Security", action: () => { openWin("settings"); setShowProfilePanel(false); } },
                     ].map((item, i) => (
                       <button key={i} onClick={item.action}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-left transition-colors"
+                        className="w-full flex items-center gap-4 px-3 py-2 rounded-lg text-left transition-colors"
                         onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
                         onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                         <I d={item.icon} s={14} c={c.textMuted} />
