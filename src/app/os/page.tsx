@@ -1520,6 +1520,9 @@ export default function AlternusOS() {
   const [zCounter, setZCounter] = useState(10);
   const [showApps, setShowApps] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showWifiPanel, setShowWifiPanel] = useState(false);
+  const [showProfilePanel, setShowProfilePanel] = useState(false);
+  const [connectedWifi, setConnectedWifi] = useState(0);
   const [showTaskSwitcher, setShowTaskSwitcher] = useState(false);
   const [taskSwitcherIdx, setTaskSwitcherIdx] = useState(0);
   const [systemModal, setSystemModal] = useState<SystemModal>(null);
@@ -2081,15 +2084,105 @@ export default function AlternusOS() {
               <I d={ic.bell} s={13} />
               <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full" style={{ background: c.danger }} />
             </button>
-            <span className="p-1.5" style={{ color: ic_ }}><I d={ic.wifi} s={13} /></span>
+            <div className="relative">
+              <button onClick={() => { setShowWifiPanel(!showWifiPanel); setShowProfilePanel(false); }} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.wifi} s={13} /></button>
+              {/* WiFi Panel */}
+              {showWifiPanel && (
+                <div className="absolute top-full right-0 mt-2 w-[280px] rounded-xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 32px rgba(0,0,0,0.3)", zIndex: 999 }}
+                  onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
+                    <p className="text-xs font-semibold" style={{ color: c.text }}>Wi-Fi</p>
+                    <div className="w-9 h-5 rounded-full flex items-center px-0.5" style={{ background: c.accent }}>
+                      <div className="w-4 h-4 rounded-full bg-white" style={{ marginLeft: 16 }} />
+                    </div>
+                  </div>
+                  <div className="py-1">
+                    {["AlternusNet", "Guest_WiFi", "Office_5G", "Neighbors_Net"].map((net, i) => (
+                      <button key={i} onClick={() => setConnectedWifi(i)}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors"
+                        style={{ background: i === connectedWifi ? c.accentSoft : "transparent" }}
+                        onMouseEnter={e => { if (i !== connectedWifi) e.currentTarget.style.background = c.cardAlt; }}
+                        onMouseLeave={e => { if (i !== connectedWifi) e.currentTarget.style.background = i === connectedWifi ? c.accentSoft : "transparent"; }}>
+                        <I d={ic.wifi} s={14} c={i === connectedWifi ? c.accentText : c.textMuted} />
+                        <div className="flex-1">
+                          <p className="text-[11px] font-medium" style={{ color: c.text }}>{net}</p>
+                          {i === connectedWifi && <p className="text-[9px]" style={{ color: c.accentText }}>Connected · 5GHz</p>}
+                        </div>
+                        {i === connectedWifi && <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: c.accentSoft, color: c.accentText }}>✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="px-4 py-2" style={{ borderTop: `1px solid ${c.border}` }}>
+                    <button onClick={() => { openWin("settings"); setShowWifiPanel(false); }}
+                      className="w-full text-center text-[10px] py-1.5 rounded-lg transition-colors" style={{ color: c.accentText }}
+                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      Network Settings
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
             <button onClick={() => setMode(mode === "dark" ? "light" : "dark")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
               <I d={mode === "dark" ? ic.sun : ic.moon} s={13} />
             </button>
             {/* Separator */}
             <div className="w-px h-4 mx-1" style={{ background: c.border }} />
-            <button onClick={() => setIsLocked(true)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
-              <I d={ic.user} s={13} />
-            </button>
+            <div className="relative">
+              <button onClick={() => { setShowProfilePanel(!showProfilePanel); setShowWifiPanel(false); }} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
+                <I d={ic.user} s={13} />
+              </button>
+              {/* Profile Panel */}
+              {showProfilePanel && (
+                <div className="absolute top-full right-0 mt-2 w-[240px] rounded-xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 32px rgba(0,0,0,0.3)", zIndex: 999 }}
+                  onClick={e => e.stopPropagation()}>
+                  {/* User info */}
+                  <div className="flex items-center gap-3 px-4 py-4" style={{ borderBottom: `1px solid ${c.border}` }}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: c.accentSoft, color: c.accentText }}>
+                      <I d={ic.user} s={20} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold" style={{ color: c.text }}>Admin</p>
+                      <p className="text-[10px]" style={{ color: c.textMuted }}>admin@alternus.art</p>
+                    </div>
+                  </div>
+                  {/* Actions */}
+                  <div className="py-1">
+                    {[
+                      { icon: ic.user, label: "My Profile", action: () => { openWin("settings"); setShowProfilePanel(false); } },
+                      { icon: ic.settings, label: "Settings", action: () => { openWin("settings"); setShowProfilePanel(false); } },
+                      { icon: mode === "dark" ? ic.sun : ic.moon, label: mode === "dark" ? "Light Mode" : "Dark Mode", action: () => { setMode(mode === "dark" ? "light" : "dark"); } },
+                      { icon: ic.shield, label: "Privacy & Security", action: () => { openWin("settings"); setShowProfilePanel(false); } },
+                    ].map((item, i) => (
+                      <button key={i} onClick={item.action}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-left transition-colors"
+                        onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                        <I d={item.icon} s={14} c={c.textMuted} />
+                        <span className="text-[11px]" style={{ color: c.text }}>{item.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  {/* Lock & Power */}
+                  <div className="flex gap-1 px-3 py-2" style={{ borderTop: `1px solid ${c.border}` }}>
+                    <button onClick={() => { setIsLocked(true); setShowProfilePanel(false); }}
+                      className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-[10px] font-medium transition-colors"
+                      style={{ background: c.cardAlt, color: c.text }}
+                      onMouseEnter={e => (e.currentTarget.style.background = c.border)}
+                      onMouseLeave={e => (e.currentTarget.style.background = c.cardAlt)}>
+                      <I d={ic.lock} s={12} c={c.textMuted} /> Lock
+                    </button>
+                    <button onClick={() => { setIsBooting(true); setIsLocked(true); setShowProfilePanel(false); }}
+                      className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-[10px] font-medium transition-colors"
+                      style={{ background: c.cardAlt, color: c.danger }}
+                      onMouseEnter={e => (e.currentTarget.style.background = c.border)}
+                      onMouseLeave={e => (e.currentTarget.style.background = c.cardAlt)}>
+                      <I d={ic.power} s={12} c={c.danger} /> Restart
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
             <button onClick={() => { setIsBooting(true); setIsLocked(true); }} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
               <I d={ic.power} s={13} />
             </button>
@@ -2098,7 +2191,7 @@ export default function AlternusOS() {
       </div>
 
       {/* Desktop Area - fixed, no scroll */}
-      <div className="flex-1 relative overflow-hidden" onClick={() => { if (showApps) setShowApps(false); }}>
+      <div className="flex-1 relative overflow-hidden" onClick={() => { if (showApps) setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); }}>
         {/* Apps button - top center, always visible */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center" onClick={e => e.stopPropagation()}>
             <button
