@@ -1951,9 +1951,9 @@ export default function AlternusOS() {
     const visibleLines = Object.entries(bootMessages).slice(0, phaseIdx + 1).flatMap(([, msgs]) => msgs);
 
     return (
-      <div className="fixed inset-0 flex flex-col overflow-hidden" style={{ background: "#0a0a0a" }}>
-        {/* Terminal-style boot log at top */}
-        <div className="flex-1 p-6 overflow-hidden font-mono text-[11px] leading-5" style={{ color: "#4ade80" }}>
+      <div className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden" style={{ background: "#0a0a0a" }}>
+        {/* Terminal-style boot log - hidden, runs in background */}
+        <div className="absolute top-0 left-0 right-0 p-6 overflow-hidden font-mono text-[11px] leading-5 opacity-0 pointer-events-none" style={{ color: "#4ade80" }}>
           {visibleLines.map((line, i) => (
             <p key={i} style={{ opacity: i === visibleLines.length - 1 ? 0.7 : 1 }}>
               {line.includes("OK") || line === "Ready" ? (
@@ -1966,8 +1966,8 @@ export default function AlternusOS() {
           {bootPhase !== "done" && <span className="inline-block w-2 h-4 ml-1 animate-pulse" style={{ background: "#4ade80" }} />}
         </div>
 
-        {/* Bottom: Logo + Progress */}
-        <div className="flex flex-col items-center pb-12">
+        {/* Center: Logo + Progress */}
+        <div className="flex flex-col items-center">
           <h1
             className="text-5xl font-semibold mb-6 select-none bg-clip-text"
             style={{
@@ -2098,9 +2098,9 @@ export default function AlternusOS() {
       </div>
 
       {/* Desktop Area - fixed, no scroll */}
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 relative overflow-hidden" onClick={() => { if (showApps) setShowApps(false); }}>
         {/* Apps button - top center, always visible */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center" onClick={e => e.stopPropagation()}>
             <button
               onClick={() => setShowApps(!showApps)}
               className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
