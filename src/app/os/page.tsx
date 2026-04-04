@@ -1815,6 +1815,12 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
             onKeyDown={e => { if (e.key === "Enter") navigate(displayUrl); }}
           />
         </div>
+        <button className="px-3 py-1.5 rounded-lg text-[9px] font-semibold whitespace-nowrap flex items-center gap-1.5 transition-all flex-shrink-0"
+          style={{ background: c.accent + "15", color: c.accentText, border: `1px solid ${c.accent}30` }}
+          onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.color = "#fff"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = c.accent + "15"; e.currentTarget.style.color = c.accentText; }}>
+          <I d={ic.sparkle} s={10} /> Try AI
+        </button>
       </div>
 
       {/* Bookmarks */}
@@ -2084,8 +2090,13 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
               <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "#3B82F6" }}>
                 <I d={ic.sparkle} s={10} c="#fff" />
               </div>
-              <span className="text-[10px] font-bold" style={{ color: "#ccc" }}>AI Copilot</span>
-              <span className="text-[8px] px-1.5 py-0.5 rounded-full ml-auto" style={{ background: "#3A3A4210", color: "#7A7A85" }}>Active</span>
+              <span className="text-[10px] font-bold flex-1" style={{ color: "#ccc" }}>AI Copilot</span>
+              <button title="Voice" className="w-5 h-5 rounded-full flex items-center justify-center transition-colors"
+                style={{ color: "#666" }}
+                onMouseEnter={e => { e.currentTarget.style.color = "#60a5fa"; }}
+                onMouseLeave={e => { e.currentTarget.style.color = "#666"; }}>
+                <I d={ic.voice} s={11} />
+              </button>
             </div>
             <div className="flex-1 overflow-y-auto px-2 py-2 space-y-2" style={{ scrollbarWidth: "none" }}>
               {aiMsgs.map((m, i) => (
@@ -3781,13 +3792,16 @@ export default function AlternusOS() {
 
         {/* ━━━━ AI Suggestion Bar ━━━━ */}
         {aiSuggestion && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[150] flex items-center gap-3 px-5 py-3 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.accent}`, boxShadow: `0 4px 24px rgba(59,130,246,0.2)` }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: c.accentSoft }}><I d={ic.sparkle} s={16} c={c.accentText} /></div>
-            <p className="text-xs" style={{ color: c.text }}>{aiSuggestion.message}</p>
-            <div className="flex gap-2 ml-2">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[150] flex items-center gap-4 px-5 py-3 rounded-2xl max-w-[90%]"
+            style={{ background: c.surface, border: `1px solid ${c.accent}40`, boxShadow: `0 0 20px ${c.accent}15, 0 4px 16px rgba(0,0,0,0.12)` }}>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: c.accent }}>
+              <I d={ic.sparkle} s={14} c="#fff" />
+            </div>
+            <p className="text-[11px] flex-1" style={{ color: c.text }}>{aiSuggestion.message}</p>
+            <div className="flex items-center gap-2 flex-shrink-0">
               {aiSuggestion.actions.map((a, i) => (
-                <button key={i} onClick={a.action} className="px-3 py-1 rounded-lg text-[10px] font-medium whitespace-nowrap"
-                  style={{ background: i === 0 ? c.accent : c.cardAlt, color: i === 0 ? "#fff" : c.text }}>{a.label}</button>
+                <button key={i} onClick={a.action} className="px-3.5 py-1.5 rounded-lg text-[10px] font-semibold whitespace-nowrap transition-all hover:opacity-90"
+                  style={{ background: i === 0 ? c.accent : c.cardAlt, color: i === 0 ? "#fff" : c.textSec, border: i > 0 ? `1px solid ${c.border}` : "none" }}>{a.label}</button>
               ))}
             </div>
           </div>
