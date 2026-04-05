@@ -1051,7 +1051,7 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
             <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Accent Color</p>
             <div className="flex gap-2 px-1">
               {["#3B82F6", "#8B5CF6", "#10B981", "#F59E0B", "#EF4444", "#EC4899"].map(col => (
-                <div key={col} className="w-8 h-8 rounded-full cursor-pointer transition-transform hover:scale-110" style={{ background: col, border: col === c.accent ? "3px solid " + c.text : "3px solid transparent" }} />
+                <div key={col} className="w-8 h-8 rounded-full cursor-pointer transition-transform" style={{ background: col, border: col === c.accent ? "3px solid " + c.text : "3px solid transparent" }} />
               ))}
             </div>
             <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Wallpaper</p>
@@ -1064,7 +1064,7 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
                 { bg: "", img: "/wallpapers/OSwp4.png", label: "Emerald" },
               ].map((wp, i) => (
                 <div key={i} onClick={() => setWallpaper(i)}
-                  className="h-16 rounded-xl cursor-pointer transition-all hover:scale-105 relative overflow-hidden"
+                  className="h-16 rounded-xl cursor-pointer transition-all relative overflow-hidden"
                   style={{ background: wp.img ? `url('${wp.img}') center/cover no-repeat` : wp.bg, border: wallpaper === i ? `2px solid ${c.accent}` : `2px solid transparent`, boxShadow: wallpaper === i ? `0 0 8px ${c.accent}40` : "none" }}>
                   <span className="absolute bottom-1 left-2 text-[7px] font-semibold" style={{ color: i === 0 ? c.textMuted : "rgba(255,255,255,0.6)" }}>{wp.label}</span>
                 </div>
@@ -1233,7 +1233,7 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
           <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: c.textMuted }}>Settings</p>
           <div className="flex items-center gap-1">
             <button title="AI Assistant" onClick={() => setShowAIPanel(!showAIPanel)}
-              className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105"
+              className="w-6 h-6 rounded-full flex items-center justify-center transition-all"
               style={{ background: "#3B82F6", boxShadow: showAIPanel ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
               <I d={ic.sparkle} s={10} c="#fff" />
             </button>
@@ -1382,7 +1382,7 @@ function WordApp({ c }: { c: typeof palette.dark }) {
         <ToolBtn icon={ic.upload} label="Export" />
         <div className="w-px h-5 mx-1" style={{ background: c.border }} />
         <button title="AI Assistant" onClick={() => setShowAI(!showAI)}
-          className="w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+          className="w-7 h-7 rounded-full flex items-center justify-center transition-all"
           style={{ background: "#3B82F6", boxShadow: showAI ? "0 0 12px rgba(139,92,246,0.5)" : "0 0 6px rgba(139,92,246,0.25)" }}>
           <I d={ic.sparkle} s={12} c="#fff" />
         </button>
@@ -1693,14 +1693,14 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
           {/* AI classify button */}
           <button
             onClick={() => setShowAIPanel(!showAIPanel)}
-            className="w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 flex-shrink-0"
+            className="w-7 h-7 rounded-full flex items-center justify-center transition-all flex-shrink-0"
             style={{ background: "#3B82F6", boxShadow: showAIPanel ? "0 0 10px rgba(139,92,246,0.4)" : "0 0 6px rgba(139,92,246,0.25)" }}
             title="AI File Manager"
           >
             <I d={ic.sparkle} s={12} c="#fff" />
           </button>
           {/* Voice */}
-          <button title="Voice Command" className="p-1.5 rounded-lg transition-all hover:scale-105 active:scale-95 flex-shrink-0"
+          <button title="Voice Command" className="p-1.5 rounded-lg transition-all flex-shrink-0"
             style={{ color: c.textMuted }}
             onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.accentText; }}
             onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
@@ -2059,7 +2059,7 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
           <SideIcon icon={ic.terminal} label="Terminal" active={showTerminal} onClick={() => setShowTerminal(!showTerminal)} />
           <div className="flex-1" />
           <button title="AI Copilot" onClick={() => setShowAI(!showAI)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-105"
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
             style={{ background: showAI ? "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" : "transparent", boxShadow: showAI ? "0 0 8px rgba(139,92,246,0.3)" : "none" }}>
             <I d={ic.sparkle} s={14} c={showAI ? "#fff" : "#555"} />
           </button>
@@ -2323,7 +2323,7 @@ function ClockApp({ c }: { c: typeof palette.dark }) {
             style={{ color: tab === t ? c.text : c.textMuted, background: tab === t ? c.cardAlt : "transparent" }}>{t}</button>
         ))}
         <button title="AI" onClick={() => setShowAIPanel(!showAIPanel)}
-          className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105 ml-1 flex-shrink-0"
+          className="w-6 h-6 rounded-full flex items-center justify-center transition-all ml-1 flex-shrink-0"
           style={{ background: "#3B82F6", boxShadow: showAIPanel ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
           <I d={ic.sparkle} s={9} c="#fff" />
         </button>
@@ -2429,7 +2429,7 @@ function CalculatorApp({ c }: { c: typeof palette.dark }) {
 
   const Btn = ({ label, wide, type, onClick }: { label: string; wide?: boolean; type?: "op" | "fn" | "eq"; onClick: () => void }) => (
     <button onClick={onClick}
-      className={`${wide ? "col-span-2" : ""} rounded-2xl text-sm font-semibold transition-all active:scale-95`}
+      className={`${wide ? "col-span-2" : ""} rounded-2xl text-sm font-semibold transition-all`}
       style={{
         height: 48,
         background: type === "op" ? c.accent : type === "eq" ? c.accent : type === "fn" ? c.cardAlt : c.surface,
@@ -2612,7 +2612,7 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
         ))}
         <div className="flex items-center gap-1 ml-auto">
           <button title="AI Assistant" onClick={() => setShowAIPanel(!showAIPanel)}
-            className="w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-105"
+            className="w-6 h-6 rounded-full flex items-center justify-center transition-all"
             style={{ background: "#3B82F6" }}>
             <I d={ic.sparkle} s={10} c="#fff" />
           </button>
@@ -2835,7 +2835,7 @@ export default function AlternusOS() {
   const c = palette[mode];
 
   const defaultWins: WinState[] = [
-    { id: "ai", title: "Alternus AI", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 0, y: 0, w: 360, h: 800 },
+    { id: "ai", title: "Notes", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 0, y: 0, w: 360, h: 800 },
     { id: "terminal", title: "Terminal", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 80, w: 460, h: 340 },
     { id: "code", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 520, h: 400 },
     { id: "files", title: "Files", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 240, y: 70, w: 520, h: 400 },
@@ -2938,7 +2938,7 @@ export default function AlternusOS() {
     const sh = typeof window !== "undefined" ? window.innerHeight - 40 : 700;
     // Per-app ideal sizes
     const sizes: Record<WinId, { w: number; h: number }> = {
-      ai: { w: 380, h: sh },
+      ai: { w: 480, h: 400 },
       terminal: { w: 620, h: 400 },
       code: { w: 900, h: 560 },
       files: { w: 640, h: 460 },
@@ -2960,9 +2960,9 @@ export default function AlternusOS() {
       if (w.id === id) {
         if (!w.isOpen) {
           const s = sizes[id];
-          // Fixed positions: AI snaps left, Weather top-right, Calendar top-right below weather, others center
-          const x = id === "ai" ? 0 : id === "weather" ? sw - s.w - 10 : id === "calendar" ? sw - s.w - 10 : Math.max(0, Math.floor((sw - s.w) / 2));
-          const y = id === "ai" ? 0 : id === "weather" ? 10 : id === "calendar" ? 10 : Math.max(0, Math.floor((sh - s.h) / 2));
+          // Fixed positions: Weather top-right, Calendar top-right, others center
+          const x = id === "weather" ? sw - s.w - 10 : id === "calendar" ? sw - s.w - 10 : Math.max(0, Math.floor((sw - s.w) / 2));
+          const y = id === "weather" ? 10 : id === "calendar" ? 10 : Math.max(0, Math.floor((sh - s.h) / 2));
           return { ...w, isOpen: true, isMinimized: false, zIndex: zCounter + 1, x, y, w: s.w, h: s.h };
         }
         if (w.isMinimized) return { ...w, isMinimized: false, zIndex: zCounter + 1 };
@@ -3249,7 +3249,7 @@ export default function AlternusOS() {
   };
 
   const winContent: Record<WinId, React.ReactNode> = {
-    ai: <AIPanel c={c} context="Alternus AI" />,
+    ai: <NotesApp c={c} />,
     terminal: <TerminalApp c={c} />,
     code: <CodeApp c={c} />,
     files: <FilesApp c={c} onOpenApp={openWin} />,
@@ -3291,8 +3291,8 @@ export default function AlternusOS() {
       const renderAppRow = (app: typeof allApps[0]) => (
         <div key={app.name} className="flex items-center gap-3 p-2.5 rounded-2xl transition-all cursor-pointer"
           style={{ background: c.cardAlt }}
-          onMouseEnter={e => { e.currentTarget.style.background = c.border; e.currentTarget.style.transform = "scale(1.01)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.transform = "scale(1)"; }}>
+          onMouseEnter={e => { e.currentTarget.style.background = c.border; }}
+          onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; }}>
           <div className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: app.iconBg + "18", border: `1px solid ${app.iconBg}25` }}>
             <I d={app.icon} s={20} c={app.iconBg} />
           </div>
@@ -3427,8 +3427,7 @@ export default function AlternusOS() {
       const movieCard = (m: typeof trending[0], size: "sm" | "lg" = "sm") => (
         <div key={m.name} className="rounded-2xl overflow-hidden cursor-pointer transition-all group"
           style={{ background: c.cardAlt }}
-          onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.02)"; e.currentTarget.style.boxShadow = `0 4px 20px ${m.color}20`; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "none"; }}>
+>
           {/* Poster */}
           <div className={size === "lg" ? "h-24" : "h-20"} style={{ background: `linear-gradient(135deg, ${m.color}30, ${m.color}10)`, position: "relative" }}>
             <div className="absolute inset-0 flex items-center justify-center">
@@ -3650,7 +3649,7 @@ export default function AlternusOS() {
             {/* Open Desktop button */}
             <button
               onClick={() => { setIsLocked(false); }}
-              className="flex items-center gap-2.5 px-8 py-3 rounded-2xl text-sm font-medium whitespace-nowrap transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer mb-3"
+              className="flex items-center gap-2.5 px-8 py-3 rounded-2xl text-sm font-medium whitespace-nowrap transition-all cursor-pointer mb-3"
               style={{ background: c.accent, color: "#fff" }}
               onMouseEnter={e => { e.currentTarget.style.background = "#2563EB"; }}
               onMouseLeave={e => { e.currentTarget.style.background = c.accent; }}
@@ -3820,7 +3819,7 @@ export default function AlternusOS() {
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center" onClick={e => e.stopPropagation()}>
             <button
               onClick={() => setShowApps(!showApps)}
-              className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
               style={{
                 background: showApps ? c.accent : c.surface,
                 border: `1px solid ${showApps ? c.accent : c.border}`,
@@ -3864,7 +3863,7 @@ export default function AlternusOS() {
                   <button
                     key={app.id}
                     onClick={() => { openWinWithAI(app.id); setShowApps(false); }}
-                    className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+                    className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all"
                     style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}
                     onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; }}
                     onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.borderColor = c.border; }}
@@ -3921,7 +3920,7 @@ export default function AlternusOS() {
               />
               <button
                 onClick={() => aiInput.trim() && handleDesktopSearch()}
-                className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90 active:scale-95"
+                className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90"
                 style={{ background: c.accent }}
               >
                 <I d={ic.send} s={16} c="#fff" />
@@ -3942,7 +3941,7 @@ export default function AlternusOS() {
                 {/* Copy button */}
                 <button
                   onClick={() => { navigator.clipboard.writeText(aiResponse); }}
-                  className="absolute top-2.5 right-2.5 p-1.5 rounded-lg transition-all hover:scale-105 active:scale-95"
+                  className="absolute top-2.5 right-2.5 p-1.5 rounded-lg transition-all"
                   style={{ background: c.cardAlt, color: c.textMuted }}
                   title="Copy"
                 >
@@ -4209,7 +4208,7 @@ export default function AlternusOS() {
 
         {/* ━━━━ AI Notification Sidebar ━━━━ */}
         <div
-          className="absolute top-0 right-0 h-full z-[100] transition-transform duration-300 ease-in-out"
+          className="absolute top-0 right-0 h-full z-[100] transition-colorsduration-300 ease-in-out"
           style={{
             width: 340,
             transform: showNotifications ? "translateX(0)" : "translateX(100%)",
@@ -4272,8 +4271,8 @@ export default function AlternusOS() {
             ].map((n, i) => (
               <div key={`app-${i}`} className="flex items-start gap-3 p-3 rounded-2xl transition-all cursor-pointer"
                 style={{ background: c.cardAlt }}
-                onMouseEnter={e => { e.currentTarget.style.background = c.border; e.currentTarget.style.transform = "scale(1.01)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.transform = "scale(1)"; }}>
+                onMouseEnter={e => { e.currentTarget.style.background = c.border; }}
+                onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; }}>
                 <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: n.color + "20" }}>
                   <span className="text-xs font-bold" style={{ color: n.color }}>{n.initials}</span>
                 </div>
