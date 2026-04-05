@@ -190,7 +190,6 @@ const ic = {
   menu: "M3 12h18M3 6h18M3 18h18",
   trash: "M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6",
   voice: "M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8",
-  heart: "M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z",
   // Filled icon variants
   globeF: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z",
   codeF: "M16 18l6-6-6-6M8 6l-6 6 6 6",
@@ -3404,7 +3403,7 @@ export default function AlternusOS() {
         { icon: ic.film, label: "Movies" },
         { icon: ic.monitor, label: "Series" },
         { icon: ic.sparkle, label: "New" },
-        { icon: ic.heart, label: "Watchlist" },
+        { icon: ic.sparkle, label: "Watchlist" },
       ];
       const featured = { name: "The Last Algorithm", genre: "Sci-Fi", year: "2025", rating: "9.2", desc: "In a world run by AI, one programmer discovers the code that controls reality.", color: "#6366F1" };
       const trending = [
