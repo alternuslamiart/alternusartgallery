@@ -4504,14 +4504,6 @@ export default function AlternusOS() {
                 }}
               />
               <button
-                onClick={() => setShowAiChat(true)}
-                className="p-2.5 rounded-xl transition-colors hover:opacity-80"
-                style={{ background: c.cardAlt }}
-                title="Open AI Chat"
-              >
-                <I d={ic.sparkle} s={16} c={c.accent} />
-              </button>
-              <button
                 onClick={() => aiInput.trim() && handleDesktopSearch()}
                 className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90"
                 style={{ background: c.accent }}
