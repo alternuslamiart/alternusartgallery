@@ -499,18 +499,19 @@ function AIPanel({ c, context, onAction }: { c: typeof palette.dark; context: st
 
 // ━━━━ App Contents ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function AIChat({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp?: (id: WinId) => void }) {
+function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; onOpenApp?: (id: WinId) => void }) {
   const [input, setInput] = useState("");
   const [msgs, setMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([
     { role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant. Ask me to create apps, write code, or design anything." },
   ]);
+  const [showAccount, setShowAccount] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
 
-  const send = () => {
-    if (!input.trim()) return;
-    const m = input.trim();
+  const send = (text?: string) => {
+    const m = (text || input).trim();
+    if (!m) return;
     setInput("");
     setMsgs(p => [...p, { role: "user", text: m }]);
     setTimeout(() => {
@@ -519,6 +520,9 @@ function AIChat({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp?: (id: Win
       if (l.includes("create") || l.includes("build")) r = "I can build that. Let me generate the code. Which framework: React, Python, or something else?";
       else if (l.includes("code") || l.includes("function")) r = "Here's an approach:\n\n```js\nfunction solve(data) {\n  return data.map(process);\n}\n```\n\nShall I expand this?";
       else if (l.includes("hello") || l.includes("hi")) r = "Hello! I'm Alternus AI. What would you like to build today?";
+      else if (l.includes("description")) r = "Sure! Please provide details about what you'd like me to describe — a product, a project, an image, or something else.";
+      else if (l.includes("email")) r = "I'll draft an email for you. Who is the recipient and what's the subject?";
+      else if (l.includes("quantum")) r = "Quantum computing uses qubits that can exist in superposition (both 0 and 1 simultaneously). This enables parallel processing of vast possibilities. Key concepts:\n\n• Superposition — qubits in multiple states at once\n• Entanglement — linked qubits affect each other instantly\n• Quantum gates — operations on qubits\n• Decoherence — loss of quantum state\n\nQuantum computers excel at optimization, cryptography, and simulation problems.";
       else if (l.includes("illustrat") || l.includes("draw") || l.includes("design") || l.includes("sketch")) r = "I can help with design! Describe what you'd like to create and I'll generate a concept or open the design tools.";
       else if (l.includes("video") || l.includes("edit video") || l.includes("clip")) r = "I can help with video editing. Describe the video you want to create or edit.";
       else if (l.includes("image") || l.includes("photo") || l.includes("picture")) r = "I can help with images. Describe the image you want or I can edit an existing one.";
@@ -529,45 +533,112 @@ function AIChat({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp?: (id: Win
     }, 600);
   };
 
-  const sideTools = [
-    { icon: ic.settings, label: "Settings", action: "settings" as WinId },
-    { icon: ic.user, label: "Profile", action: "settings" as WinId },
-    { icon: ic.pen, label: "Illustrate", action: null },
-    { icon: ic.film, label: "Video", action: null },
-    { icon: ic.image, label: "Image", action: null },
+  const newChat = () => {
+    setMsgs([{ role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant. Ask me to create apps, write code, or design anything." }]);
+    setInput("");
+  };
+
+  const suggestions = [
+    "Create a description",
+    "Write an email",
+    "Explain quantum computing",
   ];
 
   return (
     <div className="flex h-full">
-      {/* Sidebar tools */}
-      <div className="w-[40px] flex-shrink-0 flex flex-col items-center py-2 gap-0.5" style={{ borderRight: `1px solid ${c.border}` }}>
-        {sideTools.map((tool, i) => (
-          <button key={i} onClick={() => {
-            if (tool.action && onOpenApp) onOpenApp(tool.action);
-            else { setMsgs(p => [...p, { role: "user", text: tool.label }, { role: "ai", text: `${tool.label} mode activated. Describe what you'd like to create.` }]); }
-          }}
-            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
-            style={{ color: c.textMuted }}
-            title={tool.label}
-            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.accentText; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-            <I d={tool.icon} s={14} />
+      {/* Sidebar */}
+      <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ borderRight: `1px solid ${c.border}`, background: c.bg }}>
+        {/* Brand */}
+        <div className="px-4 pt-4 pb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold" style={{ color: c.accent }}>ALTERNUS</span>
+            <span className="text-xs" style={{ color: c.textMuted }}>OS</span>
+          </div>
+        </div>
+
+        {/* New chat button */}
+        <div className="px-3 py-2">
+          <button onClick={newChat} className="w-full py-2.5 rounded-xl text-sm font-medium" style={{ background: c.accent, color: "#fff" }}>
+            + New chat
           </button>
-        ))}
+        </div>
+
+        {/* Suggestions */}
+        <div className="px-3 py-2 space-y-1">
+          {suggestions.map((s, i) => (
+            <button key={i} onClick={() => send(s)}
+              className="w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors"
+              style={{ color: c.text }}
+              onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+              {s}
+            </button>
+          ))}
+        </div>
+
         <div className="flex-1" />
-        {/* Search web button */}
-        <button onClick={() => { if (onOpenApp) onOpenApp("browser"); }}
-          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
-          style={{ background: c.accentSoft, color: c.accentText }}
-          title="Search Web"
-          onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.color = "#fff"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = c.accentSoft; e.currentTarget.style.color = c.accentText; }}>
-          <I d={ic.globe} s={14} />
-        </button>
+
+        {/* Bottom actions */}
+        <div className="px-3 pb-4 space-y-1">
+          {/* Light/Dark mode toggle */}
+          <button onClick={() => setMode(mode === "dark" ? "light" : "dark")}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+            style={{ color: c.textSec }}
+            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+            <I d={mode === "dark" ? ic.sun : ic.moon} s={16} c={c.textSec} />
+            {mode === "dark" ? "Light mode" : "Dark mode"}
+          </button>
+
+          {/* My account */}
+          <button onClick={() => setShowAccount(!showAccount)}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+            style={{ color: c.textSec }}
+            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+            <I d={ic.user} s={16} c={c.textSec} />
+            My account
+          </button>
+
+          {/* Settings */}
+          <button onClick={() => { if (onOpenApp) onOpenApp("settings"); }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+            style={{ color: c.textSec }}
+            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+            <I d={ic.settings} s={16} c={c.textSec} />
+            Settings
+          </button>
+        </div>
       </div>
 
       {/* Chat area */}
       <div className="flex-1 flex flex-col">
+        {/* Account panel (toggleable) */}
+        {showAccount && (
+          <div className="p-4 space-y-3" style={{ borderBottom: `1px solid ${c.border}`, background: c.cardAlt }}>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: c.accent }}>
+                <I d={ic.user} s={20} c="#fff" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold" style={{ color: c.text }}>Alternus User</p>
+                <p className="text-xs" style={{ color: c.textMuted }}>user@alternusos.com</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="p-3 rounded-xl" style={{ background: c.bg }}>
+                <p className="text-[10px]" style={{ color: c.textMuted }}>Plan</p>
+                <p className="text-xs font-semibold" style={{ color: c.text }}>Pro</p>
+              </div>
+              <div className="p-3 rounded-xl" style={{ background: c.bg }}>
+                <p className="text-[10px]" style={{ color: c.textMuted }}>Messages</p>
+                <p className="text-xs font-semibold" style={{ color: c.text }}>∞ Unlimited</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
           {msgs.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -592,7 +663,6 @@ function AIChat({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp?: (id: Win
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && send()}
             />
-            {/* Attach file */}
             <button onClick={() => { if (onOpenApp) onOpenApp("files"); }}
               className="p-1.5 rounded-lg transition-all"
               style={{ color: c.textMuted }}
@@ -601,7 +671,7 @@ function AIChat({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp?: (id: Win
               onMouseLeave={e => (e.currentTarget.style.color = c.textMuted)}>
               <I d={ic.fileText} s={14} />
             </button>
-            <button onClick={send} className="p-1.5 rounded-lg" style={{ background: c.accent }}>
+            <button onClick={() => send()} className="p-1.5 rounded-lg" style={{ background: c.accent }}>
               <I d={ic.send} s={14} c="#fff" />
             </button>
           </div>
@@ -877,20 +947,20 @@ function WeatherApp({ c }: { c: typeof palette.dark }) {
       </div>
 
       {/* Add city bar */}
-      <div className="flex items-center gap-2 rounded-2xl px-4 py-3" style={{ background: c.cardAlt }}>
+      <div className="flex items-center gap-2 rounded-2xl px-4 py-3" style={{ background: "linear-gradient(135deg, #7c6bc4 0%, #8b7fd4 50%, #6e8ad4 100%)" }}>
         <input
           type="text"
           placeholder="Add city for weather"
           value={cityInput}
           onChange={e => setCityInput(e.target.value)}
           className="flex-1 bg-transparent outline-none text-sm"
-          style={{ color: c.text }}
+          style={{ color: "#fff" }}
         />
-        <button className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: c.purpleSoft }}>
-          <I d={ic.type} s={16} c={c.purple} />
+        <button className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.2)" }}>
+          <I d={ic.type} s={16} c="#fff" />
         </button>
-        <button className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: c.purpleSoft }}>
-          <I d={ic.menu} s={16} c={c.purple} />
+        <button className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.2)" }}>
+          <I d={ic.menu} s={16} c="#fff" />
         </button>
       </div>
     </div>
@@ -2887,13 +2957,13 @@ export default function AlternusOS() {
   const c = palette[mode];
 
   const defaultWins: WinState[] = [
-    { id: "ai", title: "Notes", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 0, y: 0, w: 360, h: 800 },
+    { id: "ai", title: "Alternus AI", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 0, y: 0, w: 660, h: 500 },
     { id: "terminal", title: "Terminal", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 80, w: 460, h: 340 },
     { id: "code", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 520, h: 400 },
     { id: "files", title: "Files", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 240, y: 70, w: 520, h: 400 },
     { id: "settings", title: "Settings", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 180, y: 60, w: 500, h: 380 },
     { id: "music", title: "Music", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 80, w: 340, h: 360 },
-    { id: "weather", title: "Weather", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 350, y: 70, w: 340, h: 360 },
+    { id: "weather", title: "Weather", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 350, y: 70, w: 360, h: 430 },
     { id: "calendar", title: "Calendar", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 380, y: 90, w: 320, h: 340 },
     { id: "notes", title: "Notes", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 80, w: 400, h: 340 },
     { id: "browser", title: "Browser", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 540, h: 400 },
@@ -3310,7 +3380,7 @@ export default function AlternusOS() {
   };
 
   const winContent: Record<WinId, React.ReactNode> = {
-    ai: <NotesApp c={c} />,
+    ai: <AIChat c={c} mode={mode} setMode={setMode} onOpenApp={openWin} />,
     terminal: <TerminalApp c={c} />,
     code: <CodeApp c={c} />,
     files: <FilesApp c={c} onOpenApp={openWin} />,
