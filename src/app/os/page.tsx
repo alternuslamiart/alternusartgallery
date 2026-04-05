@@ -499,15 +499,50 @@ function AIPanel({ c, context, onAction }: { c: typeof palette.dark; context: st
 
 // ━━━━ App Contents ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+type FileType = "video" | "photo" | "document" | "folder" | "word" | "excel" | "figma" | null;
+type FileDestination = "VideoFile" | "PhotoFile" | "Document" | "Folder" | "Word" | "Excel" | "Figma.file";
+
+interface ChatMsg {
+  role: "user" | "ai";
+  text: string;
+  fileType?: FileType;
+  fileName?: string;
+  routed?: FileDestination | null;
+}
+
+const fileRouteButtons: { type: FileType; emoji: string; label: string; dest: FileDestination; color: string }[] = [
+  { type: "video", emoji: "\uD83C\uDFA5", label: "D\u00EBrgo te VideoFile", dest: "VideoFile", color: "#EF4444" },
+  { type: "photo", emoji: "\uD83D\uDCF8", label: "D\u00EBrgo te PhotoFile", dest: "PhotoFile", color: "#8B5CF6" },
+  { type: "document", emoji: "\uD83D\uDCC4", label: "D\u00EBrgo te Document", dest: "Document", color: "#3B82F6" },
+  { type: "folder", emoji: "\uD83D\uDCC1", label: "D\u00EBrgo te Folder", dest: "Folder", color: "#F59E0B" },
+  { type: "word", emoji: "\uD83D\uDCDD", label: "D\u00EBrgo te Word/DOCX", dest: "Word", color: "#2563EB" },
+  { type: "excel", emoji: "\uD83D\uDCCA", label: "D\u00EBrgo te Excel", dest: "Excel", color: "#10B981" },
+  { type: "figma", emoji: "\uD83C\uDFA8", label: "D\u00EBrgo te Figma.file", dest: "Figma.file", color: "#EC4899" },
+];
+
 function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; onOpenApp?: (id: WinId) => void }) {
   const [input, setInput] = useState("");
-  const [msgs, setMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([
-    { role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant. Ask me to create apps, write code, or design anything." },
+  const [msgs, setMsgs] = useState<ChatMsg[]>([
+    { role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant.\n\nI can generate files for you — videos, photos, documents, Word, Excel, Figma designs, and more. After generating, use the routing buttons to send files to their destination." },
   ]);
   const [showAccount, setShowAccount] = useState(false);
+  const [toast, setToast] = useState<{ text: string; color: string } | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
+
+  const routeFile = (msgIdx: number, dest: FileDestination, color: string) => {
+    setMsgs(p => p.map((m, i) => i === msgIdx ? { ...m, routed: dest } : m));
+    const msg = msgs[msgIdx];
+    setToast({ text: `${msg.fileName || "File"} \u2192 ${dest}`, color });
+  };
+
+  const getButtonsForType = (ft: FileType) => {
+    if (!ft) return fileRouteButtons;
+    const primary = fileRouteButtons.find(b => b.type === ft);
+    return primary ? [primary] : fileRouteButtons;
+  };
 
   const send = (text?: string) => {
     const m = (text || input).trim();
@@ -516,25 +551,98 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
     setMsgs(p => [...p, { role: "user", text: m }]);
     setTimeout(() => {
       let r = "I understand. Let me work on that for you.";
+      let fileType: FileType = null;
+      let fileName = "";
       const l = m.toLowerCase();
-      if (l.includes("create") || l.includes("build")) r = "I can build that. Let me generate the code. Which framework: React, Python, or something else?";
-      else if (l.includes("code") || l.includes("function")) r = "Here's an approach:\n\n```js\nfunction solve(data) {\n  return data.map(process);\n}\n```\n\nShall I expand this?";
-      else if (l.includes("hello") || l.includes("hi")) r = "Hello! I'm Alternus AI. What would you like to build today?";
-      else if (l.includes("description")) r = "Sure! Please provide details about what you'd like me to describe — a product, a project, an image, or something else.";
-      else if (l.includes("email")) r = "I'll draft an email for you. Who is the recipient and what's the subject?";
-      else if (l.includes("quantum")) r = "Quantum computing uses qubits that can exist in superposition (both 0 and 1 simultaneously). This enables parallel processing of vast possibilities. Key concepts:\n\n• Superposition — qubits in multiple states at once\n• Entanglement — linked qubits affect each other instantly\n• Quantum gates — operations on qubits\n• Decoherence — loss of quantum state\n\nQuantum computers excel at optimization, cryptography, and simulation problems.";
-      else if (l.includes("illustrat") || l.includes("draw") || l.includes("design") || l.includes("sketch")) r = "I can help with design! Describe what you'd like to create and I'll generate a concept or open the design tools.";
-      else if (l.includes("video") || l.includes("edit video") || l.includes("clip")) r = "I can help with video editing. Describe the video you want to create or edit.";
-      else if (l.includes("image") || l.includes("photo") || l.includes("picture")) r = "I can help with images. Describe the image you want or I can edit an existing one.";
-      else if (l.includes("search") || l.includes("find") || l.includes("google")) r = "I'll search for that. What exactly would you like to find?";
-      else if (l.includes("classify") || l.includes("organize") || l.includes("sort")) r = "AI Classification complete:\n\n📁 Documents → 12 files\n📁 Media → 8 files\n📁 Code → 6 files\n📁 Archives → 4 files\n\nAll files tagged and sorted.";
-      else if (l.includes("file") || l.includes("document")) r = "I can help manage your files. Want me to classify, find duplicates, or clean up?";
-      setMsgs(p => [...p, { role: "ai", text: r }]);
+
+      // Video generation
+      if (l.includes("video") || l.includes("clip") || l.includes("animation") || l.includes("film")) {
+        fileType = "video";
+        fileName = "AlternusVideo_" + Date.now() + ".mp4";
+        r = `Video generated successfully!\n\n\uD83C\uDFA5 ${fileName}\n\u2022 Resolution: 1920\u00D71080 (Full HD)\n\u2022 Duration: 00:32\n\u2022 Format: MP4 / H.264\n\u2022 Size: 24.6 MB\n\nUse the button below to route this file.`;
+      }
+      // Photo / Image generation
+      else if (l.includes("photo") || l.includes("image") || l.includes("picture") || l.includes("illustration") || l.includes("draw") || l.includes("sketch") || l.includes("screenshot")) {
+        fileType = "photo";
+        fileName = "AlternusImage_" + Date.now() + ".png";
+        r = `Image generated successfully!\n\n\uD83D\uDCF8 ${fileName}\n\u2022 Resolution: 2048\u00D72048\n\u2022 Format: PNG (lossless)\n\u2022 Color space: sRGB\n\u2022 Size: 3.8 MB\n\nUse the button below to route this file.`;
+      }
+      // Figma / UI design
+      else if (l.includes("figma") || l.includes("wireframe") || l.includes("prototype") || l.includes("mockup") || l.includes("ui design") || l.includes("layout design")) {
+        fileType = "figma";
+        fileName = "AlternusDesign_" + Date.now() + ".fig";
+        r = `Figma design file created!\n\n\uD83C\uDFA8 ${fileName}\n\u2022 Pages: 3 (Desktop, Tablet, Mobile)\n\u2022 Components: 24 reusable\n\u2022 Auto-layout: Enabled\n\u2022 Design tokens: Linked\n\nUse the button below to route this file.`;
+      }
+      // Excel / Spreadsheet
+      else if (l.includes("excel") || l.includes("spreadsheet") || l.includes("xlsx") || l.includes("csv") || l.includes("budget") || l.includes("table") || l.includes("chart data")) {
+        fileType = "excel";
+        fileName = "AlternusSheet_" + Date.now() + ".xlsx";
+        r = `Excel spreadsheet generated!\n\n\uD83D\uDCCA ${fileName}\n\u2022 Sheets: 2 (Data, Summary)\n\u2022 Rows: 150 entries\n\u2022 Charts: 3 auto-generated\n\u2022 Formulas: SUM, AVG, VLOOKUP\n\nUse the button below to route this file.`;
+      }
+      // Word / Document writing
+      else if (l.includes("write a") || l.includes("letter") || l.includes("essay") || l.includes("report") || l.includes("article") || l.includes("word") || l.includes("docx")) {
+        fileType = "word";
+        fileName = "AlternusDoc_" + Date.now() + ".docx";
+        r = `Word document created!\n\n\uD83D\uDCDD ${fileName}\n\u2022 Pages: 4\n\u2022 Words: 1,240\n\u2022 Format: DOCX (Office Open XML)\n\u2022 Styles: Heading, Body, Quote\n\nUse the button below to route this file.`;
+      }
+      // Email (also generates as word/doc)
+      else if (l.includes("email")) {
+        fileType = "word";
+        fileName = "Email_Draft_" + Date.now() + ".docx";
+        r = `Email draft generated!\n\n\uD83D\uDCDD ${fileName}\n\u2022 Subject: [Your subject here]\n\u2022 Body: Professional formatted\n\u2022 Format: DOCX\n\u2022 Ready to copy & send\n\nUse the button below to route this file.`;
+      }
+      // Folder creation
+      else if (l.includes("folder") || l.includes("directory") || l.includes("organize files")) {
+        fileType = "folder";
+        fileName = "AlternusFolder_" + Date.now();
+        r = `Folder structure created!\n\n\uD83D\uDCC1 ${fileName}/\n\u2022 Subfolders: 5\n  \u2514 Documents/\n  \u2514 Media/\n  \u2514 Code/\n  \u2514 Assets/\n  \u2514 Archives/\n\nUse the button below to route this folder.`;
+      }
+      // Document / PDF / Contract
+      else if (l.includes("document") || l.includes("pdf") || l.includes("contract") || l.includes("invoice") || l.includes("file")) {
+        fileType = "document";
+        fileName = "AlternusDoc_" + Date.now() + ".pdf";
+        r = `Document generated!\n\n\uD83D\uDCC4 ${fileName}\n\u2022 Pages: 2\n\u2022 Format: PDF\n\u2022 Size: 186 KB\n\u2022 Signed: Ready for signature\n\nUse the button below to route this file.`;
+      }
+      // Description (generates word file)
+      else if (l.includes("description")) {
+        fileType = "word";
+        fileName = "Description_" + Date.now() + ".docx";
+        r = `Description document created!\n\n\uD83D\uDCDD ${fileName}\n\u2022 Content: Professional description\n\u2022 Words: 320\n\u2022 Format: DOCX\n\nUse the button below to route this file.`;
+      }
+      // Code generation (document)
+      else if (l.includes("code") || l.includes("function") || l.includes("create") || l.includes("build")) {
+        fileType = "document";
+        fileName = "AlternusCode_" + Date.now() + ".js";
+        r = `Code file generated!\n\n\uD83D\uDCC4 ${fileName}\n\u2022 Language: JavaScript\n\u2022 Lines: 48\n\u2022 Functions: 3\n\u2022 Dependencies: none\n\n\`\`\`js\nfunction solve(data) {\n  return data.map(process);\n}\n\`\`\`\n\nUse the button below to route this file.`;
+      }
+      // Design (figma)
+      else if (l.includes("design")) {
+        fileType = "figma";
+        fileName = "AlternusDesign_" + Date.now() + ".fig";
+        r = `Design file created!\n\n\uD83C\uDFA8 ${fileName}\n\u2022 Type: UI/UX Design\n\u2022 Artboards: 4\n\u2022 Components: 12\n\nUse the button below to route this file.`;
+      }
+      // General responses without file generation
+      else if (l.includes("hello") || l.includes("hi")) {
+        r = "Hello! I'm Alternus AI. What would you like to create today?\n\nI can generate:\n\u2022 \uD83C\uDFA5 Videos\n\u2022 \uD83D\uDCF8 Photos & Images\n\u2022 \uD83D\uDCDD Word Documents\n\u2022 \uD83D\uDCCA Excel Spreadsheets\n\u2022 \uD83C\uDFA8 Figma Designs\n\u2022 \uD83D\uDCC4 Documents & PDFs\n\u2022 \uD83D\uDCC1 Folder Structures";
+      }
+      else if (l.includes("quantum")) {
+        r = "Quantum computing uses qubits that can exist in superposition (both 0 and 1 simultaneously). This enables parallel processing of vast possibilities. Key concepts:\n\n\u2022 Superposition \u2014 qubits in multiple states at once\n\u2022 Entanglement \u2014 linked qubits affect each other instantly\n\u2022 Quantum gates \u2014 operations on qubits\n\u2022 Decoherence \u2014 loss of quantum state\n\nQuantum computers excel at optimization, cryptography, and simulation problems.";
+      }
+      else if (l.includes("search") || l.includes("find") || l.includes("google")) {
+        r = "I'll search for that. What exactly would you like to find?";
+      }
+      else if (l.includes("classify") || l.includes("organize") || l.includes("sort")) {
+        fileType = "folder";
+        fileName = "Organized_" + Date.now();
+        r = "AI Classification complete!\n\n\uD83D\uDCC1 " + fileName + "/\n\u2022 Documents \u2192 12 files\n\u2022 Media \u2192 8 files\n\u2022 Code \u2192 6 files\n\u2022 Archives \u2192 4 files\n\nAll files tagged and sorted. Use the button below to route.";
+      }
+
+      setMsgs(p => [...p, { role: "ai", text: r, fileType, fileName: fileName || undefined, routed: null }]);
     }, 600);
   };
 
   const newChat = () => {
-    setMsgs([{ role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant. Ask me to create apps, write code, or design anything." }]);
+    setMsgs([{ role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant.\n\nI can generate files for you — videos, photos, documents, Word, Excel, Figma designs, and more. After generating, use the routing buttons to send files to their destination." }]);
     setInput("");
   };
 
@@ -546,6 +654,14 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
 
   return (
     <div className="flex h-full">
+      {/* Toast notification */}
+      {toast && (
+        <div className="absolute top-3 right-3 z-50 flex items-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-medium shadow-lg"
+          style={{ background: toast.color, color: "#fff", animation: "fadeInUp 0.3s ease" }}>
+          <span>{toast.text}</span>
+        </div>
+      )}
+
       {/* Sidebar */}
       <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ borderRight: `1px solid ${c.border}`, background: c.bg }}>
         {/* Brand */}
@@ -613,28 +729,41 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
       </div>
 
       {/* Chat area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col relative">
         {/* Account panel (toggleable) */}
         {showAccount && (
           <div className="p-4 space-y-3" style={{ borderBottom: `1px solid ${c.border}`, background: c.cardAlt }}>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: c.accent }}>
-                <I d={ic.user} s={20} c="#fff" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: c.accent }}>
+                  <I d={ic.user} s={20} c="#fff" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: c.text }}>Alternus User</p>
+                  <p className="text-xs" style={{ color: c.textMuted }}>user@alternusos.com</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold" style={{ color: c.text }}>Alternus User</p>
-                <p className="text-xs" style={{ color: c.textMuted }}>user@alternusos.com</p>
-              </div>
+              <button onClick={() => setShowAccount(false)} className="p-1 rounded-lg" style={{ color: c.textMuted }}>
+                <I d={ic.close} s={14} />
+              </button>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <div className="p-3 rounded-xl" style={{ background: c.bg }}>
                 <p className="text-[10px]" style={{ color: c.textMuted }}>Plan</p>
                 <p className="text-xs font-semibold" style={{ color: c.text }}>Pro</p>
               </div>
               <div className="p-3 rounded-xl" style={{ background: c.bg }}>
                 <p className="text-[10px]" style={{ color: c.textMuted }}>Messages</p>
-                <p className="text-xs font-semibold" style={{ color: c.text }}>∞ Unlimited</p>
+                <p className="text-xs font-semibold" style={{ color: c.text }}>\u221E Unlimited</p>
               </div>
+              <div className="p-3 rounded-xl" style={{ background: c.bg }}>
+                <p className="text-[10px]" style={{ color: c.textMuted }}>Storage</p>
+                <p className="text-xs font-semibold" style={{ color: c.text }}>50 GB</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button className="flex-1 py-2 rounded-xl text-[11px] font-medium" style={{ background: c.accentSoft, color: c.accentText }}>Edit Profile</button>
+              <button className="flex-1 py-2 rounded-xl text-[11px] font-medium" style={{ background: c.bg, color: c.danger }}>Sign Out</button>
             </div>
           </div>
         )}
@@ -642,11 +771,35 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
         <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
           {msgs.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div
-                className="max-w-[85%] px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed"
-                style={m.role === "user" ? { background: c.accent, color: "#fff" } : { background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}
-              >
-                <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
+              <div className="max-w-[85%]">
+                <div
+                  className="px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed"
+                  style={m.role === "user" ? { background: c.accent, color: "#fff" } : { background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}
+                >
+                  <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
+                </div>
+                {/* File routing buttons */}
+                {m.role === "ai" && m.fileType && !m.routed && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {getButtonsForType(m.fileType).map((btn, bi) => (
+                      <button key={bi} onClick={() => routeFile(i, btn.dest, btn.color)}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-medium transition-all"
+                        style={{ background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}
+                        onMouseEnter={e => { e.currentTarget.style.background = btn.color; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = btn.color; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; e.currentTarget.style.borderColor = c.border; }}>
+                        <span>{btn.emoji}</span>
+                        <span>{btn.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {/* Routed confirmation */}
+                {m.role === "ai" && m.routed && (
+                  <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl text-[11px]"
+                    style={{ background: c.accentSoft, border: `1px solid ${c.accent}` }}>
+                    <span style={{ color: c.accentText }}>\u2713 Routed to {m.routed}</span>
+                  </div>
+                )}
               </div>
             </div>
           ))}
