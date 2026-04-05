@@ -123,6 +123,27 @@ const palette = {
   },
 };
 
+// ━━━━ Container-aware scaling hook ━━━━━━━━━━━━━━━━━━━━━━━━
+function useContainerSize(baseW: number) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [dims, setDims] = useState({ w: baseW, h: 400 });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(entries => {
+      const { width, height } = entries[0].contentRect;
+      setDims(prev => {
+        if (Math.abs(prev.w - width) < 10 && Math.abs(prev.h - height) < 10) return prev;
+        return { w: width, h: height };
+      });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const scale = Math.max(0.85, Math.min(1.5, dims.w / baseW));
+  return { ref, w: dims.w, h: dims.h, scale };
+}
+
 // ━━━━ Simple SVG Icon ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function I({ d, s = 16, c, w, f }: { d: string; s?: number; c?: string; w?: number; f?: boolean }) {
   return (
@@ -3243,6 +3264,463 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
+// ━━━━ STORE APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function StoreApp({ c, installedApps, installingApp, installProgress, handleInstallApp, setPaymentModal }: {
+  c: typeof palette.dark;
+  installedApps: string[];
+  installingApp: string | null;
+  installProgress: number;
+  handleInstallApp: (name: string) => void;
+  setPaymentModal: (app: { name: string; price: string; icon: string; iconBg: string } | null) => void;
+}) {
+  const { ref, w, scale } = useContainerSize(680);
+  const [activeTab, setActiveTab] = useState(0);
+  const [activeCat, setActiveCat] = useState(0);
+
+  const storeCats = [
+    { icon: ic.sparkle, label: "Discover" },
+    { icon: ic.play, label: "Games" },
+    { icon: ic.store, label: "Apps" },
+    { icon: ic.settings, label: "Categories" },
+  ];
+  const allApps = [
+    { name: "Alternus Paint", desc: "Digital art & illustration", icon: ic.pen, iconBg: "#8B5CF6", price: "Free", rating: "4.9", reviews: "14K" },
+    { name: "CloudSync Pro", desc: "Sync files across devices", icon: ic.cloud, iconBg: "#06B6D4", price: "$4.99", rating: "4.7", reviews: "8.2K" },
+    { name: "Alternus Chat", desc: "Encrypted messaging", icon: ic.send, iconBg: "#10B981", price: "Free", rating: "4.8", reviews: "22K" },
+    { name: "MindMap AI", desc: "AI brainstorming tool", icon: ic.sparkle, iconBg: "#F59E0B", price: "$2.99", rating: "4.6", reviews: "3.1K" },
+    { name: "Pixel Quest", desc: "Retro platformer", icon: ic.play, iconBg: "#EF4444", price: "Free", rating: "4.5", reviews: "9.7K" },
+    { name: "Neural Racer", desc: "AI racing game", icon: ic.cpu, iconBg: "#8B5CF6", price: "$9.99", rating: "4.4", reviews: "5.6K" },
+  ];
+  const trendingApps = [
+    { name: "Code Breaker", desc: "Logic puzzle game", icon: ic.lock, iconBg: "#3B82F6", price: "Free", rating: "4.7", reviews: "6.3K" },
+    { name: "Galaxy Wars", desc: "Space strategy", icon: ic.sparkle, iconBg: "#F59E0B", price: "$5.99", rating: "4.8", reviews: "11K" },
+    { name: "AlternusTV", desc: "Stream movies & shows", icon: ic.film, iconBg: "#EF4444", price: "Free", rating: "4.9", reviews: "31K" },
+    { name: "Alternus Photos", desc: "AI photo editor", icon: ic.image, iconBg: "#EC4899", price: "Free", rating: "4.6", reviews: "18K" },
+  ];
+  const editorPicks = [
+    { name: "Focus Timer", desc: "Pomodoro & productivity", icon: ic.clock, iconBg: "#10B981", price: "Free", rating: "4.8", reviews: "7.4K" },
+    { name: "Sketch AI", desc: "AI-powered drawing", icon: ic.pen, iconBg: "#EC4899", price: "$3.99", rating: "4.7", reviews: "4.2K" },
+    { name: "DataVault", desc: "Secure password manager", icon: ic.shield, iconBg: "#6366F1", price: "Free", rating: "4.9", reviews: "15K" },
+    { name: "SoundScape", desc: "Ambient sound mixer", icon: ic.music, iconBg: "#F59E0B", price: "$1.99", rating: "4.5", reviews: "2.8K" },
+  ];
+  const tabs = ["Featured", "Top", "My Apps", "Updates", "Settings"];
+
+  const fs = (base: number) => Math.round(base * scale);
+  const cols = w > 900 ? 3 : w > 550 ? 2 : 1;
+
+  const renderAppRow = (app: typeof allApps[0]) => (
+    <div key={app.name} className="flex items-center gap-3 rounded-2xl transition-all cursor-pointer group"
+      style={{ padding: `${fs(10)}px ${fs(12)}px`, background: c.cardAlt }}
+      onMouseEnter={e => { e.currentTarget.style.background = c.border; e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = `0 4px 12px ${c.accent}15`; }}
+      onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
+      <div className="rounded-2xl flex items-center justify-center flex-shrink-0"
+        style={{ width: fs(44), height: fs(44), background: `radial-gradient(circle at 30% 30%, ${app.iconBg}30, ${app.iconBg}12)`, border: `1px solid ${app.iconBg}20` }}>
+        <I d={app.icon} s={fs(20)} c={app.iconBg} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold truncate" style={{ fontSize: fs(12), color: c.text }}>{app.name}</p>
+        <p className="truncate" style={{ fontSize: fs(10), color: c.textMuted, marginTop: 2 }}>{app.desc}</p>
+        <p style={{ fontSize: fs(9), color: c.textMuted, marginTop: 3, opacity: 0.7 }}>
+          <span style={{ color: "#F59E0B" }}>&#9733;</span> {app.rating} &middot; {app.reviews} ratings
+        </p>
+      </div>
+      {installingApp === app.name ? (
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="rounded-full overflow-hidden" style={{ width: fs(72), height: fs(6), background: c.border }}>
+            <div className="h-full rounded-full transition-all duration-200" style={{ width: `${installProgress}%`, background: c.accent }} />
+          </div>
+          <span className="font-medium" style={{ fontSize: fs(9), color: c.textMuted }}>{Math.round(installProgress)}%</span>
+        </div>
+      ) : installedApps.includes(app.name) ? (
+        <span className="rounded-full font-semibold flex-shrink-0" style={{ fontSize: fs(10), padding: `${fs(4)}px ${fs(14)}px`, background: c.successSoft, color: c.success }}>Open</span>
+      ) : (
+        <button onClick={() => app.price === "Free" ? handleInstallApp(app.name) : setPaymentModal(app)}
+          className="rounded-full font-semibold flex-shrink-0 transition-all"
+          style={{
+            fontSize: fs(10), padding: `${fs(4)}px ${fs(14)}px`,
+            background: app.price === "Free" ? c.accent : "transparent",
+            color: app.price === "Free" ? "#fff" : c.accentText,
+            border: app.price !== "Free" ? `1px solid ${c.accent}` : "none",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 0 16px ${c.accent}40`; }}
+          onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; }}>
+          {app.price === "Free" ? "Get" : app.price}
+        </button>
+      )}
+    </div>
+  );
+
+  return (
+    <div ref={ref} className="flex flex-col h-full overflow-hidden">
+      {/* Top nav bar */}
+      <div className="flex items-center gap-1 flex-shrink-0" style={{ padding: `${fs(8)}px ${fs(16)}px`, borderBottom: `1px solid ${c.border}` }}>
+        <div className="flex items-center gap-1 flex-1">
+          {tabs.map((tab, i) => (
+            <button key={i} onClick={() => setActiveTab(i)}
+              className="rounded-full font-medium transition-all relative"
+              style={{
+                padding: `${fs(5)}px ${fs(14)}px`, fontSize: fs(11),
+                background: activeTab === i ? "transparent" : "transparent",
+                color: activeTab === i ? c.accentText : c.textMuted,
+                borderBottom: activeTab === i ? `2px solid ${c.accent}` : "2px solid transparent",
+              }}
+              onMouseEnter={e => { if (activeTab !== i) e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { if (activeTab !== i) e.currentTarget.style.background = "transparent"; }}>
+              {tab}
+              {tab === "Updates" && <span className="absolute -top-0.5 -right-0.5 rounded-full" style={{ width: fs(6), height: fs(6), background: c.danger, animation: "pulse 2s infinite" }} />}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 rounded-xl" style={{ padding: `${fs(5)}px ${fs(10)}px`, width: `clamp(100px, 25%, 200px)`, background: c.cardAlt, border: `1px solid ${c.border}` }}>
+          <I d={ic.search} s={fs(12)} c={c.textMuted} />
+          <input className="flex-1 bg-transparent outline-none" style={{ fontSize: fs(11), color: c.text }} placeholder="Search apps..." />
+        </div>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <div className="flex-shrink-0 flex flex-col py-2 px-2" style={{ width: `clamp(110px, 20%, 170px)`, borderRight: `1px solid ${c.border}` }}>
+          {storeCats.map((s, i) => (
+            <button key={i} onClick={() => setActiveCat(i)}
+              className="w-full flex items-center gap-3 rounded-xl text-left transition-all"
+              style={{
+                padding: `${fs(8)}px ${fs(12)}px`,
+                background: activeCat === i ? c.accentSoft : "transparent",
+                borderLeft: activeCat === i ? `3px solid ${c.accent}` : "3px solid transparent",
+              }}
+              onMouseEnter={e => { if (activeCat !== i) e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { if (activeCat !== i) e.currentTarget.style.background = "transparent"; }}>
+              <I d={s.icon} s={fs(16)} c={activeCat === i ? c.accentText : c.textMuted} />
+              <span className="font-medium" style={{ fontSize: fs(12), color: activeCat === i ? c.accentText : c.text }}>{s.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto" style={{ padding: `${fs(16)}px`, scrollbarWidth: "none" }}>
+          {/* Featured Banner */}
+          <div className="rounded-2xl relative overflow-hidden" style={{
+            padding: `${fs(20)}px ${fs(22)}px`, marginBottom: fs(20),
+            background: `linear-gradient(135deg, ${c.accent}18, ${c.purple}14, transparent 70%), radial-gradient(ellipse at 20% 50%, ${c.accent}12, transparent 60%), radial-gradient(ellipse at 85% 25%, ${c.purple}10, transparent 50%), ${c.cardAlt}`,
+            border: `1px solid ${c.accent}12`,
+          }}>
+            <div className="flex items-center gap-4 mb-3">
+              <div className="rounded-2xl flex items-center justify-center" style={{
+                width: fs(52), height: fs(52),
+                background: `radial-gradient(circle at 35% 35%, ${c.accent}35, ${c.accent}15)`,
+                boxShadow: `0 4px 20px ${c.accent}20`,
+              }}>
+                <I d={ic.sparkle} s={fs(26)} c={c.accent} />
+              </div>
+              <div>
+                <p className="font-bold" style={{ fontSize: fs(16), color: c.text }}>Alternus AI Suite</p>
+                <p style={{ fontSize: fs(11), color: c.textMuted }}>The complete AI productivity toolkit</p>
+              </div>
+            </div>
+            <p className="leading-relaxed" style={{ fontSize: fs(11), color: c.textSec, marginBottom: fs(14) }}>Create, edit, and automate with AI. Includes Paint, Chat, and MindMap tools in one bundle.</p>
+            <button className="rounded-xl font-semibold transition-all" style={{
+              padding: `${fs(8)}px ${fs(20)}px`, fontSize: fs(12),
+              background: `linear-gradient(135deg, ${c.accent}, ${c.accent}DD)`, color: "#fff",
+              boxShadow: `0 2px 12px ${c.accent}30`,
+            }}
+            onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 4px 24px ${c.accent}50`; e.currentTarget.style.transform = "translateY(-1px)"; }}
+            onMouseLeave={e => { e.currentTarget.style.boxShadow = `0 2px 12px ${c.accent}30`; e.currentTarget.style.transform = "none"; }}>
+              Get Bundle &mdash; Free
+            </button>
+          </div>
+
+          {/* Best Apps and Games */}
+          <div className="flex items-center justify-between" style={{ marginBottom: fs(12) }}>
+            <p className="font-bold" style={{ fontSize: fs(15), color: c.text }}>Best Apps and Games</p>
+            <span className="font-medium cursor-pointer flex items-center gap-1 transition-all" style={{ fontSize: fs(11), color: c.accentText }}
+              onMouseEnter={e => { e.currentTarget.style.opacity = "0.7"; }}
+              onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}>
+              See All <I d={ic.chevR} s={fs(10)} c={c.accentText} />
+            </span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: fs(10) }}>
+            {allApps.map(renderAppRow)}
+          </div>
+
+          {/* Trending Now - horizontal scroll */}
+          <div className="flex items-center justify-between" style={{ marginTop: fs(24), marginBottom: fs(12) }}>
+            <p className="font-bold" style={{ fontSize: fs(15), color: c.text }}>Trending Now</p>
+            <span className="font-medium cursor-pointer flex items-center gap-1" style={{ fontSize: fs(11), color: c.accentText }}>
+              See All <I d={ic.chevR} s={fs(10)} c={c.accentText} />
+            </span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
+            {trendingApps.map(app => (
+              <div key={app.name} className="flex-shrink-0 rounded-2xl overflow-hidden cursor-pointer transition-all group"
+                style={{ width: `clamp(155px, 30%, 230px)`, background: c.cardAlt }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 6px 20px ${app.iconBg}20`; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
+                <div className="relative flex items-center justify-center" style={{
+                  height: fs(80),
+                  background: `linear-gradient(135deg, ${app.iconBg}20, ${app.iconBg}08), radial-gradient(circle at 40% 30%, ${app.iconBg}25, transparent 60%), ${c.cardAlt}`,
+                }}>
+                  <I d={app.icon} s={fs(28)} c={app.iconBg + "70"} />
+                  <div className="absolute top-2 right-2 rounded-md font-bold" style={{ padding: `${fs(2)}px ${fs(6)}px`, fontSize: fs(8), background: "rgba(0,0,0,0.5)", color: "#F59E0B" }}>&#9733; {app.rating}</div>
+                </div>
+                <div style={{ padding: `${fs(10)}px ${fs(12)}px` }}>
+                  <p className="font-semibold truncate" style={{ fontSize: fs(11), color: c.text }}>{app.name}</p>
+                  <p className="truncate" style={{ fontSize: fs(9), color: c.textMuted, marginTop: 2 }}>{app.desc}</p>
+                  <button onClick={() => app.price === "Free" ? handleInstallApp(app.name) : setPaymentModal(app)}
+                    className="rounded-full font-semibold transition-all" style={{
+                    fontSize: fs(9), padding: `${fs(3)}px ${fs(12)}px`, marginTop: fs(8),
+                    background: app.price === "Free" ? c.accent : "transparent", color: app.price === "Free" ? "#fff" : c.accentText,
+                    border: app.price !== "Free" ? `1px solid ${c.accent}` : "none",
+                  }}>
+                    {app.price === "Free" ? "Get" : app.price}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Editor's Picks */}
+          <div className="flex items-center justify-between" style={{ marginTop: fs(24), marginBottom: fs(12) }}>
+            <p className="font-bold" style={{ fontSize: fs(15), color: c.text }}>Editor&apos;s Picks</p>
+            <span className="font-medium cursor-pointer flex items-center gap-1" style={{ fontSize: fs(11), color: c.accentText }}>
+              See All <I d={ic.chevR} s={fs(10)} c={c.accentText} />
+            </span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: fs(10) }}>
+            {editorPicks.map(renderAppRow)}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ━━━━ MOVIES APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function MoviesApp({ c }: { c: typeof palette.dark }) {
+  const { ref, w, scale } = useContainerSize(720);
+  const [activeCat, setActiveCat] = useState(0);
+
+  const movieCats = [
+    { icon: ic.play, label: "For You" },
+    { icon: ic.film, label: "Movies" },
+    { icon: ic.monitor, label: "Series" },
+    { icon: ic.sparkle, label: "New" },
+    { icon: ic.clock, label: "Watchlist" },
+  ];
+
+  const featured = { name: "The Last Algorithm", genre: "Sci-Fi", year: "2025", rating: "9.2", desc: "In a world run by AI, one programmer discovers the code that controls reality.", color: "#6366F1" };
+
+  const trending = [
+    { name: "Digital Dreams", genre: "Drama", year: "2024", rating: "7.9", color: "#6366F1", duration: "2h 15m" },
+    { name: "Code Runner", genre: "Action", year: "2025", rating: "8.2", color: "#EC4899", duration: "1h 58m" },
+    { name: "Neural Path", genre: "Thriller", year: "2024", rating: "8.5", color: "#06B6D4", duration: "2h 03m" },
+    { name: "Pixel World", genre: "Animation", year: "2025", rating: "9.1", color: "#F59E0B", duration: "1h 45m" },
+  ];
+
+  const topRated = [
+    { name: "Binary Love", genre: "Romance", year: "2025", rating: "8.8", color: "#EC4899", duration: "2h 01m" },
+    { name: "Kernel Panic", genre: "Horror", year: "2024", rating: "7.6", color: "#EF4444", duration: "1h 52m" },
+    { name: "Cloud Atlas II", genre: "Sci-Fi", year: "2025", rating: "8.9", color: "#8B5CF6", duration: "2h 42m" },
+    { name: "The Compiler", genre: "Mystery", year: "2024", rating: "8.1", color: "#10B981", duration: "1h 47m" },
+  ];
+
+  const continueWatching = [
+    { name: "Digital Dreams", progress: 65, color: "#6366F1", ep: "1h 23m left" },
+    { name: "Neural Path", progress: 30, color: "#06B6D4", ep: "1h 25m left" },
+  ];
+
+  const fs = (base: number) => Math.round(base * scale);
+  const gridCols = w > 800 ? 4 : w > 550 ? 3 : 2;
+
+  const movieCard = (m: typeof trending[0], rank?: number) => (
+    <div key={m.name} className="rounded-2xl overflow-hidden cursor-pointer transition-all group"
+      style={{ background: c.cardAlt }}
+      onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.03) translateY(-4px)"; e.currentTarget.style.boxShadow = `0 8px 24px ${m.color}25`; }}
+      onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}>
+      {/* Poster - cinematic multi-layer gradient */}
+      <div style={{
+        height: fs(120), position: "relative", overflow: "hidden",
+        background: `linear-gradient(180deg, transparent 30%, ${m.color}60 100%), radial-gradient(ellipse at 50% 0%, ${m.color}30, transparent 70%), radial-gradient(circle at 25% 65%, ${m.color}18, transparent 50%), radial-gradient(circle at 75% 35%, ${c.purple}12, transparent 45%), linear-gradient(135deg, ${c.cardAlt}, ${c.card})`,
+        boxShadow: `inset 0 -30px 30px -15px rgba(0,0,0,0.2)`,
+      }}>
+        {/* Large initial letter as background */}
+        <div className="absolute inset-0 flex items-center justify-center" style={{ opacity: 0.08 }}>
+          <span style={{ fontSize: fs(72), fontWeight: 900, color: m.color, lineHeight: 1 }}>{m.name[0]}</span>
+        </div>
+        {/* Rank number */}
+        {rank && <div className="absolute bottom-1 left-2" style={{ fontSize: fs(32), fontWeight: 900, color: m.color, opacity: 0.25, lineHeight: 1 }}>{rank}</div>}
+        {/* Rating badge */}
+        <div className="absolute top-2 right-2 rounded-lg font-bold flex items-center gap-1" style={{
+          padding: `${fs(2)}px ${fs(7)}px`, fontSize: fs(9),
+          background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)",
+        }}>
+          <span style={{ color: "#F59E0B" }}>&#9733;</span>
+          <span style={{ color: "#fff" }}>{m.rating}</span>
+        </div>
+        {/* Play overlay on hover */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: "rgba(0,0,0,0.35)", backdropFilter: "blur(2px)" }}>
+          <div className="rounded-full flex items-center justify-center" style={{ width: fs(36), height: fs(36), background: c.accent, boxShadow: `0 0 20px ${c.accent}50` }}>
+            <I d={ic.play} s={fs(14)} c="#fff" />
+          </div>
+        </div>
+      </div>
+      {/* Info */}
+      <div style={{ padding: `${fs(10)}px ${fs(12)}px` }}>
+        <p className="font-semibold truncate" style={{ fontSize: fs(12), color: c.text }}>{m.name}</p>
+        <p style={{ fontSize: fs(9), color: c.textMuted, marginTop: fs(3) }}>{m.genre} &middot; {m.year} &middot; {m.duration}</p>
+      </div>
+    </div>
+  );
+
+  // Circular progress ring SVG
+  const progressRing = (progress: number, color: string, size: number) => {
+    const r = size * 0.4;
+    const circ = 2 * Math.PI * r;
+    const offset = circ - (progress / 100) * circ;
+    return (
+      <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={c.border} strokeWidth={2.5} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={2.5}
+          strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round"
+          style={{ transition: "stroke-dashoffset 0.3s ease" }} />
+      </svg>
+    );
+  };
+
+  return (
+    <div ref={ref} className="flex h-full overflow-hidden">
+      {/* Sidebar */}
+      <div className="flex-shrink-0 flex flex-col py-2 px-2" style={{ width: `clamp(95px, 18%, 155px)`, borderRight: `1px solid ${c.border}` }}>
+        {movieCats.map((s, i) => (
+          <button key={i} onClick={() => setActiveCat(i)}
+            className="w-full flex items-center gap-2.5 rounded-xl text-left transition-all"
+            style={{
+              padding: `${fs(8)}px ${fs(10)}px`,
+              background: activeCat === i ? c.accentSoft : "transparent",
+              borderLeft: activeCat === i ? `3px solid ${c.accent}` : "3px solid transparent",
+            }}
+            onMouseEnter={e => { if (activeCat !== i) e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { if (activeCat !== i) e.currentTarget.style.background = "transparent"; }}>
+            <I d={s.icon} s={fs(15)} c={activeCat === i ? c.accentText : c.textMuted} />
+            <span className="font-medium" style={{ fontSize: fs(11), color: activeCat === i ? c.accentText : c.text }}>{s.label}</span>
+          </button>
+        ))}
+        {/* User profile mini */}
+        <div className="mt-auto pt-3" style={{ borderTop: `1px solid ${c.border}`, marginTop: fs(12) }}>
+          <div className="flex items-center gap-2 rounded-xl" style={{ padding: `${fs(6)}px ${fs(8)}px` }}>
+            <div className="rounded-full flex items-center justify-center" style={{ width: fs(24), height: fs(24), background: c.accent + "25" }}>
+              <I d={ic.user} s={fs(12)} c={c.accentText} />
+            </div>
+            <span style={{ fontSize: fs(9), color: c.textMuted }}>My Profile</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto" style={{ padding: `${fs(14)}px ${fs(16)}px`, scrollbarWidth: "none" }}>
+        {/* Featured Hero */}
+        <div className="rounded-2xl overflow-hidden relative" style={{
+          marginBottom: fs(20), minHeight: fs(180),
+          background: `linear-gradient(to top, ${c.surface}EE 0%, transparent 55%), linear-gradient(to right, ${c.surface}DD 0%, transparent 45%), radial-gradient(ellipse at 70% 25%, ${featured.color}35, transparent 65%), radial-gradient(ellipse at 30% 75%, ${featured.color}15, transparent 55%), linear-gradient(135deg, ${featured.color}25, ${c.cardAlt})`,
+          border: `1px solid ${featured.color}12`,
+        }}>
+          {/* Large background letter */}
+          <div className="absolute right-6 top-2" style={{ fontSize: fs(100), fontWeight: 900, color: featured.color, opacity: 0.06, lineHeight: 1, pointerEvents: "none" }}>
+            {featured.name[0]}
+          </div>
+          <div style={{ padding: `${fs(24)}px ${fs(22)}px`, position: "relative", zIndex: 1 }}>
+            <div className="flex items-center gap-2" style={{ marginBottom: fs(8) }}>
+              <span className="rounded-full font-bold flex items-center gap-1" style={{
+                fontSize: fs(9), padding: `${fs(3)}px ${fs(10)}px`,
+                background: "#F59E0B", color: "#000",
+                boxShadow: "0 0 8px rgba(245,158,11,0.3)",
+              }}>&#9733; {featured.rating}</span>
+              <span style={{ fontSize: fs(10), color: c.textMuted }}>{featured.genre} &middot; {featured.year}</span>
+              <span className="rounded-full" style={{ fontSize: fs(9), padding: `${fs(3)}px ${fs(10)}px`, background: c.accent + "18", color: c.accentText }}>Featured</span>
+            </div>
+            <p className="font-extrabold" style={{
+              fontSize: fs(24), color: c.text, marginBottom: fs(6),
+              textShadow: `0 2px 8px ${featured.color}20`,
+            }}>{featured.name}</p>
+            <p className="leading-relaxed" style={{ fontSize: fs(12), color: c.textSec, marginBottom: fs(16), maxWidth: "70%" }}>{featured.desc}</p>
+            <div className="flex gap-3 items-center">
+              <button className="rounded-xl font-semibold flex items-center gap-2 transition-all" style={{
+                padding: `${fs(9)}px ${fs(22)}px`, fontSize: fs(12),
+                background: c.accent, color: "#fff",
+                boxShadow: `0 2px 16px ${c.accent}35`,
+              }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 4px 24px ${c.accent}55`; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = `0 2px 16px ${c.accent}35`; e.currentTarget.style.transform = "none"; }}>
+                <I d={ic.play} s={fs(12)} c="#fff" /> Watch Now
+              </button>
+              <button className="rounded-xl font-medium transition-all" style={{
+                padding: `${fs(9)}px ${fs(20)}px`, fontSize: fs(12),
+                background: "transparent", color: c.text,
+                border: `1px solid ${c.border}`, backdropFilter: "blur(4px)",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                + Watchlist
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Continue Watching */}
+        {continueWatching.length > 0 && (<>
+          <div className="flex items-center justify-between" style={{ marginBottom: fs(10) }}>
+            <p className="font-bold" style={{ fontSize: fs(14), color: c.text }}>Continue Watching</p>
+          </div>
+          <div className="flex gap-3" style={{ marginBottom: fs(20) }}>
+            {continueWatching.map(m => (
+              <div key={m.name} className="flex-1 rounded-2xl cursor-pointer transition-all flex items-center gap-3"
+                style={{ padding: `${fs(12)}px ${fs(14)}px`, background: c.cardAlt }}
+                onMouseEnter={e => { e.currentTarget.style.background = c.border; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.transform = "none"; }}>
+                <div className="rounded-xl flex items-center justify-center flex-shrink-0" style={{
+                  width: fs(40), height: fs(40),
+                  background: `radial-gradient(circle, ${m.color}25, ${m.color}08)`,
+                }}>
+                  <I d={ic.play} s={fs(16)} c={m.color} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold truncate" style={{ fontSize: fs(12), color: c.text }}>{m.name}</p>
+                  <p style={{ fontSize: fs(9), color: c.textMuted, marginTop: 2 }}>{m.ep}</p>
+                </div>
+                <div className="flex-shrink-0 relative flex items-center justify-center" style={{ width: fs(34), height: fs(34) }}>
+                  {progressRing(m.progress, c.accent, fs(34))}
+                  <span className="absolute" style={{ fontSize: fs(8), fontWeight: 700, color: c.text, transform: "rotate(0deg)" }}>{m.progress}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>)}
+
+        {/* Trending Now */}
+        <div className="flex items-center justify-between" style={{ marginBottom: fs(10) }}>
+          <p className="font-bold" style={{ fontSize: fs(14), color: c.text }}>Trending Now</p>
+          <span className="font-medium cursor-pointer flex items-center gap-1" style={{ fontSize: fs(11), color: c.accentText }}>
+            See All <I d={ic.chevR} s={fs(10)} c={c.accentText} />
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${gridCols}, 1fr)`, gap: fs(10), marginBottom: fs(20) }}>
+          {trending.map(m => movieCard(m))}
+        </div>
+
+        {/* Top Rated */}
+        <div className="flex items-center justify-between" style={{ marginBottom: fs(10) }}>
+          <p className="font-bold" style={{ fontSize: fs(14), color: c.text }}>Top Rated</p>
+          <span className="font-medium cursor-pointer flex items-center gap-1" style={{ fontSize: fs(11), color: c.accentText }}>
+            See All <I d={ic.chevR} s={fs(10)} c={c.accentText} />
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${gridCols}, 1fr)`, gap: fs(10) }}>
+          {topRated.map((m, i) => movieCard(m, i + 1))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ MAIN OS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function AlternusOS() {
   const [mode, setMode] = useState<ThemeMode>("dark");
@@ -3302,8 +3780,8 @@ export default function AlternusOS() {
     { id: "calendar", title: "Calendar", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 380, y: 90, w: 320, h: 340 },
     { id: "notes", title: "Notes", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 80, w: 400, h: 340 },
     { id: "browser", title: "Browser", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 540, h: 400 },
-    { id: "store", title: "Store", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 40, y: 40, w: 540, h: 460 },
-    { id: "movies", title: "Movies", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 260, y: 50, w: 480, h: 380 },
+    { id: "store", title: "Store", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 40, y: 40, w: 680, h: 500 },
+    { id: "movies", title: "Movies", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 40, w: 640, h: 460 },
     { id: "word", title: "Alternus Word", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 140, y: 50, w: 540, h: 400 },
     { id: "clock", title: "Clock", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 400, y: 100, w: 360, h: 420 },
     { id: "calculator", title: "Calculator", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 500, y: 80, w: 320, h: 440 },
@@ -3405,8 +3883,8 @@ export default function AlternusOS() {
       calendar: { w: 360, h: 400 },
       notes: { w: 480, h: 400 },
       browser: { w: 820, h: 540 },
-      store: { w: 680, h: 500 },
-      movies: { w: 560, h: 440 },
+      store: { w: 780, h: 540 },
+      movies: { w: 720, h: 500 },
       word: { w: 760, h: 520 },
       clock: { w: 380, h: 460 },
       calculator: { w: 320, h: 460 },
@@ -3726,275 +4204,8 @@ export default function AlternusOS() {
     notes: <NotesApp c={c} />,
     browser: <BrowserApp c={c} />,
     word: <WordApp c={c} />,
-    store: (() => {
-      const storeCats = [
-        { icon: ic.sparkle, label: "Discover" },
-        { icon: ic.play, label: "Games" },
-        { icon: ic.store, label: "Apps" },
-        { icon: ic.settings, label: "Categories" },
-      ];
-      const allApps = [
-        { name: "Alternus Paint", desc: "Digital art & illustration", icon: ic.pen, iconBg: "#8B5CF6", price: "Free" },
-        { name: "CloudSync Pro", desc: "Sync files across devices", icon: ic.cloud, iconBg: "#06B6D4", price: "$4.99" },
-        { name: "Alternus Chat", desc: "Encrypted messaging", icon: ic.send, iconBg: "#10B981", price: "Free" },
-        { name: "MindMap AI", desc: "AI brainstorming tool", icon: ic.sparkle, iconBg: "#F59E0B", price: "$2.99" },
-        { name: "Pixel Quest", desc: "Retro platformer", icon: ic.play, iconBg: "#EF4444", price: "Free" },
-        { name: "Neural Racer", desc: "AI racing game", icon: ic.cpu, iconBg: "#8B5CF6", price: "$9.99" },
-      ];
-      const trendingApps = [
-        { name: "Code Breaker", desc: "Logic puzzle game", icon: ic.lock, iconBg: "#3B82F6", price: "Free" },
-        { name: "Galaxy Wars", desc: "Space strategy", icon: ic.sparkle, iconBg: "#F59E0B", price: "$5.99" },
-        { name: "AlternusTV", desc: "Stream movies", icon: ic.film, iconBg: "#EF4444", price: "Free" },
-        { name: "Alternus Photos", desc: "AI photo editor", icon: ic.image, iconBg: "#EC4899", price: "Free" },
-      ];
-      const editorPicks = [
-        { name: "Focus Timer", desc: "Pomodoro & productivity", icon: ic.clock, iconBg: "#10B981", price: "Free" },
-        { name: "Sketch AI", desc: "AI-powered drawing", icon: ic.pen, iconBg: "#EC4899", price: "$3.99" },
-        { name: "DataVault", desc: "Secure password manager", icon: ic.shield, iconBg: "#6366F1", price: "Free" },
-        { name: "SoundScape", desc: "Ambient sound mixer", icon: ic.music, iconBg: "#F59E0B", price: "$1.99" },
-      ];
-      const tabs = ["Featured", "Top", "My Apps", "Updates", "Settings"];
-      const renderAppRow = (app: typeof allApps[0]) => (
-        <div key={app.name} className="flex items-center gap-3 p-2.5 rounded-2xl transition-all cursor-pointer"
-          style={{ background: c.cardAlt }}
-          onMouseEnter={e => { e.currentTarget.style.background = c.border; }}
-          onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; }}>
-          <div className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: app.iconBg + "18", border: `1px solid ${app.iconBg}25` }}>
-            <I d={app.icon} s={20} c={app.iconBg} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>{app.name}</p>
-            <p className="text-[8px] mt-0.5" style={{ color: c.textMuted }}>{app.desc}</p>
-          </div>
-          {installingApp === app.name ? (
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <div className="w-20 h-2.5 rounded-full overflow-hidden" style={{ background: c.border }}>
-                <div className="h-full rounded-full transition-all duration-200" style={{ width: `${installProgress}%`, background: c.accent }} />
-              </div>
-              <span className="text-[9px] font-medium" style={{ color: c.textMuted }}>{Math.round(installProgress)}%</span>
-            </div>
-          ) : installedApps.includes(app.name) ? (
-            <span className="text-[9px] px-3 py-1 rounded-full font-semibold flex-shrink-0" style={{ background: c.successSoft, color: c.success }}>Open</span>
-          ) : (
-            <button onClick={() => app.price === "Free" ? handleInstallApp(app.name) : setPaymentModal(app)}
-              className="text-[9px] px-3 py-1 rounded-full font-semibold flex-shrink-0 transition-all"
-              style={{ background: app.price === "Free" ? c.accent : "transparent", color: app.price === "Free" ? "#fff" : c.accentText, border: app.price !== "Free" ? `1px solid ${c.accent}` : "none" }}>
-              {app.price === "Free" ? "Free" : app.price}
-            </button>
-          )}
-        </div>
-      );
-      return (
-        <div className="flex flex-col h-full overflow-hidden">
-          {/* Top nav bar */}
-          <div className="flex items-center gap-1 px-4 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-            <div className="flex items-center gap-1 flex-1">
-              {tabs.map((tab, i) => (
-                <button key={i} className="px-3 py-1 rounded-full text-[10px] font-medium transition-colors relative"
-                  style={{ background: i === 0 ? c.accent : "transparent", color: i === 0 ? "#fff" : c.textMuted }}
-                  onMouseEnter={e => { if (i !== 0) e.currentTarget.style.background = c.cardAlt; }}
-                  onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = "transparent"; }}>
-                  {tab}
-                  {tab === "Updates" && <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full" style={{ background: c.danger }} />}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg w-[120px]" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-              <I d={ic.search} s={11} c={c.textMuted} />
-              <input className="flex-1 bg-transparent outline-none text-[10px]" style={{ color: c.text }} placeholder="Search" />
-            </div>
-          </div>
-          <div className="flex flex-1 overflow-hidden">
-            {/* Sidebar */}
-            <div className="w-[130px] flex-shrink-0 flex flex-col py-1 px-1.5" style={{ borderRight: `1px solid ${c.border}` }}>
-              {storeCats.map((s, i) => (
-                <button key={i} className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors"
-                  style={{ background: i === 0 ? c.accent : "transparent" }}
-                  onMouseEnter={e => { if (i !== 0) e.currentTarget.style.background = c.cardAlt; }}
-                  onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = "transparent"; }}>
-                  <I d={s.icon} s={15} c={i === 0 ? "#fff" : c.textMuted} />
-                  <span className="text-[11px] font-medium" style={{ color: i === 0 ? "#fff" : c.text }}>{s.label}</span>
-                </button>
-              ))}
-            </div>
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto px-4 py-3" style={{ scrollbarWidth: "none" }}>
-              {/* Featured Banner */}
-              <div className="rounded-2xl p-4 mb-4 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${c.accent}20, ${c.purple}20, ${c.accent}10)`, border: `1px solid ${c.accent}15` }}>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: c.accent + "25" }}>
-                    <I d={ic.sparkle} s={24} c={c.accent} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold" style={{ color: c.text }}>Alternus AI Suite</p>
-                    <p className="text-[9px]" style={{ color: c.textMuted }}>The complete AI productivity toolkit</p>
-                  </div>
-                </div>
-                <p className="text-[9px] mb-3 leading-relaxed" style={{ color: c.textSec }}>Create, edit, and automate with AI. Includes Paint, Chat, and MindMap tools.</p>
-                <button className="px-4 py-1.5 rounded-xl text-[10px] font-semibold" style={{ background: c.accent, color: "#fff" }}>Get Bundle - Free</button>
-              </div>
-
-              {/* Best Apps and Games */}
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-bold" style={{ color: c.text }}>Best Apps and Games</p>
-                <span className="text-[10px] font-medium cursor-pointer" style={{ color: c.accentText }}>See All</span>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                {allApps.map(renderAppRow)}
-              </div>
-
-              {/* Trending Now */}
-              <div className="flex items-center justify-between mt-5 mb-3">
-                <p className="text-xs font-bold" style={{ color: c.text }}>Trending Now</p>
-                <span className="text-[10px] font-medium cursor-pointer" style={{ color: c.accentText }}>See All</span>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                {trendingApps.map(renderAppRow)}
-              </div>
-
-              {/* Editor's Picks */}
-              <div className="flex items-center justify-between mt-5 mb-3">
-                <p className="text-xs font-bold" style={{ color: c.text }}>Editor&apos;s Picks</p>
-                <span className="text-[10px] font-medium cursor-pointer" style={{ color: c.accentText }}>See All</span>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                {editorPicks.map(renderAppRow)}
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    })(),
-    movies: (() => {
-      const movieCats = [
-        { icon: ic.play, label: "For You" },
-        { icon: ic.film, label: "Movies" },
-        { icon: ic.monitor, label: "Series" },
-        { icon: ic.sparkle, label: "New" },
-        { icon: ic.sparkle, label: "Watchlist" },
-      ];
-      const featured = { name: "The Last Algorithm", genre: "Sci-Fi", year: "2025", rating: "9.2", desc: "In a world run by AI, one programmer discovers the code that controls reality.", color: "#6366F1" };
-      const trending = [
-        { name: "Digital Dreams", genre: "Drama", year: "2024", rating: "7.9", color: "#6366F1", duration: "2h 15m" },
-        { name: "Code Runner", genre: "Action", year: "2025", rating: "8.2", color: "#EC4899", duration: "1h 58m" },
-        { name: "Neural Path", genre: "Thriller", year: "2024", rating: "8.5", color: "#06B6D4", duration: "2h 03m" },
-        { name: "Pixel World", genre: "Animation", year: "2025", rating: "9.1", color: "#F59E0B", duration: "1h 45m" },
-      ];
-      const topRated = [
-        { name: "Binary Love", genre: "Romance", year: "2025", rating: "8.8", color: "#EC4899", duration: "2h 01m" },
-        { name: "Kernel Panic", genre: "Horror", year: "2024", rating: "7.6", color: "#EF4444", duration: "1h 52m" },
-        { name: "Cloud Atlas II", genre: "Sci-Fi", year: "2025", rating: "8.9", color: "#8B5CF6", duration: "2h 42m" },
-        { name: "The Compiler", genre: "Mystery", year: "2024", rating: "8.1", color: "#10B981", duration: "1h 47m" },
-      ];
-      const continueWatching = [
-        { name: "Digital Dreams", progress: 65, color: "#6366F1", ep: "1h 23m left" },
-        { name: "Neural Path", progress: 30, color: "#06B6D4", ep: "1h 25m left" },
-      ];
-      const movieCard = (m: typeof trending[0], size: "sm" | "lg" = "sm") => (
-        <div key={m.name} className="rounded-2xl overflow-hidden cursor-pointer transition-all group"
-          style={{ background: c.cardAlt }}
->
-          {/* Poster */}
-          <div className={size === "lg" ? "h-24" : "h-20"} style={{ background: `linear-gradient(135deg, ${m.color}30, ${m.color}10)`, position: "relative" }}>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <I d={ic.film} s={size === "lg" ? 28 : 22} c={m.color + "60"} />
-            </div>
-            <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[7px] font-bold" style={{ background: "rgba(0,0,0,0.6)", color: "#F59E0B" }}>★ {m.rating}</div>
-            {/* Play overlay on hover */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: "rgba(0,0,0,0.3)" }}>
-              <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: c.accent }}>
-                <I d={ic.play} s={14} c="#fff" />
-              </div>
-            </div>
-          </div>
-          {/* Info */}
-          <div className="p-2.5">
-            <p className="text-[10px] font-semibold truncate" style={{ color: c.text }}>{m.name}</p>
-            <p className="text-[8px] mt-0.5" style={{ color: c.textMuted }}>{m.genre} · {m.year} · {m.duration}</p>
-          </div>
-        </div>
-      );
-      return (
-        <div className="flex h-full overflow-hidden">
-          {/* Sidebar */}
-          <div className="w-[110px] flex-shrink-0 flex flex-col py-1 px-1.5" style={{ borderRight: `1px solid ${c.border}` }}>
-            {movieCats.map((s, i) => (
-              <button key={i} className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-colors"
-                style={{ background: i === 0 ? c.accent : "transparent" }}
-                onMouseEnter={e => { if (i !== 0) e.currentTarget.style.background = c.cardAlt; }}
-                onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = "transparent"; }}>
-                <I d={s.icon} s={14} c={i === 0 ? "#fff" : c.textMuted} />
-                <span className="text-[10px] font-medium" style={{ color: i === 0 ? "#fff" : c.text }}>{s.label}</span>
-              </button>
-            ))}
-          </div>
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto px-3 py-3" style={{ scrollbarWidth: "none" }}>
-            {/* Featured Hero */}
-            <div className="rounded-2xl overflow-hidden mb-4 relative" style={{ background: `linear-gradient(135deg, ${featured.color}25, ${c.cardAlt})`, border: `1px solid ${featured.color}15` }}>
-              <div className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[8px] px-2 py-0.5 rounded-full font-bold" style={{ background: "#F59E0B", color: "#000" }}>★ {featured.rating}</span>
-                  <span className="text-[9px]" style={{ color: c.textMuted }}>{featured.genre} · {featured.year}</span>
-                  <span className="text-[8px] px-2 py-0.5 rounded-full" style={{ background: c.accent + "20", color: c.accentText }}>Featured</span>
-                </div>
-                <p className="text-base font-bold mb-1" style={{ color: c.text }}>{featured.name}</p>
-                <p className="text-[10px] mb-3 leading-relaxed" style={{ color: c.textSec }}>{featured.desc}</p>
-                <div className="flex gap-2">
-                  <button className="px-4 py-2 rounded-xl text-[10px] font-semibold flex items-center gap-1.5 transition-all" style={{ background: c.accent, color: "#fff" }}><I d={ic.play} s={10} c="#fff" /> Watch Now</button>
-                  <button className="px-4 py-2 rounded-xl text-[10px] font-medium transition-all" style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}` }}>+ Watchlist</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Continue Watching */}
-            {continueWatching.length > 0 && (<>
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-bold" style={{ color: c.text }}>Continue Watching</p>
-              </div>
-              <div className="flex gap-2 mb-4">
-                {continueWatching.map(m => (
-                  <div key={m.name} className="flex-1 p-2.5 rounded-2xl cursor-pointer transition-all" style={{ background: c.cardAlt }}
-                    onMouseEnter={e => { e.currentTarget.style.background = c.border; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; }}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: m.color + "15" }}>
-                        <I d={ic.play} s={14} c={m.color} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-semibold truncate" style={{ color: c.text }}>{m.name}</p>
-                        <p className="text-[7px]" style={{ color: c.textMuted }}>{m.ep}</p>
-                      </div>
-                    </div>
-                    <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: c.border }}>
-                      <div className="h-full rounded-full" style={{ width: `${m.progress}%`, background: c.accent }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>)}
-
-            {/* Trending */}
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-bold" style={{ color: c.text }}>Trending Now</p>
-              <span className="text-[10px] font-medium cursor-pointer" style={{ color: c.accentText }}>See All</span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }} className="mb-4">
-              {trending.map(m => movieCard(m))}
-            </div>
-
-            {/* Top Rated */}
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-bold" style={{ color: c.text }}>Top Rated</p>
-              <span className="text-[10px] font-medium cursor-pointer" style={{ color: c.accentText }}>See All</span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              {topRated.map(m => movieCard(m))}
-            </div>
-          </div>
-        </div>
-      );
-    })(),
+    store: <StoreApp c={c} installedApps={installedApps} installingApp={installingApp} installProgress={installProgress} handleInstallApp={handleInstallApp} setPaymentModal={setPaymentModal} />,
+    movies: <MoviesApp c={c} />,
     clock: <ClockApp c={c} />,
     calculator: <CalculatorApp c={c} />,
     accounts: <AccountsApp c={c} />,
