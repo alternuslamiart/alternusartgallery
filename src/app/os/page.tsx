@@ -615,7 +615,9 @@ function TerminalApp({ c }: { c: typeof palette.dark }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const lines = tabs.find(t => t.id === activeTab)?.lines || [];
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [lines]);
+  const linesLen = lines.length;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [linesLen]);
 
   const addTab = () => {
     const id = Date.now();
@@ -1779,7 +1781,7 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
                   </div>
                   <div>
                     <p className="text-xs font-semibold" style={{ color: c.text }}>Delete file?</p>
-                    <p className="text-[10px]" style={{ color: c.textMuted }}>"{deleteConfirm}" will be moved to Trash.</p>
+                    <p className="text-[10px]" style={{ color: c.textMuted }}>&quot;{deleteConfirm}&quot; will be moved to Trash.</p>
                   </div>
                 </div>
                 <div className="flex justify-end gap-2">
