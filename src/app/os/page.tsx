@@ -825,31 +825,73 @@ function CalendarApp({ c }: { c: typeof palette.dark }) {
 }
 
 function WeatherApp({ c }: { c: typeof palette.dark }) {
+  const [activeMode, setActiveMode] = useState<string | null>(null);
+  const [cityInput, setCityInput] = useState("");
+
+  const modes = [
+    { id: "hot", label: "Hot", icon: "M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41M12 8a4 4 0 100 8 4 4 0 000-8z" },
+    { id: "fan", label: "Fan", icon: "M12 12c-1.5-3-4.5-5-7-4s-2 5 1 7c-3 1.5-5 4.5-4 7s5 2 7-1c1.5 3 4.5 5 7 4s2-5-1-7c3-1.5 5-4.5 4-7s-5-2-7 1z" },
+    { id: "cold", label: "Cold", icon: "M12 2v20M17 7l-5 5-5-5M7 17l5-5 5 5M2 12h20M7 7l-5 5 5 5M17 7l5 5-5 5" },
+    { id: "damp", label: "Damp", icon: "M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" },
+  ];
+
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-4">
+    <div className="p-4 space-y-4">
+      {/* Gradient header card */}
+      <div className="rounded-2xl p-5 flex items-center justify-between" style={{ background: "linear-gradient(135deg, #f6a04a 0%, #f7c948 40%, #f0a0c0 100%)", minHeight: 100 }}>
         <div>
-          <p className="text-3xl font-light" style={{ color: c.text }}>17°</p>
-          <p className="text-xs" style={{ color: c.textMuted }}>Partly Cloudy</p>
+          <p className="text-xl font-semibold" style={{ color: "#fff" }}>New York</p>
+          <p className="text-xs" style={{ color: "rgba(255,255,255,0.8)" }}>Golden Sun</p>
         </div>
-        <span className="text-4xl">⛅</span>
+        <div className="flex items-center gap-3">
+          <p className="text-3xl font-bold" style={{ color: "#fff" }}>25 C</p>
+          <I d={ic.sun} s={32} c="#fff" />
+        </div>
       </div>
-      <div className="flex gap-2 mb-4">
-        {["Mon","Tue","Wed","Thu","Fri"].map((d,i) => (
-          <div key={d} className="flex-1 flex flex-col items-center gap-1 py-2 rounded-xl" style={{ background: i === 2 ? c.accentSoft : "transparent" }}>
-            <span className="text-[10px] font-medium" style={{ color: i === 2 ? c.accentText : c.textMuted }}>{d}</span>
-            <span className="text-sm">{["☀️","⛅","🌤","⛅","☀️"][i]}</span>
-            <span className="text-[11px] font-medium" style={{ color: i === 2 ? c.accentText : c.text }}>{[15,14,17,16,19][i]}°</span>
-          </div>
+
+      {/* Mode buttons */}
+      <div className="flex gap-3 justify-center">
+        {modes.map(m => (
+          <button
+            key={m.id}
+            onClick={() => setActiveMode(activeMode === m.id ? null : m.id)}
+            className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-2xl transition-colors"
+            style={{ background: activeMode === m.id ? c.accentSoft : c.cardAlt, minWidth: 64 }}
+          >
+            <I d={m.icon} s={20} c={activeMode === m.id ? c.accentText : c.textSec} />
+            <span className="text-[11px] font-medium" style={{ color: activeMode === m.id ? c.accentText : c.textSec }}>{m.label}</span>
+          </button>
         ))}
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        {[{l:"Humidity",v:"62%"},{l:"Wind",v:"12 km/h"},{l:"UV Index",v:"3 Low"},{l:"Pressure",v:"1013 hPa"}].map((s,i) => (
-          <div key={i} className="p-3 rounded-xl" style={{ background: c.cardAlt }}>
-            <p className="text-[10px]" style={{ color: c.textMuted }}>{s.l}</p>
-            <p className="text-sm font-semibold" style={{ color: c.text }}>{s.v}</p>
-          </div>
-        ))}
+
+      {/* Stats row */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="p-4 rounded-2xl" style={{ background: c.cardAlt }}>
+          <p className="text-[11px] mb-1" style={{ color: c.textMuted }}>Current Consumption</p>
+          <p className="text-2xl font-bold" style={{ color: c.text }}>1,5 kWh</p>
+        </div>
+        <div className="p-4 rounded-2xl" style={{ background: c.cardAlt }}>
+          <p className="text-[11px] mb-1" style={{ color: c.textMuted }}>Humidity</p>
+          <p className="text-2xl font-bold" style={{ color: c.text }}>48,%</p>
+        </div>
+      </div>
+
+      {/* Add city bar */}
+      <div className="flex items-center gap-2 rounded-2xl px-4 py-3" style={{ background: c.cardAlt }}>
+        <input
+          type="text"
+          placeholder="Add city for weather"
+          value={cityInput}
+          onChange={e => setCityInput(e.target.value)}
+          className="flex-1 bg-transparent outline-none text-sm"
+          style={{ color: c.text }}
+        />
+        <button className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: c.purpleSoft }}>
+          <I d={ic.type} s={16} c={c.purple} />
+        </button>
+        <button className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: c.purpleSoft }}>
+          <I d={ic.menu} s={16} c={c.purple} />
+        </button>
       </div>
     </div>
   );
