@@ -3649,14 +3649,14 @@ export default function AlternusOS() {
               onClick={() => setShowApps(!showApps)}
               className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
               style={{
-                background: showApps ? "#4ADE80" : c.surface,
-                border: `1px solid ${showApps ? "#4ADE80" : c.border}`,
+                background: showApps ? c.accent : c.surface,
+                border: `1px solid ${showApps ? c.accent : c.border}`,
                 color: showApps ? "#fff" : c.textSec,
               }}
               onMouseEnter={e => {
                 if (!showApps) {
-                  e.currentTarget.style.background = "#4ADE80";
-                  e.currentTarget.style.borderColor = "#4ADE80";
+                  e.currentTarget.style.background = c.accent;
+                  e.currentTarget.style.borderColor = c.accent;
                   e.currentTarget.style.color = "#fff";
                 }
               }}
