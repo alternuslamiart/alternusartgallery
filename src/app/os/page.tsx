@@ -4305,7 +4305,7 @@ export default function AlternusOS() {
             {/* Main chat area */}
             <div className="flex-1 flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3 flex-shrink-0">
+            <div className="flex items-center justify-between px-5 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
               <div className="flex items-center gap-2">
                 <I d={ic.sparkle} s={16} c={c.accent} />
                 <span className="text-sm font-semibold" style={{ color: c.text }}>Alternus AI</span>
