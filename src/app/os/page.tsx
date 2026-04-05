@@ -100,7 +100,7 @@ const palette = {
     titlebarBorder: "#3A3A3A",
   },
   light: {
-    bg: "#F2F2F4",
+    bg: "#E8E8EC",
     surface: "#FFFFFF",
     card: "#FFFFFF",
     cardAlt: "#EDEDF0",
@@ -3841,13 +3841,13 @@ export default function AlternusOS() {
             style={{
               backgroundImage: mode === "dark"
                 ? `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`
-                : "linear-gradient(90deg, #9CA3AF 0%, #D1D5DB 30%, #F3F4F6 50%, #D1D5DB 70%, #9CA3AF 100%)",
+                : "linear-gradient(90deg, #6B7280 0%, #9CA3AF 30%, #B0B5BC 50%, #9CA3AF 70%, #6B7280 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               color: "transparent",
             }}
           >
-            Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: mode === "dark" ? c.textMuted : "#9CA3AF" }}>©</span>
+            Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: mode === "dark" ? c.textMuted : "#6B7280" }}>©</span>
           </h1>
 
           {/* Welcome message */}
