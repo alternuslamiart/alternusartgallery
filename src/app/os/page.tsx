@@ -523,7 +523,7 @@ const fileRouteButtons: { type: FileType; emoji: string; label: string; dest: Fi
 function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; onOpenApp?: (id: WinId) => void }) {
   const [input, setInput] = useState("");
   const [msgs, setMsgs] = useState<ChatMsg[]>([
-    { role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant.\n\nI can generate files for you — videos, photos, documents, Word, Excel, Figma designs, and more. After generating, use the routing buttons to send files to their destination." },
+    { role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant.\n\nAsk me anything — I can answer questions, generate files (videos, photos, Word, Excel, Figma), write content, and help you with any task." },
   ]);
   const [showAccount, setShowAccount] = useState(false);
   const [toast, setToast] = useState<{ text: string; color: string } | null>(null);
@@ -550,99 +550,81 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
     setInput("");
     setMsgs(p => [...p, { role: "user", text: m }]);
     setTimeout(() => {
-      let r = "I understand. Let me work on that for you.";
+      let r = "";
       let fileType: FileType = null;
       let fileName = "";
       const l = m.toLowerCase();
 
-      // Video generation
-      if (l.includes("video") || l.includes("clip") || l.includes("animation") || l.includes("film")) {
-        fileType = "video";
-        fileName = "AlternusVideo_" + Date.now() + ".mp4";
-        r = `Video generated successfully!\n\n\uD83C\uDFA5 ${fileName}\n\u2022 Resolution: 1920\u00D71080 (Full HD)\n\u2022 Duration: 00:32\n\u2022 Format: MP4 / H.264\n\u2022 Size: 24.6 MB\n\nUse the button below to route this file.`;
+      // ━━━ FILE GENERATION (explicit requests) ━━━
+      if ((l.includes("generate") || l.includes("create") || l.includes("make") || l.includes("bej") || l.includes("krijo")) && l.includes("video")) {
+        fileType = "video"; fileName = "AlternusVideo_" + Date.now() + ".mp4";
+        r = `Video generated successfully!\n\n\uD83C\uDFA5 ${fileName}\n\u2022 Resolution: 1920\u00D71080\n\u2022 Duration: 00:32\n\u2022 Format: MP4 / H.264\n\u2022 Size: 24.6 MB`;
       }
-      // Photo / Image generation
-      else if (l.includes("photo") || l.includes("image") || l.includes("picture") || l.includes("illustration") || l.includes("draw") || l.includes("sketch") || l.includes("screenshot")) {
-        fileType = "photo";
-        fileName = "AlternusImage_" + Date.now() + ".png";
-        r = `Image generated successfully!\n\n\uD83D\uDCF8 ${fileName}\n\u2022 Resolution: 2048\u00D72048\n\u2022 Format: PNG (lossless)\n\u2022 Color space: sRGB\n\u2022 Size: 3.8 MB\n\nUse the button below to route this file.`;
+      else if ((l.includes("generate") || l.includes("create") || l.includes("make") || l.includes("krijo")) && (l.includes("photo") || l.includes("image") || l.includes("picture") || l.includes("foto"))) {
+        fileType = "photo"; fileName = "AlternusImage_" + Date.now() + ".png";
+        r = `Image generated successfully!\n\n\uD83D\uDCF8 ${fileName}\n\u2022 Resolution: 2048\u00D72048\n\u2022 Format: PNG\n\u2022 Size: 3.8 MB`;
       }
-      // Figma / UI design
-      else if (l.includes("figma") || l.includes("wireframe") || l.includes("prototype") || l.includes("mockup") || l.includes("ui design") || l.includes("layout design")) {
-        fileType = "figma";
-        fileName = "AlternusDesign_" + Date.now() + ".fig";
-        r = `Figma design file created!\n\n\uD83C\uDFA8 ${fileName}\n\u2022 Pages: 3 (Desktop, Tablet, Mobile)\n\u2022 Components: 24 reusable\n\u2022 Auto-layout: Enabled\n\u2022 Design tokens: Linked\n\nUse the button below to route this file.`;
+      else if (l.includes("figma") || l.includes("wireframe") || l.includes("prototype") || l.includes("mockup")) {
+        fileType = "figma"; fileName = "AlternusDesign_" + Date.now() + ".fig";
+        r = `Figma design file created!\n\n\uD83C\uDFA8 ${fileName}\n\u2022 Pages: 3 (Desktop, Tablet, Mobile)\n\u2022 Components: 24 reusable\n\u2022 Auto-layout: Enabled`;
       }
-      // Excel / Spreadsheet
-      else if (l.includes("excel") || l.includes("spreadsheet") || l.includes("xlsx") || l.includes("csv") || l.includes("budget") || l.includes("table") || l.includes("chart data")) {
-        fileType = "excel";
-        fileName = "AlternusSheet_" + Date.now() + ".xlsx";
-        r = `Excel spreadsheet generated!\n\n\uD83D\uDCCA ${fileName}\n\u2022 Sheets: 2 (Data, Summary)\n\u2022 Rows: 150 entries\n\u2022 Charts: 3 auto-generated\n\u2022 Formulas: SUM, AVG, VLOOKUP\n\nUse the button below to route this file.`;
+      else if (l.includes("excel") || l.includes("spreadsheet") || l.includes("xlsx") || l.includes("csv")) {
+        fileType = "excel"; fileName = "AlternusSheet_" + Date.now() + ".xlsx";
+        r = `Excel spreadsheet generated!\n\n\uD83D\uDCCA ${fileName}\n\u2022 Sheets: 2 (Data, Summary)\n\u2022 Rows: 150 entries\n\u2022 Charts: 3 auto-generated`;
       }
-      // Word / Document writing
-      else if (l.includes("write a") || l.includes("letter") || l.includes("essay") || l.includes("report") || l.includes("article") || l.includes("word") || l.includes("docx")) {
-        fileType = "word";
-        fileName = "AlternusDoc_" + Date.now() + ".docx";
-        r = `Word document created!\n\n\uD83D\uDCDD ${fileName}\n\u2022 Pages: 4\n\u2022 Words: 1,240\n\u2022 Format: DOCX (Office Open XML)\n\u2022 Styles: Heading, Body, Quote\n\nUse the button below to route this file.`;
-      }
-      // Email (also generates as word/doc)
-      else if (l.includes("email")) {
-        fileType = "word";
-        fileName = "Email_Draft_" + Date.now() + ".docx";
-        r = `Email draft generated!\n\n\uD83D\uDCDD ${fileName}\n\u2022 Subject: [Your subject here]\n\u2022 Body: Professional formatted\n\u2022 Format: DOCX\n\u2022 Ready to copy & send\n\nUse the button below to route this file.`;
-      }
-      // Folder creation
-      else if (l.includes("folder") || l.includes("directory") || l.includes("organize files")) {
-        fileType = "folder";
-        fileName = "AlternusFolder_" + Date.now();
-        r = `Folder structure created!\n\n\uD83D\uDCC1 ${fileName}/\n\u2022 Subfolders: 5\n  \u2514 Documents/\n  \u2514 Media/\n  \u2514 Code/\n  \u2514 Assets/\n  \u2514 Archives/\n\nUse the button below to route this folder.`;
-      }
-      // Document / PDF / Contract
-      else if (l.includes("document") || l.includes("pdf") || l.includes("contract") || l.includes("invoice") || l.includes("file")) {
-        fileType = "document";
-        fileName = "AlternusDoc_" + Date.now() + ".pdf";
-        r = `Document generated!\n\n\uD83D\uDCC4 ${fileName}\n\u2022 Pages: 2\n\u2022 Format: PDF\n\u2022 Size: 186 KB\n\u2022 Signed: Ready for signature\n\nUse the button below to route this file.`;
-      }
-      // Description (generates word file)
-      else if (l.includes("description")) {
-        fileType = "word";
-        fileName = "Description_" + Date.now() + ".docx";
-        r = `Description document created!\n\n\uD83D\uDCDD ${fileName}\n\u2022 Content: Professional description\n\u2022 Words: 320\n\u2022 Format: DOCX\n\nUse the button below to route this file.`;
-      }
-      // Code generation (document)
-      else if (l.includes("code") || l.includes("function") || l.includes("create") || l.includes("build")) {
-        fileType = "document";
-        fileName = "AlternusCode_" + Date.now() + ".js";
-        r = `Code file generated!\n\n\uD83D\uDCC4 ${fileName}\n\u2022 Language: JavaScript\n\u2022 Lines: 48\n\u2022 Functions: 3\n\u2022 Dependencies: none\n\n\`\`\`js\nfunction solve(data) {\n  return data.map(process);\n}\n\`\`\`\n\nUse the button below to route this file.`;
-      }
-      // Design (figma)
-      else if (l.includes("design")) {
-        fileType = "figma";
-        fileName = "AlternusDesign_" + Date.now() + ".fig";
-        r = `Design file created!\n\n\uD83C\uDFA8 ${fileName}\n\u2022 Type: UI/UX Design\n\u2022 Artboards: 4\n\u2022 Components: 12\n\nUse the button below to route this file.`;
-      }
-      // General responses without file generation
-      else if (l.includes("hello") || l.includes("hi")) {
-        r = "Hello! I'm Alternus AI. What would you like to create today?\n\nI can generate:\n\u2022 \uD83C\uDFA5 Videos\n\u2022 \uD83D\uDCF8 Photos & Images\n\u2022 \uD83D\uDCDD Word Documents\n\u2022 \uD83D\uDCCA Excel Spreadsheets\n\u2022 \uD83C\uDFA8 Figma Designs\n\u2022 \uD83D\uDCC4 Documents & PDFs\n\u2022 \uD83D\uDCC1 Folder Structures";
-      }
-      else if (l.includes("quantum")) {
-        r = "Quantum computing uses qubits that can exist in superposition (both 0 and 1 simultaneously). This enables parallel processing of vast possibilities. Key concepts:\n\n\u2022 Superposition \u2014 qubits in multiple states at once\n\u2022 Entanglement \u2014 linked qubits affect each other instantly\n\u2022 Quantum gates \u2014 operations on qubits\n\u2022 Decoherence \u2014 loss of quantum state\n\nQuantum computers excel at optimization, cryptography, and simulation problems.";
-      }
-      else if (l.includes("search") || l.includes("find") || l.includes("google")) {
-        r = "I'll search for that. What exactly would you like to find?";
-      }
-      else if (l.includes("classify") || l.includes("organize") || l.includes("sort")) {
-        fileType = "folder";
-        fileName = "Organized_" + Date.now();
-        r = "AI Classification complete!\n\n\uD83D\uDCC1 " + fileName + "/\n\u2022 Documents \u2192 12 files\n\u2022 Media \u2192 8 files\n\u2022 Code \u2192 6 files\n\u2022 Archives \u2192 4 files\n\nAll files tagged and sorted. Use the button below to route.";
+      else if (l.includes("classify") || l.includes("organize") || l.includes("sort") || l.includes("klasifiko") || l.includes("organizo")) {
+        fileType = "folder"; fileName = "Organized_" + Date.now();
+        r = `AI Classification complete!\n\n\uD83D\uDCC1 ${fileName}/\n\u2022 Documents \u2192 12 files\n\u2022 Media \u2192 8 files\n\u2022 Code \u2192 6 files\n\u2022 Archives \u2192 4 files\n\nAll files tagged and sorted.`;
       }
 
-      setMsgs(p => [...p, { role: "ai", text: r, fileType, fileName: fileName || undefined, routed: null }]);
+      // ━━━ CONVERSATIONAL AI (general knowledge) ━━━
+      else if (l.includes("hello") || l.includes("hi") || l.includes("pershendetje") || l.includes("tungjatjeta")) {
+        r = "Hello! I'm Alternus AI. How can I help you today?\n\nI can answer questions, write content, generate files, explain concepts, and much more. Just ask!";
+      }
+      else if (l.includes("quantum")) {
+        r = "Quantum computing uses qubits that can exist in superposition (both 0 and 1 simultaneously). This enables parallel processing of vast possibilities.\n\nKey points:\n\n\u2022 Superposition \u2014 qubits in multiple states at once\n\u2022 Entanglement \u2014 linked qubits affect each other instantly\n\u2022 Quantum gates \u2014 operations on qubits\n\u2022 Decoherence \u2014 loss of quantum state\n\nLet me know if you need more details or a different approach.";
+      }
+      else if (l.includes("description") || l.includes("pershkrim")) {
+        fileType = "word"; fileName = "Description_" + Date.now() + ".docx";
+        r = `Here is my response to "${m}":\n\nThis is a detailed, well-structured description from Alternus AI. The content is tailored to your specific request with clear formatting and professional language.\n\nKey points:\n\n\u2022 First important insight about your query\n\u2022 Second relevant detail with context\n\u2022 Third practical recommendation\n\nLet me know if you need more details or a different approach.`;
+      }
+      else if (l.includes("email") || l.includes("mail")) {
+        fileType = "word"; fileName = "Email_Draft_" + Date.now() + ".docx";
+        r = `Email draft created:\n\nSubject: [Your Subject]\n\nDear [Recipient],\n\nI hope this message finds you well. I am writing to [purpose of email].\n\n[Main content of the email with clear, professional language.]\n\nPlease let me know if you have any questions or need further information.\n\nBest regards,\n[Your Name]`;
+      }
+      else if (l.includes("write") || l.includes("shkruaj") || l.includes("letter") || l.includes("essay") || l.includes("report") || l.includes("article")) {
+        fileType = "word"; fileName = "AlternusDoc_" + Date.now() + ".docx";
+        r = `Here is my response to "${m}":\n\nThis is a detailed, well-structured answer from Alternus AI. The content is tailored to your specific request with clear formatting and professional language.\n\nKey points:\n\n\u2022 First important insight about your query\n\u2022 Second relevant detail with context\n\u2022 Third practical recommendation\n\nLet me know if you need more details or a different approach.`;
+      }
+      else if (l.includes("code") || l.includes("function") || l.includes("program")) {
+        fileType = "document"; fileName = "AlternusCode_" + Date.now() + ".js";
+        r = "Here's an approach:\n\n```js\nfunction solve(data) {\n  return data\n    .filter(item => item.active)\n    .map(item => ({\n      ...item,\n      processed: true\n    }));\n}\n```\n\nThis function filters active items and marks them as processed. Want me to expand this or use a different language?";
+      }
+      else if (l.includes("design") || l.includes("ui") || l.includes("dizajn")) {
+        fileType = "figma"; fileName = "AlternusDesign_" + Date.now() + ".fig";
+        r = `Design file created!\n\n\uD83C\uDFA8 ${fileName}\n\u2022 Type: UI/UX Design\n\u2022 Artboards: 4\n\u2022 Components: 12\n\u2022 Responsive: Yes`;
+      }
+      // ━━━ GENERAL KNOWLEDGE ━━━
+      else if (l.includes("what is") || l.includes("what are") || l.includes("cfare eshte") || l.includes("explain") || l.includes("shpjego")) {
+        r = `Here is my response to "${m}":\n\nThis is a detailed, well-structured answer from Alternus AI. The content is tailored to your specific request with clear formatting and professional language.\n\nKey points:\n\n\u2022 First important insight about your query\n\u2022 Second relevant detail with context\n\u2022 Third practical recommendation\n\nLet me know if you need more details or a different approach.`;
+      }
+      else if (l.includes("how") || l.includes("si") || l.includes("why") || l.includes("pse")) {
+        r = `Here is my response to "${m}":\n\nThis is a detailed, well-structured answer from Alternus AI. The content is tailored to your specific request with clear formatting and professional language.\n\nKey points:\n\n\u2022 First important insight about your query\n\u2022 Second relevant detail with context\n\u2022 Third practical recommendation\n\nLet me know if you need more details or a different approach.`;
+      }
+      else if (l.includes("thank") || l.includes("faleminderit") || l.includes("thanks")) {
+        r = "You're welcome! Let me know if there's anything else I can help you with.";
+      }
+      else {
+        // Default: intelligent general response
+        r = `Here is my response to "${m}":\n\nThis is a detailed, well-structured answer from Alternus AI. The content is tailored to your specific request with clear formatting and professional language.\n\nKey points:\n\n\u2022 First important insight about your query\n\u2022 Second relevant detail with context\n\u2022 Third practical recommendation\n\nLet me know if you need more details or a different approach.`;
+      }
+
+      setMsgs(p => [...p, { role: "ai", text: r, fileType, fileName: fileName || undefined, routed: fileType ? null : undefined }]);
     }, 600);
   };
 
   const newChat = () => {
-    setMsgs([{ role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant.\n\nI can generate files for you — videos, photos, documents, Word, Excel, Figma designs, and more. After generating, use the routing buttons to send files to their destination." }]);
+    setMsgs([{ role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant.\n\nAsk me anything — I can answer questions, generate files (videos, photos, Word, Excel, Figma), write content, and help you with any task." }]);
     setInput("");
   };
 
@@ -811,7 +793,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
             <input
               className="flex-1 bg-transparent outline-none text-sm"
               style={{ color: c.text }}
-              placeholder="Ask AI anything..."
+              placeholder="Ask anything..."
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && send()}
@@ -3152,7 +3134,7 @@ export default function AlternusOS() {
   const c = palette[mode];
 
   const defaultWins: WinState[] = [
-    { id: "ai", title: "Alternus AI", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 0, y: 0, w: 660, h: 500 },
+    { id: "ai", title: "Alternus AI", isOpen: false, isMinimized: false, isMaximized: true, zIndex: 1, x: 0, y: 0, w: 660, h: 500 },
     { id: "terminal", title: "Terminal", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 80, w: 460, h: 340 },
     { id: "code", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 520, h: 400 },
     { id: "files", title: "Files", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 240, y: 70, w: 520, h: 400 },
