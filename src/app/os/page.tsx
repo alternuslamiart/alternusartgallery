@@ -520,6 +520,47 @@ const fileRouteButtons: { type: FileType; emoji: string; label: string; dest: Fi
   { type: "figma", emoji: "\uD83C\uDFA8", label: "D\u00EBrgo te Figma.file", dest: "Figma.file", color: "#EC4899" },
 ];
 
+// Renders AI text with basic markdown: **bold**, bullet points, newlines
+function AIFormattedText({ text, c }: { text: string; c: typeof palette.dark }) {
+  const lines = text.split("\n");
+  return (
+    <>
+      {lines.map((line, li) => {
+        const trimmed = line.trim();
+        // Bullet point
+        if (trimmed.startsWith("- ") || trimmed.startsWith("\u2022 ") || trimmed.startsWith("* ")) {
+          const content = trimmed.replace(/^[-\u2022*]\s*/, "");
+          return (
+            <div key={li} className="flex gap-2 ml-2 my-1">
+              <span style={{ color: c.textMuted }}>{"\u2022"}</span>
+              <span><BoldText text={content} c={c} /></span>
+            </div>
+          );
+        }
+        // Empty line
+        if (!trimmed) return <div key={li} className="h-3" />;
+        // Normal line with bold support
+        return <p key={li} className="my-0.5"><BoldText text={line} c={c} /></p>;
+      })}
+    </>
+  );
+}
+
+// Renders **bold** segments within text
+function BoldText({ text, c }: { text: string; c: typeof palette.dark }) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith("**") && part.endsWith("**")) {
+          return <strong key={i} style={{ color: c.text, fontWeight: 600 }}>{part.slice(2, -2)}</strong>;
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+}
+
 function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; onOpenApp?: (id: WinId) => void }) {
   const [input, setInput] = useState("");
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
@@ -709,7 +750,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
           <div className="flex-1 flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-[560px] -mt-8">
               {/* Greeting */}
-              <h2 className="text-[22px] font-light mb-1" style={{ color: c.textMuted }}>Hi Bulzart</h2>
+              <h2 className="text-[22px] font-light mb-1" style={{ color: c.textMuted }}>Hi Alter</h2>
               <h1 className="text-[36px] font-light mb-8" style={{ color: c.text }}>Where should we start?</h1>
 
               {/* Input box */}
@@ -748,82 +789,131 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
             </div>
           </div>
         ) : (
-          /* ===== CONVERSATION VIEW ===== */
+          /* ===== GEMINI-STYLE CONVERSATION VIEW ===== */
           <>
-            <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-              {msgs.map((m, i) => (
-                <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className="max-w-[85%]">
-                    <div
-                      className="px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed"
-                      style={m.role === "user" ? { background: c.accent, color: "#fff" } : { background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}
-                    >
-                      <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
+            <div className="flex-1 overflow-y-auto px-6 py-6" style={{ scrollbarWidth: "none" }}>
+              <div className="max-w-[720px] mx-auto space-y-6">
+                {msgs.map((m, i) => (
+                  m.role === "user" ? (
+                    /* User message — right-aligned dark pill */
+                    <div key={i} className="flex justify-end">
+                      <div className="px-5 py-3 rounded-3xl text-[14px] leading-relaxed" style={{ background: c.cardAlt, color: c.text }}>
+                        {m.text}
+                      </div>
                     </div>
-                    {/* File routing buttons */}
-                    {m.role === "ai" && m.fileType && !m.routed && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {getButtonsForType(m.fileType).map((btn, bi) => (
-                          <button key={bi} onClick={() => routeFile(i, btn.dest, btn.color)}
-                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-medium transition-all"
-                            style={{ background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}
-                            onMouseEnter={e => { e.currentTarget.style.background = btn.color; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = btn.color; }}
-                            onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; e.currentTarget.style.borderColor = c.border; }}>
-                            <span>{btn.emoji}</span>
-                            <span>{btn.label}</span>
-                          </button>
-                        ))}
+                  ) : (
+                    /* AI message — sparkle icon + open text */
+                    <div key={i} className="flex gap-4 items-start">
+                      <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5" style={{ background: c.accentSoft }}>
+                        <I d={ic.sparkle} s={16} c={c.accent} />
                       </div>
-                    )}
-                    {/* Routed confirmation */}
-                    {m.role === "ai" && m.routed && (
-                      <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl text-[11px]"
-                        style={{ background: c.accentSoft, border: `1px solid ${c.accent}` }}>
-                        <span style={{ color: c.accentText }}>{"\u2713"} Routed to {m.routed}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[14px] leading-[1.8]" style={{ color: c.text }}>
+                          <AIFormattedText text={m.text} c={c} />
+                        </div>
+                        {/* File routing buttons */}
+                        {m.fileType && !m.routed && (
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {getButtonsForType(m.fileType).map((btn, bi) => (
+                              <button key={bi} onClick={() => routeFile(i, btn.dest, btn.color)}
+                                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-medium transition-all"
+                                style={{ background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}
+                                onMouseEnter={e => { e.currentTarget.style.background = btn.color; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = btn.color; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; e.currentTarget.style.borderColor = c.border; }}>
+                                <span>{btn.emoji}</span>
+                                <span>{btn.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        {/* Routed confirmation */}
+                        {m.routed && (
+                          <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-xl text-[11px]"
+                            style={{ background: c.accentSoft, border: `1px solid ${c.accent}` }}>
+                            <span style={{ color: c.accentText }}>{"\u2713"} Routed to {m.routed}</span>
+                          </div>
+                        )}
+                        {/* Action buttons — Gemini-style */}
+                        <div className="flex items-center gap-1 mt-3">
+                          {[
+                            { icon: "M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3", title: "Good response" },
+                            { icon: "M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3zm7-13h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17", title: "Bad response" },
+                            { icon: ic.refresh, title: "Regenerate" },
+                            { icon: "M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2M9 2h6v4H9z", title: "Copy" },
+                          ].map((action, ai) => (
+                            <button key={ai}
+                              className="p-2 rounded-lg transition-colors"
+                              style={{ color: c.textMuted }}
+                              title={action.title}
+                              onClick={() => {
+                                if (action.title === "Copy") {
+                                  navigator.clipboard.writeText(m.text);
+                                  setToast({ text: "Copied to clipboard", color: c.accent });
+                                }
+                                if (action.title === "Regenerate") {
+                                  const lastUserMsg = msgs.slice(0, i).reverse().find(msg => msg.role === "user");
+                                  if (lastUserMsg) {
+                                    setMsgs(p => p.filter((_, idx) => idx < i));
+                                    setTimeout(() => send(lastUserMsg.text), 100);
+                                  }
+                                }
+                              }}
+                              onMouseEnter={e => { e.currentTarget.style.color = c.text; e.currentTarget.style.background = c.cardAlt; }}
+                              onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; e.currentTarget.style.background = "transparent"; }}>
+                              <I d={typeof action.icon === "string" ? action.icon : ""} s={14} />
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+                    </div>
+                  )
+                ))}
 
-              {/* Typing indicator */}
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className="px-4 py-3 rounded-2xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-                    <div className="flex gap-1.5">
+                {/* Typing indicator — Gemini-style with sparkle */}
+                {isTyping && (
+                  <div className="flex gap-4 items-start">
+                    <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center" style={{ background: c.accentSoft }}>
+                      <I d={ic.sparkle} s={16} c={c.accent} />
+                    </div>
+                    <div className="flex gap-1.5 pt-2.5">
                       <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: c.textMuted, animationDelay: "0ms" }} />
                       <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: c.textMuted, animationDelay: "150ms" }} />
                       <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: c.textMuted, animationDelay: "300ms" }} />
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <div ref={endRef} />
+                <div ref={endRef} />
+              </div>
             </div>
 
-            {/* Input bar */}
-            <div className="px-3 py-2" style={{ borderTop: `1px solid ${c.border}` }}>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-                <input
-                  className="flex-1 bg-transparent outline-none text-sm"
-                  style={{ color: c.text }}
-                  placeholder="Ask anything..."
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") send(); }}
-                />
-                <button onClick={() => { if (onOpenApp) onOpenApp("files"); }}
-                  className="p-1.5 rounded-lg transition-all"
-                  style={{ color: c.textMuted }}
-                  title="Attach file"
-                  onMouseEnter={e => (e.currentTarget.style.color = c.text)}
-                  onMouseLeave={e => (e.currentTarget.style.color = c.textMuted)}>
-                  <I d={ic.fileText} s={14} />
-                </button>
-                <button onClick={() => send()} disabled={!input.trim() || isTyping} className="p-1.5 rounded-lg transition-opacity" style={{ background: c.accent, opacity: (!input.trim() || isTyping) ? 0.4 : 1 }}>
-                  <I d={ic.send} s={14} c="#fff" />
-                </button>
+            {/* Gemini-style input bar */}
+            <div className="px-6 pb-4 pt-2">
+              <div className="max-w-[720px] mx-auto">
+                <div className="rounded-2xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+                  <input
+                    className="w-full bg-transparent outline-none text-[14px] px-5 pt-4 pb-2"
+                    style={{ color: c.text }}
+                    placeholder="Ask Alternus AI..."
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") send(); }}
+                  />
+                  <div className="flex items-center justify-between px-4 pb-3">
+                    <div className="flex items-center gap-1">
+                      <button className="p-1.5 rounded-lg" style={{ color: c.textMuted }} title="Attach"
+                        onMouseEnter={e => { e.currentTarget.style.color = c.text; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; }}>
+                        <I d={ic.plus} s={16} />
+                      </button>
+                    </div>
+                    <button onClick={() => send()} disabled={!input.trim() || isTyping}
+                      className="p-1.5 rounded-lg transition-opacity"
+                      style={{ background: input.trim() ? c.accent : c.cardAlt, opacity: (!input.trim() || isTyping) ? 0.3 : 1 }}>
+                      <I d={ic.send} s={14} c="#fff" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </>
