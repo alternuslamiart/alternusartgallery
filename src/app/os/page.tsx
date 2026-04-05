@@ -2822,7 +2822,7 @@ export default function AlternusOS() {
   const [showAiChat, setShowAiChat] = useState(false);
   const [aiChatMsgs, setAiChatMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([]);
   const [aiChatInput, setAiChatInput] = useState("");
-  const [aiChatHistory] = useState([
+  const [_aiChatHistory] = useState([
     { title: "Create a description", time: "Today" },
     { title: "Write an email", time: "Today" },
     { title: "Explain quantum computing", time: "Yesterday" },
