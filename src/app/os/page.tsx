@@ -3839,13 +3839,15 @@ export default function AlternusOS() {
           <h1
             className="text-8xl md:text-9xl font-semibold mb-4 select-none bg-clip-text"
             style={{
-              backgroundImage: `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`,
+              backgroundImage: mode === "dark"
+                ? `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`
+                : "linear-gradient(90deg, #9CA3AF 0%, #D1D5DB 30%, #F3F4F6 50%, #D1D5DB 70%, #9CA3AF 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               color: "transparent",
             }}
           >
-            Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
+            Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: mode === "dark" ? c.textMuted : "#9CA3AF" }}>©</span>
           </h1>
 
           {/* Welcome message */}
