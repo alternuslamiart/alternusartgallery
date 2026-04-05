@@ -522,12 +522,13 @@ const fileRouteButtons: { type: FileType; emoji: string; label: string; dest: Fi
 
 function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; onOpenApp?: (id: WinId) => void }) {
   const [input, setInput] = useState("");
-  const [msgs, setMsgs] = useState<ChatMsg[]>([
-    { role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant.\n\nAsk me anything — I can answer questions, generate files (videos, photos, Word, Excel, Figma), write content, and help you with any task." },
-  ]);
+  const [msgs, setMsgs] = useState<ChatMsg[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
   const [toast, setToast] = useState<{ text: string; color: string } | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
+
+  const hasMessages = msgs.length > 0;
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
@@ -544,94 +545,50 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
     return primary ? [primary] : fileRouteButtons;
   };
 
-  const send = (text?: string) => {
+  const send = async (text?: string) => {
     const m = (text || input).trim();
-    if (!m) return;
+    if (!m || isTyping) return;
     setInput("");
     setMsgs(p => [...p, { role: "user", text: m }]);
-    setTimeout(() => {
-      let r = "";
-      let fileType: FileType = null;
-      let fileName = "";
-      const l = m.toLowerCase();
+    setIsTyping(true);
 
-      // ━━━ FILE GENERATION (explicit requests) ━━━
-      if ((l.includes("generate") || l.includes("create") || l.includes("make") || l.includes("bej") || l.includes("krijo")) && l.includes("video")) {
-        fileType = "video"; fileName = "AlternusVideo_" + Date.now() + ".mp4";
-        r = `Video generated successfully!\n\n\uD83C\uDFA5 ${fileName}\n\u2022 Resolution: 1920\u00D71080\n\u2022 Duration: 00:32\n\u2022 Format: MP4 / H.264\n\u2022 Size: 24.6 MB`;
-      }
-      else if ((l.includes("generate") || l.includes("create") || l.includes("make") || l.includes("krijo")) && (l.includes("photo") || l.includes("image") || l.includes("picture") || l.includes("foto"))) {
-        fileType = "photo"; fileName = "AlternusImage_" + Date.now() + ".png";
-        r = `Image generated successfully!\n\n\uD83D\uDCF8 ${fileName}\n\u2022 Resolution: 2048\u00D72048\n\u2022 Format: PNG\n\u2022 Size: 3.8 MB`;
-      }
-      else if (l.includes("figma") || l.includes("wireframe") || l.includes("prototype") || l.includes("mockup")) {
-        fileType = "figma"; fileName = "AlternusDesign_" + Date.now() + ".fig";
-        r = `Figma design file created!\n\n\uD83C\uDFA8 ${fileName}\n\u2022 Pages: 3 (Desktop, Tablet, Mobile)\n\u2022 Components: 24 reusable\n\u2022 Auto-layout: Enabled`;
-      }
-      else if (l.includes("excel") || l.includes("spreadsheet") || l.includes("xlsx") || l.includes("csv")) {
-        fileType = "excel"; fileName = "AlternusSheet_" + Date.now() + ".xlsx";
-        r = `Excel spreadsheet generated!\n\n\uD83D\uDCCA ${fileName}\n\u2022 Sheets: 2 (Data, Summary)\n\u2022 Rows: 150 entries\n\u2022 Charts: 3 auto-generated`;
-      }
-      else if (l.includes("classify") || l.includes("organize") || l.includes("sort") || l.includes("klasifiko") || l.includes("organizo")) {
-        fileType = "folder"; fileName = "Organized_" + Date.now();
-        r = `AI Classification complete!\n\n\uD83D\uDCC1 ${fileName}/\n\u2022 Documents \u2192 12 files\n\u2022 Media \u2192 8 files\n\u2022 Code \u2192 6 files\n\u2022 Archives \u2192 4 files\n\nAll files tagged and sorted.`;
+    try {
+      const conversationHistory = msgs.map(msg => ({
+        role: msg.role === "ai" ? "assistant" : "user",
+        content: msg.text,
+      }));
+
+      const response = await fetch("/api/ai-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: m, conversationHistory }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to get response");
       }
 
-      // ━━━ CONVERSATIONAL AI (general knowledge) ━━━
-      else if (l.includes("hello") || l.includes("hi") || l.includes("pershendetje") || l.includes("tungjatjeta")) {
-        r = "Hello! I'm Alternus AI. How can I help you today?\n\nI can answer questions, write content, generate files, explain concepts, and much more. Just ask!";
-      }
-      else if (l.includes("quantum")) {
-        r = "Quantum computing uses qubits that can exist in superposition (both 0 and 1 simultaneously). This enables parallel processing of vast possibilities.\n\nKey points:\n\n\u2022 Superposition \u2014 qubits in multiple states at once\n\u2022 Entanglement \u2014 linked qubits affect each other instantly\n\u2022 Quantum gates \u2014 operations on qubits\n\u2022 Decoherence \u2014 loss of quantum state\n\nLet me know if you need more details or a different approach.";
-      }
-      else if (l.includes("description") || l.includes("pershkrim")) {
-        fileType = "word"; fileName = "Description_" + Date.now() + ".docx";
-        r = `Here is my response to "${m}":\n\nThis is a detailed, well-structured description from Alternus AI. The content is tailored to your specific request with clear formatting and professional language.\n\nKey points:\n\n\u2022 First important insight about your query\n\u2022 Second relevant detail with context\n\u2022 Third practical recommendation\n\nLet me know if you need more details or a different approach.`;
-      }
-      else if (l.includes("email") || l.includes("mail")) {
-        fileType = "word"; fileName = "Email_Draft_" + Date.now() + ".docx";
-        r = `Email draft created:\n\nSubject: [Your Subject]\n\nDear [Recipient],\n\nI hope this message finds you well. I am writing to [purpose of email].\n\n[Main content of the email with clear, professional language.]\n\nPlease let me know if you have any questions or need further information.\n\nBest regards,\n[Your Name]`;
-      }
-      else if (l.includes("write") || l.includes("shkruaj") || l.includes("letter") || l.includes("essay") || l.includes("report") || l.includes("article")) {
-        fileType = "word"; fileName = "AlternusDoc_" + Date.now() + ".docx";
-        r = `Here is my response to "${m}":\n\nThis is a detailed, well-structured answer from Alternus AI. The content is tailored to your specific request with clear formatting and professional language.\n\nKey points:\n\n\u2022 First important insight about your query\n\u2022 Second relevant detail with context\n\u2022 Third practical recommendation\n\nLet me know if you need more details or a different approach.`;
-      }
-      else if (l.includes("code") || l.includes("function") || l.includes("program")) {
-        fileType = "document"; fileName = "AlternusCode_" + Date.now() + ".js";
-        r = "Here's an approach:\n\n```js\nfunction solve(data) {\n  return data\n    .filter(item => item.active)\n    .map(item => ({\n      ...item,\n      processed: true\n    }));\n}\n```\n\nThis function filters active items and marks them as processed. Want me to expand this or use a different language?";
-      }
-      else if (l.includes("design") || l.includes("ui") || l.includes("dizajn")) {
-        fileType = "figma"; fileName = "AlternusDesign_" + Date.now() + ".fig";
-        r = `Design file created!\n\n\uD83C\uDFA8 ${fileName}\n\u2022 Type: UI/UX Design\n\u2022 Artboards: 4\n\u2022 Components: 12\n\u2022 Responsive: Yes`;
-      }
-      // ━━━ GENERAL KNOWLEDGE ━━━
-      else if (l.includes("what is") || l.includes("what are") || l.includes("cfare eshte") || l.includes("explain") || l.includes("shpjego")) {
-        r = `Here is my response to "${m}":\n\nThis is a detailed, well-structured answer from Alternus AI. The content is tailored to your specific request with clear formatting and professional language.\n\nKey points:\n\n\u2022 First important insight about your query\n\u2022 Second relevant detail with context\n\u2022 Third practical recommendation\n\nLet me know if you need more details or a different approach.`;
-      }
-      else if (l.includes("how") || l.includes("si") || l.includes("why") || l.includes("pse")) {
-        r = `Here is my response to "${m}":\n\nThis is a detailed, well-structured answer from Alternus AI. The content is tailored to your specific request with clear formatting and professional language.\n\nKey points:\n\n\u2022 First important insight about your query\n\u2022 Second relevant detail with context\n\u2022 Third practical recommendation\n\nLet me know if you need more details or a different approach.`;
-      }
-      else if (l.includes("thank") || l.includes("faleminderit") || l.includes("thanks")) {
-        r = "You're welcome! Let me know if there's anything else I can help you with.";
-      }
-      else {
-        // Default: intelligent general response
-        r = `Here is my response to "${m}":\n\nThis is a detailed, well-structured answer from Alternus AI. The content is tailored to your specific request with clear formatting and professional language.\n\nKey points:\n\n\u2022 First important insight about your query\n\u2022 Second relevant detail with context\n\u2022 Third practical recommendation\n\nLet me know if you need more details or a different approach.`;
-      }
-
-      setMsgs(p => [...p, { role: "ai", text: r, fileType, fileName: fileName || undefined, routed: fileType ? null : undefined }]);
-    }, 600);
+      setMsgs(p => [...p, { role: "ai", text: data.content }]);
+    } catch {
+      setMsgs(p => [...p, { role: "ai", text: "I apologize, but I'm having trouble connecting right now. Please try again in a moment." }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const newChat = () => {
-    setMsgs([{ role: "ai", text: "Welcome to Alternus OS. I'm your AI assistant.\n\nAsk me anything — I can answer questions, generate files (videos, photos, Word, Excel, Figma), write content, and help you with any task." }]);
+    setMsgs([]);
     setInput("");
   };
 
-  const suggestions = [
-    "Create a description",
-    "Write an email",
-    "Explain quantum computing",
+  const landingChips = [
+    { label: "Explore gallery", icon: ic.image },
+    { label: "Art styles", icon: ic.sparkle },
+    { label: "Commission art", icon: ic.pen },
+    { label: "Help me choose", icon: ic.search },
+    { label: "Art care tips", icon: ic.shield },
   ];
 
   return (
@@ -650,7 +607,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
         <div className="px-4 pt-4 pb-2">
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold" style={{ color: c.accent }}>ALTERNUS</span>
-            <span className="text-xs" style={{ color: c.textMuted }}>OS</span>
+            <span className="text-xs" style={{ color: c.textMuted }}>AI</span>
           </div>
         </div>
 
@@ -661,18 +618,15 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
           </button>
         </div>
 
-        {/* Suggestions */}
-        <div className="px-3 py-2 space-y-1">
-          {suggestions.map((s, i) => (
-            <button key={i} onClick={() => send(s)}
-              className="w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors"
-              style={{ color: c.text }}
-              onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-              {s}
-            </button>
-          ))}
-        </div>
+        {/* Chat history hint */}
+        {hasMessages && (
+          <div className="px-3 py-2">
+            <p className="text-[10px] px-2 mb-1" style={{ color: c.textMuted }}>TODAY</p>
+            <div className="px-3 py-2 rounded-xl text-[12px] truncate" style={{ background: c.cardAlt, color: c.textSec }}>
+              {msgs[0]?.text.slice(0, 36)}{(msgs[0]?.text.length ?? 0) > 36 ? "..." : ""}
+            </div>
+          </div>
+        )}
 
         <div className="flex-1" />
 
@@ -736,7 +690,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
               </div>
               <div className="p-3 rounded-xl" style={{ background: c.bg }}>
                 <p className="text-[10px]" style={{ color: c.textMuted }}>Messages</p>
-                <p className="text-xs font-semibold" style={{ color: c.text }}>\u221E Unlimited</p>
+                <p className="text-xs font-semibold" style={{ color: c.text }}>{"\u221E"} Unlimited</p>
               </div>
               <div className="p-3 rounded-xl" style={{ background: c.bg }}>
                 <p className="text-[10px]" style={{ color: c.textMuted }}>Storage</p>
@@ -750,67 +704,130 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          {msgs.map((m, i) => (
-            <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div className="max-w-[85%]">
-                <div
-                  className="px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed"
-                  style={m.role === "user" ? { background: c.accent, color: "#fff" } : { background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}
-                >
-                  <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
+        {!hasMessages ? (
+          /* ===== GEMINI-STYLE LANDING ===== */
+          <div className="flex-1 flex flex-col items-center justify-center px-6">
+            <div className="w-full max-w-[560px] -mt-8">
+              {/* Greeting */}
+              <h2 className="text-[22px] font-light mb-1" style={{ color: c.textMuted }}>Hi Bulzart</h2>
+              <h1 className="text-[36px] font-light mb-8" style={{ color: c.text }}>Where should we start?</h1>
+
+              {/* Input box */}
+              <div className="rounded-2xl mb-5" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+                <input
+                  className="w-full bg-transparent outline-none text-sm px-5 pt-4 pb-2"
+                  style={{ color: c.text }}
+                  placeholder="Ask Alternus AI..."
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") send(); }}
+                />
+                <div className="flex items-center justify-between px-4 pb-3">
+                  <button className="p-1.5 rounded-lg" style={{ color: c.textMuted }} title="Attach">
+                    <I d={ic.plus} s={16} />
+                  </button>
+                  <button onClick={() => send()} disabled={!input.trim()} className="p-1.5 rounded-lg transition-opacity" style={{ background: input.trim() ? c.accent : c.cardAlt, opacity: input.trim() ? 1 : 0.3 }}>
+                    <I d={ic.send} s={14} c="#fff" />
+                  </button>
                 </div>
-                {/* File routing buttons */}
-                {m.role === "ai" && m.fileType && !m.routed && (
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {getButtonsForType(m.fileType).map((btn, bi) => (
-                      <button key={bi} onClick={() => routeFile(i, btn.dest, btn.color)}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-medium transition-all"
-                        style={{ background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}
-                        onMouseEnter={e => { e.currentTarget.style.background = btn.color; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = btn.color; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; e.currentTarget.style.borderColor = c.border; }}>
-                        <span>{btn.emoji}</span>
-                        <span>{btn.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {/* Routed confirmation */}
-                {m.role === "ai" && m.routed && (
-                  <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl text-[11px]"
-                    style={{ background: c.accentSoft, border: `1px solid ${c.accent}` }}>
-                    <span style={{ color: c.accentText }}>\u2713 Routed to {m.routed}</span>
-                  </div>
-                )}
+              </div>
+
+              {/* Suggestion chips */}
+              <div className="flex flex-wrap gap-2 justify-center">
+                {landingChips.map(chip => (
+                  <button key={chip.label} onClick={() => send(chip.label)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[12px] transition-colors"
+                    style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}
+                    onMouseEnter={e => { e.currentTarget.style.background = c.border; e.currentTarget.style.color = c.text; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.textSec; }}>
+                    <I d={chip.icon} s={14} />
+                    {chip.label}
+                  </button>
+                ))}
               </div>
             </div>
-          ))}
-          <div ref={endRef} />
-        </div>
-        {/* Input bar */}
-        <div className="px-3 py-2" style={{ borderTop: `1px solid ${c.border}` }}>
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-            <input
-              className="flex-1 bg-transparent outline-none text-sm"
-              style={{ color: c.text }}
-              placeholder="Ask anything..."
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && send()}
-            />
-            <button onClick={() => { if (onOpenApp) onOpenApp("files"); }}
-              className="p-1.5 rounded-lg transition-all"
-              style={{ color: c.textMuted }}
-              title="Attach file"
-              onMouseEnter={e => (e.currentTarget.style.color = c.text)}
-              onMouseLeave={e => (e.currentTarget.style.color = c.textMuted)}>
-              <I d={ic.fileText} s={14} />
-            </button>
-            <button onClick={() => send()} className="p-1.5 rounded-lg" style={{ background: c.accent }}>
-              <I d={ic.send} s={14} c="#fff" />
-            </button>
           </div>
-        </div>
+        ) : (
+          /* ===== CONVERSATION VIEW ===== */
+          <>
+            <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
+              {msgs.map((m, i) => (
+                <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div className="max-w-[85%]">
+                    <div
+                      className="px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed"
+                      style={m.role === "user" ? { background: c.accent, color: "#fff" } : { background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}
+                    >
+                      <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
+                    </div>
+                    {/* File routing buttons */}
+                    {m.role === "ai" && m.fileType && !m.routed && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {getButtonsForType(m.fileType).map((btn, bi) => (
+                          <button key={bi} onClick={() => routeFile(i, btn.dest, btn.color)}
+                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-medium transition-all"
+                            style={{ background: c.cardAlt, color: c.text, border: `1px solid ${c.border}` }}
+                            onMouseEnter={e => { e.currentTarget.style.background = btn.color; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = btn.color; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; e.currentTarget.style.borderColor = c.border; }}>
+                            <span>{btn.emoji}</span>
+                            <span>{btn.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {/* Routed confirmation */}
+                    {m.role === "ai" && m.routed && (
+                      <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl text-[11px]"
+                        style={{ background: c.accentSoft, border: `1px solid ${c.accent}` }}>
+                        <span style={{ color: c.accentText }}>{"\u2713"} Routed to {m.routed}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* Typing indicator */}
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="px-4 py-3 rounded-2xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+                    <div className="flex gap-1.5">
+                      <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: c.textMuted, animationDelay: "0ms" }} />
+                      <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: c.textMuted, animationDelay: "150ms" }} />
+                      <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: c.textMuted, animationDelay: "300ms" }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div ref={endRef} />
+            </div>
+
+            {/* Input bar */}
+            <div className="px-3 py-2" style={{ borderTop: `1px solid ${c.border}` }}>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+                <input
+                  className="flex-1 bg-transparent outline-none text-sm"
+                  style={{ color: c.text }}
+                  placeholder="Ask anything..."
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") send(); }}
+                />
+                <button onClick={() => { if (onOpenApp) onOpenApp("files"); }}
+                  className="p-1.5 rounded-lg transition-all"
+                  style={{ color: c.textMuted }}
+                  title="Attach file"
+                  onMouseEnter={e => (e.currentTarget.style.color = c.text)}
+                  onMouseLeave={e => (e.currentTarget.style.color = c.textMuted)}>
+                  <I d={ic.fileText} s={14} />
+                </button>
+                <button onClick={() => send()} disabled={!input.trim() || isTyping} className="p-1.5 rounded-lg transition-opacity" style={{ background: c.accent, opacity: (!input.trim() || isTyping) ? 0.4 : 1 }}>
+                  <I d={ic.send} s={14} c="#fff" />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
