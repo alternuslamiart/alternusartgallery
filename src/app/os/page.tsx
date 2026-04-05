@@ -235,7 +235,7 @@ function TitleBar({
           onMouseDown={e => e.stopPropagation()}
           onClick={onMinimize}
           className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#D4A844"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", "#fff"); }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#4ADE80"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", "#fff"); }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", c.textMuted); }}
         >
           <svg width={10} height={10} viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
