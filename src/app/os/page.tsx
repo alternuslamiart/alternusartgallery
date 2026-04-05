@@ -190,7 +190,16 @@ const ic = {
   menu: "M3 12h18M3 6h18M3 18h18",
   trash: "M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6",
   voice: "M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8",
+  heart: "M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z",
   // Filled icon variants
+  globeF: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z",
+  codeF: "M16 18l6-6-6-6M8 6l-6 6 6 6",
+  terminalF: "M4 17l6-6-6-6M12 19h8",
+  cloudF: "M17.5 19H9a7 7 0 116.71-9h1.79a4.5 4.5 0 110 9z",
+  calendarF: "M3 10h18M8 2v4M16 2v4M3 6a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6z",
+  storeF: "M3 3h18l-2 13H5L3 3zM16 16a2 2 0 100 4 2 2 0 000-4zM9 16a2 2 0 100 4 2 2 0 000-4z",
+  filmF: "M2 2h20v20H2zM7 2v20M17 2v20M2 7h5M2 12h20M2 17h5M17 7h5M17 17h5",
+  bellF: "M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0",
   settingsF: "M12 8a4 4 0 100 8 4 4 0 000-8zM12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z",
   wifiF: "M12 20h.01M8.5 16.5a5 5 0 017 0M5 13a10 10 0 0114 0M2 8.82a15 15 0 0120 0",
   batteryF: "M17 6H3a2 2 0 00-2 2v8a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2zM23 13v-2M7 10v4M10 10v4M13 10v4",
@@ -3676,23 +3685,23 @@ export default function AlternusOS() {
           <span style={{ color: c.text }} className="text-[11px] font-bold tracking-wider">ALTERNUS</span>
           <span style={{ color: c.textMuted }} className="text-[10px]">OS</span>
         </div>
-        <span className="absolute left-1/2 -translate-x-1/2 text-xs font-medium" style={{ color: c.textSec }}>{fmt(time)} · {time.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+        <span className="absolute left-1/2 -translate-x-1/2 text-xs font-bold" style={{ color: c.text }}>{fmt(time)} · {time.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
         <div className="flex items-center gap-1">
           {(() => { const ic_ = mode === "dark" ? "#FFFFFF" : "#444444"; return (<>
             {/* Quick launch apps */}
-            <button title="Browser" onClick={() => openWin("browser")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.globe} s={15} /></button>
-            <button title="Settings" onClick={() => openWin("settings")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.settingsF} s={15} /></button>
-            <button title="Code Editor" onClick={() => openWin("code")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.code} s={15} /></button>
-            <button title="Terminal" onClick={() => openWin("terminal")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.terminal} s={15} /></button>
-            <button title="Weather" onClick={() => openWin("weather")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.cloud} s={15} /></button>
-            <button title="Calendar" onClick={() => openWin("calendar")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.calendar} s={15} /></button>
-            <button title="Store" onClick={() => openWin("store")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.store} s={15} /></button>
-            <button title="Movies" onClick={() => openWin("movies")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.film} s={15} /></button>
+            <button title="Browser" onClick={() => openWin("browser")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.globeF} s={15} f /></button>
+            <button title="Settings" onClick={() => openWin("settings")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.settingsF} s={15} f /></button>
+            <button title="Code Editor" onClick={() => openWin("code")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.codeF} s={15} f /></button>
+            <button title="Terminal" onClick={() => openWin("terminal")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.terminalF} s={15} f /></button>
+            <button title="Weather" onClick={() => openWin("weather")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.cloudF} s={15} f /></button>
+            <button title="Calendar" onClick={() => openWin("calendar")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.calendarF} s={15} f /></button>
+            <button title="Store" onClick={() => openWin("store")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.storeF} s={15} f /></button>
+            <button title="Movies" onClick={() => openWin("movies")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.filmF} s={15} f /></button>
             {/* Separator */}
             <div className="w-px h-4 mx-1" style={{ background: c.border }} />
             {/* System tray */}
             <button title="Notifications" onClick={() => setShowNotifications(!showNotifications)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors relative" style={{ color: ic_ }}>
-              <I d={ic.bell} s={15} />
+              <I d={ic.bellF} s={15} f />
               <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full" style={{ background: c.danger }} />
             </button>
             <div className="relative">
@@ -4242,22 +4251,28 @@ export default function AlternusOS() {
                 </div>
               </div>
             ))}
-            {/* Static system notifications */}
+            {/* App notifications */}
             {[
-              { title: "System Update", desc: "Alternus OS v1.1 is available", time: "2 min ago", icon: ic.settings },
-              { title: "Welcome", desc: "Welcome to Alternus OS! Explore your new desktop.", time: "5 min ago", icon: ic.sparkle },
-              { title: "Network", desc: "Connected to AlternusNet · 5GHz", time: "10 min ago", icon: ic.wifi },
+              { title: "OpenAI", desc: "GPT-5 is now available. Try the new model with enhanced reasoning capabilities.", time: "Now", color: "#10A37F", initials: "AI" },
+              { title: "Claude", desc: "Your conversation has been saved. Continue where you left off anytime.", time: "2m", color: "#D97706", initials: "C" },
+              { title: "Facebook", desc: "John tagged you in a photo. Check it out!", time: "5m", color: "#1877F2", initials: "f" },
+              { title: "Instagram", desc: "Sarah started a live video. Watch before it ends.", time: "8m", color: "#E4405F", initials: "IG" },
+              { title: "Discord", desc: "New message in #general: \"Meeting at 3pm today\"", time: "12m", color: "#5865F2", initials: "D" },
+              { title: "System Update", desc: "Alternus OS v1.1 is available with performance improvements.", time: "15m", color: c.accent, initials: "OS" },
             ].map((n, i) => (
-              <div key={`sys-${i}`} className="flex items-start gap-3 p-3 rounded-xl transition-colors"
-                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: c.cardAlt }}>
-                  <I d={n.icon} s={14} c={c.textSec} />
+              <div key={`app-${i}`} className="flex items-start gap-3 p-3 rounded-2xl transition-all cursor-pointer"
+                style={{ background: c.cardAlt }}
+                onMouseEnter={e => { e.currentTarget.style.background = c.border; e.currentTarget.style.transform = "scale(1.01)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.transform = "scale(1)"; }}>
+                <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: n.color + "20" }}>
+                  <span className="text-xs font-bold" style={{ color: n.color }}>{n.initials}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium" style={{ color: c.text }}>{n.title}</p>
-                  <p className="text-[10px] mt-0.5" style={{ color: c.textMuted }}>{n.desc}</p>
-                  <p className="text-[9px] mt-1" style={{ color: c.textMuted }}>{n.time}</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-semibold" style={{ color: c.text }}>{n.title}</p>
+                    <span className="text-[8px] px-2 py-0.5 rounded-full font-medium" style={{ background: i === 0 ? n.color + "20" : c.surface, color: i === 0 ? n.color : c.textMuted }}>{n.time}</span>
+                  </div>
+                  <p className="text-[10px] mt-1 leading-relaxed" style={{ color: c.textSec }}>{n.desc}</p>
                 </div>
               </div>
             ))}
