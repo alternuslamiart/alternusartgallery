@@ -813,7 +813,9 @@ function CalendarApp({ c }: { c: typeof palette.dark }) {
       <div className="grid grid-cols-7 gap-1">
         {days.map((d, i) => (
           <button key={i} onClick={() => d && setSel(d)} className="aspect-square flex items-center justify-center rounded-lg text-xs font-medium transition-all"
-            style={{ background: d === sel ? c.accent : d === now.getDate() && d !== sel ? c.accentSoft : "transparent", color: d === sel ? "#fff" : d === now.getDate() ? c.accentText : d ? c.text : "transparent" }}>
+            style={{ background: d === sel ? c.accent : d === now.getDate() && d !== sel ? c.accentSoft : "transparent", color: d === sel ? "#fff" : d === now.getDate() ? c.accentText : d ? c.text : "transparent" }}
+            onMouseEnter={e => { if (d && d !== sel) e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { if (d && d !== sel) e.currentTarget.style.background = d === now.getDate() ? c.accentSoft : "transparent"; }}>
             {d}
           </button>
         ))}
@@ -3929,7 +3931,7 @@ export default function AlternusOS() {
             {/* AI response - separate below */}
             {aiResponse && (
               <div
-                className="mt-3 px-5 py-4 rounded-2xl text-[13px] leading-relaxed"
+                className="mt-3 px-5 py-4 rounded-2xl text-[13px] leading-relaxed relative"
                 style={{
                   background: c.surface,
                   border: `1px solid ${c.border}`,
@@ -3937,7 +3939,16 @@ export default function AlternusOS() {
                   boxShadow: mode === "dark" ? "0 2px 12px rgba(0,0,0,0.12)" : "0 2px 12px rgba(0,0,0,0.04)",
                 }}
               >
-                <pre className="whitespace-pre-wrap font-sans">{aiResponse}</pre>
+                {/* Copy button */}
+                <button
+                  onClick={() => { navigator.clipboard.writeText(aiResponse); }}
+                  className="absolute top-2.5 right-2.5 p-1.5 rounded-lg transition-all hover:scale-105 active:scale-95"
+                  style={{ background: c.cardAlt, color: c.textMuted }}
+                  title="Copy"
+                >
+                  <I d={ic.fileText} s={12} c={c.textMuted} />
+                </button>
+                <pre className="whitespace-pre-wrap font-sans pr-8">{aiResponse}</pre>
                 {aiActions.length > 0 && (
                   <div className="flex gap-2 mt-3">
                     {aiActions.map((a, i) => (
