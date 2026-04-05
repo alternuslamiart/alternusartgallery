@@ -3016,7 +3016,7 @@ export default function AlternusOS() {
           setInstalledApps(prev => [...prev, appName]);
           setInstallingApp(null);
           setInstallProgress(0);
-          setSystemModal({ type: "info", title: "Installed", message: `${appName} has been installed successfully.` });
+          setSystemModal({ type: "info", title: "Installed", message: `${appName} has been installed\nsuccessfully.` });
           setTimeout(() => setSystemModal(null), 2500);
         }, 400);
       } else {
@@ -3323,11 +3323,11 @@ export default function AlternusOS() {
                     <p className="text-[8px] mt-0.5" style={{ color: c.textMuted }}>{app.desc}</p>
                   </div>
                   {installingApp === app.name ? (
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: c.border }}>
-                        <div className="h-full rounded-full transition-all" style={{ width: `${installProgress}%`, background: c.accent }} />
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="w-20 h-2.5 rounded-full overflow-hidden" style={{ background: c.border }}>
+                        <div className="h-full rounded-full transition-all duration-200" style={{ width: `${installProgress}%`, background: c.accent }} />
                       </div>
-                      <span className="text-[8px]" style={{ color: c.textMuted }}>{Math.round(installProgress)}%</span>
+                      <span className="text-[9px] font-medium" style={{ color: c.textMuted }}>{Math.round(installProgress)}%</span>
                     </div>
                   ) : installedApps.includes(app.name) ? (
                     <span className="text-[9px] px-3 py-1 rounded-full font-semibold flex-shrink-0" style={{ background: c.successSoft, color: c.success }}>Open</span>
@@ -3366,11 +3366,11 @@ export default function AlternusOS() {
                     <p className="text-[8px] mt-0.5" style={{ color: c.textMuted }}>{app.desc}</p>
                   </div>
                   {installingApp === app.name ? (
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: c.border }}>
-                        <div className="h-full rounded-full transition-all" style={{ width: `${installProgress}%`, background: c.accent }} />
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="w-20 h-2.5 rounded-full overflow-hidden" style={{ background: c.border }}>
+                        <div className="h-full rounded-full transition-all duration-200" style={{ width: `${installProgress}%`, background: c.accent }} />
                       </div>
-                      <span className="text-[8px]" style={{ color: c.textMuted }}>{Math.round(installProgress)}%</span>
+                      <span className="text-[9px] font-medium" style={{ color: c.textMuted }}>{Math.round(installProgress)}%</span>
                     </div>
                   ) : installedApps.includes(app.name) ? (
                     <span className="text-[9px] px-3 py-1 rounded-full font-semibold flex-shrink-0" style={{ background: c.successSoft, color: c.success }}>Open</span>
@@ -3975,7 +3975,7 @@ export default function AlternusOS() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold" style={{ color: c.text }}>{systemModal.title}</p>
-                  <p className="text-xs" style={{ color: c.textMuted }}>{systemModal.message}</p>
+                  <p className="text-xs whitespace-pre-line" style={{ color: c.textMuted }}>{systemModal.message}</p>
                 </div>
               </div>
               <div className="flex justify-end gap-2">
