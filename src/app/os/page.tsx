@@ -3876,27 +3876,86 @@ export default function AlternusOS() {
           </div>
 
         {/* Center: Alternus branding + AI Search - always visible behind windows */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-[0]">
-          {/* Alternus gradient text */}
-          <h1
-            className="text-8xl md:text-9xl font-semibold mb-4 select-none bg-clip-text"
-            style={{
-              backgroundImage: `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              color: "transparent",
-            }}
-          >
-            Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
-          </h1>
+        <div className="absolute inset-0 flex flex-col items-center z-[0]">
+          {/* Top section: Alternus branding OR AI response */}
+          <div className="flex-1 flex flex-col items-center justify-center w-full">
+            {!aiResponse ? (<>
+              {/* Alternus gradient text */}
+              <h1
+                className="text-8xl md:text-9xl font-semibold mb-4 select-none bg-clip-text"
+                style={{
+                  backgroundImage: `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  color: "transparent",
+                }}
+              >
+                Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
+              </h1>
+              {/* Welcome message */}
+              <p className="text-base font-light" style={{ color: c.textSec }}>
+                Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}. What would you like to create today?
+              </p>
+            </>) : (
+              /* AI response area - replaces Alternus text */
+              <div className="w-full max-w-2xl px-4 overflow-y-auto" style={{ maxHeight: "calc(100vh - 200px)", scrollbarWidth: "none" }}>
+                <div
+                  className="px-6 py-5 rounded-2xl text-[13px] leading-[1.8] relative"
+                  style={{
+                    background: c.surface,
+                    border: `1px solid ${c.border}`,
+                    color: c.text,
+                    boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.2)" : "0 4px 24px rgba(0,0,0,0.06)",
+                  }}
+                >
+                  {/* Copy button */}
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(aiResponse); }}
+                    className="absolute top-3 right-3 p-1.5 rounded-lg transition-colors"
+                    style={{ background: c.cardAlt, color: c.textMuted }}
+                    title="Copy"
+                  >
+                    <I d={ic.fileText} s={12} c={c.textMuted} />
+                  </button>
+                  {/* Formatted response */}
+                  <div className="pr-8 space-y-2">
+                    {aiResponse.split("\n").map((line, i) => {
+                      const trimmed = line.trim();
+                      if (!trimmed) return <div key={i} className="h-2" />;
+                      if (trimmed.startsWith("•") || trimmed.startsWith("▪")) return <div key={i} className="flex gap-2 pl-2"><span style={{ color: c.accent }}>•</span><span>{trimmed.slice(1).trim()}</span></div>;
+                      if (trimmed.startsWith("📁") || trimmed.startsWith("💾") || trimmed.startsWith("📊") || trimmed.startsWith("🎬") || trimmed.startsWith("📄") || trimmed.startsWith("🗑️")) return <div key={i} className="pl-2">{trimmed}</div>;
+                      if (trimmed.endsWith(":")) return <p key={i} className="font-semibold mt-2" style={{ color: c.text }}>{trimmed}</p>;
+                      return <p key={i}>{trimmed}</p>;
+                    })}
+                  </div>
+                  {aiActions.length > 0 && (
+                    <div className="flex gap-2 mt-4 pt-3" style={{ borderTop: `1px solid ${c.border}` }}>
+                      {aiActions.map((a, i) => (
+                        <button
+                          key={i}
+                          onClick={() => { openWin(a.action); setAiResponse(null); setAiActions([]); setAiInput(""); }}
+                          className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors hover:opacity-80"
+                          style={{ background: c.accentSoft, color: c.accentText }}
+                        >
+                          {a.label}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => { setAiResponse(null); setAiActions([]); }}
+                        className="px-3 py-1.5 rounded-lg text-xs transition-colors"
+                        style={{ color: c.textMuted }}
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
-          {/* Welcome message */}
-          <p className="text-base font-light mb-10" style={{ color: c.textSec }}>
-            Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}. What would you like to create today?
-          </p>
-
-          {/* AI Search Bar */}
-          <div className="w-full max-w-2xl">
+          {/* Bottom: AI Search Bar - always at bottom */}
+          <div className="w-full max-w-2xl px-4 pb-8">
             <div
               className="flex items-center gap-2 pl-5 pr-2 py-2 rounded-2xl transition-all"
               style={{
@@ -3926,51 +3985,6 @@ export default function AlternusOS() {
                 <I d={ic.send} s={16} c="#fff" />
               </button>
             </div>
-
-            {/* AI response - separate below */}
-            {aiResponse && (
-              <div
-                className="mt-3 px-5 py-4 rounded-2xl text-[13px] leading-relaxed relative"
-                style={{
-                  background: c.surface,
-                  border: `1px solid ${c.border}`,
-                  color: c.text,
-                  boxShadow: mode === "dark" ? "0 2px 12px rgba(0,0,0,0.12)" : "0 2px 12px rgba(0,0,0,0.04)",
-                }}
-              >
-                {/* Copy button */}
-                <button
-                  onClick={() => { navigator.clipboard.writeText(aiResponse); }}
-                  className="absolute top-2.5 right-2.5 p-1.5 rounded-lg transition-all"
-                  style={{ background: c.cardAlt, color: c.textMuted }}
-                  title="Copy"
-                >
-                  <I d={ic.fileText} s={12} c={c.textMuted} />
-                </button>
-                <pre className="whitespace-pre-wrap font-sans pr-8">{aiResponse}</pre>
-                {aiActions.length > 0 && (
-                  <div className="flex gap-2 mt-3">
-                    {aiActions.map((a, i) => (
-                      <button
-                        key={i}
-                        onClick={() => { openWin(a.action); setAiResponse(null); setAiActions([]); setAiInput(""); }}
-                        className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:opacity-80"
-                        style={{ background: c.accentSoft, color: c.accentText }}
-                      >
-                        {a.label}
-                      </button>
-                    ))}
-                    <button
-                      onClick={() => { setAiResponse(null); setAiActions([]); }}
-                      className="px-3 py-1.5 rounded-lg text-xs transition-colors"
-                      style={{ color: c.textMuted }}
-                    >
-                      Dismiss
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
