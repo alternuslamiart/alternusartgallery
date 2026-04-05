@@ -3099,6 +3099,7 @@ export default function AlternusOS() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showWifiPanel, setShowWifiPanel] = useState(false);
   const [showProfilePanel, setShowProfilePanel] = useState(false);
+  const [showAISidebar, setShowAISidebar] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [connectedWifi, setConnectedWifi] = useState(0);
   const [showTaskSwitcher, setShowTaskSwitcher] = useState(false);
@@ -3844,7 +3845,6 @@ export default function AlternusOS() {
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
-    { id: "ai", icon: ic.sparkle, label: "AI Chat", color: c.accent },
     { id: "terminal", icon: ic.terminal, label: "Terminal", color: c.success },
     { id: "code", icon: ic.code, label: "Code", color: c.purple },
     { id: "files", icon: ic.folder, label: "Files", color: c.warning },
@@ -4124,8 +4124,101 @@ export default function AlternusOS() {
       {/* Desktop Area - fixed, no scroll */}
       <div className="flex-1 relative overflow-hidden"
         style={{ background: desktopBg }}
-        onClick={() => { if (showApps) setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setContextMenu(null); }}
-        onContextMenu={e => { e.preventDefault(); setContextMenu({ x: e.clientX, y: e.clientY - 36 }); setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); }}>
+        onClick={() => { if (showApps) setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setShowAISidebar(false); setContextMenu(null); }}
+        onContextMenu={e => { e.preventDefault(); setContextMenu({ x: e.clientX, y: e.clientY - 36 }); setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setShowAISidebar(false); }}>
+
+        {/* AI Sparkle button - bottom left */}
+        <div className="absolute bottom-6 left-6 z-[60]" onClick={e => e.stopPropagation()}>
+          <button
+            onClick={() => setShowAISidebar(!showAISidebar)}
+            className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-lg"
+            style={{
+              background: showAISidebar ? c.accent : c.surface,
+              border: `1px solid ${showAISidebar ? c.accent : c.border}`,
+              boxShadow: showAISidebar ? `0 0 20px ${c.accent}40` : mode === "dark" ? "0 4px 16px rgba(0,0,0,0.3)" : "0 4px 16px rgba(0,0,0,0.1)",
+            }}
+            onMouseEnter={e => { if (!showAISidebar) { e.currentTarget.style.background = c.accentSoft; e.currentTarget.style.borderColor = c.accent; } }}
+            onMouseLeave={e => { if (!showAISidebar) { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; } }}
+          >
+            <I d={ic.sparkle} s={22} c={showAISidebar ? "#fff" : c.accent} />
+          </button>
+
+          {/* AI Sidebar panel */}
+          {showAISidebar && (
+            <div className="absolute bottom-16 left-0 w-[220px] rounded-2xl overflow-hidden shadow-2xl"
+              style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4)" : "0 8px 32px rgba(0,0,0,0.12)" }}>
+              <div className="flex flex-col" style={{ maxHeight: 480 }}>
+                {/* Brand */}
+                <div className="px-4 pt-4 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold" style={{ color: c.accent }}>ALTERNUS</span>
+                    <span className="text-xs" style={{ color: c.textMuted }}>OS</span>
+                  </div>
+                </div>
+
+                {/* New chat button */}
+                <div className="px-3 py-2">
+                  <button onClick={() => { openWin("ai"); setShowAISidebar(false); }}
+                    className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
+                    style={{ background: c.accent, color: "#fff" }}
+                    onMouseEnter={e => { e.currentTarget.style.opacity = "0.9"; }}
+                    onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}>
+                    + New chat
+                  </button>
+                </div>
+
+                {/* Suggestions */}
+                <div className="px-3 py-1 space-y-0.5">
+                  {["Create a description", "Write an email", "Explain quantum computing"].map((s, i) => (
+                    <button key={i} onClick={() => { openWin("ai"); setShowAISidebar(false); }}
+                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors"
+                      style={{ color: c.text }}
+                      onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex-1" style={{ minHeight: 40 }} />
+
+                {/* Bottom actions */}
+                <div className="px-3 pb-4 pt-2 space-y-0.5" style={{ borderTop: `1px solid ${c.border}` }}>
+                  {/* Light/Dark mode toggle */}
+                  <button onClick={() => setMode(mode === "dark" ? "light" : "dark")}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                    <I d={mode === "dark" ? ic.sun : ic.moon} s={16} c={c.textSec} />
+                    {mode === "dark" ? "Dark mode" : "Light mode"}
+                  </button>
+
+                  {/* My account */}
+                  <button onClick={() => { openWin("settings"); setShowAISidebar(false); }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                    <I d={ic.user} s={16} c={c.textSec} />
+                    My account
+                  </button>
+
+                  {/* Settings */}
+                  <button onClick={() => { openWin("settings"); setShowAISidebar(false); }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                    <I d={ic.settings} s={16} c={c.textSec} />
+                    Settings
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Apps button - top center, always visible */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center" onClick={e => e.stopPropagation()}>
             <button
