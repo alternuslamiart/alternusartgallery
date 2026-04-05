@@ -1497,10 +1497,12 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
   const [fileContent, setFileContent] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"recent" | "favorites" | "shared">("recent");
   const [showAIPanel, setShowAIPanel] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [fileContextMenu, setFileContextMenu] = useState<{ x: number; y: number; name: string } | null>(null);
 
   type FileItem = { name: string; type: "folder" | "file"; icon: string; iconColor: string; size: string; modified: string; action?: WinId | string };
 
-  const fileSystem: Record<string, FileItem[]> = {
+  const [fileSystem, setFileSystem] = useState<Record<string, FileItem[]>>({
     Home: [
       { name: "Desktop", type: "folder", icon: ic.monitor, iconColor: "#60A5FA", size: "8 items", modified: "Today", action: "Desktop" },
       { name: "Downloads", type: "folder", icon: ic.download, iconColor: "#34D399", size: "23 items", modified: "Today", action: "Downloads" },
@@ -1557,6 +1559,25 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
       { name: "draft-v1.docx", type: "file", icon: ic.fileText, iconColor: c.textMuted, size: "120 KB", modified: "Feb 15" },
       { name: "temp-screenshot.png", type: "file", icon: ic.image, iconColor: c.textMuted, size: "2.1 MB", modified: "Feb 10" },
     ],
+  });
+
+  const deleteFile = (fileName: string) => {
+    const curFolder = currentPath[currentPath.length - 1];
+    setFileSystem(prev => {
+      const file = prev[curFolder]?.find(f => f.name === fileName);
+      if (!file) return prev;
+      return {
+        ...prev,
+        [curFolder]: prev[curFolder].filter(f => f.name !== fileName),
+        Trash: [...(prev.Trash || []), { ...file, iconColor: c.textMuted, modified: "Just now" }],
+      };
+    });
+    setSelectedFile(null);
+    setDeleteConfirm(null);
+  };
+
+  const emptyTrash = () => {
+    setFileSystem(prev => ({ ...prev, Trash: [] }));
   };
 
   const sidebarItems = [
@@ -1690,7 +1711,7 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
         )}
 
         {/* File list */}
-        <div className="flex-1 overflow-y-auto px-2 py-1" style={{ scrollbarWidth: "none" }}>
+        <div className="flex-1 overflow-y-auto px-2 py-1 relative" style={{ scrollbarWidth: "none" }} onClick={() => setFileContextMenu(null)}>
           {/* Column header */}
           <div className="flex items-center gap-4 px-4 py-1.5 mb-0.5">
             <span className="flex-1 text-[10px] font-medium" style={{ color: c.textMuted }}>Name</span>
@@ -1699,23 +1720,75 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
           </div>
 
           {filteredFiles.map((f, i) => (
-            <button key={i} className="w-full flex items-center gap-4 px-4 py-2 rounded-lg text-left transition-colors"
-              style={{ background: selectedFile === f.name ? c.accentSoft : "transparent", minHeight: 40 }}
-              onMouseEnter={e => { if (selectedFile !== f.name) e.currentTarget.style.background = c.cardAlt; }}
-              onMouseLeave={e => { if (selectedFile !== f.name) e.currentTarget.style.background = "transparent"; }}
-              onClick={() => setSelectedFile(f.name)}
-              onDoubleClick={() => handleFileClick(f)}>
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: f.type === "folder" ? "transparent" : c.cardAlt }}>
-                <I d={f.icon} s={f.type === "folder" ? 20 : 16} c={f.iconColor} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs truncate" style={{ color: c.text }}>{f.name}</p>
-                {f.type === "folder" && <p className="text-[9px]" style={{ color: c.textMuted }}>{f.size}</p>}
-              </div>
-              <span className="w-16 text-[10px] text-right flex-shrink-0" style={{ color: c.textMuted }}>{f.type === "file" ? f.size : ""}</span>
-              <span className="w-20 text-[10px] text-right flex-shrink-0" style={{ color: c.textMuted }}>{f.modified}</span>
-            </button>
+            <div key={i} className="relative">
+              <button className="w-full flex items-center gap-4 px-4 py-2 rounded-lg text-left transition-colors"
+                style={{ background: selectedFile === f.name ? c.accentSoft : "transparent", minHeight: 40 }}
+                onMouseEnter={e => { if (selectedFile !== f.name) e.currentTarget.style.background = c.cardAlt; }}
+                onMouseLeave={e => { if (selectedFile !== f.name) e.currentTarget.style.background = "transparent"; }}
+                onClick={() => { setSelectedFile(f.name); setFileContextMenu(null); }}
+                onDoubleClick={() => handleFileClick(f)}
+                onContextMenu={e => { e.preventDefault(); e.stopPropagation(); setSelectedFile(f.name); setFileContextMenu({ x: e.clientX, y: e.clientY, name: f.name }); }}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: f.type === "folder" ? "transparent" : c.cardAlt }}>
+                  <I d={f.icon} s={f.type === "folder" ? 20 : 16} c={f.iconColor} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs truncate" style={{ color: c.text }}>{f.name}</p>
+                  {f.type === "folder" && <p className="text-[9px]" style={{ color: c.textMuted }}>{f.size}</p>}
+                </div>
+                <span className="w-16 text-[10px] text-right flex-shrink-0" style={{ color: c.textMuted }}>{f.type === "file" ? f.size : ""}</span>
+                <span className="w-20 text-[10px] text-right flex-shrink-0" style={{ color: c.textMuted }}>{f.modified}</span>
+              </button>
+            </div>
           ))}
+
+          {/* Trash actions */}
+          {curPath === "Trash" && fileSystem.Trash.length > 0 && (
+            <div className="flex justify-center py-3">
+              <button onClick={emptyTrash} className="text-[10px] px-4 py-1.5 rounded-lg font-medium" style={{ background: "rgba(239,68,68,0.1)", color: c.danger }}>Empty Trash</button>
+            </div>
+          )}
+
+          {/* File right-click context menu */}
+          {fileContextMenu && (
+            <div className="fixed z-[500] w-[180px] rounded-xl overflow-hidden py-1"
+              style={{ left: fileContextMenu.x, top: fileContextMenu.y, background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 4px 16px rgba(0,0,0,0.15)" }}>
+              {[
+                { icon: ic.fileText, label: "Open", action: () => { const f = filteredFiles.find(f => f.name === fileContextMenu.name); if (f) handleFileClick(f); setFileContextMenu(null); } },
+                { icon: ic.pen, label: "Rename", action: () => setFileContextMenu(null) },
+                { icon: ic.fileText, label: "Copy", action: () => setFileContextMenu(null) },
+                { icon: ic.trash, label: "Delete", action: () => { setDeleteConfirm(fileContextMenu.name); setFileContextMenu(null); }, danger: true },
+              ].map((item, i) => (
+                <button key={i} onClick={item.action}
+                  className="w-full flex items-center gap-3 px-3 py-1.5 text-left transition-colors"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={item.icon} s={13} c={(item as {danger?: boolean}).danger ? c.danger : c.textMuted} />
+                  <span className="text-[11px]" style={{ color: (item as {danger?: boolean}).danger ? c.danger : c.text }}>{item.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Delete confirmation */}
+          {deleteConfirm && (
+            <div className="absolute inset-0 flex items-center justify-center z-[500]" style={{ background: "rgba(0,0,0,0.3)" }}>
+              <div className="w-72 p-4 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(239,68,68,0.12)" }}>
+                    <I d={ic.trash} s={18} c={c.danger} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold" style={{ color: c.text }}>Delete file?</p>
+                    <p className="text-[10px]" style={{ color: c.textMuted }}>"{deleteConfirm}" will be moved to Trash.</p>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button onClick={() => setDeleteConfirm(null)} className="px-4 py-1.5 rounded-lg text-[11px] font-medium" style={{ background: c.cardAlt, color: c.textSec }}>Cancel</button>
+                  <button onClick={() => deleteFile(deleteConfirm)} className="px-4 py-1.5 rounded-lg text-[11px] font-medium" style={{ background: c.danger, color: "#fff" }}>Delete</button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Bottom bar - Recent / Favorites / Shared */}
@@ -2742,6 +2815,10 @@ export default function AlternusOS() {
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   const [showTimeline, setShowTimeline] = useState(false);
   const [wallpaper, setWallpaper] = useState(0);
+  const [installedApps, setInstalledApps] = useState<string[]>([]);
+  const [installingApp, setInstallingApp] = useState<string | null>(null);
+  const [installProgress, setInstallProgress] = useState(0);
+  const [paymentModal, setPaymentModal] = useState<{ name: string; price: string; icon: string; iconBg: string } | null>(null);
   const lastMouseMove = useRef(Date.now());
 
   const c = palette[mode];
@@ -2920,6 +2997,38 @@ export default function AlternusOS() {
     setSystemModal({ type: "info", title: "App Terminated", message: `The application was force quit successfully.` });
     setTimeout(() => setSystemModal(null), 3000);
   }, []);
+
+  // ━━━━ STORE INSTALL HANDLER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const handleInstallApp = useCallback((appName: string) => {
+    if (installedApps.includes(appName) || installingApp) return;
+    setInstallingApp(appName);
+    setInstallProgress(0);
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 15 + 5;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(interval);
+        setInstallProgress(100);
+        setTimeout(() => {
+          setInstalledApps(prev => [...prev, appName]);
+          setInstallingApp(null);
+          setInstallProgress(0);
+          setSystemModal({ type: "info", title: "Installed", message: `${appName} has been installed successfully.` });
+          setTimeout(() => setSystemModal(null), 2500);
+        }, 400);
+      } else {
+        setInstallProgress(Math.min(progress, 99));
+      }
+    }, 200);
+  }, [installedApps, installingApp]);
+
+  const handlePaidInstall = useCallback(() => {
+    if (!paymentModal) return;
+    const appName = paymentModal.name;
+    setPaymentModal(null);
+    handleInstallApp(appName);
+  }, [paymentModal, handleInstallApp]);
 
   // ━━━━ PREDICTIVE WORKSPACE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const openWinWithAI = useCallback((id: WinId) => {
@@ -3211,10 +3320,22 @@ export default function AlternusOS() {
                     <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>{app.name}</p>
                     <p className="text-[8px] mt-0.5" style={{ color: c.textMuted }}>{app.desc}</p>
                   </div>
-                  <button className="text-[9px] px-3 py-1 rounded-full font-semibold flex-shrink-0"
-                    style={{ background: app.price === "Free" ? c.accent : "transparent", color: app.price === "Free" ? "#fff" : c.accentText, border: app.price !== "Free" ? `1px solid ${c.accent}` : "none" }}>
-                    {app.price === "Free" ? "Free" : app.price}
-                  </button>
+                  {installingApp === app.name ? (
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: c.border }}>
+                        <div className="h-full rounded-full transition-all" style={{ width: `${installProgress}%`, background: c.accent }} />
+                      </div>
+                      <span className="text-[8px]" style={{ color: c.textMuted }}>{Math.round(installProgress)}%</span>
+                    </div>
+                  ) : installedApps.includes(app.name) ? (
+                    <span className="text-[9px] px-3 py-1 rounded-full font-semibold flex-shrink-0" style={{ background: c.successSoft, color: c.success }}>Open</span>
+                  ) : (
+                    <button onClick={() => app.price === "Free" ? handleInstallApp(app.name) : setPaymentModal(app)}
+                      className="text-[9px] px-3 py-1 rounded-full font-semibold flex-shrink-0"
+                      style={{ background: app.price === "Free" ? c.accent : "transparent", color: app.price === "Free" ? "#fff" : c.accentText, border: app.price !== "Free" ? `1px solid ${c.accent}` : "none" }}>
+                      {app.price === "Free" ? "Free" : app.price}
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -3242,10 +3363,22 @@ export default function AlternusOS() {
                     <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>{app.name}</p>
                     <p className="text-[8px] mt-0.5" style={{ color: c.textMuted }}>{app.desc}</p>
                   </div>
-                  <button className="text-[9px] px-3 py-1 rounded-full font-semibold flex-shrink-0"
-                    style={{ background: app.price === "Free" ? c.accent : "transparent", color: app.price === "Free" ? "#fff" : c.accentText, border: app.price !== "Free" ? `1px solid ${c.accent}` : "none" }}>
-                    {app.price === "Free" ? "Free" : app.price}
-                  </button>
+                  {installingApp === app.name ? (
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: c.border }}>
+                        <div className="h-full rounded-full transition-all" style={{ width: `${installProgress}%`, background: c.accent }} />
+                      </div>
+                      <span className="text-[8px]" style={{ color: c.textMuted }}>{Math.round(installProgress)}%</span>
+                    </div>
+                  ) : installedApps.includes(app.name) ? (
+                    <span className="text-[9px] px-3 py-1 rounded-full font-semibold flex-shrink-0" style={{ background: c.successSoft, color: c.success }}>Open</span>
+                  ) : (
+                    <button onClick={() => app.price === "Free" ? handleInstallApp(app.name) : setPaymentModal(app)}
+                      className="text-[9px] px-3 py-1 rounded-full font-semibold flex-shrink-0"
+                      style={{ background: app.price === "Free" ? c.accent : "transparent", color: app.price === "Free" ? "#fff" : c.accentText, border: app.price !== "Free" ? `1px solid ${c.accent}` : "none" }}>
+                      {app.price === "Free" ? "Free" : app.price}
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -3845,6 +3978,41 @@ export default function AlternusOS() {
               </div>
               <div className="flex justify-end gap-2">
                 <button onClick={() => setSystemModal(null)} className="px-4 py-1.5 rounded-lg text-xs font-medium" style={{ background: c.accent, color: "#fff" }}>OK</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ━━━━ Payment Modal ━━━━ */}
+        {paymentModal && (
+          <div className="absolute inset-0 flex items-center justify-center z-[300]" style={{ background: "rgba(0,0,0,0.4)" }} onClick={() => setPaymentModal(null)}>
+            <div className="w-[320px] rounded-2xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)" }} onClick={e => e.stopPropagation()}>
+              <div className="p-5 flex flex-col items-center" style={{ borderBottom: `1px solid ${c.border}` }}>
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3" style={{ background: paymentModal.iconBg + "20" }}>
+                  <I d={paymentModal.icon} s={28} c={paymentModal.iconBg} />
+                </div>
+                <p className="text-sm font-bold mb-0.5" style={{ color: c.text }}>{paymentModal.name}</p>
+                <p className="text-2xl font-bold" style={{ color: c.accent }}>{paymentModal.price}</p>
+              </div>
+              <div className="p-4 space-y-2.5">
+                <div>
+                  <label className="text-[9px] font-medium mb-1 block" style={{ color: c.textMuted }}>Card Number</label>
+                  <input className="w-full px-3 py-2 rounded-lg text-[11px] outline-none" style={{ background: c.cardAlt, border: `1px solid ${c.border}`, color: c.text }} placeholder="4242 4242 4242 4242" />
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="text-[9px] font-medium mb-1 block" style={{ color: c.textMuted }}>Expiry</label>
+                    <input className="w-full px-3 py-2 rounded-lg text-[11px] outline-none" style={{ background: c.cardAlt, border: `1px solid ${c.border}`, color: c.text }} placeholder="MM/YY" />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-[9px] font-medium mb-1 block" style={{ color: c.textMuted }}>CVC</label>
+                    <input className="w-full px-3 py-2 rounded-lg text-[11px] outline-none" style={{ background: c.cardAlt, border: `1px solid ${c.border}`, color: c.text }} placeholder="123" />
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2 p-4 pt-2">
+                <button onClick={() => setPaymentModal(null)} className="flex-1 py-2 rounded-lg text-xs font-medium" style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}>Cancel</button>
+                <button onClick={handlePaidInstall} className="flex-1 py-2 rounded-lg text-xs font-semibold" style={{ background: c.accent, color: "#fff" }}>Pay {paymentModal.price}</button>
               </div>
             </div>
           </div>
