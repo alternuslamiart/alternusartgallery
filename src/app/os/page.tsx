@@ -3862,6 +3862,7 @@ export default function AlternusOS() {
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
+    { id: "ai", icon: ic.sparkle, label: "AI Chat", color: c.accent },
     { id: "terminal", icon: ic.terminal, label: "Terminal", color: c.success },
     { id: "code", icon: ic.code, label: "Code", color: c.purple },
     { id: "files", icon: ic.folder, label: "Files", color: c.warning },
@@ -3869,7 +3870,9 @@ export default function AlternusOS() {
     { id: "store", icon: ic.store, label: "Store", color: c.accent },
     { id: "movies", icon: ic.film, label: "Movies", color: c.purple },
     { id: "music", icon: ic.music, label: "Music", color: "#F472B6" },
+    { id: "weather", icon: ic.cloud, label: "Weather", color: "#60A5FA" },
     { id: "calendar", icon: ic.calendar, label: "Calendar", color: "#60A5FA" },
+    { id: "notes", icon: ic.note, label: "Notes", color: "#FBBF24" },
     { id: "word", icon: ic.fileText, label: "Word", color: c.accentText },
     { id: "downloads", icon: ic.download, label: "Downloads", color: "#34D399" },
     { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A" },
