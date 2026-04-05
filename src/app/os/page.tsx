@@ -2950,9 +2950,9 @@ export default function AlternusOS() {
       if (w.id === id) {
         if (!w.isOpen) {
           const s = sizes[id];
-          // AI snaps left, others center
-          const x = id === "ai" ? 0 : Math.max(0, Math.floor((sw - s.w) / 2));
-          const y = id === "ai" ? 0 : Math.max(0, Math.floor((sh - s.h) / 2));
+          // Fixed positions: AI snaps left, Weather top-right, Calendar top-right below weather, others center
+          const x = id === "ai" ? 0 : id === "weather" ? sw - s.w - 10 : id === "calendar" ? sw - s.w - 10 : Math.max(0, Math.floor((sw - s.w) / 2));
+          const y = id === "ai" ? 0 : id === "weather" ? 10 : id === "calendar" ? 10 : Math.max(0, Math.floor((sh - s.h) / 2));
           return { ...w, isOpen: true, isMinimized: false, zIndex: zCounter + 1, x, y, w: s.w, h: s.h };
         }
         if (w.isMinimized) return { ...w, isMinimized: false, zIndex: zCounter + 1 };
