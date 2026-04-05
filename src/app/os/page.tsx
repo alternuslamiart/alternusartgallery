@@ -2822,6 +2822,12 @@ export default function AlternusOS() {
   const [showAiChat, setShowAiChat] = useState(false);
   const [aiChatMsgs, setAiChatMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([]);
   const [aiChatInput, setAiChatInput] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [aiChatHistory, setAiChatHistory] = useState([
+    { title: "Create a description", time: "Today" },
+    { title: "Write an email", time: "Today" },
+    { title: "Explain quantum computing", time: "Yesterday" },
+  ]);
   // AI features
   const [aiNotifications, setAiNotifications] = useState<AINotification[]>([]);
   const [aiSuggestion, setAiSuggestion] = useState<{ message: string; actions: { label: string; action: () => void }[] } | null>(null);
@@ -4260,17 +4266,54 @@ export default function AlternusOS() {
 
         {/* ━━━━ AI Full Chat Overlay ━━━━ */}
         {showAiChat && (
-          <div className="absolute inset-0 z-[200] flex flex-col" style={{ background: c.bg }}>
+          <div className="absolute inset-0 z-[200] flex" style={{ background: c.bg }}>
+            {/* Sidebar */}
+            <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ background: c.surface, borderRight: `1px solid ${c.border}` }}>
+              <div className="px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
+                <button className="w-full px-3 py-2 rounded-xl text-xs font-medium transition-colors"
+                  style={{ background: c.accent, color: "#fff" }}
+                  onClick={() => setAiChatMsgs([])}>
+                  + New chat
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5" style={{ scrollbarWidth: "none" }}>
+                {aiChatHistory.map((h, i) => (
+                  <button key={i} className="w-full text-left px-3 py-2 rounded-lg text-[11px] truncate transition-colors"
+                    style={{ color: c.text }}
+                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                    {h.title}
+                  </button>
+                ))}
+              </div>
+              <div className="px-2 py-2 space-y-0.5" style={{ borderTop: `1px solid ${c.border}` }}>
+                {[
+                  { icon: ic.moon, label: mode === "dark" ? "Light mode" : "Dark mode" },
+                  { icon: ic.user, label: "My account" },
+                  { icon: ic.settings, label: "Settings" },
+                ].map((item, i) => (
+                  <button key={i} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[11px] transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                    <I d={item.icon} s={13} c={c.textMuted} />
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Main chat area */}
+            <div className="flex-1 flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-2.5 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
+            <div className="flex items-center justify-between px-5 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
               <div className="flex items-center gap-2">
-                <I d={ic.sparkle} s={14} c={c.accent} />
-                <span className="text-xs font-semibold" style={{ color: c.text }}>Alternus AI</span>
+                <I d={ic.sparkle} s={16} c={c.accent} />
+                <span className="text-sm font-semibold" style={{ color: c.text }}>Alternus AI</span>
               </div>
               <button onClick={() => setShowAiChat(false)} className="p-1.5 rounded-lg transition-colors" style={{ color: c.textMuted }}
                 onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
                 onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-                <I d={ic.close} s={14} c={c.textMuted} />
+                <I d={ic.close} s={16} c={c.textMuted} />
               </button>
             </div>
             {/* Chat area */}
@@ -4369,6 +4412,7 @@ export default function AlternusOS() {
                   <I d={ic.send} s={14} c="#fff" />
                 </button>
               </div>
+            </div>
             </div>
           </div>
         )}
