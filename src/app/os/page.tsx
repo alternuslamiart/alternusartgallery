@@ -2819,6 +2819,14 @@ export default function AlternusOS() {
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [aiActions, setAiActions] = useState<{ label: string; action: WinId }[]>([]);
   const [aiCreation, setAiCreation] = useState<string | null>(null);
+  const [showAiChat, setShowAiChat] = useState(false);
+  const [aiChatMsgs, setAiChatMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([]);
+  const [aiChatInput, setAiChatInput] = useState("");
+  const [aiChatHistory] = useState([
+    { title: "Create a description", time: "Today" },
+    { title: "Write an email", time: "Today" },
+    { title: "Explain quantum computing", time: "Yesterday" },
+  ]);
   // AI features
   const [aiNotifications, setAiNotifications] = useState<AINotification[]>([]);
   const [aiSuggestion, setAiSuggestion] = useState<{ message: string; actions: { label: string; action: () => void }[] } | null>(null);
@@ -3960,6 +3968,14 @@ export default function AlternusOS() {
                 }}
               />
               <button
+                onClick={() => setShowAiChat(true)}
+                className="p-2.5 rounded-xl transition-colors hover:opacity-80"
+                style={{ background: c.cardAlt }}
+                title="Open AI Chat"
+              >
+                <I d={ic.sparkle} s={16} c={c.accent} />
+              </button>
+              <button
                 onClick={() => aiInput.trim() && handleDesktopSearch()}
                 className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90"
                 style={{ background: c.accent }}
@@ -4243,6 +4259,151 @@ export default function AlternusOS() {
                   <span className="flex-1 text-[11px]" style={{ color: c.text }}>{item.label}</span>
                 </button>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* ━━━━ AI Full Chat Overlay ━━━━ */}
+        {showAiChat && (
+          <div className="absolute inset-0 z-[200] flex" style={{ background: c.bg }}>
+            {/* Sidebar */}
+            <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ background: c.surface, borderRight: `1px solid ${c.border}` }}>
+              <div className="px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
+                <button className="w-full px-3 py-2 rounded-xl text-xs font-medium transition-colors"
+                  style={{ background: c.accent, color: "#fff" }}
+                  onClick={() => setAiChatMsgs([])}>
+                  + New chat
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5" style={{ scrollbarWidth: "none" }}>
+                {aiChatHistory.map((h, i) => (
+                  <button key={i} className="w-full text-left px-3 py-2 rounded-lg text-[11px] truncate transition-colors"
+                    style={{ color: c.text }}
+                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                    {h.title}
+                  </button>
+                ))}
+              </div>
+              <div className="px-2 py-2 space-y-0.5" style={{ borderTop: `1px solid ${c.border}` }}>
+                {[
+                  { icon: ic.moon, label: mode === "dark" ? "Light mode" : "Dark mode" },
+                  { icon: ic.user, label: "My account" },
+                  { icon: ic.settings, label: "Settings" },
+                ].map((item, i) => (
+                  <button key={i} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[11px] transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                    <I d={item.icon} s={13} c={c.textMuted} />
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Main chat area */}
+            <div className="flex-1 flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+                <div className="flex items-center gap-2">
+                  <I d={ic.sparkle} s={16} c={c.accent} />
+                  <span className="text-sm font-semibold" style={{ color: c.text }}>Alternus AI</span>
+                </div>
+                <button onClick={() => setShowAiChat(false)} className="p-1.5 rounded-lg transition-colors" style={{ color: c.textMuted }}
+                  onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                  <I d={ic.close} s={16} c={c.textMuted} />
+                </button>
+              </div>
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto px-6 py-6" style={{ scrollbarWidth: "none" }}>
+                {aiChatMsgs.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full">
+                    <I d={ic.sparkle} s={40} c={c.textMuted + "40"} />
+                    <p className="text-lg font-semibold mt-4" style={{ color: c.text }}>Alternus AI</p>
+                    <p className="text-xs mt-1" style={{ color: c.textMuted }}>Ask me anything. I can create, explain, write, and more.</p>
+                    <div className="grid grid-cols-3 gap-3 mt-6 max-w-lg">
+                      {[
+                        { title: "Examples", items: ["\"Explain quantum computing\"", "\"Write a birthday message\"", "\"Create a product description\""] },
+                        { title: "Capabilities", items: ["Remembers conversation", "Follow-up corrections", "Declines inappropriate requests"] },
+                        { title: "Limitations", items: ["May generate incorrect info", "May produce biased content", "Limited knowledge after 2025"] },
+                      ].map((col, ci) => (
+                        <div key={ci} className="flex flex-col items-center gap-2">
+                          <p className="text-[10px] font-semibold" style={{ color: c.text }}>{col.title}</p>
+                          {col.items.map((item, ii) => (
+                            <div key={ii} className="w-full px-3 py-2 rounded-xl text-[9px] text-center" style={{ background: c.cardAlt, color: c.textSec }}>{item}</div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="max-w-2xl mx-auto space-y-4">
+                    {aiChatMsgs.map((msg, i) => (
+                      <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                        <div className="max-w-[85%] px-4 py-3 rounded-2xl text-[13px] leading-[1.7]"
+                          style={{
+                            background: msg.role === "user" ? c.accent : c.cardAlt,
+                            color: msg.role === "user" ? "#fff" : c.text,
+                          }}>
+                          {msg.role === "ai" ? (
+                            <div className="space-y-2">
+                              {msg.text.split("\n").map((line, li) => {
+                                const t = line.trim();
+                                if (!t) return <div key={li} className="h-1" />;
+                                if (t.endsWith(":")) return <p key={li} className="font-semibold">{t}</p>;
+                                if (t.startsWith("•")) return <div key={li} className="flex gap-2 pl-1"><span style={{ color: c.accent }}>•</span><span>{t.slice(1).trim()}</span></div>;
+                                return <p key={li}>{t}</p>;
+                              })}
+                            </div>
+                          ) : msg.text}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {/* Input */}
+              <div className="px-6 pb-5 pt-2">
+                <div className="max-w-2xl mx-auto flex items-center gap-2 pl-4 pr-2 py-2 rounded-2xl"
+                  style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                  <input
+                    className="flex-1 bg-transparent outline-none text-sm py-1.5"
+                    style={{ color: c.text }}
+                    placeholder="Ask anything..."
+                    value={aiChatInput}
+                    onChange={e => setAiChatInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter" && aiChatInput.trim()) {
+                        const userMsg = aiChatInput.trim();
+                        setAiChatMsgs(prev => [...prev, { role: "user", text: userMsg }]);
+                        setAiChatInput("");
+                        setTimeout(() => {
+                          const q = userMsg.toLowerCase();
+                          let response = `Here is my response to "${userMsg}":\n\nThis is a detailed, well-structured answer from Alternus AI. The content is tailored to your specific request with clear formatting and professional language.\n\nKey points:\n\n• First important insight about your query\n• Second relevant detail with context\n• Third practical recommendation\n\nLet me know if you need more details or a different approach.`;
+                          if (q.includes("hello") || q.includes("hi")) response = "Hello! I'm Alternus AI. How can I help you today?";
+                          setAiChatMsgs(prev => [...prev, { role: "ai", text: response }]);
+                        }, 500);
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      if (!aiChatInput.trim()) return;
+                      const userMsg = aiChatInput.trim();
+                      setAiChatMsgs(prev => [...prev, { role: "user", text: userMsg }]);
+                      setAiChatInput("");
+                      setTimeout(() => {
+                        setAiChatMsgs(prev => [...prev, { role: "ai", text: `Here is my response to "${userMsg}":\n\nA well-crafted answer from Alternus AI.\n\n• Key insight one\n• Key insight two\n• Key insight three` }]);
+                      }, 500);
+                    }}
+                    className="p-2 rounded-xl transition-colors hover:opacity-80"
+                    style={{ background: c.accent }}
+                  >
+                    <I d={ic.send} s={14} c="#fff" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
