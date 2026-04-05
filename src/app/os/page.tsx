@@ -1047,16 +1047,15 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
             <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Wallpaper</p>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { bg: c.bg, label: "Default" },
-                { bg: "linear-gradient(135deg, #1a3a6e, #4a8fe7, #8b5cf6, #c77dba, #4ac1e0)", label: "Flow" },
-                { bg: "linear-gradient(160deg, #0c1445, #1e40af, #7c3aed, #c026d3)", label: "Aurora" },
-                { bg: "radial-gradient(ellipse at 30% 40%, #60a5fa, #3b82f6, #1e3a8a, #0c1445)", label: "Ocean" },
-                { bg: "linear-gradient(135deg, #065f46, #10b981, #34d399, #06b6d4, #0e7490)", label: "Emerald" },
-                { bg: "linear-gradient(160deg, #1e1b4b, #4338ca, #7c3aed, #a855f7, #c084fc)", label: "Violet" },
+                { bg: c.bg, img: "", label: "Default" },
+                { bg: "", img: "/wallpapers/OSpw3.png", label: "Flow" },
+                { bg: "", img: "/wallpapers/OSwp.png", label: "Aurora" },
+                { bg: "", img: "/wallpapers/OSwp2.png", label: "Ocean" },
+                { bg: "", img: "/wallpapers/OSwp4.png", label: "Emerald" },
               ].map((wp, i) => (
                 <div key={i} onClick={() => setWallpaper(i)}
                   className="h-16 rounded-xl cursor-pointer transition-all hover:scale-105 relative overflow-hidden"
-                  style={{ background: wp.bg, border: wallpaper === i ? `2px solid ${c.accent}` : `2px solid transparent`, boxShadow: wallpaper === i ? `0 0 8px ${c.accent}40` : "none" }}>
+                  style={{ background: wp.img ? `url('${wp.img}') center/cover no-repeat` : wp.bg, border: wallpaper === i ? `2px solid ${c.accent}` : `2px solid transparent`, boxShadow: wallpaper === i ? `0 0 8px ${c.accent}40` : "none" }}>
                   <span className="absolute bottom-1 left-2 text-[7px] font-semibold" style={{ color: i === 0 ? c.textMuted : "rgba(255,255,255,0.6)" }}>{wp.label}</span>
                 </div>
               ))}
@@ -3628,13 +3627,12 @@ export default function AlternusOS() {
   // ━━━━ DESKTOP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const wallpapers = [
     "", // 0: Default — uses c.bg solid color
-    "linear-gradient(135deg, #1a3a6e 0%, #4a8fe7 25%, #8b5cf6 50%, #c77dba 75%, #4ac1e0 100%)",
-    "linear-gradient(160deg, #0c1445 0%, #1e40af 30%, #7c3aed 60%, #c026d3 100%)",
-    "radial-gradient(ellipse at 30% 40%, #60a5fa 0%, #3b82f6 30%, #1e3a8a 60%, #0c1445 100%)",
-    "linear-gradient(135deg, #065f46 0%, #10b981 30%, #34d399 50%, #06b6d4 70%, #0e7490 100%)",
-    "linear-gradient(160deg, #1e1b4b 0%, #4338ca 30%, #7c3aed 50%, #a855f7 70%, #c084fc 100%)",
+    "url('/wallpapers/OSpw3.png') center/cover no-repeat",
+    "url('/wallpapers/OSwp.png') center/cover no-repeat",
+    "url('/wallpapers/OSwp2.png') center/cover no-repeat",
+    "url('/wallpapers/OSwp4.png') center/cover no-repeat",
   ];
-  const desktopBg = wallpaper === 0 ? c.bg : (mode === "dark" ? wallpapers[wallpaper] : wallpapers[wallpaper]) || c.bg;
+  const desktopBg = wallpaper === 0 ? c.bg : wallpapers[wallpaper] || c.bg;
 
   return (
     <div style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
