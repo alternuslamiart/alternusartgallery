@@ -234,29 +234,32 @@ function TitleBar({
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onMinimize}
-          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#4ADE80"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", "#fff"); }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", c.textMuted); }}
+          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
+          style={{ background: "#4ADE80" }}
+          onMouseEnter={e => { e.currentTarget.style.opacity = "0.85"; }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
         >
-          <svg width={10} height={10} viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
+          <svg width={10} height={10} viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke="#fff" strokeWidth="1.5" /></svg>
         </button>
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onMaximize}
-          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#5BA3E6"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", "#fff"); }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", c.textMuted); }}
+          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
+          style={{ background: "#5BA3E6" }}
+          onMouseEnter={e => { e.currentTarget.style.opacity = "0.85"; }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
         >
-          <svg width={10} height={10} viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
+          <svg width={10} height={10} viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1.5" fill="none" stroke="#fff" strokeWidth="1.5" /></svg>
         </button>
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onClose}
-          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#E06060"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", "#fff"); }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", c.textMuted); }}
+          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
+          style={{ background: "#F87171" }}
+          onMouseEnter={e => { e.currentTarget.style.opacity = "0.85"; }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
         >
-          <svg width={10} height={10} viewBox="0 0 10 10"><polygon points="5,1.5 9,8.5 1,8.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" strokeLinejoin="round" /></svg>
+          <svg width={10} height={10} viewBox="0 0 10 10"><polygon points="5,1.5 9,8.5 1,8.5" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinejoin="round" /></svg>
         </button>
       </div>
     </div>
