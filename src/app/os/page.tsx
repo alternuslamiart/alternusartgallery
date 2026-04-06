@@ -917,6 +917,8 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
 
         <div className="flex-1" />
 
+        <div className="w-6 my-1" style={{ borderTop: `1px solid ${c.border}` }} />
+
         {/* Bottom icons: profile, wifi, power */}
         <button onClick={() => setShowAccount(!showAccount)}
           className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
