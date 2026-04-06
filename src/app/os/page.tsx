@@ -379,21 +379,23 @@ function AppWindow({
     ? { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: win.zIndex }
     : { position: "absolute", top: win.y, left: win.x, width: win.w, height: win.h, zIndex: win.zIndex };
 
+  const isAI = win.id === "ai";
+
   return (
     <div
       style={{
         ...style,
-        background: c.bg,
-        border: `1px solid ${c.border}`,
+        background: isAI ? "transparent" : c.bg,
+        border: isAI ? "none" : `1px solid ${c.border}`,
         borderRadius: win.isMaximized ? 0 : 12,
-        boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+        boxShadow: isAI ? "none" : "0 4px 16px rgba(0,0,0,0.12)",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
       }}
       onClick={onFocus}
     >
-      <TitleBar
+      {!isAI && <TitleBar
         title={win.title}
         c={c}
         onClose={onClose}
@@ -402,9 +404,9 @@ function AppWindow({
         onMouseDown={handleMouseDown}
         isFrozen={win.isFrozen}
         onForceQuit={onForceQuit}
-      />
-      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: "6px" }}>
-        <div style={{ background: c.surface, borderRadius: 16, border: `1px solid ${c.cardAlt}`, height: "100%", overflow: "auto", position: "relative" }}>
+      />}
+      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: isAI ? 0 : "6px" }}>
+        <div style={{ background: isAI ? "transparent" : c.surface, borderRadius: isAI ? 0 : 16, border: isAI ? "none" : `1px solid ${c.cardAlt}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
         {/* Frozen overlay */}
         {win.isFrozen && (
@@ -654,7 +656,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
   ];
 
   return (
-    <div className="flex h-full" style={{ background: c.bg }}>
+    <div className="flex h-full" style={{ background: "transparent" }}>
       {/* Toast notification */}
       {toast && (
         <div className="absolute top-3 right-3 z-50 flex items-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-medium shadow-lg"
@@ -664,7 +666,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
       )}
 
       {/* Chat area */}
-      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ background: c.surface, borderRight: `1px solid ${c.border}` }}>
+      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ background: "transparent", borderRight: `1px solid ${c.border}` }}>
         {/* Account panel (toggleable) */}
         {showAccount && (
           <div className="p-4 space-y-3" style={{ borderBottom: `1px solid ${c.border}`, background: c.cardAlt }}>
@@ -891,7 +893,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
       </div>
 
       {/* Right sidebar — Narrow vertical icon bar */}
-      <div className="w-[52px] flex-shrink-0 flex flex-col items-center py-4 gap-1" style={{ background: c.bg }}>
+      <div className="w-[52px] flex-shrink-0 flex flex-col items-center py-4 gap-1" style={{ background: "transparent" }}>
         {/* Alternus AI icon */}
         <img src="/alternus-os.png" alt="Alternus AI" className="w-8 h-8 rounded-full object-cover mb-1" />
 
@@ -4208,7 +4210,7 @@ export default function AlternusOS() {
   const c = palette[mode];
 
   const defaultWins: WinState[] = [
-    { id: "ai", title: "Alternus AI", isOpen: false, isMinimized: false, isMaximized: true, zIndex: 1, x: 0, y: 0, w: 660, h: 500 },
+    { id: "ai", title: "Alternus AI", isOpen: true, isMinimized: false, isMaximized: true, zIndex: 1, x: 0, y: 0, w: 660, h: 500 },
     { id: "terminal", title: "Terminal", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 80, w: 460, h: 340 },
     { id: "code", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 520, h: 400 },
     { id: "files", title: "Files", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 240, y: 70, w: 520, h: 400 },
