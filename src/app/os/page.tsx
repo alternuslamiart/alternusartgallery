@@ -4912,67 +4912,84 @@ export default function AlternusOS() {
           {showAISidebar && (
             <div className="absolute bottom-16 left-0 w-[220px] rounded-2xl overflow-hidden shadow-2xl"
               style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4)" : "0 8px 32px rgba(0,0,0,0.12)" }}>
-              <div className="flex flex-col" style={{ maxHeight: 480 }}>
-                {/* Brand */}
-                <div className="px-4 pt-4 pb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold" style={{ color: c.accent }}>ALTERNUS</span>
-                    <span className="text-xs" style={{ color: c.textMuted }}>OS</span>
+              <div className="flex flex-col overflow-y-auto" style={{ maxHeight: 520, scrollbarWidth: "none" }}>
+                {/* Profile */}
+                <div className="flex items-center gap-3 px-4 pt-4 pb-3">
+                  <img src="/alternus-os.png" alt="AI" className="w-8 h-8 rounded-full object-cover" />
+                  <span className="text-sm font-bold" style={{ color: c.text }}>Alternus</span>
+                </div>
+
+                {/* Favorites */}
+                <div className="px-4 pt-2 pb-1">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: c.textMuted }}>Favorites</p>
+                </div>
+                {[
+                  { label: "AI Assistant", icon: ic.sparkle, action: () => { openWin("ai"); setShowAISidebar(false); } },
+                  { label: "Browser", icon: ic.globe, action: () => { openWin("browser"); setShowAISidebar(false); } },
+                  { label: "Files", icon: ic.folder, action: () => { openWin("files"); setShowAISidebar(false); } },
+                ].map((item, i) => (
+                  <button key={i} onClick={item.action}
+                    className="w-full flex items-center gap-3 px-5 py-2 text-left transition-colors"
+                    style={{ color: c.text }}
+                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                    <I d={item.icon} s={14} c={c.textMuted} />
+                    <span className="text-[12px]">{item.label}</span>
+                  </button>
+                ))}
+
+                {/* Apps */}
+                <div className="px-4 pt-3 pb-1">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: c.textMuted }}>Apps</p>
+                </div>
+                {[
+                  { label: "Terminal", icon: ic.terminal, id: "terminal" as WinId },
+                  { label: "Code Editor", icon: ic.code, id: "code" as WinId },
+                  { label: "Music", icon: ic.music, id: "music" as WinId },
+                  { label: "Weather", icon: ic.cloud, id: "weather" as WinId },
+                  { label: "Calendar", icon: ic.calendar, id: "calendar" as WinId },
+                  { label: "Notes", icon: ic.note, id: "notes" as WinId },
+                  { label: "Word", icon: ic.fileText, id: "word" as WinId },
+                  { label: "Store", icon: ic.store, id: "store" as WinId },
+                  { label: "Movies", icon: ic.film, id: "movies" as WinId },
+                  { label: "Calculator", icon: ic.calc, id: "calculator" as WinId },
+                  { label: "Downloads", icon: ic.download, id: "downloads" as WinId },
+                ].map((item, i) => (
+                  <button key={i} onClick={() => { openWin(item.id); setShowAISidebar(false); }}
+                    className="w-full flex items-center gap-3 px-5 py-2 text-left transition-colors"
+                    style={{ color: c.text }}
+                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                    <I d={item.icon} s={14} c={c.textMuted} />
+                    <span className="text-[12px]">{item.label}</span>
+                  </button>
+                ))}
+
+                {/* System */}
+                <div className="px-4 pt-3 pb-1">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: c.textMuted }}>System</p>
+                </div>
+                {[
+                  { label: "Control Panel", icon: ic.monitor, action: () => { openWin("controlpanel"); setShowAISidebar(false); } },
+                  { label: "Settings", icon: ic.settings, action: () => { openWin("settings"); setShowAISidebar(false); } },
+                  { label: "Accounts", icon: ic.user, action: () => { openWin("accounts"); setShowAISidebar(false); } },
+                ].map((item, i) => (
+                  <button key={i} onClick={item.action}
+                    className="w-full flex items-center gap-3 px-5 py-2 text-left transition-colors"
+                    style={{ color: c.text }}
+                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                    <I d={item.icon} s={14} c={c.textMuted} />
+                    <span className="text-[12px]">{item.label}</span>
+                  </button>
+                ))}
+
+                {/* Bottom */}
+                <div className="px-3 pb-3 pt-3 mt-2" style={{ borderTop: `1px solid ${c.border}` }}>
+                  <div className="flex items-center gap-2 px-2">
+                    <img src="/alternus-os.png" alt="Alternus" className="w-4 h-4 rounded-full object-cover opacity-50" />
+                    <span className="text-[10px]" style={{ color: c.textMuted }}>Alternus OS</span>
                   </div>
-                </div>
-
-                {/* New chat button */}
-                <div className="px-3 py-2">
-                  <button onClick={() => { openWin("ai"); setShowAISidebar(false); }}
-                    className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
-                    style={{ background: c.accent, color: "#fff" }}
-                    onMouseEnter={e => { e.currentTarget.style.opacity = "0.9"; }}
-                    onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}>
-                    + New chat
-                  </button>
-                </div>
-
-                {/* Suggestions */}
-                <div className="px-3 py-1 space-y-0.5">
-                  {["Create a description", "Write an email", "Explain quantum computing"].map((s, i) => (
-                    <button key={i} onClick={() => { openWin("ai"); setShowAISidebar(false); }}
-                      className="w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors"
-                      style={{ color: c.text }}
-                      onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-                      {s}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex-1" style={{ minHeight: 40 }} />
-
-                {/* Bottom actions */}
-                <div className="px-3 pb-4 pt-2 space-y-0.5" style={{ borderTop: `1px solid ${c.border}` }}>
-                  <button onClick={() => setMode(mode === "dark" ? "light" : "dark")}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-                    style={{ color: c.textSec }}
-                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-                    <I d={mode === "dark" ? ic.sun : ic.moon} s={16} c={c.textSec} />
-                    {mode === "dark" ? "Dark mode" : "Light mode"}
-                  </button>
-                  <button onClick={() => { openWin("settings"); setShowAISidebar(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-                    style={{ color: c.textSec }}
-                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-                    <I d={ic.user} s={16} c={c.textSec} />
-                    My account
-                  </button>
-                  <button onClick={() => { openWin("settings"); setShowAISidebar(false); }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-                    style={{ color: c.textSec }}
-                    onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-                    <I d={ic.settings} s={16} c={c.textSec} />
-                    Settings
-                  </button>
                 </div>
               </div>
             </div>
