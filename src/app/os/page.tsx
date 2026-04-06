@@ -675,10 +675,11 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
         </div>
 
         {/* New chat button */}
-        <div className="px-3 py-2">
-          <button onClick={newChat} className="w-full py-2.5 rounded-xl text-sm font-medium" style={{ background: c.accent, color: "#fff" }}>
-            + New chat
+        <div className="px-3 py-2 flex items-center gap-2">
+          <button onClick={newChat} className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: c.accent }}>
+            <I d={ic.plus} s={18} c="#fff" />
           </button>
+          <span className="text-sm font-medium" style={{ color: c.textSec }}>New</span>
         </div>
 
         {/* Chat history hint */}
@@ -942,6 +943,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
 
       {/* Right sidebar — Narrow vertical icon bar */}
       <div className="w-[52px] flex-shrink-0 flex flex-col items-center py-4 gap-1" style={{ background: c.bg }}>
+        <img src="/alternus-os.png" alt="Alternus AI" className="w-8 h-8 rounded-full object-cover mb-2" />
         {[
           { label: "PC Desktop", icon: ic.monitor },
           { label: "Video", icon: ic.film },
@@ -4672,39 +4674,24 @@ export default function AlternusOS() {
               </div>
             </div>
           )}
-          {/* Alternus gradient text */}
-          <h1
-            className="text-8xl md:text-9xl font-semibold mb-4 select-none bg-clip-text"
-            style={{
-              backgroundImage: `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              color: "transparent",
-            }}
-          >
-            Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
-          </h1>
-
-          {/* Welcome message */}
-          <p className="text-base font-light mb-10" style={{ color: c.textSec }}>
-            Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}. What would you like to create today?
-          </p>
+          {/* Greeting */}
+          <h2 className="text-[22px] font-light mb-1" style={{ color: c.textMuted }}>Hi Alter</h2>
+          <h1 className="text-[36px] font-light mb-8" style={{ color: c.text }}>Where should we start?</h1>
 
           {/* AI Search Bar */}
           <div className="w-full max-w-2xl">
             <div
-              className="flex items-center gap-2 pl-5 pr-2 py-2 rounded-2xl transition-all"
+              className="rounded-2xl transition-all"
               style={{
                 background: c.surface,
                 border: `1px solid ${c.border}`,
                 boxShadow: mode === "dark" ? "0 2px 16px rgba(0,0,0,0.15)" : "0 2px 16px rgba(0,0,0,0.06)",
               }}
             >
-              <I d={ic.search} s={20} c={c.textMuted} />
               <input
-                className="flex-1 bg-transparent outline-none text-base py-2"
+                className="w-full bg-transparent outline-none text-base px-5 pt-4 pb-2"
                 style={{ color: c.text }}
-                placeholder="Search or ask AI anything..."
+                placeholder="Ask Alternus AI..."
                 value={aiInput}
                 onChange={e => setAiInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -4713,13 +4700,18 @@ export default function AlternusOS() {
                   }
                 }}
               />
-              <button
-                onClick={() => aiInput.trim() && handleDesktopSearch()}
-                className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90"
-                style={{ background: c.accent }}
-              >
-                <I d={ic.send} s={16} c="#fff" />
-              </button>
+              <div className="flex items-center justify-between px-4 pb-3">
+                <button className="p-1.5 rounded-lg" style={{ color: c.textMuted }} title="Attach">
+                  <I d={ic.plus} s={16} />
+                </button>
+                <button
+                  onClick={() => aiInput.trim() && handleDesktopSearch()}
+                  className="p-1.5 rounded-lg transition-opacity"
+                  style={{ background: aiInput.trim() ? c.accent : c.cardAlt, opacity: aiInput.trim() ? 1 : 0.3 }}
+                >
+                  <I d={ic.send} s={14} c="#fff" />
+                </button>
+              </div>
             </div>
 
             {/* AI response - separate below */}
