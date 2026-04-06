@@ -666,7 +666,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
       )}
 
       {/* Chat area */}
-      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ background: "transparent", borderRight: `1px solid ${c.border}` }}>
+      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ background: "transparent" }}>
         {/* Account panel (toggleable) */}
         {showAccount && (
           <div className="p-4 space-y-3" style={{ borderBottom: `1px solid ${c.border}`, background: c.cardAlt }}>
