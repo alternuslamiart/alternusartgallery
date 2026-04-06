@@ -893,7 +893,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
       </div>
 
       {/* Right sidebar — Narrow vertical icon bar */}
-      <div className="w-[52px] flex-shrink-0 flex flex-col items-center py-4 gap-1" style={{ background: "transparent" }}>
+      <div className="w-[52px] flex-shrink-0 flex flex-col items-center py-4 gap-1" style={{ background: c.bg, borderLeft: `1px solid ${c.border}` }}>
         {/* Alternus AI icon */}
         <img src="/alternus-os.png" alt="Alternus AI" className="w-8 h-8 rounded-full object-cover mb-1" />
 
