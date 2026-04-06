@@ -3705,9 +3705,13 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
 
   const sections = [
     { label: "System", icon: ic.monitor },
+    { label: "Boot", icon: ic.power },
+    { label: "Security", icon: ic.shield },
     { label: "Display", icon: ic.sun },
     { label: "Network", icon: ic.wifi },
     { label: "Storage", icon: ic.folder },
+    { label: "Services", icon: ic.settings },
+    { label: "Devices", icon: ic.cpu },
     { label: "Users", icon: ic.user },
     { label: "Updates", icon: ic.refresh },
   ];
@@ -3752,6 +3756,108 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        );
+      case "Boot":
+        return (
+          <div className="space-y-4">
+            <p className="text-sm font-semibold" style={{ color: c.text }}>Boot Configuration</p>
+            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
+              {[
+                { label: "Boot Mode", value: "UEFI" },
+                { label: "Secure Boot", value: "Enabled" },
+                { label: "Fast Boot", value: "Enabled" },
+                { label: "Boot Timeout", value: "5 seconds" },
+                { label: "Default OS", value: "Alternus OS v3.0" },
+              ].map((item, i) => (
+                <div key={i} className="flex justify-between">
+                  <span className="text-xs" style={{ color: c.textMuted }}>{item.label}</span>
+                  <span className="text-xs font-medium" style={{ color: c.text }}>{item.value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl p-4" style={{ background: c.cardAlt }}>
+              <p className="text-xs font-medium mb-3" style={{ color: c.text }}>Boot Order</p>
+              {["1. NVMe SSD — Alternus OS", "2. USB Drive", "3. Network (PXE)", "4. Optical Drive"].map((item, i) => (
+                <div key={i} className="flex items-center gap-2 py-1.5 px-2 rounded-lg mb-1" style={{ background: i === 0 ? c.accentSoft : "transparent" }}>
+                  <span className="text-[11px]" style={{ color: i === 0 ? c.accentText : c.textSec }}>{item}</span>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
+              <p className="text-xs font-medium" style={{ color: c.text }}>Startup Programs</p>
+              {[
+                { name: "Alternus Shell", enabled: true },
+                { name: "AI Engine", enabled: true },
+                { name: "Network Manager", enabled: true },
+                { name: "Cloud Sync", enabled: true },
+                { name: "Bluetooth Service", enabled: false },
+              ].map((s, i) => (
+                <div key={i} className="flex justify-between items-center">
+                  <span className="text-[11px]" style={{ color: c.text }}>{s.name}</span>
+                  <div className="w-8 h-4 rounded-full cursor-pointer transition-colors" style={{ background: s.enabled ? c.accent : c.border }}>
+                    <div className="w-3 h-3 rounded-full mt-0.5 transition-all" style={{ background: "#fff", marginLeft: s.enabled ? 16 : 2 }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      case "Security":
+        return (
+          <div className="space-y-4">
+            <p className="text-sm font-semibold" style={{ color: c.text }}>Security & Privacy</p>
+            <div className="rounded-xl p-4 flex items-center gap-3" style={{ background: c.success + "10", border: `1px solid ${c.success}30` }}>
+              <I d={ic.shield} s={20} c={c.success} />
+              <div>
+                <p className="text-xs font-semibold" style={{ color: c.text }}>System Protected</p>
+                <p className="text-[10px]" style={{ color: c.textMuted }}>All security features active</p>
+              </div>
+            </div>
+            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
+              <p className="text-xs font-medium" style={{ color: c.text }}>Firewall</p>
+              {[
+                { label: "Firewall Status", value: "Active", ok: true },
+                { label: "Inbound Rules", value: "24 rules" },
+                { label: "Outbound Rules", value: "18 rules" },
+                { label: "Blocked Attempts", value: "147 (last 24h)" },
+              ].map((item, i) => (
+                <div key={i} className="flex justify-between">
+                  <span className="text-xs" style={{ color: c.textMuted }}>{item.label}</span>
+                  <span className="text-xs font-medium" style={{ color: ("ok" in item) ? c.success : c.text }}>{item.value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
+              <p className="text-xs font-medium" style={{ color: c.text }}>Encryption</p>
+              {[
+                { label: "Disk Encryption", value: "AES-256", ok: true },
+                { label: "Secure Boot", value: "Enabled", ok: true },
+                { label: "TPM", value: "v2.0 Active", ok: true },
+              ].map((item, i) => (
+                <div key={i} className="flex justify-between">
+                  <span className="text-xs" style={{ color: c.textMuted }}>{item.label}</span>
+                  <span className="text-xs font-medium" style={{ color: c.success }}>{item.value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
+              <p className="text-xs font-medium" style={{ color: c.text }}>Privacy</p>
+              {[
+                { name: "Location Services", enabled: false },
+                { name: "Camera Access", enabled: true },
+                { name: "Microphone Access", enabled: true },
+                { name: "Analytics & Telemetry", enabled: false },
+                { name: "Ad Tracking", enabled: false },
+              ].map((s, i) => (
+                <div key={i} className="flex justify-between items-center">
+                  <span className="text-[11px]" style={{ color: c.text }}>{s.name}</span>
+                  <div className="w-8 h-4 rounded-full cursor-pointer transition-colors" style={{ background: s.enabled ? c.accent : c.border }}>
+                    <div className="w-3 h-3 rounded-full mt-0.5 transition-all" style={{ background: "#fff", marginLeft: s.enabled ? 16 : 2 }} />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         );
@@ -3853,6 +3959,69 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
                 ))}
               </div>
             </div>
+          </div>
+        );
+      case "Services":
+        return (
+          <div className="space-y-4">
+            <p className="text-sm font-semibold" style={{ color: c.text }}>System Services</p>
+            <div className="rounded-xl overflow-hidden" style={{ background: c.cardAlt }}>
+              {[
+                { name: "AlternusShell", status: "Running", type: "Core", pid: 1 },
+                { name: "AI Engine v3.1", status: "Running", type: "Core", pid: 42 },
+                { name: "NetworkManager", status: "Running", type: "Network", pid: 88 },
+                { name: "DisplayServer", status: "Running", type: "Display", pid: 112 },
+                { name: "AudioService", status: "Running", type: "Media", pid: 156 },
+                { name: "CloudSync", status: "Running", type: "Cloud", pid: 201 },
+                { name: "PrintSpooler", status: "Stopped", type: "Peripheral", pid: 0 },
+                { name: "BluetoothService", status: "Stopped", type: "Peripheral", pid: 0 },
+                { name: "VPN Client", status: "Stopped", type: "Network", pid: 0 },
+                { name: "BackupAgent", status: "Running", type: "System", pid: 310 },
+              ].map((svc, i) => (
+                <div key={i} className="flex items-center justify-between px-4 py-2.5" style={{ borderBottom: `1px solid ${c.border}` }}>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ background: svc.status === "Running" ? c.success : c.textMuted }} />
+                    <span className="text-[11px] font-medium" style={{ color: c.text }}>{svc.name}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: c.bg, color: c.textMuted }}>{svc.type}</span>
+                    <span className="text-[10px] w-12 text-right" style={{ color: svc.status === "Running" ? c.success : c.textMuted }}>{svc.status}</span>
+                    {svc.pid > 0 && <span className="text-[9px] w-8 text-right" style={{ color: c.textMuted }}>:{svc.pid}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      case "Devices":
+        return (
+          <div className="space-y-4">
+            <p className="text-sm font-semibold" style={{ color: c.text }}>Device Manager</p>
+            {[
+              { category: "Processors", devices: [{ name: "AlternusCore x86_64 @ 4.2GHz", status: "OK" }] },
+              { category: "Display", devices: [{ name: "Integrated GPU — AlternusGraphics", status: "OK" }, { name: "Monitor — 1920x1080 @60Hz", status: "OK" }] },
+              { category: "Storage", devices: [{ name: "NVMe SSD 512GB", status: "OK" }] },
+              { category: "Network", devices: [{ name: "Wi-Fi Adapter — Alternus Wireless AC", status: "OK" }, { name: "Ethernet — Alternus GbE LAN", status: "Disconnected" }] },
+              { category: "Audio", devices: [{ name: "Alternus HD Audio", status: "OK" }, { name: "Microphone Array", status: "OK" }] },
+              { category: "Input", devices: [{ name: "Keyboard", status: "OK" }, { name: "Trackpad / Mouse", status: "OK" }] },
+              { category: "USB", devices: [{ name: "USB 3.2 Hub — 4 ports", status: "OK" }, { name: "USB-C Thunderbolt", status: "OK" }] },
+              { category: "Bluetooth", devices: [{ name: "Bluetooth 5.3 Adapter", status: "Disabled" }] },
+            ].map((cat, i) => (
+              <div key={i} className="rounded-xl overflow-hidden" style={{ background: c.cardAlt }}>
+                <div className="px-4 py-2" style={{ borderBottom: `1px solid ${c.border}` }}>
+                  <p className="text-[11px] font-semibold" style={{ color: c.text }}>{cat.category}</p>
+                </div>
+                {cat.devices.map((dev, j) => (
+                  <div key={j} className="flex items-center justify-between px-4 py-2" style={{ borderBottom: j < cat.devices.length - 1 ? `1px solid ${c.border}` : "none" }}>
+                    <span className="text-[11px]" style={{ color: c.textSec }}>{dev.name}</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{
+                      background: dev.status === "OK" ? c.success + "20" : dev.status === "Disabled" ? c.warning + "20" : c.border,
+                      color: dev.status === "OK" ? c.success : dev.status === "Disabled" ? c.warning : c.textMuted
+                    }}>{dev.status}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         );
       case "Users":
