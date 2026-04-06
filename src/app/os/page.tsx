@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel";
 
 interface WinState {
   id: WinId;
@@ -3699,6 +3699,251 @@ function MoviesApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
+// ━━━━ Control Panel ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; onOpenApp?: (id: WinId) => void }) {
+  const [activeSection, setActiveSection] = useState("System");
+
+  const sections = [
+    { label: "System", icon: ic.monitor },
+    { label: "Display", icon: ic.sun },
+    { label: "Network", icon: ic.wifi },
+    { label: "Storage", icon: ic.folder },
+    { label: "Users", icon: ic.user },
+    { label: "Updates", icon: ic.refresh },
+  ];
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case "System":
+        return (
+          <div className="space-y-4">
+            <p className="text-sm font-semibold" style={{ color: c.text }}>System Information</p>
+            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
+              {[
+                { label: "OS", value: "Alternus OS v3.0" },
+                { label: "Kernel", value: "AlternusKernel 6.2" },
+                { label: "CPU", value: "AlternusCore x86_64 @ 4.2GHz" },
+                { label: "RAM", value: "16 GB DDR5" },
+                { label: "GPU", value: "Integrated Graphics" },
+                { label: "Architecture", value: "64-bit" },
+              ].map((item, i) => (
+                <div key={i} className="flex justify-between">
+                  <span className="text-xs" style={{ color: c.textMuted }}>{item.label}</span>
+                  <span className="text-xs font-medium" style={{ color: c.text }}>{item.value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl p-4" style={{ background: c.cardAlt }}>
+              <p className="text-xs font-medium mb-2" style={{ color: c.text }}>Performance</p>
+              <div className="space-y-2">
+                {[
+                  { label: "CPU Usage", pct: 23, color: c.accent },
+                  { label: "Memory", pct: 58, color: c.purple },
+                  { label: "GPU", pct: 12, color: c.success },
+                ].map((item, i) => (
+                  <div key={i}>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-[10px]" style={{ color: c.textMuted }}>{item.label}</span>
+                      <span className="text-[10px] font-medium" style={{ color: c.text }}>{item.pct}%</span>
+                    </div>
+                    <div className="h-1.5 rounded-full" style={{ background: c.border }}>
+                      <div className="h-full rounded-full transition-all" style={{ width: `${item.pct}%`, background: item.color }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      case "Display":
+        return (
+          <div className="space-y-4">
+            <p className="text-sm font-semibold" style={{ color: c.text }}>Display Settings</p>
+            <div className="rounded-xl p-4 space-y-4" style={{ background: c.cardAlt }}>
+              <div className="flex justify-between items-center">
+                <span className="text-xs" style={{ color: c.textMuted }}>Theme</span>
+                <div className="flex gap-2">
+                  {(["dark", "light"] as ThemeMode[]).map(m => (
+                    <button key={m} onClick={() => setMode(m)} className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                      style={{ background: mode === m ? c.accent : c.bg, color: mode === m ? "#fff" : c.textSec }}>
+                      {m === "dark" ? "Dark" : "Light"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-xs" style={{ color: c.textMuted }}>Resolution</span>
+                <span className="text-xs font-medium" style={{ color: c.text }}>1920 x 1080</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-xs" style={{ color: c.textMuted }}>Refresh Rate</span>
+                <span className="text-xs font-medium" style={{ color: c.text }}>60 Hz</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-xs" style={{ color: c.textMuted }}>Scaling</span>
+                <span className="text-xs font-medium" style={{ color: c.text }}>100%</span>
+              </div>
+              <div>
+                <span className="text-xs" style={{ color: c.textMuted }}>Brightness</span>
+                <div className="mt-2 h-2 rounded-full" style={{ background: c.border }}>
+                  <div className="h-full rounded-full" style={{ width: "75%", background: c.accent }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case "Network":
+        return (
+          <div className="space-y-4">
+            <p className="text-sm font-semibold" style={{ color: c.text }}>Network</p>
+            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <I d={ic.wifi} s={16} c={c.success} />
+                  <span className="text-xs font-medium" style={{ color: c.text }}>Wi-Fi Connected</span>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: c.success + "20", color: c.success }}>Active</span>
+              </div>
+              {[
+                { label: "Network", value: "Alternus-Net-5G" },
+                { label: "IP Address", value: "192.168.1.105" },
+                { label: "MAC Address", value: "A1:B2:C3:D4:E5:F6" },
+                { label: "Signal", value: "Excellent (-42 dBm)" },
+                { label: "Speed", value: "866 Mbps" },
+                { label: "DNS", value: "8.8.8.8" },
+              ].map((item, i) => (
+                <div key={i} className="flex justify-between">
+                  <span className="text-xs" style={{ color: c.textMuted }}>{item.label}</span>
+                  <span className="text-xs font-medium" style={{ color: c.text }}>{item.value}</span>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl p-4" style={{ background: c.cardAlt }}>
+              <p className="text-xs font-medium mb-2" style={{ color: c.text }}>Ethernet</p>
+              <p className="text-[10px]" style={{ color: c.textMuted }}>Not connected</p>
+            </div>
+          </div>
+        );
+      case "Storage":
+        return (
+          <div className="space-y-4">
+            <p className="text-sm font-semibold" style={{ color: c.text }}>Storage</p>
+            <div className="rounded-xl p-4" style={{ background: c.cardAlt }}>
+              <div className="flex justify-between mb-2">
+                <span className="text-xs font-medium" style={{ color: c.text }}>Main Drive (NVMe)</span>
+                <span className="text-xs" style={{ color: c.textMuted }}>287 GB / 512 GB</span>
+              </div>
+              <div className="h-3 rounded-full mb-3" style={{ background: c.border }}>
+                <div className="h-full rounded-full" style={{ width: "56%", background: c.accent }} />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: "System", size: "42 GB", color: c.accent },
+                  { label: "Apps", size: "68 GB", color: c.purple },
+                  { label: "Documents", size: "95 GB", color: c.warning },
+                  { label: "Media", size: "82 GB", color: c.success },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 p-2 rounded-lg" style={{ background: c.bg }}>
+                    <div className="w-2 h-2 rounded-full" style={{ background: item.color }} />
+                    <div>
+                      <p className="text-[10px] font-medium" style={{ color: c.text }}>{item.label}</p>
+                      <p className="text-[9px]" style={{ color: c.textMuted }}>{item.size}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      case "Users":
+        return (
+          <div className="space-y-4">
+            <p className="text-sm font-semibold" style={{ color: c.text }}>User Accounts</p>
+            {[
+              { name: "Admin", email: "admin@alternus.art", role: "Administrator", active: true },
+              { name: "Guest", email: "guest@alternus.art", role: "Guest", active: false },
+            ].map((user, i) => (
+              <div key={i} className="rounded-xl p-4 flex items-center gap-3" style={{ background: c.cardAlt }}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: user.active ? c.accentSoft : c.border }}>
+                  <I d={ic.user} s={18} c={user.active ? c.accentText : c.textMuted} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold" style={{ color: c.text }}>{user.name}</p>
+                  <p className="text-[10px]" style={{ color: c.textMuted }}>{user.email}</p>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: user.active ? c.success + "20" : c.border, color: user.active ? c.success : c.textMuted }}>
+                  {user.role}
+                </span>
+              </div>
+            ))}
+            <button className="w-full py-2.5 rounded-xl text-xs font-medium" style={{ background: c.cardAlt, color: c.accent }}>
+              + Add User
+            </button>
+          </div>
+        );
+      case "Updates":
+        return (
+          <div className="space-y-4">
+            <p className="text-sm font-semibold" style={{ color: c.text }}>System Updates</p>
+            <div className="rounded-xl p-4 flex items-center gap-3" style={{ background: c.success + "10", border: `1px solid ${c.success}30` }}>
+              <I d={ic.shield} s={20} c={c.success} />
+              <div>
+                <p className="text-xs font-semibold" style={{ color: c.text }}>System is up to date</p>
+                <p className="text-[10px]" style={{ color: c.textMuted }}>Last checked: Today, {new Date().getHours()}:{String(new Date().getMinutes()).padStart(2, "0")}</p>
+              </div>
+            </div>
+            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
+              <p className="text-xs font-medium" style={{ color: c.text }}>Recent Updates</p>
+              {[
+                { name: "Alternus OS v3.0.2", date: "Apr 5, 2026", status: "Installed" },
+                { name: "Security Patch 04-2026", date: "Apr 3, 2026", status: "Installed" },
+                { name: "AI Engine v3.1", date: "Apr 1, 2026", status: "Installed" },
+              ].map((u, i) => (
+                <div key={i} className="flex justify-between items-center">
+                  <div>
+                    <p className="text-[11px] font-medium" style={{ color: c.text }}>{u.name}</p>
+                    <p className="text-[9px]" style={{ color: c.textMuted }}>{u.date}</p>
+                  </div>
+                  <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: c.success + "20", color: c.success }}>{u.status}</span>
+                </div>
+              ))}
+            </div>
+            <button className="w-full py-2.5 rounded-xl text-xs font-medium" style={{ background: c.accent, color: "#fff" }}>
+              Check for Updates
+            </button>
+          </div>
+        );
+      default: return null;
+    }
+  };
+
+  return (
+    <div className="flex h-full overflow-hidden">
+      {/* Sidebar */}
+      <div className="w-[170px] flex-shrink-0 flex flex-col py-3 px-2 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+        <div className="flex items-center gap-2 px-3 mb-3">
+          <I d={ic.settings} s={16} c={c.accent} />
+          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: c.textMuted }}>Control Panel</p>
+        </div>
+        {sections.map((it, i) => (
+          <button key={i} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors mb-0.5"
+            onClick={() => setActiveSection(it.label)}
+            style={{ background: activeSection === it.label ? c.accentSoft : "transparent" }}
+            onMouseEnter={e => { if (activeSection !== it.label) e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { if (activeSection !== it.label) e.currentTarget.style.background = "transparent"; }}>
+            <I d={it.icon} s={15} c={activeSection === it.label ? c.accentText : c.textSec} />
+            <span className="text-[11px] font-medium" style={{ color: activeSection === it.label ? c.accentText : c.text }}>{it.label}</span>
+          </button>
+        ))}
+      </div>
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-5" style={{ scrollbarWidth: "none" }}>
+        {renderContent()}
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ MAIN OS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function AlternusOS() {
   const [mode, setMode] = useState<ThemeMode>("dark");
@@ -3765,6 +4010,7 @@ export default function AlternusOS() {
     { id: "calculator", title: "Calculator", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 500, y: 80, w: 320, h: 440 },
     { id: "accounts", title: "Accounts", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 90, w: 360, h: 400 },
     { id: "downloads", title: "Downloads", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 350, y: 80, w: 440, h: 480 },
+    { id: "controlpanel", title: "Control Panel", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 40, w: 580, h: 440 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -3868,6 +4114,7 @@ export default function AlternusOS() {
       calculator: { w: 320, h: 460 },
       accounts: { w: 380, h: 440 },
       downloads: { w: 440, h: 480 },
+      controlpanel: { w: 580, h: 440 },
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
@@ -4188,6 +4435,7 @@ export default function AlternusOS() {
     calculator: <CalculatorApp c={c} />,
     accounts: <AccountsApp c={c} />,
     downloads: <DownloadsApp c={c} />,
+    controlpanel: <ControlPanelApp c={c} mode={mode} setMode={setMode} onOpenApp={openWin} />,
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
@@ -4205,6 +4453,7 @@ export default function AlternusOS() {
     { id: "downloads", icon: ic.download, label: "Downloads", color: "#34D399" },
     { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A" },
     { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec },
+    { id: "controlpanel", icon: ic.monitor, label: "Control Panel", color: c.textSec },
   ];
 
   // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
