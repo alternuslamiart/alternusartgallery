@@ -471,9 +471,7 @@ function AIPanel({ c, context, onAction }: { c: typeof palette.dark; context: st
     <div className="flex flex-col h-full" style={{ borderLeft: `1px solid ${c.border}`, background: c.bg }}>
       {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "#3B82F6" }}>
-          <I d={ic.sparkle} s={10} c="#fff" />
-        </div>
+        <img src="/Alternus OS.png" alt="AI" className="w-5 h-5 rounded-full object-cover" />
         <span className="text-[10px] font-bold flex-1" style={{ color: c.text }}>AI</span>
         <button onClick={() => { setListening(!listening); if (!listening) setTimeout(() => { send("help"); setListening(false); }, 1500); }}
           className="w-6 h-6 rounded-full flex items-center justify-center transition-all"
@@ -670,6 +668,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
         {/* Brand */}
         <div className="px-4 pt-4 pb-2">
           <div className="flex items-center gap-2">
+            <img src="/Alternus OS.png" alt="AI" className="w-6 h-6 rounded-full object-cover" />
             <span className="text-sm font-bold" style={{ color: c.accent }}>ALTERNUS</span>
             <span className="text-xs" style={{ color: c.textMuted }}>AI</span>
           </div>
@@ -827,9 +826,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
                   ) : (
                     /* AI message — sparkle icon + open text */
                     <div key={i} className="flex gap-4 items-start">
-                      <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5" style={{ background: c.accentSoft }}>
-                        <I d={ic.sparkle} s={16} c={c.accent} />
-                      </div>
+                      <img src="/Alternus OS.png" alt="AI" className="w-8 h-8 rounded-full flex-shrink-0 object-cover mt-0.5" />
                       <div className="flex-1 min-w-0">
                         <div className="text-[14px] leading-[1.8]" style={{ color: c.text }}>
                           <AIFormattedText text={m.text} c={c} />
@@ -1701,9 +1698,9 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
           <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: c.textMuted }}>Settings</p>
           <div className="flex items-center gap-1">
             <button title="AI Assistant" onClick={() => setShowAIPanel(!showAIPanel)}
-              className="w-6 h-6 rounded-full flex items-center justify-center transition-all"
-              style={{ background: "#3B82F6", boxShadow: showAIPanel ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
-              <I d={ic.sparkle} s={10} c="#fff" />
+              className="w-6 h-6 rounded-full flex items-center justify-center transition-all overflow-hidden"
+              style={{ boxShadow: showAIPanel ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
+              <img src="/Alternus OS.png" alt="AI" className="w-6 h-6 rounded-full object-cover" />
             </button>
             <button title="Voice" className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
               style={{ color: c.textMuted }}
@@ -1731,9 +1728,7 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
       {showAIPanel && (
         <div className="w-[180px] flex-shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${c.border}`, background: c.bg }}>
           <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "#3B82F6" }}>
-              <I d={ic.sparkle} s={10} c="#fff" />
-            </div>
+            <img src="/Alternus OS.png" alt="AI" className="w-5 h-5 rounded-full object-cover" />
             <span className="text-[10px] font-bold flex-1" style={{ color: c.text }}>AI Assistant</span>
             <button title="Voice" className="w-5 h-5 rounded-full flex items-center justify-center transition-colors"
               style={{ color: c.textMuted }}
