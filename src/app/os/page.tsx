@@ -633,7 +633,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
   ];
 
   return (
-    <div className="flex h-full" style={{ background: c.surface }}>
+    <div className="flex h-full" style={{ background: c.bg }}>
       {/* Toast notification */}
       {toast && (
         <div className="absolute top-3 right-3 z-50 flex items-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-medium shadow-lg"
@@ -706,7 +706,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
       </div>
 
       {/* Chat area — rounded card between sidebars */}
-      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ background: c.surface, borderRadius: "16px", margin: "6px 0", border: `1px solid ${c.bg}` }}>
+      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ background: c.surface, borderRadius: "16px", margin: "6px 0", border: `1px solid ${c.cardAlt}` }}>
         {/* Account panel (toggleable) */}
         {showAccount && (
           <div className="p-4 space-y-3" style={{ borderBottom: `1px solid ${c.border}`, background: c.cardAlt }}>
