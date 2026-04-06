@@ -382,7 +382,7 @@ function AppWindow({
         isFrozen={win.isFrozen}
         onForceQuit={onForceQuit}
       />
-      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: "0 0 6px 0" }}>
+      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: "0 6px 6px 6px" }}>
         <div style={{ background: c.surface, borderRadius: 16, border: `1px solid ${c.cardAlt}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
         {/* Frozen overlay */}
