@@ -633,7 +633,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
   ];
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full" style={{ background: c.surface }}>
       {/* Toast notification */}
       {toast && (
         <div className="absolute top-3 right-3 z-50 flex items-center gap-2 px-4 py-2.5 rounded-xl text-[12px] font-medium shadow-lg"
@@ -643,7 +643,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
       )}
 
       {/* Sidebar */}
-      <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ borderRight: `1px solid ${c.border}`, background: c.bg }}>
+      <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ background: c.bg }}>
         {/* Brand */}
         <div className="px-4 pt-4 pb-2">
           <div className="flex items-center gap-2">
@@ -705,8 +705,8 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
         </div>
       </div>
 
-      {/* Chat area */}
-      <div className="flex-1 flex flex-col relative">
+      {/* Chat area — rounded card between sidebars */}
+      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ background: c.surface, borderRadius: "16px", margin: "6px 0", border: `1px solid ${c.border}` }}>
         {/* Account panel (toggleable) */}
         {showAccount && (
           <div className="p-4 space-y-3" style={{ borderBottom: `1px solid ${c.border}`, background: c.cardAlt }}>
@@ -921,7 +921,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
       </div>
 
       {/* Right sidebar — Narrow vertical icon bar */}
-      <div className="w-[52px] flex-shrink-0 flex flex-col items-center py-4 gap-1" style={{ borderLeft: `1px solid ${c.border}`, background: c.bg }}>
+      <div className="w-[52px] flex-shrink-0 flex flex-col items-center py-4 gap-1" style={{ background: c.bg }}>
         {[
           { label: "PC Desktop", icon: ic.monitor },
           { label: "Video", icon: ic.film },
