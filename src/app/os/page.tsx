@@ -1529,6 +1529,7 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
                 { bg: "", img: "/wallpapers/OSwp.png", label: "Aurora" },
                 { bg: "", img: "/wallpapers/OSwp2.png", label: "Ocean" },
                 { bg: "", img: "/wallpapers/OSwp4.png", label: "Emerald" },
+                { bg: "", img: "/wallpapers/OSwp5.png", label: "OSwp5" },
               ].map((wp, i) => (
                 <div key={i} onClick={() => setWallpaper(i)}
                   className="h-16 rounded-xl cursor-pointer transition-all relative overflow-hidden"
@@ -4352,6 +4353,7 @@ export default function AlternusOS() {
     "url('/wallpapers/OSwp.png') center/cover no-repeat",
     "url('/wallpapers/OSwp2.png') center/cover no-repeat",
     "url('/wallpapers/OSwp4.png') center/cover no-repeat",
+    "url('/wallpapers/OSwp5.png') center/cover no-repeat",
   ];
   const desktopBg = wallpaper === 0 ? c.bg : wallpapers[wallpaper] || c.bg;
 
