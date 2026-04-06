@@ -382,7 +382,7 @@ function AppWindow({
         isFrozen={win.isFrozen}
         onForceQuit={onForceQuit}
       />
-      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: "0 6px 6px 6px" }}>
+      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: "6px" }}>
         <div style={{ background: c.surface, borderRadius: 16, border: `1px solid ${c.cardAlt}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
         {/* Frozen overlay */}
@@ -707,8 +707,8 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
         </div>
       </div>
 
-      {/* Chat area — rounded card between sidebars */}
-      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ background: c.surface, borderRadius: "16px", margin: "6px 0", border: `1px solid ${c.cardAlt}` }}>
+      {/* Chat area — lines top & bottom only */}
+      <div className="flex-1 flex flex-col relative overflow-hidden" style={{ background: c.surface, borderTop: `1px solid ${c.cardAlt}`, borderBottom: `1px solid ${c.cardAlt}` }}>
         {/* Account panel (toggleable) */}
         {showAccount && (
           <div className="p-4 space-y-3" style={{ borderBottom: `1px solid ${c.border}`, background: c.cardAlt }}>
