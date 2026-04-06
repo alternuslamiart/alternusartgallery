@@ -647,12 +647,12 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
     setInput("");
   };
 
-  const landingChips = [
-    { label: "Explore gallery", icon: ic.image },
-    { label: "Art styles", icon: ic.sparkle },
-    { label: "Commission art", icon: ic.pen },
-    { label: "Help me choose", icon: ic.search },
-    { label: "Art care tips", icon: ic.shield },
+  const landingChips: { label: string; icon: string; app?: WinId }[] = [
+    { label: "Browser", icon: ic.globe, app: "browser" },
+    { label: "Clock", icon: ic.clock, app: "clock" },
+    { label: "Code", icon: ic.code, app: "code" },
+    { label: "Studio", icon: ic.pen, app: "studio" },
+    { label: "Files", icon: ic.folder, app: "files" },
   ];
 
   return (
@@ -708,7 +708,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
         {!hasMessages ? (
           /* ===== GEMINI-STYLE LANDING ===== */
           <div className="flex-1 flex flex-col items-center justify-center px-6">
-            <div className="w-full max-w-[560px] -mt-8">
+            <div className="w-full max-w-[620px] -mt-8 text-center">
               {/* Alternus gradient text */}
               <h1
                 className="text-8xl md:text-9xl font-semibold mb-4 select-none bg-clip-text"
@@ -724,32 +724,34 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
               {/* Greeting */}
               <h1 className="text-[36px] font-light mb-8" style={{ color: c.text }}>Where should we start?</h1>
 
-              {/* Input box */}
-              <div className="flex items-center gap-2 pl-5 pr-2 py-2 rounded-2xl mb-5"
-                style={{
-                  background: c.surface,
-                  border: `1px solid ${c.border}`,
-                  boxShadow: mode === "dark" ? "0 2px 16px rgba(0,0,0,0.15)" : "0 2px 16px rgba(0,0,0,0.06)",
-                }}>
-                <I d={ic.search} s={20} c={c.textMuted} />
-                <input
-                  className="flex-1 bg-transparent outline-none text-base py-2"
-                  style={{ color: c.text }}
-                  placeholder="Search or ask AI anything..."
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") send(); }}
-                />
-                <button onClick={() => send()} disabled={!input.trim()} className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90"
-                  style={{ background: c.accent }}>
-                  <I d={ic.send} s={16} c="#fff" />
-                </button>
+              {/* Input box + app chips row */}
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex-1 flex items-center gap-2 pl-5 pr-2 py-2 rounded-2xl"
+                  style={{
+                    background: c.surface,
+                    border: `1px solid ${c.border}`,
+                    boxShadow: mode === "dark" ? "0 2px 16px rgba(0,0,0,0.15)" : "0 2px 16px rgba(0,0,0,0.06)",
+                  }}>
+                  <I d={ic.search} s={20} c={c.textMuted} />
+                  <input
+                    className="flex-1 bg-transparent outline-none text-base py-2"
+                    style={{ color: c.text }}
+                    placeholder="Search or ask AI anything..."
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") send(); }}
+                  />
+                  <button onClick={() => send()} disabled={!input.trim()} className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90"
+                    style={{ background: c.accent }}>
+                    <I d={ic.send} s={16} c="#fff" />
+                  </button>
+                </div>
               </div>
 
-              {/* Suggestion chips */}
+              {/* App shortcut chips */}
               <div className="flex flex-wrap gap-2 justify-center">
                 {landingChips.map(chip => (
-                  <button key={chip.label} onClick={() => send(chip.label)}
+                  <button key={chip.label} onClick={() => { if (chip.app && onOpenApp) onOpenApp(chip.app); }}
                     className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[12px] transition-colors"
                     style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}
                     onMouseEnter={e => { e.currentTarget.style.background = c.border; e.currentTarget.style.color = c.text; }}
