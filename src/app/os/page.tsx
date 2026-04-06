@@ -403,8 +403,8 @@ function AppWindow({
         isFrozen={win.isFrozen}
         onForceQuit={onForceQuit}
       />
-      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: win.isMaximized ? 0 : "6px" }}>
-        <div style={{ background: c.surface, borderRadius: win.isMaximized ? 0 : 16, border: win.isMaximized ? "none" : `1px solid ${c.cardAlt}`, height: "100%", overflow: "auto", position: "relative" }}>
+      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: "6px" }}>
+        <div style={{ background: c.surface, borderRadius: 16, border: `1px solid ${c.cardAlt}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
         {/* Frozen overlay */}
         {win.isFrozen && (
