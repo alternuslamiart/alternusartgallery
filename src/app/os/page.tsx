@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio";
 
 interface WinState {
   id: WinId;
@@ -3746,6 +3746,243 @@ function MoviesApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
+// ━━━━ Alternus Studio 3D ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function StudioApp({ c }: { c: typeof palette.dark }) {
+  const { ref, w, scale } = useContainerSize(720);
+  const fs = (base: number) => Math.round(base * scale);
+  const [activeWS, setActiveWS] = useState(1);
+  const [selObj, setSelObj] = useState("Cube");
+
+  const workspaces = ["Layout", "Modeling", "Sculpting", "Shading", "Animation", "Rendering"];
+  const menus = ["File", "Edit", "Render", "Window", "Help"];
+  const tools = [
+    { icon: ic.mouse, tip: "Select Box" },
+    { icon: ic.move || ic.share, tip: "Move" },
+    { icon: ic.refresh, tip: "Rotate" },
+    { icon: ic.maximize, tip: "Scale" },
+    { icon: ic.plus, tip: "Cursor" },
+    { icon: ic.pen, tip: "Annotate" },
+    { icon: ic.type, tip: "Measure" },
+  ];
+  const sceneItems = [
+    { name: "Camera", icon: ic.film, type: "camera" },
+    { name: "Cube", icon: ic.maximize, type: "mesh" },
+    { name: "Light", icon: ic.sun, type: "light" },
+  ];
+  const transform = {
+    location: { x: "0.000", y: "0.000", z: "0.000" },
+    rotation: { x: "0.00°", y: "0.00°", z: "0.00°" },
+    scale: { x: "1.000", y: "1.000", z: "1.000" },
+  };
+
+  const gridColor = c.border;
+  const panelBg = c.surface;
+  const darkBg = c.bg;
+
+  return (
+    <div ref={ref} style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: darkBg, color: c.text, fontSize: fs(10), overflow: "hidden", fontFamily: "monospace" }}>
+
+      {/* Top Menu Bar */}
+      <div style={{ display: "flex", alignItems: "center", background: panelBg, borderBottom: `1px solid ${c.border}`, height: fs(26), flexShrink: 0, gap: fs(2), padding: `0 ${fs(6)}px` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: fs(1), marginRight: fs(8) }}>
+          <I d={ic.pen} s={fs(12)} c={c.accent} />
+          <span style={{ fontSize: fs(10), fontWeight: 700, color: c.accent, marginLeft: fs(3) }}>Studio</span>
+        </div>
+        {menus.map(m => (
+          <div key={m} style={{ padding: `${fs(3)}px ${fs(7)}px`, cursor: "pointer", borderRadius: fs(3), fontSize: fs(10), color: c.textMuted }}
+            onMouseEnter={e => { e.currentTarget.style.background = c.border; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+            {m}
+          </div>
+        ))}
+        <div style={{ flex: 1 }} />
+        {workspaces.map((ws, i) => (
+          <div key={ws} onClick={() => setActiveWS(i)} style={{
+            padding: `${fs(3)}px ${fs(8)}px`, cursor: "pointer", borderRadius: fs(3), fontSize: fs(10),
+            background: activeWS === i ? c.accentSoft : "transparent",
+            color: activeWS === i ? c.accent : c.textMuted,
+            fontWeight: activeWS === i ? 600 : 400,
+          }}
+            onMouseEnter={e => { if (activeWS !== i) e.currentTarget.style.background = c.border; }}
+            onMouseLeave={e => { if (activeWS !== i) e.currentTarget.style.background = "transparent"; }}>
+            {ws}
+          </div>
+        ))}
+      </div>
+
+      {/* Main Area: Left toolbar + Viewport + Right panels */}
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+
+        {/* Left Toolbar */}
+        <div style={{ width: fs(32), background: panelBg, borderRight: `1px solid ${c.border}`, display: "flex", flexDirection: "column", alignItems: "center", paddingTop: fs(6), gap: fs(2), flexShrink: 0 }}>
+          {tools.map((t, i) => (
+            <div key={i} title={t.tip} style={{
+              width: fs(24), height: fs(24), display: "flex", alignItems: "center", justifyContent: "center",
+              borderRadius: fs(4), cursor: "pointer", background: i === 0 ? c.accentSoft : "transparent",
+            }}
+              onMouseEnter={e => { if (i !== 0) e.currentTarget.style.background = c.border; }}
+              onMouseLeave={e => { if (i !== 0) e.currentTarget.style.background = i === 0 ? c.accentSoft : "transparent"; }}>
+              <I d={t.icon} s={fs(13)} c={i === 0 ? c.accent : c.textMuted} />
+            </div>
+          ))}
+        </div>
+
+        {/* Center Viewport */}
+        <div style={{ flex: 1, position: "relative", overflow: "hidden", background: darkBg }}>
+          {/* Grid */}
+          <svg width="100%" height="100%" style={{ position: "absolute", top: 0, left: 0, opacity: 0.15 }}>
+            <defs>
+              <pattern id="sgrid" width={fs(30)} height={fs(30)} patternUnits="userSpaceOnUse">
+                <path d={`M ${fs(30)} 0 L 0 0 0 ${fs(30)}`} fill="none" stroke={gridColor} strokeWidth="0.5" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#sgrid)" />
+            {/* Axis lines */}
+            <line x1="50%" y1="0" x2="50%" y2="100%" stroke="#EF4444" strokeWidth="0.5" opacity="0.3" />
+            <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#22C55E" strokeWidth="0.5" opacity="0.3" />
+          </svg>
+
+          {/* Wireframe Cube */}
+          <svg width={fs(140)} height={fs(140)} viewBox="0 0 140 140" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
+            {/* Back face */}
+            <polygon points="45,25 105,25 105,85 45,85" fill="none" stroke={c.accent} strokeWidth="1" opacity="0.3" />
+            {/* Front face */}
+            <polygon points="25,45 85,45 85,115 25,115" fill="none" stroke={c.accent} strokeWidth="1.2" opacity="0.7" />
+            {/* Connecting edges */}
+            <line x1="25" y1="45" x2="45" y2="25" stroke={c.accent} strokeWidth="0.8" opacity="0.5" />
+            <line x1="85" y1="45" x2="105" y2="25" stroke={c.accent} strokeWidth="0.8" opacity="0.5" />
+            <line x1="85" y1="115" x2="105" y2="85" stroke={c.accent} strokeWidth="0.8" opacity="0.5" />
+            <line x1="25" y1="115" x2="45" y2="85" stroke={c.accent} strokeWidth="0.8" opacity="0.3" />
+            {/* Vertices */}
+            {[[25,45],[85,45],[85,115],[25,115],[45,25],[105,25],[105,85],[45,85]].map(([cx,cy], vi) => (
+              <circle key={vi} cx={cx} cy={cy} r="2" fill={c.accent} opacity="0.8" />
+            ))}
+          </svg>
+
+          {/* Viewport labels */}
+          <div style={{ position: "absolute", top: fs(8), left: fs(8), fontSize: fs(9), color: c.textMuted, opacity: 0.6 }}>
+            <div>User Perspective</div>
+            <div style={{ fontSize: fs(8), marginTop: fs(2) }}>(numpad 5)</div>
+          </div>
+          <div style={{ position: "absolute", top: fs(8), right: fs(8), display: "flex", gap: fs(4), alignItems: "center" }}>
+            {["X", "Y", "Z"].map((ax, ai) => (
+              <div key={ax} style={{ fontSize: fs(9), fontWeight: 700, color: ["#EF4444", "#22C55E", "#3B82F6"][ai], opacity: 0.7 }}>{ax}</div>
+            ))}
+          </div>
+          {/* Watermark */}
+          <div style={{ position: "absolute", bottom: fs(30), left: "50%", transform: "translateX(-50%)", fontSize: fs(11), color: c.textMuted, opacity: 0.15, fontWeight: 700, letterSpacing: fs(3), whiteSpace: "nowrap" }}>
+            ALTERNUS STUDIO 3D
+          </div>
+          {/* Camera widget */}
+          <div style={{ position: "absolute", top: fs(8), right: fs(60), display: "flex", gap: fs(3) }}>
+            <div style={{ width: fs(20), height: fs(20), borderRadius: fs(3), background: c.surface, border: `1px solid ${c.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+              <I d={ic.eye || ic.search} s={fs(10)} c={c.textMuted} />
+            </div>
+          </div>
+        </div>
+
+        {/* Right Panel */}
+        <div style={{ width: fs(180), background: panelBg, borderLeft: `1px solid ${c.border}`, display: "flex", flexDirection: "column", flexShrink: 0, overflow: "hidden" }}>
+
+          {/* Outliner */}
+          <div style={{ borderBottom: `1px solid ${c.border}`, padding: fs(6), flexShrink: 0 }}>
+            <div style={{ fontSize: fs(10), fontWeight: 600, color: c.textMuted, marginBottom: fs(6), display: "flex", alignItems: "center", gap: fs(4) }}>
+              <I d={ic.folder} s={fs(10)} c={c.textMuted} /> Scene Collection
+            </div>
+            {sceneItems.map(item => (
+              <div key={item.name} onClick={() => setSelObj(item.name)} style={{
+                display: "flex", alignItems: "center", gap: fs(5), padding: `${fs(3)}px ${fs(4)}px`,
+                borderRadius: fs(3), cursor: "pointer", marginBottom: fs(1),
+                background: selObj === item.name ? c.accentSoft : "transparent",
+                color: selObj === item.name ? c.accent : c.text,
+              }}
+                onMouseEnter={e => { if (selObj !== item.name) e.currentTarget.style.background = c.border; }}
+                onMouseLeave={e => { if (selObj !== item.name) e.currentTarget.style.background = selObj === item.name ? c.accentSoft : "transparent"; }}>
+                <I d={item.icon} s={fs(10)} c={selObj === item.name ? c.accent : c.textMuted} />
+                <span style={{ fontSize: fs(10) }}>{item.name}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Properties */}
+          <div style={{ flex: 1, overflow: "auto", padding: fs(6) }}>
+            <div style={{ fontSize: fs(10), fontWeight: 600, color: c.textMuted, marginBottom: fs(6), display: "flex", alignItems: "center", gap: fs(4) }}>
+              <I d={ic.maximize} s={fs(10)} c={c.accent} /> Transform
+            </div>
+            {(["location", "rotation", "scale"] as const).map(prop => (
+              <div key={prop} style={{ marginBottom: fs(8) }}>
+                <div style={{ fontSize: fs(9), color: c.textMuted, textTransform: "capitalize", marginBottom: fs(3) }}>{prop}</div>
+                {(["x", "y", "z"] as const).map(axis => (
+                  <div key={axis} style={{ display: "flex", alignItems: "center", gap: fs(3), marginBottom: fs(2) }}>
+                    <span style={{ fontSize: fs(9), fontWeight: 600, color: { x: "#EF4444", y: "#22C55E", z: "#3B82F6" }[axis], width: fs(10) }}>{axis.toUpperCase()}</span>
+                    <div style={{ flex: 1, background: c.cardAlt, borderRadius: fs(2), padding: `${fs(2)}px ${fs(4)}px`, fontSize: fs(9), color: c.text, border: `1px solid ${c.border}` }}>
+                      {transform[prop][axis]}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+
+            {/* Collapsible sections */}
+            {["Relations", "Collections", "Shading", "Visibility"].map(sec => (
+              <div key={sec} style={{ display: "flex", alignItems: "center", gap: fs(4), padding: `${fs(3)}px 0`, borderTop: `1px solid ${c.border}`, cursor: "pointer", marginTop: fs(2) }}
+                onMouseEnter={e => { e.currentTarget.style.opacity = "0.8"; }}
+                onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}>
+                <I d={ic.chevR} s={fs(9)} c={c.textMuted} />
+                <span style={{ fontSize: fs(9), color: c.textMuted }}>{sec}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Timeline */}
+      <div style={{ height: fs(36), background: panelBg, borderTop: `1px solid ${c.border}`, display: "flex", alignItems: "center", gap: fs(4), padding: `0 ${fs(6)}px`, flexShrink: 0 }}>
+        {/* Playback controls */}
+        <div style={{ display: "flex", gap: fs(2), alignItems: "center", marginRight: fs(6) }}>
+          {[{ icon: ic.skip, flip: true }, { icon: ic.play }, { icon: ic.pause }, { icon: ic.skip, flip: false }].map((b, bi) => (
+            <div key={bi} style={{
+              width: fs(20), height: fs(20), display: "flex", alignItems: "center", justifyContent: "center",
+              borderRadius: fs(3), cursor: "pointer", background: bi === 1 ? c.accentSoft : "transparent",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = c.border; }}
+              onMouseLeave={e => { e.currentTarget.style.background = bi === 1 ? c.accentSoft : "transparent"; }}>
+              <I d={b.icon} s={fs(10)} c={bi === 1 ? c.accent : c.textMuted} />
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: fs(9), color: c.textMuted, minWidth: fs(50) }}>Frame: 1</div>
+        {/* Timeline track */}
+        <div style={{ flex: 1, height: fs(16), background: c.cardAlt, borderRadius: fs(3), position: "relative", overflow: "hidden", border: `1px solid ${c.border}` }}>
+          {/* Frame markers */}
+          {Array.from({ length: 11 }, (_, i) => (
+            <div key={i} style={{ position: "absolute", left: `${i * 10}%`, top: 0, bottom: 0, width: 1, background: c.border, opacity: 0.5 }}>
+              {i % 2 === 0 && <span style={{ position: "absolute", top: fs(1), left: fs(2), fontSize: fs(7), color: c.textMuted }}>{i * 25}</span>}
+            </div>
+          ))}
+          {/* Scrubber */}
+          <div style={{ position: "absolute", left: "0.4%", top: 0, bottom: 0, width: fs(2), background: c.accent, borderRadius: fs(1) }} />
+        </div>
+        <div style={{ fontSize: fs(9), color: c.textMuted, minWidth: fs(60), textAlign: "right" }}>End: 250</div>
+      </div>
+
+      {/* Bottom Status Bar */}
+      <div style={{ height: fs(20), background: c.cardAlt, borderTop: `1px solid ${c.border}`, display: "flex", alignItems: "center", padding: `0 ${fs(8)}px`, gap: fs(12), flexShrink: 0 }}>
+        <span style={{ fontSize: fs(9), color: c.textMuted }}>Object Mode</span>
+        <span style={{ fontSize: fs(9), color: c.textMuted }}>|</span>
+        <span style={{ fontSize: fs(9), color: c.textMuted }}>Vertices: 8</span>
+        <span style={{ fontSize: fs(9), color: c.textMuted }}>|</span>
+        <span style={{ fontSize: fs(9), color: c.textMuted }}>Faces: 6</span>
+        <span style={{ fontSize: fs(9), color: c.textMuted }}>|</span>
+        <span style={{ fontSize: fs(9), color: c.textMuted }}>Edges: 12</span>
+        <div style={{ flex: 1 }} />
+        <span style={{ fontSize: fs(9), color: c.textMuted }}>Collection: Scene Collection</span>
+        <span style={{ fontSize: fs(9), color: c.accent, fontWeight: 600 }}>{selObj}</span>
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ Control Panel ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; onOpenApp?: (id: WinId) => void }) {
   const [activeSection, setActiveSection] = useState("System");
@@ -4228,6 +4465,7 @@ export default function AlternusOS() {
     { id: "accounts", title: "Accounts", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 90, w: 360, h: 400 },
     { id: "downloads", title: "Downloads", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 350, y: 80, w: 440, h: 480 },
     { id: "controlpanel", title: "Control Panel", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 40, w: 580, h: 440 },
+    { id: "studio", title: "Alternus Studio", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 60, y: 30, w: 720, h: 520 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -4653,6 +4891,7 @@ export default function AlternusOS() {
     accounts: <AccountsApp c={c} />,
     downloads: <DownloadsApp c={c} />,
     controlpanel: <ControlPanelApp c={c} mode={mode} setMode={setMode} onOpenApp={openWin} />,
+    studio: <StudioApp c={c} />,
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
@@ -4669,6 +4908,7 @@ export default function AlternusOS() {
     { id: "word", icon: ic.fileText, label: "Word", color: c.accentText },
     { id: "downloads", icon: ic.download, label: "Downloads", color: "#34D399" },
     { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A" },
+    { id: "studio", icon: ic.pen, label: "Studio", color: "#A78BFA" },
     { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec },
     { id: "controlpanel", icon: ic.monitor, label: "Control Panel", color: c.textSec },
   ];
