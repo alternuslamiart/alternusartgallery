@@ -902,16 +902,42 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
 
         <div className="w-6 my-1" style={{ borderTop: `1px solid ${c.border}` }} />
 
-        {/* Tool icons */}
+        {/* App icons */}
         {[
-          { label: "PC Desktop", icon: ic.monitor },
-          { label: "Video", icon: ic.film },
-          { label: "Image", icon: ic.image },
-          { label: "Voice", icon: ic.voice },
-          { label: "Document", icon: ic.fileText },
-          { label: "Folder", icon: ic.folder },
+          { label: "Code Editor", icon: ic.code, id: "code" as WinId },
+          { label: "Music", icon: ic.music, id: "music" as WinId },
+          { label: "Weather", icon: ic.cloud, id: "weather" as WinId },
+          { label: "Calendar", icon: ic.calendar, id: "calendar" as WinId },
+          { label: "Notes", icon: ic.note, id: "notes" as WinId },
+          { label: "Word", icon: ic.fileText, id: "word" as WinId },
+          { label: "Store", icon: ic.store, id: "store" as WinId },
+          { label: "Movies", icon: ic.film, id: "movies" as WinId },
+          { label: "Calculator", icon: ic.calc, id: "calculator" as WinId },
+          { label: "Downloads", icon: ic.download, id: "downloads" as WinId },
         ].map(item => (
-          <button key={item.label} onClick={() => send(`Create ${item.label.toLowerCase()}`)}
+          <button key={item.label} onClick={() => { if (onOpenApp) onOpenApp(item.id); }}
+            className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
+            style={{ color: c.textMuted }}
+            title={item.label}
+            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
+            <I d={item.icon} s={16} />
+            <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+              style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+              {item.label}
+            </span>
+          </button>
+        ))}
+
+        <div className="w-6 my-1" style={{ borderTop: `1px solid ${c.border}` }} />
+
+        {/* System icons */}
+        {[
+          { label: "Control Panel", icon: ic.monitor, id: "controlpanel" as WinId },
+          { label: "Settings", icon: ic.settings, id: "settings" as WinId },
+          { label: "Accounts", icon: ic.user, id: "accounts" as WinId },
+        ].map(item => (
+          <button key={item.label} onClick={() => { if (onOpenApp) onOpenApp(item.id); }}
             className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
             style={{ color: c.textMuted }}
             title={item.label}
@@ -929,7 +955,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
 
         <div className="w-6 my-1" style={{ borderTop: `1px solid ${c.border}` }} />
 
-        {/* Bottom icons: profile, wifi, power */}
+        {/* Bottom icons: profile, wifi, power, expand */}
         <button onClick={() => setShowAccount(!showAccount)}
           className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
           style={{ color: c.textMuted }}
@@ -956,16 +982,32 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
           </span>
         </button>
 
-        <button onClick={() => setMode(mode === "dark" ? "light" : "dark")}
+        <button onClick={() => { if (onOpenApp) onOpenApp("settings"); }}
           className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
           style={{ color: c.textMuted }}
-          title={mode === "dark" ? "Light mode" : "Dark mode"}
+          title="Power"
           onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
           onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
           <I d={ic.power} s={16} />
           <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
             style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-            {mode === "dark" ? "Light mode" : "Dark mode"}
+            Power
+          </span>
+        </button>
+
+        {/* Arrow up-down */}
+        <button
+          className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
+          style={{ color: c.textMuted }}
+          title="Expand"
+          onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
+          <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 5l-5 5h10zM12 19l-5-5h10z" />
+          </svg>
+          <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+            style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+            Expand
           </span>
         </button>
       </div>
