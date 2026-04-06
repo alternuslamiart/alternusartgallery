@@ -4674,9 +4674,23 @@ export default function AlternusOS() {
               </div>
             </div>
           )}
-          {/* Greeting */}
-          <h2 className="text-[22px] font-light mb-1" style={{ color: c.textMuted }}>Hi Alter</h2>
-          <h1 className="text-[36px] font-light mb-8" style={{ color: c.text }}>Where should we start?</h1>
+          {/* Alternus gradient text */}
+          <h1
+            className="text-8xl md:text-9xl font-semibold mb-4 select-none bg-clip-text"
+            style={{
+              backgroundImage: `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`,
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              color: "transparent",
+            }}
+          >
+            Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
+          </h1>
+
+          {/* Welcome message */}
+          <p className="text-base font-light mb-10" style={{ color: c.textSec }}>
+            Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}. What would you like to create today?
+          </p>
 
           {/* AI Search Bar */}
           <div className="w-full max-w-2xl">
