@@ -5087,8 +5087,8 @@ export default function AlternusOS() {
             </div>
           </div>
 
-        {/* Center: Alternus branding + AI Search - always visible behind windows */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-[0]">
+        {/* Center: Alternus branding + AI Search - hidden when AI window is open */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-[0]" style={{ display: wins.find(w => w.id === "ai")?.isOpen && !wins.find(w => w.id === "ai")?.isMinimized ? "none" : "flex" }}>
           {/* AI Creation frame - appears above Alternus text */}
           {aiCreation && (
             <div className="w-full max-w-2xl mb-6 px-4">
