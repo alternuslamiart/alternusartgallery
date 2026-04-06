@@ -725,19 +725,23 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
 
               {/* Input box */}
               <div className="flex items-center gap-2 pl-5 pr-2 py-2 rounded-2xl mb-5"
-                style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+                style={{
+                  background: c.surface,
+                  border: `1px solid ${c.border}`,
+                  boxShadow: mode === "dark" ? "0 2px 16px rgba(0,0,0,0.15)" : "0 2px 16px rgba(0,0,0,0.06)",
+                }}>
                 <I d={ic.search} s={20} c={c.textMuted} />
                 <input
-                  className="flex-1 bg-transparent outline-none text-sm py-2"
+                  className="flex-1 bg-transparent outline-none text-base py-2"
                   style={{ color: c.text }}
                   placeholder="Search or ask AI anything..."
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter") send(); }}
                 />
-                <button onClick={() => send()} disabled={!input.trim()} className="px-4 py-2 rounded-xl transition-opacity"
-                  style={{ background: input.trim() ? c.accent : c.cardAlt, opacity: input.trim() ? 1 : 0.3 }}>
-                  <I d={ic.send} s={14} c="#fff" />
+                <button onClick={() => send()} disabled={!input.trim()} className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90"
+                  style={{ background: c.accent }}>
+                  <I d={ic.send} s={16} c="#fff" />
                 </button>
               </div>
 
