@@ -531,6 +531,8 @@ interface ChatMsg {
   fileType?: FileType;
   fileName?: string;
   routed?: FileDestination | null;
+  appAction?: WinId;
+  appLabel?: string;
 }
 
 const fileRouteButtons: { type: FileType; emoji: string; label: string; dest: FileDestination; color: string }[] = [
@@ -614,6 +616,15 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
     if (!m || isTyping) return;
     setInput("");
     setMsgs(p => [...p, { role: "user", text: m }]);
+
+    // Check if user is trying to open an app
+    const lower = m.toLowerCase();
+    const matchedApp = appKeywords.find(a => a.keywords.some(k => lower.includes(k)));
+    if (matchedApp) {
+      setMsgs(p => [...p, { role: "ai", text: `Opening ${matchedApp.label} for you.`, appAction: matchedApp.id, appLabel: matchedApp.label }]);
+      return;
+    }
+
     setIsTyping(true);
 
     try {
@@ -647,12 +658,32 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
     setInput("");
   };
 
-  const landingChips: { label: string; icon: string; app?: WinId }[] = [
-    { label: "Browser", icon: ic.globe, app: "browser" },
-    { label: "Clock", icon: ic.clock, app: "clock" },
-    { label: "Code", icon: ic.code, app: "code" },
-    { label: "Studio", icon: ic.pen, app: "studio" },
-    { label: "Files", icon: ic.folder, app: "files" },
+  const landingChips = [
+    { label: "Explore gallery", icon: ic.image },
+    { label: "Art styles", icon: ic.sparkle },
+    { label: "Commission art", icon: ic.pen },
+    { label: "Help me choose", icon: ic.search },
+    { label: "Art care tips", icon: ic.shield },
+  ];
+
+  const appKeywords: { keywords: string[]; id: WinId; label: string }[] = [
+    { keywords: ["browser", "web", "internet", "browse"], id: "browser", label: "Browser" },
+    { keywords: ["clock", "time", "alarm"], id: "clock", label: "Clock" },
+    { keywords: ["code", "editor", "programming", "dev"], id: "code", label: "Code Editor" },
+    { keywords: ["studio", "3d", "design", "blender", "model"], id: "studio", label: "Studio" },
+    { keywords: ["files", "file", "folder", "explorer"], id: "files", label: "Files" },
+    { keywords: ["terminal", "console", "shell", "cmd"], id: "terminal", label: "Terminal" },
+    { keywords: ["music", "player", "song"], id: "music", label: "Music" },
+    { keywords: ["weather", "forecast"], id: "weather", label: "Weather" },
+    { keywords: ["calendar", "date", "schedule"], id: "calendar", label: "Calendar" },
+    { keywords: ["notes", "note", "notepad"], id: "notes", label: "Notes" },
+    { keywords: ["word", "document", "doc"], id: "word", label: "Word" },
+    { keywords: ["store", "shop", "app store"], id: "store", label: "Store" },
+    { keywords: ["movies", "movie", "video", "cinema"], id: "movies", label: "Movies" },
+    { keywords: ["calculator", "calc", "math"], id: "calculator", label: "Calculator" },
+    { keywords: ["settings", "preferences", "config"], id: "settings", label: "Settings" },
+    { keywords: ["control", "panel", "system"], id: "controlpanel", label: "Control Panel" },
+    { keywords: ["downloads", "download"], id: "downloads", label: "Downloads" },
   ];
 
   return (
@@ -751,7 +782,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
               {/* App shortcut chips */}
               <div className="flex flex-wrap gap-2 justify-center">
                 {landingChips.map(chip => (
-                  <button key={chip.label} onClick={() => { if (chip.app && onOpenApp) onOpenApp(chip.app); }}
+                  <button key={chip.label} onClick={() => send(chip.label)}
                     className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[12px] transition-colors"
                     style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}
                     onMouseEnter={e => { e.currentTarget.style.background = c.border; e.currentTarget.style.color = c.text; }}
@@ -806,8 +837,25 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
                             <span style={{ color: c.accentText }}>{"\u2713"} Routed to {m.routed}</span>
                           </div>
                         )}
+                        {/* App open action */}
+                        {m.appAction && (
+                          <div className="flex items-center gap-2 mt-3">
+                            <button onClick={() => { if (onOpenApp) onOpenApp(m.appAction!); }}
+                              className="px-4 py-2 rounded-xl text-[12px] font-medium transition-all hover:opacity-90"
+                              style={{ background: c.accent, color: "#fff" }}>
+                              Open {m.appLabel}
+                            </button>
+                            <button onClick={() => setMsgs(p => p.filter((_, idx) => idx !== i))}
+                              className="px-3 py-2 rounded-xl text-[12px] transition-colors"
+                              style={{ color: c.textMuted }}
+                              onMouseEnter={e => { e.currentTarget.style.color = c.text; }}
+                              onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; }}>
+                              Dismiss
+                            </button>
+                          </div>
+                        )}
                         {/* Action buttons — Gemini-style */}
-                        <div className="flex items-center gap-1 mt-3">
+                        {!m.appAction && <div className="flex items-center gap-1 mt-3">
                           {[
                             { icon: "M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3", title: "Good response" },
                             { icon: "M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3zm7-13h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17", title: "Bad response" },
@@ -836,7 +884,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
                               <I d={typeof action.icon === "string" ? action.icon : ""} s={14} />
                             </button>
                           ))}
-                        </div>
+                        </div>}
                       </div>
                     </div>
                   )
@@ -4467,7 +4515,7 @@ export default function AlternusOS() {
     { id: "accounts", title: "Accounts", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 90, w: 360, h: 400 },
     { id: "downloads", title: "Downloads", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 350, y: 80, w: 440, h: 480 },
     { id: "controlpanel", title: "Control Panel", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 40, w: 580, h: 440 },
-    { id: "studio", title: "Alternus Studio", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 60, y: 30, w: 720, h: 520 },
+    { id: "studio", title: "Alternus Studio", isOpen: false, isMinimized: false, isMaximized: true, zIndex: 1, x: 60, y: 30, w: 720, h: 520 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
