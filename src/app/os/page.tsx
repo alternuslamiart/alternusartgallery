@@ -403,8 +403,8 @@ function AppWindow({
         isFrozen={win.isFrozen}
         onForceQuit={onForceQuit}
       />
-      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: "6px" }}>
-        <div style={{ background: c.surface, borderRadius: 16, border: `1px solid ${c.cardAlt}`, height: "100%", overflow: "auto", position: "relative" }}>
+      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: win.isMaximized ? 0 : "6px" }}>
+        <div style={{ background: c.surface, borderRadius: win.isMaximized ? 0 : 16, border: win.isMaximized ? "none" : `1px solid ${c.cardAlt}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
         {/* Frozen overlay */}
         {win.isFrozen && (
@@ -707,6 +707,18 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
           /* ===== GEMINI-STYLE LANDING ===== */
           <div className="flex-1 flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-[560px] -mt-8">
+              {/* Alternus gradient text */}
+              <h1
+                className="text-6xl font-semibold mb-4 select-none bg-clip-text"
+                style={{
+                  backgroundImage: `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  color: "transparent",
+                }}
+              >
+                Alternus<span className="text-sm align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
+              </h1>
               {/* Greeting */}
               <h2 className="text-[22px] font-light mb-1" style={{ color: c.textMuted }}>Hi Alter</h2>
               <h1 className="text-[36px] font-light mb-8" style={{ color: c.text }}>Where should we start?</h1>
