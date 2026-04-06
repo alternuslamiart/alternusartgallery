@@ -233,7 +233,7 @@ function TitleBar({
     <div
       onMouseDown={onMouseDown}
       className="flex items-center justify-between h-9 px-3 select-none cursor-move flex-shrink-0"
-      style={{ background: c.titlebar, borderBottom: `1px solid ${c.titlebarBorder}` }}
+      style={{ background: c.bg, borderBottom: "none" }}
     >
       <span style={{ color: isFrozen ? c.warning : c.textSec }} className="text-xs font-medium">
         {title}{isFrozen ? " (Not Responding)" : ""}
@@ -362,7 +362,7 @@ function AppWindow({
     <div
       style={{
         ...style,
-        background: c.surface,
+        background: c.bg,
         border: `1px solid ${c.border}`,
         borderRadius: win.isMaximized ? 0 : 12,
         boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
@@ -382,7 +382,8 @@ function AppWindow({
         isFrozen={win.isFrozen}
         onForceQuit={onForceQuit}
       />
-      <div style={{ flex: 1, overflow: "auto", position: "relative" }}>
+      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: "0 0 6px 0" }}>
+        <div style={{ background: c.surface, borderRadius: 16, border: `1px solid ${c.cardAlt}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
         {/* Frozen overlay */}
         {win.isFrozen && (
@@ -398,6 +399,7 @@ function AppWindow({
             </div>
           </div>
         )}
+        </div>
       </div>
       {/* Resize handles */}
       {!win.isMaximized && (
