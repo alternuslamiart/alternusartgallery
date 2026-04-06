@@ -4174,6 +4174,7 @@ export default function AlternusOS() {
   const [showWifiPanel, setShowWifiPanel] = useState(false);
   const [showProfilePanel, setShowProfilePanel] = useState(false);
   const [showAISidebar, setShowAISidebar] = useState(false);
+  const [showTopBar, setShowTopBar] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [connectedWifi, setConnectedWifi] = useState(0);
   const [showTaskSwitcher, setShowTaskSwitcher] = useState(false);
@@ -4802,8 +4803,21 @@ export default function AlternusOS() {
   return (
     <div style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
       <style>{`* { scrollbar-width: none !important; -ms-overflow-style: none !important; } *::-webkit-scrollbar { display: none !important; }`}</style>
+      {/* Top Bar hover trigger zone */}
+      <div className="absolute top-0 left-0 right-0 h-2 z-[300]" onMouseEnter={() => setShowTopBar(true)} />
       {/* Top Bar */}
-      <div className="relative flex items-center justify-between px-4 h-9 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
+      <div
+        className="relative flex items-center justify-between px-4 h-9 flex-shrink-0 transition-all duration-300 z-[200]"
+        style={{
+          background: c.surface,
+          borderBottom: `1px solid ${c.border}`,
+          transform: showTopBar ? "translateY(0)" : "translateY(-100%)",
+          position: showTopBar ? "relative" : "absolute",
+          top: 0, left: 0, right: 0,
+        }}
+        onMouseEnter={() => setShowTopBar(true)}
+        onMouseLeave={() => setShowTopBar(false)}
+      >
         <div className="flex items-center gap-2">
           <span style={{ color: c.text }} className="text-[11px] font-bold tracking-wider">ALTERNUS</span>
           <span style={{ color: c.textMuted }} className="text-[10px]">OS</span>
