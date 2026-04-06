@@ -693,39 +693,6 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
         )}
 
         <div className="flex-1" />
-
-        {/* Bottom actions */}
-        <div className="px-3 pb-4 space-y-1">
-          {/* Light/Dark mode toggle */}
-          <button onClick={() => setMode(mode === "dark" ? "light" : "dark")}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            style={{ color: c.textSec }}
-            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-            <I d={mode === "dark" ? ic.sun : ic.moon} s={16} c={c.textSec} />
-            {mode === "dark" ? "Light mode" : "Dark mode"}
-          </button>
-
-          {/* My account */}
-          <button onClick={() => setShowAccount(!showAccount)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            style={{ color: c.textSec }}
-            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-            <I d={ic.user} s={16} c={c.textSec} />
-            My account
-          </button>
-
-          {/* Settings */}
-          <button onClick={() => { if (onOpenApp) onOpenApp("settings"); }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors"
-            style={{ color: c.textSec }}
-            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-            <I d={ic.settings} s={16} c={c.textSec} />
-            Settings
-          </button>
-        </div>
       </div>
 
       {/* Chat area */}
@@ -988,6 +955,36 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
             </span>
           </button>
         ))}
+
+        <div className="flex-1" />
+
+        {/* Light/Dark mode */}
+        <button onClick={() => setMode(mode === "dark" ? "light" : "dark")}
+          className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
+          style={{ color: c.textMuted }}
+          title={mode === "dark" ? "Light mode" : "Dark mode"}
+          onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
+          <I d={mode === "dark" ? ic.sun : ic.moon} s={16} />
+          <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+            style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+            {mode === "dark" ? "Light mode" : "Dark mode"}
+          </span>
+        </button>
+
+        {/* My account */}
+        <button onClick={() => setShowAccount(!showAccount)}
+          className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
+          style={{ color: c.textMuted }}
+          title="My account"
+          onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
+          <I d={ic.user} s={16} />
+          <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+            style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+            My account
+          </span>
+        </button>
       </div>
     </div>
   );
