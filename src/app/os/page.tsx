@@ -663,31 +663,6 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
         </div>
       )}
 
-      {/* Sidebar */}
-      <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ background: c.bg }}>
-        {/* Brand */}
-        <div className="px-4 pt-4 pb-2">
-          <div className="flex items-center gap-2">
-            <img src="/alternus-os.png" alt="AI" className="w-6 h-6 rounded-full object-cover" />
-            <span className="text-sm font-bold" style={{ color: c.accent }}>ALTERNUS</span>
-            <span className="text-xs" style={{ color: c.textMuted }}>AI</span>
-          </div>
-        </div>
-
-
-        {/* Chat history hint */}
-        {hasMessages && (
-          <div className="px-3 py-2">
-            <p className="text-[10px] px-2 mb-1" style={{ color: c.textMuted }}>TODAY</p>
-            <div className="px-3 py-2 rounded-xl text-[12px] truncate" style={{ background: c.cardAlt, color: c.textSec }}>
-              {msgs[0]?.text.slice(0, 36)}{(msgs[0]?.text.length ?? 0) > 36 ? "..." : ""}
-            </div>
-          </div>
-        )}
-
-        <div className="flex-1" />
-      </div>
-
       {/* Chat area */}
       <div className="flex-1 flex flex-col relative overflow-hidden" style={{ background: c.surface, borderRadius: "16px", margin: "6px 0", border: `1px solid ${c.cardAlt}` }}>
         {/* Account panel (toggleable) */}
@@ -914,6 +889,31 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
             New chat
           </span>
         </button>
+
+        <div className="w-6 my-1" style={{ borderTop: `1px solid ${c.border}` }} />
+
+        {/* Tool icons */}
+        {[
+          { label: "PC Desktop", icon: ic.monitor },
+          { label: "Video", icon: ic.film },
+          { label: "Image", icon: ic.image },
+          { label: "Voice", icon: ic.voice },
+          { label: "Document", icon: ic.fileText },
+          { label: "Folder", icon: ic.folder },
+        ].map(item => (
+          <button key={item.label} onClick={() => send(`Create ${item.label.toLowerCase()}`)}
+            className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
+            style={{ color: c.textMuted }}
+            title={item.label}
+            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
+            <I d={item.icon} s={16} />
+            <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+              style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+              {item.label}
+            </span>
+          </button>
+        ))}
 
         <div className="flex-1" />
 
