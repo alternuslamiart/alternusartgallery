@@ -674,13 +674,6 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
           </div>
         </div>
 
-        {/* New chat button */}
-        <div className="px-3 py-2 flex items-center gap-2">
-          <button onClick={newChat} className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: c.accent }}>
-            <I d={ic.plus} s={18} c="#fff" />
-          </button>
-          <span className="text-sm font-medium" style={{ color: c.textSec }}>New</span>
-        </div>
 
         {/* Chat history hint */}
         {hasMessages && (
@@ -910,69 +903,21 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
 
       {/* Right sidebar — Narrow vertical icon bar */}
       <div className="w-[52px] flex-shrink-0 flex flex-col items-center py-4 gap-1" style={{ background: c.bg }}>
-        <img src="/alternus-os.png" alt="Alternus AI" className="w-8 h-8 rounded-full object-cover mb-2" />
-        {[
-          { label: "PC Desktop", icon: ic.monitor },
-          { label: "Video", icon: ic.film },
-          { label: "Image", icon: ic.image },
-          { label: "Voice", icon: ic.voice },
-          { label: "Document", icon: ic.fileText },
-          { label: "Folder", icon: ic.folder },
-        ].map(item => (
-          <button key={item.label} onClick={() => send(`Create ${item.label.toLowerCase()}`)}
-            className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
-            style={{ color: c.textMuted }}
-            title={item.label}
-            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-            <I d={item.icon} s={16} />
-            <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
-              style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-              {item.label}
-            </span>
-          </button>
-        ))}
+        {/* Alternus AI icon */}
+        <img src="/alternus-os.png" alt="Alternus AI" className="w-8 h-8 rounded-full object-cover mb-1" />
 
-        <div className="w-6 my-1" style={{ borderTop: `1px solid ${c.border}` }} />
-
-        {[
-          { label: "Fix WiFi", icon: ic.wifi, action: "send" },
-          { label: "Settings", icon: ic.settings, action: "settings" },
-        ].map(item => (
-          <button key={item.label} onClick={() => {
-            if (item.action === "settings" && onOpenApp) { onOpenApp("settings"); }
-            else { send(item.label); }
-          }}
-            className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
-            style={{ color: c.textMuted }}
-            title={item.label}
-            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-            <I d={item.icon} s={16} />
-            <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
-              style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-              {item.label}
-            </span>
-          </button>
-        ))}
-
-        <div className="flex-1" />
-
-        {/* Light/Dark mode */}
-        <button onClick={() => setMode(mode === "dark" ? "light" : "dark")}
-          className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
-          style={{ color: c.textMuted }}
-          title={mode === "dark" ? "Light mode" : "Dark mode"}
-          onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-          <I d={mode === "dark" ? ic.sun : ic.moon} s={16} />
+        {/* New chat button */}
+        <button onClick={newChat} className="w-10 h-10 rounded-xl flex items-center justify-center transition-all relative group" style={{ background: c.accent }} title="New chat">
+          <I d={ic.plus} s={18} c="#fff" />
           <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
             style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-            {mode === "dark" ? "Light mode" : "Dark mode"}
+            New chat
           </span>
         </button>
 
-        {/* My account */}
+        <div className="flex-1" />
+
+        {/* Bottom icons: profile, wifi, power */}
         <button onClick={() => setShowAccount(!showAccount)}
           className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
           style={{ color: c.textMuted }}
@@ -983,6 +928,32 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
           <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
             style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
             My account
+          </span>
+        </button>
+
+        <button onClick={() => send("Fix WiFi")}
+          className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
+          style={{ color: c.textMuted }}
+          title="WiFi"
+          onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
+          <I d={ic.wifi} s={16} />
+          <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+            style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+            WiFi
+          </span>
+        </button>
+
+        <button onClick={() => setMode(mode === "dark" ? "light" : "dark")}
+          className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
+          style={{ color: c.textMuted }}
+          title={mode === "dark" ? "Light mode" : "Dark mode"}
+          onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
+          <I d={ic.power} s={16} />
+          <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity"
+            style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+            {mode === "dark" ? "Light mode" : "Dark mode"}
           </span>
         </button>
       </div>
