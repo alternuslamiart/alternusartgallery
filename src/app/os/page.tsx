@@ -3757,7 +3757,7 @@ function StudioApp({ c }: { c: typeof palette.dark }) {
   const menus = ["File", "Edit", "Render", "Window", "Help"];
   const tools = [
     { icon: ic.mouse, tip: "Select Box" },
-    { icon: ic.move || ic.share, tip: "Move" },
+    { icon: ic.share, tip: "Move" },
     { icon: ic.refresh, tip: "Rotate" },
     { icon: ic.maximize, tip: "Scale" },
     { icon: ic.plus, tip: "Cursor" },
@@ -3876,7 +3876,7 @@ function StudioApp({ c }: { c: typeof palette.dark }) {
           {/* Camera widget */}
           <div style={{ position: "absolute", top: fs(8), right: fs(60), display: "flex", gap: fs(3) }}>
             <div style={{ width: fs(20), height: fs(20), borderRadius: fs(3), background: c.surface, border: `1px solid ${c.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-              <I d={ic.eye || ic.search} s={fs(10)} c={c.textMuted} />
+              <I d={ic.search} s={fs(10)} c={c.textMuted} />
             </div>
           </div>
         </div>
@@ -4570,6 +4570,7 @@ export default function AlternusOS() {
       accounts: { w: 380, h: 440 },
       downloads: { w: 440, h: 480 },
       controlpanel: { w: 580, h: 440 },
+      studio: { w: 720, h: 520 },
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
