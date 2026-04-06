@@ -4692,17 +4692,18 @@ export default function AlternusOS() {
           {/* AI Search Bar */}
           <div className="w-full max-w-2xl">
             <div
-              className="rounded-2xl transition-all"
+              className="flex items-center gap-2 pl-5 pr-2 py-2 rounded-2xl transition-all"
               style={{
                 background: c.surface,
                 border: `1px solid ${c.border}`,
                 boxShadow: mode === "dark" ? "0 2px 16px rgba(0,0,0,0.15)" : "0 2px 16px rgba(0,0,0,0.06)",
               }}
             >
+              <I d={ic.search} s={20} c={c.textMuted} />
               <input
-                className="w-full bg-transparent outline-none text-base px-5 pt-4 pb-2"
+                className="flex-1 bg-transparent outline-none text-base py-2"
                 style={{ color: c.text }}
-                placeholder="Ask Alternus AI..."
+                placeholder="Search or ask AI anything..."
                 value={aiInput}
                 onChange={e => setAiInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -4711,18 +4712,13 @@ export default function AlternusOS() {
                   }
                 }}
               />
-              <div className="flex items-center justify-between px-4 pb-3">
-                <button className="p-1.5 rounded-lg" style={{ color: c.textMuted }} title="Attach">
-                  <I d={ic.plus} s={16} />
-                </button>
-                <button
-                  onClick={() => aiInput.trim() && handleDesktopSearch()}
-                  className="p-1.5 rounded-lg transition-opacity"
-                  style={{ background: aiInput.trim() ? c.accent : c.cardAlt, opacity: aiInput.trim() ? 1 : 0.3 }}
-                >
-                  <I d={ic.send} s={14} c="#fff" />
-                </button>
-              </div>
+              <button
+                onClick={() => aiInput.trim() && handleDesktopSearch()}
+                className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90"
+                style={{ background: c.accent }}
+              >
+                <I d={ic.send} s={16} c="#fff" />
+              </button>
             </div>
 
             {/* AI response - separate below */}
