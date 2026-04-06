@@ -711,7 +711,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
             <div className="w-full max-w-[560px] -mt-8">
               {/* Alternus gradient text */}
               <h1
-                className="text-6xl font-semibold mb-4 select-none bg-clip-text"
+                className="text-8xl md:text-9xl font-semibold mb-4 select-none bg-clip-text"
                 style={{
                   backgroundImage: `linear-gradient(90deg, ${c.textMuted} 0%, ${c.text} 50%, ${c.textMuted} 100%)`,
                   WebkitBackgroundClip: "text",
@@ -719,10 +719,9 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
                   color: "transparent",
                 }}
               >
-                Alternus<span className="text-sm align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
+                Alternus<span className="text-xl align-super" style={{ WebkitTextFillColor: c.textMuted }}>©</span>
               </h1>
               {/* Greeting */}
-              <h2 className="text-[22px] font-light mb-1" style={{ color: c.textMuted }}>Hi Alter</h2>
               <h1 className="text-[36px] font-light mb-8" style={{ color: c.text }}>Where should we start?</h1>
 
               {/* Input box */}
