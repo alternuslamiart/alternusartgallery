@@ -3,6 +3,15 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
+import { X, Plus, ChevronDown, Sparkles, Check } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { WELCOME_MESSAGE, SUGGESTED_QUESTIONS } from "@/lib/ai-assistant";
 
 interface Message {
@@ -14,16 +23,39 @@ interface Message {
   imageUrl?: string;
 }
 
-const QUICK_ACTIONS = [
-  { label: "Browse Gallery", link: "/gallery" },
-  { label: "View Artists", link: "/artists" },
-  { label: "Create an image", prompt: "Create a beautiful impressionist painting of a sunset over the sea" },
-  { label: "How to buy art?", prompt: "How do I buy art on Alternus? Walk me through the process." },
-  { label: "Sell your Art", link: "/apply" },
-  { label: "Shipping & Returns", prompt: "What are your shipping times and return policy?" },
-  { label: "Art styles guide", prompt: "Tell me about different art styles and movements available on Alternus" },
-  { label: "Commission artwork", prompt: "How can I commission a custom artwork from an artist?" },
+interface QuickAction {
+  id: string;
+  label: string;
+  link?: string;
+  prompt?: string;
+}
+
+const DEFAULT_QUICK_ACTIONS: QuickAction[] = [
+  { id: "browse-gallery", label: "Browse Gallery", link: "/gallery" },
+  { id: "view-artists", label: "View Artists", link: "/artists" },
+  { id: "create-image", label: "Create an image", prompt: "Create a beautiful impressionist painting of a sunset over the sea" },
+  { id: "how-to-buy", label: "How to buy art?", prompt: "How do I buy art on Alternus? Walk me through the process." },
+  { id: "sell-art", label: "Sell your Art", link: "/apply" },
+  { id: "shipping-returns", label: "Shipping & Returns", prompt: "What are your shipping times and return policy?" },
+  { id: "art-styles", label: "Art styles guide", prompt: "Tell me about different art styles and movements available on Alternus" },
+  { id: "commission", label: "Commission artwork", prompt: "How can I commission a custom artwork from an artist?" },
 ];
+
+const ADDABLE_ACTIONS: QuickAction[] = [
+  { id: "generate-image", label: "Generate image", prompt: "Generate a unique art image for me" },
+  { id: "art-news", label: "Art news today", prompt: "What's happening in the art world today?" },
+  { id: "price-guide", label: "Art price guide", prompt: "Help me understand art pricing and valuation" },
+  { id: "frame-advice", label: "Framing advice", prompt: "What framing options do you recommend for artwork?" },
+  { id: "color-palette", label: "Color palette ideas", prompt: "Suggest a color palette for my space" },
+  { id: "gift-ideas", label: "Art gift ideas", prompt: "Suggest art gifts for different occasions" },
+];
+
+const AI_MODES = [
+  { id: "smart", label: "Smart", description: "Balanced speed and quality", icon: Sparkles },
+  { id: "think-deeper", label: "Think deeper", description: "More thorough analysis", icon: Sparkles },
+  { id: "study-learn", label: "Study and learn", description: "Educational explanations", icon: Sparkles },
+  { id: "search", label: "Search", description: "Find artworks and artists", icon: Sparkles },
+] as const;
 
 interface ChatSession {
   id: string;
@@ -49,6 +81,10 @@ export function AIChat() {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [quickActions, setQuickActions] = useState<QuickAction[]>(DEFAULT_QUICK_ACTIONS);
+  const [selectedMode, setSelectedMode] = useState<string>("smart");
+  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+  const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const expandedInputRef = useRef<HTMLTextAreaElement>(null);
@@ -77,6 +113,14 @@ export function AIChat() {
         const parsed = JSON.parse(savedMessages) as Message[];
         setMessages(parsed.map(m => ({ ...m, timestamp: new Date(m.timestamp) })));
       }
+      const savedActions = localStorage.getItem("alternus_ai_quick_actions");
+      if (savedActions) {
+        setQuickActions(JSON.parse(savedActions));
+      }
+      const savedMode = localStorage.getItem("alternus_ai_mode");
+      if (savedMode) {
+        setSelectedMode(savedMode);
+      }
     } catch {}
     hydratedRef.current = true;
   }, []);
@@ -86,6 +130,18 @@ export function AIChat() {
     if (!hydratedRef.current) return;
     localStorage.setItem("alternus_ai_chat_history", JSON.stringify(chatHistory));
   }, [chatHistory]);
+
+  // Persist quick actions to localStorage
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    localStorage.setItem("alternus_ai_quick_actions", JSON.stringify(quickActions));
+  }, [quickActions]);
+
+  // Persist selected mode to localStorage
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    localStorage.setItem("alternus_ai_mode", selectedMode);
+  }, [selectedMode]);
 
   // Persist current messages to localStorage
   useEffect(() => {
@@ -194,6 +250,18 @@ export function AIChat() {
   const loadChat = (session: ChatSession) => {
     setMessages(session.messages);
     setIsSidebarOpen(false);
+  };
+
+  const removeQuickAction = (id: string) => {
+    setQuickActions(prev => prev.filter(a => a.id !== id));
+  };
+
+  const addQuickAction = (action: QuickAction) => {
+    setQuickActions(prev => {
+      if (prev.some(a => a.id === action.id)) return prev;
+      return [...prev, action];
+    });
+    setIsAddMenuOpen(false);
   };
 
   const lastMessage = messages[messages.length - 1];
@@ -322,7 +390,7 @@ export function AIChat() {
             <div className="px-4 py-3 bg-white border-t border-stone-100">
               <div className="flex items-center gap-2 bg-stone-50 rounded-full px-4 py-1 border border-stone-200 focus-within:border-stone-400 transition-colors">
                 <input ref={inputRef} type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={handleKeyPress}
-                  placeholder="Ask me anything about art..." className="flex-1 py-2.5 bg-transparent text-[13px] text-stone-900 placeholder:text-stone-400 focus:outline-none" />
+                  placeholder="Search or ask AI anything..." className="flex-1 py-2.5 bg-transparent text-[13px] text-stone-900 placeholder:text-stone-400 focus:outline-none" />
                 <button onClick={handleSend} disabled={!input.trim() || isTyping}
                   className="w-9 h-9 bg-coffee hover:bg-stone-800 text-white rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
@@ -449,14 +517,14 @@ export function AIChat() {
                 <p className="text-stone-500 text-sm mb-8">What can I help you with today?</p>
 
                 {/* Input */}
-                <div className="w-full max-w-xl mb-6">
+                <div className="w-full max-w-xl mb-4">
                   <div className="flex items-end gap-3 bg-white rounded-2xl border border-stone-200 shadow-sm px-4 py-3 focus-within:border-stone-400 focus-within:shadow-md transition-all">
                     <textarea
                       ref={expandedInputRef}
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      placeholder="Ask anything about art..."
+                      placeholder="Search or ask AI anything..."
                       rows={1}
                       className="flex-1 resize-none bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none min-h-[24px] max-h-[120px]"
                       style={{ height: "24px" }}
@@ -467,7 +535,7 @@ export function AIChat() {
                       }}
                     />
                     <button onClick={handleSend} disabled={!input.trim() || isTyping}
-                      className="w-10 h-10 bg-coffee hover:bg-stone-800 text-white rounded-xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0">
+                      className="w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>
                       </svg>
@@ -475,23 +543,84 @@ export function AIChat() {
                   </div>
                 </div>
 
+                {/* Mode Selector + Add Button Row */}
+                <div className="flex items-center gap-2 mb-4 max-w-xl w-full px-2">
+                  <DropdownMenu open={isModeMenuOpen} onOpenChange={setIsModeMenuOpen}>
+                    <DropdownMenuTrigger asChild>
+                      <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-sm text-stone-600 transition-colors">
+                        <Sparkles size={14} />
+                        {AI_MODES.find(m => m.id === selectedMode)?.label ?? "Smart"}
+                        <ChevronDown size={14} />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" sideOffset={8} className="w-52 z-[60]">
+                      <DropdownMenuLabel>Select mode</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {AI_MODES.map(mode => (
+                        <DropdownMenuItem
+                          key={mode.id}
+                          onClick={() => setSelectedMode(mode.id)}
+                          className={selectedMode === mode.id ? "bg-coffee/5 text-coffee" : ""}
+                        >
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{mode.label}</p>
+                            <p className="text-xs text-stone-400">{mode.description}</p>
+                          </div>
+                          {selectedMode === mode.id && <Check size={14} className="ml-auto text-coffee" />}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <DropdownMenu open={isAddMenuOpen} onOpenChange={setIsAddMenuOpen}>
+                    <DropdownMenuTrigger asChild>
+                      <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-sm text-stone-600 transition-colors">
+                        <Plus size={14} />
+                        Add
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" sideOffset={8} className="w-56 z-[60]">
+                      <DropdownMenuLabel>Add quick action</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {ADDABLE_ACTIONS
+                        .filter(a => !quickActions.some(q => q.id === a.id))
+                        .map(action => (
+                          <DropdownMenuItem key={action.id} onClick={() => addQuickAction(action)}>
+                            <Plus size={14} className="mr-2 text-stone-400" />
+                            {action.label}
+                          </DropdownMenuItem>
+                        ))}
+                      {ADDABLE_ACTIONS.filter(a => !quickActions.some(q => q.id === a.id)).length === 0 && (
+                        <p className="text-xs text-stone-400 text-center py-2">All actions already added</p>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
                 {/* Quick Actions */}
                 <div className="flex flex-wrap gap-2 justify-center px-2 max-w-xl">
-                  {QUICK_ACTIONS.map((action) => (
-                    <button key={action.label} onClick={() => {
-                      if ('link' in action && action.link) { closeAll(); router.push(action.link); }
-                      else if ('prompt' in action && action.prompt) { sendMessage(action.prompt); }
-                    }}
-                      className={`px-4 py-2 rounded-full border text-sm transition-all ${
-                        'link' in action && action.link
-                          ? "bg-coffee/5 border-coffee/20 text-coffee hover:bg-coffee/10 font-medium"
-                          : "bg-white border-stone-200 hover:border-stone-300 hover:shadow-sm text-stone-600"
-                      }`}>
-                      {'link' in action && action.link && (
-                        <span className="mr-1.5">→</span>
-                      )}
-                      {action.label}
-                    </button>
+                  {quickActions.map((action) => (
+                    <div key={action.id} className="relative group inline-flex">
+                      <button onClick={() => {
+                        if (action.link) { closeAll(); router.push(action.link); }
+                        else if (action.prompt) { sendMessage(action.prompt); }
+                      }}
+                        className={`px-4 py-2 rounded-full border text-sm transition-all ${
+                          action.link
+                            ? "bg-coffee/5 border-coffee/20 text-coffee hover:bg-coffee/10 font-medium"
+                            : "bg-white border-stone-200 hover:border-stone-300 hover:shadow-sm text-stone-600"
+                        }`}>
+                        {action.link && <span className="mr-1.5">→</span>}
+                        {action.label}
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); removeQuickAction(action.id); }}
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
+                        title="Remove"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
                   ))}
                 </div>
 
@@ -546,7 +675,7 @@ export function AIChat() {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      placeholder="Ask anything about art..."
+                      placeholder="Search or ask AI anything..."
                       rows={1}
                       className="flex-1 resize-none bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none min-h-[24px] max-h-[120px]"
                       style={{ height: "24px" }}
