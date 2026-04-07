@@ -5208,25 +5208,25 @@ export default function AlternusOS() {
         </div>
         <span className="absolute left-1/2 -translate-x-1/2 text-xs font-bold" style={{ color: c.text }}>{fmt(time)} · {time.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
         <div className="flex items-center gap-1">
-          {(() => { const ic_ = mode === "dark" ? "#FFFFFF" : "#444444"; return (<>
+          {(() => { const ic_ = mode === "dark" ? "#aaaaaa" : "#666666"; const icH = mode === "dark" ? "#ffffff" : "#000000"; return (<>
             {/* Quick launch apps */}
-            <button title="Browser" onClick={() => openWin("browser")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.globeF} s={15} f /></button>
-            <button title="Settings" onClick={() => openWin("settings")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.settingsF} s={15} f /></button>
-            <button title="Code Editor" onClick={() => openWin("code")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.codeF} s={15} f /></button>
-            <button title="Terminal" onClick={() => openWin("terminal")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.terminalF} s={15} f /></button>
-            <button title="Weather" onClick={() => openWin("weather")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.cloudF} s={15} f /></button>
-            <button title="Calendar" onClick={() => openWin("calendar")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.calendarF} s={15} f /></button>
-            <button title="Store" onClick={() => openWin("store")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.storeF} s={15} f /></button>
-            <button title="Movies" onClick={() => openWin("movies")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.filmF} s={15} f /></button>
+            <button title="Browser" onClick={() => openWin("browser")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.globe} s={15} /></button>
+            <button title="Settings" onClick={() => openWin("settings")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.settings} s={15} /></button>
+            <button title="Code Editor" onClick={() => openWin("code")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.code} s={15} /></button>
+            <button title="Terminal" onClick={() => openWin("terminal")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.terminal} s={15} /></button>
+            <button title="Weather" onClick={() => openWin("weather")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.cloud} s={15} /></button>
+            <button title="Calendar" onClick={() => openWin("calendar")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.calendar} s={15} /></button>
+            <button title="Store" onClick={() => openWin("store")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.store} s={15} /></button>
+            <button title="Movies" onClick={() => openWin("movies")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.film} s={15} /></button>
             {/* Separator */}
             <div className="w-px h-4 mx-1" style={{ background: c.border }} />
             {/* System tray */}
-            <button title="Notifications" onClick={() => setShowNotifications(!showNotifications)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors relative" style={{ color: ic_ }}>
-              <I d={ic.bellF} s={15} f />
+            <button title="Notifications" onClick={() => setShowNotifications(!showNotifications)} className="p-1.5 rounded-md transition-colors relative" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}>
+              <I d={ic.bell} s={15} />
               <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full" style={{ background: c.danger }} />
             </button>
             <div className="relative">
-              <button onClick={() => { setShowWifiPanel(!showWifiPanel); setShowProfilePanel(false); }} title="Wi-Fi" className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}><I d={ic.wifiF} s={15} f /></button>
+              <button onClick={() => { setShowWifiPanel(!showWifiPanel); setShowProfilePanel(false); }} title="Wi-Fi" className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.wifi} s={15} /></button>
               {/* WiFi Panel */}
               {showWifiPanel && (
                 <div className="absolute top-full right-0 mt-2 w-[280px] rounded-xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 4px 16px rgba(0,0,0,0.12)", zIndex: 999 }}
@@ -5264,13 +5264,13 @@ export default function AlternusOS() {
                 </div>
               )}
             </div>
-            <button onClick={() => setMode(mode === "dark" ? "light" : "dark")} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
-              <I d={mode === "dark" ? ic.sunF : ic.moonF} s={15} f />
+            <button onClick={() => setMode(mode === "dark" ? "light" : "dark")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}>
+              <I d={mode === "dark" ? ic.sun : ic.moon} s={15} />
             </button>
             {/* Separator */}
             <div className="w-px h-4 mx-1" style={{ background: c.border }} />
             <div className="relative">
-              <button onClick={() => { setShowProfilePanel(!showProfilePanel); setShowWifiPanel(false); }} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
+              <button onClick={() => { setShowProfilePanel(!showProfilePanel); setShowWifiPanel(false); }} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}>
                 <I d={ic.user} s={15} />
               </button>
               {/* Profile Panel */}
@@ -5324,7 +5324,7 @@ export default function AlternusOS() {
                 </div>
               )}
             </div>
-            <button onClick={() => { setIsBooting(true); setIsLocked(true); }} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: ic_ }}>
+            <button onClick={() => { setIsBooting(true); setIsLocked(true); }} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}>
               <I d={ic.power} s={15} />
             </button>
           </>); })()}
