@@ -5806,6 +5806,20 @@ export default function AlternusOS() {
                 }}
               />
               <button
+                onClick={() => {
+                  const apps = ["browser", "code", "terminal", "files", "music", "weather", "calendar", "notes", "word", "store", "movies", "settings", "clock", "calculator", "accounts", "downloads", "news", "recovery"];
+                  const random = apps[Math.floor(Math.random() * apps.length)];
+                  setAiInput(random);
+                }}
+                className="w-9 h-9 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
+                style={{ color: c.textMuted }}
+                onMouseEnter={e => { e.currentTarget.style.color = c.accent; e.currentTarget.style.background = c.cardAlt; }}
+                onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; e.currentTarget.style.background = "transparent"; }}
+                title="Quick suggestion"
+              >
+                <I d={ic.plus} s={18} />
+              </button>
+              <button
                 onClick={() => aiInput.trim() && handleDesktopSearch()}
                 className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90"
                 style={{ background: c.accent }}
