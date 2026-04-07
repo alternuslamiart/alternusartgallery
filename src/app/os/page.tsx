@@ -1342,40 +1342,60 @@ function MusicApp({ c }: { c: typeof palette.dark }) {
   ];
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-2">
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <p className="text-[13px] font-semibold" style={{ color: c.text }}>Library</p>
+        <button className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold"
+          style={{ background: c.accent, color: "#fff", borderRadius: "9999px", boxShadow: `0 0 14px ${c.accent}60` }}>
+          <I d={ic.sparkle} s={11} c="#fff" /> Try AI
+        </button>
+      </div>
+
+      {/* Track list */}
+      <div className="flex-1 overflow-y-auto py-2 px-3" style={{ scrollbarWidth: "none" }}>
         {tracks.map((t, i) => (
-          <button
-            key={i}
-            onClick={() => { setCurrent(i); setPlaying(true); }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors"
-            style={{ background: i === current ? c.accentSoft : "transparent" }}
+          <button key={i} onClick={() => { setCurrent(i); setPlaying(true); }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-all mb-1"
+            style={{ borderRadius: "12px", background: i === current ? c.accentSoft : "transparent", border: i === current ? `1px solid ${c.accent}40` : "1px solid transparent" }}
             onMouseEnter={e => { if (i !== current) e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { if (i !== current) e.currentTarget.style.background = "transparent"; }}
-          >
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: i === current ? c.accent : c.cardAlt }}>
+            onMouseLeave={e => { if (i !== current) e.currentTarget.style.background = "transparent"; }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: i === current ? c.accent : c.cardAlt, boxShadow: i === current ? `0 0 16px ${c.accent}50` : "none" }}>
               <I d={ic.music} s={14} c={i === current ? "#fff" : c.textMuted} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium truncate" style={{ color: i === current ? c.accentText : c.text }}>{t.name}</p>
-              <p className="text-[10px]" style={{ color: c.textMuted }}>{t.artist}</p>
+              <p className="text-[13px] font-medium truncate" style={{ color: i === current ? c.accentText : c.text }}>{t.name}</p>
+              <p className="text-[11px]" style={{ color: c.textMuted }}>{t.artist}</p>
             </div>
-            <span className="text-[10px]" style={{ color: c.textMuted }}>{t.dur}</span>
+            <span className="text-[11px] font-mono" style={{ color: c.textMuted }}>{t.dur}</span>
           </button>
         ))}
       </div>
-      <div className="p-4 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-        <p className="text-xs font-medium mb-1" style={{ color: c.text }}>{tracks[current].name}</p>
-        <p className="text-[10px] mb-3" style={{ color: c.textMuted }}>{tracks[current].artist}</p>
-        <div className="w-full h-1 rounded-full mb-3" style={{ background: c.cardAlt }}>
+
+      {/* Now Playing */}
+      <div className="flex-shrink-0 px-4 pt-3 pb-4" style={{ borderTop: `1px solid ${c.border}` }}>
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: c.accent, boxShadow: `0 0 16px ${c.accent}50` }}>
+            <I d={ic.music} s={14} c="#fff" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-semibold truncate" style={{ color: c.text }}>{tracks[current].name}</p>
+            <p className="text-[11px]" style={{ color: c.textMuted }}>{tracks[current].artist}</p>
+          </div>
+        </div>
+        <div className="w-full h-1 rounded-full mb-4" style={{ background: c.cardAlt }}>
           <div className="h-full rounded-full" style={{ background: c.accent, width: playing ? "45%" : "0%", transition: "width 0.3s" }} />
         </div>
         <div className="flex items-center justify-center gap-6">
-          <button style={{ color: c.textSec }} onClick={() => setCurrent(p => p > 0 ? p - 1 : tracks.length - 1)}><I d={ic.skip} s={14} /></button>
-          <button className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: c.accent }} onClick={() => setPlaying(!playing)}>
-            <I d={playing ? ic.pause : ic.play} s={14} c="#fff" />
+          <button style={{ color: c.textSec }} onClick={() => setCurrent(p => p > 0 ? p - 1 : tracks.length - 1)}><I d={ic.skip} s={16} /></button>
+          <button className="w-11 h-11 rounded-full flex items-center justify-center transition-all"
+            style={{ background: c.accent, boxShadow: `0 0 20px ${c.accent}60` }}
+            onClick={() => setPlaying(!playing)}>
+            <I d={playing ? ic.pause : ic.play} s={16} c="#fff" />
           </button>
-          <button style={{ color: c.textSec }} onClick={() => setCurrent(p => p < tracks.length - 1 ? p + 1 : 0)}><I d={ic.skip} s={14} /></button>
+          <button style={{ color: c.textSec }} onClick={() => setCurrent(p => p < tracks.length - 1 ? p + 1 : 0)}><I d={ic.skip} s={16} /></button>
         </div>
       </div>
     </div>
@@ -2336,12 +2356,12 @@ function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palett
       <div className="w-[150px] flex-shrink-0 flex flex-col py-1 px-1.5 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
         {sidebarItems.map((item, i) => (
           <button key={i} onClick={() => { setCurrentPath([item.path]); setSelectedFile(null); setSearchQuery(""); }}
-            className="w-full flex items-center gap-4 px-3 py-2 rounded-lg text-left transition-colors"
-            style={{ background: curPath === item.path ? c.accent : "transparent", minHeight: 36 }}
+            className="w-full flex items-center gap-2.5 px-2.5 py-2 text-left transition-all"
+            style={{ borderRadius: "8px", background: curPath === item.path ? c.accentSoft : "transparent", borderLeft: curPath === item.path ? `2px solid ${c.accent}` : "2px solid transparent", minHeight: 34 }}
             onMouseEnter={e => { if (curPath !== item.path) e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { if (curPath !== item.path) e.currentTarget.style.background = curPath === item.path ? c.accent : "transparent"; }}>
-            <I d={item.icon} s={15} c={curPath === item.path ? "#fff" : c.textMuted} />
-            <span className="text-[11px] font-medium" style={{ color: curPath === item.path ? "#fff" : c.text }}>{item.label}</span>
+            onMouseLeave={e => { if (curPath !== item.path) e.currentTarget.style.background = "transparent"; }}>
+            <I d={item.icon} s={14} c={curPath === item.path ? c.accentText : c.textMuted} />
+            <span className="text-[11px] font-medium" style={{ color: curPath === item.path ? c.accentText : c.textSec }}>{item.label}</span>
           </button>
         ))}
       </div>
@@ -2410,7 +2430,7 @@ function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palett
               draggable={f.type === "file"}
               onDragStart={e => { if (f.type === "file") { e.dataTransfer.setData("text/plain", f.name); e.dataTransfer.effectAllowed = "copy"; if (onDragFile) onDragFile(f.name); } }}>
               <button className="w-full flex items-center gap-4 px-4 py-2 rounded-lg text-left transition-colors"
-                style={{ background: selectedFile === f.name ? c.accentSoft : "transparent", minHeight: 40 }}
+                style={{ background: selectedFile === f.name ? c.accentSoft : "transparent", border: selectedFile === f.name ? `1px solid ${c.accent}30` : "1px solid transparent", borderRadius: "8px", minHeight: 38 }}
                 onMouseEnter={e => { if (selectedFile !== f.name) e.currentTarget.style.background = c.cardAlt; }}
                 onMouseLeave={e => { if (selectedFile !== f.name) e.currentTarget.style.background = "transparent"; }}
                 onClick={() => { setSelectedFile(f.name); setFileContextMenu(null); }}
@@ -2537,6 +2557,7 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [history, setHistory] = useState<string[]>(["https://alternus.art"]);
+  const [showAIComp, setShowAIComp] = useState(false);
   const [bookmarks] = useState([
     { name: "Alternus Art", url: "https://alternus.art" },
     { name: "GitHub", url: "https://github.com" },
@@ -2556,13 +2577,16 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
       {/* URL Bar */}
       <div className="flex items-center gap-2 px-3 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <button onClick={() => { if (history.length > 1) { const h = [...history]; h.pop(); setHistory(h); setUrl(h[h.length - 1]); setDisplayUrl(h[h.length - 1]); } }} style={{ color: c.textMuted }} className="p-1 rounded-md hover:bg-white/10 transition-colors">
+        <button onClick={() => { if (history.length > 1) { const h = [...history]; h.pop(); setHistory(h); setUrl(h[h.length - 1]); setDisplayUrl(h[h.length - 1]); } }}
+          className="p-1.5 flex-shrink-0 transition-colors" style={{ color: c.textMuted, borderRadius: "8px" }}
+          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
           <I d={ic.chevL} s={14} />
         </button>
-        <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+        <div className="flex-1 flex items-center gap-2 px-3 py-2" style={{ background: c.cardAlt, border: `1px solid ${c.border}`, borderRadius: "12px" }}>
           {isLoading ? (
             <div className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin flex-shrink-0" style={{ borderColor: `${c.accent} transparent ${c.accent} ${c.accent}` }} />
           ) : (
@@ -2576,51 +2600,95 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
             onKeyDown={e => { if (e.key === "Enter") navigate(displayUrl); }}
           />
         </div>
-        <button className="px-3 py-1.5 rounded-lg text-[9px] font-semibold whitespace-nowrap flex items-center gap-1.5 transition-all flex-shrink-0"
-          style={{ background: c.accent + "15", color: c.accentText, border: `1px solid ${c.accent}30` }}
-          onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.color = "#fff"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = c.accent + "15"; e.currentTarget.style.color = c.accentText; }}>
-          <I d={ic.sparkle} s={10} /> Try AI
+        <button onClick={() => setShowAIComp(p => !p)}
+          className="flex items-center gap-2 px-4 py-2 text-[11px] font-semibold whitespace-nowrap transition-all flex-shrink-0"
+          style={{ background: showAIComp ? c.accent : c.accentSoft, color: showAIComp ? "#fff" : c.accentText, borderRadius: "9999px", border: `1px solid ${c.accent}40`, boxShadow: showAIComp ? `0 0 16px ${c.accent}60` : `0 0 8px ${c.accent}30` }}
+          onMouseEnter={e => { if (!showAIComp) { e.currentTarget.style.background = c.accent; e.currentTarget.style.color = "#fff"; } }}
+          onMouseLeave={e => { if (!showAIComp) { e.currentTarget.style.background = c.accentSoft; e.currentTarget.style.color = c.accentText; } }}>
+          <I d={ic.sparkle} s={12} /> Try AI
         </button>
       </div>
 
       {/* Bookmarks */}
-      <div className="flex items-center gap-1 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+      <div className="flex items-center gap-1 px-3 py-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
         {bookmarks.map((b, i) => (
-          <button key={i} onClick={() => navigate(b.url)} className="px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors"
-            style={{ color: c.textSec }}
+          <button key={i} onClick={() => navigate(b.url)}
+            className="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium transition-colors"
+            style={{ color: c.textSec, borderRadius: "6px" }}
             onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
             onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
             {b.name}
           </button>
         ))}
+        <div className="flex-1" />
+        {showAIComp && (
+          <span className="text-[11px] font-medium px-2" style={{ color: c.textSec }}>AI Companion</span>
+        )}
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-hidden relative" style={{ background: c.cardAlt }}>
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center h-full gap-3">
-            <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${c.accent} transparent ${c.accent} ${c.accent}` }} />
-            <p className="text-xs" style={{ color: c.textMuted }}>Loading {displayUrl}...</p>
-          </div>
-        ) : (
-          <>
-            <iframe
-              src={url}
-              className="w-full h-full border-0"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-              title="Browser"
-              onError={() => setLoadError(true)}
-            />
-            {loadError && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3" style={{ background: c.cardAlt }}>
-                <I d={ic.globe} s={32} c={c.textMuted} />
-                <p className="text-sm font-medium" style={{ color: c.text }}>Cannot display this page</p>
-                <p className="text-xs" style={{ color: c.textMuted }}>{url} refused to connect</p>
-                <button onClick={() => navigate(url)} className="mt-2 px-4 py-1.5 rounded-lg text-xs font-medium" style={{ background: c.accent, color: "#fff" }}>Retry</button>
+      {/* Content + optional AI panel */}
+      <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 relative" style={{ background: c.cardAlt }}>
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center h-full gap-3">
+              <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${c.accent} transparent ${c.accent} ${c.accent}` }} />
+              <p className="text-xs" style={{ color: c.textMuted }}>Loading {displayUrl}...</p>
+            </div>
+          ) : (
+            <>
+              <iframe
+                src={url}
+                className="w-full h-full border-0"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                title="Browser"
+                onError={() => setLoadError(true)}
+              />
+              {loadError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3" style={{ background: c.cardAlt }}>
+                  <I d={ic.globe} s={32} c={c.textMuted} />
+                  <p className="text-sm font-medium" style={{ color: c.text }}>Cannot display this page</p>
+                  <p className="text-xs" style={{ color: c.textMuted }}>{url} refused to connect</p>
+                  <button onClick={() => navigate(url)} className="mt-2 px-4 py-1.5 rounded-lg text-xs font-medium" style={{ background: c.accent, color: "#fff" }}>Retry</button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* AI Companion panel */}
+        {showAIComp && (
+          <div className="w-[200px] flex-shrink-0 flex flex-col" style={{ background: c.surface, borderLeft: `1px solid ${c.border}` }}>
+            <div className="px-3 pt-3 pb-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: c.accentSoft }}>
+                  <I d={ic.sparkle} s={14} c={c.accentText} />
+                </div>
+                <p className="text-[12px] font-semibold" style={{ color: c.text }}>AI Companion</p>
               </div>
-            )}
-          </>
+              <p className="text-[10px]" style={{ color: c.textMuted }}>Analyzing current page…</p>
+            </div>
+            <div className="flex-1 p-3 space-y-2.5 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+              <div className="rounded-xl p-2.5" style={{ background: c.card, border: `1px solid ${c.border}` }}>
+                <p className="text-[10px] font-semibold mb-1.5" style={{ color: c.textSec }}>ANALYZING</p>
+                <div className="h-1 rounded-full mb-1.5" style={{ background: c.cardAlt }}>
+                  <div className="h-full rounded-full" style={{ width: "75%", background: c.accent }} />
+                </div>
+                <p className="text-[10px]" style={{ color: c.textMuted }}>75% · GitHub, ArXiv</p>
+              </div>
+              <div className="rounded-xl p-2.5" style={{ background: c.card, border: `1px solid ${c.border}` }}>
+                <p className="text-[10px] font-semibold mb-1" style={{ color: c.textSec }}>INSIGHT</p>
+                <p className="text-[10px]" style={{ color: c.textMuted }}>Generation: <span style={{ color: c.accentText }}>High</span></p>
+              </div>
+              {["Summarize this page", "Find key facts", "Translate content"].map((action, i) => (
+                <button key={i} className="w-full text-left px-2.5 py-2 text-[11px] transition-colors"
+                  style={{ color: c.textSec, background: "transparent", borderRadius: "8px" }}
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  {action}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -4979,91 +5047,170 @@ function SysMonApp({ c }: { c: typeof palette.dark }) {
 
 // ━━━━ DASHBOARD APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function DashboardApp({ c }: { c: typeof palette.dark }) {
-  const [time, setTime] = useState(new Date());
-  useEffect(() => { const iv = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(iv); }, []);
-  const stats = [
-    { label: "CPU", value: "34%", color: c.accent, bar: 34 },
-    { label: "RAM", value: "6.2 GB", color: c.success, bar: 52 },
-    { label: "Storage", value: "128 GB", color: c.warning, bar: 65 },
-    { label: "Network", value: "↑ 1.2 MB/s", color: c.purple, bar: 20 },
-  ];
-  const tasks = [
-    { text: "Review gallery uploads", done: false, priority: "high" },
-    { text: "Update artist profiles", done: true, priority: "medium" },
-    { text: "Check payment reports", done: false, priority: "high" },
-    { text: "Respond to inquiries", done: false, priority: "low" },
-  ];
-  const recent = [
-    { name: "project_v2.fig", time: "2m ago", icon: ic.pen },
-    { name: "gallery_export.zip", time: "1h ago", icon: ic.folder },
-    { name: "meeting_notes.txt", time: "3h ago", icon: ic.note },
-    { name: "report_q4.pdf", time: "Yesterday", icon: ic.fileText },
-  ];
+  const [activeIcon, setActiveIcon] = useState(0);
+  const sideIcons = [ic.monitor, ic.menu, ic.refresh, ic.settings, ic.power];
+
   return (
-    <div className="flex flex-col h-full overflow-y-auto p-4 gap-4" style={{ background: c.bg, scrollbarWidth: "none" }}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-[11px]" style={{ color: c.textMuted }}>Good {time.getHours() < 12 ? "morning" : time.getHours() < 18 ? "afternoon" : "evening"}</p>
-          <h2 className="text-[16px] font-bold" style={{ color: c.text }}>Dashboard</h2>
-        </div>
-        <div className="text-right">
-          <p className="text-[18px] font-bold font-mono" style={{ color: c.text }}>{time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
-          <p className="text-[10px]" style={{ color: c.textMuted }}>{time.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</p>
-        </div>
-      </div>
-      {/* System Stats */}
-      <div className="grid grid-cols-2 gap-2">
-        {stats.map(s => (
-          <div key={s.label} className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-medium" style={{ color: c.textMuted }}>{s.label}</span>
-              <span className="text-[11px] font-bold" style={{ color: s.color }}>{s.value}</span>
-            </div>
-            <div className="h-1.5 rounded-full" style={{ background: c.border }}>
-              <div className="h-full rounded-full transition-all" style={{ width: `${s.bar}%`, background: s.color }} />
-            </div>
-          </div>
+    <div className="flex h-full overflow-hidden" style={{ background: c.bg }}>
+      {/* Slim left icon bar */}
+      <div className="w-10 flex-shrink-0 flex flex-col items-center py-3 gap-1" style={{ borderRight: `1px solid ${c.border}` }}>
+        {sideIcons.map((icon, i) => (
+          <button key={i} onClick={() => setActiveIcon(i)}
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
+            style={{ color: i === activeIcon ? c.accentText : c.textMuted, background: i === activeIcon ? c.accentSoft : "transparent" }}
+            onMouseEnter={e => { if (i !== activeIcon) { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.textSec; } }}
+            onMouseLeave={e => { if (i !== activeIcon) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; } }}>
+            <I d={icon} s={15} />
+          </button>
         ))}
       </div>
-      {/* Tasks + Recent */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-          <p className="text-[11px] font-semibold mb-2" style={{ color: c.text }}>Tasks</p>
-          <div className="space-y-1.5">
-            {tasks.map((t, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: t.done ? c.success : t.priority === "high" ? c.danger : t.priority === "medium" ? c.warning : c.textMuted, opacity: t.done ? 0.5 : 1 }} />
-                <span className="text-[10px] leading-tight" style={{ color: t.done ? c.textMuted : c.textSec, textDecoration: t.done ? "line-through" : "none" }}>{t.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-          <p className="text-[11px] font-semibold mb-2" style={{ color: c.text }}>Recent Files</p>
-          <div className="space-y-1.5">
-            {recent.map((f, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <I d={f.icon} s={12} c={c.textMuted} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] truncate" style={{ color: c.textSec }}>{f.name}</p>
-                </div>
-                <span className="text-[9px] flex-shrink-0" style={{ color: c.textMuted }}>{f.time}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      {/* Quick Launch */}
-      <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-        <p className="text-[11px] font-semibold mb-2" style={{ color: c.text }}>Quick Stats</p>
-        <div className="grid grid-cols-4 gap-2 text-center">
-          {[{ label: "Files", val: "1,284" }, { label: "Tasks", val: "12" }, { label: "Emails", val: "8" }, { label: "Alerts", val: "3" }].map(q => (
-            <div key={q.label} className="rounded-lg py-2" style={{ background: c.cardAlt }}>
-              <p className="text-[14px] font-bold" style={{ color: c.text }}>{q.val}</p>
-              <p className="text-[9px]" style={{ color: c.textMuted }}>{q.label}</p>
+
+      {/* Main content */}
+      <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2" style={{ scrollbarWidth: "none" }}>
+        {/* Top row — 3 cards */}
+        <div className="grid gap-2" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
+
+          {/* Trend line chart */}
+          <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[11px] font-medium" style={{ color: c.textSec }}>Trend Charts</p>
+              <span className="text-[14px]" style={{ color: c.textMuted }}>···</span>
             </div>
-          ))}
+            <p className="text-[20px] font-bold" style={{ color: c.text }}>3,328 <span className="text-[11px]" style={{ color: c.success }}>▲</span></p>
+            <svg viewBox="0 0 120 38" className="w-full mt-1" style={{ height: 36 }}>
+              <defs>
+                <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={c.accent} stopOpacity="0.25" />
+                  <stop offset="100%" stopColor={c.accent} stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <polygon points="0,34 20,26 40,29 60,15 80,21 100,11 120,5 120,38 0,38" fill="url(#trendGrad)" />
+              <polyline points="0,34 20,26 40,29 60,15 80,21 100,11 120,5" fill="none" stroke={c.accent} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <div className="flex justify-between mt-1">
+              {["Jan","Feb","Mar","Apr","May"].map(m => <span key={m} className="text-[9px]" style={{ color: c.textMuted }}>{m}</span>)}
+            </div>
+          </div>
+
+          {/* KPI + bars */}
+          <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[11px] font-medium" style={{ color: c.textSec }}>Data Stats</p>
+              <span className="text-[14px]" style={{ color: c.textMuted }}>···</span>
+            </div>
+            <p className="text-[26px] font-bold mb-3" style={{ color: c.text }}>12%</p>
+            {([["Revenue", 63, c.accent], ["Total", 43, c.success]] as [string, number, string][]).map(([label, pct, color]) => (
+              <div key={label} className="mb-2">
+                <div className="flex justify-between mb-0.5">
+                  <span className="text-[10px]" style={{ color: c.textMuted }}>● {label}</span>
+                  <span className="text-[10px]" style={{ color: c.textMuted }}>{pct}%</span>
+                </div>
+                <div className="h-1 rounded-full" style={{ background: c.cardAlt }}>
+                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Donut chart */}
+          <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[11px] font-medium" style={{ color: c.textSec }}>Data Analyse</p>
+              <span className="text-[14px]" style={{ color: c.textMuted }}>···</span>
+            </div>
+            <div className="flex items-center justify-center my-1">
+              <svg viewBox="0 0 80 80" style={{ width: 62, height: 62 }}>
+                <circle cx="40" cy="40" r="26" fill="none" stroke={c.cardAlt} strokeWidth="9" />
+                <circle cx="40" cy="40" r="26" fill="none" stroke={c.accent} strokeWidth="9"
+                  strokeDasharray="103 60" strokeDashoffset="16" strokeLinecap="round" transform="rotate(-90 40 40)" />
+                <circle cx="40" cy="40" r="26" fill="none" stroke={c.success} strokeWidth="9"
+                  strokeDasharray="55 108" strokeDashoffset="-87" strokeLinecap="round" transform="rotate(-90 40 40)" />
+              </svg>
+            </div>
+            <div className="flex justify-center gap-2">
+              <span className="text-[10px]" style={{ color: c.textMuted }}><span style={{ color: c.accent }}>●</span> Rev 63%</span>
+              <span className="text-[10px]" style={{ color: c.textMuted }}><span style={{ color: c.success }}>●</span> Total 43%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Middle row */}
+        <div className="grid gap-2" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
+
+          {/* Bar chart */}
+          <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-medium" style={{ color: c.textSec }}>Data Charts</p>
+              <span className="text-[14px]" style={{ color: c.textMuted }}>···</span>
+            </div>
+            <svg viewBox="0 0 120 50" className="w-full" style={{ height: 48 }}>
+              {[18,35,28,45,22,38,30,50,25,42,35,48].map((h, i) => (
+                <rect key={i} x={i * 10 + 1} y={50 - h} width="8" height={h} rx="2"
+                  fill={i === 7 ? c.accent : `${c.accent}35`} />
+              ))}
+            </svg>
+            <div className="flex justify-between mt-1">
+              {["Jul","Aug","Sep","Oct","Nov","Dec"].map(m => <span key={m} className="text-[9px]" style={{ color: c.textMuted }}>{m}</span>)}
+            </div>
+          </div>
+
+          {/* AI Companion card */}
+          <div className="rounded-xl p-4 flex flex-col items-center justify-center text-center" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center mb-2"
+              style={{ background: c.accentSoft, border: `1px solid ${c.accent}40`, boxShadow: `0 0 20px ${c.accent}30` }}>
+              <I d={ic.play} s={20} c={c.accentText} />
+            </div>
+            <p className="text-[13px] font-semibold mb-1" style={{ color: c.text }}>AI-companion</p>
+            <p className="text-[10px] mb-3 leading-relaxed" style={{ color: c.textMuted }}>Smart analysis &amp; AI account assistant.</p>
+            <button className="flex items-center gap-1.5 px-4 py-1.5 text-[11px] font-semibold transition-all"
+              style={{ background: c.accent, color: "#fff", borderRadius: "9999px", boxShadow: `0 0 14px ${c.accent}60` }}
+              onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
+              onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
+              <I d={ic.sparkle} s={10} c="#fff" /> Try AI
+            </button>
+          </div>
+
+          {/* Data Analysis bars */}
+          <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-medium" style={{ color: c.textSec }}>Data Analysis</p>
+              <span className="text-[14px]" style={{ color: c.textMuted }}>···</span>
+            </div>
+            {([["Volumes", 50], ["Less", 30], ["Evaluated", 27], ["Floating", 30]] as [string, number][]).map(([label, pct]) => (
+              <div key={label} className="mb-2">
+                <div className="flex justify-between mb-0.5">
+                  <span className="text-[10px]" style={{ color: c.textSec }}>{label}</span>
+                  <span className="text-[10px]" style={{ color: c.textMuted }}>{pct}%</span>
+                </div>
+                <div className="h-1 rounded-full" style={{ background: c.cardAlt }}>
+                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c.accent }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom row */}
+        <div className="grid gap-2" style={{ gridTemplateColumns: "1fr 1fr" }}>
+          <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[11px] font-medium" style={{ color: c.textSec }}>Data Mans</p>
+              <span className="text-[14px]" style={{ color: c.textMuted }}>···</span>
+            </div>
+            <p className="text-[26px] font-bold" style={{ color: c.text }}>709</p>
+            <p className="text-[10px] mt-1" style={{ color: c.success }}>▲ +3.2% this week</p>
+          </div>
+          <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            <p className="text-[11px] font-medium mb-2" style={{ color: c.textSec }}>Quick Stats</p>
+            <div className="grid grid-cols-2 gap-1.5">
+              {[{ label: "Files", val: "1,284" }, { label: "Tasks", val: "12" }, { label: "Emails", val: "8" }, { label: "Alerts", val: "3" }].map(q => (
+                <div key={q.label} className="rounded-lg py-1.5 px-2 text-center" style={{ background: c.cardAlt }}>
+                  <p className="text-[14px] font-bold" style={{ color: c.text }}>{q.val}</p>
+                  <p className="text-[9px]" style={{ color: c.textMuted }}>{q.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
