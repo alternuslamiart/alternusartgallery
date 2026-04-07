@@ -5398,10 +5398,10 @@ export default function AlternusOS() {
           </div>
 
         {/* Center: Alternus branding + AI Search - hidden when AI window is open */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-[0]" style={{ display: wins.find(w => w.id === "ai")?.isOpen && !wins.find(w => w.id === "ai")?.isMinimized ? "none" : "flex" }}>
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-[0] pointer-events-none" style={{ display: wins.find(w => w.id === "ai")?.isOpen && !wins.find(w => w.id === "ai")?.isMinimized ? "none" : "flex" }}>
           {/* AI Creation frame - appears above Alternus text */}
           {aiCreation && (
-            <div className="w-full max-w-2xl mb-6 px-4">
+            <div className="w-full max-w-2xl mb-6 px-4 pointer-events-auto">
               <div className="rounded-2xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.08)", maxHeight: 320, overflowY: "auto", scrollbarWidth: "none" }}>
                 <div className="px-6 py-5 text-[13px] leading-[1.8] relative" style={{ color: c.text }}>
                   {/* Copy button */}
@@ -5449,7 +5449,7 @@ export default function AlternusOS() {
           </p>
 
           {/* AI Search Bar */}
-          <div className="w-full max-w-2xl">
+          <div className="w-full max-w-2xl pointer-events-auto">
             <div
               className="flex items-center gap-2 pl-5 pr-2 py-2 rounded-2xl transition-all"
               style={{
