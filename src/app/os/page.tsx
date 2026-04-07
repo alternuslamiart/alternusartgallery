@@ -4192,19 +4192,19 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
     a.click();
   };
 
-  // ── Design tokens ──────────────────────────────────────────
+  // ── Design tokens — derived from OS palette (dark/light aware) ──
   const dt = {
-    bg:      "#0A0F1A",
-    panel:   "#1A1F2E",
-    card:    "#252B3D",
-    text:    "#E8EDF2",
-    textSec: "#8E9AAE",
-    accent:  "#2D9CDB",
-    success: "#27AE60",
-    warning: "#F2C94C",
-    error:   "#EB5757",
-    border:  "#3A4052",
-    hover:   "#2A3045",
+    bg:      c.bg,
+    panel:   c.surface,
+    card:    c.card,
+    text:    c.text,
+    textSec: c.textSec,
+    accent:  c.accent,
+    success: c.success,
+    warning: c.warning,
+    error:   c.danger,
+    border:  c.border,
+    hover:   c.cardAlt,
     font:    "'Inter', sans-serif",
     r:       "4px",
     tr:      "0.1s ease",
@@ -4339,7 +4339,7 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 4, borderTop: `1px solid ${dt.border}` }}>
             <span style={{ fontSize: 12, color: dt.textSec }}>Last check: 2 min ago</span>
             <button style={{ height: 32, padding: "0 14px", borderRadius: dt.r, fontSize: 13, fontWeight: 500, background: "transparent", border: `1px solid ${dt.error}`, color: dt.error, cursor: "pointer", transition: dt.tr }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#3A2025"; }}
+              onMouseEnter={e => { e.currentTarget.style.background = `${c.danger}22`; }}
               onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
               onMouseDown={e => (e.currentTarget.style.opacity = "0.7")}
               onMouseUp={e => (e.currentTarget.style.opacity = "1")}
