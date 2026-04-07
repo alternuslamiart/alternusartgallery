@@ -6142,7 +6142,7 @@ export default function AlternusOS() {
           setTaskSwitcherIdx(prev => (prev + 1) % openWins.length);
         }
       }
-      // Spotlight: Ctrl+K or Cmd+Space
+      // Spotlight: Ctrl+K or Ctrl+Space
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
         setShowSpotlight(p => !p);
@@ -6167,19 +6167,19 @@ export default function AlternusOS() {
         e.preventDefault();
         setActiveSpace(parseInt(e.key));
       }
-      // Cmd+W — close focused (highest z) open window
+      // Ctrl+W — close focused (highest z) open window
       if ((e.ctrlKey || e.metaKey) && e.key === "w") {
         e.preventDefault();
         const topWin = [...wins].filter(w => w.isOpen && !w.isMinimized).sort((a, b) => b.zIndex - a.zIndex)[0];
         if (topWin) closeWinWithAI(topWin.id);
       }
-      // Cmd+M — minimize focused window
+      // Ctrl+M — minimize focused window
       if ((e.ctrlKey || e.metaKey) && e.key === "m") {
         e.preventDefault();
         const topWin = [...wins].filter(w => w.isOpen && !w.isMinimized).sort((a, b) => b.zIndex - a.zIndex)[0];
         if (topWin) minimizeWin(topWin.id);
       }
-      // Cmd+H — hide all windows (show desktop)
+      // Ctrl+H — hide all windows (show desktop)
       if ((e.ctrlKey || e.metaKey) && e.key === "h") {
         e.preventDefault();
         setWins(p => p.map(w => w.isOpen && !w.isMinimized ? { ...w, isMinimized: true } : w));
@@ -6838,7 +6838,7 @@ export default function AlternusOS() {
               <div className="px-5 py-2 flex items-center gap-4 text-[10px]" style={{ borderTop: `1px solid ${c.border}`, color: c.textMuted }}>
                 <span>↑↓ Navigate</span><span>↵ Open</span><span>ESC Dismiss</span>
                 <div className="ml-auto flex gap-2">
-                  {[["⌘Space","Spotlight"],["⌘W","Close"],["⌘M","Min"],["⌘H","Hide all"]].map(([k,l]) => (
+                  {[["Ctrl+Space","Spotlight"],["Ctrl+W","Close"],["Ctrl+M","Min"],["Ctrl+H","Hide all"]].map(([k,l]) => (
                     <span key={k} className="flex items-center gap-1">
                       <span className="px-1 rounded font-mono" style={{ background: c.cardAlt }}>{k}</span>
                       <span>{l}</span>
@@ -7384,7 +7384,7 @@ export default function AlternusOS() {
                 { icon: ic.image, label: "Change wallpaper", action: () => { setWallpaper(p => (p + 1) % 6); setContextMenu(null); } },
                 { icon: ic.monitor, label: "Display settings", action: () => { openWin("settings"); setContextMenu(null); } },
                 { icon: ic.terminal, label: "Open Terminal", action: () => { openWin("terminal"); setContextMenu(null); }, shortcut: "" },
-                { icon: ic.search, label: "Spotlight", action: () => { setShowSpotlight(true); setContextMenu(null); }, shortcut: "⌘Space" },
+                { icon: ic.search, label: "Spotlight", action: () => { setShowSpotlight(true); setContextMenu(null); }, shortcut: "Ctrl+K" },
               ].map((item, i) => (
                 <button key={i} onClick={item.action}
                   className="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-left transition-colors"
