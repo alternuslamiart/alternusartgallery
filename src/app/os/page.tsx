@@ -5770,6 +5770,15 @@ export default function AlternusOS() {
       studio: { w: 720, h: 520 },
       recovery: { w: 520, h: 440 },
       news: { w: 500, h: 480 },
+      dashboard: { w: 520, h: 460 },
+      tasks: { w: 420, h: 480 },
+      mail: { w: 580, h: 460 },
+      monaco: { w: 680, h: 500 },
+      aihub: { w: 480, h: 500 },
+      imagegen: { w: 440, h: 520 },
+      aivoice: { w: 380, h: 440 },
+      writer: { w: 560, h: 480 },
+      knowledge: { w: 580, h: 480 },
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
