@@ -393,10 +393,11 @@ function AppWindow({
         flexDirection: "column",
         overflow: "hidden",
         transition: "box-shadow 0.2s ease",
+        pointerEvents: isAI ? "none" : "auto",
       }}
       onMouseEnter={e => { if (!isAI) { e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.24)"; } }}
       onMouseLeave={e => { if (!isAI) { e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)"; } }}
-      onClick={onFocus}
+      onClick={isAI ? undefined : onFocus}
     >
       {!isAI && <TitleBar
         title={win.title}
@@ -408,7 +409,7 @@ function AppWindow({
         isFrozen={win.isFrozen}
         onForceQuit={onForceQuit}
       />}
-      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: isAI ? 0 : "6px" }}>
+      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: isAI ? 0 : "6px", pointerEvents: isAI ? "auto" : undefined }}>
         <div style={{ background: isAI ? "transparent" : c.surface, borderRadius: isAI ? 0 : 12, border: isAI ? "none" : `1px solid ${c.border}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
         {/* Frozen overlay */}
