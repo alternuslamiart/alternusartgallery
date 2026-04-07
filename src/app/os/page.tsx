@@ -809,6 +809,46 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
                     onChange={e => setInput(e.target.value)}
                     onKeyDown={e => { if (e.key === "Enter") send(); }}
                   />
+                  {/* + Add button inside search bar */}
+                  <div className="relative">
+                    <button onClick={() => setShowAddMenu(!showAddMenu)}
+                      className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+                      style={{ color: c.textMuted }}
+                      onMouseEnter={e => { e.currentTarget.style.color = c.accent; e.currentTarget.style.background = c.cardAlt; }}
+                      onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; e.currentTarget.style.background = "transparent"; }}
+                      title="Add quick action"
+                    >
+                      <I d={ic.plus} s={18} />
+                    </button>
+
+                    {/* Add menu dropdown */}
+                    {showAddMenu && (
+                      <>
+                        <div className="fixed inset-0 z-10" onClick={() => setShowAddMenu(false)} />
+                        <div className="absolute top-full mt-2 right-0 w-52 rounded-xl py-1 shadow-xl z-20"
+                          style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                          <p className="px-3 py-2 text-[11px] font-medium" style={{ color: c.textMuted }}>Add quick action</p>
+                          <div style={{ height: 1, background: c.border }} />
+                          {addableChips.filter(a => !landingChips.some(ch => ch.id === a.id)).length === 0 ? (
+                            <p className="px-3 py-3 text-[11px] text-center" style={{ color: c.textMuted }}>All actions added</p>
+                          ) : (
+                            addableChips
+                              .filter(a => !landingChips.some(ch => ch.id === a.id))
+                              .map(chip => (
+                                <button key={chip.id} onClick={() => addChip(chip)}
+                                  className="w-full flex items-center gap-2 px-3 py-2.5 text-[12px] transition-colors text-left"
+                                  style={{ color: c.textSec }}
+                                  onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                                  <I d={ic.plus} s={14} c={c.textMuted} />
+                                  {chip.label}
+                                </button>
+                              ))
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
                   <button onClick={() => send()} disabled={!input.trim()} className="px-5 py-2.5 rounded-xl transition-all hover:opacity-90"
                     style={{ background: c.accent }}>
                     <I d={ic.send} s={16} c="#fff" />
@@ -839,46 +879,6 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
                   </div>
                 ))}
 
-                {/* Add chip button */}
-                <div className="relative">
-                  <button onClick={() => setShowAddMenu(!showAddMenu)}
-                    className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
-                    style={{ border: `2px dashed ${c.border}`, color: c.textMuted }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = c.accent; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textMuted; }}
-                    title="Add quick action"
-                  >
-                    <I d={ic.plus} s={16} />
-                  </button>
-
-                  {/* Add menu dropdown */}
-                  {showAddMenu && (
-                    <>
-                      <div className="fixed inset-0 z-10" onClick={() => setShowAddMenu(false)} />
-                      <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-52 rounded-xl py-1 shadow-xl z-20"
-                        style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-                        <p className="px-3 py-2 text-[11px] font-medium" style={{ color: c.textMuted }}>Add quick action</p>
-                        <div style={{ height: 1, background: c.border }} />
-                        {addableChips.filter(a => !landingChips.some(ch => ch.id === a.id)).length === 0 ? (
-                          <p className="px-3 py-3 text-[11px] text-center" style={{ color: c.textMuted }}>All actions added</p>
-                        ) : (
-                          addableChips
-                            .filter(a => !landingChips.some(ch => ch.id === a.id))
-                            .map(chip => (
-                              <button key={chip.id} onClick={() => addChip(chip)}
-                                className="w-full flex items-center gap-2 px-3 py-2.5 text-[12px] transition-colors text-left"
-                                style={{ color: c.textSec }}
-                                onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
-                                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-                                <I d={ic.plus} s={14} c={c.textMuted} />
-                                {chip.label}
-                              </button>
-                            ))
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
               </div>
             </div>
           </div>
