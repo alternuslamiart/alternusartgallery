@@ -375,11 +375,11 @@ function AppWindow({
 
   if (!win.isOpen || win.isMinimized) return null;
 
+  const isAI = win.id === "ai";
+
   const style: React.CSSProperties = win.isMaximized
     ? { position: "absolute", top: 6, left: 6, right: isAI ? 6 : 58, bottom: 6, zIndex: win.zIndex }
     : { position: "absolute", top: win.y, left: win.x, width: win.w, height: win.h, zIndex: win.zIndex };
-
-  const isAI = win.id === "ai";
 
   return (
     <div
