@@ -376,7 +376,7 @@ function AppWindow({
   if (!win.isOpen || win.isMinimized) return null;
 
   const style: React.CSSProperties = win.isMaximized
-    ? { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: win.zIndex }
+    ? { position: "absolute", top: 6, left: 6, right: 6, bottom: 6, zIndex: win.zIndex }
     : { position: "absolute", top: win.y, left: win.x, width: win.w, height: win.h, zIndex: win.zIndex };
 
   const isAI = win.id === "ai";
@@ -387,7 +387,7 @@ function AppWindow({
         ...style,
         background: isAI ? "transparent" : c.bg,
         border: isAI ? "none" : `1px solid ${c.border}`,
-        borderRadius: win.isMaximized ? 0 : 16,
+        borderRadius: 16,
         boxShadow: isAI ? "none" : "0 4px 16px rgba(0,0,0,0.12)",
         display: "flex",
         flexDirection: "column",
@@ -4756,9 +4756,9 @@ export default function AlternusOS() {
   }, []);
 
   const snapWin = useCallback((id: WinId, side: "left" | "right") => {
-    const hw = Math.floor(window.innerWidth / 2);
-    const fh = window.innerHeight - 36; // minus top bar
-    setWins(p => p.map(w => w.id === id ? { ...w, x: side === "left" ? 0 : hw, y: 0, w: hw, h: fh, isMaximized: false } : w));
+    const hw = Math.floor((window.innerWidth - 18) / 2);
+    const fh = window.innerHeight - 36 - 12; // minus top bar and padding
+    setWins(p => p.map(w => w.id === id ? { ...w, x: side === "left" ? 6 : 6 + hw + 6, y: 6, w: hw, h: fh, isMaximized: false } : w));
   }, []);
 
   const forceQuitWin = useCallback((id: WinId) => {
