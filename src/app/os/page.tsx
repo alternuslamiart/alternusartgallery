@@ -4564,6 +4564,7 @@ export default function AlternusOS() {
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [aiActions, setAiActions] = useState<{ label: string; action: WinId }[]>([]);
   const [aiCreation, setAiCreation] = useState<string | null>(null);
+  const [aiAppResults, setAiAppResults] = useState<{ id: WinId; title: string; icon: string; description: string }[]>([]);
   const [showAiChat, setShowAiChat] = useState(false);
   const [aiChatMsgs, setAiChatMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([]);
   const [aiChatInput, setAiChatInput] = useState("");
@@ -4879,64 +4880,47 @@ export default function AlternusOS() {
   const handleDesktopSearch = () => {
     const q = aiInput.trim().toLowerCase();
     if (!q) return;
+    setAiAppResults([]); setAiResponse(null); setAiActions([]); setAiCreation(null);
     addTimelineEvent("Searched", `"${aiInput.trim()}"`, ic.search);
 
     // ━━━ APP KEYWORD MAP — every keyword opens the right app ━━━
-    const appMap: { keys: string[]; response: string; actions: { label: string; action: WinId }[] }[] = [
-      // Browser & Web
+    const appMap: { keys: string[]; id: WinId; title: string; icon: string; description: string; extra?: { id: WinId; title: string; icon: string; description: string } }[] = [
       { keys: ["google", "browse", "browser", "web", "search", "internet", "url", "website", "http", "youtube", "facebook", "instagram", "twitter", "reddit", "wikipedia", "linkedin", "amazon", "ebay", "netflix", "spotify", "tiktok", "pinterest", "stackoverflow", "github"],
-        response: "Opening browser for you.", actions: [{ label: "Open Browser", action: "browser" }] },
-      // Code & Development
+        id: "browser", title: "Browser", icon: ic.globe, description: "Browse the web, search, and access websites" },
       { keys: ["code", "program", "develop", "javascript", "python", "html", "css", "react", "typescript", "debug", "compile", "script", "function", "variable", "api", "claude", "ai code", "copilot", "vscode", "editor", "ide", "git", "npm", "node"],
-        response: "Ready to code. Opening the code editor.", actions: [{ label: "Open Code Editor", action: "code" }] },
-      // Terminal
+        id: "code", title: "Code Editor", icon: ic.code, description: "Write, edit, and debug code" },
       { keys: ["terminal", "command", "shell", "bash", "cmd", "console", "cli", "ssh", "ping", "npm run", "yarn", "pip"],
-        response: "Opening terminal for command line access.", actions: [{ label: "Open Terminal", action: "terminal" }] },
-      // Files & Documents
-      { keys: ["file", "document", "folder", "directory", "explorer", "download", "upload", "pdf", "docx", "xlsx", "zip", "rar", "copy", "paste", "move", "rename", "delete file"],
-        response: "Opening the file manager.", actions: [{ label: "Open Files", action: "files" }] },
-      // Music & Audio
-      { keys: ["music", "song", "play", "playlist", "album", "artist", "spotify", "audio", "mp3", "radio", "podcast", "beats", "dj", "sound", "volume"],
-        response: "Opening the music player.", actions: [{ label: "Open Music", action: "music" }] },
-      // Weather
+        id: "terminal", title: "Terminal", icon: ic.terminal, description: "Command line interface and shell access" },
+      { keys: ["file", "document", "folder", "directory", "explorer", "pdf", "docx", "xlsx", "zip", "rar", "copy", "paste", "move", "rename", "delete file"],
+        id: "files", title: "Files", icon: ic.folder, description: "Browse and manage your files and folders" },
+      { keys: ["music", "song", "play", "playlist", "album", "artist", "audio", "mp3", "radio", "podcast", "beats", "dj", "sound", "volume"],
+        id: "music", title: "Music", icon: ic.music, description: "Listen to music, playlists, and audio" },
       { keys: ["weather", "temperature", "rain", "sunny", "cloudy", "forecast", "storm", "snow", "wind", "humidity", "celsius", "fahrenheit", "climate"],
-        response: `Currently 17° and partly cloudy in your area. Opening weather for details.`, actions: [{ label: "Open Weather", action: "weather" }] },
-      // Calendar & Time
+        id: "weather", title: "Weather", icon: ic.cloud, description: "Check current weather and forecasts" },
       { keys: ["calendar", "schedule", "event", "meeting", "appointment", "date", "today", "tomorrow", "week", "month", "birthday", "deadline", "planner", "agenda"],
-        response: `Today is ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}. Opening calendar.`, actions: [{ label: "Open Calendar", action: "calendar" }] },
-      // Clock
+        id: "calendar", title: "Calendar", icon: ic.calendar, description: "Manage events, schedule, and reminders" },
       { keys: ["alarm", "clock", "timer", "stopwatch", "time", "reminder", "world clock", "countdown"],
-        response: "Opening Clock app.", actions: [{ label: "Open Clock", action: "clock" }] },
-      // Calculator
+        id: "clock", title: "Clock", icon: ic.clock, description: "Alarms, timers, stopwatch, and world clock" },
       { keys: ["calculator", "calculate", "math", "add", "subtract", "multiply", "divide", "sum", "percentage", "convert"],
-        response: "Opening Calculator.", actions: [{ label: "Open Calculator", action: "calculator" }] },
-      // Accounts
+        id: "calculator", title: "Calculator", icon: ic.calc, description: "Perform calculations and conversions" },
       { keys: ["account", "login", "password", "credential", "saved account", "sign in", "profile", "username"],
-        response: "Opening your saved accounts.", actions: [{ label: "Open Accounts", action: "accounts" }] },
-      // Downloads
+        id: "accounts", title: "Accounts", icon: ic.user, description: "Manage your saved accounts and credentials" },
       { keys: ["download", "upload", "install", "update", "package", "setup", "installer", "transfer"],
-        response: "Opening Downloads & Install manager.", actions: [{ label: "Open Downloads", action: "downloads" }] },
-      // Notes & Writing
+        id: "downloads", title: "Downloads", icon: ic.download, description: "Downloads and install manager" },
       { keys: ["note", "write", "memo", "todo", "checklist", "list", "journal", "diary", "scratch", "jot", "brainstorm", "idea"],
-        response: "Opening Notes for you.", actions: [{ label: "Open Notes", action: "notes" }] },
-      // Word & Documents
+        id: "notes", title: "Notes", icon: ic.note, description: "Quick notes, memos, and to-do lists" },
       { keys: ["word", "document", "letter", "essay", "report", "resume", "cv", "thesis", "article", "blog", "paper", "manuscript", "format", "paragraph", "font", "bold", "italic", "heading"],
-        response: "Opening Alternus Word for document editing.", actions: [{ label: "Open Word", action: "word" }] },
-      // Settings & System
-      { keys: ["setting", "config", "theme", "dark mode", "light mode", "wifi", "bluetooth", "network", "display", "brightness", "language", "notification", "privacy", "security", "update", "system", "preference", "account", "password", "storage", "battery"],
-        response: "Opening settings.", actions: [{ label: "Open Settings", action: "settings" }] },
-      // Store & Shopping
-      { keys: ["store", "shop", "buy", "purchase", "app store", "download app", "install", "marketplace", "shopping", "cart", "order", "product", "price", "deal", "sale", "discount", "ecommerce"],
-        response: "Opening the Store for you.", actions: [{ label: "Open Store", action: "store" }] },
-      // Movies & Video
+        id: "word", title: "Alternus Word", icon: ic.fileText, description: "Create and edit documents" },
+      { keys: ["setting", "config", "theme", "dark mode", "light mode", "wifi", "bluetooth", "network", "display", "brightness", "language", "notification", "privacy", "security", "system", "preference", "storage", "battery"],
+        id: "settings", title: "Settings", icon: ic.settings, description: "System settings and preferences" },
+      { keys: ["store", "shop", "buy", "purchase", "app store", "download app", "marketplace", "shopping", "cart", "order", "product", "price", "deal", "sale", "discount", "ecommerce"],
+        id: "store", title: "Store", icon: ic.store, description: "Browse and install apps" },
       { keys: ["movie", "film", "video", "watch", "stream", "cinema", "series", "tv show", "anime", "documentary", "trailer", "imdb", "popcorn", "subtitle", "episode", "season"],
-        response: "Opening Movies. What would you like to watch?", actions: [{ label: "Open Movies", action: "movies" }] },
-      // AI Chat
-      { keys: ["ai", "chat", "assistant", "help me", "ask", "question", "explain", "translate", "summarize", "generate", "create", "analyze", "solve", "calculate", "math", "gpt", "claude", "chatbot", "conversation"],
-        response: "I'm here to help! Opening AI Chat.", actions: [{ label: "Open AI Chat", action: "ai" }] },
-      // Design & Illustration
+        id: "movies", title: "Movies", icon: ic.film, description: "Watch movies, series, and videos" },
+      { keys: ["ai", "chat", "assistant", "help me", "ask", "question", "explain", "translate", "summarize", "generate", "create", "analyze", "solve", "gpt", "claude", "chatbot", "conversation"],
+        id: "ai", title: "Alternus AI", icon: ic.sparkle, description: "AI-powered assistant and chat" },
       { keys: ["illustrator", "design", "draw", "paint", "sketch", "art", "photoshop", "figma", "canvas", "graphic", "logo", "icon", "illustration", "vector", "pixel", "color", "gradient", "brush", "layer"],
-        response: "For design work, I recommend opening the Code Editor for SVG/CSS design, or the Browser for Figma.", actions: [{ label: "Open Code Editor", action: "code" }, { label: "Open Browser", action: "browser" }] },
+        id: "code", title: "Code Editor", icon: ic.code, description: "SVG/CSS design and creative coding", extra: { id: "browser", title: "Browser", icon: ic.globe, description: "Open Figma or design tools in browser" } },
     ];
 
     // ━━━ SEMANTIC FILE SEARCH ━━━
@@ -4993,13 +4977,19 @@ export default function AlternusOS() {
     }
 
     // ━━━ MATCH APP KEYWORDS ━━━
+    const matchedApps: { id: WinId; title: string; icon: string; description: string }[] = [];
     for (const entry of appMap) {
-      const match = entry.keys.some(k => q.includes(k));
-      if (match) {
-        setAiResponse(entry.response);
-        setAiActions(entry.actions);
-        return;
+      if (entry.keys.some(k => q.includes(k))) {
+        matchedApps.push({ id: entry.id, title: entry.title, icon: entry.icon, description: entry.description });
+        if (entry.extra) matchedApps.push(entry.extra);
+        break;
       }
+    }
+    if (matchedApps.length > 0) {
+      setAiAppResults(matchedApps);
+      setAiResponse(null); setAiActions([]);
+      setAiInput("");
+      return;
     }
 
     // ━━━ AI CONTENT CREATION ━━━
@@ -5481,6 +5471,49 @@ export default function AlternusOS() {
                 <I d={ic.send} s={16} c="#fff" />
               </button>
             </div>
+
+            {/* App search results - separate cards */}
+            {aiAppResults.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {aiAppResults.map((app, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-4 px-4 py-3 rounded-2xl"
+                    style={{
+                      background: c.surface,
+                      border: `1px solid ${c.border}`,
+                      boxShadow: mode === "dark" ? "0 2px 12px rgba(0,0,0,0.12)" : "0 2px 12px rgba(0,0,0,0.04)",
+                    }}
+                  >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: c.accentSoft }}>
+                      <I d={app.icon} s={20} c={c.accentText} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold" style={{ color: c.text }}>{app.title}</p>
+                      <p className="text-xs" style={{ color: c.textMuted }}>{app.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => { openWin(app.id); setAiAppResults([]); }}
+                        className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all hover:opacity-90"
+                        style={{ background: c.accent, color: "#fff" }}
+                      >
+                        Open
+                      </button>
+                      <button
+                        onClick={() => setAiAppResults(prev => prev.filter((_, j) => j !== i))}
+                        className="px-3 py-1.5 rounded-lg text-xs transition-colors"
+                        style={{ color: c.textMuted }}
+                        onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* AI response - separate below */}
             {aiResponse && (
