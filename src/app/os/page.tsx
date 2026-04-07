@@ -658,13 +658,50 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
     setInput("");
   };
 
-  const landingChips = [
-    { label: "Explore gallery", icon: ic.image },
-    { label: "Art styles", icon: ic.sparkle },
-    { label: "Commission art", icon: ic.pen },
-    { label: "Help me choose", icon: ic.search },
-    { label: "Art care tips", icon: ic.shield },
+  const defaultChips = [
+    { id: "explore-gallery", label: "Explore gallery", icon: ic.image },
+    { id: "art-styles", label: "Art styles", icon: ic.sparkle },
+    { id: "commission-art", label: "Commission art", icon: ic.pen },
+    { id: "help-choose", label: "Help me choose", icon: ic.search },
+    { id: "art-care", label: "Art care tips", icon: ic.shield },
   ];
+
+  const addableChips = [
+    { id: "generate-image", label: "Generate image", icon: ic.sparkle },
+    { id: "art-news", label: "Art news today", icon: ic.globe },
+    { id: "price-guide", label: "Art price guide", icon: ic.store },
+    { id: "frame-advice", label: "Framing advice", icon: ic.image },
+    { id: "color-palette", label: "Color palette ideas", icon: ic.pen },
+    { id: "gift-ideas", label: "Art gift ideas", icon: ic.store },
+  ];
+
+  const [landingChips, setLandingChips] = useState(defaultChips);
+  const [showAddMenu, setShowAddMenu] = useState(false);
+
+  // Load chips from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("alternus_os_chips");
+      if (saved) setLandingChips(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  // Persist chips
+  useEffect(() => {
+    localStorage.setItem("alternus_os_chips", JSON.stringify(landingChips));
+  }, [landingChips]);
+
+  const removeChip = (id: string) => {
+    setLandingChips(prev => prev.filter(ch => ch.id !== id));
+  };
+
+  const addChip = (chip: typeof defaultChips[0]) => {
+    setLandingChips(prev => {
+      if (prev.some(ch => ch.id === chip.id)) return prev;
+      return [...prev, chip];
+    });
+    setShowAddMenu(false);
+  };
 
   const appKeywords: { keywords: string[]; id: WinId; label: string }[] = [
     { keywords: ["browser", "web", "internet", "browse"], id: "browser", label: "Browser" },
@@ -780,17 +817,68 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
               </div>
 
               {/* App shortcut chips */}
-              <div className="flex flex-wrap gap-2 justify-center">
+              <div className="flex flex-wrap gap-2 justify-center items-center">
                 {landingChips.map(chip => (
-                  <button key={chip.label} onClick={() => send(chip.label)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[12px] transition-colors"
-                    style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}
-                    onMouseEnter={e => { e.currentTarget.style.background = c.border; e.currentTarget.style.color = c.text; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.textSec; }}>
-                    <I d={chip.icon} s={14} />
-                    {chip.label}
-                  </button>
+                  <div key={chip.id} className="relative group inline-flex">
+                    <button onClick={() => send(chip.label)}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[12px] transition-colors"
+                      style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}
+                      onMouseEnter={e => { e.currentTarget.style.background = c.border; e.currentTarget.style.color = c.text; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.textSec; }}>
+                      <I d={chip.icon} s={14} />
+                      {chip.label}
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); removeChip(chip.id); }}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
+                      style={{ background: "#ef4444" }}
+                      title="Remove"
+                    >
+                      <I d={ic.close} s={10} c="#fff" />
+                    </button>
+                  </div>
                 ))}
+
+                {/* Add chip button */}
+                <div className="relative">
+                  <button onClick={() => setShowAddMenu(!showAddMenu)}
+                    className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
+                    style={{ border: `2px dashed ${c.border}`, color: c.textMuted }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = c.accent; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textMuted; }}
+                    title="Add quick action"
+                  >
+                    <I d={ic.plus} s={16} />
+                  </button>
+
+                  {/* Add menu dropdown */}
+                  {showAddMenu && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setShowAddMenu(false)} />
+                      <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-52 rounded-xl py-1 shadow-xl z-20"
+                        style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                        <p className="px-3 py-2 text-[11px] font-medium" style={{ color: c.textMuted }}>Add quick action</p>
+                        <div style={{ height: 1, background: c.border }} />
+                        {addableChips.filter(a => !landingChips.some(ch => ch.id === a.id)).length === 0 ? (
+                          <p className="px-3 py-3 text-[11px] text-center" style={{ color: c.textMuted }}>All actions added</p>
+                        ) : (
+                          addableChips
+                            .filter(a => !landingChips.some(ch => ch.id === a.id))
+                            .map(chip => (
+                              <button key={chip.id} onClick={() => addChip(chip)}
+                                className="w-full flex items-center gap-2 px-3 py-2.5 text-[12px] transition-colors text-left"
+                                style={{ color: c.textSec }}
+                                onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                                <I d={ic.plus} s={14} c={c.textMuted} />
+                                {chip.label}
+                              </button>
+                            ))
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
