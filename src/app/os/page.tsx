@@ -317,6 +317,8 @@ function AppWindow({
   onResize,
   onSnap,
   onForceQuit,
+  onSnapPreview,
+  onFileDrop,
 }: {
   win: WinState;
   c: typeof palette.dark;
@@ -327,11 +329,14 @@ function AppWindow({
   onFocus: () => void;
   onMove: (x: number, y: number) => void;
   onResize?: (w: number, h: number) => void;
-  onSnap?: (side: "left" | "right") => void;
+  onSnap?: (side: "left" | "right" | "top") => void;
   onForceQuit?: () => void;
+  onSnapPreview?: (zone: "left" | "right" | "top" | null) => void;
+  onFileDrop?: (name: string) => void;
 }) {
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (win.isMaximized) return;
@@ -340,16 +345,24 @@ function AppWindow({
     onFocus();
 
     const move = (ev: MouseEvent) => {
-      if (dragging.current) {
-        onMove(ev.clientX - offset.current.x, ev.clientY - offset.current.y);
+      if (!dragging.current) return;
+      onMove(ev.clientX - offset.current.x, ev.clientY - offset.current.y);
+      // Snap preview
+      if (onSnapPreview) {
+        if (ev.clientX <= 8) onSnapPreview("left");
+        else if (ev.clientX >= window.innerWidth - 8) onSnapPreview("right");
+        else if (ev.clientY <= 8) onSnapPreview("top");
+        else onSnapPreview(null);
       }
     };
     const up = (ev: MouseEvent) => {
       dragging.current = false;
+      if (onSnapPreview) onSnapPreview(null);
       // Snap to edges
       if (onSnap) {
-        if (ev.clientX <= 5) onSnap("left");
-        else if (ev.clientX >= window.innerWidth - 5) onSnap("right");
+        if (ev.clientX <= 8) onSnap("left");
+        else if (ev.clientX >= window.innerWidth - 8) onSnap("right");
+        else if (ev.clientY <= 8) onSnap("top");
       }
       document.removeEventListener("mousemove", move);
       document.removeEventListener("mouseup", up);
@@ -398,18 +411,21 @@ function AppWindow({
       style={{
         ...style,
         background: isAI ? "transparent" : c.bg,
-        border: isAI ? "none" : `1px solid ${c.border}`,
+        border: isAI ? "none" : isDragOver ? `1px solid ${c.accent}` : `1px solid ${c.border}`,
         borderRadius: 16,
         boxShadow: isAI ? "none" : "0 4px 16px rgba(0,0,0,0.12)",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
-        transition: "box-shadow 0.2s ease",
+        transition: "box-shadow 0.2s ease, border-color 0.15s ease",
         pointerEvents: isAI ? "none" : "auto",
       }}
       onMouseEnter={e => { if (!isAI) { e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.24)"; } }}
       onMouseLeave={e => { if (!isAI) { e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)"; } }}
       onClick={isAI ? undefined : onFocus}
+      onDragOver={onFileDrop ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; setIsDragOver(true); } : undefined}
+      onDragLeave={onFileDrop ? () => setIsDragOver(false) : undefined}
+      onDrop={onFileDrop ? (e) => { e.preventDefault(); setIsDragOver(false); const name = e.dataTransfer.getData("text/plain"); if (name) onFileDrop(name); } : undefined}
     >
       {!isAI && <TitleBar
         title={win.title}
@@ -424,6 +440,15 @@ function AppWindow({
       <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: isAI ? 0 : "6px", pointerEvents: isAI ? "auto" : undefined }}>
         <div style={{ background: isAI ? "transparent" : c.surface, borderRadius: isAI ? 0 : 12, border: isAI ? "none" : `1px solid ${c.border}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
+        {/* Drag-over file drop overlay */}
+        {isDragOver && onFileDrop && (
+          <div className="absolute inset-0 flex items-center justify-center z-[50] pointer-events-none" style={{ background: "rgba(59,130,246,0.12)", border: "2px dashed rgba(59,130,246,0.5)", borderRadius: 10 }}>
+            <div className="flex flex-col items-center gap-2">
+              <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="rgba(96,165,250,0.9)" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" /></svg>
+              <span className="text-[11px] font-medium" style={{ color: "rgba(96,165,250,0.9)" }}>Drop file here</span>
+            </div>
+          </div>
+        )}
         {/* Frozen overlay */}
         {win.isFrozen && (
           <div className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.5)", zIndex: 999 }}>
@@ -2148,7 +2173,7 @@ function WordApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
-function FilesApp({ c, onOpenApp, onTrashEmpty }: { c: typeof palette.dark; onOpenApp: (id: WinId) => void; onTrashEmpty?: (files: { name: string; icon: string; size: string; origin: string }[]) => void }) {
+function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palette.dark; onOpenApp: (id: WinId) => void; onTrashEmpty?: (files: { name: string; icon: string; size: string; origin: string }[]) => void; onDragFile?: (name: string) => void }) {
   const [currentPath, setCurrentPath] = useState<string[]>(["Home"]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -2381,7 +2406,9 @@ function FilesApp({ c, onOpenApp, onTrashEmpty }: { c: typeof palette.dark; onOp
           </div>
 
           {filteredFiles.map((f, i) => (
-            <div key={i} className="relative">
+            <div key={i} className="relative"
+              draggable={f.type === "file"}
+              onDragStart={e => { if (f.type === "file") { e.dataTransfer.setData("text/plain", f.name); e.dataTransfer.effectAllowed = "copy"; if (onDragFile) onDragFile(f.name); } }}>
               <button className="w-full flex items-center gap-4 px-4 py-2 rounded-lg text-left transition-colors"
                 style={{ background: selectedFile === f.name ? c.accentSoft : "transparent", minHeight: 40 }}
                 onMouseEnter={e => { if (selectedFile !== f.name) e.currentTarget.style.background = c.cardAlt; }}
@@ -5782,6 +5809,9 @@ export default function AlternusOS() {
   const [spotlightQuery, setSpotlightQuery] = useState("");
   const [activeSpace, setActiveSpace] = useState(1);
   const [showSpacesView, setShowSpacesView] = useState(false);
+  const [draggedFile, setDraggedFile] = useState<string | null>(null);
+  const [snapPreview, setSnapPreview] = useState<"left" | "right" | "top" | null>(null);
+  const savePosTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastMouseMove = useRef(Date.now());
 
   const c = palette[mode];
@@ -5821,6 +5851,32 @@ export default function AlternusOS() {
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
+
+  // Load saved window positions from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("alternus-win-pos") || "[]") as { id: string; x: number; y: number; w: number; h: number; isMaximized: boolean }[];
+      if (saved.length > 0) {
+        setWins(cur => cur.map(w => {
+          const s = saved.find(sv => sv.id === w.id);
+          return s ? { ...w, x: s.x, y: s.y, w: s.w, h: s.h, isMaximized: s.isMaximized } : w;
+        }));
+      }
+    } catch { /* ignore */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist window positions to localStorage (debounced 600ms)
+  useEffect(() => {
+    if (savePosTimer.current) clearTimeout(savePosTimer.current);
+    savePosTimer.current = setTimeout(() => {
+      try {
+        const toSave = wins.map(w => ({ id: w.id, x: w.x, y: w.y, w: w.w, h: w.h, isMaximized: w.isMaximized }));
+        localStorage.setItem("alternus-win-pos", JSON.stringify(toSave));
+      } catch { /* ignore */ }
+    }, 600);
+    return () => { if (savePosTimer.current) clearTimeout(savePosTimer.current); };
+  }, [wins]);
 
   useEffect(() => {
     const iv = setInterval(() => setTime(new Date()), 1000);
@@ -5977,7 +6033,11 @@ export default function AlternusOS() {
     setWins(p => p.map(win => win.id === id ? { ...win, w, h } : win));
   }, []);
 
-  const snapWin = useCallback((id: WinId, side: "left" | "right") => {
+  const snapWin = useCallback((id: WinId, side: "left" | "right" | "top") => {
+    if (side === "top") {
+      setWins(p => p.map(w => w.id === id ? { ...w, isMaximized: true } : w));
+      return;
+    }
     const hw = Math.floor(window.innerWidth / 2);
     const fh = window.innerHeight - 36; // minus top bar
     setWins(p => p.map(w => w.id === id ? { ...w, x: side === "left" ? 0 : hw, y: 0, w: hw, h: fh, isMaximized: false } : w));
@@ -6082,21 +6142,47 @@ export default function AlternusOS() {
           setTaskSwitcherIdx(prev => (prev + 1) % openWins.length);
         }
       }
-      // Spotlight: Ctrl+K
+      // Spotlight: Ctrl+K or Cmd+Space
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
         setShowSpotlight(p => !p);
         setSpotlightQuery("");
       }
-      // Escape closes spotlight
+      if ((e.ctrlKey || e.metaKey) && e.key === " ") {
+        e.preventDefault();
+        setShowSpotlight(p => !p);
+        setSpotlightQuery("");
+      }
+      // Escape closes spotlight / spaces / panels
       if (e.key === "Escape") {
         setShowSpotlight(false);
         setShowSpacesView(false);
+        setShowApps(false);
+        setShowNotifications(false);
+        setShowWifiPanel(false);
+        setShowProfilePanel(false);
       }
       // Ctrl+1/2/3 switch spaces
       if ((e.ctrlKey || e.metaKey) && ["1", "2", "3"].includes(e.key)) {
         e.preventDefault();
         setActiveSpace(parseInt(e.key));
+      }
+      // Cmd+W — close focused (highest z) open window
+      if ((e.ctrlKey || e.metaKey) && e.key === "w") {
+        e.preventDefault();
+        const topWin = [...wins].filter(w => w.isOpen && !w.isMinimized).sort((a, b) => b.zIndex - a.zIndex)[0];
+        if (topWin) closeWinWithAI(topWin.id);
+      }
+      // Cmd+M — minimize focused window
+      if ((e.ctrlKey || e.metaKey) && e.key === "m") {
+        e.preventDefault();
+        const topWin = [...wins].filter(w => w.isOpen && !w.isMinimized).sort((a, b) => b.zIndex - a.zIndex)[0];
+        if (topWin) minimizeWin(topWin.id);
+      }
+      // Cmd+H — hide all windows (show desktop)
+      if ((e.ctrlKey || e.metaKey) && e.key === "h") {
+        e.preventDefault();
+        setWins(p => p.map(w => w.isOpen && !w.isMinimized ? { ...w, isMinimized: true } : w));
       }
     };
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -6298,7 +6384,7 @@ export default function AlternusOS() {
     ai: <AIChat c={c} mode={mode} setMode={setMode} onOpenApp={openWin} />,
     terminal: <TerminalApp c={c} />,
     code: <CodeApp c={c} />,
-    files: <FilesApp c={c} onOpenApp={openWin} onTrashEmpty={handleTrashEmpty} />,
+    files: <FilesApp c={c} onOpenApp={openWin} onTrashEmpty={handleTrashEmpty} onDragFile={name => setDraggedFile(name)} />,
     settings: <SettingsApp c={c} mode={mode} setMode={setMode} wallpaper={wallpaper} setWallpaper={setWallpaper} />,
     music: <MusicApp c={c} />,
     weather: <WeatherApp c={c} />,
@@ -6640,6 +6726,25 @@ export default function AlternusOS() {
         onContextMenu={e => { e.preventDefault(); setContextMenu({ x: e.clientX, y: e.clientY - 36 }); setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setShowAISidebar(false); }}>
 
 
+        {/* ━━━━ Snap Preview Overlay ━━━━ */}
+        {snapPreview && (
+          <div className="absolute pointer-events-none z-[90] transition-all duration-150" style={{
+            ...(snapPreview === "left"  ? { top: 0, left: 0, width: "50%", bottom: 0 } :
+                snapPreview === "right" ? { top: 0, right: 0, width: "50%", bottom: 0 } :
+                                          { top: 0, left: 0, right: 0, bottom: 0 }),
+            background: "rgba(59,130,246,0.15)",
+            border: "2px solid rgba(59,130,246,0.5)",
+            borderRadius: 12,
+            margin: 4,
+          }}>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-[11px] font-medium px-3 py-1.5 rounded-lg" style={{ background: "rgba(59,130,246,0.8)", color: "#fff" }}>
+                {snapPreview === "top" ? "Maximize" : `Snap ${snapPreview}`}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* ━━━━ Spotlight Search Overlay ━━━━ */}
         {showSpotlight && (
           <div className="absolute inset-0 z-[500] flex items-start justify-center pt-16" style={{ background: "rgba(0,0,0,0.45)" }}
@@ -6732,7 +6837,14 @@ export default function AlternusOS() {
               </div>
               <div className="px-5 py-2 flex items-center gap-4 text-[10px]" style={{ borderTop: `1px solid ${c.border}`, color: c.textMuted }}>
                 <span>↑↓ Navigate</span><span>↵ Open</span><span>ESC Dismiss</span>
-                <span className="ml-auto">Ctrl+K</span>
+                <div className="ml-auto flex gap-2">
+                  {[["⌘Space","Spotlight"],["⌘W","Close"],["⌘M","Min"],["⌘H","Hide all"]].map(([k,l]) => (
+                    <span key={k} className="flex items-center gap-1">
+                      <span className="px-1 rounded font-mono" style={{ background: c.cardAlt }}>{k}</span>
+                      <span>{l}</span>
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -7061,6 +7173,13 @@ export default function AlternusOS() {
             onResize={(nw, nh) => resizeWin(w.id, nw, nh)}
             onSnap={(side) => snapWin(w.id, side)}
             onForceQuit={() => forceQuitWin(w.id)}
+            onSnapPreview={zone => setSnapPreview(zone)}
+            onFileDrop={draggedFile && (w.id === "terminal" || w.id === "notes" || w.id === "word" || w.id === "code") ? (name) => {
+              setDraggedFile(null);
+              // Notify user with a system modal
+              setSystemModal({ type: "info", title: "File Dropped", message: `"${name}" opened in ${w.title}.` });
+              setTimeout(() => setSystemModal(null), 2000);
+            } : undefined}
           >
             {winContent[w.id]}
           </AppWindow>
@@ -7246,26 +7365,9 @@ export default function AlternusOS() {
             <div className="my-1 mx-3 h-px" style={{ background: c.border }} />
             <div className="py-1 px-1.5">
               {[
-                { icon: ic.plus, label: "New", shortcut: "›" },
-                { icon: ic.folder, label: "New Folder", shortcut: "" },
-              ].map((item, i) => (
-                <button key={i} onClick={() => setContextMenu(null)}
-                  className="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-left transition-colors"
-                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <I d={item.icon} s={14} c={c.textMuted} />
-                  <span className="flex-1 text-[11px]" style={{ color: c.text }}>{item.label}</span>
-                  {item.shortcut && <span className="text-[10px]" style={{ color: c.textMuted }}>{item.shortcut}</span>}
-                </button>
-              ))}
-            </div>
-            <div className="my-1 mx-3 h-px" style={{ background: c.border }} />
-            <div className="py-1 px-1.5">
-              {[
-                { icon: ic.image, label: "Change wallpaper", action: () => setContextMenu(null) },
-                { icon: ic.monitor, label: "Display settings", action: () => { openWin("settings"); setContextMenu(null); } },
-                { icon: ic.pen, label: "Personalize", action: () => { openWin("settings"); setContextMenu(null); } },
-                { icon: ic.terminal, label: "Open in Terminal", action: () => { openWin("terminal"); setContextMenu(null); } },
+                { icon: ic.note, label: "New Note", action: () => { openWin("notes"); setContextMenu(null); } },
+                { icon: ic.folder, label: "New Folder", action: () => { openWin("files"); setContextMenu(null); } },
+                { icon: ic.fileText, label: "New Document", action: () => { openWin("word"); setContextMenu(null); } },
               ].map((item, i) => (
                 <button key={i} onClick={item.action}
                   className="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-left transition-colors"
@@ -7273,6 +7375,24 @@ export default function AlternusOS() {
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <I d={item.icon} s={14} c={c.textMuted} />
                   <span className="flex-1 text-[11px]" style={{ color: c.text }}>{item.label}</span>
+                </button>
+              ))}
+            </div>
+            <div className="my-1 mx-3 h-px" style={{ background: c.border }} />
+            <div className="py-1 px-1.5">
+              {[
+                { icon: ic.image, label: "Change wallpaper", action: () => { setWallpaper(p => (p + 1) % 6); setContextMenu(null); } },
+                { icon: ic.monitor, label: "Display settings", action: () => { openWin("settings"); setContextMenu(null); } },
+                { icon: ic.terminal, label: "Open Terminal", action: () => { openWin("terminal"); setContextMenu(null); }, shortcut: "" },
+                { icon: ic.search, label: "Spotlight", action: () => { setShowSpotlight(true); setContextMenu(null); }, shortcut: "⌘Space" },
+              ].map((item, i) => (
+                <button key={i} onClick={item.action}
+                  className="w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-left transition-colors"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={item.icon} s={14} c={c.textMuted} />
+                  <span className="flex-1 text-[11px]" style={{ color: c.text }}>{item.label}</span>
+                  {(item as {shortcut?: string}).shortcut && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded" style={{ background: c.cardAlt, color: c.textMuted }}>{(item as {shortcut?: string}).shortcut}</span>}
                 </button>
               ))}
             </div>
