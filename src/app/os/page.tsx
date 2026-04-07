@@ -387,12 +387,15 @@ function AppWindow({
         ...style,
         background: isAI ? "transparent" : c.bg,
         border: isAI ? "none" : `1px solid ${c.border}`,
-        borderRadius: win.isMaximized ? 0 : 12,
+        borderRadius: win.isMaximized ? 0 : 16,
         boxShadow: isAI ? "none" : "0 4px 16px rgba(0,0,0,0.12)",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
+        transition: "border-color 0.2s ease, box-shadow 0.2s ease",
       }}
+      onMouseEnter={e => { if (!isAI) { e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.24)"; } }}
+      onMouseLeave={e => { if (!isAI) { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)"; } }}
       onClick={onFocus}
     >
       {!isAI && <TitleBar
@@ -406,7 +409,7 @@ function AppWindow({
         onForceQuit={onForceQuit}
       />}
       <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: isAI ? 0 : "6px" }}>
-        <div style={{ background: isAI ? "transparent" : c.surface, borderRadius: isAI ? 0 : 16, border: isAI ? "none" : `1px solid ${c.cardAlt}`, height: "100%", overflow: "auto", position: "relative" }}>
+        <div style={{ background: isAI ? "transparent" : c.surface, borderRadius: isAI ? 0 : 12, border: isAI ? "none" : `1px solid ${c.border}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
         {/* Frozen overlay */}
         {win.isFrozen && (
