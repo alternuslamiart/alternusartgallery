@@ -5820,7 +5820,7 @@ export default function AlternusOS() {
 
             {/* App search results - separate cards */}
             {aiAppResults.length > 0 && (
-              <div className="mt-3 space-y-2">
+              <div className="mt-3 space-y-2 pointer-events-auto">
                 {aiAppResults.map((app, i) => (
                   <div
                     key={i}
