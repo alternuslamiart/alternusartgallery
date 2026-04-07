@@ -5397,8 +5397,8 @@ export default function AlternusOS() {
             </div>
           </div>
 
-        {/* Center: Alternus branding + AI Search - hidden when AI window is open */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-[0] pointer-events-none" style={{ display: wins.find(w => w.id === "ai")?.isOpen && !wins.find(w => w.id === "ai")?.isMinimized ? "none" : "flex" }}>
+        {/* Center: Alternus branding + AI Search - hidden when any window is open */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-[0] pointer-events-none" style={{ display: wins.some(w => w.isOpen && !w.isMinimized) ? "none" : "flex" }}>
           {/* AI Creation frame - appears above Alternus text */}
           {aiCreation && (
             <div className="w-full max-w-2xl mb-6 px-4 pointer-events-auto">
