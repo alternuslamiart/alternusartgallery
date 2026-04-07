@@ -4600,69 +4600,88 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
   const currentArticles = articles[activeCategory] || articles.top;
   const toggleSave = (id: number) => setSavedArticles(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
 
+  const sourceColors: Record<string, string> = {
+    "Reuters": "#F97316", "Bloomberg": "#FBBF24", "Nature": "#34D399",
+    "AP News": "#F87171", "Space.com": "#60A5FA", "ESPN": "#A78BFA",
+    "The Verge": "#EC4899", "Wired": "#06B6D4", "TechCrunch": "#22C55E",
+    "Ars Technica": "#F59E0B", "BBC": "#E11D48", "NHK": "#EF4444",
+    "DW News": "#3B82F6", "Al Jazeera": "#10B981", "CNBC": "#FBBF24",
+    "Forbes": "#F97316", "WSJ": "#6366F1", "NASA": "#60A5FA",
+    "The Lancet": "#F472B6", "Science": "#34D399", "BBC Sport": "#E11D48",
+    "Sports Illustrated": "#F97316",
+  };
+
   return (
     <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      {/* Breaking news ticker */}
+      {/* Breaking news bar — solid red */}
       {currentArticles.some(a => a.breaking) && (
-        <div className="px-4 py-1.5 flex items-center gap-2 flex-shrink-0" style={{ background: "rgba(239,68,68,0.08)", borderBottom: `1px solid rgba(239,68,68,0.15)` }}>
-          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: c.danger, color: "#fff" }}>BREAKING</span>
-          <p className="text-[10px] font-medium truncate" style={{ color: c.danger }}>
+        <div className="px-3 py-1.5 flex items-center gap-2 flex-shrink-0" style={{ background: "#EF4444" }}>
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: "rgba(0,0,0,0.25)", color: "#fff" }}>BREAKING</span>
+          <p className="text-[10px] font-medium truncate" style={{ color: "#fff" }}>
             {currentArticles.find(a => a.breaking)?.title}
           </p>
         </div>
       )}
 
-      {/* Category tabs */}
-      <div className="flex items-center gap-0.5 px-3 py-2 flex-shrink-0 overflow-x-auto" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+      {/* Category tabs — underline style */}
+      <div className="flex items-center gap-0 px-2 flex-shrink-0 overflow-x-auto" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
         {categories.map(cat => (
           <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-            className="px-3 py-1.5 rounded-lg text-[10px] font-medium whitespace-nowrap transition-colors"
-            style={{ background: activeCategory === cat.id ? c.accentSoft : "transparent", color: activeCategory === cat.id ? c.accentText : c.textMuted }}
-            onMouseEnter={e => { if (activeCategory !== cat.id) e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { if (activeCategory !== cat.id) e.currentTarget.style.background = "transparent"; }}>
+            className="px-3 text-[10px] font-medium whitespace-nowrap transition-colors"
+            style={{
+              paddingTop: "8px",
+              paddingBottom: "8px",
+              background: "transparent",
+              borderRadius: 0,
+              color: activeCategory === cat.id ? c.text : c.textMuted,
+              borderBottom: activeCategory === cat.id ? `2px solid ${c.accent}` : "2px solid transparent",
+              marginBottom: "-1px",
+            }}
+            onMouseEnter={e => { if (activeCategory !== cat.id) (e.currentTarget.style.color = c.textSec); }}
+            onMouseLeave={e => { if (activeCategory !== cat.id) (e.currentTarget.style.color = c.textMuted); }}>
             {cat.label}
           </button>
         ))}
       </div>
 
-      {/* Articles */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2" style={{ scrollbarWidth: "none" }}>
-        {currentArticles.map(article => (
-          <div key={article.id} className="rounded-xl overflow-hidden transition-colors"
-            style={{ background: c.surface, border: `1px solid ${c.border}` }}
+      {/* Articles — flat rows with dividers */}
+      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+        {currentArticles.map((article, idx) => (
+          <div key={article.id}
+            className="px-4 py-3 transition-colors cursor-pointer"
+            style={{ borderBottom: idx < currentArticles.length - 1 ? `1px solid ${c.border}` : "none", background: "transparent" }}
             onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-            onMouseLeave={e => (e.currentTarget.style.background = c.surface)}>
-            <div className="px-4 py-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    {article.breaking && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: c.danger, color: "#fff" }}>LIVE</span>
-                    )}
-                    <span className="text-[9px] font-medium" style={{ color: c.accentText }}>{article.source}</span>
-                    <span className="text-[9px]" style={{ color: c.textMuted }}>· {article.time}</span>
-                  </div>
-                  <p className="text-[12px] font-semibold leading-snug mb-1.5" style={{ color: c.text }}>{article.title}</p>
-                  <p className="text-[10px] leading-relaxed" style={{ color: c.textSec }}>{article.summary}</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between mt-2.5 pt-2" style={{ borderTop: `1px solid ${c.border}` }}>
-                <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: c.cardAlt, color: c.textMuted }}>{article.category}</span>
-                <div className="flex items-center gap-1">
-                  <button onClick={() => toggleSave(article.id)}
-                    className="p-1 rounded-md transition-colors"
-                    style={{ color: savedArticles.has(article.id) ? c.accent : c.textMuted }}
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                    <I d={savedArticles.has(article.id) ? "M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" : "M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"} s={13}
-                      c={savedArticles.has(article.id) ? c.accent : undefined} />
-                  </button>
-                  <button className="p-1 rounded-md transition-colors" style={{ color: c.textMuted }}
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                    <I d={ic.share} s={13} />
-                  </button>
-                </div>
+            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            {/* Source + time */}
+            <div className="flex items-center gap-2 mb-1">
+              {article.breaking && (
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: "#16A34A", color: "#fff" }}>LIVE</span>
+              )}
+              <span className="text-[9px] font-semibold" style={{ color: sourceColors[article.source] ?? c.accentText }}>{article.source}</span>
+              <span className="text-[9px]" style={{ color: c.textMuted }}>{article.time}</span>
+            </div>
+            {/* Title */}
+            <p className="text-[12px] font-semibold leading-snug mb-1.5" style={{ color: c.text }}>{article.title}</p>
+            {/* Summary */}
+            <p className="text-[10px] leading-relaxed mb-2.5" style={{ color: c.textSec }}>{article.summary}</p>
+            {/* Category + icons */}
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: c.cardAlt, color: c.textMuted }}>{article.category}</span>
+              <div className="flex items-center gap-1">
+                <button onClick={(e) => { e.stopPropagation(); toggleSave(article.id); }}
+                  className="p-1 rounded-md transition-colors"
+                  style={{ color: savedArticles.has(article.id) ? c.accent : c.textMuted }}
+                  onMouseEnter={e => (e.currentTarget.style.background = c.border)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={13}
+                    c={savedArticles.has(article.id) ? c.accent : c.textMuted}
+                    f={savedArticles.has(article.id)} />
+                </button>
+                <button className="p-1 rounded-md transition-colors" style={{ color: c.textMuted }}
+                  onMouseEnter={e => (e.currentTarget.style.background = c.border)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={ic.share} s={13} />
+                </button>
               </div>
             </div>
           </div>
