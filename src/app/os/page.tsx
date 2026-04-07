@@ -4756,9 +4756,9 @@ export default function AlternusOS() {
   }, []);
 
   const snapWin = useCallback((id: WinId, side: "left" | "right") => {
-    const hw = Math.floor((window.innerWidth - 18) / 2);
-    const fh = window.innerHeight - 36 - 12; // minus top bar and padding
-    setWins(p => p.map(w => w.id === id ? { ...w, x: side === "left" ? 6 : 6 + hw + 6, y: 6, w: hw, h: fh, isMaximized: false } : w));
+    const hw = Math.floor(window.innerWidth / 2);
+    const fh = window.innerHeight - 36; // minus top bar
+    setWins(p => p.map(w => w.id === id ? { ...w, x: side === "left" ? 0 : hw, y: 0, w: hw, h: fh, isMaximized: false } : w));
   }, []);
 
   const forceQuitWin = useCallback((id: WinId) => {
