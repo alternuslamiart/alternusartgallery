@@ -392,10 +392,10 @@ function AppWindow({
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
-        transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+        transition: "box-shadow 0.2s ease",
       }}
-      onMouseEnter={e => { if (!isAI) { e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.24)"; } }}
-      onMouseLeave={e => { if (!isAI) { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)"; } }}
+      onMouseEnter={e => { if (!isAI) { e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.24)"; } }}
+      onMouseLeave={e => { if (!isAI) { e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)"; } }}
       onClick={onFocus}
     >
       {!isAI && <TitleBar
@@ -838,8 +838,8 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
                             .filter(a => !landingChips.some(ch => ch.id === a.id))
                             .map(chip => (
                               <button key={chip.id} onClick={() => addChip(chip)}
-                                className="w-full flex items-center gap-2 px-3 py-2.5 text-[12px] transition-colors text-left"
-                                style={{ color: c.textSec }}
+                                className="flex items-center gap-2 px-3 py-2.5 text-[12px] transition-colors text-left rounded-lg"
+                                style={{ color: c.textSec, margin: "2px 6px", width: "calc(100% - 12px)" }}
                                 onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
                                 onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
                                 <I d={ic.plus} s={14} c={c.textMuted} />
