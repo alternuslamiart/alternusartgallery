@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news";
 
 interface WinState {
   id: WinId;
@@ -211,6 +211,7 @@ const ic = {
   menu: "M3 12h18M3 6h18M3 18h18",
   trash: "M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6",
   voice: "M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8",
+  newspaper: "M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zM8 10h8M8 14h4M8 18h6M16 14h2v4h-2z",
   // Filled icon variants
   globeF: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z",
   codeF: "M16 18l6-6-6-6M8 6l-6 6 6 6",
@@ -4543,6 +4544,144 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
   );
 }
 
+// ━━━━ NEWS APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function NewsApp({ c }: { c: typeof palette.dark }) {
+  const [activeCategory, setActiveCategory] = useState("top");
+  const [savedArticles, setSavedArticles] = useState<Set<number>>(new Set());
+
+  const categories = [
+    { id: "top", label: "Top Stories" },
+    { id: "tech", label: "Technology" },
+    { id: "world", label: "World" },
+    { id: "business", label: "Business" },
+    { id: "science", label: "Science" },
+    { id: "sports", label: "Sports" },
+  ];
+
+  const articles: Record<string, { id: number; title: string; source: string; time: string; summary: string; category: string; breaking?: boolean; image?: string }[]> = {
+    top: [
+      { id: 1, title: "Global AI Summit Reaches Historic Agreement on Safety Standards", source: "Reuters", time: "12 min ago", summary: "World leaders have agreed on a landmark framework for AI safety, establishing international standards for development and deployment of advanced AI systems.", category: "Technology", breaking: true },
+      { id: 2, title: "Markets Surge as Central Banks Signal Rate Cuts", source: "Bloomberg", time: "45 min ago", summary: "Stock markets worldwide rally as major central banks indicate a coordinated shift toward monetary easing in the coming quarter.", category: "Business" },
+      { id: 3, title: "Scientists Discover New Method for Carbon Capture", source: "Nature", time: "1 hour ago", summary: "Researchers at MIT have developed a revolutionary carbon capture technique that is 10x more efficient than current methods.", category: "Science" },
+      { id: 4, title: "Historic Peace Deal Signed in Eastern Europe", source: "AP News", time: "2 hours ago", summary: "After months of negotiations, a comprehensive peace agreement has been signed, ending years of regional conflict.", category: "World" },
+      { id: 5, title: "SpaceX Launches Largest Satellite Constellation", source: "Space.com", time: "3 hours ago", summary: "SpaceX successfully deploys 120 next-generation satellites in a single mission, breaking its own record.", category: "Technology" },
+      { id: 6, title: "World Cup 2026 Venues Officially Announced", source: "ESPN", time: "4 hours ago", summary: "FIFA reveals the complete list of stadiums and host cities for the upcoming World Cup tournament.", category: "Sports" },
+    ],
+    tech: [
+      { id: 10, title: "Apple Unveils Revolutionary AR Glasses", source: "The Verge", time: "30 min ago", summary: "Apple's next-generation AR glasses feature holographic displays and all-day battery life, available next quarter.", category: "Technology", breaking: true },
+      { id: 11, title: "Quantum Computing Breakthrough Achieves Error Correction", source: "Wired", time: "2 hours ago", summary: "Google's quantum team demonstrates reliable error correction, bringing practical quantum computing years closer.", category: "Technology" },
+      { id: 12, title: "Open Source AI Model Surpasses GPT-5 Benchmarks", source: "TechCrunch", time: "3 hours ago", summary: "A community-developed open source model has outperformed leading proprietary AI systems across multiple benchmarks.", category: "Technology" },
+      { id: 13, title: "Cybersecurity Alert: Major Vulnerability Found in IoT Devices", source: "Ars Technica", time: "5 hours ago", summary: "Security researchers discover a critical flaw affecting millions of smart home devices worldwide.", category: "Technology" },
+      { id: 14, title: "Tesla Announces Fully Autonomous Robotaxi Service", source: "Reuters", time: "6 hours ago", summary: "Tesla begins rolling out its driverless taxi service in three major US cities starting next month.", category: "Technology" },
+    ],
+    world: [
+      { id: 20, title: "UN General Assembly Adopts Climate Emergency Resolution", source: "BBC", time: "1 hour ago", summary: "The United Nations passes a sweeping resolution declaring a global climate emergency with binding commitments.", category: "World", breaking: true },
+      { id: 21, title: "Japan Launches New Bullet Train Connecting Tokyo to Osaka in 1 Hour", source: "NHK", time: "3 hours ago", summary: "The next-generation maglev train begins commercial operations, cutting travel time by more than half.", category: "World" },
+      { id: 22, title: "EU Passes Comprehensive Digital Privacy Framework", source: "DW News", time: "5 hours ago", summary: "The European Union enacts the most stringent digital privacy protections in history, affecting global tech companies.", category: "World" },
+      { id: 23, title: "African Union Launches Continental Free Trade Zone", source: "Al Jazeera", time: "7 hours ago", summary: "The world's largest free trade area officially begins operations, connecting 1.3 billion people.", category: "World" },
+    ],
+    business: [
+      { id: 30, title: "Nvidia Becomes World's Most Valuable Company", source: "CNBC", time: "1 hour ago", summary: "Nvidia's market cap surpasses $4 trillion as AI chip demand continues to soar beyond expectations.", category: "Business", breaking: true },
+      { id: 31, title: "Global Startup Funding Rebounds to Record Highs", source: "Forbes", time: "3 hours ago", summary: "Venture capital investments surge 40% year-over-year, with AI and cleantech leading the charge.", category: "Business" },
+      { id: 32, title: "Amazon Opens First Fully Automated Warehouse", source: "WSJ", time: "5 hours ago", summary: "The facility operates with zero human workers, processing 100,000 packages per day using advanced robotics.", category: "Business" },
+    ],
+    science: [
+      { id: 40, title: "James Webb Telescope Discovers Signs of Life on Exoplanet", source: "NASA", time: "2 hours ago", summary: "Atmospheric analysis reveals biosignature gases on a planet 40 light-years away, the strongest evidence yet of extraterrestrial life.", category: "Science", breaking: true },
+      { id: 41, title: "CRISPR Gene Therapy Cures Hereditary Blindness in Trial", source: "The Lancet", time: "4 hours ago", summary: "A landmark clinical trial successfully restores vision in patients with inherited retinal disease using gene editing.", category: "Science" },
+      { id: 42, title: "Fusion Reactor Achieves Net Energy Gain for 24 Hours", source: "Science", time: "6 hours ago", summary: "European researchers sustain a net-positive fusion reaction for a full day, a major milestone toward clean energy.", category: "Science" },
+    ],
+    sports: [
+      { id: 50, title: "Champions League Final: Historic Comeback Stuns Europe", source: "ESPN", time: "1 hour ago", summary: "In one of the greatest finals ever, the underdog team stages a remarkable 3-goal comeback in the second half.", category: "Sports", breaking: true },
+      { id: 51, title: "Olympic Record Shattered in 100m Sprint", source: "BBC Sport", time: "3 hours ago", summary: "A new world record is set in the 100-meter dash, breaking a mark that stood for over a decade.", category: "Sports" },
+      { id: 52, title: "NBA Expansion: Two New Teams Announced for 2027", source: "Sports Illustrated", time: "5 hours ago", summary: "The NBA confirms expansion to 32 teams with new franchises in Las Vegas and Seattle.", category: "Sports" },
+    ],
+  };
+
+  const currentArticles = articles[activeCategory] || articles.top;
+  const toggleSave = (id: number) => setSavedArticles(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+
+  return (
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      {/* Breaking news ticker */}
+      {currentArticles.some(a => a.breaking) && (
+        <div className="px-4 py-1.5 flex items-center gap-2 flex-shrink-0" style={{ background: "rgba(239,68,68,0.08)", borderBottom: `1px solid rgba(239,68,68,0.15)` }}>
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: c.danger, color: "#fff" }}>BREAKING</span>
+          <p className="text-[10px] font-medium truncate" style={{ color: c.danger }}>
+            {currentArticles.find(a => a.breaking)?.title}
+          </p>
+        </div>
+      )}
+
+      {/* Category tabs */}
+      <div className="flex items-center gap-0.5 px-3 py-2 flex-shrink-0 overflow-x-auto" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+        {categories.map(cat => (
+          <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
+            className="px-3 py-1.5 rounded-lg text-[10px] font-medium whitespace-nowrap transition-colors"
+            style={{ background: activeCategory === cat.id ? c.accentSoft : "transparent", color: activeCategory === cat.id ? c.accentText : c.textMuted }}
+            onMouseEnter={e => { if (activeCategory !== cat.id) e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { if (activeCategory !== cat.id) e.currentTarget.style.background = "transparent"; }}>
+            {cat.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Articles */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-2" style={{ scrollbarWidth: "none" }}>
+        {currentArticles.map(article => (
+          <div key={article.id} className="rounded-xl overflow-hidden transition-colors"
+            style={{ background: c.surface, border: `1px solid ${c.border}` }}
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+            onMouseLeave={e => (e.currentTarget.style.background = c.surface)}>
+            <div className="px-4 py-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    {article.breaking && (
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: c.danger, color: "#fff" }}>LIVE</span>
+                    )}
+                    <span className="text-[9px] font-medium" style={{ color: c.accentText }}>{article.source}</span>
+                    <span className="text-[9px]" style={{ color: c.textMuted }}>· {article.time}</span>
+                  </div>
+                  <p className="text-[12px] font-semibold leading-snug mb-1.5" style={{ color: c.text }}>{article.title}</p>
+                  <p className="text-[10px] leading-relaxed" style={{ color: c.textSec }}>{article.summary}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-2.5 pt-2" style={{ borderTop: `1px solid ${c.border}` }}>
+                <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: c.cardAlt, color: c.textMuted }}>{article.category}</span>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => toggleSave(article.id)}
+                    className="p-1 rounded-md transition-colors"
+                    style={{ color: savedArticles.has(article.id) ? c.accent : c.textMuted }}
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <I d={savedArticles.has(article.id) ? "M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" : "M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"} s={13}
+                      c={savedArticles.has(article.id) ? c.accent : undefined} />
+                  </button>
+                  <button className="p-1 rounded-md transition-colors" style={{ color: c.textMuted }}
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <I d={ic.share} s={13} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer */}
+      <div className="px-4 py-2 flex items-center justify-between flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+        <p className="text-[9px]" style={{ color: c.textMuted }}>Powered by Alternus News · Updated just now</p>
+        <button className="text-[10px] font-medium px-2 py-1 rounded-lg transition-colors" style={{ color: c.accentText }}
+          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+          Refresh
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ RECOVERY APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 interface RecoveryFile {
   name: string;
@@ -4774,6 +4913,7 @@ export default function AlternusOS() {
     { id: "controlpanel", title: "Control Panel", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 40, w: 580, h: 440 },
     { id: "studio", title: "Alternus Studio", isOpen: false, isMinimized: false, isMaximized: true, zIndex: 1, x: 60, y: 30, w: 720, h: 520 },
     { id: "recovery", title: "Recovery", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 60, w: 520, h: 440 },
+    { id: "news", title: "News", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 180, y: 50, w: 500, h: 480 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -4880,6 +5020,7 @@ export default function AlternusOS() {
       controlpanel: { w: 580, h: 440 },
       studio: { w: 720, h: 520 },
       recovery: { w: 520, h: 440 },
+      news: { w: 500, h: 480 },
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
@@ -5088,6 +5229,8 @@ export default function AlternusOS() {
         id: "code", title: "Code Editor", icon: ic.code, description: "SVG/CSS design and creative coding", extra: { id: "browser", title: "Browser", icon: ic.globe, description: "Open Figma or design tools in browser" } },
       { keys: ["recovery", "recover", "restore", "undelete", "recycle", "trash", "deleted", "lost file", "deep scan"],
         id: "recovery", title: "Recovery", icon: ic.shield, description: "Recover deleted files and deep scan" },
+      { keys: ["news", "breaking", "headline", "article", "press", "journalism", "newspaper", "media", "report", "bbc", "cnn", "reuters", "current events"],
+        id: "news", title: "News", icon: ic.newspaper, description: "Breaking news and world headlines" },
     ];
 
     // ━━━ SEMANTIC FILE SEARCH ━━━
@@ -5226,6 +5369,7 @@ export default function AlternusOS() {
     controlpanel: <ControlPanelApp c={c} mode={mode} setMode={setMode} onOpenApp={openWin} />,
     studio: <StudioApp c={c} />,
     recovery: <RecoveryApp c={c} files={recoveryFiles} onRecover={handleRecoveryRecover} onPermanentDelete={handleRecoveryDelete} onScan={handleRecoveryScan} />,
+    news: <NewsApp c={c} />,
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
@@ -5246,6 +5390,7 @@ export default function AlternusOS() {
     { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec },
     { id: "controlpanel", icon: ic.monitor, label: "Control Panel", color: c.textSec },
     { id: "recovery", icon: ic.shield, label: "Recovery", color: c.success },
+    { id: "news", icon: ic.newspaper, label: "News", color: c.danger },
   ];
 
   // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
