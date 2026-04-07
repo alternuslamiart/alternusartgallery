@@ -5287,19 +5287,15 @@ export default function AlternusOS() {
     }
 
     // ━━━ MATCH APP KEYWORDS ━━━
-    const matchedApps: { id: WinId; title: string; icon: string; description: string }[] = [];
     for (const entry of appMap) {
       if (entry.keys.some(k => q.includes(k))) {
-        matchedApps.push({ id: entry.id, title: entry.title, icon: entry.icon, description: entry.description });
-        if (entry.extra) matchedApps.push(entry.extra);
-        break;
+        const actions: { label: string; action: WinId }[] = [{ label: `Open ${entry.title}`, action: entry.id }];
+        if (entry.extra) actions.push({ label: `Open ${entry.extra.title}`, action: entry.extra.id });
+        setAiResponse(`Opening ${entry.title.toLowerCase()} for you.`);
+        setAiActions(actions);
+        setAiInput("");
+        return;
       }
-    }
-    if (matchedApps.length > 0) {
-      setAiAppResults(matchedApps);
-      setAiResponse(null); setAiActions([]);
-      setAiInput("");
-      return;
     }
 
     // ━━━ AI CONTENT CREATION ━━━
