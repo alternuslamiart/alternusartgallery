@@ -2551,6 +2551,47 @@ function NotesApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
+// ─── Brain visualization data (module-level, computed once) ─────────────────
+const _BP: [number, number, boolean][] = [
+  // [cx, cy, isGold] — SVG viewBox 600 × 400
+  // Crown
+  [293,65,false],[312,55,true],[330,62,false],[352,72,false],
+  // Upper-left curve
+  [265,78,false],[248,96,false],[240,120,false],[238,145,false],
+  // Upper-right curve
+  [376,90,false],[394,112,false],[400,138,false],[394,165,false],
+  // Upper-middle band
+  [275,88,false],[297,79,false],[318,70,false],[342,82,false],[370,98,false],
+  // Interior top folds
+  [286,110,false],[306,103,true],[326,109,false],[344,120,false],[302,125,true],[322,132,false],
+  // Middle band
+  [252,154,false],[270,142,false],[291,147,false],[313,142,false],[334,147,false],[356,154,false],[380,162,false],
+  // Interior middle
+  [282,162,true],[304,156,false],[324,160,false],[346,166,false],
+  // Lower band
+  [257,174,false],[275,170,false],[295,175,false],[318,170,false],[340,174,false],[364,180,false],
+  // Interior lower
+  [268,190,false],[289,187,false],[309,190,false],[331,186,false],[352,192,false],
+  // Bottom cerebrum
+  [266,212,false],[286,215,false],[306,218,false],[326,213,false],[344,209,false],
+  // Cerebellum
+  [358,207,false],[372,200,false],[388,210,false],[398,226,false],[390,246,false],[372,252,false],[354,247,false],[344,233,false],
+  // Brainstem
+  [303,226,false],[301,248,true],[299,270,false],
+];
+const _BC: [number, number][] = (() => {
+  const out: [number, number][] = [];
+  _BP.forEach(([ax,ay],i) => _BP.forEach(([bx,by],j) => {
+    if (j <= i) return;
+    if ((ax-bx)**2+(ay-by)**2 < 58**2) out.push([i,j]);
+  }));
+  return out;
+})();
+const _BW = Array.from({length:130},(_,i) =>
+  2.5 + Math.abs(Math.sin(i*0.22)*5 + Math.sin(i*0.07)*3.5 + Math.sin(i*0.55)*1.5)
+);
+// ─────────────────────────────────────────────────────────────────────────────
+
 function BrowserApp({ c }: { c: typeof palette.dark }) {
   const [url, setUrl] = useState("https://alternus.art");
   const [displayUrl, setDisplayUrl] = useState("https://alternus.art");
@@ -2558,104 +2599,188 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
   const [loadError, setLoadError] = useState(false);
   const [history, setHistory] = useState<string[]>(["https://alternus.art"]);
   const [showAIComp, setShowAIComp] = useState(false);
-  const [bookmarks] = useState([
-    { name: "Alternus Art", url: "https://alternus.art" },
-    { name: "GitHub", url: "https://github.com" },
-    { name: "Google", url: "https://google.com" },
-    { name: "Stack Overflow", url: "https://stackoverflow.com" },
-  ]);
+  const bookmarks = [
+    { name: "Alternus Art", url: "https://alternus.art", icon: ic.store },
+    { name: "GitHub",       url: "https://github.com",  icon: ic.code  },
+    { name: "Google",       url: "https://google.com",  icon: ic.search},
+    { name: "Stack Overflow",url:"https://stackoverflow.com",icon: ic.terminal},
+  ];
 
   const navigate = (newUrl: string) => {
-    let finalUrl = newUrl;
-    if (!finalUrl.startsWith("http")) finalUrl = "https://" + finalUrl;
-    setDisplayUrl(finalUrl);
-    setUrl(finalUrl);
-    setHistory(p => [...p, finalUrl]);
-    setIsLoading(true);
-    setLoadError(false);
+    let f = newUrl;
+    if (!f.startsWith("http")) f = "https://" + f;
+    setDisplayUrl(f); setUrl(f);
+    setHistory(p => [...p, f]);
+    setIsLoading(true); setLoadError(false);
     setTimeout(() => setIsLoading(false), 1500);
   };
 
+  const isAlternus = url.includes("alternus.art");
+
   return (
     <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      {/* URL Bar */}
-      <div className="flex items-center gap-2 px-3 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <button onClick={() => { if (history.length > 1) { const h = [...history]; h.pop(); setHistory(h); setUrl(h[h.length - 1]); setDisplayUrl(h[h.length - 1]); } }}
+
+      {/* ── URL Bar ── */}
+      <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
+        <button onClick={() => { if (history.length > 1) { const h=[...history]; h.pop(); setHistory(h); setUrl(h[h.length-1]); setDisplayUrl(h[h.length-1]); } }}
           className="p-1.5 flex-shrink-0 transition-colors" style={{ color: c.textMuted, borderRadius: "8px" }}
-          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+          onMouseEnter={e=>(e.currentTarget.style.background=c.cardAlt)}
+          onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
           <I d={ic.chevL} s={14} />
         </button>
+
+        {/* URL input */}
         <div className="flex-1 flex items-center gap-2 px-3 py-2" style={{ background: c.cardAlt, border: `1px solid ${c.border}`, borderRadius: "12px" }}>
-          {isLoading ? (
-            <div className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin flex-shrink-0" style={{ borderColor: `${c.accent} transparent ${c.accent} ${c.accent}` }} />
-          ) : (
-            <I d={ic.globe} s={12} c={c.textMuted} />
-          )}
-          <input
-            className="flex-1 bg-transparent outline-none text-xs"
-            style={{ color: c.text }}
-            value={displayUrl}
-            onChange={e => setDisplayUrl(e.target.value)}
-            onKeyDown={e => { if (e.key === "Enter") navigate(displayUrl); }}
-          />
+          {isLoading
+            ? <div className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin flex-shrink-0" style={{ borderColor:`${c.accent} transparent ${c.accent} ${c.accent}` }} />
+            : <I d={ic.globe} s={12} c={c.textMuted} />}
+          <input className="flex-1 bg-transparent outline-none text-[12px]" style={{ color: c.text }}
+            value={displayUrl} onChange={e=>setDisplayUrl(e.target.value)}
+            onKeyDown={e=>{ if(e.key==="Enter") navigate(displayUrl); }} />
         </div>
-        <button onClick={() => setShowAIComp(p => !p)}
-          className="flex items-center gap-2 px-4 py-2 text-[11px] font-semibold whitespace-nowrap transition-all flex-shrink-0"
-          style={{ background: showAIComp ? c.accent : c.accentSoft, color: showAIComp ? "#fff" : c.accentText, borderRadius: "9999px", border: `1px solid ${c.accent}40`, boxShadow: showAIComp ? `0 0 16px ${c.accent}60` : `0 0 8px ${c.accent}30` }}
-          onMouseEnter={e => { if (!showAIComp) { e.currentTarget.style.background = c.accent; e.currentTarget.style.color = "#fff"; } }}
-          onMouseLeave={e => { if (!showAIComp) { e.currentTarget.style.background = c.accentSoft; e.currentTarget.style.color = c.accentText; } }}>
-          <I d={ic.sparkle} s={12} /> Try AI
+
+        {/* Try AI pill — matches reference */}
+        <button onClick={()=>setShowAIComp(p=>!p)} className="flex items-center gap-0 flex-shrink-0 transition-all"
+          style={{ borderRadius: "9999px", padding: "3px 14px 3px 4px",
+            background: showAIComp ? c.accentSoft : c.surface,
+            border: `1.5px solid ${showAIComp ? c.accent : c.border}`,
+            boxShadow: showAIComp ? `0 0 18px ${c.accent}70, 0 0 40px ${c.accent}30` : `0 0 10px ${c.accent}25` }}
+          onMouseEnter={e=>{ e.currentTarget.style.boxShadow=`0 0 18px ${c.accent}70, 0 0 40px ${c.accent}30`; e.currentTarget.style.borderColor=c.accent; }}
+          onMouseLeave={e=>{ if(!showAIComp){ e.currentTarget.style.boxShadow=`0 0 10px ${c.accent}25`; e.currentTarget.style.borderColor=c.border; } }}>
+          {/* Brain icon circle */}
+          <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ background: showAIComp ? c.accent : c.cardAlt, boxShadow: showAIComp ? `0 0 12px ${c.accent}80` : "none", transition: "all 0.2s" }}>
+            <I d={ic.sparkle} s={14} c={showAIComp ? "#fff" : c.accentText} />
+          </div>
+          <span className="text-[12px] font-semibold ml-2" style={{ color: showAIComp ? c.accentText : c.text }}>✦ Try AI</span>
         </button>
       </div>
 
-      {/* Bookmarks */}
-      <div className="flex items-center gap-1 px-3 py-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        {bookmarks.map((b, i) => (
-          <button key={i} onClick={() => navigate(b.url)}
+      {/* ── Bookmarks bar ── */}
+      <div className="flex items-center px-3 py-1 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
+        {bookmarks.map((b,i) => (
+          <button key={i} onClick={()=>navigate(b.url)}
             className="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium transition-colors"
             style={{ color: c.textSec, borderRadius: "6px" }}
-            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-            {b.name}
+            onMouseEnter={e=>(e.currentTarget.style.background=c.cardAlt)}
+            onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
+            <I d={b.icon} s={11} c={c.textMuted} /> {b.name}
           </button>
         ))}
         <div className="flex-1" />
-        {showAIComp && (
-          <span className="text-[11px] font-medium px-2" style={{ color: c.textSec }}>AI Companion</span>
-        )}
+        <span className="text-[11px] font-medium pr-2" style={{ color: c.textSec }}>AI Companion</span>
       </div>
 
-      {/* Content + optional AI panel */}
+      {/* ── Content + optional AI panel ── */}
       <div className="flex-1 flex overflow-hidden">
-        <div className="flex-1 relative" style={{ background: c.cardAlt }}>
+
+        {/* Main content area */}
+        <div className="flex-1 relative overflow-hidden">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center h-full gap-3">
-              <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${c.accent} transparent ${c.accent} ${c.accent}` }} />
-              <p className="text-xs" style={{ color: c.textMuted }}>Loading {displayUrl}...</p>
+            <div className="flex flex-col items-center justify-center h-full gap-3" style={{ background: c.cardAlt }}>
+              <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor:`${c.accent} transparent ${c.accent} ${c.accent}` }} />
+              <p className="text-xs" style={{ color: c.textMuted }}>Loading {displayUrl}…</p>
+            </div>
+          ) : isAlternus ? (
+            /* ── Brain Visualization ── */
+            <div className="absolute inset-0 flex flex-col" style={{ background: "radial-gradient(ellipse at 50% 20%, #1B2F50 0%, #0D1929 55%, #080F1C 100%)" }}>
+              {/* Top light ray */}
+              <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 65% 0%, rgba(80,140,255,0.15) 0%, transparent 55%)" }} />
+
+              {/* Neural brain SVG */}
+              <div className="flex-1 relative">
+                <svg viewBox="0 0 600 330" className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet">
+                  <defs>
+                    <filter id="glowBlue" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="3.5" result="b"/>
+                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="glowGold" x="-100%" y="-100%" width="300%" height="300%">
+                      <feGaussianBlur stdDeviation="5" result="b"/>
+                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <radialGradient id="brainGlow" cx="50%" cy="45%" r="50%">
+                      <stop offset="0%" stopColor="rgba(100,160,255,0.08)" />
+                      <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+                    </radialGradient>
+                  </defs>
+
+                  {/* Ambient glow behind brain */}
+                  <ellipse cx="312" cy="155" rx="165" ry="130" fill="url(#brainGlow)" />
+
+                  {/* Neural connections */}
+                  {_BC.map(([i,j],k) => (
+                    <line key={k}
+                      x1={_BP[i][0]} y1={_BP[i][1]} x2={_BP[j][0]} y2={_BP[j][1]}
+                      stroke={(_BP[i][2]||_BP[j][2]) ? "rgba(210,168,50,0.30)" : "rgba(90,150,255,0.22)"}
+                      strokeWidth={(_BP[i][2]||_BP[j][2]) ? "0.8" : "0.5"} />
+                  ))}
+
+                  {/* Neural nodes */}
+                  {_BP.map(([x,y,gold],i) => gold ? (
+                    <g key={i} filter="url(#glowGold)">
+                      <circle cx={x} cy={y} r="4" fill="#D4A832" opacity="0.9" />
+                      <circle cx={x} cy={y} r="2" fill="#FFD960" />
+                    </g>
+                  ) : (
+                    <g key={i} filter="url(#glowBlue)">
+                      <circle cx={x} cy={y} r="2.5" fill="#5AB4FF" opacity="0.7" />
+                      <circle cx={x} cy={y} r="1" fill="#A8D8FF" />
+                    </g>
+                  ))}
+
+                  {/* Scattered star particles */}
+                  {[[40,20],[80,45],[520,30],[560,80],[30,180],[580,200],[50,280],[510,260],[155,15],[430,18],[100,300],[480,305]].map(([px,py],i) => (
+                    <circle key={i} cx={px} cy={py} r="1" fill="rgba(200,220,255,0.5)" />
+                  ))}
+                </svg>
+              </div>
+
+              {/* ── Analysis overlay bar ── */}
+              <div className="flex-shrink-0 px-6 py-2" style={{ background: "linear-gradient(0deg, rgba(5,10,22,0.95) 0%, rgba(5,10,22,0.6) 100%)" }}>
+                <div className="flex items-center gap-6 mb-2">
+                  <span className="text-[12px]" style={{ color: "#8CAECE" }}>Analyzing: <strong style={{ color: "#E8F4FF" }}>75%</strong></span>
+                  <div className="w-px h-3" style={{ background: "rgba(255,255,255,0.15)" }} />
+                  <span className="text-[12px]" style={{ color: "#8CAECE" }}>Data Sources: <strong style={{ color: "#E8F4FF" }}>GitHub, ArXiv</strong></span>
+                  <div className="w-px h-3" style={{ background: "rgba(255,255,255,0.15)" }} />
+                  <span className="text-[12px]" style={{ color: "#8CAECE" }}>Insight Generation: <strong style={{ color: "#E8F4FF" }}>High</strong></span>
+                  <div className="flex-1" />
+                  <div className="flex items-center gap-2" style={{ color: "#8CAECE" }}>
+                    <I d={ic.volume} s={13} c="#8CAECE" />
+                    <I d={ic.chevR} s={11} c="#8CAECE" />
+                  </div>
+                </div>
+                {/* Waveform */}
+                <svg viewBox={`0 0 ${_BW.length * 4.5} 18`} className="w-full" style={{ height: 14 }} preserveAspectRatio="none">
+                  {_BW.map((h,i) => (
+                    <rect key={i} x={i*4.5} y={(18-h)/2} width="2.5" height={h} rx="1"
+                      fill={i>45&&i<80 ? "#C8900A" : "rgba(90,160,255,0.55)"} opacity={0.8} />
+                  ))}
+                </svg>
+                {/* Scale ticks */}
+                <div className="flex justify-between mt-0.5" style={{ color: "rgba(100,140,180,0.5)", fontSize: 8 }}>
+                  {["0","","","4","","","8","","","12","","","16"].map((t,i)=><span key={i}>{t}</span>)}
+                </div>
+              </div>
             </div>
           ) : (
             <>
-              <iframe
-                src={url}
-                className="w-full h-full border-0"
+              <iframe src={url} className="w-full h-full border-0"
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                title="Browser"
-                onError={() => setLoadError(true)}
-              />
+                title="Browser" onError={()=>setLoadError(true)} />
               {loadError && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3" style={{ background: c.cardAlt }}>
                   <I d={ic.globe} s={32} c={c.textMuted} />
                   <p className="text-sm font-medium" style={{ color: c.text }}>Cannot display this page</p>
                   <p className="text-xs" style={{ color: c.textMuted }}>{url} refused to connect</p>
-                  <button onClick={() => navigate(url)} className="mt-2 px-4 py-1.5 rounded-lg text-xs font-medium" style={{ background: c.accent, color: "#fff" }}>Retry</button>
+                  <button onClick={()=>navigate(url)} className="mt-2 px-4 py-1.5 rounded-lg text-xs font-medium" style={{ background: c.accent, color:"#fff" }}>Retry</button>
                 </div>
               )}
             </>
           )}
         </div>
 
-        {/* AI Companion panel */}
+        {/* ── AI Companion panel ── */}
         {showAIComp && (
           <div className="w-[200px] flex-shrink-0 flex flex-col" style={{ background: c.surface, borderLeft: `1px solid ${c.border}` }}>
             <div className="px-3 pt-3 pb-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
@@ -2679,12 +2804,12 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
                 <p className="text-[10px] font-semibold mb-1" style={{ color: c.textSec }}>INSIGHT</p>
                 <p className="text-[10px]" style={{ color: c.textMuted }}>Generation: <span style={{ color: c.accentText }}>High</span></p>
               </div>
-              {["Summarize this page", "Find key facts", "Translate content"].map((action, i) => (
+              {["Summarize this page","Find key facts","Translate content"].map((a,i) => (
                 <button key={i} className="w-full text-left px-2.5 py-2 text-[11px] transition-colors"
                   style={{ color: c.textSec, background: "transparent", borderRadius: "8px" }}
-                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  {action}
+                  onMouseEnter={e=>(e.currentTarget.style.background=c.cardAlt)}
+                  onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
+                  {a}
                 </button>
               ))}
             </div>
