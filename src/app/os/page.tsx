@@ -6859,8 +6859,8 @@ export default function AlternusOS() {
           </div>
 
         {/* Center: Alternus branding + AI Search - only shown when no window is open */}
-        {!wins.some(w => w.isOpen && !w.isMinimized) && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none" style={{ zIndex: 0 }}>
+        {!wins.some(w => w.isOpen) && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ zIndex: 1, pointerEvents: "none" }}>
           {/* AI Creation frame - appears above Alternus text */}
           {aiCreation && (
             <div className="w-full max-w-2xl mb-6 px-4 pointer-events-auto">
