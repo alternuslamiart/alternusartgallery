@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news" | "dashboard" | "tasks" | "mail" | "monaco" | "aihub" | "imagegen" | "aivoice" | "writer" | "knowledge";
 
 interface WinState {
   id: WinId;
@@ -228,6 +228,14 @@ const ic = {
   sunF: "M12 7a5 5 0 100 10 5 5 0 000-10zM12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42",
   download: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3",
   image: "M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zM8.5 10a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM21 15l-5-5L5 21",
+  grid: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
+  checkSquare: "M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11",
+  mail: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6",
+  wand: "M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8L19.2 13.2M17.8 6.2L19.2 4.8M3 21L12 12M12.2 6.2L10.8 4.8",
+  brain: "M9.5 2A2.5 2.5 0 007 4.5v.5H5a3 3 0 000 6h.5v.5a3.5 3.5 0 007 0V11h.5a3 3 0 000-6H13v-.5A2.5 2.5 0 0010.5 2h-1zM15 8a4 4 0 014 4v1a4 4 0 01-4 4",
+  messageCircle: "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z",
+  bookOpen: "M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z",
+  edit3: "M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z",
 };
 
 // ━━━━ Window Title Bar ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -4701,6 +4709,719 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
+// ━━━━ DASHBOARD APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function DashboardApp({ c }: { c: typeof palette.dark }) {
+  const [time, setTime] = useState(new Date());
+  useEffect(() => { const iv = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(iv); }, []);
+  const stats = [
+    { label: "CPU", value: "34%", color: c.accent, bar: 34 },
+    { label: "RAM", value: "6.2 GB", color: c.success, bar: 52 },
+    { label: "Storage", value: "128 GB", color: c.warning, bar: 65 },
+    { label: "Network", value: "↑ 1.2 MB/s", color: c.purple, bar: 20 },
+  ];
+  const tasks = [
+    { text: "Review gallery uploads", done: false, priority: "high" },
+    { text: "Update artist profiles", done: true, priority: "medium" },
+    { text: "Check payment reports", done: false, priority: "high" },
+    { text: "Respond to inquiries", done: false, priority: "low" },
+  ];
+  const recent = [
+    { name: "project_v2.fig", time: "2m ago", icon: ic.pen },
+    { name: "gallery_export.zip", time: "1h ago", icon: ic.folder },
+    { name: "meeting_notes.txt", time: "3h ago", icon: ic.note },
+    { name: "report_q4.pdf", time: "Yesterday", icon: ic.fileText },
+  ];
+  return (
+    <div className="flex flex-col h-full overflow-y-auto p-4 gap-4" style={{ background: c.bg, scrollbarWidth: "none" }}>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-[11px]" style={{ color: c.textMuted }}>Good {time.getHours() < 12 ? "morning" : time.getHours() < 18 ? "afternoon" : "evening"}</p>
+          <h2 className="text-[16px] font-bold" style={{ color: c.text }}>Dashboard</h2>
+        </div>
+        <div className="text-right">
+          <p className="text-[18px] font-bold font-mono" style={{ color: c.text }}>{time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
+          <p className="text-[10px]" style={{ color: c.textMuted }}>{time.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</p>
+        </div>
+      </div>
+      {/* System Stats */}
+      <div className="grid grid-cols-2 gap-2">
+        {stats.map(s => (
+          <div key={s.label} className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-medium" style={{ color: c.textMuted }}>{s.label}</span>
+              <span className="text-[11px] font-bold" style={{ color: s.color }}>{s.value}</span>
+            </div>
+            <div className="h-1.5 rounded-full" style={{ background: c.border }}>
+              <div className="h-full rounded-full transition-all" style={{ width: `${s.bar}%`, background: s.color }} />
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* Tasks + Recent */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+          <p className="text-[11px] font-semibold mb-2" style={{ color: c.text }}>Tasks</p>
+          <div className="space-y-1.5">
+            {tasks.map((t, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: t.done ? c.success : t.priority === "high" ? c.danger : t.priority === "medium" ? c.warning : c.textMuted, opacity: t.done ? 0.5 : 1 }} />
+                <span className="text-[10px] leading-tight" style={{ color: t.done ? c.textMuted : c.textSec, textDecoration: t.done ? "line-through" : "none" }}>{t.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+          <p className="text-[11px] font-semibold mb-2" style={{ color: c.text }}>Recent Files</p>
+          <div className="space-y-1.5">
+            {recent.map((f, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <I d={f.icon} s={12} c={c.textMuted} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] truncate" style={{ color: c.textSec }}>{f.name}</p>
+                </div>
+                <span className="text-[9px] flex-shrink-0" style={{ color: c.textMuted }}>{f.time}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {/* Quick Launch */}
+      <div className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+        <p className="text-[11px] font-semibold mb-2" style={{ color: c.text }}>Quick Stats</p>
+        <div className="grid grid-cols-4 gap-2 text-center">
+          {[{ label: "Files", val: "1,284" }, { label: "Tasks", val: "12" }, { label: "Emails", val: "8" }, { label: "Alerts", val: "3" }].map(q => (
+            <div key={q.label} className="rounded-lg py-2" style={{ background: c.cardAlt }}>
+              <p className="text-[14px] font-bold" style={{ color: c.text }}>{q.val}</p>
+              <p className="text-[9px]" style={{ color: c.textMuted }}>{q.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ━━━━ TASKS APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function TasksApp({ c }: { c: typeof palette.dark }) {
+  const [tasks, setTasks] = useState([
+    { id: 1, text: "Finalize gallery redesign", priority: "high" as const, done: false, deadline: "Today", tag: "Design" },
+    { id: 2, text: "Review artist applications", priority: "high" as const, done: false, deadline: "Today", tag: "Review" },
+    { id: 3, text: "Update payment integration", priority: "medium" as const, done: false, deadline: "Tomorrow", tag: "Dev" },
+    { id: 4, text: "Write blog post", priority: "medium" as const, done: true, deadline: "Dec 10", tag: "Content" },
+    { id: 5, text: "Backup database", priority: "low" as const, done: false, deadline: "Dec 15", tag: "Ops" },
+    { id: 6, text: "Send invoice to client", priority: "high" as const, done: true, deadline: "Done", tag: "Finance" },
+  ]);
+  const [input, setInput] = useState("");
+  const [filter, setFilter] = useState<"all" | "active" | "done">("all");
+  const priorityColor = { high: c.danger, medium: c.warning, low: c.success };
+  const filtered = tasks.filter(t => filter === "all" ? true : filter === "done" ? t.done : !t.done);
+  const addTask = () => {
+    if (!input.trim()) return;
+    setTasks(p => [...p, { id: Date.now(), text: input.trim(), priority: "medium", done: false, deadline: "No deadline", tag: "Task" }]);
+    setInput("");
+  };
+  return (
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      <div className="px-4 pt-4 pb-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="flex items-center gap-2 mb-3">
+          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && addTask()}
+            placeholder="Add a task... (Enter to save)"
+            className="flex-1 text-[11px] px-3 py-2 rounded-lg outline-none"
+            style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
+          <button onClick={addTask} className="px-3 py-2 rounded-lg text-[11px] font-medium" style={{ background: c.accent, color: "#fff" }}>Add</button>
+        </div>
+        <div className="flex gap-1">
+          {(["all", "active", "done"] as const).map(f => (
+            <button key={f} onClick={() => setFilter(f)} className="px-3 py-1 rounded-full text-[10px] font-medium capitalize transition-colors"
+              style={{ background: filter === f ? c.accentSoft : "transparent", color: filter === f ? c.accentText : c.textMuted }}>
+              {f}
+            </button>
+          ))}
+          <span className="ml-auto text-[10px] px-2 py-1 rounded-full" style={{ background: c.cardAlt, color: c.textMuted }}>
+            {tasks.filter(t => !t.done).length} remaining
+          </span>
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto p-3 space-y-1.5" style={{ scrollbarWidth: "none" }}>
+        {filtered.map(task => (
+          <div key={task.id} className="flex items-start gap-3 px-3 py-2.5 rounded-xl transition-colors"
+            style={{ background: c.surface, border: `1px solid ${c.border}`, opacity: task.done ? 0.6 : 1 }}>
+            <button onClick={() => setTasks(p => p.map(t => t.id === task.id ? { ...t, done: !t.done } : t))}
+              className="mt-0.5 w-4 h-4 rounded flex-shrink-0 flex items-center justify-center transition-colors"
+              style={{ border: `2px solid ${task.done ? c.success : priorityColor[task.priority]}`, background: task.done ? c.success : "transparent" }}>
+              {task.done && <I d="M20 6L9 17l-5-5" s={10} c="#fff" w={2.5} />}
+            </button>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] font-medium leading-snug" style={{ color: c.text, textDecoration: task.done ? "line-through" : "none" }}>{task.text}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: c.cardAlt, color: c.textMuted }}>{task.tag}</span>
+                <span className="text-[9px]" style={{ color: c.textMuted }}>⏰ {task.deadline}</span>
+              </div>
+            </div>
+            <div className="w-2 h-2 rounded-full mt-1 flex-shrink-0" style={{ background: priorityColor[task.priority] }} />
+          </div>
+        ))}
+      </div>
+      <div className="px-4 py-2 flex items-center justify-between flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+        <p className="text-[9px]" style={{ color: c.textMuted }}>{tasks.filter(t => t.done).length}/{tasks.length} completed</p>
+        <div className="flex gap-1">
+          {[{ col: c.danger, label: "High" }, { col: c.warning, label: "Med" }, { col: c.success, label: "Low" }].map(p => (
+            <span key={p.label} className="flex items-center gap-1 text-[9px]" style={{ color: c.textMuted }}>
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: p.col }} />{p.label}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ━━━━ MAIL APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function MailApp({ c }: { c: typeof palette.dark }) {
+  const mails = [
+    { id: 1, from: "Sarah Mitchell", email: "sarah@alternus.art", subject: "New artwork submission", preview: "Hi, I've uploaded 3 new pieces to my gallery profile...", time: "9:41 AM", read: false, tag: "Gallery" },
+    { id: 2, from: "Stripe", email: "no-reply@stripe.com", subject: "Payment received — €450.00", preview: "A payment of €450.00 was successfully processed for...", time: "8:15 AM", read: false, tag: "Finance" },
+    { id: 3, from: "Marcus Chen", email: "m.chen@artist.com", subject: "Re: Commission request", preview: "Thank you for reaching out! I'd be happy to discuss the commission...", time: "Yesterday", read: true, tag: "Client" },
+    { id: 4, from: "Vercel", email: "noreply@vercel.com", subject: "Deployment successful", preview: "Your project alternusartgallery was successfully deployed...", time: "Yesterday", read: true, tag: "Dev" },
+    { id: 5, from: "Emma Rodriguez", email: "emma@artist.com", subject: "Studio booking confirmation", preview: "Your studio session is confirmed for December 15th at 2PM...", time: "Dec 10", read: true, tag: "Studio" },
+    { id: 6, from: "Newsletter", email: "news@artworld.com", subject: "Top art sales this week", preview: "This week's highlights: A rare Basquiat sold for $2.4M at Christie's...", time: "Dec 9", read: true, tag: "News" },
+  ];
+  const [selected, setSelected] = useState(mails[0]);
+  const tagColors: Record<string, string> = { Gallery: c.accent, Finance: c.success, Client: c.purple, Dev: c.warning, Studio: "#F472B6", News: c.danger };
+  return (
+    <div className="flex h-full" style={{ background: c.bg }}>
+      {/* Sidebar */}
+      <div className="w-48 flex-shrink-0 flex flex-col" style={{ borderRight: `1px solid ${c.border}` }}>
+        <div className="px-3 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <button className="w-full py-1.5 rounded-lg text-[11px] font-medium" style={{ background: c.accent, color: "#fff" }}>
+            + Compose
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+          {mails.map(m => (
+            <div key={m.id} onClick={() => setSelected(m)}
+              className="px-3 py-2.5 cursor-pointer transition-colors"
+              style={{ background: selected.id === m.id ? c.accentSoft : m.read ? "transparent" : `${c.accent}08`, borderBottom: `1px solid ${c.border}` }}>
+              <div className="flex items-center justify-between mb-0.5">
+                <span className="text-[10px] font-semibold truncate" style={{ color: m.read ? c.textSec : c.text }}>{m.from}</span>
+                {!m.read && <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 ml-1" style={{ background: c.accent }} />}
+              </div>
+              <p className="text-[10px] truncate" style={{ color: c.textMuted }}>{m.subject}</p>
+              <p className="text-[9px] mt-0.5" style={{ color: c.textMuted }}>{m.time}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Email content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="px-5 py-4 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <h3 className="text-[13px] font-bold mb-1" style={{ color: c.text }}>{selected.subject}</h3>
+              <p className="text-[10px]" style={{ color: c.textMuted }}>From: <span style={{ color: c.textSec }}>{selected.from}</span> &lt;{selected.email}&gt;</p>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: `${tagColors[selected.tag]}20`, color: tagColors[selected.tag] }}>{selected.tag}</span>
+              <span className="text-[10px]" style={{ color: c.textMuted }}>{selected.time}</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto px-5 py-4" style={{ scrollbarWidth: "none" }}>
+          <p className="text-[12px] leading-relaxed" style={{ color: c.textSec }}>
+            {selected.preview} Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+          </p>
+          <p className="text-[12px] leading-relaxed mt-4" style={{ color: c.textSec }}>
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.
+          </p>
+          <p className="text-[12px] mt-4" style={{ color: c.textSec }}>Best regards,<br />{selected.from}</p>
+        </div>
+        <div className="px-5 py-3 flex gap-2 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+          {["Reply", "Forward", "Archive"].map(a => (
+            <button key={a} className="px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors"
+              style={{ background: a === "Reply" ? c.accent : c.surface, color: a === "Reply" ? "#fff" : c.textSec, border: `1px solid ${c.border}` }}>
+              {a}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ━━━━ MONACO CODE EDITOR APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function MonacoApp({ c }: { c: typeof palette.dark }) {
+  const files = [
+    { name: "index.tsx", lang: "tsx" },
+    { name: "globals.css", lang: "css" },
+    { name: "page.tsx", lang: "tsx" },
+    { name: "blog.ts", lang: "ts" },
+    { name: ".env.local", lang: "env" },
+  ];
+  const code = {
+    tsx: `import { useState } from "react";\nimport Link from "next/link";\nimport Image from "next/image";\n\nexport default function BlogPage() {\n  const [selected, setSelected] =\n    useState<string | null>(null);\n\n  return (\n    <div className="container mx-auto px-4">\n      <h1 className="text-4xl font-bold">\n        The Alternus Art Journal\n      </h1>\n    </div>\n  );\n}`,
+    css: `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\n:root {\n  --background: 0 0% 100%;\n  --foreground: 0 0% 3.9%;\n  --primary: 226 30% 13%;\n}\n\n.font-playfair {\n  font-family: var(--font-playfair),\n    'Playfair Display', serif;\n}`,
+    ts: `export interface BlogPost {\n  id: string;\n  title: string;\n  excerpt: string;\n  content: string;\n  image: string;\n  author: string;\n  date: string;\n  category: string;\n  readTime: string;\n}\n\nexport const blogPosts: BlogPost[] = [];`,
+    env: `DATABASE_URL="postgresql://..."\nDIRECT_URL="postgresql://..."\nNEXT_PUBLIC_APP_URL="http://localhost:3000"\nGROQ_API_KEY="gsk_..."`,
+  };
+  const [activeFile, setActiveFile] = useState(files[0]);
+  const [content, setContent] = useState(code.tsx);
+  const switchFile = (f: typeof files[0]) => {
+    setActiveFile(f);
+    setContent(code[f.lang as keyof typeof code] ?? "// No content");
+  };
+  const lines = content.split("\n");
+  return (
+    <div className="flex flex-col h-full font-mono" style={{ background: "#1e1e1e", color: "#d4d4d4" }}>
+      {/* Tab bar */}
+      <div className="flex items-center overflow-x-auto flex-shrink-0" style={{ background: "#252526", borderBottom: "1px solid #3c3c3c", scrollbarWidth: "none" }}>
+        {files.map(f => (
+          <button key={f.name} onClick={() => switchFile(f)}
+            className="px-4 py-2 text-[10px] whitespace-nowrap transition-colors flex-shrink-0"
+            style={{ background: activeFile.name === f.name ? "#1e1e1e" : "transparent", color: activeFile.name === f.name ? "#ffffff" : "#888", borderRight: "1px solid #3c3c3c", borderTop: activeFile.name === f.name ? "1px solid #007acc" : "1px solid transparent" }}>
+            {f.name}
+          </button>
+        ))}
+      </div>
+      {/* Editor */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Line numbers */}
+        <div className="py-3 px-2 text-right flex-shrink-0 select-none" style={{ background: "#1e1e1e", minWidth: "36px" }}>
+          {lines.map((_, i) => (
+            <div key={i} className="text-[10px] leading-5" style={{ color: "#858585" }}>{i + 1}</div>
+          ))}
+        </div>
+        {/* Code area */}
+        <textarea value={content} onChange={e => setContent(e.target.value)}
+          className="flex-1 p-3 text-[11px] leading-5 resize-none outline-none"
+          style={{ background: "#1e1e1e", color: "#d4d4d4", fontFamily: "monospace", scrollbarWidth: "none" }}
+          spellCheck={false} />
+      </div>
+      {/* Status bar */}
+      <div className="px-4 py-1 flex items-center gap-4 text-[9px] flex-shrink-0" style={{ background: "#007acc", color: "#fff" }}>
+        <span>main</span>
+        <span>{activeFile.lang.toUpperCase()}</span>
+        <span className="ml-auto">Ln {lines.length}, Col 1</span>
+        <span>UTF-8</span>
+        <span>Spaces: 2</span>
+      </div>
+    </div>
+  );
+}
+
+// ━━━━ AI HUB APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function AIHubApp({ c }: { c: typeof palette.dark }) {
+  const models = [
+    { id: "claude", name: "Claude Opus", company: "Anthropic", color: "#F97316", desc: "Best for reasoning & analysis" },
+    { id: "gpt4", name: "GPT-4o", company: "OpenAI", color: "#10B981", desc: "Best for general tasks" },
+    { id: "gemini", name: "Gemini Ultra", company: "Google", color: "#3B82F6", desc: "Best for multimodal" },
+    { id: "llama", name: "Llama 3.1", company: "Meta", color: "#8B5CF6", desc: "Open source, fast" },
+  ];
+  const [activeModel, setActiveModel] = useState(models[0]);
+  const [msgs, setMsgs] = useState<{ role: "user" | "ai"; text: string; model?: string }[]>([
+    { role: "ai", text: `Hello! I'm ${models[0].name} by ${models[0].company}. How can I help you today?`, model: models[0].name },
+  ]);
+  const [input, setInput] = useState("");
+  const responses: Record<string, string[]> = {
+    claude: ["I'll analyze that carefully and provide a nuanced response...", "From a reasoning perspective, this involves multiple considerations...", "Let me break this down step by step for you..."],
+    gpt4: ["Great question! Here's what I think...", "I can help with that! Let me explain...", "Based on my training, here's a comprehensive answer..."],
+    gemini: ["I can process both text and visual information to help...", "Using multimodal analysis, I can see that...", "Let me provide a comprehensive response with multiple perspectives..."],
+    llama: ["Processing your request with open-source efficiency...", "Here's my response based on open-source training data...", "As an open model, I'll give you a transparent answer..."],
+  };
+  const send = () => {
+    if (!input.trim()) return;
+    const userMsg = { role: "user" as const, text: input };
+    const opts = responses[activeModel.id];
+    const aiMsg = { role: "ai" as const, text: opts[Math.floor(Math.random() * opts.length)] + " " + input.toLowerCase() + ".", model: activeModel.name };
+    setMsgs(p => [...p, userMsg, aiMsg]);
+    setInput("");
+  };
+  return (
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      {/* Model selector */}
+      <div className="px-3 py-2.5 flex gap-1.5 overflow-x-auto flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+        {models.map(m => (
+          <button key={m.id} onClick={() => { setActiveModel(m); setMsgs([{ role: "ai", text: `Hello! I'm ${m.name} by ${m.company}. How can I help you?`, model: m.name }]); }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-medium whitespace-nowrap flex-shrink-0 transition-all"
+            style={{ background: activeModel.id === m.id ? `${m.color}20` : c.surface, color: activeModel.id === m.id ? m.color : c.textMuted, border: `1px solid ${activeModel.id === m.id ? m.color : c.border}` }}>
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: m.color }} />
+            {m.name}
+          </button>
+        ))}
+      </div>
+      {/* Active model info */}
+      <div className="px-4 py-2 flex-shrink-0" style={{ background: `${activeModel.color}08`, borderBottom: `1px solid ${c.border}` }}>
+        <p className="text-[10px]" style={{ color: activeModel.color }}>{activeModel.name} · {activeModel.company} — {activeModel.desc}</p>
+      </div>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-2" style={{ scrollbarWidth: "none" }}>
+        {msgs.map((m, i) => (
+          <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div className="max-w-[80%] px-3 py-2 rounded-xl text-[11px] leading-relaxed"
+              style={{ background: m.role === "user" ? activeModel.color : c.surface, color: m.role === "user" ? "#fff" : c.text, border: m.role === "ai" ? `1px solid ${c.border}` : "none" }}>
+              {m.role === "ai" && <p className="text-[9px] font-semibold mb-1" style={{ color: activeModel.color }}>{m.model}</p>}
+              {m.text}
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* Input */}
+      <div className="px-3 py-3 flex gap-2 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+        <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
+          placeholder={`Message ${activeModel.name}...`}
+          className="flex-1 text-[11px] px-3 py-2 rounded-lg outline-none"
+          style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
+        <button onClick={send} className="px-3 py-2 rounded-lg text-[11px] font-medium" style={{ background: activeModel.color, color: "#fff" }}>
+          <I d={ic.send} s={14} c="#fff" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ━━━━ AI IMAGE GENERATOR APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function ImageGenApp({ c }: { c: typeof palette.dark }) {
+  const styles = ["Photorealistic", "Oil Painting", "Watercolor", "Anime", "Abstract", "Pixel Art", "Sketch", "3D Render"];
+  const [prompt, setPrompt] = useState("");
+  const [style, setStyle] = useState("Photorealistic");
+  const [generating, setGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [generated, setGenerated] = useState(false);
+  const mockImages = [
+    "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=300&q=80",
+    "https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=300&q=80",
+    "https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=300&q=80",
+    "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=300&q=80",
+  ];
+  const generate = () => {
+    if (!prompt.trim()) return;
+    setGenerating(true); setProgress(0); setGenerated(false);
+    const iv = setInterval(() => {
+      setProgress(p => { if (p >= 100) { clearInterval(iv); setGenerating(false); setGenerated(true); return 100; } return p + 5; });
+    }, 80);
+  };
+  return (
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <textarea value={prompt} onChange={e => setPrompt(e.target.value)}
+          placeholder="Describe the image you want to generate..."
+          rows={2} className="w-full text-[11px] px-3 py-2 rounded-lg outline-none resize-none mb-2"
+          style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
+        <div className="flex flex-wrap gap-1 mb-2">
+          {styles.map(s => (
+            <button key={s} onClick={() => setStyle(s)}
+              className="px-2 py-0.5 rounded-full text-[9px] transition-colors"
+              style={{ background: style === s ? c.accent : c.cardAlt, color: style === s ? "#fff" : c.textMuted }}>
+              {s}
+            </button>
+          ))}
+        </div>
+        <button onClick={generate} disabled={generating}
+          className="w-full py-2 rounded-lg text-[11px] font-semibold transition-all"
+          style={{ background: generating ? c.cardAlt : c.accent, color: generating ? c.textMuted : "#fff" }}>
+          {generating ? `Generating... ${progress}%` : "✨ Generate Image"}
+        </button>
+        {generating && (
+          <div className="mt-2 h-1.5 rounded-full" style={{ background: c.border }}>
+            <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: c.accent }} />
+          </div>
+        )}
+      </div>
+      <div className="flex-1 overflow-y-auto p-3" style={{ scrollbarWidth: "none" }}>
+        {generated && (
+          <div className="mb-3">
+            <p className="text-[10px] font-semibold mb-2" style={{ color: c.text }}>Generated — {style}</p>
+            <div className="rounded-xl overflow-hidden aspect-square relative mb-2" style={{ background: c.surface }}>
+              <img src={mockImages[Math.floor(Math.random() * mockImages.length)]} alt="Generated" className="w-full h-full object-cover" />
+              <div className="absolute bottom-2 right-2 flex gap-1">
+                {["Save", "Upscale"].map(a => (
+                  <button key={a} className="px-2 py-1 rounded-lg text-[9px] font-medium" style={{ background: "rgba(0,0,0,0.6)", color: "#fff" }}>{a}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        <p className="text-[10px] font-semibold mb-2" style={{ color: c.textMuted }}>History</p>
+        <div className="grid grid-cols-2 gap-2">
+          {mockImages.map((img, i) => (
+            <div key={i} className="rounded-xl overflow-hidden aspect-square" style={{ background: c.surface }}>
+              <img src={img} alt="" className="w-full h-full object-cover opacity-70" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ━━━━ AI VOICE APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function AIVoiceApp({ c }: { c: typeof palette.dark }) {
+  const [mode, setMode] = useState<"stt" | "tts">("stt");
+  const [listening, setListening] = useState(false);
+  const [transcript, setTranscript] = useState("");
+  const [ttsText, setTtsText] = useState("Type something and I'll speak it aloud.");
+  const [voice, setVoice] = useState("Aria");
+  const [speaking, setSpeaking] = useState(false);
+  const voices = ["Aria", "Nova", "Echo", "Onyx", "Shimmer", "Fable"];
+  const mockTranscripts = [
+    "Open the gallery application and show me the latest uploads.",
+    "Create a new task: Review artist applications by Friday.",
+    "What is the weather forecast for tomorrow in New York?",
+    "Send an email to Sarah Mitchell about her recent submission.",
+  ];
+  const toggleListen = () => {
+    setListening(p => !p);
+    if (!listening) {
+      setTimeout(() => {
+        setTranscript(mockTranscripts[Math.floor(Math.random() * mockTranscripts.length)]);
+        setListening(false);
+      }, 2500);
+    }
+  };
+  const speak = () => { setSpeaking(true); setTimeout(() => setSpeaking(false), 2000); };
+  const bars = Array.from({ length: 20 }, (_, i) => i);
+  return (
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      <div className="flex flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        {[{ id: "stt", label: "🎤 Speech → Text" }, { id: "tts", label: "🔊 Text → Speech" }].map(m => (
+          <button key={m.id} onClick={() => setMode(m.id as "stt" | "tts")}
+            className="flex-1 py-2.5 text-[11px] font-medium transition-colors"
+            style={{ background: mode === m.id ? c.surface : "transparent", color: mode === m.id ? c.text : c.textMuted, borderBottom: mode === m.id ? `2px solid ${c.accent}` : "2px solid transparent" }}>
+            {m.label}
+          </button>
+        ))}
+      </div>
+      {mode === "stt" ? (
+        <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
+          <button onClick={toggleListen}
+            className="w-24 h-24 rounded-full flex items-center justify-center transition-all"
+            style={{ background: listening ? `${c.danger}20` : c.accentSoft, border: `2px solid ${listening ? c.danger : c.accent}`, boxShadow: listening ? `0 0 0 8px ${c.danger}15` : "none" }}>
+            <I d={ic.mic} s={36} c={listening ? c.danger : c.accent} />
+          </button>
+          {/* Waveform */}
+          <div className="flex items-center gap-0.5 h-10">
+            {bars.map(i => (
+              <div key={i} className="w-1 rounded-full transition-all"
+                style={{ height: listening ? `${Math.random() * 100}%` : "15%", background: listening ? c.danger : c.border, animation: listening ? `pulse ${0.3 + i * 0.05}s ease-in-out infinite alternate` : "none" }} />
+            ))}
+          </div>
+          <p className="text-[11px] font-medium" style={{ color: c.textSec }}>{listening ? "Listening..." : "Tap to speak"}</p>
+          {transcript && (
+            <div className="w-full p-3 rounded-xl text-[11px] leading-relaxed" style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }}>
+              &ldquo;{transcript}&rdquo;
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="flex-1 flex flex-col p-4 gap-4">
+          <div>
+            <p className="text-[10px] font-semibold mb-1.5" style={{ color: c.textMuted }}>Voice</p>
+            <div className="flex flex-wrap gap-1.5">
+              {voices.map(v => (
+                <button key={v} onClick={() => setVoice(v)}
+                  className="px-3 py-1 rounded-full text-[10px] transition-colors"
+                  style={{ background: voice === v ? c.accentSoft : c.surface, color: voice === v ? c.accentText : c.textMuted, border: `1px solid ${voice === v ? c.accent : c.border}` }}>
+                  {v}
+                </button>
+              ))}
+            </div>
+          </div>
+          <textarea value={ttsText} onChange={e => setTtsText(e.target.value)}
+            rows={5} className="flex-1 text-[11px] px-3 py-2 rounded-xl outline-none resize-none"
+            style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
+          <button onClick={speak} disabled={speaking}
+            className="py-2.5 rounded-xl text-[12px] font-semibold flex items-center justify-center gap-2"
+            style={{ background: speaking ? c.cardAlt : c.accent, color: speaking ? c.textMuted : "#fff" }}>
+            <I d={ic.volume} s={16} c={speaking ? c.textMuted : "#fff"} />
+            {speaking ? "Speaking..." : `Speak as ${voice}`}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ━━━━ AI WRITER APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function WriterApp({ c }: { c: typeof palette.dark }) {
+  const [content, setContent] = useState("# Untitled Document\n\nStart writing here...");
+  const [suggestion, setSuggestion] = useState<string | null>(null);
+  const [tone, setTone] = useState("Professional");
+  const tones = ["Professional", "Casual", "Creative", "Formal", "Friendly"];
+  const aiSuggestions = [
+    " Furthermore, this approach demonstrates significant potential for growth and innovation in the field.",
+    " The data clearly supports this conclusion, with multiple studies confirming these findings.",
+    " This presents a unique opportunity to explore new creative directions and expand our artistic vision.",
+    " In conclusion, these elements combine to create a cohesive and compelling narrative.",
+  ];
+  const getSuggestion = () => setSuggestion(aiSuggestions[Math.floor(Math.random() * aiSuggestions.length)]);
+  const acceptSuggestion = () => { if (suggestion) { setContent(p => p + suggestion); setSuggestion(null); } };
+  const words = content.trim().split(/\s+/).filter(Boolean).length;
+  const chars = content.length;
+  return (
+    <div className="flex h-full" style={{ background: c.bg }}>
+      {/* Editor */}
+      <div className="flex-1 flex flex-col">
+        {/* Toolbar */}
+        <div className="px-3 py-2 flex items-center gap-1 flex-shrink-0 overflow-x-auto" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+          {[ic.alignLeft, ic.alignCenter, ic.alignRight, ic.alignJustify].map((d, i) => (
+            <button key={i} className="p-1.5 rounded" onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <I d={d} s={13} c={c.textMuted} />
+            </button>
+          ))}
+          <div className="w-px h-4 mx-1" style={{ background: c.border }} />
+          {["B", "I", "U"].map(f => (
+            <button key={f} className="w-6 h-6 rounded text-[11px] font-bold" style={{ color: c.textMuted }}
+              onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              {f}
+            </button>
+          ))}
+        </div>
+        <div className="flex-1 relative overflow-hidden">
+          <textarea value={content} onChange={e => setContent(e.target.value)}
+            className="w-full h-full p-5 text-[12px] leading-7 resize-none outline-none"
+            style={{ background: c.bg, color: c.text, scrollbarWidth: "none" }} />
+          {suggestion && (
+            <div className="absolute bottom-4 left-4 right-4 p-3 rounded-xl text-[11px] leading-relaxed"
+              style={{ background: `${c.accent}15`, border: `1px solid ${c.accent}40`, color: c.accentText }}>
+              <p className="text-[9px] font-semibold mb-1" style={{ color: c.textMuted }}>AI SUGGESTION</p>
+              {suggestion}
+              <div className="flex gap-2 mt-2">
+                <button onClick={acceptSuggestion} className="px-2 py-0.5 rounded text-[9px] font-medium" style={{ background: c.accent, color: "#fff" }}>Accept</button>
+                <button onClick={() => setSuggestion(null)} className="px-2 py-0.5 rounded text-[9px] font-medium" style={{ background: c.cardAlt, color: c.textMuted }}>Dismiss</button>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="px-4 py-1.5 flex items-center gap-4 text-[9px] flex-shrink-0" style={{ borderTop: `1px solid ${c.border}`, color: c.textMuted }}>
+          <span>{words} words</span><span>{chars} chars</span>
+        </div>
+      </div>
+      {/* AI sidebar */}
+      <div className="w-36 flex-shrink-0 flex flex-col p-3 gap-3" style={{ borderLeft: `1px solid ${c.border}` }}>
+        <div>
+          <p className="text-[10px] font-semibold mb-1.5" style={{ color: c.text }}>Tone</p>
+          {tones.map(t => (
+            <button key={t} onClick={() => setTone(t)}
+              className="w-full text-left px-2 py-1 rounded-lg text-[10px] mb-0.5 transition-colors"
+              style={{ background: tone === t ? c.accentSoft : "transparent", color: tone === t ? c.accentText : c.textMuted }}>
+              {t}
+            </button>
+          ))}
+        </div>
+        <div className="h-px" style={{ background: c.border }} />
+        <div>
+          <p className="text-[10px] font-semibold mb-1.5" style={{ color: c.text }}>AI Assist</p>
+          {["Suggest", "Rephrase", "Expand", "Shorten"].map(a => (
+            <button key={a} onClick={a === "Suggest" ? getSuggestion : undefined}
+              className="w-full text-left px-2 py-1.5 rounded-lg text-[10px] mb-0.5 transition-colors"
+              style={{ background: c.surface, color: c.textSec, border: `1px solid ${c.border}` }}
+              onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = c.surface)}>
+              {a}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ━━━━ KNOWLEDGE BASE APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function KnowledgeApp({ c }: { c: typeof palette.dark }) {
+  const docs = [
+    { name: "Artist Guidelines 2024", size: "245 KB", pages: 12, tags: ["policy", "artists"], indexed: true },
+    { name: "Payment Integration Docs", size: "89 KB", pages: 5, tags: ["dev", "payments"], indexed: true },
+    { name: "Gallery Exhibition Plan", size: "1.2 MB", pages: 34, tags: ["gallery", "events"], indexed: true },
+    { name: "Marketing Strategy Q1", size: "560 KB", pages: 18, tags: ["marketing", "strategy"], indexed: false },
+    { name: "Legal Terms & Conditions", size: "120 KB", pages: 8, tags: ["legal"], indexed: true },
+  ];
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<{ doc: string; snippet: string; page: number }[]>([]);
+  const [searching, setSearching] = useState(false);
+  const snippets: Record<string, string> = {
+    pay: "...payment is processed via Stripe with 3DS authentication. Funds are held for 7 days before release to artists...",
+    art: "...artists must submit a portfolio of at least 5 original works. All pieces must be verified authentic...",
+    gall: "...the gallery exhibition runs from March 15 to April 30. Artists are required to attend the opening night...",
+    mark: "...Q1 marketing budget is €12,000 with focus on Instagram and Google Ads campaigns targeting collectors...",
+    legal: "...users agree to our terms of service. Alternus retains a 20% commission on all successful sales...",
+  };
+  const search = () => {
+    if (!query.trim()) return;
+    setSearching(true);
+    setTimeout(() => {
+      const key = Object.keys(snippets).find(k => query.toLowerCase().includes(k)) ?? "art";
+      setResults([
+        { doc: docs[0].name, snippet: snippets[key] ?? snippets.art, page: 3 },
+        { doc: docs[2].name, snippet: "...related context found in the exhibition planning document regarding artists and submissions...", page: 7 },
+      ]);
+      setSearching(false);
+    }, 800);
+  };
+  return (
+    <div className="flex h-full" style={{ background: c.bg }}>
+      {/* Document list */}
+      <div className="w-44 flex-shrink-0 flex flex-col" style={{ borderRight: `1px solid ${c.border}` }}>
+        <div className="px-3 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <p className="text-[11px] font-semibold" style={{ color: c.text }}>Documents</p>
+          <p className="text-[9px]" style={{ color: c.textMuted }}>{docs.filter(d => d.indexed).length} indexed</p>
+        </div>
+        <div className="flex-1 overflow-y-auto p-2 space-y-1" style={{ scrollbarWidth: "none" }}>
+          {docs.map((d, i) => (
+            <div key={i} className="px-2 py-2 rounded-lg" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <I d={ic.fileText} s={11} c={d.indexed ? c.success : c.textMuted} />
+                <span className="text-[9px] font-medium truncate" style={{ color: c.textSec }}>{d.name}</span>
+              </div>
+              <div className="flex gap-1.5">
+                <span className="text-[8px]" style={{ color: c.textMuted }}>{d.size}</span>
+                <span className="text-[8px] px-1 rounded" style={{ background: d.indexed ? `${c.success}20` : c.cardAlt, color: d.indexed ? c.success : c.textMuted }}>{d.indexed ? "indexed" : "pending"}</span>
+              </div>
+            </div>
+          ))}
+          <button className="w-full py-1.5 rounded-lg text-[10px] text-center" style={{ border: `1px dashed ${c.border}`, color: c.textMuted }}>
+            + Add Document
+          </button>
+        </div>
+      </div>
+      {/* Search */}
+      <div className="flex-1 flex flex-col">
+        <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <p className="text-[11px] font-semibold mb-2" style={{ color: c.text }}>Semantic Search</p>
+          <div className="flex gap-2">
+            <input value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === "Enter" && search()}
+              placeholder="Ask anything about your documents..."
+              className="flex-1 text-[11px] px-3 py-2 rounded-lg outline-none"
+              style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
+            <button onClick={search} className="px-3 py-2 rounded-lg" style={{ background: c.accent }}>
+              <I d={ic.search} s={14} c="#fff" />
+            </button>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
+          {searching && <p className="text-[11px] text-center py-8" style={{ color: c.textMuted }}>Searching knowledge base...</p>}
+          {results.map((r, i) => (
+            <div key={i} className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-[11px] font-semibold" style={{ color: c.text }}>{r.doc}</p>
+                <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: c.cardAlt, color: c.textMuted }}>Page {r.page}</span>
+              </div>
+              <p className="text-[10px] leading-relaxed" style={{ color: c.textSec }}>{r.snippet}</p>
+              <div className="flex gap-1 mt-2">
+                <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: `${c.accent}15`, color: c.accentText }}>Relevance: 94%</span>
+              </div>
+            </div>
+          ))}
+          {!searching && results.length === 0 && (
+            <div className="text-center py-12">
+              <I d={ic.bookOpen} s={32} c={c.textMuted} />
+              <p className="text-[11px] mt-3" style={{ color: c.textMuted }}>Search your indexed documents with natural language</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ RECOVERY APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 interface RecoveryFile {
   name: string;
@@ -4933,6 +5654,15 @@ export default function AlternusOS() {
     { id: "studio", title: "Alternus Studio", isOpen: false, isMinimized: false, isMaximized: true, zIndex: 1, x: 60, y: 30, w: 720, h: 520 },
     { id: "recovery", title: "Recovery", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 60, w: 520, h: 440 },
     { id: "news", title: "News", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 180, y: 50, w: 500, h: 480 },
+    { id: "dashboard", title: "Dashboard", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 40, w: 520, h: 460 },
+    { id: "tasks", title: "Tasks", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 60, w: 420, h: 480 },
+    { id: "mail", title: "Mail", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 50, w: 580, h: 460 },
+    { id: "monaco", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 60, y: 30, w: 600, h: 480 },
+    { id: "aihub", title: "AI Hub", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 150, y: 60, w: 480, h: 500 },
+    { id: "imagegen", title: "AI Image Generator", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 40, w: 440, h: 520 },
+    { id: "aivoice", title: "AI Voice", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 80, w: 380, h: 440 },
+    { id: "writer", title: "AI Writer", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 40, w: 560, h: 480 },
+    { id: "knowledge", title: "Knowledge Base", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 560, h: 480 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -5250,6 +5980,24 @@ export default function AlternusOS() {
         id: "recovery", title: "Recovery", icon: ic.shield, description: "Recover deleted files and deep scan" },
       { keys: ["news", "breaking", "headline", "article", "press", "journalism", "newspaper", "media", "report", "bbc", "cnn", "reuters", "current events"],
         id: "news", title: "News", icon: ic.newspaper, description: "Breaking news and world headlines" },
+      { keys: ["dashboard", "overview", "stats", "system", "monitor", "home", "widgets", "summary", "quick view"],
+        id: "dashboard", title: "Dashboard", icon: ic.grid, description: "System overview, stats and widgets" },
+      { keys: ["task", "todo", "to-do", "checklist", "priority", "deadline", "reminder", "plan", "agenda", "productivity"],
+        id: "tasks", title: "Tasks", icon: ic.checkSquare, description: "Manage tasks with priorities and deadlines" },
+      { keys: ["mail", "email", "inbox", "compose", "message", "send", "receive", "smtp", "letter", "newsletter"],
+        id: "mail", title: "Mail", icon: ic.mail, description: "Email client with inbox and compose" },
+      { keys: ["vscode", "monaco", "ide", "editor", "code editor", "typescript", "javascript", "python", "syntax", "programming"],
+        id: "monaco", title: "Code Editor", icon: ic.code, description: "VS Code-style code editor" },
+      { keys: ["ai hub", "multi model", "gpt", "claude", "gemini", "llama", "compare", "model", "chat ai", "ai chat"],
+        id: "aihub", title: "AI Hub", icon: ic.messageCircle, description: "Multi-model AI chat hub" },
+      { keys: ["image gen", "generate image", "dalle", "stable diffusion", "midjourney", "text to image", "art ai", "draw ai"],
+        id: "imagegen", title: "AI Image Generator", icon: ic.wand, description: "Generate images with AI" },
+      { keys: ["voice", "speech", "microphone", "text to speech", "speech to text", "stt", "tts", "dictate", "transcribe"],
+        id: "aivoice", title: "AI Voice", icon: ic.mic, description: "Speech-to-text and text-to-speech" },
+      { keys: ["writer", "ai write", "autocomplete", "document ai", "content", "copywriting", "blog writer", "essay ai"],
+        id: "writer", title: "AI Writer", icon: ic.edit3, description: "Document editor with AI writing assistance" },
+      { keys: ["knowledge", "rag", "search docs", "knowledge base", "semantic search", "index", "upload doc", "qa", "document search"],
+        id: "knowledge", title: "Knowledge Base", icon: ic.bookOpen, description: "Semantic search over your documents" },
     ];
 
     // ━━━ SEMANTIC FILE SEARCH ━━━
@@ -5385,6 +6133,15 @@ export default function AlternusOS() {
     studio: <StudioApp c={c} />,
     recovery: <RecoveryApp c={c} files={recoveryFiles} onRecover={handleRecoveryRecover} onPermanentDelete={handleRecoveryDelete} onScan={handleRecoveryScan} />,
     news: <NewsApp c={c} />,
+    dashboard: <DashboardApp c={c} />,
+    tasks: <TasksApp c={c} />,
+    mail: <MailApp c={c} />,
+    monaco: <MonacoApp c={c} />,
+    aihub: <AIHubApp c={c} />,
+    imagegen: <ImageGenApp c={c} />,
+    aivoice: <AIVoiceApp c={c} />,
+    writer: <WriterApp c={c} />,
+    knowledge: <KnowledgeApp c={c} />,
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
@@ -5406,6 +6163,15 @@ export default function AlternusOS() {
     { id: "controlpanel", icon: ic.monitor, label: "Control Panel", color: c.textSec },
     { id: "recovery", icon: ic.shield, label: "Recovery", color: c.success },
     { id: "news", icon: ic.newspaper, label: "News", color: c.danger },
+    { id: "dashboard", icon: ic.grid, label: "Dashboard", color: "#60A5FA" },
+    { id: "tasks", icon: ic.checkSquare, label: "Tasks", color: "#34D399" },
+    { id: "mail", icon: ic.mail, label: "Mail", color: "#F97316" },
+    { id: "monaco", icon: ic.code, label: "VS Code", color: "#007ACC" },
+    { id: "aihub", icon: ic.messageCircle, label: "AI Hub", color: "#A78BFA" },
+    { id: "imagegen", icon: ic.wand, label: "Image AI", color: "#EC4899" },
+    { id: "aivoice", icon: ic.mic, label: "AI Voice", color: "#FBBF24" },
+    { id: "writer", icon: ic.edit3, label: "AI Writer", color: "#34D399" },
+    { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316" },
   ];
 
   // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
