@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery";
 
 interface WinState {
   id: WinId;
@@ -2136,7 +2136,7 @@ function WordApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
-function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: WinId) => void }) {
+function FilesApp({ c, onOpenApp, onTrashEmpty }: { c: typeof palette.dark; onOpenApp: (id: WinId) => void; onTrashEmpty?: (files: { name: string; icon: string; size: string; origin: string }[]) => void }) {
   const [currentPath, setCurrentPath] = useState<string[]>(["Home"]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -2223,6 +2223,9 @@ function FilesApp({ c, onOpenApp }: { c: typeof palette.dark; onOpenApp: (id: Wi
   };
 
   const emptyTrash = () => {
+    if (onTrashEmpty && fileSystem.Trash.length > 0) {
+      onTrashEmpty(fileSystem.Trash.map(f => ({ name: f.name, icon: f.icon, size: f.size, origin: "Trash" })));
+    }
     setFileSystem(prev => ({ ...prev, Trash: [] }));
   };
 
@@ -4540,6 +4543,165 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
   );
 }
 
+// ━━━━ RECOVERY APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+interface RecoveryFile {
+  name: string;
+  icon: string;
+  deletedAt: string;
+  origin: string;
+  size: string;
+  status: "recoverable" | "partial";
+  integrity: number;
+}
+
+function RecoveryApp({ c, files, onRecover, onPermanentDelete, onScan }: {
+  c: typeof palette.dark;
+  files: RecoveryFile[];
+  onRecover: (name: string) => void;
+  onPermanentDelete: (name: string) => void;
+  onScan: () => void;
+}) {
+  const [scanning, setScanning] = useState(false);
+  const [scanProgress, setScanProgress] = useState(0);
+  const [filter, setFilter] = useState<"all" | "recoverable" | "partial">("all");
+
+  const doScan = () => {
+    setScanning(true); setScanProgress(0);
+    const iv = setInterval(() => {
+      setScanProgress(p => {
+        if (p >= 100) { clearInterval(iv); setScanning(false); onScan(); return 100; }
+        return p + Math.random() * 15 + 5;
+      });
+    }, 200);
+  };
+
+  const filtered = files.filter(f => filter === "all" || f.status === filter);
+  const totalSize = files.reduce((a, f) => {
+    const n = parseFloat(f.size);
+    return a + (f.size.includes("MB") ? n : f.size.includes("KB") ? n / 1024 : n / (1024 * 1024));
+  }, 0);
+
+  return (
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      {/* Header */}
+      <div className="px-5 py-4 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(52,211,153,0.12)" }}>
+              <I d={ic.shield} s={18} c={c.success} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold" style={{ color: c.text }}>Recovery Tool</p>
+              <p className="text-[10px]" style={{ color: c.textMuted }}>{files.length} file{files.length !== 1 ? "s" : ""} recoverable · {totalSize.toFixed(1)} MB total</p>
+            </div>
+          </div>
+          <button
+            onClick={doScan}
+            disabled={scanning}
+            className="px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all"
+            style={{ background: scanning ? c.cardAlt : c.accent, color: scanning ? c.textMuted : "#fff" }}
+          >
+            <I d={ic.refresh} s={13} c={scanning ? c.textMuted : "#fff"} />
+            {scanning ? "Scanning..." : "Deep Scan"}
+          </button>
+        </div>
+
+        {/* Scan progress */}
+        {scanning && (
+          <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: c.cardAlt }}>
+            <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(scanProgress, 100)}%`, background: `linear-gradient(90deg, ${c.accent}, ${c.success})` }} />
+          </div>
+        )}
+
+        {/* Filter tabs */}
+        {!scanning && files.length > 0 && (
+          <div className="flex gap-1 mt-3">
+            {(["all", "recoverable", "partial"] as const).map(f => (
+              <button key={f} onClick={() => setFilter(f)}
+                className="px-3 py-1 rounded-lg text-[10px] font-medium transition-colors"
+                style={{ background: filter === f ? c.accentSoft : "transparent", color: filter === f ? c.accentText : c.textMuted }}>
+                {f === "all" ? `All (${files.length})` : f === "recoverable" ? `Recoverable (${files.filter(x => x.status === "recoverable").length})` : `Partial (${files.filter(x => x.status === "partial").length})`}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* File list */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-1.5" style={{ scrollbarWidth: "none" }}>
+        {filtered.length === 0 && !scanning && (
+          <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-6">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: c.cardAlt }}>
+              <I d={ic.shield} s={24} c={c.textMuted} />
+            </div>
+            <p className="text-sm font-medium" style={{ color: c.text }}>No recoverable files</p>
+            <p className="text-xs" style={{ color: c.textMuted }}>Files deleted from Trash will appear here. Run a Deep Scan to search for recoverable data.</p>
+            <button onClick={doScan} className="mt-2 px-5 py-2 rounded-xl text-xs font-semibold" style={{ background: c.accent, color: "#fff" }}>
+              <I d={ic.refresh} s={13} c="#fff" /> Start Deep Scan
+            </button>
+          </div>
+        )}
+
+        {filtered.map((file, i) => (
+          <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
+            style={{ background: c.surface, border: `1px solid ${c.border}` }}
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+            onMouseLeave={e => (e.currentTarget.style.background = c.surface)}>
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: file.status === "recoverable" ? "rgba(52,211,153,0.1)" : "rgba(251,191,36,0.1)" }}>
+              <I d={file.icon} s={16} c={file.status === "recoverable" ? c.success : c.warning} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] font-medium truncate" style={{ color: c.text }}>{file.name}</p>
+              <p className="text-[9px]" style={{ color: c.textMuted }}>
+                {file.origin} · {file.deletedAt} · {file.size}
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <span className="text-[9px] px-1.5 py-0.5 rounded-full font-medium"
+                style={{
+                  background: file.status === "recoverable" ? "rgba(52,211,153,0.12)" : "rgba(251,191,36,0.12)",
+                  color: file.status === "recoverable" ? c.success : c.warning,
+                }}>
+                {file.status === "recoverable" ? `${file.integrity}%` : `${file.integrity}%`}
+              </span>
+              <button onClick={() => onRecover(file.name)}
+                className="px-3 py-1 rounded-lg text-[10px] font-semibold transition-all hover:opacity-90"
+                style={{ background: c.accent, color: "#fff" }}>
+                Recover
+              </button>
+              <button onClick={() => onPermanentDelete(file.name)}
+                className="p-1 rounded-lg transition-colors"
+                style={{ color: c.textMuted }}
+                onMouseEnter={e => (e.currentTarget.style.color = c.danger)}
+                onMouseLeave={e => (e.currentTarget.style.color = c.textMuted)}>
+                <I d={ic.close} s={12} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer */}
+      {filtered.length > 0 && (
+        <div className="px-5 py-3 flex items-center justify-between flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+          <button onClick={() => { filtered.forEach(f => onRecover(f.name)); }}
+            className="px-4 py-1.5 rounded-lg text-[11px] font-semibold transition-all hover:opacity-90"
+            style={{ background: c.accentSoft, color: c.accentText }}>
+            Recover All ({filtered.length})
+          </button>
+          <button onClick={() => { filtered.forEach(f => onPermanentDelete(f.name)); }}
+            className="px-4 py-1.5 rounded-lg text-[11px] font-medium transition-colors"
+            style={{ color: c.danger }}
+            onMouseEnter={e => (e.currentTarget.style.background = "rgba(239,68,68,0.08)")}
+            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            Delete All Permanently
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ━━━━ MAIN OS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function AlternusOS() {
   const [mode, setMode] = useState<ThemeMode>("dark");
@@ -4582,6 +4744,7 @@ export default function AlternusOS() {
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   const [showTimeline, setShowTimeline] = useState(false);
   const [wallpaper, setWallpaper] = useState(0);
+  const [recoveryFiles, setRecoveryFiles] = useState<RecoveryFile[]>([]);
   const [installedApps, setInstalledApps] = useState<string[]>([]);
   const [installingApp, setInstallingApp] = useState<string | null>(null);
   const [installProgress, setInstallProgress] = useState(0);
@@ -4610,6 +4773,7 @@ export default function AlternusOS() {
     { id: "downloads", title: "Downloads", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 350, y: 80, w: 440, h: 480 },
     { id: "controlpanel", title: "Control Panel", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 40, w: 580, h: 440 },
     { id: "studio", title: "Alternus Studio", isOpen: false, isMinimized: false, isMaximized: true, zIndex: 1, x: 60, y: 30, w: 720, h: 520 },
+    { id: "recovery", title: "Recovery", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 60, w: 520, h: 440 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -4715,6 +4879,7 @@ export default function AlternusOS() {
       downloads: { w: 440, h: 480 },
       controlpanel: { w: 580, h: 440 },
       studio: { w: 720, h: 520 },
+      recovery: { w: 520, h: 440 },
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
@@ -4921,6 +5086,8 @@ export default function AlternusOS() {
         id: "ai", title: "Alternus AI", icon: ic.sparkle, description: "AI-powered assistant and chat" },
       { keys: ["illustrator", "design", "draw", "paint", "sketch", "art", "photoshop", "figma", "canvas", "graphic", "logo", "icon", "illustration", "vector", "pixel", "color", "gradient", "brush", "layer"],
         id: "code", title: "Code Editor", icon: ic.code, description: "SVG/CSS design and creative coding", extra: { id: "browser", title: "Browser", icon: ic.globe, description: "Open Figma or design tools in browser" } },
+      { keys: ["recovery", "recover", "restore", "undelete", "recycle", "trash", "deleted", "lost file", "deep scan"],
+        id: "recovery", title: "Recovery", icon: ic.shield, description: "Recover deleted files and deep scan" },
     ];
 
     // ━━━ SEMANTIC FILE SEARCH ━━━
@@ -5006,11 +5173,43 @@ export default function AlternusOS() {
     setAiActions([{ label: "Search on Google", action: "browser" }, { label: "Open AI Chat", action: "ai" }]);
   };
 
+  const handleRecoveryRecover = (name: string) => {
+    const file = recoveryFiles.find(f => f.name === name);
+    if (!file) return;
+    setRecoveryFiles(prev => prev.filter(f => f.name !== name));
+    addTimelineEvent("Recovered", file.name, ic.refresh);
+  };
+  const handleRecoveryDelete = (name: string) => {
+    setRecoveryFiles(prev => prev.filter(f => f.name !== name));
+  };
+  const handleRecoveryScan = () => {
+    const scanResults: RecoveryFile[] = [
+      { name: "project-backup.zip", icon: ic.folder, deletedAt: "3 days ago", origin: "Documents", size: "45 MB", status: "recoverable", integrity: 100 },
+      { name: "presentation-final.pptx", icon: ic.fileText, deletedAt: "1 week ago", origin: "Documents", size: "12 MB", status: "recoverable", integrity: 98 },
+      { name: "vacation-photo.jpg", icon: ic.image, deletedAt: "2 weeks ago", origin: "Pictures", size: "4.2 MB", status: "partial", integrity: 67 },
+      { name: "database-export.sql", icon: ic.code, deletedAt: "3 weeks ago", origin: "Projects", size: "8.5 MB", status: "recoverable", integrity: 95 },
+      { name: "old-resume.docx", icon: ic.fileText, deletedAt: "1 month ago", origin: "Documents", size: "340 KB", status: "partial", integrity: 43 },
+    ];
+    setRecoveryFiles(prev => {
+      const existing = new Set(prev.map(f => f.name));
+      return [...prev, ...scanResults.filter(f => !existing.has(f.name))];
+    });
+  };
+  const handleTrashEmpty = (files: { name: string; icon: string; size: string; origin: string }[]) => {
+    const newRecovery: RecoveryFile[] = files.map(f => ({
+      ...f,
+      deletedAt: "Just now",
+      status: Math.random() > 0.3 ? "recoverable" as const : "partial" as const,
+      integrity: Math.random() > 0.3 ? Math.floor(Math.random() * 15 + 85) : Math.floor(Math.random() * 40 + 30),
+    }));
+    setRecoveryFiles(prev => [...prev, ...newRecovery]);
+  };
+
   const winContent: Record<WinId, React.ReactNode> = {
     ai: <AIChat c={c} mode={mode} setMode={setMode} onOpenApp={openWin} />,
     terminal: <TerminalApp c={c} />,
     code: <CodeApp c={c} />,
-    files: <FilesApp c={c} onOpenApp={openWin} />,
+    files: <FilesApp c={c} onOpenApp={openWin} onTrashEmpty={handleTrashEmpty} />,
     settings: <SettingsApp c={c} mode={mode} setMode={setMode} wallpaper={wallpaper} setWallpaper={setWallpaper} />,
     music: <MusicApp c={c} />,
     weather: <WeatherApp c={c} />,
@@ -5026,6 +5225,7 @@ export default function AlternusOS() {
     downloads: <DownloadsApp c={c} />,
     controlpanel: <ControlPanelApp c={c} mode={mode} setMode={setMode} onOpenApp={openWin} />,
     studio: <StudioApp c={c} />,
+    recovery: <RecoveryApp c={c} files={recoveryFiles} onRecover={handleRecoveryRecover} onPermanentDelete={handleRecoveryDelete} onScan={handleRecoveryScan} />,
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
@@ -5045,6 +5245,7 @@ export default function AlternusOS() {
     { id: "studio", icon: ic.pen, label: "Studio", color: "#A78BFA" },
     { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec },
     { id: "controlpanel", icon: ic.monitor, label: "Control Panel", color: c.textSec },
+    { id: "recovery", icon: ic.shield, label: "Recovery", color: c.success },
   ];
 
   // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
