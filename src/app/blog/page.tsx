@@ -72,12 +72,29 @@ export default function BlogPage() {
         </div>
       </div>
 
+      {/* ═══ Breaking News Bar ═══ */}
+      <Link href={`/blog/${blogPosts[0].id}`}>
+        <div className="bg-[#1a1a2e] dark:bg-[#0d0d1a] border-y border-red-900/30 cursor-pointer hover:bg-[#1f1f35] dark:hover:bg-[#111128] transition-colors">
+          <div className="container mx-auto px-4 py-3 flex items-center gap-4">
+            <Badge className="bg-red-600 hover:bg-red-600 text-white text-[10px] uppercase tracking-wider font-bold flex-shrink-0 animate-pulse">
+              Breaking
+            </Badge>
+            <p className="text-sm md:text-base font-medium text-white truncate">
+              {blogPosts[0].title}
+            </p>
+            <span className="text-red-400 text-xs flex-shrink-0 hidden sm:inline">
+              LIVE
+            </span>
+          </div>
+        </div>
+      </Link>
+
       {/* ═══ Trending Ticker ═══ */}
-      <div className="relative border-y border-border/50 backdrop-blur-md bg-background/80 overflow-hidden">
+      <div className="relative border-b border-border/50 backdrop-blur-md bg-background/80 overflow-hidden">
         <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-background to-transparent z-10" />
         <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-background to-transparent z-10" />
         <div className="flex items-center py-2.5 px-4">
-          <Badge className="bg-red-600 hover:bg-red-600 text-white text-[10px] uppercase tracking-wider flex-shrink-0 mr-4">
+          <Badge className="bg-amber-600 hover:bg-amber-600 text-white text-[10px] uppercase tracking-wider flex-shrink-0 mr-4">
             Trending
           </Badge>
           <div className="overflow-hidden flex-1">
