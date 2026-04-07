@@ -4171,6 +4171,43 @@ function StudioApp({ c }: { c: typeof palette.dark }) {
 // ━━━━ Control Panel ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; onOpenApp?: (id: WinId) => void }) {
   const [activeSection, setActiveSection] = useState("System");
+  const [perfStats, setPerfStats] = useState({ cpu: 23, mem: 58, gpu: 12 });
+  const [diagMsg, setDiagMsg] = useState<string | null>(null);
+
+  // Strict flat palette — fixed regardless of OS theme
+  const fp = {
+    bg: "#0A192F",
+    panel: "#F0F0F0",
+    panelDark: "#E0E0E0",
+    accent: "#00B4D8",
+    red: "#E63946",
+    dark: "#1E1E1E",
+    light: "#FFFFFF",
+    green: "#2E8B57",
+    sidebar: "#071629",
+    sidebarBorder: "#0F2847",
+    activeItem: "#0D2440",
+    muted: "#8A9BB0",
+    panelBorder: "#C8C8C8",
+  };
+
+  const refreshStats = () => {
+    setPerfStats({ cpu: Math.floor(Math.random() * 35 + 5), mem: Math.floor(Math.random() * 25 + 40), gpu: Math.floor(Math.random() * 18 + 3) });
+  };
+
+  const runDiagnostic = () => {
+    setDiagMsg("Running...");
+    setTimeout(() => setDiagMsg("✓ All systems passed — no issues detected."), 1600);
+    setTimeout(() => setDiagMsg(null), 5000);
+  };
+
+  const exportLog = () => {
+    const log = `ALTERNUS OS v3.0 — SYSTEM LOG\n---\nCPU: ${perfStats.cpu}%\nMemory: ${perfStats.mem}%\nGPU: ${perfStats.gpu}%\nStatus: Operational\nTimestamp: ${new Date().toISOString()}`;
+    const a = document.createElement("a");
+    a.href = "data:text/plain," + encodeURIComponent(log);
+    a.download = "alternus-log.txt";
+    a.click();
+  };
 
   const sections = [
     { label: "System", icon: ic.monitor },
@@ -4189,42 +4226,117 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
     switch (activeSection) {
       case "System":
         return (
-          <div className="space-y-4">
-            <p className="text-sm font-semibold" style={{ color: c.text }}>System Information</p>
-            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
-              {[
-                { label: "OS", value: "Alternus OS v3.0" },
-                { label: "Kernel", value: "AlternusKernel 6.2" },
-                { label: "CPU", value: "AlternusCore x86_64 @ 4.2GHz" },
-                { label: "RAM", value: "16 GB DDR5" },
-                { label: "GPU", value: "Integrated Graphics" },
-                { label: "Architecture", value: "64-bit" },
-              ].map((item, i) => (
-                <div key={i} className="flex justify-between">
-                  <span className="text-xs" style={{ color: c.textMuted }}>{item.label}</span>
-                  <span className="text-xs font-medium" style={{ color: c.text }}>{item.value}</span>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-xl p-4" style={{ background: c.cardAlt }}>
-              <p className="text-xs font-medium mb-2" style={{ color: c.text }}>Performance</p>
-              <div className="space-y-2">
-                {[
-                  { label: "CPU Usage", pct: 23, color: c.accent },
-                  { label: "Memory", pct: 58, color: c.purple },
-                  { label: "GPU", pct: 12, color: c.success },
-                ].map((item, i) => (
-                  <div key={i}>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-[10px]" style={{ color: c.textMuted }}>{item.label}</span>
-                      <span className="text-[10px] font-medium" style={{ color: c.text }}>{item.pct}%</span>
-                    </div>
-                    <div className="h-1.5 rounded-full" style={{ background: c.border }}>
-                      <div className="h-full rounded-full transition-all" style={{ width: `${item.pct}%`, background: item.color }} />
-                    </div>
-                  </div>
-                ))}
+          <div className="flex flex-col h-full" style={{ background: fp.panel }}>
+            {/* Header bar */}
+            <div className="px-5 py-3 flex items-center justify-between flex-shrink-0" style={{ background: fp.bg, borderBottom: `2px solid ${fp.accent}` }}>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest" style={{ color: fp.accent }}>Control Panel</p>
+                <p className="text-[10px] mt-0.5" style={{ color: fp.muted }}>Alternus OS v3.0 — System Overview</p>
               </div>
+              {/* Status pill */}
+              <div className="flex items-center gap-2">
+                <div style={{ width: 8, height: 8, background: fp.green, borderRadius: 0 }} />
+                <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: fp.light }}>All systems operational</span>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4" style={{ scrollbarWidth: "none" }}>
+              {/* System Info block */}
+              <div style={{ border: `1px solid ${fp.panelBorder}`, borderRadius: 2 }}>
+                <div className="px-4 py-2 flex items-center gap-2" style={{ background: fp.bg, borderBottom: `1px solid ${fp.panelBorder}` }}>
+                  <I d={ic.monitor} s={13} c={fp.accent} />
+                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: fp.accent }}>System Information</span>
+                </div>
+                <div className="divide-y" style={{ background: fp.panel }}>
+                  {[
+                    { label: "OS", value: "Alternus OS v3.0" },
+                    { label: "Kernel", value: "AlternusKernel 6.2" },
+                    { label: "CPU", value: "AlternusCore x86_64 @ 4.2 GHz" },
+                    { label: "RAM", value: "16 GB DDR5" },
+                    { label: "GPU", value: "Integrated Graphics" },
+                    { label: "Architecture", value: "64-bit" },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center justify-between px-4 py-2.5" style={{ borderBottom: `1px solid ${fp.panelBorder}` }}>
+                      <span className="text-[11px] font-medium" style={{ color: fp.muted }}>{item.label}</span>
+                      <span className="text-[11px] font-semibold font-mono" style={{ color: fp.dark }}>{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Performance block */}
+              <div style={{ border: `1px solid ${fp.panelBorder}`, borderRadius: 2 }}>
+                <div className="px-4 py-2 flex items-center gap-2" style={{ background: fp.bg, borderBottom: `1px solid ${fp.panelBorder}` }}>
+                  <I d={ic.activity} s={13} c={fp.accent} />
+                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: fp.accent }}>Performance</span>
+                </div>
+                <div className="px-4 py-3 space-y-3" style={{ background: fp.panel }}>
+                  {[
+                    { label: "CPU Usage", key: "cpu" as const },
+                    { label: "Memory", key: "mem" as const },
+                    { label: "GPU", key: "gpu" as const },
+                  ].map(item => (
+                    <div key={item.key}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[11px] font-medium" style={{ color: fp.dark }}>{item.label}</span>
+                        <span className="text-[11px] font-bold font-mono" style={{ color: fp.accent }}>{perfStats[item.key]}%</span>
+                      </div>
+                      {/* Flat progress bar — no border-radius, no shadow */}
+                      <div style={{ height: 6, background: fp.panelDark, borderRadius: 0 }}>
+                        <div style={{ height: "100%", width: `${perfStats[item.key]}%`, background: fp.accent, borderRadius: 0, transition: "width 0.5s ease" }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-2">
+                <button onClick={refreshStats}
+                  className="flex-1 py-2 text-[11px] font-semibold uppercase tracking-wide transition-colors"
+                  style={{ border: `1px solid ${fp.accent}`, borderRadius: 2, background: "transparent", color: fp.accent }}
+                  onMouseEnter={e => { e.currentTarget.style.background = fp.accent; e.currentTarget.style.color = fp.light; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = fp.accent; }}>
+                  Refresh Stats
+                </button>
+                <button onClick={runDiagnostic}
+                  className="flex-1 py-2 text-[11px] font-semibold uppercase tracking-wide transition-colors"
+                  style={{ border: `1px solid ${fp.accent}`, borderRadius: 2, background: fp.accent, color: fp.light }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "#009AB8"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = fp.accent; }}>
+                  Run Diagnostic
+                </button>
+                <button onClick={exportLog}
+                  className="flex-1 py-2 text-[11px] font-semibold uppercase tracking-wide transition-colors"
+                  style={{ border: `1px solid ${fp.panelBorder}`, borderRadius: 2, background: "transparent", color: fp.dark }}
+                  onMouseEnter={e => { e.currentTarget.style.background = fp.panelDark; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                  Export Log
+                </button>
+              </div>
+
+              {/* Diagnostic message */}
+              {diagMsg && (
+                <div className="px-4 py-2 text-[11px] font-medium" style={{ background: diagMsg.startsWith("✓") ? fp.green + "18" : fp.accent + "18", border: `1px solid ${diagMsg.startsWith("✓") ? fp.green : fp.accent}`, borderRadius: 2, color: diagMsg.startsWith("✓") ? fp.green : fp.dark }}>
+                  {diagMsg}
+                </div>
+              )}
+            </div>
+
+            {/* Footer bar with Shutdown */}
+            <div className="px-5 py-2.5 flex items-center justify-between flex-shrink-0" style={{ borderTop: `1px solid ${fp.panelBorder}`, background: fp.panel }}>
+              <div className="flex items-center gap-2">
+                <div style={{ width: 8, height: 8, background: fp.green, borderRadius: 0 }} />
+                <span className="text-[10px]" style={{ color: fp.muted }}>All systems operational</span>
+              </div>
+              <button
+                onClick={() => onOpenApp && onOpenApp("recovery")}
+                className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide transition-colors"
+                style={{ border: `1px solid ${fp.red}`, borderRadius: 2, background: fp.red, color: fp.light }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#C5303C"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = fp.red; }}>
+                Shutdown
+              </button>
             </div>
           </div>
         );
@@ -4556,27 +4668,44 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
   };
 
   return (
-    <div className="flex h-full overflow-hidden">
-      {/* Sidebar */}
-      <div className="w-[170px] flex-shrink-0 flex flex-col py-3 px-2 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
-        <div className="flex items-center gap-2 px-3 mb-3">
-          <I d={ic.settings} s={16} c={c.accent} />
-          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: c.textMuted }}>Control Panel</p>
+    <div className="flex h-full overflow-hidden" style={{ background: fp.bg }}>
+      {/* Sidebar — dark blue, flat */}
+      <div className="flex-shrink-0 flex flex-col overflow-y-auto" style={{ width: 160, background: fp.sidebar, borderRight: `1px solid ${fp.sidebarBorder}`, scrollbarWidth: "none" }}>
+        {/* Logo row */}
+        <div className="px-4 py-3 flex items-center gap-2 flex-shrink-0" style={{ borderBottom: `1px solid ${fp.sidebarBorder}` }}>
+          <div style={{ width: 3, height: 18, background: fp.accent, borderRadius: 0, flexShrink: 0 }} />
+          <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: fp.light }}>Control Panel</span>
         </div>
-        {sections.map((it, i) => (
-          <button key={i} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors mb-0.5"
-            onClick={() => setActiveSection(it.label)}
-            style={{ background: activeSection === it.label ? c.accentSoft : "transparent" }}
-            onMouseEnter={e => { if (activeSection !== it.label) e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { if (activeSection !== it.label) e.currentTarget.style.background = "transparent"; }}>
-            <I d={it.icon} s={15} c={activeSection === it.label ? c.accentText : c.textSec} />
-            <span className="text-[11px] font-medium" style={{ color: activeSection === it.label ? c.accentText : c.text }}>{it.label}</span>
-          </button>
-        ))}
+        {/* Nav items */}
+        <div className="flex-1 py-1">
+          {sections.map((it, i) => (
+            <button key={i} className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors relative"
+              onClick={() => setActiveSection(it.label)}
+              style={{ background: activeSection === it.label ? fp.activeItem : "transparent" }}
+              onMouseEnter={e => { if (activeSection !== it.label) e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+              onMouseLeave={e => { if (activeSection !== it.label) e.currentTarget.style.background = "transparent"; }}>
+              {/* Active indicator — left border accent */}
+              {activeSection === it.label && (
+                <div className="absolute left-0 top-0 bottom-0" style={{ width: 2, background: fp.accent }} />
+              )}
+              <I d={it.icon} s={13} c={activeSection === it.label ? fp.accent : fp.muted} />
+              <span className="text-[11px] font-medium" style={{ color: activeSection === it.label ? fp.light : fp.muted }}>{it.label}</span>
+            </button>
+          ))}
+        </div>
+        {/* Sidebar footer */}
+        <div className="px-4 py-3 flex-shrink-0" style={{ borderTop: `1px solid ${fp.sidebarBorder}` }}>
+          <p className="text-[9px] uppercase tracking-wider" style={{ color: fp.muted }}>AlternusKernel 6.2</p>
+          <p className="text-[9px] mt-0.5" style={{ color: "#3A5068" }}>64-bit · x86_64</p>
+        </div>
       </div>
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-5" style={{ scrollbarWidth: "none" }}>
-        {renderContent()}
+      {/* Content — flat panel bg */}
+      <div className="flex-1 overflow-hidden flex flex-col" style={{ background: activeSection === "System" ? fp.panel : c.bg }}>
+        {activeSection === "System" ? renderContent() : (
+          <div className="flex-1 overflow-y-auto p-5" style={{ scrollbarWidth: "none" }}>
+            {renderContent()}
+          </div>
+        )}
       </div>
     </div>
   );
