@@ -268,37 +268,45 @@ function TitleBar({
       className="flex items-center justify-between h-9 px-3 select-none cursor-move flex-shrink-0"
       style={{ background: c.bg, borderBottom: "none" }}
     >
-      <span style={{ color: isFrozen ? c.warning : c.textSec }} className="text-xs font-medium">
+      <span style={{ color: isFrozen ? c.warning : c.textSec }} className="text-xs font-medium truncate max-w-[160px]">
         {title}{isFrozen ? " (Not Responding)" : ""}
       </span>
-      <div className="flex items-center gap-1">
-        <button
-          onMouseDown={e => e.stopPropagation()}
-          onClick={onMinimize}
-          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#4ADE80"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", "#fff"); }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", c.textMuted); }}
-        >
-          <svg width={10} height={10} viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
-        </button>
-        <button
-          onMouseDown={e => e.stopPropagation()}
-          onClick={onMaximize}
-          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#5BA3E6"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", "#fff"); }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", c.textMuted); }}
-        >
-          <svg width={10} height={10} viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
-        </button>
-        <button
-          onMouseDown={e => e.stopPropagation()}
-          onClick={onClose}
-          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#F87171"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", "#fff"); }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", c.textMuted); }}
-        >
-          <svg width={10} height={10} viewBox="0 0 10 10"><polygon points="5,1.5 9,8.5 1,8.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" strokeLinejoin="round" /></svg>
-        </button>
+      <div className="flex items-center gap-2">
+        {/* Try AI badge */}
+        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full select-none pointer-events-none"
+          style={{ background: c.accent, color: "#fff", fontSize: 10, fontWeight: 600, lineHeight: "18px", boxShadow: `0 0 8px ${c.accent}60` }}>
+          <I d={ic.sparkle} s={9} c="#fff" /> Try AI
+        </div>
+        {/* Window controls */}
+        <div className="flex items-center gap-1">
+          <button
+            onMouseDown={e => e.stopPropagation()}
+            onClick={onMinimize}
+            className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
+            onMouseEnter={e => { e.currentTarget.style.background = "#4ADE80"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", "#fff"); }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", c.textMuted); }}
+          >
+            <svg width={10} height={10} viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
+          </button>
+          <button
+            onMouseDown={e => e.stopPropagation()}
+            onClick={onMaximize}
+            className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
+            onMouseEnter={e => { e.currentTarget.style.background = "#5BA3E6"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", "#fff"); }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", c.textMuted); }}
+          >
+            <svg width={10} height={10} viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
+          </button>
+          <button
+            onMouseDown={e => e.stopPropagation()}
+            onClick={onClose}
+            className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
+            onMouseEnter={e => { e.currentTarget.style.background = "#F87171"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", "#fff"); }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", c.textMuted); }}
+          >
+            <svg width={10} height={10} viewBox="0 0 10 10"><polygon points="5,1.5 9,8.5 1,8.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" strokeLinejoin="round" /></svg>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -5419,70 +5427,168 @@ function TasksApp({ c }: { c: typeof palette.dark }) {
 
 // ━━━━ MAIL APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function MailApp({ c }: { c: typeof palette.dark }) {
-  const mails = [
-    { id: 1, from: "Sarah Mitchell", email: "sarah@alternus.art", subject: "New artwork submission", preview: "Hi, I've uploaded 3 new pieces to my gallery profile...", time: "9:41 AM", read: false, tag: "Gallery" },
-    { id: 2, from: "Stripe", email: "no-reply@stripe.com", subject: "Payment received — €450.00", preview: "A payment of €450.00 was successfully processed for...", time: "8:15 AM", read: false, tag: "Finance" },
-    { id: 3, from: "Marcus Chen", email: "m.chen@artist.com", subject: "Re: Commission request", preview: "Thank you for reaching out! I'd be happy to discuss the commission...", time: "Yesterday", read: true, tag: "Client" },
-    { id: 4, from: "Vercel", email: "noreply@vercel.com", subject: "Deployment successful", preview: "Your project alternusartgallery was successfully deployed...", time: "Yesterday", read: true, tag: "Dev" },
-    { id: 5, from: "Emma Rodriguez", email: "emma@artist.com", subject: "Studio booking confirmation", preview: "Your studio session is confirmed for December 15th at 2PM...", time: "Dec 10", read: true, tag: "Studio" },
-    { id: 6, from: "Newsletter", email: "news@artworld.com", subject: "Top art sales this week", preview: "This week's highlights: A rare Basquiat sold for $2.4M at Christie's...", time: "Dec 9", read: true, tag: "News" },
+  const contacts = [
+    { id: 1, name: "Jane Bons",     sub: "Chat with your cir...",     time: "1:23 PM", unread: 0, init: "JB", color: "#3B82F6" },
+    { id: 2, name: "Rans Smith",    sub: "Openplity with mi...",       time: "1:23 PM", unread: 3, init: "RS", color: "#8B5CF6" },
+    { id: 3, name: "Rama Mavdi",    sub: "Mianrut smith",              time: "1:26 PM", unread: 0, init: "RM", color: "#10B981" },
+    { id: 4, name: "Jana Bons",     sub: "Maman@gmail.com",            time: "1:28 PM", unread: 0, init: "JB", color: "#F59E0B" },
+    { id: 5, name: "Mary Smith",    sub: "Moxl@gmail.com",             time: "1:23 PM", unread: 0, init: "MS", color: "#EF4444" },
+    { id: 6, name: "Evan Smith",    sub: "Manages then ort...",        time: "1:33 PM", unread: 0, init: "ES", color: "#06B6D4" },
+    { id: 7, name: "Misa Kolanson", sub: "Contact@gmail.com",          time: "1:35 PM", unread: 0, init: "MK", color: "#EC4899" },
+    { id: 8, name: "Mark Towsy",    sub: "Boan.gkali.com",             time: "1:35 PM", unread: 0, init: "MT", color: "#84CC16" },
   ];
-  const [selected, setSelected] = useState(mails[0]);
-  const tagColors: Record<string, string> = { Gallery: c.accent, Finance: c.success, Client: c.purple, Dev: c.warning, Studio: "#F472B6", News: c.danger };
+  const [selId, setSelId] = useState(1);
+  const [input, setInput] = useState("");
+  const [msgMap, setMsgMap] = useState<Record<number, { me: boolean; text: string; time: string }[]>>({
+    1: [
+      { me: false, text: "Hello, from renments you to your contact?", time: "1:20 PM" },
+      { me: true,  text: "Wov and selectng your contart?",            time: "1:21 PM" },
+      { me: false, text: "What does mms?",                            time: "1:22 PM" },
+      { me: false, text: "What can I reconnect for your contants??",  time: "1:23 PM" },
+      { me: true,  text: "Thank joy your possians?",                  time: "1:28 PM" },
+    ],
+    2: [
+      { me: false, text: "Hey! Are you available for a quick sync?", time: "1:18 PM" },
+      { me: true,  text: "Sure, what's up?",                         time: "1:19 PM" },
+      { me: false, text: "Let's discuss the new project scope.",      time: "1:23 PM" },
+    ],
+  });
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [selId, msgMap]);
+
+  const sel = contacts.find(c => c.id === selId)!;
+  const msgs = msgMap[selId] || [{ me: false, text: "Say hi to start a conversation!", time: "" }];
+
+  const sendMsg = () => {
+    if (!input.trim()) return;
+    const now = new Date();
+    const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")} PM`;
+    setMsgMap(p => ({ ...p, [selId]: [...(p[selId]||[]), { me: true, text: input.trim(), time }] }));
+    setInput("");
+  };
+
   return (
     <div className="flex h-full" style={{ background: c.bg }}>
-      {/* Sidebar */}
-      <div className="w-48 flex-shrink-0 flex flex-col" style={{ borderRight: `1px solid ${c.border}` }}>
-        <div className="px-3 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-          <button className="w-full py-1.5 rounded-lg text-[11px] font-medium" style={{ background: c.accent, color: "#fff" }}>
-            + Compose
-          </button>
+      {/* ── Left sidebar: contact list ── */}
+      <div className="flex-shrink-0 flex flex-col" style={{ width: 200, borderRight: `1px solid ${c.border}` }}>
+        {/* Search */}
+        <div className="px-3 pt-3 pb-2 flex-shrink-0">
+          <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+            <I d={ic.search} s={12} c={c.textMuted} />
+            <input className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: c.text }} placeholder="Search" />
+            <I d={ic.settings} s={12} c={c.textMuted} />
+          </div>
         </div>
+        {/* Label */}
+        <div className="px-4 py-1 flex-shrink-0">
+          <span className="text-[10px] font-semibold" style={{ color: c.textMuted }}>Chats</span>
+        </div>
+        {/* Today divider */}
+        <div className="px-4 py-0.5 flex-shrink-0">
+          <span className="text-[9px]" style={{ color: c.textMuted }}>Today</span>
+        </div>
+        {/* Contact list */}
         <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-          {mails.map(m => (
-            <div key={m.id} onClick={() => setSelected(m)}
-              className="px-3 py-2.5 cursor-pointer transition-colors"
-              style={{ background: selected.id === m.id ? c.accentSoft : m.read ? "transparent" : `${c.accent}08`, borderBottom: `1px solid ${c.border}` }}>
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="text-[10px] font-semibold truncate" style={{ color: m.read ? c.textSec : c.text }}>{m.from}</span>
-                {!m.read && <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 ml-1" style={{ background: c.accent }} />}
+          {contacts.map(ct => (
+            <button key={ct.id} onClick={() => setSelId(ct.id)}
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition-all"
+              style={{ background: selId === ct.id ? c.accentSoft : "transparent", borderLeft: selId === ct.id ? `2px solid ${c.accent}` : "2px solid transparent" }}
+              onMouseEnter={e => { if (selId !== ct.id) e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { if (selId !== ct.id) e.currentTarget.style.background = "transparent"; }}>
+              {/* Avatar */}
+              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-white"
+                style={{ background: ct.color }}>
+                {ct.init}
               </div>
-              <p className="text-[10px] truncate" style={{ color: c.textMuted }}>{m.subject}</p>
-              <p className="text-[9px] mt-0.5" style={{ color: c.textMuted }}>{m.time}</p>
-            </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-medium truncate" style={{ color: c.text }}>{ct.name}</span>
+                  <span className="text-[9px] flex-shrink-0 ml-1" style={{ color: c.textMuted }}>{ct.time}</span>
+                </div>
+                <div className="flex items-center justify-between mt-0.5">
+                  <p className="text-[10px] truncate" style={{ color: c.textMuted }}>{ct.sub}</p>
+                  {ct.unread > 0 && (
+                    <span className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white flex-shrink-0 ml-1"
+                      style={{ background: c.accent }}>{ct.unread}</span>
+                  )}
+                </div>
+              </div>
+            </button>
           ))}
         </div>
       </div>
-      {/* Email content */}
+
+      {/* ── Right panel: chat thread ── */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="px-5 py-4 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-          <div className="flex items-start justify-between gap-2">
+        {/* Chat header */}
+        <div className="flex items-center justify-between px-4 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
+              style={{ background: sel.color }}>{sel.init}</div>
             <div>
-              <h3 className="text-[13px] font-bold mb-1" style={{ color: c.text }}>{selected.subject}</h3>
-              <p className="text-[10px]" style={{ color: c.textMuted }}>From: <span style={{ color: c.textSec }}>{selected.from}</span> &lt;{selected.email}&gt;</p>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: `${tagColors[selected.tag]}20`, color: tagColors[selected.tag] }}>{selected.tag}</span>
-              <span className="text-[10px]" style={{ color: c.textMuted }}>{selected.time}</span>
+              <p className="text-[12px] font-semibold" style={{ color: c.text }}>{sel.name}</p>
+              <p className="text-[10px]" style={{ color: c.success }}>Chat</p>
             </div>
           </div>
-        </div>
-        <div className="flex-1 overflow-y-auto px-5 py-4" style={{ scrollbarWidth: "none" }}>
-          <p className="text-[12px] leading-relaxed" style={{ color: c.textSec }}>
-            {selected.preview} Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-          </p>
-          <p className="text-[12px] leading-relaxed mt-4" style={{ color: c.textSec }}>
-            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.
-          </p>
-          <p className="text-[12px] mt-4" style={{ color: c.textSec }}>Best regards,<br />{selected.from}</p>
-        </div>
-        <div className="px-5 py-3 flex gap-2 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-          {["Reply", "Forward", "Archive"].map(a => (
-            <button key={a} className="px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors"
-              style={{ background: a === "Reply" ? c.accent : c.surface, color: a === "Reply" ? "#fff" : c.textSec, border: `1px solid ${c.border}` }}>
-              {a}
+          <div className="flex items-center gap-1">
+            <button className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors" style={{ color: c.textMuted }}
+              onMouseEnter={e=>(e.currentTarget.style.background=c.cardAlt)}
+              onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
+              <I d={ic.volume} s={14} />
             </button>
+            <button className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors" style={{ color: c.textMuted }}
+              onMouseEnter={e=>(e.currentTarget.style.background=c.cardAlt)}
+              onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
+              <I d={ic.menu} s={14} />
+            </button>
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2" style={{ scrollbarWidth: "none" }}>
+          {msgs.map((msg, i) => (
+            <div key={i} className={`flex ${msg.me ? "justify-end" : "justify-start"}`}>
+              {!msg.me && (
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0 mr-2 mt-1 self-end"
+                  style={{ background: sel.color }}>{sel.init[0]}</div>
+              )}
+              <div className="max-w-[65%]">
+                <div className="px-3 py-2 rounded-2xl text-[12px] leading-relaxed"
+                  style={{
+                    background: msg.me ? c.accent : c.cardAlt,
+                    color: msg.me ? "#fff" : c.text,
+                    borderBottomRightRadius: msg.me ? 4 : undefined,
+                    borderBottomLeftRadius: !msg.me ? 4 : undefined,
+                  }}>
+                  {msg.text}
+                </div>
+                {msg.time && <p className="text-[9px] mt-0.5 px-1" style={{ color: c.textMuted, textAlign: msg.me ? "right" : "left" }}>{msg.time}</p>}
+              </div>
+            </div>
           ))}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input bar */}
+        <div className="flex items-center gap-2 px-3 py-2.5 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+          <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+            <input className="flex-1 bg-transparent outline-none text-[12px]" style={{ color: c.text }}
+              placeholder="Type a message" value={input}
+              onChange={e=>setInput(e.target.value)}
+              onKeyDown={e=>{ if(e.key==="Enter") sendMsg(); }} />
+            <button style={{ color: c.textMuted }}
+              onMouseEnter={e=>(e.currentTarget.style.color=c.accentText)}
+              onMouseLeave={e=>(e.currentTarget.style.color=c.textMuted)}>
+              <I d={ic.mic} s={14} />
+            </button>
+          </div>
+          <button onClick={sendMsg}
+            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
+            style={{ background: c.accent, boxShadow: `0 0 10px ${c.accent}50` }}
+            onMouseEnter={e=>(e.currentTarget.style.opacity="0.85")}
+            onMouseLeave={e=>(e.currentTarget.style.opacity="1")}>
+            <I d={ic.send} s={14} c="#fff" />
+          </button>
         </div>
       </div>
     </div>
