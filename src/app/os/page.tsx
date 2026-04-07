@@ -4192,448 +4192,481 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
     a.click();
   };
 
+  // ── Design tokens ──────────────────────────────────────────
+  const dt = {
+    bg:      "#0A0F1A",
+    panel:   "#1A1F2E",
+    card:    "#252B3D",
+    text:    "#E8EDF2",
+    textSec: "#8E9AAE",
+    accent:  "#2D9CDB",
+    success: "#27AE60",
+    warning: "#F2C94C",
+    error:   "#EB5757",
+    border:  "#3A4052",
+    hover:   "#2A3045",
+    font:    "'Inter', sans-serif",
+    r:       "4px",
+    tr:      "0.1s ease",
+  };
+
+  // Shared helpers
+  const Card = ({ children, style = {} }: { children: React.ReactNode; style?: React.CSSProperties }) => (
+    <div style={{ background: dt.card, border: `1px solid ${dt.border}`, borderRadius: dt.r, ...style }}>{children}</div>
+  );
+  const SectionTitle = ({ label }: { label: string }) => (
+    <p style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: dt.textSec, fontFamily: dt.font, marginBottom: 12 }}>{label}</p>
+  );
+  const Row = ({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) => (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: `1px solid ${dt.border}` }}>
+      <span style={{ fontSize: 13, color: dt.textSec, fontFamily: dt.font }}>{label}</span>
+      <span style={{ fontSize: 14, fontWeight: 500, color: valueColor ?? dt.text, fontFamily: dt.font }}>{value}</span>
+    </div>
+  );
+  const Btn = ({ label, variant, onClick }: { label: string; variant: "accent-outline" | "accent-solid" | "gray-outline"; onClick?: () => void }) => {
+    const base: React.CSSProperties = { height: 36, padding: "0 16px", borderRadius: dt.r, fontSize: 14, fontWeight: 500, fontFamily: dt.font, cursor: "pointer", border: "1px solid", transition: dt.tr, flex: 1 };
+    const styles = {
+      "accent-outline": { ...base, background: "transparent", borderColor: dt.accent, color: dt.accent },
+      "accent-solid":   { ...base, background: dt.accent, borderColor: dt.accent, color: "#fff" },
+      "gray-outline":   { ...base, background: "transparent", borderColor: dt.border, color: dt.textSec },
+    };
+    return (
+      <button style={styles[variant]} onClick={onClick}
+        onMouseEnter={e => { const el = e.currentTarget; if (variant === "accent-outline") { el.style.background = dt.hover; } else if (variant === "accent-solid") { el.style.opacity = "0.85"; } else { el.style.background = dt.hover; } }}
+        onMouseLeave={e => { const el = e.currentTarget; if (variant === "accent-outline") { el.style.background = "transparent"; } else if (variant === "accent-solid") { el.style.opacity = "1"; } else { el.style.background = "transparent"; } }}
+        onMouseDown={e => (e.currentTarget.style.opacity = "0.7")}
+        onMouseUp={e => (e.currentTarget.style.opacity = "1")}>
+        {label}
+      </button>
+    );
+  };
+  const Bar = ({ pct, color = dt.accent }: { pct: number; color?: string }) => (
+    <div style={{ height: 6, background: dt.border, borderRadius: dt.r, overflow: "hidden" }}>
+      <div style={{ height: "100%", width: `${pct}%`, background: color, borderRadius: dt.r, transition: "width 0.5s ease" }} />
+    </div>
+  );
+  const Toggle = ({ on }: { on: boolean }) => (
+    <div style={{ width: 32, height: 18, borderRadius: 9, background: on ? dt.accent : dt.border, cursor: "pointer", position: "relative", transition: dt.tr, flexShrink: 0 }}>
+      <div style={{ position: "absolute", top: 3, left: on ? 17 : 3, width: 12, height: 12, borderRadius: "50%", background: "#fff", transition: dt.tr }} />
+    </div>
+  );
+
   const sections = [
-    { label: "System", icon: ic.monitor },
-    { label: "Boot", icon: ic.power },
+    { label: "System",   icon: ic.monitor },
+    { label: "Boot",     icon: ic.power },
     { label: "Security", icon: ic.shield },
-    { label: "Display", icon: ic.sun },
-    { label: "Network", icon: ic.wifi },
-    { label: "Storage", icon: ic.folder },
+    { label: "Display",  icon: ic.sun },
+    { label: "Network",  icon: ic.wifi },
+    { label: "Storage",  icon: ic.folder },
     { label: "Services", icon: ic.settings },
-    { label: "Devices", icon: ic.cpu },
-    { label: "Users", icon: ic.user },
-    { label: "Updates", icon: ic.refresh },
+    { label: "Devices",  icon: ic.cpu },
+    { label: "Users",    icon: ic.user },
+    { label: "Updates",  icon: ic.refresh },
   ];
 
   const renderContent = () => {
+    const p = { padding: 24, fontFamily: dt.font } as React.CSSProperties;
     switch (activeSection) {
-      case "System":
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold" style={{ color: c.text }}>System Information</p>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full" style={{ background: c.success }} />
-                <span className="text-[10px]" style={{ color: c.textMuted }}>All systems operational</span>
-              </div>
+
+      // ── SYSTEM ──────────────────────────────────────────────
+      case "System": return (
+        <div style={{ ...p, display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* Header */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 20, fontWeight: 600, color: dt.text, fontFamily: dt.font }}>Control Panel</span>
+            <span style={{ fontSize: 12, fontWeight: 400, color: dt.success, fontFamily: dt.font }}>● Operational</span>
+          </div>
+
+          {/* System Info — 2-col grid */}
+          <Card>
+            <div style={{ padding: "14px 16px 6px", borderBottom: `1px solid ${dt.border}` }}>
+              <SectionTitle label="System Information" />
             </div>
-            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
-              {[
-                { label: "OS", value: "Alternus OS v3.0" },
-                { label: "Kernel", value: "AlternusKernel 6.2" },
-                { label: "CPU", value: "AlternusCore x86_64 @ 4.2 GHz" },
-                { label: "RAM", value: "16 GB DDR5" },
-                { label: "GPU", value: "Integrated Graphics" },
-                { label: "Architecture", value: "64-bit" },
-              ].map((item, i) => (
-                <div key={i} className="flex justify-between">
-                  <span className="text-xs" style={{ color: c.textMuted }}>{item.label}</span>
-                  <span className="text-xs font-medium" style={{ color: c.text }}>{item.value}</span>
+            <div style={{ padding: "0 16px 8px" }}>
+              {([
+                ["OS",           "Alternus OS v3.0"],
+                ["Kernel",       "AlternusKernel 6.2"],
+                ["CPU",          "AlternusCore x86_64 @ 4.2 GHz"],
+                ["RAM",          "16 GB DDR5"],
+                ["GPU",          "Integrated Graphics"],
+                ["Architecture", "64-bit"],
+              ] as [string, string][]).map(([label, value], i, arr) => (
+                <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: i < arr.length - 1 ? `1px solid ${dt.border}` : "none" }}>
+                  <span style={{ fontSize: 13, color: dt.textSec }}>{label}</span>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: dt.text }}>{value}</span>
                 </div>
               ))}
             </div>
-            <div className="rounded-xl p-4" style={{ background: c.cardAlt }}>
-              <p className="text-xs font-medium mb-2" style={{ color: c.text }}>Performance</p>
-              <div className="space-y-2">
-                {[
-                  { label: "CPU Usage", key: "cpu" as const, color: c.accent },
-                  { label: "Memory", key: "mem" as const, color: c.purple },
-                  { label: "GPU", key: "gpu" as const, color: c.success },
-                ].map(item => (
-                  <div key={item.key}>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-[10px]" style={{ color: c.textMuted }}>{item.label}</span>
-                      <span className="text-[10px] font-medium" style={{ color: c.text }}>{perfStats[item.key]}%</span>
-                    </div>
-                    <div className="h-1.5 rounded-full" style={{ background: c.border }}>
-                      <div className="h-full rounded-full transition-all duration-500" style={{ width: `${perfStats[item.key]}%`, background: item.color }} />
-                    </div>
+          </Card>
+
+          {/* Performance */}
+          <Card>
+            <div style={{ padding: "14px 16px 6px", borderBottom: `1px solid ${dt.border}` }}>
+              <SectionTitle label="Performance" />
+            </div>
+            <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 14 }}>
+              {([
+                ["CPU Usage", "cpu"],
+                ["Memory",    "mem"],
+                ["GPU",       "gpu"],
+              ] as [string, keyof typeof perfStats][]).map(([label, key]) => (
+                <div key={key}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                    <span style={{ fontSize: 13, color: dt.textSec }}>{label}</span>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: dt.text }}>{perfStats[key]}%</span>
+                  </div>
+                  <Bar pct={perfStats[key]} />
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Buttons */}
+          <div style={{ display: "flex", gap: 8 }}>
+            <Btn label="Refresh"    variant="accent-outline" onClick={refreshStats} />
+            <Btn label="Diagnostic" variant="accent-solid"   onClick={runDiagnostic} />
+            <Btn label="Export"     variant="gray-outline"   onClick={exportLog} />
+          </div>
+
+          {/* Diagnostic result */}
+          {diagMsg && (
+            <div style={{ padding: "10px 14px", borderRadius: dt.r, border: `1px solid ${diagMsg === "ok" ? dt.success + "50" : dt.accent + "50"}`, background: diagMsg === "ok" ? dt.success + "12" : dt.accent + "12", fontSize: 13, color: diagMsg === "ok" ? dt.success : dt.text }}>
+              {diagMsg === "running" ? "Running diagnostic…" : "✓ All systems passed — no issues detected."}
+            </div>
+          )}
+
+          {/* Footer row */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 4, borderTop: `1px solid ${dt.border}` }}>
+            <span style={{ fontSize: 12, color: dt.textSec }}>Last check: 2 min ago</span>
+            <button style={{ height: 32, padding: "0 14px", borderRadius: dt.r, fontSize: 13, fontWeight: 500, background: "transparent", border: `1px solid ${dt.error}`, color: dt.error, cursor: "pointer", transition: dt.tr }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#3A2025"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+              onMouseDown={e => (e.currentTarget.style.opacity = "0.7")}
+              onMouseUp={e => (e.currentTarget.style.opacity = "1")}
+              onClick={() => onOpenApp && onOpenApp("recovery")}>
+              Shutdown
+            </button>
+          </div>
+        </div>
+      );
+
+      // ── BOOT ────────────────────────────────────────────────
+      case "Boot": return (
+        <div style={{ ...p, display: "flex", flexDirection: "column", gap: 20 }}>
+          <span style={{ fontSize: 20, fontWeight: 600, color: dt.text }}>Boot</span>
+          <Card>
+            <div style={{ padding: "14px 16px 6px", borderBottom: `1px solid ${dt.border}` }}><SectionTitle label="Configuration" /></div>
+            <div style={{ padding: "0 16px 8px" }}>
+              {([["Boot Mode","UEFI"],["Secure Boot","Enabled"],["Fast Boot","Enabled"],["Boot Timeout","5 seconds"],["Default OS","Alternus OS v3.0"]] as [string,string][]).map(([l,v],i,a) => (
+                <div key={l} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 0", borderBottom: i<a.length-1 ? `1px solid ${dt.border}` : "none" }}>
+                  <span style={{ fontSize:13, color:dt.textSec }}>{l}</span>
+                  <span style={{ fontSize:14, fontWeight:500, color:dt.text }}>{v}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+          <Card>
+            <div style={{ padding: "14px 16px 6px", borderBottom: `1px solid ${dt.border}` }}><SectionTitle label="Boot Order" /></div>
+            <div style={{ padding: "0 16px 8px" }}>
+              {["1. NVMe SSD — Alternus OS","2. USB Drive","3. Network (PXE)","4. Optical Drive"].map((item,i) => (
+                <div key={i} style={{ padding:"8px 0", borderBottom: i<3 ? `1px solid ${dt.border}` : "none", fontSize:13, color: i===0 ? dt.accent : dt.textSec }}>{item}</div>
+              ))}
+            </div>
+          </Card>
+          <Card>
+            <div style={{ padding: "14px 16px 6px", borderBottom: `1px solid ${dt.border}` }}><SectionTitle label="Startup Programs" /></div>
+            <div style={{ padding: "0 16px 8px" }}>
+              {([["Alternus Shell",true],["AI Engine",true],["Network Manager",true],["Cloud Sync",true],["Bluetooth Service",false]] as [string,boolean][]).map(([name,on],i,a) => (
+                <div key={name} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 0", borderBottom: i<a.length-1 ? `1px solid ${dt.border}` : "none" }}>
+                  <span style={{ fontSize:13, color:dt.text }}>{name}</span>
+                  <Toggle on={on} />
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      );
+
+      // ── SECURITY ────────────────────────────────────────────
+      case "Security": return (
+        <div style={{ ...p, display:"flex", flexDirection:"column", gap:20 }}>
+          <span style={{ fontSize:20, fontWeight:600, color:dt.text }}>Security</span>
+          <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", background:dt.success+"14", border:`1px solid ${dt.success}40`, borderRadius:dt.r }}>
+            <I d={ic.shield} s={20} c={dt.success} />
+            <div><p style={{ fontSize:14, fontWeight:500, color:dt.text }}>System Protected</p><p style={{ fontSize:12, color:dt.textSec }}>All security features active</p></div>
+          </div>
+          {[
+            { title:"Firewall", rows:[["Status","Active",dt.success],["Inbound Rules","24 rules"],["Outbound Rules","18 rules"],["Blocked (24h)","147"]] as [string,string,string?][] },
+            { title:"Encryption", rows:[["Disk","AES-256",dt.success],["Secure Boot","Enabled",dt.success],["TPM","v2.0 Active",dt.success]] as [string,string,string?][] },
+          ].map(section => (
+            <Card key={section.title}>
+              <div style={{ padding:"14px 16px 6px", borderBottom:`1px solid ${dt.border}` }}><SectionTitle label={section.title} /></div>
+              <div style={{ padding:"0 16px 8px" }}>
+                {section.rows.map(([l,v,vc],i,a) => (
+                  <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"8px 0", borderBottom: i<a.length-1?`1px solid ${dt.border}`:"none" }}>
+                    <span style={{ fontSize:13, color:dt.textSec }}>{l}</span>
+                    <span style={{ fontSize:14, fontWeight:500, color:vc??dt.text }}>{v}</span>
                   </div>
                 ))}
               </div>
-            </div>
-            {/* Action buttons */}
-            <div className="flex gap-2">
-              {[
-                { label: "Refresh Stats", action: refreshStats, style: { background: "transparent", color: c.accentText, border: `1px solid ${c.accent}` } },
-                { label: "Run Diagnostic", action: runDiagnostic, style: { background: c.accent, color: "#fff", border: `1px solid ${c.accent}` } },
-                { label: "Export Log", action: exportLog, style: { background: "transparent", color: c.textSec, border: `1px solid ${c.border}` } },
-              ].map(btn => (
-                <button key={btn.label} onClick={btn.action}
-                  className="flex-1 py-2 rounded-xl text-[11px] font-medium transition-all"
-                  style={btn.style}
-                  onMouseEnter={e => (e.currentTarget.style.opacity = "0.8")}
-                  onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
-                  {btn.label}
-                </button>
+            </Card>
+          ))}
+          <Card>
+            <div style={{ padding:"14px 16px 6px", borderBottom:`1px solid ${dt.border}` }}><SectionTitle label="Privacy" /></div>
+            <div style={{ padding:"0 16px 8px" }}>
+              {([["Location Services",false],["Camera Access",true],["Microphone",true],["Analytics",false],["Ad Tracking",false]] as [string,boolean][]).map(([name,on],i,a) => (
+                <div key={name} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 0", borderBottom: i<a.length-1?`1px solid ${dt.border}`:"none" }}>
+                  <span style={{ fontSize:13, color:dt.text }}>{name}</span><Toggle on={on} />
+                </div>
               ))}
             </div>
-            {/* Diagnostic feedback */}
-            {diagMsg && (
-              <div className="px-3 py-2 rounded-xl text-[11px] font-medium" style={{ background: diagMsg === "ok" ? c.successSoft : c.accentSoft, color: diagMsg === "ok" ? c.success : c.accentText, border: `1px solid ${diagMsg === "ok" ? c.success + "40" : c.accent + "40"}` }}>
-                {diagMsg === "running" ? "⏳ Running diagnostic..." : "✓ All systems passed — no issues detected."}
+          </Card>
+        </div>
+      );
+
+      // ── DISPLAY ─────────────────────────────────────────────
+      case "Display": return (
+        <div style={{ ...p, display:"flex", flexDirection:"column", gap:20 }}>
+          <span style={{ fontSize:20, fontWeight:600, color:dt.text }}>Display</span>
+          <Card>
+            <div style={{ padding:"14px 16px 6px", borderBottom:`1px solid ${dt.border}` }}><SectionTitle label="Settings" /></div>
+            <div style={{ padding:"0 16px 8px" }}>
+              {([["Resolution","1920 × 1080"],["Refresh Rate","60 Hz"],["Scaling","100%"],["Color Depth","32-bit"]] as [string,string][]).map(([l,v],i,a) => (
+                <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"8px 0", borderBottom: i<a.length-1?`1px solid ${dt.border}`:"none" }}>
+                  <span style={{ fontSize:13, color:dt.textSec }}>{l}</span>
+                  <span style={{ fontSize:14, fontWeight:500, color:dt.text }}>{v}</span>
+                </div>
+              ))}
+              <div style={{ padding:"8px 0", borderBottom:`1px solid ${dt.border}` }}>
+                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+                  <span style={{ fontSize:13, color:dt.textSec }}>Brightness</span>
+                  <span style={{ fontSize:13, color:dt.text }}>75%</span>
+                </div>
+                <Bar pct={75} />
               </div>
-            )}
-            {/* Shutdown */}
-            <div className="flex justify-end pt-1">
-              <button onClick={() => onOpenApp && onOpenApp("recovery")}
-                className="px-4 py-2 rounded-xl text-[11px] font-medium transition-all"
-                style={{ background: c.danger + "18", color: c.danger, border: `1px solid ${c.danger}40` }}
-                onMouseEnter={e => { e.currentTarget.style.background = c.danger; e.currentTarget.style.color = "#fff"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = c.danger + "18"; e.currentTarget.style.color = c.danger; }}>
-                Shutdown
-              </button>
-            </div>
-          </div>
-        );
-      case "Boot":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm font-semibold" style={{ color: c.text }}>Boot Configuration</p>
-            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
-              {[
-                { label: "Boot Mode", value: "UEFI" },
-                { label: "Secure Boot", value: "Enabled" },
-                { label: "Fast Boot", value: "Enabled" },
-                { label: "Boot Timeout", value: "5 seconds" },
-                { label: "Default OS", value: "Alternus OS v3.0" },
-              ].map((item, i) => (
-                <div key={i} className="flex justify-between">
-                  <span className="text-xs" style={{ color: c.textMuted }}>{item.label}</span>
-                  <span className="text-xs font-medium" style={{ color: c.text }}>{item.value}</span>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-xl p-4" style={{ background: c.cardAlt }}>
-              <p className="text-xs font-medium mb-3" style={{ color: c.text }}>Boot Order</p>
-              {["1. NVMe SSD — Alternus OS", "2. USB Drive", "3. Network (PXE)", "4. Optical Drive"].map((item, i) => (
-                <div key={i} className="flex items-center gap-2 py-1.5 px-2 rounded-lg mb-1" style={{ background: i === 0 ? c.accentSoft : "transparent" }}>
-                  <span className="text-[11px]" style={{ color: i === 0 ? c.accentText : c.textSec }}>{item}</span>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
-              <p className="text-xs font-medium" style={{ color: c.text }}>Startup Programs</p>
-              {[
-                { name: "Alternus Shell", enabled: true },
-                { name: "AI Engine", enabled: true },
-                { name: "Network Manager", enabled: true },
-                { name: "Cloud Sync", enabled: true },
-                { name: "Bluetooth Service", enabled: false },
-              ].map((s, i) => (
-                <div key={i} className="flex justify-between items-center">
-                  <span className="text-[11px]" style={{ color: c.text }}>{s.name}</span>
-                  <div className="w-8 h-4 rounded-full cursor-pointer transition-colors" style={{ background: s.enabled ? c.accent : c.border }}>
-                    <div className="w-3 h-3 rounded-full mt-0.5 transition-all" style={{ background: "#fff", marginLeft: s.enabled ? 16 : 2 }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      case "Security":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm font-semibold" style={{ color: c.text }}>Security & Privacy</p>
-            <div className="rounded-xl p-4 flex items-center gap-3" style={{ background: c.success + "10", border: `1px solid ${c.success}30` }}>
-              <I d={ic.shield} s={20} c={c.success} />
-              <div>
-                <p className="text-xs font-semibold" style={{ color: c.text }}>System Protected</p>
-                <p className="text-[10px]" style={{ color: c.textMuted }}>All security features active</p>
-              </div>
-            </div>
-            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
-              <p className="text-xs font-medium" style={{ color: c.text }}>Firewall</p>
-              {[
-                { label: "Firewall Status", value: "Active", ok: true },
-                { label: "Inbound Rules", value: "24 rules" },
-                { label: "Outbound Rules", value: "18 rules" },
-                { label: "Blocked Attempts", value: "147 (last 24h)" },
-              ].map((item, i) => (
-                <div key={i} className="flex justify-between">
-                  <span className="text-xs" style={{ color: c.textMuted }}>{item.label}</span>
-                  <span className="text-xs font-medium" style={{ color: ("ok" in item) ? c.success : c.text }}>{item.value}</span>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
-              <p className="text-xs font-medium" style={{ color: c.text }}>Encryption</p>
-              {[
-                { label: "Disk Encryption", value: "AES-256", ok: true },
-                { label: "Secure Boot", value: "Enabled", ok: true },
-                { label: "TPM", value: "v2.0 Active", ok: true },
-              ].map((item, i) => (
-                <div key={i} className="flex justify-between">
-                  <span className="text-xs" style={{ color: c.textMuted }}>{item.label}</span>
-                  <span className="text-xs font-medium" style={{ color: c.success }}>{item.value}</span>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
-              <p className="text-xs font-medium" style={{ color: c.text }}>Privacy</p>
-              {[
-                { name: "Location Services", enabled: false },
-                { name: "Camera Access", enabled: true },
-                { name: "Microphone Access", enabled: true },
-                { name: "Analytics & Telemetry", enabled: false },
-                { name: "Ad Tracking", enabled: false },
-              ].map((s, i) => (
-                <div key={i} className="flex justify-between items-center">
-                  <span className="text-[11px]" style={{ color: c.text }}>{s.name}</span>
-                  <div className="w-8 h-4 rounded-full cursor-pointer transition-colors" style={{ background: s.enabled ? c.accent : c.border }}>
-                    <div className="w-3 h-3 rounded-full mt-0.5 transition-all" style={{ background: "#fff", marginLeft: s.enabled ? 16 : 2 }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-      case "Display":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm font-semibold" style={{ color: c.text }}>Display Settings</p>
-            <div className="rounded-xl p-4 space-y-4" style={{ background: c.cardAlt }}>
-              <div className="flex justify-between items-center">
-                <span className="text-xs" style={{ color: c.textMuted }}>Theme</span>
-                <div className="flex gap-2">
-                  {(["dark", "light"] as ThemeMode[]).map(m => (
-                    <button key={m} onClick={() => setMode(m)} className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-                      style={{ background: mode === m ? c.accent : c.bg, color: mode === m ? "#fff" : c.textSec }}>
-                      {m === "dark" ? "Dark" : "Light"}
-                    </button>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 0" }}>
+                <span style={{ fontSize:13, color:dt.textSec }}>Theme</span>
+                <div style={{ display:"flex", gap:4 }}>
+                  {(["dark","light"] as ThemeMode[]).map(m => (
+                    <button key={m} onClick={() => setMode(m)} style={{ height:28, padding:"0 12px", borderRadius:dt.r, fontSize:12, fontWeight:500, cursor:"pointer", transition:dt.tr, border:`1px solid ${mode===m ? dt.accent : dt.border}`, background: mode===m ? dt.accent : "transparent", color: mode===m ? "#fff" : dt.textSec }}>{m==="dark"?"Dark":"Light"}</button>
                   ))}
                 </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-xs" style={{ color: c.textMuted }}>Resolution</span>
-                <span className="text-xs font-medium" style={{ color: c.text }}>1920 x 1080</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-xs" style={{ color: c.textMuted }}>Refresh Rate</span>
-                <span className="text-xs font-medium" style={{ color: c.text }}>60 Hz</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-xs" style={{ color: c.textMuted }}>Scaling</span>
-                <span className="text-xs font-medium" style={{ color: c.text }}>100%</span>
-              </div>
-              <div>
-                <span className="text-xs" style={{ color: c.textMuted }}>Brightness</span>
-                <div className="mt-2 h-2 rounded-full" style={{ background: c.border }}>
-                  <div className="h-full rounded-full" style={{ width: "75%", background: c.accent }} />
-                </div>
+            </div>
+          </Card>
+        </div>
+      );
+
+      // ── NETWORK ─────────────────────────────────────────────
+      case "Network": return (
+        <div style={{ ...p, display:"flex", flexDirection:"column", gap:20 }}>
+          <span style={{ fontSize:20, fontWeight:600, color:dt.text }}>Network</span>
+          <Card>
+            <div style={{ padding:"14px 16px 6px", borderBottom:`1px solid ${dt.border}` }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                <SectionTitle label="Wi-Fi" />
+                <span style={{ fontSize:11, color:dt.success, fontWeight:500, marginTop:-8 }}>● Connected</span>
               </div>
             </div>
-          </div>
-        );
-      case "Network":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm font-semibold" style={{ color: c.text }}>Network</p>
-            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <I d={ic.wifi} s={16} c={c.success} />
-                  <span className="text-xs font-medium" style={{ color: c.text }}>Wi-Fi Connected</span>
-                </div>
-                <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: c.success + "20", color: c.success }}>Active</span>
-              </div>
-              {[
-                { label: "Network", value: "Alternus-Net-5G" },
-                { label: "IP Address", value: "192.168.1.105" },
-                { label: "MAC Address", value: "A1:B2:C3:D4:E5:F6" },
-                { label: "Signal", value: "Excellent (-42 dBm)" },
-                { label: "Speed", value: "866 Mbps" },
-                { label: "DNS", value: "8.8.8.8" },
-              ].map((item, i) => (
-                <div key={i} className="flex justify-between">
-                  <span className="text-xs" style={{ color: c.textMuted }}>{item.label}</span>
-                  <span className="text-xs font-medium" style={{ color: c.text }}>{item.value}</span>
+            <div style={{ padding:"0 16px 8px" }}>
+              {([["Network","Alternus-Net-5G"],["IP Address","192.168.1.105"],["MAC","A1:B2:C3:D4:E5:F6"],["Signal","Excellent (−42 dBm)"],["Speed","866 Mbps"],["DNS","8.8.8.8"]] as [string,string][]).map(([l,v],i,a) => (
+                <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"8px 0", borderBottom: i<a.length-1?`1px solid ${dt.border}`:"none" }}>
+                  <span style={{ fontSize:13, color:dt.textSec }}>{l}</span>
+                  <span style={{ fontSize:14, fontWeight:500, color:dt.text }}>{v}</span>
                 </div>
               ))}
             </div>
-            <div className="rounded-xl p-4" style={{ background: c.cardAlt }}>
-              <p className="text-xs font-medium mb-2" style={{ color: c.text }}>Ethernet</p>
-              <p className="text-[10px]" style={{ color: c.textMuted }}>Not connected</p>
-            </div>
-          </div>
-        );
-      case "Storage":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm font-semibold" style={{ color: c.text }}>Storage</p>
-            <div className="rounded-xl p-4" style={{ background: c.cardAlt }}>
-              <div className="flex justify-between mb-2">
-                <span className="text-xs font-medium" style={{ color: c.text }}>Main Drive (NVMe)</span>
-                <span className="text-xs" style={{ color: c.textMuted }}>287 GB / 512 GB</span>
-              </div>
-              <div className="h-3 rounded-full mb-3" style={{ background: c.border }}>
-                <div className="h-full rounded-full" style={{ width: "56%", background: c.accent }} />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { label: "System", size: "42 GB", color: c.accent },
-                  { label: "Apps", size: "68 GB", color: c.purple },
-                  { label: "Documents", size: "95 GB", color: c.warning },
-                  { label: "Media", size: "82 GB", color: c.success },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 p-2 rounded-lg" style={{ background: c.bg }}>
-                    <div className="w-2 h-2 rounded-full" style={{ background: item.color }} />
-                    <div>
-                      <p className="text-[10px] font-medium" style={{ color: c.text }}>{item.label}</p>
-                      <p className="text-[9px]" style={{ color: c.textMuted }}>{item.size}</p>
-                    </div>
-                  </div>
-                ))}
+          </Card>
+          <Card>
+            <div style={{ padding:"14px 16px 6px", borderBottom:`1px solid ${dt.border}` }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                <SectionTitle label="Ethernet" />
+                <span style={{ fontSize:11, color:dt.textSec, marginTop:-8 }}>Not connected</span>
               </div>
             </div>
-          </div>
-        );
-      case "Services":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm font-semibold" style={{ color: c.text }}>System Services</p>
-            <div className="rounded-xl overflow-hidden" style={{ background: c.cardAlt }}>
-              {[
-                { name: "AlternusShell", status: "Running", type: "Core", pid: 1 },
-                { name: "AI Engine v3.1", status: "Running", type: "Core", pid: 42 },
-                { name: "NetworkManager", status: "Running", type: "Network", pid: 88 },
-                { name: "DisplayServer", status: "Running", type: "Display", pid: 112 },
-                { name: "AudioService", status: "Running", type: "Media", pid: 156 },
-                { name: "CloudSync", status: "Running", type: "Cloud", pid: 201 },
-                { name: "PrintSpooler", status: "Stopped", type: "Peripheral", pid: 0 },
-                { name: "BluetoothService", status: "Stopped", type: "Peripheral", pid: 0 },
-                { name: "VPN Client", status: "Stopped", type: "Network", pid: 0 },
-                { name: "BackupAgent", status: "Running", type: "System", pid: 310 },
-              ].map((svc, i) => (
-                <div key={i} className="flex items-center justify-between px-4 py-2.5" style={{ borderBottom: `1px solid ${c.border}` }}>
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full" style={{ background: svc.status === "Running" ? c.success : c.textMuted }} />
-                    <span className="text-[11px] font-medium" style={{ color: c.text }}>{svc.name}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: c.bg, color: c.textMuted }}>{svc.type}</span>
-                    <span className="text-[10px] w-12 text-right" style={{ color: svc.status === "Running" ? c.success : c.textMuted }}>{svc.status}</span>
-                    {svc.pid > 0 && <span className="text-[9px] w-8 text-right" style={{ color: c.textMuted }}>:{svc.pid}</span>}
-                  </div>
+            <div style={{ padding:"12px 16px" }}><span style={{ fontSize:13, color:dt.textSec }}>No cable detected</span></div>
+          </Card>
+        </div>
+      );
+
+      // ── STORAGE ─────────────────────────────────────────────
+      case "Storage": return (
+        <div style={{ ...p, display:"flex", flexDirection:"column", gap:20 }}>
+          <span style={{ fontSize:20, fontWeight:600, color:dt.text }}>Storage</span>
+          <Card>
+            <div style={{ padding:"14px 16px 10px", borderBottom:`1px solid ${dt.border}` }}>
+              <div style={{ display:"flex", justifyContent:"space-between", marginBottom:10 }}>
+                <span style={{ fontSize:13, fontWeight:500, color:dt.text }}>NVMe SSD</span>
+                <span style={{ fontSize:12, color:dt.textSec }}>287 GB / 512 GB</span>
+              </div>
+              <Bar pct={56} />
+            </div>
+            <div style={{ padding:"12px 16px", display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+              {([["System","42 GB",dt.accent],["Apps","68 GB","#8B5CF6"],["Documents","95 GB",dt.warning],["Media","82 GB",dt.success]] as [string,string,string][]).map(([label,size,color]) => (
+                <div key={label} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 10px", background:dt.bg, borderRadius:dt.r, border:`1px solid ${dt.border}` }}>
+                  <div style={{ width:8, height:8, borderRadius:"50%", background:color, flexShrink:0 }} />
+                  <div><p style={{ fontSize:11, fontWeight:500, color:dt.text }}>{label}</p><p style={{ fontSize:10, color:dt.textSec }}>{size}</p></div>
                 </div>
               ))}
             </div>
-          </div>
-        );
-      case "Devices":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm font-semibold" style={{ color: c.text }}>Device Manager</p>
+          </Card>
+        </div>
+      );
+
+      // ── SERVICES ────────────────────────────────────────────
+      case "Services": return (
+        <div style={{ ...p, display:"flex", flexDirection:"column", gap:20 }}>
+          <span style={{ fontSize:20, fontWeight:600, color:dt.text }}>Services</span>
+          <Card style={{ overflow:"hidden" }}>
+            <div style={{ padding:"14px 16px 6px", borderBottom:`1px solid ${dt.border}` }}><SectionTitle label="System Services" /></div>
             {[
-              { category: "Processors", devices: [{ name: "AlternusCore x86_64 @ 4.2GHz", status: "OK" }] },
-              { category: "Display", devices: [{ name: "Integrated GPU — AlternusGraphics", status: "OK" }, { name: "Monitor — 1920x1080 @60Hz", status: "OK" }] },
-              { category: "Storage", devices: [{ name: "NVMe SSD 512GB", status: "OK" }] },
-              { category: "Network", devices: [{ name: "Wi-Fi Adapter — Alternus Wireless AC", status: "OK" }, { name: "Ethernet — Alternus GbE LAN", status: "Disconnected" }] },
-              { category: "Audio", devices: [{ name: "Alternus HD Audio", status: "OK" }, { name: "Microphone Array", status: "OK" }] },
-              { category: "Input", devices: [{ name: "Keyboard", status: "OK" }, { name: "Trackpad / Mouse", status: "OK" }] },
-              { category: "USB", devices: [{ name: "USB 3.2 Hub — 4 ports", status: "OK" }, { name: "USB-C Thunderbolt", status: "OK" }] },
-              { category: "Bluetooth", devices: [{ name: "Bluetooth 5.3 Adapter", status: "Disabled" }] },
-            ].map((cat, i) => (
-              <div key={i} className="rounded-xl overflow-hidden" style={{ background: c.cardAlt }}>
-                <div className="px-4 py-2" style={{ borderBottom: `1px solid ${c.border}` }}>
-                  <p className="text-[11px] font-semibold" style={{ color: c.text }}>{cat.category}</p>
+              { name:"AlternusShell",    status:"Running", type:"Core",       pid:1 },
+              { name:"AI Engine v3.1",   status:"Running", type:"Core",       pid:42 },
+              { name:"NetworkManager",   status:"Running", type:"Network",    pid:88 },
+              { name:"DisplayServer",    status:"Running", type:"Display",    pid:112 },
+              { name:"AudioService",     status:"Running", type:"Media",      pid:156 },
+              { name:"CloudSync",        status:"Running", type:"Cloud",      pid:201 },
+              { name:"PrintSpooler",     status:"Stopped", type:"Peripheral", pid:0 },
+              { name:"BluetoothService", status:"Stopped", type:"Peripheral", pid:0 },
+              { name:"BackupAgent",      status:"Running", type:"System",     pid:310 },
+            ].map((svc, i, a) => (
+              <div key={svc.name} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"9px 16px", borderBottom: i<a.length-1 ? `1px solid ${dt.border}` : "none" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <div style={{ width:6, height:6, borderRadius:"50%", background: svc.status==="Running" ? dt.success : dt.border, flexShrink:0 }} />
+                  <span style={{ fontSize:13, color:dt.text }}>{svc.name}</span>
                 </div>
-                {cat.devices.map((dev, j) => (
-                  <div key={j} className="flex items-center justify-between px-4 py-2" style={{ borderBottom: j < cat.devices.length - 1 ? `1px solid ${c.border}` : "none" }}>
-                    <span className="text-[11px]" style={{ color: c.textSec }}>{dev.name}</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{
-                      background: dev.status === "OK" ? c.success + "20" : dev.status === "Disabled" ? c.warning + "20" : c.border,
-                      color: dev.status === "OK" ? c.success : dev.status === "Disabled" ? c.warning : c.textMuted
-                    }}>{dev.status}</span>
-                  </div>
-                ))}
+                <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                  <span style={{ fontSize:11, color:dt.textSec, background:dt.bg, padding:"2px 6px", borderRadius:dt.r }}>{svc.type}</span>
+                  <span style={{ fontSize:12, color: svc.status==="Running" ? dt.success : dt.textSec, width:48, textAlign:"right" }}>{svc.status}</span>
+                  {svc.pid>0 && <span style={{ fontSize:11, color:dt.textSec, width:32, textAlign:"right" }}>:{svc.pid}</span>}
+                </div>
               </div>
             ))}
-          </div>
-        );
-      case "Users":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm font-semibold" style={{ color: c.text }}>User Accounts</p>
-            {[
-              { name: "Admin", email: "admin@alternus.art", role: "Administrator", active: true },
-              { name: "Guest", email: "guest@alternus.art", role: "Guest", active: false },
-            ].map((user, i) => (
-              <div key={i} className="rounded-xl p-4 flex items-center gap-3" style={{ background: c.cardAlt }}>
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: user.active ? c.accentSoft : c.border }}>
-                  <I d={ic.user} s={18} c={user.active ? c.accentText : c.textMuted} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs font-semibold" style={{ color: c.text }}>{user.name}</p>
-                  <p className="text-[10px]" style={{ color: c.textMuted }}>{user.email}</p>
-                </div>
-                <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: user.active ? c.success + "20" : c.border, color: user.active ? c.success : c.textMuted }}>
-                  {user.role}
-                </span>
+          </Card>
+        </div>
+      );
+
+      // ── DEVICES ─────────────────────────────────────────────
+      case "Devices": return (
+        <div style={{ ...p, display:"flex", flexDirection:"column", gap:20 }}>
+          <span style={{ fontSize:20, fontWeight:600, color:dt.text }}>Devices</span>
+          {[
+            { cat:"Processors",  devs:[["AlternusCore x86_64 @ 4.2 GHz","OK"]] },
+            { cat:"Display",     devs:[["Integrated GPU — AlternusGraphics","OK"],["Monitor — 1920×1080 @60Hz","OK"]] },
+            { cat:"Storage",     devs:[["NVMe SSD 512 GB","OK"]] },
+            { cat:"Network",     devs:[["Wi-Fi Adapter — Alternus AC","OK"],["Ethernet — Alternus GbE LAN","Disconnected"]] },
+            { cat:"Audio",       devs:[["Alternus HD Audio","OK"],["Microphone Array","OK"]] },
+            { cat:"Input",       devs:[["Keyboard","OK"],["Mouse / Trackpad","OK"]] },
+            { cat:"Bluetooth",   devs:[["Bluetooth 5.3 Adapter","Disabled"]] },
+          ].map(({ cat, devs }) => (
+            <Card key={cat} style={{ overflow:"hidden" }}>
+              <div style={{ padding:"10px 14px", borderBottom:`1px solid ${dt.border}` }}>
+                <span style={{ fontSize:12, fontWeight:600, color:dt.textSec, textTransform:"uppercase", letterSpacing:"0.07em" }}>{cat}</span>
               </div>
-            ))}
-            <button className="w-full py-2.5 rounded-xl text-xs font-medium" style={{ background: c.cardAlt, color: c.accent }}>
-              + Add User
-            </button>
-          </div>
-        );
-      case "Updates":
-        return (
-          <div className="space-y-4">
-            <p className="text-sm font-semibold" style={{ color: c.text }}>System Updates</p>
-            <div className="rounded-xl p-4 flex items-center gap-3" style={{ background: c.success + "10", border: `1px solid ${c.success}30` }}>
-              <I d={ic.shield} s={20} c={c.success} />
-              <div>
-                <p className="text-xs font-semibold" style={{ color: c.text }}>System is up to date</p>
-                <p className="text-[10px]" style={{ color: c.textMuted }}>Last checked: Today, {new Date().getHours()}:{String(new Date().getMinutes()).padStart(2, "0")}</p>
-              </div>
-            </div>
-            <div className="rounded-xl p-4 space-y-3" style={{ background: c.cardAlt }}>
-              <p className="text-xs font-medium" style={{ color: c.text }}>Recent Updates</p>
-              {[
-                { name: "Alternus OS v3.0.2", date: "Apr 5, 2026", status: "Installed" },
-                { name: "Security Patch 04-2026", date: "Apr 3, 2026", status: "Installed" },
-                { name: "AI Engine v3.1", date: "Apr 1, 2026", status: "Installed" },
-              ].map((u, i) => (
-                <div key={i} className="flex justify-between items-center">
-                  <div>
-                    <p className="text-[11px] font-medium" style={{ color: c.text }}>{u.name}</p>
-                    <p className="text-[9px]" style={{ color: c.textMuted }}>{u.date}</p>
-                  </div>
-                  <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: c.success + "20", color: c.success }}>{u.status}</span>
+              {devs.map(([name, status], j) => (
+                <div key={name} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"9px 14px", borderBottom: j<devs.length-1?`1px solid ${dt.border}`:"none" }}>
+                  <span style={{ fontSize:13, color:dt.text }}>{name}</span>
+                  <span style={{ fontSize:11, padding:"2px 8px", borderRadius:dt.r, fontWeight:500, background: status==="OK" ? dt.success+"20" : status==="Disabled" ? dt.warning+"20" : dt.error+"20", color: status==="OK" ? dt.success : status==="Disabled" ? dt.warning : dt.error }}>{status}</span>
                 </div>
               ))}
+            </Card>
+          ))}
+        </div>
+      );
+
+      // ── USERS ───────────────────────────────────────────────
+      case "Users": return (
+        <div style={{ ...p, display:"flex", flexDirection:"column", gap:20 }}>
+          <span style={{ fontSize:20, fontWeight:600, color:dt.text }}>Users</span>
+          {[
+            { name:"Admin", email:"admin@alternus.art", role:"Administrator", active:true },
+            { name:"Guest", email:"guest@alternus.art", role:"Guest",         active:false },
+          ].map(user => (
+            <Card key={user.name} style={{ padding:"14px 16px", display:"flex", alignItems:"center", gap:14 }}>
+              <div style={{ width:40, height:40, borderRadius:dt.r, display:"flex", alignItems:"center", justifyContent:"center", background: user.active ? dt.accent+"20" : dt.border, flexShrink:0 }}>
+                <I d={ic.user} s={18} c={user.active ? dt.accent : dt.textSec} />
+              </div>
+              <div style={{ flex:1 }}>
+                <p style={{ fontSize:14, fontWeight:500, color:dt.text }}>{user.name}</p>
+                <p style={{ fontSize:12, color:dt.textSec }}>{user.email}</p>
+              </div>
+              <span style={{ fontSize:11, padding:"3px 8px", borderRadius:dt.r, background: user.active ? dt.success+"20" : dt.border, color: user.active ? dt.success : dt.textSec }}>{user.role}</span>
+            </Card>
+          ))}
+          <button style={{ height:36, borderRadius:dt.r, border:`1px solid ${dt.border}`, background:"transparent", color:dt.accent, fontSize:14, fontWeight:500, cursor:"pointer", transition:dt.tr }}
+            onMouseEnter={e => (e.currentTarget.style.background = dt.hover)}
+            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            + Add User
+          </button>
+        </div>
+      );
+
+      // ── UPDATES ─────────────────────────────────────────────
+      case "Updates": return (
+        <div style={{ ...p, display:"flex", flexDirection:"column", gap:20 }}>
+          <span style={{ fontSize:20, fontWeight:600, color:dt.text }}>Updates</span>
+          <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", background:dt.success+"14", border:`1px solid ${dt.success}40`, borderRadius:dt.r }}>
+            <I d={ic.shield} s={20} c={dt.success} />
+            <div>
+              <p style={{ fontSize:14, fontWeight:500, color:dt.text }}>System is up to date</p>
+              <p style={{ fontSize:12, color:dt.textSec }}>Last checked: {new Date().getHours()}:{String(new Date().getMinutes()).padStart(2,"0")} today</p>
             </div>
-            <button className="w-full py-2.5 rounded-xl text-xs font-medium" style={{ background: c.accent, color: "#fff" }}>
-              Check for Updates
-            </button>
           </div>
-        );
+          <Card style={{ overflow:"hidden" }}>
+            <div style={{ padding:"14px 16px 6px", borderBottom:`1px solid ${dt.border}` }}><SectionTitle label="Recent Updates" /></div>
+            {[
+              ["Alternus OS v3.0.2",       "Apr 5, 2026"],
+              ["Security Patch 04-2026",   "Apr 3, 2026"],
+              ["AI Engine v3.1",           "Apr 1, 2026"],
+            ].map(([name, date], i, a) => (
+              <div key={name} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 16px", borderBottom: i<a.length-1?`1px solid ${dt.border}`:"none" }}>
+                <div><p style={{ fontSize:13, color:dt.text }}>{name}</p><p style={{ fontSize:11, color:dt.textSec }}>{date}</p></div>
+                <span style={{ fontSize:11, padding:"2px 8px", borderRadius:dt.r, background:dt.success+"20", color:dt.success }}>Installed</span>
+              </div>
+            ))}
+          </Card>
+          <button style={{ height:36, borderRadius:dt.r, border:"none", background:dt.accent, color:"#fff", fontSize:14, fontWeight:500, cursor:"pointer", transition:dt.tr }}
+            onMouseEnter={e => (e.currentTarget.style.opacity="0.85")}
+            onMouseLeave={e => (e.currentTarget.style.opacity="1")}>
+            Check for Updates
+          </button>
+        </div>
+      );
+
       default: return null;
     }
   };
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div style={{ display:"flex", height:"100%", overflow:"hidden", fontFamily:dt.font, background:dt.bg }}>
       {/* Sidebar */}
-      <div className="w-[170px] flex-shrink-0 flex flex-col py-3 px-2 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
-        <div className="flex items-center gap-2 px-3 mb-3">
-          <I d={ic.settings} s={16} c={c.accent} />
-          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: c.textMuted }}>Control Panel</p>
+      <div style={{ width:156, flexShrink:0, display:"flex", flexDirection:"column", background:dt.panel, borderRight:`1px solid ${dt.border}`, overflowY:"auto", scrollbarWidth:"none" }}>
+        {/* Logo */}
+        <div style={{ padding:"16px 16px 12px", borderBottom:`1px solid ${dt.border}`, flexShrink:0 }}>
+          <span style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", color:dt.textSec }}>Control Panel</span>
         </div>
-        {sections.map((it, i) => (
-          <button key={i} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors mb-0.5"
-            onClick={() => setActiveSection(it.label)}
-            style={{ background: activeSection === it.label ? c.accentSoft : "transparent" }}
-            onMouseEnter={e => { if (activeSection !== it.label) e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { if (activeSection !== it.label) e.currentTarget.style.background = "transparent"; }}>
-            <I d={it.icon} s={15} c={activeSection === it.label ? c.accentText : c.textSec} />
-            <span className="text-[11px] font-medium" style={{ color: activeSection === it.label ? c.accentText : c.text }}>{it.label}</span>
-          </button>
-        ))}
+        {/* Nav */}
+        <div style={{ flex:1, padding:"6px 6px" }}>
+          {sections.map(it => (
+            <button key={it.label}
+              onClick={() => setActiveSection(it.label)}
+              style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"8px 10px", borderRadius:dt.r, background: activeSection===it.label ? dt.hover : "transparent", border:"none", cursor:"pointer", textAlign:"left", marginBottom:2, transition:dt.tr, borderLeft: activeSection===it.label ? `2px solid ${dt.accent}` : "2px solid transparent" }}
+              onMouseEnter={e => { if (activeSection!==it.label) e.currentTarget.style.background=dt.hover; }}
+              onMouseLeave={e => { if (activeSection!==it.label) e.currentTarget.style.background="transparent"; }}
+              onMouseDown={e => (e.currentTarget.style.opacity="0.7")}
+              onMouseUp={e => (e.currentTarget.style.opacity="1")}>
+              <I d={it.icon} s={14} c={activeSection===it.label ? dt.accent : dt.textSec} />
+              <span style={{ fontSize:13, fontWeight: activeSection===it.label ? 500 : 400, color: activeSection===it.label ? dt.text : dt.textSec }}>{it.label}</span>
+            </button>
+          ))}
+        </div>
+        {/* Version */}
+        <div style={{ padding:"10px 16px", borderTop:`1px solid ${dt.border}`, flexShrink:0 }}>
+          <span style={{ fontSize:10, color:dt.textSec, display:"block" }}>v3.0 · x86_64</span>
+        </div>
       </div>
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-5" style={{ scrollbarWidth: "none" }}>
+      <div style={{ flex:1, overflowY:"auto", background:dt.bg, scrollbarWidth:"none" }}>
         {renderContent()}
       </div>
     </div>
