@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news" | "dashboard" | "tasks" | "mail" | "monaco" | "aihub" | "imagegen" | "aivoice" | "writer" | "knowledge";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news" | "dashboard" | "tasks" | "mail" | "monaco" | "aihub" | "imagegen" | "aivoice" | "writer" | "knowledge" | "sysmon";
 
 interface WinState {
   id: WinId;
@@ -236,6 +236,9 @@ const ic = {
   messageCircle: "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z",
   bookOpen: "M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z",
   edit3: "M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z",
+  activity: "M22 12h-4l-3 9L9 3l-3 9H2",
+  layers: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5",
+  zap: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
 };
 
 // ━━━━ Window Title Bar ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -4709,6 +4712,153 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
+// ━━━━ SYSTEM MONITOR APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function SysMonApp({ c }: { c: typeof palette.dark }) {
+  const rand = (min: number, max: number) => Math.floor(Math.random() * (max - min) + min);
+  const [stats, setStats] = useState({ cpu: 34, ram: 52, gpu: 18, net: 12, disk: 65, temp: 44 });
+  const [history, setHistory] = useState<{ cpu: number[]; ram: number[]; gpu: number[] }>({
+    cpu: Array.from({ length: 30 }, () => rand(20, 60)),
+    ram: Array.from({ length: 30 }, () => rand(45, 65)),
+    gpu: Array.from({ length: 30 }, () => rand(10, 40)),
+  });
+  const [activeTab, setActiveTab] = useState<"overview" | "processes">("overview");
+  useEffect(() => {
+    const iv = setInterval(() => {
+      const cpu = Math.max(5, Math.min(95, stats.cpu + rand(-8, 8)));
+      const gpu = Math.max(2, Math.min(80, stats.gpu + rand(-6, 6)));
+      const net = Math.max(1, Math.min(100, stats.net + rand(-10, 10)));
+      setStats(s => ({ ...s, cpu, gpu, net, temp: 40 + Math.floor(cpu / 10) }));
+      setHistory(h => ({
+        cpu: [...h.cpu.slice(1), cpu],
+        ram: [...h.ram.slice(1), h.ram[h.ram.length - 1] + rand(-2, 2)],
+        gpu: [...h.gpu.slice(1), gpu],
+      }));
+    }, 1000);
+    return () => clearInterval(iv);
+  }, [stats.cpu, stats.gpu, stats.net]);
+
+  const processes = [
+    { name: "Alternus AI", pid: 1201, cpu: 12.4, ram: 842, status: "running" },
+    { name: "Browser", pid: 2340, cpu: 8.1, ram: 1240, status: "running" },
+    { name: "Code Editor", pid: 3102, cpu: 4.2, ram: 380, status: "running" },
+    { name: "Music", pid: 4023, cpu: 2.1, ram: 120, status: "running" },
+    { name: "System (kernel)", pid: 1, cpu: 1.8, ram: 256, status: "system" },
+    { name: "News", pid: 5011, cpu: 0.9, ram: 98, status: "running" },
+    { name: "Dashboard", pid: 5200, cpu: 0.4, ram: 64, status: "running" },
+  ];
+
+  const Sparkline = ({ data, color }: { data: number[]; color: string }) => {
+    const max = Math.max(...data, 1);
+    const w = 200; const h = 40;
+    const pts = data.map((v, i) => `${(i / (data.length - 1)) * w},${h - (v / max) * h}`).join(" ");
+    return (
+      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="w-full">
+        <polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        <linearGradient id={`grad-${color.replace("#", "")}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.15" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+        <polygon points={`0,${h} ${pts} ${w},${h}`} fill={`url(#grad-${color.replace("#", "")})`} />
+      </svg>
+    );
+  };
+
+  return (
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      {/* Tabs */}
+      <div className="flex flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        {[{ id: "overview", label: "Overview" }, { id: "processes", label: "Processes" }].map(t => (
+          <button key={t.id} onClick={() => setActiveTab(t.id as "overview" | "processes")}
+            className="px-4 py-2.5 text-[11px] font-medium transition-colors"
+            style={{ color: activeTab === t.id ? c.text : c.textMuted, borderBottom: activeTab === t.id ? `2px solid ${c.accent}` : "2px solid transparent", marginBottom: "-1px" }}>
+            {t.label}
+          </button>
+        ))}
+        <div className="ml-auto flex items-center px-3 gap-2">
+          <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: `${c.success}20`, color: c.success }}>● Live</span>
+          <span className="text-[10px]" style={{ color: c.textMuted }}>{stats.temp}°C</span>
+        </div>
+      </div>
+
+      {activeTab === "overview" ? (
+        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ scrollbarWidth: "none" }}>
+          {/* Summary row */}
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { label: "CPU", val: stats.cpu, color: c.accent, unit: "%" },
+              { label: "RAM", val: stats.ram, color: "#34D399", unit: "%" },
+              { label: "GPU", val: stats.gpu, color: "#A78BFA", unit: "%" },
+            ].map(s => (
+              <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                <p className="text-[9px] uppercase tracking-wider mb-1" style={{ color: c.textMuted }}>{s.label}</p>
+                <p className="text-[20px] font-bold" style={{ color: s.color }}>{s.val}<span className="text-[12px]">{s.unit}</span></p>
+              </div>
+            ))}
+          </div>
+
+          {/* CPU Graph */}
+          {[
+            { label: "CPU", key: "cpu" as const, color: c.accent, val: stats.cpu },
+            { label: "RAM", key: "ram" as const, color: "#34D399", val: stats.ram },
+            { label: "GPU", key: "gpu" as const, color: "#A78BFA", val: stats.gpu },
+          ].map(s => (
+            <div key={s.label} className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[11px] font-semibold" style={{ color: c.text }}>{s.label}</p>
+                <span className="text-[12px] font-bold" style={{ color: s.color }}>{s.val}%</span>
+              </div>
+              <Sparkline data={history[s.key]} color={s.color} />
+            </div>
+          ))}
+
+          {/* Other stats */}
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { label: "Storage", val: stats.disk, color: c.warning },
+              { label: "Network", val: stats.net, color: "#60A5FA" },
+            ].map(s => (
+              <div key={s.label} className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px]" style={{ color: c.textMuted }}>{s.label}</p>
+                  <span className="text-[11px] font-bold" style={{ color: s.color }}>{s.val}%</span>
+                </div>
+                <div className="h-1.5 rounded-full" style={{ background: c.border }}>
+                  <div className="h-full rounded-full" style={{ width: `${s.val}%`, background: s.color }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+          <div className="px-3 py-2 grid grid-cols-4 text-[9px] uppercase tracking-wider" style={{ color: c.textMuted, borderBottom: `1px solid ${c.border}` }}>
+            <span>Process</span><span className="text-right">PID</span><span className="text-right">CPU</span><span className="text-right">RAM</span>
+          </div>
+          {processes.map((p, i) => (
+            <div key={i} className="px-3 py-2.5 grid grid-cols-4 items-center transition-colors"
+              style={{ borderBottom: `1px solid ${c.border}` }}
+              onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: p.status === "system" ? c.warning : c.success }} />
+                <span className="text-[11px] truncate" style={{ color: c.text }}>{p.name}</span>
+              </div>
+              <span className="text-right text-[10px] font-mono" style={{ color: c.textMuted }}>{p.pid}</span>
+              <span className="text-right text-[11px] font-medium" style={{ color: p.cpu > 8 ? c.danger : c.textSec }}>{p.cpu}%</span>
+              <span className="text-right text-[10px]" style={{ color: c.textSec }}>{p.ram} MB</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="px-4 py-2 flex items-center justify-between flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+        <p className="text-[9px]" style={{ color: c.textMuted }}>AlternusCore x86_64 · 16 GB DDR5 · Updates every 1s</p>
+        <span className="text-[9px] font-mono" style={{ color: c.textMuted }}>Uptime: 3h 42m</span>
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ DASHBOARD APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function DashboardApp({ c }: { c: typeof palette.dark }) {
   const [time, setTime] = useState(new Date());
@@ -5628,6 +5778,10 @@ export default function AlternusOS() {
   const [installingApp, setInstallingApp] = useState<string | null>(null);
   const [installProgress, setInstallProgress] = useState(0);
   const [paymentModal, setPaymentModal] = useState<{ name: string; price: string; icon: string; iconBg: string } | null>(null);
+  const [showSpotlight, setShowSpotlight] = useState(false);
+  const [spotlightQuery, setSpotlightQuery] = useState("");
+  const [activeSpace, setActiveSpace] = useState(1);
+  const [showSpacesView, setShowSpacesView] = useState(false);
   const lastMouseMove = useRef(Date.now());
 
   const c = palette[mode];
@@ -5663,6 +5817,7 @@ export default function AlternusOS() {
     { id: "aivoice", title: "AI Voice", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 80, w: 380, h: 440 },
     { id: "writer", title: "AI Writer", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 40, w: 560, h: 480 },
     { id: "knowledge", title: "Knowledge Base", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 560, h: 480 },
+    { id: "sysmon", title: "System Monitor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 500, h: 480 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -5779,6 +5934,7 @@ export default function AlternusOS() {
       aivoice: { w: 380, h: 440 },
       writer: { w: 560, h: 480 },
       knowledge: { w: 580, h: 480 },
+      sysmon: { w: 500, h: 480 },
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
@@ -5926,6 +6082,22 @@ export default function AlternusOS() {
           setTaskSwitcherIdx(prev => (prev + 1) % openWins.length);
         }
       }
+      // Spotlight: Ctrl+K
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setShowSpotlight(p => !p);
+        setSpotlightQuery("");
+      }
+      // Escape closes spotlight
+      if (e.key === "Escape") {
+        setShowSpotlight(false);
+        setShowSpacesView(false);
+      }
+      // Ctrl+1/2/3 switch spaces
+      if ((e.ctrlKey || e.metaKey) && ["1", "2", "3"].includes(e.key)) {
+        e.preventDefault();
+        setActiveSpace(parseInt(e.key));
+      }
     };
     const handleKeyUp = (e: KeyboardEvent) => {
       if (e.key === "Alt" && showTaskSwitcher) {
@@ -6007,6 +6179,8 @@ export default function AlternusOS() {
         id: "writer", title: "AI Writer", icon: ic.edit3, description: "Document editor with AI writing assistance" },
       { keys: ["knowledge", "rag", "search docs", "knowledge base", "semantic search", "index", "upload doc", "qa", "document search"],
         id: "knowledge", title: "Knowledge Base", icon: ic.bookOpen, description: "Semantic search over your documents" },
+      { keys: ["system monitor", "cpu", "ram", "gpu", "memory", "performance", "processes", "usage", "task manager", "resources", "temperature"],
+        id: "sysmon", title: "System Monitor", icon: ic.activity, description: "Real-time CPU, RAM, GPU monitoring" },
     ];
 
     // ━━━ SEMANTIC FILE SEARCH ━━━
@@ -6151,6 +6325,7 @@ export default function AlternusOS() {
     aivoice: <AIVoiceApp c={c} />,
     writer: <WriterApp c={c} />,
     knowledge: <KnowledgeApp c={c} />,
+    sysmon: <SysMonApp c={c} />,
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
@@ -6181,6 +6356,7 @@ export default function AlternusOS() {
     { id: "aivoice", icon: ic.mic, label: "AI Voice", color: "#FBBF24" },
     { id: "writer", icon: ic.edit3, label: "AI Writer", color: "#34D399" },
     { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316" },
+    { id: "sysmon", icon: ic.activity, label: "System Monitor", color: "#34D399" },
   ];
 
   // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -6464,6 +6640,139 @@ export default function AlternusOS() {
         onContextMenu={e => { e.preventDefault(); setContextMenu({ x: e.clientX, y: e.clientY - 36 }); setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setShowAISidebar(false); }}>
 
 
+        {/* ━━━━ Spotlight Search Overlay ━━━━ */}
+        {showSpotlight && (
+          <div className="absolute inset-0 z-[500] flex items-start justify-center pt-16" style={{ background: "rgba(0,0,0,0.45)" }}
+            onClick={() => setShowSpotlight(false)}>
+            <div className="w-[560px] rounded-2xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 24px 64px rgba(0,0,0,0.4)" }}
+              onClick={e => e.stopPropagation()}>
+              {/* Input */}
+              <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: `1px solid ${c.border}` }}>
+                <I d={ic.search} s={20} c={c.textMuted} />
+                <input autoFocus value={spotlightQuery} onChange={e => setSpotlightQuery(e.target.value)}
+                  placeholder="Search apps, files, commands..."
+                  className="flex-1 bg-transparent outline-none text-base"
+                  style={{ color: c.text }} />
+                {spotlightQuery && (
+                  <button onClick={() => setSpotlightQuery("")} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: c.cardAlt, color: c.textMuted }}>✕</button>
+                )}
+                <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: c.cardAlt, color: c.textMuted }}>ESC</span>
+              </div>
+              {/* Results */}
+              <div className="max-h-[360px] overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                {!spotlightQuery ? (
+                  <>
+                    <p className="px-5 py-2 text-[10px] uppercase tracking-wider font-semibold" style={{ color: c.textMuted }}>Recent & Suggested</p>
+                    {[
+                      { icon: ic.grid, label: "Dashboard", id: "dashboard", color: "#60A5FA" },
+                      { icon: ic.activity, label: "System Monitor", id: "sysmon", color: "#34D399" },
+                      { icon: ic.sparkle, label: "Alternus AI", id: "ai", color: c.accent },
+                      { icon: ic.mail, label: "Mail", id: "mail", color: "#F97316" },
+                      { icon: ic.newspaper, label: "News", id: "news", color: c.danger },
+                    ].map(item => (
+                      <button key={item.id} onClick={() => { openWinWithAI(item.id as WinId); setShowSpotlight(false); }}
+                        className="w-full flex items-center gap-3 px-5 py-2.5 transition-colors text-left"
+                        onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${item.color}20` }}>
+                          <I d={item.icon} s={16} c={item.color} />
+                        </div>
+                        <span className="text-[13px]" style={{ color: c.text }}>{item.label}</span>
+                        <span className="ml-auto text-[10px]" style={{ color: c.textMuted }}>App</span>
+                      </button>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {/* App results */}
+                    {(() => {
+                      const q = spotlightQuery.toLowerCase();
+                      const matched = dockApps.filter(a => a.label.toLowerCase().includes(q));
+                      return matched.length > 0 ? (
+                        <>
+                          <p className="px-5 py-2 text-[10px] uppercase tracking-wider font-semibold" style={{ color: c.textMuted }}>Apps</p>
+                          {matched.map(app => (
+                            <button key={app.id} onClick={() => { openWinWithAI(app.id); setShowSpotlight(false); setSpotlightQuery(""); }}
+                              className="w-full flex items-center gap-3 px-5 py-2.5 transition-colors text-left"
+                              onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${app.color}20` }}>
+                                <I d={app.icon} s={16} c={app.color} />
+                              </div>
+                              <span className="text-[13px]" style={{ color: c.text }}>{app.label}</span>
+                              <span className="ml-auto text-[10px]" style={{ color: c.textMuted }}>↵ Open</span>
+                            </button>
+                          ))}
+                        </>
+                      ) : null;
+                    })()}
+                    {/* Calculation */}
+                    {/^\d[\d\s\+\-\*\/\.\(\)]*$/.test(spotlightQuery) && (
+                      <div className="px-5 py-4 flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${c.success}20` }}>
+                          <I d={ic.calc} s={16} c={c.success} />
+                        </div>
+                        <div>
+                          <p className="text-[11px]" style={{ color: c.textMuted }}>{spotlightQuery} =</p>
+                          <p className="text-[18px] font-bold" style={{ color: c.text }}>
+                            {(() => { try { return eval(spotlightQuery); } catch { return "?"; } })()}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {/* No results */}
+                    {dockApps.filter(a => a.label.toLowerCase().includes(spotlightQuery.toLowerCase())).length === 0 &&
+                      !/^\d[\d\s\+\-\*\/\.\(\)]*$/.test(spotlightQuery) && (
+                      <div className="px-5 py-8 text-center">
+                        <p className="text-[13px]" style={{ color: c.textMuted }}>No results for &ldquo;{spotlightQuery}&rdquo;</p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+              <div className="px-5 py-2 flex items-center gap-4 text-[10px]" style={{ borderTop: `1px solid ${c.border}`, color: c.textMuted }}>
+                <span>↑↓ Navigate</span><span>↵ Open</span><span>ESC Dismiss</span>
+                <span className="ml-auto">Ctrl+K</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ━━━━ Spaces View (Mission Control) ━━━━ */}
+        {showSpacesView && (
+          <div className="absolute inset-0 z-[400] flex flex-col items-center justify-center gap-4" style={{ background: "rgba(0,0,0,0.7)" }}
+            onClick={() => setShowSpacesView(false)}>
+            <p className="text-[12px] uppercase tracking-widest font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>Spaces</p>
+            <div className="flex gap-4">
+              {[1, 2, 3].map(n => (
+                <button key={n} onClick={e => { e.stopPropagation(); setActiveSpace(n); setShowSpacesView(false); }}
+                  className="flex flex-col items-center gap-2 transition-all"
+                  style={{ transform: activeSpace === n ? "scale(1.05)" : "scale(1)" }}>
+                  <div className="w-48 h-32 rounded-xl flex items-center justify-center"
+                    style={{ background: activeSpace === n ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.05)", border: `2px solid ${activeSpace === n ? c.accent : "rgba(255,255,255,0.1)"}`, backdropFilter: "blur(8px)" }}>
+                    <div className="flex flex-wrap gap-1.5 p-2 justify-center">
+                      {(n === 1 ? ["terminal", "code", "files"] : n === 2 ? ["aihub", "writer", "knowledge"] : ["mail", "tasks", "dashboard"]).map(id => (
+                        <div key={id} className="w-6 h-6 rounded-md" style={{ background: `${(dockApps.find(a => a.id === id)?.color) ?? "#666"}30`, border: `1px solid ${(dockApps.find(a => a.id === id)?.color) ?? "#666"}50` }}>
+                          <I d={(dockApps.find(a => a.id === id)?.icon) ?? ic.sparkle} s={12} c={(dockApps.find(a => a.id === id)?.color) ?? "#666"} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-[11px] font-medium" style={{ color: activeSpace === n ? "#fff" : "rgba(255,255,255,0.5)" }}>
+                    Space {n}
+                  </p>
+                  <div className="flex gap-1">
+                    {(n === 1 ? ["Dev", "Code"] : n === 2 ? ["AI", "Write"] : ["Org", "Mail"]).map(tag => (
+                      <span key={tag} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>{tag}</span>
+                    ))}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>Ctrl+1 · Ctrl+2 · Ctrl+3 to switch · ESC to dismiss</p>
+          </div>
+        )}
+
         {/* Apps button - top center, always visible */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center" onClick={e => e.stopPropagation()}>
             <button
@@ -6494,6 +6803,31 @@ export default function AlternusOS() {
                 <path d="M18 15l-6-6-6 6" />
               </svg>
             </button>
+
+            {/* Spotlight + Spaces buttons beside apps button */}
+            <div className="absolute -left-24 top-0 flex gap-2">
+              <button onClick={() => setShowSpotlight(true)} title="Spotlight (Ctrl+K)"
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
+                style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.textSec }}
+                onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = "#fff"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}>
+                <I d={ic.search} s={16} />
+              </button>
+            </div>
+            <div className="absolute -right-24 top-0 flex gap-2">
+              <button onClick={() => setShowSpacesView(true)} title="Spaces (Ctrl+1/2/3)"
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all gap-0.5"
+                style={{ background: c.surface, border: `1px solid ${c.border}`, flexDirection: "column" }}
+                onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; }}
+                onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; }}>
+                <div className="flex gap-0.5">
+                  {[1, 2, 3].map(n => (
+                    <div key={n} className="w-2 h-2 rounded-sm" style={{ background: activeSpace === n ? c.accent : c.border }} />
+                  ))}
+                </div>
+                <span className="text-[8px]" style={{ color: c.textMuted }}>Space {activeSpace}</span>
+              </button>
+            </div>
 
             {/* Apps panel - slides down, horizontal scroll */}
             <div
@@ -7109,10 +7443,11 @@ export default function AlternusOS() {
             boxShadow: showNotifications ? (mode === "dark" ? "-4px 0 20px rgba(0,0,0,0.4)" : "-4px 0 20px rgba(0,0,0,0.1)") : "none",
           }}
         >
-          <div className="flex items-center justify-between px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <div className="flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
-              <I d={ic.sparkle} s={14} c={c.accentText} />
-              <p className="text-sm font-semibold" style={{ color: c.text }}>Notifications</p>
+              <I d={ic.bell} s={14} c={c.accentText} />
+              <p className="text-sm font-semibold" style={{ color: c.text }}>Notification Center</p>
               {smartDND && <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: c.warningSoft, color: c.warning }}>DND</span>}
             </div>
             <div className="flex items-center gap-1">
@@ -7126,7 +7461,20 @@ export default function AlternusOS() {
               <button onClick={() => setShowNotifications(false)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors" style={{ color: c.textMuted }}><I d={ic.close} s={14} /></button>
             </div>
           </div>
-          <div className="p-3 space-y-2 overflow-y-auto" style={{ height: "calc(100% - 52px)", scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          {/* Category tabs */}
+          <div className="flex px-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+            {["All", "AI", "Apps", "System"].map(tab => (
+              <button key={tab} className="px-3 py-2 text-[10px] font-medium transition-colors"
+                style={{ color: tab === "All" ? c.text : c.textMuted, borderBottom: tab === "All" ? `2px solid ${c.accent}` : "2px solid transparent", marginBottom: "-1px" }}>
+                {tab}
+              </button>
+            ))}
+            <button onClick={() => setAiNotifications([])} className="ml-auto px-2 py-2 text-[9px] transition-colors" style={{ color: c.textMuted }}>
+              Clear all
+            </button>
+          </div>
+          </div>
+          <div className="p-3 space-y-2 overflow-y-auto" style={{ height: "calc(100% - 96px)", scrollbarWidth: "none", msOverflowStyle: "none" }}>
             {/* AI notifications */}
             {aiNotifications.map((n) => (
               <div key={n.id} className="flex items-start gap-3 p-3 rounded-xl transition-colors"
