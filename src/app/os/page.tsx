@@ -7455,74 +7455,95 @@ export default function AlternusOS() {
           const focusedWin = [...wins].filter(w => w.isOpen && !w.isMinimized).sort((a, b) => b.zIndex - a.zIndex)[0];
           const creativeWins: WinId[] = ["word", "notes", "writer", "imagegen", "studio", "monaco", "code", "browser", "aihub", "aivoice", "knowledge"];
           const isCreative = focusedWin && creativeWins.includes(focusedWin.id);
-          const systemChips = ["Fixed", "Update", "Create document", "Search File"];
-          const creativeChips = ["Writen", "Suggested text", "Email Write", "Create Docx", "Detected"];
+          const systemChips = ["Smart Animated", "Fixed", "Update", "Create document", "Search File"];
+          const creativeChips = ["Smart Animated", "Writen", "Create document", "Email Write", "Create Docx"];
           const chips = isCreative ? creativeChips : systemChips;
-          // Position overlay centered over focused window or screen center
           const ox = focusedWin ? focusedWin.x + focusedWin.w / 2 : window.innerWidth / 2;
           const oy = focusedWin ? focusedWin.y + 60 : window.innerHeight / 2 - 60;
+          const chipBg = mode === "dark" ? "rgba(58,62,75,0.92)" : "rgba(210,213,228,0.88)";
+          const chipColor = mode === "dark" ? "#d0d4e8" : "#2d3250";
+          const chipBorder = mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.55)";
+          const barBg = mode === "dark" ? "rgba(36,38,50,0.94)" : "rgba(210,213,232,0.92)";
+          const inputColor = mode === "dark" ? "#e8eaf6" : "#1e2140";
           return (
             <>
+              <style>{`
+                @keyframes ctrlai-in {
+                  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+                  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+                }
+                @keyframes chip-in {
+                  from { opacity: 0; transform: translateY(6px); }
+                  to   { opacity: 1; transform: translateY(0);   }
+                }
+                .ctrlai-panel { animation: ctrlai-in 0.22s cubic-bezier(.22,.68,0,1.2) both; }
+                .ctrlai-chip  { animation: chip-in  0.18s cubic-bezier(.22,.68,0,1.2) both; }
+              `}</style>
               {/* Backdrop dismiss */}
-              <div className="fixed inset-0 z-[490]" onClick={() => { setShowCtrlAi(false); setCtrlAiChips(false); }} />
-              {/* Overlay panel */}
+              <div className="fixed inset-0 z-[490]" onClick={() => { setShowCtrlAi(false); setCtrlAiChips(true); }} />
+              {/* Panel */}
               <div
-                className="absolute z-[491]"
-                style={{ left: Math.min(Math.max(ox - 220, 8), window.innerWidth - 448), top: Math.max(oy, 8), width: 440 }}
+                className="absolute z-[491] ctrlai-panel"
+                style={{ left: Math.min(Math.max(ox - 230, 8), window.innerWidth - 468), top: Math.max(oy, 8), width: 460 }}
                 onClick={e => e.stopPropagation()}
               >
-                {/* Bar */}
+                {/* Bar row */}
                 <div className="flex items-center gap-2 p-1.5 rounded-2xl mb-2"
-                  style={{ background: "rgba(200,205,230,0.85)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.6)", boxShadow: "0 4px 24px rgba(100,110,180,0.18)" }}>
-                  {/* Left: sparkle button */}
-                  <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-opacity hover:opacity-80"
-                    style={{ background: "#3B82F6", boxShadow: "0 2px 8px rgba(59,130,246,0.35)" }}
-                    onClick={() => { /* submit */ }}>
-                    <svg width={18} height={18} viewBox="0 0 24 24" fill="none"><path d="M12 3v1M12 20v1M4.22 4.22l.7.7M19.07 19.07l.7.7M3 12h1M20 12h1M4.22 19.78l.7-.7M19.07 4.93l.7-.7M12 8a4 4 0 100 8 4 4 0 000-8z" stroke="#fff" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                  style={{ background: barBg, backdropFilter: "blur(20px) saturate(1.5)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.65)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)" : "0 4px 24px rgba(100,110,180,0.18)" }}>
+                  {/* Left: diamond button */}
+                  <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
+                    style={{ background: "#3B82F6", boxShadow: "0 2px 12px rgba(59,130,246,0.45)" }}
+                    onClick={() => { if (ctrlAiInput.trim()) { openWin("ai"); setShowCtrlAi(false); } }}>
+                    <svg width={16} height={16} viewBox="0 0 24 24" fill="none"><path d={ic.sparkle} fill="#fff" /></svg>
                   </button>
                   {/* Input */}
                   <input
                     ref={ctrlAiInputRef}
-                    className="flex-1 bg-transparent outline-none text-[15px]"
-                    style={{ color: "#2d3250", caretColor: "#3B82F6" }}
+                    className="flex-1 bg-transparent outline-none text-[14px] font-light"
+                    style={{ color: inputColor, caretColor: "#3B82F6" }}
                     placeholder="Ask AI anything..."
                     value={ctrlAiInput}
                     onChange={e => setCtrlAiInput(e.target.value)}
                     onKeyDown={e => {
-                      if (e.key === "Escape") { setShowCtrlAi(false); setCtrlAiChips(false); }
-                      if (e.key === "Enter" && ctrlAiInput.trim()) {
-                        openWin("ai");
-                        setShowCtrlAi(false);
-                      }
+                      if (e.key === "Escape") { setShowCtrlAi(false); setCtrlAiChips(true); }
+                      if (e.key === "Enter" && ctrlAiInput.trim()) { openWin("ai"); setShowCtrlAi(false); }
                     }}
                   />
-                  {/* Right: chevron button — toggles chips */}
-                  <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-opacity hover:opacity-80"
-                    style={{ background: "#3B82F6", boxShadow: "0 2px 8px rgba(59,130,246,0.35)" }}
+                  {/* Chevron toggle */}
+                  <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
+                    style={{ background: "#3B82F6", boxShadow: "0 2px 12px rgba(59,130,246,0.45)" }}
                     onClick={() => setCtrlAiChips(p => !p)}>
-                    <I d={ctrlAiChips ? ic.chevU : ic.chevD} s={18} c="#fff" />
+                    <I d={ctrlAiChips ? ic.chevU : ic.chevD} s={16} c="#fff" />
                   </button>
                 </div>
-                {/* Chips row — visible when ctrlAiChips is true */}
+
+                {/* Chips row */}
                 {ctrlAiChips && (
-                  <div className="flex items-center gap-2 px-1">
+                  <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2 flex-1 flex-wrap">
-                      {chips.map(chip => (
+                      {chips.map((chip, i) => (
                         <button key={chip}
-                          className="px-4 py-2.5 rounded-2xl text-[12px] font-medium transition-all"
-                          style={{ background: "rgba(200,205,230,0.75)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.5)", color: "#2d3250", boxShadow: "0 1px 4px rgba(100,110,180,0.1)" }}
-                          onMouseEnter={e => { e.currentTarget.style.background = "#3B82F6"; e.currentTarget.style.color = "#fff"; }}
-                          onMouseLeave={e => { e.currentTarget.style.background = "rgba(200,205,230,0.75)"; e.currentTarget.style.color = "#2d3250"; }}
-                          onClick={() => { setCtrlAiInput(chip + ": "); ctrlAiInputRef.current?.focus(); }}>
+                          className="ctrlai-chip px-4 py-2.5 rounded-2xl text-[12px] font-medium transition-all"
+                          style={{
+                            background: chipBg,
+                            backdropFilter: "blur(16px)",
+                            border: `1px solid ${chipBorder}`,
+                            color: chipColor,
+                            boxShadow: mode === "dark" ? "0 2px 8px rgba(0,0,0,0.25)" : "0 1px 4px rgba(100,110,180,0.1)",
+                            animationDelay: `${i * 0.04}s`,
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = "#3B82F6"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#3B82F6"; e.currentTarget.style.boxShadow = "0 2px 12px rgba(59,130,246,0.4)"; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = chipBg; e.currentTarget.style.color = chipColor; e.currentTarget.style.borderColor = chipBorder; e.currentTarget.style.boxShadow = mode === "dark" ? "0 2px 8px rgba(0,0,0,0.25)" : "0 1px 4px rgba(100,110,180,0.1)"; }}
+                          onClick={() => { setCtrlAiInput(chip + ": "); setTimeout(() => ctrlAiInputRef.current?.focus(), 10); }}>
                           {chip}
                         </button>
                       ))}
                     </div>
-                    {/* ^ collapse button */}
-                    <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-opacity hover:opacity-80"
-                      style={{ background: "#3B82F6" }}
+                    {/* ^ button */}
+                    <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105 flex-shrink-0"
+                      style={{ background: "#3B82F6", boxShadow: "0 2px 12px rgba(59,130,246,0.45)" }}
                       onClick={() => setCtrlAiChips(false)}>
-                      <I d={ic.chevU} s={18} c="#fff" />
+                      <I d={ic.chevU} s={16} c="#fff" />
                     </button>
                   </div>
                 )}
