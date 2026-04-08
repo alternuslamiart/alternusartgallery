@@ -643,7 +643,7 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
   const [toast, setToast] = useState<{ text: string; color: string } | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
-  const hasMessages = msgs.length > 0;
+
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
   useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 3000); return () => clearTimeout(t); } }, [toast]);
@@ -705,51 +705,6 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
   const newChat = () => {
     setMsgs([]);
     setInput("");
-  };
-
-  const defaultChips = [
-    { id: "explore-gallery", label: "Explore gallery", icon: ic.image },
-    { id: "art-styles", label: "Art styles", icon: ic.sparkle },
-    { id: "commission-art", label: "Commission art", icon: ic.pen },
-    { id: "help-choose", label: "Help me choose", icon: ic.search },
-    { id: "art-care", label: "Art care tips", icon: ic.shield },
-  ];
-
-  const addableChips = [
-    { id: "generate-image", label: "Generate image", icon: ic.sparkle },
-    { id: "art-news", label: "Art news today", icon: ic.globe },
-    { id: "price-guide", label: "Art price guide", icon: ic.store },
-    { id: "frame-advice", label: "Framing advice", icon: ic.image },
-    { id: "color-palette", label: "Color palette ideas", icon: ic.pen },
-    { id: "gift-ideas", label: "Art gift ideas", icon: ic.store },
-  ];
-
-  const [landingChips, setLandingChips] = useState(defaultChips);
-  const [showAddMenu, setShowAddMenu] = useState(false);
-
-  // Load chips from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("alternus_os_chips");
-      if (saved) setLandingChips(JSON.parse(saved));
-    } catch {}
-  }, []);
-
-  // Persist chips
-  useEffect(() => {
-    localStorage.setItem("alternus_os_chips", JSON.stringify(landingChips));
-  }, [landingChips]);
-
-  const removeChip = (id: string) => {
-    setLandingChips(prev => prev.filter(ch => ch.id !== id));
-  };
-
-  const addChip = (chip: typeof defaultChips[0]) => {
-    setLandingChips(prev => {
-      if (prev.some(ch => ch.id === chip.id)) return prev;
-      return [...prev, chip];
-    });
-    setShowAddMenu(false);
   };
 
   const appKeywords: { keywords: string[]; id: WinId; label: string }[] = [
@@ -822,37 +777,6 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
           </div>
         )}
 
-        {!hasMessages ? (
-          /* ===== GEMINI-STYLE LANDING ===== */
-          <div className="flex-1 flex flex-col items-center justify-center px-6">
-            <div className="w-full max-w-[620px] text-center">
-              {/* App shortcut chips */}
-              <div className="flex flex-wrap gap-2 justify-center items-center">
-                {landingChips.map(chip => (
-                  <div key={chip.id} className="relative group inline-flex">
-                    <button onClick={() => send(chip.label)}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[12px] transition-colors"
-                      style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}
-                      onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = c.text; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}>
-                      <I d={chip.icon} s={14} />
-                      {chip.label}
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); removeChip(chip.id); }}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
-                      style={{ background: "#ef4444" }}
-                      title="Remove"
-                    >
-                      <I d={ic.close} s={10} c="#fff" />
-                    </button>
-                  </div>
-                ))}
-
-              </div>
-            </div>
-          </div>
-        ) : (
           /* ===== GEMINI-STYLE CONVERSATION VIEW ===== */
           <>
             <div className="flex-1 overflow-y-auto px-6 py-6" style={{ scrollbarWidth: "none" }}>
@@ -996,7 +920,6 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
               </div>
             </div>
           </>
-        )}
       </div>
 
       {/* Right sidebar — Icon bar with border + expandable panel */}
