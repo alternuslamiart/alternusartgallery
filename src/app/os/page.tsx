@@ -172,6 +172,7 @@ const ic = {
   chevR: "M9 18l6-6-6-6",
   chevL: "M15 18l-6-6 6-6",
   chevD: "M6 9l6 6 6-6",
+  chevU: "M18 15l-6-6-6 6",
   play: "M5 3l14 9-14 9V3z",
   pause: "M6 4h4v16H6zM14 4h4v16h-4z",
   skip: "M5 4l10 8-10 8V4zM19 5v14",
@@ -415,9 +416,6 @@ function AppWindow({
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
   const [isDragOver, setIsDragOver] = useState(false);
-  const [aiBarHover, setAiBarHover] = useState(false);
-  const [aiBarQuery, setAiBarQuery] = useState("");
-  const aiBarRef = useRef<HTMLInputElement>(null);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (win.isMaximized) return;
@@ -525,104 +523,6 @@ function AppWindow({
         onForceQuit={onForceQuit}
         mode={mode}
       />}
-      {/* ━━━━ AI Hover Bar — appears on mouse enter below title bar ━━━━ */}
-      {!isAI && (
-        <div
-          className="flex-shrink-0"
-          onMouseEnter={() => { setAiBarHover(true); setTimeout(() => aiBarRef.current?.focus(), 100); }}
-          onMouseLeave={() => { if (!aiBarQuery) setAiBarHover(false); }}
-          style={{ position: "relative", zIndex: 10 }}
-        >
-          {/* Thin hover trigger strip — always visible */}
-          <div
-            className="flex items-center justify-center transition-all duration-200"
-            style={{
-              height: aiBarHover ? 0 : 3,
-              opacity: aiBarHover ? 0 : 0.5,
-              overflow: "hidden",
-              cursor: "default",
-            }}
-          >
-            <div style={{ width: 32, height: 2, borderRadius: 1, background: c.border }} />
-          </div>
-
-          {/* Expanded AI bar */}
-          <div
-            className="overflow-hidden transition-all duration-300 ease-out"
-            style={{
-              maxHeight: aiBarHover ? 120 : 0,
-              opacity: aiBarHover ? 1 : 0,
-            }}
-          >
-            <div
-              className="mx-2 mb-1 rounded-xl overflow-hidden"
-              style={{
-                background: (mode || "dark") === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-                border: `1px solid ${(mode || "dark") === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"}`,
-              }}
-            >
-              {/* Search row */}
-              <div className="flex items-center gap-2 px-3 py-1.5">
-                <svg width={13} height={13} viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, filter: "drop-shadow(0 0 3px rgba(59,130,246,0.3))" }}>
-                  <path d={ic.sparkle} fill={c.accent} />
-                </svg>
-                <input
-                  ref={aiBarRef}
-                  className="flex-1 bg-transparent outline-none text-[11px]"
-                  style={{ color: c.text, caretColor: c.accent }}
-                  placeholder="Ask AI anything..."
-                  value={aiBarQuery}
-                  onChange={e => setAiBarQuery(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === "Escape") { setAiBarHover(false); setAiBarQuery(""); }
-                  }}
-                  onMouseDown={e => e.stopPropagation()}
-                />
-                {aiBarQuery && (
-                  <button onClick={() => setAiBarQuery("")} onMouseDown={e => e.stopPropagation()} className="p-0.5 rounded transition-colors" style={{ color: c.textMuted }}>
-                    <I d={ic.close} s={10} />
-                  </button>
-                )}
-              </div>
-              {/* Quick action chips */}
-              <div className="flex items-center gap-1 px-3 pb-2 flex-wrap">
-                {[
-                  { label: "Write", icon: ic.pen, app: "word" as WinId },
-                  { label: "Edit", icon: ic.code, app: "code" as WinId },
-                  { label: "Browse", icon: ic.globe, app: "browser" as WinId },
-                  { label: "Files", icon: ic.folder, app: "files" as WinId },
-                  { label: "Notes", icon: ic.note, app: "notes" as WinId },
-                  { label: "AI Chat", icon: ic.sparkle, app: "ai" as WinId },
-                ].map((chip, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { if (onOpenApp) onOpenApp(chip.app); setAiBarHover(false); setAiBarQuery(""); }}
-                    onMouseDown={e => e.stopPropagation()}
-                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-medium transition-all"
-                    style={{
-                      background: (mode || "dark") === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
-                      color: c.textMuted,
-                      border: `1px solid ${(mode || "dark") === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)"}`,
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = (mode || "dark") === "dark" ? "rgba(59,130,246,0.12)" : "rgba(59,130,246,0.06)";
-                      e.currentTarget.style.borderColor = (mode || "dark") === "dark" ? "rgba(59,130,246,0.2)" : "rgba(59,130,246,0.15)";
-                      e.currentTarget.style.color = c.accentText;
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = (mode || "dark") === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
-                      e.currentTarget.style.borderColor = (mode || "dark") === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)";
-                      e.currentTarget.style.color = c.textMuted;
-                    }}
-                  >
-                    <I d={chip.icon} s={9} />{chip.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
       <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: isAI ? 0 : "6px", pointerEvents: isAI ? "auto" : undefined }}>
         <div style={{ background: isAI ? "transparent" : isDark ? "rgba(44,44,44,0.5)" : "rgba(255,255,255,0.45)", borderRadius: isAI ? 0 : 12, border: isAI ? "none" : `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)"}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
@@ -668,84 +568,6 @@ function AppWindow({
 }
 
 // ━━━━ Universal AI Panel ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function AIPanel({ c, context, onAction }: { c: typeof palette.dark; context: string; onAction?: (cmd: string) => void }) {
-  const [input, setInput] = useState("");
-  const [msgs, setMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([
-    { role: "ai", text: `AI ready for ${context}. How can I help?` },
-  ]);
-  const [listening, setListening] = useState(false);
-  const endRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
-
-  const send = (text?: string) => {
-    const q = (text || input).trim();
-    if (!q) return;
-    setInput("");
-    setMsgs(p => [...p, { role: "user", text: q }]);
-    setTimeout(() => {
-      let r = `I'll help with that in ${context}.`;
-      const l = q.toLowerCase();
-      if (l.includes("help")) r = `In ${context}, I can:\n• Automate tasks\n• Search & organize\n• Generate content\n• Answer questions\n• Voice commands`;
-      else if (l.includes("organize") || l.includes("sort")) r = "Done! I've organized everything by date and category.";
-      else if (l.includes("find") || l.includes("search")) r = `Searching ${context}... Found 3 relevant results.`;
-      else if (l.includes("create") || l.includes("new")) r = "Created! The new item is ready.";
-      else if (l.includes("delete") || l.includes("remove")) r = "Removed. You can undo this in the next 30 seconds.";
-      else if (l.includes("explain")) r = `This ${context} section manages your data and preferences. Everything is synced with Alternus Cloud.`;
-      if (onAction) onAction(q);
-      setMsgs(p => [...p, { role: "ai", text: r }]);
-    }, 400);
-  };
-
-  return (
-    <div className="flex flex-col h-full" style={{ borderLeft: `1px solid ${c.border}`, background: c.bg }}>
-      {/* Header */}
-      <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <img src="/alternus-os.png" alt="AI" className="w-5 h-5 rounded-full object-cover" />
-        <span className="text-[10px] font-bold flex-1" style={{ color: c.text }}>AI</span>
-        <button onClick={() => { setListening(!listening); if (!listening) setTimeout(() => { send("help"); setListening(false); }, 1500); }}
-          className="w-6 h-6 rounded-full flex items-center justify-center transition-all"
-          style={{ background: listening ? "#EF444420" : "transparent", color: listening ? "#EF4444" : c.textMuted }}
-          title="Voice">
-          <I d={ic.voice} s={12} />
-          {listening && <span className="absolute w-6 h-6 rounded-full animate-ping opacity-30" style={{ background: "#EF4444" }} />}
-        </button>
-      </div>
-      {/* Quick chips */}
-      <div className="flex flex-wrap gap-1 px-2 py-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        {["Organize", "Search", "Create", "Help"].map(chip => (
-          <button key={chip} onClick={() => send(chip.toLowerCase())}
-            className="px-2 py-0.5 rounded-full text-[8px] font-medium transition-colors"
-            style={{ background: c.cardAlt, color: c.textSec }}
-            onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.textSec; }}>
-            {chip}
-          </button>
-        ))}
-      </div>
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1.5" style={{ scrollbarWidth: "none" }}>
-        {msgs.map((m, i) => (
-          <div key={i} className={m.role === "user" ? "flex justify-end" : ""}>
-            <div className="max-w-[92%] px-2.5 py-1.5 rounded-xl text-[9px] leading-relaxed"
-              style={m.role === "user" ? { background: c.accent, color: "#fff" } : { background: c.cardAlt, color: c.text }}>
-              <pre className="whitespace-pre-wrap font-sans">{m.text}</pre>
-            </div>
-          </div>
-        ))}
-        <div ref={endRef} />
-      </div>
-      {/* Input */}
-      <div className="px-2 py-1.5 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-        <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-          <input className="flex-1 bg-transparent outline-none text-[9px]" style={{ color: c.text }}
-            placeholder="Ask AI..." value={input} onChange={e => setInput(e.target.value)}
-            onKeyDown={e => { if (e.key === "Enter") send(); }} />
-          <button onClick={() => send()} className="p-1 rounded-lg" style={{ background: c.accent }}><I d={ic.send} s={8} c="#fff" /></button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ━━━━ App Contents ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -1732,7 +1554,6 @@ function WeatherApp({ c }: { c: typeof palette.dark }) {
 
 function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; wallpaper: number; setWallpaper: (w: number) => void }) {
   const [activeSection, setActiveSection] = useState("Network");
-  const [showAIPanel, setShowAIPanel] = useState(false);
   const [wifiOn, setWifiOn] = useState(true);
   const [btOn, setBtOn] = useState(true);
   const [dndOn, setDndOn] = useState(false);
@@ -2108,11 +1929,6 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
         <div className="flex items-center justify-between px-3 mb-3">
           <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: c.textMuted }}>Settings</p>
           <div className="flex items-center gap-1">
-            <button title="AI Assistant" onClick={() => setShowAIPanel(!showAIPanel)}
-              className="w-6 h-6 rounded-full flex items-center justify-center transition-all overflow-hidden"
-              style={{ boxShadow: showAIPanel ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
-              <img src="/alternus-os.png" alt="AI" className="w-6 h-6 rounded-full object-cover" />
-            </button>
             <button title="Voice" className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
               style={{ color: c.textMuted }}
               onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.accentText; }}
@@ -2136,44 +1952,6 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
       <div className="flex-1 overflow-hidden">
         {renderContent()}
       </div>
-      {showAIPanel && (
-        <div className="w-[180px] flex-shrink-0 flex flex-col" style={{ borderLeft: `1px solid ${c.border}`, background: c.bg }}>
-          <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-            <img src="/alternus-os.png" alt="AI" className="w-5 h-5 rounded-full object-cover" />
-            <span className="text-[10px] font-bold flex-1" style={{ color: c.text }}>AI Assistant</span>
-            <button title="Voice" className="w-5 h-5 rounded-full flex items-center justify-center transition-colors"
-              style={{ color: c.textMuted }}
-              onMouseEnter={e => { e.currentTarget.style.color = c.accentText; }}
-              onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; }}>
-              <I d={ic.voice} s={11} />
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1" style={{ scrollbarWidth: "none" }}>
-            {[
-              { label: "Fix Problem", desc: "Diagnose & fix issues" },
-              { label: "Check Updates", desc: "Find latest versions" },
-              { label: "New Version", desc: "Upgrade Alternus OS" },
-              { label: "Optimize", desc: "Speed up your system" },
-              { label: "Backup", desc: "Save your settings" },
-              { label: "Reset", desc: "Restore defaults" },
-            ].map((item, i) => (
-              <button key={i} className="w-full text-left px-3 py-2 rounded-xl transition-colors"
-                style={{ background: "transparent" }}
-                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                <p className="text-[10px] font-semibold" style={{ color: c.text }}>{item.label}</p>
-                <p className="text-[8px]" style={{ color: c.textMuted }}>{item.desc}</p>
-              </button>
-            ))}
-          </div>
-          <div className="px-2 py-1.5 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-            <div className="flex items-center gap-1 px-2 py-1.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-              <input className="flex-1 bg-transparent outline-none text-[9px]" style={{ color: c.text }} placeholder="Ask AI..." />
-              <button className="p-1 rounded-lg" style={{ background: c.accent }}><I d={ic.send} s={8} c="#fff" /></button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -2381,7 +2159,6 @@ function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palett
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"recent" | "favorites" | "shared">("recent");
-  const [showAIPanel, setShowAIPanel] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [fileContextMenu, setFileContextMenu] = useState<{ x: number; y: number; name: string } | null>(null);
 
@@ -2567,15 +2344,6 @@ function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palett
               </div>
             ))}
           </div>
-          {/* AI classify button */}
-          <button
-            onClick={() => setShowAIPanel(!showAIPanel)}
-            className="w-7 h-7 rounded-full flex items-center justify-center transition-all flex-shrink-0"
-            style={{ background: "#3B82F6", boxShadow: showAIPanel ? "0 0 10px rgba(139,92,246,0.4)" : "0 0 6px rgba(139,92,246,0.25)" }}
-            title="AI File Manager"
-          >
-            <I d={ic.sparkle} s={12} c="#fff" />
-          </button>
           {/* Voice */}
           <button title="Voice Command" className="p-1.5 rounded-lg transition-all flex-shrink-0"
             style={{ color: c.textMuted }}
@@ -2714,7 +2482,6 @@ function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palett
           <span className="text-[9px]" style={{ color: c.textMuted }}>{curPath}</span>
         </div>
       </div>
-      {showAIPanel && <div className="w-[170px] flex-shrink-0"><AIPanel c={c} context="Files" /></div>}
     </div>
   );
 }
@@ -3342,7 +3109,6 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
 
 // ━━━━ CLOCK APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function ClockApp({ c }: { c: typeof palette.dark }) {
-  const [showAIPanel, setShowAIPanel] = useState(false);
   const [tab, setTab] = useState<"clock" | "alarm" | "timer" | "stopwatch">("clock");
   const [time, setTime] = useState(new Date());
   const [timerSec, setTimerSec] = useState(300);
@@ -3374,11 +3140,6 @@ function ClockApp({ c }: { c: typeof palette.dark }) {
           <button key={t} onClick={() => setTab(t)} className="flex-1 py-1.5 text-[10px] font-semibold capitalize text-center rounded-lg transition-colors"
             style={{ color: tab === t ? c.text : c.textMuted, background: tab === t ? c.cardAlt : "transparent" }}>{t}</button>
         ))}
-        <button title="AI" onClick={() => setShowAIPanel(!showAIPanel)}
-          className="w-6 h-6 rounded-full flex items-center justify-center transition-all ml-1 flex-shrink-0"
-          style={{ background: "#3B82F6", boxShadow: showAIPanel ? "0 0 8px rgba(139,92,246,0.4)" : "none" }}>
-          <I d={ic.sparkle} s={9} c="#fff" />
-        </button>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center overflow-y-auto px-4 pb-4" style={{ scrollbarWidth: "none" }}>
@@ -3459,7 +3220,6 @@ function ClockApp({ c }: { c: typeof palette.dark }) {
         </>)}
       </div>
     </div>
-    {showAIPanel && <div className="w-[160px] flex-shrink-0"><AIPanel c={c} context="Clock" /></div>}
     </div>
   );
 }
@@ -3606,7 +3366,6 @@ function AccountsApp({ c }: { c: typeof palette.dark }) {
 
 // ━━━━ DOWNLOADS APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function DownloadsApp({ c }: { c: typeof palette.dark }) {
-  const [showAIPanel, setShowAIPanel] = useState(false);
   const [tab, setTab] = useState<"downloads" | "uploads" | "install">("downloads");
   const [installStep, setInstallStep] = useState(0); // 0=select, 1=policy, 2=installing, 3=done
   const [policyAccepted, setPolicyAccepted] = useState(false);
@@ -3663,11 +3422,6 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
           </button>
         ))}
         <div className="flex items-center gap-1 ml-auto">
-          <button title="AI Assistant" onClick={() => setShowAIPanel(!showAIPanel)}
-            className="w-6 h-6 rounded-full flex items-center justify-center transition-all"
-            style={{ background: "#3B82F6" }}>
-            <I d={ic.sparkle} s={10} c="#fff" />
-          </button>
           <button title="Voice" className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
             style={{ color: c.textMuted }}
             onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.accentText; }}
@@ -3844,7 +3598,6 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
         )}
       </div>
     </div>
-    {showAIPanel && <div className="w-[180px] flex-shrink-0"><AIPanel c={c} context="Downloads" /></div>}
     </div>
   );
 }
@@ -6429,6 +6182,10 @@ export default function AlternusOS() {
   const [showAIFrame, setShowAIFrame] = useState(false);
   const aiFrameInputRef = useRef<HTMLInputElement>(null);
   const [showAiFixMenu, setShowAiFixMenu] = useState(false);
+  const [showCtrlAi, setShowCtrlAi] = useState(false);
+  const [ctrlAiInput, setCtrlAiInput] = useState("");
+  const [ctrlAiChips, setCtrlAiChips] = useState(true);
+  const ctrlAiInputRef = useRef<HTMLInputElement>(null);
   const [showAiChat, setShowAiChat] = useState(false);
   const [aiChatMsgs, setAiChatMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([]);
   const [aiChatInput, setAiChatInput] = useState("");
@@ -6799,6 +6556,13 @@ export default function AlternusOS() {
         setShowSpotlight(p => !p);
         setSpotlightQuery("");
       }
+      // Ctrl+A — open AI overlay over focused window
+      if ((e.ctrlKey || e.metaKey) && e.key === "a") {
+        e.preventDefault();
+        setShowCtrlAi(p => { if (!p) setTimeout(() => ctrlAiInputRef.current?.focus(), 50); return !p; });
+        setCtrlAiChips(true);
+        setCtrlAiInput("");
+      }
       // Escape closes spotlight / spaces / panels
       if (e.key === "Escape") {
         setShowSpotlight(false);
@@ -6809,6 +6573,8 @@ export default function AlternusOS() {
         setShowProfilePanel(false);
         setShowAIFrame(false);
         setShowAiFixMenu(false);
+        setShowCtrlAi(false);
+        setCtrlAiChips(false);
       }
       // Ctrl+1/2/3 switch spaces
       if ((e.ctrlKey || e.metaKey) && ["1", "2", "3"].includes(e.key)) {
@@ -8006,6 +7772,87 @@ export default function AlternusOS() {
           </div>
         </div>
         )}
+
+        {/* ━━━━ Ctrl+A Global AI Overlay ━━━━ */}
+        {showCtrlAi && (() => {
+          const focusedWin = [...wins].filter(w => w.isOpen && !w.isMinimized).sort((a, b) => b.zIndex - a.zIndex)[0];
+          const creativeWins: WinId[] = ["word", "notes", "writer", "imagegen", "studio", "monaco", "code", "browser", "aihub", "aivoice", "knowledge"];
+          const isCreative = focusedWin && creativeWins.includes(focusedWin.id);
+          const systemChips = ["Fixed", "Update", "Create document", "Search File"];
+          const creativeChips = ["Writen", "Suggested text", "Email Write", "Create Docx", "Detected"];
+          const chips = isCreative ? creativeChips : systemChips;
+          // Position overlay centered over focused window or screen center
+          const ox = focusedWin ? focusedWin.x + focusedWin.w / 2 : window.innerWidth / 2;
+          const oy = focusedWin ? focusedWin.y + 60 : window.innerHeight / 2 - 60;
+          return (
+            <>
+              {/* Backdrop dismiss */}
+              <div className="fixed inset-0 z-[490]" onClick={() => { setShowCtrlAi(false); setCtrlAiChips(false); }} />
+              {/* Overlay panel */}
+              <div
+                className="absolute z-[491]"
+                style={{ left: Math.min(Math.max(ox - 220, 8), window.innerWidth - 448), top: Math.max(oy, 8), width: 440 }}
+                onClick={e => e.stopPropagation()}
+              >
+                {/* Bar */}
+                <div className="flex items-center gap-2 p-1.5 rounded-2xl mb-2"
+                  style={{ background: "rgba(200,205,230,0.85)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.6)", boxShadow: "0 4px 24px rgba(100,110,180,0.18)" }}>
+                  {/* Left: sparkle button */}
+                  <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-opacity hover:opacity-80"
+                    style={{ background: "#3B82F6", boxShadow: "0 2px 8px rgba(59,130,246,0.35)" }}
+                    onClick={() => { /* submit */ }}>
+                    <svg width={18} height={18} viewBox="0 0 24 24" fill="none"><path d="M12 3v1M12 20v1M4.22 4.22l.7.7M19.07 19.07l.7.7M3 12h1M20 12h1M4.22 19.78l.7-.7M19.07 4.93l.7-.7M12 8a4 4 0 100 8 4 4 0 000-8z" stroke="#fff" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                  </button>
+                  {/* Input */}
+                  <input
+                    ref={ctrlAiInputRef}
+                    className="flex-1 bg-transparent outline-none text-[15px]"
+                    style={{ color: "#2d3250", caretColor: "#3B82F6" }}
+                    placeholder="Ask AI anything..."
+                    value={ctrlAiInput}
+                    onChange={e => setCtrlAiInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Escape") { setShowCtrlAi(false); setCtrlAiChips(false); }
+                      if (e.key === "Enter" && ctrlAiInput.trim()) {
+                        openWin("ai");
+                        setShowCtrlAi(false);
+                      }
+                    }}
+                  />
+                  {/* Right: chevron button — toggles chips */}
+                  <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-opacity hover:opacity-80"
+                    style={{ background: "#3B82F6", boxShadow: "0 2px 8px rgba(59,130,246,0.35)" }}
+                    onClick={() => setCtrlAiChips(p => !p)}>
+                    <I d={ctrlAiChips ? ic.chevU : ic.chevD} s={18} c="#fff" />
+                  </button>
+                </div>
+                {/* Chips row — visible when ctrlAiChips is true */}
+                {ctrlAiChips && (
+                  <div className="flex items-center gap-2 px-1">
+                    <div className="flex items-center gap-2 flex-1 flex-wrap">
+                      {chips.map(chip => (
+                        <button key={chip}
+                          className="px-4 py-2.5 rounded-2xl text-[12px] font-medium transition-all"
+                          style={{ background: "rgba(200,205,230,0.75)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.5)", color: "#2d3250", boxShadow: "0 1px 4px rgba(100,110,180,0.1)" }}
+                          onMouseEnter={e => { e.currentTarget.style.background = "#3B82F6"; e.currentTarget.style.color = "#fff"; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = "rgba(200,205,230,0.75)"; e.currentTarget.style.color = "#2d3250"; }}
+                          onClick={() => { setCtrlAiInput(chip + ": "); ctrlAiInputRef.current?.focus(); }}>
+                          {chip}
+                        </button>
+                      ))}
+                    </div>
+                    {/* ^ collapse button */}
+                    <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-opacity hover:opacity-80"
+                      style={{ background: "#3B82F6" }}
+                      onClick={() => setCtrlAiChips(false)}>
+                      <I d={ic.chevU} s={18} c="#fff" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          );
+        })()}
 
         {/* Windows */}
         {wins.map(w => (
