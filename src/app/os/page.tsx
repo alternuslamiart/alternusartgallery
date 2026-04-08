@@ -271,42 +271,34 @@ function TitleBar({
       <span style={{ color: isFrozen ? c.warning : c.textSec }} className="text-xs font-medium truncate max-w-[160px]">
         {title}{isFrozen ? " (Not Responding)" : ""}
       </span>
-      <div className="flex items-center gap-2">
-        {/* Try AI badge */}
-        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full select-none pointer-events-none"
-          style={{ background: c.accent, color: "#fff", fontSize: 10, fontWeight: 600, lineHeight: "18px", boxShadow: `0 0 8px ${c.accent}60` }}>
-          <I d={ic.sparkle} s={9} c="#fff" /> Try AI
-        </div>
-        {/* Window controls */}
-        <div className="flex items-center gap-1">
-          <button
-            onMouseDown={e => e.stopPropagation()}
-            onClick={onMinimize}
-            className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
-            onMouseEnter={e => { e.currentTarget.style.background = "#4ADE80"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", "#fff"); }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", c.textMuted); }}
-          >
-            <svg width={10} height={10} viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
-          </button>
-          <button
-            onMouseDown={e => e.stopPropagation()}
-            onClick={onMaximize}
-            className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
-            onMouseEnter={e => { e.currentTarget.style.background = "#5BA3E6"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", "#fff"); }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", c.textMuted); }}
-          >
-            <svg width={10} height={10} viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
-          </button>
-          <button
-            onMouseDown={e => e.stopPropagation()}
-            onClick={onClose}
-            className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
-            onMouseEnter={e => { e.currentTarget.style.background = "#F87171"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", "#fff"); }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", c.textMuted); }}
-          >
-            <svg width={10} height={10} viewBox="0 0 10 10"><polygon points="5,1.5 9,8.5 1,8.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" strokeLinejoin="round" /></svg>
-          </button>
-        </div>
+      <div className="flex items-center gap-1">
+        <button
+          onMouseDown={e => e.stopPropagation()}
+          onClick={onMinimize}
+          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
+          onMouseEnter={e => { e.currentTarget.style.background = "#4ADE80"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", "#fff"); }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", c.textMuted); }}
+        >
+          <svg width={10} height={10} viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
+        </button>
+        <button
+          onMouseDown={e => e.stopPropagation()}
+          onClick={onMaximize}
+          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
+          onMouseEnter={e => { e.currentTarget.style.background = "#5BA3E6"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", "#fff"); }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", c.textMuted); }}
+        >
+          <svg width={10} height={10} viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
+        </button>
+        <button
+          onMouseDown={e => e.stopPropagation()}
+          onClick={onClose}
+          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
+          onMouseEnter={e => { e.currentTarget.style.background = "#F87171"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", "#fff"); }}
+          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", c.textMuted); }}
+        >
+          <svg width={10} height={10} viewBox="0 0 10 10"><polygon points="5,1.5 9,8.5 1,8.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" strokeLinejoin="round" /></svg>
+        </button>
       </div>
     </div>
   );
@@ -327,6 +319,8 @@ function AppWindow({
   onForceQuit,
   onSnapPreview,
   onFileDrop,
+  onOpenApp,
+  mode,
 }: {
   win: WinState;
   c: typeof palette.dark;
@@ -341,10 +335,15 @@ function AppWindow({
   onForceQuit?: () => void;
   onSnapPreview?: (zone: "left" | "right" | "top" | null) => void;
   onFileDrop?: (name: string) => void;
+  onOpenApp?: (id: WinId) => void;
+  mode?: ThemeMode;
 }) {
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
   const [isDragOver, setIsDragOver] = useState(false);
+  const [aiBarHover, setAiBarHover] = useState(false);
+  const [aiBarQuery, setAiBarQuery] = useState("");
+  const aiBarRef = useRef<HTMLInputElement>(null);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (win.isMaximized) return;
@@ -445,6 +444,104 @@ function AppWindow({
         isFrozen={win.isFrozen}
         onForceQuit={onForceQuit}
       />}
+      {/* ━━━━ AI Hover Bar — appears on mouse enter below title bar ━━━━ */}
+      {!isAI && (
+        <div
+          className="flex-shrink-0"
+          onMouseEnter={() => { setAiBarHover(true); setTimeout(() => aiBarRef.current?.focus(), 100); }}
+          onMouseLeave={() => { if (!aiBarQuery) setAiBarHover(false); }}
+          style={{ position: "relative", zIndex: 10 }}
+        >
+          {/* Thin hover trigger strip — always visible */}
+          <div
+            className="flex items-center justify-center transition-all duration-200"
+            style={{
+              height: aiBarHover ? 0 : 3,
+              opacity: aiBarHover ? 0 : 0.5,
+              overflow: "hidden",
+              cursor: "default",
+            }}
+          >
+            <div style={{ width: 32, height: 2, borderRadius: 1, background: c.border }} />
+          </div>
+
+          {/* Expanded AI bar */}
+          <div
+            className="overflow-hidden transition-all duration-300 ease-out"
+            style={{
+              maxHeight: aiBarHover ? 120 : 0,
+              opacity: aiBarHover ? 1 : 0,
+            }}
+          >
+            <div
+              className="mx-2 mb-1 rounded-xl overflow-hidden"
+              style={{
+                background: (mode || "dark") === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
+                border: `1px solid ${(mode || "dark") === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"}`,
+              }}
+            >
+              {/* Search row */}
+              <div className="flex items-center gap-2 px-3 py-1.5">
+                <svg width={13} height={13} viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, filter: "drop-shadow(0 0 3px rgba(59,130,246,0.3))" }}>
+                  <path d={ic.sparkle} fill={c.accent} />
+                </svg>
+                <input
+                  ref={aiBarRef}
+                  className="flex-1 bg-transparent outline-none text-[11px]"
+                  style={{ color: c.text, caretColor: c.accent }}
+                  placeholder="Ask AI anything..."
+                  value={aiBarQuery}
+                  onChange={e => setAiBarQuery(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === "Escape") { setAiBarHover(false); setAiBarQuery(""); }
+                  }}
+                  onMouseDown={e => e.stopPropagation()}
+                />
+                {aiBarQuery && (
+                  <button onClick={() => setAiBarQuery("")} onMouseDown={e => e.stopPropagation()} className="p-0.5 rounded transition-colors" style={{ color: c.textMuted }}>
+                    <I d={ic.close} s={10} />
+                  </button>
+                )}
+              </div>
+              {/* Quick action chips */}
+              <div className="flex items-center gap-1 px-3 pb-2 flex-wrap">
+                {[
+                  { label: "Write", icon: ic.pen, app: "word" as WinId },
+                  { label: "Edit", icon: ic.code, app: "code" as WinId },
+                  { label: "Browse", icon: ic.globe, app: "browser" as WinId },
+                  { label: "Files", icon: ic.folder, app: "files" as WinId },
+                  { label: "Notes", icon: ic.note, app: "notes" as WinId },
+                  { label: "AI Chat", icon: ic.sparkle, app: "ai" as WinId },
+                ].map((chip, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { if (onOpenApp) onOpenApp(chip.app); setAiBarHover(false); setAiBarQuery(""); }}
+                    onMouseDown={e => e.stopPropagation()}
+                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-medium transition-all"
+                    style={{
+                      background: (mode || "dark") === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
+                      color: c.textMuted,
+                      border: `1px solid ${(mode || "dark") === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)"}`,
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = (mode || "dark") === "dark" ? "rgba(59,130,246,0.12)" : "rgba(59,130,246,0.06)";
+                      e.currentTarget.style.borderColor = (mode || "dark") === "dark" ? "rgba(59,130,246,0.2)" : "rgba(59,130,246,0.15)";
+                      e.currentTarget.style.color = c.accentText;
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = (mode || "dark") === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
+                      e.currentTarget.style.borderColor = (mode || "dark") === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)";
+                      e.currentTarget.style.color = c.textMuted;
+                    }}
+                  >
+                    <I d={chip.icon} s={9} />{chip.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: isAI ? 0 : "6px", pointerEvents: isAI ? "auto" : undefined }}>
         <div style={{ background: isAI ? "transparent" : c.surface, borderRadius: isAI ? 0 : 12, border: isAI ? "none" : `1px solid ${c.border}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
@@ -1354,10 +1451,6 @@ function MusicApp({ c }: { c: typeof palette.dark }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
         <p className="text-[13px] font-semibold" style={{ color: c.text }}>Library</p>
-        <button className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold"
-          style={{ background: c.accent, color: "#fff", borderRadius: "9999px", boxShadow: `0 0 14px ${c.accent}60` }}>
-          <I d={ic.sparkle} s={11} c="#fff" /> Try AI
-        </button>
       </div>
 
       {/* Track list */}
@@ -2647,7 +2740,7 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
             onKeyDown={e=>{ if(e.key==="Enter") navigate(displayUrl); }} />
         </div>
 
-        {/* Try AI pill — matches reference */}
+        {/* AI companion toggle */}
         <button onClick={()=>setShowAIComp(p=>!p)} className="flex items-center gap-0 flex-shrink-0 transition-all"
           style={{ borderRadius: "9999px", padding: "3px 14px 3px 4px",
             background: showAIComp ? c.accentSoft : c.surface,
@@ -2660,7 +2753,7 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
             style={{ background: showAIComp ? c.accent : c.cardAlt, boxShadow: showAIComp ? `0 0 12px ${c.accent}80` : "none", transition: "all 0.2s" }}>
             <I d={ic.sparkle} s={14} c={showAIComp ? "#fff" : c.accentText} />
           </div>
-          <span className="text-[12px] font-semibold ml-2" style={{ color: showAIComp ? c.accentText : c.text }}>✦ Try AI</span>
+          <span className="text-[12px] font-semibold ml-2" style={{ color: showAIComp ? c.accentText : c.text }}>✦ AI</span>
         </button>
       </div>
 
@@ -5299,7 +5392,7 @@ function DashboardApp({ c }: { c: typeof palette.dark }) {
               style={{ background: c.accent, color: "#fff", borderRadius: "9999px", boxShadow: `0 0 14px ${c.accent}60` }}
               onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
               onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
-              <I d={ic.sparkle} s={10} c="#fff" /> Try AI
+              <I d={ic.sparkle} s={10} c="#fff" /> AI Assist
             </button>
           </div>
 
@@ -7737,6 +7830,8 @@ export default function AlternusOS() {
               setSystemModal({ type: "info", title: "File Dropped", message: `"${name}" opened in ${w.title}.` });
               setTimeout(() => setSystemModal(null), 2000);
             } : undefined}
+            onOpenApp={openWinWithAI}
+            mode={mode}
           >
             {winContent[w.id]}
           </AppWindow>
