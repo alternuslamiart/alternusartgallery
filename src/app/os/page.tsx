@@ -266,7 +266,7 @@ function TitleBar({
     <div
       onMouseDown={onMouseDown}
       className="flex items-center justify-between h-9 px-3 select-none cursor-move flex-shrink-0"
-      style={{ background: c.bg, borderBottom: "none" }}
+      style={{ background: "transparent", borderBottom: "none" }}
     >
       <span style={{ color: isFrozen ? c.warning : c.textSec }} className="text-xs font-medium truncate max-w-[160px]">
         {title}{isFrozen ? " (Not Responding)" : ""}
@@ -413,22 +413,28 @@ function AppWindow({
     ? { position: "absolute", top: 6, left: 6, right: isAI ? 6 : 58, bottom: 6, zIndex: win.zIndex }
     : { position: "absolute", top: win.y, left: win.x, width: win.w, height: win.h, zIndex: win.zIndex };
 
+  const isDark = (mode || "dark") === "dark";
+
   return (
     <div
       style={{
         ...style,
-        background: isAI ? "transparent" : c.bg,
-        border: isAI ? "none" : isDragOver ? `1px solid ${c.accent}` : `1px solid ${c.border}`,
+        background: isAI ? "transparent" : isDark ? "rgba(36,36,36,0.6)" : "rgba(255,255,255,0.6)",
+        backdropFilter: isAI ? "none" : "blur(20px) saturate(1.4)",
+        WebkitBackdropFilter: isAI ? "none" : "blur(20px) saturate(1.4)",
+        border: isAI ? "none" : isDragOver ? `1px solid ${c.accent}` : `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
         borderRadius: 16,
-        boxShadow: isAI ? "none" : "0 4px 16px rgba(0,0,0,0.12)",
+        boxShadow: isAI ? "none" : isDark
+          ? "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)"
+          : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
         transition: "box-shadow 0.2s ease, border-color 0.15s ease",
         pointerEvents: isAI ? "none" : "auto",
       }}
-      onMouseEnter={e => { if (!isAI) { e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.24)"; } }}
-      onMouseLeave={e => { if (!isAI) { e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)"; } }}
+      onMouseEnter={e => { if (!isAI) { e.currentTarget.style.boxShadow = isDark ? "0 12px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)" : "0 12px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.6)"; } }}
+      onMouseLeave={e => { if (!isAI) { e.currentTarget.style.boxShadow = isDark ? "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)"; } }}
       onClick={isAI ? undefined : onFocus}
       onDragOver={onFileDrop ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; setIsDragOver(true); } : undefined}
       onDragLeave={onFileDrop ? () => setIsDragOver(false) : undefined}
@@ -543,7 +549,7 @@ function AppWindow({
         </div>
       )}
       <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: isAI ? 0 : "6px", pointerEvents: isAI ? "auto" : undefined }}>
-        <div style={{ background: isAI ? "transparent" : c.surface, borderRadius: isAI ? 0 : 12, border: isAI ? "none" : `1px solid ${c.border}`, height: "100%", overflow: "auto", position: "relative" }}>
+        <div style={{ background: isAI ? "transparent" : isDark ? "rgba(44,44,44,0.5)" : "rgba(255,255,255,0.45)", borderRadius: isAI ? 0 : 12, border: isAI ? "none" : `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)"}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
         {/* Drag-over file drop overlay */}
         {isDragOver && onFileDrop && (
@@ -7147,8 +7153,10 @@ export default function AlternusOS() {
       <div
         className="relative flex items-center justify-between px-4 h-9 flex-shrink-0 transition-all duration-300 z-[200]"
         style={{
-          background: c.surface,
-          borderBottom: `1px solid ${c.border}`,
+          background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)",
+          backdropFilter: "blur(20px) saturate(1.4)",
+          WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+          borderBottom: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
           transform: showTopBar ? "translateY(0)" : "translateY(-100%)",
           position: showTopBar ? "relative" : "absolute",
           top: 0, left: 0, right: 0,
@@ -7183,7 +7191,7 @@ export default function AlternusOS() {
               <button onClick={() => { setShowWifiPanel(!showWifiPanel); setShowProfilePanel(false); }} title="Wi-Fi" className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.wifi} s={15} /></button>
               {/* WiFi Panel */}
               {showWifiPanel && (
-                <div className="absolute top-full right-0 mt-2 w-[280px] rounded-xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 4px 16px rgba(0,0,0,0.12)", zIndex: 999 }}
+                <div className="absolute top-full right-0 mt-2 w-[280px] rounded-xl overflow-hidden" style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)", zIndex: 999 }}
                   onClick={e => e.stopPropagation()}>
                   <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
                     <p className="text-xs font-semibold" style={{ color: c.text }}>Wi-Fi</p>
@@ -7229,7 +7237,7 @@ export default function AlternusOS() {
               </button>
               {/* Profile Panel */}
               {showProfilePanel && (
-                <div className="absolute top-full right-0 mt-2 w-[240px] rounded-xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 4px 16px rgba(0,0,0,0.12)", zIndex: 999 }}
+                <div className="absolute top-full right-0 mt-2 w-[240px] rounded-xl overflow-hidden" style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)", zIndex: 999 }}
                   onClick={e => e.stopPropagation()}>
                   {/* User info */}
                   <div className="flex items-center gap-3 px-4 py-4" style={{ borderBottom: `1px solid ${c.border}` }}>
@@ -7315,7 +7323,7 @@ export default function AlternusOS() {
         {showSpotlight && (
           <div className="absolute inset-0 z-[500] flex items-start justify-center pt-16" style={{ background: "rgba(0,0,0,0.45)" }}
             onClick={() => setShowSpotlight(false)}>
-            <div className="w-[560px] rounded-2xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 24px 64px rgba(0,0,0,0.4)" }}
+            <div className="w-[560px] rounded-2xl overflow-hidden" style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, boxShadow: mode === "dark" ? "0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 24px 64px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.5)" }}
               onClick={e => e.stopPropagation()}>
               {/* Input */}
               <div className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: `1px solid ${c.border}` }}>
@@ -7457,9 +7465,12 @@ export default function AlternusOS() {
               onClick={() => setShowApps(!showApps)}
               className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
               style={{
-                background: showApps ? c.accent : c.surface,
-                border: `1px solid ${showApps ? c.accent : c.border}`,
+                background: showApps ? c.accent : mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)",
+                backdropFilter: "blur(20px) saturate(1.4)",
+                WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+                border: `1px solid ${showApps ? c.accent : mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
                 color: showApps ? "#fff" : c.textSec,
+                boxShadow: mode === "dark" ? "0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 4px 16px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5)",
               }}
               onMouseEnter={e => {
                 if (!showApps) {
@@ -7470,8 +7481,8 @@ export default function AlternusOS() {
               }}
               onMouseLeave={e => {
                 if (!showApps) {
-                  e.currentTarget.style.background = c.surface;
-                  e.currentTarget.style.borderColor = c.border;
+                  e.currentTarget.style.background = mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)";
+                  e.currentTarget.style.borderColor = mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
                   e.currentTarget.style.color = c.textSec;
                 }
               }}
@@ -7486,18 +7497,18 @@ export default function AlternusOS() {
             <div className="absolute -left-24 top-0 flex gap-2">
               <button onClick={() => setShowSpotlight(true)} title="Spotlight (Ctrl+K)"
                 className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
-                style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.textSec }}
+                style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, color: c.textSec, boxShadow: mode === "dark" ? "0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 4px 16px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5)" }}
                 onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = "#fff"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}>
+                onMouseLeave={e => { e.currentTarget.style.background = mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)"; e.currentTarget.style.borderColor = mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"; e.currentTarget.style.color = c.textSec; }}>
                 <I d={ic.search} s={16} />
               </button>
             </div>
             <div className="absolute -right-24 top-0 flex gap-2">
               <button onClick={() => setShowSpacesView(true)} title="Spaces (Ctrl+1/2/3)"
                 className="w-10 h-10 rounded-full flex items-center justify-center transition-all gap-0.5"
-                style={{ background: c.surface, border: `1px solid ${c.border}`, flexDirection: "column" }}
+                style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, flexDirection: "column", boxShadow: mode === "dark" ? "0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 4px 16px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5)" }}
                 onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; }}
-                onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; }}>
+                onMouseLeave={e => { e.currentTarget.style.background = mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)"; e.currentTarget.style.borderColor = mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"; }}>
                 <div className="flex gap-0.5">
                   {[1, 2, 3].map(n => (
                     <div key={n} className="w-2 h-2 rounded-sm" style={{ background: activeSpace === n ? c.accent : c.border }} />
@@ -7517,7 +7528,7 @@ export default function AlternusOS() {
             >
               <div
                 className="flex items-center gap-2 px-4 py-3 rounded-2xl overflow-x-auto"
-                style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 24px rgba(0,0,0,0.35)" : "0 4px 24px rgba(0,0,0,0.1)", scrollbarWidth: "none", msOverflowStyle: "none" }}
+                style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)", scrollbarWidth: "none", msOverflowStyle: "none" }}
                 onWheel={e => { e.currentTarget.scrollLeft += e.deltaY; }}
               >
                 {dockApps.map(app => (
@@ -7843,7 +7854,7 @@ export default function AlternusOS() {
           if (openW.length === 0) return null;
           return (
             <div className="absolute inset-0 flex items-center justify-center z-[200]" style={{ background: "rgba(0,0,0,0.4)" }}>
-              <div className="flex gap-3 px-6 py-4 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}>
+              <div className="flex gap-3 px-6 py-4 rounded-2xl" style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)" }}>
                 {openW.map((w, i) => (
                   <div key={w.id} className="flex flex-col items-center gap-2 px-4 py-3 rounded-xl transition-all"
                     style={{ background: i === taskSwitcherIdx ? c.accentSoft : "transparent", border: i === taskSwitcherIdx ? `2px solid ${c.accent}` : "2px solid transparent" }}>
@@ -7861,7 +7872,7 @@ export default function AlternusOS() {
         {/* System Modal */}
         {systemModal && (
           <div className="absolute inset-0 flex items-center justify-center z-[300]" style={{ background: "rgba(0,0,0,0.3)" }}>
-            <div className="w-80 p-5 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}>
+            <div className="w-80 p-5 rounded-2xl" style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)" }}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: systemModal.type === "error" ? "rgba(239,68,68,0.15)" : systemModal.type === "warning" ? c.warningSoft : c.accentSoft }}>
                   <I d={systemModal.type === "error" ? ic.alertTriangle : systemModal.type === "warning" ? ic.alertTriangle : ic.shield} s={20} c={systemModal.type === "error" ? c.danger : systemModal.type === "warning" ? c.warning : c.accentText} />
@@ -7881,7 +7892,7 @@ export default function AlternusOS() {
         {/* ━━━━ Payment Modal ━━━━ */}
         {paymentModal && (
           <div className="absolute inset-0 flex items-center justify-center z-[300]" style={{ background: "rgba(0,0,0,0.4)" }} onClick={() => setPaymentModal(null)}>
-            <div className="w-[320px] rounded-2xl overflow-hidden" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 32px rgba(0,0,0,0.2)" }} onClick={e => e.stopPropagation()}>
+            <div className="w-[320px] rounded-2xl overflow-hidden" style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)" }} onClick={e => e.stopPropagation()}>
               <div className="p-5 flex flex-col items-center" style={{ borderBottom: `1px solid ${c.border}` }}>
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3" style={{ background: paymentModal.iconBg + "20" }}>
                   <I d={paymentModal.icon} s={28} c={paymentModal.iconBg} />
@@ -7916,7 +7927,7 @@ export default function AlternusOS() {
         {/* ━━━━ AI Suggestion Bar ━━━━ */}
         {aiSuggestion && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[150] flex items-center gap-4 px-5 py-3 rounded-2xl max-w-[90%]"
-            style={{ background: c.surface, border: `1px solid ${c.accent}40`, boxShadow: `0 0 20px ${c.accent}15, 0 4px 16px rgba(0,0,0,0.12)` }}>
+            style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${c.accent}30`, boxShadow: `0 0 20px ${c.accent}15, 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 ${mode === "dark" ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.5)"}` }}>
             <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: c.accent }}>
               <I d={ic.sparkle} s={14} c="#fff" />
             </div>
@@ -7933,7 +7944,7 @@ export default function AlternusOS() {
         {/* ━━━━ Action Chain Dialog ━━━━ */}
         {closeChain && (
           <div className="absolute inset-0 flex items-center justify-center z-[300]" style={{ background: "rgba(0,0,0,0.3)" }}>
-            <div className="w-96 p-5 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}>
+            <div className="w-96 p-5 rounded-2xl" style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)" }}>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.accentSoft }}><I d={ic.sparkle} s={20} c={c.accentText} /></div>
                 <div>
@@ -7954,7 +7965,7 @@ export default function AlternusOS() {
         {/* ━━━━ Unified Timeline Panel ━━━━ */}
         {showTimeline && (
           <div className="absolute inset-0 flex items-center justify-center z-[250]" style={{ background: "rgba(0,0,0,0.3)" }}>
-            <div className="w-[400px] max-h-[500px] rounded-2xl flex flex-col" style={{ background: c.surface, border: `1px solid ${c.border}`, boxShadow: "0 8px 24px rgba(0,0,0,0.15)" }}>
+            <div className="w-[400px] max-h-[500px] rounded-2xl flex flex-col" style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)" }}>
               <div className="flex items-center justify-between px-5 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
                 <div className="flex items-center gap-2"><I d={ic.refresh} s={16} c={c.accentText} /><p className="text-sm font-semibold" style={{ color: c.text }}>Unified Timeline</p></div>
                 <button onClick={() => setShowTimeline(false)} className="p-1 rounded-md" style={{ color: c.textMuted }}><I d={ic.close} s={14} /></button>
@@ -7977,7 +7988,7 @@ export default function AlternusOS() {
         {/* ━━━━ Right-Click Context Menu ━━━━ */}
         {contextMenu && (
           <div className="absolute z-[200] w-[220px] rounded-xl overflow-hidden py-1.5"
-            style={{ left: contextMenu.x, top: contextMenu.y, background: c.surface, border: `1px solid ${c.border}`, boxShadow: mode === "dark" ? "0 4px 20px rgba(0,0,0,0.25)" : "0 4px 20px rgba(0,0,0,0.08)" }}
+            style={{ left: contextMenu.x, top: contextMenu.y, background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)" }}
             onClick={e => e.stopPropagation()}>
             {/* Quick actions row */}
             <div className="flex items-center gap-1 px-3 py-2" style={{ borderBottom: `1px solid ${c.border}` }}>
@@ -8053,9 +8064,9 @@ export default function AlternusOS() {
 
         {/* ━━━━ AI Full Chat Overlay ━━━━ */}
         {showAiChat && (
-          <div className="absolute inset-0 z-[200] flex" style={{ background: c.bg }}>
+          <div className="absolute inset-0 z-[200] flex" style={{ background: mode === "dark" ? "rgba(36,36,36,0.6)" : "rgba(242,242,244,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)" }}>
             {/* Sidebar */}
-            <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ background: c.surface, borderRight: `1px solid ${c.border}` }}>
+            <div className="w-[220px] flex-shrink-0 flex flex-col" style={{ background: mode === "dark" ? "rgba(44,44,44,0.5)" : "rgba(255,255,255,0.5)", borderRight: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"}` }}>
               <div className="px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
                 <button className="w-full px-3 py-2 rounded-xl text-xs font-medium transition-colors"
                   style={{ background: c.accent, color: "#fff" }}
@@ -8210,9 +8221,11 @@ export default function AlternusOS() {
           style={{
             width: 340,
             transform: showNotifications ? "translateX(0)" : "translateX(100%)",
-            background: c.surface,
-            borderLeft: `1px solid ${c.border}`,
-            boxShadow: showNotifications ? (mode === "dark" ? "-4px 0 20px rgba(0,0,0,0.4)" : "-4px 0 20px rgba(0,0,0,0.1)") : "none",
+            background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)",
+            backdropFilter: "blur(20px) saturate(1.4)",
+            WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+            borderLeft: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
+            boxShadow: showNotifications ? (mode === "dark" ? "-4px 0 32px rgba(0,0,0,0.4), inset 1px 0 0 rgba(255,255,255,0.04)" : "-4px 0 32px rgba(0,0,0,0.08), inset 1px 0 0 rgba(255,255,255,0.5)") : "none",
           }}
         >
           <div className="flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
