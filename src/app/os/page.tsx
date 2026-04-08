@@ -171,6 +171,7 @@ const ic = {
   user: "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z",
   chevR: "M9 18l6-6-6-6",
   chevL: "M15 18l-6-6 6-6",
+  chevD: "M6 9l6 6 6-6",
   play: "M5 3l14 9-14 9V3z",
   pause: "M6 4h4v16H6zM14 4h4v16h-4z",
   skip: "M5 4l10 8-10 8V4zM19 5v14",
@@ -6427,6 +6428,7 @@ export default function AlternusOS() {
   const [aiAppResults, setAiAppResults] = useState<{ id: WinId; title: string; icon: string; description: string }[]>([]);
   const [showAIFrame, setShowAIFrame] = useState(false);
   const aiFrameInputRef = useRef<HTMLInputElement>(null);
+  const [showAiFixMenu, setShowAiFixMenu] = useState(false);
   const [showAiChat, setShowAiChat] = useState(false);
   const [aiChatMsgs, setAiChatMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([]);
   const [aiChatInput, setAiChatInput] = useState("");
@@ -6805,6 +6807,8 @@ export default function AlternusOS() {
         setShowNotifications(false);
         setShowWifiPanel(false);
         setShowProfilePanel(false);
+        setShowAiBar(false);
+        setShowAiFixMenu(false);
       }
       // Ctrl+1/2/3 switch spaces
       if ((e.ctrlKey || e.metaKey) && ["1", "2", "3"].includes(e.key)) {
@@ -7220,7 +7224,7 @@ export default function AlternusOS() {
 
   return (
     <div style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
-      <style>{`* { scrollbar-width: none !important; -ms-overflow-style: none !important; } *::-webkit-scrollbar { display: none !important; }`}</style>
+      <style>{`* { scrollbar-width: none !important; -ms-overflow-style: none !important; } *::-webkit-scrollbar { display: none !important; } .ai-bar-input::placeholder { color: rgba(255,255,255,0.65); }`}</style>
       {/* Top Bar hover trigger zone */}
       <div className="absolute top-0 left-0 right-0 h-2 z-[300]" onMouseEnter={() => setShowTopBar(true)} />
       {/* Top Bar */}
@@ -7370,7 +7374,8 @@ export default function AlternusOS() {
       {/* Desktop Area - fixed, no scroll */}
       <div className="flex-1 relative overflow-hidden"
         style={{ background: desktopBg }}
-        onClick={() => { if (showApps) setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setShowAISidebar(false); setContextMenu(null); if (showAIFrame && !aiResponse) setShowAIFrame(false); }}
+        onClick={() => { if (showApps) setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setShowAISidebar(false); setContextMenu(null); if (showAIFrame && !aiResponse) setShowAIFrame(false); setShowAiFixMenu(false); }}
+        onDoubleClick={() => { setShowAIFrame(true); setShowAiFixMenu(false); setTimeout(() => aiFrameInputRef.current?.focus(), 50); }}
         onContextMenu={e => { e.preventDefault(); setContextMenu({ x: e.clientX, y: e.clientY - 36 }); setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setShowAISidebar(false); }}>
 
 
@@ -7780,7 +7785,7 @@ export default function AlternusOS() {
 
           {/* Label under button */}
           {!showAIFrame && !aiResponse && !aiAppResults.length && (
-            <p className="text-[11px] font-medium tracking-wide" style={{ color: c.textMuted, opacity: 0.7 }}>Ask AI</p>
+            <p className="text-[11px] font-medium tracking-wide" style={{ color: c.textMuted, opacity: 0.7 }}>Double-click or click to ask AI</p>
           )}
 
           {/* ━━━━ EXPANDED AI SEARCH FRAME — frosted glass ━━━━ */}
@@ -7831,7 +7836,7 @@ export default function AlternusOS() {
                   onChange={e => setAiInput(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && aiInput.trim()) handleDesktopSearch();
-                    if (e.key === "Escape") { setShowAIFrame(false); if (!aiResponse) setAiInput(""); }
+                    if (e.key === "Escape") { setShowAIFrame(false); setShowAiFixMenu(false); if (!aiResponse) setAiInput(""); }
                   }}
                 />
                 {aiInput && (
@@ -7841,6 +7846,57 @@ export default function AlternusOS() {
                     <I d={ic.close} s={14} />
                   </button>
                 )}
+                {/* Chevron dropdown — AI fix options */}
+                <div className="relative flex-shrink-0">
+                  <button
+                    className="flex items-center justify-center rounded-xl transition-all"
+                    style={{
+                      width: 36, height: 36,
+                      background: showAiFixMenu
+                        ? (mode === "dark" ? "rgba(59,130,246,0.2)" : "rgba(59,130,246,0.12)")
+                        : (mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"),
+                    }}
+                    onClick={() => setShowAiFixMenu(p => !p)}
+                    title="AI fix options"
+                    onMouseEnter={e => { if (!showAiFixMenu) e.currentTarget.style.background = mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"; }}
+                    onMouseLeave={e => { if (!showAiFixMenu) e.currentTarget.style.background = mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"; }}
+                  >
+                    <I d={ic.chevD} s={15} c={showAiFixMenu ? c.accentText : c.textMuted} />
+                  </button>
+                  {showAiFixMenu && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setShowAiFixMenu(false)} />
+                      <div className="absolute top-full mt-2 right-0 w-56 rounded-2xl py-2 shadow-2xl z-20"
+                        style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                        <p className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide" style={{ color: c.textMuted }}>Fix with AI</p>
+                        {[
+                          { label: "Fix grammar", icon: ic.pen, prefix: "Fix the grammar in: " },
+                          { label: "Improve writing", icon: ic.edit3, prefix: "Improve this text: " },
+                          { label: "Summarize", icon: ic.alignLeft, prefix: "Summarize this: " },
+                          { label: "Make shorter", icon: ic.minimize, prefix: "Make this shorter: " },
+                          { label: "Make longer", icon: ic.plus, prefix: "Expand this text: " },
+                          { label: "Fix code errors", icon: ic.code, prefix: "Fix the code errors in: " },
+                          { label: "Translate to English", icon: ic.globe, prefix: "Translate to English: " },
+                          { label: "Explain this", icon: ic.sparkle, prefix: "Explain this: " },
+                        ].map(opt => (
+                          <button key={opt.label}
+                            onClick={() => {
+                              setAiInput(opt.prefix + (aiInput || ""));
+                              setShowAiFixMenu(false);
+                              setTimeout(() => aiFrameInputRef.current?.focus(), 50);
+                            }}
+                            className="flex items-center gap-3 px-4 py-2.5 text-[13px] w-full text-left transition-colors"
+                            style={{ color: c.textSec }}
+                            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                            <I d={opt.icon} s={14} c={c.textMuted} />
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
                 <button
                   onClick={() => { if (aiInput.trim()) handleDesktopSearch(); else setShowAIFrame(false); }}
                   className="flex items-center justify-center rounded-xl transition-all"
