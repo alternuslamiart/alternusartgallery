@@ -7121,8 +7121,8 @@ export default function AlternusOS() {
           </div>
         )}
 
-        {/* Apps button - centered */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[50] flex flex-col items-center" onClick={e => e.stopPropagation()}>
+        {/* Apps button - top center */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center" onClick={e => e.stopPropagation()}>
             <button
               onClick={() => setShowApps(!showApps)}
               className="w-14 h-14 rounded-full flex items-center justify-center transition-all"
