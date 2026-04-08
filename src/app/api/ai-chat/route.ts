@@ -113,56 +113,52 @@ Remember: You're an art expert passionate about helping people discover and appr
 export const dynamic = 'force-dynamic';
 
 async function getAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
-  // Build Gemini conversation format
-  const contents = [
-    ...conversationHistory.map((msg) => ({
-      role: msg.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: msg.content }],
-    })),
-    { role: 'user', parts: [{ text: message }] },
-  ];
-
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return { text: null, error: 'GEMINI_API_KEY not set' };
+    return { text: null, error: 'ANTHROPIC_API_KEY not set' };
   }
 
+  const messages = [
+    ...conversationHistory.map((msg) => ({
+      role: msg.role === 'assistant' ? 'assistant' : 'user',
+      content: msg.content,
+    })),
+    { role: 'user', content: message },
+  ];
+
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: SYSTEM_PROMPT }],
-          },
-          contents,
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 1024,
-          },
-        }),
-      }
-    );
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-6',
+        max_tokens: 1024,
+        system: SYSTEM_PROMPT,
+        messages,
+      }),
+    });
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('Gemini API error:', response.status, errorData);
-      return { text: null, error: `Gemini API error: ${response.status}` };
+      console.error('Anthropic API error:', response.status, errorData);
+      return { text: null, error: `Anthropic API error: ${response.status}` };
     }
 
     const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const text = data?.content?.[0]?.text;
 
     if (text) {
       return { text, error: null };
     }
 
-    return { text: null, error: 'No response from Gemini' };
+    return { text: null, error: 'No response from Claude' };
   } catch (error: unknown) {
     const errMsg = error instanceof Error ? error.message : String(error);
-    console.error('Gemini error:', errMsg);
+    console.error('Anthropic error:', errMsg);
     return { text: null, error: errMsg };
   }
 }
@@ -176,8 +172,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      console.error('GEMINI_API_KEY not configured');
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error('ANTHROPIC_API_KEY not configured');
       return NextResponse.json({ error: 'Our AI assistant is temporarily unavailable. Please try again later or contact us at info@alternusart.com.' }, { status: 500 });
     }
 
