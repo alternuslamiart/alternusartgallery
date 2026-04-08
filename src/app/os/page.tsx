@@ -6807,7 +6807,7 @@ export default function AlternusOS() {
         setShowNotifications(false);
         setShowWifiPanel(false);
         setShowProfilePanel(false);
-        setShowAiBar(false);
+        setShowAIFrame(false);
         setShowAiFixMenu(false);
       }
       // Ctrl+1/2/3 switch spaces
