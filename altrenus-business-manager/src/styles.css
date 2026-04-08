@@ -1,0 +1,50 @@
+/* Alternus Work Manager — Design Tokens
+   Used as reference for CustomTkinter colors and spacing.
+   -------------------------------------------------------- */
+
+:root {
+  /* Brand */
+  --accent:       #3B82F6;
+  --accent-soft:  #1e3a5f;
+  --success:      #22C55E;
+  --danger:       #EF4444;
+  --warning:      #F59E0B;
+  --purple:       #8B5CF6;
+
+  /* Dark theme */
+  --bg-dark:      #0f0f17;
+  --surface-dark: #16161f;
+  --card-dark:    #1f2937;
+  --border-dark:  #2d2d3a;
+  --text-dark:    #F9FAFB;
+  --muted-dark:   #6B7280;
+
+  /* Light theme */
+  --bg-light:     #F9FAFB;
+  --surface-light:#FFFFFF;
+  --card-light:   #F3F4F6;
+  --border-light: #E5E7EB;
+  --text-light:   #111827;
+  --muted-light:  #6B7280;
+
+  /* Typography */
+  --font-family:  "Segoe UI", system-ui, sans-serif;
+  --font-sm:      11px;
+  --font-base:    13px;
+  --font-lg:      15px;
+  --font-xl:      18px;
+  --font-2xl:     22px;
+
+  /* Spacing */
+  --radius-sm:    6px;
+  --radius-md:    10px;
+  --radius-lg:    14px;
+  --gap-xs:       4px;
+  --gap-sm:       8px;
+  --gap-md:       14px;
+  --gap-lg:       20px;
+
+  /* Sidebar */
+  --sidebar-width: 220px;
+  --nav-active:    #1e293b;
+}
