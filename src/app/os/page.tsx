@@ -890,35 +890,6 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
               </div>
             </div>
 
-            {/* Gemini-style input bar */}
-            <div className="px-6 pb-4 pt-2">
-              <div className="max-w-[720px] mx-auto">
-                <div className="rounded-2xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-                  <input
-                    className="w-full bg-transparent outline-none text-[14px] px-5 pt-4 pb-2"
-                    style={{ color: c.text }}
-                    placeholder="Ask Alternus AI..."
-                    value={input}
-                    onChange={e => setInput(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter") send(); }}
-                  />
-                  <div className="flex items-center justify-between px-4 pb-3">
-                    <div className="flex items-center gap-1">
-                      <button className="p-1.5 rounded-lg" style={{ color: c.textMuted }} title="Attach"
-                        onMouseEnter={e => { e.currentTarget.style.color = c.text; }}
-                        onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; }}>
-                        <I d={ic.plus} s={16} />
-                      </button>
-                    </div>
-                    <button onClick={() => send()} disabled={!input.trim() || isTyping}
-                      className="p-1.5 rounded-lg transition-opacity"
-                      style={{ background: input.trim() ? c.accent : c.cardAlt, opacity: (!input.trim() || isTyping) ? 0.3 : 1 }}>
-                      <I d={ic.send} s={14} c="#fff" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
           </>
       </div>
 
@@ -7150,71 +7121,41 @@ export default function AlternusOS() {
           </div>
         )}
 
-        {/* Apps button - top center, always visible */}
-        <div className="absolute top-4 left-[70%] -translate-x-1/2 z-[50] flex flex-col items-center" onClick={e => e.stopPropagation()}>
+        {/* Apps button - centered */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[50] flex flex-col items-center" onClick={e => e.stopPropagation()}>
             <button
               onClick={() => setShowApps(!showApps)}
-              className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
+              className="w-14 h-14 rounded-full flex items-center justify-center transition-all"
               style={{
-                background: showApps ? c.accent : mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)",
+                background: c.accent,
                 backdropFilter: "blur(20px) saturate(1.4)",
                 WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-                border: `1px solid ${showApps ? c.accent : mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
-                color: showApps ? "#fff" : c.textSec,
-                boxShadow: mode === "dark" ? "0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 4px 16px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5)",
+                border: `1px solid ${c.accent}`,
+                color: "#fff",
+                boxShadow: `0 8px 32px ${c.accent}60, 0 0 0 4px ${c.accent}20, inset 0 1px 0 rgba(255,255,255,0.2)`,
               }}
               onMouseEnter={e => {
-                if (!showApps) {
-                  e.currentTarget.style.background = c.accent;
-                  e.currentTarget.style.borderColor = c.accent;
-                  e.currentTarget.style.color = "#fff";
-                }
+                e.currentTarget.style.transform = "scale(1.08)";
+                e.currentTarget.style.boxShadow = `0 12px 40px ${c.accent}80, 0 0 0 6px ${c.accent}30, inset 0 1px 0 rgba(255,255,255,0.2)`;
               }}
               onMouseLeave={e => {
-                if (!showApps) {
-                  e.currentTarget.style.background = mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)";
-                  e.currentTarget.style.borderColor = mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
-                  e.currentTarget.style.color = c.textSec;
-                }
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = `0 8px 32px ${c.accent}60, 0 0 0 4px ${c.accent}20, inset 0 1px 0 rgba(255,255,255,0.2)`;
               }}
             >
-              <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+              <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
                 style={{ transform: showApps ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s ease" }}>
                 <path d="M18 15l-6-6-6 6" />
               </svg>
             </button>
 
-            {/* Spotlight + Spaces buttons beside apps button */}
-            <div className="absolute -left-24 top-0 flex gap-2">
-              <button onClick={() => setShowSpotlight(true)} title="Spotlight (Ctrl+K)"
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
-                style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, color: c.textSec, boxShadow: mode === "dark" ? "0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 4px 16px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5)" }}
-                onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = "#fff"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)"; e.currentTarget.style.borderColor = mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"; e.currentTarget.style.color = c.textSec; }}>
-                <I d={ic.search} s={16} />
-              </button>
-            </div>
-            <div className="absolute -right-24 top-0 flex gap-2">
-              <button onClick={() => setShowSpacesView(true)} title="Spaces (Ctrl+1/2/3)"
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-all gap-0.5"
-                style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, flexDirection: "column", boxShadow: mode === "dark" ? "0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 4px 16px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5)" }}
-                onMouseEnter={e => { e.currentTarget.style.background = c.accent; e.currentTarget.style.borderColor = c.accent; }}
-                onMouseLeave={e => { e.currentTarget.style.background = mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)"; e.currentTarget.style.borderColor = mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"; }}>
-                <div className="flex gap-0.5">
-                  {[1, 2, 3].map(n => (
-                    <div key={n} className="w-2 h-2 rounded-sm" style={{ background: activeSpace === n ? c.accent : c.border }} />
-                  ))}
-                </div>
-                <span className="text-[8px]" style={{ color: c.textMuted }}>Space {activeSpace}</span>
-              </button>
-            </div>
-
-            {/* Apps panel - slides down, horizontal scroll */}
+            {/* Apps panel - slides up from center */}
             <div
-              className="mt-3 overflow-hidden transition-all duration-300 ease-in-out"
+              className="mb-3 overflow-hidden transition-all duration-300 ease-in-out"
               style={{
                 maxHeight: showApps ? 90 : 0,
                 opacity: showApps ? 1 : 0,
+                order: -1,
               }}
             >
               <div
