@@ -252,6 +252,7 @@ function TitleBar({
   isFrozen,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onForceQuit,
+  mode,
 }: {
   title: string;
   c: typeof palette.dark;
@@ -261,43 +262,115 @@ function TitleBar({
   onMouseDown: (e: React.MouseEvent) => void;
   isFrozen?: boolean;
   onForceQuit?: () => void;
+  mode?: ThemeMode;
 }) {
+  const dk = (mode || "dark") === "dark";
+  const iconStroke = dk ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)";
+  const iconStrokeHover = "#fff";
+
+  /* shared glass button style */
+  const btnBase: React.CSSProperties = {
+    width: 26,
+    height: 26,
+    borderRadius: 9,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    overflow: "hidden",
+    background: dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
+    border: `1px solid ${dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"}`,
+    transition: "all 0.2s ease",
+    cursor: "pointer",
+  };
+
   return (
     <div
       onMouseDown={onMouseDown}
-      className="flex items-center justify-between h-9 px-3 select-none cursor-move flex-shrink-0"
+      className="flex items-center justify-between h-10 px-3 select-none cursor-move flex-shrink-0"
       style={{ background: "transparent", borderBottom: "none" }}
     >
-      <span style={{ color: isFrozen ? c.warning : c.textSec }} className="text-xs font-medium truncate max-w-[160px]">
+      <span style={{ color: isFrozen ? c.warning : c.textSec }} className="text-[11px] font-medium truncate max-w-[180px]">
         {title}{isFrozen ? " (Not Responding)" : ""}
       </span>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-[5px]">
+        {/* ● Minimize — circle */}
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onMinimize}
-          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#4ADE80"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", "#fff"); }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("circle"); if (s) s.setAttribute("stroke", c.textMuted); }}
+          style={btnBase}
+          onMouseEnter={e => {
+            const el = e.currentTarget;
+            el.style.background = "rgba(74,222,128,0.85)";
+            el.style.borderColor = "rgba(74,222,128,0.4)";
+            el.style.boxShadow = "0 0 12px rgba(74,222,128,0.35), inset 0 1px 0 rgba(255,255,255,0.25)";
+            const s = el.querySelector("circle"); if (s) s.setAttribute("stroke", iconStrokeHover);
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget;
+            el.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
+            el.style.borderColor = dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+            el.style.boxShadow = "none";
+            const s = el.querySelector("circle"); if (s) s.setAttribute("stroke", iconStroke);
+          }}
         >
-          <svg width={10} height={10} viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
+          {/* Gloss reflection */}
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "50%", borderRadius: "9px 9px 0 0", background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%)", pointerEvents: "none" }} />
+          <svg width={11} height={11} viewBox="0 0 10 10" style={{ position: "relative", zIndex: 1 }}>
+            <circle cx="5" cy="5" r="3.5" fill="none" stroke={iconStroke} strokeWidth="1.4" />
+          </svg>
         </button>
+
+        {/* ■ Maximize — rounded square */}
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onMaximize}
-          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#5BA3E6"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", "#fff"); }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("rect"); if (s) s.setAttribute("stroke", c.textMuted); }}
+          style={btnBase}
+          onMouseEnter={e => {
+            const el = e.currentTarget;
+            el.style.background = "rgba(91,163,230,0.85)";
+            el.style.borderColor = "rgba(91,163,230,0.4)";
+            el.style.boxShadow = "0 0 12px rgba(91,163,230,0.35), inset 0 1px 0 rgba(255,255,255,0.25)";
+            const s = el.querySelector("rect"); if (s) s.setAttribute("stroke", iconStrokeHover);
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget;
+            el.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
+            el.style.borderColor = dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+            el.style.boxShadow = "none";
+            const s = el.querySelector("rect"); if (s) s.setAttribute("stroke", iconStroke);
+          }}
         >
-          <svg width={10} height={10} viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" rx="1.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" /></svg>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "50%", borderRadius: "9px 9px 0 0", background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%)", pointerEvents: "none" }} />
+          <svg width={11} height={11} viewBox="0 0 10 10" style={{ position: "relative", zIndex: 1 }}>
+            <rect x="2" y="2" width="6" height="6" rx="1.2" fill="none" stroke={iconStroke} strokeWidth="1.4" />
+          </svg>
         </button>
+
+        {/* ▲ Close — triangle */}
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onClose}
-          className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
-          onMouseEnter={e => { e.currentTarget.style.background = "#F87171"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", "#fff"); }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; const s = e.currentTarget.querySelector("polygon"); if (s) s.setAttribute("stroke", c.textMuted); }}
+          style={btnBase}
+          onMouseEnter={e => {
+            const el = e.currentTarget;
+            el.style.background = "rgba(248,113,113,0.85)";
+            el.style.borderColor = "rgba(248,113,113,0.4)";
+            el.style.boxShadow = "0 0 12px rgba(248,113,113,0.35), inset 0 1px 0 rgba(255,255,255,0.25)";
+            const s = el.querySelector("polygon"); if (s) s.setAttribute("stroke", iconStrokeHover);
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget;
+            el.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
+            el.style.borderColor = dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+            el.style.boxShadow = "none";
+            const s = el.querySelector("polygon"); if (s) s.setAttribute("stroke", iconStroke);
+          }}
         >
-          <svg width={10} height={10} viewBox="0 0 10 10"><polygon points="5,1.5 9,8.5 1,8.5" fill="none" stroke={c.textMuted} strokeWidth="1.5" strokeLinejoin="round" /></svg>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "50%", borderRadius: "9px 9px 0 0", background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%)", pointerEvents: "none" }} />
+          <svg width={11} height={11} viewBox="0 0 10 10" style={{ position: "relative", zIndex: 1 }}>
+            <polygon points="5,1.8 8.8,8.2 1.2,8.2" fill="none" stroke={iconStroke} strokeWidth="1.4" strokeLinejoin="round" />
+          </svg>
         </button>
       </div>
     </div>
@@ -449,6 +522,7 @@ function AppWindow({
         onMouseDown={handleMouseDown}
         isFrozen={win.isFrozen}
         onForceQuit={onForceQuit}
+        mode={mode}
       />}
       {/* ━━━━ AI Hover Bar — appears on mouse enter below title bar ━━━━ */}
       {!isAI && (
