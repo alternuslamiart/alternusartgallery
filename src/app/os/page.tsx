@@ -7332,120 +7332,112 @@ export default function AlternusOS() {
           </div>
         )}
 
-        {/* Apps button - top center */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center" onClick={e => e.stopPropagation()}>
-            <button
-              onClick={() => setShowApps(!showApps)}
-              className="w-14 h-14 rounded-full flex items-center justify-center transition-all"
-              style={{
-                background: c.accent,
-                backdropFilter: "blur(20px) saturate(1.4)",
-                WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-                border: `1px solid ${c.accent}`,
-                color: "#fff",
-                boxShadow: `0 8px 32px ${c.accent}60, 0 0 0 4px ${c.accent}20, inset 0 1px 0 rgba(255,255,255,0.2)`,
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.transform = "scale(1.08)";
-                e.currentTarget.style.boxShadow = `0 12px 40px ${c.accent}80, 0 0 0 6px ${c.accent}30, inset 0 1px 0 rgba(255,255,255,0.2)`;
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = `0 8px 32px ${c.accent}60, 0 0 0 4px ${c.accent}20, inset 0 1px 0 rgba(255,255,255,0.2)`;
-              }}
-            >
-              <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-                style={{ transform: showApps ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s ease" }}>
-                <path d="M18 15l-6-6-6 6" />
-              </svg>
-            </button>
-
-            {/* Apps panel - slides up from center */}
-            <div
-              className="mb-3 overflow-hidden transition-all duration-300 ease-in-out"
-              style={{
-                maxHeight: showApps ? 90 : 0,
-                opacity: showApps ? 1 : 0,
-                order: -1,
-              }}
-            >
-              <div
-                className="flex items-center gap-2 px-4 py-3 rounded-2xl overflow-x-auto"
-                style={{ background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)", backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)", scrollbarWidth: "none", msOverflowStyle: "none" }}
-                onWheel={e => { e.currentTarget.scrollLeft += e.deltaY; }}
-              >
-                {dockApps.map(app => {
-                  const dk = mode === "dark";
-                  return (
-                    <button
-                      key={app.id}
-                      onClick={() => { openWinWithAI(app.id); setShowApps(false); }}
-                      className="flex-shrink-0 relative overflow-hidden transition-all duration-200"
-                      style={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: 13,
-                        background: dk
-                          ? `linear-gradient(145deg, ${app.color}18 0%, ${app.color}08 100%)`
-                          : `linear-gradient(145deg, ${app.color}14 0%, ${app.color}06 100%)`,
-                        border: `1px solid ${dk ? `${app.color}25` : `${app.color}18`}`,
-                        boxShadow: dk
-                          ? `0 2px 8px ${app.color}12, inset 0 1px 0 rgba(255,255,255,0.06)`
-                          : `0 2px 8px ${app.color}10, inset 0 1px 0 rgba(255,255,255,0.4)`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                      onMouseEnter={e => {
-                        const el = e.currentTarget;
-                        el.style.background = dk
-                          ? `linear-gradient(145deg, ${app.color}35 0%, ${app.color}18 100%)`
-                          : `linear-gradient(145deg, ${app.color}28 0%, ${app.color}12 100%)`;
-                        el.style.borderColor = dk ? `${app.color}50` : `${app.color}35`;
-                        el.style.boxShadow = dk
-                          ? `0 4px 16px ${app.color}25, 0 0 20px ${app.color}15, inset 0 1px 0 rgba(255,255,255,0.1)`
-                          : `0 4px 16px ${app.color}18, 0 0 20px ${app.color}10, inset 0 1px 0 rgba(255,255,255,0.5)`;
-                        el.style.transform = "translateY(-2px) scale(1.05)";
-                      }}
-                      onMouseLeave={e => {
-                        const el = e.currentTarget;
-                        el.style.background = dk
-                          ? `linear-gradient(145deg, ${app.color}18 0%, ${app.color}08 100%)`
-                          : `linear-gradient(145deg, ${app.color}14 0%, ${app.color}06 100%)`;
-                        el.style.borderColor = dk ? `${app.color}25` : `${app.color}18`;
-                        el.style.boxShadow = dk
-                          ? `0 2px 8px ${app.color}12, inset 0 1px 0 rgba(255,255,255,0.06)`
-                          : `0 2px 8px ${app.color}10, inset 0 1px 0 rgba(255,255,255,0.4)`;
-                        el.style.transform = "translateY(0) scale(1)";
-                      }}
-                    >
-                      {/* Gloss reflection — top half */}
-                      <div style={{
-                        position: "absolute", top: 0, left: 0, right: 0, height: "50%",
-                        borderRadius: "13px 13px 0 0",
-                        background: dk
-                          ? "linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)"
-                          : "linear-gradient(180deg, rgba(255,255,255,0.35) 0%, transparent 100%)",
-                        pointerEvents: "none",
-                      }} />
-                      {/* Light spot — top-left corner */}
-                      <div style={{
-                        position: "absolute", top: 2, left: 3, width: 12, height: 5,
-                        borderRadius: "50%",
-                        background: dk ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.4)",
-                        filter: "blur(3px)",
-                        pointerEvents: "none",
-                      }} />
-                      {/* Icon with glow */}
-                      <div style={{ position: "relative", zIndex: 1, filter: `drop-shadow(0 0 4px ${app.color}40)` }}>
-                        <I d={app.icon} s={19} c={app.color} />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+        {/* ━━━━ Bottom Dock Bar — fixed, 3D icons ━━━━ */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[50]" onClick={e => e.stopPropagation()}>
+          <div
+            className="flex items-center gap-1.5 px-3 py-2 rounded-2xl"
+            style={{
+              background: mode === "dark" ? "rgba(30,30,30,0.65)" : "rgba(255,255,255,0.55)",
+              backdropFilter: "blur(24px) saturate(1.6)",
+              WebkitBackdropFilter: "blur(24px) saturate(1.6)",
+              border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
+              boxShadow: mode === "dark"
+                ? "0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)"
+                : "0 8px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)",
+            }}
+          >
+            {dockApps.map(app => {
+              const dk = mode === "dark";
+              const isOpen = wins.some(w => w.id === app.id && w.isOpen);
+              return (
+                <button
+                  key={app.id}
+                  onClick={() => openWinWithAI(app.id)}
+                  className="flex-shrink-0 relative overflow-hidden transition-all duration-200"
+                  title={app.label}
+                  style={{
+                    width: 46,
+                    height: 46,
+                    borderRadius: 14,
+                    background: dk
+                      ? `linear-gradient(135deg, ${app.color}30 0%, ${app.color}10 50%, ${app.color}05 100%)`
+                      : `linear-gradient(135deg, ${app.color}25 0%, ${app.color}10 50%, ${app.color}04 100%)`,
+                    border: `1px solid ${dk ? `${app.color}30` : `${app.color}20`}`,
+                    boxShadow: dk
+                      ? `0 4px 12px ${app.color}15, 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 2px rgba(0,0,0,0.2)`
+                      : `0 4px 12px ${app.color}12, 0 1px 3px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 2px rgba(0,0,0,0.04)`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  onMouseEnter={e => {
+                    const el = e.currentTarget;
+                    el.style.background = dk
+                      ? `linear-gradient(135deg, ${app.color}50 0%, ${app.color}25 50%, ${app.color}12 100%)`
+                      : `linear-gradient(135deg, ${app.color}40 0%, ${app.color}18 50%, ${app.color}08 100%)`;
+                    el.style.borderColor = dk ? `${app.color}55` : `${app.color}40`;
+                    el.style.boxShadow = dk
+                      ? `0 8px 24px ${app.color}30, 0 0 20px ${app.color}18, inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 2px rgba(0,0,0,0.3)`
+                      : `0 8px 24px ${app.color}20, 0 0 20px ${app.color}12, inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.06)`;
+                    el.style.transform = "translateY(-6px) scale(1.12)";
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget;
+                    el.style.background = dk
+                      ? `linear-gradient(135deg, ${app.color}30 0%, ${app.color}10 50%, ${app.color}05 100%)`
+                      : `linear-gradient(135deg, ${app.color}25 0%, ${app.color}10 50%, ${app.color}04 100%)`;
+                    el.style.borderColor = dk ? `${app.color}30` : `${app.color}20`;
+                    el.style.boxShadow = dk
+                      ? `0 4px 12px ${app.color}15, 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 2px rgba(0,0,0,0.2)`
+                      : `0 4px 12px ${app.color}12, 0 1px 3px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 2px rgba(0,0,0,0.04)`;
+                    el.style.transform = "translateY(0) scale(1)";
+                  }}
+                >
+                  {/* 3D top gloss */}
+                  <div style={{
+                    position: "absolute", top: 0, left: 0, right: 0, height: "45%",
+                    borderRadius: "14px 14px 0 0",
+                    background: dk
+                      ? "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 100%)"
+                      : "linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.05) 100%)",
+                    pointerEvents: "none",
+                  }} />
+                  {/* 3D specular highlight */}
+                  <div style={{
+                    position: "absolute", top: 3, left: 5, width: 14, height: 6,
+                    borderRadius: "50%",
+                    background: dk ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.55)",
+                    filter: "blur(4px)",
+                    pointerEvents: "none",
+                  }} />
+                  {/* Bottom edge shadow for 3D depth */}
+                  <div style={{
+                    position: "absolute", bottom: 0, left: 2, right: 2, height: 4,
+                    borderRadius: "0 0 12px 12px",
+                    background: dk ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.04)",
+                    pointerEvents: "none",
+                  }} />
+                  {/* Icon with glow */}
+                  <div style={{ position: "relative", zIndex: 1, filter: `drop-shadow(0 2px 6px ${app.color}50)` }}>
+                    <I d={app.icon} s={20} c={app.color} />
+                  </div>
+                </button>
+              );
+            })}
           </div>
+          {/* Open app indicators */}
+          <div className="flex justify-center gap-1.5 mt-1">
+            {dockApps.map(app => {
+              const isOpen = wins.some(w => w.id === app.id && w.isOpen);
+              return <div key={app.id} className="transition-all duration-200" style={{
+                width: isOpen ? 5 : 0, height: isOpen ? 5 : 0, borderRadius: "50%",
+                background: isOpen ? app.color : "transparent",
+                boxShadow: isOpen ? `0 0 6px ${app.color}60` : "none",
+                opacity: isOpen ? 1 : 0,
+              }} />;
+            })}
+          </div>
+        </div>
 
 
         {/* ━━━━ Ctrl+A Global AI Overlay ━━━━ */}
