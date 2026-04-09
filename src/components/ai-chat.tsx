@@ -273,18 +273,85 @@ export function AIChat() {
 
   return (
     <>
-      {/* Floating Chat Button */}
+      {/* Floating AI Assistant Bar */}
       {!isOpen && !isExpanded && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="flex fixed bottom-20 right-5 md:bottom-6 md:right-6 z-50 w-14 h-14 bg-coffee text-white rounded-full shadow-2xl hover:scale-110 transition-all duration-300 items-center justify-center"
-          aria-label="Open AI Chat"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
-          </svg>
-          <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse" />
-        </button>
+        <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-stone-200/60 px-2 py-2 w-[320px] md:w-[420px]">
+
+          {/* Left: "+" button — quick actions dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="relative w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-xl flex items-center justify-center flex-shrink-0 transition-colors shadow-sm"
+                aria-label="Quick actions"
+              >
+                <Plus size={18} />
+                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-white animate-pulse" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" sideOffset={8} className="w-56 z-[60]">
+              <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {DEFAULT_QUICK_ACTIONS.map((action) => (
+                <DropdownMenuItem
+                  key={action.id}
+                  onClick={() => {
+                    if (action.link) { router.push(action.link); }
+                    else if (action.prompt) { setIsExpanded(true); sendMessage(action.prompt); }
+                  }}
+                >
+                  {action.link && <span className="mr-2 text-coffee">→</span>}
+                  {action.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Center: text input */}
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && input.trim()) {
+                setIsExpanded(true);
+                sendMessage(input.trim());
+              }
+            }}
+            onClick={() => setIsOpen(true)}
+            placeholder="Ask AI anything..."
+            className="flex-1 bg-transparent text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none px-2 cursor-text"
+          />
+
+          {/* Right: chevron-down button — mode selection dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-xl flex items-center justify-center flex-shrink-0 transition-colors shadow-sm"
+                aria-label="Select AI mode"
+              >
+                <ChevronDown size={18} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={8} className="w-52 z-[60]">
+              <DropdownMenuLabel>AI Mode</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {AI_MODES.map((mode) => (
+                <DropdownMenuItem
+                  key={mode.id}
+                  onClick={() => setSelectedMode(mode.id)}
+                  className={selectedMode === mode.id ? "bg-coffee/5 text-coffee" : ""}
+                >
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{mode.label}</p>
+                    <p className="text-xs text-stone-400">{mode.description}</p>
+                  </div>
+                  {selectedMode === mode.id && <Check size={14} className="ml-auto text-coffee" />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+        </div>
       )}
 
       {/* ==================== MINI CHAT WINDOW ==================== */}
