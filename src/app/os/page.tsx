@@ -7693,6 +7693,9 @@ export default function AlternusOS() {
         setShowAiFixMenu(false);
         setShowCtrlAi(false);
         setCtrlAiChips(false);
+        setShowAiChat(false);
+        setShowAISidebar(false);
+        setContextMenu(null);
       }
       // Ctrl+1/2/3 switch spaces
       if ((e.ctrlKey || e.metaKey) && ["1", "2", "3"].includes(e.key)) {
@@ -8266,7 +8269,7 @@ export default function AlternusOS() {
       {/* Desktop Area - fixed, no scroll */}
       <div className="flex-1 relative overflow-hidden"
         style={{ background: desktopBg }}
-        onClick={() => { if (showApps) setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setShowAISidebar(false); setContextMenu(null); if (showAIFrame && !aiResponse) setShowAIFrame(false); setShowAiFixMenu(false); }}
+        onClick={() => { if (showApps) setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setShowAISidebar(false); setContextMenu(null); if (showAIFrame && !aiResponse) setShowAIFrame(false); setShowAiFixMenu(false); setShowNotifications(false); setShowCtrlAi(false); setShowSpotlight(false); setShowSpacesView(false); setShowAiChat(false); }}
         onDoubleClick={() => { setShowAIFrame(true); setShowAiFixMenu(false); setTimeout(() => aiFrameInputRef.current?.focus(), 50); }}
         onContextMenu={e => { e.preventDefault(); setContextMenu({ x: e.clientX, y: e.clientY - 36 }); setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setShowAISidebar(false); }}>
 
@@ -9422,10 +9425,11 @@ export default function AlternusOS() {
 
         {/* ━━━━ AI Notification Sidebar ━━━━ */}
         <div
-          className="absolute top-0 right-0 h-full z-[100] transition-colorsduration-300 ease-in-out"
+          className="absolute top-0 right-0 h-full z-[100] transition-all duration-300 ease-in-out"
           style={{
             width: 340,
             transform: showNotifications ? "translateX(0)" : "translateX(100%)",
+            pointerEvents: showNotifications ? "auto" : "none",
             background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)",
             backdropFilter: "blur(20px) saturate(1.4)",
             WebkitBackdropFilter: "blur(20px) saturate(1.4)",
