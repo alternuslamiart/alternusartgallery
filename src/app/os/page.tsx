@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news" | "dashboard" | "tasks" | "mail" | "monaco" | "aihub" | "imagegen" | "aivoice" | "writer" | "knowledge" | "sysmon" | "business";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news" | "dashboard" | "tasks" | "mail" | "monaco" | "aihub" | "aivoice" | "knowledge" | "sysmon" | "business";
 
 interface WinState {
   id: WinId;
@@ -2191,17 +2191,32 @@ function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palett
   return (
     <div className="flex h-full overflow-hidden">
       {/* Sidebar */}
-      <div className="w-[150px] flex-shrink-0 flex flex-col py-1 px-1.5 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
-        {sidebarItems.map((item, i) => (
-          <button key={i} onClick={() => { setCurrentPath([item.path]); setSelectedFile(null); setSearchQuery(""); }}
-            className="w-full flex items-center gap-2.5 px-2.5 py-2 text-left transition-all"
-            style={{ borderRadius: "8px", background: curPath === item.path ? c.accentSoft : "transparent", borderLeft: curPath === item.path ? `2px solid ${c.accent}` : "2px solid transparent", minHeight: 34 }}
-            onMouseEnter={e => { if (curPath !== item.path) e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { if (curPath !== item.path) e.currentTarget.style.background = "transparent"; }}>
-            <I d={item.icon} s={14} c={curPath === item.path ? c.accentText : c.textMuted} />
-            <span className="text-[11px] font-medium" style={{ color: curPath === item.path ? c.accentText : c.textSec }}>{item.label}</span>
-          </button>
-        ))}
+      <div className="w-[168px] flex-shrink-0 flex flex-col overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+        {/* Sidebar Header */}
+        <div className="px-3 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #FBBF24, #D97706)", boxShadow: "0 2px 8px rgba(251,191,36,0.3)" }}>
+              <I d={ic.folder} s={14} c="#fff" />
+            </div>
+            <div>
+              <p className="text-[11px] font-bold" style={{ color: c.text }}>Files</p>
+              <p className="text-[9px]" style={{ color: c.textMuted }}>File Manager</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1 py-1.5 px-1.5">
+          <p className="text-[8px] font-bold uppercase tracking-wider px-2.5 py-1 mb-0.5" style={{ color: c.textMuted }}>Locations</p>
+          {sidebarItems.map((item, i) => (
+            <button key={i} onClick={() => { setCurrentPath([item.path]); setSelectedFile(null); setSearchQuery(""); }}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 text-left transition-all"
+              style={{ borderRadius: "8px", background: curPath === item.path ? c.accentSoft : "transparent", borderLeft: curPath === item.path ? `2px solid ${c.accent}` : "2px solid transparent", minHeight: 34 }}
+              onMouseEnter={e => { if (curPath !== item.path) e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { if (curPath !== item.path) e.currentTarget.style.background = "transparent"; }}>
+              <I d={item.icon} s={14} c={curPath === item.path ? c.accentText : c.textMuted} />
+              <span className="text-[11px] font-medium" style={{ color: curPath === item.path ? c.accentText : c.textSec }}>{item.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Main content */}
@@ -3495,22 +3510,35 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
   return (
     <div className="flex h-full">
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Tabs + AI/Voice */}
-      <div className="flex items-center px-2 py-1 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        {(["downloads", "uploads", "install"] as const).map(t => (
-          <button key={t} onClick={() => { setTab(t); if (t === "install") { setInstallStep(0); setSelectedApp(null); setPolicyAccepted(false); } }}
-            className="flex-1 py-1.5 text-[10px] font-semibold capitalize text-center rounded-lg transition-colors"
-            style={{ color: tab === t ? c.text : c.textMuted, background: tab === t ? c.cardAlt : "transparent" }}>
-            {t === "install" ? "Install App" : t}
-          </button>
-        ))}
-        <div className="flex items-center gap-1 ml-auto">
-          <button title="Voice" className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-            style={{ color: c.textMuted }}
-            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.accentText; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-            <I d={ic.voice} s={12} />
-          </button>
+      {/* Header */}
+      <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="flex items-center gap-3 mb-2.5">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #34D399, #059669)", boxShadow: "0 3px 12px rgba(52,211,153,0.3)" }}>
+            <I d={ic.download} s={16} c="#fff" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-[13px] font-bold" style={{ color: c.text }}>Transfer Manager</h3>
+            <p className="text-[10px]" style={{ color: c.textMuted }}>Downloads, uploads, and application installer</p>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[9px] font-bold px-2 py-1 rounded-lg" style={{ background: c.cardAlt, color: c.textMuted }}>
+              {downloads.filter(d => d.progress < 100).length} active
+            </span>
+          </div>
+        </div>
+        {/* Tabs */}
+        <div className="flex gap-1">
+          {(["downloads", "uploads", "install"] as const).map(t => {
+            const tabIcons = { downloads: ic.download, uploads: ic.upload, install: ic.store };
+            return (
+              <button key={t} onClick={() => { setTab(t); if (t === "install") { setInstallStep(0); setSelectedApp(null); setPolicyAccepted(false); } }}
+                className="flex items-center gap-1.5 flex-1 py-2 text-[10px] font-semibold capitalize text-center rounded-xl transition-all justify-center"
+                style={{ color: tab === t ? c.accentText : c.textMuted, background: tab === t ? c.accentSoft : "transparent" }}>
+                <I d={tabIcons[t]} s={12} c={tab === t ? c.accentText : c.textMuted} />
+                {t === "install" ? "Install" : t}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -3519,20 +3547,19 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
         {tab === "downloads" && (
           <div className="space-y-2">
             {downloads.map((d, i) => (
-              <div key={i} className="p-3 rounded-2xl" style={{ background: c.cardAlt }}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <I d={ic.download} s={14} c={d.progress === 100 ? c.success : c.accentText} />
-                    <p className="text-[11px] font-medium truncate" style={{ color: c.text }}>{d.name}</p>
+              <div key={i} className="p-3.5 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                <div className="flex items-center gap-2.5 mb-2">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: d.progress === 100 ? `${c.success}12` : `${c.accent}12` }}>
+                    <I d={ic.download} s={14} c={d.progress === 100 ? c.success : c.accent} />
                   </div>
-                  <span className="text-[9px] ml-2" style={{ color: c.textMuted }}>{d.size}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>{d.name}</p>
+                    <p className="text-[9px]" style={{ color: c.textMuted }}>{d.size} {d.speed ? `\u00B7 ${d.speed}` : ""}</p>
+                  </div>
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0" style={{ background: d.progress === 100 ? `${c.success}15` : `${c.accent}12`, color: d.progress === 100 ? c.success : c.accentText }}>{d.status}</span>
                 </div>
                 <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.border }}>
-                  <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(d.progress, 100)}%`, background: d.progress === 100 ? c.success : c.accent }} />
-                </div>
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-[8px]" style={{ color: d.progress === 100 ? c.success : c.accentText }}>{d.status}</span>
-                  <span className="text-[8px]" style={{ color: c.textMuted }}>{d.speed || `${d.progress}%`}</span>
+                  <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(d.progress, 100)}%`, background: d.progress === 100 ? c.success : `linear-gradient(90deg, ${c.accent}, #818CF8)` }} />
                 </div>
               </div>
             ))}
@@ -3543,18 +3570,20 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
         {tab === "uploads" && (
           <div className="space-y-2">
             {uploads.map((u, i) => (
-              <div key={i} className="p-3 rounded-2xl" style={{ background: c.cardAlt }}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <I d={ic.upload} s={14} c={u.progress === 100 ? c.success : c.accentText} />
-                    <p className="text-[11px] font-medium truncate" style={{ color: c.text }}>{u.name}</p>
+              <div key={i} className="p-3.5 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                <div className="flex items-center gap-2.5 mb-2">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: u.progress === 100 ? `${c.success}12` : `${c.accent}12` }}>
+                    <I d={ic.upload} s={14} c={u.progress === 100 ? c.success : c.accent} />
                   </div>
-                  <span className="text-[9px] ml-2" style={{ color: c.textMuted }}>{u.size}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>{u.name}</p>
+                    <p className="text-[9px]" style={{ color: c.textMuted }}>{u.size}</p>
+                  </div>
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md flex-shrink-0" style={{ background: u.progress === 100 ? `${c.success}15` : `${c.accent}12`, color: u.progress === 100 ? c.success : c.accentText }}>{u.status}</span>
                 </div>
                 <div className="h-1.5 rounded-full overflow-hidden" style={{ background: c.border }}>
                   <div className="h-full rounded-full" style={{ width: `${u.progress}%`, background: u.progress === 100 ? c.success : c.accent }} />
                 </div>
-                <span className="text-[8px]" style={{ color: u.progress === 100 ? c.success : c.accentText }}>{u.status}</span>
               </div>
             ))}
           </div>
@@ -4851,33 +4880,52 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
   return (
     <div style={{ display:"flex", height:"100%", overflow:"hidden", fontFamily:dt.font, background:dt.bg }}>
       {/* Sidebar */}
-      <div style={{ width:156, flexShrink:0, display:"flex", flexDirection:"column", background:dt.panel, borderRight:`1px solid ${dt.border}`, overflowY:"auto", scrollbarWidth:"none" }}>
-        {/* Logo */}
-        <div style={{ padding:"16px 16px 12px", borderBottom:`1px solid ${dt.border}`, flexShrink:0 }}>
-          <span style={{ fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em", color:dt.textSec }}>Control Panel</span>
+      <div style={{ width:180, flexShrink:0, display:"flex", flexDirection:"column", background:dt.panel, borderRight:`1px solid ${dt.border}`, overflowY:"auto", scrollbarWidth:"none" as const }}>
+        {/* Header */}
+        <div style={{ padding:"14px 14px 12px", borderBottom:`1px solid ${dt.border}`, flexShrink:0 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6 }}>
+            <div style={{ width:32, height:32, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", background:"linear-gradient(135deg, #6366F1, #4F46E5)", boxShadow:"0 3px 10px rgba(99,102,241,0.3)" }}>
+              <I d={ic.monitor} s={14} c="#fff" />
+            </div>
+            <div>
+              <p style={{ fontSize:12, fontWeight:700, color:dt.text, lineHeight:"1.2" }}>Control Panel</p>
+              <p style={{ fontSize:9, color:dt.textSec }}>System Configuration</p>
+            </div>
+          </div>
+          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+            <div style={{ width:6, height:6, borderRadius:3, background:dt.success }} />
+            <span style={{ fontSize:9, fontWeight:600, color:dt.success }}>All systems operational</span>
+          </div>
         </div>
         {/* Nav */}
-        <div style={{ flex:1, padding:"6px 6px" }}>
-          {sections.map(it => (
-            <button key={it.label}
-              onClick={() => setActiveSection(it.label)}
-              style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"8px 10px", borderRadius:dt.r, background: activeSection===it.label ? dt.hover : "transparent", border:"none", cursor:"pointer", textAlign:"left", marginBottom:2, transition:dt.tr, borderLeft: activeSection===it.label ? `2px solid ${dt.accent}` : "2px solid transparent" }}
-              onMouseEnter={e => { if (activeSection!==it.label) e.currentTarget.style.background=dt.hover; }}
-              onMouseLeave={e => { if (activeSection!==it.label) e.currentTarget.style.background="transparent"; }}
-              onMouseDown={e => (e.currentTarget.style.opacity="0.7")}
-              onMouseUp={e => (e.currentTarget.style.opacity="1")}>
-              <I d={it.icon} s={14} c={activeSection===it.label ? dt.accent : dt.textSec} />
-              <span style={{ fontSize:13, fontWeight: activeSection===it.label ? 500 : 400, color: activeSection===it.label ? dt.text : dt.textSec }}>{it.label}</span>
-            </button>
-          ))}
+        <div style={{ flex:1, padding:"8px 6px" }}>
+          <p style={{ fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", color:dt.textSec, padding:"4px 10px", marginBottom:4 }}>Sections</p>
+          {sections.map(it => {
+            const isActive = activeSection === it.label;
+            return (
+              <button key={it.label}
+                onClick={() => setActiveSection(it.label)}
+                style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"9px 10px", borderRadius:8, background: isActive ? `${dt.accent}12` : "transparent", border:"none", cursor:"pointer", textAlign:"left" as const, marginBottom:2, transition:dt.tr, borderLeft: isActive ? `2px solid ${dt.accent}` : "2px solid transparent" }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background=dt.hover; }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background="transparent"; }}>
+                <div style={{ width:24, height:24, borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", background: isActive ? `${dt.accent}15` : "transparent" }}>
+                  <I d={it.icon} s={13} c={isActive ? dt.accent : dt.textSec} />
+                </div>
+                <span style={{ fontSize:12, fontWeight: isActive ? 600 : 400, color: isActive ? dt.text : dt.textSec }}>{it.label}</span>
+              </button>
+            );
+          })}
         </div>
-        {/* Version */}
-        <div style={{ padding:"10px 16px", borderTop:`1px solid ${dt.border}`, flexShrink:0 }}>
-          <span style={{ fontSize:10, color:dt.textSec, display:"block" }}>v3.0 · x86_64</span>
+        {/* Footer */}
+        <div style={{ padding:"12px 14px", borderTop:`1px solid ${dt.border}`, flexShrink:0 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <span style={{ fontSize:9, color:dt.textSec }}>Alternus OS v3.0</span>
+            <span style={{ fontSize:8, fontWeight:600, padding:"2px 6px", borderRadius:4, background:dt.hover, color:dt.textSec }}>x86_64</span>
+          </div>
         </div>
       </div>
       {/* Content */}
-      <div style={{ flex:1, overflowY:"auto", background:dt.bg, scrollbarWidth:"none" }}>
+      <div style={{ flex:1, overflowY:"auto", background:dt.bg, scrollbarWidth:"none" as const }}>
         {renderContent()}
       </div>
     </div>
@@ -5598,74 +5646,100 @@ function DashboardApp({ c }: { c: typeof palette.dark }) {
 // ━━━━ TASKS APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function TasksApp({ c }: { c: typeof palette.dark }) {
   const [tasks, setTasks] = useState([
-    { id: 1, text: "Finalize gallery redesign", priority: "high" as const, done: false, deadline: "Today", tag: "Design" },
-    { id: 2, text: "Review artist applications", priority: "high" as const, done: false, deadline: "Today", tag: "Review" },
-    { id: 3, text: "Update payment integration", priority: "medium" as const, done: false, deadline: "Tomorrow", tag: "Dev" },
-    { id: 4, text: "Write blog post", priority: "medium" as const, done: true, deadline: "Dec 10", tag: "Content" },
-    { id: 5, text: "Backup database", priority: "low" as const, done: false, deadline: "Dec 15", tag: "Ops" },
-    { id: 6, text: "Send invoice to client", priority: "high" as const, done: true, deadline: "Done", tag: "Finance" },
+    { id: 1, text: "Finalize gallery redesign", desc: "Update layout, typography, and color scheme for the main gallery page", priority: "high" as const, done: false, deadline: "Today", tag: "Design" },
+    { id: 2, text: "Review artist applications", desc: "Evaluate 12 new portfolio submissions for Q1 exhibition", priority: "high" as const, done: false, deadline: "Today", tag: "Review" },
+    { id: 3, text: "Update payment integration", desc: "Migrate from Stripe v2 to v3 API with 3DS authentication", priority: "medium" as const, done: false, deadline: "Tomorrow", tag: "Dev" },
+    { id: 4, text: "Write blog post", desc: "Draft article about emerging digital art trends for newsletter", priority: "medium" as const, done: true, deadline: "Dec 10", tag: "Content" },
+    { id: 5, text: "Backup database", desc: "Run full PostgreSQL backup and verify restore procedure", priority: "low" as const, done: false, deadline: "Dec 15", tag: "Ops" },
+    { id: 6, text: "Send invoice to client", desc: "Generate and send invoice #1042 for commissioned artwork", priority: "high" as const, done: true, deadline: "Done", tag: "Finance" },
   ]);
   const [input, setInput] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "done">("all");
   const priorityColor = { high: c.danger, medium: c.warning, low: c.success };
+  const priorityLabel = { high: "Urgent", medium: "Medium", low: "Low" };
   const filtered = tasks.filter(t => filter === "all" ? true : filter === "done" ? t.done : !t.done);
+  const completedPct = tasks.length > 0 ? Math.round((tasks.filter(t => t.done).length / tasks.length) * 100) : 0;
   const addTask = () => {
     if (!input.trim()) return;
-    setTasks(p => [...p, { id: Date.now(), text: input.trim(), priority: "medium", done: false, deadline: "No deadline", tag: "Task" }]);
+    setTasks(p => [...p, { id: Date.now(), text: input.trim(), desc: "", priority: "medium", done: false, deadline: "No deadline", tag: "Task" }]);
     setInput("");
   };
   return (
     <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      {/* Header */}
       <div className="px-4 pt-4 pb-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <div className="flex items-center gap-2 mb-3">
-          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && addTask()}
-            placeholder="Add a task... (Enter to save)"
-            className="flex-1 text-[11px] px-3 py-2 rounded-lg outline-none"
-            style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
-          <button onClick={addTask} className="px-3 py-2 rounded-lg text-[11px] font-medium" style={{ background: c.accent, color: "#fff" }}>Add</button>
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #10B981, #059669)", boxShadow: "0 3px 12px rgba(16,185,129,0.35)" }}>
+            <I d={ic.checkSquare} s={16} c="#fff" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-[13px] font-bold" style={{ color: c.text }}>Task Manager</h3>
+            <p className="text-[10px]" style={{ color: c.textMuted }}>Organize, prioritize, and track your workflow</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[16px] font-bold" style={{ color: c.accent }}>{completedPct}%</p>
+            <p className="text-[8px]" style={{ color: c.textMuted }}>complete</p>
+          </div>
         </div>
-        <div className="flex gap-1">
+        {/* Progress bar */}
+        <div className="h-1.5 rounded-full mb-3" style={{ background: c.border }}>
+          <div className="h-full rounded-full transition-all" style={{ width: `${completedPct}%`, background: "linear-gradient(90deg, #10B981, #3B82F6)" }} />
+        </div>
+        {/* Add task */}
+        <div className="flex items-center gap-2 mb-2.5">
+          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && addTask()}
+            placeholder="What needs to be done?"
+            className="flex-1 text-[11px] px-3 py-2.5 rounded-xl outline-none"
+            style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
+          <button onClick={addTask} className="px-4 py-2.5 rounded-xl text-[11px] font-semibold transition-all hover:scale-105"
+            style={{ background: c.accent, color: "#fff", boxShadow: `0 2px 8px ${c.accent}40` }}>
+            <I d={ic.plus} s={14} c="#fff" />
+          </button>
+        </div>
+        {/* Filters */}
+        <div className="flex items-center gap-1">
           {(["all", "active", "done"] as const).map(f => (
-            <button key={f} onClick={() => setFilter(f)} className="px-3 py-1 rounded-full text-[10px] font-medium capitalize transition-colors"
+            <button key={f} onClick={() => setFilter(f)} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold capitalize transition-all"
               style={{ background: filter === f ? c.accentSoft : "transparent", color: filter === f ? c.accentText : c.textMuted }}>
-              {f}
+              {f} {f === "all" ? `(${tasks.length})` : f === "active" ? `(${tasks.filter(t => !t.done).length})` : `(${tasks.filter(t => t.done).length})`}
             </button>
           ))}
-          <span className="ml-auto text-[10px] px-2 py-1 rounded-full" style={{ background: c.cardAlt, color: c.textMuted }}>
-            {tasks.filter(t => !t.done).length} remaining
-          </span>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto p-3 space-y-1.5" style={{ scrollbarWidth: "none" }}>
+      {/* Task List */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-2" style={{ scrollbarWidth: "none" }}>
         {filtered.map(task => (
-          <div key={task.id} className="flex items-start gap-3 px-3 py-2.5 rounded-xl transition-colors"
-            style={{ background: c.surface, border: `1px solid ${c.border}`, opacity: task.done ? 0.6 : 1 }}>
+          <div key={task.id} className="flex items-start gap-3 p-3 rounded-xl transition-all"
+            style={{ background: c.surface, border: `1px solid ${task.done ? c.border : `${priorityColor[task.priority]}20`}`, opacity: task.done ? 0.55 : 1 }}>
             <button onClick={() => setTasks(p => p.map(t => t.id === task.id ? { ...t, done: !t.done } : t))}
-              className="mt-0.5 w-4 h-4 rounded flex-shrink-0 flex items-center justify-center transition-colors"
+              className="mt-0.5 w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center transition-all"
               style={{ border: `2px solid ${task.done ? c.success : priorityColor[task.priority]}`, background: task.done ? c.success : "transparent" }}>
-              {task.done && <I d="M20 6L9 17l-5-5" s={10} c="#fff" w={2.5} />}
+              {task.done && <I d="M20 6L9 17l-5-5" s={11} c="#fff" w={2.5} />}
             </button>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-medium leading-snug" style={{ color: c.text, textDecoration: task.done ? "line-through" : "none" }}>{task.text}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: c.cardAlt, color: c.textMuted }}>{task.tag}</span>
-                <span className="text-[9px]" style={{ color: c.textMuted }}>⏰ {task.deadline}</span>
+              <p className="text-[11px] font-semibold leading-snug" style={{ color: c.text, textDecoration: task.done ? "line-through" : "none" }}>{task.text}</p>
+              {task.desc && <p className="text-[9px] mt-0.5 leading-snug" style={{ color: c.textMuted }}>{task.desc}</p>}
+              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: `${priorityColor[task.priority]}15`, color: priorityColor[task.priority] }}>{priorityLabel[task.priority]}</span>
+                <span className="text-[8px] px-1.5 py-0.5 rounded-md" style={{ background: c.cardAlt, color: c.textMuted }}>{task.tag}</span>
+                <span className="text-[8px] flex items-center gap-1" style={{ color: c.textMuted }}><I d={ic.clock} s={8} c={c.textMuted} />{task.deadline}</span>
               </div>
             </div>
-            <div className="w-2 h-2 rounded-full mt-1 flex-shrink-0" style={{ background: priorityColor[task.priority] }} />
+            <button onClick={() => setTasks(p => p.filter(t => t.id !== task.id))} className="p-1 rounded-md flex-shrink-0 transition-colors"
+              style={{ color: c.textMuted }} onMouseEnter={e => { e.currentTarget.style.color = c.danger; }} onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; }}>
+              <I d={ic.trash} s={12} />
+            </button>
           </div>
         ))}
       </div>
-      <div className="px-4 py-2 flex items-center justify-between flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-        <p className="text-[9px]" style={{ color: c.textMuted }}>{tasks.filter(t => t.done).length}/{tasks.length} completed</p>
-        <div className="flex gap-2">
-          {[{ col: c.danger, label: "High" }, { col: c.warning, label: "Med" }, { col: c.success, label: "Low" }].map(p => (
-            <span key={p.label} className="flex items-center gap-1 text-[9px]" style={{ color: c.textMuted }}>
-              <span className="w-1.5 h-1.5 rounded-full" style={{ background: p.col }} />{p.label}
-            </span>
-          ))}
-          <button onClick={() => setTasks(p => p.filter(t => !t.done))} className="text-[9px] px-1.5 py-0.5 rounded" style={{ color: c.danger, background: c.danger + "10" }}>Clear done</button>
-        </div>
+      {/* Footer */}
+      <div className="px-4 py-2.5 flex items-center justify-between flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+        <p className="text-[9px] font-medium" style={{ color: c.textMuted }}>{tasks.filter(t => t.done).length} of {tasks.length} tasks completed</p>
+        <button onClick={() => setTasks(p => p.filter(t => !t.done))} className="text-[9px] font-semibold px-2 py-1 rounded-lg transition-all"
+          style={{ color: c.danger, background: `${c.danger}08` }}
+          onMouseEnter={e => { e.currentTarget.style.background = `${c.danger}15`; }} onMouseLeave={e => { e.currentTarget.style.background = `${c.danger}08`; }}>
+          Clear completed
+        </button>
       </div>
     </div>
   );
@@ -5904,22 +5978,31 @@ function MonacoApp({ c }: { c: typeof palette.dark }) {
 // ━━━━ AI HUB APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AIHubApp({ c }: { c: typeof palette.dark }) {
   const models = [
-    { id: "claude", name: "Claude Opus", company: "Anthropic", color: "#F97316", desc: "Best for reasoning & analysis" },
-    { id: "gpt4", name: "GPT-4o", company: "OpenAI", color: "#10B981", desc: "Best for general tasks" },
-    { id: "gemini", name: "Gemini Ultra", company: "Google", color: "#3B82F6", desc: "Best for multimodal" },
-    { id: "llama", name: "Llama 3.1", company: "Meta", color: "#8B5CF6", desc: "Open source, fast" },
+    { id: "claude", name: "Claude Opus", company: "Anthropic", color: "#F97316", desc: "Advanced reasoning and deep analysis", params: "2T", ctx: "200K", badge: "Flagship" },
+    { id: "gpt4", name: "GPT-4o", company: "OpenAI", color: "#10B981", desc: "Versatile general-purpose intelligence", params: "1.8T", ctx: "128K", badge: "Popular" },
+    { id: "gemini", name: "Gemini Ultra", company: "Google", color: "#3B82F6", desc: "Multimodal vision, audio and text", params: "1.5T", ctx: "1M", badge: "Multimodal" },
+    { id: "llama", name: "Llama 3.1", company: "Meta", color: "#8B5CF6", desc: "Open-source with transparent weights", params: "405B", ctx: "128K", badge: "Open Source" },
   ];
   const [activeModel, setActiveModel] = useState(models[0]);
   const [msgs, setMsgs] = useState<{ role: "user" | "ai"; text: string; model?: string }[]>([
-    { role: "ai", text: `Hello! I'm ${models[0].name} by ${models[0].company}. How can I help you today?`, model: models[0].name },
+    { role: "ai", text: `Hello! I'm ${models[0].name} by ${models[0].company}. I specialize in ${models[0].desc.toLowerCase()}. How can I assist you today?`, model: models[0].name },
   ]);
   const [input, setInput] = useState("");
+  const [tab, setTab] = useState<"chat" | "models" | "capabilities">("chat");
   const responses: Record<string, string[]> = {
     claude: ["I'll analyze that carefully and provide a nuanced response...", "From a reasoning perspective, this involves multiple considerations...", "Let me break this down step by step for you..."],
     gpt4: ["Great question! Here's what I think...", "I can help with that! Let me explain...", "Based on my training, here's a comprehensive answer..."],
     gemini: ["I can process both text and visual information to help...", "Using multimodal analysis, I can see that...", "Let me provide a comprehensive response with multiple perspectives..."],
     llama: ["Processing your request with open-source efficiency...", "Here's my response based on open-source training data...", "As an open model, I'll give you a transparent answer..."],
   };
+  const capabilities = [
+    { icon: ic.messageCircle, title: "Natural Conversation", desc: "Context-aware dialogue with memory across sessions", color: "#3B82F6" },
+    { icon: ic.code, title: "Code Generation", desc: "Write, debug, and refactor code in 50+ languages", color: "#10B981" },
+    { icon: ic.image, title: "Image Analysis", desc: "Understand and describe visual content in detail", color: "#F59E0B" },
+    { icon: ic.fileText, title: "Document Processing", desc: "Summarize, extract, and transform documents", color: "#8B5CF6" },
+    { icon: ic.globe, title: "Research & Analysis", desc: "Deep topic research with source attribution", color: "#EC4899" },
+    { icon: ic.layers, title: "Translation", desc: "Fluent translation across 100+ language pairs", color: "#06B6D4" },
+  ];
   const send = () => {
     if (!input.trim()) return;
     const userMsg = { role: "user" as const, text: input };
@@ -5930,43 +6013,142 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
   };
   return (
     <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      {/* Model selector */}
-      <div className="px-3 py-2.5 flex gap-1.5 overflow-x-auto flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
-        {models.map(m => (
-          <button key={m.id} onClick={() => { setActiveModel(m); setMsgs([{ role: "ai", text: `Hello! I'm ${m.name} by ${m.company}. How can I help you?`, model: m.name }]); }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-medium whitespace-nowrap flex-shrink-0 transition-all"
-            style={{ background: activeModel.id === m.id ? `${m.color}20` : c.surface, color: activeModel.id === m.id ? m.color : c.textMuted, border: `1px solid ${activeModel.id === m.id ? m.color : c.border}` }}>
-            <span className="w-1.5 h-1.5 rounded-full" style={{ background: m.color }} />
-            {m.name}
-          </button>
-        ))}
+      {/* Header */}
+      <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="flex items-center gap-3 mb-2.5">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}CC)`, boxShadow: `0 3px 12px ${activeModel.color}35` }}>
+            <I d={ic.sparkle} s={16} c="#fff" f />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <h3 className="text-[13px] font-bold" style={{ color: c.text }}>AI Foundry</h3>
+              <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider" style={{ background: `${activeModel.color}15`, color: activeModel.color }}>{activeModel.badge}</span>
+            </div>
+            <p className="text-[10px]" style={{ color: c.textMuted }}>Multi-model AI workspace — Switch models, compare outputs, build with AI</p>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
+            <span className="text-[9px] font-medium" style={{ color: c.textMuted }}>Online</span>
+          </div>
+        </div>
+        {/* Tabs */}
+        <div className="flex gap-1">
+          {(["chat", "models", "capabilities"] as const).map(t => (
+            <button key={t} onClick={() => setTab(t)}
+              className="px-3 py-1.5 rounded-lg text-[10px] font-semibold capitalize transition-all"
+              style={{ background: tab === t ? `${activeModel.color}15` : "transparent", color: tab === t ? activeModel.color : c.textMuted }}>
+              {t}
+            </button>
+          ))}
+        </div>
       </div>
-      {/* Active model info */}
-      <div className="px-4 py-2 flex-shrink-0" style={{ background: `${activeModel.color}08`, borderBottom: `1px solid ${c.border}` }}>
-        <p className="text-[10px]" style={{ color: activeModel.color }}>{activeModel.name} · {activeModel.company} — {activeModel.desc}</p>
-      </div>
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2" style={{ scrollbarWidth: "none" }}>
-        {msgs.map((m, i) => (
-          <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className="max-w-[80%] px-3 py-2 rounded-xl text-[11px] leading-relaxed"
-              style={{ background: m.role === "user" ? activeModel.color : c.surface, color: m.role === "user" ? "#fff" : c.text, border: m.role === "ai" ? `1px solid ${c.border}` : "none" }}>
-              {m.role === "ai" && <p className="text-[9px] font-semibold mb-1" style={{ color: activeModel.color }}>{m.model}</p>}
-              {m.text}
+
+      {/* Chat Tab */}
+      {tab === "chat" && (
+        <>
+          {/* Active model bar */}
+          <div className="px-4 py-2 flex items-center gap-3 flex-shrink-0" style={{ background: `${activeModel.color}06`, borderBottom: `1px solid ${c.border}` }}>
+            <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: `${activeModel.color}15` }}>
+              <I d={ic.sparkle} s={10} c={activeModel.color} f />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] font-semibold" style={{ color: activeModel.color }}>{activeModel.name}</p>
+              <p className="text-[8px]" style={{ color: c.textMuted }}>{activeModel.company} \u00B7 {activeModel.params} params \u00B7 {activeModel.ctx} context</p>
+            </div>
+            <div className="flex gap-1">
+              {models.filter(m => m.id !== activeModel.id).slice(0, 2).map(m => (
+                <button key={m.id} onClick={() => { setActiveModel(m); setMsgs([{ role: "ai", text: `Hello! I'm ${m.name}. I specialize in ${m.desc.toLowerCase()}. How can I help?`, model: m.name }]); }}
+                  className="w-6 h-6 rounded-md flex items-center justify-center transition-all hover:scale-110"
+                  title={`Switch to ${m.name}`}
+                  style={{ background: `${m.color}15`, border: `1px solid ${m.color}25` }}>
+                  <span className="w-2 h-2 rounded-full" style={{ background: m.color }} />
+                </button>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-      {/* Input */}
-      <div className="px-3 py-3 flex gap-2 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-        <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
-          placeholder={`Message ${activeModel.name}...`}
-          className="flex-1 text-[11px] px-3 py-2 rounded-lg outline-none"
-          style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
-        <button onClick={send} className="px-3 py-2 rounded-lg text-[11px] font-medium" style={{ background: activeModel.color, color: "#fff" }}>
-          <I d={ic.send} s={14} c="#fff" />
-        </button>
-      </div>
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
+            {msgs.map((m, i) => (
+              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start gap-2.5"}`}>
+                {m.role === "ai" && (
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${activeModel.color}12` }}>
+                    <I d={ic.sparkle} s={12} c={activeModel.color} f />
+                  </div>
+                )}
+                <div className="max-w-[78%]">
+                  {m.role === "ai" && <p className="text-[9px] font-bold mb-1 flex items-center gap-1.5" style={{ color: activeModel.color }}>{m.model}<span className="text-[8px] font-normal" style={{ color: c.textMuted }}>\u00B7 just now</span></p>}
+                  <div className="px-3.5 py-2.5 rounded-2xl text-[11px] leading-relaxed"
+                    style={{ background: m.role === "user" ? activeModel.color : c.surface, color: m.role === "user" ? "#fff" : c.text, border: m.role === "ai" ? `1px solid ${c.border}` : "none", borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px" }}>
+                    {m.text}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Input */}
+          <div className="px-3 py-3 flex gap-2 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+            <button className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+              <I d={ic.upload} s={14} c={c.textMuted} />
+            </button>
+            <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
+              placeholder={`Message ${activeModel.name}...`}
+              className="flex-1 text-[11px] px-3 py-2 rounded-xl outline-none"
+              style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
+            <button onClick={send} className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
+              style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}CC)`, boxShadow: `0 2px 8px ${activeModel.color}40` }}>
+              <I d={ic.send} s={14} c="#fff" />
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Models Tab */}
+      {tab === "models" && (
+        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
+          <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>Available Models</p>
+          {models.map(m => (
+            <button key={m.id} onClick={() => { setActiveModel(m); setTab("chat"); setMsgs([{ role: "ai", text: `Hello! I'm ${m.name}. ${m.desc}. How can I assist?`, model: m.name }]); }}
+              className="w-full flex items-start gap-3 p-3.5 rounded-2xl text-left transition-all"
+              style={{ background: activeModel.id === m.id ? `${m.color}10` : c.surface, border: `1px solid ${activeModel.id === m.id ? `${m.color}40` : c.border}` }}
+              onMouseEnter={e => { if (activeModel.id !== m.id) e.currentTarget.style.borderColor = `${m.color}30`; }}
+              onMouseLeave={e => { if (activeModel.id !== m.id) e.currentTarget.style.borderColor = c.border; }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `linear-gradient(135deg, ${m.color}, ${m.color}BB)` }}>
+                <I d={ic.sparkle} s={16} c="#fff" f />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <p className="text-[12px] font-bold" style={{ color: c.text }}>{m.name}</p>
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: `${m.color}12`, color: m.color }}>{m.badge}</span>
+                </div>
+                <p className="text-[10px] mb-1.5" style={{ color: c.textMuted }}>{m.company} \u2014 {m.desc}</p>
+                <div className="flex gap-3">
+                  <span className="text-[9px] flex items-center gap-1" style={{ color: c.textMuted }}><I d={ic.cpu} s={9} c={c.textMuted} /> {m.params} params</span>
+                  <span className="text-[9px] flex items-center gap-1" style={{ color: c.textMuted }}><I d={ic.layers} s={9} c={c.textMuted} /> {m.ctx} context</span>
+                </div>
+              </div>
+              {activeModel.id === m.id && <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ background: m.color, boxShadow: `0 0 6px ${m.color}60` }} />}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Capabilities Tab */}
+      {tab === "capabilities" && (
+        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
+          <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: c.textMuted }}>AI Capabilities</p>
+          <div className="grid grid-cols-2 gap-2">
+            {capabilities.map((cap, i) => (
+              <div key={i} className="p-3 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style={{ background: `${cap.color}12` }}>
+                  <I d={cap.icon} s={15} c={cap.color} />
+                </div>
+                <p className="text-[11px] font-bold mb-0.5" style={{ color: c.text }}>{cap.title}</p>
+                <p className="text-[9px] leading-snug" style={{ color: c.textMuted }}>{cap.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -6220,20 +6402,20 @@ function WriterApp({ c }: { c: typeof palette.dark }) {
 // ━━━━ KNOWLEDGE BASE APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function KnowledgeApp({ c }: { c: typeof palette.dark }) {
   const docs = [
-    { name: "Artist Guidelines 2024", size: "245 KB", pages: 12, tags: ["policy", "artists"], indexed: true },
-    { name: "Payment Integration Docs", size: "89 KB", pages: 5, tags: ["dev", "payments"], indexed: true },
-    { name: "Gallery Exhibition Plan", size: "1.2 MB", pages: 34, tags: ["gallery", "events"], indexed: true },
-    { name: "Marketing Strategy Q1", size: "560 KB", pages: 18, tags: ["marketing", "strategy"], indexed: false },
-    { name: "Legal Terms & Conditions", size: "120 KB", pages: 8, tags: ["legal"], indexed: true },
+    { name: "Artist Guidelines 2024", size: "245 KB", pages: 12, tags: ["policy", "artists"], indexed: true, icon: ic.fileText, color: "#3B82F6" },
+    { name: "Payment Integration Docs", size: "89 KB", pages: 5, tags: ["dev", "payments"], indexed: true, icon: ic.dollarSign, color: "#10B981" },
+    { name: "Gallery Exhibition Plan", size: "1.2 MB", pages: 34, tags: ["gallery", "events"], indexed: true, icon: ic.image, color: "#8B5CF6" },
+    { name: "Marketing Strategy Q1", size: "560 KB", pages: 18, tags: ["marketing", "strategy"], indexed: false, icon: ic.trendingUp, color: "#F59E0B" },
+    { name: "Legal Terms & Conditions", size: "120 KB", pages: 8, tags: ["legal"], indexed: true, icon: ic.shield, color: "#EF4444" },
   ];
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<{ doc: string; snippet: string; page: number }[]>([]);
+  const [results, setResults] = useState<{ doc: string; snippet: string; page: number; relevance: number }[]>([]);
   const [searching, setSearching] = useState(false);
   const snippets: Record<string, string> = {
     pay: "...payment is processed via Stripe with 3DS authentication. Funds are held for 7 days before release to artists...",
     art: "...artists must submit a portfolio of at least 5 original works. All pieces must be verified authentic...",
     gall: "...the gallery exhibition runs from March 15 to April 30. Artists are required to attend the opening night...",
-    mark: "...Q1 marketing budget is €12,000 with focus on Instagram and Google Ads campaigns targeting collectors...",
+    mark: "...Q1 marketing budget is \u20AC12,000 with focus on Instagram and Google Ads campaigns targeting collectors...",
     legal: "...users agree to our terms of service. Alternus retains a 20% commission on all successful sales...",
   };
   const search = () => {
@@ -6242,70 +6424,109 @@ function KnowledgeApp({ c }: { c: typeof palette.dark }) {
     setTimeout(() => {
       const key = Object.keys(snippets).find(k => query.toLowerCase().includes(k)) ?? "art";
       setResults([
-        { doc: docs[0].name, snippet: snippets[key] ?? snippets.art, page: 3 },
-        { doc: docs[2].name, snippet: "...related context found in the exhibition planning document regarding artists and submissions...", page: 7 },
+        { doc: docs[0].name, snippet: snippets[key] ?? snippets.art, page: 3, relevance: 94 },
+        { doc: docs[2].name, snippet: "...related context found in the exhibition planning document regarding artists and submissions...", page: 7, relevance: 78 },
       ]);
       setSearching(false);
     }, 800);
   };
+  const indexedCount = docs.filter(d => d.indexed).length;
   return (
     <div className="flex h-full" style={{ background: c.bg }}>
-      {/* Document list */}
-      <div className="w-44 flex-shrink-0 flex flex-col" style={{ borderRight: `1px solid ${c.border}` }}>
-        <div className="px-3 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-          <p className="text-[11px] font-semibold" style={{ color: c.text }}>Documents</p>
-          <p className="text-[9px]" style={{ color: c.textMuted }}>{docs.filter(d => d.indexed).length} indexed</p>
+      {/* Sidebar */}
+      <div className="w-52 flex-shrink-0 flex flex-col" style={{ borderRight: `1px solid ${c.border}` }}>
+        <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #F97316, #EA580C)", boxShadow: "0 2px 8px rgba(249,115,22,0.3)" }}>
+              <I d={ic.bookOpen} s={14} c="#fff" />
+            </div>
+            <div>
+              <h3 className="text-[11px] font-bold" style={{ color: c.text }}>Knowledge Base</h3>
+              <p className="text-[9px]" style={{ color: c.textMuted }}>Semantic document search</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-1 rounded-full" style={{ background: c.border }}>
+              <div className="h-full rounded-full" style={{ width: `${(indexedCount / docs.length) * 100}%`, background: c.success }} />
+            </div>
+            <span className="text-[8px] font-bold" style={{ color: c.success }}>{indexedCount}/{docs.length}</span>
+          </div>
         </div>
-        <div className="flex-1 overflow-y-auto p-2 space-y-1" style={{ scrollbarWidth: "none" }}>
+        <div className="flex-1 overflow-y-auto p-2.5 space-y-1.5" style={{ scrollbarWidth: "none" }}>
+          <p className="text-[9px] font-bold uppercase tracking-wider px-1 mb-1" style={{ color: c.textMuted }}>Documents</p>
           {docs.map((d, i) => (
-            <div key={i} className="px-2 py-2 rounded-lg" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <I d={ic.fileText} s={11} c={d.indexed ? c.success : c.textMuted} />
-                <span className="text-[9px] font-medium truncate" style={{ color: c.textSec }}>{d.name}</span>
+            <div key={i} className="px-2.5 py-2.5 rounded-xl transition-all" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: `${d.color}12` }}>
+                  <I d={d.icon} s={11} c={d.color} />
+                </div>
+                <span className="text-[10px] font-semibold truncate flex-1" style={{ color: c.text }}>{d.name}</span>
               </div>
-              <div className="flex gap-1.5">
-                <span className="text-[8px]" style={{ color: c.textMuted }}>{d.size}</span>
-                <span className="text-[8px] px-1 rounded" style={{ background: d.indexed ? `${c.success}20` : c.cardAlt, color: d.indexed ? c.success : c.textMuted }}>{d.indexed ? "indexed" : "pending"}</span>
+              <div className="flex items-center gap-1.5 pl-8">
+                <span className="text-[8px]" style={{ color: c.textMuted }}>{d.size} \u00B7 {d.pages} pages</span>
+                <span className="text-[7px] font-bold px-1 py-0.5 rounded" style={{ background: d.indexed ? `${c.success}15` : `${c.warning}15`, color: d.indexed ? c.success : c.warning }}>
+                  {d.indexed ? "Indexed" : "Pending"}
+                </span>
               </div>
             </div>
           ))}
-          <button className="w-full py-1.5 rounded-lg text-[10px] text-center" style={{ border: `1px dashed ${c.border}`, color: c.textMuted }}>
-            + Add Document
+          <button className="w-full py-2 rounded-xl text-[10px] font-medium text-center flex items-center justify-center gap-1.5 transition-all"
+            style={{ border: `1px dashed ${c.border}`, color: c.textMuted }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = c.accent; e.currentTarget.style.color = c.accentText; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textMuted; }}>
+            <I d={ic.plus} s={12} /> Upload Document
           </button>
         </div>
       </div>
-      {/* Search */}
+      {/* Main */}
       <div className="flex-1 flex flex-col">
-        <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-          <p className="text-[11px] font-semibold mb-2" style={{ color: c.text }}>Semantic Search</p>
+        <div className="px-5 py-4 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <h3 className="text-[12px] font-bold mb-1" style={{ color: c.text }}>Semantic Search</h3>
+          <p className="text-[10px] mb-3" style={{ color: c.textMuted }}>Ask natural language questions across all your indexed documents</p>
           <div className="flex gap-2">
             <input value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => e.key === "Enter" && search()}
-              placeholder="Ask anything about your documents..."
-              className="flex-1 text-[11px] px-3 py-2 rounded-lg outline-none"
+              placeholder="What are the artist submission requirements?"
+              className="flex-1 text-[11px] px-4 py-2.5 rounded-xl outline-none"
               style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
-            <button onClick={search} className="px-3 py-2 rounded-lg" style={{ background: c.accent }}>
-              <I d={ic.search} s={14} c="#fff" />
+            <button onClick={search} className="px-4 py-2.5 rounded-xl flex items-center gap-1.5 text-[11px] font-semibold transition-all hover:scale-105"
+              style={{ background: c.accent, color: "#fff", boxShadow: `0 2px 8px ${c.accent}40` }}>
+              <I d={ic.search} s={13} c="#fff" />
+              Search
             </button>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          {searching && <p className="text-[11px] text-center py-8" style={{ color: c.textMuted }}>Searching knowledge base...</p>}
+          {searching && (
+            <div className="text-center py-10">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3" style={{ background: `${c.accent}12` }}>
+                <I d={ic.search} s={18} c={c.accent} />
+              </div>
+              <p className="text-[11px] font-medium" style={{ color: c.text }}>Searching knowledge base...</p>
+              <p className="text-[9px] mt-1" style={{ color: c.textMuted }}>Analyzing {indexedCount} documents with semantic matching</p>
+            </div>
+          )}
           {results.map((r, i) => (
-            <div key={i} className="rounded-xl p-3" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-              <div className="flex items-center justify-between mb-1.5">
-                <p className="text-[11px] font-semibold" style={{ color: c.text }}>{r.doc}</p>
-                <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: c.cardAlt, color: c.textMuted }}>Page {r.page}</span>
+            <div key={i} className="rounded-xl p-4" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <I d={ic.fileText} s={13} c={c.accent} />
+                  <p className="text-[11px] font-bold" style={{ color: c.text }}>{r.doc}</p>
+                </div>
+                <div className="flex gap-1.5">
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: c.cardAlt, color: c.textMuted }}>Page {r.page}</span>
+                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: r.relevance > 90 ? `${c.success}15` : `${c.accent}12`, color: r.relevance > 90 ? c.success : c.accentText }}>{r.relevance}% match</span>
+                </div>
               </div>
               <p className="text-[10px] leading-relaxed" style={{ color: c.textSec }}>{r.snippet}</p>
-              <div className="flex gap-1 mt-2">
-                <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: `${c.accent}15`, color: c.accentText }}>Relevance: 94%</span>
-              </div>
             </div>
           ))}
           {!searching && results.length === 0 && (
             <div className="text-center py-12">
-              <I d={ic.bookOpen} s={32} c={c.textMuted} />
-              <p className="text-[11px] mt-3" style={{ color: c.textMuted }}>Search your indexed documents with natural language</p>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                <I d={ic.bookOpen} s={26} c={c.textMuted} />
+              </div>
+              <p className="text-[12px] font-bold mb-1" style={{ color: c.text }}>Search Your Knowledge</p>
+              <p className="text-[10px] max-w-[280px] mx-auto" style={{ color: c.textMuted }}>Ask questions in natural language and get instant answers from your indexed documents</p>
             </div>
           )}
         </div>
@@ -6903,9 +7124,7 @@ export default function AlternusOS() {
     { id: "mail", title: "Mail", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 50, w: 580, h: 460 },
     { id: "monaco", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 60, y: 30, w: 600, h: 480 },
     { id: "aihub", title: "AI Hub", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 150, y: 60, w: 480, h: 500 },
-    { id: "imagegen", title: "AI Image Generator", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 40, w: 440, h: 520 },
     { id: "aivoice", title: "AI Voice", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 80, w: 380, h: 440 },
-    { id: "writer", title: "AI Writer", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 40, w: 560, h: 480 },
     { id: "knowledge", title: "Knowledge Base", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 560, h: 480 },
     { id: "sysmon", title: "System Monitor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 500, h: 480 },
     { id: "business", title: "Business Manager", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 30, w: 820, h: 540 },
@@ -7047,9 +7266,7 @@ export default function AlternusOS() {
       mail: { w: 580, h: 460 },
       monaco: { w: 680, h: 500 },
       aihub: { w: 480, h: 500 },
-      imagegen: { w: 440, h: 520 },
       aivoice: { w: 380, h: 440 },
-      writer: { w: 560, h: 480 },
       knowledge: { w: 580, h: 480 },
       sysmon: { w: 500, h: 480 },
       business: { w: 820, h: 540 },
@@ -7332,12 +7549,8 @@ export default function AlternusOS() {
         id: "monaco", title: "Code Editor", icon: ic.code, description: "VS Code-style code editor" },
       { keys: ["ai hub", "multi model", "gpt", "claude", "gemini", "llama", "compare", "model", "chat ai", "ai chat"],
         id: "aihub", title: "AI Hub", icon: ic.messageCircle, description: "Multi-model AI chat hub" },
-      { keys: ["image gen", "generate image", "dalle", "stable diffusion", "midjourney", "text to image", "art ai", "draw ai"],
-        id: "imagegen", title: "AI Image Generator", icon: ic.wand, description: "Generate images with AI" },
       { keys: ["voice", "speech", "microphone", "text to speech", "speech to text", "stt", "tts", "dictate", "transcribe"],
         id: "aivoice", title: "AI Voice", icon: ic.mic, description: "Speech-to-text and text-to-speech" },
-      { keys: ["writer", "ai write", "autocomplete", "document ai", "content", "copywriting", "blog writer", "essay ai"],
-        id: "writer", title: "AI Writer", icon: ic.edit3, description: "Document editor with AI writing assistance" },
       { keys: ["knowledge", "rag", "search docs", "knowledge base", "semantic search", "index", "upload doc", "qa", "document search"],
         id: "knowledge", title: "Knowledge Base", icon: ic.bookOpen, description: "Semantic search over your documents" },
       { keys: ["system monitor", "cpu", "ram", "gpu", "memory", "performance", "processes", "usage", "task manager", "resources", "temperature"],
@@ -7482,9 +7695,7 @@ export default function AlternusOS() {
     mail: <MailApp c={c} />,
     monaco: <MonacoApp c={c} />,
     aihub: <AIHubApp c={c} />,
-    imagegen: <ImageGenApp c={c} />,
     aivoice: <AIVoiceApp c={c} />,
-    writer: <WriterApp c={c} />,
     knowledge: <KnowledgeApp c={c} />,
     sysmon: <SysMonApp c={c} />,
     business: <BusinessApp c={c} />,
@@ -7514,9 +7725,7 @@ export default function AlternusOS() {
     { id: "mail", icon: ic.mail, label: "Mail", color: "#F97316" },
     { id: "monaco", icon: ic.code, label: "VS Code", color: "#007ACC" },
     { id: "aihub", icon: ic.messageCircle, label: "AI Hub", color: "#A78BFA" },
-    { id: "imagegen", icon: ic.wand, label: "Image AI", color: "#EC4899" },
     { id: "aivoice", icon: ic.mic, label: "AI Voice", color: "#FBBF24" },
-    { id: "writer", icon: ic.edit3, label: "AI Writer", color: "#34D399" },
     { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316" },
     { id: "sysmon", icon: ic.activity, label: "System Monitor", color: "#34D399" },
     { id: "business", icon: ic.briefcase, label: "Business", color: "#6366F1" },
@@ -7943,7 +8152,7 @@ export default function AlternusOS() {
                   <div className="w-48 h-32 rounded-xl flex items-center justify-center"
                     style={{ background: activeSpace === n ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.05)", border: `2px solid ${activeSpace === n ? c.accent : "rgba(255,255,255,0.1)"}`, backdropFilter: "blur(8px)" }}>
                     <div className="flex flex-wrap gap-1.5 p-2 justify-center">
-                      {(n === 1 ? ["terminal", "code", "files"] : n === 2 ? ["aihub", "writer", "knowledge"] : ["mail", "tasks", "dashboard"]).map(id => (
+                      {(n === 1 ? ["terminal", "code", "files"] : n === 2 ? ["aihub", "ai", "knowledge"] : ["mail", "tasks", "dashboard"]).map(id => (
                         <div key={id} className="w-6 h-6 rounded-md" style={{ background: `${(dockApps.find(a => a.id === id)?.color) ?? "#666"}30`, border: `1px solid ${(dockApps.find(a => a.id === id)?.color) ?? "#666"}50` }}>
                           <I d={(dockApps.find(a => a.id === id)?.icon) ?? ic.sparkle} s={12} c={(dockApps.find(a => a.id === id)?.color) ?? "#666"} />
                         </div>
