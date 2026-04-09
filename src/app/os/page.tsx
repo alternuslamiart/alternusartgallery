@@ -78,48 +78,48 @@ const aiFileIndex = [
 // ━━━━ Colors ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const palette = {
   dark: {
-    bg: "#242424",
-    surface: "#2C2C2C",
-    card: "#2C2C2C",
-    cardAlt: "#333333",
-    border: "#3A3A3A",
-    text: "#F1F5F9",
-    textSec: "#A0A0A0",
-    textMuted: "#707070",
-    accent: "#3B82F6",
-    accentSoft: "rgba(59,130,246,0.15)",
-    accentText: "#60A5FA",
-    success: "#34D399",
-    successSoft: "rgba(52,211,153,0.15)",
-    warning: "#FBBF24",
-    warningSoft: "rgba(251,191,36,0.15)",
-    danger: "#F87171",
+    bg: "#1C1D22",
+    surface: "#25262D",
+    card: "#2A2B33",
+    cardAlt: "#31323B",
+    border: "#383942",
+    text: "#F0F2F8",
+    textSec: "#A4A8B8",
+    textMuted: "#6B6F82",
+    accent: "#4F8EF7",
+    accentSoft: "rgba(79,142,247,0.13)",
+    accentText: "#6EA5FA",
+    success: "#3DD68C",
+    successSoft: "rgba(61,214,140,0.13)",
+    warning: "#F5B73B",
+    warningSoft: "rgba(245,183,59,0.13)",
+    danger: "#F47272",
     purple: "#A78BFA",
-    purpleSoft: "rgba(167,139,250,0.15)",
-    titlebar: "#2C2C2C",
-    titlebarBorder: "#3A3A3A",
+    purpleSoft: "rgba(167,139,250,0.13)",
+    titlebar: "#25262D",
+    titlebarBorder: "#383942",
   },
   light: {
-    bg: "#F2F2F4",
+    bg: "#F5F6FA",
     surface: "#FFFFFF",
     card: "#FFFFFF",
-    cardAlt: "#EDEDF0",
-    border: "#DDDDE0",
-    text: "#1A1A1A",
-    textSec: "#555555",
-    textMuted: "#888888",
-    accent: "#3B82F6",
-    accentSoft: "rgba(59,130,246,0.12)",
-    accentText: "#2563EB",
-    success: "#10B981",
-    successSoft: "rgba(16,185,129,0.12)",
-    warning: "#F59E0B",
-    warningSoft: "rgba(245,158,11,0.12)",
-    danger: "#EF4444",
+    cardAlt: "#F0F1F5",
+    border: "#E4E5EC",
+    text: "#1A1C28",
+    textSec: "#5A5E72",
+    textMuted: "#8B8FA5",
+    accent: "#4F8EF7",
+    accentSoft: "rgba(79,142,247,0.10)",
+    accentText: "#3672D9",
+    success: "#22C07A",
+    successSoft: "rgba(34,192,122,0.10)",
+    warning: "#E5A117",
+    warningSoft: "rgba(229,161,23,0.10)",
+    danger: "#E85454",
     purple: "#8B5CF6",
-    purpleSoft: "rgba(139,92,246,0.12)",
-    titlebar: "#F0F0F2",
-    titlebarBorder: "#D4D4D8",
+    purpleSoft: "rgba(139,92,246,0.10)",
+    titlebar: "#F0F1F5",
+    titlebarBorder: "#DCDEE6",
   },
 };
 
@@ -323,15 +323,15 @@ function TitleBar({
   const btnBase: React.CSSProperties = {
     width: 26,
     height: 26,
-    borderRadius: 9,
+    borderRadius: 10,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
     overflow: "hidden",
-    background: dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
+    background: dk ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
     border: `1px solid ${dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"}`,
-    transition: "all 0.2s ease",
+    transition: "all 0.22s cubic-bezier(0.4,0,0.2,1)",
     cursor: "pointer",
   };
 
@@ -540,22 +540,22 @@ function AppWindow({
     <div
       style={{
         ...style,
-        background: isAI ? "transparent" : isDark ? "rgba(36,36,36,0.6)" : "rgba(255,255,255,0.6)",
-        backdropFilter: isAI ? "none" : "blur(20px) saturate(1.4)",
-        WebkitBackdropFilter: isAI ? "none" : "blur(20px) saturate(1.4)",
-        border: isAI ? "none" : isDragOver ? `1px solid ${c.accent}` : `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
-        borderRadius: 16,
+        background: isAI ? "transparent" : isDark ? "rgba(30,31,38,0.72)" : "rgba(255,255,255,0.68)",
+        backdropFilter: isAI ? "none" : "blur(28px) saturate(1.5)",
+        WebkitBackdropFilter: isAI ? "none" : "blur(28px) saturate(1.5)",
+        border: isAI ? "none" : isDragOver ? `1px solid ${c.accent}` : `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)"}`,
+        borderRadius: 18,
         boxShadow: isAI ? "none" : isDark
-          ? "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)"
-          : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)",
+          ? "0 12px 40px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.04)"
+          : "0 12px 40px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.6)",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
         transition: "box-shadow 0.2s ease, border-color 0.15s ease",
         pointerEvents: isAI ? "none" : "auto",
       }}
-      onMouseEnter={e => { if (!isAI) { e.currentTarget.style.boxShadow = isDark ? "0 12px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)" : "0 12px 48px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.6)"; } }}
-      onMouseLeave={e => { if (!isAI) { e.currentTarget.style.boxShadow = isDark ? "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)"; } }}
+      onMouseEnter={e => { if (!isAI) { e.currentTarget.style.boxShadow = isDark ? "0 16px 56px rgba(0,0,0,0.45), 0 3px 10px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)" : "0 16px 56px rgba(0,0,0,0.10), 0 3px 8px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.7)"; } }}
+      onMouseLeave={e => { if (!isAI) { e.currentTarget.style.boxShadow = isDark ? "0 12px 40px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 12px 40px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.6)"; } }}
       onClick={isAI ? undefined : onFocus}
       onDragOver={onFileDrop ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; setIsDragOver(true); } : undefined}
       onDragLeave={onFileDrop ? () => setIsDragOver(false) : undefined}
@@ -572,8 +572,8 @@ function AppWindow({
         onForceQuit={onForceQuit}
         mode={mode}
       />}
-      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: isAI ? 0 : "6px", pointerEvents: isAI ? "auto" : undefined }}>
-        <div style={{ background: isAI ? "transparent" : isDark ? "rgba(44,44,44,0.5)" : "rgba(255,255,255,0.45)", borderRadius: isAI ? 0 : 12, border: isAI ? "none" : `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)"}`, height: "100%", overflow: "auto", position: "relative" }}>
+      <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: isAI ? 0 : "0 6px 6px 6px", pointerEvents: isAI ? "auto" : undefined }}>
+        <div style={{ background: isAI ? "transparent" : isDark ? "rgba(37,38,45,0.6)" : "rgba(255,255,255,0.5)", borderRadius: isAI ? 0 : 14, border: isAI ? "none" : `1px solid ${isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)"}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
         {/* Drag-over file drop overlay */}
         {isDragOver && onFileDrop && (
@@ -1029,6 +1029,20 @@ function TerminalApp({ c }: { c: typeof palette.dark }) {
 
   return (
     <div className="flex flex-col h-full font-mono" style={{ background: "#0A0A0C" }} onClick={() => inputRef.current?.focus()}>
+      {/* Header */}
+      <div className="flex items-center gap-2.5 px-3 py-2 flex-shrink-0" style={{ background: "#101014", borderBottom: "1px solid #1E1E28" }}>
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #34D399, #059669)" }}>
+          <I d={ic.terminal} s={13} c="#fff" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[11px] font-bold" style={{ color: "#A0D9A0" }}>Terminal</p>
+          <p className="text-[8px]" style={{ color: "#5A6A5A" }}>AI-powered shell environment</p>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#34D399" }} />
+          <span className="text-[8px]" style={{ color: "#5A6A5A" }}>bash</span>
+        </div>
+      </div>
       {/* Tab bar */}
       <div className="flex items-center flex-shrink-0" style={{ background: "#101014", borderBottom: "1px solid #2A2A35" }}>
         {tabs.map(t => (
@@ -1106,7 +1120,22 @@ function MusicApp({ c }: { c: typeof palette.dark }) {
   const totalDur = tracks.reduce((s, t) => { const [m, sec] = t.dur.split(":").map(Number); return s + m * 60 + sec; }, 0);
 
   return (
-    <div className="flex h-full" style={{ background: c.bg }}>
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #F472B6, #DB2777)", boxShadow: "0 3px 12px rgba(244,114,182,0.3)" }}>
+          <I d={ic.music} s={16} c="#fff" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-[13px] font-bold" style={{ color: c.text }}>Music</h3>
+          <p className="text-[10px]" style={{ color: c.textMuted }}>Curated playlists and ambient sounds</p>
+        </div>
+        <div className="flex items-center gap-1.5">
+          {playing && <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#F472B6", boxShadow: "0 0 6px rgba(244,114,182,0.5)" }} />}
+          <span className="text-[9px] font-medium" style={{ color: c.textMuted }}>{tracks.length} tracks</span>
+        </div>
+      </div>
+      <div className="flex flex-1 min-h-0">
       {/* Sidebar — playlists */}
       <div className="w-[140px] flex-shrink-0 flex flex-col py-3 border-r" style={{ borderColor: c.border, background: c.surface }}>
         <p className="px-3 text-[9px] font-semibold uppercase tracking-wider mb-2" style={{ color: c.textMuted }}>Playlists</p>
@@ -1187,6 +1216,7 @@ function MusicApp({ c }: { c: typeof palette.dark }) {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
@@ -2415,7 +2445,19 @@ function NotesApp({ c }: { c: typeof palette.dark }) {
   const words = active ? active.text.trim().split(/\s+/).filter(Boolean).length : 0;
 
   return (
-    <div className="flex h-full" style={{ background: c.bg }}>
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #FBBF24, #D97706)", boxShadow: "0 3px 12px rgba(251,191,36,0.3)" }}>
+          <I d={ic.note} s={16} c="#fff" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-[13px] font-bold" style={{ color: c.text }}>Notes</h3>
+          <p className="text-[10px]" style={{ color: c.textMuted }}>Quick notes, ideas, and documents</p>
+        </div>
+        <span className="text-[9px] font-bold px-2 py-1 rounded-lg" style={{ background: c.cardAlt, color: c.textMuted }}>{notes.length} notes</span>
+      </div>
+      <div className="flex flex-1 min-h-0">
       {/* Sidebar — note list */}
       <div className="w-[220px] flex-shrink-0 flex flex-col border-r" style={{ borderColor: c.border, background: c.surface }}>
         {/* Search + new */}
@@ -2503,6 +2545,7 @@ function NotesApp({ c }: { c: typeof palette.dark }) {
             <p className="text-[12px]" style={{ color: c.textMuted }}>Select a note or create a new one</p>
           </div>
         )}
+      </div>
       </div>
     </div>
   );
@@ -5001,6 +5044,17 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
 
   return (
     <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #EF4444, #DC2626)", boxShadow: "0 3px 12px rgba(239,68,68,0.3)" }}>
+          <I d={ic.newspaper} s={16} c="#fff" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-[13px] font-bold" style={{ color: c.text }}>News</h3>
+          <p className="text-[10px]" style={{ color: c.textMuted }}>Real-time headlines and world updates</p>
+        </div>
+        <span className="text-[9px] font-bold px-2 py-1 rounded-lg" style={{ background: c.cardAlt, color: c.textMuted }}>Live</span>
+      </div>
       {/* Breaking news bar — solid red */}
       {currentArticles.some(a => a.breaking) && (
         <div className="px-3 py-1.5 flex items-center gap-2 flex-shrink-0" style={{ background: "#EF4444" }}>
@@ -5377,19 +5431,29 @@ function SysMonApp({ c }: { c: typeof palette.dark }) {
 
   return (
     <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #34D399, #059669)", boxShadow: "0 3px 12px rgba(52,211,153,0.3)" }}>
+          <I d={ic.activity} s={16} c="#fff" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-[13px] font-bold" style={{ color: c.text }}>System Monitor</h3>
+          <p className="text-[10px]" style={{ color: c.textMuted }}>Real-time hardware performance metrics</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[9px] font-bold px-2 py-1 rounded-lg flex items-center gap-1" style={{ background: `${c.success}12`, color: c.success }}><div className="w-1.5 h-1.5 rounded-full" style={{ background: c.success, boxShadow: `0 0 6px ${c.success}` }} />Live</span>
+          <span className="text-[9px] font-bold px-2 py-1 rounded-lg" style={{ background: c.cardAlt, color: c.textMuted }}>{stats.temp}°C</span>
+        </div>
+      </div>
       {/* Tabs */}
       <div className="flex flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
         {[{ id: "overview", label: "Overview" }, { id: "processes", label: "Processes" }].map(t => (
           <button key={t.id} onClick={() => setActiveTab(t.id as "overview" | "processes")}
-            className="px-4 py-2.5 text-[11px] font-medium transition-colors"
+            className="px-4 py-2 text-[11px] font-medium transition-colors"
             style={{ color: activeTab === t.id ? c.text : c.textMuted, borderBottom: activeTab === t.id ? `2px solid ${c.accent}` : "2px solid transparent", marginBottom: "-1px" }}>
             {t.label}
           </button>
         ))}
-        <div className="ml-auto flex items-center px-3 gap-2">
-          <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: `${c.success}20`, color: c.success }}>● Live</span>
-          <span className="text-[10px]" style={{ color: c.textMuted }}>{stats.temp}°C</span>
-        </div>
       </div>
 
       {activeTab === "overview" ? (
@@ -5788,7 +5852,23 @@ function MailApp({ c }: { c: typeof palette.dark }) {
   };
 
   return (
-    <div className="flex h-full" style={{ background: c.bg }}>
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #F97316, #EA580C)", boxShadow: "0 3px 12px rgba(249,115,22,0.3)" }}>
+          <I d={ic.mail} s={16} c="#fff" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-[13px] font-bold" style={{ color: c.text }}>Mail</h3>
+          <p className="text-[10px]" style={{ color: c.textMuted }}>Messages and conversations</p>
+        </div>
+        {contacts.some(ct => ct.unread > 0) && (
+          <span className="text-[9px] font-bold px-2 py-1 rounded-lg" style={{ background: `${c.danger}15`, color: c.danger }}>
+            {contacts.reduce((s, ct) => s + ct.unread, 0)} new
+          </span>
+        )}
+      </div>
+      <div className="flex flex-1 min-h-0">
       {/* ── Left sidebar: contact list ── */}
       <div className="flex-shrink-0 flex flex-col" style={{ width: 200, borderRight: `1px solid ${c.border}` }}>
         {/* Search */}
@@ -5910,6 +5990,7 @@ function MailApp({ c }: { c: typeof palette.dark }) {
             <I d={ic.send} s={14} c="#fff" />
           </button>
         </div>
+      </div>
       </div>
     </div>
   );
