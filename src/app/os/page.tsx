@@ -7332,6 +7332,40 @@ export default function AlternusOS() {
           </div>
         )}
 
+        {/* ━━━━ Search Button — top center ━━━━ */}
+        <button
+          onClick={() => { setShowSpotlight(true); setSpotlightQuery(""); }}
+          className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-200"
+          style={{
+            background: mode === "dark" ? "rgba(30,30,30,0.55)" : "rgba(255,255,255,0.5)",
+            backdropFilter: "blur(20px) saturate(1.4)",
+            WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+            border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
+            boxShadow: mode === "dark"
+              ? "0 4px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05)"
+              : "0 4px 20px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)",
+            color: c.textMuted,
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = mode === "dark" ? "rgba(40,40,40,0.7)" : "rgba(255,255,255,0.7)";
+            e.currentTarget.style.boxShadow = mode === "dark"
+              ? "0 6px 28px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)"
+              : "0 6px 28px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.6)";
+            e.currentTarget.style.transform = "translateX(-50%) scale(1.03)";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = mode === "dark" ? "rgba(30,30,30,0.55)" : "rgba(255,255,255,0.5)";
+            e.currentTarget.style.boxShadow = mode === "dark"
+              ? "0 4px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05)"
+              : "0 4px 20px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)";
+            e.currentTarget.style.transform = "translateX(-50%) scale(1)";
+          }}
+        >
+          <I d={ic.search} s={15} />
+          <span className="text-[12px] font-medium" style={{ color: c.textMuted }}>Search</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-md ml-1" style={{ background: mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", color: c.textMuted }}>⌘K</span>
+        </button>
+
         {/* ━━━━ Bottom Dock Bar — fixed, 3D icons ━━━━ */}
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[50]" onClick={e => e.stopPropagation()}>
           <div
