@@ -6275,6 +6275,7 @@ export default function AlternusOS() {
     { id: "writer", title: "AI Writer", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 40, w: 560, h: 480 },
     { id: "knowledge", title: "Knowledge Base", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 560, h: 480 },
     { id: "sysmon", title: "System Monitor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 500, h: 480 },
+    { id: "business", title: "Business Manager", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 30, w: 820, h: 540 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -6427,7 +6428,7 @@ export default function AlternusOS() {
           // Fixed positions: Weather top-right, Calendar top-right, others center
           const x = id === "weather" ? sw - s.w - 10 : id === "calendar" ? sw - s.w - 10 : Math.max(0, Math.floor((sw - s.w) / 2));
           const y = id === "weather" ? 10 : id === "calendar" ? 10 : Math.max(0, Math.floor((sh - s.h) / 2));
-          return { ...w, isOpen: true, isMinimized: false, zIndex: zCounter + 1, x, y, w: s.w, h: s.h };
+          return { ...w, isOpen: true, isMinimized: false, isMaximized: true, zIndex: zCounter + 1, x, y, w: s.w, h: s.h };
         }
         if (w.isMinimized) return { ...w, isMinimized: false, zIndex: zCounter + 1 };
         return { ...w, zIndex: zCounter + 1 };
