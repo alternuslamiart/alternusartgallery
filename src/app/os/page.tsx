@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news" | "dashboard" | "tasks" | "mail" | "monaco" | "aihub" | "imagegen" | "aivoice" | "writer" | "knowledge" | "sysmon";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news" | "dashboard" | "tasks" | "mail" | "monaco" | "aihub" | "imagegen" | "aivoice" | "writer" | "knowledge" | "sysmon" | "business";
 
 interface WinState {
   id: WinId;
@@ -241,6 +241,12 @@ const ic = {
   activity: "M22 12h-4l-3 9L9 3l-3 9H2",
   layers: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5",
   zap: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
+  briefcase: "M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2M2 13h20",
+  dollarSign: "M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6",
+  trendingUp: "M23 6l-9.5 9.5-5-5L1 18",
+  users: "M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 3a4 4 0 100 8 4 4 0 000-8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75",
+  fileInvoice: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M8 13h8M8 17h8M8 9h2",
+  barChart: "M18 20V10M12 20V4M6 20v-6",
 };
 
 // ━━━━ Window Title Bar ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -892,134 +898,6 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
           </>
       </div>
 
-      {/* Right sidebar — Icon bar with border + expandable panel */}
-      <div className="flex-shrink-0 flex" style={{ borderLeft: `1px solid ${c.border}` }}>
-        {/* Icon strip */}
-        <div className="w-[52px] flex flex-col items-center py-4 gap-1" style={{ background: c.surface }}>
-          {/* Alternus AI icon */}
-          <img src="/alternus-os.png" alt="Alternus AI" className="w-8 h-8 rounded-full object-cover mb-1" />
-
-          {/* New chat button */}
-          <button onClick={newChat} className="w-10 h-10 rounded-xl flex items-center justify-center transition-all relative group" style={{ background: c.accent }} title="New chat">
-            <I d={ic.plus} s={18} c="#fff" />
-            <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50"
-              style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-              New chat
-            </span>
-          </button>
-
-          <div className="w-6 my-1" style={{ borderTop: `1px solid ${c.border}` }} />
-
-          {/* App icons */}
-          {[
-            { label: "Code Editor", icon: ic.code, id: "code" as WinId },
-            { label: "Music", icon: ic.music, id: "music" as WinId },
-            { label: "Weather", icon: ic.cloud, id: "weather" as WinId },
-            { label: "Calendar", icon: ic.calendar, id: "calendar" as WinId },
-            { label: "Notes", icon: ic.note, id: "notes" as WinId },
-            { label: "Word", icon: ic.fileText, id: "word" as WinId },
-            { label: "Store", icon: ic.store, id: "store" as WinId },
-            { label: "Movies", icon: ic.film, id: "movies" as WinId },
-            { label: "Calculator", icon: ic.calc, id: "calculator" as WinId },
-            { label: "Downloads", icon: ic.download, id: "downloads" as WinId },
-          ].map(item => (
-            <button key={item.label} onClick={() => { if (onOpenApp) onOpenApp(item.id); }}
-              className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
-              style={{ color: c.textMuted }}
-              title={item.label}
-              onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-              <I d={item.icon} s={16} />
-              <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50"
-                style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-                {item.label}
-              </span>
-            </button>
-          ))}
-
-          <div className="w-6 my-1" style={{ borderTop: `1px solid ${c.border}` }} />
-
-          {/* System icons */}
-          {[
-            { label: "Control Panel", icon: ic.monitor, id: "controlpanel" as WinId },
-            { label: "Settings", icon: ic.settings, id: "settings" as WinId },
-            { label: "Accounts", icon: ic.user, id: "accounts" as WinId },
-          ].map(item => (
-            <button key={item.label} onClick={() => { if (onOpenApp) onOpenApp(item.id); }}
-              className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
-              style={{ color: c.textMuted }}
-              title={item.label}
-              onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-              <I d={item.icon} s={16} />
-              <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50"
-                style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-                {item.label}
-              </span>
-            </button>
-          ))}
-
-          <div className="flex-1" />
-
-          <div className="w-6 my-1" style={{ borderTop: `1px solid ${c.border}` }} />
-
-          {/* Bottom icons: profile, wifi, power, expand */}
-          <button onClick={() => setShowAccount(!showAccount)}
-            className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
-            style={{ color: c.textMuted }}
-            title="My account"
-            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-            <I d={ic.user} s={16} />
-            <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50"
-              style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-              My account
-            </span>
-          </button>
-
-          <button onClick={() => send("Fix WiFi")}
-            className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
-            style={{ color: c.textMuted }}
-            title="WiFi"
-            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-            <I d={ic.wifi} s={16} />
-            <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50"
-              style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-              WiFi
-            </span>
-          </button>
-
-          <button onClick={() => { if (onOpenApp) onOpenApp("settings"); }}
-            className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
-            style={{ color: c.textMuted }}
-            title="Power"
-            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-            <I d={ic.power} s={16} />
-            <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50"
-              style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-              Power
-            </span>
-          </button>
-
-          {/* Arrow up-down */}
-          <button
-            className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative group"
-            style={{ color: c.textMuted }}
-            title="Expand"
-            onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.text; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-            <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 5l-5 5h10zM12 19l-5-5h10z" />
-            </svg>
-            <span className="absolute right-full mr-2 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50"
-              style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}`, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
-              Expand
-            </span>
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
@@ -5970,6 +5848,336 @@ function RecoveryApp({ c, files, onRecover, onPermanentDelete, onScan }: {
   );
 }
 
+// ━━━━ BUSINESS MANAGER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function BusinessApp({ c }: { c: typeof palette.dark }) {
+  type Tab = "dashboard" | "clients" | "invoices" | "projects";
+  const [tab, setTab] = useState<Tab>("dashboard");
+  const [clients] = useState([
+    { id: 1, name: "Acme Corp", contact: "John Smith", email: "john@acme.com", revenue: 48500, status: "active" as const, deals: 3 },
+    { id: 2, name: "TechFlow Inc", contact: "Sarah Lee", email: "sarah@techflow.io", revenue: 32000, status: "active" as const, deals: 2 },
+    { id: 3, name: "GlobalNet", contact: "Mike Chen", email: "mike@globalnet.com", revenue: 19200, status: "lead" as const, deals: 1 },
+    { id: 4, name: "DataPrime", contact: "Ana Torres", email: "ana@dataprime.co", revenue: 67800, status: "active" as const, deals: 5 },
+    { id: 5, name: "CloudAxis", contact: "Omar Patel", email: "omar@cloudaxis.dev", revenue: 12400, status: "lead" as const, deals: 1 },
+    { id: 6, name: "NovaBuild", contact: "Lena Ivanova", email: "lena@novabuild.eu", revenue: 55100, status: "active" as const, deals: 4 },
+    { id: 7, name: "Zentrix Labs", contact: "James Park", email: "james@zentrix.ai", revenue: 8900, status: "inactive" as const, deals: 0 },
+    { id: 8, name: "Meridian Group", contact: "Fatima Al-Rashid", email: "fatima@meridian.sa", revenue: 91200, status: "active" as const, deals: 7 },
+  ]);
+  const [invoices] = useState([
+    { id: "INV-001", client: "Acme Corp", amount: 12500, date: "2026-04-01", due: "2026-04-30", status: "paid" as const },
+    { id: "INV-002", client: "TechFlow Inc", amount: 8400, date: "2026-03-28", due: "2026-04-28", status: "pending" as const },
+    { id: "INV-003", client: "DataPrime", amount: 24000, date: "2026-03-15", due: "2026-04-15", status: "overdue" as const },
+    { id: "INV-004", client: "NovaBuild", amount: 15600, date: "2026-04-05", due: "2026-05-05", status: "pending" as const },
+    { id: "INV-005", client: "GlobalNet", amount: 6200, date: "2026-04-08", due: "2026-05-08", status: "draft" as const },
+    { id: "INV-006", client: "Meridian Group", amount: 31000, date: "2026-03-20", due: "2026-04-20", status: "paid" as const },
+    { id: "INV-007", client: "Acme Corp", amount: 18700, date: "2026-04-02", due: "2026-05-02", status: "pending" as const },
+    { id: "INV-008", client: "CloudAxis", amount: 4800, date: "2026-03-10", due: "2026-04-10", status: "overdue" as const },
+  ]);
+  const [projects] = useState([
+    { id: 1, name: "Website Redesign", client: "Acme Corp", progress: 78, budget: 25000, spent: 19500, deadline: "2026-05-15", status: "on-track" as const },
+    { id: 2, name: "Mobile App v2", client: "TechFlow Inc", progress: 45, budget: 60000, spent: 27000, deadline: "2026-06-30", status: "on-track" as const },
+    { id: 3, name: "Data Migration", client: "DataPrime", progress: 92, budget: 18000, spent: 17200, deadline: "2026-04-20", status: "at-risk" as const },
+    { id: 4, name: "Cloud Infrastructure", client: "NovaBuild", progress: 30, budget: 45000, spent: 13500, deadline: "2026-07-01", status: "on-track" as const },
+    { id: 5, name: "API Integration", client: "GlobalNet", progress: 15, budget: 12000, spent: 1800, deadline: "2026-05-30", status: "on-track" as const },
+    { id: 6, name: "ERP System", client: "Meridian Group", progress: 60, budget: 120000, spent: 72000, deadline: "2026-09-01", status: "at-risk" as const },
+  ]);
+
+  const totalRevenue = clients.reduce((s, cl) => s + cl.revenue, 0);
+  const activeClients = clients.filter(cl => cl.status === "active").length;
+  const pendingInvoices = invoices.filter(inv => inv.status === "pending" || inv.status === "overdue");
+  const pendingAmount = pendingInvoices.reduce((s, inv) => s + inv.amount, 0);
+  const activeProjects = projects.filter(p => p.progress < 100).length;
+
+  const fmt = (n: number) => "$" + n.toLocaleString();
+
+  const statusColor = (s: string) => {
+    switch (s) {
+      case "active": case "paid": case "on-track": return c.success;
+      case "lead": case "pending": case "draft": return c.warning;
+      case "inactive": case "overdue": case "at-risk": return c.danger;
+      default: return c.textMuted;
+    }
+  };
+
+  const tabs: { id: Tab; label: string; icon: string }[] = [
+    { id: "dashboard", label: "Dashboard", icon: ic.barChart },
+    { id: "clients", label: "Clients", icon: ic.users },
+    { id: "invoices", label: "Invoices", icon: ic.fileInvoice },
+    { id: "projects", label: "Projects", icon: ic.layers },
+  ];
+
+  const revenueByMonth = [
+    { month: "Nov", value: 42000 },
+    { month: "Dec", value: 38000 },
+    { month: "Jan", value: 51000 },
+    { month: "Feb", value: 47000 },
+    { month: "Mar", value: 63000 },
+    { month: "Apr", value: 55000 },
+  ];
+  const maxRevenue = Math.max(...revenueByMonth.map(r => r.value));
+
+  return (
+    <div className="flex h-full" style={{ background: c.bg, color: c.text }}>
+      {/* Sidebar nav */}
+      <div className="w-[200px] flex-shrink-0 flex flex-col border-r py-4" style={{ borderColor: c.border, background: c.surface }}>
+        <div className="px-4 mb-4 flex items-center gap-2">
+          <I d={ic.briefcase} s={20} c={c.accent} />
+          <span className="font-semibold text-sm">Business Manager</span>
+        </div>
+        <div className="flex flex-col gap-0.5 px-2">
+          {tabs.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors text-left"
+              style={{ background: tab === t.id ? c.cardAlt : "transparent", color: tab === t.id ? c.text : c.textMuted }}>
+              <I d={t.icon} s={15} />
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex-1" />
+        <div className="px-4 py-3 mx-3 rounded-xl text-[11px]" style={{ background: c.cardAlt }}>
+          <div className="font-semibold text-[12px] mb-1" style={{ color: c.text }}>Quick Stats</div>
+          <div style={{ color: c.textMuted }}>{activeClients} active clients</div>
+          <div style={{ color: c.textMuted }}>{activeProjects} active projects</div>
+          <div style={{ color: c.warning }}>{pendingInvoices.length} pending invoices</div>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 overflow-y-auto p-5">
+        {tab === "dashboard" && (
+          <div>
+            <h2 className="text-lg font-bold mb-4">Business Overview</h2>
+            {/* KPI cards */}
+            <div className="grid grid-cols-4 gap-3 mb-5">
+              {[
+                { label: "Total Revenue", value: fmt(totalRevenue), icon: ic.dollarSign, color: c.success, sub: "+12.5% from last month" },
+                { label: "Active Clients", value: String(activeClients), icon: ic.users, color: c.accent, sub: `${clients.length} total` },
+                { label: "Pending Amount", value: fmt(pendingAmount), icon: ic.fileInvoice, color: c.warning, sub: `${pendingInvoices.length} invoices` },
+                { label: "Active Projects", value: String(activeProjects), icon: ic.layers, color: c.purple, sub: `${projects.length} total` },
+              ].map((kpi, i) => (
+                <div key={i} className="rounded-xl p-4 border" style={{ background: c.card, borderColor: c.border }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-medium" style={{ color: c.textMuted }}>{kpi.label}</span>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: kpi.color + "18" }}>
+                      <I d={kpi.icon} s={15} c={kpi.color} />
+                    </div>
+                  </div>
+                  <div className="text-xl font-bold mb-0.5">{kpi.value}</div>
+                  <div className="text-[11px]" style={{ color: c.textMuted }}>{kpi.sub}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Revenue chart + Recent invoices */}
+            <div className="grid grid-cols-2 gap-4 mb-5">
+              {/* Revenue chart */}
+              <div className="rounded-xl border p-4" style={{ background: c.card, borderColor: c.border }}>
+                <div className="text-[13px] font-semibold mb-3">Monthly Revenue</div>
+                <div className="flex items-end gap-2 h-[140px]">
+                  {revenueByMonth.map((r, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                      <div className="text-[10px] font-medium" style={{ color: c.textMuted }}>{fmt(r.value).replace("$", "")}</div>
+                      <div className="w-full rounded-t-md transition-all"
+                        style={{ height: `${(r.value / maxRevenue) * 100}px`, background: i === revenueByMonth.length - 1 ? c.accent : c.accent + "50" }} />
+                      <div className="text-[10px]" style={{ color: c.textMuted }}>{r.month}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Recent invoices */}
+              <div className="rounded-xl border p-4" style={{ background: c.card, borderColor: c.border }}>
+                <div className="text-[13px] font-semibold mb-3">Recent Invoices</div>
+                <div className="flex flex-col gap-2">
+                  {invoices.slice(0, 5).map(inv => (
+                    <div key={inv.id} className="flex items-center justify-between py-1.5 px-2 rounded-lg" style={{ background: c.cardAlt }}>
+                      <div>
+                        <div className="text-[12px] font-medium">{inv.id}</div>
+                        <div className="text-[11px]" style={{ color: c.textMuted }}>{inv.client}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[12px] font-semibold">{fmt(inv.amount)}</div>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: statusColor(inv.status) + "20", color: statusColor(inv.status) }}>
+                          {inv.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Project progress */}
+            <div className="rounded-xl border p-4" style={{ background: c.card, borderColor: c.border }}>
+              <div className="text-[13px] font-semibold mb-3">Project Progress</div>
+              <div className="grid grid-cols-3 gap-3">
+                {projects.map(p => (
+                  <div key={p.id} className="rounded-lg p-3 border" style={{ borderColor: c.border, background: c.cardAlt }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-[12px] font-semibold">{p.name}</div>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: statusColor(p.status) + "20", color: statusColor(p.status) }}>
+                        {p.status.replace("-", " ")}
+                      </span>
+                    </div>
+                    <div className="text-[11px] mb-2" style={{ color: c.textMuted }}>{p.client}</div>
+                    <div className="w-full h-1.5 rounded-full mb-1" style={{ background: c.border }}>
+                      <div className="h-full rounded-full transition-all" style={{ width: `${p.progress}%`, background: statusColor(p.status) }} />
+                    </div>
+                    <div className="flex justify-between text-[10px]" style={{ color: c.textMuted }}>
+                      <span>{p.progress}%</span>
+                      <span>{fmt(p.spent)} / {fmt(p.budget)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === "clients" && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold">Clients</h2>
+              <button className="px-3 py-1.5 rounded-lg text-[12px] font-medium flex items-center gap-1.5" style={{ background: c.accent, color: "#fff" }}>
+                <I d={ic.plus} s={13} c="#fff" /> Add Client
+              </button>
+            </div>
+            <div className="rounded-xl border overflow-hidden" style={{ borderColor: c.border }}>
+              <table className="w-full text-[12px]">
+                <thead>
+                  <tr style={{ background: c.cardAlt }}>
+                    {["Company", "Contact", "Email", "Revenue", "Deals", "Status"].map(h => (
+                      <th key={h} className="text-left px-4 py-2.5 font-semibold" style={{ color: c.textMuted, borderBottom: `1px solid ${c.border}` }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {clients.map(cl => (
+                    <tr key={cl.id} className="transition-colors" style={{ borderBottom: `1px solid ${c.border}` }}
+                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <td className="px-4 py-2.5 font-medium">{cl.name}</td>
+                      <td className="px-4 py-2.5" style={{ color: c.textMuted }}>{cl.contact}</td>
+                      <td className="px-4 py-2.5" style={{ color: c.accent }}>{cl.email}</td>
+                      <td className="px-4 py-2.5 font-semibold">{fmt(cl.revenue)}</td>
+                      <td className="px-4 py-2.5">{cl.deals}</td>
+                      <td className="px-4 py-2.5">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ background: statusColor(cl.status) + "20", color: statusColor(cl.status) }}>
+                          {cl.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {tab === "invoices" && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold">Invoices</h2>
+              <button className="px-3 py-1.5 rounded-lg text-[12px] font-medium flex items-center gap-1.5" style={{ background: c.accent, color: "#fff" }}>
+                <I d={ic.plus} s={13} c="#fff" /> New Invoice
+              </button>
+            </div>
+            {/* Summary cards */}
+            <div className="grid grid-cols-4 gap-3 mb-4">
+              {[
+                { label: "Total Invoiced", value: fmt(invoices.reduce((s, i) => s + i.amount, 0)), color: c.text },
+                { label: "Paid", value: fmt(invoices.filter(i => i.status === "paid").reduce((s, i) => s + i.amount, 0)), color: c.success },
+                { label: "Pending", value: fmt(invoices.filter(i => i.status === "pending").reduce((s, i) => s + i.amount, 0)), color: c.warning },
+                { label: "Overdue", value: fmt(invoices.filter(i => i.status === "overdue").reduce((s, i) => s + i.amount, 0)), color: c.danger },
+              ].map((s, i) => (
+                <div key={i} className="rounded-xl p-3 border" style={{ borderColor: c.border, background: c.card }}>
+                  <div className="text-[11px] mb-1" style={{ color: c.textMuted }}>{s.label}</div>
+                  <div className="text-base font-bold" style={{ color: s.color }}>{s.value}</div>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl border overflow-hidden" style={{ borderColor: c.border }}>
+              <table className="w-full text-[12px]">
+                <thead>
+                  <tr style={{ background: c.cardAlt }}>
+                    {["Invoice", "Client", "Amount", "Date", "Due Date", "Status"].map(h => (
+                      <th key={h} className="text-left px-4 py-2.5 font-semibold" style={{ color: c.textMuted, borderBottom: `1px solid ${c.border}` }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoices.map(inv => (
+                    <tr key={inv.id} className="transition-colors" style={{ borderBottom: `1px solid ${c.border}` }}
+                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <td className="px-4 py-2.5 font-semibold" style={{ color: c.accent }}>{inv.id}</td>
+                      <td className="px-4 py-2.5">{inv.client}</td>
+                      <td className="px-4 py-2.5 font-semibold">{fmt(inv.amount)}</td>
+                      <td className="px-4 py-2.5" style={{ color: c.textMuted }}>{inv.date}</td>
+                      <td className="px-4 py-2.5" style={{ color: c.textMuted }}>{inv.due}</td>
+                      <td className="px-4 py-2.5">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ background: statusColor(inv.status) + "20", color: statusColor(inv.status) }}>
+                          {inv.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {tab === "projects" && (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold">Projects</h2>
+              <button className="px-3 py-1.5 rounded-lg text-[12px] font-medium flex items-center gap-1.5" style={{ background: c.accent, color: "#fff" }}>
+                <I d={ic.plus} s={13} c="#fff" /> New Project
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {projects.map(p => (
+                <div key={p.id} className="rounded-xl border p-4" style={{ borderColor: c.border, background: c.card }}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <div className="text-[14px] font-semibold">{p.name}</div>
+                      <div className="text-[11px]" style={{ color: c.textMuted }}>{p.client}</div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ background: statusColor(p.status) + "20", color: statusColor(p.status) }}>
+                      {p.status.replace("-", " ")}
+                    </span>
+                  </div>
+                  <div className="w-full h-2 rounded-full mb-2" style={{ background: c.border }}>
+                    <div className="h-full rounded-full transition-all" style={{ width: `${p.progress}%`, background: statusColor(p.status) }} />
+                  </div>
+                  <div className="flex justify-between text-[11px] mb-3" style={{ color: c.textMuted }}>
+                    <span>{p.progress}% complete</span>
+                    <span>Due {p.deadline}</span>
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="flex-1 rounded-lg p-2 text-center" style={{ background: c.cardAlt }}>
+                      <div className="text-[10px]" style={{ color: c.textMuted }}>Budget</div>
+                      <div className="text-[12px] font-semibold">{fmt(p.budget)}</div>
+                    </div>
+                    <div className="flex-1 rounded-lg p-2 text-center" style={{ background: c.cardAlt }}>
+                      <div className="text-[10px]" style={{ color: c.textMuted }}>Spent</div>
+                      <div className="text-[12px] font-semibold" style={{ color: p.spent > p.budget * 0.9 ? c.danger : c.text }}>{fmt(p.spent)}</div>
+                    </div>
+                    <div className="flex-1 rounded-lg p-2 text-center" style={{ background: c.cardAlt }}>
+                      <div className="text-[10px]" style={{ color: c.textMuted }}>Remaining</div>
+                      <div className="text-[12px] font-semibold" style={{ color: c.success }}>{fmt(p.budget - p.spent)}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ MAIN OS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function AlternusOS() {
   const [mode, setMode] = useState<ThemeMode>("dark");
@@ -6644,6 +6852,7 @@ export default function AlternusOS() {
     writer: <WriterApp c={c} />,
     knowledge: <KnowledgeApp c={c} />,
     sysmon: <SysMonApp c={c} />,
+    business: <BusinessApp c={c} />,
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
@@ -6675,6 +6884,7 @@ export default function AlternusOS() {
     { id: "writer", icon: ic.edit3, label: "AI Writer", color: "#34D399" },
     { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316" },
     { id: "sysmon", icon: ic.activity, label: "System Monitor", color: "#34D399" },
+    { id: "business", icon: ic.briefcase, label: "Business", color: "#6366F1" },
   ];
 
   // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
