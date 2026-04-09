@@ -488,7 +488,7 @@ function AppWindow({
   const isAI = win.id === "ai";
 
   const style: React.CSSProperties = win.isMaximized
-    ? { position: "absolute", top: 6, left: 6, right: isAI ? 6 : 58, bottom: 6, zIndex: win.zIndex }
+    ? { position: "absolute", top: 6, left: 6, right: 6, bottom: 6, zIndex: win.zIndex }
     : { position: "absolute", top: win.y, left: win.x, width: win.w, height: win.h, zIndex: win.zIndex };
 
   const isDark = (mode || "dark") === "dark";
@@ -6428,7 +6428,7 @@ export default function AlternusOS() {
           // Fixed positions: Weather top-right, Calendar top-right, others center
           const x = id === "weather" ? sw - s.w - 10 : id === "calendar" ? sw - s.w - 10 : Math.max(0, Math.floor((sw - s.w) / 2));
           const y = id === "weather" ? 10 : id === "calendar" ? 10 : Math.max(0, Math.floor((sh - s.h) / 2));
-          return { ...w, isOpen: true, isMinimized: false, isMaximized: true, zIndex: zCounter + 1, x, y, w: s.w, h: s.h };
+          return { ...w, isOpen: true, isMinimized: false, zIndex: zCounter + 1, x, y, w: s.w, h: s.h };
         }
         if (w.isMinimized) return { ...w, isMinimized: false, zIndex: zCounter + 1 };
         return { ...w, zIndex: zCounter + 1 };
