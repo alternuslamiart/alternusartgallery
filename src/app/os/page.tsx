@@ -6418,6 +6418,7 @@ export default function AlternusOS() {
       writer: { w: 560, h: 480 },
       knowledge: { w: 580, h: 480 },
       sysmon: { w: 500, h: 480 },
+      business: { w: 820, h: 540 },
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
