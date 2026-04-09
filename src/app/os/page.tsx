@@ -1463,6 +1463,9 @@ function WeatherApp({ c }: { c: typeof palette.dark }) {
 
 function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; wallpaper: number; setWallpaper: (w: number) => void }) {
   const [activeSection, setActiveSection] = useState("Network");
+  const [settNavHistory, setSettNavHistory] = useState<string[]>(["Network"]);
+  const [settNavIdx, setSettNavIdx] = useState(0);
+  const [settPageKey, setSettPageKey] = useState(0);
   const [wifiOn, setWifiOn] = useState(true);
   const [btOn, setBtOn] = useState(true);
   const [dndOn, setDndOn] = useState(false);
@@ -1471,24 +1474,40 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
   const [activeLang, setActiveLang] = useState(0);
   const [connectedNet, setConnectedNet] = useState(0);
 
+  const settNavigateTo = (section: string) => {
+    if (section === activeSection) return;
+    const h = [...settNavHistory.slice(0, settNavIdx + 1), section];
+    setSettNavHistory(h);
+    setSettNavIdx(h.length - 1);
+    setActiveSection(section);
+    setSettPageKey(k => k + 1);
+  };
+  const settGoBack = () => {
+    if (settNavIdx > 0) { const i = settNavIdx - 1; setSettNavIdx(i); setActiveSection(settNavHistory[i]); setSettPageKey(k => k + 1); }
+  };
+  const settGoForward = () => {
+    if (settNavIdx < settNavHistory.length - 1) { const i = settNavIdx + 1; setSettNavIdx(i); setActiveSection(settNavHistory[i]); setSettPageKey(k => k + 1); }
+  };
+
   const Toggle = ({ on, onToggle }: { on: boolean; onToggle: () => void }) => (
-    <button onClick={onToggle} className="w-10 h-5 rounded-full flex items-center px-0.5 transition-colors" style={{ background: on ? c.accent : c.cardAlt }}>
-      <div className="w-4 h-4 rounded-full bg-white transition-all" style={{ marginLeft: on ? "18px" : "0px" }} />
+    <button onClick={onToggle} className="w-10 h-[22px] rounded-full flex items-center px-0.5 transition-colors" style={{ background: on ? c.accent : c.cardAlt }}>
+      <div className="w-4 h-4 rounded-full bg-white transition-all" style={{ marginLeft: on ? "18px" : "0px", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
     </button>
   );
 
   const items = [
-    { icon: ic.wifi, label: "Network" },
-    { icon: ic.bluetooth, label: "Bluetooth" },
-    { icon: ic.user, label: "Account" },
-    { icon: ic.bell, label: "Notifications" },
-    { icon: ic.globe, label: "Language" },
-    { icon: ic.moon, label: "Appearance" },
-    { icon: ic.hdd, label: "Storage" },
-    { icon: ic.battery, label: "Battery" },
-    { icon: ic.shield, label: "Privacy" },
-    { icon: ic.settings, label: "System" },
+    { icon: ic.wifi, label: "Network", desc: "Wi-Fi & connections" },
+    { icon: ic.bluetooth, label: "Bluetooth", desc: "Paired devices" },
+    { icon: ic.user, label: "Account", desc: "Profile & identity" },
+    { icon: ic.bell, label: "Notifications", desc: "Alerts & sounds" },
+    { icon: ic.globe, label: "Language", desc: "Region & locale" },
+    { icon: ic.moon, label: "Appearance", desc: "Theme & wallpaper" },
+    { icon: ic.hdd, label: "Storage", desc: "Disk usage" },
+    { icon: ic.battery, label: "Battery", desc: "Power management" },
+    { icon: ic.shield, label: "Privacy", desc: "Security & permissions" },
+    { icon: ic.settings, label: "System", desc: "General preferences" },
   ];
+  const activeItem = items.find(it => it.label === activeSection) || items[0];
 
   const renderContent = () => {
     switch (activeSection) {
@@ -1834,32 +1853,80 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
   return (
     <div className="flex h-full overflow-hidden">
       {/* Sidebar */}
-      <div className="w-[170px] flex-shrink-0 flex flex-col py-3 px-2 overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none", msOverflowStyle: "none" }}>
-        <div className="flex items-center justify-between px-3 mb-3">
-          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: c.textMuted }}>Settings</p>
-          <div className="flex items-center gap-1">
-            <button title="Voice" className="w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-              style={{ color: c.textMuted }}
-              onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.color = c.accentText; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.textMuted; }}>
-              <I d={ic.voice} s={12} />
-            </button>
+      <div className="w-[195px] flex-shrink-0 flex flex-col overflow-y-auto" style={{ borderRight: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+        {/* Sidebar Header */}
+        <div className="px-4 py-3.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #6B7280, #4B5563)", boxShadow: "0 3px 10px rgba(107,114,128,0.3)" }}>
+              <I d={ic.settings} s={14} c="#fff" />
+            </div>
+            <div>
+              <p className="text-[12px] font-bold" style={{ color: c.text }}>Settings</p>
+              <p className="text-[9px]" style={{ color: c.textMuted }}>Preferences & Configuration</p>
+            </div>
           </div>
         </div>
-        {items.map((it, i) => (
-          <button key={i} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors mb-0.5"
-            onClick={() => setActiveSection(it.label)}
-            style={{ background: activeSection === it.label ? c.accentSoft : "transparent" }}
-            onMouseEnter={e => { if (activeSection !== it.label) e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { if (activeSection !== it.label) e.currentTarget.style.background = "transparent"; }}>
-            <I d={it.icon} s={15} c={activeSection === it.label ? c.accentText : c.textSec} />
-            <span className="text-[11px] font-medium" style={{ color: activeSection === it.label ? c.accentText : c.text }}>{it.label}</span>
-          </button>
-        ))}
+        <div className="flex-1 py-2 px-2">
+          <p className="text-[8px] font-bold uppercase tracking-wider px-3 py-1.5 mb-1" style={{ color: c.textMuted }}>Categories</p>
+          {items.map((it, i) => {
+            const isActive = activeSection === it.label;
+            return (
+              <button key={i} className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all mb-0.5"
+                onClick={() => settNavigateTo(it.label)}
+                style={{ background: isActive ? c.accentSoft : "transparent", borderLeft: isActive ? `3px solid ${c.accent}` : "3px solid transparent" }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = c.cardAlt; }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = isActive ? c.accentSoft : "transparent"; }}>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: isActive ? `${c.accent}18` : c.cardAlt }}>
+                  <I d={it.icon} s={13} c={isActive ? c.accentText : c.textSec} />
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold block leading-tight" style={{ color: isActive ? c.accentText : c.text }}>{it.label}</span>
+                  <span className="text-[8px] block" style={{ color: c.textMuted }}>{it.desc}</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
-      {/* Content */}
-      <div className="flex-1 overflow-hidden">
-        {renderContent()}
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Breadcrumb bar */}
+        <div className="flex items-center gap-2 px-4 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <button onClick={settGoBack} className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
+            style={{ background: "transparent", border: `1px solid ${c.border}`, opacity: settNavIdx > 0 ? 1 : 0.3 }}
+            onMouseEnter={e => { if (settNavIdx > 0) e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+            <I d={ic.chevL} s={12} c={c.textSec} />
+          </button>
+          <button onClick={settGoForward} className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
+            style={{ background: "transparent", border: `1px solid ${c.border}`, opacity: settNavIdx < settNavHistory.length - 1 ? 1 : 0.3 }}
+            onMouseEnter={e => { if (settNavIdx < settNavHistory.length - 1) e.currentTarget.style.background = c.cardAlt; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+            <I d={ic.chevR} s={12} c={c.textSec} />
+          </button>
+          <div className="flex items-center gap-1.5 flex-1">
+            <span className="text-[10px] font-medium" style={{ color: c.textMuted }}>Settings</span>
+            <I d={ic.chevR} s={9} c={c.textMuted} />
+            <span className="text-[10px] font-bold" style={{ color: c.text }}>{activeSection}</span>
+          </div>
+          <span className="text-[8px] font-bold px-2 py-1 rounded-md" style={{ background: c.cardAlt, color: c.textMuted }}>v3.0</span>
+        </div>
+        {/* Page content with transition */}
+        <div key={settPageKey} className="os-page-enter flex-1 overflow-hidden flex flex-col">
+          {/* Page header */}
+          <div className="flex items-center gap-3 px-5 pt-4 pb-2 flex-shrink-0">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${c.accent}10`, border: `1px solid ${c.accent}18` }}>
+              <I d={activeItem.icon} s={16} c={c.accent} />
+            </div>
+            <div>
+              <h2 className="text-[16px] font-bold leading-tight" style={{ color: c.text }}>{activeSection}</h2>
+              <p className="text-[10px]" style={{ color: c.textMuted }}>{activeItem.desc}</p>
+            </div>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            {renderContent()}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -4454,8 +4521,36 @@ function StudioApp({ c }: { c: typeof palette.dark }) {
 // ━━━━ Control Panel ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; onOpenApp?: (id: WinId) => void }) {
   const [activeSection, setActiveSection] = useState("System");
+  const [navHistory, setNavHistory] = useState<string[]>(["System"]);
+  const [navIdx, setNavIdx] = useState(0);
+  const [pageKey, setPageKey] = useState(0);
   const [perfStats, setPerfStats] = useState({ cpu: 23, mem: 58, gpu: 12 });
   const [diagMsg, setDiagMsg] = useState<string | null>(null);
+
+  const navigateTo = (section: string) => {
+    if (section === activeSection) return;
+    const newHistory = [...navHistory.slice(0, navIdx + 1), section];
+    setNavHistory(newHistory);
+    setNavIdx(newHistory.length - 1);
+    setActiveSection(section);
+    setPageKey(k => k + 1);
+  };
+  const goBack = () => {
+    if (navIdx > 0) {
+      const newIdx = navIdx - 1;
+      setNavIdx(newIdx);
+      setActiveSection(navHistory[newIdx]);
+      setPageKey(k => k + 1);
+    }
+  };
+  const goForward = () => {
+    if (navIdx < navHistory.length - 1) {
+      const newIdx = navIdx + 1;
+      setNavIdx(newIdx);
+      setActiveSection(navHistory[newIdx]);
+      setPageKey(k => k + 1);
+    }
+  };
 
   const refreshStats = () => {
     setPerfStats({ cpu: Math.floor(Math.random() * 35 + 5), mem: Math.floor(Math.random() * 25 + 40), gpu: Math.floor(Math.random() * 18 + 3) });
@@ -4468,14 +4563,13 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
   };
 
   const exportLog = () => {
-    const log = `ALTERNUS OS v3.0 — SYSTEM LOG\n---\nCPU: ${perfStats.cpu}%\nMemory: ${perfStats.mem}%\nGPU: ${perfStats.gpu}%\nStatus: Operational\nTimestamp: ${new Date().toISOString()}`;
+    const log = `ALTERNUS OS v3.0 \u2014 SYSTEM LOG\n---\nCPU: ${perfStats.cpu}%\nMemory: ${perfStats.mem}%\nGPU: ${perfStats.gpu}%\nStatus: Operational\nTimestamp: ${new Date().toISOString()}`;
     const a = document.createElement("a");
     a.href = "data:text/plain," + encodeURIComponent(log);
     a.download = "alternus-log.txt";
     a.click();
   };
 
-  // ── Design tokens — derived from OS palette (dark/light aware) ──
   const dt = {
     bg:      c.bg,
     panel:   c.surface,
@@ -4489,25 +4583,24 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
     border:  c.border,
     hover:   c.cardAlt,
     font:    "'Inter', sans-serif",
-    r:       "4px",
-    tr:      "0.1s ease",
+    r:       "8px",
+    tr:      "0.15s ease",
   };
 
-  // Shared helpers
   const Card = ({ children, style = {} }: { children: React.ReactNode; style?: React.CSSProperties }) => (
     <div style={{ background: dt.card, border: `1px solid ${dt.border}`, borderRadius: dt.r, ...style }}>{children}</div>
   );
   const SectionTitle = ({ label }: { label: string }) => (
-    <p style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: dt.textSec, fontFamily: dt.font, marginBottom: 12 }}>{label}</p>
+    <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: dt.textSec, fontFamily: dt.font, marginBottom: 12 }}>{label}</p>
   );
   const Row = ({ label, value, valueColor }: { label: string; value: string; valueColor?: string }) => (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: `1px solid ${dt.border}` }}>
-      <span style={{ fontSize: 13, color: dt.textSec, fontFamily: dt.font }}>{label}</span>
-      <span style={{ fontSize: 14, fontWeight: 500, color: valueColor ?? dt.text, fontFamily: dt.font }}>{value}</span>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: `1px solid ${dt.border}` }}>
+      <span style={{ fontSize: 12, color: dt.textSec, fontFamily: dt.font }}>{label}</span>
+      <span style={{ fontSize: 13, fontWeight: 600, color: valueColor ?? dt.text, fontFamily: dt.font }}>{value}</span>
     </div>
   );
   const Btn = ({ label, variant, onClick }: { label: string; variant: "accent-outline" | "accent-solid" | "gray-outline"; onClick?: () => void }) => {
-    const base: React.CSSProperties = { height: 36, padding: "0 16px", borderRadius: dt.r, fontSize: 14, fontWeight: 500, fontFamily: dt.font, cursor: "pointer", border: "1px solid", transition: dt.tr, flex: 1 };
+    const base: React.CSSProperties = { height: 36, padding: "0 16px", borderRadius: dt.r, fontSize: 12, fontWeight: 600, fontFamily: dt.font, cursor: "pointer", border: "1px solid", transition: dt.tr, flex: 1 };
     const styles = {
       "accent-outline": { ...base, background: "transparent", borderColor: dt.accent, color: dt.accent },
       "accent-solid":   { ...base, background: dt.accent, borderColor: dt.accent, color: "#fff" },
@@ -4529,23 +4622,25 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
     </div>
   );
   const Toggle = ({ on }: { on: boolean }) => (
-    <div style={{ width: 32, height: 18, borderRadius: 9, background: on ? dt.accent : dt.border, cursor: "pointer", position: "relative", transition: dt.tr, flexShrink: 0 }}>
-      <div style={{ position: "absolute", top: 3, left: on ? 17 : 3, width: 12, height: 12, borderRadius: "50%", background: "#fff", transition: dt.tr }} />
+    <div style={{ width: 34, height: 20, borderRadius: 10, background: on ? dt.accent : dt.border, cursor: "pointer", position: "relative", transition: dt.tr, flexShrink: 0 }}>
+      <div style={{ position: "absolute", top: 3, left: on ? 17 : 3, width: 14, height: 14, borderRadius: "50%", background: "#fff", transition: dt.tr, boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
     </div>
   );
 
   const sections = [
-    { label: "System",   icon: ic.monitor },
-    { label: "Boot",     icon: ic.power },
-    { label: "Security", icon: ic.shield },
-    { label: "Display",  icon: ic.sun },
-    { label: "Network",  icon: ic.wifi },
-    { label: "Storage",  icon: ic.folder },
-    { label: "Services", icon: ic.settings },
-    { label: "Devices",  icon: ic.cpu },
-    { label: "Users",    icon: ic.user },
-    { label: "Updates",  icon: ic.refresh },
+    { label: "System",   icon: ic.monitor, desc: "Hardware info & performance" },
+    { label: "Boot",     icon: ic.power, desc: "Startup configuration" },
+    { label: "Security", icon: ic.shield, desc: "Firewall & encryption" },
+    { label: "Display",  icon: ic.sun, desc: "Resolution & appearance" },
+    { label: "Network",  icon: ic.wifi, desc: "Connections & DNS" },
+    { label: "Storage",  icon: ic.folder, desc: "Disk usage & partitions" },
+    { label: "Services", icon: ic.settings, desc: "System processes" },
+    { label: "Devices",  icon: ic.cpu, desc: "Hardware peripherals" },
+    { label: "Users",    icon: ic.user, desc: "Accounts & permissions" },
+    { label: "Updates",  icon: ic.refresh, desc: "System updates" },
   ];
+
+  const activeSec = sections.find(s => s.label === activeSection) || sections[0];
 
   const renderContent = () => {
     const p = { padding: 24, fontFamily: dt.font } as React.CSSProperties;
@@ -4923,53 +5018,119 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
   return (
     <div style={{ display:"flex", height:"100%", overflow:"hidden", fontFamily:dt.font, background:dt.bg }}>
       {/* Sidebar */}
-      <div style={{ width:180, flexShrink:0, display:"flex", flexDirection:"column", background:dt.panel, borderRight:`1px solid ${dt.border}`, overflowY:"auto", scrollbarWidth:"none" as const }}>
+      <div style={{ width:200, flexShrink:0, display:"flex", flexDirection:"column", background:dt.panel, borderRight:`1px solid ${dt.border}`, overflowY:"auto", scrollbarWidth:"none" as const }}>
         {/* Header */}
-        <div style={{ padding:"14px 14px 12px", borderBottom:`1px solid ${dt.border}`, flexShrink:0 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:6 }}>
-            <div style={{ width:32, height:32, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", background:"linear-gradient(135deg, #6366F1, #4F46E5)", boxShadow:"0 3px 10px rgba(99,102,241,0.3)" }}>
-              <I d={ic.monitor} s={14} c="#fff" />
+        <div style={{ padding:"16px 16px 14px", borderBottom:`1px solid ${dt.border}`, flexShrink:0 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:8 }}>
+            <div style={{ width:36, height:36, borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", background:"linear-gradient(135deg, #6366F1, #4F46E5)", boxShadow:"0 4px 14px rgba(99,102,241,0.35)" }}>
+              <I d={ic.monitor} s={16} c="#fff" />
             </div>
             <div>
-              <p style={{ fontSize:12, fontWeight:700, color:dt.text, lineHeight:"1.2" }}>Control Panel</p>
-              <p style={{ fontSize:9, color:dt.textSec }}>System Configuration</p>
+              <p style={{ fontSize:13, fontWeight:700, color:dt.text, lineHeight:"1.2" }}>Control Panel</p>
+              <p style={{ fontSize:10, color:dt.textSec, marginTop:1 }}>System Configuration</p>
             </div>
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-            <div style={{ width:6, height:6, borderRadius:3, background:dt.success }} />
+            <div style={{ width:6, height:6, borderRadius:3, background:dt.success, boxShadow:`0 0 6px ${dt.success}` }} />
             <span style={{ fontSize:9, fontWeight:600, color:dt.success }}>All systems operational</span>
           </div>
         </div>
         {/* Nav */}
-        <div style={{ flex:1, padding:"8px 6px" }}>
-          <p style={{ fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", color:dt.textSec, padding:"4px 10px", marginBottom:4 }}>Sections</p>
+        <div style={{ flex:1, padding:"8px 8px" }}>
+          <p style={{ fontSize:9, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", color:dt.textSec, padding:"6px 10px", marginBottom:2 }}>Navigate</p>
           {sections.map(it => {
             const isActive = activeSection === it.label;
             return (
               <button key={it.label}
-                onClick={() => setActiveSection(it.label)}
-                style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"9px 10px", borderRadius:8, background: isActive ? `${dt.accent}12` : "transparent", border:"none", cursor:"pointer", textAlign:"left" as const, marginBottom:2, transition:dt.tr, borderLeft: isActive ? `2px solid ${dt.accent}` : "2px solid transparent" }}
+                onClick={() => navigateTo(it.label)}
+                style={{ width:"100%", display:"flex", alignItems:"center", gap:10, padding:"10px 10px", borderRadius:10, background: isActive ? `${dt.accent}12` : "transparent", border:"none", cursor:"pointer", textAlign:"left" as const, marginBottom:2, transition:dt.tr, borderLeft: isActive ? `3px solid ${dt.accent}` : "3px solid transparent" }}
                 onMouseEnter={e => { if (!isActive) e.currentTarget.style.background=dt.hover; }}
-                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background="transparent"; }}>
-                <div style={{ width:24, height:24, borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", background: isActive ? `${dt.accent}15` : "transparent" }}>
-                  <I d={it.icon} s={13} c={isActive ? dt.accent : dt.textSec} />
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background= isActive ? `${dt.accent}12` : "transparent"; }}>
+                <div style={{ width:28, height:28, borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", background: isActive ? `${dt.accent}18` : dt.hover }}>
+                  <I d={it.icon} s={14} c={isActive ? dt.accent : dt.textSec} />
                 </div>
-                <span style={{ fontSize:12, fontWeight: isActive ? 600 : 400, color: isActive ? dt.text : dt.textSec }}>{it.label}</span>
+                <div>
+                  <span style={{ fontSize:12, fontWeight: isActive ? 700 : 500, color: isActive ? dt.text : dt.textSec, display:"block", lineHeight:"1.2" }}>{it.label}</span>
+                  <span style={{ fontSize:9, color: dt.textSec, display:"block", marginTop:1 }}>{it.desc}</span>
+                </div>
               </button>
             );
           })}
         </div>
-        {/* Footer */}
-        <div style={{ padding:"12px 14px", borderTop:`1px solid ${dt.border}`, flexShrink:0 }}>
+        {/* Sidebar Footer */}
+        <div style={{ padding:"12px 16px", borderTop:`1px solid ${dt.border}`, flexShrink:0 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <span style={{ fontSize:9, color:dt.textSec }}>Alternus OS v3.0</span>
-            <span style={{ fontSize:8, fontWeight:600, padding:"2px 6px", borderRadius:4, background:dt.hover, color:dt.textSec }}>x86_64</span>
+            <span style={{ fontSize:8, fontWeight:700, padding:"2px 8px", borderRadius:6, background:dt.hover, color:dt.textSec }}>x86_64</span>
           </div>
         </div>
       </div>
-      {/* Content */}
-      <div style={{ flex:1, overflowY:"auto", background:dt.bg, scrollbarWidth:"none" as const }}>
-        {renderContent()}
+      {/* Main Content Area */}
+      <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
+        {/* Breadcrumb + Navigation Bar */}
+        <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 20px", borderBottom:`1px solid ${dt.border}`, flexShrink:0 }}>
+          {/* Back/Forward */}
+          <button onClick={goBack} style={{ width:28, height:28, borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", background:"transparent", border:`1px solid ${dt.border}`, cursor: navIdx > 0 ? "pointer" : "default", opacity: navIdx > 0 ? 1 : 0.3, transition:dt.tr }}
+            onMouseEnter={e => { if (navIdx > 0) e.currentTarget.style.background = dt.hover; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+            <I d={ic.chevL} s={13} c={dt.textSec} />
+          </button>
+          <button onClick={goForward} style={{ width:28, height:28, borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", background:"transparent", border:`1px solid ${dt.border}`, cursor: navIdx < navHistory.length - 1 ? "pointer" : "default", opacity: navIdx < navHistory.length - 1 ? 1 : 0.3, transition:dt.tr }}
+            onMouseEnter={e => { if (navIdx < navHistory.length - 1) e.currentTarget.style.background = dt.hover; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+            <I d={ic.chevR} s={13} c={dt.textSec} />
+          </button>
+          {/* Breadcrumb */}
+          <div style={{ display:"flex", alignItems:"center", gap:4, flex:1 }}>
+            <button onClick={() => navigateTo("System")} style={{ fontSize:11, fontWeight:500, color:dt.textSec, background:"transparent", border:"none", cursor:"pointer", padding:"2px 4px", borderRadius:4 }}
+              onMouseEnter={e => { e.currentTarget.style.background = dt.hover; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+              Control Panel
+            </button>
+            <I d={ic.chevR} s={10} c={dt.textSec} />
+            <span style={{ fontSize:11, fontWeight:700, color:dt.text, padding:"2px 4px" }}>{activeSection}</span>
+          </div>
+          {/* Contextual actions */}
+          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+            <button onClick={refreshStats} style={{ height:28, padding:"0 12px", borderRadius:8, fontSize:10, fontWeight:600, background:"transparent", border:`1px solid ${dt.border}`, color:dt.textSec, cursor:"pointer", display:"flex", alignItems:"center", gap:4, transition:dt.tr }}
+              onMouseEnter={e => { e.currentTarget.style.background = dt.hover; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+              <I d={ic.refresh} s={11} c={dt.textSec} /> Refresh
+            </button>
+            <button onClick={exportLog} style={{ height:28, padding:"0 12px", borderRadius:8, fontSize:10, fontWeight:600, background:"transparent", border:`1px solid ${dt.border}`, color:dt.textSec, cursor:"pointer", display:"flex", alignItems:"center", gap:4, transition:dt.tr }}
+              onMouseEnter={e => { e.currentTarget.style.background = dt.hover; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+              <I d={ic.download} s={11} c={dt.textSec} /> Export
+            </button>
+          </div>
+        </div>
+        {/* Page Content with transition */}
+        <div key={pageKey} className="os-page-enter" style={{ flex:1, overflowY:"auto", scrollbarWidth:"none" as const }}>
+          {/* Page Header */}
+          <div style={{ padding:"20px 24px 0", display:"flex", alignItems:"center", gap:12 }}>
+            <div style={{ width:40, height:40, borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", background:`${dt.accent}12`, border:`1px solid ${dt.accent}18` }}>
+              <I d={activeSec.icon} s={18} c={dt.accent} />
+            </div>
+            <div>
+              <h2 style={{ fontSize:18, fontWeight:700, color:dt.text, lineHeight:"1.2", margin:0 }}>{activeSection}</h2>
+              <p style={{ fontSize:11, color:dt.textSec, margin:0, marginTop:2 }}>{activeSec.desc}</p>
+            </div>
+          </div>
+          {renderContent()}
+        </div>
+        {/* Status Footer */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"8px 20px", borderTop:`1px solid ${dt.border}`, flexShrink:0 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <span style={{ fontSize:9, color:dt.textSec }}>CPU: {perfStats.cpu}%</span>
+            <span style={{ fontSize:9, color:dt.textSec }}>RAM: {perfStats.mem}%</span>
+            <span style={{ fontSize:9, color:dt.textSec }}>GPU: {perfStats.gpu}%</span>
+          </div>
+          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            {diagMsg === "running" && <span style={{ fontSize:9, color:dt.warning }}>Diagnostic running...</span>}
+            {diagMsg === "ok" && <span style={{ fontSize:9, color:dt.success }}>All checks passed</span>}
+            <span style={{ fontSize:9, color:dt.textSec }}>{new Date().toLocaleTimeString()}</span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -7941,7 +8102,21 @@ export default function AlternusOS() {
 
   return (
     <div style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
-      <style>{`* { scrollbar-width: none !important; -ms-overflow-style: none !important; } *::-webkit-scrollbar { display: none !important; } .ai-bar-input::placeholder { color: rgba(255,255,255,0.65); }`}</style>
+      <style>{`
+        * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+        *::-webkit-scrollbar { display: none !important; }
+        .ai-bar-input::placeholder { color: rgba(255,255,255,0.65); }
+        @keyframes os-page-in {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes os-fade-in {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        .os-page-enter { animation: os-page-in 0.18s cubic-bezier(0.4,0,0.2,1) both; }
+        .os-fade-enter { animation: os-fade-in 0.15s ease both; }
+      `}</style>
       {/* Top Bar hover trigger zone */}
       <div className="absolute top-0 left-0 right-0 h-2 z-[300]" onMouseEnter={() => setShowTopBar(true)} />
       {/* Top Bar */}
