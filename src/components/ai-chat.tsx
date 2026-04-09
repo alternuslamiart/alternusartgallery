@@ -69,6 +69,7 @@ export function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isBarVisible, setIsBarVisible] = useState(true);
   const [chatHistory, setChatHistory] = useState<ChatSession[]>([]);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -160,6 +161,21 @@ export function AIChat() {
   useEffect(() => {
     if (isExpanded && expandedInputRef.current) expandedInputRef.current.focus();
   }, [isExpanded]);
+
+  // Ctrl+A — toggle the floating bar
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === "a") {
+        const tag = (e.target as HTMLElement).tagName;
+        if (tag !== "INPUT" && tag !== "TEXTAREA") {
+          e.preventDefault();
+          setIsBarVisible((v) => !v);
+        }
+      }
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, []);
 
   const sendMessage = async (text: string) => {
     const userMessage: Message = {
@@ -275,82 +291,131 @@ export function AIChat() {
     <>
       {/* Floating AI Assistant Bar */}
       {!isOpen && !isExpanded && (
-        <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-stone-200/60 px-2 py-2 w-[320px] md:w-[420px]">
+        <div
+          className={`fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ease-out ${
+            isBarVisible
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 translate-y-5 pointer-events-none"
+          }`}
+        >
+          <div className="relative flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-stone-200/60 px-2 py-2 w-[320px] md:w-[440px] group hover:shadow-blue-200/40 hover:shadow-[0_8px_32px] transition-shadow duration-300">
 
-          {/* Left: "+" button — quick actions dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="relative w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-xl flex items-center justify-center flex-shrink-0 transition-colors shadow-sm"
-                aria-label="Quick actions"
-              >
-                <Plus size={18} />
-                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-white animate-pulse" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" sideOffset={8} className="w-56 z-[60]">
-              <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {DEFAULT_QUICK_ACTIONS.map((action) => (
-                <DropdownMenuItem
-                  key={action.id}
-                  onClick={() => {
-                    if (action.link) { router.push(action.link); }
-                    else if (action.prompt) { setIsExpanded(true); sendMessage(action.prompt); }
-                  }}
+            {/* Animated glow ring on hover */}
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/0 via-blue-400/5 to-blue-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            {/* Left: "+" button — quick actions / navigation dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="relative w-10 h-10 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-150 shadow-sm shadow-blue-500/30 hover:shadow-blue-500/50 hover:shadow-md"
+                  aria-label="Quick actions"
                 >
-                  {action.link && <span className="mr-2 text-coffee">→</span>}
-                  {action.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  <Plus size={18} />
+                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-white animate-pulse" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" sideOffset={10} className="w-60 z-[60] animate-in fade-in slide-in-from-bottom-2 duration-150">
 
-          {/* Center: text input */}
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && input.trim()) {
-                setIsExpanded(true);
-                sendMessage(input.trim());
-              }
-            }}
-            onClick={() => setIsOpen(true)}
-            placeholder="Ask AI anything..."
-            className="flex-1 bg-transparent text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none px-2 cursor-text"
-          />
+                {/* Navigation section */}
+                <DropdownMenuLabel className="flex items-center gap-1.5 text-stone-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  Navigate
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {[
+                  { id: "home", label: "Home", link: "/home", icon: "🏠" },
+                  { id: "gallery-nav", label: "Gallery", link: "/gallery", icon: "🖼️" },
+                  { id: "artists-nav", label: "Artists", link: "/artists", icon: "🎨" },
+                  { id: "ai-page", label: "AI Assistant", link: "/ai", icon: "✨" },
+                  { id: "apply-nav", label: "Sell your Art", link: "/apply", icon: "💼" },
+                  { id: "dashboard-nav", label: "My Dashboard", link: "/dashboard", icon: "📊" },
+                  { id: "orders-nav", label: "My Orders", link: "/orders", icon: "📦" },
+                  { id: "cart-nav", label: "Cart", link: "/cart", icon: "🛒" },
+                ].map((item) => (
+                  <DropdownMenuItem
+                    key={item.id}
+                    onClick={() => router.push(item.link)}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <span className="text-base leading-none">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </DropdownMenuItem>
+                ))}
 
-          {/* Right: chevron-down button — mode selection dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-xl flex items-center justify-center flex-shrink-0 transition-colors shadow-sm"
-                aria-label="Select AI mode"
-              >
-                <ChevronDown size={18} />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" sideOffset={8} className="w-52 z-[60]">
-              <DropdownMenuLabel>AI Mode</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {AI_MODES.map((mode) => (
-                <DropdownMenuItem
-                  key={mode.id}
-                  onClick={() => setSelectedMode(mode.id)}
-                  className={selectedMode === mode.id ? "bg-coffee/5 text-coffee" : ""}
+                {/* AI actions section */}
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="flex items-center gap-1.5 text-stone-500">
+                  <Sparkles size={12} />
+                  Ask AI
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {DEFAULT_QUICK_ACTIONS.filter((a) => !!a.prompt).map((action) => (
+                  <DropdownMenuItem
+                    key={action.id}
+                    onClick={() => { setIsExpanded(true); sendMessage(action.prompt!); }}
+                    className="cursor-pointer"
+                  >
+                    <span className="mr-2 text-blue-400">→</span>
+                    {action.label}
+                  </DropdownMenuItem>
+                ))}
+
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Center: text input */}
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && input.trim()) {
+                  setIsExpanded(true);
+                  sendMessage(input.trim());
+                }
+              }}
+              onClick={() => setIsOpen(true)}
+              placeholder="Ask AI anything..."
+              className="flex-1 bg-transparent text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none px-2 cursor-text transition-colors duration-150"
+            />
+
+            {/* Right: chevron-down button — mode selection dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="w-10 h-10 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-150 shadow-sm shadow-blue-500/30 hover:shadow-blue-500/50 hover:shadow-md"
+                  aria-label="Select AI mode"
                 >
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{mode.label}</p>
-                    <p className="text-xs text-stone-400">{mode.description}</p>
-                  </div>
-                  {selectedMode === mode.id && <Check size={14} className="ml-auto text-coffee" />}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  <ChevronDown size={18} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" sideOffset={10} className="w-52 z-[60] animate-in fade-in slide-in-from-bottom-2 duration-150">
+                <DropdownMenuLabel className="flex items-center gap-1.5 text-stone-500">
+                  <Sparkles size={12} />
+                  AI Mode
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {AI_MODES.map((mode) => (
+                  <DropdownMenuItem
+                    key={mode.id}
+                    onClick={() => setSelectedMode(mode.id)}
+                    className={`cursor-pointer ${selectedMode === mode.id ? "bg-blue-50 text-blue-600" : ""}`}
+                  >
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{mode.label}</p>
+                      <p className="text-xs text-stone-400">{mode.description}</p>
+                    </div>
+                    {selectedMode === mode.id && <Check size={14} className="ml-auto text-blue-500" />}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <div className="px-2 py-1.5">
+                  <p className="text-[10px] text-stone-400 text-center">Press <kbd className="px-1 py-0.5 bg-stone-100 rounded text-stone-500 font-mono">Ctrl+A</kbd> to hide/show</p>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
+          </div>
         </div>
       )}
 
