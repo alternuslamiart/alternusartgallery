@@ -1035,65 +1035,114 @@ function TerminalApp({ c }: { c: typeof palette.dark }) {
 function MusicApp({ c }: { c: typeof palette.dark }) {
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const tracks = [
-    { name: "Focus Flow", artist: "Ambient AI", dur: "3:42" },
-    { name: "Deep Work", artist: "Neural Beats", dur: "4:15" },
-    { name: "Code Session", artist: "Synthwave", dur: "5:01" },
-    { name: "Creative Space", artist: "Lo-Fi Engine", dur: "3:58" },
-    { name: "Night Coding", artist: "Chill Pulse", dur: "4:33" },
-  ];
+  const [activePlaylist, setActivePlaylist] = useState("Focus");
+  const [shuffle, setShuffle] = useState(false);
+  const [repeat, setRepeat] = useState(false);
+  const [volume, setVolume] = useState(75);
+  const playlists: Record<string, { name: string; artist: string; dur: string }[]> = {
+    Focus: [
+      { name: "Focus Flow", artist: "Ambient AI", dur: "3:42" },
+      { name: "Deep Work", artist: "Neural Beats", dur: "4:15" },
+      { name: "Code Session", artist: "Synthwave", dur: "5:01" },
+      { name: "Creative Space", artist: "Lo-Fi Engine", dur: "3:58" },
+      { name: "Night Coding", artist: "Chill Pulse", dur: "4:33" },
+    ],
+    Chill: [
+      { name: "Sunset Drive", artist: "Lo-Fi Engine", dur: "4:22" },
+      { name: "Rainy Afternoon", artist: "Ambient AI", dur: "5:15" },
+      { name: "Coffee Break", artist: "Jazz Bytes", dur: "3:48" },
+      { name: "Ocean Waves", artist: "Nature Sound", dur: "6:00" },
+    ],
+    Energy: [
+      { name: "Power Up", artist: "Synthwave", dur: "3:20" },
+      { name: "Electric Rush", artist: "Neural Beats", dur: "4:05" },
+      { name: "Neon City", artist: "Retro Pulse", dur: "3:55" },
+    ],
+  };
+  const tracks = playlists[activePlaylist];
+  const totalDur = tracks.reduce((s, t) => { const [m, sec] = t.dur.split(":").map(Number); return s + m * 60 + sec; }, 0);
 
   return (
-    <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <p className="text-[13px] font-semibold" style={{ color: c.text }}>Library</p>
-      </div>
-
-      {/* Track list */}
-      <div className="flex-1 overflow-y-auto py-2 px-3" style={{ scrollbarWidth: "none" }}>
-        {tracks.map((t, i) => (
-          <button key={i} onClick={() => { setCurrent(i); setPlaying(true); }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-all mb-1"
-            style={{ borderRadius: "12px", background: i === current ? c.accentSoft : "transparent", border: i === current ? `1px solid ${c.accent}40` : "1px solid transparent" }}
-            onMouseEnter={e => { if (i !== current) e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { if (i !== current) e.currentTarget.style.background = "transparent"; }}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: i === current ? c.accent : c.cardAlt, boxShadow: i === current ? `0 0 16px ${c.accent}50` : "none" }}>
-              <I d={ic.music} s={14} c={i === current ? "#fff" : c.textMuted} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-medium truncate" style={{ color: i === current ? c.accentText : c.text }}>{t.name}</p>
-              <p className="text-[11px]" style={{ color: c.textMuted }}>{t.artist}</p>
-            </div>
-            <span className="text-[11px] font-mono" style={{ color: c.textMuted }}>{t.dur}</span>
+    <div className="flex h-full" style={{ background: c.bg }}>
+      {/* Sidebar — playlists */}
+      <div className="w-[140px] flex-shrink-0 flex flex-col py-3 border-r" style={{ borderColor: c.border, background: c.surface }}>
+        <p className="px-3 text-[9px] font-semibold uppercase tracking-wider mb-2" style={{ color: c.textMuted }}>Playlists</p>
+        {Object.keys(playlists).map(pl => (
+          <button key={pl} onClick={() => { setActivePlaylist(pl); setCurrent(0); }}
+            className="flex items-center gap-2 px-3 py-1.5 text-left text-[11px] font-medium transition-colors"
+            style={{ background: activePlaylist === pl ? c.cardAlt : "transparent", color: activePlaylist === pl ? c.text : c.textMuted }}>
+            <I d={ic.music} s={12} /> {pl}
+            <span className="ml-auto text-[9px]" style={{ color: c.textMuted }}>{playlists[pl].length}</span>
+          </button>
+        ))}
+        <div className="h-px mx-3 my-2" style={{ background: c.border }} />
+        <p className="px-3 text-[9px] font-semibold uppercase tracking-wider mb-2" style={{ color: c.textMuted }}>Library</p>
+        {["Liked Songs", "Recent", "Downloads"].map(item => (
+          <button key={item} className="flex items-center gap-2 px-3 py-1.5 text-[11px] transition-colors" style={{ color: c.textMuted }}
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <I d={item === "Liked Songs" ? ic.sparkle : item === "Recent" ? ic.clock : ic.download} s={12} /> {item}
           </button>
         ))}
       </div>
-
-      {/* Now Playing */}
-      <div className="flex-shrink-0 px-4 pt-3 pb-4" style={{ borderTop: `1px solid ${c.border}` }}>
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: c.accent, boxShadow: `0 0 16px ${c.accent}50` }}>
-            <I d={ic.music} s={14} c="#fff" />
+      {/* Main */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Playlist header */}
+        <div className="px-4 py-3 flex items-center gap-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: c.accentSoft }}>
+            <I d={ic.music} s={20} c={c.accent} />
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold truncate" style={{ color: c.text }}>{tracks[current].name}</p>
-            <p className="text-[11px]" style={{ color: c.textMuted }}>{tracks[current].artist}</p>
+          <div>
+            <p className="text-[14px] font-bold" style={{ color: c.text }}>{activePlaylist}</p>
+            <p className="text-[10px]" style={{ color: c.textMuted }}>{tracks.length} tracks · {Math.floor(totalDur / 60)}m {totalDur % 60}s</p>
           </div>
-        </div>
-        <div className="w-full h-1 rounded-full mb-4" style={{ background: c.cardAlt }}>
-          <div className="h-full rounded-full" style={{ background: c.accent, width: playing ? "45%" : "0%", transition: "width 0.3s" }} />
-        </div>
-        <div className="flex items-center justify-center gap-6">
-          <button style={{ color: c.textSec }} onClick={() => setCurrent(p => p > 0 ? p - 1 : tracks.length - 1)}><I d={ic.skip} s={16} /></button>
-          <button className="w-11 h-11 rounded-full flex items-center justify-center transition-all"
-            style={{ background: c.accent, boxShadow: `0 0 20px ${c.accent}60` }}
-            onClick={() => setPlaying(!playing)}>
-            <I d={playing ? ic.pause : ic.play} s={16} c="#fff" />
+          <button className="ml-auto w-9 h-9 rounded-full flex items-center justify-center"
+            style={{ background: c.accent, boxShadow: `0 0 16px ${c.accent}50` }} onClick={() => setPlaying(!playing)}>
+            <I d={playing ? ic.pause : ic.play} s={14} c="#fff" />
           </button>
-          <button style={{ color: c.textSec }} onClick={() => setCurrent(p => p < tracks.length - 1 ? p + 1 : 0)}><I d={ic.skip} s={16} /></button>
+        </div>
+        {/* Track list */}
+        <div className="flex-1 overflow-y-auto py-1 px-2" style={{ scrollbarWidth: "none" }}>
+          {tracks.map((t, i) => (
+            <button key={i} onClick={() => { setCurrent(i); setPlaying(true); }}
+              className="w-full flex items-center gap-3 px-3 py-2 text-left transition-all rounded-lg mb-0.5"
+              style={{ background: i === current ? c.accentSoft : "transparent", border: i === current ? `1px solid ${c.accent}30` : "1px solid transparent" }}
+              onMouseEnter={e => { if (i !== current) e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { if (i !== current) e.currentTarget.style.background = "transparent"; }}>
+              <span className="w-5 text-center text-[10px] font-mono" style={{ color: i === current ? c.accent : c.textMuted }}>{i === current && playing ? "▶" : i + 1}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-medium truncate" style={{ color: i === current ? c.accentText : c.text }}>{t.name}</p>
+                <p className="text-[10px]" style={{ color: c.textMuted }}>{t.artist}</p>
+              </div>
+              <span className="text-[10px] font-mono" style={{ color: c.textMuted }}>{t.dur}</span>
+            </button>
+          ))}
+        </div>
+        {/* Now Playing bar */}
+        <div className="flex-shrink-0 px-4 pt-2.5 pb-3" style={{ borderTop: `1px solid ${c.border}`, background: c.surface }}>
+          <div className="w-full h-1 rounded-full mb-2.5" style={{ background: c.cardAlt }}>
+            <div className="h-full rounded-full" style={{ background: c.accent, width: playing ? "45%" : "0%", transition: "width 0.3s" }} />
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>{tracks[current].name}</p>
+              <p className="text-[9px]" style={{ color: c.textMuted }}>{tracks[current].artist}</p>
+            </div>
+            <button onClick={() => setShuffle(!shuffle)} style={{ color: shuffle ? c.accent : c.textMuted }}><I d={ic.refresh} s={13} /></button>
+            <button style={{ color: c.textSec }} onClick={() => setCurrent(p => p > 0 ? p - 1 : tracks.length - 1)}><I d={ic.skip} s={14} /></button>
+            <button className="w-9 h-9 rounded-full flex items-center justify-center"
+              style={{ background: c.accent, boxShadow: `0 0 16px ${c.accent}50` }} onClick={() => setPlaying(!playing)}>
+              <I d={playing ? ic.pause : ic.play} s={14} c="#fff" />
+            </button>
+            <button style={{ color: c.textSec }} onClick={() => setCurrent(p => p < tracks.length - 1 ? p + 1 : 0)}><I d={ic.skip} s={14} /></button>
+            <button onClick={() => setRepeat(!repeat)} style={{ color: repeat ? c.accent : c.textMuted }}><I d={ic.refresh} s={13} /></button>
+            <div className="flex items-center gap-1 ml-1">
+              <I d={ic.volume} s={12} c={c.textMuted} />
+              <div className="w-16 h-1 rounded-full relative cursor-pointer" style={{ background: c.border }}
+                onClick={e => { const rect = e.currentTarget.getBoundingClientRect(); setVolume(Math.round(((e.clientX - rect.left) / rect.width) * 100)); }}>
+                <div className="h-full rounded-full" style={{ width: `${volume}%`, background: c.accent }} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1101,31 +1150,124 @@ function MusicApp({ c }: { c: typeof palette.dark }) {
 }
 
 function CalendarApp({ c }: { c: typeof palette.dark }) {
+  const [viewDate, setViewDate] = useState(new Date());
   const now = new Date();
   const [sel, setSel] = useState(now.getDate());
-  const dim = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  const fd = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+  const [view, setView] = useState<"month" | "week" | "day">("month");
+  const [events] = useState([
+    { id: 1, title: "Team Standup", day: 9, time: "09:00", duration: "30m", color: "#3B82F6", recurring: true },
+    { id: 2, title: "Design Review", day: 9, time: "14:00", duration: "1h", color: "#8B5CF6", recurring: false },
+    { id: 3, title: "Client Call — Acme", day: 11, time: "11:00", duration: "45m", color: "#F97316", recurring: false },
+    { id: 4, title: "Sprint Planning", day: 14, time: "10:00", duration: "2h", color: "#10B981", recurring: true },
+    { id: 5, title: "Lunch with Sarah", day: 15, time: "12:30", duration: "1h", color: "#EC4899", recurring: false },
+    { id: 6, title: "Deploy v2.1", day: 18, time: "16:00", duration: "1h", color: "#EF4444", recurring: false },
+    { id: 7, title: "Gallery Opening", day: 22, time: "18:00", duration: "3h", color: "#F59E0B", recurring: false },
+    { id: 8, title: "Investor Meeting", day: 25, time: "09:30", duration: "1.5h", color: "#6366F1", recurring: false },
+  ]);
+  const [showNewEvent, setShowNewEvent] = useState(false);
+
+  const month = viewDate.getMonth();
+  const year = viewDate.getFullYear();
+  const dim = new Date(year, month + 1, 0).getDate();
+  const fd = new Date(year, month, 1).getDay();
   const days: (number | null)[] = [...Array.from({ length: fd }, () => null as null), ...Array.from({ length: dim }, (_, i) => i + 1)];
+  const monthName = viewDate.toLocaleString("default", { month: "long" });
+
+  const prevMonth = () => setViewDate(new Date(year, month - 1, 1));
+  const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
+  const goToday = () => { setViewDate(new Date()); setSel(now.getDate()); };
+
+  const dayEvents = (d: number) => events.filter(e => e.day === d);
+  const selEvents = dayEvents(sel);
+  const isToday = (d: number) => d === now.getDate() && month === now.getMonth() && year === now.getFullYear();
 
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-4">
-        <button style={{ color: c.textMuted }} className="p-1"><I d={ic.chevL} s={14} /></button>
-        <p className="text-sm font-semibold" style={{ color: c.text }}>{now.toLocaleString("default", { month: "long" })} {now.getFullYear()}</p>
-        <button style={{ color: c.textMuted }} className="p-1"><I d={ic.chevR} s={14} /></button>
+    <div className="flex h-full" style={{ background: c.bg }}>
+      {/* Left — Calendar grid */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Toolbar */}
+        <div className="flex items-center justify-between px-4 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <div className="flex items-center gap-2">
+            <button onClick={prevMonth} className="p-1 rounded-md transition-colors" style={{ color: c.textMuted }} onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}><I d={ic.chevL} s={14} /></button>
+            <p className="text-sm font-semibold min-w-[140px] text-center" style={{ color: c.text }}>{monthName} {year}</p>
+            <button onClick={nextMonth} className="p-1 rounded-md transition-colors" style={{ color: c.textMuted }} onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}><I d={ic.chevR} s={14} /></button>
+          </div>
+          <div className="flex items-center gap-1">
+            <button onClick={goToday} className="px-2.5 py-1 rounded-lg text-[10px] font-medium" style={{ background: c.accentSoft, color: c.accentText }}>Today</button>
+            {(["month", "week", "day"] as const).map(v => (
+              <button key={v} onClick={() => setView(v)} className="px-2 py-1 rounded-lg text-[10px] font-medium capitalize transition-colors"
+                style={{ background: view === v ? c.cardAlt : "transparent", color: view === v ? c.text : c.textMuted }}>
+                {v}
+              </button>
+            ))}
+            <button onClick={() => setShowNewEvent(true)} className="ml-1 px-2 py-1 rounded-lg text-[10px] font-medium flex items-center gap-1" style={{ background: c.accent, color: "#fff" }}>
+              <I d={ic.plus} s={11} c="#fff" /> Event
+            </button>
+          </div>
+        </div>
+        {/* Day labels */}
+        <div className="grid grid-cols-7 gap-px px-3 pt-2" style={{ background: c.bg }}>
+          {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d, i) => <div key={i} className="text-center text-[10px] font-semibold py-1" style={{ color: c.textMuted }}>{d}</div>)}
+        </div>
+        {/* Month grid */}
+        <div className="flex-1 grid grid-cols-7 gap-px px-3 pb-2 auto-rows-fr">
+          {days.map((d, i) => {
+            const evts = d ? dayEvents(d) : [];
+            return (
+              <button key={i} onClick={() => d && setSel(d)}
+                className="flex flex-col items-start p-1 rounded-lg text-[11px] transition-all overflow-hidden"
+                style={{
+                  background: d === sel ? c.accentSoft : "transparent",
+                  border: isToday(d ?? 0) ? `1.5px solid ${c.accent}` : "1.5px solid transparent",
+                }}
+                onMouseEnter={e => { if (d && d !== sel) e.currentTarget.style.background = c.cardAlt; }}
+                onMouseLeave={e => { if (d && d !== sel) e.currentTarget.style.background = "transparent"; }}>
+                <span className="font-medium" style={{ color: d === sel ? c.accentText : d ? c.text : "transparent" }}>{d}</span>
+                {evts.slice(0, 2).map(ev => (
+                  <div key={ev.id} className="w-full mt-0.5 px-1 py-0.5 rounded text-[8px] font-medium truncate" style={{ background: ev.color + "20", color: ev.color }}>
+                    {ev.title}
+                  </div>
+                ))}
+                {evts.length > 2 && <span className="text-[8px] mt-0.5" style={{ color: c.textMuted }}>+{evts.length - 2} more</span>}
+              </button>
+            );
+          })}
+        </div>
       </div>
-      <div className="grid grid-cols-7 gap-1 mb-2">
-        {["S","M","T","W","T","F","S"].map((d,i) => <div key={i} className="text-center text-[10px] font-medium py-1" style={{ color: c.textMuted }}>{d}</div>)}
-      </div>
-      <div className="grid grid-cols-7 gap-1">
-        {days.map((d, i) => (
-          <button key={i} onClick={() => d && setSel(d)} className="aspect-square flex items-center justify-center rounded-lg text-xs font-medium transition-all"
-            style={{ background: d === sel ? c.accent : d === now.getDate() && d !== sel ? c.accentSoft : "transparent", color: d === sel ? "#fff" : d === now.getDate() ? c.accentText : d ? c.text : "transparent" }}
-            onMouseEnter={e => { if (d && d !== sel) e.currentTarget.style.background = c.cardAlt; }}
-            onMouseLeave={e => { if (d && d !== sel) e.currentTarget.style.background = d === now.getDate() ? c.accentSoft : "transparent"; }}>
-            {d}
-          </button>
-        ))}
+      {/* Right — Day detail & events */}
+      <div className="w-[200px] flex-shrink-0 flex flex-col border-l" style={{ borderColor: c.border, background: c.surface }}>
+        <div className="p-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <p className="text-[18px] font-bold" style={{ color: c.text }}>{sel}</p>
+          <p className="text-[10px]" style={{ color: c.textMuted }}>{new Date(year, month, sel).toLocaleDateString("default", { weekday: "long", month: "long", day: "numeric" })}</p>
+        </div>
+        <div className="flex-1 overflow-y-auto p-2 space-y-1.5" style={{ scrollbarWidth: "none" }}>
+          {selEvents.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full gap-2">
+              <I d={ic.calendar} s={24} c={c.textMuted} />
+              <p className="text-[10px]" style={{ color: c.textMuted }}>No events</p>
+            </div>
+          ) : selEvents.map(ev => (
+            <div key={ev.id} className="p-2.5 rounded-xl" style={{ background: ev.color + "10", border: `1px solid ${ev.color}25` }}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <div className="w-2 h-2 rounded-full" style={{ background: ev.color }} />
+                <span className="text-[11px] font-semibold" style={{ color: c.text }}>{ev.title}</span>
+              </div>
+              <p className="text-[10px]" style={{ color: c.textMuted }}>{ev.time} · {ev.duration}</p>
+              {ev.recurring && <span className="text-[8px] px-1.5 py-0.5 rounded-full mt-1 inline-block" style={{ background: c.cardAlt, color: c.textMuted }}>Recurring</span>}
+            </div>
+          ))}
+        </div>
+        {showNewEvent && (
+          <div className="p-3 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+            <p className="text-[10px] font-semibold mb-2" style={{ color: c.text }}>New Event</p>
+            <input placeholder="Event title..." className="w-full px-2 py-1.5 rounded-lg text-[10px] outline-none mb-1.5" style={{ background: c.bg, border: `1px solid ${c.border}`, color: c.text }} />
+            <input type="time" className="w-full px-2 py-1.5 rounded-lg text-[10px] outline-none mb-2" style={{ background: c.bg, border: `1px solid ${c.border}`, color: c.text }} />
+            <div className="flex gap-1.5">
+              <button className="flex-1 py-1.5 rounded-lg text-[10px] font-medium" style={{ background: c.accent, color: "#fff" }}>Save</button>
+              <button onClick={() => setShowNewEvent(false)} className="flex-1 py-1.5 rounded-lg text-[10px] font-medium" style={{ background: c.cardAlt, color: c.textMuted }}>Cancel</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -2181,15 +2323,129 @@ function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palett
 }
 
 function NotesApp({ c }: { c: typeof palette.dark }) {
-  const [text, setText] = useState("# My Notes\n\nStart typing here...\n\n- Project ideas\n- Meeting notes\n- Quick reminders");
+  const [notes, setNotes] = useState([
+    { id: 1, title: "Project Ideas", text: "# Project Ideas\n\n- Gallery V2 redesign\n- AI art curation engine\n- Mobile app MVP\n- Artist onboarding flow", folder: "Work", pinned: true, updated: "2 min ago" },
+    { id: 2, title: "Meeting Notes", text: "# Meeting Notes — Apr 8\n\nAttendees: Team lead, Designer, Dev\n\n## Action Items\n- Finalize mockups by Friday\n- Deploy staging by Monday\n- Review analytics dashboard", folder: "Work", pinned: true, updated: "1h ago" },
+    { id: 3, title: "Quick Reminders", text: "- Call dentist\n- Renew domain alternus.art\n- Order new keyboard\n- Update portfolio", folder: "Personal", pinned: false, updated: "3h ago" },
+    { id: 4, title: "API Endpoints", text: "# API Reference\n\nGET /api/v1/artworks\nPOST /api/v1/artworks\nPUT /api/v1/artworks/:id\nDELETE /api/v1/artworks/:id\n\nAuth: Bearer token required", folder: "Dev", pinned: false, updated: "Yesterday" },
+    { id: 5, title: "Shopping List", text: "- Milk\n- Coffee beans\n- Bread\n- Pasta\n- Olive oil", folder: "Personal", pinned: false, updated: "2 days ago" },
+    { id: 6, title: "Sprint Retro", text: "## What went well\n- Shipped on time\n- Good test coverage\n\n## What to improve\n- Better standup format\n- Reduce context switching", folder: "Work", pinned: false, updated: "3 days ago" },
+  ]);
+  const [activeId, setActiveId] = useState(1);
+  const [searchQ, setSearchQ] = useState("");
+  const [activeFolder, setActiveFolder] = useState<string | null>(null);
+  const folders = [...new Set(notes.map(n => n.folder))];
+  const active = notes.find(n => n.id === activeId);
+
+  const filtered = notes
+    .filter(n => !activeFolder || n.folder === activeFolder)
+    .filter(n => !searchQ || n.title.toLowerCase().includes(searchQ.toLowerCase()) || n.text.toLowerCase().includes(searchQ.toLowerCase()));
+  const pinned = filtered.filter(n => n.pinned);
+  const unpinned = filtered.filter(n => !n.pinned);
+
+  const addNote = () => {
+    const id = Date.now();
+    const n = { id, title: "Untitled Note", text: "", folder: activeFolder || "Work", pinned: false, updated: "Just now" };
+    setNotes(p => [n, ...p]);
+    setActiveId(id);
+  };
+  const updateText = (text: string) => {
+    setNotes(p => p.map(n => n.id === activeId ? { ...n, text, updated: "Just now" } : n));
+  };
+  const togglePin = (id: number) => setNotes(p => p.map(n => n.id === id ? { ...n, pinned: !n.pinned } : n));
+  const deleteNote = (id: number) => { setNotes(p => p.filter(n => n.id !== id)); if (activeId === id && notes.length > 1) setActiveId(notes.find(n => n.id !== id)?.id ?? 1); };
+  const words = active ? active.text.trim().split(/\s+/).filter(Boolean).length : 0;
+
   return (
-    <div className="flex flex-col h-full">
-      <textarea
-        className="flex-1 p-4 bg-transparent outline-none resize-none text-sm leading-relaxed font-mono"
-        style={{ color: c.text }}
-        value={text}
-        onChange={e => setText(e.target.value)}
-      />
+    <div className="flex h-full" style={{ background: c.bg }}>
+      {/* Sidebar — note list */}
+      <div className="w-[220px] flex-shrink-0 flex flex-col border-r" style={{ borderColor: c.border, background: c.surface }}>
+        {/* Search + new */}
+        <div className="p-2 flex items-center gap-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <div className="flex-1 flex items-center gap-1.5 px-2 py-1.5 rounded-lg" style={{ background: c.bg, border: `1px solid ${c.border}` }}>
+            <I d={ic.search} s={12} c={c.textMuted} />
+            <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="Search notes..."
+              className="flex-1 bg-transparent outline-none text-[10px]" style={{ color: c.text }} />
+          </div>
+          <button onClick={addNote} className="p-1.5 rounded-lg" style={{ background: c.accent }} title="New Note">
+            <I d={ic.plus} s={13} c="#fff" />
+          </button>
+        </div>
+        {/* Folder tabs */}
+        <div className="flex gap-0.5 px-2 py-1.5 overflow-x-auto flex-shrink-0" style={{ scrollbarWidth: "none" }}>
+          <button onClick={() => setActiveFolder(null)} className="px-2 py-0.5 rounded-full text-[9px] font-medium whitespace-nowrap"
+            style={{ background: !activeFolder ? c.accentSoft : "transparent", color: !activeFolder ? c.accentText : c.textMuted }}>All</button>
+          {folders.map(f => (
+            <button key={f} onClick={() => setActiveFolder(f)} className="px-2 py-0.5 rounded-full text-[9px] font-medium whitespace-nowrap"
+              style={{ background: activeFolder === f ? c.accentSoft : "transparent", color: activeFolder === f ? c.accentText : c.textMuted }}>{f}</button>
+          ))}
+        </div>
+        {/* Note list */}
+        <div className="flex-1 overflow-y-auto px-1.5 py-1 space-y-0.5" style={{ scrollbarWidth: "none" }}>
+          {pinned.length > 0 && <p className="text-[8px] font-semibold uppercase tracking-wider px-2 py-1" style={{ color: c.textMuted }}>Pinned</p>}
+          {pinned.map(n => (
+            <button key={n.id} onClick={() => setActiveId(n.id)} className="w-full text-left px-2.5 py-2 rounded-lg transition-colors"
+              style={{ background: activeId === n.id ? c.cardAlt : "transparent" }}>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] font-semibold truncate flex-1" style={{ color: c.text }}>{n.title}</span>
+                <span className="text-[8px]" style={{ color: c.warning }}>📌</span>
+              </div>
+              <p className="text-[9px] truncate mt-0.5" style={{ color: c.textMuted }}>{n.text.split("\n")[0].replace(/#/g, "").trim()}</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-[8px]" style={{ color: c.textMuted }}>{n.updated}</span>
+                <span className="text-[8px] px-1 rounded" style={{ background: c.cardAlt, color: c.textMuted }}>{n.folder}</span>
+              </div>
+            </button>
+          ))}
+          {unpinned.length > 0 && pinned.length > 0 && <p className="text-[8px] font-semibold uppercase tracking-wider px-2 py-1" style={{ color: c.textMuted }}>Notes</p>}
+          {unpinned.map(n => (
+            <button key={n.id} onClick={() => setActiveId(n.id)} className="w-full text-left px-2.5 py-2 rounded-lg transition-colors"
+              style={{ background: activeId === n.id ? c.cardAlt : "transparent" }}>
+              <span className="text-[10px] font-semibold truncate block" style={{ color: c.text }}>{n.title}</span>
+              <p className="text-[9px] truncate mt-0.5" style={{ color: c.textMuted }}>{n.text.split("\n")[0].replace(/#/g, "").trim()}</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-[8px]" style={{ color: c.textMuted }}>{n.updated}</span>
+                <span className="text-[8px] px-1 rounded" style={{ background: c.cardAlt, color: c.textMuted }}>{n.folder}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+      {/* Editor */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {active ? (
+          <>
+            <div className="flex items-center justify-between px-4 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+              <input value={active.title} onChange={e => setNotes(p => p.map(n => n.id === activeId ? { ...n, title: e.target.value } : n))}
+                className="text-[13px] font-semibold bg-transparent outline-none flex-1" style={{ color: c.text }} />
+              <div className="flex items-center gap-1 ml-2">
+                <button onClick={() => togglePin(activeId)} className="p-1.5 rounded-lg transition-colors" title={active.pinned ? "Unpin" : "Pin"}
+                  style={{ color: active.pinned ? c.warning : c.textMuted }}
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={ic.lock} s={12} />
+                </button>
+                <button onClick={() => deleteNote(activeId)} className="p-1.5 rounded-lg transition-colors" title="Delete" style={{ color: c.danger }}
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={ic.trash} s={12} />
+                </button>
+              </div>
+            </div>
+            <textarea value={active.text} onChange={e => updateText(e.target.value)}
+              className="flex-1 p-4 bg-transparent outline-none resize-none text-[12px] leading-relaxed font-mono"
+              style={{ color: c.text, scrollbarWidth: "none" }} />
+            <div className="px-4 py-1.5 flex items-center gap-4 text-[9px] flex-shrink-0" style={{ borderTop: `1px solid ${c.border}`, color: c.textMuted }}>
+              <span>{words} words</span>
+              <span>{active.text.length} chars</span>
+              <span className="ml-auto">{active.folder}</span>
+              <span>{active.updated}</span>
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-[12px]" style={{ color: c.textMuted }}>Select a note or create a new one</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -3012,47 +3268,137 @@ function CalculatorApp({ c }: { c: typeof palette.dark }) {
 
 // ━━━━ ACCOUNTS APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AccountsApp({ c }: { c: typeof palette.dark }) {
+  const [tab, setTab] = useState<"accounts" | "profile" | "security">("accounts");
   const [accounts, setAccounts] = useState([
-    { name: "Google", user: "admin@gmail.com", icon: ic.globe, color: "#4285F4" },
-    { name: "GitHub", user: "alternuslamiart", icon: ic.code, color: "#8B5CF6" },
-    { name: "Alternus Cloud", user: "admin@alternus.art", icon: ic.cloud, color: "#06B6D4" },
-    { name: "Microsoft", user: "admin@outlook.com", icon: ic.monitor, color: "#00A4EF" },
+    { name: "Google", user: "admin@gmail.com", icon: ic.globe, color: "#4285F4", synced: true, lastSync: "2 min ago" },
+    { name: "GitHub", user: "alternuslamiart", icon: ic.code, color: "#8B5CF6", synced: true, lastSync: "5 min ago" },
+    { name: "Alternus Cloud", user: "admin@alternus.art", icon: ic.cloud, color: "#06B6D4", synced: true, lastSync: "Just now" },
+    { name: "Microsoft", user: "admin@outlook.com", icon: ic.monitor, color: "#00A4EF", synced: false, lastSync: "1h ago" },
+    { name: "Stripe", user: "payments@alternus.art", icon: ic.dollarSign, color: "#635BFF", synced: true, lastSync: "10 min ago" },
   ]);
   const [showAdd, setShowAdd] = useState(false);
   const [newName, setNewName] = useState("");
   const [newUser, setNewUser] = useState("");
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-4 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <p className="text-xs font-semibold" style={{ color: c.text }}>Saved Accounts</p>
-        <button onClick={() => setShowAdd(!showAdd)} className="p-1 rounded-md" style={{ color: c.accentText }}><I d={ic.plus} s={14} /></button>
+    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+      {/* Tabs */}
+      <div className="flex px-2 pt-2 gap-0.5 flex-shrink-0">
+        {[{ id: "accounts" as const, label: "Accounts", icon: ic.users }, { id: "profile" as const, label: "Profile", icon: ic.user }, { id: "security" as const, label: "Security", icon: ic.shield }].map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} className="flex items-center gap-1.5 px-3 py-2 rounded-t-lg text-[11px] font-medium transition-colors"
+            style={{ background: tab === t.id ? c.surface : "transparent", color: tab === t.id ? c.text : c.textMuted, borderBottom: tab === t.id ? `2px solid ${c.accent}` : "2px solid transparent" }}>
+            <I d={t.icon} s={13} />{t.label}
+          </button>
+        ))}
       </div>
-      <div className="flex-1 overflow-y-auto px-2 py-2" style={{ scrollbarWidth: "none" }}>
-        {showAdd && (
-          <div className="p-3 rounded-xl mb-2 space-y-2" style={{ background: c.cardAlt }}>
-            <input className="w-full px-3 py-1.5 rounded-lg text-[11px] bg-transparent outline-none" style={{ color: c.text, border: `1px solid ${c.border}` }} placeholder="Service name..." value={newName} onChange={e => setNewName(e.target.value)} />
-            <input className="w-full px-3 py-1.5 rounded-lg text-[11px] bg-transparent outline-none" style={{ color: c.text, border: `1px solid ${c.border}` }} placeholder="Username/Email..." value={newUser} onChange={e => setNewUser(e.target.value)} />
-            <button onClick={() => { if (newName && newUser) { setAccounts(p => [...p, { name: newName, user: newUser, icon: ic.key, color: c.accentText }]); setNewName(""); setNewUser(""); setShowAdd(false); } }}
-              className="w-full py-1.5 rounded-lg text-[10px] font-medium" style={{ background: c.accent, color: "#fff" }}>Save Account</button>
+      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+        {tab === "accounts" && (
+          <div className="p-3">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[12px] font-semibold" style={{ color: c.text }}>Connected Accounts</p>
+              <button onClick={() => setShowAdd(!showAdd)} className="px-2.5 py-1 rounded-lg text-[10px] font-medium flex items-center gap-1" style={{ background: c.accent, color: "#fff" }}>
+                <I d={ic.plus} s={11} c="#fff" />Add
+              </button>
+            </div>
+            {showAdd && (
+              <div className="p-3 rounded-xl mb-3 space-y-2" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                <input className="w-full px-3 py-1.5 rounded-lg text-[11px] bg-transparent outline-none" style={{ color: c.text, border: `1px solid ${c.border}` }} placeholder="Service name..." value={newName} onChange={e => setNewName(e.target.value)} />
+                <input className="w-full px-3 py-1.5 rounded-lg text-[11px] bg-transparent outline-none" style={{ color: c.text, border: `1px solid ${c.border}` }} placeholder="Username/Email..." value={newUser} onChange={e => setNewUser(e.target.value)} />
+                <div className="flex gap-2">
+                  <button onClick={() => { if (newName && newUser) { setAccounts(p => [...p, { name: newName, user: newUser, icon: ic.key, color: c.accentText, synced: false, lastSync: "Never" }]); setNewName(""); setNewUser(""); setShowAdd(false); } }}
+                    className="flex-1 py-1.5 rounded-lg text-[10px] font-medium" style={{ background: c.accent, color: "#fff" }}>Save</button>
+                  <button onClick={() => setShowAdd(false)} className="flex-1 py-1.5 rounded-lg text-[10px] font-medium" style={{ background: c.cardAlt, color: c.textMuted }}>Cancel</button>
+                </div>
+              </div>
+            )}
+            <div className="space-y-1.5">
+              {accounts.map((acc, i) => (
+                <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: acc.color + "20" }}>
+                    <I d={acc.icon} s={18} c={acc.color} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>{acc.name}</p>
+                    <p className="text-[9px]" style={{ color: c.textMuted }}>{acc.user}</p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: acc.synced ? c.success : c.warning }} />
+                      <span className="text-[8px]" style={{ color: c.textMuted }}>{acc.synced ? "Synced" : "Not synced"} · {acc.lastSync}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button className="p-1.5 rounded-lg" style={{ color: c.textMuted }} title="Sync"
+                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <I d={ic.refresh} s={12} />
+                    </button>
+                    <button onClick={() => setAccounts(p => p.filter((_, j) => j !== i))} className="p-1.5 rounded-lg" style={{ color: c.danger }} title="Remove"
+                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <I d={ic.trash} s={12} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
-        {accounts.map((acc, i) => (
-          <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors mb-0.5"
-            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: acc.color + "20" }}>
-              <I d={acc.icon} s={16} c={acc.color} />
+        {tab === "profile" && (
+          <div className="p-4 space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center text-lg font-bold" style={{ background: c.accentSoft, color: c.accentText }}>BA</div>
+              <div>
+                <p className="text-[14px] font-bold" style={{ color: c.text }}>Bulzart Aliu</p>
+                <p className="text-[11px]" style={{ color: c.textMuted }}>admin@alternus.art</p>
+                <button className="mt-1 px-2 py-0.5 rounded text-[9px] font-medium" style={{ background: c.accentSoft, color: c.accentText }}>Change Avatar</button>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-medium truncate" style={{ color: c.text }}>{acc.name}</p>
-              <p className="text-[9px]" style={{ color: c.textMuted }}>{acc.user}</p>
-            </div>
-            <button onClick={() => setAccounts(p => p.filter((_, j) => j !== i))} className="p-1 rounded-md opacity-0 group-hover:opacity-100" style={{ color: c.textMuted }} title="Remove">
-              <I d={ic.close} s={10} />
-            </button>
+            {[{ label: "Display Name", value: "Bulzart Aliu" }, { label: "Email", value: "admin@alternus.art" }, { label: "Organization", value: "Alternus Art Gallery" }, { label: "Role", value: "Administrator" }, { label: "Timezone", value: "Europe/Tirane (UTC+1)" }].map(f => (
+              <div key={f.label}>
+                <p className="text-[10px] font-semibold mb-1" style={{ color: c.textMuted }}>{f.label}</p>
+                <div className="px-3 py-2 rounded-lg text-[11px]" style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }}>{f.value}</div>
+              </div>
+            ))}
+            <button className="w-full py-2 rounded-lg text-[11px] font-medium" style={{ background: c.accent, color: "#fff" }}>Save Changes</button>
           </div>
-        ))}
+        )}
+        {tab === "security" && (
+          <div className="p-4 space-y-3">
+            <div className="p-3 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <I d={ic.lock} s={14} c={c.accent} />
+                  <span className="text-[11px] font-semibold" style={{ color: c.text }}>Password</span>
+                </div>
+                <button className="px-2 py-1 rounded-lg text-[9px] font-medium" style={{ background: c.accentSoft, color: c.accentText }}>Change</button>
+              </div>
+              <p className="text-[10px]" style={{ color: c.textMuted }}>Last changed 30 days ago</p>
+            </div>
+            <div className="p-3 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <I d={ic.shield} s={14} c={c.success} />
+                  <span className="text-[11px] font-semibold" style={{ color: c.text }}>Two-Factor Authentication</span>
+                </div>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-medium" style={{ background: c.success + "20", color: c.success }}>Enabled</span>
+              </div>
+              <p className="text-[10px]" style={{ color: c.textMuted }}>Authenticator app · Last verified 2 days ago</p>
+            </div>
+            <div className="p-3 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+              <div className="flex items-center gap-2 mb-2">
+                <I d={ic.key} s={14} c={c.warning} />
+                <span className="text-[11px] font-semibold" style={{ color: c.text }}>Active Sessions</span>
+              </div>
+              {[{ device: "MacBook Pro — Chrome", location: "Tirana, AL", active: true }, { device: "iPhone 15 — Safari", location: "Tirana, AL", active: true }, { device: "Windows PC — Edge", location: "Berlin, DE", active: false }].map((s, i) => (
+                <div key={i} className="flex items-center justify-between py-1.5">
+                  <div>
+                    <p className="text-[10px] font-medium" style={{ color: c.text }}>{s.device}</p>
+                    <p className="text-[9px]" style={{ color: c.textMuted }}>{s.location}</p>
+                  </div>
+                  {s.active ? <span className="w-2 h-2 rounded-full" style={{ background: c.success }} /> : <button className="text-[9px] px-1.5 py-0.5 rounded" style={{ color: c.danger, background: c.danger + "15" }}>Revoke</button>}
+                </div>
+              ))}
+            </div>
+            <button className="w-full py-2 rounded-lg text-[11px] font-medium" style={{ background: c.danger + "15", color: c.danger }}>Sign Out of All Sessions</button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -5034,12 +5380,13 @@ function TasksApp({ c }: { c: typeof palette.dark }) {
       </div>
       <div className="px-4 py-2 flex items-center justify-between flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
         <p className="text-[9px]" style={{ color: c.textMuted }}>{tasks.filter(t => t.done).length}/{tasks.length} completed</p>
-        <div className="flex gap-1">
+        <div className="flex gap-2">
           {[{ col: c.danger, label: "High" }, { col: c.warning, label: "Med" }, { col: c.success, label: "Low" }].map(p => (
             <span key={p.label} className="flex items-center gap-1 text-[9px]" style={{ color: c.textMuted }}>
               <span className="w-1.5 h-1.5 rounded-full" style={{ background: p.col }} />{p.label}
             </span>
           ))}
+          <button onClick={() => setTasks(p => p.filter(t => !t.done))} className="text-[9px] px-1.5 py-0.5 rounded" style={{ color: c.danger, background: c.danger + "10" }}>Clear done</button>
         </div>
       </div>
     </div>
