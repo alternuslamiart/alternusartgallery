@@ -6835,6 +6835,14 @@ export default function AlternusOS() {
   const [ctrlAiInput, setCtrlAiInput] = useState("");
   const [ctrlAiChips, setCtrlAiChips] = useState(true);
   const ctrlAiInputRef = useRef<HTMLInputElement>(null);
+  const [ctrlAiMode, setCtrlAiMode] = useState<"chat" | "write" | "code" | "image" | "research" | "translate">("chat");
+  const [ctrlAiTab, setCtrlAiTab] = useState<"suggestions" | "recent" | "tools">("suggestions");
+  const [ctrlAiRecent] = useState([
+    { text: "Summarize this document", icon: ic.fileText },
+    { text: "Write a professional email", icon: ic.mail },
+    { text: "Debug my code", icon: ic.code },
+    { text: "Generate a creative story", icon: ic.pen },
+  ]);
   const [showAiChat, setShowAiChat] = useState(false);
   const [aiChatMsgs, setAiChatMsgs] = useState<{ role: "user" | "ai"; text: string }[]>([]);
   const [aiChatInput, setAiChatInput] = useState("");
@@ -8076,46 +8084,116 @@ export default function AlternusOS() {
         {/* ━━━━ Ctrl+A Global AI Overlay ━━━━ */}
         {showCtrlAi && (() => {
           const focusedWin = [...wins].filter(w => w.isOpen && !w.isMinimized).sort((a, b) => b.zIndex - a.zIndex)[0];
-          const creativeWins: WinId[] = ["word", "notes", "writer", "imagegen", "studio", "monaco", "code", "browser", "aihub", "aivoice", "knowledge"];
-          const isCreative = focusedWin && creativeWins.includes(focusedWin.id);
-          const systemChips = ["Smart Animated", "Fixed", "Update", "Create document", "Search File"];
-          const creativeChips = ["Smart Animated", "Writen", "Create document", "Email Write", "Create Docx"];
-          const chips = isCreative ? creativeChips : systemChips;
           const ox = focusedWin ? focusedWin.x + focusedWin.w / 2 : window.innerWidth / 2;
-          const oy = focusedWin ? focusedWin.y + 60 : window.innerHeight / 2 - 60;
+          const oy = focusedWin ? focusedWin.y + 60 : window.innerHeight / 2 - 100;
           const chipBg = mode === "dark" ? "rgba(58,62,75,0.92)" : "rgba(210,213,228,0.88)";
           const chipColor = mode === "dark" ? "#d0d4e8" : "#2d3250";
           const chipBorder = mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.55)";
           const barBg = mode === "dark" ? "rgba(36,38,50,0.94)" : "rgba(210,213,232,0.92)";
           const inputColor = mode === "dark" ? "#e8eaf6" : "#1e2140";
+          const panelBg = mode === "dark" ? "rgba(30,32,44,0.96)" : "rgba(220,223,240,0.95)";
+          const dividerColor = mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
+          const mutedColor = mode === "dark" ? "#7a7f9a" : "#8b90a8";
+          const hoverBg = mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+
+          const aiModes: { id: typeof ctrlAiMode; label: string; icon: string; color: string }[] = [
+            { id: "chat", label: "Chat", icon: ic.messageCircle, color: "#3B82F6" },
+            { id: "write", label: "Write", icon: ic.pen, color: "#8B5CF6" },
+            { id: "code", label: "Code", icon: ic.code, color: "#10B981" },
+            { id: "image", label: "Image", icon: ic.image, color: "#F59E0B" },
+            { id: "research", label: "Research", icon: ic.globe, color: "#EC4899" },
+            { id: "translate", label: "Translate", icon: ic.layers, color: "#06B6D4" },
+          ];
+
+          const modeAccent = aiModes.find(m => m.id === ctrlAiMode)?.color || "#3B82F6";
+
+          const modePlaceholders: Record<typeof ctrlAiMode, string> = {
+            chat: "Ask AI anything...",
+            write: "What would you like to write?",
+            code: "Describe the code you need...",
+            image: "Describe an image to generate...",
+            research: "What topic to research?",
+            translate: "Enter text to translate...",
+          };
+
+          const suggestionGroups: Record<typeof ctrlAiMode, { label: string; icon: string; items: string[] }[]> = {
+            chat: [
+              { label: "Productivity", icon: ic.zap, items: ["Summarize this page", "Create a to-do list", "Set a reminder", "Draft a quick reply"] },
+              { label: "Creative", icon: ic.wand, items: ["Write a poem", "Story ideas", "Name suggestions", "Brainstorm concepts"] },
+              { label: "Analysis", icon: ic.activity, items: ["Explain this topic", "Compare options", "Pros and cons", "Fact check"] },
+            ],
+            write: [
+              { label: "Documents", icon: ic.fileText, items: ["Professional email", "Cover letter", "Meeting notes", "Project proposal"] },
+              { label: "Creative", icon: ic.pen, items: ["Blog post", "Social media caption", "Short story", "Product description"] },
+              { label: "Edit", icon: ic.edit3, items: ["Proofread text", "Make it shorter", "Change tone to formal", "Improve clarity"] },
+            ],
+            code: [
+              { label: "Generate", icon: ic.terminal, items: ["React component", "API endpoint", "Database query", "Unit test"] },
+              { label: "Debug", icon: ic.alertTriangle, items: ["Fix this error", "Find the bug", "Explain this code", "Optimize performance"] },
+              { label: "Refactor", icon: ic.refresh, items: ["Clean up code", "Add TypeScript types", "Convert to async/await", "Extract function"] },
+            ],
+            image: [
+              { label: "Styles", icon: ic.image, items: ["Photorealistic", "Digital art", "Watercolor painting", "3D render"] },
+              { label: "Subjects", icon: ic.wand, items: ["Portrait", "Landscape", "Abstract art", "Logo design"] },
+              { label: "Modify", icon: ic.edit3, items: ["Remove background", "Change colors", "Add text overlay", "Resize for social"] },
+            ],
+            research: [
+              { label: "Analysis", icon: ic.barChart, items: ["Market research", "Competitor analysis", "Trend report", "SWOT analysis"] },
+              { label: "Learning", icon: ic.bookOpen, items: ["Explain like I'm 5", "Deep dive topic", "History of...", "How does X work?"] },
+              { label: "Data", icon: ic.trendingUp, items: ["Summarize article", "Extract key points", "Find sources", "Verify claim"] },
+            ],
+            translate: [
+              { label: "Languages", icon: ic.globe, items: ["English to Albanian", "Albanian to English", "English to Spanish", "English to French"] },
+              { label: "Context", icon: ic.layers, items: ["Formal translation", "Casual conversation", "Technical document", "Legal text"] },
+              { label: "Tools", icon: ic.settings, items: ["Detect language", "Pronunciation guide", "Grammar check", "Localize content"] },
+            ],
+          };
+
+          const quickTools: { icon: string; label: string; action: () => void; color: string }[] = [
+            { icon: ic.mic, label: "Voice Input", action: () => {}, color: "#EF4444" },
+            { icon: ic.upload, label: "Upload File", action: () => {}, color: "#8B5CF6" },
+            { icon: ic.image, label: "Paste Image", action: () => {}, color: "#F59E0B" },
+            { icon: ic.bookOpen, label: "Knowledge Base", action: () => { openWin("knowledge" as WinId); setShowCtrlAi(false); }, color: "#10B981" },
+            { icon: ic.clock, label: "History", action: () => setCtrlAiTab("recent"), color: "#6366F1" },
+            { icon: ic.settings, label: "AI Settings", action: () => { openWin("settings"); setShowCtrlAi(false); }, color: "#64748B" },
+          ];
+
+          const currentGroups = suggestionGroups[ctrlAiMode];
+
           return (
             <>
               <style>{`
                 @keyframes ctrlai-in {
-                  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+                  from { opacity: 0; transform: translateY(12px) scale(0.96); }
                   to   { opacity: 1; transform: translateY(0)   scale(1);    }
                 }
                 @keyframes chip-in {
                   from { opacity: 0; transform: translateY(6px); }
                   to   { opacity: 1; transform: translateY(0);   }
                 }
-                .ctrlai-panel { animation: ctrlai-in 0.22s cubic-bezier(.22,.68,0,1.2) both; }
+                @keyframes ctrlai-fade {
+                  from { opacity: 0; }
+                  to   { opacity: 1; }
+                }
+                .ctrlai-panel { animation: ctrlai-in 0.24s cubic-bezier(.22,.68,0,1.15) both; }
                 .ctrlai-chip  { animation: chip-in  0.18s cubic-bezier(.22,.68,0,1.2) both; }
+                .ctrlai-fade  { animation: ctrlai-fade 0.15s ease both; }
+                .ctrlai-tool:hover .ctrlai-tool-icon { transform: scale(1.12); }
               `}</style>
               {/* Backdrop dismiss */}
-              <div className="fixed inset-0 z-[490]" onClick={() => { setShowCtrlAi(false); setCtrlAiChips(true); }} />
+              <div className="fixed inset-0 z-[490] ctrlai-fade" style={{ background: mode === "dark" ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.1)" }} onClick={() => { setShowCtrlAi(false); setCtrlAiChips(true); setCtrlAiTab("suggestions"); }} />
               {/* Panel */}
               <div
                 className="absolute z-[491] ctrlai-panel"
-                style={{ left: Math.min(Math.max(ox - 230, 8), window.innerWidth - 468), top: Math.max(oy, 8), width: 460 }}
+                style={{ left: Math.min(Math.max(ox - 270, 8), window.innerWidth - 548), top: Math.max(oy, 8), width: 540 }}
                 onClick={e => e.stopPropagation()}
               >
-                {/* Bar row */}
+                {/* Search Bar */}
                 <div className="flex items-center gap-2 p-1.5 rounded-2xl mb-2"
                   style={{ background: barBg, backdropFilter: "blur(20px) saturate(1.5)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.65)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)" : "0 4px 24px rgba(100,110,180,0.18)" }}>
-                  {/* Left: diamond button */}
+                  {/* Submit button */}
                   <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
-                    style={{ background: "#3B82F6", boxShadow: "0 2px 12px rgba(59,130,246,0.45)" }}
+                    style={{ background: modeAccent, boxShadow: `0 2px 12px ${modeAccent}73` }}
                     onClick={() => { if (ctrlAiInput.trim()) { openWin("ai"); setShowCtrlAi(false); } }}>
                     <svg width={16} height={16} viewBox="0 0 24 24" fill="none"><path d={ic.sparkle} fill="#fff" /></svg>
                   </button>
@@ -8123,51 +8201,179 @@ export default function AlternusOS() {
                   <input
                     ref={ctrlAiInputRef}
                     className="flex-1 bg-transparent outline-none text-[14px] font-light"
-                    style={{ color: inputColor, caretColor: "#3B82F6" }}
-                    placeholder="Ask AI anything..."
+                    style={{ color: inputColor, caretColor: modeAccent }}
+                    placeholder={modePlaceholders[ctrlAiMode]}
                     value={ctrlAiInput}
                     onChange={e => setCtrlAiInput(e.target.value)}
                     onKeyDown={e => {
-                      if (e.key === "Escape") { setShowCtrlAi(false); setCtrlAiChips(true); }
+                      if (e.key === "Escape") { setShowCtrlAi(false); setCtrlAiChips(true); setCtrlAiTab("suggestions"); }
                       if (e.key === "Enter" && ctrlAiInput.trim()) { openWin("ai"); setShowCtrlAi(false); }
                     }}
                   />
-                  {/* Chevron toggle */}
+                  {/* Attachment button */}
+                  <button className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
+                    style={{ background: mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)" }}
+                    title="Attach file">
+                    <I d={ic.upload} s={14} c={mutedColor} />
+                  </button>
+                  {/* Voice button */}
+                  <button className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
+                    style={{ background: mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)" }}
+                    title="Voice input">
+                    <I d={ic.mic} s={14} c={mutedColor} />
+                  </button>
+                  {/* Expand/collapse toggle */}
                   <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
-                    style={{ background: "#3B82F6", boxShadow: "0 2px 12px rgba(59,130,246,0.45)" }}
+                    style={{ background: modeAccent, boxShadow: `0 2px 12px ${modeAccent}73` }}
                     onClick={() => setCtrlAiChips(p => !p)}>
                     <I d={ctrlAiChips ? ic.chevU : ic.chevD} s={16} c="#fff" />
                   </button>
                 </div>
 
-                {/* Chips row */}
+                {/* Expanded Panel */}
                 {ctrlAiChips && (
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-2 flex-1 flex-wrap">
-                      {chips.map((chip, i) => (
-                        <button key={chip}
-                          className="ctrlai-chip px-4 py-2.5 rounded-2xl text-[12px] font-medium transition-all"
+                  <div className="rounded-2xl overflow-hidden ctrlai-chip"
+                    style={{ background: panelBg, backdropFilter: "blur(24px) saturate(1.5)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.6)"}`, boxShadow: mode === "dark" ? "0 12px 48px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.25)" : "0 8px 32px rgba(100,110,180,0.15)" }}>
+
+                    {/* AI Mode Tabs */}
+                    <div className="flex items-center gap-1 px-3 pt-3 pb-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+                      {aiModes.map(m => (
+                        <button key={m.id}
+                          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all whitespace-nowrap"
                           style={{
-                            background: chipBg,
-                            backdropFilter: "blur(16px)",
-                            border: `1px solid ${chipBorder}`,
-                            color: chipColor,
-                            boxShadow: mode === "dark" ? "0 2px 8px rgba(0,0,0,0.25)" : "0 1px 4px rgba(100,110,180,0.1)",
-                            animationDelay: `${i * 0.04}s`,
+                            background: ctrlAiMode === m.id ? m.color : "transparent",
+                            color: ctrlAiMode === m.id ? "#fff" : mutedColor,
+                            boxShadow: ctrlAiMode === m.id ? `0 2px 10px ${m.color}50` : "none",
                           }}
-                          onMouseEnter={e => { e.currentTarget.style.background = "#3B82F6"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#3B82F6"; e.currentTarget.style.boxShadow = "0 2px 12px rgba(59,130,246,0.4)"; }}
-                          onMouseLeave={e => { e.currentTarget.style.background = chipBg; e.currentTarget.style.color = chipColor; e.currentTarget.style.borderColor = chipBorder; e.currentTarget.style.boxShadow = mode === "dark" ? "0 2px 8px rgba(0,0,0,0.25)" : "0 1px 4px rgba(100,110,180,0.1)"; }}
-                          onClick={() => { setCtrlAiInput(chip + ": "); setTimeout(() => ctrlAiInputRef.current?.focus(), 10); }}>
-                          {chip}
+                          onMouseEnter={e => { if (ctrlAiMode !== m.id) e.currentTarget.style.background = hoverBg; }}
+                          onMouseLeave={e => { if (ctrlAiMode !== m.id) e.currentTarget.style.background = "transparent"; }}
+                          onClick={() => { setCtrlAiMode(m.id); setCtrlAiTab("suggestions"); }}>
+                          <I d={m.icon} s={13} c={ctrlAiMode === m.id ? "#fff" : mutedColor} />
+                          {m.label}
                         </button>
                       ))}
                     </div>
-                    {/* ^ button */}
-                    <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105 flex-shrink-0"
-                      style={{ background: "#3B82F6", boxShadow: "0 2px 12px rgba(59,130,246,0.45)" }}
-                      onClick={() => setCtrlAiChips(false)}>
-                      <I d={ic.chevU} s={16} c="#fff" />
-                    </button>
+
+                    <div style={{ height: 1, background: dividerColor }} />
+
+                    {/* Tab switcher: Suggestions | Recent | Tools */}
+                    <div className="flex items-center gap-4 px-4 pt-2.5 pb-1">
+                      {(["suggestions", "recent", "tools"] as const).map(tab => (
+                        <button key={tab}
+                          className="text-[11px] font-medium pb-1.5 transition-all capitalize"
+                          style={{
+                            color: ctrlAiTab === tab ? modeAccent : mutedColor,
+                            borderBottom: ctrlAiTab === tab ? `2px solid ${modeAccent}` : "2px solid transparent",
+                          }}
+                          onClick={() => setCtrlAiTab(tab)}>
+                          {tab}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Tab Content */}
+                    <div className="px-3 pb-3" style={{ maxHeight: 320, overflowY: "auto", scrollbarWidth: "none" }}>
+
+                      {/* Suggestions Tab */}
+                      {ctrlAiTab === "suggestions" && (
+                        <div className="space-y-3 pt-1">
+                          {currentGroups.map((group, gi) => (
+                            <div key={group.label} className="ctrlai-chip" style={{ animationDelay: `${gi * 0.05}s` }}>
+                              <div className="flex items-center gap-1.5 px-1 mb-1.5">
+                                <I d={group.icon} s={11} c={mutedColor} />
+                                <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: mutedColor }}>{group.label}</span>
+                              </div>
+                              <div className="grid grid-cols-2 gap-1.5">
+                                {group.items.map((item, ii) => (
+                                  <button key={item}
+                                    className="ctrlai-chip flex items-center gap-2 px-3 py-2.5 rounded-xl text-[12px] font-medium text-left transition-all"
+                                    style={{
+                                      background: chipBg,
+                                      border: `1px solid ${chipBorder}`,
+                                      color: chipColor,
+                                      animationDelay: `${(gi * 4 + ii) * 0.025}s`,
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = modeAccent; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = modeAccent; e.currentTarget.style.boxShadow = `0 2px 12px ${modeAccent}40`; }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = chipBg; e.currentTarget.style.color = chipColor; e.currentTarget.style.borderColor = chipBorder; e.currentTarget.style.boxShadow = "none"; }}
+                                    onClick={() => { setCtrlAiInput(item + ": "); setTimeout(() => ctrlAiInputRef.current?.focus(), 10); }}>
+                                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: modeAccent, opacity: 0.6 }} />
+                                    {item}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Recent Tab */}
+                      {ctrlAiTab === "recent" && (
+                        <div className="space-y-1 pt-1">
+                          {ctrlAiRecent.map((item, i) => (
+                            <button key={i}
+                              className="ctrlai-chip flex items-center gap-3 w-full px-3 py-3 rounded-xl text-left transition-all"
+                              style={{ animationDelay: `${i * 0.04}s`, color: chipColor }}
+                              onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                              onClick={() => { setCtrlAiInput(item.text); setTimeout(() => ctrlAiInputRef.current?.focus(), 10); }}>
+                              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: chipBg }}>
+                                <I d={item.icon} s={14} c={mutedColor} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[12px] font-medium truncate">{item.text}</p>
+                                <p className="text-[10px]" style={{ color: mutedColor }}>Recent</p>
+                              </div>
+                              <I d={ic.chevR} s={12} c={mutedColor} />
+                            </button>
+                          ))}
+                          {ctrlAiRecent.length === 0 && (
+                            <div className="flex flex-col items-center py-8">
+                              <I d={ic.clock} s={24} c={mutedColor} />
+                              <p className="text-[12px] mt-2" style={{ color: mutedColor }}>No recent prompts</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Tools Tab */}
+                      {ctrlAiTab === "tools" && (
+                        <div className="grid grid-cols-3 gap-2 pt-1">
+                          {quickTools.map((tool, i) => (
+                            <button key={tool.label}
+                              className="ctrlai-chip ctrlai-tool flex flex-col items-center gap-2 py-4 px-2 rounded-xl transition-all"
+                              style={{ animationDelay: `${i * 0.04}s`, color: chipColor }}
+                              onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                              onClick={tool.action}>
+                              <div className="ctrlai-tool-icon w-10 h-10 rounded-xl flex items-center justify-center transition-transform"
+                                style={{ background: `${tool.color}18`, border: `1px solid ${tool.color}30` }}>
+                                <I d={tool.icon} s={18} c={tool.color} />
+                              </div>
+                              <span className="text-[11px] font-medium">{tool.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Footer */}
+                    <div style={{ height: 1, background: dividerColor }} />
+                    <div className="flex items-center justify-between px-4 py-2.5">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
+                        <span className="text-[10px] font-medium" style={{ color: mutedColor }}>Alternus AI Ready</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px]" style={{ color: mutedColor }}>Ctrl+A</span>
+                        <button className="text-[10px] font-medium px-2 py-1 rounded-lg transition-all"
+                          style={{ color: modeAccent }}
+                          onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                          onClick={() => { openWin("ai"); setShowCtrlAi(false); }}>
+                          Open Full AI
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
