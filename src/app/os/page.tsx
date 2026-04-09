@@ -8085,77 +8085,172 @@ export default function AlternusOS() {
         {showCtrlAi && (() => {
           const focusedWin = [...wins].filter(w => w.isOpen && !w.isMinimized).sort((a, b) => b.zIndex - a.zIndex)[0];
           const ox = focusedWin ? focusedWin.x + focusedWin.w / 2 : window.innerWidth / 2;
-          const oy = focusedWin ? focusedWin.y + 60 : window.innerHeight / 2 - 100;
-          const chipBg = mode === "dark" ? "rgba(58,62,75,0.92)" : "rgba(210,213,228,0.88)";
-          const chipColor = mode === "dark" ? "#d0d4e8" : "#2d3250";
-          const chipBorder = mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.55)";
+          const oy = focusedWin ? focusedWin.y + 40 : window.innerHeight / 2 - 140;
           const barBg = mode === "dark" ? "rgba(36,38,50,0.94)" : "rgba(210,213,232,0.92)";
           const inputColor = mode === "dark" ? "#e8eaf6" : "#1e2140";
-          const panelBg = mode === "dark" ? "rgba(30,32,44,0.96)" : "rgba(220,223,240,0.95)";
-          const dividerColor = mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
-          const mutedColor = mode === "dark" ? "#7a7f9a" : "#8b90a8";
-          const hoverBg = mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+          const panelBg = mode === "dark" ? "rgba(22,24,36,0.97)" : "rgba(235,237,248,0.97)";
+          const cardBg = mode === "dark" ? "rgba(44,47,62,0.7)" : "rgba(255,255,255,0.75)";
+          const cardBorder = mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)";
+          const dividerColor = mode === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+          const mutedColor = mode === "dark" ? "#6b7094" : "#8890ab";
+          const textColor = mode === "dark" ? "#e0e3f0" : "#1a1d35";
+          const subtextColor = mode === "dark" ? "#8891b0" : "#6e7599";
+          const hoverBg = mode === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)";
 
-          const aiModes: { id: typeof ctrlAiMode; label: string; icon: string; color: string }[] = [
-            { id: "chat", label: "Chat", icon: ic.messageCircle, color: "#3B82F6" },
-            { id: "write", label: "Write", icon: ic.pen, color: "#8B5CF6" },
-            { id: "code", label: "Code", icon: ic.code, color: "#10B981" },
-            { id: "image", label: "Image", icon: ic.image, color: "#F59E0B" },
-            { id: "research", label: "Research", icon: ic.globe, color: "#EC4899" },
-            { id: "translate", label: "Translate", icon: ic.layers, color: "#06B6D4" },
+          const aiModes: { id: typeof ctrlAiMode; label: string; desc: string; icon: string; color: string; gradient: string }[] = [
+            { id: "chat", label: "Chat", desc: "General assistant", icon: ic.messageCircle, color: "#3B82F6", gradient: "linear-gradient(135deg, #3B82F6, #2563EB)" },
+            { id: "write", label: "Write", desc: "Content & docs", icon: ic.pen, color: "#8B5CF6", gradient: "linear-gradient(135deg, #8B5CF6, #7C3AED)" },
+            { id: "code", label: "Code", desc: "Dev assistant", icon: ic.code, color: "#10B981", gradient: "linear-gradient(135deg, #10B981, #059669)" },
+            { id: "image", label: "Image", desc: "Visual creation", icon: ic.image, color: "#F59E0B", gradient: "linear-gradient(135deg, #F59E0B, #D97706)" },
+            { id: "research", label: "Research", desc: "Deep analysis", icon: ic.globe, color: "#EC4899", gradient: "linear-gradient(135deg, #EC4899, #DB2777)" },
+            { id: "translate", label: "Translate", desc: "Multi-language", icon: ic.layers, color: "#06B6D4", gradient: "linear-gradient(135deg, #06B6D4, #0891B2)" },
           ];
 
-          const modeAccent = aiModes.find(m => m.id === ctrlAiMode)?.color || "#3B82F6";
+          const modeObj = aiModes.find(m => m.id === ctrlAiMode)!;
+          const modeAccent = modeObj.color;
+          const modeGrad = modeObj.gradient;
 
           const modePlaceholders: Record<typeof ctrlAiMode, string> = {
-            chat: "Ask AI anything...",
-            write: "What would you like to write?",
-            code: "Describe the code you need...",
-            image: "Describe an image to generate...",
-            research: "What topic to research?",
-            translate: "Enter text to translate...",
+            chat: "Ask me anything \u2014 I can help with tasks, ideas, and answers...",
+            write: "Tell me what to write \u2014 emails, docs, stories, posts...",
+            code: "Describe what you need \u2014 components, functions, debugging...",
+            image: "Describe your vision \u2014 style, subject, mood, details...",
+            research: "What should I investigate \u2014 topics, data, comparisons...",
+            translate: "Paste text or describe what to translate...",
           };
 
-          const suggestionGroups: Record<typeof ctrlAiMode, { label: string; icon: string; items: string[] }[]> = {
+          type SuggItem = { title: string; desc: string; icon: string };
+          type SuggGroup = { label: string; headline: string; icon: string; items: SuggItem[] };
+          const suggestionGroups: Record<typeof ctrlAiMode, SuggGroup[]> = {
             chat: [
-              { label: "Productivity", icon: ic.zap, items: ["Summarize this page", "Create a to-do list", "Set a reminder", "Draft a quick reply"] },
-              { label: "Creative", icon: ic.wand, items: ["Write a poem", "Story ideas", "Name suggestions", "Brainstorm concepts"] },
-              { label: "Analysis", icon: ic.activity, items: ["Explain this topic", "Compare options", "Pros and cons", "Fact check"] },
+              { label: "Productivity", headline: "Get things done faster", icon: ic.zap, items: [
+                { title: "Summarize Page", desc: "Condense any content into key takeaways", icon: ic.fileText },
+                { title: "To-Do List", desc: "Organize tasks with priorities and deadlines", icon: ic.checkSquare },
+                { title: "Set Reminder", desc: "Schedule alerts for important events", icon: ic.bell },
+                { title: "Quick Reply", desc: "Draft professional responses instantly", icon: ic.send },
+              ] },
+              { label: "Creative", headline: "Spark new ideas", icon: ic.wand, items: [
+                { title: "Write a Poem", desc: "Generate poetry in any style or theme", icon: ic.pen },
+                { title: "Story Ideas", desc: "Get plot concepts and character sketches", icon: ic.bookOpen },
+                { title: "Name Generator", desc: "Creative names for brands, projects, or characters", icon: ic.type },
+                { title: "Brainstorm", desc: "Explore concepts with mind-mapping prompts", icon: ic.brain },
+              ] },
+              { label: "Analysis", headline: "Understand deeply", icon: ic.activity, items: [
+                { title: "Explain Topic", desc: "Break down complex subjects simply", icon: ic.bookOpen },
+                { title: "Compare Options", desc: "Side-by-side analysis of choices", icon: ic.barChart },
+                { title: "Pros & Cons", desc: "Balanced evaluation of any decision", icon: ic.layers },
+                { title: "Fact Check", desc: "Verify claims with source references", icon: ic.shield },
+              ] },
             ],
             write: [
-              { label: "Documents", icon: ic.fileText, items: ["Professional email", "Cover letter", "Meeting notes", "Project proposal"] },
-              { label: "Creative", icon: ic.pen, items: ["Blog post", "Social media caption", "Short story", "Product description"] },
-              { label: "Edit", icon: ic.edit3, items: ["Proofread text", "Make it shorter", "Change tone to formal", "Improve clarity"] },
+              { label: "Documents", headline: "Professional writing", icon: ic.fileText, items: [
+                { title: "Email", desc: "Draft polished business correspondence", icon: ic.mail },
+                { title: "Cover Letter", desc: "Tailored applications for any role", icon: ic.briefcase },
+                { title: "Meeting Notes", desc: "Structured summaries from discussions", icon: ic.alignLeft },
+                { title: "Proposal", desc: "Persuasive project or business proposals", icon: ic.fileInvoice },
+              ] },
+              { label: "Creative", headline: "Content creation", icon: ic.pen, items: [
+                { title: "Blog Post", desc: "SEO-friendly articles on any topic", icon: ic.newspaper },
+                { title: "Social Caption", desc: "Platform-optimized engaging posts", icon: ic.share },
+                { title: "Short Story", desc: "Narrative fiction with your parameters", icon: ic.bookOpen },
+                { title: "Product Copy", desc: "Compelling descriptions that convert", icon: ic.dollarSign },
+              ] },
+              { label: "Edit & Refine", headline: "Polish your text", icon: ic.edit3, items: [
+                { title: "Proofread", desc: "Grammar, spelling, and punctuation fixes", icon: ic.checkSquare },
+                { title: "Shorten", desc: "Condense while keeping the core message", icon: ic.minimize },
+                { title: "Formal Tone", desc: "Elevate casual text to professional", icon: ic.briefcase },
+                { title: "Clarity Pass", desc: "Simplify complex or confusing sentences", icon: ic.sun },
+              ] },
             ],
             code: [
-              { label: "Generate", icon: ic.terminal, items: ["React component", "API endpoint", "Database query", "Unit test"] },
-              { label: "Debug", icon: ic.alertTriangle, items: ["Fix this error", "Find the bug", "Explain this code", "Optimize performance"] },
-              { label: "Refactor", icon: ic.refresh, items: ["Clean up code", "Add TypeScript types", "Convert to async/await", "Extract function"] },
+              { label: "Generate", headline: "Build from scratch", icon: ic.terminal, items: [
+                { title: "React Component", desc: "Typed, styled, production-ready JSX", icon: ic.code },
+                { title: "API Endpoint", desc: "RESTful routes with validation and error handling", icon: ic.globe },
+                { title: "Database Query", desc: "Optimized SQL or ORM operations", icon: ic.hdd },
+                { title: "Unit Test", desc: "Comprehensive test suites with edge cases", icon: ic.checkSquare },
+              ] },
+              { label: "Debug", headline: "Find and fix issues", icon: ic.alertTriangle, items: [
+                { title: "Fix Error", desc: "Diagnose and resolve runtime exceptions", icon: ic.alertTriangle },
+                { title: "Find Bug", desc: "Trace logic errors through code flow", icon: ic.search },
+                { title: "Explain Code", desc: "Line-by-line breakdown of any snippet", icon: ic.bookOpen },
+                { title: "Optimize", desc: "Performance improvements and best practices", icon: ic.zap },
+              ] },
+              { label: "Refactor", headline: "Improve existing code", icon: ic.refresh, items: [
+                { title: "Clean Up", desc: "Remove dead code and improve structure", icon: ic.trash },
+                { title: "Add Types", desc: "TypeScript annotations for type safety", icon: ic.shield },
+                { title: "Async/Await", desc: "Convert callbacks and promises", icon: ic.refresh },
+                { title: "Extract Logic", desc: "Break large functions into composable pieces", icon: ic.layers },
+              ] },
             ],
             image: [
-              { label: "Styles", icon: ic.image, items: ["Photorealistic", "Digital art", "Watercolor painting", "3D render"] },
-              { label: "Subjects", icon: ic.wand, items: ["Portrait", "Landscape", "Abstract art", "Logo design"] },
-              { label: "Modify", icon: ic.edit3, items: ["Remove background", "Change colors", "Add text overlay", "Resize for social"] },
+              { label: "Art Styles", headline: "Choose your aesthetic", icon: ic.image, items: [
+                { title: "Photorealistic", desc: "Ultra-detailed lifelike renders", icon: ic.monitor },
+                { title: "Digital Art", desc: "Modern illustration and concept art", icon: ic.pen },
+                { title: "Watercolor", desc: "Soft, organic painted textures", icon: ic.wand },
+                { title: "3D Render", desc: "Volumetric lighting and materials", icon: ic.cpu },
+              ] },
+              { label: "Subjects", headline: "What to create", icon: ic.wand, items: [
+                { title: "Portrait", desc: "Character studies and headshots", icon: ic.user },
+                { title: "Landscape", desc: "Scenic environments and vistas", icon: ic.sun },
+                { title: "Abstract", desc: "Non-representational forms and patterns", icon: ic.grid },
+                { title: "Logo Design", desc: "Brand marks and visual identities", icon: ic.sparkle },
+              ] },
+              { label: "Edit & Modify", headline: "Transform images", icon: ic.edit3, items: [
+                { title: "Remove BG", desc: "Isolate subjects with clean edges", icon: ic.image },
+                { title: "Recolor", desc: "Shift palette and mood of any image", icon: ic.wand },
+                { title: "Text Overlay", desc: "Add typography with style presets", icon: ic.type },
+                { title: "Social Resize", desc: "Crop for Instagram, X, LinkedIn formats", icon: ic.share },
+              ] },
             ],
             research: [
-              { label: "Analysis", icon: ic.barChart, items: ["Market research", "Competitor analysis", "Trend report", "SWOT analysis"] },
-              { label: "Learning", icon: ic.bookOpen, items: ["Explain like I'm 5", "Deep dive topic", "History of...", "How does X work?"] },
-              { label: "Data", icon: ic.trendingUp, items: ["Summarize article", "Extract key points", "Find sources", "Verify claim"] },
+              { label: "Business", headline: "Strategic intelligence", icon: ic.barChart, items: [
+                { title: "Market Research", desc: "Industry size, trends, and opportunity maps", icon: ic.trendingUp },
+                { title: "Competitors", desc: "Strengths, weaknesses, and positioning analysis", icon: ic.users },
+                { title: "Trend Report", desc: "Emerging patterns and future forecasts", icon: ic.activity },
+                { title: "SWOT Analysis", desc: "Structured strategic assessment framework", icon: ic.grid },
+              ] },
+              { label: "Learning", headline: "Deep understanding", icon: ic.bookOpen, items: [
+                { title: "ELI5", desc: "Complex topics in simple, clear language", icon: ic.messageCircle },
+                { title: "Deep Dive", desc: "Comprehensive exploration with sources", icon: ic.search },
+                { title: "History Of...", desc: "Timeline and evolution of any subject", icon: ic.clock },
+                { title: "How It Works", desc: "Mechanism breakdowns with diagrams", icon: ic.cpu },
+              ] },
+              { label: "Data", headline: "Extract insights", icon: ic.trendingUp, items: [
+                { title: "Summarize", desc: "Distill articles into core findings", icon: ic.fileText },
+                { title: "Key Points", desc: "Extract the most important takeaways", icon: ic.zap },
+                { title: "Find Sources", desc: "Locate authoritative references", icon: ic.globe },
+                { title: "Verify Claim", desc: "Cross-reference facts and statistics", icon: ic.shield },
+              ] },
             ],
             translate: [
-              { label: "Languages", icon: ic.globe, items: ["English to Albanian", "Albanian to English", "English to Spanish", "English to French"] },
-              { label: "Context", icon: ic.layers, items: ["Formal translation", "Casual conversation", "Technical document", "Legal text"] },
-              { label: "Tools", icon: ic.settings, items: ["Detect language", "Pronunciation guide", "Grammar check", "Localize content"] },
+              { label: "Popular", headline: "Frequently used pairs", icon: ic.globe, items: [
+                { title: "EN \u2192 Albanian", desc: "Natural, culturally adapted Albanian text", icon: ic.layers },
+                { title: "Albanian \u2192 EN", desc: "Fluent English with context preserved", icon: ic.layers },
+                { title: "EN \u2192 Spanish", desc: "Latin American or European variants", icon: ic.layers },
+                { title: "EN \u2192 French", desc: "Formal or conversational register", icon: ic.layers },
+              ] },
+              { label: "Context", headline: "Set the right tone", icon: ic.alignLeft, items: [
+                { title: "Formal", desc: "Business, legal, and academic register", icon: ic.briefcase },
+                { title: "Casual", desc: "Everyday conversational language", icon: ic.messageCircle },
+                { title: "Technical", desc: "Industry-specific terminology preserved", icon: ic.code },
+                { title: "Legal", desc: "Precise legal language and clauses", icon: ic.shield },
+              ] },
+              { label: "Tools", headline: "Language utilities", icon: ic.settings, items: [
+                { title: "Detect Language", desc: "Identify source text language automatically", icon: ic.search },
+                { title: "Pronunciation", desc: "Phonetic guides and audio references", icon: ic.voice },
+                { title: "Grammar Check", desc: "Fix errors in any supported language", icon: ic.checkSquare },
+                { title: "Localize", desc: "Adapt content for regional audiences", icon: ic.globe },
+              ] },
             ],
           };
 
-          const quickTools: { icon: string; label: string; action: () => void; color: string }[] = [
-            { icon: ic.mic, label: "Voice Input", action: () => {}, color: "#EF4444" },
-            { icon: ic.upload, label: "Upload File", action: () => {}, color: "#8B5CF6" },
-            { icon: ic.image, label: "Paste Image", action: () => {}, color: "#F59E0B" },
-            { icon: ic.bookOpen, label: "Knowledge Base", action: () => { openWin("knowledge" as WinId); setShowCtrlAi(false); }, color: "#10B981" },
-            { icon: ic.clock, label: "History", action: () => setCtrlAiTab("recent"), color: "#6366F1" },
-            { icon: ic.settings, label: "AI Settings", action: () => { openWin("settings"); setShowCtrlAi(false); }, color: "#64748B" },
+          const quickTools: { icon: string; label: string; desc: string; action: () => void; color: string }[] = [
+            { icon: ic.mic, label: "Voice Input", desc: "Speak your prompt naturally", action: () => {}, color: "#EF4444" },
+            { icon: ic.upload, label: "Upload File", desc: "Attach documents for context", action: () => {}, color: "#8B5CF6" },
+            { icon: ic.image, label: "Paste Image", desc: "Analyze or edit visuals", action: () => {}, color: "#F59E0B" },
+            { icon: ic.bookOpen, label: "Knowledge", desc: "Browse the AI knowledge base", action: () => { openWin("knowledge" as WinId); setShowCtrlAi(false); }, color: "#10B981" },
+            { icon: ic.clock, label: "History", desc: "View previous conversations", action: () => setCtrlAiTab("recent"), color: "#6366F1" },
+            { icon: ic.settings, label: "Settings", desc: "Configure AI preferences", action: () => { openWin("settings"); setShowCtrlAi(false); }, color: "#64748B" },
           ];
 
           const currentGroups = suggestionGroups[ctrlAiMode];
@@ -8164,43 +8259,47 @@ export default function AlternusOS() {
             <>
               <style>{`
                 @keyframes ctrlai-in {
-                  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+                  from { opacity: 0; transform: translateY(14px) scale(0.95); }
                   to   { opacity: 1; transform: translateY(0)   scale(1);    }
                 }
-                @keyframes chip-in {
-                  from { opacity: 0; transform: translateY(6px); }
-                  to   { opacity: 1; transform: translateY(0);   }
+                @keyframes ctrlai-card {
+                  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+                  to   { opacity: 1; transform: translateY(0)   scale(1);    }
                 }
                 @keyframes ctrlai-fade {
                   from { opacity: 0; }
                   to   { opacity: 1; }
                 }
-                .ctrlai-panel { animation: ctrlai-in 0.24s cubic-bezier(.22,.68,0,1.15) both; }
-                .ctrlai-chip  { animation: chip-in  0.18s cubic-bezier(.22,.68,0,1.2) both; }
-                .ctrlai-fade  { animation: ctrlai-fade 0.15s ease both; }
-                .ctrlai-tool:hover .ctrlai-tool-icon { transform: scale(1.12); }
+                @keyframes ctrlai-glow {
+                  0%, 100% { opacity: 0.5; }
+                  50% { opacity: 1; }
+                }
+                .ctrlai-panel { animation: ctrlai-in 0.28s cubic-bezier(.22,.68,0,1.12) both; }
+                .ctrlai-card  { animation: ctrlai-card 0.22s cubic-bezier(.22,.68,0,1.15) both; }
+                .ctrlai-fade  { animation: ctrlai-fade 0.18s ease both; }
+                .ctrlai-tool:hover .ctrlai-tool-icon { transform: scale(1.08) translateY(-1px); }
+                .ctrlai-sugg:hover .ctrlai-sugg-icon { transform: scale(1.1); }
+                .ctrlai-sugg:hover .ctrlai-sugg-arrow { opacity: 1; transform: translateX(0); }
               `}</style>
-              {/* Backdrop dismiss */}
-              <div className="fixed inset-0 z-[490] ctrlai-fade" style={{ background: mode === "dark" ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.1)" }} onClick={() => { setShowCtrlAi(false); setCtrlAiChips(true); setCtrlAiTab("suggestions"); }} />
+              {/* Backdrop */}
+              <div className="fixed inset-0 z-[490] ctrlai-fade" style={{ background: mode === "dark" ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0.12)" }} onClick={() => { setShowCtrlAi(false); setCtrlAiChips(true); setCtrlAiTab("suggestions"); }} />
               {/* Panel */}
               <div
                 className="absolute z-[491] ctrlai-panel"
-                style={{ left: Math.min(Math.max(ox - 270, 8), window.innerWidth - 548), top: Math.max(oy, 8), width: 540 }}
+                style={{ left: Math.min(Math.max(ox - 290, 8), window.innerWidth - 588), top: Math.max(oy, 8), width: 580 }}
                 onClick={e => e.stopPropagation()}
               >
                 {/* Search Bar */}
                 <div className="flex items-center gap-2 p-1.5 rounded-2xl mb-2"
                   style={{ background: barBg, backdropFilter: "blur(20px) saturate(1.5)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.65)"}`, boxShadow: mode === "dark" ? "0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2)" : "0 4px 24px rgba(100,110,180,0.18)" }}>
-                  {/* Submit button */}
                   <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
-                    style={{ background: modeAccent, boxShadow: `0 2px 12px ${modeAccent}73` }}
+                    style={{ background: modeGrad, boxShadow: `0 2px 12px ${modeAccent}60` }}
                     onClick={() => { if (ctrlAiInput.trim()) { openWin("ai"); setShowCtrlAi(false); } }}>
                     <svg width={16} height={16} viewBox="0 0 24 24" fill="none"><path d={ic.sparkle} fill="#fff" /></svg>
                   </button>
-                  {/* Input */}
                   <input
                     ref={ctrlAiInputRef}
-                    className="flex-1 bg-transparent outline-none text-[14px] font-light"
+                    className="flex-1 bg-transparent outline-none text-[13.5px] font-light"
                     style={{ color: inputColor, caretColor: modeAccent }}
                     placeholder={modePlaceholders[ctrlAiMode]}
                     value={ctrlAiInput}
@@ -8210,21 +8309,18 @@ export default function AlternusOS() {
                       if (e.key === "Enter" && ctrlAiInput.trim()) { openWin("ai"); setShowCtrlAi(false); }
                     }}
                   />
-                  {/* Attachment button */}
-                  <button className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
-                    style={{ background: mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)" }}
+                  <button className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all hover:scale-105 hover:bg-opacity-20"
+                    style={{ background: mode === "dark" ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)" }}
                     title="Attach file">
                     <I d={ic.upload} s={14} c={mutedColor} />
                   </button>
-                  {/* Voice button */}
                   <button className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
-                    style={{ background: mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)" }}
+                    style={{ background: mode === "dark" ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)" }}
                     title="Voice input">
                     <I d={ic.mic} s={14} c={mutedColor} />
                   </button>
-                  {/* Expand/collapse toggle */}
                   <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
-                    style={{ background: modeAccent, boxShadow: `0 2px 12px ${modeAccent}73` }}
+                    style={{ background: modeGrad, boxShadow: `0 2px 12px ${modeAccent}60` }}
                     onClick={() => setCtrlAiChips(p => !p)}>
                     <I d={ctrlAiChips ? ic.chevU : ic.chevD} s={16} c="#fff" />
                   </button>
@@ -8232,72 +8328,137 @@ export default function AlternusOS() {
 
                 {/* Expanded Panel */}
                 {ctrlAiChips && (
-                  <div className="rounded-2xl overflow-hidden ctrlai-chip"
-                    style={{ background: panelBg, backdropFilter: "blur(24px) saturate(1.5)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.6)"}`, boxShadow: mode === "dark" ? "0 12px 48px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.25)" : "0 8px 32px rgba(100,110,180,0.15)" }}>
+                  <div className="rounded-2xl overflow-hidden ctrlai-card"
+                    style={{ background: panelBg, backdropFilter: "blur(28px) saturate(1.6)", border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.7)"}`, boxShadow: mode === "dark" ? "0 16px 56px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 12px 40px rgba(100,110,180,0.18), inset 0 1px 0 rgba(255,255,255,0.8)" }}>
 
-                    {/* AI Mode Tabs */}
-                    <div className="flex items-center gap-1 px-3 pt-3 pb-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-                      {aiModes.map(m => (
-                        <button key={m.id}
-                          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all whitespace-nowrap"
-                          style={{
-                            background: ctrlAiMode === m.id ? m.color : "transparent",
-                            color: ctrlAiMode === m.id ? "#fff" : mutedColor,
-                            boxShadow: ctrlAiMode === m.id ? `0 2px 10px ${m.color}50` : "none",
-                          }}
-                          onMouseEnter={e => { if (ctrlAiMode !== m.id) e.currentTarget.style.background = hoverBg; }}
-                          onMouseLeave={e => { if (ctrlAiMode !== m.id) e.currentTarget.style.background = "transparent"; }}
-                          onClick={() => { setCtrlAiMode(m.id); setCtrlAiTab("suggestions"); }}>
-                          <I d={m.icon} s={13} c={ctrlAiMode === m.id ? "#fff" : mutedColor} />
-                          {m.label}
+                    {/* Header - AI Identity */}
+                    <div className="px-5 pt-4 pb-3">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="relative">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: modeGrad, boxShadow: `0 4px 16px ${modeAccent}40` }}>
+                            <svg width={18} height={18} viewBox="0 0 24 24" fill="none"><path d={ic.sparkle} fill="#fff" /></svg>
+                          </div>
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center" style={{ background: "#10B981", borderColor: panelBg }}>
+                            <div className="w-1 h-1 rounded-full bg-white" />
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-[14px] font-bold tracking-tight" style={{ color: textColor }}>Alternus AI</h3>
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider" style={{ background: `${modeAccent}18`, color: modeAccent }}>{modeObj.label}</span>
+                          </div>
+                          <p className="text-[11px] mt-0.5" style={{ color: subtextColor }}>Intelligent assistant powered by neural architecture. Ready to help.</p>
+                        </div>
+                        <button className="p-2 rounded-xl transition-all" style={{ color: mutedColor }}
+                          onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                          onClick={() => { openWin("ai"); setShowCtrlAi(false); }}>
+                          <I d={ic.maximize} s={13} />
                         </button>
-                      ))}
+                      </div>
+
+                      {/* AI Mode Selector - pill cards */}
+                      <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5" style={{ scrollbarWidth: "none" }}>
+                        {aiModes.map(m => (
+                          <button key={m.id}
+                            className="flex items-center gap-2 px-3 py-2 rounded-xl transition-all whitespace-nowrap group"
+                            style={{
+                              background: ctrlAiMode === m.id ? modeGrad : "transparent",
+                              border: ctrlAiMode === m.id ? "none" : `1px solid ${cardBorder}`,
+                              boxShadow: ctrlAiMode === m.id ? `0 3px 12px ${m.color}45` : "none",
+                              minWidth: 0,
+                            }}
+                            onMouseEnter={e => { if (ctrlAiMode !== m.id) { e.currentTarget.style.background = hoverBg; e.currentTarget.style.borderColor = `${m.color}40`; } }}
+                            onMouseLeave={e => { if (ctrlAiMode !== m.id) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = cardBorder; } }}
+                            onClick={() => { setCtrlAiMode(m.id); setCtrlAiTab("suggestions"); }}>
+                            <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
+                              style={{ background: ctrlAiMode === m.id ? "rgba(255,255,255,0.2)" : `${m.color}15` }}>
+                              <I d={m.icon} s={11} c={ctrlAiMode === m.id ? "#fff" : m.color} />
+                            </div>
+                            <div className="text-left min-w-0">
+                              <p className="text-[11px] font-semibold leading-none" style={{ color: ctrlAiMode === m.id ? "#fff" : textColor }}>{m.label}</p>
+                              <p className="text-[9px] leading-none mt-0.5" style={{ color: ctrlAiMode === m.id ? "rgba(255,255,255,0.7)" : mutedColor }}>{m.desc}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     <div style={{ height: 1, background: dividerColor }} />
 
-                    {/* Tab switcher: Suggestions | Recent | Tools */}
-                    <div className="flex items-center gap-4 px-4 pt-2.5 pb-1">
-                      {(["suggestions", "recent", "tools"] as const).map(tab => (
-                        <button key={tab}
-                          className="text-[11px] font-medium pb-1.5 transition-all capitalize"
-                          style={{
-                            color: ctrlAiTab === tab ? modeAccent : mutedColor,
-                            borderBottom: ctrlAiTab === tab ? `2px solid ${modeAccent}` : "2px solid transparent",
-                          }}
-                          onClick={() => setCtrlAiTab(tab)}>
-                          {tab}
-                        </button>
-                      ))}
+                    {/* Tab switcher */}
+                    <div className="flex items-center gap-1 px-5 pt-2.5 pb-1">
+                      {(["suggestions", "recent", "tools"] as const).map(tab => {
+                        const tabIcon = tab === "suggestions" ? ic.sparkle : tab === "recent" ? ic.clock : ic.grid;
+                        return (
+                          <button key={tab}
+                            className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-lg transition-all capitalize"
+                            style={{
+                              background: ctrlAiTab === tab ? `${modeAccent}12` : "transparent",
+                              color: ctrlAiTab === tab ? modeAccent : mutedColor,
+                            }}
+                            onMouseEnter={e => { if (ctrlAiTab !== tab) e.currentTarget.style.background = hoverBg; }}
+                            onMouseLeave={e => { if (ctrlAiTab !== tab) e.currentTarget.style.background = "transparent"; }}
+                            onClick={() => setCtrlAiTab(tab)}>
+                            <I d={tabIcon} s={11} c={ctrlAiTab === tab ? modeAccent : mutedColor} />
+                            {tab}
+                          </button>
+                        );
+                      })}
                     </div>
 
                     {/* Tab Content */}
-                    <div className="px-3 pb-3" style={{ maxHeight: 320, overflowY: "auto", scrollbarWidth: "none" }}>
+                    <div className="px-4 pb-3" style={{ maxHeight: 360, overflowY: "auto", scrollbarWidth: "none" }}>
 
                       {/* Suggestions Tab */}
                       {ctrlAiTab === "suggestions" && (
-                        <div className="space-y-3 pt-1">
+                        <div className="space-y-4 pt-1">
                           {currentGroups.map((group, gi) => (
-                            <div key={group.label} className="ctrlai-chip" style={{ animationDelay: `${gi * 0.05}s` }}>
-                              <div className="flex items-center gap-1.5 px-1 mb-1.5">
-                                <I d={group.icon} s={11} c={mutedColor} />
-                                <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: mutedColor }}>{group.label}</span>
+                            <div key={group.label} className="ctrlai-card" style={{ animationDelay: `${gi * 0.06}s` }}>
+                              {/* Section Header */}
+                              <div className="flex items-center gap-2 px-1 mb-2">
+                                <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ background: `${modeAccent}12` }}>
+                                  <I d={group.icon} s={11} c={modeAccent} />
+                                </div>
+                                <div>
+                                  <span className="text-[11px] font-bold" style={{ color: textColor }}>{group.label}</span>
+                                  <span className="text-[10px] ml-2" style={{ color: mutedColor }}>{group.headline}</span>
+                                </div>
                               </div>
-                              <div className="grid grid-cols-2 gap-1.5">
+                              {/* Suggestion Cards */}
+                              <div className="grid grid-cols-2 gap-2">
                                 {group.items.map((item, ii) => (
-                                  <button key={item}
-                                    className="ctrlai-chip flex items-center gap-2 px-3 py-2.5 rounded-xl text-[12px] font-medium text-left transition-all"
+                                  <button key={item.title}
+                                    className="ctrlai-card ctrlai-sugg flex items-start gap-2.5 p-3 rounded-xl text-left transition-all group"
                                     style={{
-                                      background: chipBg,
-                                      border: `1px solid ${chipBorder}`,
-                                      color: chipColor,
-                                      animationDelay: `${(gi * 4 + ii) * 0.025}s`,
+                                      background: cardBg,
+                                      border: `1px solid ${cardBorder}`,
+                                      animationDelay: `${(gi * 4 + ii) * 0.03}s`,
                                     }}
-                                    onMouseEnter={e => { e.currentTarget.style.background = modeAccent; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = modeAccent; e.currentTarget.style.boxShadow = `0 2px 12px ${modeAccent}40`; }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = chipBg; e.currentTarget.style.color = chipColor; e.currentTarget.style.borderColor = chipBorder; e.currentTarget.style.boxShadow = "none"; }}
-                                    onClick={() => { setCtrlAiInput(item + ": "); setTimeout(() => ctrlAiInputRef.current?.focus(), 10); }}>
-                                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: modeAccent, opacity: 0.6 }} />
-                                    {item}
+                                    onMouseEnter={e => {
+                                      e.currentTarget.style.borderColor = `${modeAccent}50`;
+                                      e.currentTarget.style.boxShadow = `0 4px 16px ${modeAccent}15, 0 0 0 1px ${modeAccent}15`;
+                                      e.currentTarget.style.background = mode === "dark" ? `rgba(${parseInt(modeAccent.slice(1,3),16)},${parseInt(modeAccent.slice(3,5),16)},${parseInt(modeAccent.slice(5,7),16)},0.08)` : `rgba(${parseInt(modeAccent.slice(1,3),16)},${parseInt(modeAccent.slice(3,5),16)},${parseInt(modeAccent.slice(5,7),16)},0.06)`;
+                                    }}
+                                    onMouseLeave={e => {
+                                      e.currentTarget.style.borderColor = cardBorder;
+                                      e.currentTarget.style.boxShadow = "none";
+                                      e.currentTarget.style.background = cardBg;
+                                    }}
+                                    onClick={() => { setCtrlAiInput(item.title + ": "); setTimeout(() => ctrlAiInputRef.current?.focus(), 10); }}>
+                                    <div className="ctrlai-sugg-icon w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform"
+                                      style={{ background: `${modeAccent}12`, border: `1px solid ${modeAccent}18` }}>
+                                      <I d={item.icon} s={14} c={modeAccent} />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-1">
+                                        <p className="text-[12px] font-semibold truncate" style={{ color: textColor }}>{item.title}</p>
+                                        <span className="ctrlai-sugg-arrow opacity-0 transform -translate-x-1 transition-all" style={{ color: modeAccent }}>
+                                          <I d={ic.chevR} s={10} c={modeAccent} />
+                                        </span>
+                                      </div>
+                                      <p className="text-[10px] leading-snug mt-0.5" style={{ color: subtextColor }}>{item.desc}</p>
+                                    </div>
                                   </button>
                                 ))}
                               </div>
@@ -8308,28 +8469,35 @@ export default function AlternusOS() {
 
                       {/* Recent Tab */}
                       {ctrlAiTab === "recent" && (
-                        <div className="space-y-1 pt-1">
+                        <div className="space-y-1.5 pt-1">
+                          <p className="text-[10px] font-semibold uppercase tracking-wider px-1 mb-2" style={{ color: mutedColor }}>Recent Prompts</p>
                           {ctrlAiRecent.map((item, i) => (
                             <button key={i}
-                              className="ctrlai-chip flex items-center gap-3 w-full px-3 py-3 rounded-xl text-left transition-all"
-                              style={{ animationDelay: `${i * 0.04}s`, color: chipColor }}
-                              onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
-                              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                              className="ctrlai-card flex items-center gap-3 w-full px-3.5 py-3 rounded-xl text-left transition-all"
+                              style={{ animationDelay: `${i * 0.04}s`, border: `1px solid ${cardBorder}` }}
+                              onMouseEnter={e => { e.currentTarget.style.background = hoverBg; e.currentTarget.style.borderColor = `${modeAccent}30`; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = cardBorder; }}
                               onClick={() => { setCtrlAiInput(item.text); setTimeout(() => ctrlAiInputRef.current?.focus(), 10); }}>
-                              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: chipBg }}>
-                                <I d={item.icon} s={14} c={mutedColor} />
+                              <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: cardBg }}>
+                                <I d={item.icon} s={15} c={mutedColor} />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-[12px] font-medium truncate">{item.text}</p>
-                                <p className="text-[10px]" style={{ color: mutedColor }}>Recent</p>
+                                <p className="text-[12px] font-medium truncate" style={{ color: textColor }}>{item.text}</p>
+                                <p className="text-[10px] mt-0.5" style={{ color: mutedColor }}>Used recently</p>
                               </div>
-                              <I d={ic.chevR} s={12} c={mutedColor} />
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-md" style={{ background: hoverBg, color: mutedColor }}>Reuse</span>
+                                <I d={ic.chevR} s={11} c={mutedColor} />
+                              </div>
                             </button>
                           ))}
                           {ctrlAiRecent.length === 0 && (
-                            <div className="flex flex-col items-center py-8">
-                              <I d={ic.clock} s={24} c={mutedColor} />
-                              <p className="text-[12px] mt-2" style={{ color: mutedColor }}>No recent prompts</p>
+                            <div className="flex flex-col items-center py-10">
+                              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: hoverBg }}>
+                                <I d={ic.clock} s={22} c={mutedColor} />
+                              </div>
+                              <p className="text-[12px] font-medium" style={{ color: textColor }}>No recent prompts</p>
+                              <p className="text-[10px] mt-1" style={{ color: mutedColor }}>Your conversation history will appear here</p>
                             </div>
                           )}
                         </div>
@@ -8337,39 +8505,50 @@ export default function AlternusOS() {
 
                       {/* Tools Tab */}
                       {ctrlAiTab === "tools" && (
-                        <div className="grid grid-cols-3 gap-2 pt-1">
-                          {quickTools.map((tool, i) => (
-                            <button key={tool.label}
-                              className="ctrlai-chip ctrlai-tool flex flex-col items-center gap-2 py-4 px-2 rounded-xl transition-all"
-                              style={{ animationDelay: `${i * 0.04}s`, color: chipColor }}
-                              onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
-                              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
-                              onClick={tool.action}>
-                              <div className="ctrlai-tool-icon w-10 h-10 rounded-xl flex items-center justify-center transition-transform"
-                                style={{ background: `${tool.color}18`, border: `1px solid ${tool.color}30` }}>
-                                <I d={tool.icon} s={18} c={tool.color} />
-                              </div>
-                              <span className="text-[11px] font-medium">{tool.label}</span>
-                            </button>
-                          ))}
+                        <div className="pt-1">
+                          <p className="text-[10px] font-semibold uppercase tracking-wider px-1 mb-2" style={{ color: mutedColor }}>Quick Tools</p>
+                          <div className="grid grid-cols-3 gap-2">
+                            {quickTools.map((tool, i) => (
+                              <button key={tool.label}
+                                className="ctrlai-card ctrlai-tool flex flex-col items-center gap-2 py-4 px-3 rounded-xl transition-all text-center"
+                                style={{ animationDelay: `${i * 0.04}s`, border: `1px solid ${cardBorder}` }}
+                                onMouseEnter={e => { e.currentTarget.style.background = hoverBg; e.currentTarget.style.borderColor = `${tool.color}35`; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = cardBorder; }}
+                                onClick={tool.action}>
+                                <div className="ctrlai-tool-icon w-11 h-11 rounded-xl flex items-center justify-center transition-transform"
+                                  style={{ background: `${tool.color}12`, border: `1px solid ${tool.color}22` }}>
+                                  <I d={tool.icon} s={19} c={tool.color} />
+                                </div>
+                                <div>
+                                  <p className="text-[11px] font-semibold" style={{ color: textColor }}>{tool.label}</p>
+                                  <p className="text-[9px] mt-0.5 leading-snug" style={{ color: mutedColor }}>{tool.desc}</p>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
 
                     {/* Footer */}
                     <div style={{ height: 1, background: dividerColor }} />
-                    <div className="flex items-center justify-between px-4 py-2.5">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
-                        <span className="text-[10px] font-medium" style={{ color: mutedColor }}>Alternus AI Ready</span>
+                    <div className="flex items-center justify-between px-5 py-2.5">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981", boxShadow: "0 0 6px rgba(16,185,129,0.5)" }} />
+                          <span className="text-[10px] font-semibold" style={{ color: mutedColor }}>Online</span>
+                        </div>
+                        <div className="w-px h-3" style={{ background: dividerColor }} />
+                        <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-md" style={{ background: hoverBg, color: mutedColor }}>Neural v4.2</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px]" style={{ color: mutedColor }}>Ctrl+A</span>
-                        <button className="text-[10px] font-medium px-2 py-1 rounded-lg transition-all"
-                          style={{ color: modeAccent }}
-                          onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
-                          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                        <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-md" style={{ background: hoverBg, color: mutedColor }}>Ctrl+A</span>
+                        <button className="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-all flex items-center gap-1"
+                          style={{ background: `${modeAccent}12`, color: modeAccent }}
+                          onMouseEnter={e => { e.currentTarget.style.background = `${modeAccent}20`; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = `${modeAccent}12`; }}
                           onClick={() => { openWin("ai"); setShowCtrlAi(false); }}>
+                          <I d={ic.maximize} s={10} c={modeAccent} />
                           Open Full AI
                         </button>
                       </div>
