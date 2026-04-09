@@ -2334,7 +2334,7 @@ function NotesApp({ c }: { c: typeof palette.dark }) {
   const [activeId, setActiveId] = useState(1);
   const [searchQ, setSearchQ] = useState("");
   const [activeFolder, setActiveFolder] = useState<string | null>(null);
-  const folders = [...new Set(notes.map(n => n.folder))];
+  const folders = Array.from(new Set(notes.map(n => n.folder)));
   const active = notes.find(n => n.id === activeId);
 
   const filtered = notes
