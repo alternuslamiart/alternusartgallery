@@ -145,9 +145,19 @@ function useContainerSize(baseW: number) {
 }
 
 // ━━━━ Simple SVG Icon ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function I({ d, s = 16, c, w, f }: { d: string; s?: number; c?: string; w?: number; f?: boolean }) {
+let _gradId = 0;
+function I({ d, s = 16, c, w, f, grad }: { d: string; s?: number; c?: string; w?: number; f?: boolean; grad?: [string, string] }) {
+  const gid = grad ? `ig${++_gradId}` : null;
   return (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill={f ? (c || "currentColor") : "none"} stroke={f ? "none" : (c || "currentColor")} strokeWidth={f ? 0 : (w || 2)} strokeLinecap="round" strokeLinejoin="round">
+    <svg width={s} height={s} viewBox="0 0 24 24" fill={f ? (gid ? `url(#${gid})` : (c || "currentColor")) : "none"} stroke={f ? "none" : (c || "currentColor")} strokeWidth={f ? 0 : (w || 2)} strokeLinecap="round" strokeLinejoin="round">
+      {grad && gid && (
+        <defs>
+          <linearGradient id={gid} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={grad[0]} />
+            <stop offset="100%" stopColor={grad[1]} />
+          </linearGradient>
+        </defs>
+      )}
       <path d={d} />
     </svg>
   );
@@ -247,6 +257,39 @@ const ic = {
   users: "M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 3a4 4 0 100 8 4 4 0 000-8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75",
   fileInvoice: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M8 13h8M8 17h8M8 9h2",
   barChart: "M18 20V10M12 20V4M6 20v-6",
+};
+
+// ━━━━ Fill Icon Paths (closed shapes for filled rendering) ━━━━━━━━━━━━━━━━━━
+const icFill: Record<string, string> = {
+  terminal:     "M3 3h18c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2zm2.29 4.29a1 1 0 00-1.42 1.42L6.59 11l-2.7 2.71a1 1 0 001.42 1.41l3.41-3.41a1 1 0 000-1.41l-3.41-3.41zM12 14a1 1 0 000 2h5a1 1 0 000-2h-5z",
+  code:         "M14.447 3.026a.5.5 0 01.235.32l3.5 14a.5.5 0 01-.966.256L13.757 4.5H10.5l.016.065-3.507 14a.5.5 0 01-.966-.256l3.5-14a.5.5 0 01.484-.37h4a.5.5 0 01.42.087zM3.854 8.146a.5.5 0 010 .708L1.707 11l2.147 2.146a.5.5 0 01-.708.708l-2.5-2.5a.5.5 0 010-.708l2.5-2.5a.5.5 0 01.708 0zm16.292 0a.5.5 0 01.708 0l2.5 2.5a.5.5 0 010 .708l-2.5 2.5a.5.5 0 01-.708-.708L22.293 11l-2.147-2.146a.5.5 0 010-.708z",
+  files:        "M3 7a2 2 0 012-2h4.586A2 2 0 0111 5.586L13 7.414A2 2 0 0113.414 8H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z",
+  browser:      "M12 2a10 10 0 100 20A10 10 0 0012 2zm1 5v5.586l3.707 3.707a1 1 0 01-1.414 1.414l-4-4A1 1 0 0111 13V7a1 1 0 012 0z",
+  store:        "M1 1.5A.5.5 0 011.5 1h1a.5.5 0 01.485.379L3.89 4h18.01a.5.5 0 01.489.598l-2 10a.5.5 0 01-.49.402H5a.5.5 0 01-.49-.402L2.01 2H1.5a.5.5 0 01-.5-.5zM6 20a2 2 0 100-4 2 2 0 000 4zm11 0a2 2 0 100-4 2 2 0 000 4z",
+  movies:       "M2 4a2 2 0 00-2 2v12a2 2 0 002 2h20a2 2 0 002-2V6a2 2 0 00-2-2H2zm6 2v2H4V6h4zm2 0h4v2h-4V6zm6 0h4v2h-4V6zM4 10h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4zM4 16h4v2H4v-2zm6 0h4v2h-4v-2zm6 0h4v2h-4v-2z",
+  music:        "M9 3v11.5a3.5 3.5 0 10-1 2.5V11l10-2v6.5a3.5 3.5 0 10-1 2.5V5L9 3z",
+  weather:      "M17.5 19H9a7 7 0 116.71-9h1.79a4.5 4.5 0 110 9z",
+  calendar:     "M3 6a2 2 0 012-2h14a2 2 0 012 2v2H3V6zM3 10h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V10zm5-6a1 1 0 012 0v1a1 1 0 01-2 0V4zm8 0a1 1 0 012 0v1a1 1 0 01-2 0V4z",
+  notes:        "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM9 13h6a1 1 0 010 2H9a1 1 0 010-2zm0-4h2a1 1 0 010 2H9a1 1 0 010-2zm0 8h4a1 1 0 010 2H9a1 1 0 010-2z",
+  word:         "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM8 13h8a1 1 0 010 2H8a1 1 0 010-2zm0-4h8a1 1 0 010 2H8a1 1 0 010-2z",
+  downloads:    "M4 17a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1zM12 3a1 1 0 00-1 1v8.586L8.707 10.29a1 1 0 10-1.414 1.42l4 4a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.42L13 12.586V4a1 1 0 00-1-1z",
+  calculator:   "M4 2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm1 2v3h14V4H5zm0 5v2h2v-2H5zm4 0v2h2v-2H9zm4 0v2h2v-2h-2zm4 0v6h-2v-6h2zM5 13v2h2v-2H5zm4 0v2h2v-2H9zm-4 4v2h2v-2H5zm4 0v2h2v-2H9z",
+  studio:       "M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z",
+  settings:     "M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2zM12 15a3 3 0 100-6 3 3 0 000 6z",
+  controlpanel: "M2 3h20a1 1 0 011 1v12a1 1 0 01-1 1H2a1 1 0 01-1-1V4a1 1 0 011-1zm16 18H6a1 1 0 010-2h12a1 1 0 010 2zm-6-4v-2a1 1 0 012 0v2a1 1 0 01-2 0z",
+  recovery:     "M12 1l9 4v7c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4zm0 6a1 1 0 00-1 1v4a1 1 0 002 0V8a1 1 0 00-1-1zm0 7a1 1 0 100 2 1 1 0 000-2z",
+  news:         "M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm0 2v3h8V6H4zm10 0v8h6V6h-6zM4 11v2h8v-2H4zm0 4v2h8v-2H4z",
+  dashboard:    "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
+  tasks:        "M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11a1 1 0 010 2H5v14h14v-7a1 1 0 012 0zm-9.293-.293l7.5-7.5a1 1 0 011.414 1.414l-8.207 8.207a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414l2.293 2.293z",
+  mail:         "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm8 9L4.8 7h14.4L12 13zm8 5V8.9l-8 5.5-8-5.5V18h16z",
+  monaco:       "M3 3h18a2 2 0 012 2v14a2 2 0 01-2 2H3a2 2 0 01-2-2V5a2 2 0 012-2zm13.5 5.5a.5.5 0 00-.854-.354L12 11.793l-3.646-3.647a.5.5 0 00-.708.708L11.293 12l-3.647 3.646a.5.5 0 00.708.708L12 12.707l3.646 3.647a.5.5 0 00.708-.708L12.707 12l3.647-3.646a.5.5 0 00.146-.354z",
+  aihub:        "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z",
+  imagegen:     "M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zM8.5 7a2 2 0 110 4 2 2 0 010-4zM5 19l4-6 3 4 2-3 5 5H5z",
+  aivoice:      "M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM5 11a7 7 0 0014 0h-2a5 5 0 01-10 0H5zm7 9v-2a9 9 0 009-9h-2a7 7 0 01-14 0H3a9 9 0 009 9v2z",
+  writer:       "M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83zM12 20h9a1 1 0 010 2h-9a1 1 0 010-2z",
+  knowledge:    "M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z",
+  sysmon:       "M2 12h3l3 8 4-16 3 8h7",
+  business:     "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM18 14a4 4 0 100 8 4 4 0 000-8z",
 };
 
 // ━━━━ Window Title Bar ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -4998,6 +5041,241 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
+// ━━━━ BUSINESS MANAGER APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
+  type Customer = { id: number; name: string; email: string; phone: string; status: string };
+  type Transaction = { id: number; type: "income" | "expense"; amount: number; category: string; desc: string; date: string };
+  type Task = { id: number; title: string; priority: "E ulët" | "Normale" | "E lartë" | "Urgjente"; status: "Në pritje" | "Në progres" | "Përfunduar"; due: string };
+
+  const load = <T,>(key: string, def: T): T => { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; } };
+  const save = <T,>(key: string, v: T) => { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} };
+
+  const [tab, setTab] = useState<"dash" | "customers" | "finance" | "tasks">("dash");
+  const [customers, setCustomers]     = useState<Customer[]>(() => load("bm_customers", []));
+  const [transactions, setTransactions] = useState<Transaction[]>(() => load("bm_transactions", []));
+  const [tasks, setTasks]             = useState<Task[]>(() => load("bm_tasks", []));
+
+  // Forms
+  const [cForm, setCForm] = useState({ name: "", email: "", phone: "", status: "Aktiv" });
+  const [tForm, setTForm] = useState<{ type: "income" | "expense"; amount: string; category: string; desc: string; date: string }>({ type: "income", amount: "", category: "Shitje", desc: "", date: new Date().toISOString().slice(0, 10) });
+  const [tkForm, setTkForm] = useState({ title: "", priority: "Normale" as Task["priority"], due: "" });
+
+  const nextId = (arr: { id: number }[]) => arr.length ? Math.max(...arr.map(x => x.id)) + 1 : 1;
+
+  const addCustomer = () => {
+    if (!cForm.name.trim()) return;
+    const updated = [...customers, { id: nextId(customers), ...cForm }];
+    setCustomers(updated); save("bm_customers", updated);
+    setCForm({ name: "", email: "", phone: "", status: "Aktiv" });
+  };
+  const delCustomer = (id: number) => { const u = customers.filter(x => x.id !== id); setCustomers(u); save("bm_customers", u); };
+
+  const addTransaction = () => {
+    const amt = parseFloat(tForm.amount);
+    if (!amt || amt <= 0) return;
+    const updated = [...transactions, { id: nextId(transactions), type: tForm.type, amount: amt, category: tForm.category, desc: tForm.desc, date: tForm.date }];
+    setTransactions(updated); save("bm_transactions", updated);
+    setTForm(f => ({ ...f, amount: "", desc: "" }));
+  };
+  const delTransaction = (id: number) => { const u = transactions.filter(x => x.id !== id); setTransactions(u); save("bm_transactions", u); };
+
+  const addTask = () => {
+    if (!tkForm.title.trim()) return;
+    const updated = [...tasks, { id: nextId(tasks), title: tkForm.title, priority: tkForm.priority, status: "Në pritje" as Task["status"], due: tkForm.due }];
+    setTasks(updated); save("bm_tasks", updated);
+    setTkForm({ title: "", priority: "Normale", due: "" });
+  };
+  const advanceTask = (id: number) => {
+    const map: Record<string, Task["status"]> = { "Në pritje": "Në progres", "Në progres": "Përfunduar" };
+    const u = tasks.map(t => t.id === id && t.status !== "Përfunduar" ? { ...t, status: map[t.status] } : t);
+    setTasks(u); save("bm_tasks", u);
+  };
+  const delTask = (id: number) => { const u = tasks.filter(x => x.id !== id); setTasks(u); save("bm_tasks", u); };
+
+  const income  = transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const expense = transactions.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  const balance = income - expense;
+
+  const fs = (n: number) => `${n}px`;
+  const tabBtn = (key: typeof tab, label: string) => (
+    <button key={key} onClick={() => setTab(key)}
+      style={{ padding: "6px 16px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer", border: "none",
+        background: tab === key ? c.accent : c.cardAlt, color: tab === key ? "#fff" : c.textSec }}>
+      {label}
+    </button>
+  );
+
+  const pColors: Record<string, string> = { "E ulët": c.textMuted, "Normale": c.accent, "E lartë": c.warning, "Urgjente": c.danger };
+  const sColors: Record<string, string> = { "Në pritje": c.textMuted, "Në progres": c.accent, "Përfunduar": c.success };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: c.bg, color: c.text, fontFamily: "Segoe UI, sans-serif" }}>
+      {/* Header */}
+      <div style={{ padding: "14px 20px 8px", borderBottom: `1px solid ${c.border}` }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+          <span style={{ fontSize: 16, fontWeight: 700 }}>💼 Work Manager</span>
+          <div style={{ display: "flex", gap: 4 }}>
+            {(["dash", "customers", "finance", "tasks"] as const).map(k =>
+              tabBtn(k, { dash: "📊 Dashboard", customers: "👥 Klientët", finance: "💰 Financat", tasks: "📋 Detyrat" }[k])
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflow: "auto", padding: "14px 20px" }}>
+
+        {/* ── DASHBOARD ── */}
+        {tab === "dash" && (
+          <div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
+              {[
+                { label: "👥 Klientë", val: customers.length.toString(), color: c.accent },
+                { label: "💰 Të Ardhura", val: `€${income.toFixed(2)}`, color: c.success },
+                { label: "💸 Shpenzime", val: `€${expense.toFixed(2)}`, color: c.danger },
+                { label: "📊 Bilanci", val: `€${balance.toFixed(2)}`, color: balance >= 0 ? c.success : c.danger },
+              ].map(({ label, val, color }) => (
+                <div key={label} style={{ background: c.surface, borderRadius: 10, padding: "12px 14px", border: `1px solid ${c.border}` }}>
+                  <div style={{ fontSize: 11, color: c.textMuted, marginBottom: 4 }}>{label}</div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color }}>{val}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div style={{ background: c.surface, borderRadius: 10, padding: "12px 14px", border: `1px solid ${c.border}` }}>
+                <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 12 }}>📋 Detyrat e fundit</div>
+                {tasks.slice(-4).reverse().map(t => (
+                  <div key={t.id} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: `1px solid ${c.border}`, fontSize: 12 }}>
+                    <span style={{ color: c.text }}>{t.title}</span>
+                    <span style={{ color: sColors[t.status], fontSize: 11 }}>{t.status}</span>
+                  </div>
+                ))}
+                {tasks.length === 0 && <div style={{ color: c.textMuted, fontSize: 12 }}>Nuk ka detyra.</div>}
+              </div>
+              <div style={{ background: c.surface, borderRadius: 10, padding: "12px 14px", border: `1px solid ${c.border}` }}>
+                <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 12 }}>💳 Transaksionet e fundit</div>
+                {transactions.slice(-4).reverse().map(t => (
+                  <div key={t.id} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: `1px solid ${c.border}`, fontSize: 12 }}>
+                    <span style={{ color: c.text }}>{t.category}</span>
+                    <span style={{ color: t.type === "income" ? c.success : c.danger, fontWeight: 600 }}>
+                      {t.type === "income" ? "+" : "-"}€{t.amount.toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+                {transactions.length === 0 && <div style={{ color: c.textMuted, fontSize: 12 }}>Nuk ka transaksione.</div>}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── CUSTOMERS ── */}
+        {tab === "customers" && (
+          <div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+              {(["name", "email", "phone"] as const).map(f => (
+                <input key={f} placeholder={{ name: "Emri *", email: "Email", phone: "Telefon" }[f]}
+                  value={cForm[f]} onChange={e => setCForm(p => ({ ...p, [f]: e.target.value }))}
+                  onKeyDown={e => e.key === "Enter" && addCustomer()}
+                  style={{ flex: 1, minWidth: 100, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
+              ))}
+              <button onClick={addCustomer} style={{ padding: "6px 16px", borderRadius: 8, background: c.accent, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Shto</button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {customers.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>Nuk ka klientë akoma.</div>}
+              {customers.map(cu => (
+                <div key={cu.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: c.surface, borderRadius: 8, border: `1px solid ${c.border}` }}>
+                  <span style={{ width: 28, height: 28, borderRadius: "50%", background: c.accent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{cu.name[0]?.toUpperCase()}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>{cu.name}</div>
+                    <div style={{ fontSize: 11, color: c.textMuted }}>{cu.email}{cu.phone ? ` · ${cu.phone}` : ""}</div>
+                  </div>
+                  <span style={{ fontSize: 11, color: c.success, background: c.successSoft, padding: "2px 8px", borderRadius: 6 }}>{cu.status}</span>
+                  <button onClick={() => delCustomer(cu.id)} style={{ background: "none", border: "none", color: c.danger, cursor: "pointer", fontSize: 14, padding: "2px 6px" }}>✕</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── FINANCE ── */}
+        {tab === "finance" && (
+          <div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
+              {[{ l: "💰 Të Ardhura", v: `€${income.toFixed(2)}`, col: c.success }, { l: "💸 Shpenzime", v: `€${expense.toFixed(2)}`, col: c.danger }, { l: "📊 Bilanci", v: `€${balance.toFixed(2)}`, col: balance >= 0 ? c.success : c.danger }].map(({ l, v, col }) => (
+                <div key={l} style={{ background: c.surface, borderRadius: 8, padding: "10px 12px", border: `1px solid ${c.border}`, textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: c.textMuted }}>{l}</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: col }}>{v}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+              <select value={tForm.type} onChange={e => setTForm(p => ({ ...p, type: e.target.value as "income" | "expense" }))}
+                style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12 }}>
+                <option value="income">⬆ Të Ardhura</option>
+                <option value="expense">⬇ Shpenzim</option>
+              </select>
+              <input placeholder="Shuma €" value={tForm.amount} onChange={e => setTForm(p => ({ ...p, amount: e.target.value }))}
+                style={{ width: 90, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
+              <input placeholder="Kategoria" value={tForm.category} onChange={e => setTForm(p => ({ ...p, category: e.target.value }))}
+                style={{ width: 110, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
+              <input placeholder="Përshkrimi" value={tForm.desc} onChange={e => setTForm(p => ({ ...p, desc: e.target.value }))}
+                style={{ flex: 1, minWidth: 100, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
+              <input type="date" value={tForm.date} onChange={e => setTForm(p => ({ ...p, date: e.target.value }))}
+                style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12 }} />
+              <button onClick={addTransaction} style={{ padding: "6px 16px", borderRadius: 8, background: tForm.type === "income" ? c.success : c.danger, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Shto</button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+              {transactions.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>Nuk ka transaksione akoma.</div>}
+              {[...transactions].reverse().map(t => (
+                <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 12px", background: c.surface, borderRadius: 8, border: `1px solid ${c.border}` }}>
+                  <span style={{ fontSize: 14 }}>{t.type === "income" ? "⬆" : "⬇"}</span>
+                  <span style={{ fontWeight: 700, color: t.type === "income" ? c.success : c.danger, minWidth: 80 }}>€{t.amount.toFixed(2)}</span>
+                  <span style={{ fontSize: 11, color: c.textMuted, flex: 1 }}>{t.category}{t.desc ? ` — ${t.desc}` : ""}</span>
+                  <span style={{ fontSize: 11, color: c.textMuted }}>{t.date}</span>
+                  <button onClick={() => delTransaction(t.id)} style={{ background: "none", border: "none", color: c.danger, cursor: "pointer", fontSize: 14 }}>✕</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── TASKS ── */}
+        {tab === "tasks" && (
+          <div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+              <input placeholder="Titulli i detyrës *" value={tkForm.title} onChange={e => setTkForm(p => ({ ...p, title: e.target.value }))}
+                onKeyDown={e => e.key === "Enter" && addTask()}
+                style={{ flex: 1, minWidth: 150, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
+              <select value={tkForm.priority} onChange={e => setTkForm(p => ({ ...p, priority: e.target.value as Task["priority"] }))}
+                style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12 }}>
+                {["E ulët", "Normale", "E lartë", "Urgjente"].map(p => <option key={p}>{p}</option>)}
+              </select>
+              <input type="date" value={tkForm.due} onChange={e => setTkForm(p => ({ ...p, due: e.target.value }))}
+                style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12 }} />
+              <button onClick={addTask} style={{ padding: "6px 16px", borderRadius: 8, background: c.accent, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Shto</button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {tasks.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>Nuk ka detyra akoma.</div>}
+              {tasks.map(t => (
+                <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: c.surface, borderRadius: 8, border: `1px solid ${c.border}` }}>
+                  <button onClick={() => advanceTask(t.id)}
+                    style={{ width: 22, height: 22, borderRadius: "50%", border: `2px solid ${sColors[t.status]}`, background: t.status === "Përfunduar" ? sColors[t.status] : "transparent", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {t.status === "Përfunduar" && <span style={{ color: "#fff", fontSize: 10 }}>✓</span>}
+                  </button>
+                  <span style={{ flex: 1, fontSize: 13, textDecoration: t.status === "Përfunduar" ? "line-through" : "none", color: t.status === "Përfunduar" ? c.textMuted : c.text }}>{t.title}</span>
+                  <span style={{ fontSize: 10, color: pColors[t.priority], background: `${pColors[t.priority]}20`, padding: "2px 8px", borderRadius: 6 }}>{t.priority}</span>
+                  <span style={{ fontSize: 10, color: sColors[t.status] }}>{t.status}</span>
+                  {t.due && <span style={{ fontSize: 10, color: c.textMuted }}>📅 {t.due}</span>}
+                  <button onClick={() => delTask(t.id)} style={{ background: "none", border: "none", color: c.danger, cursor: "pointer", fontSize: 14 }}>✕</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ SYSTEM MONITOR APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function SysMonApp({ c }: { c: typeof palette.dark }) {
   const rand = (min: number, max: number) => Math.floor(Math.random() * (max - min) + min);
@@ -7713,7 +7991,7 @@ export default function AlternusOS() {
           <span className="text-[10px] px-1.5 py-0.5 rounded-md ml-1" style={{ background: mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", color: c.textMuted }}>⌘K</span>
         </button>
 
-        {/* ━━━━ Bottom Dock Bar — fixed, 3D icons ━━━━ */}
+        {/* ━━━━ Bottom Dock Bar — fixed, 3D Minimalist fill icons ━━━━ */}
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[50]" onClick={e => e.stopPropagation()}>
           <div
             className="flex items-center gap-1.5 px-3 py-2 rounded-2xl"
@@ -7728,8 +8006,7 @@ export default function AlternusOS() {
             }}
           >
             {dockApps.map(app => {
-              const dk = mode === "dark";
-              const isOpen = wins.some(w => w.id === app.id && w.isOpen);
+              const fillPath = icFill[app.id] ?? app.icon;
               return (
                 <button
                   key={app.id}
@@ -7740,67 +8017,42 @@ export default function AlternusOS() {
                     width: 46,
                     height: 46,
                     borderRadius: 14,
-                    background: dk
-                      ? `linear-gradient(135deg, ${app.color}30 0%, ${app.color}10 50%, ${app.color}05 100%)`
-                      : `linear-gradient(135deg, ${app.color}25 0%, ${app.color}10 50%, ${app.color}04 100%)`,
-                    border: `1px solid ${dk ? `${app.color}30` : `${app.color}20`}`,
-                    boxShadow: dk
-                      ? `0 4px 12px ${app.color}15, 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 2px rgba(0,0,0,0.2)`
-                      : `0 4px 12px ${app.color}12, 0 1px 3px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 2px rgba(0,0,0,0.04)`,
+                    background: `linear-gradient(145deg, ${app.color}EE 0%, ${app.color}99 55%, ${app.color}66 100%)`,
+                    border: `1px solid ${app.color}60`,
+                    boxShadow: `0 4px 12px ${app.color}50, 0 1px 3px ${app.color}30, inset 0 1px 0 rgba(255,255,255,0.30), inset 0 -1px 0 rgba(0,0,0,0.12)`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                   onMouseEnter={e => {
                     const el = e.currentTarget;
-                    el.style.background = dk
-                      ? `linear-gradient(135deg, ${app.color}50 0%, ${app.color}25 50%, ${app.color}12 100%)`
-                      : `linear-gradient(135deg, ${app.color}40 0%, ${app.color}18 50%, ${app.color}08 100%)`;
-                    el.style.borderColor = dk ? `${app.color}55` : `${app.color}40`;
-                    el.style.boxShadow = dk
-                      ? `0 8px 24px ${app.color}30, 0 0 20px ${app.color}18, inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 2px rgba(0,0,0,0.3)`
-                      : `0 8px 24px ${app.color}20, 0 0 20px ${app.color}12, inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 2px rgba(0,0,0,0.06)`;
+                    el.style.boxShadow = `0 8px 24px ${app.color}70, 0 2px 6px ${app.color}40, inset 0 1px 0 rgba(255,255,255,0.40), inset 0 -1px 0 rgba(0,0,0,0.15)`;
                     el.style.transform = "translateY(-6px) scale(1.12)";
+                    el.style.filter = "brightness(1.12)";
                   }}
                   onMouseLeave={e => {
                     const el = e.currentTarget;
-                    el.style.background = dk
-                      ? `linear-gradient(135deg, ${app.color}30 0%, ${app.color}10 50%, ${app.color}05 100%)`
-                      : `linear-gradient(135deg, ${app.color}25 0%, ${app.color}10 50%, ${app.color}04 100%)`;
-                    el.style.borderColor = dk ? `${app.color}30` : `${app.color}20`;
-                    el.style.boxShadow = dk
-                      ? `0 4px 12px ${app.color}15, 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 2px rgba(0,0,0,0.2)`
-                      : `0 4px 12px ${app.color}12, 0 1px 3px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 2px rgba(0,0,0,0.04)`;
+                    el.style.boxShadow = `0 4px 12px ${app.color}50, 0 1px 3px ${app.color}30, inset 0 1px 0 rgba(255,255,255,0.30), inset 0 -1px 0 rgba(0,0,0,0.12)`;
                     el.style.transform = "translateY(0) scale(1)";
+                    el.style.filter = "brightness(1)";
                   }}
                 >
-                  {/* 3D top gloss */}
+                  {/* Specular highlight — top half (3D convex) */}
                   <div style={{
-                    position: "absolute", top: 0, left: 0, right: 0, height: "45%",
-                    borderRadius: "14px 14px 0 0",
-                    background: dk
-                      ? "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 100%)"
-                      : "linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.05) 100%)",
+                    position: "absolute", top: 0, left: 0, right: 0, height: "46%",
+                    borderRadius: "14px 14px 60% 60%",
+                    background: "linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 100%)",
                     pointerEvents: "none",
                   }} />
-                  {/* 3D specular highlight */}
+                  {/* Rim light — bottom edge */}
                   <div style={{
-                    position: "absolute", top: 3, left: 5, width: 14, height: 6,
-                    borderRadius: "50%",
-                    background: dk ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.55)",
-                    filter: "blur(4px)",
+                    position: "absolute", bottom: 0, left: "15%", right: "15%", height: 1,
+                    background: "rgba(255,255,255,0.18)",
                     pointerEvents: "none",
                   }} />
-                  {/* Bottom edge shadow for 3D depth */}
-                  <div style={{
-                    position: "absolute", bottom: 0, left: 2, right: 2, height: 4,
-                    borderRadius: "0 0 12px 12px",
-                    background: dk ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.04)",
-                    pointerEvents: "none",
-                  }} />
-                  {/* Icon with glow */}
-                  <div style={{ position: "relative", zIndex: 1, filter: `drop-shadow(0 2px 6px ${app.color}50)` }}>
-                    <I d={app.icon} s={20} c={app.color} />
+                  {/* Fill icon — white gradient */}
+                  <div style={{ position: "relative", zIndex: 1, filter: `drop-shadow(0 1px 2px rgba(0,0,0,0.25))` }}>
+                    <I d={fillPath} s={20} f={true} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.78)"]} />
                   </div>
                 </button>
               );
