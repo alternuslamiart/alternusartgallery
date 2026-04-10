@@ -9326,164 +9326,184 @@ export default function AlternusOS() {
           <span className="text-[10px] px-1.5 py-0.5 rounded-md ml-1" style={{ background: mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", color: c.textMuted }}>⌘K</span>
         </button>
 
-        {/* ━━━━ Bottom Dock Bar — Minimal dark pill (Image #3 style) ━━━━ */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[50]" onClick={e => e.stopPropagation()}>
-          <div
-            className="flex items-center gap-5 px-5"
-            style={{
-              height: 64,
-              borderRadius: 28,
-              background: "rgba(14,16,24,0.82)",
-              backdropFilter: "blur(28px) saturate(1.5)",
-              WebkitBackdropFilter: "blur(28px) saturate(1.5)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              boxShadow: "0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)",
-            }}
-          >
-            {/* Home */}
-            {(() => {
-              const isAnyOpen = wins.some(w => w.isOpen && !w.isMinimized);
-              return (
-                <div className="flex flex-col items-center gap-0.5">
-                  <button
-                    title="Show Desktop"
-                    onClick={() => setWins(p => p.map(w => w.isOpen && !w.isMinimized ? { ...w, isMinimized: true } : w))}
-                    className="flex items-center justify-center transition-all duration-180"
-                    style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; (e.currentTarget.querySelector("svg") as SVGElement | null)?.style && ((e.currentTarget.querySelector("svg") as SVGElement).style.opacity = "1"); }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; (e.currentTarget.querySelector("svg") as SVGElement | null)?.style && ((e.currentTarget.querySelector("svg") as SVGElement).style.opacity = "0.65"); }}
-                  >
-                    <I d={ic.home} s={19} c="rgba(255,255,255,0.65)" />
-                  </button>
-                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: isAnyOpen ? "rgba(255,255,255,0.5)" : "transparent", transition: "all 200ms" }} />
-                </div>
-              );
-            })()}
-
-            {/* App Grid / Launchpad */}
-            <div className="flex flex-col items-center gap-0.5">
-              <button
-                title="All Apps"
-                onClick={() => setShowLaunchpad(true)}
-                className="flex items-center justify-center transition-all duration-180"
-                style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
-                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+        {/* ━━━━ Bottom Dock Bar — Minimal pill, mode-aware ━━━━ */}
+        {(() => {
+          const dockBg = mode === "dark" ? "rgba(14,16,24,0.82)" : "rgba(240,242,250,0.84)";
+          const dockBorder = mode === "dark" ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.09)";
+          const dockShadow = mode === "dark"
+            ? "0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)"
+            : "0 8px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.7)";
+          const iconColor = mode === "dark" ? "rgba(255,255,255,0.65)" : "rgba(28,30,42,0.62)";
+          const hoverBg   = mode === "dark" ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.06)";
+          const dotColor  = mode === "dark" ? "rgba(255,255,255,0.5)" : "rgba(28,30,42,0.4)";
+          return (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[50]" onClick={e => e.stopPropagation()}>
+              <div
+                className="flex items-center gap-5 px-5"
+                style={{
+                  height: 64,
+                  borderRadius: 28,
+                  background: dockBg,
+                  backdropFilter: "blur(28px) saturate(1.5)",
+                  WebkitBackdropFilter: "blur(28px) saturate(1.5)",
+                  border: `1px solid ${dockBorder}`,
+                  boxShadow: dockShadow,
+                  transition: "background 300ms ease, border-color 300ms ease, box-shadow 300ms ease",
+                }}
               >
-                <I d={ic.grid} s={19} c="rgba(255,255,255,0.65)" />
-              </button>
-              <div style={{ width: 4, height: 4, borderRadius: "50%", background: "transparent" }} />
+                {/* Home */}
+                {(() => {
+                  const isAnyOpen = wins.some(w => w.isOpen && !w.isMinimized);
+                  return (
+                    <div className="flex flex-col items-center gap-0.5">
+                      <button
+                        title="Show Desktop"
+                        onClick={() => setWins(p => p.map(w => w.isOpen && !w.isMinimized ? { ...w, isMinimized: true } : w))}
+                        className="flex items-center justify-center transition-all duration-180"
+                        style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                      >
+                        <I d={ic.home} s={19} c={iconColor} />
+                      </button>
+                      <div style={{ width: 4, height: 4, borderRadius: "50%", background: isAnyOpen ? dotColor : "transparent", transition: "all 200ms" }} />
+                    </div>
+                  );
+                })()}
+
+                {/* App Grid / Launchpad */}
+                <div className="flex flex-col items-center gap-0.5">
+                  <button
+                    title="All Apps"
+                    onClick={() => setShowLaunchpad(true)}
+                    className="flex items-center justify-center transition-all duration-180"
+                    style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <I d={ic.grid} s={19} c={iconColor} />
+                  </button>
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: "transparent" }} />
+                </div>
+
+                {/* Search */}
+                <div className="flex flex-col items-center gap-0.5">
+                  <button
+                    title="Search (⌘K)"
+                    onClick={() => setShowSpotlight(true)}
+                    className="flex items-center justify-center transition-all duration-180"
+                    style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <I d={ic.search} s={19} c={iconColor} />
+                  </button>
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: "transparent" }} />
+                </div>
+
+                {/* Glowing Orb — AI Hub (center piece) */}
+                {(() => {
+                  const isAiOpen = wins.some(w => w.id === "aihub" && w.isOpen);
+                  return (
+                    <div className="flex flex-col items-center gap-0.5">
+                      <button
+                        title="AI Hub"
+                        onClick={() => openWinWithAI("aihub")}
+                        className="flex items-center justify-center transition-all duration-200"
+                        style={{
+                          width: 52, height: 52,
+                          borderRadius: "50%",
+                          background: "radial-gradient(circle at 38% 35%, #c8e8ff 0%, #7abcff 22%, #4a90e2 48%, #7b5ea7 78%, #3a2060 100%)",
+                          boxShadow: mode === "dark"
+                            ? "0 0 18px 6px rgba(120,180,255,0.55), 0 0 40px 12px rgba(100,140,255,0.25), inset 0 1px 0 rgba(255,255,255,0.45)"
+                            : "0 0 14px 5px rgba(100,160,255,0.4), 0 0 30px 8px rgba(80,120,255,0.18), inset 0 1px 0 rgba(255,255,255,0.5)",
+                          border: "none",
+                          position: "relative",
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.transform = "scale(1.08)";
+                          e.currentTarget.style.boxShadow = mode === "dark"
+                            ? "0 0 26px 10px rgba(120,180,255,0.7), 0 0 55px 16px rgba(100,140,255,0.35), inset 0 1px 0 rgba(255,255,255,0.5)"
+                            : "0 0 22px 8px rgba(100,160,255,0.55), 0 0 46px 12px rgba(80,120,255,0.28), inset 0 1px 0 rgba(255,255,255,0.55)";
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.transform = "scale(1)";
+                          e.currentTarget.style.boxShadow = mode === "dark"
+                            ? "0 0 18px 6px rgba(120,180,255,0.55), 0 0 40px 12px rgba(100,140,255,0.25), inset 0 1px 0 rgba(255,255,255,0.45)"
+                            : "0 0 14px 5px rgba(100,160,255,0.4), 0 0 30px 8px rgba(80,120,255,0.18), inset 0 1px 0 rgba(255,255,255,0.5)";
+                        }}
+                      >
+                        {/* Specular glint */}
+                        <div style={{ position: "absolute", top: "14%", left: "22%", width: "28%", height: "18%", borderRadius: "50%", background: "rgba(255,255,255,0.45)", filter: "blur(2px)", pointerEvents: "none" }} />
+                      </button>
+                      <div style={{ width: 4, height: 4, borderRadius: "50%", background: isAiOpen ? "rgba(120,170,255,0.7)" : "transparent", boxShadow: isAiOpen ? "0 0 6px rgba(120,170,255,0.6)" : "none", transition: "all 200ms" }} />
+                    </div>
+                  );
+                })()}
+
+                {/* Files */}
+                {(() => {
+                  const isOpen = wins.some(w => w.id === "files" && w.isOpen);
+                  return (
+                    <div className="flex flex-col items-center gap-0.5">
+                      <button
+                        title="Files"
+                        onClick={() => openWinWithAI("files")}
+                        className="flex items-center justify-center transition-all duration-180"
+                        style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                      >
+                        <I d={ic.folder} s={19} c={iconColor} />
+                      </button>
+                      <div style={{ width: 4, height: 4, borderRadius: "50%", background: isOpen ? dotColor : "transparent", transition: "all 200ms" }} />
+                    </div>
+                  );
+                })()}
+
+                {/* Browser */}
+                {(() => {
+                  const isOpen = wins.some(w => w.id === "browser" && w.isOpen);
+                  return (
+                    <div className="flex flex-col items-center gap-0.5">
+                      <button
+                        title="Browser"
+                        onClick={() => openWinWithAI("browser")}
+                        className="flex items-center justify-center transition-all duration-180"
+                        style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                      >
+                        <I d={ic.refresh} s={19} c={iconColor} />
+                      </button>
+                      <div style={{ width: 4, height: 4, borderRadius: "50%", background: isOpen ? dotColor : "transparent", transition: "all 200ms" }} />
+                    </div>
+                  );
+                })()}
+
+                {/* Settings */}
+                {(() => {
+                  const isOpen = wins.some(w => w.id === "settings" && w.isOpen);
+                  return (
+                    <div className="flex flex-col items-center gap-0.5">
+                      <button
+                        title="Settings"
+                        onClick={() => openWinWithAI("settings")}
+                        className="flex items-center justify-center transition-all duration-180"
+                        style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                      >
+                        <I d={ic.settings} s={19} c={iconColor} />
+                      </button>
+                      <div style={{ width: 4, height: 4, borderRadius: "50%", background: isOpen ? dotColor : "transparent", transition: "all 200ms" }} />
+                    </div>
+                  );
+                })()}
+              </div>
             </div>
-
-            {/* Search */}
-            <div className="flex flex-col items-center gap-0.5">
-              <button
-                title="Search (⌘K)"
-                onClick={() => setShowSpotlight(true)}
-                className="flex items-center justify-center transition-all duration-180"
-                style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
-                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
-              >
-                <I d={ic.search} s={19} c="rgba(255,255,255,0.65)" />
-              </button>
-              <div style={{ width: 4, height: 4, borderRadius: "50%", background: "transparent" }} />
-            </div>
-
-            {/* Glowing Orb — AI Hub (center piece) */}
-            {(() => {
-              const isAiOpen = wins.some(w => w.id === "aihub" && w.isOpen);
-              return (
-                <div className="flex flex-col items-center gap-0.5">
-                  <button
-                    title="AI Hub"
-                    onClick={() => openWinWithAI("aihub")}
-                    className="flex items-center justify-center transition-all duration-200"
-                    style={{
-                      width: 52, height: 52,
-                      borderRadius: "50%",
-                      background: "radial-gradient(circle at 38% 35%, #c8e8ff 0%, #7abcff 22%, #4a90e2 48%, #7b5ea7 78%, #3a2060 100%)",
-                      boxShadow: "0 0 18px 6px rgba(120,180,255,0.55), 0 0 40px 12px rgba(100,140,255,0.25), inset 0 1px 0 rgba(255,255,255,0.45)",
-                      border: "none",
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.transform = "scale(1.08)";
-                      e.currentTarget.style.boxShadow = "0 0 26px 10px rgba(120,180,255,0.7), 0 0 55px 16px rgba(100,140,255,0.35), inset 0 1px 0 rgba(255,255,255,0.5)";
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.transform = "scale(1)";
-                      e.currentTarget.style.boxShadow = "0 0 18px 6px rgba(120,180,255,0.55), 0 0 40px 12px rgba(100,140,255,0.25), inset 0 1px 0 rgba(255,255,255,0.45)";
-                    }}
-                  >
-                    {/* Specular glint */}
-                    <div style={{ position: "absolute", top: "14%", left: "22%", width: "28%", height: "18%", borderRadius: "50%", background: "rgba(255,255,255,0.45)", filter: "blur(2px)", pointerEvents: "none" }} />
-                  </button>
-                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: isAiOpen ? "rgba(160,200,255,0.7)" : "transparent", boxShadow: isAiOpen ? "0 0 6px rgba(160,200,255,0.6)" : "none", transition: "all 200ms" }} />
-                </div>
-              );
-            })()}
-
-            {/* Files */}
-            {(() => {
-              const isOpen = wins.some(w => w.id === "files" && w.isOpen);
-              return (
-                <div className="flex flex-col items-center gap-0.5">
-                  <button
-                    title="Files"
-                    onClick={() => openWinWithAI("files")}
-                    className="flex items-center justify-center transition-all duration-180"
-                    style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
-                  >
-                    <I d={ic.folder} s={19} c="rgba(255,255,255,0.65)" />
-                  </button>
-                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: isOpen ? "rgba(255,255,255,0.5)" : "transparent", transition: "all 200ms" }} />
-                </div>
-              );
-            })()}
-
-            {/* Browser */}
-            {(() => {
-              const isOpen = wins.some(w => w.id === "browser" && w.isOpen);
-              return (
-                <div className="flex flex-col items-center gap-0.5">
-                  <button
-                    title="Browser"
-                    onClick={() => openWinWithAI("browser")}
-                    className="flex items-center justify-center transition-all duration-180"
-                    style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
-                  >
-                    <I d={ic.refresh} s={19} c="rgba(255,255,255,0.65)" />
-                  </button>
-                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: isOpen ? "rgba(255,255,255,0.5)" : "transparent", transition: "all 200ms" }} />
-                </div>
-              );
-            })()}
-
-            {/* Settings */}
-            {(() => {
-              const isOpen = wins.some(w => w.id === "settings" && w.isOpen);
-              return (
-                <div className="flex flex-col items-center gap-0.5">
-                  <button
-                    title="Settings"
-                    onClick={() => openWinWithAI("settings")}
-                    className="flex items-center justify-center transition-all duration-180"
-                    style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
-                  >
-                    <I d={ic.settings} s={19} c="rgba(255,255,255,0.65)" />
-                  </button>
-                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: isOpen ? "rgba(255,255,255,0.5)" : "transparent", transition: "all 200ms" }} />
-                </div>
-              );
-            })()}
-          </div>
-        </div>
+          );
+        })()}
 
 
         {/* ━━━━ Ctrl+A Global AI Overlay ━━━━ */}
