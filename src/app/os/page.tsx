@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news" | "dashboard" | "tasks" | "mail" | "monaco" | "aihub" | "aivoice" | "knowledge" | "sysmon" | "business";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news" | "dashboard" | "tasks" | "mail" | "monaco" | "aihub" | "aivoice" | "knowledge" | "sysmon" | "business" | "agent";
 
 interface WinState {
   id: WinId;
@@ -7669,6 +7669,456 @@ function BusinessApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
+// ━━━━ ALTERNUS AI AGENT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+type AgentActionType = "openApp" | "changeTheme" | "changeWallpaper" | "draftEmail" | "createDoc" | "readFile" | "runCommand" | "changeSetting" | "search" | "schedule";
+interface AgentStep { label: string; status: "pending" | "running" | "done" | "error"; detail?: string }
+interface AgentMessage {
+  id: string;
+  role: "user" | "agent";
+  text: string;
+  steps?: AgentStep[];
+  workspace?: { type: "email" | "doc" | "file" | "terminal" | "settings" | "info"; title: string; content: string };
+  timestamp: Date;
+}
+
+function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp }: {
+  c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void;
+  wallpaper: number; setWallpaper: (w: number) => void; onOpenApp: (id: WinId) => void;
+}) {
+  const [msgs, setMsgs] = useState<AgentMessage[]>([{
+    id: "welcome", role: "agent", timestamp: new Date(),
+    text: "Përshëndetje! Unë jam **Alternus AI Agent** — asistenti juaj inteligjent i OS-it.\n\nMund të kryej veprime reale si:\n- 📂 Hap & menaxho skedarë\n- 📧 Shkruaj & dërgo email\n- 📄 Krijo & redakto dokumente\n- ⚙️ Ndrysho cilësimet e sistemit\n- 🖥️ Hap aplikacione\n- 💻 Ekzekuto komanda\n\nÇfarë dëshironi të bëj sot?",
+  }]);
+  const [input, setInput] = useState("");
+  const [isThinking, setIsThinking] = useState(false);
+  const [activeWorkspace, setActiveWorkspace] = useState<AgentMessage["workspace"] | null>(null);
+  const [agentCapability, setAgentCapability] = useState<"all" | "files" | "email" | "docs" | "settings">("all");
+  const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
+
+  const QUICK_ACTIONS = [
+    { label: "📂 Hap Files", task: "Hap aplikacionin Files" },
+    { label: "📧 Draft Email", task: "Shkruaj një email profesional për ekipin rreth progresit të projektit" },
+    { label: "📄 Krijo Dokument", task: "Krijo një dokument të ri Word me strukturë profesionale" },
+    { label: "🌙 Dark Mode", task: "Kalo në dark mode" },
+    { label: "☀️ Light Mode", task: "Kalo në light mode" },
+    { label: "🖥️ Ndrysho Wallpaper", task: "Ndrysho wallpaperin në OSwp 2" },
+    { label: "💻 Terminal", task: "Hap terminalin dhe kontrollo statusin e sistemit" },
+    { label: "📊 Dashboard", task: "Hap dashboardin e biznesit" },
+  ];
+
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+  const addStepUpdate = (msgId: string, stepIdx: number, status: AgentStep["status"]) => {
+    setMsgs(prev => prev.map(m => {
+      if (m.id !== msgId || !m.steps) return m;
+      const steps = [...m.steps];
+      steps[stepIdx] = { ...steps[stepIdx], status };
+      return { ...m, steps };
+    }));
+  };
+
+  const classify = (text: string): AgentActionType => {
+    const t = text.toLowerCase();
+    if (/email|mail|dërgoj|shkruaj.*email|message/.test(t)) return "draftEmail";
+    if (/dokument|word|docx|shkruaj.*raport|krijo.*dok/.test(t)) return "createDoc";
+    if (/dark|light|theme|temë|mënyrë/.test(t)) return "changeTheme";
+    if (/wallpaper|sfond|prapav/.test(t)) return "changeWallpaper";
+    if (/skedar|file|files|dokument.*lexo|hap.*fajl/.test(t)) return "openApp";
+    if (/terminal|komandë|komand|run|exec/.test(t)) return "runCommand";
+    if (/cilësi|setting|konfig|ndrysho.*sistem/.test(t)) return "changeSetting";
+    if (/kërko|search|gjej|find/.test(t)) return "search";
+    if (/takim|meeting|orare|schedule|kalendar/.test(t)) return "schedule";
+    return "openApp";
+  };
+
+  const execute = async (userText: string) => {
+    const msgId = Date.now().toString();
+    const t = userText.toLowerCase();
+    const actionType = classify(userText);
+
+    // Build steps based on action
+    let steps: AgentStep[] = [];
+    let workspace: AgentMessage["workspace"] | undefined;
+    let finalText = "";
+
+    if (actionType === "draftEmail") {
+      steps = [
+        { label: "Analizoj kërkesën tuaj", status: "pending" },
+        { label: "Gjeneroj përmbajtjen e emailit", status: "pending" },
+        { label: "Formatoj email-in profesional", status: "pending" },
+        { label: "Email gati për dërgim", status: "pending" },
+      ];
+    } else if (actionType === "createDoc") {
+      steps = [
+        { label: "Krijon strukturën e dokumentit", status: "pending" },
+        { label: "Gjeneroj përmbajtjen", status: "pending" },
+        { label: "Apliko formatim profesional", status: "pending" },
+        { label: "Ruis si DOCX", status: "pending" },
+      ];
+    } else if (actionType === "changeTheme") {
+      steps = [
+        { label: "Lexoj preferencën e temës", status: "pending" },
+        { label: "Apliko ndryshimin e temës", status: "pending" },
+        { label: "Rifreshoj ndërfaqen", status: "pending" },
+      ];
+    } else if (actionType === "changeWallpaper") {
+      steps = [
+        { label: "Identifikoj wallpaperin e kërkuar", status: "pending" },
+        { label: "Ngarkoj wallpaperin", status: "pending" },
+        { label: "Apliko në desktop", status: "pending" },
+      ];
+    } else if (actionType === "runCommand") {
+      steps = [
+        { label: "Analizoj komandën", status: "pending" },
+        { label: "Hap terminalin", status: "pending" },
+        { label: "Ekzekutoj komandën", status: "pending" },
+        { label: "Kthej rezultatin", status: "pending" },
+      ];
+    } else {
+      const appLabel = /files|skedar|fajl/.test(t) ? "Files" : /mail|email/.test(t) ? "Mail" : /dashboard/.test(t) ? "Dashboard" : /terminal/.test(t) ? "Terminal" : /settings|cilësi/.test(t) ? "Settings" : /notes|shënim/.test(t) ? "Notes" : /browser|web/.test(t) ? "Browser" : /calendar|takim/.test(t) ? "Calendar" : "AI Hub";
+      steps = [
+        { label: `Identifikoj aplikacionin: ${appLabel}`, status: "pending" },
+        { label: `Hap ${appLabel}`, status: "pending" },
+      ];
+    }
+
+    // Add agent message with steps immediately
+    const agentMsg: AgentMessage = { id: msgId, role: "agent", timestamp: new Date(), text: "Duke punuar...", steps };
+    setMsgs(prev => [...prev, agentMsg]);
+    setIsThinking(true);
+
+    // Execute steps with real delays
+    for (let i = 0; i < steps.length; i++) {
+      addStepUpdate(msgId, i, "running");
+      await sleep(600 + Math.random() * 400);
+
+      // REAL ACTIONS
+      if (actionType === "changeTheme" && i === 1) {
+        const newMode: ThemeMode = /light|ndriçim|e bardhë/.test(t) ? "light" : "dark";
+        setMode(newMode);
+      }
+      if (actionType === "changeWallpaper" && i === 1) {
+        const wpNum = t.match(/[1-5]/)?.[0];
+        setWallpaper(wpNum ? parseInt(wpNum) : Math.floor(Math.random() * 5) + 1);
+      }
+      if (actionType === "openApp" && i === steps.length - 1) {
+        const appId: WinId = /files|skedar/.test(t) ? "files" : /mail|email/.test(t) ? "mail" : /dashboard/.test(t) ? "dashboard" : /terminal/.test(t) ? "terminal" : /settings/.test(t) ? "settings" : /notes/.test(t) ? "notes" : /browser/.test(t) ? "browser" : /calendar/.test(t) ? "calendar" : /tasks/.test(t) ? "tasks" : /music/.test(t) ? "music" : "aihub";
+        onOpenApp(appId);
+      }
+      if (actionType === "runCommand" && i === 1) onOpenApp("terminal");
+
+      addStepUpdate(msgId, i, "done");
+    }
+
+    // Build workspace content
+    if (actionType === "draftEmail") {
+      const subject = /projekt/.test(t) ? "Përditësim i Projektit" : /raport/.test(t) ? "Raport Javor" : /takm|meeting/.test(t) ? "Ftesë për Takim" : "Komunikim Profesional";
+      workspace = {
+        type: "email", title: `📧 Draft: ${subject}`,
+        content: `Nga: alternus@alternusart.com\nTe: ekipi@alternusart.com\nCC: menaxheri@alternusart.com\nTema: ${subject}\n\n---\n\nI nderuar ekip,\n\nShpresoj që ky email ju gjen mirë.\n\n${/projekt/.test(t) ? "Dëshiroj t'ju informoj rreth progresit të fundit të projektit. Kemi arritur objektivat kryesore të kësaj jave dhe jemi në rrugë të mirë për të përmbushur afatin e vendosur.\n\nPikat kryesore:\n• Faza e parë e zhvillimit: 85% e kompletuar\n• Testimi i moduleve: Në progres\n• Dokumentacioni: Përditësuar\n\nHapi tjetër: Takim rishikimi të premten." : "Dëshiroj të ndaj me ju disa informacione të rëndësishme rreth punës sonë të përbashkët.\n\nJu lutem rishikoni dokumentin e bashkangjitur dhe kthehuni me komentet tuaja."}\n\nFaleminderit për bashkëpunimin tuaj të vazhdueshëm.\n\nMe respekt,\nAlternus AI Agent\nAlternus Art Gallery`,
+      };
+      finalText = `✅ Email-i është gati!\n\nKam hartuar një email profesional me:\n- **Temë**: ${subject}\n- **Destinacionet**: ekipi + menaxheri\n- **Formatim** standard korporativ\n\nMund ta redaktoni, kopjoni ose dërgoni direkt.`;
+    } else if (actionType === "createDoc") {
+      const docTitle = /raport/.test(t) ? "Raport Mujor" : /propozim/.test(t) ? "Propozim Projekti" : /plan/.test(t) ? "Plan Strategjik" : "Dokument i Ri";
+      workspace = {
+        type: "doc", title: `📄 ${docTitle}.docx`,
+        content: `# ${docTitle}\n\n**Data:** ${new Date().toLocaleDateString("sq-AL")}\n**Autori:** Alternus AI Agent\n**Versioni:** 1.0\n\n---\n\n## 1. Hyrje\n\nKy dokument është hartuar automatikisht nga Alternus AI Agent bazuar në kërkesën tuaj. Përmban strukturë profesionale dhe mund të redaktohet sipas nevojave tuaja.\n\n## 2. Qëllimi\n\nQëllimi kryesor i këtij dokumenti është të ofrojë një bazë solide për punën tuaj. Struktura e propozuar ndjek standardet ndërkombëtare të shkrimit profesional.\n\n## 3. Përmbajtja Kryesore\n\n### 3.1 Seksioni i Parë\nShkruani detajet e seksionit të parë këtu.\n\n### 3.2 Seksioni i Dytë  \nShkruani detajet e seksionit të dytë këtu.\n\n## 4. Konkluzione\n\nPërmbledhja e pikave kryesore dhe hapat e ardhshëm.\n\n## 5. Rekomandime\n\n- Rekomandimi i parë\n- Rekomandimi i dytë\n- Rekomandimi i tretë\n\n---\n*Gjeneruar nga Alternus AI Agent · ${new Date().toLocaleString("sq-AL")}*`,
+      };
+      finalText = `✅ Dokumenti është krijuar!\n\n**${docTitle}.docx** është gati me:\n- Strukturë profesionale 5 seksione\n- Formatim standard korporativ\n- Data dhe metadata automatike\n\nMund ta hapni në Word ose ta eksportoni.`;
+      onOpenApp("word");
+    } else if (actionType === "changeTheme") {
+      const newMode: ThemeMode = /light|ndriçim|e bardhë/.test(t) ? "light" : "dark";
+      workspace = {
+        type: "settings", title: "⚙️ Cilësimet e Temës",
+        content: `VEPRIMI I KRYER:\n────────────────\nTema: ${newMode === "dark" ? "🌙 Dark Mode" : "☀️ Light Mode"}\nStatusi: ✅ Aplikuar me sukses\nKoha: ${new Date().toLocaleTimeString()}\n\nNDRYSHIMET:\n• Interface: ${newMode}\n• Sfondi: ${newMode === "dark" ? "#1C1D22" : "#F8F9FA"}\n• Teksti: ${newMode === "dark" ? "#F0F2F8" : "#1A1A2E"}\n• Ikonat: Azhurnuar\n\nTë gjitha aplikacionet e hapura janë azhurnuar automatikisht.`,
+      };
+      finalText = `✅ Tema u ndryshua!\n\nKam aplikuar **${newMode === "dark" ? "Dark Mode 🌙" : "Light Mode ☀️"}** në të gjithë sistemin.\n\nNdryshimi është i menjëhershëm dhe do të ruhet.`;
+    } else if (actionType === "changeWallpaper") {
+      workspace = {
+        type: "settings", title: "🖼️ Wallpaper i Ri",
+        content: `VEPRIMI I KRYER:\n────────────────\nWallpaper: OSwp ${wallpaper}\nStatusi: ✅ Aplikuar\nKoha: ${new Date().toLocaleTimeString()}\n\nWallpaperet e disponueshme:\n• Default (0) - Ngjyra OS\n• OSwp 1 - Gradient Vjollcë\n• OSwp 2 - Ocean Blue\n• OSwp 3 - Flow Aurora\n• OSwp 4 - Emerald Green\n• OSwp 5 - Sunset Rose\n\nFolësi aktual: OSwp ${wallpaper}`,
+      };
+      finalText = `✅ Wallpaperi u ndryshua!\n\nKam aplikuar **OSwp ${wallpaper}** në desktop.\n\nDëshironi të provoni wallpaper tjetër? Thoni numrin (1-5).`;
+    } else if (actionType === "runCommand") {
+      workspace = {
+        type: "terminal", title: "💻 Terminal Output",
+        content: `$ alternus-agent --status\n> Initializing agent...\n> Agent v2.0.0 active ✓\n\n$ system-info\nOS: Alternus OS v3.0\nCPU: 12 cores @ 67% load\nRAM: 8.2 GB / 16 GB used\nDisk: 278 GB / 512 GB\nGPU: NVIDIA A100 82%\nNetwork: AlternusNet 5GHz ✓\nUptime: 14h 22m\n\n$ agent-tasks --list\n→ Task queue: 0 pending\n→ Last task: ${userText.slice(0, 30)}...\n→ Status: Completed ✓\n\n$ _`,
+      };
+      finalText = `✅ Komanda u ekzekutua!\n\nStatusi i sistemit:\n- **CPU**: 67% · **RAM**: 8.2/16 GB\n- **Disk**: 278/512 GB · **Network**: AlternusNet ✓\n- **GPU**: 82% · **Uptime**: 14h 22m\n\nTerminali është hapur për komanda shtesë.`;
+    } else {
+      const appLabel = /files|skedar/.test(t) ? "Files" : /mail|email/.test(t) ? "Mail" : /dashboard/.test(t) ? "Dashboard" : /terminal/.test(t) ? "Terminal" : /settings/.test(t) ? "Settings" : "aplikacionin";
+      workspace = {
+        type: "info", title: `🖥️ ${appLabel} u hap`,
+        content: `VEPRIMI I KRYER:\n────────────────\nAplikacioni: ${appLabel}\nStatusi: ✅ Hapur\nKoha: ${new Date().toLocaleTimeString()}\n\nShikoni dritaren aktive.\nPërdorni Ctrl+A për veprime të tjera AI.`,
+      };
+      finalText = `✅ **${appLabel}** u hap!\n\nDritarja është aktive. A dëshironi të kryej ndonjë veprim specifik brenda tij?`;
+    }
+
+    // Try real API call for richer response
+    try {
+      const resp = await fetch("/api/ai-chat", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userText, conversationHistory: msgs.filter(m => m.id !== "welcome").map(m => ({ role: m.role === "agent" ? "assistant" : "user", content: m.text })).slice(-6) }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.content) finalText = data.content;
+      }
+    } catch { /* use pre-built finalText */ }
+
+    setMsgs(prev => prev.map(m => m.id === msgId ? { ...m, text: finalText, workspace } : m));
+    if (workspace) setActiveWorkspace(workspace);
+    setIsThinking(false);
+  };
+
+  const send = async (text?: string) => {
+    const m = (text || input).trim();
+    if (!m || isThinking) return;
+    setInput("");
+    const userMsg: AgentMessage = { id: `u${Date.now()}`, role: "user", text: m, timestamp: new Date() };
+    setMsgs(prev => [...prev, userMsg]);
+    await execute(m);
+  };
+
+  const statusColors: Record<AgentStep["status"], string> = {
+    pending: c.textMuted, running: c.accent, done: c.success, error: c.danger,
+  };
+
+  return (
+    <div className="flex h-full overflow-hidden" style={{ background: c.bg, fontFamily: "'Inter', sans-serif" }}>
+      {/* ── Left: Chat panel ── */}
+      <div className="flex flex-col" style={{ width: 340, borderRight: `1px solid ${c.border}`, flexShrink: 0 }}>
+        {/* Header */}
+        <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, #7C3AED, #4F8EF7)`, boxShadow: "0 3px 12px rgba(124,58,237,0.35)" }}>
+              <I d={ic.sparkle} s={18} c="#fff" f />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="text-[13px] font-bold" style={{ color: c.text }}>Alternus AI Agent</p>
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: "#7C3AED18", color: "#7C3AED" }}>AGENT</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full" style={{ background: c.success }} />
+                <p className="text-[9px]" style={{ color: c.textMuted }}>Online · Autonomous · Full OS Access</p>
+              </div>
+            </div>
+          </div>
+          {/* Capability filter */}
+          <div className="flex gap-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+            {(["all", "files", "email", "docs", "settings"] as const).map(cap => (
+              <button key={cap} onClick={() => setAgentCapability(cap)}
+                className="px-2.5 py-1 rounded-lg text-[9px] font-semibold capitalize flex-shrink-0 transition-all"
+                style={{ background: agentCapability === cap ? "#7C3AED18" : "transparent", color: agentCapability === cap ? "#7C3AED" : c.textMuted, border: agentCapability === cap ? "1px solid #7C3AED30" : "1px solid transparent" }}>
+                {cap === "all" ? "⚡ Të gjitha" : cap === "files" ? "📂 Skedarë" : cap === "email" ? "📧 Email" : cap === "docs" ? "📄 Docs" : "⚙️ Settings"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3" style={{ scrollbarWidth: "none" }}>
+          {msgs.map(m => (
+            <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "gap-2"}`}>
+              {m.role === "agent" && (
+                <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "linear-gradient(135deg, #7C3AED, #4F8EF7)" }}>
+                  <I d={ic.sparkle} s={11} c="#fff" f />
+                </div>
+              )}
+              <div style={{ maxWidth: "85%" }}>
+                {/* Steps */}
+                {m.steps && m.steps.length > 0 && (
+                  <div className="mb-1.5 p-2.5 rounded-xl space-y-1" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+                    {m.steps.map((s, si) => (
+                      <div key={si} className="flex items-center gap-2">
+                        <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: statusColors[s.status] + "20" }}>
+                          {s.status === "done" ? (
+                            <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke={c.success} strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                          ) : s.status === "running" ? (
+                            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: c.accent }} />
+                          ) : s.status === "error" ? (
+                            <div className="w-1.5 h-1.5 rounded-full" style={{ background: c.danger }} />
+                          ) : (
+                            <div className="w-1 h-1 rounded-full" style={{ background: c.textMuted }} />
+                          )}
+                        </div>
+                        <span className="text-[9px]" style={{ color: s.status === "done" ? c.textSec : s.status === "running" ? c.accentText : c.textMuted }}>{s.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {/* Message bubble */}
+                <div className="px-3 py-2 rounded-2xl text-[11px] leading-relaxed" style={{
+                  background: m.role === "user" ? `linear-gradient(135deg, #7C3AED, #4F8EF7)` : c.surface,
+                  color: m.role === "user" ? "#fff" : c.textSec,
+                  border: m.role === "agent" ? `1px solid ${c.border}` : "none",
+                  whiteSpace: "pre-line",
+                }}>
+                  <AIFormattedText text={m.text} c={c} />
+                </div>
+                {/* Workspace preview link */}
+                {m.workspace && (
+                  <button onClick={() => setActiveWorkspace(m.workspace!)}
+                    className="mt-1 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9px] font-medium w-full transition-all"
+                    style={{ background: c.cardAlt, color: c.accentText, border: `1px solid ${c.border}` }}>
+                    <I d={ic.layers} s={10} c={c.accentText} />
+                    {m.workspace.title}
+                    <span className="ml-auto" style={{ color: c.textMuted }}>→</span>
+                  </button>
+                )}
+                <p className="text-[8px] mt-0.5 px-1" style={{ color: c.textMuted }}>
+                  {m.timestamp.toLocaleTimeString("sq-AL", { hour: "2-digit", minute: "2-digit" })}
+                </p>
+              </div>
+            </div>
+          ))}
+          {isThinking && (
+            <div className="flex gap-2">
+              <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #7C3AED, #4F8EF7)" }}>
+                <I d={ic.sparkle} s={11} c="#fff" f />
+              </div>
+              <div className="px-3 py-2 rounded-2xl flex gap-1 items-center" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+                {[0, 1, 2].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: c.textMuted, animationDelay: `${i * 0.15}s` }} />)}
+              </div>
+            </div>
+          )}
+          <div ref={endRef} />
+        </div>
+
+        {/* Quick actions */}
+        <div className="flex-shrink-0 px-3 pb-2" style={{ borderTop: `1px solid ${c.border}` }}>
+          <div className="pt-2 flex flex-wrap gap-1">
+            {QUICK_ACTIONS.filter(qa => agentCapability === "all" || (agentCapability === "email" && qa.label.includes("Email")) || (agentCapability === "docs" && qa.label.includes("Dokument")) || (agentCapability === "files" && qa.label.includes("Files")) || (agentCapability === "settings" && (qa.label.includes("Mode") || qa.label.includes("Wallpaper")))).map(qa => (
+              <button key={qa.label} onClick={() => send(qa.task)}
+                className="px-2 py-1 rounded-lg text-[9px] font-medium transition-all flex-shrink-0"
+                style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "#7C3AED50"; e.currentTarget.style.color = "#7C3AED"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}>
+                {qa.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Input */}
+        <div className="flex-shrink-0 px-3 pb-3 pt-2">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+              placeholder="Shkruani një detyrë për agjentin..." disabled={isThinking}
+              className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: c.text }} />
+            <button onClick={() => send()} disabled={isThinking || !input.trim()}
+              className="w-7 h-7 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
+              style={{ background: input.trim() && !isThinking ? "linear-gradient(135deg, #7C3AED, #4F8EF7)" : c.cardAlt, boxShadow: input.trim() && !isThinking ? "0 2px 8px rgba(124,58,237,0.4)" : "none" }}>
+              <I d={ic.send} s={12} c={input.trim() && !isThinking ? "#fff" : c.textMuted} />
+            </button>
+          </div>
+          <p className="text-[8px] text-center mt-1" style={{ color: c.textMuted }}>Enter → dërgo · Shift+Enter → rresht i ri</p>
+        </div>
+      </div>
+
+      {/* ── Right: Workspace panel ── */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Workspace header */}
+        <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: c.accentSoft }}>
+            <I d={ic.layers} s={13} c={c.accentText} />
+          </div>
+          <p className="text-[12px] font-bold" style={{ color: c.text }}>
+            {activeWorkspace ? activeWorkspace.title : "⚡ Workspace"}
+          </p>
+          {activeWorkspace && (
+            <button onClick={() => setActiveWorkspace(null)} className="ml-auto p-1.5 rounded-lg" style={{ color: c.textMuted }}
+              onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+              <I d={ic.close} s={12} />
+            </button>
+          )}
+        </div>
+
+        {/* Workspace content */}
+        {activeWorkspace ? (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Action bar */}
+            <div className="flex items-center gap-2 px-4 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+              {activeWorkspace.type === "email" && (
+                <>
+                  {[{ label: "📤 Dërgo", primary: true }, { label: "💾 Ruaj Draft" }, { label: "📋 Kopjo" }, { label: "🗑️ Fshi" }].map(({ label, primary }) => (
+                    <button key={label} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
+                      style={{ background: primary ? c.accent : c.cardAlt, color: primary ? "#fff" : c.textSec, border: `1px solid ${primary ? "transparent" : c.border}` }}>
+                      {label}
+                    </button>
+                  ))}
+                </>
+              )}
+              {activeWorkspace.type === "doc" && (
+                <>
+                  {[{ label: "💾 Ruaj DOCX", primary: true }, { label: "📤 Eksporto PDF" }, { label: "✏️ Redakto" }, { label: "📋 Kopjo" }].map(({ label, primary }) => (
+                    <button key={label} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
+                      style={{ background: primary ? c.accent : c.cardAlt, color: primary ? "#fff" : c.textSec, border: `1px solid ${primary ? "transparent" : c.border}` }}>
+                      {label}
+                    </button>
+                  ))}
+                </>
+              )}
+              {(activeWorkspace.type === "terminal" || activeWorkspace.type === "info" || activeWorkspace.type === "settings") && (
+                <>
+                  {[{ label: "📋 Kopjo" }, { label: "💾 Ruis Log" }, { label: "🔄 Rifresko" }].map(({ label }) => (
+                    <button key={label} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
+                      style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}>
+                      {label}
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+
+            {/* Content area */}
+            <div className="flex-1 overflow-auto p-4">
+              <pre className="text-[11px] leading-relaxed whitespace-pre-wrap font-mono"
+                style={{ color: activeWorkspace.type === "terminal" ? c.success : c.textSec }}>
+                {activeWorkspace.content}
+              </pre>
+            </div>
+          </div>
+        ) : (
+          /* Empty state */
+          <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
+            <div className="w-20 h-20 rounded-3xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #7C3AED18, #4F8EF718)", border: `1px solid #7C3AED20` }}>
+              <I d={ic.sparkle} s={36} c="#7C3AED" f />
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-bold mb-1" style={{ color: c.text }}>Workspace i Agjentit</p>
+              <p className="text-[11px] max-w-xs" style={{ color: c.textMuted }}>Rezultatet e veprimeve të agjentit do të shfaqen këtu — email-e, dokumente, komanda terminali, ndryshime cilësimesh.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 w-full max-w-xs mt-2">
+              {[
+                { icon: "📧", label: "Email", action: "Shkruaj një email profesional" },
+                { icon: "📄", label: "Dokument", action: "Krijo një dokument të ri" },
+                { icon: "⚙️", label: "Settings", action: "Ndrysho cilësimet e sistemit" },
+                { icon: "💻", label: "Terminal", action: "Kontrollo statusin e sistemit" },
+              ].map(it => (
+                <button key={it.label} onClick={() => send(it.action)}
+                  className="flex items-center gap-2 p-3 rounded-xl text-left transition-all"
+                  style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#7C3AED40"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; }}>
+                  <span className="text-lg">{it.icon}</span>
+                  <span className="text-[10px] font-semibold" style={{ color: c.text }}>{it.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ MAIN OS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function AlternusOS() {
   const [mode, setMode] = useState<ThemeMode>("dark");
@@ -7773,6 +8223,7 @@ export default function AlternusOS() {
     { id: "knowledge", title: "Knowledge Base", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 560, h: 480 },
     { id: "sysmon", title: "System Monitor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 500, h: 480 },
     { id: "business", title: "Business Manager", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 30, w: 820, h: 540 },
+    { id: "agent", title: "Alternus AI Agent", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 60, y: 30, w: 900, h: 600 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -7915,6 +8366,7 @@ export default function AlternusOS() {
       knowledge: { w: 580, h: 480 },
       sysmon: { w: 500, h: 480 },
       business: { w: 820, h: 540 },
+      agent: { w: 900, h: 600 },
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
@@ -8347,6 +8799,7 @@ export default function AlternusOS() {
     knowledge: <KnowledgeApp c={c} />,
     sysmon: <SysMonApp c={c} />,
     business: <BusinessApp c={c} />,
+    agent: <AlternusAgentApp c={c} mode={mode} setMode={setMode} wallpaper={wallpaper} setWallpaper={setWallpaper} onOpenApp={openWin} />,
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
@@ -8377,6 +8830,7 @@ export default function AlternusOS() {
     { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316" },
     { id: "sysmon", icon: ic.activity, label: "System Monitor", color: "#34D399" },
     { id: "business", icon: ic.briefcase, label: "Business", color: "#6366F1" },
+    { id: "agent", icon: ic.cpu, label: "AI Agent", color: "#8B5CF6" },
   ];
 
   // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
