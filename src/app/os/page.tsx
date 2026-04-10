@@ -8182,6 +8182,7 @@ export default function AlternusOS() {
   const [installProgress, setInstallProgress] = useState(0);
   const [paymentModal, setPaymentModal] = useState<{ name: string; price: string; icon: string; iconBg: string } | null>(null);
   const [showSpotlight, setShowSpotlight] = useState(false);
+  const [showLaunchpad, setShowLaunchpad] = useState(false);
   const [spotlightQuery, setSpotlightQuery] = useState("");
   const [activeSpace, setActiveSpace] = useState(1);
   const [showSpacesView, setShowSpacesView] = useState(false);
@@ -8538,6 +8539,7 @@ export default function AlternusOS() {
       }
       // Escape closes spotlight / spaces / panels
       if (e.key === "Escape") {
+        setShowLaunchpad(false);
         setShowSpotlight(false);
         setShowSpacesView(false);
         setShowApps(false);
@@ -9324,84 +9326,162 @@ export default function AlternusOS() {
           <span className="text-[10px] px-1.5 py-0.5 rounded-md ml-1" style={{ background: mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)", color: c.textMuted }}>⌘K</span>
         </button>
 
-        {/* ━━━━ Bottom Dock Bar — fixed, 3D Minimalist fill icons ━━━━ */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[50]" onClick={e => e.stopPropagation()}>
+        {/* ━━━━ Bottom Dock Bar — Minimal dark pill (Image #3 style) ━━━━ */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[50]" onClick={e => e.stopPropagation()}>
           <div
-            className="flex items-center gap-1.5 px-3 py-2 rounded-2xl"
+            className="flex items-center gap-5 px-5"
             style={{
-              background: mode === "dark" ? "rgba(30,30,30,0.65)" : "rgba(255,255,255,0.55)",
-              backdropFilter: "blur(24px) saturate(1.6)",
-              WebkitBackdropFilter: "blur(24px) saturate(1.6)",
-              border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
-              boxShadow: mode === "dark"
-                ? "0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)"
-                : "0 8px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)",
+              height: 64,
+              borderRadius: 28,
+              background: "rgba(14,16,24,0.82)",
+              backdropFilter: "blur(28px) saturate(1.5)",
+              WebkitBackdropFilter: "blur(28px) saturate(1.5)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              boxShadow: "0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)",
             }}
           >
-            {dockApps.map(app => {
-              const fillPath = icFill[app.id] ?? app.icon;
+            {/* Home */}
+            {(() => {
+              const isAnyOpen = wins.some(w => w.isOpen && !w.isMinimized);
               return (
-                <button
-                  key={app.id}
-                  onClick={() => openWinWithAI(app.id)}
-                  className="flex-shrink-0 relative overflow-hidden transition-all duration-200"
-                  title={app.label}
-                  style={{
-                    width: 46,
-                    height: 46,
-                    borderRadius: 14,
-                    background: `linear-gradient(145deg, ${app.color}EE 0%, ${app.color}99 55%, ${app.color}66 100%)`,
-                    border: `1px solid ${app.color}60`,
-                    boxShadow: `0 4px 12px ${app.color}50, 0 1px 3px ${app.color}30, inset 0 1px 0 rgba(255,255,255,0.30), inset 0 -1px 0 rgba(0,0,0,0.12)`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                  onMouseEnter={e => {
-                    const el = e.currentTarget;
-                    el.style.boxShadow = `0 8px 24px ${app.color}70, 0 2px 6px ${app.color}40, inset 0 1px 0 rgba(255,255,255,0.40), inset 0 -1px 0 rgba(0,0,0,0.15)`;
-                    el.style.transform = "translateY(-6px) scale(1.12)";
-                    el.style.filter = "brightness(1.12)";
-                  }}
-                  onMouseLeave={e => {
-                    const el = e.currentTarget;
-                    el.style.boxShadow = `0 4px 12px ${app.color}50, 0 1px 3px ${app.color}30, inset 0 1px 0 rgba(255,255,255,0.30), inset 0 -1px 0 rgba(0,0,0,0.12)`;
-                    el.style.transform = "translateY(0) scale(1)";
-                    el.style.filter = "brightness(1)";
-                  }}
-                >
-                  {/* Specular highlight — top half (3D convex) */}
-                  <div style={{
-                    position: "absolute", top: 0, left: 0, right: 0, height: "46%",
-                    borderRadius: "14px 14px 60% 60%",
-                    background: "linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 100%)",
-                    pointerEvents: "none",
-                  }} />
-                  {/* Rim light — bottom edge */}
-                  <div style={{
-                    position: "absolute", bottom: 0, left: "15%", right: "15%", height: 1,
-                    background: "rgba(255,255,255,0.18)",
-                    pointerEvents: "none",
-                  }} />
-                  {/* Fill icon — white gradient */}
-                  <div style={{ position: "relative", zIndex: 1, filter: `drop-shadow(0 1px 2px rgba(0,0,0,0.25))` }}>
-                    <I d={fillPath} s={20} f={true} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.78)"]} />
-                  </div>
-                </button>
+                <div className="flex flex-col items-center gap-0.5">
+                  <button
+                    title="Show Desktop"
+                    onClick={() => setWins(p => p.map(w => w.isOpen && !w.isMinimized ? { ...w, isMinimized: true } : w))}
+                    className="flex items-center justify-center transition-all duration-180"
+                    style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; (e.currentTarget.querySelector("svg") as SVGElement | null)?.style && ((e.currentTarget.querySelector("svg") as SVGElement).style.opacity = "1"); }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; (e.currentTarget.querySelector("svg") as SVGElement | null)?.style && ((e.currentTarget.querySelector("svg") as SVGElement).style.opacity = "0.65"); }}
+                  >
+                    <I d={ic.home} s={19} c="rgba(255,255,255,0.65)" />
+                  </button>
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: isAnyOpen ? "rgba(255,255,255,0.5)" : "transparent", transition: "all 200ms" }} />
+                </div>
               );
-            })}
-          </div>
-          {/* Open app indicators */}
-          <div className="flex justify-center gap-1.5 mt-1">
-            {dockApps.map(app => {
-              const isOpen = wins.some(w => w.id === app.id && w.isOpen);
-              return <div key={app.id} className="transition-all duration-200" style={{
-                width: isOpen ? 5 : 0, height: isOpen ? 5 : 0, borderRadius: "50%",
-                background: isOpen ? app.color : "transparent",
-                boxShadow: isOpen ? `0 0 6px ${app.color}60` : "none",
-                opacity: isOpen ? 1 : 0,
-              }} />;
-            })}
+            })()}
+
+            {/* App Grid / Launchpad */}
+            <div className="flex flex-col items-center gap-0.5">
+              <button
+                title="All Apps"
+                onClick={() => setShowLaunchpad(true)}
+                className="flex items-center justify-center transition-all duration-180"
+                style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+              >
+                <I d={ic.grid} s={19} c="rgba(255,255,255,0.65)" />
+              </button>
+              <div style={{ width: 4, height: 4, borderRadius: "50%", background: "transparent" }} />
+            </div>
+
+            {/* Search */}
+            <div className="flex flex-col items-center gap-0.5">
+              <button
+                title="Search (⌘K)"
+                onClick={() => setShowSpotlight(true)}
+                className="flex items-center justify-center transition-all duration-180"
+                style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+              >
+                <I d={ic.search} s={19} c="rgba(255,255,255,0.65)" />
+              </button>
+              <div style={{ width: 4, height: 4, borderRadius: "50%", background: "transparent" }} />
+            </div>
+
+            {/* Glowing Orb — AI Hub (center piece) */}
+            {(() => {
+              const isAiOpen = wins.some(w => w.id === "aihub" && w.isOpen);
+              return (
+                <div className="flex flex-col items-center gap-0.5">
+                  <button
+                    title="AI Hub"
+                    onClick={() => openWinWithAI("aihub")}
+                    className="flex items-center justify-center transition-all duration-200"
+                    style={{
+                      width: 52, height: 52,
+                      borderRadius: "50%",
+                      background: "radial-gradient(circle at 38% 35%, #c8e8ff 0%, #7abcff 22%, #4a90e2 48%, #7b5ea7 78%, #3a2060 100%)",
+                      boxShadow: "0 0 18px 6px rgba(120,180,255,0.55), 0 0 40px 12px rgba(100,140,255,0.25), inset 0 1px 0 rgba(255,255,255,0.45)",
+                      border: "none",
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = "scale(1.08)";
+                      e.currentTarget.style.boxShadow = "0 0 26px 10px rgba(120,180,255,0.7), 0 0 55px 16px rgba(100,140,255,0.35), inset 0 1px 0 rgba(255,255,255,0.5)";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = "scale(1)";
+                      e.currentTarget.style.boxShadow = "0 0 18px 6px rgba(120,180,255,0.55), 0 0 40px 12px rgba(100,140,255,0.25), inset 0 1px 0 rgba(255,255,255,0.45)";
+                    }}
+                  >
+                    {/* Specular glint */}
+                    <div style={{ position: "absolute", top: "14%", left: "22%", width: "28%", height: "18%", borderRadius: "50%", background: "rgba(255,255,255,0.45)", filter: "blur(2px)", pointerEvents: "none" }} />
+                  </button>
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: isAiOpen ? "rgba(160,200,255,0.7)" : "transparent", boxShadow: isAiOpen ? "0 0 6px rgba(160,200,255,0.6)" : "none", transition: "all 200ms" }} />
+                </div>
+              );
+            })()}
+
+            {/* Files */}
+            {(() => {
+              const isOpen = wins.some(w => w.id === "files" && w.isOpen);
+              return (
+                <div className="flex flex-col items-center gap-0.5">
+                  <button
+                    title="Files"
+                    onClick={() => openWinWithAI("files")}
+                    className="flex items-center justify-center transition-all duration-180"
+                    style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <I d={ic.folder} s={19} c="rgba(255,255,255,0.65)" />
+                  </button>
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: isOpen ? "rgba(255,255,255,0.5)" : "transparent", transition: "all 200ms" }} />
+                </div>
+              );
+            })()}
+
+            {/* Browser */}
+            {(() => {
+              const isOpen = wins.some(w => w.id === "browser" && w.isOpen);
+              return (
+                <div className="flex flex-col items-center gap-0.5">
+                  <button
+                    title="Browser"
+                    onClick={() => openWinWithAI("browser")}
+                    className="flex items-center justify-center transition-all duration-180"
+                    style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <I d={ic.refresh} s={19} c="rgba(255,255,255,0.65)" />
+                  </button>
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: isOpen ? "rgba(255,255,255,0.5)" : "transparent", transition: "all 200ms" }} />
+                </div>
+              );
+            })()}
+
+            {/* Settings */}
+            {(() => {
+              const isOpen = wins.some(w => w.id === "settings" && w.isOpen);
+              return (
+                <div className="flex flex-col items-center gap-0.5">
+                  <button
+                    title="Settings"
+                    onClick={() => openWinWithAI("settings")}
+                    className="flex items-center justify-center transition-all duration-180"
+                    style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
+                  >
+                    <I d={ic.settings} s={19} c="rgba(255,255,255,0.65)" />
+                  </button>
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: isOpen ? "rgba(255,255,255,0.5)" : "transparent", transition: "all 200ms" }} />
+                </div>
+              );
+            })()}
           </div>
         </div>
 
@@ -9884,6 +9964,65 @@ export default function AlternusOS() {
             </>
           );
         })()}
+
+        {/* ━━━━ Launchpad Overlay — all apps grid ━━━━ */}
+        {showLaunchpad && (
+          <div
+            className="absolute inset-0 z-[80] flex flex-col items-center justify-center"
+            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}
+            onClick={() => setShowLaunchpad(false)}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowLaunchpad(false)}
+              className="absolute top-5 right-6 flex items-center justify-center transition-all duration-150"
+              style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.18)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
+            >
+              <I d={ic.close} s={14} c="rgba(255,255,255,0.8)" />
+            </button>
+            {/* Title */}
+            <p className="text-lg font-semibold mb-7 tracking-wide" style={{ color: "rgba(255,255,255,0.85)" }}>Applications</p>
+            {/* App Grid */}
+            <div
+              className="grid gap-5"
+              style={{ gridTemplateColumns: "repeat(6, 1fr)", maxWidth: 560 }}
+              onClick={e => e.stopPropagation()}
+            >
+              {dockApps.map(app => {
+                const fillPath = icFill[app.id] ?? app.icon;
+                return (
+                  <button
+                    key={app.id}
+                    title={app.label}
+                    onClick={() => { openWinWithAI(app.id); setShowLaunchpad(false); }}
+                    className="flex flex-col items-center gap-1.5 transition-all duration-150"
+                    onMouseEnter={e => { (e.currentTarget.querySelector(".lp-icon") as HTMLElement | null)?.style && ((e.currentTarget.querySelector(".lp-icon") as HTMLElement).style.transform = "translateY(-4px) scale(1.1)"); }}
+                    onMouseLeave={e => { (e.currentTarget.querySelector(".lp-icon") as HTMLElement | null)?.style && ((e.currentTarget.querySelector(".lp-icon") as HTMLElement).style.transform = "translateY(0) scale(1)"); }}
+                  >
+                    <div
+                      className="lp-icon relative overflow-hidden flex items-center justify-center transition-all duration-150"
+                      style={{
+                        width: 68, height: 68, borderRadius: 18,
+                        background: `linear-gradient(145deg, ${app.color}EE 0%, ${app.color}99 55%, ${app.color}66 100%)`,
+                        border: `1px solid ${app.color}55`,
+                        boxShadow: `0 4px 14px ${app.color}50, inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(0,0,0,0.1)`,
+                      }}
+                    >
+                      {/* Specular */}
+                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", borderRadius: "18px 18px 60% 60%", background: "linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 100%)", pointerEvents: "none" }} />
+                      <div style={{ position: "relative", zIndex: 1, filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.25))" }}>
+                        <I d={fillPath} s={28} f={true} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.78)"]} />
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-medium text-center leading-tight" style={{ color: "rgba(255,255,255,0.8)", maxWidth: 68, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{app.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Windows */}
         {wins.map(w => (
