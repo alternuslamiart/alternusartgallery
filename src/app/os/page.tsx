@@ -1679,40 +1679,59 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
       case "Appearance":
         return (
           <div className="p-5 space-y-4 overflow-y-auto h-full">
-            <p className="text-xs font-medium px-1" style={{ color: c.textMuted }}>Theme</p>
+            {/* Theme toggle — functional dark/light */}
+            <p className="text-[10px] font-semibold uppercase tracking-wider px-1" style={{ color: c.textMuted }}>Theme</p>
             <div className="flex gap-3">
               {(["dark", "light"] as ThemeMode[]).map(m => (
-                <button key={m} onClick={() => setMode(m)} className="flex-1 p-4 rounded-xl text-center transition-all"
-                  style={{ background: mode === m ? c.accentSoft : c.cardAlt, border: `2px solid ${mode === m ? c.accent : "transparent"}` }}>
-                  <I d={m === "dark" ? ic.moon : ic.sun} s={24} c={mode === m ? c.accentText : c.textSec} />
-                  <p className="text-xs mt-2 capitalize" style={{ color: mode === m ? c.accentText : c.text }}>{m}</p>
+                <button key={m} onClick={() => setMode(m)} className="flex-1 py-5 rounded-2xl text-center transition-all"
+                  style={{ background: mode === m ? c.accentSoft : c.cardAlt, border: `2px solid ${mode === m ? c.accent : "transparent"}`, boxShadow: mode === m ? `0 0 16px ${c.accent}20` : "none" }}>
+                  <I d={m === "dark" ? ic.moon : ic.sun} s={28} c={mode === m ? c.accentText : c.textMuted} />
+                  <p className="text-xs mt-2.5 capitalize font-semibold" style={{ color: mode === m ? c.accentText : c.textSec }}>{m === "dark" ? "Dark" : "Light"}</p>
                 </button>
               ))}
             </div>
-            <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Accent Color</p>
-            <div className="flex gap-2 px-1">
+            {/* Accent Color */}
+            <p className="text-[10px] font-semibold uppercase tracking-wider px-1 mt-2" style={{ color: c.textMuted }}>Accent Color</p>
+            <div className="flex gap-2.5 px-1">
               {["#3B82F6", "#8B5CF6", "#10B981", "#F59E0B", "#EF4444", "#EC4899"].map(col => (
-                <div key={col} className="w-8 h-8 rounded-full cursor-pointer transition-transform" style={{ background: col, border: col === c.accent ? "3px solid " + c.text : "3px solid transparent" }} />
+                <div key={col} className="w-9 h-9 rounded-full cursor-pointer transition-transform hover:scale-110"
+                  style={{ background: col, border: col === c.accent ? `3px solid ${c.text}` : "3px solid transparent", boxShadow: col === c.accent ? `0 0 8px ${col}60` : "none" }} />
               ))}
             </div>
-            <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Wallpaper</p>
+            {/* Wallpaper */}
+            <p className="text-[10px] font-semibold uppercase tracking-wider px-1 mt-2" style={{ color: c.textMuted }}>Wallpaper</p>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { bg: c.bg, img: "", label: "Default" },
-                { bg: "", img: "/wallpapers/OSpw3.png", label: "Flow" },
-                { bg: "", img: "/wallpapers/OSwp.png", label: "Aurora" },
-                { bg: "", img: "/wallpapers/OSwp2.png", label: "Ocean" },
-                { bg: "", img: "/wallpapers/OSwp4.png", label: "Emerald" },
-                { bg: "", img: "/wallpapers/OSwp5.png", label: "OSwp5" },
-              ].map((wp, i) => (
-                <div key={i} onClick={() => setWallpaper(i)}
-                  className="h-16 rounded-xl cursor-pointer transition-all relative overflow-hidden"
-                  style={{ background: wp.img ? `url('${wp.img}') center/cover no-repeat` : wp.bg, border: wallpaper === i ? `2px solid ${c.accent}` : `2px solid transparent`, boxShadow: wallpaper === i ? `0 0 8px ${c.accent}40` : "none" }}>
-                  <span className="absolute bottom-1 left-2 text-[7px] font-semibold" style={{ color: i === 0 ? c.textMuted : "rgba(255,255,255,0.6)" }}>{wp.label}</span>
+                { img: "",                          label: "Default",  idx: 0 },
+                { img: "/wallpapers/OSwp.png",      label: "OSwp 1",   idx: 1 },
+                { img: "/wallpapers/OSwp2.png",     label: "OSwp 2",   idx: 2 },
+                { img: "/wallpapers/OSpw3.png",     label: "OSwp 3",   idx: 3 },
+                { img: "/wallpapers/OSwp4.png",     label: "OSwp 4",   idx: 4 },
+                { img: "/wallpapers/OSwp5.png",     label: "OSwp 5",   idx: 5 },
+              ].map((wp) => (
+                <div key={wp.idx} onClick={() => setWallpaper(wp.idx)}
+                  className="h-20 rounded-xl cursor-pointer transition-all relative overflow-hidden group"
+                  style={{
+                    background: wp.img ? `url('${wp.img}') center/cover no-repeat` : c.cardAlt,
+                    border: wallpaper === wp.idx ? `2px solid ${c.accent}` : `2px solid ${c.border}`,
+                    boxShadow: wallpaper === wp.idx ? `0 0 12px ${c.accent}50` : "none",
+                  }}>
+                  {/* Selected check */}
+                  {wallpaper === wp.idx && (
+                    <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: c.accent }}>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                  )}
+                  {/* Label */}
+                  <span className="absolute bottom-1 left-2 text-[8px] font-semibold drop-shadow"
+                    style={{ color: wp.img ? "rgba(255,255,255,0.85)" : c.textMuted }}>
+                    {wp.label}
+                  </span>
                 </div>
               ))}
             </div>
-            <p className="text-xs font-medium px-1 mt-4" style={{ color: c.textMuted }}>Font Size</p>
+            {/* Font Size */}
+            <p className="text-[10px] font-semibold uppercase tracking-wider px-1 mt-2" style={{ color: c.textMuted }}>Font Size</p>
             <div className="flex gap-2">
               {["Small", "Medium", "Large"].map((s, i) => (
                 <button key={s} className="flex-1 py-2 rounded-xl text-xs font-medium transition-all"
@@ -1964,10 +1983,10 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
                     </button>
                   ))}
                 </div>
-                {/* Quick settings still visible below */}
+                {/* Quick settings — fully interactive for Appearance, dimmed for others */}
                 <div className="pt-2" style={{ borderTop: `1px solid ${c.border}` }}>
                   <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: c.textMuted }}>Quick settings</p>
-                  <div style={{ height: 220, overflow: "hidden", opacity: 0.6, pointerEvents: "none" }}>
+                  <div style={{ overflow: "hidden", opacity: activeSection === "Appearance" ? 1 : 0.6, pointerEvents: activeSection === "Appearance" ? "auto" : "none" }}>
                     {renderContent()}
                   </div>
                 </div>
