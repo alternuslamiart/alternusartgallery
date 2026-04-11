@@ -10933,7 +10933,7 @@ export default function AlternusOS() {
                         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)" }}>No apps found</p>
                       </div>
                     ) : (
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "18px 10px" }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "6px 4px" }}>
                         {filteredApps.map(app => {
                           const fillPath = icFill[app.id] ?? app.icon;
                           return (
