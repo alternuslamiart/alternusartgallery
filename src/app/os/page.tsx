@@ -8647,6 +8647,8 @@ export default function AlternusOS() {
   const [paymentModal, setPaymentModal] = useState<{ name: string; price: string; icon: string; iconBg: string } | null>(null);
   const [showSpotlight, setShowSpotlight] = useState(false);
   const [showLaunchpad, setShowLaunchpad] = useState(false);
+  const [launchSearch, setLaunchSearch] = useState("");
+  const [launchCategory, setLaunchCategory] = useState<"all" | "ai" | "productivity" | "media" | "system" | "web">("all");
   const [spotlightQuery, setSpotlightQuery] = useState("");
   const [activeSpace, setActiveSpace] = useState(1);
   const [showSpacesView, setShowSpacesView] = useState(false);
@@ -9288,35 +9290,35 @@ export default function AlternusOS() {
     agent: <AlternusAgentApp c={c} mode={mode} setMode={setMode} wallpaper={wallpaper} setWallpaper={setWallpaper} onOpenApp={openWin} onExecuteAIActions={executeAIActions} osContext={{ openApps: wins.filter(w => w.isOpen && !w.isMinimized).map(w => w.id), theme: mode }} />,
   };
 
-  const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
-    { id: "agent", icon: ic.sparkle, label: "Alternus AI Agent", color: "#7C3AED" },
-    { id: "terminal", icon: ic.terminal, label: "Terminal", color: c.success },
-    { id: "code", icon: ic.code, label: "Code", color: c.purple },
-    { id: "files", icon: ic.folder, label: "Files", color: c.warning },
-    { id: "browser", icon: ic.globe, label: "Browser", color: c.accentText },
-    { id: "store", icon: ic.store, label: "Store", color: c.accent },
-    { id: "movies", icon: ic.film, label: "Movies", color: c.purple },
-    { id: "music", icon: ic.music, label: "Music", color: "#F472B6" },
-    { id: "weather", icon: ic.cloud, label: "Weather", color: "#60A5FA" },
-    { id: "calendar", icon: ic.calendar, label: "Calendar", color: "#60A5FA" },
-    { id: "notes", icon: ic.note, label: "Notes", color: "#FBBF24" },
-    { id: "word", icon: ic.fileText, label: "Word", color: c.accentText },
-    { id: "downloads", icon: ic.download, label: "Downloads", color: "#34D399" },
-    { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A" },
-    { id: "studio", icon: ic.pen, label: "Studio", color: "#A78BFA" },
-    { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec },
-    { id: "controlpanel", icon: ic.monitor, label: "Control Panel", color: c.textSec },
-    { id: "recovery", icon: ic.shield, label: "Recovery", color: c.success },
-    { id: "news", icon: ic.newspaper, label: "News", color: c.danger },
-    { id: "dashboard", icon: ic.grid, label: "Dashboard", color: "#60A5FA" },
-    { id: "tasks", icon: ic.checkSquare, label: "Tasks", color: "#34D399" },
-    { id: "mail", icon: ic.mail, label: "Mail", color: "#F97316" },
-    { id: "monaco", icon: ic.code, label: "VS Code", color: "#007ACC" },
-    { id: "aihub", icon: ic.messageCircle, label: "AI Hub", color: "#A78BFA" },
-    { id: "aivoice", icon: ic.mic, label: "AI Voice", color: "#FBBF24" },
-    { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316" },
-    { id: "sysmon", icon: ic.activity, label: "System Monitor", color: "#34D399" },
-    { id: "business", icon: ic.briefcase, label: "Business", color: "#6366F1" },
+  const dockApps: { id: WinId; icon: string; label: string; color: string; category: "ai" | "productivity" | "media" | "system" | "web" }[] = [
+    { id: "agent", icon: ic.sparkle, label: "Alternus AI Agent", color: "#7C3AED", category: "ai" },
+    { id: "aihub", icon: ic.messageCircle, label: "AI Hub", color: "#A78BFA", category: "ai" },
+    { id: "aivoice", icon: ic.mic, label: "AI Voice", color: "#FBBF24", category: "ai" },
+    { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316", category: "ai" },
+    { id: "code", icon: ic.code, label: "Code", color: c.purple, category: "productivity" },
+    { id: "monaco", icon: ic.code, label: "VS Code", color: "#007ACC", category: "productivity" },
+    { id: "word", icon: ic.fileText, label: "Word", color: c.accentText, category: "productivity" },
+    { id: "notes", icon: ic.note, label: "Notes", color: "#FBBF24", category: "productivity" },
+    { id: "tasks", icon: ic.checkSquare, label: "Tasks", color: "#34D399", category: "productivity" },
+    { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A", category: "productivity" },
+    { id: "calendar", icon: ic.calendar, label: "Calendar", color: "#60A5FA", category: "productivity" },
+    { id: "dashboard", icon: ic.grid, label: "Dashboard", color: "#60A5FA", category: "productivity" },
+    { id: "movies", icon: ic.film, label: "Movies", color: c.purple, category: "media" },
+    { id: "music", icon: ic.music, label: "Music", color: "#F472B6", category: "media" },
+    { id: "studio", icon: ic.pen, label: "Studio", color: "#A78BFA", category: "media" },
+    { id: "terminal", icon: ic.terminal, label: "Terminal", color: c.success, category: "system" },
+    { id: "files", icon: ic.folder, label: "Files", color: c.warning, category: "system" },
+    { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec, category: "system" },
+    { id: "controlpanel", icon: ic.monitor, label: "Control Panel", color: c.textSec, category: "system" },
+    { id: "recovery", icon: ic.shield, label: "Recovery", color: c.success, category: "system" },
+    { id: "downloads", icon: ic.download, label: "Downloads", color: "#34D399", category: "system" },
+    { id: "sysmon", icon: ic.activity, label: "System Monitor", color: "#34D399", category: "system" },
+    { id: "browser", icon: ic.globe, label: "Browser", color: c.accentText, category: "web" },
+    { id: "weather", icon: ic.cloud, label: "Weather", color: "#60A5FA", category: "web" },
+    { id: "news", icon: ic.newspaper, label: "News", color: c.danger, category: "web" },
+    { id: "mail", icon: ic.mail, label: "Mail", color: "#F97316", category: "web" },
+    { id: "store", icon: ic.store, label: "Store", color: c.accent, category: "web" },
+    { id: "business", icon: ic.briefcase, label: "Business", color: "#6366F1", category: "web" },
   ];
 
   // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -10469,64 +10471,155 @@ export default function AlternusOS() {
           );
         })()}
 
-        {/* ━━━━ Launchpad Overlay — all apps grid ━━━━ */}
-        {showLaunchpad && (
-          <div
-            className="absolute inset-0 z-[80] flex flex-col items-center justify-center"
-            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}
-            onClick={() => setShowLaunchpad(false)}
-          >
-            {/* Close button */}
-            <button
-              onClick={() => setShowLaunchpad(false)}
-              className="absolute top-5 right-6 flex items-center justify-center transition-all duration-150"
-              style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.18)"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
-            >
-              <I d={ic.close} s={14} c="rgba(255,255,255,0.8)" />
-            </button>
-            {/* Title */}
-            <p className="text-lg font-semibold mb-7 tracking-wide" style={{ color: "rgba(255,255,255,0.85)" }}>Applications</p>
-            {/* App Grid */}
+        {/* ━━━━ Launchpad Overlay — Library style ━━━━ */}
+        {showLaunchpad && (() => {
+          const closeLaunchpad = () => { setShowLaunchpad(false); setLaunchSearch(""); setLaunchCategory("all"); };
+          const filteredApps = dockApps.filter(app => {
+            const matchCat = launchCategory === "all" || app.category === launchCategory;
+            const matchSearch = app.label.toLowerCase().includes(launchSearch.toLowerCase());
+            return matchCat && matchSearch;
+          });
+          const categories: { id: "all" | "ai" | "productivity" | "media" | "system" | "web"; label: string; icon: string }[] = [
+            { id: "all", label: "All", icon: ic.grid },
+            { id: "ai", label: "AI", icon: ic.sparkle },
+            { id: "productivity", label: "Productivity", icon: ic.checkSquare },
+            { id: "media", label: "Media", icon: ic.film },
+            { id: "system", label: "System", icon: ic.monitor },
+            { id: "web", label: "Web", icon: ic.globe },
+          ];
+          return (
             <div
-              className="grid gap-5"
-              style={{ gridTemplateColumns: "repeat(6, 1fr)", maxWidth: 560 }}
-              onClick={e => e.stopPropagation()}
+              className="absolute inset-0 z-[80] flex items-center justify-center"
+              style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)" }}
+              onClick={closeLaunchpad}
             >
-              {dockApps.map(app => {
-                const fillPath = icFill[app.id] ?? app.icon;
-                return (
-                  <button
-                    key={app.id}
-                    title={app.label}
-                    onClick={() => { openWinWithAI(app.id); setShowLaunchpad(false); }}
-                    className="flex flex-col items-center gap-1.5 transition-all duration-150"
-                    onMouseEnter={e => { (e.currentTarget.querySelector(".lp-icon") as HTMLElement | null)?.style && ((e.currentTarget.querySelector(".lp-icon") as HTMLElement).style.transform = "translateY(-4px) scale(1.1)"); }}
-                    onMouseLeave={e => { (e.currentTarget.querySelector(".lp-icon") as HTMLElement | null)?.style && ((e.currentTarget.querySelector(".lp-icon") as HTMLElement).style.transform = "translateY(0) scale(1)"); }}
-                  >
-                    <div
-                      className="lp-icon relative overflow-hidden flex items-center justify-center transition-all duration-150"
-                      style={{
-                        width: 68, height: 68, borderRadius: 18,
-                        background: `linear-gradient(145deg, ${app.color}EE 0%, ${app.color}99 55%, ${app.color}66 100%)`,
-                        border: `1px solid ${app.color}55`,
-                        boxShadow: `0 4px 14px ${app.color}50, inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(0,0,0,0.1)`,
-                      }}
-                    >
-                      {/* Specular */}
-                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", borderRadius: "18px 18px 60% 60%", background: "linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 100%)", pointerEvents: "none" }} />
-                      <div style={{ position: "relative", zIndex: 1, filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.25))" }}>
-                        <I d={fillPath} s={28} f={true} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.78)"]} />
-                      </div>
+              {/* Panel */}
+              <div
+                onClick={e => e.stopPropagation()}
+                style={{
+                  width: 980, height: 620, borderRadius: 20, display: "flex", overflow: "hidden",
+                  background: c.bg, boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06)",
+                }}
+              >
+                {/* ── Sidebar ── */}
+                <div style={{ width: 210, background: c.surface, borderRight: `1px solid ${c.border}`, display: "flex", flexDirection: "column", padding: "28px 16px", flexShrink: 0 }}>
+                  <p style={{ fontSize: 18, fontWeight: 700, color: c.text, marginBottom: 20, paddingLeft: 8 }}>Library</p>
+                  <div style={{ height: 1, background: c.border, marginBottom: 16 }} />
+                  {categories.map(cat => {
+                    const isActive = launchCategory === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => setLaunchCategory(cat.id)}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 10, padding: "9px 12px",
+                          borderRadius: 10, marginBottom: 2, border: "none", cursor: "pointer",
+                          background: isActive ? `${c.accent}22` : "transparent",
+                          color: isActive ? c.accent : c.textSec,
+                          fontWeight: isActive ? 600 : 400, fontSize: 13, textAlign: "left", width: "100%",
+                          transition: "all 0.15s",
+                        }}
+                        onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = `${c.border}88`; }}
+                        onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
+                      >
+                        <I d={cat.icon} s={15} c={isActive ? c.accent : c.textMuted} />
+                        {cat.label}
+                        {isActive && <div style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: c.accent }} />}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* ── Content ── */}
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                  {/* Top bar */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "18px 24px 14px", borderBottom: `1px solid ${c.border}`, flexShrink: 0 }}>
+                    {/* Search */}
+                    <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, background: c.card, borderRadius: 10, padding: "0 14px", height: 36, border: `1px solid ${c.border}` }}>
+                      <I d={ic.search} s={14} c={c.textMuted} />
+                      <input
+                        autoFocus
+                        value={launchSearch}
+                        onChange={e => setLaunchSearch(e.target.value)}
+                        placeholder="Search applications..."
+                        style={{ background: "transparent", border: "none", outline: "none", color: c.text, fontSize: 13, flex: 1 }}
+                      />
+                      {launchSearch && (
+                        <button onClick={() => setLaunchSearch("")} style={{ background: "none", border: "none", cursor: "pointer", color: c.textMuted, padding: 0, display: "flex" }}>
+                          <I d={ic.close} s={12} c={c.textMuted} />
+                        </button>
+                      )}
                     </div>
-                    <span className="text-[10px] font-medium text-center leading-tight" style={{ color: "rgba(255,255,255,0.8)", maxWidth: 68, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{app.label}</span>
-                  </button>
-                );
-              })}
+                    {/* Count badge */}
+                    <span style={{ fontSize: 11, color: c.textMuted, whiteSpace: "nowrap" }}>
+                      {filteredApps.length} {filteredApps.length === 1 ? "app" : "apps"}
+                    </span>
+                    {/* Close */}
+                    <button
+                      onClick={closeLaunchpad}
+                      style={{ width: 30, height: 30, borderRadius: "50%", background: c.card, border: `1px solid ${c.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
+                      onMouseEnter={e => { e.currentTarget.style.background = c.border; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = c.card; }}
+                    >
+                      <I d={ic.close} s={13} c={c.textSec} />
+                    </button>
+                  </div>
+
+                  {/* Grid */}
+                  <div style={{ flex: 1, overflowY: "auto", padding: "22px 24px" }}>
+                    {filteredApps.length === 0 ? (
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", color: c.textMuted, gap: 10 }}>
+                        <I d={ic.search} s={32} c={c.textMuted} />
+                        <p style={{ fontSize: 14 }}>No apps found</p>
+                      </div>
+                    ) : (
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16 }}>
+                        {filteredApps.map(app => {
+                          const fillPath = icFill[app.id] ?? app.icon;
+                          return (
+                            <button
+                              key={app.id}
+                              title={app.label}
+                              onClick={() => { openWinWithAI(app.id); closeLaunchpad(); }}
+                              style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "14px 8px", borderRadius: 14, border: "none", background: "transparent", cursor: "pointer", transition: "background 0.15s" }}
+                              onMouseEnter={e => {
+                                e.currentTarget.style.background = `${c.surface}`;
+                                const icon = e.currentTarget.querySelector(".lp2-icon") as HTMLElement | null;
+                                if (icon) { icon.style.transform = "translateY(-3px) scale(1.07)"; icon.style.boxShadow = `0 8px 24px ${app.color}60`; }
+                              }}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.background = "transparent";
+                                const icon = e.currentTarget.querySelector(".lp2-icon") as HTMLElement | null;
+                                if (icon) { icon.style.transform = "translateY(0) scale(1)"; icon.style.boxShadow = `0 4px 14px ${app.color}40`; }
+                              }}
+                            >
+                              <div
+                                className="lp2-icon relative overflow-hidden flex items-center justify-center"
+                                style={{
+                                  width: 72, height: 72, borderRadius: 20, flexShrink: 0,
+                                  background: `linear-gradient(145deg, ${app.color}EE 0%, ${app.color}99 55%, ${app.color}66 100%)`,
+                                  border: `1px solid ${app.color}44`,
+                                  boxShadow: `0 4px 14px ${app.color}40, inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.1)`,
+                                  transition: "all 0.18s ease",
+                                }}
+                              >
+                                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", borderRadius: "20px 20px 60% 60%", background: "linear-gradient(180deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 100%)", pointerEvents: "none" }} />
+                                <div style={{ position: "relative", zIndex: 1, filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.25))" }}>
+                                  <I d={fillPath} s={30} f={true} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.75)"]} />
+                                </div>
+                              </div>
+                              <span style={{ fontSize: 11, fontWeight: 500, color: c.textSec, maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>{app.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Windows */}
         {wins.map(w => (
