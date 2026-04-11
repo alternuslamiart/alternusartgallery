@@ -6662,10 +6662,12 @@ function MonacoApp({ c }: { c: typeof palette.dark }) {
 // ━━━━ AI HUB APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AIHubApp({ c }: { c: typeof palette.dark }) {
   const models = [
-    { id: "claude", name: "Claude Opus", company: "Anthropic", color: "#F97316", desc: "Advanced reasoning and deep analysis", params: "2T", ctx: "200K", badge: "Flagship" },
-    { id: "gpt4", name: "GPT-4o", company: "OpenAI", color: "#10B981", desc: "Versatile general-purpose intelligence", params: "1.8T", ctx: "128K", badge: "Popular" },
-    { id: "gemini", name: "Gemini Ultra", company: "Google", color: "#3B82F6", desc: "Multimodal vision, audio and text", params: "1.5T", ctx: "1M", badge: "Multimodal" },
-    { id: "llama", name: "Llama 3.1", company: "Meta", color: "#8B5CF6", desc: "Open-source with transparent weights", params: "405B", ctx: "128K", badge: "Open Source" },
+    { id: "claude", name: "Claude Opus", company: "Anthropic", color: "#F97316", desc: "Advanced reasoning and deep analysis", params: "2T", ctx: "200K", badge: "Flagship", initials: "CO", lastMsg: "Hello! How can I assist you today?", time: "now", online: true },
+    { id: "gpt4", name: "GPT-4o", company: "OpenAI", color: "#10B981", desc: "Versatile general-purpose intelligence", params: "1.8T", ctx: "128K", badge: "Popular", initials: "G4", lastMsg: "Great question! Here's what I think...", time: "2m", online: true },
+    { id: "gemini", name: "Gemini Ultra", company: "Google", color: "#3B82F6", desc: "Multimodal vision, audio, and text", params: "1.5T", ctx: "1M", badge: "Multimodal", initials: "GU", lastMsg: "I can process visual content too!", time: "5m", online: true },
+    { id: "llama", name: "Llama 3.1", company: "Meta", color: "#8B5CF6", desc: "Open-source with transparent weights", params: "405B", ctx: "128K", badge: "Open Source", initials: "L3", lastMsg: "Open-source and transparent.", time: "12m", online: false },
+    { id: "mistral", name: "Mistral Large", company: "Mistral AI", color: "#EC4899", desc: "Fast, European frontier model", params: "123B", ctx: "32K", badge: "Fast", initials: "ML", lastMsg: "Ready for your next request.", time: "1h", online: false },
+    { id: "deepseek", name: "DeepSeek R1", company: "DeepSeek", color: "#06B6D4", desc: "Reasoning-focused chain-of-thought model", params: "671B", ctx: "64K", badge: "Reasoning", initials: "DS", lastMsg: "Let me think step by step...", time: "3h", online: false },
   ];
   const [activeModel, setActiveModel] = useState(models[0]);
   const [msgs, setMsgs] = useState<{ role: "user" | "ai"; text: string; model?: string }[]>([
@@ -6675,6 +6677,12 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
   const [tab, setTab] = useState<"chat" | "models" | "capabilities" | "pipelines" | "fine-tune" | "deploy">("chat");
   const [modelDetailId, setModelDetailId] = useState<string | null>(null);
   const modelDetail = modelDetailId ? models.find(m => m.id === modelDetailId) : null;
+  const [navSection, setNavSection] = useState<"chats" | "models" | "marketplace" | "archive">("chats");
+  const [callActive, setCallActive] = useState(false);
+  const [micOn, setMicOn] = useState(true);
+  const [camOn, setCamOn] = useState(false);
+  const hubEndRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { hubEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
 
   const pipelines = [
     { name: "Art Classification", status: "active", steps: ["Ingest", "Resize", "Classify", "Tag", "Store"], lastRun: "2m ago", rate: "1,240/hr" },
@@ -6708,306 +6716,292 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
     setMsgs(p => [...p, userMsg, aiMsg]);
     setInput("");
   };
+  const communities = [
+    { id: "c1", name: "AI Researchers", members: "12.4k", color: "#7C3AED" },
+    { id: "c2", name: "LLM Builders", members: "8.9k", color: "#3B82F6" },
+    { id: "c3", name: "Prompt Engineers", members: "5.2k", color: "#10B981" },
+  ];
+
+  const selectModel = (m: typeof models[0]) => {
+    setActiveModel(m);
+    setMsgs([{ role: "ai", text: `Hello! I'm ${m.name} by ${m.company}. I specialize in ${m.desc.toLowerCase()}. How can I assist?`, model: m.name }]);
+    setCallActive(false);
+  };
+
   return (
-    <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      {/* Header */}
-      <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <div className="flex items-center gap-3 mb-2.5">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}CC)`, boxShadow: `0 3px 12px ${activeModel.color}35` }}>
-            <I d={ic.sparkle} s={16} c="#fff" f />
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="text-[13px] font-bold" style={{ color: c.text }}>AI Foundry</h3>
-              <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider" style={{ background: `${activeModel.color}15`, color: activeModel.color }}>{activeModel.badge}</span>
+    <div className="flex h-full overflow-hidden" style={{ background: c.bg, fontFamily: "-apple-system, 'Inter', sans-serif" }}>
+
+      {/* ── LEFT SIDEBAR (160px) ── */}
+      <div className="flex flex-col flex-shrink-0" style={{ width: 168, borderRight: `1px solid ${c.border}`, background: c.surface }}>
+        {/* Profile header */}
+        <div className="px-3 pt-3 pb-2 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-[11px] font-bold text-white"
+              style={{ background: "linear-gradient(135deg, #7C3AED, #4F8EF7)" }}>AI</div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-0.5">
+                <span className="text-[11px] font-semibold truncate" style={{ color: c.text }}>AI Hub</span>
+                <I d={ic.chevD} s={9} c={c.textMuted} />
+              </div>
             </div>
-            <p className="text-[10px]" style={{ color: c.textMuted }}>Multi-model AI workspace — Switch models, compare outputs, build with AI</p>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
-            <span className="text-[9px] font-medium" style={{ color: c.textMuted }}>Online</span>
-          </div>
+          <button className="w-6 h-6 rounded-md flex items-center justify-center" style={{ color: c.textMuted }}
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <I d={ic.settings} s={12} c={c.textMuted} />
+          </button>
         </div>
-        {/* Tabs */}
-        <div className="flex gap-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-          {(["chat", "models", "capabilities", "pipelines", "fine-tune", "deploy"] as const).map(t => (
-            <button key={t} onClick={() => { setTab(t); setModelDetailId(null); }}
-              className="px-3 py-1.5 rounded-lg text-[10px] font-semibold capitalize transition-all flex-shrink-0"
-              style={{ background: tab === t ? `${activeModel.color}15` : "transparent", color: tab === t ? activeModel.color : c.textMuted }}>
-              {t}
+
+        {/* Nav */}
+        <div className="flex-1 overflow-y-auto px-2" style={{ scrollbarWidth: "none" }}>
+          {[
+            { id: "chats", icon: ic.messageCircle, label: "Chats", badge: models.filter(m => m.online).length },
+            { id: "models", icon: ic.sparkle, label: "Models" },
+            { id: "marketplace", icon: ic.store, label: "Marketplace" },
+            { id: "archive", icon: ic.download, label: "Archive" },
+          ].map(item => (
+            <button key={item.id} onClick={() => setNavSection(item.id as typeof navSection)}
+              className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left mb-0.5 transition-all"
+              style={{ background: navSection === item.id ? c.accentSoft : "transparent", color: navSection === item.id ? c.accentText : c.textSec }}
+              onMouseEnter={e => { if (navSection !== item.id) e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { if (navSection !== item.id) e.currentTarget.style.background = "transparent"; }}>
+              <I d={item.icon} s={14} c={navSection === item.id ? c.accentText : c.textMuted} />
+              <span className="text-[11px] font-medium flex-1">{item.label}</span>
+              {item.badge != null && item.badge > 0 && (
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: c.accent, color: "#fff" }}>{item.badge}</span>
+              )}
+            </button>
+          ))}
+
+          {/* Communities */}
+          <p className="text-[8px] font-bold uppercase tracking-widest px-2 pt-3 pb-1" style={{ color: c.textMuted }}>Communities</p>
+          {communities.map(com => (
+            <button key={com.id}
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg mb-0.5 transition-all text-left"
+              onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <div className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center"
+                style={{ background: `${com.color}18`, border: `1px solid ${com.color}30` }}>
+                <I d={ic.brain} s={13} c={com.color} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[9px] font-semibold truncate" style={{ color: c.text }}>{com.name}</p>
+                <p className="text-[8px]" style={{ color: c.textMuted }}>{com.members} active</p>
+              </div>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Chat Tab */}
-      {tab === "chat" && (
-        <>
-          {/* Active model bar */}
-          <div className="px-4 py-2 flex items-center gap-3 flex-shrink-0" style={{ background: `${activeModel.color}06`, borderBottom: `1px solid ${c.border}` }}>
-            <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: `${activeModel.color}15` }}>
-              <I d={ic.sparkle} s={10} c={activeModel.color} f />
-            </div>
-            <div className="flex-1">
-              <p className="text-[10px] font-semibold" style={{ color: activeModel.color }}>{activeModel.name}</p>
-              <p className="text-[8px]" style={{ color: c.textMuted }}>{activeModel.company} \u00B7 {activeModel.params} params \u00B7 {activeModel.ctx} context</p>
-            </div>
-            <div className="flex gap-1">
-              {models.filter(m => m.id !== activeModel.id).slice(0, 2).map(m => (
-                <button key={m.id} onClick={() => { setActiveModel(m); setMsgs([{ role: "ai", text: `Hello! I'm ${m.name}. I specialize in ${m.desc.toLowerCase()}. How can I help?`, model: m.name }]); }}
-                  className="w-6 h-6 rounded-md flex items-center justify-center transition-all hover:scale-110"
-                  title={`Switch to ${m.name}`}
-                  style={{ background: `${m.color}15`, border: `1px solid ${m.color}25` }}>
-                  <span className="w-2 h-2 rounded-full" style={{ background: m.color }} />
-                </button>
-              ))}
-            </div>
+      {/* ── MIDDLE CONTACT LIST (200px) ── */}
+      <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{ width: 200, borderRight: `1px solid ${c.border}` }}>
+        {/* Search */}
+        <div className="px-3 pt-3 pb-2 flex-shrink-0">
+          <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+            <I d={ic.search} s={12} c={c.textMuted} />
+            <input placeholder="Search" className="flex-1 bg-transparent outline-none text-[10px]" style={{ color: c.text }} />
           </div>
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-            {msgs.map((m, i) => (
-              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start gap-2.5"}`}>
-                {m.role === "ai" && (
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${activeModel.color}12` }}>
-                    <I d={ic.sparkle} s={12} c={activeModel.color} f />
-                  </div>
-                )}
-                <div className="max-w-[78%]">
-                  {m.role === "ai" && <p className="text-[9px] font-bold mb-1 flex items-center gap-1.5" style={{ color: activeModel.color }}>{m.model}<span className="text-[8px] font-normal" style={{ color: c.textMuted }}>\u00B7 just now</span></p>}
-                  <div className="px-3.5 py-2.5 rounded-2xl text-[11px] leading-relaxed"
-                    style={{ background: m.role === "user" ? activeModel.color : c.surface, color: m.role === "user" ? "#fff" : c.text, border: m.role === "ai" ? `1px solid ${c.border}` : "none", borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px" }}>
-                    {m.text}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* Input */}
-          <div className="px-3 py-3 flex gap-2 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-            <button className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-              <I d={ic.upload} s={14} c={c.textMuted} />
-            </button>
-            <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
-              placeholder={`Message ${activeModel.name}...`}
-              className="flex-1 text-[11px] px-3 py-2 rounded-xl outline-none"
-              style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
-            <button onClick={send} className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
-              style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}CC)`, boxShadow: `0 2px 8px ${activeModel.color}40` }}>
-              <I d={ic.send} s={14} c="#fff" />
-            </button>
-          </div>
-        </>
-      )}
+        </div>
 
-      {/* Models Tab — list OR detail view */}
-      {tab === "models" && !modelDetail && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>Available Models · click to inspect</p>
-          {models.map(m => (
-            <button key={m.id} onClick={() => setModelDetailId(m.id)}
-              className="w-full flex items-start gap-3 p-3.5 rounded-2xl text-left transition-all"
-              style={{ background: activeModel.id === m.id ? `${m.color}10` : c.surface, border: `1px solid ${activeModel.id === m.id ? `${m.color}40` : c.border}` }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = `${m.color}40`; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = activeModel.id === m.id ? `${m.color}40` : c.border; }}>
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `linear-gradient(135deg, ${m.color}, ${m.color}BB)` }}>
-                <I d={ic.sparkle} s={16} c="#fff" f />
+        {/* Story-style model avatars */}
+        <div className="flex gap-2 px-3 pb-2 overflow-x-auto flex-shrink-0" style={{ scrollbarWidth: "none" }}>
+          {models.slice(0, 5).map(m => (
+            <button key={m.id} onClick={() => selectModel(m)} className="flex flex-col items-center gap-0.5 flex-shrink-0">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold text-white relative"
+                style={{ background: `linear-gradient(135deg, ${m.color}, ${m.color}AA)`, border: activeModel.id === m.id ? `2px solid ${m.color}` : "2px solid transparent", padding: 1 }}>
+                {m.initials}
+                {m.online && <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white" style={{ background: "#10B981", borderColor: c.bg }} />}
+              </div>
+              <span className="text-[7.5px] truncate w-9 text-center" style={{ color: c.textMuted }}>{m.name.split(" ")[0]}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Conversation list */}
+        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+          {models.map((m, i) => (
+            <button key={m.id} onClick={() => selectModel(m)}
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 transition-all text-left"
+              style={{ background: activeModel.id === m.id ? c.accentSoft : "transparent", borderLeft: activeModel.id === m.id ? `2px solid ${m.color}` : "2px solid transparent" }}
+              onMouseEnter={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = "transparent"; }}>
+              {/* Avatar */}
+              <div className="relative flex-shrink-0">
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                  style={{ background: `linear-gradient(135deg, ${m.color}, ${m.color}AA)` }}>
+                  {m.initials}
+                </div>
+                {m.online && <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full" style={{ background: "#10B981", border: `2px solid ${c.bg}` }} />}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <p className="text-[12px] font-bold" style={{ color: c.text }}>{m.name}</p>
-                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: `${m.color}12`, color: m.color }}>{m.badge}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-semibold truncate" style={{ color: c.text }}>{m.name}</span>
+                  <span className="text-[8px] flex-shrink-0 ml-1" style={{ color: c.textMuted }}>{m.time}</span>
                 </div>
-                <p className="text-[10px] mb-1.5" style={{ color: c.textMuted }}>{m.company} — {m.desc}</p>
-                <div className="flex gap-3">
-                  <span className="text-[9px] flex items-center gap-1" style={{ color: c.textMuted }}><I d={ic.cpu} s={9} c={c.textMuted} /> {m.params} params</span>
-                  <span className="text-[9px] flex items-center gap-1" style={{ color: c.textMuted }}><I d={ic.layers} s={9} c={c.textMuted} /> {m.ctx} context</span>
-                </div>
+                <p className="text-[9px] truncate" style={{ color: c.textMuted }}>{activeModel.id === m.id && msgs.length > 1 ? msgs[msgs.length - 1].text.slice(0, 32) + "…" : m.lastMsg.slice(0, 32) + "…"}</p>
               </div>
-              <I d={ic.chevR} s={11} c={c.textMuted} />
             </button>
           ))}
         </div>
-      )}
+      </div>
 
-      {/* Model Detail View (3rd level: Models → Model name → full profile) */}
-      {tab === "models" && modelDetail && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-1 mb-1">
-            <button onClick={() => setModelDetailId(null)} className="text-[10px] transition-colors" style={{ color: c.accentText }}>← Models</button>
-            <I d={ic.chevR} s={9} c={c.textMuted} />
-            <span className="text-[10px] font-semibold" style={{ color: c.text }}>{modelDetail.name}</span>
-          </div>
-          {/* Header card */}
-          <div className="p-4 rounded-2xl" style={{ background: `${modelDetail.color}10`, border: `1px solid ${modelDetail.color}30` }}>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${modelDetail.color}, ${modelDetail.color}CC)` }}>
-                <I d={ic.sparkle} s={20} c="#fff" f />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="text-[14px] font-bold" style={{ color: c.text }}>{modelDetail.name}</p>
-                  <span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{ background: `${modelDetail.color}20`, color: modelDetail.color }}>{modelDetail.badge}</span>
-                </div>
-                <p className="text-[10px]" style={{ color: c.textMuted }}>{modelDetail.company}</p>
-              </div>
-              <button onClick={() => { setActiveModel(modelDetail); setTab("chat"); setMsgs([{ role: "ai", text: `Hello! I'm ${modelDetail.name}. ${modelDetail.desc}. Ready to assist!`, model: modelDetail.name }]); setModelDetailId(null); }}
-                className="ml-auto px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all"
-                style={{ background: modelDetail.color, color: "#fff", boxShadow: `0 2px 8px ${modelDetail.color}40` }}>
-                Use this model
+      {/* ── RIGHT ACTIVE CHAT / CALL PANEL (flex-1) ── */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {callActive ? (
+          /* ── VIDEO CALL VIEW ── */
+          <div className="flex flex-col h-full" style={{ background: "#0d0d14" }}>
+            {/* Call header */}
+            <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
+              <button onClick={() => setCallActive(false)} className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+                <I d={ic.chevL} s={14} c="rgba(255,255,255,0.7)" />
+                <span className="text-[10px]">Back</span>
               </button>
-            </div>
-            <p className="text-[11px]" style={{ color: c.textSec }}>{modelDetail.desc}</p>
-          </div>
-          {/* Specs */}
-          <p className="text-[9px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>Specifications</p>
-          <div className="grid grid-cols-2 gap-2">
-            {[["Parameters", modelDetail.params], ["Context Window", modelDetail.ctx + " tokens"], ["Provider", modelDetail.company], ["Status", "Available"], ["Modality", "Text + Vision"], ["License", modelDetail.id === "llama" ? "Open Source" : "Commercial"]].map(([k, v], i) => (
-              <div key={i} className="p-2.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-                <p className="text-[9px]" style={{ color: c.textMuted }}>{k}</p>
-                <p className="text-[11px] font-bold" style={{ color: c.text }}>{v}</p>
+              <div className="text-center">
+                <p className="text-[11px] font-semibold text-white">{activeModel.name}</p>
+                <p className="text-[9px] text-white/50">AI Session · {new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}</p>
               </div>
-            ))}
-          </div>
-          {/* Benchmarks */}
-          <p className="text-[9px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>Benchmarks</p>
-          {[{ name: "MMLU", score: modelDetail.id === "claude" ? 89 : modelDetail.id === "gpt4" ? 87 : modelDetail.id === "gemini" ? 90 : 82 }, { name: "HumanEval", score: modelDetail.id === "claude" ? 84 : modelDetail.id === "gpt4" ? 90 : modelDetail.id === "gemini" ? 74 : 72 }, { name: "MT-Bench", score: modelDetail.id === "claude" ? 91 : modelDetail.id === "gpt4" ? 93 : modelDetail.id === "gemini" ? 88 : 80 }].map((b, i) => (
-            <div key={i}>
-              <div className="flex justify-between text-[9px] mb-1" style={{ color: c.textMuted }}>
-                <span>{b.name}</span><span style={{ color: modelDetail.color }}>{b.score}/100</span>
-              </div>
-              <div className="h-1.5 rounded-full" style={{ background: c.cardAlt }}>
-                <div className="h-full rounded-full transition-all" style={{ width: `${b.score}%`, background: `linear-gradient(90deg, ${modelDetail.color}80, ${modelDetail.color})` }} />
+              <div className="flex gap-1.5">
+                <button className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}>
+                  <I d={ic.user} s={12} c="white" />
+                </button>
+                <button className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}>
+                  <I d={ic.menu} s={12} c="white" />
+                </button>
               </div>
             </div>
-          ))}
-          {/* Actions */}
-          <div className="flex gap-2 pt-1">
-            {["Fine-tune", "Deploy", "Compare"].map((a, i) => (
-              <button key={i} onClick={() => { if (a === "Fine-tune") setTab("fine-tune"); if (a === "Deploy") setTab("deploy"); setModelDetailId(null); }}
-                className="flex-1 py-2 rounded-xl text-[10px] font-semibold transition-all"
-                style={{ background: i === 0 ? modelDetail.color : c.cardAlt, color: i === 0 ? "#fff" : c.textSec, border: `1px solid ${i === 0 ? "transparent" : c.border}` }}>
-                {a}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Capabilities Tab */}
-      {tab === "capabilities" && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: c.textMuted }}>AI Capabilities</p>
-          <div className="grid grid-cols-2 gap-2">
-            {capabilities.map((cap, i) => (
-              <div key={i} className="p-3 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style={{ background: `${cap.color}12` }}>
-                  <I d={cap.icon} s={15} c={cap.color} />
+            {/* Main video area */}
+            <div className="flex-1 flex items-center justify-center relative">
+              {/* Model avatar as "video feed" */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-28 h-28 rounded-full flex items-center justify-center text-4xl font-bold text-white"
+                  style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}99)`, boxShadow: `0 0 60px ${activeModel.color}40` }}>
+                  {activeModel.initials}
                 </div>
-                <p className="text-[11px] font-bold mb-0.5" style={{ color: c.text }}>{cap.title}</p>
-                <p className="text-[9px] leading-snug" style={{ color: c.textMuted }}>{cap.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Pipelines Tab */}
-      {tab === "pipelines" && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>AI Pipelines</p>
-            <button className="text-[9px] px-2.5 py-1 rounded-lg font-semibold" style={{ background: c.accentSoft, color: c.accentText }}>+ New</button>
-          </div>
-          {pipelines.map((p, pi) => (
-            <div key={pi} className="p-3.5 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex-1">
-                  <p className="text-[11px] font-bold" style={{ color: c.text }}>{p.name}</p>
-                  <p className="text-[9px]" style={{ color: c.textMuted }}>Last run: {p.lastRun} · {p.rate !== "—" ? p.rate + " req/hr" : "Paused"}</p>
+                <p className="text-white text-[13px] font-semibold">{activeModel.name}</p>
+                <p className="text-white/50 text-[10px]">{activeModel.company}</p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#10B981" }} />
+                  <span className="text-[9px]" style={{ color: "#10B981" }}>AI Session Active</span>
                 </div>
-                <span className="text-[8px] px-2 py-0.5 rounded-full font-semibold" style={{ background: p.status === "active" ? "#10B98118" : p.status === "training" ? "#3B82F618" : c.cardAlt, color: p.status === "active" ? "#10B981" : p.status === "training" ? "#3B82F6" : c.textMuted }}>{p.status}</span>
               </div>
-              {/* Step chain */}
-              <div className="flex items-center gap-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-                {p.steps.map((s, si) => (
-                  <div key={si} className="flex items-center gap-1">
-                    <div className="text-[8px] px-2 py-0.5 rounded-md font-medium flex-shrink-0" style={{ background: si === 0 && p.status === "training" ? c.accentSoft : c.cardAlt, color: si === 0 && p.status === "training" ? c.accentText : c.textSec }}>{s}</div>
-                    {si < p.steps.length - 1 && <I d={ic.chevR} s={8} c={c.textMuted} />}
+              {/* Mini self video (bottom right) */}
+              <div className="absolute bottom-4 right-4 w-20 h-16 rounded-xl flex items-center justify-center"
+                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                {camOn ? (
+                  <span className="text-[9px] text-white/60">Camera</span>
+                ) : (
+                  <I d={ic.user} s={20} c="rgba(255,255,255,0.3)" />
+                )}
+              </div>
+            </div>
+            {/* Call controls */}
+            <div className="flex items-center justify-center gap-4 py-4 flex-shrink-0">
+              {[
+                { icon: ic.monitor, on: true, color: "rgba(255,255,255,0.1)", label: "Screen" },
+                { icon: ic.mic, on: micOn, color: micOn ? "rgba(255,255,255,0.1)" : "#EF4444", label: "Mic", toggle: () => setMicOn(p => !p) },
+                { icon: ic.film, on: camOn, color: camOn ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.06)", label: "Cam", toggle: () => setCamOn(p => !p) },
+                { icon: ic.volume, on: true, color: "rgba(255,255,255,0.1)", label: "Sound" },
+                { icon: ic.power, on: false, color: "#EF4444", label: "End", toggle: () => setCallActive(false) },
+              ].map((btn, i) => (
+                <button key={i} onClick={btn.toggle}
+                  className="flex flex-col items-center gap-1"
+                  title={btn.label}>
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center transition-all"
+                    style={{ background: btn.color }}>
+                    <I d={btn.icon} s={16} c="white" />
                   </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Fine-tune Tab */}
-      {tab === "fine-tune" && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: c.textMuted }}>Fine-Tuning</p>
-          <div className="p-3 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-            <p className="text-[10px] font-semibold mb-2" style={{ color: c.text }}>Base Model</p>
-            <div className="flex gap-1 flex-wrap">
-              {models.map(m => (
-                <button key={m.id} onClick={() => { setActiveModel(m); }}
-                  className="px-2.5 py-1 rounded-lg text-[9px] font-semibold transition-all"
-                  style={{ background: activeModel.id === m.id ? `${m.color}20` : c.cardAlt, color: activeModel.id === m.id ? m.color : c.textMuted, border: `1px solid ${activeModel.id === m.id ? m.color + "40" : "transparent"}` }}>
-                  {m.name}
+                  <span className="text-[7px] text-white/40">{btn.label}</span>
                 </button>
               ))}
             </div>
           </div>
-          {[{ label: "Training Dataset", placeholder: "Upload JSONL or paste dataset URL..." }, { label: "Validation Set", placeholder: "Optional validation dataset URL..." }].map((f, i) => (
-            <div key={i} className="p-3 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-              <p className="text-[10px] font-semibold mb-1.5" style={{ color: c.text }}>{f.label}</p>
-              <input className="w-full text-[10px] px-2.5 py-1.5 rounded-lg outline-none" style={{ background: c.cardAlt, border: `1px solid ${c.border}`, color: c.text }} placeholder={f.placeholder} />
-            </div>
-          ))}
-          {[{ label: "Epochs", def: "3" }, { label: "Learning Rate", def: "1e-5" }, { label: "Batch Size", def: "8" }, { label: "Max Seq Length", def: "2048" }].map((f, i) => (
-            <div key={i} className="flex items-center justify-between px-3 py-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-              <span className="text-[10px]" style={{ color: c.textSec }}>{f.label}</span>
-              <input className="w-20 text-[10px] text-right px-2 py-0.5 rounded-md outline-none" style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} defaultValue={f.def} />
-            </div>
-          ))}
-          <button className="w-full py-2 rounded-xl text-[11px] font-bold transition-all" style={{ background: c.accent, color: "#fff", boxShadow: `0 2px 8px ${c.accent}40` }}>Start Fine-Tuning Job</button>
-        </div>
-      )}
-
-      {/* Deploy Tab */}
-      {tab === "deploy" && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>Deployments</p>
-            <button className="text-[9px] px-2.5 py-1 rounded-lg font-semibold" style={{ background: c.accentSoft, color: c.accentText }}>+ Deploy</button>
-          </div>
-          {deployments.map((d, di) => {
-            const m = models.find(mx => mx.id === d.model)!;
-            return (
-              <div key={di} className="p-3.5 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-                <div className="flex items-start gap-2 mb-2">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${m.color}15` }}>
-                    <I d={ic.sparkle} s={11} c={m.color} f />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-bold truncate" style={{ color: c.text }}>{d.name}</p>
-                    <p className="font-mono text-[9px] truncate" style={{ color: c.textMuted }}>{d.endpoint}</p>
-                  </div>
-                  <span className="text-[8px] px-2 py-0.5 rounded-full font-semibold" style={{ background: d.status === "active" ? "#10B98118" : c.cardAlt, color: d.status === "active" ? "#10B981" : c.textMuted }}>{d.status}</span>
+        ) : (
+          /* ── CHAT VIEW ── */
+          <>
+            {/* Chat header */}
+            <div className="flex items-center justify-between px-4 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                  style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}AA)` }}>
+                  {activeModel.initials}
                 </div>
-                <div className="flex gap-3">
-                  {[["RPS", d.rps], ["P99", d.p99], ["Uptime", d.uptime]].map(([k, v], i) => (
-                    <div key={i}>
-                      <p className="text-[8px]" style={{ color: c.textMuted }}>{k}</p>
-                      <p className="text-[10px] font-bold" style={{ color: c.text }}>{v}</p>
-                    </div>
-                  ))}
+                <div>
+                  <p className="text-[11px] font-semibold" style={{ color: c.text }}>{activeModel.name}</p>
+                  <p className="text-[9px]" style={{ color: activeModel.color }}>{activeModel.online ? "● Online" : "○ Offline"}</p>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
+              <div className="flex items-center gap-1">
+                <span className="text-[7px] font-bold px-1.5 py-0.5 rounded-md mr-1" style={{ background: `${activeModel.color}15`, color: activeModel.color }}>{activeModel.badge}</span>
+                <button onClick={() => setCallActive(true)}
+                  className="w-7 h-7 rounded-full flex items-center justify-center transition-all"
+                  style={{ background: "#10B98115" }}
+                  title="Start AI session"
+                  onMouseEnter={e => (e.currentTarget.style.background = "#10B98130")} onMouseLeave={e => (e.currentTarget.style.background = "#10B98115")}>
+                  <I d={ic.mic} s={13} c="#10B981" />
+                </button>
+                <button
+                  className="w-7 h-7 rounded-full flex items-center justify-center transition-all"
+                  style={{ background: `${activeModel.color}15` }}
+                  title="Video session"
+                  onMouseEnter={e => (e.currentTarget.style.background = `${activeModel.color}30`)} onMouseLeave={e => (e.currentTarget.style.background = `${activeModel.color}15`)}>
+                  <I d={ic.monitor} s={13} c={activeModel.color} />
+                </button>
+                <button className="w-7 h-7 rounded-full flex items-center justify-center" style={{ color: c.textMuted }}>
+                  <I d={ic.menu} s={13} c={c.textMuted} />
+                </button>
+              </div>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3" style={{ scrollbarWidth: "none" }}>
+              {msgs.map((m, i) => (
+                <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start gap-2"}`}>
+                  {m.role === "ai" && (
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-white mt-0.5"
+                      style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}AA)` }}>
+                      {activeModel.initials}
+                    </div>
+                  )}
+                  <div className="max-w-[72%]">
+                    {m.role === "ai" && (
+                      <p className="text-[9px] font-semibold mb-1 flex items-center gap-1.5" style={{ color: activeModel.color }}>
+                        {m.model}
+                        <span className="font-normal" style={{ color: c.textMuted }}>· just now</span>
+                      </p>
+                    )}
+                    <div className="px-3.5 py-2.5 text-[11px] leading-relaxed"
+                      style={{
+                        background: m.role === "user" ? `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}CC)` : c.surface,
+                        color: m.role === "user" ? "#fff" : c.text,
+                        border: m.role === "ai" ? `1px solid ${c.border}` : "none",
+                        borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+                      }}>
+                      {m.text}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div ref={hubEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="px-3 py-3 flex items-center gap-2 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+              <button className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
+                style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = activeModel.color + "60")} onMouseLeave={e => (e.currentTarget.style.borderColor = c.border)}>
+                <I d={ic.upload} s={13} c={c.textMuted} />
+              </button>
+              <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
+                placeholder={`Message ${activeModel.name}...`}
+                className="flex-1 text-[11px] px-3 py-2 rounded-xl outline-none"
+                style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
+              <button onClick={send}
+                className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
+                style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}CC)`, boxShadow: `0 2px 8px ${activeModel.color}40` }}>
+                <I d={ic.send} s={13} c="#fff" />
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -8689,7 +8683,7 @@ export default function AlternusOS() {
     { id: "tasks", title: "Tasks", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 60, w: 420, h: 480 },
     { id: "mail", title: "Mail", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 50, w: 580, h: 460 },
     { id: "monaco", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 60, y: 30, w: 600, h: 480 },
-    { id: "aihub", title: "AI Hub", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 150, y: 60, w: 480, h: 500 },
+    { id: "aihub", title: "AI Hub", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 40, w: 720, h: 520 },
     { id: "aivoice", title: "AI Voice", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 80, w: 380, h: 440 },
     { id: "knowledge", title: "Knowledge Base", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 560, h: 480 },
     { id: "sysmon", title: "System Monitor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 500, h: 480 },
@@ -8832,7 +8826,7 @@ export default function AlternusOS() {
       tasks: { w: 420, h: 480 },
       mail: { w: 580, h: 460 },
       monaco: { w: 680, h: 500 },
-      aihub: { w: 480, h: 500 },
+      aihub: { w: 720, h: 520 },
       aivoice: { w: 380, h: 440 },
       knowledge: { w: 580, h: 480 },
       sysmon: { w: 500, h: 480 },
