@@ -27,6 +27,11 @@ interface WinState {
 type BootPhase = "bios" | "hardware" | "kernel" | "services" | "desktop" | "done";
 type SystemModal = { type: "error" | "warning" | "info"; title: string; message: string } | null;
 
+interface OSAIAction {
+  type: "open_app" | "close_app" | "minimize_app" | "send_notification";
+  payload: Record<string, string>;
+}
+
 interface AINotification {
   id: string;
   title: string;
@@ -684,7 +689,12 @@ function BoldText({ text, c }: { text: string; c: typeof palette.dark }) {
   );
 }
 
-function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void; onOpenApp?: (id: WinId) => void }) {
+function AIChat({ c, mode, setMode, onOpenApp, onExecuteAIActions, osContext }: {
+  c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void;
+  onOpenApp?: (id: WinId) => void;
+  onExecuteAIActions?: (actions: OSAIAction[]) => void;
+  osContext?: { openApps: string[]; theme: "dark" | "light" };
+}) {
   const [input, setInput] = useState("");
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -724,28 +734,83 @@ function AIChat({ c, mode, setMode, onOpenApp }: { c: typeof palette.dark; mode:
     }
 
     setIsTyping(true);
+    const aiMsgId = Date.now().toString();
+    setMsgs(p => [...p, { role: "ai", text: "" }]);
 
     try {
       const conversationHistory = msgs.map(msg => ({
-        role: msg.role === "ai" ? "assistant" : "user",
+        role: msg.role === "ai" ? "assistant" as const : "user" as const,
         content: msg.text,
-      }));
+      })).slice(-10);
 
-      const response = await fetch("/api/ai-chat", {
+      const response = await fetch("/api/os/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: m, conversationHistory }),
+        body: JSON.stringify({
+          message: m,
+          conversationHistory,
+          osContext: osContext || { openApps: [], theme: mode },
+        }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to get response");
+      if (!response.ok || !response.body) {
+        throw new Error(`API error: ${response.status}`);
       }
 
-      setMsgs(p => [...p, { role: "ai", text: data.content }]);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = "";
+      let actionsProcessed = false;
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        if (!actionsProcessed) {
+          const newlineIdx = buffer.indexOf("\n");
+          if (newlineIdx !== -1) {
+            const jsonLine = buffer.slice(0, newlineIdx);
+            const rest = buffer.slice(newlineIdx + 1);
+            buffer = "";
+            try {
+              const { actions } = JSON.parse(jsonLine) as { actions: OSAIAction[] };
+              if (actions && actions.length > 0 && onExecuteAIActions) {
+                onExecuteAIActions(actions);
+              }
+            } catch { /* ignore */ }
+            actionsProcessed = true;
+            fullText += rest;
+          }
+        } else {
+          fullText += buffer;
+          buffer = "";
+        }
+
+        if (fullText) {
+          setMsgs(p => {
+            const updated = [...p];
+            const lastIdx = updated.length - 1;
+            if (lastIdx >= 0 && updated[lastIdx].role === "ai") {
+              updated[lastIdx] = { ...updated[lastIdx], text: fullText };
+            }
+            return updated;
+          });
+        }
+      }
+
+      void aiMsgId; // suppress unused var warning
     } catch {
-      setMsgs(p => [...p, { role: "ai", text: "I apologize, but I'm having trouble connecting right now. Please try again in a moment." }]);
+      setMsgs(p => {
+        const updated = [...p];
+        const lastIdx = updated.length - 1;
+        if (lastIdx >= 0 && updated[lastIdx].role === "ai") {
+          updated[lastIdx] = { ...updated[lastIdx], text: "I apologize, but I'm having trouble connecting right now. Please try again in a moment." };
+        }
+        return updated;
+      });
     } finally {
       setIsTyping(false);
     }
@@ -2253,6 +2318,66 @@ function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palett
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [fileContextMenu, setFileContextMenu] = useState<{ x: number; y: number; name: string } | null>(null);
 
+  // ── DB-backed cloud files ──────────────────────────────────
+  type DbFile = { id: string; name: string; type: "FILE" | "FOLDER"; path: string; size: number; content?: string | null; createdAt: string; parentId?: string | null };
+  const [dbFiles, setDbFiles] = useState<DbFile[]>([]);
+  const [dbFolderId, setDbFolderId] = useState<string | null>(null);
+  const [dbLoading, setDbLoading] = useState(false);
+  const [showCloudFiles, setShowCloudFiles] = useState(false);
+  const [newFileName, setNewFileName] = useState("");
+  const [showNewFileInput, setShowNewFileInput] = useState(false);
+
+  const fetchDbFiles = useCallback(async (parentId?: string | null) => {
+    setDbLoading(true);
+    try {
+      const params = parentId ? `parentId=${parentId}` : "path=/";
+      const res = await fetch(`/api/os/files?${params}`);
+      if (!res.ok) return;
+      const data: { files: DbFile[] } = await res.json();
+      if (data.files.length === 0 && !parentId) {
+        // Seed on first load
+        await fetch("/api/os/files/seed", { method: "POST" });
+        const res2 = await fetch("/api/os/files?path=/");
+        if (res2.ok) {
+          const data2: { files: DbFile[] } = await res2.json();
+          setDbFiles(data2.files);
+        }
+      } else {
+        setDbFiles(data.files);
+      }
+    } catch { /* ignore */ } finally {
+      setDbLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showCloudFiles) {
+      fetchDbFiles(dbFolderId);
+    }
+  }, [showCloudFiles, dbFolderId, fetchDbFiles]);
+
+  const dbCreateFile = async (name: string) => {
+    if (!name.trim()) return;
+    const res = await fetch("/api/os/files", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name.trim(), type: "FILE", path: "/", parentId: dbFolderId }),
+    });
+    if (res.ok) {
+      const data: { file: DbFile } = await res.json();
+      setDbFiles(prev => [...prev, data.file]);
+    }
+  };
+
+  const dbDeleteFile = async (id: string) => {
+    await fetch(`/api/os/files/${id}`, { method: "DELETE" });
+    setDbFiles(prev => prev.filter(f => f.id !== id));
+  };
+
+  const dbFileIcon = (f: DbFile) => f.type === "FOLDER" ? ic.folder : f.name.endsWith(".md") ? ic.note : f.name.endsWith(".txt") ? ic.note : ic.fileText;
+  const dbFileColor = (f: DbFile) => f.type === "FOLDER" ? "#FBBF24" : f.name.endsWith(".md") ? "#FBBF24" : "#3B82F6";
+  const formatDbSize = (bytes: number) => bytes < 1024 ? `${bytes} B` : bytes < 1048576 ? `${Math.round(bytes / 1024)} KB` : `${(bytes / 1048576).toFixed(1)} MB`;
+
   type FileItem = { name: string; type: "folder" | "file"; icon: string; iconColor: string; size: string; modified: string; action?: WinId | string };
 
   const [fileSystem, setFileSystem] = useState<Record<string, FileItem[]>>({
@@ -2576,6 +2701,96 @@ function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palett
               placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
           </div>
         </div>
+
+        {/* Cloud Files (DB-backed) */}
+        {curPath === "Home" && (
+          <div className="flex-shrink-0 px-3 pt-2 pb-1">
+            <button
+              onClick={() => setShowCloudFiles(v => !v)}
+              className="flex items-center gap-2 w-full px-3 py-2 rounded-lg transition-all text-left"
+              style={{ background: showCloudFiles ? c.accentSoft : c.cardAlt, border: `1px solid ${showCloudFiles ? c.accent + "40" : c.border}` }}
+            >
+              <I d={ic.cloudF} s={13} c={showCloudFiles ? c.accentText : c.textSec} />
+              <span className="text-[11px] font-medium flex-1" style={{ color: showCloudFiles ? c.accentText : c.textSec }}>Cloud Files (AI)</span>
+              {dbLoading && <span className="text-[9px]" style={{ color: c.textMuted }}>loading...</span>}
+              <span style={{ transform: showCloudFiles ? "rotate(90deg)" : "none", transition: "transform 0.2s", display: "inline-flex" }}><I d={ic.chevR} s={10} c={c.textMuted} /></span>
+            </button>
+
+            {showCloudFiles && (
+              <div className="mt-1 rounded-lg overflow-hidden" style={{ border: `1px solid ${c.border}` }}>
+                {/* Breadcrumb for cloud nav */}
+                {dbFolderId && (
+                  <div className="flex items-center gap-1 px-3 py-1.5" style={{ borderBottom: `1px solid ${c.border}`, background: c.cardAlt }}>
+                    <button onClick={() => setDbFolderId(null)} className="text-[10px]" style={{ color: c.accentText }}>Root</button>
+                  </div>
+                )}
+                {/* File list */}
+                <div className="max-h-[160px] overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                  {dbFiles.length === 0 && !dbLoading && (
+                    <p className="text-[10px] text-center py-3" style={{ color: c.textMuted }}>No cloud files yet</p>
+                  )}
+                  {dbFiles.map(f => (
+                    <div key={f.id} className="flex items-center gap-2 px-3 py-1.5 group hover:bg-opacity-50 transition-colors"
+                      style={{ borderBottom: `1px solid ${c.border}30` }}
+                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                    >
+                      <I d={dbFileIcon(f)} s={13} c={dbFileColor(f)} />
+                      <button
+                        className="flex-1 text-left text-[11px] truncate"
+                        style={{ color: c.text }}
+                        onClick={() => {
+                          if (f.type === "FOLDER") setDbFolderId(f.id);
+                          else { setSelectedFile(f.name); setFileContent(f.content || "(empty file)"); }
+                        }}
+                      >
+                        {f.name}
+                      </button>
+                      <span className="text-[9px]" style={{ color: c.textMuted }}>{formatDbSize(f.size)}</span>
+                      <button
+                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded transition-opacity"
+                        style={{ color: c.danger }}
+                        onClick={() => dbDeleteFile(f.id)}
+                        title="Delete"
+                      >
+                        <I d={ic.trash} s={11} c={c.danger} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                {/* New file input */}
+                {showNewFileInput ? (
+                  <div className="flex items-center gap-1 px-3 py-1.5" style={{ borderTop: `1px solid ${c.border}` }}>
+                    <input
+                      autoFocus
+                      className="flex-1 bg-transparent outline-none text-[11px]"
+                      style={{ color: c.text }}
+                      placeholder="filename.txt"
+                      value={newFileName}
+                      onChange={e => setNewFileName(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === "Enter") { dbCreateFile(newFileName); setNewFileName(""); setShowNewFileInput(false); }
+                        if (e.key === "Escape") { setShowNewFileInput(false); setNewFileName(""); }
+                      }}
+                    />
+                    <button onClick={() => { dbCreateFile(newFileName); setNewFileName(""); setShowNewFileInput(false); }}
+                      className="text-[10px] px-2 py-0.5 rounded" style={{ background: c.accent, color: "#fff" }}>Create</button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowNewFileInput(true)}
+                    className="w-full text-[10px] py-1.5 text-center transition-colors"
+                    style={{ color: c.accentText, borderTop: `1px solid ${c.border}` }}
+                    onMouseEnter={e => (e.currentTarget.style.background = c.accentSoft)}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                  >
+                    + New File
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Quick Access header for Home */}
         {curPath === "Home" && !searchQuery && (
@@ -7680,9 +7895,11 @@ interface AgentMessage {
   timestamp: Date;
 }
 
-function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp }: {
+function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp, onExecuteAIActions, osContext }: {
   c: typeof palette.dark; mode: ThemeMode; setMode: (m: ThemeMode) => void;
   wallpaper: number; setWallpaper: (w: number) => void; onOpenApp: (id: WinId) => void;
+  onExecuteAIActions?: (actions: OSAIAction[]) => void;
+  osContext?: { openApps: string[]; theme: "dark" | "light" };
 }) {
   const [msgs, setMsgs] = useState<AgentMessage[]>([{
     id: "welcome", role: "agent", timestamp: new Date(),
@@ -7708,8 +7925,6 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
     { label: "📊 Dashboard", task: "Open the business dashboard" },
   ];
 
-  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
-
   const addStepUpdate = (msgId: string, stepIdx: number, status: AgentStep["status"]) => {
     setMsgs(prev => prev.map(m => {
       if (m.id !== msgId || !m.steps) return m;
@@ -7719,158 +7934,110 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
     }));
   };
 
-  const classify = (text: string): AgentActionType => {
-    const t = text.toLowerCase();
-    if (/email|mail|send.*email|draft.*email|write.*email|message/.test(t)) return "draftEmail";
-    if (/document|word|docx|write.*report|create.*doc/.test(t)) return "createDoc";
-    if (/dark|light|theme|appearance/.test(t)) return "changeTheme";
-    if (/wallpaper|background/.test(t)) return "changeWallpaper";
-    if (/file|files|open.*file|manage.*file/.test(t)) return "openApp";
-    if (/terminal|command|run|exec|shell/.test(t)) return "runCommand";
-    if (/setting|config|preference|change.*system/.test(t)) return "changeSetting";
-    if (/search|find|look.*for|query/.test(t)) return "search";
-    if (/meeting|schedule|calendar|appointment/.test(t)) return "schedule";
-    return "openApp";
-  };
-
   const execute = async (userText: string) => {
     const msgId = Date.now().toString();
-    const t = userText.toLowerCase();
-    const actionType = classify(userText);
 
-    // Build steps based on action
-    let steps: AgentStep[] = [];
-    let workspace: AgentMessage["workspace"] | undefined;
-    let finalText = "";
+    // Show thinking steps immediately
+    const steps: AgentStep[] = [
+      { label: "Po analizoj kërkesën...", status: "running" },
+      { label: "Po planifikoj veprimet", status: "pending" },
+      { label: "Po ekzekutoj", status: "pending" },
+    ];
 
-    if (actionType === "draftEmail") {
-      steps = [
-        { label: "Analyzing your request", status: "pending" },
-        { label: "Generating email content", status: "pending" },
-        { label: "Formatting professional email", status: "pending" },
-        { label: "Email ready to send", status: "pending" },
-      ];
-    } else if (actionType === "createDoc") {
-      steps = [
-        { label: "Building document structure", status: "pending" },
-        { label: "Generating content", status: "pending" },
-        { label: "Applying professional formatting", status: "pending" },
-        { label: "Saving as DOCX", status: "pending" },
-      ];
-    } else if (actionType === "changeTheme") {
-      steps = [
-        { label: "Reading theme preference", status: "pending" },
-        { label: "Applying theme change", status: "pending" },
-        { label: "Refreshing interface", status: "pending" },
-      ];
-    } else if (actionType === "changeWallpaper") {
-      steps = [
-        { label: "Identifying requested wallpaper", status: "pending" },
-        { label: "Loading wallpaper", status: "pending" },
-        { label: "Applying to desktop", status: "pending" },
-      ];
-    } else if (actionType === "runCommand") {
-      steps = [
-        { label: "Analyzing command", status: "pending" },
-        { label: "Opening terminal", status: "pending" },
-        { label: "Executing command", status: "pending" },
-        { label: "Returning result", status: "pending" },
-      ];
-    } else {
-      const appLabel = /files|file/.test(t) ? "Files" : /mail|email/.test(t) ? "Mail" : /dashboard/.test(t) ? "Dashboard" : /terminal/.test(t) ? "Terminal" : /settings/.test(t) ? "Settings" : /notes/.test(t) ? "Notes" : /browser|web/.test(t) ? "Browser" : /calendar/.test(t) ? "Calendar" : "AI Hub";
-      steps = [
-        { label: `Identifying application: ${appLabel}`, status: "pending" },
-        { label: `Opening ${appLabel}`, status: "pending" },
-      ];
-    }
-
-    // Add agent message with steps immediately
-    const agentMsg: AgentMessage = { id: msgId, role: "agent", timestamp: new Date(), text: "Working...", steps };
+    const agentMsg: AgentMessage = { id: msgId, role: "agent", timestamp: new Date(), text: "", steps };
     setMsgs(prev => [...prev, agentMsg]);
     setIsThinking(true);
 
-    // Execute steps with real delays
-    for (let i = 0; i < steps.length; i++) {
-      addStepUpdate(msgId, i, "running");
-      await sleep(600 + Math.random() * 400);
-
-      // REAL ACTIONS
-      if (actionType === "changeTheme" && i === 1) {
-        const newMode: ThemeMode = /light/.test(t) ? "light" : "dark";
-        setMode(newMode);
-      }
-      if (actionType === "changeWallpaper" && i === 1) {
-        const wpNum = t.match(/[1-5]/)?.[0];
-        setWallpaper(wpNum ? parseInt(wpNum) : Math.floor(Math.random() * 5) + 1);
-      }
-      if (actionType === "openApp" && i === steps.length - 1) {
-        const appId: WinId = /files|file/.test(t) ? "files" : /mail|email/.test(t) ? "mail" : /dashboard/.test(t) ? "dashboard" : /terminal/.test(t) ? "terminal" : /settings/.test(t) ? "settings" : /notes/.test(t) ? "notes" : /browser/.test(t) ? "browser" : /calendar/.test(t) ? "calendar" : /tasks/.test(t) ? "tasks" : /music/.test(t) ? "music" : "aihub";
-        onOpenApp(appId);
-      }
-      if (actionType === "runCommand" && i === 1) onOpenApp("terminal");
-
-      addStepUpdate(msgId, i, "done");
-    }
-
-    // Build workspace content
-    if (actionType === "draftEmail") {
-      const subject = /project/.test(t) ? "Project Update" : /report/.test(t) ? "Weekly Report" : /meeting/.test(t) ? "Meeting Invitation" : "Professional Communication";
-      workspace = {
-        type: "email", title: `📧 Draft: ${subject}`,
-        content: `From: alternus@alternusart.com\nTo: team@alternusart.com\nCC: manager@alternusart.com\nSubject: ${subject}\n\n---\n\nHi team,\n\nI hope this email finds you well.\n\n${/project/.test(t) ? "I wanted to update you on the latest project progress. We've hit the main objectives for this week and we're on track to meet the agreed deadline.\n\nKey points:\n• Development phase one: 85% complete\n• Module testing: In progress\n• Documentation: Up to date\n\nNext step: Review meeting on Friday." : "I want to share some important information about our ongoing work.\n\nPlease review the attached document and get back to me with your comments."}\n\nThanks for your continued collaboration.\n\nBest regards,\nAlternus AI Agent\nAlternus Art Gallery`,
-      };
-      finalText = `✅ Email ready!\n\nI've drafted a professional email with:\n- **Subject**: ${subject}\n- **Recipients**: team + manager\n- **Formatting**: standard corporate\n\nYou can edit, copy, or send it directly.`;
-    } else if (actionType === "createDoc") {
-      const docTitle = /report/.test(t) ? "Monthly Report" : /proposal/.test(t) ? "Project Proposal" : /plan/.test(t) ? "Strategic Plan" : "New Document";
-      workspace = {
-        type: "doc", title: `📄 ${docTitle}.docx`,
-        content: `# ${docTitle}\n\n**Date:** ${new Date().toLocaleDateString("en-US")}\n**Author:** Alternus AI Agent\n**Version:** 1.0\n\n---\n\n## 1. Introduction\n\nThis document was generated automatically by Alternus AI Agent based on your request. It contains a professional structure and can be edited to fit your needs.\n\n## 2. Purpose\n\nThe main purpose of this document is to provide a solid foundation for your work. The proposed structure follows international standards for professional writing.\n\n## 3. Main Content\n\n### 3.1 First Section\nWrite the details of the first section here.\n\n### 3.2 Second Section  \nWrite the details of the second section here.\n\n## 4. Conclusions\n\nSummary of the key points and next steps.\n\n## 5. Recommendations\n\n- First recommendation\n- Second recommendation\n- Third recommendation\n\n---\n*Generated by Alternus AI Agent · ${new Date().toLocaleString("en-US")}*`,
-      };
-      finalText = `✅ Document created!\n\n**${docTitle}.docx** is ready with:\n- Professional 5-section structure\n- Standard corporate formatting\n- Automatic date and metadata\n\nYou can open it in Word or export it.`;
-      onOpenApp("word");
-    } else if (actionType === "changeTheme") {
-      const newMode: ThemeMode = /light/.test(t) ? "light" : "dark";
-      workspace = {
-        type: "settings", title: "⚙️ Theme Settings",
-        content: `ACTION PERFORMED:\n────────────────\nTheme: ${newMode === "dark" ? "🌙 Dark Mode" : "☀️ Light Mode"}\nStatus: ✅ Applied successfully\nTime: ${new Date().toLocaleTimeString()}\n\nCHANGES:\n• Interface: ${newMode}\n• Background: ${newMode === "dark" ? "#1C1D22" : "#F8F9FA"}\n• Text: ${newMode === "dark" ? "#F0F2F8" : "#1A1A2E"}\n• Icons: Updated\n\nAll open applications have been updated automatically.`,
-      };
-      finalText = `✅ Theme changed!\n\nI've applied **${newMode === "dark" ? "Dark Mode 🌙" : "Light Mode ☀️"}** across the entire system.\n\nThe change is immediate and will be persisted.`;
-    } else if (actionType === "changeWallpaper") {
-      workspace = {
-        type: "settings", title: "🖼️ New Wallpaper",
-        content: `ACTION PERFORMED:\n────────────────\nWallpaper: OSwp ${wallpaper}\nStatus: ✅ Applied\nTime: ${new Date().toLocaleTimeString()}\n\nAvailable wallpapers:\n• OSwp 1 - Purple Gradient\n• OSwp 2 - Ocean Blue\n• OSwp 3 - Flow Aurora\n• OSwp 4 - Emerald Green\n• OSwp 5 - Sunset Rose\n\nCurrent selection: OSwp ${wallpaper}`,
-      };
-      finalText = `✅ Wallpaper changed!\n\nI've applied **OSwp ${wallpaper}** to the desktop.\n\nWant to try a different wallpaper? Just say the number (1-5).`;
-    } else if (actionType === "runCommand") {
-      workspace = {
-        type: "terminal", title: "💻 Terminal Output",
-        content: `$ alternus-agent --status\n> Initializing agent...\n> Agent v2.0.0 active ✓\n\n$ system-info\nOS: Alternus OS v3.0\nCPU: 12 cores @ 67% load\nRAM: 8.2 GB / 16 GB used\nDisk: 278 GB / 512 GB\nGPU: NVIDIA A100 82%\nNetwork: AlternusNet 5GHz ✓\nUptime: 14h 22m\n\n$ agent-tasks --list\n→ Task queue: 0 pending\n→ Last task: ${userText.slice(0, 30)}...\n→ Status: Completed ✓\n\n$ _`,
-      };
-      finalText = `✅ Command executed!\n\nSystem status:\n- **CPU**: 67% · **RAM**: 8.2/16 GB\n- **Disk**: 278/512 GB · **Network**: AlternusNet ✓\n- **GPU**: 82% · **Uptime**: 14h 22m\n\nTerminal is open for additional commands.`;
-    } else {
-      const appLabel = /files|file/.test(t) ? "Files" : /mail|email/.test(t) ? "Mail" : /dashboard/.test(t) ? "Dashboard" : /terminal/.test(t) ? "Terminal" : /settings/.test(t) ? "Settings" : "the application";
-      workspace = {
-        type: "info", title: `🖥️ ${appLabel} opened`,
-        content: `ACTION PERFORMED:\n────────────────\nApplication: ${appLabel}\nStatus: ✅ Opened\nTime: ${new Date().toLocaleTimeString()}\n\nCheck the active window.\nUse Ctrl+A for additional AI actions.`,
-      };
-      finalText = `✅ **${appLabel}** opened!\n\nThe window is active. Would you like me to perform any specific action inside it?`;
-    }
-
-    // Try real API call for richer response
     try {
-      const resp = await fetch("/api/ai-chat", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userText, conversationHistory: msgs.filter(m => m.id !== "welcome").map(m => ({ role: m.role === "agent" ? "assistant" : "user", content: m.text })).slice(-6) }),
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        if (data.content) finalText = data.content;
-      }
-    } catch { /* use pre-built finalText */ }
+      // Build conversation history (last 10 turns, skip welcome message)
+      const conversationHistory = msgs
+        .filter(m => m.id !== "welcome" && m.text.trim().length > 0)
+        .map(m => ({ role: m.role === "agent" ? "assistant" as const : "user" as const, content: m.text }))
+        .slice(-10);
 
-    setMsgs(prev => prev.map(m => m.id === msgId ? { ...m, text: finalText, workspace } : m));
-    if (workspace) setActiveWorkspace(workspace);
-    setIsThinking(false);
+      const response = await fetch("/api/os/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userText,
+          conversationHistory,
+          osContext: osContext || { openApps: [], theme: "dark" },
+        }),
+      });
+
+      if (!response.ok || !response.body) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      addStepUpdate(msgId, 0, "done");
+      addStepUpdate(msgId, 1, "running");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = "";
+      let actionsProcessed = false;
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        if (!actionsProcessed) {
+          // First newline-terminated line is the JSON actions object
+          const newlineIdx = buffer.indexOf("\n");
+          if (newlineIdx !== -1) {
+            const jsonLine = buffer.slice(0, newlineIdx);
+            const rest = buffer.slice(newlineIdx + 1);
+            buffer = "";
+            try {
+              const { actions } = JSON.parse(jsonLine) as { actions: OSAIAction[] };
+              if (actions && actions.length > 0 && onExecuteAIActions) {
+                onExecuteAIActions(actions);
+                addStepUpdate(msgId, 1, "done");
+                addStepUpdate(msgId, 2, "running");
+              } else {
+                addStepUpdate(msgId, 1, "done");
+                addStepUpdate(msgId, 2, "running");
+              }
+            } catch {
+              addStepUpdate(msgId, 1, "done");
+              addStepUpdate(msgId, 2, "running");
+            }
+            actionsProcessed = true;
+            fullText += rest;
+          }
+        } else {
+          fullText += buffer;
+          buffer = "";
+        }
+
+        // Stream text into message in real-time
+        if (fullText) {
+          setMsgs(prev => prev.map(m => m.id === msgId ? { ...m, text: fullText } : m));
+        }
+      }
+
+      addStepUpdate(msgId, 2, "done");
+
+      // Remove steps after a short delay for clean UI
+      setTimeout(() => {
+        setMsgs(prev => prev.map(m => m.id === msgId ? { ...m, steps: undefined } : m));
+      }, 1200);
+
+    } catch (error) {
+      console.error("Agent execute error:", error);
+      setMsgs(prev => prev.map(m =>
+        m.id === msgId ? {
+          ...m,
+          text: "Ndodhi një gabim gjatë procesimit të kërkesës. Ju lutemi provoni përsëri.",
+          steps: undefined,
+        } : m
+      ));
+    } finally {
+      setIsThinking(false);
+    }
   };
 
   const send = async (text?: string) => {
@@ -8504,6 +8671,26 @@ export default function AlternusOS() {
     }
   }, [wins, closeWin, smartDND, addTimelineEvent]);
 
+  // ━━━━ AI ACTIONS EXECUTOR (called by AI Agent & AI Chat) ━━
+  const executeAIActions = useCallback((actions: OSAIAction[]) => {
+    for (const action of actions) {
+      switch (action.type) {
+        case "open_app":
+          openWin(action.payload.app_id as WinId);
+          break;
+        case "close_app":
+          closeWin(action.payload.app_id as WinId);
+          break;
+        case "minimize_app":
+          minimizeWin(action.payload.app_id as WinId);
+          break;
+        case "send_notification":
+          addAINotification("suggestion", action.payload.title || "AI", action.payload.message || "", ic.sparkle);
+          break;
+      }
+    }
+  }, [openWin, closeWin, minimizeWin, addAINotification]);
+
   // Alt+Tab task switcher
   useEffect(() => {
     const openWins = wins.filter(w => w.isOpen && !w.isMinimized);
@@ -8770,7 +8957,7 @@ export default function AlternusOS() {
   };
 
   const winContent: Record<WinId, React.ReactNode> = {
-    ai: <AIChat c={c} mode={mode} setMode={setMode} onOpenApp={openWin} />,
+    ai: <AIChat c={c} mode={mode} setMode={setMode} onOpenApp={openWin} onExecuteAIActions={executeAIActions} osContext={{ openApps: wins.filter(w => w.isOpen && !w.isMinimized).map(w => w.id), theme: mode }} />,
     terminal: <TerminalApp c={c} />,
     code: <CodeApp c={c} />,
     files: <FilesApp c={c} onOpenApp={openWin} onTrashEmpty={handleTrashEmpty} onDragFile={name => setDraggedFile(name)} />,
@@ -8800,7 +8987,7 @@ export default function AlternusOS() {
     knowledge: <KnowledgeApp c={c} />,
     sysmon: <SysMonApp c={c} />,
     business: <BusinessApp c={c} />,
-    agent: <AlternusAgentApp c={c} mode={mode} setMode={setMode} wallpaper={wallpaper} setWallpaper={setWallpaper} onOpenApp={openWin} />,
+    agent: <AlternusAgentApp c={c} mode={mode} setMode={setMode} wallpaper={wallpaper} setWallpaper={setWallpaper} onOpenApp={openWin} onExecuteAIActions={executeAIActions} osContext={{ openApps: wins.filter(w => w.isOpen && !w.isMinimized).map(w => w.id), theme: mode }} />,
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
