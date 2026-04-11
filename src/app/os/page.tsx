@@ -10669,7 +10669,7 @@ export default function AlternusOS() {
           );
         })()}
 
-        {/* ━━━━ Launchpad Overlay — Library style ━━━━ */}
+        {/* ━━━━ Launchpad Overlay — Full-screen Library ━━━━ */}
         {showLaunchpad && (() => {
           const closeLaunchpad = () => { setShowLaunchpad(false); setLaunchSearch(""); setLaunchCategory("all"); };
           const filteredApps = dockApps.filter(app => {
@@ -10678,31 +10678,65 @@ export default function AlternusOS() {
             return matchCat && matchSearch;
           });
           const categories: { id: "all" | "ai" | "productivity" | "media" | "system" | "web"; label: string; icon: string }[] = [
-            { id: "all", label: "All", icon: ic.grid },
-            { id: "ai", label: "AI", icon: ic.sparkle },
+            { id: "all",          label: "All",          icon: ic.grid },
+            { id: "ai",           label: "AI",           icon: ic.sparkle },
             { id: "productivity", label: "Productivity", icon: ic.checkSquare },
-            { id: "media", label: "Media", icon: ic.film },
-            { id: "system", label: "System", icon: ic.monitor },
-            { id: "web", label: "Web", icon: ic.globe },
+            { id: "media",        label: "Media",        icon: ic.film },
+            { id: "system",       label: "System",       icon: ic.monitor },
+            { id: "web",          label: "Web",          icon: ic.globe },
           ];
           return (
             <div
-              className="absolute inset-0 z-[80] flex items-center justify-center"
-              style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)" }}
+              className="absolute inset-0 z-[80] flex flex-col"
+              style={{ backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", background: "rgba(0,0,0,0.62)" }}
               onClick={closeLaunchpad}
             >
-              {/* Panel */}
-              <div
-                onClick={e => e.stopPropagation()}
-                style={{
-                  width: 980, height: 620, borderRadius: 20, display: "flex", overflow: "hidden",
-                  background: c.bg, boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06)",
-                }}
-              >
-                {/* ── Sidebar ── */}
-                <div style={{ width: 210, background: c.surface, borderRight: `1px solid ${c.border}`, display: "flex", flexDirection: "column", padding: "28px 16px", flexShrink: 0 }}>
-                  <p style={{ fontSize: 18, fontWeight: 700, color: c.text, marginBottom: 20, paddingLeft: 8 }}>Library</p>
-                  <div style={{ height: 1, background: c.border, marginBottom: 16 }} />
+              <style>{`
+                @keyframes lp-in {
+                  from { opacity:0; transform:scale(0.97) translateY(10px); }
+                  to   { opacity:1; transform:scale(1) translateY(0); }
+                }
+                .lp-enter { animation: lp-in 0.28s cubic-bezier(.22,.68,0,1.1) both; }
+              `}</style>
+
+              {/* ── Top header: title + search + ESC ── */}
+              <div className="lp-enter" onClick={e => e.stopPropagation()}
+                style={{ paddingTop: 48, paddingBottom: 0, textAlign: "center", flexShrink: 0, position: "relative" }}>
+                <h1 style={{ fontSize: 30, fontWeight: 700, color: "rgba(255,255,255,0.92)", letterSpacing: "-0.5px", marginBottom: 18 }}>Library</h1>
+                {/* Centered search bar */}
+                <div style={{ maxWidth: 360, margin: "0 auto 0", display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 12, padding: "0 16px", height: 40 }}>
+                  <I d={ic.search} s={14} c="rgba(255,255,255,0.5)" />
+                  <input
+                    autoFocus
+                    value={launchSearch}
+                    onChange={e => setLaunchSearch(e.target.value)}
+                    placeholder="Search"
+                    style={{ background: "transparent", border: "none", outline: "none", color: "rgba(255,255,255,0.9)", fontSize: 14, flex: 1, textAlign: "center" }}
+                  />
+                  {launchSearch && (
+                    <button onClick={() => setLaunchSearch("")} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
+                      <I d={ic.close} s={12} c="rgba(255,255,255,0.5)" />
+                    </button>
+                  )}
+                </div>
+                {/* ESC close hint — top right */}
+                <button
+                  onClick={closeLaunchpad}
+                  style={{ position: "absolute", top: 48, right: 52, display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "5px 12px", cursor: "pointer" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.18)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.10)"; }}
+                >
+                  <I d={ic.close} s={12} c="rgba(255,255,255,0.7)" />
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", fontWeight: 500 }}>Esc</span>
+                </button>
+              </div>
+
+              {/* ── Body: sidebar + grid ── */}
+              <div className="lp-enter" onClick={e => e.stopPropagation()}
+                style={{ flex: 1, display: "flex", overflow: "hidden", padding: "32px 52px 44px", gap: 44, animationDelay: "0.04s" }}>
+
+                {/* Sidebar */}
+                <div style={{ width: 176, flexShrink: 0, display: "flex", flexDirection: "column", gap: 4, paddingTop: 4 }}>
                   {categories.map(cat => {
                     const isActive = launchCategory === cat.id;
                     return (
@@ -10710,68 +10744,57 @@ export default function AlternusOS() {
                         key={cat.id}
                         onClick={() => setLaunchCategory(cat.id)}
                         style={{
-                          display: "flex", alignItems: "center", gap: 10, padding: "9px 12px",
-                          borderRadius: 10, marginBottom: 2, border: "none", cursor: "pointer",
-                          background: isActive ? `${c.accent}22` : "transparent",
-                          color: isActive ? c.accent : c.textSec,
-                          fontWeight: isActive ? 600 : 400, fontSize: 13, textAlign: "left", width: "100%",
-                          transition: "all 0.15s",
+                          display: "flex", alignItems: "center", gap: 11,
+                          padding: "10px 14px", borderRadius: 10, border: "none", cursor: "pointer",
+                          background: isActive ? "rgba(255,255,255,0.18)" : "transparent",
+                          color: isActive ? "#fff" : "rgba(255,255,255,0.55)",
+                          fontWeight: isActive ? 700 : 400, fontSize: 14, textAlign: "left", width: "100%",
+                          transition: "background 0.15s, color 0.15s",
                         }}
-                        onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = `${c.border}88`; }}
-                        onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
+                        onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; e.currentTarget.style.color = "rgba(255,255,255,0.8)"; } }}
+                        onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.55)"; } }}
                       >
-                        <I d={cat.icon} s={15} c={isActive ? c.accent : c.textMuted} />
+                        <I d={cat.icon} s={16} c={isActive ? "#fff" : "rgba(255,255,255,0.45)"} />
                         {cat.label}
-                        {isActive && <div style={{ marginLeft: "auto", width: 6, height: 6, borderRadius: "50%", background: c.accent }} />}
                       </button>
                     );
                   })}
+
+                  {/* Divider + count */}
+                  <div style={{ height: 1, background: "rgba(255,255,255,0.10)", margin: "8px 0" }} />
+                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", paddingLeft: 14 }}>
+                    {filteredApps.length} {filteredApps.length === 1 ? "app" : "apps"}
+                  </p>
                 </div>
 
-                {/* ── Content ── */}
+                {/* Right column: filter row + grid */}
                 <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                  {/* Top bar */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "18px 24px 14px", borderBottom: `1px solid ${c.border}`, flexShrink: 0 }}>
-                    {/* Search */}
-                    <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, background: c.card, borderRadius: 10, padding: "0 14px", height: 36, border: `1px solid ${c.border}` }}>
-                      <I d={ic.search} s={14} c={c.textMuted} />
-                      <input
-                        autoFocus
-                        value={launchSearch}
-                        onChange={e => setLaunchSearch(e.target.value)}
-                        placeholder="Search applications..."
-                        style={{ background: "transparent", border: "none", outline: "none", color: c.text, fontSize: 13, flex: 1 }}
-                      />
-                      {launchSearch && (
-                        <button onClick={() => setLaunchSearch("")} style={{ background: "none", border: "none", cursor: "pointer", color: c.textMuted, padding: 0, display: "flex" }}>
-                          <I d={ic.close} s={12} c={c.textMuted} />
-                        </button>
-                      )}
-                    </div>
-                    {/* Count badge */}
-                    <span style={{ fontSize: 11, color: c.textMuted, whiteSpace: "nowrap" }}>
-                      {filteredApps.length} {filteredApps.length === 1 ? "app" : "apps"}
-                    </span>
-                    {/* Close */}
-                    <button
-                      onClick={closeLaunchpad}
-                      style={{ width: 30, height: 30, borderRadius: "50%", background: c.card, border: `1px solid ${c.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
-                      onMouseEnter={e => { e.currentTarget.style.background = c.border; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = c.card; }}
-                    >
-                      <I d={ic.close} s={13} c={c.textSec} />
-                    </button>
+                  {/* Filter / Sort row — top right */}
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginBottom: 20, flexShrink: 0 }}>
+                    {[
+                      { label: "Filter: All" },
+                      { label: "Sort: Recent" },
+                    ].map(btn => (
+                      <button key={btn.label}
+                        style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 8, padding: "6px 12px", color: "rgba(255,255,255,0.7)", fontSize: 12, cursor: "pointer", transition: "background 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.16)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.10)"; }}
+                      >
+                        {btn.label}
+                        <I d="M19 9l-7 7-7-7" s={11} c="rgba(255,255,255,0.5)" />
+                      </button>
+                    ))}
                   </div>
 
-                  {/* Grid */}
-                  <div style={{ flex: 1, overflowY: "auto", padding: "22px 24px" }}>
+                  {/* App grid — scrollable */}
+                  <div style={{ flex: 1, overflowY: "auto", scrollbarWidth: "none" }}>
                     {filteredApps.length === 0 ? (
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", color: c.textMuted, gap: 10 }}>
-                        <I d={ic.search} s={32} c={c.textMuted} />
-                        <p style={{ fontSize: 14 }}>No apps found</p>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "60%", gap: 12 }}>
+                        <I d={ic.search} s={36} c="rgba(255,255,255,0.2)" />
+                        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)" }}>No apps found</p>
                       </div>
                     ) : (
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "28px 16px" }}>
                         {filteredApps.map(app => {
                           const fillPath = icFill[app.id] ?? app.icon;
                           return (
@@ -10779,34 +10802,37 @@ export default function AlternusOS() {
                               key={app.id}
                               title={app.label}
                               onClick={() => { openWinWithAI(app.id); closeLaunchpad(); }}
-                              style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "14px 8px", borderRadius: 14, border: "none", background: "transparent", cursor: "pointer", transition: "background 0.15s" }}
+                              style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "12px 6px 10px", borderRadius: 16, border: "none", background: "transparent", cursor: "pointer", transition: "background 0.15s" }}
                               onMouseEnter={e => {
-                                e.currentTarget.style.background = `${c.surface}`;
-                                const icon = e.currentTarget.querySelector(".lp2-icon") as HTMLElement | null;
-                                if (icon) { icon.style.transform = "translateY(-3px) scale(1.07)"; icon.style.boxShadow = `0 8px 24px ${app.color}60`; }
+                                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                                const icon = e.currentTarget.querySelector(".lp3-icon") as HTMLElement | null;
+                                if (icon) { icon.style.transform = "translateY(-5px) scale(1.06)"; icon.style.boxShadow = `0 14px 32px ${app.color}70`; }
                               }}
                               onMouseLeave={e => {
                                 e.currentTarget.style.background = "transparent";
-                                const icon = e.currentTarget.querySelector(".lp2-icon") as HTMLElement | null;
-                                if (icon) { icon.style.transform = "translateY(0) scale(1)"; icon.style.boxShadow = `0 4px 14px ${app.color}40`; }
+                                const icon = e.currentTarget.querySelector(".lp3-icon") as HTMLElement | null;
+                                if (icon) { icon.style.transform = "translateY(0) scale(1)"; icon.style.boxShadow = `0 6px 18px ${app.color}45`; }
                               }}
                             >
                               <div
-                                className="lp2-icon relative overflow-hidden flex items-center justify-center"
+                                className="lp3-icon relative overflow-hidden flex items-center justify-center"
                                 style={{
-                                  width: 72, height: 72, borderRadius: 20, flexShrink: 0,
-                                  background: `linear-gradient(145deg, ${app.color}EE 0%, ${app.color}99 55%, ${app.color}66 100%)`,
-                                  border: `1px solid ${app.color}44`,
-                                  boxShadow: `0 4px 14px ${app.color}40, inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -1px 0 rgba(0,0,0,0.1)`,
-                                  transition: "all 0.18s ease",
+                                  width: 108, height: 108, borderRadius: 26, flexShrink: 0,
+                                  background: `linear-gradient(145deg, ${app.color}F0 0%, ${app.color}A0 55%, ${app.color}70 100%)`,
+                                  border: `1px solid ${app.color}50`,
+                                  boxShadow: `0 6px 18px ${app.color}45, inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(0,0,0,0.12)`,
+                                  transition: "all 0.20s cubic-bezier(.22,.68,0,1.1)",
                                 }}
                               >
-                                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", borderRadius: "20px 20px 60% 60%", background: "linear-gradient(180deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 100%)", pointerEvents: "none" }} />
-                                <div style={{ position: "relative", zIndex: 1, filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.25))" }}>
-                                  <I d={fillPath} s={30} f={true} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.75)"]} />
+                                {/* Specular sheen */}
+                                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", borderRadius: "26px 26px 60% 60%", background: "linear-gradient(180deg,rgba(255,255,255,0.28) 0%,rgba(255,255,255,0) 100%)", pointerEvents: "none" }} />
+                                <div style={{ position: "relative", zIndex: 1, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.28))" }}>
+                                  <I d={fillPath} s={42} f={true} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.76)"]} />
                                 </div>
                               </div>
-                              <span style={{ fontSize: 11, fontWeight: 500, color: c.textSec, maxWidth: 80, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>{app.label}</span>
+                              <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.82)", maxWidth: 108, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center", letterSpacing: "0.01em" }}>
+                                {app.label}
+                              </span>
                             </button>
                           );
                         })}
