@@ -9260,6 +9260,11 @@ export default function AlternusOS() {
         e.preventDefault();
         setWins(p => p.map(w => w.isOpen && !w.isMinimized ? { ...w, isMinimized: true } : w));
       }
+      // Ctrl+T — open Task Manager
+      if ((e.ctrlKey || e.metaKey) && e.key === "t") {
+        e.preventDefault();
+        openWinWithAI("tasks");
+      }
     };
     const handleKeyUp = (e: KeyboardEvent) => {
       if (e.key === "Alt" && showTaskSwitcher) {
