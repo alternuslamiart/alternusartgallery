@@ -8805,6 +8805,7 @@ export default function AlternusOS() {
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
+    { id: "ai", icon: ic.sparkle, label: "Alternus AI Agent", color: c.accent },
     { id: "terminal", icon: ic.terminal, label: "Terminal", color: c.success },
     { id: "code", icon: ic.code, label: "Code", color: c.purple },
     { id: "files", icon: ic.folder, label: "Files", color: c.warning },
