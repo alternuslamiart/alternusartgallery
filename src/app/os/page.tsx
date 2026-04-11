@@ -8850,6 +8850,7 @@ export default function AlternusOS() {
   const [spotlightQuery, setSpotlightQuery] = useState("");
   const [activeSpace, setActiveSpace] = useState(1);
   const [showSpacesView, setShowSpacesView] = useState(false);
+  const [showTaskView, setShowTaskView] = useState(false);
   const [draggedFile, setDraggedFile] = useState<string | null>(null);
   const [snapPreview, setSnapPreview] = useState<"left" | "right" | "top" | null>(null);
   const savePosTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -9226,6 +9227,7 @@ export default function AlternusOS() {
         setShowLaunchpad(false);
         setShowSpotlight(false);
         setShowSpacesView(false);
+        setShowTaskView(false);
         setShowApps(false);
         setShowNotifications(false);
         setShowWifiPanel(false);
@@ -9260,10 +9262,10 @@ export default function AlternusOS() {
         e.preventDefault();
         setWins(p => p.map(w => w.isOpen && !w.isMinimized ? { ...w, isMinimized: true } : w));
       }
-      // Ctrl+T — open Task Manager
+      // Ctrl+T — Task View (all open windows)
       if ((e.ctrlKey || e.metaKey) && e.key === "t") {
         e.preventDefault();
-        openWinWithAI("tasks");
+        setShowTaskView(p => !p);
       }
     };
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -9980,6 +9982,138 @@ export default function AlternusOS() {
             <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>Ctrl+1 · Ctrl+2 · Ctrl+3 to switch · ESC to dismiss</p>
           </div>
         )}
+
+        {/* ━━━━ Task View (Ctrl+T) ━━━━ */}
+        {showTaskView && (() => {
+          const openW = wins.filter(w => w.isOpen);
+          const topZ = Math.max(...openW.map(w => w.zIndex), 0);
+          const closeView = () => setShowTaskView(false);
+          return (
+            <div
+              className="absolute inset-0 z-[300] flex flex-col"
+              style={{ backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", background: "rgba(0,0,0,0.60)" }}
+              onClick={closeView}
+            >
+              <style>{`
+                @keyframes tv-in {
+                  from { opacity:0; transform:scale(0.94) translateY(16px); }
+                  to   { opacity:1; transform:scale(1) translateY(0); }
+                }
+                @keyframes tv-card-in {
+                  from { opacity:0; transform:translateY(20px) scale(0.95); }
+                  to   { opacity:1; transform:translateY(0) scale(1); }
+                }
+                .tv-root  { animation: tv-in 0.26s cubic-bezier(.22,.68,0,1.1) both; }
+                .tv-card  { animation: tv-card-in 0.28s cubic-bezier(.22,.68,0,1.1) both; }
+              `}</style>
+
+              {/* Header */}
+              <div className="tv-root" style={{ textAlign: "center", paddingTop: 44, paddingBottom: 0, flexShrink: 0 }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.45)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6 }}>Task View</p>
+                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.28)" }}>
+                  {openW.length === 0 ? "No open windows" : `${openW.length} window${openW.length !== 1 ? "s" : ""} open`} · Ctrl+T or Esc to close
+                </p>
+              </div>
+
+              {/* Window cards grid */}
+              <div
+                onClick={e => e.stopPropagation()}
+                style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "32px 60px 48px" }}
+              >
+                {openW.length === 0 ? (
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+                    <div style={{ width: 64, height: 64, borderRadius: 20, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <I d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" s={28} c="rgba(255,255,255,0.25)" />
+                    </div>
+                    <p style={{ fontSize: 14, color: "rgba(255,255,255,0.35)" }}>No windows open</p>
+                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)" }}>Open an app from the dock or All Apps</p>
+                  </div>
+                ) : (
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: openW.length <= 3 ? `repeat(${openW.length}, 260px)` : openW.length <= 6 ? "repeat(3, 260px)" : "repeat(4, 230px)",
+                    gap: 20,
+                    justifyContent: "center",
+                  }}>
+                    {openW.sort((a, b) => b.zIndex - a.zIndex).map((w, i) => {
+                      const app = dockApps.find(a => a.id === w.id);
+                      const color = app?.color ?? c.accent;
+                      const icon = app?.icon ?? ic.sparkle;
+                      const isActive = w.zIndex === topZ;
+                      const isMinimized = w.isMinimized;
+                      return (
+                        <div
+                          key={w.id}
+                          className="tv-card"
+                          style={{ animationDelay: `${i * 0.04}s`, cursor: "pointer" }}
+                          onClick={() => {
+                            if (isMinimized) setWins(p => p.map(ww => ww.id === w.id ? { ...ww, isMinimized: false } : ww));
+                            focusWin(w.id);
+                            closeView();
+                          }}
+                        >
+                          {/* Preview card */}
+                          <div style={{
+                            borderRadius: 14,
+                            overflow: "hidden",
+                            border: `2px solid ${isActive ? c.accent : "rgba(255,255,255,0.12)"}`,
+                            boxShadow: isActive ? `0 0 0 1px ${c.accent}40, 0 16px 40px rgba(0,0,0,0.45)` : "0 8px 28px rgba(0,0,0,0.4)",
+                            transition: "transform 0.15s, box-shadow 0.15s",
+                            background: c.bg,
+                            position: "relative",
+                          }}
+                            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px) scale(1.02)"; e.currentTarget.style.boxShadow = isActive ? `0 0 0 1px ${c.accent}60, 0 22px 48px rgba(0,0,0,0.55)` : "0 18px 44px rgba(0,0,0,0.55)"; }}
+                            onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = isActive ? `0 0 0 1px ${c.accent}40, 0 16px 40px rgba(0,0,0,0.45)` : "0 8px 28px rgba(0,0,0,0.4)"; }}
+                          >
+                            {/* Fake window preview */}
+                            <div style={{ height: 22, background: c.surface, display: "flex", alignItems: "center", paddingLeft: 10, gap: 5, borderBottom: `1px solid ${c.border}` }}>
+                              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#FF5F57" }} />
+                              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#FFBD2E" }} />
+                              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#28CA41" }} />
+                              <span style={{ fontSize: 9, color: c.textMuted, marginLeft: 6, fontWeight: 500 }}>{w.title}</span>
+                            </div>
+                            {/* App visual area */}
+                            <div style={{ height: 140, background: `linear-gradient(135deg, ${color}14 0%, ${c.bg} 60%)`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+                              {/* Background pattern */}
+                              <div style={{ position: "absolute", inset: 0, backgroundImage: `radial-gradient(circle at 30% 40%, ${color}18 0%, transparent 60%)`, pointerEvents: "none" }} />
+                              <div style={{ width: 52, height: 52, borderRadius: 16, background: `linear-gradient(145deg, ${color}EE, ${color}77)`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 6px 20px ${color}50`, position: "relative", zIndex: 1 }}>
+                                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", borderRadius: "16px 16px 60% 60%", background: "linear-gradient(180deg,rgba(255,255,255,0.25) 0%,rgba(255,255,255,0) 100%)" }} />
+                                <I d={icon} s={22} f c={`${color}00`} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.75)"]} />
+                              </div>
+                              {/* Minimized badge */}
+                              {isMinimized && (
+                                <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.5)", borderRadius: 5, padding: "2px 6px" }}>
+                                  <span style={{ fontSize: 8, color: "rgba(255,255,255,0.6)" }}>Minimized</span>
+                                </div>
+                              )}
+                            </div>
+                            {/* Active glow bar */}
+                            {isActive && <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${c.accent}, transparent)` }} />}
+                          </div>
+
+                          {/* Label + close */}
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 8, padding: "0 4px" }}>
+                            <span style={{ fontSize: 11, fontWeight: isActive ? 600 : 400, color: isActive ? "#fff" : "rgba(255,255,255,0.65)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 180 }}>
+                              {w.title}
+                            </span>
+                            <button
+                              onClick={e => { e.stopPropagation(); closeWinWithAI(w.id); if (openW.length === 1) closeView(); }}
+                              style={{ width: 18, height: 18, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.12s" }}
+                              onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,0.7)"; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; }}
+                            >
+                              <I d={ic.close} s={9} c="#fff" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ━━━━ Search Button — top center ━━━━ */}
         <button
