@@ -7687,7 +7687,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 }) {
   const [msgs, setMsgs] = useState<AgentMessage[]>([{
     id: "welcome", role: "agent", timestamp: new Date(),
-    text: "Përshëndetje! Unë jam **Alternus AI Agent** — asistenti juaj inteligjent i OS-it.\n\nMund të kryej veprime reale si:\n- 📂 Hap & menaxho skedarë\n- 📧 Shkruaj & dërgo email\n- 📄 Krijo & redakto dokumente\n- ⚙️ Ndrysho cilësimet e sistemit\n- 🖥️ Hap aplikacione\n- 💻 Ekzekuto komanda\n\nÇfarë dëshironi të bëj sot?",
+    text: "Hi! I'm **Alternus AI Agent** — your intelligent OS assistant.\n\nI can perform real actions such as:\n- 📂 Open & manage files\n- 📧 Draft & send email\n- 📄 Create & edit documents\n- ⚙️ Change system settings\n- 🖥️ Launch applications\n- 💻 Run terminal commands\n\nWhat would you like me to do today?",
   }]);
   const [input, setInput] = useState("");
   const [isThinking, setIsThinking] = useState(false);
@@ -7699,14 +7699,14 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
 
   const QUICK_ACTIONS = [
-    { label: "📂 Hap Files", task: "Hap aplikacionin Files" },
-    { label: "📧 Draft Email", task: "Shkruaj një email profesional për ekipin rreth progresit të projektit" },
-    { label: "📄 Krijo Dokument", task: "Krijo një dokument të ri Word me strukturë profesionale" },
-    { label: "🌙 Dark Mode", task: "Kalo në dark mode" },
-    { label: "☀️ Light Mode", task: "Kalo në light mode" },
-    { label: "🖥️ Ndrysho Wallpaper", task: "Ndrysho wallpaperin në OSwp 2" },
-    { label: "💻 Terminal", task: "Hap terminalin dhe kontrollo statusin e sistemit" },
-    { label: "📊 Dashboard", task: "Hap dashboardin e biznesit" },
+    { label: "📂 Open Files", task: "Open the Files application" },
+    { label: "📧 Draft Email", task: "Write a professional email to the team about the project progress" },
+    { label: "📄 Create Document", task: "Create a new Word document with a professional structure" },
+    { label: "🌙 Dark Mode", task: "Switch to dark mode" },
+    { label: "☀️ Light Mode", task: "Switch to light mode" },
+    { label: "🖥️ Change Wallpaper", task: "Change the wallpaper to OSwp 2" },
+    { label: "💻 Terminal", task: "Open the terminal and check the system status" },
+    { label: "📊 Dashboard", task: "Open the business dashboard" },
   ];
 
   const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
@@ -7722,15 +7722,15 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
   const classify = (text: string): AgentActionType => {
     const t = text.toLowerCase();
-    if (/email|mail|dërgoj|shkruaj.*email|message/.test(t)) return "draftEmail";
-    if (/dokument|word|docx|shkruaj.*raport|krijo.*dok/.test(t)) return "createDoc";
-    if (/dark|light|theme|temë|mënyrë/.test(t)) return "changeTheme";
-    if (/wallpaper|sfond|prapav/.test(t)) return "changeWallpaper";
-    if (/skedar|file|files|dokument.*lexo|hap.*fajl/.test(t)) return "openApp";
-    if (/terminal|komandë|komand|run|exec/.test(t)) return "runCommand";
-    if (/cilësi|setting|konfig|ndrysho.*sistem/.test(t)) return "changeSetting";
-    if (/kërko|search|gjej|find/.test(t)) return "search";
-    if (/takim|meeting|orare|schedule|kalendar/.test(t)) return "schedule";
+    if (/email|mail|send.*email|draft.*email|write.*email|message/.test(t)) return "draftEmail";
+    if (/document|word|docx|write.*report|create.*doc/.test(t)) return "createDoc";
+    if (/dark|light|theme|appearance/.test(t)) return "changeTheme";
+    if (/wallpaper|background/.test(t)) return "changeWallpaper";
+    if (/file|files|open.*file|manage.*file/.test(t)) return "openApp";
+    if (/terminal|command|run|exec|shell/.test(t)) return "runCommand";
+    if (/setting|config|preference|change.*system/.test(t)) return "changeSetting";
+    if (/search|find|look.*for|query/.test(t)) return "search";
+    if (/meeting|schedule|calendar|appointment/.test(t)) return "schedule";
     return "openApp";
   };
 
@@ -7746,47 +7746,47 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
     if (actionType === "draftEmail") {
       steps = [
-        { label: "Analizoj kërkesën tuaj", status: "pending" },
-        { label: "Gjeneroj përmbajtjen e emailit", status: "pending" },
-        { label: "Formatoj email-in profesional", status: "pending" },
-        { label: "Email gati për dërgim", status: "pending" },
+        { label: "Analyzing your request", status: "pending" },
+        { label: "Generating email content", status: "pending" },
+        { label: "Formatting professional email", status: "pending" },
+        { label: "Email ready to send", status: "pending" },
       ];
     } else if (actionType === "createDoc") {
       steps = [
-        { label: "Krijon strukturën e dokumentit", status: "pending" },
-        { label: "Gjeneroj përmbajtjen", status: "pending" },
-        { label: "Apliko formatim profesional", status: "pending" },
-        { label: "Ruis si DOCX", status: "pending" },
+        { label: "Building document structure", status: "pending" },
+        { label: "Generating content", status: "pending" },
+        { label: "Applying professional formatting", status: "pending" },
+        { label: "Saving as DOCX", status: "pending" },
       ];
     } else if (actionType === "changeTheme") {
       steps = [
-        { label: "Lexoj preferencën e temës", status: "pending" },
-        { label: "Apliko ndryshimin e temës", status: "pending" },
-        { label: "Rifreshoj ndërfaqen", status: "pending" },
+        { label: "Reading theme preference", status: "pending" },
+        { label: "Applying theme change", status: "pending" },
+        { label: "Refreshing interface", status: "pending" },
       ];
     } else if (actionType === "changeWallpaper") {
       steps = [
-        { label: "Identifikoj wallpaperin e kërkuar", status: "pending" },
-        { label: "Ngarkoj wallpaperin", status: "pending" },
-        { label: "Apliko në desktop", status: "pending" },
+        { label: "Identifying requested wallpaper", status: "pending" },
+        { label: "Loading wallpaper", status: "pending" },
+        { label: "Applying to desktop", status: "pending" },
       ];
     } else if (actionType === "runCommand") {
       steps = [
-        { label: "Analizoj komandën", status: "pending" },
-        { label: "Hap terminalin", status: "pending" },
-        { label: "Ekzekutoj komandën", status: "pending" },
-        { label: "Kthej rezultatin", status: "pending" },
+        { label: "Analyzing command", status: "pending" },
+        { label: "Opening terminal", status: "pending" },
+        { label: "Executing command", status: "pending" },
+        { label: "Returning result", status: "pending" },
       ];
     } else {
-      const appLabel = /files|skedar|fajl/.test(t) ? "Files" : /mail|email/.test(t) ? "Mail" : /dashboard/.test(t) ? "Dashboard" : /terminal/.test(t) ? "Terminal" : /settings|cilësi/.test(t) ? "Settings" : /notes|shënim/.test(t) ? "Notes" : /browser|web/.test(t) ? "Browser" : /calendar|takim/.test(t) ? "Calendar" : "AI Hub";
+      const appLabel = /files|file/.test(t) ? "Files" : /mail|email/.test(t) ? "Mail" : /dashboard/.test(t) ? "Dashboard" : /terminal/.test(t) ? "Terminal" : /settings/.test(t) ? "Settings" : /notes/.test(t) ? "Notes" : /browser|web/.test(t) ? "Browser" : /calendar/.test(t) ? "Calendar" : "AI Hub";
       steps = [
-        { label: `Identifikoj aplikacionin: ${appLabel}`, status: "pending" },
-        { label: `Hap ${appLabel}`, status: "pending" },
+        { label: `Identifying application: ${appLabel}`, status: "pending" },
+        { label: `Opening ${appLabel}`, status: "pending" },
       ];
     }
 
     // Add agent message with steps immediately
-    const agentMsg: AgentMessage = { id: msgId, role: "agent", timestamp: new Date(), text: "Duke punuar...", steps };
+    const agentMsg: AgentMessage = { id: msgId, role: "agent", timestamp: new Date(), text: "Working...", steps };
     setMsgs(prev => [...prev, agentMsg]);
     setIsThinking(true);
 
@@ -7797,7 +7797,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
       // REAL ACTIONS
       if (actionType === "changeTheme" && i === 1) {
-        const newMode: ThemeMode = /light|ndriçim|e bardhë/.test(t) ? "light" : "dark";
+        const newMode: ThemeMode = /light/.test(t) ? "light" : "dark";
         setMode(newMode);
       }
       if (actionType === "changeWallpaper" && i === 1) {
@@ -7805,7 +7805,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
         setWallpaper(wpNum ? parseInt(wpNum) : Math.floor(Math.random() * 5) + 1);
       }
       if (actionType === "openApp" && i === steps.length - 1) {
-        const appId: WinId = /files|skedar/.test(t) ? "files" : /mail|email/.test(t) ? "mail" : /dashboard/.test(t) ? "dashboard" : /terminal/.test(t) ? "terminal" : /settings/.test(t) ? "settings" : /notes/.test(t) ? "notes" : /browser/.test(t) ? "browser" : /calendar/.test(t) ? "calendar" : /tasks/.test(t) ? "tasks" : /music/.test(t) ? "music" : "aihub";
+        const appId: WinId = /files|file/.test(t) ? "files" : /mail|email/.test(t) ? "mail" : /dashboard/.test(t) ? "dashboard" : /terminal/.test(t) ? "terminal" : /settings/.test(t) ? "settings" : /notes/.test(t) ? "notes" : /browser/.test(t) ? "browser" : /calendar/.test(t) ? "calendar" : /tasks/.test(t) ? "tasks" : /music/.test(t) ? "music" : "aihub";
         onOpenApp(appId);
       }
       if (actionType === "runCommand" && i === 1) onOpenApp("terminal");
@@ -7815,46 +7815,46 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
     // Build workspace content
     if (actionType === "draftEmail") {
-      const subject = /projekt/.test(t) ? "Përditësim i Projektit" : /raport/.test(t) ? "Raport Javor" : /takm|meeting/.test(t) ? "Ftesë për Takim" : "Komunikim Profesional";
+      const subject = /project/.test(t) ? "Project Update" : /report/.test(t) ? "Weekly Report" : /meeting/.test(t) ? "Meeting Invitation" : "Professional Communication";
       workspace = {
         type: "email", title: `📧 Draft: ${subject}`,
-        content: `Nga: alternus@alternusart.com\nTe: ekipi@alternusart.com\nCC: menaxheri@alternusart.com\nTema: ${subject}\n\n---\n\nI nderuar ekip,\n\nShpresoj që ky email ju gjen mirë.\n\n${/projekt/.test(t) ? "Dëshiroj t'ju informoj rreth progresit të fundit të projektit. Kemi arritur objektivat kryesore të kësaj jave dhe jemi në rrugë të mirë për të përmbushur afatin e vendosur.\n\nPikat kryesore:\n• Faza e parë e zhvillimit: 85% e kompletuar\n• Testimi i moduleve: Në progres\n• Dokumentacioni: Përditësuar\n\nHapi tjetër: Takim rishikimi të premten." : "Dëshiroj të ndaj me ju disa informacione të rëndësishme rreth punës sonë të përbashkët.\n\nJu lutem rishikoni dokumentin e bashkangjitur dhe kthehuni me komentet tuaja."}\n\nFaleminderit për bashkëpunimin tuaj të vazhdueshëm.\n\nMe respekt,\nAlternus AI Agent\nAlternus Art Gallery`,
+        content: `From: alternus@alternusart.com\nTo: team@alternusart.com\nCC: manager@alternusart.com\nSubject: ${subject}\n\n---\n\nHi team,\n\nI hope this email finds you well.\n\n${/project/.test(t) ? "I wanted to update you on the latest project progress. We've hit the main objectives for this week and we're on track to meet the agreed deadline.\n\nKey points:\n• Development phase one: 85% complete\n• Module testing: In progress\n• Documentation: Up to date\n\nNext step: Review meeting on Friday." : "I want to share some important information about our ongoing work.\n\nPlease review the attached document and get back to me with your comments."}\n\nThanks for your continued collaboration.\n\nBest regards,\nAlternus AI Agent\nAlternus Art Gallery`,
       };
-      finalText = `✅ Email-i është gati!\n\nKam hartuar një email profesional me:\n- **Temë**: ${subject}\n- **Destinacionet**: ekipi + menaxheri\n- **Formatim** standard korporativ\n\nMund ta redaktoni, kopjoni ose dërgoni direkt.`;
+      finalText = `✅ Email ready!\n\nI've drafted a professional email with:\n- **Subject**: ${subject}\n- **Recipients**: team + manager\n- **Formatting**: standard corporate\n\nYou can edit, copy, or send it directly.`;
     } else if (actionType === "createDoc") {
-      const docTitle = /raport/.test(t) ? "Raport Mujor" : /propozim/.test(t) ? "Propozim Projekti" : /plan/.test(t) ? "Plan Strategjik" : "Dokument i Ri";
+      const docTitle = /report/.test(t) ? "Monthly Report" : /proposal/.test(t) ? "Project Proposal" : /plan/.test(t) ? "Strategic Plan" : "New Document";
       workspace = {
         type: "doc", title: `📄 ${docTitle}.docx`,
-        content: `# ${docTitle}\n\n**Data:** ${new Date().toLocaleDateString("sq-AL")}\n**Autori:** Alternus AI Agent\n**Versioni:** 1.0\n\n---\n\n## 1. Hyrje\n\nKy dokument është hartuar automatikisht nga Alternus AI Agent bazuar në kërkesën tuaj. Përmban strukturë profesionale dhe mund të redaktohet sipas nevojave tuaja.\n\n## 2. Qëllimi\n\nQëllimi kryesor i këtij dokumenti është të ofrojë një bazë solide për punën tuaj. Struktura e propozuar ndjek standardet ndërkombëtare të shkrimit profesional.\n\n## 3. Përmbajtja Kryesore\n\n### 3.1 Seksioni i Parë\nShkruani detajet e seksionit të parë këtu.\n\n### 3.2 Seksioni i Dytë  \nShkruani detajet e seksionit të dytë këtu.\n\n## 4. Konkluzione\n\nPërmbledhja e pikave kryesore dhe hapat e ardhshëm.\n\n## 5. Rekomandime\n\n- Rekomandimi i parë\n- Rekomandimi i dytë\n- Rekomandimi i tretë\n\n---\n*Gjeneruar nga Alternus AI Agent · ${new Date().toLocaleString("sq-AL")}*`,
+        content: `# ${docTitle}\n\n**Date:** ${new Date().toLocaleDateString("en-US")}\n**Author:** Alternus AI Agent\n**Version:** 1.0\n\n---\n\n## 1. Introduction\n\nThis document was generated automatically by Alternus AI Agent based on your request. It contains a professional structure and can be edited to fit your needs.\n\n## 2. Purpose\n\nThe main purpose of this document is to provide a solid foundation for your work. The proposed structure follows international standards for professional writing.\n\n## 3. Main Content\n\n### 3.1 First Section\nWrite the details of the first section here.\n\n### 3.2 Second Section  \nWrite the details of the second section here.\n\n## 4. Conclusions\n\nSummary of the key points and next steps.\n\n## 5. Recommendations\n\n- First recommendation\n- Second recommendation\n- Third recommendation\n\n---\n*Generated by Alternus AI Agent · ${new Date().toLocaleString("en-US")}*`,
       };
-      finalText = `✅ Dokumenti është krijuar!\n\n**${docTitle}.docx** është gati me:\n- Strukturë profesionale 5 seksione\n- Formatim standard korporativ\n- Data dhe metadata automatike\n\nMund ta hapni në Word ose ta eksportoni.`;
+      finalText = `✅ Document created!\n\n**${docTitle}.docx** is ready with:\n- Professional 5-section structure\n- Standard corporate formatting\n- Automatic date and metadata\n\nYou can open it in Word or export it.`;
       onOpenApp("word");
     } else if (actionType === "changeTheme") {
-      const newMode: ThemeMode = /light|ndriçim|e bardhë/.test(t) ? "light" : "dark";
+      const newMode: ThemeMode = /light/.test(t) ? "light" : "dark";
       workspace = {
-        type: "settings", title: "⚙️ Cilësimet e Temës",
-        content: `VEPRIMI I KRYER:\n────────────────\nTema: ${newMode === "dark" ? "🌙 Dark Mode" : "☀️ Light Mode"}\nStatusi: ✅ Aplikuar me sukses\nKoha: ${new Date().toLocaleTimeString()}\n\nNDRYSHIMET:\n• Interface: ${newMode}\n• Sfondi: ${newMode === "dark" ? "#1C1D22" : "#F8F9FA"}\n• Teksti: ${newMode === "dark" ? "#F0F2F8" : "#1A1A2E"}\n• Ikonat: Azhurnuar\n\nTë gjitha aplikacionet e hapura janë azhurnuar automatikisht.`,
+        type: "settings", title: "⚙️ Theme Settings",
+        content: `ACTION PERFORMED:\n────────────────\nTheme: ${newMode === "dark" ? "🌙 Dark Mode" : "☀️ Light Mode"}\nStatus: ✅ Applied successfully\nTime: ${new Date().toLocaleTimeString()}\n\nCHANGES:\n• Interface: ${newMode}\n• Background: ${newMode === "dark" ? "#1C1D22" : "#F8F9FA"}\n• Text: ${newMode === "dark" ? "#F0F2F8" : "#1A1A2E"}\n• Icons: Updated\n\nAll open applications have been updated automatically.`,
       };
-      finalText = `✅ Tema u ndryshua!\n\nKam aplikuar **${newMode === "dark" ? "Dark Mode 🌙" : "Light Mode ☀️"}** në të gjithë sistemin.\n\nNdryshimi është i menjëhershëm dhe do të ruhet.`;
+      finalText = `✅ Theme changed!\n\nI've applied **${newMode === "dark" ? "Dark Mode 🌙" : "Light Mode ☀️"}** across the entire system.\n\nThe change is immediate and will be persisted.`;
     } else if (actionType === "changeWallpaper") {
       workspace = {
-        type: "settings", title: "🖼️ Wallpaper i Ri",
-        content: `VEPRIMI I KRYER:\n────────────────\nWallpaper: OSwp ${wallpaper}\nStatusi: ✅ Aplikuar\nKoha: ${new Date().toLocaleTimeString()}\n\nWallpaperet e disponueshme:\n• Default (0) - Ngjyra OS\n• OSwp 1 - Gradient Vjollcë\n• OSwp 2 - Ocean Blue\n• OSwp 3 - Flow Aurora\n• OSwp 4 - Emerald Green\n• OSwp 5 - Sunset Rose\n\nFolësi aktual: OSwp ${wallpaper}`,
+        type: "settings", title: "🖼️ New Wallpaper",
+        content: `ACTION PERFORMED:\n────────────────\nWallpaper: OSwp ${wallpaper}\nStatus: ✅ Applied\nTime: ${new Date().toLocaleTimeString()}\n\nAvailable wallpapers:\n• Default (0) - OS Color\n• OSwp 1 - Purple Gradient\n• OSwp 2 - Ocean Blue\n• OSwp 3 - Flow Aurora\n• OSwp 4 - Emerald Green\n• OSwp 5 - Sunset Rose\n\nCurrent selection: OSwp ${wallpaper}`,
       };
-      finalText = `✅ Wallpaperi u ndryshua!\n\nKam aplikuar **OSwp ${wallpaper}** në desktop.\n\nDëshironi të provoni wallpaper tjetër? Thoni numrin (1-5).`;
+      finalText = `✅ Wallpaper changed!\n\nI've applied **OSwp ${wallpaper}** to the desktop.\n\nWant to try a different wallpaper? Just say the number (1-5).`;
     } else if (actionType === "runCommand") {
       workspace = {
         type: "terminal", title: "💻 Terminal Output",
         content: `$ alternus-agent --status\n> Initializing agent...\n> Agent v2.0.0 active ✓\n\n$ system-info\nOS: Alternus OS v3.0\nCPU: 12 cores @ 67% load\nRAM: 8.2 GB / 16 GB used\nDisk: 278 GB / 512 GB\nGPU: NVIDIA A100 82%\nNetwork: AlternusNet 5GHz ✓\nUptime: 14h 22m\n\n$ agent-tasks --list\n→ Task queue: 0 pending\n→ Last task: ${userText.slice(0, 30)}...\n→ Status: Completed ✓\n\n$ _`,
       };
-      finalText = `✅ Komanda u ekzekutua!\n\nStatusi i sistemit:\n- **CPU**: 67% · **RAM**: 8.2/16 GB\n- **Disk**: 278/512 GB · **Network**: AlternusNet ✓\n- **GPU**: 82% · **Uptime**: 14h 22m\n\nTerminali është hapur për komanda shtesë.`;
+      finalText = `✅ Command executed!\n\nSystem status:\n- **CPU**: 67% · **RAM**: 8.2/16 GB\n- **Disk**: 278/512 GB · **Network**: AlternusNet ✓\n- **GPU**: 82% · **Uptime**: 14h 22m\n\nTerminal is open for additional commands.`;
     } else {
-      const appLabel = /files|skedar/.test(t) ? "Files" : /mail|email/.test(t) ? "Mail" : /dashboard/.test(t) ? "Dashboard" : /terminal/.test(t) ? "Terminal" : /settings/.test(t) ? "Settings" : "aplikacionin";
+      const appLabel = /files|file/.test(t) ? "Files" : /mail|email/.test(t) ? "Mail" : /dashboard/.test(t) ? "Dashboard" : /terminal/.test(t) ? "Terminal" : /settings/.test(t) ? "Settings" : "the application";
       workspace = {
-        type: "info", title: `🖥️ ${appLabel} u hap`,
-        content: `VEPRIMI I KRYER:\n────────────────\nAplikacioni: ${appLabel}\nStatusi: ✅ Hapur\nKoha: ${new Date().toLocaleTimeString()}\n\nShikoni dritaren aktive.\nPërdorni Ctrl+A për veprime të tjera AI.`,
+        type: "info", title: `🖥️ ${appLabel} opened`,
+        content: `ACTION PERFORMED:\n────────────────\nApplication: ${appLabel}\nStatus: ✅ Opened\nTime: ${new Date().toLocaleTimeString()}\n\nCheck the active window.\nUse Ctrl+A for additional AI actions.`,
       };
-      finalText = `✅ **${appLabel}** u hap!\n\nDritarja është aktive. A dëshironi të kryej ndonjë veprim specifik brenda tij?`;
+      finalText = `✅ **${appLabel}** opened!\n\nThe window is active. Would you like me to perform any specific action inside it?`;
     }
 
     // Try real API call for richer response
@@ -7914,7 +7914,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               <button key={cap} onClick={() => setAgentCapability(cap)}
                 className="px-2.5 py-1 rounded-lg text-[9px] font-semibold capitalize flex-shrink-0 transition-all"
                 style={{ background: agentCapability === cap ? "#7C3AED18" : "transparent", color: agentCapability === cap ? "#7C3AED" : c.textMuted, border: agentCapability === cap ? "1px solid #7C3AED30" : "1px solid transparent" }}>
-                {cap === "all" ? "⚡ Të gjitha" : cap === "files" ? "📂 Skedarë" : cap === "email" ? "📧 Email" : cap === "docs" ? "📄 Docs" : "⚙️ Settings"}
+                {cap === "all" ? "⚡ All" : cap === "files" ? "📂 Files" : cap === "email" ? "📧 Email" : cap === "docs" ? "📄 Docs" : "⚙️ Settings"}
               </button>
             ))}
           </div>
@@ -7971,7 +7971,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                   </button>
                 )}
                 <p className="text-[8px] mt-0.5 px-1" style={{ color: c.textMuted }}>
-                  {m.timestamp.toLocaleTimeString("sq-AL", { hour: "2-digit", minute: "2-digit" })}
+                  {m.timestamp.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>
             </div>
@@ -7992,7 +7992,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
         {/* Quick actions */}
         <div className="flex-shrink-0 px-3 pb-2" style={{ borderTop: `1px solid ${c.border}` }}>
           <div className="pt-2 flex flex-wrap gap-1">
-            {QUICK_ACTIONS.filter(qa => agentCapability === "all" || (agentCapability === "email" && qa.label.includes("Email")) || (agentCapability === "docs" && qa.label.includes("Dokument")) || (agentCapability === "files" && qa.label.includes("Files")) || (agentCapability === "settings" && (qa.label.includes("Mode") || qa.label.includes("Wallpaper")))).map(qa => (
+            {QUICK_ACTIONS.filter(qa => agentCapability === "all" || (agentCapability === "email" && qa.label.includes("Email")) || (agentCapability === "docs" && qa.label.includes("Document")) || (agentCapability === "files" && qa.label.includes("Files")) || (agentCapability === "settings" && (qa.label.includes("Mode") || qa.label.includes("Wallpaper")))).map(qa => (
               <button key={qa.label} onClick={() => send(qa.task)}
                 className="px-2 py-1 rounded-lg text-[9px] font-medium transition-all flex-shrink-0"
                 style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}
@@ -8009,7 +8009,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           <div className="flex items-center gap-2 px-3 py-2 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
             <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-              placeholder="Shkruani një detyrë për agjentin..." disabled={isThinking}
+              placeholder="Type a task for the agent..." disabled={isThinking}
               className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: c.text }} />
             <button onClick={() => send()} disabled={isThinking || !input.trim()}
               className="w-7 h-7 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
@@ -8017,7 +8017,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               <I d={ic.send} s={12} c={input.trim() && !isThinking ? "#fff" : c.textMuted} />
             </button>
           </div>
-          <p className="text-[8px] text-center mt-1" style={{ color: c.textMuted }}>Enter → dërgo · Shift+Enter → rresht i ri</p>
+          <p className="text-[8px] text-center mt-1" style={{ color: c.textMuted }}>Enter → send · Shift+Enter → new line</p>
         </div>
       </div>
 
@@ -8047,7 +8047,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
             <div className="flex items-center gap-2 px-4 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
               {activeWorkspace.type === "email" && (
                 <>
-                  {[{ label: "📤 Dërgo", primary: true }, { label: "💾 Ruaj Draft" }, { label: "📋 Kopjo" }, { label: "🗑️ Fshi" }].map(({ label, primary }) => (
+                  {[{ label: "📤 Send", primary: true }, { label: "💾 Save Draft" }, { label: "📋 Copy" }, { label: "🗑️ Delete" }].map(({ label, primary }) => (
                     <button key={label} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
                       style={{ background: primary ? c.accent : c.cardAlt, color: primary ? "#fff" : c.textSec, border: `1px solid ${primary ? "transparent" : c.border}` }}>
                       {label}
@@ -8057,7 +8057,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               )}
               {activeWorkspace.type === "doc" && (
                 <>
-                  {[{ label: "💾 Ruaj DOCX", primary: true }, { label: "📤 Eksporto PDF" }, { label: "✏️ Redakto" }, { label: "📋 Kopjo" }].map(({ label, primary }) => (
+                  {[{ label: "💾 Save DOCX", primary: true }, { label: "📤 Export PDF" }, { label: "✏️ Edit" }, { label: "📋 Copy" }].map(({ label, primary }) => (
                     <button key={label} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
                       style={{ background: primary ? c.accent : c.cardAlt, color: primary ? "#fff" : c.textSec, border: `1px solid ${primary ? "transparent" : c.border}` }}>
                       {label}
@@ -8067,7 +8067,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               )}
               {(activeWorkspace.type === "terminal" || activeWorkspace.type === "info" || activeWorkspace.type === "settings") && (
                 <>
-                  {[{ label: "📋 Kopjo" }, { label: "💾 Ruis Log" }, { label: "🔄 Rifresko" }].map(({ label }) => (
+                  {[{ label: "📋 Copy" }, { label: "💾 Save Log" }, { label: "🔄 Refresh" }].map(({ label }) => (
                     <button key={label} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
                       style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}>
                       {label}
@@ -8092,15 +8092,15 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               <I d={ic.sparkle} s={36} c="#7C3AED" f />
             </div>
             <div className="text-center">
-              <p className="text-sm font-bold mb-1" style={{ color: c.text }}>Workspace i Agjentit</p>
-              <p className="text-[11px] max-w-xs" style={{ color: c.textMuted }}>Rezultatet e veprimeve të agjentit do të shfaqen këtu — email-e, dokumente, komanda terminali, ndryshime cilësimesh.</p>
+              <p className="text-sm font-bold mb-1" style={{ color: c.text }}>Agent Workspace</p>
+              <p className="text-[11px] max-w-xs" style={{ color: c.textMuted }}>The results of agent actions will appear here — emails, documents, terminal commands, and setting changes.</p>
             </div>
             <div className="grid grid-cols-2 gap-2 w-full max-w-xs mt-2">
               {[
-                { icon: "📧", label: "Email", action: "Shkruaj një email profesional" },
-                { icon: "📄", label: "Dokument", action: "Krijo një dokument të ri" },
-                { icon: "⚙️", label: "Settings", action: "Ndrysho cilësimet e sistemit" },
-                { icon: "💻", label: "Terminal", action: "Kontrollo statusin e sistemit" },
+                { icon: "📧", label: "Email", action: "Write a professional email" },
+                { icon: "📄", label: "Document", action: "Create a new document" },
+                { icon: "⚙️", label: "Settings", action: "Change the system settings" },
+                { icon: "💻", label: "Terminal", action: "Check the system status" },
               ].map(it => (
                 <button key={it.label} onClick={() => send(it.action)}
                   className="flex items-center gap-2 p-3 rounded-xl text-left transition-all"
@@ -8805,7 +8805,7 @@ export default function AlternusOS() {
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
-    { id: "ai", icon: ic.sparkle, label: "Alternus AI Agent", color: c.accent },
+    { id: "agent", icon: ic.sparkle, label: "Alternus AI Agent", color: "#7C3AED" },
     { id: "terminal", icon: ic.terminal, label: "Terminal", color: c.success },
     { id: "code", icon: ic.code, label: "Code", color: c.purple },
     { id: "files", icon: ic.folder, label: "Files", color: c.warning },
@@ -8833,7 +8833,6 @@ export default function AlternusOS() {
     { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316" },
     { id: "sysmon", icon: ic.activity, label: "System Monitor", color: "#34D399" },
     { id: "business", icon: ic.briefcase, label: "Business", color: "#6366F1" },
-    { id: "agent", icon: ic.cpu, label: "AI Agent", color: "#8B5CF6" },
   ];
 
   // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
