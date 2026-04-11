@@ -1702,7 +1702,6 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
             <p className="text-[10px] font-semibold uppercase tracking-wider px-1 mt-2" style={{ color: c.textMuted }}>Wallpaper</p>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { img: "",                          label: "Default",  idx: 0 },
                 { img: "/wallpapers/OSwp.png",      label: "OSwp 1",   idx: 1 },
                 { img: "/wallpapers/OSwp2.png",     label: "OSwp 2",   idx: 2 },
                 { img: "/wallpapers/OSpw3.png",     label: "OSwp 3",   idx: 3 },
@@ -7839,7 +7838,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
     } else if (actionType === "changeWallpaper") {
       workspace = {
         type: "settings", title: "🖼️ New Wallpaper",
-        content: `ACTION PERFORMED:\n────────────────\nWallpaper: OSwp ${wallpaper}\nStatus: ✅ Applied\nTime: ${new Date().toLocaleTimeString()}\n\nAvailable wallpapers:\n• Default (0) - OS Color\n• OSwp 1 - Purple Gradient\n• OSwp 2 - Ocean Blue\n• OSwp 3 - Flow Aurora\n• OSwp 4 - Emerald Green\n• OSwp 5 - Sunset Rose\n\nCurrent selection: OSwp ${wallpaper}`,
+        content: `ACTION PERFORMED:\n────────────────\nWallpaper: OSwp ${wallpaper}\nStatus: ✅ Applied\nTime: ${new Date().toLocaleTimeString()}\n\nAvailable wallpapers:\n• OSwp 1 - Purple Gradient\n• OSwp 2 - Ocean Blue\n• OSwp 3 - Flow Aurora\n• OSwp 4 - Emerald Green\n• OSwp 5 - Sunset Rose\n\nCurrent selection: OSwp ${wallpaper}`,
       };
       finalText = `✅ Wallpaper changed!\n\nI've applied **OSwp ${wallpaper}** to the desktop.\n\nWant to try a different wallpaper? Just say the number (1-5).`;
     } else if (actionType === "runCommand") {
@@ -8175,7 +8174,7 @@ export default function AlternusOS() {
   const [smartDND, setSmartDND] = useState(false);
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   const [showTimeline, setShowTimeline] = useState(false);
-  const [wallpaper, setWallpaper] = useState(0);
+  const [wallpaper, setWallpaper] = useState(1);
   const [recoveryFiles, setRecoveryFiles] = useState<RecoveryFile[]>([]);
   const [installedApps, setInstalledApps] = useState<string[]>([]);
   const [installingApp, setInstallingApp] = useState<string | null>(null);
@@ -10268,7 +10267,7 @@ export default function AlternusOS() {
             <div className="my-1 mx-3 h-px" style={{ background: c.border }} />
             <div className="py-1 px-1.5">
               {[
-                { icon: ic.image, label: "Change wallpaper", action: () => { setWallpaper(p => (p + 1) % 6); setContextMenu(null); } },
+                { icon: ic.image, label: "Change wallpaper", action: () => { setWallpaper(p => (p % 5) + 1); setContextMenu(null); } },
                 { icon: ic.monitor, label: "Display settings", action: () => { openWin("settings"); setContextMenu(null); } },
                 { icon: ic.terminal, label: "Open Terminal", action: () => { openWin("terminal"); setContextMenu(null); }, shortcut: "" },
                 { icon: ic.search, label: "Spotlight", action: () => { setShowSpotlight(true); setContextMenu(null); }, shortcut: "Ctrl+K" },
