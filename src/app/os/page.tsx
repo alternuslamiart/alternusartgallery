@@ -7939,9 +7939,9 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
     // Show thinking steps immediately
     const steps: AgentStep[] = [
-      { label: "Po analizoj kërkesën...", status: "running" },
-      { label: "Po planifikoj veprimet", status: "pending" },
-      { label: "Po ekzekutoj", status: "pending" },
+      { label: "Analyzing request...", status: "running" },
+      { label: "Planning actions", status: "pending" },
+      { label: "Executing", status: "pending" },
     ];
 
     const agentMsg: AgentMessage = { id: msgId, role: "agent", timestamp: new Date(), text: "", steps };
@@ -8031,7 +8031,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
       setMsgs(prev => prev.map(m =>
         m.id === msgId ? {
           ...m,
-          text: "Ndodhi një gabim gjatë procesimit të kërkesës. Ju lutemi provoni përsëri.",
+          text: "An error occurred while processing your request. Please try again.",
           steps: undefined,
         } : m
       ));
@@ -8099,91 +8099,154 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
   // Thread items from messages for sidebar
   const threadItems = msgs.filter(m => m.id !== "welcome").slice(-12).reverse();
 
+  // Static inbox groups for sidebar (Image #4 style)
+  const inboxGroups = [
+    {
+      id: "projects", label: "Projects", iconBg: "#5B6CF9", iconChar: "P",
+      threads: [
+        { id: "t1", sender: "Linda", tag: "[main]", preview: "Needs a review before...", avatar: "L", avatarBg: "#F97316" },
+        { id: "t2", sender: "Newsletter", tag: "", preview: "", avatar: "N", avatarBg: "#10B981", isGroup: true, children: [
+          { id: "t2a", sender: "Linda", tag: "", preview: "Linear auto-closed...", avatar: "L", avatarBg: "#F97316" },
+          { id: "t2b", sender: "Linda", tag: "[main]", preview: "Needs a hover effect", avatar: "L", avatarBg: "#F97316" },
+        ]},
+      ],
+    },
+    {
+      id: "design", label: "Design", iconBg: "#0EA5E9", iconChar: "D",
+      threads: [],
+    },
+    {
+      id: "team", label: "My team", iconBg: "#6B7280", iconChar: "T",
+      threads: [
+        { id: "t3", sender: "Necati, João, Me", tag: "", preview: "Hello, what's the update?", avatar: "N", avatarBg: "#7C3AED" },
+        { id: "t4", sender: "Necati, Batu, Me", tag: "", preview: "UI feedback from client", avatar: "N", avatarBg: "#7C3AED" },
+      ],
+    },
+  ];
+
   return (
     <div className="flex h-full overflow-hidden" style={{ background: agBg, fontFamily: "-apple-system, 'Inter', sans-serif" }}>
       {/* ── LEFT SIDEBAR ─────────────────────────────────────── */}
       <div className="flex flex-col flex-shrink-0" style={{ width: 238, background: agSidebarBg, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderRight: `1px solid ${agBorder}` }}>
-        {/* Header */}
-        <div className="px-4 py-3 flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #7C3AED, #4F8EF7)" }}>
-              <I d={ic.sparkle} s={12} c="#fff" f />
-            </div>
-            <span className="text-[12px] font-semibold truncate" style={{ color: agText }}>Alternus AI</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <button className="w-6 h-6 rounded-md flex items-center justify-center" style={{ color: agTextMuted }}
-              onMouseEnter={e => (e.currentTarget.style.background = agAccentSoft)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-              <I d={ic.search} s={12} c={agTextMuted} />
-            </button>
-            <button onClick={() => { setMsgs([{ id: "welcome", role: "agent", timestamp: new Date(), text: "Hi! I am **Alternus AI Agent**. What would you like me to do?" }]); setActiveWorkspace(null); }}
-              className="w-6 h-6 rounded-md flex items-center justify-center" style={{ color: agTextMuted }}
-              onMouseEnter={e => (e.currentTarget.style.background = agAccentSoft)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-              <I d={ic.pen} s={11} c={agTextMuted} />
-            </button>
-          </div>
-        </div>
 
-        {/* New Task button */}
-        <div className="px-3 pb-2 flex-shrink-0">
+        {/* New email button */}
+        <div className="px-3 pt-3 pb-2 flex-shrink-0">
           <button onClick={() => { setInput(""); inputRef.current?.focus(); setActiveWorkspace(null); }}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-semibold transition-all"
-            style={{ background: agAccentSoft, color: agAccent, border: `1px solid ${agAccent}22` }}
-            onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")} onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
-            <span className="text-base leading-none">+</span>
-            <span className="flex-1 text-left">New conversation</span>
-            <span className="text-[9px] font-normal opacity-60">⌘N</span>
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-medium transition-all"
+            style={{ background: dk ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.75)", color: agText, border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}
+            onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.13)" : "rgba(255,255,255,0.95)")}
+            onMouseLeave={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.75)")}>
+            <span className="text-[15px] leading-none font-light" style={{ color: agAccent }}>+</span>
+            <span className="flex-1 text-left">New email</span>
+            <span className="text-[9px] font-normal" style={{ color: agTextMuted }}>⌘ N</span>
           </button>
         </div>
 
-        {/* Sidebar nav */}
-        <div className="flex-1 overflow-y-auto px-2 pb-2" style={{ scrollbarWidth: "none" }}>
-          {/* Workspace section */}
-          <p className="text-[9px] font-semibold uppercase tracking-widest px-2 py-1.5" style={{ color: agTextMuted }}>Workspace</p>
+        {/* Scrollable sidebar */}
+        <div className="flex-1 overflow-y-auto px-2 pb-3" style={{ scrollbarWidth: "none" }}>
+
+          {/* Inbox groups (Linear-style) */}
+          {inboxGroups.map(group => (
+            <div key={group.id} className="mb-1">
+              {/* Group header */}
+              <button
+                onClick={() => setAgentCapability(group.id === "projects" ? "docs" : group.id === "team" ? "email" : "all")}
+                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all text-left"
+                onMouseEnter={e => (e.currentTarget.style.background = agSelected + "66")}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                {/* Colored square icon */}
+                <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-white"
+                  style={{ background: group.iconBg }}>
+                  {group.iconChar}
+                </div>
+                <span className="text-[11px] font-semibold flex-1 truncate" style={{ color: agText }}>{group.label}</span>
+              </button>
+
+              {/* Thread rows */}
+              {group.threads.map(thread => (
+                <div key={thread.id}>
+                  {/* Thread item */}
+                  <button
+                    className="w-full flex items-center gap-2 pl-8 pr-2 py-1 rounded-lg transition-all text-left"
+                    onMouseEnter={e => (e.currentTarget.style.background = agSelected + "66")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    {/* Avatar */}
+                    <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[8px] font-bold text-white"
+                      style={{ background: thread.avatarBg }}>
+                      {thread.avatar}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-1 truncate">
+                        <span className="text-[10px] font-semibold truncate" style={{ color: agText }}>{thread.sender}</span>
+                        {thread.tag && <span className="text-[9px] flex-shrink-0" style={{ color: agTextMuted }}>{thread.tag}</span>}
+                      </div>
+                      {thread.preview && <p className="text-[9px] truncate" style={{ color: agTextMuted }}>{thread.preview}</p>}
+                    </div>
+                  </button>
+                  {/* Children (sub-threads) */}
+                  {thread.children?.map(child => (
+                    <button key={child.id}
+                      className="w-full flex items-center gap-2 pl-12 pr-2 py-1 rounded-lg transition-all text-left"
+                      onMouseEnter={e => (e.currentTarget.style.background = agSelected + "66")}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[8px] font-bold text-white"
+                        style={{ background: child.avatarBg }}>
+                        {child.avatar}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-baseline gap-1 truncate">
+                          <span className="text-[10px] font-semibold truncate" style={{ color: agText }}>{child.sender}</span>
+                          {child.tag && <span className="text-[9px] flex-shrink-0" style={{ color: agTextMuted }}>{child.tag}</span>}
+                        </div>
+                        <p className="text-[9px] truncate" style={{ color: agTextMuted }}>{child.preview}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ))}
+
+          {/* Divider */}
+          <div className="mx-2 my-2" style={{ height: 1, background: agBorder }} />
+
+          {/* Mail section */}
+          <p className="text-[9px] font-semibold px-2 pb-1" style={{ color: agTextMuted }}>Mail</p>
           {[
-            { id: "all", icon: ic.sparkle, label: "All tasks" },
-            { id: "files", icon: ic.folder, label: "Files" },
-            { id: "email", icon: ic.mail, label: "Email" },
-            { id: "docs", icon: ic.fileText, label: "Documents" },
-            { id: "settings", icon: ic.settings, label: "Settings" },
+            { id: "all", icon: ic.mail, label: "All Mail" },
+            { id: "sent", icon: ic.send, label: "Sent" },
+            { id: "drafts", icon: ic.fileText, label: "Drafts" },
           ].map(item => (
-            <button key={item.id} onClick={() => setAgentCapability(item.id as typeof agentCapability)}
-              className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[11px] mb-0.5 transition-all text-left"
-              style={{ background: agentCapability === item.id ? agSelected : "transparent", color: agentCapability === item.id ? agAccent : agTextSec, fontWeight: agentCapability === item.id ? 600 : 400 }}
-              onMouseEnter={e => { if (agentCapability !== item.id) e.currentTarget.style.background = agSelected + "88"; }}
-              onMouseLeave={e => { if (agentCapability !== item.id) e.currentTarget.style.background = "transparent"; }}>
-              <I d={item.icon} s={12} c={agentCapability === item.id ? agAccent : agTextMuted} />
+            <button key={item.id}
+              onClick={() => setAgentCapability(item.id === "all" ? "email" : item.id === "drafts" ? "docs" : "all")}
+              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] mb-0.5 transition-all text-left"
+              style={{ background: "transparent", color: agTextSec }}
+              onMouseEnter={e => (e.currentTarget.style.background = agSelected + "66")}
+              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                <I d={item.icon} s={12} c={agTextMuted} />
+              </div>
               {item.label}
             </button>
           ))}
 
-          {/* Recent section */}
-          <p className="text-[9px] font-semibold uppercase tracking-widest px-2 pt-3 pb-1.5" style={{ color: agTextMuted }}>Recent</p>
-          {threadItems.length === 0 && (
-            <p className="text-[10px] px-2 py-1" style={{ color: agTextMuted }}>No conversations yet</p>
-          )}
-          {threadItems.map((m, i) => (
-            <button key={m.id} onClick={() => { if (m.workspace) setActiveWorkspace(m.workspace); }}
-              className="w-full flex items-start gap-2 px-2.5 py-2 rounded-lg mb-0.5 transition-all text-left"
-              style={{ background: i === 0 && activeWorkspace ? agSelected : "transparent" }}
-              onMouseEnter={e => (e.currentTarget.style.background = agSelected + "88")}
-              onMouseLeave={e => (e.currentTarget.style.background = i === 0 && activeWorkspace ? agSelected : "transparent")}>
-              {/* Avatar */}
-              <div className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5"
-                style={{ background: m.role === "agent" ? "linear-gradient(135deg, #7C3AED, #4F8EF7)" : "linear-gradient(135deg, #F97316, #FBBF24)" }}>
-                <I d={m.role === "agent" ? ic.sparkle : ic.user} s={10} c="#fff" f />
+          {/* Workspace filter pills */}
+          <div className="mx-2 my-2" style={{ height: 1, background: agBorder }} />
+          <p className="text-[9px] font-semibold px-2 pb-1" style={{ color: agTextMuted }}>AI Tasks</p>
+          {[
+            { id: "all", icon: ic.sparkle, label: "All tasks" },
+            { id: "files", icon: ic.folder, label: "Files" },
+            { id: "settings", icon: ic.settings, label: "Settings" },
+          ].map(item => (
+            <button key={item.id} onClick={() => setAgentCapability(item.id as typeof agentCapability)}
+              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] mb-0.5 transition-all text-left"
+              style={{ background: agentCapability === item.id ? agSelected : "transparent", color: agentCapability === item.id ? agAccent : agTextSec, fontWeight: agentCapability === item.id ? 600 : 400 }}
+              onMouseEnter={e => { if (agentCapability !== item.id) e.currentTarget.style.background = agSelected + "66"; }}
+              onMouseLeave={e => { if (agentCapability !== item.id) e.currentTarget.style.background = "transparent"; }}>
+              <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                <I d={item.icon} s={12} c={agentCapability === item.id ? agAccent : agTextMuted} />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-semibold truncate" style={{ color: agText }}>
-                    {m.role === "agent" ? "AI Agent" : "You"}
-                  </span>
-                  <span className="text-[8px] flex-shrink-0 ml-1" style={{ color: agTextMuted }}>
-                    {m.timestamp.toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}
-                  </span>
-                </div>
-                <p className="text-[9px] truncate" style={{ color: agTextMuted }}>{m.text.replace(/\*\*/g, "").slice(0, 50)}</p>
-              </div>
+              {item.label}
             </button>
           ))}
         </div>
