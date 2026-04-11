@@ -10799,7 +10799,7 @@ export default function AlternusOS() {
                         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)" }}>No apps found</p>
                       </div>
                     ) : (
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "28px 16px" }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "18px 10px" }}>
                         {filteredApps.map(app => {
                           const fillPath = icFill[app.id] ?? app.icon;
                           return (
@@ -10807,35 +10807,34 @@ export default function AlternusOS() {
                               key={app.id}
                               title={app.label}
                               onClick={() => { openWinWithAI(app.id); closeLaunchpad(); }}
-                              style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "12px 6px 10px", borderRadius: 16, border: "none", background: "transparent", cursor: "pointer", transition: "background 0.15s" }}
+                              style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7, padding: "8px 4px 8px", borderRadius: 13, border: "none", background: "transparent", cursor: "pointer", transition: "background 0.15s" }}
                               onMouseEnter={e => {
                                 e.currentTarget.style.background = "rgba(255,255,255,0.08)";
                                 const icon = e.currentTarget.querySelector(".lp3-icon") as HTMLElement | null;
-                                if (icon) { icon.style.transform = "translateY(-5px) scale(1.06)"; icon.style.boxShadow = `0 14px 32px ${app.color}70`; }
+                                if (icon) { icon.style.transform = "translateY(-4px) scale(1.07)"; icon.style.boxShadow = `0 10px 24px ${app.color}65`; }
                               }}
                               onMouseLeave={e => {
                                 e.currentTarget.style.background = "transparent";
                                 const icon = e.currentTarget.querySelector(".lp3-icon") as HTMLElement | null;
-                                if (icon) { icon.style.transform = "translateY(0) scale(1)"; icon.style.boxShadow = `0 6px 18px ${app.color}45`; }
+                                if (icon) { icon.style.transform = "translateY(0) scale(1)"; icon.style.boxShadow = `0 4px 12px ${app.color}40`; }
                               }}
                             >
                               <div
                                 className="lp3-icon relative overflow-hidden flex items-center justify-center"
                                 style={{
-                                  width: 108, height: 108, borderRadius: 26, flexShrink: 0,
+                                  width: 72, height: 72, borderRadius: 20, flexShrink: 0,
                                   background: `linear-gradient(145deg, ${app.color}F0 0%, ${app.color}A0 55%, ${app.color}70 100%)`,
                                   border: `1px solid ${app.color}50`,
-                                  boxShadow: `0 6px 18px ${app.color}45, inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(0,0,0,0.12)`,
-                                  transition: "all 0.20s cubic-bezier(.22,.68,0,1.1)",
+                                  boxShadow: `0 4px 12px ${app.color}40, inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(0,0,0,0.12)`,
+                                  transition: "all 0.18s cubic-bezier(.22,.68,0,1.1)",
                                 }}
                               >
-                                {/* Specular sheen */}
-                                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", borderRadius: "26px 26px 60% 60%", background: "linear-gradient(180deg,rgba(255,255,255,0.28) 0%,rgba(255,255,255,0) 100%)", pointerEvents: "none" }} />
-                                <div style={{ position: "relative", zIndex: 1, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.28))" }}>
-                                  <I d={fillPath} s={42} f={true} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.76)"]} />
+                                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", borderRadius: "20px 20px 60% 60%", background: "linear-gradient(180deg,rgba(255,255,255,0.26) 0%,rgba(255,255,255,0) 100%)", pointerEvents: "none" }} />
+                                <div style={{ position: "relative", zIndex: 1, filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.25))" }}>
+                                  <I d={fillPath} s={28} f={true} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.76)"]} />
                                 </div>
                               </div>
-                              <span style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,0.82)", maxWidth: 108, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center", letterSpacing: "0.01em" }}>
+                              <span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,0.80)", maxWidth: 76, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>
                                 {app.label}
                               </span>
                             </button>
