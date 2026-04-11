@@ -6320,91 +6320,289 @@ function TasksApp({ c }: { c: typeof palette.dark }) {
     { id: 5, text: "Backup database", desc: "Run full PostgreSQL backup and verify restore procedure", priority: "low" as const, done: false, deadline: "Dec 15", tag: "Ops" },
     { id: 6, text: "Send invoice to client", desc: "Generate and send invoice #1042 for commissioned artwork", priority: "high" as const, done: true, deadline: "Done", tag: "Finance" },
   ]);
-  const [input, setInput] = useState("");
-  const [filter, setFilter] = useState<"all" | "active" | "done">("all");
+  const [input, setInput]       = useState("");
+  const [filter, setFilter]     = useState<"all" | "active" | "done">("all");
+  const [view, setView]         = useState<"list" | "board">("list");
+  const [search, setSearch]     = useState("");
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [animIn, setAnimIn]     = useState<Set<number>>(new Set());
+  const [animOut, setAnimOut]   = useState<Set<number>>(new Set());
+  const [justChecked, setJustChecked]   = useState<Set<number>>(new Set());
+  const [priorityAnim, setPriorityAnim] = useState<Set<number>>(new Set());
+
   const priorityColor = { high: c.danger, medium: c.warning, low: c.success };
   const priorityLabel = { high: "Urgent", medium: "Medium", low: "Low" };
-  const filtered = tasks.filter(t => filter === "all" ? true : filter === "done" ? t.done : !t.done);
+  const priorityNext: Record<string, "high" | "medium" | "low"> = { high: "medium", medium: "low", low: "high" };
+
+  const filtered = tasks
+    .filter(t => filter === "all" ? true : filter === "done" ? t.done : !t.done)
+    .filter(t => !search || t.text.toLowerCase().includes(search.toLowerCase()) || t.tag.toLowerCase().includes(search.toLowerCase()));
+
   const completedPct = tasks.length > 0 ? Math.round((tasks.filter(t => t.done).length / tasks.length) * 100) : 0;
+
+  // ── Smart Animate helpers ──
   const addTask = () => {
     if (!input.trim()) return;
-    setTasks(p => [...p, { id: Date.now(), text: input.trim(), desc: "", priority: "medium", done: false, deadline: "No deadline", tag: "Task" }]);
+    const newId = Date.now();
+    setTasks(p => [...p, { id: newId, text: input.trim(), desc: "", priority: "medium" as const, done: false, deadline: "No deadline", tag: "Task" }]);
+    setAnimIn(s => { const n = new Set(s); n.add(newId); return n; });
+    setTimeout(() => setAnimIn(s => { const n = new Set(s); n.delete(newId); return n; }), 480);
     setInput("");
   };
+  const deleteTask = (id: number) => {
+    setAnimOut(s => { const n = new Set(s); n.add(id); return n; });
+    setTimeout(() => {
+      setTasks(p => p.filter(t => t.id !== id));
+      setAnimOut(s => { const n = new Set(s); n.delete(id); return n; });
+    }, 300);
+  };
+  const toggleTask = (id: number) => {
+    setJustChecked(s => { const n = new Set(s); n.add(id); return n; });
+    setTimeout(() => setJustChecked(s => { const n = new Set(s); n.delete(id); return n; }), 420);
+    setTasks(p => p.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  };
+  const cyclePriority = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPriorityAnim(s => { const n = new Set(s); n.add(id); return n; });
+    setTimeout(() => setPriorityAnim(s => { const n = new Set(s); n.delete(id); return n; }), 360);
+    setTasks(p => p.map(t => t.id === id ? { ...t, priority: priorityNext[t.priority] } : t));
+  };
+
+  // Board columns
+  const boardCols = [
+    { key: "urgent",   label: "Urgent",      color: c.danger,  dot: c.danger,  tasks: tasks.filter(t => !t.done && t.priority === "high") },
+    { key: "progress", label: "In Progress", color: c.warning, dot: c.warning, tasks: tasks.filter(t => !t.done && t.priority !== "high") },
+    { key: "done",     label: "Completed",   color: c.success, dot: c.success, tasks: tasks.filter(t => t.done) },
+  ];
+
   return (
-    <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      {/* Header */}
-      <div className="px-4 pt-4 pb-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #10B981, #059669)", boxShadow: "0 3px 12px rgba(16,185,129,0.35)" }}>
-            <I d={ic.checkSquare} s={16} c="#fff" />
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: c.bg }}>
+      <style>{`
+        @keyframes task-slide-in {
+          from { opacity:0; transform:translateY(10px) scale(0.97); }
+          to   { opacity:1; transform:translateY(0) scale(1); }
+        }
+        @keyframes task-slide-out {
+          from { opacity:1; transform:translateX(0) scale(1); max-height:120px; margin-bottom:7px; }
+          to   { opacity:0; transform:translateX(38px) scale(0.94); max-height:0; margin-bottom:0; padding-top:0; padding-bottom:0; }
+        }
+        @keyframes check-pop {
+          0%  { transform:scale(1); }
+          38% { transform:scale(1.45); }
+          68% { transform:scale(0.82); }
+          100%{ transform:scale(1); }
+        }
+        @keyframes pri-flip {
+          0%  { transform:scale(1) rotate(0deg); }
+          50% { transform:scale(1.22) rotate(-10deg); }
+          100%{ transform:scale(1) rotate(0deg); }
+        }
+        @keyframes view-fade {
+          from { opacity:0; transform:translateY(6px); }
+          to   { opacity:1; transform:translateY(0); }
+        }
+        .task-new   { animation: task-slide-in 0.38s cubic-bezier(.22,.68,0,1.12) both; }
+        .task-gone  { animation: task-slide-out 0.30s cubic-bezier(.4,0,1,1) forwards; overflow:hidden; }
+        .check-anim { animation: check-pop 0.4s cubic-bezier(.22,.68,0,1.2) both; }
+        .pri-anim   { animation: pri-flip 0.34s cubic-bezier(.22,.68,0,1.2) both; }
+        .view-enter { animation: view-fade 0.2s ease both; }
+      `}</style>
+
+      {/* ── Header ── */}
+      <div style={{ padding: "13px 14px 10px", borderBottom: `1px solid ${c.border}`, flexShrink: 0 }}>
+        {/* Title row */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+          <div style={{ width: 34, height: 34, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,#10B981,#059669)", boxShadow: "0 3px 12px rgba(16,185,129,0.35)", flexShrink: 0 }}>
+            <I d={ic.checkSquare} s={15} c="#fff" />
           </div>
-          <div className="flex-1">
-            <h3 className="text-[13px] font-bold" style={{ color: c.text }}>Task Manager</h3>
-            <p className="text-[10px]" style={{ color: c.textMuted }}>Organize, prioritize, and track your workflow</p>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: c.text, lineHeight: 1.2 }}>Task Manager</p>
+            <p style={{ fontSize: 9, color: c.textMuted }}>Smart organize · prioritize · track</p>
           </div>
-          <div className="text-right">
-            <p className="text-[16px] font-bold" style={{ color: c.accent }}>{completedPct}%</p>
-            <p className="text-[8px]" style={{ color: c.textMuted }}>complete</p>
+          {/* View toggle */}
+          <div style={{ display: "flex", background: c.surface, borderRadius: 8, border: `1px solid ${c.border}`, overflow: "hidden" }}>
+            {([
+              { id: "list"  as const, d: "M4 6h16M4 11h16M4 16h16" },
+              { id: "board" as const, d: "M3 3h5v18H3zM9.5 3h5v18h-5zM16 3h5v18h-5z" },
+            ] as { id: "list" | "board"; d: string }[]).map(v => (
+              <button key={v.id} onClick={() => setView(v.id)}
+                style={{ padding: "5px 9px", background: view === v.id ? c.accent : "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.18s" }}>
+                <I d={v.d} s={13} c={view === v.id ? "#fff" : c.textMuted} />
+              </button>
+            ))}
           </div>
         </div>
+
+        {/* Stats chips */}
+        <div style={{ display: "flex", gap: 5, marginBottom: 9, alignItems: "center" }}>
+          {[
+            { label: "Urgent", count: tasks.filter(t => !t.done && t.priority === "high").length, color: c.danger },
+            { label: "Active", count: tasks.filter(t => !t.done).length, color: c.warning },
+            { label: "Done",   count: tasks.filter(t => t.done).length,  color: c.success },
+          ].map(s => (
+            <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 4, background: `${s.color}12`, borderRadius: 6, padding: "3px 7px", border: `1px solid ${s.color}28` }}>
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: s.color }} />
+              <span style={{ fontSize: 10, fontWeight: 700, color: s.color }}>{s.count}</span>
+              <span style={{ fontSize: 8, color: c.textMuted }}>{s.label}</span>
+            </div>
+          ))}
+          <div style={{ flex: 1 }} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: c.accent }}>{completedPct}%</span>
+        </div>
+
         {/* Progress bar */}
-        <div className="h-1.5 rounded-full mb-3" style={{ background: c.border }}>
-          <div className="h-full rounded-full transition-all" style={{ width: `${completedPct}%`, background: "linear-gradient(90deg, #10B981, #3B82F6)" }} />
+        <div style={{ height: 4, borderRadius: 4, background: c.border, marginBottom: 9, overflow: "hidden" }}>
+          <div style={{ height: "100%", borderRadius: 4, width: `${completedPct}%`, background: "linear-gradient(90deg,#10B981,#3B82F6)", transition: "width 0.55s cubic-bezier(.4,0,.2,1)" }} />
         </div>
+
+        {/* Search */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, background: c.surface, border: `1px solid ${c.border}`, borderRadius: 9, padding: "0 10px", height: 30, marginBottom: 7 }}>
+          <I d={ic.search} s={12} c={c.textMuted} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search tasks..."
+            style={{ background: "transparent", border: "none", outline: "none", fontSize: 11, color: c.text, flex: 1 }} />
+          {search && <button onClick={() => setSearch("")} style={{ background: "none", border: "none", cursor: "pointer", display: "flex" }}><I d={ic.close} s={11} c={c.textMuted} /></button>}
+        </div>
+
         {/* Add task */}
-        <div className="flex items-center gap-2 mb-2.5">
+        <div style={{ display: "flex", gap: 6, marginBottom: 7 }}>
           <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && addTask()}
             placeholder="What needs to be done?"
-            className="flex-1 text-[11px] px-3 py-2.5 rounded-xl outline-none"
-            style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
-          <button onClick={addTask} className="px-4 py-2.5 rounded-xl text-[11px] font-semibold transition-all hover:scale-105"
-            style={{ background: c.accent, color: "#fff", boxShadow: `0 2px 8px ${c.accent}40` }}>
+            style={{ flex: 1, fontSize: 11, padding: "0 12px", height: 32, borderRadius: 9, background: c.surface, border: `1px solid ${c.border}`, color: c.text, outline: "none" }} />
+          <button onClick={addTask}
+            style={{ width: 32, height: 32, borderRadius: 9, background: c.accent, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 2px 8px ${c.accent}40`, flexShrink: 0 }}>
             <I d={ic.plus} s={14} c="#fff" />
           </button>
         </div>
-        {/* Filters */}
-        <div className="flex items-center gap-1">
+
+        {/* Filter tabs */}
+        <div style={{ display: "flex", gap: 2 }}>
           {(["all", "active", "done"] as const).map(f => (
-            <button key={f} onClick={() => setFilter(f)} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold capitalize transition-all"
-              style={{ background: filter === f ? c.accentSoft : "transparent", color: filter === f ? c.accentText : c.textMuted }}>
-              {f} {f === "all" ? `(${tasks.length})` : f === "active" ? `(${tasks.filter(t => !t.done).length})` : `(${tasks.filter(t => t.done).length})`}
+            <button key={f} onClick={() => setFilter(f)}
+              style={{ padding: "4px 10px", borderRadius: 7, fontSize: 10, fontWeight: 600, border: "none", cursor: "pointer", background: filter === f ? c.accentSoft : "transparent", color: filter === f ? c.accentText : c.textMuted, textTransform: "capitalize", transition: "all 0.15s" }}>
+              {f} ({f === "all" ? tasks.length : f === "active" ? tasks.filter(t => !t.done).length : tasks.filter(t => t.done).length})
             </button>
           ))}
         </div>
       </div>
-      {/* Task List */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2" style={{ scrollbarWidth: "none" }}>
-        {filtered.map(task => (
-          <div key={task.id} className="flex items-start gap-3 p-3 rounded-xl transition-all"
-            style={{ background: c.surface, border: `1px solid ${task.done ? c.border : `${priorityColor[task.priority]}20`}`, opacity: task.done ? 0.55 : 1 }}>
-            <button onClick={() => setTasks(p => p.map(t => t.id === task.id ? { ...t, done: !t.done } : t))}
-              className="mt-0.5 w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center transition-all"
-              style={{ border: `2px solid ${task.done ? c.success : priorityColor[task.priority]}`, background: task.done ? c.success : "transparent" }}>
-              {task.done && <I d="M20 6L9 17l-5-5" s={11} c="#fff" w={2.5} />}
-            </button>
-            <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-semibold leading-snug" style={{ color: c.text, textDecoration: task.done ? "line-through" : "none" }}>{task.text}</p>
-              {task.desc && <p className="text-[9px] mt-0.5 leading-snug" style={{ color: c.textMuted }}>{task.desc}</p>}
-              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: `${priorityColor[task.priority]}15`, color: priorityColor[task.priority] }}>{priorityLabel[task.priority]}</span>
-                <span className="text-[8px] px-1.5 py-0.5 rounded-md" style={{ background: c.cardAlt, color: c.textMuted }}>{task.tag}</span>
-                <span className="text-[8px] flex items-center gap-1" style={{ color: c.textMuted }}><I d={ic.clock} s={8} c={c.textMuted} />{task.deadline}</span>
+
+      {/* ── Content (key=view triggers fade animation on switch) ── */}
+      <div className="view-enter" key={view} style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+
+        {/* LIST VIEW */}
+        {view === "list" && (
+          <div style={{ flex: 1, overflowY: "auto", padding: "9px 11px", scrollbarWidth: "none" }}>
+            {filtered.length === 0 && (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 100, color: c.textMuted, gap: 8 }}>
+                <I d={ic.checkSquare} s={26} c={c.border} />
+                <p style={{ fontSize: 11 }}>{search ? "No matching tasks" : "All clear!"}</p>
               </div>
+            )}
+            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+              {filtered.map(task => {
+                const isNew      = animIn.has(task.id);
+                const isGone     = animOut.has(task.id);
+                const isChecked  = justChecked.has(task.id);
+                const isPriAnim  = priorityAnim.has(task.id);
+                const isExpanded = expandedId === task.id;
+                return (
+                  <div key={task.id}
+                    className={isNew ? "task-new" : isGone ? "task-gone" : ""}
+                    onClick={() => setExpandedId(isExpanded ? null : task.id)}
+                    style={{ background: c.surface, border: `1px solid ${task.done ? c.border : `${priorityColor[task.priority]}22`}`, borderRadius: 11, padding: "9px 11px", opacity: task.done ? 0.62 : 1, transition: "opacity 0.25s, border-color 0.25s", cursor: "pointer" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
+                      {/* Checkbox */}
+                      <button
+                        className={isChecked ? "check-anim" : ""}
+                        onClick={e => { e.stopPropagation(); toggleTask(task.id); }}
+                        style={{ marginTop: 2, width: 17, height: 17, borderRadius: 5, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${task.done ? c.success : priorityColor[task.priority]}`, background: task.done ? c.success : "transparent", cursor: "pointer", transition: "background 0.2s, border-color 0.2s" }}>
+                        {task.done && <I d="M20 6L9 17l-5-5" s={9} c="#fff" w={2.5} />}
+                      </button>
+
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: 11, fontWeight: 600, color: c.text, textDecoration: task.done ? "line-through" : "none", lineHeight: 1.3, transition: "text-decoration 0.2s" }}>{task.text}</p>
+                        {/* Collapsed desc preview */}
+                        {task.desc && !isExpanded && (
+                          <p style={{ fontSize: 9, color: c.textMuted, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{task.desc}</p>
+                        )}
+                        {/* Expanded desc */}
+                        {isExpanded && task.desc && (
+                          <p style={{ fontSize: 10, color: c.textSec, marginTop: 5, lineHeight: 1.5, animation: "task-slide-in 0.2s ease both" }}>{task.desc}</p>
+                        )}
+                        {/* Badges */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 5, flexWrap: "wrap" }}>
+                          <button
+                            className={isPriAnim ? "pri-anim" : ""}
+                            onClick={e => cyclePriority(task.id, e)}
+                            title="Click to change priority"
+                            style={{ fontSize: 8, fontWeight: 700, padding: "2px 6px", borderRadius: 5, background: `${priorityColor[task.priority]}18`, color: priorityColor[task.priority], border: "none", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}>
+                            {priorityLabel[task.priority]}
+                          </button>
+                          <span style={{ fontSize: 8, padding: "2px 6px", borderRadius: 5, background: c.card, color: c.textMuted }}>{task.tag}</span>
+                          <span style={{ fontSize: 8, color: c.textMuted, display: "flex", alignItems: "center", gap: 3 }}>
+                            <I d={ic.clock} s={8} c={c.textMuted} />{task.deadline}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Delete */}
+                      <button onClick={e => { e.stopPropagation(); deleteTask(task.id); }}
+                        style={{ padding: 4, borderRadius: 6, background: "none", border: "none", cursor: "pointer", color: c.textMuted, flexShrink: 0, transition: "color 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.color = c.danger; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; }}>
+                        <I d={ic.trash} s={12} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <button onClick={() => setTasks(p => p.filter(t => t.id !== task.id))} className="p-1 rounded-md flex-shrink-0 transition-colors"
-              style={{ color: c.textMuted }} onMouseEnter={e => { e.currentTarget.style.color = c.danger; }} onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; }}>
-              <I d={ic.trash} s={12} />
-            </button>
           </div>
-        ))}
+        )}
+
+        {/* BOARD VIEW */}
+        {view === "board" && (
+          <div style={{ flex: 1, display: "flex", gap: 8, padding: "10px 10px", overflowX: "auto", overflowY: "hidden" }}>
+            {boardCols.map(col => (
+              <div key={col.key} style={{ flex: 1, minWidth: 120, display: "flex", flexDirection: "column", background: c.surface, borderRadius: 11, border: `1px solid ${col.color}28`, overflow: "hidden" }}>
+                {/* Column header */}
+                <div style={{ padding: "9px 11px 8px", borderBottom: `2px solid ${col.color}38`, flexShrink: 0, display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: col.dot, flexShrink: 0 }} />
+                  <span style={{ fontSize: 10, fontWeight: 700, color: col.color, flex: 1 }}>{col.label}</span>
+                  <span style={{ fontSize: 9, fontWeight: 600, color: c.textMuted, background: c.card, borderRadius: 5, padding: "1px 6px" }}>{col.tasks.length}</span>
+                </div>
+                {/* Cards */}
+                <div style={{ flex: 1, overflowY: "auto", padding: 7, display: "flex", flexDirection: "column", gap: 6, scrollbarWidth: "none" }}>
+                  {col.tasks.length === 0 && (
+                    <div style={{ textAlign: "center", color: c.textMuted, fontSize: 9, padding: "14px 0", opacity: 0.5 }}>Empty</div>
+                  )}
+                  {col.tasks.map(task => (
+                    <div key={task.id}
+                      onClick={() => toggleTask(task.id)}
+                      style={{ background: c.card, borderRadius: 9, padding: "8px 9px", border: `1px solid ${c.border}`, cursor: "pointer", transition: "transform 0.15s, box-shadow 0.15s" }}
+                      onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.22)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
+                      <p style={{ fontSize: 10, fontWeight: 600, color: task.done ? c.textMuted : c.text, lineHeight: 1.35, textDecoration: task.done ? "line-through" : "none", marginBottom: 5 }}>{task.text}</p>
+                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        <span style={{ fontSize: 7, fontWeight: 700, padding: "1px 5px", borderRadius: 4, background: `${priorityColor[task.priority]}18`, color: priorityColor[task.priority] }}>{priorityLabel[task.priority]}</span>
+                        <span style={{ fontSize: 7, color: c.textMuted, marginLeft: "auto", display: "flex", alignItems: "center", gap: 2 }}><I d={ic.clock} s={7} c={c.textMuted} />{task.deadline}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-      {/* Footer */}
-      <div className="px-4 py-2.5 flex items-center justify-between flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-        <p className="text-[9px] font-medium" style={{ color: c.textMuted }}>{tasks.filter(t => t.done).length} of {tasks.length} tasks completed</p>
-        <button onClick={() => setTasks(p => p.filter(t => !t.done))} className="text-[9px] font-semibold px-2 py-1 rounded-lg transition-all"
-          style={{ color: c.danger, background: `${c.danger}08` }}
-          onMouseEnter={e => { e.currentTarget.style.background = `${c.danger}15`; }} onMouseLeave={e => { e.currentTarget.style.background = `${c.danger}08`; }}>
+
+      {/* ── Footer ── */}
+      <div style={{ padding: "7px 14px", borderTop: `1px solid ${c.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+        <p style={{ fontSize: 9, color: c.textMuted }}>{tasks.filter(t => t.done).length} of {tasks.length} completed</p>
+        <button
+          onClick={() => { tasks.filter(t => t.done).forEach(t => deleteTask(t.id)); }}
+          style={{ fontSize: 9, fontWeight: 600, padding: "4px 8px", borderRadius: 6, background: `${c.danger}0A`, color: c.danger, border: "none", cursor: "pointer", transition: "background 0.15s" }}
+          onMouseEnter={e => { e.currentTarget.style.background = `${c.danger}18`; }}
+          onMouseLeave={e => { e.currentTarget.style.background = `${c.danger}0A`; }}>
           Clear completed
         </button>
       </div>
