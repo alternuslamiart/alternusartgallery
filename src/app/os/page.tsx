@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type ThemeMode = "dark" | "light";
-type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news" | "dashboard" | "tasks" | "mail" | "monaco" | "aihub" | "aivoice" | "knowledge" | "sysmon" | "business" | "agent";
+type WinId = "ai" | "terminal" | "code" | "files" | "settings" | "music" | "weather" | "calendar" | "notes" | "browser" | "store" | "movies" | "word" | "clock" | "calculator" | "accounts" | "downloads" | "controlpanel" | "studio" | "recovery" | "news" | "dashboard" | "tasks" | "mail" | "monaco" | "aihub" | "aivoice" | "knowledge" | "sysmon" | "business" | "agent" | "resvis";
 
 interface WinState {
   id: WinId;
@@ -7191,6 +7191,214 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
+// ━━━━ RESOURCE VISUALIZER APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function ResourceVisualizerApp() {
+  const [zoom, setZoom] = useState(1);
+  const [activeNav, setActiveNav] = useState("resvis");
+
+  const RV = {
+    bg:      "#FFFFFF",
+    sidebar: "#FFFFFF",
+    main:    "#F8F9FA",
+    border:  "#E1DFDD",
+    borderL: "#F3F2F1",
+    txt:     "#323130",
+    txtSec:  "#605E5C",
+    txtMut:  "#A19F9D",
+    active:  "#EFF6FF",
+    activeB: "#0078D4",
+    hover:   "#F3F2F1",
+    cardBg:  "#FFFFFF",
+    cardBrd: "#D1D1D1",
+  };
+
+  const navItems: { id: string; icon: string; label: string; indent?: boolean; section?: string }[] = [
+    { id: "tags",        icon: ic.key,         label: "Tags" },
+    { id: "diagnose",    icon: ic.alertTriangle,label: "Diagnose and solve problems" },
+    { id: "resvis",      icon: ic.layers,       label: "Resource visualizer" },
+    { id: "_rm",         icon: "",              label: "Resource Management", section: "header" },
+    { id: "projects",    icon: ic.folder,       label: "Projects",              indent: true },
+    { id: "keys",        icon: ic.key,          label: "Keys and Endpoint",     indent: true },
+    { id: "encryption",  icon: ic.lock,         label: "Encryption",            indent: true },
+    { id: "networking",  icon: ic.wifi,         label: "Networking",            indent: true },
+    { id: "stored",      icon: ic.hdd,          label: "Stored Completions",    indent: true },
+    { id: "identity",    icon: ic.user,         label: "Identity",              indent: true },
+    { id: "cost",        icon: ic.dollarSign,   label: "Cost analysis",         indent: true },
+    { id: "props",       icon: ic.fileText,     label: "Properties",            indent: true },
+    { id: "_sec",        icon: ic.chevR,        label: "Security",   section: "collapse" },
+    { id: "_mon",        icon: ic.chevR,        label: "Monitoring", section: "collapse" },
+    { id: "_auto",       icon: ic.chevR,        label: "Automation", section: "collapse" },
+    { id: "help",        icon: ic.bookOpen,     label: "Help" },
+  ];
+
+  const toolbarBtns = [
+    { icon: ic.layers,  label: "Choose resources" },
+    { icon: ic.refresh, label: "Reset diagram"    },
+    { icon: ic.maximize,label: "Zoom to fit"      },
+    { icon: ic.refresh, label: "Refresh"          },
+    { icon: ic.upload,  label: "Export",  caret: true },
+    { icon: ic.menu,    label: "List view"        },
+  ];
+
+  return (
+    <div className="flex h-full overflow-hidden" style={{ fontFamily: "'Segoe UI', -apple-system, sans-serif", background: RV.bg }}>
+
+      {/* ── SIDEBAR ── */}
+      <div className="flex flex-col flex-shrink-0 overflow-y-auto" style={{ width: 220, borderRight: `1px solid ${RV.border}`, background: RV.sidebar, scrollbarWidth: "none" }}>
+
+        {/* App header */}
+        <div className="px-3 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${RV.borderL}` }}>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0"
+              style={{ background: "linear-gradient(135deg, #0078D4, #50B0F0)" }}>
+              <I d={ic.cloud} s={11} c="#fff" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold truncate" style={{ color: RV.txt }}>ai-project-123-resource</p>
+              <p className="text-[9px]" style={{ color: RV.txtMut }}>Foundry</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="flex items-center gap-2 px-3 py-1.5 flex-shrink-0" style={{ borderBottom: `1px solid ${RV.borderL}` }}>
+          <I d={ic.search} s={12} c={RV.txtMut} />
+          <input placeholder="Search" className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: RV.txt }} />
+          <button className="text-[11px] font-bold px-1" style={{ color: RV.txtSec }}>«</button>
+        </div>
+
+        {/* Nav */}
+        <div className="py-1 flex-1">
+          {navItems.map(item => {
+            if (item.section === "header") return (
+              <p key={item.id} className="px-3 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-widest" style={{ color: RV.txtMut }}>{item.label}</p>
+            );
+            if (item.section === "collapse") return (
+              <button key={item.id}
+                className="w-full flex items-center gap-2 px-3 py-1.5 text-left transition-colors"
+                style={{ borderLeft: "3px solid transparent" }}
+                onMouseEnter={e => (e.currentTarget.style.background = RV.hover)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <I d={ic.chevR} s={11} c={RV.txtMut} />
+                <span className="text-[12px]" style={{ color: RV.txt }}>{item.label}</span>
+              </button>
+            );
+            const isActive = activeNav === item.id;
+            return (
+              <button key={item.id} onClick={() => setActiveNav(item.id)}
+                className="w-full flex items-center gap-2 py-1.5 text-left transition-colors"
+                style={{
+                  background: isActive ? RV.active : "transparent",
+                  borderLeft: isActive ? `3px solid ${RV.activeB}` : "3px solid transparent",
+                  paddingLeft: item.indent ? (isActive ? 24 : 27) : (isActive ? 9 : 12),
+                }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = RV.hover; }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
+                {item.icon && <I d={item.icon} s={13} c={isActive ? RV.activeB : RV.txtSec} />}
+                <span className="text-[12px] truncate" style={{ color: isActive ? RV.activeB : RV.txt, fontWeight: isActive ? 600 : 400 }}>{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── MAIN CONTENT ── */}
+      <div className="flex-1 flex flex-col overflow-hidden" style={{ background: RV.main }}>
+
+        {/* Toolbar */}
+        <div className="flex items-center gap-0.5 px-4 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${RV.border}`, background: RV.bg }}>
+          {toolbarBtns.map((btn, i) => (
+            <button key={i}
+              className="flex items-center gap-1.5 px-3 py-1 text-[11px] transition-colors rounded-sm"
+              style={{ color: RV.txt, background: "transparent" }}
+              onMouseEnter={e => (e.currentTarget.style.background = RV.hover)}
+              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <I d={btn.icon} s={13} c={RV.activeB} />
+              {btn.label}
+              {btn.caret && <I d={ic.chevD} s={10} c={RV.txtSec} />}
+            </button>
+          ))}
+        </div>
+
+        {/* Diagram canvas */}
+        <div className="flex-1 relative overflow-hidden" style={{ background: RV.main }}>
+
+          {/* Diagram center */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div style={{ transform: `scale(${zoom})`, transformOrigin: "center", transition: "transform 0.15s ease" }}>
+              <div className="flex flex-col items-center gap-0">
+
+                {/* Card 1 — Foundry resource */}
+                <div className="flex flex-col items-center px-6 py-5 rounded"
+                  style={{ background: RV.cardBg, border: `1px solid ${RV.cardBrd}`, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", width: 200, minHeight: 120 }}>
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-3"
+                    style={{ background: "linear-gradient(135deg, #50B0F0, #0078D4)" }}>
+                    <I d={ic.cloud} s={26} c="#fff" />
+                  </div>
+                  <p className="text-[12px] font-semibold text-center" style={{ color: RV.txt }}>ai-project-123-resource</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: RV.txtSec }}>Foundry</p>
+                </div>
+
+                {/* Arrow */}
+                <svg width="24" height="40" viewBox="0 0 24 40" fill="none">
+                  <line x1="12" y1="0" x2="12" y2="28" stroke="#605E5C" strokeWidth="1.5" />
+                  <polyline points="6,22 12,32 18,22" fill="none" stroke="#605E5C" strokeWidth="1.5" strokeLinejoin="round" />
+                </svg>
+
+                {/* Card 2 — Foundry project */}
+                <div className="flex flex-col items-center px-6 py-5 rounded"
+                  style={{ background: RV.cardBg, border: `1px solid ${RV.cardBrd}`, boxShadow: "0 1px 4px rgba(0,0,0,0.08)", width: 200, minHeight: 120 }}>
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-3"
+                    style={{ background: "linear-gradient(135deg, #7B68EE, #5B4FD9)" }}>
+                    {/* Ribbon / badge shape */}
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                      <path d="M14 2L22 7V14L14 26L6 14V7L14 2Z" fill="rgba(255,255,255,0.9)" />
+                      <path d="M14 6L19 9.5V14L14 22L9 14V9.5L14 6Z" fill="#5B4FD9" />
+                    </svg>
+                  </div>
+                  <p className="text-[11px] font-semibold text-center leading-snug" style={{ color: RV.txt }}>ai-project-123-resource/<br/>ai-project-123</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: RV.txtSec }}>Foundry project</p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom-right nav controls */}
+          <div className="absolute bottom-5 right-5 flex flex-col gap-1">
+            {[
+              { icon: ic.mouse,             label: "Pan",      action: () => {} },
+              { icon: ic.plus,             label: "Zoom in",  action: () => setZoom(z => Math.min(z + 0.15, 2.5)) },
+              { icon: ic.minimize,         label: "Zoom out", action: () => setZoom(z => Math.max(z - 0.15, 0.3)) },
+            ].map((btn, i) => (
+              <button key={i} title={btn.label} onClick={btn.action}
+                className="w-8 h-8 flex items-center justify-center rounded transition-colors"
+                style={{ background: RV.cardBg, border: `1px solid ${RV.cardBrd}`, boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}
+                onMouseEnter={e => (e.currentTarget.style.background = RV.hover)}
+                onMouseLeave={e => (e.currentTarget.style.background = RV.cardBg)}>
+                <I d={btn.icon} s={14} c={RV.txtSec} />
+              </button>
+            ))}
+          </div>
+
+          {/* Give feedback */}
+          <div className="absolute bottom-5 left-0 px-4">
+            <p className="text-[11px] font-semibold mb-1" style={{ color: RV.txt }}>Give feedback</p>
+            <button className="flex items-center gap-1.5 text-[11px] transition-colors"
+              style={{ color: RV.activeB }}
+              onMouseEnter={e => (e.currentTarget.style.textDecoration = "underline")}
+              onMouseLeave={e => (e.currentTarget.style.textDecoration = "none")}>
+              <I d={ic.user} s={12} c={RV.activeB} />
+              Tell us about your experience with resource visualizer
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ AI IMAGE GENERATOR APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function ImageGenApp({ c }: { c: typeof palette.dark }) {
   const styles = ["Photorealistic", "Oil Painting", "Watercolor", "Anime", "Abstract", "Pixel Art", "Sketch", "3D Render"];
@@ -8876,7 +9084,8 @@ export default function AlternusOS() {
     { id: "knowledge", title: "Knowledge Base", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 560, h: 480 },
     { id: "sysmon", title: "System Monitor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 500, h: 480 },
     { id: "business", title: "Business Manager", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 30, w: 820, h: 540 },
-    { id: "agent", title: "Alternus AI Agent", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 60, y: 30, w: 900, h: 600 },
+    { id: "agent",  title: "Alternus AI Agent",    isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 60,  y: 30, w: 900, h: 600 },
+    { id: "resvis", title: "Resource Visualizer",  isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 40, w: 820, h: 560 },
   ];
 
   const [wins, setWins] = useState<WinState[]>(defaultWins);
@@ -9019,7 +9228,8 @@ export default function AlternusOS() {
       knowledge: { w: 580, h: 480 },
       sysmon: { w: 500, h: 480 },
       business: { w: 820, h: 540 },
-      agent: { w: 900, h: 600 },
+      agent:  { w: 900, h: 600 },
+      resvis: { w: 820, h: 560 },
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
@@ -9475,6 +9685,7 @@ export default function AlternusOS() {
     mail: <MailApp c={c} />,
     monaco: <MonacoApp c={c} />,
     aihub: <AIHubApp c={c} />,
+    resvis: <ResourceVisualizerApp />,
     aivoice: <AIVoiceApp c={c} />,
     knowledge: <KnowledgeApp c={c} />,
     sysmon: <SysMonApp c={c} />,
@@ -9484,7 +9695,8 @@ export default function AlternusOS() {
 
   const dockApps: { id: WinId; icon: string; label: string; color: string; category: "ai" | "productivity" | "media" | "system" | "web" }[] = [
     { id: "agent", icon: ic.sparkle, label: "Alternus AI Agent", color: "#7C3AED", category: "ai" },
-    { id: "aihub", icon: ic.messageCircle, label: "AI Hub", color: "#A78BFA", category: "ai" },
+    { id: "aihub",  icon: ic.messageCircle, label: "AI Hub",               color: "#A78BFA", category: "ai" },
+    { id: "resvis", icon: ic.layers,       label: "Resource Visualizer",  color: "#0078D4", category: "ai" },
     { id: "aivoice", icon: ic.mic, label: "AI Voice", color: "#FBBF24", category: "ai" },
     { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316", category: "ai" },
     { id: "code", icon: ic.code, label: "Code", color: c.purple, category: "productivity" },
