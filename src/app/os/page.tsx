@@ -117,26 +117,26 @@ const palette = {
     titlebarBorder: "#383942",
   },
   light: {
-    bg: "#F5F6FA",
+    bg: "#ECEDF2",
     surface: "#FFFFFF",
     card: "#FFFFFF",
-    cardAlt: "#F0F1F5",
-    border: "#E4E5EC",
-    text: "#1A1C28",
-    textSec: "#5A5E72",
-    textMuted: "#8B8FA5",
-    accent: "#4F8EF7",
-    accentSoft: "rgba(79,142,247,0.10)",
-    accentText: "#3672D9",
-    success: "#22C07A",
-    successSoft: "rgba(34,192,122,0.10)",
-    warning: "#E5A117",
-    warningSoft: "rgba(229,161,23,0.10)",
-    danger: "#E85454",
+    cardAlt: "#F3F4F8",
+    border: "#E2E3EC",
+    text: "#11131F",
+    textSec: "#52566A",
+    textMuted: "#9295A8",
+    accent: "#5B5EA6",
+    accentSoft: "rgba(91,94,166,0.10)",
+    accentText: "#4749A0",
+    success: "#1E9E6B",
+    successSoft: "rgba(30,158,107,0.10)",
+    warning: "#D98A0A",
+    warningSoft: "rgba(217,138,10,0.10)",
+    danger: "#D64545",
     purple: "#8B5CF6",
     purpleSoft: "rgba(139,92,246,0.10)",
-    titlebar: "#F0F1F5",
-    titlebarBorder: "#DCDEE6",
+    titlebar: "#FFFFFF",
+    titlebarBorder: "#E2E3EC",
   },
 };
 
@@ -288,114 +288,57 @@ function TitleBar({
   mode?: ThemeMode;
 }) {
   const dk = (mode || "dark") === "dark";
-  const iconStroke = dk ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)";
-  const iconStrokeHover = "#fff";
 
-  /* shared glass button style */
-  const btnBase: React.CSSProperties = {
-    width: 26,
-    height: 26,
-    borderRadius: 10,
+  /* macOS traffic-light button base */
+  const tlBtn: React.CSSProperties = {
+    width: 13,
+    height: 13,
+    borderRadius: "50%",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    position: "relative",
-    overflow: "hidden",
-    background: dk ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-    border: `1px solid ${dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"}`,
-    transition: "all 0.22s cubic-bezier(0.4,0,0.2,1)",
+    border: "none",
     cursor: "pointer",
+    flexShrink: 0,
+    transition: "filter 0.15s ease, box-shadow 0.15s ease",
   };
 
   return (
     <div
       onMouseDown={onMouseDown}
-      className="flex items-center justify-between h-10 px-3 select-none cursor-move flex-shrink-0"
+      className="flex items-center gap-2 h-10 px-3 select-none cursor-move flex-shrink-0"
       style={{ background: "transparent", borderBottom: "none" }}
     >
-      <span style={{ color: isFrozen ? c.warning : c.textSec }} className="text-[11px] font-medium truncate max-w-[180px]">
-        {title}{isFrozen ? " (Not Responding)" : ""}
-      </span>
-      <div className="flex items-center gap-[5px]">
-        {/* ● Minimize — circle */}
-        <button
-          onMouseDown={e => e.stopPropagation()}
-          onClick={onMinimize}
-          style={btnBase}
-          onMouseEnter={e => {
-            const el = e.currentTarget;
-            el.style.background = "rgba(74,222,128,0.85)";
-            el.style.borderColor = "rgba(74,222,128,0.4)";
-            el.style.boxShadow = "0 0 12px rgba(74,222,128,0.35), inset 0 1px 0 rgba(255,255,255,0.25)";
-            const s = el.querySelector("circle"); if (s) s.setAttribute("stroke", iconStrokeHover);
-          }}
-          onMouseLeave={e => {
-            const el = e.currentTarget;
-            el.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
-            el.style.borderColor = dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
-            el.style.boxShadow = "none";
-            const s = el.querySelector("circle"); if (s) s.setAttribute("stroke", iconStroke);
-          }}
-        >
-          {/* Gloss reflection */}
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "50%", borderRadius: "9px 9px 0 0", background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%)", pointerEvents: "none" }} />
-          <svg width={11} height={11} viewBox="0 0 10 10" style={{ position: "relative", zIndex: 1 }}>
-            <circle cx="5" cy="5" r="3.5" fill="none" stroke={iconStroke} strokeWidth="1.4" />
-          </svg>
-        </button>
-
-        {/* ■ Maximize — rounded square */}
-        <button
-          onMouseDown={e => e.stopPropagation()}
-          onClick={onMaximize}
-          style={btnBase}
-          onMouseEnter={e => {
-            const el = e.currentTarget;
-            el.style.background = "rgba(91,163,230,0.85)";
-            el.style.borderColor = "rgba(91,163,230,0.4)";
-            el.style.boxShadow = "0 0 12px rgba(91,163,230,0.35), inset 0 1px 0 rgba(255,255,255,0.25)";
-            const s = el.querySelector("rect"); if (s) s.setAttribute("stroke", iconStrokeHover);
-          }}
-          onMouseLeave={e => {
-            const el = e.currentTarget;
-            el.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
-            el.style.borderColor = dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
-            el.style.boxShadow = "none";
-            const s = el.querySelector("rect"); if (s) s.setAttribute("stroke", iconStroke);
-          }}
-        >
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "50%", borderRadius: "9px 9px 0 0", background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%)", pointerEvents: "none" }} />
-          <svg width={11} height={11} viewBox="0 0 10 10" style={{ position: "relative", zIndex: 1 }}>
-            <rect x="2" y="2" width="6" height="6" rx="1.2" fill="none" stroke={iconStroke} strokeWidth="1.4" />
-          </svg>
-        </button>
-
-        {/* ▲ Close — triangle */}
+      {/* Traffic-light buttons */}
+      <div className="flex items-center gap-[6px]">
+        {/* ● Close — red */}
         <button
           onMouseDown={e => e.stopPropagation()}
           onClick={onClose}
-          style={btnBase}
-          onMouseEnter={e => {
-            const el = e.currentTarget;
-            el.style.background = "rgba(248,113,113,0.85)";
-            el.style.borderColor = "rgba(248,113,113,0.4)";
-            el.style.boxShadow = "0 0 12px rgba(248,113,113,0.35), inset 0 1px 0 rgba(255,255,255,0.25)";
-            const s = el.querySelector("polygon"); if (s) s.setAttribute("stroke", iconStrokeHover);
-          }}
-          onMouseLeave={e => {
-            const el = e.currentTarget;
-            el.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
-            el.style.borderColor = dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
-            el.style.boxShadow = "none";
-            const s = el.querySelector("polygon"); if (s) s.setAttribute("stroke", iconStroke);
-          }}
-        >
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "50%", borderRadius: "9px 9px 0 0", background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%)", pointerEvents: "none" }} />
-          <svg width={11} height={11} viewBox="0 0 10 10" style={{ position: "relative", zIndex: 1 }}>
-            <polygon points="5,1.8 8.8,8.2 1.2,8.2" fill="none" stroke={iconStroke} strokeWidth="1.4" strokeLinejoin="round" />
-          </svg>
-        </button>
+          style={{ ...tlBtn, background: "#FF5F57" }}
+          onMouseEnter={e => { e.currentTarget.style.filter = "brightness(0.88)"; e.currentTarget.style.boxShadow = "0 0 6px rgba(255,95,87,0.5)"; }}
+          onMouseLeave={e => { e.currentTarget.style.filter = "none"; e.currentTarget.style.boxShadow = "none"; }}
+        />
+        {/* ● Minimize — amber */}
+        <button
+          onMouseDown={e => e.stopPropagation()}
+          onClick={onMinimize}
+          style={{ ...tlBtn, background: "#FFBD2E" }}
+          onMouseEnter={e => { e.currentTarget.style.filter = "brightness(0.88)"; e.currentTarget.style.boxShadow = "0 0 6px rgba(255,189,46,0.55)"; }}
+          onMouseLeave={e => { e.currentTarget.style.filter = "none"; e.currentTarget.style.boxShadow = "none"; }}
+        />
+        {/* ● Maximize — green */}
+        <button
+          onMouseDown={e => e.stopPropagation()}
+          onClick={onMaximize}
+          style={{ ...tlBtn, background: "#28C840" }}
+          onMouseEnter={e => { e.currentTarget.style.filter = "brightness(0.88)"; e.currentTarget.style.boxShadow = "0 0 6px rgba(40,200,64,0.5)"; }}
+          onMouseLeave={e => { e.currentTarget.style.filter = "none"; e.currentTarget.style.boxShadow = "none"; }}
+        />
       </div>
+      <span style={{ color: isFrozen ? c.warning : c.textSec, fontWeight: 500 }} className="text-[11px] truncate max-w-[200px]">
+        {title}{isFrozen ? " (Not Responding)" : ""}
+      </span>
     </div>
   );
 }
@@ -512,22 +455,22 @@ function AppWindow({
     <div
       style={{
         ...style,
-        background: isAI ? "transparent" : isDark ? "rgba(30,31,38,0.72)" : "rgba(255,255,255,0.68)",
+        background: isAI ? "transparent" : isDark ? "rgba(30,31,38,0.72)" : "rgba(255,255,255,0.82)",
         backdropFilter: isAI ? "none" : "blur(28px) saturate(1.5)",
         WebkitBackdropFilter: isAI ? "none" : "blur(28px) saturate(1.5)",
-        border: isAI ? "none" : isDragOver ? `1px solid ${c.accent}` : `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.05)"}`,
-        borderRadius: 18,
+        border: isAI ? "none" : isDragOver ? `1px solid ${c.accent}` : `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(140,120,200,0.14)"}`,
+        borderRadius: 14,
         boxShadow: isAI ? "none" : isDark
           ? "0 12px 40px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.04)"
-          : "0 12px 40px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.6)",
+          : "0 4px 24px rgba(60,50,120,0.10), 0 1px 4px rgba(60,50,120,0.05), inset 0 1px 0 rgba(255,255,255,0.9)",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
         transition: "box-shadow 0.2s ease, border-color 0.15s ease",
         pointerEvents: isAI ? "none" : "auto",
       }}
-      onMouseEnter={e => { if (!isAI) { e.currentTarget.style.boxShadow = isDark ? "0 16px 56px rgba(0,0,0,0.45), 0 3px 10px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)" : "0 16px 56px rgba(0,0,0,0.10), 0 3px 8px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.7)"; } }}
-      onMouseLeave={e => { if (!isAI) { e.currentTarget.style.boxShadow = isDark ? "0 12px 40px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 12px 40px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,0.6)"; } }}
+      onMouseEnter={e => { if (!isAI) { e.currentTarget.style.boxShadow = isDark ? "0 16px 56px rgba(0,0,0,0.45), 0 3px 10px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)" : "0 8px 40px rgba(60,50,120,0.16), 0 2px 6px rgba(60,50,120,0.07), inset 0 1px 0 rgba(255,255,255,1)"; } }}
+      onMouseLeave={e => { if (!isAI) { e.currentTarget.style.boxShadow = isDark ? "0 12px 40px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.04)" : "0 4px 24px rgba(60,50,120,0.10), 0 1px 4px rgba(60,50,120,0.05), inset 0 1px 0 rgba(255,255,255,0.9)"; } }}
       onClick={isAI ? undefined : onFocus}
       onDragOver={onFileDrop ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; setIsDragOver(true); } : undefined}
       onDragLeave={onFileDrop ? () => setIsDragOver(false) : undefined}
@@ -8955,7 +8898,7 @@ export default function AlternusOS() {
   const [showWifiPanel, setShowWifiPanel] = useState(false);
   const [showProfilePanel, setShowProfilePanel] = useState(false);
   const [showAISidebar, setShowAISidebar] = useState(false);
-  const [showTopBar, setShowTopBar] = useState(false);
+  const [showTopBar, setShowTopBar] = useState(true);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [connectedWifi, setConnectedWifi] = useState(0);
   const [showTaskSwitcher, setShowTaskSwitcher] = useState(false);
@@ -9815,10 +9758,12 @@ export default function AlternusOS() {
     "url('/wallpapers/OSwp4.png') center/cover no-repeat",
     "url('/wallpapers/OSwp5.png') center/cover no-repeat",
   ];
-  const desktopBg = wallpaper === 0 ? c.bg : wallpapers[wallpaper] || c.bg;
+  const desktopBg = wallpaper === 0
+    ? (mode === "dark" ? c.bg : "linear-gradient(150deg, #EEE8F8 0%, #E8EEF8 40%, #E8F3F8 100%)")
+    : wallpapers[wallpaper] || c.bg;
 
   return (
-    <div style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
+    <div style={{ background: mode === "dark" ? c.bg : "linear-gradient(150deg, #EEE8F8 0%, #E8EEF8 40%, #E8F3F8 100%)" }} className="fixed inset-0 flex flex-col overflow-hidden">
       <style>{`
         * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
         *::-webkit-scrollbar { display: none !important; }
@@ -9834,26 +9779,25 @@ export default function AlternusOS() {
         .os-page-enter { animation: os-page-in 0.18s cubic-bezier(0.4,0,0.2,1) both; }
         .os-fade-enter { animation: os-fade-in 0.15s ease both; }
       `}</style>
-      {/* Top Bar hover trigger zone */}
-      <div className="absolute top-0 left-0 right-0 h-2 z-[300]" onMouseEnter={() => setShowTopBar(true)} />
-      {/* Top Bar */}
+      {/* Top Bar — always visible */}
       <div
-        className="relative flex items-center justify-between px-4 h-9 flex-shrink-0 transition-all duration-300 z-[200]"
+        className="relative flex items-center justify-between px-4 flex-shrink-0 z-[200]"
         style={{
-          background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)",
-          backdropFilter: "blur(20px) saturate(1.4)",
-          WebkitBackdropFilter: "blur(20px) saturate(1.4)",
-          borderBottom: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
-          transform: showTopBar ? "translateY(0)" : "translateY(-100%)",
-          position: showTopBar ? "relative" : "absolute",
-          top: 0, left: 0, right: 0,
+          height: 44,
+          background: mode === "dark" ? "rgba(28,29,36,0.88)" : "linear-gradient(135deg, #e8d5f5 0%, #dce4fb 50%, #d5eaf8 100%)",
+          backdropFilter: "blur(20px) saturate(1.5)",
+          WebkitBackdropFilter: "blur(20px) saturate(1.5)",
+          borderBottom: mode === "dark" ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(150,130,200,0.15)",
         }}
-        onMouseEnter={() => setShowTopBar(true)}
-        onMouseLeave={() => setShowTopBar(false)}
       >
-        <div className="flex items-center gap-2">
-          <span style={{ color: c.text }} className="text-[11px] font-bold tracking-wider">ALTERNUS</span>
-          <span style={{ color: c.textMuted }} className="text-[10px]">OS</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[13px] font-bold tracking-tight" style={{
+            background: mode === "dark" ? "none" : "linear-gradient(90deg, #7B5EA6 0%, #4F6FCF 100%)",
+            WebkitBackgroundClip: mode === "dark" ? "unset" : "text",
+            WebkitTextFillColor: mode === "dark" ? c.text : "transparent",
+            color: mode === "dark" ? c.text : undefined,
+          }}>Alternus</span>
+          <span className="text-[11px] font-medium" style={{ color: mode === "dark" ? c.textMuted : "rgba(100,80,150,0.6)" }}>OS</span>
         </div>
         <span className="absolute left-1/2 -translate-x-1/2 text-xs font-bold" style={{ color: c.text }}>{fmt(time)} · {time.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
         <div className="flex items-center gap-1">
@@ -10315,13 +10259,13 @@ export default function AlternusOS() {
 
         {/* ━━━━ Bottom Dock Bar — Minimal pill, mode-aware ━━━━ */}
         {(() => {
-          const dockBg = mode === "dark" ? "rgba(14,16,24,0.82)" : "rgba(240,242,250,0.84)";
-          const dockBorder = mode === "dark" ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.09)";
+          const dockBg = mode === "dark" ? "rgba(14,16,24,0.82)" : "rgba(255,255,255,0.75)";
+          const dockBorder = mode === "dark" ? "rgba(255,255,255,0.07)" : "rgba(140,120,200,0.18)";
           const dockShadow = mode === "dark"
             ? "0 8px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)"
-            : "0 8px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.7)";
-          const iconColor = mode === "dark" ? "rgba(255,255,255,0.65)" : "rgba(28,30,42,0.62)";
-          const hoverBg   = mode === "dark" ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.06)";
+            : "0 8px 32px rgba(80,60,160,0.14), 0 2px 8px rgba(80,60,160,0.07), inset 0 1px 0 rgba(255,255,255,0.9)";
+          const iconColor = mode === "dark" ? "rgba(255,255,255,0.65)" : "rgba(60,50,100,0.70)";
+          const hoverBg   = mode === "dark" ? "rgba(255,255,255,0.09)" : "rgba(91,94,166,0.09)";
           const dotColor  = mode === "dark" ? "rgba(255,255,255,0.5)" : "rgba(28,30,42,0.4)";
           return (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[50]" onClick={e => e.stopPropagation()}>
@@ -10431,6 +10375,7 @@ export default function AlternusOS() {
                 {/* Files */}
                 {(() => {
                   const isOpen = wins.some(w => w.id === "files" && w.isOpen);
+                  const appColor = dockApps.find(a => a.id === "files")?.color ?? "#D98A0A";
                   return (
                     <div className="flex flex-col items-center gap-0.5">
                       <button
@@ -10441,7 +10386,9 @@ export default function AlternusOS() {
                         onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
                       >
-                        <I d={ic.folder} s={19} c={iconColor} />
+                        <div style={{ width: 28, height: 28, borderRadius: 8, background: `${appColor}18`, border: `1px solid ${appColor}30`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <I d={ic.folder} s={16} c={appColor} />
+                        </div>
                       </button>
                       <div style={{ width: 4, height: 4, borderRadius: "50%", background: isOpen ? dotColor : "transparent", transition: "all 200ms" }} />
                     </div>
@@ -10451,6 +10398,7 @@ export default function AlternusOS() {
                 {/* Browser */}
                 {(() => {
                   const isOpen = wins.some(w => w.id === "browser" && w.isOpen);
+                  const appColor = dockApps.find(a => a.id === "browser")?.color ?? "#4749A0";
                   return (
                     <div className="flex flex-col items-center gap-0.5">
                       <button
@@ -10461,7 +10409,9 @@ export default function AlternusOS() {
                         onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
                       >
-                        <I d={ic.refresh} s={19} c={iconColor} />
+                        <div style={{ width: 28, height: 28, borderRadius: 8, background: `${appColor}18`, border: `1px solid ${appColor}30`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <I d={ic.globe} s={16} c={appColor} />
+                        </div>
                       </button>
                       <div style={{ width: 4, height: 4, borderRadius: "50%", background: isOpen ? dotColor : "transparent", transition: "all 200ms" }} />
                     </div>
@@ -10471,6 +10421,7 @@ export default function AlternusOS() {
                 {/* Settings */}
                 {(() => {
                   const isOpen = wins.some(w => w.id === "settings" && w.isOpen);
+                  const appColor = mode === "dark" ? "rgba(255,255,255,0.5)" : "#5B5EA6";
                   return (
                     <div className="flex flex-col items-center gap-0.5">
                       <button
@@ -10481,7 +10432,9 @@ export default function AlternusOS() {
                         onMouseEnter={e => { e.currentTarget.style.background = hoverBg; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
                       >
-                        <I d={ic.settings} s={19} c={iconColor} />
+                        <div style={{ width: 28, height: 28, borderRadius: 8, background: `${appColor}18`, border: `1px solid ${appColor}30`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <I d={ic.settings} s={16} c={appColor} />
+                        </div>
                       </button>
                       <div style={{ width: 4, height: 4, borderRadius: "50%", background: isOpen ? dotColor : "transparent", transition: "all 200ms" }} />
                     </div>
