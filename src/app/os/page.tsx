@@ -9608,7 +9608,7 @@ export default function AlternusOS() {
   return (
     <div style={{ background: desktopBg }} className="fixed inset-0 flex flex-col overflow-hidden">
       <style>{`
-        * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+        * { scrollbar-width: none !important; -ms-overflow-style: none !important; font-family: var(--font-montserrat), 'Montserrat', system-ui, sans-serif !important; }
         *::-webkit-scrollbar { display: none !important; }
         .ai-bar-input::placeholder { color: rgba(255,255,255,0.65); }
         @keyframes os-page-in {
