@@ -1,6 +1,18 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  Sparkles, Terminal, Code, Folder, Settings, Music, Cloud, Calendar, StickyNote,
+  Globe, Sun, Moon, Wifi, Send, User, ChevronRight, ChevronLeft, ChevronDown, ChevronUp,
+  Play, Pause, SkipForward, Minus, Maximize2, X, Search, Power, Bell, ShoppingCart,
+  Film, FileText, Type, Pen, Upload, Share2, Plus, AlignLeft, AlignCenter, AlignRight,
+  AlignJustify, Bluetooth, Mic, Monitor, Mouse, Volume2, AlertTriangle, Shield, Lock,
+  Battery, Cpu, HardDrive, RefreshCw, Home, Clock, Calculator, Key, Menu, Trash2,
+  Newspaper, Download, Image, LayoutGrid, CheckSquare, Mail, Wand2, Brain, MessageCircle,
+  BookOpen, Pencil, Activity, Layers, Zap, Briefcase, DollarSign, TrendingUp, Users,
+  BarChart2, Droplets, Wind, ThumbsUp, ThumbsDown, Copy,
+  Bold, Italic, Underline, Strikethrough, Redo2, Check, Bookmark, List, Columns, Snowflake, type LucideIcon,
+} from "lucide-react";
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Alternus OS — AI-Powered Desktop Operating System
@@ -36,7 +48,7 @@ interface AINotification {
   id: string;
   title: string;
   message: string;
-  icon: string;
+  icon: LucideIcon;
   time: string;
   type: "security" | "suggestion" | "cleanup" | "summary" | "system";
   actions?: { label: string; handler: string }[];
@@ -47,7 +59,7 @@ interface TimelineEvent {
   time: string;
   action: string;
   app: string;
-  icon: string;
+  icon: LucideIcon;
 }
 
 // ━━━━ AI Engine ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -150,152 +162,107 @@ function useContainerSize(baseW: number) {
 }
 
 // ━━━━ Simple SVG Icon ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-let _gradId = 0;
-function I({ d, s = 16, c, w, f, grad }: { d: string; s?: number; c?: string; w?: number; f?: boolean; grad?: [string, string] }) {
-  const gid = grad ? `ig${++_gradId}` : null;
-  return (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill={f ? (gid ? `url(#${gid})` : (c || "currentColor")) : "none"} stroke={f ? "none" : (c || "currentColor")} strokeWidth={f ? 0 : (w || 2)} strokeLinecap="round" strokeLinejoin="round">
-      {grad && gid && (
-        <defs>
-          <linearGradient id={gid} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={grad[0]} />
-            <stop offset="100%" stopColor={grad[1]} />
-          </linearGradient>
-        </defs>
-      )}
-      <path d={d} />
-    </svg>
-  );
+// ━━━━ Icon wrapper — uses lucide-react ━━━━━━━━━━━━━━━━━━━
+function I({ d: Icon, s = 16, c, w }: { d: LucideIcon; s?: number; c?: string; w?: number; f?: boolean; grad?: [string, string] }) {
+  return <Icon size={s} color={c ?? "currentColor"} strokeWidth={w ?? 2} />;
 }
 
+// ━━━━ Icon map — lucide-react components ━━━━━━━━━━━━━━━━━━
 const ic = {
-  sparkle: "M9.937 15.5A2 2 0 008.5 14.063l-6.135-1.582a.5.5 0 010-.962L8.5 9.936A2 2 0 009.937 8.5l1.582-6.135a.5.5 0 01.963 0L14.063 8.5A2 2 0 0015.5 9.937l6.135 1.582a.5.5 0 010 .963L15.5 14.063a2 2 0 00-1.437 1.437l-1.582 6.135a.5.5 0 01-.963 0z",
-  terminal: "M4 17l6-6-6-6M12 19h8",
-  code: "M16 18l6-6-6-6M8 6l-6 6 6 6",
-  folder: "M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z",
-  settings: "M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z",
-  music: "M9 18V5l12-2v13M6 18a3 3 0 100-6 3 3 0 000 6zM18 16a3 3 0 100-6 3 3 0 000 6z",
-  cloud: "M17.5 19H9a7 7 0 116.71-9h1.79a4.5 4.5 0 110 9z",
-  calendar: "M3 10h18M8 2v4M16 2v4M3 6a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6z",
-  note: "M16 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V8zM15 3v4a2 2 0 002 2h4",
-  globe: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z",
-  sun: "M12 8a4 4 0 100 8 4 4 0 000-8zM12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41",
-  moon: "M12 3a6 6 0 009 9 9 9 0 11-9-9z",
-  wifi: "M5 13a10 10 0 0114 0M8.5 16.5a5 5 0 017 0M2 8.82a15 15 0 0120 0M12 20h.01",
-  send: "M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z",
-  user: "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z",
-  chevR: "M9 18l6-6-6-6",
-  chevL: "M15 18l-6-6 6-6",
-  chevD: "M6 9l6 6 6-6",
-  chevU: "M18 15l-6-6-6 6",
-  play: "M5 3l14 9-14 9V3z",
-  pause: "M6 4h4v16H6zM14 4h4v16h-4z",
-  skip: "M5 4l10 8-10 8V4zM19 5v14",
-  minimize: "M5 12h14",
-  maximize: "M3 3h18v18H3z",
-  close: "M18 6L6 18M6 6l12 12",
-  search: "M11 3a8 8 0 100 16 8 8 0 000-16zM21 21l-4.3-4.3",
-  power: "M12 2v10M16.24 7.76a6 6 0 11-8.49 0",
-  bell: "M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0",
-  store: "M3 3h18l-2 13H5L3 3zM16 16a2 2 0 100 4 2 2 0 000-4zM9 16a2 2 0 100 4 2 2 0 000-4z",
-  film: "M2 2h20v20H2zM7 2v20M17 2v20M2 7h5M2 12h20M2 17h5M17 7h5M17 17h5",
-  fileText: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8",
-  type: "M4 7V4h16v3M9 20h6M12 4v16",
-  pen: "M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z",
-  upload: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12",
-  share: "M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13",
-  plus: "M12 5v14M5 12h14",
-  alignLeft: "M17 10H3M21 6H3M21 14H3M17 18H3",
-  alignCenter: "M18 10H6M21 6H3M21 14H3M18 18H6",
-  alignRight: "M21 10H7M21 6H3M21 14H3M21 18H7",
-  alignJustify: "M21 10H3M21 6H3M21 14H3M21 18H3",
-  bluetooth: "M6.5 6.5l11 11L12 23V1l5.5 5.5-11 11",
-  mic: "M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2",
-  monitor: "M2 3h20v14H2zM8 21h8M12 17v4",
-  mouse: "M12 2a5 5 0 00-5 5v10a5 5 0 0010 0V7a5 5 0 00-5-5zM12 2v6",
-  volume: "M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07",
-  alertTriangle: "M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01",
-  shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
-  lock: "M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2zM7 11V7a5 5 0 0110 0v4",
-  battery: "M17 6H3a2 2 0 00-2 2v8a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2zM23 13v-2",
-  cpu: "M18 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2zM9 9h6v6H9zM9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3",
-  hdd: "M22 12H2M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11zM6 16h.01M10 16h.01",
-  refresh: "M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15",
-  home: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0v-6a1 1 0 011-1h2a1 1 0 011 1v6m-6 0h6",
-  clock: "M12 2a10 10 0 100 20 10 10 0 000-20zM12 6v6l4 2",
-  calc: "M4 2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zM8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01M8 6h8",
-  key: "M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4",
-  menu: "M3 12h18M3 6h18M3 18h18",
-  trash: "M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6",
-  voice: "M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8",
-  newspaper: "M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zM8 10h8M8 14h4M8 18h6M16 14h2v4h-2z",
-  // Filled icon variants
-  globeF: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z",
-  codeF: "M16 18l6-6-6-6M8 6l-6 6 6 6",
-  terminalF: "M4 17l6-6-6-6M12 19h8",
-  cloudF: "M17.5 19H9a7 7 0 116.71-9h1.79a4.5 4.5 0 110 9z",
-  calendarF: "M3 10h18M8 2v4M16 2v4M3 6a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6z",
-  storeF: "M3 3h18l-2 13H5L3 3zM16 16a2 2 0 100 4 2 2 0 000-4zM9 16a2 2 0 100 4 2 2 0 000-4z",
-  filmF: "M2 2h20v20H2zM7 2v20M17 2v20M2 7h5M2 12h20M2 17h5M17 7h5M17 17h5",
-  bellF: "M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0",
-  settingsF: "M12 8a4 4 0 100 8 4 4 0 000-8zM12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2z",
-  wifiF: "M12 20h.01M8.5 16.5a5 5 0 017 0M5 13a10 10 0 0114 0M2 8.82a15 15 0 0120 0",
-  batteryF: "M17 6H3a2 2 0 00-2 2v8a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2zM23 13v-2M7 10v4M10 10v4M13 10v4",
-  moonF: "M12 3a6 6 0 009 9 9 9 0 11-9-9z",
-  sunF: "M12 7a5 5 0 100 10 5 5 0 000-10zM12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42",
-  download: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3",
-  image: "M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zM8.5 10a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM21 15l-5-5L5 21",
-  grid: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
-  checkSquare: "M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11",
-  mail: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6",
-  wand: "M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8L19.2 13.2M17.8 6.2L19.2 4.8M3 21L12 12M12.2 6.2L10.8 4.8",
-  brain: "M9.5 2A2.5 2.5 0 007 4.5v.5H5a3 3 0 000 6h.5v.5a3.5 3.5 0 007 0V11h.5a3 3 0 000-6H13v-.5A2.5 2.5 0 0010.5 2h-1zM15 8a4 4 0 014 4v1a4 4 0 01-4 4",
-  messageCircle: "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z",
-  bookOpen: "M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z",
-  edit3: "M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z",
-  activity: "M22 12h-4l-3 9L9 3l-3 9H2",
-  layers: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5",
-  zap: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
-  briefcase: "M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2M2 13h20",
-  dollarSign: "M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6",
-  trendingUp: "M23 6l-9.5 9.5-5-5L1 18",
-  users: "M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 3a4 4 0 100 8 4 4 0 000-8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75",
-  fileInvoice: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M8 13h8M8 17h8M8 9h2",
-  barChart: "M18 20V10M12 20V4M6 20v-6",
-};
-
-// ━━━━ Fill Icon Paths (closed shapes for filled rendering) ━━━━━━━━━━━━━━━━━━
-const icFill: Record<string, string> = {
-  terminal:     "M3 3h18c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2zm2.29 4.29a1 1 0 00-1.42 1.42L6.59 11l-2.7 2.71a1 1 0 001.42 1.41l3.41-3.41a1 1 0 000-1.41l-3.41-3.41zM12 14a1 1 0 000 2h5a1 1 0 000-2h-5z",
-  code:         "M14.447 3.026a.5.5 0 01.235.32l3.5 14a.5.5 0 01-.966.256L13.757 4.5H10.5l.016.065-3.507 14a.5.5 0 01-.966-.256l3.5-14a.5.5 0 01.484-.37h4a.5.5 0 01.42.087zM3.854 8.146a.5.5 0 010 .708L1.707 11l2.147 2.146a.5.5 0 01-.708.708l-2.5-2.5a.5.5 0 010-.708l2.5-2.5a.5.5 0 01.708 0zm16.292 0a.5.5 0 01.708 0l2.5 2.5a.5.5 0 010 .708l-2.5 2.5a.5.5 0 01-.708-.708L22.293 11l-2.147-2.146a.5.5 0 010-.708z",
-  files:        "M3 7a2 2 0 012-2h4.586A2 2 0 0111 5.586L13 7.414A2 2 0 0113.414 8H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z",
-  browser:      "M12 2a10 10 0 100 20A10 10 0 0012 2zm1 5v5.586l3.707 3.707a1 1 0 01-1.414 1.414l-4-4A1 1 0 0111 13V7a1 1 0 012 0z",
-  store:        "M1 1.5A.5.5 0 011.5 1h1a.5.5 0 01.485.379L3.89 4h18.01a.5.5 0 01.489.598l-2 10a.5.5 0 01-.49.402H5a.5.5 0 01-.49-.402L2.01 2H1.5a.5.5 0 01-.5-.5zM6 20a2 2 0 100-4 2 2 0 000 4zm11 0a2 2 0 100-4 2 2 0 000 4z",
-  movies:       "M2 4a2 2 0 00-2 2v12a2 2 0 002 2h20a2 2 0 002-2V6a2 2 0 00-2-2H2zm6 2v2H4V6h4zm2 0h4v2h-4V6zm6 0h4v2h-4V6zM4 10h4v4H4v-4zm6 0h4v4h-4v-4zm6 0h4v4h-4v-4zM4 16h4v2H4v-2zm6 0h4v2h-4v-2zm6 0h4v2h-4v-2z",
-  music:        "M9 3v11.5a3.5 3.5 0 10-1 2.5V11l10-2v6.5a3.5 3.5 0 10-1 2.5V5L9 3z",
-  weather:      "M17.5 19H9a7 7 0 116.71-9h1.79a4.5 4.5 0 110 9z",
-  calendar:     "M3 6a2 2 0 012-2h14a2 2 0 012 2v2H3V6zM3 10h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V10zm5-6a1 1 0 012 0v1a1 1 0 01-2 0V4zm8 0a1 1 0 012 0v1a1 1 0 01-2 0V4z",
-  notes:        "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM9 13h6a1 1 0 010 2H9a1 1 0 010-2zm0-4h2a1 1 0 010 2H9a1 1 0 010-2zm0 8h4a1 1 0 010 2H9a1 1 0 010-2z",
-  word:         "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM8 13h8a1 1 0 010 2H8a1 1 0 010-2zm0-4h8a1 1 0 010 2H8a1 1 0 010-2z",
-  downloads:    "M4 17a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1zM12 3a1 1 0 00-1 1v8.586L8.707 10.29a1 1 0 10-1.414 1.42l4 4a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.42L13 12.586V4a1 1 0 00-1-1z",
-  calculator:   "M4 2h16a2 2 0 012 2v16a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2zm1 2v3h14V4H5zm0 5v2h2v-2H5zm4 0v2h2v-2H9zm4 0v2h2v-2h-2zm4 0v6h-2v-6h2zM5 13v2h2v-2H5zm4 0v2h2v-2H9zm-4 4v2h2v-2H5zm4 0v2h2v-2H9z",
-  studio:       "M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z",
-  settings:     "M12.22 2h-.44a2 2 0 00-2 2v.18a2 2 0 01-1 1.73l-.43.25a2 2 0 01-2 0l-.15-.08a2 2 0 00-2.73.73l-.22.38a2 2 0 00.73 2.73l.15.1a2 2 0 011 1.72v.51a2 2 0 01-1 1.74l-.15.09a2 2 0 00-.73 2.73l.22.38a2 2 0 002.73.73l.15-.08a2 2 0 012 0l.43.25a2 2 0 011 1.73V20a2 2 0 002 2h.44a2 2 0 002-2v-.18a2 2 0 011-1.73l.43-.25a2 2 0 012 0l.15.08a2 2 0 002.73-.73l.22-.39a2 2 0 00-.73-2.73l-.15-.08a2 2 0 01-1-1.74v-.5a2 2 0 011-1.74l.15-.09a2 2 0 00.73-2.73l-.22-.38a2 2 0 00-2.73-.73l-.15.08a2 2 0 01-2 0l-.43-.25a2 2 0 01-1-1.73V4a2 2 0 00-2-2zM12 15a3 3 0 100-6 3 3 0 000 6z",
-  controlpanel: "M2 3h20a1 1 0 011 1v12a1 1 0 01-1 1H2a1 1 0 01-1-1V4a1 1 0 011-1zm16 18H6a1 1 0 010-2h12a1 1 0 010 2zm-6-4v-2a1 1 0 012 0v2a1 1 0 01-2 0z",
-  recovery:     "M12 1l9 4v7c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4zm0 6a1 1 0 00-1 1v4a1 1 0 002 0V8a1 1 0 00-1-1zm0 7a1 1 0 100 2 1 1 0 000-2z",
-  news:         "M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm0 2v3h8V6H4zm10 0v8h6V6h-6zM4 11v2h8v-2H4zm0 4v2h8v-2H4z",
-  dashboard:    "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
-  tasks:        "M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11a1 1 0 010 2H5v14h14v-7a1 1 0 012 0zm-9.293-.293l7.5-7.5a1 1 0 011.414 1.414l-8.207 8.207a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414l2.293 2.293z",
-  mail:         "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm8 9L4.8 7h14.4L12 13zm8 5V8.9l-8 5.5-8-5.5V18h16z",
-  monaco:       "M3 3h18a2 2 0 012 2v14a2 2 0 01-2 2H3a2 2 0 01-2-2V5a2 2 0 012-2zm13.5 5.5a.5.5 0 00-.854-.354L12 11.793l-3.646-3.647a.5.5 0 00-.708.708L11.293 12l-3.647 3.646a.5.5 0 00.708.708L12 12.707l3.646 3.647a.5.5 0 00.708-.708L12.707 12l3.647-3.646a.5.5 0 00.146-.354z",
-  aihub:        "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z",
-  imagegen:     "M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zM8.5 7a2 2 0 110 4 2 2 0 010-4zM5 19l4-6 3 4 2-3 5 5H5z",
-  aivoice:      "M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM5 11a7 7 0 0014 0h-2a5 5 0 01-10 0H5zm7 9v-2a9 9 0 009-9h-2a7 7 0 01-14 0H3a9 9 0 009 9v2z",
-  writer:       "M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83zM12 20h9a1 1 0 010 2h-9a1 1 0 010-2z",
-  knowledge:    "M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z",
-  sysmon:       "M2 12h3l3 8 4-16 3 8h7",
-  business:     "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM18 14a4 4 0 100 8 4 4 0 000-8z",
-};
+  sparkle: Sparkles,
+  terminal: Terminal,
+  code: Code,
+  folder: Folder,
+  settings: Settings,
+  music: Music,
+  cloud: Cloud,
+  calendar: Calendar,
+  note: StickyNote,
+  globe: Globe,
+  sun: Sun,
+  moon: Moon,
+  wifi: Wifi,
+  send: Send,
+  user: User,
+  chevR: ChevronRight,
+  chevL: ChevronLeft,
+  chevD: ChevronDown,
+  chevU: ChevronUp,
+  play: Play,
+  pause: Pause,
+  skip: SkipForward,
+  minimize: Minus,
+  maximize: Maximize2,
+  close: X,
+  search: Search,
+  power: Power,
+  bell: Bell,
+  store: ShoppingCart,
+  film: Film,
+  fileText: FileText,
+  type: Type,
+  pen: Pen,
+  upload: Upload,
+  share: Share2,
+  plus: Plus,
+  alignLeft: AlignLeft,
+  alignCenter: AlignCenter,
+  alignRight: AlignRight,
+  alignJustify: AlignJustify,
+  bluetooth: Bluetooth,
+  mic: Mic,
+  monitor: Monitor,
+  mouse: Mouse,
+  volume: Volume2,
+  alertTriangle: AlertTriangle,
+  shield: Shield,
+  lock: Lock,
+  battery: Battery,
+  cpu: Cpu,
+  hdd: HardDrive,
+  refresh: RefreshCw,
+  home: Home,
+  clock: Clock,
+  calc: Calculator,
+  key: Key,
+  menu: Menu,
+  trash: Trash2,
+  voice: Mic,
+  newspaper: Newspaper,
+  download: Download,
+  image: Image,
+  grid: LayoutGrid,
+  checkSquare: CheckSquare,
+  mail: Mail,
+  wand: Wand2,
+  brain: Brain,
+  messageCircle: MessageCircle,
+  bookOpen: BookOpen,
+  edit3: Pencil,
+  activity: Activity,
+  layers: Layers,
+  zap: Zap,
+  briefcase: Briefcase,
+  dollarSign: DollarSign,
+  trendingUp: TrendingUp,
+  users: Users,
+  fileInvoice: FileText,
+  barChart: BarChart2,
+  // "filled" aliases — lucide uses stroke-only; same component
+  globeF: Globe,
+  codeF: Code,
+  terminalF: Terminal,
+  cloudF: Cloud,
+  calendarF: Calendar,
+  storeF: ShoppingCart,
+  filmF: Film,
+  bellF: Bell,
+  settingsF: Settings,
+  wifiF: Wifi,
+  batteryF: Battery,
+  moonF: Moon,
+  sunF: Sun,
+} satisfies Record<string, LucideIcon>;
 
 // ━━━━ Window Title Bar ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function TitleBar({
@@ -952,10 +919,10 @@ function AIChat({ c, mode, setMode, onOpenApp, onExecuteAIActions, osContext }: 
                         {/* Action buttons — Gemini-style */}
                         {!m.appAction && <div className="flex items-center gap-1 mt-3">
                           {[
-                            { icon: "M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3", title: "Good response" },
-                            { icon: "M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3zm7-13h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17", title: "Bad response" },
+                            { icon: ThumbsUp,   title: "Good response" },
+                            { icon: ThumbsDown, title: "Bad response" },
                             { icon: ic.refresh, title: "Regenerate" },
-                            { icon: "M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2M9 2h6v4H9z", title: "Copy" },
+                            { icon: Copy,       title: "Copy" },
                           ].map((action, ai) => (
                             <button key={ai}
                               className="p-2 rounded-lg transition-colors"
@@ -976,7 +943,7 @@ function AIChat({ c, mode, setMode, onOpenApp, onExecuteAIActions, osContext }: 
                               }}
                               onMouseEnter={e => { e.currentTarget.style.color = c.text; e.currentTarget.style.background = c.cardAlt; }}
                               onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; e.currentTarget.style.background = "transparent"; }}>
-                              <I d={typeof action.icon === "string" ? action.icon : ""} s={14} />
+                              <I d={action.icon} s={14} />
                             </button>
                           ))}
                         </div>}
@@ -1424,9 +1391,9 @@ function WeatherApp({ c }: { c: typeof palette.dark }) {
 
   const modes = [
     { id: "hot", label: "Hot", icon: ic.sun },
-    { id: "fan", label: "Fan", icon: "M12 12c-1.5-3-4.5-5-7-4s-2 5 1 7c-3 1.5-5 4.5-4 7s5 2 7-1c1.5 3 4.5 5 7 4s2-5-1-7c3-1.5 5-4.5 4-7s-5-2-7 1z" },
-    { id: "cold", label: "Cold", icon: "M12 2v20M17 7l-5 5-5-5M7 17l5-5 5 5M2 12h20M7 7l-5 5 5 5M17 7l5 5-5 5" },
-    { id: "damp", label: "Damp", icon: "M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" },
+    { id: "fan", label: "Fan", icon: Wind },
+    { id: "cold", label: "Cold", icon: Snowflake },
+    { id: "damp", label: "Damp", icon: Droplets },
   ];
 
   return (
@@ -1474,8 +1441,8 @@ function WeatherApp({ c }: { c: typeof palette.dark }) {
         <div className="grid grid-cols-2 gap-2">
           {[
             { label: "Consumption", value: "1.5 kWh", icon: ic.cpu },
-            { label: "Humidity", value: "48%", icon: "M12 2.69l5.66 5.66a8 8 0 11-11.31 0z" },
-            { label: "Wind", value: "12 km/h", icon: "M12 12c-1.5-3-4.5-5-7-4s-2 5 1 7c-3 1.5-5 4.5-4 7s5 2 7-1c1.5 3 4.5 5 7 4s2-5-1-7c3-1.5 5-4.5 4-7s-5-2-7 1z" },
+            { label: "Humidity", value: "48%", icon: Droplets },
+            { label: "Wind", value: "12 km/h", icon: Wind },
             { label: "UV Index", value: "3 Low", icon: ic.sun },
           ].map((s, i) => (
             <div key={i} className="p-3 rounded-xl" style={{ background: c.cardAlt }}>
@@ -1541,7 +1508,7 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
   // Deep navigation: sub-section within each main section
   const [activeSubSection, setActiveSubSection] = useState<string | null>(null);
 
-  const settSubSections: Record<string, { icon: string; label: string; desc: string }[]> = {
+  const settSubSections: Record<string, { icon: LucideIcon; label: string; desc: string }[]> = {
     Network:       [{ icon: ic.wifi, label: "Wi-Fi", desc: "Wireless networks" }, { icon: ic.globe, label: "Ethernet", desc: "Wired connections" }, { icon: ic.shield, label: "VPN", desc: "Secure tunnels" }, { icon: ic.settings, label: "Proxy", desc: "Network proxy" }, { icon: ic.shield, label: "Firewall", desc: "Packet filtering" }, { icon: ic.globe, label: "DNS", desc: "Name resolution" }],
     Bluetooth:     [{ icon: ic.bluetooth, label: "Paired Devices", desc: "Manage pairing" }, { icon: ic.bluetooth, label: "Scan", desc: "Discover nearby" }, { icon: ic.music, label: "Audio", desc: "BT audio output" }, { icon: ic.download, label: "Transfer", desc: "File sharing" }],
     Account:       [{ icon: ic.user, label: "Profile", desc: "Name & avatar" }, { icon: ic.shield, label: "Security", desc: "Password & 2FA" }, { icon: ic.globe, label: "Linked Accounts", desc: "OAuth & SSO" }, { icon: ic.bell, label: "Activity", desc: "Login history" }, { icon: ic.hdd, label: "Data & Privacy", desc: "Export / delete" }],
@@ -2130,7 +2097,7 @@ function WordApp({ c }: { c: typeof palette.dark }) {
     setWordCount(docContent.trim().split(/\s+/).filter(Boolean).length);
   }, [docContent]);
 
-  const ToolBtn = ({ icon, label, active, onClick }: { icon: string; label: string; active?: boolean; onClick?: () => void }) => (
+  const ToolBtn = ({ icon, label, active, onClick }: { icon: LucideIcon; label: string; active?: boolean; onClick?: () => void }) => (
     <button title={label} onClick={onClick}
       className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
       style={{ background: active ? c.accentSoft : "transparent", color: active ? c.accentText : c.textMuted }}
@@ -2170,10 +2137,10 @@ function WordApp({ c }: { c: typeof palette.dark }) {
         </select>
         <div className="w-px h-5 mx-1" style={{ background: c.border }} />
         {/* Format */}
-        <ToolBtn icon="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6zM6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z" label="Bold" active={isBold} onClick={() => setIsBold(!isBold)} />
-        <ToolBtn icon="M19 4h-9M14 20H5M15 4L9 20" label="Italic" active={isItalic} onClick={() => setIsItalic(!isItalic)} />
-        <ToolBtn icon="M6 3v7a6 6 0 0012 0V3M4 21h16" label="Underline" active={isUnderline} onClick={() => setIsUnderline(!isUnderline)} />
-        <ToolBtn icon="M17.5 4.5l-15 15M7 4V2M17 4V2M2 7h5M2 17h5M22 7h-5M22 17h-5M17 20v2M7 20v2" label="Strikethrough" />
+        <ToolBtn icon={Bold}          label="Bold"          active={isBold}      onClick={() => setIsBold(!isBold)} />
+        <ToolBtn icon={Italic}        label="Italic"        active={isItalic}    onClick={() => setIsItalic(!isItalic)} />
+        <ToolBtn icon={Underline}     label="Underline"     active={isUnderline} onClick={() => setIsUnderline(!isUnderline)} />
+        <ToolBtn icon={Strikethrough} label="Strikethrough" />
         <div className="w-px h-5 mx-1" style={{ background: c.border }} />
         {/* Paragraph */}
         <ToolBtn icon={ic.alignLeft} label="Align Left" />
@@ -2183,7 +2150,7 @@ function WordApp({ c }: { c: typeof palette.dark }) {
         <div className="w-px h-5 mx-1" style={{ background: c.border }} />
         {/* Actions */}
         <ToolBtn icon={ic.refresh} label="Undo" />
-        <ToolBtn icon="M1 20v-6h6M23 4v6h-6M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15" label="Redo" />
+        <ToolBtn icon={Redo2} label="Redo" />
         <div className="w-px h-5 mx-1" style={{ background: c.border }} />
         <ToolBtn icon={ic.search} label="Find & Replace" />
         <ToolBtn icon={ic.download} label="Save" />
@@ -2309,7 +2276,7 @@ function WordApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
-function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palette.dark; onOpenApp: (id: WinId) => void; onTrashEmpty?: (files: { name: string; icon: string; size: string; origin: string }[]) => void; onDragFile?: (name: string) => void }) {
+function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palette.dark; onOpenApp: (id: WinId) => void; onTrashEmpty?: (files: { name: string; icon: LucideIcon; size: string; origin: string }[]) => void; onDragFile?: (name: string) => void }) {
   const [currentPath, setCurrentPath] = useState<string[]>(["Home"]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
@@ -2378,7 +2345,7 @@ function FilesApp({ c, onOpenApp, onTrashEmpty, onDragFile }: { c: typeof palett
   const dbFileColor = (f: DbFile) => f.type === "FOLDER" ? "#FBBF24" : f.name.endsWith(".md") ? "#FBBF24" : "#3B82F6";
   const formatDbSize = (bytes: number) => bytes < 1024 ? `${bytes} B` : bytes < 1048576 ? `${Math.round(bytes / 1024)} KB` : `${(bytes / 1048576).toFixed(1)} MB`;
 
-  type FileItem = { name: string; type: "folder" | "file"; icon: string; iconColor: string; size: string; modified: string; action?: WinId | string };
+  type FileItem = { name: string; type: "folder" | "file"; icon: LucideIcon; iconColor: string; size: string; modified: string; action?: WinId | string };
 
   const [fileSystem, setFileSystem] = useState<Record<string, FileItem[]>>({
     Home: [
@@ -3417,7 +3384,7 @@ function CodeApp({ c }: { c: typeof palette.dark }) {
     }, 600);
   };
 
-  const SideIcon = ({ icon, label, active, onClick }: { icon: string; label: string; active?: boolean; onClick: () => void }) => (
+  const SideIcon = ({ icon, label, active, onClick }: { icon: LucideIcon; label: string; active?: boolean; onClick: () => void }) => (
     <button title={label} onClick={onClick} className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
       style={{ color: active ? "#fff" : "#555", background: active ? "#ffffff10" : "transparent" }}
       onMouseEnter={e => { if (!active) e.currentTarget.style.color = "#aaa"; }}
@@ -4207,7 +4174,7 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
                 <label className="flex items-center gap-3 px-2 cursor-pointer" onClick={() => setPolicyAccepted(!policyAccepted)}>
                   <div className="w-5 h-5 rounded-md flex items-center justify-center transition-colors"
                     style={{ background: policyAccepted ? c.accent : "transparent", border: `2px solid ${policyAccepted ? c.accent : c.border}` }}>
-                    {policyAccepted && <I d="M20 6L9 17l-5-5" s={12} c="#fff" />}
+                    {policyAccepted && <I d={Check} s={12} c="#fff" />}
                   </div>
                   <span className="text-[10px]" style={{ color: c.text }}>I accept the license agreement</span>
                 </label>
@@ -4247,7 +4214,7 @@ function DownloadsApp({ c }: { c: typeof palette.dark }) {
             {installStep === 3 && (
               <div className="flex flex-col items-center justify-center py-8">
                 <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: c.success + "20" }}>
-                  <I d="M20 6L9 17l-5-5" s={28} c={c.success} />
+                  <I d={Check} s={28} c={c.success} />
                 </div>
                 <p className="text-sm font-bold mb-1" style={{ color: c.text }}>Installation Complete</p>
                 <p className="text-[10px] mb-4" style={{ color: c.textMuted }}>{selectedApp} has been installed successfully.</p>
@@ -4273,7 +4240,7 @@ function StoreApp({ c, installedApps, installingApp, installProgress, handleInst
   installingApp: string | null;
   installProgress: number;
   handleInstallApp: (name: string) => void;
-  setPaymentModal: (app: { name: string; price: string; icon: string; iconBg: string } | null) => void;
+  setPaymentModal: (app: { name: string; price: string; icon: LucideIcon; iconBg: string } | null) => void;
 }) {
   const { ref, w, scale } = useContainerSize(680);
   const [activeTab, setActiveTab] = useState(0);
@@ -5718,9 +5685,7 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
                   style={{ color: savedArticles.has(article.id) ? c.accent : c.textMuted }}
                   onMouseEnter={e => (e.currentTarget.style.background = c.border)}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={13}
-                    c={savedArticles.has(article.id) ? c.accent : c.textMuted}
-                    f={savedArticles.has(article.id)} />
+                  <I d={Bookmark} s={13} c={savedArticles.has(article.id) ? c.accent : c.textMuted} />
                 </button>
                 <button className="p-1 rounded-md transition-colors" style={{ color: c.textMuted }}
                   onMouseEnter={e => (e.currentTarget.style.background = c.border)}
@@ -6422,12 +6387,12 @@ function TasksApp({ c }: { c: typeof palette.dark }) {
           {/* View toggle */}
           <div style={{ display: "flex", background: c.surface, borderRadius: 8, border: `1px solid ${c.border}`, overflow: "hidden" }}>
             {([
-              { id: "list"  as const, d: "M4 6h16M4 11h16M4 16h16" },
-              { id: "board" as const, d: "M3 3h5v18H3zM9.5 3h5v18h-5zM16 3h5v18h-5z" },
-            ] as { id: "list" | "board"; d: string }[]).map(v => (
+              { id: "list"  as const, icon: List },
+              { id: "board" as const, icon: Columns },
+            ]).map(v => (
               <button key={v.id} onClick={() => setView(v.id)}
                 style={{ padding: "5px 9px", background: view === v.id ? c.accent : "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.18s" }}>
-                <I d={v.d} s={13} c={view === v.id ? "#fff" : c.textMuted} />
+                <I d={v.icon} s={13} c={view === v.id ? "#fff" : c.textMuted} />
               </button>
             ))}
           </div>
@@ -6515,7 +6480,7 @@ function TasksApp({ c }: { c: typeof palette.dark }) {
                         className={isChecked ? "check-anim" : ""}
                         onClick={e => { e.stopPropagation(); toggleTask(task.id); }}
                         style={{ marginTop: 2, width: 17, height: 17, borderRadius: 5, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${task.done ? c.success : priorityColor[task.priority]}`, background: task.done ? c.success : "transparent", cursor: "pointer", transition: "background 0.2s, border-color 0.2s" }}>
-                        {task.done && <I d="M20 6L9 17l-5-5" s={9} c="#fff" w={2.5} />}
+                        {task.done && <I d={Check} s={9} c="#fff" w={2.5} />}
                       </button>
 
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -7212,11 +7177,11 @@ function ResourceVisualizerApp() {
     cardBrd: "#D1D1D1",
   };
 
-  const navItems: { id: string; icon: string; label: string; indent?: boolean; section?: string }[] = [
+  const navItems: { id: string; icon?: LucideIcon; label: string; indent?: boolean; section?: string }[] = [
     { id: "tags",        icon: ic.key,         label: "Tags" },
     { id: "diagnose",    icon: ic.alertTriangle,label: "Diagnose and solve problems" },
     { id: "resvis",      icon: ic.layers,       label: "Resource visualizer" },
-    { id: "_rm",         icon: "",              label: "Resource Management", section: "header" },
+    { id: "_rm",                                label: "Resource Management", section: "header" },
     { id: "projects",    icon: ic.folder,       label: "Projects",              indent: true },
     { id: "keys",        icon: ic.key,          label: "Keys and Endpoint",     indent: true },
     { id: "encryption",  icon: ic.lock,         label: "Encryption",            indent: true },
@@ -7784,7 +7749,7 @@ function KnowledgeApp({ c }: { c: typeof palette.dark }) {
 // ━━━━ RECOVERY APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 interface RecoveryFile {
   name: string;
-  icon: string;
+  icon: LucideIcon;
   deletedAt: string;
   origin: string;
   size: string;
@@ -7990,7 +7955,7 @@ function BusinessApp({ c }: { c: typeof palette.dark }) {
     }
   };
 
-  const tabs: { id: Tab; label: string; icon: string }[] = [
+  const tabs: { id: Tab; label: string; icon: LucideIcon }[] = [
     { id: "dashboard", label: "Dashboard", icon: ic.barChart },
     { id: "clients", label: "Clients", icon: ic.users },
     { id: "invoices", label: "Invoices", icon: ic.fileInvoice },
@@ -9000,7 +8965,7 @@ export default function AlternusOS() {
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [aiActions, setAiActions] = useState<{ label: string; action: WinId }[]>([]);
   const [aiCreation, setAiCreation] = useState<string | null>(null);
-  const [aiAppResults, setAiAppResults] = useState<{ id: WinId; title: string; icon: string; description: string }[]>([]);
+  const [aiAppResults, setAiAppResults] = useState<{ id: WinId; title: string; icon: LucideIcon; description: string }[]>([]);
   const [showAIFrame, setShowAIFrame] = useState(false);
   const aiFrameInputRef = useRef<HTMLInputElement>(null);
   const [showAiFixMenu, setShowAiFixMenu] = useState(false);
@@ -9037,7 +9002,7 @@ export default function AlternusOS() {
   const [installedApps, setInstalledApps] = useState<string[]>([]);
   const [installingApp, setInstallingApp] = useState<string | null>(null);
   const [installProgress, setInstallProgress] = useState(0);
-  const [paymentModal, setPaymentModal] = useState<{ name: string; price: string; icon: string; iconBg: string } | null>(null);
+  const [paymentModal, setPaymentModal] = useState<{ name: string; price: string; icon: LucideIcon; iconBg: string } | null>(null);
   const [showSpotlight, setShowSpotlight] = useState(false);
   const [showLaunchpad, setShowLaunchpad] = useState(false);
   const [launchSearch, setLaunchSearch] = useState("");
@@ -9150,12 +9115,12 @@ export default function AlternusOS() {
   const fmt = (d: Date) => d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
 
   // ━━━━ AI HELPERS (defined before useEffects that need them) ━━━━
-  const addAINotification = useCallback((type: AINotification["type"], title: string, message: string, icon: string, actions?: AINotification["actions"]) => {
+  const addAINotification = useCallback((type: AINotification["type"], title: string, message: string, icon: LucideIcon, actions?: AINotification["actions"]) => {
     const notif: AINotification = { id: Date.now().toString(), title, message, icon, time: "Just now", type, actions, read: false };
     setAiNotifications(prev => [notif, ...prev.slice(0, 19)]);
   }, []);
 
-  const addTimelineEvent = useCallback((action: string, app: string, icon: string) => {
+  const addTimelineEvent = useCallback((action: string, app: string, icon: LucideIcon) => {
     const now = new Date();
     const t = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
     setTimeline(prev => [{ time: t, action, app, icon }, ...prev.slice(0, 49)]);
@@ -9323,7 +9288,7 @@ export default function AlternusOS() {
   // ━━━━ PREDICTIVE WORKSPACE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const openWinWithAI = useCallback((id: WinId) => {
     openWin(id);
-    addTimelineEvent("Opened", id, (ic as Record<string, string>)[id] || ic.sparkle);
+    addTimelineEvent("Opened", id, (ic as Record<string, LucideIcon>)[id] ?? ic.sparkle);
 
     const related = aiWorkspaceRules[id];
     if (related) {
@@ -9363,7 +9328,7 @@ export default function AlternusOS() {
       setCloseChain({ appId: id, title: win.title });
     } else {
       closeWin(id);
-      addTimelineEvent("Closed", id, (ic as Record<string, string>)[id] || ic.sparkle);
+      addTimelineEvent("Closed", id, (ic as Record<string, LucideIcon>)[id] ?? ic.sparkle);
     }
   }, [wins, closeWin, smartDND, addTimelineEvent]);
 
@@ -9488,7 +9453,7 @@ export default function AlternusOS() {
     addTimelineEvent("Searched", `"${raw}"`, ic.search);
 
     // ━━━ APP KEYWORD MAP — every keyword opens the right app ━━━
-    const appMap: { keys: string[]; id: WinId; title: string; icon: string; description: string; extra?: { id: WinId; title: string; icon: string; description: string } }[] = [
+    const appMap: { keys: string[]; id: WinId; title: string; icon: LucideIcon; description: string; extra?: { id: WinId; title: string; icon: LucideIcon; description: string } }[] = [
       { keys: ["google", "browse", "browser", "web", "search", "internet", "url", "website", "http", "youtube", "facebook", "instagram", "twitter", "reddit", "wikipedia", "linkedin", "amazon", "ebay", "netflix", "spotify", "tiktok", "pinterest", "stackoverflow", "github"],
         id: "browser", title: "Browser", icon: ic.globe, description: "Browse the web, search, and access websites" },
       { keys: ["code", "program", "develop", "javascript", "python", "html", "css", "react", "typescript", "debug", "compile", "script", "function", "variable", "api", "claude", "ai code", "copilot", "vscode", "editor", "ide", "git", "npm", "node"],
@@ -9648,7 +9613,7 @@ export default function AlternusOS() {
       return [...prev, ...scanResults.filter(f => !existing.has(f.name))];
     });
   };
-  const handleTrashEmpty = (files: { name: string; icon: string; size: string; origin: string }[]) => {
+  const handleTrashEmpty = (files: { name: string; icon: LucideIcon; size: string; origin: string }[]) => {
     const newRecovery: RecoveryFile[] = files.map(f => ({
       ...f,
       deletedAt: "Just now",
@@ -9693,7 +9658,7 @@ export default function AlternusOS() {
     agent: <AlternusAgentApp c={c} mode={mode} setMode={setMode} wallpaper={wallpaper} setWallpaper={setWallpaper} onOpenApp={openWin} onExecuteAIActions={executeAIActions} osContext={{ openApps: wins.filter(w => w.isOpen && !w.isMinimized).map(w => w.id), theme: mode }} />,
   };
 
-  const dockApps: { id: WinId; icon: string; label: string; color: string; category: "ai" | "productivity" | "media" | "system" | "web" }[] = [
+  const dockApps: { id: WinId; icon: LucideIcon; label: string; color: string; category: "ai" | "productivity" | "media" | "system" | "web" }[] = [
     { id: "agent", icon: ic.sparkle, label: "Alternus AI Agent", color: "#7C3AED", category: "ai" },
     { id: "aihub",  icon: ic.messageCircle, label: "AI Hub",               color: "#A78BFA", category: "ai" },
     { id: "resvis", icon: ic.layers,       label: "Resource Visualizer",  color: "#0078D4", category: "ai" },
@@ -10222,7 +10187,7 @@ export default function AlternusOS() {
                 {openW.length === 0 ? (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
                     <div style={{ width: 64, height: 64, borderRadius: 20, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <I d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" s={28} c="rgba(255,255,255,0.25)" />
+                      <I d={LayoutGrid} s={28} c="rgba(255,255,255,0.25)" />
                     </div>
                     <p style={{ fontSize: 14, color: "rgba(255,255,255,0.35)" }}>No windows open</p>
                     <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)" }}>Open an app from the dock or All Apps</p>
@@ -10544,7 +10509,7 @@ export default function AlternusOS() {
           const subtextColor = mode === "dark" ? "#8891b0" : "#6e7599";
           const hoverBg = mode === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)";
 
-          const aiModes: { id: typeof ctrlAiMode; label: string; desc: string; icon: string; color: string; gradient: string }[] = [
+          const aiModes: { id: typeof ctrlAiMode; label: string; desc: string; icon: LucideIcon; color: string; gradient: string }[] = [
             { id: "chat", label: "Chat", desc: "General assistant", icon: ic.messageCircle, color: "#3B82F6", gradient: "linear-gradient(135deg, #3B82F6, #2563EB)" },
             { id: "write", label: "Write", desc: "Content & docs", icon: ic.pen, color: "#8B5CF6", gradient: "linear-gradient(135deg, #8B5CF6, #7C3AED)" },
             { id: "code", label: "Code", desc: "Dev assistant", icon: ic.code, color: "#10B981", gradient: "linear-gradient(135deg, #10B981, #059669)" },
@@ -10566,8 +10531,8 @@ export default function AlternusOS() {
             translate: "Paste text or describe what to translate...",
           };
 
-          type SuggItem = { title: string; desc: string; icon: string };
-          type SuggGroup = { label: string; headline: string; icon: string; items: SuggItem[] };
+          type SuggItem = { title: string; desc: string; icon: LucideIcon };
+          type SuggGroup = { label: string; headline: string; icon: LucideIcon; items: SuggItem[] };
           const suggestionGroups: Record<typeof ctrlAiMode, SuggGroup[]> = {
             chat: [
               { label: "Productivity", headline: "Get things done faster", icon: ic.zap, items: [
@@ -10691,7 +10656,7 @@ export default function AlternusOS() {
             ],
           };
 
-          const quickTools: { icon: string; label: string; desc: string; action: () => void; color: string }[] = [
+          const quickTools: { icon: LucideIcon; label: string; desc: string; action: () => void; color: string }[] = [
             { icon: ic.mic, label: "Voice Input", desc: "Speak your prompt naturally", action: () => {}, color: "#EF4444" },
             { icon: ic.upload, label: "Upload File", desc: "Attach documents for context", action: () => {}, color: "#8B5CF6" },
             { icon: ic.image, label: "Paste Image", desc: "Analyze or edit visuals", action: () => {}, color: "#F59E0B" },
@@ -10742,7 +10707,7 @@ export default function AlternusOS() {
                   <button className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
                     style={{ background: modeGrad, boxShadow: `0 2px 12px ${modeAccent}60` }}
                     onClick={() => { if (ctrlAiInput.trim()) { openWin("ai"); setShowCtrlAi(false); } }}>
-                    <svg width={16} height={16} viewBox="0 0 24 24" fill="none"><path d={ic.sparkle} fill="#fff" /></svg>
+                    <Sparkles size={16} color="#fff" />
                   </button>
                   <input
                     ref={ctrlAiInputRef}
@@ -10783,7 +10748,7 @@ export default function AlternusOS() {
                       <div className="flex items-center gap-3 mb-3">
                         <div className="relative">
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: modeGrad, boxShadow: `0 4px 16px ${modeAccent}40` }}>
-                            <svg width={18} height={18} viewBox="0 0 24 24" fill="none"><path d={ic.sparkle} fill="#fff" /></svg>
+                            <Sparkles size={18} color="#fff" />
                           </div>
                           <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center" style={{ background: "#10B981", borderColor: panelBg }}>
                             <div className="w-1 h-1 rounded-full bg-white" />
@@ -11015,7 +10980,7 @@ export default function AlternusOS() {
             const matchSearch = app.label.toLowerCase().includes(launchSearch.toLowerCase());
             return matchCat && matchSearch;
           });
-          const categories: { id: "all" | "ai" | "productivity" | "media" | "system" | "web"; label: string; icon: string }[] = [
+          const categories: { id: "all" | "ai" | "productivity" | "media" | "system" | "web"; label: string; icon: LucideIcon }[] = [
             { id: "all",          label: "All",          icon: ic.grid },
             { id: "ai",           label: "AI",           icon: ic.sparkle },
             { id: "productivity", label: "Productivity", icon: ic.checkSquare },
@@ -11119,7 +11084,7 @@ export default function AlternusOS() {
                         onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.10)"; }}
                       >
                         {btn.label}
-                        <I d="M19 9l-7 7-7-7" s={11} c="rgba(255,255,255,0.5)" />
+                        <I d={ic.chevD} s={11} c="rgba(255,255,255,0.5)" />
                       </button>
                     ))}
                   </div>
@@ -11134,7 +11099,7 @@ export default function AlternusOS() {
                     ) : (
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 88px)", gap: "6px", justifyContent: "center" }}>
                         {filteredApps.map(app => {
-                          const fillPath = icFill[app.id] ?? app.icon;
+                          const LIcon = app.icon;
                           return (
                             <button
                               key={app.id}
@@ -11164,7 +11129,7 @@ export default function AlternusOS() {
                               >
                                 <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", borderRadius: "20px 20px 60% 60%", background: "linear-gradient(180deg,rgba(255,255,255,0.26) 0%,rgba(255,255,255,0) 100%)", pointerEvents: "none" }} />
                                 <div style={{ position: "relative", zIndex: 1, filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.25))" }}>
-                                  <I d={fillPath} s={28} f={true} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.76)"]} />
+                                  <LIcon size={28} color="white" strokeWidth={1.5} />
                                 </div>
                               </div>
                               <span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,0.80)", maxWidth: 76, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>
@@ -11221,7 +11186,7 @@ export default function AlternusOS() {
                   <div key={w.id} className="flex flex-col items-center gap-2 px-4 py-3 rounded-xl transition-all"
                     style={{ background: i === taskSwitcherIdx ? c.accentSoft : "transparent", border: i === taskSwitcherIdx ? `2px solid ${c.accent}` : "2px solid transparent" }}>
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: c.cardAlt }}>
-                      <I d={(ic as Record<string,string>)[w.id] || ic.sparkle} s={22} c={i === taskSwitcherIdx ? c.accentText : c.textSec} />
+                      <I d={(ic as Record<string,LucideIcon>)[w.id] ?? ic.sparkle} s={22} c={i === taskSwitcherIdx ? c.accentText : c.textSec} />
                     </div>
                     <span className="text-[10px] font-medium" style={{ color: i === taskSwitcherIdx ? c.accentText : c.textMuted }}>{w.title}</span>
                   </div>
