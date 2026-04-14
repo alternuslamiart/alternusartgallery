@@ -6875,7 +6875,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
   const [tab, setTab] = useState<"chat" | "models" | "capabilities" | "pipelines" | "fine-tune" | "deploy">("chat");
   const [modelDetailId, setModelDetailId] = useState<string | null>(null);
   const modelDetail = modelDetailId ? models.find(m => m.id === modelDetailId) : null;
-  const [navSection, setNavSection] = useState<"chats" | "models" | "marketplace" | "archive">("chats");
+  const [navSection, setNavSection] = useState<"chats" | "models" | "marketplace" | "archive" | "overview" | "playground" | "deployments" | "pipelines" | "fine-tune">("playground");
   const [callActive, setCallActive] = useState(false);
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(false);
@@ -6935,148 +6935,158 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
   const txtMut = "#9295A8";
   const cardHov = "#F2F4FA";
 
+  // Azure AI Foundry color tokens
+  const AZ = {
+    bg:      "#FFFFFF",
+    sidebar: "#FFFFFF",
+    main:    "#FAF9F8",
+    border:  "#E1DFDD",
+    borderL: "#F3F2F1",
+    txt:     "#323130",
+    txtSec:  "#605E5C",
+    txtMut:  "#A19F9D",
+    active:  "#EFF6FF",
+    activeB: "#0078D4",
+    hover:   "#F3F2F1",
+    btn:     "#FFFFFF",
+    btnBrd:  "#D1D1D1",
+    online:  "#107C10",
+  };
+
   return (
-    <div className="flex h-full overflow-hidden" style={{ background: bg, fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="flex h-full overflow-hidden" style={{ background: AZ.bg, fontFamily: "'Segoe UI', -apple-system, sans-serif" }}>
 
-      {/* ── LEFT SIDEBAR ── */}
-      <div className="flex flex-col flex-shrink-0" style={{ width: 172, borderRight: `1px solid ${brd}`, background: bg }}>
+      {/* ── LEFT SIDEBAR (Azure portal style) ── */}
+      <div className="flex flex-col flex-shrink-0" style={{ width: 220, borderRight: `1px solid ${AZ.border}`, background: AZ.sidebar, overflowY: "auto", scrollbarWidth: "none" }}>
 
-        {/* Gradient header strip */}
-        <div style={{ height: 4, background: "linear-gradient(90deg, #e879f9, #a855f7, #6366f1, #3b82f6, #06b6d4)", flexShrink: 0 }} />
+        {/* Search bar */}
+        <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${AZ.borderL}` }}>
+          <I d={ic.search} s={13} c={AZ.txtMut} />
+          <input placeholder="Search" className="flex-1 bg-transparent outline-none text-[12px]" style={{ color: AZ.txt }} />
+          <button className="text-[11px] font-bold px-1" style={{ color: AZ.txtSec }}>«</button>
+        </div>
 
-        {/* Logo row */}
-        <div className="px-3 py-3 flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-[11px] font-bold text-white"
-              style={{ background: "linear-gradient(135deg, #a855f7, #6366f1)" }}>AI</div>
-            <div className="flex items-center gap-0.5 min-w-0">
-              <span className="text-[12px] font-bold truncate" style={{ color: txt }}>AI Hub</span>
-              <I d={ic.chevD} s={10} c={txtMut} />
-            </div>
-          </div>
-          <button className="w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
-            onMouseEnter={e => (e.currentTarget.style.background = cardHov)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-            <I d={ic.settings} s={13} c={txtMut} />
+        {/* Top nav */}
+        <div className="py-1">
+          {[
+            { id: "overview",    icon: ic.home,          label: "Overview" },
+            { id: "playground",  icon: ic.messageCircle, label: "Playground" },
+          ].map(item => {
+            const isActive = navSection === item.id;
+            return (
+              <button key={item.id} onClick={() => setNavSection(item.id as typeof navSection)}
+                className="w-full flex items-center gap-2.5 py-2 text-left transition-colors"
+                style={{ background: isActive ? AZ.active : "transparent", borderLeft: isActive ? `3px solid ${AZ.activeB}` : "3px solid transparent", paddingLeft: isActive ? 9 : 12 }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = AZ.hover; }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
+                <I d={item.icon} s={14} c={isActive ? AZ.activeB : AZ.txtSec} />
+                <span className="text-[12px]" style={{ color: isActive ? AZ.activeB : AZ.txt, fontWeight: isActive ? 600 : 400 }}>{item.label}</span>
+              </button>
+            );
+          })}
+
+          {/* Models section header */}
+          <p className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wide" style={{ color: AZ.txtMut }}>Models</p>
+          {models.map(m => {
+            const isA = activeModel.id === m.id;
+            return (
+              <button key={m.id} onClick={() => { selectModel(m); setNavSection("playground"); }}
+                className="w-full flex items-center gap-2.5 py-1.5 text-left transition-colors"
+                style={{ background: isA ? AZ.active : "transparent", borderLeft: isA ? `3px solid ${AZ.activeB}` : "3px solid transparent", paddingLeft: isA ? 9 : 12 }}
+                onMouseEnter={e => { if (!isA) e.currentTarget.style.background = AZ.hover; }}
+                onMouseLeave={e => { if (!isA) e.currentTarget.style.background = "transparent"; }}>
+                <div className="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center text-[8px] font-bold text-white"
+                  style={{ background: m.color }}>
+                  {m.initials[0]}
+                </div>
+                <span className="text-[12px] flex-1 truncate" style={{ color: isA ? AZ.activeB : AZ.txt }}>{m.name}</span>
+                {m.online && <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mr-2" style={{ background: AZ.online }} />}
+              </button>
+            );
+          })}
+
+          {/* More nav */}
+          {[
+            { id: "deployments", icon: ic.cloud,   label: "Deployments" },
+            { id: "pipelines",   icon: ic.layers,  label: "Pipelines"   },
+            { id: "fine-tune",   icon: ic.code,    label: "Fine-tuning" },
+          ].map(item => {
+            const isActive = navSection === item.id;
+            return (
+              <button key={item.id} onClick={() => setNavSection(item.id as typeof navSection)}
+                className="w-full flex items-center gap-2.5 py-2 text-left transition-colors"
+                style={{ background: isActive ? AZ.active : "transparent", borderLeft: isActive ? `3px solid ${AZ.activeB}` : "3px solid transparent", paddingLeft: isActive ? 9 : 12 }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = AZ.hover; }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
+                <I d={item.icon} s={14} c={isActive ? AZ.activeB : AZ.txtSec} />
+                <span className="text-[12px]" style={{ color: isActive ? AZ.activeB : AZ.txt, fontWeight: isActive ? 600 : 400 }}>{item.label}</span>
+              </button>
+            );
+          })}
+
+          {/* Divider */}
+          <div className="mx-3 my-2" style={{ borderTop: `1px solid ${AZ.border}` }} />
+
+          {[
+            { icon: ic.settings, label: "Settings" },
+            { icon: ic.bookOpen, label: "Help"     },
+          ].map((item, i) => (
+            <button key={i}
+              className="w-full flex items-center gap-2.5 py-2 text-left transition-colors"
+              style={{ borderLeft: "3px solid transparent", paddingLeft: 12 }}
+              onMouseEnter={e => (e.currentTarget.style.background = AZ.hover)}
+              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <I d={item.icon} s={14} c={AZ.txtSec} />
+              <span className="text-[12px]" style={{ color: AZ.txt }}>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── MAIN AREA ── */}
+      <div className="flex-1 flex flex-col overflow-hidden" style={{ background: AZ.main }}>
+
+        {/* Toolbar */}
+        <div className="flex items-center gap-1 px-4 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${AZ.border}`, background: AZ.bg }}>
+          <span className="text-[11px]" style={{ color: AZ.txtSec }}>AI Hub</span>
+          <span className="text-[11px] px-1" style={{ color: AZ.txtMut }}>|</span>
+          <span className="text-[11px] font-semibold" style={{ color: AZ.txt }}>{activeModel.name} · Playground</span>
+          <div className="flex-1" />
+          {[
+            { icon: ic.plus,     label: "New chat", action: () => setMsgs([{ role: "ai" as const, text: `Hello! I'm ${activeModel.name}. How can I help?`, model: activeModel.name }]) },
+            { icon: ic.refresh,  label: "Reset",    action: () => setMsgs([{ role: "ai" as const, text: `Hello! I'm ${activeModel.name} by ${activeModel.company}. ${activeModel.desc}. How can I assist?`, model: activeModel.name }]) },
+            { icon: ic.download, label: "Export",   action: () => {} },
+          ].map((btn, i) => (
+            <button key={i} onClick={btn.action}
+              className="flex items-center gap-1.5 px-3 py-1 text-[11px] transition-colors"
+              style={{ color: AZ.txt, border: `1px solid ${AZ.btnBrd}`, background: AZ.btn, borderRadius: 2, marginLeft: 4 }}
+              onMouseEnter={e => (e.currentTarget.style.background = AZ.hover)}
+              onMouseLeave={e => (e.currentTarget.style.background = AZ.btn)}>
+              <I d={btn.icon} s={12} c={AZ.txt} />
+              {btn.label}
+            </button>
+          ))}
+          <button onClick={() => setCallActive(true)}
+            className="flex items-center gap-1.5 px-3 py-1 text-[11px] transition-colors ml-1"
+            style={{ color: "#fff", background: AZ.activeB, border: "none", borderRadius: 2 }}
+            onMouseEnter={e => (e.currentTarget.style.background = "#106EBE")}
+            onMouseLeave={e => (e.currentTarget.style.background = AZ.activeB)}>
+            <I d={ic.mic} s={12} c="#fff" />
+            Voice session
           </button>
         </div>
 
-        {/* Nav items */}
-        <div className="flex-1 overflow-y-auto px-2 pb-2" style={{ scrollbarWidth: "none" }}>
-          {[
-            { id: "chats",       icon: ic.messageCircle, label: "Chats",       badge: models.filter(m => m.online).length },
-            { id: "models",      icon: ic.sparkle,       label: "Models"      },
-            { id: "marketplace", icon: ic.store,         label: "Marketplace" },
-            { id: "archive",     icon: ic.download,      label: "Archive"     },
-          ].map(item => (
-            <button key={item.id} onClick={() => setNavSection(item.id as typeof navSection)}
-              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left mb-0.5 transition-all"
-              style={{ background: navSection === item.id ? "#6366f110" : "transparent" }}
-              onMouseEnter={e => { if (navSection !== item.id) e.currentTarget.style.background = cardHov; }}
-              onMouseLeave={e => { if (navSection !== item.id) e.currentTarget.style.background = "transparent"; }}>
-              <I d={item.icon} s={15} c={navSection === item.id ? "#6366f1" : txtMut} />
-              <span className="text-[11px] font-semibold flex-1" style={{ color: navSection === item.id ? "#6366f1" : txtSec }}>{item.label}</span>
-              {item.badge != null && item.badge > 0 && (
-                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: "#6366f1", color: "#fff" }}>{item.badge}</span>
-              )}
-            </button>
-          ))}
-
-          {/* Communities */}
-          <p className="text-[8px] font-bold uppercase tracking-widest px-2.5 pt-4 pb-1.5" style={{ color: txtMut }}>Communities</p>
-          {communities.map(com => (
-            <button key={com.id}
-              className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg mb-0.5 transition-all text-left"
-              onMouseEnter={e => (e.currentTarget.style.background = cardHov)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-              <div className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center"
-                style={{ background: `${com.color}14`, border: `1.5px solid ${com.color}28` }}>
-                <I d={ic.brain} s={13} c={com.color} />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-semibold truncate" style={{ color: txt }}>{com.name}</p>
-                <p className="text-[9px]" style={{ color: txtMut }}>{com.members} active</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── MIDDLE CHAT LIST ── */}
-      <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{ width: 210, borderRight: `1px solid ${brd}`, background: bg }}>
-
-        {/* Gradient header strip (same) */}
-        <div style={{ height: 4, background: "linear-gradient(90deg, #e879f9, #a855f7, #6366f1, #3b82f6, #06b6d4)", flexShrink: 0 }} />
-
-        {/* Search */}
-        <div className="px-3 pt-3 pb-2 flex-shrink-0">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: surf, border: `1px solid ${brd}` }}>
-            <I d={ic.search} s={13} c={txtMut} />
-            <input placeholder="Search" className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: txt }} />
-            <span className="text-[9px] px-1.5 py-0.5 rounded-md" style={{ background: brd, color: txtMut }}>⌘K</span>
-          </div>
-        </div>
-
-        {/* Story ring avatars */}
-        <div className="flex gap-2 px-3 pb-3 overflow-x-auto flex-shrink-0" style={{ scrollbarWidth: "none" }}>
-          {models.slice(0, 5).map(m => (
-            <button key={m.id} onClick={() => selectModel(m)} className="flex flex-col items-center gap-1 flex-shrink-0">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-                  style={{ background: `linear-gradient(135deg, ${m.color}, ${m.color}BB)`, boxShadow: activeModel.id === m.id ? `0 0 0 2px #fff, 0 0 0 3.5px ${m.color}` : "none" }}>
-                  {m.initials}
-                </div>
-                {m.online && <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full" style={{ background: "#22c55e", border: "2px solid #fff" }} />}
-              </div>
-              <span className="text-[8px] font-medium truncate w-10 text-center" style={{ color: txtMut }}>{m.name.split(" ")[0]}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Conversation list */}
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-          {models.map(m => (
-            <button key={m.id} onClick={() => selectModel(m)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 transition-all text-left"
-              style={{ background: activeModel.id === m.id ? `${m.color}0D` : "transparent", borderLeft: activeModel.id === m.id ? `3px solid ${m.color}` : "3px solid transparent" }}
-              onMouseEnter={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = cardHov; }}
-              onMouseLeave={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = "transparent"; }}>
-              <div className="relative flex-shrink-0">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-                  style={{ background: `linear-gradient(135deg, ${m.color}, ${m.color}BB)` }}>
-                  {m.initials}
-                </div>
-                {m.online && <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full" style={{ background: "#22c55e", border: "2px solid #fff" }} />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[11px] font-semibold truncate" style={{ color: txt }}>{m.name}</span>
-                  <span className="text-[9px] flex-shrink-0 ml-1" style={{ color: txtMut }}>{m.time}</span>
-                </div>
-                <p className="text-[10px] truncate" style={{ color: txtMut }}>
-                  {activeModel.id === m.id && msgs.length > 1 ? msgs[msgs.length - 1].text.slice(0, 30) + "…" : m.lastMsg.slice(0, 30) + "…"}
-                </p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── RIGHT PANEL (chat / call) ── */}
-      <div className="flex-1 flex flex-col overflow-hidden" style={{ background: "#FAFBFE" }}>
-
-        {/* Gradient strip */}
-        <div style={{ height: 4, background: "linear-gradient(90deg, #e879f9, #a855f7, #6366f1, #3b82f6, #06b6d4)", flexShrink: 0 }} />
-
         {callActive ? (
-          /* ── VIDEO CALL ── */
+          /* ── VOICE/VIDEO CALL ── */
           <div className="flex flex-col h-full" style={{ background: "#0d0d14" }}>
             <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
               <button onClick={() => setCallActive(false)} className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.7)" }}>
                 <I d={ic.chevL} s={14} c="rgba(255,255,255,0.7)" />
-                <span className="text-[10px]">Back</span>
+                <span className="text-[11px]">Back</span>
               </button>
               <div className="text-center">
-                <p className="text-[11px] font-semibold text-white">{activeModel.name}</p>
-                <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.45)" }}>AI Session · {new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}</p>
+                <p className="text-[12px] font-semibold text-white">{activeModel.name}</p>
+                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.45)" }}>AI Session · {new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}</p>
               </div>
               <div className="flex gap-1.5">
                 {[ic.user, ic.menu].map((d, i) => (
@@ -7096,7 +7106,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
                 <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.5)" }}>{activeModel.company}</p>
                 <div className="flex items-center gap-1.5 mt-1">
                   <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#22c55e" }} />
-                  <span className="text-[9px]" style={{ color: "#22c55e" }}>AI Session Active</span>
+                  <span className="text-[10px]" style={{ color: "#22c55e" }}>AI Session Active</span>
                 </div>
               </div>
               <div className="absolute bottom-4 right-4 w-20 h-16 rounded-xl flex items-center justify-center"
@@ -7104,7 +7114,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
                 <I d={ic.user} s={20} c="rgba(255,255,255,0.3)" />
               </div>
             </div>
-            <div className="flex items-center justify-center gap-4 py-4 flex-shrink-0">
+            <div className="flex items-center justify-center gap-4 py-5 flex-shrink-0">
               {[
                 { icon: ic.monitor, color: "rgba(255,255,255,0.1)", label: "Screen" },
                 { icon: ic.mic,     color: micOn ? "rgba(255,255,255,0.1)" : "#ef4444", label: "Mic",   toggle: () => setMicOn(p => !p) },
@@ -7112,11 +7122,11 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
                 { icon: ic.volume,  color: "rgba(255,255,255,0.1)", label: "Sound" },
                 { icon: ic.power,   color: "#ef4444", label: "End", toggle: () => setCallActive(false) },
               ].map((btn, i) => (
-                <button key={i} onClick={btn.toggle} className="flex flex-col items-center gap-1">
+                <button key={i} onClick={btn.toggle} className="flex flex-col items-center gap-1.5">
                   <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: btn.color }}>
                     <I d={btn.icon} s={16} c="white" />
                   </div>
-                  <span className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>{btn.label}</span>
+                  <span className="text-[8px]" style={{ color: "rgba(255,255,255,0.4)" }}>{btn.label}</span>
                 </button>
               ))}
             </div>
@@ -7124,71 +7134,27 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
         ) : (
           /* ── CHAT VIEW ── */
           <>
-            {/* Chat header */}
-            <div className="flex items-center justify-between px-4 py-3 flex-shrink-0"
-              style={{ borderBottom: `1px solid ${brd}`, background: bg }}>
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
-                  style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}BB)` }}>
-                  {activeModel.initials}
-                </div>
-                <div>
-                  <p className="text-[12px] font-bold" style={{ color: txt }}>{activeModel.name}</p>
-                  <p className="text-[10px] font-medium flex items-center gap-1" style={{ color: activeModel.online ? "#22c55e" : txtMut }}>
-                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: activeModel.online ? "#22c55e" : "#9295A8", display: "inline-block" }} />
-                    {activeModel.online ? "Online" : "Offline"}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full mr-1"
-                  style={{ background: `${activeModel.color}14`, color: activeModel.color }}>
-                  {activeModel.badge}
-                </span>
-                <button onClick={() => setCallActive(true)}
-                  className="w-7 h-7 rounded-full flex items-center justify-center transition-all"
-                  style={{ background: "#22c55e14" }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "#22c55e28")} onMouseLeave={e => (e.currentTarget.style.background = "#22c55e14")}>
-                  <I d={ic.mic} s={13} c="#22c55e" />
-                </button>
-                <button className="w-7 h-7 rounded-full flex items-center justify-center transition-all"
-                  style={{ background: `${activeModel.color}14` }}
-                  onMouseEnter={e => (e.currentTarget.style.background = `${activeModel.color}28`)} onMouseLeave={e => (e.currentTarget.style.background = `${activeModel.color}14`)}>
-                  <I d={ic.monitor} s={13} c={activeModel.color} />
-                </button>
-                <button className="w-7 h-7 rounded-full flex items-center justify-center transition-all"
-                  onMouseEnter={e => (e.currentTarget.style.background = cardHov)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <I d={ic.menu} s={13} c={txtMut} />
-                </button>
-              </div>
-            </div>
-
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4" style={{ scrollbarWidth: "none" }}>
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4" style={{ scrollbarWidth: "none" }}>
               {msgs.map((m, i) => (
                 <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start gap-2.5"}`}>
                   {m.role === "ai" && (
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-[9px] font-bold text-white mt-0.5"
-                      style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}BB)` }}>
+                    <div className="w-7 h-7 rounded flex-shrink-0 flex items-center justify-center text-[9px] font-bold text-white mt-0.5"
+                      style={{ background: activeModel.color }}>
                       {activeModel.initials}
                     </div>
                   )}
-                  <div className="max-w-[70%]">
+                  <div className="max-w-[72%]">
                     {m.role === "ai" && (
-                      <p className="text-[10px] font-bold mb-1 flex items-center gap-1.5" style={{ color: activeModel.color }}>
-                        {m.model}
-                        <span className="font-normal text-[9px]" style={{ color: txtMut }}>· just now</span>
-                      </p>
+                      <p className="text-[11px] font-semibold mb-1" style={{ color: AZ.txt }}>{m.model}</p>
                     )}
-                    <div className="px-4 py-2.5 text-[11px] leading-relaxed"
+                    <div className="px-4 py-2.5 text-[12px] leading-relaxed"
                       style={{
-                        background: m.role === "user"
-                          ? `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}CC)`
-                          : "#FFFFFF",
-                        color: m.role === "user" ? "#fff" : txt,
-                        border: m.role === "ai" ? `1px solid ${brd}` : "none",
-                        borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-                        boxShadow: m.role === "ai" ? "0 1px 4px rgba(0,0,0,0.06)" : "none",
+                        background: m.role === "user" ? AZ.activeB : AZ.bg,
+                        color: m.role === "user" ? "#fff" : AZ.txt,
+                        border: m.role === "ai" ? `1px solid ${AZ.border}` : "none",
+                        borderRadius: m.role === "user" ? "4px 4px 2px 4px" : "4px 4px 4px 2px",
+                        boxShadow: m.role === "ai" ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
                       }}>
                       {m.text}
                     </div>
@@ -7199,22 +7165,23 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
             </div>
 
             {/* Input bar */}
-            <div className="px-4 py-3 flex items-center gap-2 flex-shrink-0"
-              style={{ borderTop: `1px solid ${brd}`, background: bg }}>
-              <button className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
-                style={{ background: surf, border: `1px solid ${brd}` }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = activeModel.color + "50")}
-                onMouseLeave={e => (e.currentTarget.style.borderColor = brd)}>
-                <I d={ic.upload} s={13} c={txtMut} />
+            <div className="px-6 py-3 flex items-center gap-2 flex-shrink-0"
+              style={{ borderTop: `1px solid ${AZ.border}`, background: AZ.bg }}>
+              <button className="w-7 h-7 flex items-center justify-center flex-shrink-0 transition-colors"
+                style={{ background: AZ.hover, border: `1px solid ${AZ.btnBrd}`, borderRadius: 2 }}>
+                <I d={ic.upload} s={12} c={AZ.txtSec} />
               </button>
               <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
                 placeholder={`Message ${activeModel.name}...`}
-                className="flex-1 text-[11px] px-3.5 py-2 rounded-xl outline-none"
-                style={{ background: surf, border: `1px solid ${brd}`, color: txt }} />
+                className="flex-1 text-[12px] px-3 py-1.5 outline-none"
+                style={{ background: AZ.bg, border: `1px solid ${AZ.btnBrd}`, color: AZ.txt, borderRadius: 2 }} />
               <button onClick={send}
-                className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
-                style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}CC)`, boxShadow: `0 2px 10px ${activeModel.color}40` }}>
-                <I d={ic.send} s={13} c="#fff" />
+                className="flex items-center justify-center flex-shrink-0 px-3 py-1.5 transition-colors text-[11px] gap-1.5"
+                style={{ background: AZ.activeB, borderRadius: 2, border: "none", color: "#fff" }}
+                onMouseEnter={e => (e.currentTarget.style.background = "#106EBE")}
+                onMouseLeave={e => (e.currentTarget.style.background = AZ.activeB)}>
+                <I d={ic.send} s={12} c="#fff" />
+                Send
               </button>
             </div>
           </>
