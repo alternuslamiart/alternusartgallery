@@ -33,7 +33,6 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
 });
 
-
 export const metadata: Metadata = {
   metadataBase: new URL('https://alternusart.com'),
   title: {
