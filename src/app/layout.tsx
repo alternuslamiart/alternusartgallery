@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Roboto, Playfair_Display, Montserrat } from "next/font/google";
+import { Roboto, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/components/providers";
@@ -33,11 +33,6 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
 });
 
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-montserrat",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://alternusart.com'),
@@ -189,7 +184,7 @@ export default function RootLayout({
         }}
       />
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} ${playfair.variable} ${montserrat.variable} antialiased min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} ${playfair.variable} antialiased min-h-screen flex flex-col`}
       >
         <Providers>
           <LayoutShell>{children}</LayoutShell>

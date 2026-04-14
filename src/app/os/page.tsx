@@ -9608,7 +9608,8 @@ export default function AlternusOS() {
   return (
     <div style={{ background: desktopBg }} className="fixed inset-0 flex flex-col overflow-hidden">
       <style>{`
-        * { scrollbar-width: none !important; -ms-overflow-style: none !important; font-family: var(--font-montserrat), 'Montserrat', system-ui, sans-serif !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+        * { scrollbar-width: none !important; -ms-overflow-style: none !important; font-family: 'Montserrat', system-ui, sans-serif !important; }
         *::-webkit-scrollbar { display: none !important; }
         .ai-bar-input::placeholder { color: rgba(255,255,255,0.65); }
         @keyframes os-page-in {
