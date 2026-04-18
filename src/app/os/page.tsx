@@ -8732,62 +8732,57 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               <div className="flex flex-col h-full">
                 {/* Scrollable content — full width, no header */}
                 <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none", background: dk ? agBg : "#F7F8FA" }}>
-                  <div style={{ maxWidth: 700, margin: "0 auto", padding: "48px 32px 32px 32px" }}>
+                  <div style={{ maxWidth: 948, margin: "0 auto", padding: "48px 32px 32px 32px" }}>
 
                   {/* Big input card */}
-                  <div className="mb-6 rounded-2xl overflow-hidden" style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 2px 16px rgba(0,0,0,0.07)" }}>
+                  <div className="mb-7 rounded-2xl overflow-hidden" style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 2px 20px rgba(0,0,0,0.07)" }}>
                     <div className="px-5 pt-5 pb-3">
                       <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
                         onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-                        placeholder={
-                          agentCapability === "email" ? "Draft an email to..." :
-                          agentCapability === "docs" ? "Create a document about..." :
-                          agentCapability === "files" ? "Help me organize files..." :
-                          agentCapability === "settings" ? "Change a system setting..." :
-                          "Enter content, Shift+Enter to send, support uploading files"
-                        }
+                        placeholder="Ask me to do anything on your OS — email, files, apps, system..."
                         className="w-full bg-transparent outline-none text-[13px]"
                         style={{ color: agText, caretColor: agAccent }} />
                     </div>
                     <div className="px-5 pb-4 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         {[
-                          { icon: ic.image, label: "Upload" },
-                          { icon: ic.globe, label: "Research" },
-                          { icon: ic.code,  label: "Code" },
+                          { icon: ic.upload, label: "Upload", color: "#8B5CF6" },
+                          { icon: ic.globe,  label: "Research", color: "#3B82F6" },
+                          { icon: ic.code,   label: "Code", color: "#10B981" },
+                          { icon: ic.image,  label: "Image", color: "#F97316" },
                         ].map(btn => (
                           <button key={btn.label} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9.5px] font-medium transition-all"
                             style={{ color: agTextMuted, border: `1px solid ${agBorder}` }}
-                            onMouseEnter={e => { e.currentTarget.style.color = agAccent; e.currentTarget.style.borderColor = agAccent + "40"; }}
-                            onMouseLeave={e => { e.currentTarget.style.color = agTextMuted; e.currentTarget.style.borderColor = agBorder; }}>
+                            onMouseEnter={e => { e.currentTarget.style.color = btn.color; e.currentTarget.style.borderColor = btn.color + "50"; e.currentTarget.style.background = btn.color + "0D"; }}
+                            onMouseLeave={e => { e.currentTarget.style.color = agTextMuted; e.currentTarget.style.borderColor = agBorder; e.currentTarget.style.background = "transparent"; }}>
                             <I d={btn.icon} s={11} c={agTextMuted} /> {btn.label}
                           </button>
                         ))}
                       </div>
                       <button onClick={() => send()} disabled={!input.trim()}
                         className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
-                        style={{ background: input.trim() ? agAccent : (dk ? c.cardAlt : "#EFEFEF"), boxShadow: input.trim() ? `0 2px 12px ${agAccent}44` : "none" }}>
+                        style={{ background: input.trim() ? agAccent : (dk ? c.cardAlt : "#EFEFEF"), boxShadow: input.trim() ? `0 2px 14px ${agAccent}44` : "none" }}>
                         <I d={ic.send} s={14} c={input.trim() ? "#fff" : agTextMuted} />
                       </button>
                     </div>
                   </div>
 
-                  {/* Capability cards */}
+                  {/* Core capabilities */}
                   <p className="text-[8px] font-bold uppercase tracking-[0.14em] mb-3" style={{ color: agTextMuted }}>What I can do</p>
-                  <div className="grid grid-cols-3 gap-3 mb-6">
+                  <div className="grid grid-cols-3 gap-3 mb-3">
                     {[
                       { icon: ic.mail,     label: "Email",     desc: "Draft & send messages",  color: "#F97316", bg: "#FFF4ED", task: "Draft a professional email to the team" },
                       { icon: ic.fileText, label: "Documents", desc: "Create & edit docs",      color: "#3B82F6", bg: "#EFF6FF", task: "Create a new Word document" },
                       { icon: ic.folder,   label: "Files",     desc: "Manage & organize",       color: "#10B981", bg: "#ECFDF5", task: "Show me what you can do with files" },
                       { icon: ic.globe,    label: "Research",  desc: "Browse & analyze info",   color: "#8B5CF6", bg: "#F5F3FF", task: "Research the latest AI trends" },
                       { icon: ic.monitor,  label: "Apps",      desc: "Launch & control apps",   color: "#06B6D4", bg: "#ECFEFF", task: "What applications can you open?" },
-                      { icon: ic.code,     label: "Terminal",  desc: "Run system commands",     color: "#6B7280", bg: "#F9FAFB", task: "Open the terminal" },
+                      { icon: ic.terminal, label: "Terminal",  desc: "Run system commands",     color: "#6B7280", bg: "#F9FAFB", task: "Open the terminal" },
                     ].map(cap => (
                       <button key={cap.label} onClick={() => send(cap.task)}
                         className="flex flex-col gap-3 p-5 rounded-2xl text-left"
-                        style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 6px rgba(0,0,0,0.05)", transition: "all 0.15s" }}
-                        onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 22px rgba(0,0,0,0.11)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 6px rgba(0,0,0,0.05)"; e.currentTarget.style.transform = "translateY(0)"; }}>
+                        style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 6px rgba(0,0,0,0.05)", transition: "all 0.18s" }}
+                        onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 6px 24px ${cap.color}22`; e.currentTarget.style.borderColor = cap.color + "40"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 6px rgba(0,0,0,0.05)"; e.currentTarget.style.borderColor = agBorder; e.currentTarget.style.transform = "translateY(0)"; }}>
                         <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
                           style={{ background: dk ? c.cardAlt : cap.bg }}>
                           <I d={cap.icon} s={16} c={cap.color} />
@@ -8800,25 +8795,52 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                     ))}
                   </div>
 
-                  {/* Try asking */}
-                  <p className="text-[8px] font-bold uppercase tracking-[0.14em] mb-3" style={{ color: agTextMuted }}>Try asking</p>
-                  <div className="grid grid-cols-2 gap-2.5 mb-6">
+                  {/* System / OS agent functions */}
+                  <div className="grid grid-cols-3 gap-3 mb-7">
                     {[
-                      { label: "Draft project update email", sub: "Write to the team", task: "Write a professional email to the team about the project progress" },
-                      { label: "Create a document", sub: "Professional layout", task: "Create a new Word document with a professional structure" },
-                      { label: "Open the dashboard", sub: "Business overview", task: "Open the business dashboard" },
-                      { label: "Switch to dark mode", sub: "Change appearance", task: "Switch to dark mode" },
-                    ].map(s => (
-                      <button key={s.label} onClick={() => send(s.task)}
-                        className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-left"
-                        style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", transition: "all 0.12s" }}
-                        onMouseEnter={e => { e.currentTarget.style.background = dk ? c.cardAlt : "#F5F5F7"; e.currentTarget.style.borderColor = agAccent + "30"; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = dk ? c.card : "#fff"; e.currentTarget.style.borderColor = agBorder; }}>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[10.5px] font-semibold leading-snug" style={{ color: agText }}>{s.label}</p>
-                          <p className="text-[8.5px] mt-0.5" style={{ color: agTextMuted }}>{s.sub}</p>
+                      { icon: ic.sun,      label: "Theme",        desc: "Switch dark / light",      color: "#F59E0B", bg: "#FFFBEB", task: "Switch to dark mode" },
+                      { icon: ic.image,    label: "Wallpaper",    desc: "Change desktop background", color: "#EC4899", bg: "#FDF2F8", task: "Change the wallpaper to OSwp 2" },
+                      { icon: ic.wifi,     label: "Network",      desc: "WiFi & connection info",    color: "#0EA5E9", bg: "#F0F9FF", task: "Show me the network and WiFi status" },
+                      { icon: ic.cpu,      label: "System",       desc: "CPU, memory & status",      color: "#64748B", bg: "#F8FAFC", task: "Show me the current system status and performance" },
+                      { icon: ic.calendar, label: "Calendar",     desc: "Schedule & events",         color: "#7C3AED", bg: "#F5F3FF", task: "Open the calendar and show today's schedule" },
+                      { icon: ic.power,    label: "Power",        desc: "Restart or shut down",      color: "#EF4444", bg: "#FEF2F2", task: "Show me power and restart options" },
+                    ].map(cap => (
+                      <button key={cap.label} onClick={() => send(cap.task)}
+                        className="flex flex-col gap-3 p-5 rounded-2xl text-left"
+                        style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 6px rgba(0,0,0,0.05)", transition: "all 0.18s" }}
+                        onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 6px 24px ${cap.color}22`; e.currentTarget.style.borderColor = cap.color + "40"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 6px rgba(0,0,0,0.05)"; e.currentTarget.style.borderColor = agBorder; e.currentTarget.style.transform = "translateY(0)"; }}>
+                        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                          style={{ background: dk ? c.cardAlt : cap.bg }}>
+                          <I d={cap.icon} s={16} c={cap.color} />
                         </div>
-                        <span className="text-[14px] flex-shrink-0" style={{ color: agTextMuted }}>→</span>
+                        <div>
+                          <p className="text-[11px] font-semibold leading-snug" style={{ color: agText }}>{cap.label}</p>
+                          <p className="text-[8.5px] leading-snug mt-1" style={{ color: agTextMuted }}>{cap.desc}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Quick fire actions */}
+                  <p className="text-[8px] font-bold uppercase tracking-[0.14em] mb-3" style={{ color: agTextMuted }}>Quick actions</p>
+                  <div className="flex flex-wrap gap-2 mb-7">
+                    {[
+                      { label: "🌙 Dark mode",          task: "Switch to dark mode" },
+                      { label: "☀️ Light mode",         task: "Switch to light mode" },
+                      { label: "🖼 Change wallpaper",   task: "Change the wallpaper to OSwp 2" },
+                      { label: "📊 Open dashboard",     task: "Open the business dashboard" },
+                      { label: "💻 Open terminal",      task: "Open the terminal" },
+                      { label: "📂 Open files",         task: "Open the Files application" },
+                      { label: "📧 Draft email",        task: "Write a professional email to the team about the project progress" },
+                      { label: "📄 New document",       task: "Create a new Word document with a professional structure" },
+                    ].map(qa => (
+                      <button key={qa.label} onClick={() => send(qa.task)}
+                        className="px-3 py-1.5 rounded-full text-[9.5px] font-medium transition-all"
+                        style={{ background: dk ? c.card : "#fff", color: agTextSec, border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = agAccentSoft; e.currentTarget.style.color = agAccent; e.currentTarget.style.borderColor = agAccent + "40"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = dk ? c.card : "#fff"; e.currentTarget.style.color = agTextSec; e.currentTarget.style.borderColor = agBorder; }}>
+                        {qa.label}
                       </button>
                     ))}
                   </div>
