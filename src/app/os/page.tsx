@@ -7113,7 +7113,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
       <div className="flex-1 flex flex-col overflow-hidden">
             {/* Chat header */}
             <div className="flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
-              <div className="flex items-center justify-between pt-4 pb-3" style={{ paddingLeft: 124, paddingRight: 124 }}>
+              <div className="flex items-center justify-between px-5 pt-4 pb-3">
                 <div className="flex items-center gap-3.5">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-[12px] font-bold text-white flex-shrink-0"
                     style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}99)`, boxShadow: `0 6px 20px ${activeModel.color}45` }}>
@@ -7156,7 +7156,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
                 </div>
               </div>
               {/* Metrics strip */}
-              <div className="flex items-center pb-3 gap-0" style={{ paddingLeft: 124, paddingRight: 124 }}>
+              <div className="flex items-center px-5 pb-3 gap-0">
                 {[
                   { label: "Params", value: activeModel.params },
                   { label: "Context", value: activeModel.ctx },
@@ -7177,7 +7177,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
             </div>
 
             {/* Channel tabs */}
-            <div className="flex items-center gap-1 py-1.5 flex-shrink-0 overflow-x-auto" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none", paddingLeft: 124, paddingRight: 124 }}>
+            <div className="flex items-center gap-1 px-4 py-1.5 flex-shrink-0 overflow-x-auto" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
               {channels.map(ch => (
                 <button key={ch.id} onClick={() => setChannel(ch.id)}
                   className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9.5px] font-semibold whitespace-nowrap flex-shrink-0 transition-all"
