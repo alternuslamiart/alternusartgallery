@@ -10450,7 +10450,7 @@ export default function AlternusOS() {
 
         {/* ━━━━ Search Button — top center ━━━━ */}
         <button
-          onClick={() => { setShowSpotlight(true); setSpotlightQuery(""); }}
+          onClick={e => { e.stopPropagation(); setShowSpotlight(true); setSpotlightQuery(""); }}
           className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-200"
           style={{
             background: mode === "dark" ? "rgba(30,30,30,0.55)" : "rgba(255,255,255,0.5)",
@@ -11128,7 +11128,7 @@ export default function AlternusOS() {
                           style={{ background: `${modeAccent}12`, color: modeAccent }}
                           onMouseEnter={e => { e.currentTarget.style.background = `${modeAccent}20`; }}
                           onMouseLeave={e => { e.currentTarget.style.background = `${modeAccent}12`; }}
-                          onClick={() => { openWin("ai"); setShowCtrlAi(false); }}>
+                          onClick={() => { openWin("agent"); setShowCtrlAi(false); }}>
                           <I d={ic.maximize} s={10} c={modeAccent} />
                           Open Full AI
                         </button>
@@ -11273,7 +11273,7 @@ export default function AlternusOS() {
                             <button
                               key={app.id}
                               title={app.label}
-                              onClick={() => { openWinWithAI(app.id); closeLaunchpad(); }}
+                              onClick={e => { e.stopPropagation(); closeLaunchpad(); openWinWithAI(app.id); }}
                               style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7, padding: "8px 4px 8px", borderRadius: 13, border: "none", background: "transparent", cursor: "pointer", transition: "background 0.15s" }}
                               onMouseEnter={e => {
                                 e.currentTarget.style.background = "rgba(255,255,255,0.08)";
