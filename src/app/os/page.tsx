@@ -2239,7 +2239,7 @@ function WordApp({ c }: { c: typeof palette.dark }) {
                 { label: "Fix Grammar", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Grammar check complete. 3 corrections applied:\n• \"Enem\" → \"Enim\"\n• Comma added after \"purus\"\n• Period consistency fixed"); setAiLoading(false); }, 600); }},
                 { label: "Make Shorter", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Shortened version ready. Reduced from 144 to ~80 words while keeping key points. Click 'Apply' to replace."); setAiLoading(false); }, 700); }},
                 { label: "Make Longer", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Expanded version ready. Added details and transitions. Word count increased to ~220 words. Click 'Apply' to replace."); setAiLoading(false); }, 700); }},
-                { label: "Translate", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Translation ready (Albanian):\n\nLorem ipsum → Teksti placeholder per dokumentin tuaj..."); setAiLoading(false); }, 900); }},
+                { label: "Translate", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Translation complete:\n\nThe document has been translated and is ready for review."); setAiLoading(false); }, 900); }},
                 { label: "Change Tone", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Tone options:\n• Professional\n• Casual\n• Academic\n• Creative\n\nSelect a tone to rewrite the document."); setAiLoading(false); }, 500); }},
               ].map((item, i) => (
                 <button key={i} onClick={item.action}
@@ -5755,7 +5755,7 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
 function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
   type Customer = { id: number; name: string; email: string; phone: string; status: string };
   type Transaction = { id: number; type: "income" | "expense"; amount: number; category: string; desc: string; date: string };
-  type Task = { id: number; title: string; priority: "E ulët" | "Normale" | "E lartë" | "Urgjente"; status: "Në pritje" | "Në progres" | "Përfunduar"; due: string };
+  type Task = { id: number; title: string; priority: "Low" | "Normal" | "High" | "Urgent"; status: "Pending" | "In Progress" | "Done"; due: string };
 
   const load = <T,>(key: string, def: T): T => { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; } };
   const save = <T,>(key: string, v: T) => { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} };
@@ -5768,7 +5768,7 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
   // Forms
   const [cForm, setCForm] = useState({ name: "", email: "", phone: "", status: "Aktiv" });
   const [tForm, setTForm] = useState<{ type: "income" | "expense"; amount: string; category: string; desc: string; date: string }>({ type: "income", amount: "", category: "Shitje", desc: "", date: new Date().toISOString().slice(0, 10) });
-  const [tkForm, setTkForm] = useState({ title: "", priority: "Normale" as Task["priority"], due: "" });
+  const [tkForm, setTkForm] = useState({ title: "", priority: "Normal" as Task["priority"], due: "" });
 
   const nextId = (arr: { id: number }[]) => arr.length ? Math.max(...arr.map(x => x.id)) + 1 : 1;
 
@@ -5793,11 +5793,11 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
     if (!tkForm.title.trim()) return;
     const updated = [...tasks, { id: nextId(tasks), title: tkForm.title, priority: tkForm.priority, status: "Në pritje" as Task["status"], due: tkForm.due }];
     setTasks(updated); save("bm_tasks", updated);
-    setTkForm({ title: "", priority: "Normale", due: "" });
+    setTkForm({ title: "", priority: "Normal", due: "" });
   };
   const advanceTask = (id: number) => {
-    const map: Record<string, Task["status"]> = { "Në pritje": "Në progres", "Në progres": "Përfunduar" };
-    const u = tasks.map(t => t.id === id && t.status !== "Përfunduar" ? { ...t, status: map[t.status] } : t);
+    const map: Record<string, Task["status"]> = { "Pending": "In Progress", "In Progress": "Done" };
+    const u = tasks.map(t => t.id === id && t.status !== "Done" ? { ...t, status: map[t.status] } : t);
     setTasks(u); save("bm_tasks", u);
   };
   const delTask = (id: number) => { const u = tasks.filter(x => x.id !== id); setTasks(u); save("bm_tasks", u); };
@@ -5815,8 +5815,8 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
     </button>
   );
 
-  const pColors: Record<string, string> = { "E ulët": c.textMuted, "Normale": c.accent, "E lartë": c.warning, "Urgjente": c.danger };
-  const sColors: Record<string, string> = { "Në pritje": c.textMuted, "Në progres": c.accent, "Përfunduar": c.success };
+  const pColors: Record<string, string> = { "Low": c.textMuted, "Normal": c.accent, "High": c.warning, "Urgent": c.danger };
+  const sColors: Record<string, string> = { "Pending": c.textMuted, "In Progress": c.accent, "Done": c.success };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", background: c.bg, color: c.text, fontFamily: "Segoe UI, sans-serif" }}>
@@ -5840,9 +5840,9 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
               {[
                 { label: "👥 Klientë", val: customers.length.toString(), color: c.accent },
-                { label: "💰 Të Ardhura", val: `€${income.toFixed(2)}`, color: c.success },
-                { label: "💸 Shpenzime", val: `€${expense.toFixed(2)}`, color: c.danger },
-                { label: "📊 Bilanci", val: `€${balance.toFixed(2)}`, color: balance >= 0 ? c.success : c.danger },
+                { label: "💰 Income", val: `€${income.toFixed(2)}`, color: c.success },
+                { label: "💸 Expenses", val: `€${expense.toFixed(2)}`, color: c.danger },
+                { label: "📊 Balance", val: `€${balance.toFixed(2)}`, color: balance >= 0 ? c.success : c.danger },
               ].map(({ label, val, color }) => (
                 <div key={label} style={{ background: c.surface, borderRadius: 10, padding: "12px 14px", border: `1px solid ${c.border}` }}>
                   <div style={{ fontSize: 11, color: c.textMuted, marginBottom: 4 }}>{label}</div>
@@ -5859,7 +5859,7 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
                     <span style={{ color: sColors[t.status], fontSize: 11 }}>{t.status}</span>
                   </div>
                 ))}
-                {tasks.length === 0 && <div style={{ color: c.textMuted, fontSize: 12 }}>Nuk ka detyra.</div>}
+                {tasks.length === 0 && <div style={{ color: c.textMuted, fontSize: 12 }}>No tasks yet.</div>}
               </div>
               <div style={{ background: c.surface, borderRadius: 10, padding: "12px 14px", border: `1px solid ${c.border}` }}>
                 <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 12 }}>💳 Transaksionet e fundit</div>
@@ -5871,7 +5871,7 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
                     </span>
                   </div>
                 ))}
-                {transactions.length === 0 && <div style={{ color: c.textMuted, fontSize: 12 }}>Nuk ka transaksione.</div>}
+                {transactions.length === 0 && <div style={{ color: c.textMuted, fontSize: 12 }}>No transactions yet.</div>}
               </div>
             </div>
           </div>
@@ -5882,15 +5882,15 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
           <div>
             <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
               {(["name", "email", "phone"] as const).map(f => (
-                <input key={f} placeholder={{ name: "Emri *", email: "Email", phone: "Telefon" }[f]}
+                <input key={f} placeholder={{ name: "Name *", email: "Email", phone: "Phone" }[f]}
                   value={cForm[f]} onChange={e => setCForm(p => ({ ...p, [f]: e.target.value }))}
                   onKeyDown={e => e.key === "Enter" && addCustomer()}
                   style={{ flex: 1, minWidth: 100, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
               ))}
-              <button onClick={addCustomer} style={{ padding: "6px 16px", borderRadius: 8, background: c.accent, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Shto</button>
+              <button onClick={addCustomer} style={{ padding: "6px 16px", borderRadius: 8, background: c.accent, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Add</button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {customers.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>Nuk ka klientë akoma.</div>}
+              {customers.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>No customers yet.</div>}
               {customers.map(cu => (
                 <div key={cu.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: c.surface, borderRadius: 8, border: `1px solid ${c.border}` }}>
                   <span style={{ width: 28, height: 28, borderRadius: "50%", background: c.accent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{cu.name[0]?.toUpperCase()}</span>
@@ -5910,7 +5910,7 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
         {tab === "finance" && (
           <div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
-              {[{ l: "💰 Të Ardhura", v: `€${income.toFixed(2)}`, col: c.success }, { l: "💸 Shpenzime", v: `€${expense.toFixed(2)}`, col: c.danger }, { l: "📊 Bilanci", v: `€${balance.toFixed(2)}`, col: balance >= 0 ? c.success : c.danger }].map(({ l, v, col }) => (
+              {[{ l: "💰 Income", v: `€${income.toFixed(2)}`, col: c.success }, { l: "💸 Expenses", v: `€${expense.toFixed(2)}`, col: c.danger }, { l: "📊 Balance", v: `€${balance.toFixed(2)}`, col: balance >= 0 ? c.success : c.danger }].map(({ l, v, col }) => (
                 <div key={l} style={{ background: c.surface, borderRadius: 8, padding: "10px 12px", border: `1px solid ${c.border}`, textAlign: "center" }}>
                   <div style={{ fontSize: 11, color: c.textMuted }}>{l}</div>
                   <div style={{ fontSize: 18, fontWeight: 700, color: col }}>{v}</div>
@@ -5920,21 +5920,21 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
             <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
               <select value={tForm.type} onChange={e => setTForm(p => ({ ...p, type: e.target.value as "income" | "expense" }))}
                 style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12 }}>
-                <option value="income">⬆ Të Ardhura</option>
-                <option value="expense">⬇ Shpenzim</option>
+                <option value="income">⬆ Income</option>
+                <option value="expense">⬇ Expense</option>
               </select>
-              <input placeholder="Shuma €" value={tForm.amount} onChange={e => setTForm(p => ({ ...p, amount: e.target.value }))}
+              <input placeholder="Amount €" value={tForm.amount} onChange={e => setTForm(p => ({ ...p, amount: e.target.value }))}
                 style={{ width: 90, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
-              <input placeholder="Kategoria" value={tForm.category} onChange={e => setTForm(p => ({ ...p, category: e.target.value }))}
+              <input placeholder="Category" value={tForm.category} onChange={e => setTForm(p => ({ ...p, category: e.target.value }))}
                 style={{ width: 110, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
-              <input placeholder="Përshkrimi" value={tForm.desc} onChange={e => setTForm(p => ({ ...p, desc: e.target.value }))}
+              <input placeholder="Description" value={tForm.desc} onChange={e => setTForm(p => ({ ...p, desc: e.target.value }))}
                 style={{ flex: 1, minWidth: 100, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
               <input type="date" value={tForm.date} onChange={e => setTForm(p => ({ ...p, date: e.target.value }))}
                 style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12 }} />
-              <button onClick={addTransaction} style={{ padding: "6px 16px", borderRadius: 8, background: tForm.type === "income" ? c.success : c.danger, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Shto</button>
+              <button onClick={addTransaction} style={{ padding: "6px 16px", borderRadius: 8, background: tForm.type === "income" ? c.success : c.danger, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Add</button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-              {transactions.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>Nuk ka transaksione akoma.</div>}
+              {transactions.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>No transactions yet.</div>}
               {[...transactions].reverse().map(t => (
                 <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 12px", background: c.surface, borderRadius: 8, border: `1px solid ${c.border}` }}>
                   <span style={{ fontSize: 14 }}>{t.type === "income" ? "⬆" : "⬇"}</span>
@@ -5952,26 +5952,26 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
         {tab === "tasks" && (
           <div>
             <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-              <input placeholder="Titulli i detyrës *" value={tkForm.title} onChange={e => setTkForm(p => ({ ...p, title: e.target.value }))}
+              <input placeholder="Task title *" value={tkForm.title} onChange={e => setTkForm(p => ({ ...p, title: e.target.value }))}
                 onKeyDown={e => e.key === "Enter" && addTask()}
                 style={{ flex: 1, minWidth: 150, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
               <select value={tkForm.priority} onChange={e => setTkForm(p => ({ ...p, priority: e.target.value as Task["priority"] }))}
                 style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12 }}>
-                {["E ulët", "Normale", "E lartë", "Urgjente"].map(p => <option key={p}>{p}</option>)}
+                {["Low", "Normal", "High", "Urgent"].map(p => <option key={p}>{p}</option>)}
               </select>
               <input type="date" value={tkForm.due} onChange={e => setTkForm(p => ({ ...p, due: e.target.value }))}
                 style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12 }} />
-              <button onClick={addTask} style={{ padding: "6px 16px", borderRadius: 8, background: c.accent, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Shto</button>
+              <button onClick={addTask} style={{ padding: "6px 16px", borderRadius: 8, background: c.accent, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Add</button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {tasks.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>Nuk ka detyra akoma.</div>}
+              {tasks.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>No tasks yet.</div>}
               {tasks.map(t => (
                 <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: c.surface, borderRadius: 8, border: `1px solid ${c.border}` }}>
                   <button onClick={() => advanceTask(t.id)}
-                    style={{ width: 22, height: 22, borderRadius: "50%", border: `2px solid ${sColors[t.status]}`, background: t.status === "Përfunduar" ? sColors[t.status] : "transparent", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {t.status === "Përfunduar" && <span style={{ color: "#fff", fontSize: 10 }}>✓</span>}
+                    style={{ width: 22, height: 22, borderRadius: "50%", border: `2px solid ${sColors[t.status]}`, background: t.status === "Done" ? sColors[t.status] : "transparent", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {t.status === "Done" && <span style={{ color: "#fff", fontSize: 10 }}>✓</span>}
                   </button>
-                  <span style={{ flex: 1, fontSize: 13, textDecoration: t.status === "Përfunduar" ? "line-through" : "none", color: t.status === "Përfunduar" ? c.textMuted : c.text }}>{t.title}</span>
+                  <span style={{ flex: 1, fontSize: 13, textDecoration: t.status === "Done" ? "line-through" : "none", color: t.status === "Done" ? c.textMuted : c.text }}>{t.title}</span>
                   <span style={{ fontSize: 10, color: pColors[t.priority], background: `${pColors[t.priority]}20`, padding: "2px 8px", borderRadius: 6 }}>{t.priority}</span>
                   <span style={{ fontSize: 10, color: sColors[t.status] }}>{t.status}</span>
                   {t.due && <span style={{ fontSize: 10, color: c.textMuted }}>📅 {t.due}</span>}
@@ -7424,175 +7424,204 @@ function ImageGenApp({ c }: { c: typeof palette.dark }) {
 
 // ━━━━ AI VOICE APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AIVoiceApp({ c }: { c: typeof palette.dark }) {
-  const [mode, setMode] = useState<"ask" | "tts">("ask");
   const [listening, setListening] = useState(false);
-  const [query, setQuery] = useState("");
-  const [answer, setAnswer] = useState<{ text: string; icon: string; color: string } | null>(null);
-  const [ttsText, setTtsText] = useState("Type something and I'll speak it aloud.");
-  const [voice, setVoice] = useState("Aria");
   const [speaking, setSpeaking] = useState(false);
-  const voices = ["Aria", "Nova", "Echo", "Onyx", "Shimmer", "Fable"];
-  const queryInputRef = useRef<HTMLInputElement>(null);
+  const [transcript, setTranscript] = useState("");
+  const [answer, setAnswer] = useState<{ text: string; icon: string; color: string } | null>(null);
+  const [error, setError] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const transcriptRef = useRef("");
+  const bars = Array.from({ length: 22 }, (_, i) => i);
 
   const getOsAnswer = (q: string): { text: string; icon: string; color: string } => {
     const lower = q.toLowerCase();
     const now = new Date();
-    if (/\bora\b|time|clock|koha|çfar ore|sa esh.*ora|what time/.test(lower)) {
+    if (/\btime\b|clock|what time|current time/.test(lower))
       return { text: now.toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" }), icon: ic.clock, color: "#7C3AED" };
-    }
-    if (/\bdata\b|\bdate\b|sot|today|which day|what day|dita|javë|java/.test(lower)) {
+    if (/\bdate\b|today|which day|what day|what's today/.test(lower))
       return { text: now.toLocaleDateString("en", { weekday: "long", year: "numeric", month: "long", day: "numeric" }), icon: ic.calendar, color: "#3B82F6" };
-    }
-    if (/\bviti\b|\byear\b|which year|sa vit/.test(lower)) {
+    if (/\byear\b|which year|current year/.test(lower))
       return { text: `Year ${now.getFullYear()}`, icon: ic.calendar, color: "#10B981" };
-    }
-    if (/\bmuaji\b|\bmonth\b|what month|cili muaj/.test(lower)) {
+    if (/\bmonth\b|what month|current month/.test(lower))
       return { text: now.toLocaleDateString("en", { month: "long" }), icon: ic.calendar, color: "#F59E0B" };
-    }
-    if (/battery|bateri|charge|karikues/.test(lower)) {
-      return { text: "Battery info requires OS permission", icon: ic.battery, color: "#EC4899" };
-    }
-    if (/\bOS\b|sistem|version|alternus/.test(lower)) {
+    if (/battery|charge/.test(lower))
+      return { text: "Battery info requires OS permission.", icon: ic.battery, color: "#EC4899" };
+    if (/\bos\b|system|version|alternus/.test(lower))
       return { text: "Alternus OS v2.0 · AlternusCore 6.2", icon: ic.monitor, color: "#06B6D4" };
-    }
-    if (/resolution|screen|ekran|rezolucion/.test(lower)) {
+    if (/resolution|screen size|display/.test(lower))
       return { text: `${window.innerWidth} × ${window.innerHeight} px`, icon: ic.monitor, color: "#8B5CF6" };
-    }
-    if (/hello|hi|hej|mirëdita|ciao|salut/.test(lower)) {
+    if (/hello|hi there|hey/.test(lower)) {
       const hr = now.getHours();
       const greet = hr < 12 ? "Good morning" : hr < 18 ? "Good afternoon" : "Good evening";
       return { text: `${greet}! I'm your Alternus AI Voice assistant.`, icon: ic.sparkle, color: "#7C3AED" };
     }
-    return {
-      text: `I don't know the answer to "${q}" yet. Try asking: time, date, OS version, resolution.`,
-      icon: ic.brain, color: c.accent,
+    return { text: `I heard: "${q}". Try asking: time, date, OS version, or screen resolution.`, icon: ic.brain, color: c.accent };
+  };
+
+  const speakText = (text: string) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = "en-US";
+    utt.rate = 1.05;
+    utt.pitch = 1;
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v => v.name.includes("Microsoft") || v.name.includes("Google") || v.lang === "en-US");
+    if (preferred) utt.voice = preferred;
+    setSpeaking(true);
+    utt.onend = () => setSpeaking(false);
+    utt.onerror = () => setSpeaking(false);
+    window.speechSynthesis.speak(utt);
+  };
+
+  const startListening = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const win = window as any;
+    const SR = win.SpeechRecognition || win.webkitSpeechRecognition;
+    if (!SR) { setError("Speech recognition not supported in this browser."); return; }
+    setError("");
+    setAnswer(null);
+    setTranscript("");
+    const rec = new SR();
+    rec.lang = "en-US";
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+    recognitionRef.current = rec;
+    transcriptRef.current = "";
+    rec.onstart = () => setListening(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onresult = (e: any) => {
+      const t = Array.from(e.results as ArrayLike<SpeechRecognitionResult>).map(r => r[0].transcript).join("");
+      transcriptRef.current = t;
+      setTranscript(t);
     };
-  };
-
-  const askQuestion = () => {
-    if (!query.trim()) return;
-    setListening(true);
-    setTimeout(() => {
-      setAnswer(getOsAnswer(query));
+    rec.onend = () => {
       setListening(false);
-    }, 1200);
+      if (transcriptRef.current.trim()) {
+        const ans = getOsAnswer(transcriptRef.current);
+        setAnswer(ans);
+        speakText(ans.text);
+      }
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onerror = (e: any) => {
+      setListening(false);
+      if (e.error !== "no-speech") setError(`Mic error: ${e.error}`);
+    };
+    rec.start();
   };
 
-  const speak = () => { setSpeaking(true); setTimeout(() => setSpeaking(false), 2000); };
-  const bars = Array.from({ length: 22 }, (_, i) => i);
+  const stopListening = () => {
+    recognitionRef.current?.stop();
+  };
 
-  const suggestions = ["Sa është ora?", "Cila është data sot?", "Çfarë viti jemi?", "OS version?", "Screen resolution?"];
+  const suggestions = ["What time is it?", "What's today's date?", "What year is it?", "OS version?", "Screen resolution?"];
+
+  const handleSuggestion = (s: string) => {
+    setTranscript(s);
+    setAnswer(null);
+    const ans = getOsAnswer(s);
+    setAnswer(ans);
+    speakText(ans.text);
+  };
 
   return (
     <div className="flex flex-col h-full" style={{ background: c.bg, fontFamily: "'Segoe UI Variable','Segoe UI',system-ui,sans-serif" }}>
-      {/* Tabs */}
-      <div className="flex flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        {[{ id: "ask", label: "🎤 Speech → Text" }, { id: "tts", label: "🔊 Text → Speech" }].map(m => (
-          <button key={m.id} onClick={() => setMode(m.id as "ask" | "tts")}
-            className="flex-1 py-2.5 text-[11px] font-medium transition-colors"
-            style={{ background: mode === m.id ? c.surface : "transparent", color: mode === m.id ? c.text : c.textMuted, borderBottom: mode === m.id ? `2px solid ${c.accent}` : "2px solid transparent" }}>
-            {m.label}
-          </button>
-        ))}
+      {/* Header */}
+      <div className="flex items-center gap-2 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: c.accentSoft }}>
+          <I d={ic.mic} s={13} c={c.accent} />
+        </div>
+        <div>
+          <p className="text-[12px] font-bold" style={{ color: c.text }}>AI Voice Assistant</p>
+          <p className="text-[9px]" style={{ color: c.textMuted }}>Speak naturally — get instant answers</p>
+        </div>
+        {speaking && (
+          <div className="ml-auto flex items-center gap-1 px-2 py-1 rounded-full" style={{ background: "#7C3AED18" }}>
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#7C3AED" }} />
+            <span className="text-[9px] font-medium" style={{ color: "#7C3AED" }}>Speaking</span>
+          </div>
+        )}
       </div>
 
-      {mode === "ask" ? (
-        <div className="flex-1 flex flex-col items-center p-5 gap-4 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-          {/* Mic button */}
-          <button onClick={() => { queryInputRef.current?.focus(); }}
-            className="w-20 h-20 rounded-full flex items-center justify-center transition-all mt-2"
-            style={{
-              background: listening ? `${c.danger}18` : c.accentSoft,
-              border: `2px solid ${listening ? c.danger : c.accent}`,
-              boxShadow: listening ? `0 0 0 10px ${c.danger}12, 0 0 0 20px ${c.danger}06` : `0 0 0 6px ${c.accent}12`,
-            }}>
-            <I d={ic.mic} s={32} c={listening ? c.danger : c.accent} />
-          </button>
+      <div className="flex-1 flex flex-col items-center px-5 py-4 gap-4 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+        {/* Mic button */}
+        <button
+          onClick={listening ? stopListening : startListening}
+          className="w-24 h-24 rounded-full flex items-center justify-center transition-all mt-2 active:scale-95"
+          style={{
+            background: listening ? `${c.danger}14` : c.accentSoft,
+            border: `2.5px solid ${listening ? c.danger : c.accent}`,
+            boxShadow: listening
+              ? `0 0 0 12px ${c.danger}10, 0 0 0 24px ${c.danger}06`
+              : `0 0 0 8px ${c.accent}10`,
+          }}>
+          <I d={ic.mic} s={36} c={listening ? c.danger : c.accent} />
+        </button>
 
-          {/* Waveform */}
-          <div className="flex items-center gap-0.5 h-8 w-full justify-center">
-            {bars.map(i => (
-              <div key={i} className="w-1 rounded-full"
-                style={{
-                  height: listening ? `${20 + Math.abs(Math.sin(i * 0.8)) * 80}%` : "12%",
-                  background: listening ? c.danger : c.border,
-                  transition: `height 0.1s ease ${i * 0.02}s`,
-                }} />
-            ))}
+        {/* Waveform */}
+        <div className="flex items-center gap-0.5 h-10 w-full justify-center">
+          {bars.map(i => (
+            <div key={i} className="w-1 rounded-full"
+              style={{
+                height: (listening || speaking) ? `${15 + Math.abs(Math.sin(i * 0.7 + Date.now() * 0.001)) * 75}%` : "10%",
+                background: listening ? c.danger : speaking ? c.accent : c.border,
+                transition: `height ${listening || speaking ? "0.08" : "0.3"}s ease ${i * 0.015}s`,
+              }} />
+          ))}
+        </div>
+
+        <p className="text-[11px] font-semibold text-center" style={{ color: c.textSec }}>
+          {listening ? "Listening... speak now" : speaking ? "Speaking response..." : "Tap the mic and ask anything"}
+        </p>
+
+        {/* Transcript */}
+        {transcript && (
+          <div className="w-full px-3 py-2 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            <p className="text-[9px] font-semibold uppercase tracking-wide mb-0.5" style={{ color: c.textMuted }}>You said</p>
+            <p className="text-[11px] italic" style={{ color: c.text }}>&ldquo;{transcript}&rdquo;</p>
           </div>
+        )}
 
-          <p className="text-[10.5px] font-medium" style={{ color: c.textSec }}>
-            {listening ? "Processing..." : "Tap mic or type your question"}
-          </p>
+        {/* Error */}
+        {error && <p className="text-[10px] text-center px-3 py-2 rounded-xl w-full" style={{ color: c.danger, background: `${c.danger}10` }}>{error}</p>}
 
-          {/* Query input */}
-          <div className="w-full flex items-center gap-2 px-3 py-2 rounded-xl"
-            style={{ background: c.surface, border: `1.5px solid ${c.border}` }}>
-            <input ref={queryInputRef} value={query} onChange={e => setQuery(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && askQuestion()}
-              placeholder="Ask anything about your OS..."
-              className="flex-1 bg-transparent outline-none text-[11px]"
-              style={{ color: c.text }} />
-            <button onClick={askQuestion}
-              className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{ background: query.trim() ? c.accent : c.cardAlt }}>
-              <I d={ic.send} s={11} c={query.trim() ? "#fff" : c.textMuted} />
-            </button>
+        {/* Answer card */}
+        {answer && (
+          <div className="w-full rounded-2xl p-4 flex items-start gap-3"
+            style={{ background: `${answer.color}10`, border: `1.5px solid ${answer.color}30` }}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: `${answer.color}20` }}>
+              <I d={answer.icon} s={16} c={answer.color} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[9px] font-semibold uppercase tracking-wide mb-1" style={{ color: answer.color }}>Answer</p>
+              <p className="text-[15px] font-bold leading-snug" style={{ color: c.text }}>{answer.text}</p>
+              <button onClick={() => speakText(answer.text)} className="flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full text-[9px]"
+                style={{ background: `${answer.color}15`, color: answer.color }}>
+                <I d={ic.volume} s={9} c={answer.color} /> Repeat
+              </button>
+            </div>
           </div>
+        )}
 
-          {/* Suggestions */}
-          <div className="w-full flex flex-wrap gap-1.5">
+        {/* Suggestions */}
+        <div className="w-full">
+          <p className="text-[9px] font-semibold uppercase tracking-wide mb-2" style={{ color: c.textMuted }}>Try asking</p>
+          <div className="flex flex-wrap gap-1.5">
             {suggestions.map(s => (
-              <button key={s} onClick={() => { setQuery(s); setTimeout(askQuestion, 50); }}
+              <button key={s} onClick={() => handleSuggestion(s)}
                 className="px-2.5 py-1 rounded-full text-[9.5px] transition-all"
                 style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}
-                onMouseEnter={e => (e.currentTarget.style.borderColor = c.accent)} onMouseLeave={e => (e.currentTarget.style.borderColor = c.border)}>
+                onMouseEnter={e => (e.currentTarget.style.borderColor = c.accent)}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = c.border)}>
                 {s}
               </button>
             ))}
           </div>
-
-          {/* Answer card */}
-          {answer && (
-            <div className="w-full rounded-2xl p-4 flex items-start gap-3"
-              style={{ background: `${answer.color}10`, border: `1.5px solid ${answer.color}30` }}>
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: `${answer.color}20` }}>
-                <I d={answer.icon} s={16} c={answer.color} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[9px] font-semibold uppercase tracking-wide mb-1" style={{ color: answer.color }}>AI Voice Answer</p>
-                <p className="text-[13px] font-bold leading-snug" style={{ color: c.text }}>{answer.text}</p>
-                <p className="text-[9px] mt-1.5" style={{ color: c.textMuted }}>from Alternus OS · {new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}</p>
-              </div>
-            </div>
-          )}
         </div>
-      ) : (
-        <div className="flex-1 flex flex-col p-4 gap-4">
-          <div>
-            <p className="text-[10px] font-semibold mb-1.5" style={{ color: c.textMuted }}>Voice</p>
-            <div className="flex flex-wrap gap-1.5">
-              {voices.map(v => (
-                <button key={v} onClick={() => setVoice(v)}
-                  className="px-3 py-1 rounded-full text-[10px] transition-colors"
-                  style={{ background: voice === v ? c.accentSoft : c.surface, color: voice === v ? c.accentText : c.textMuted, border: `1px solid ${voice === v ? c.accent : c.border}` }}>
-                  {v}
-                </button>
-              ))}
-            </div>
-          </div>
-          <textarea value={ttsText} onChange={e => setTtsText(e.target.value)}
-            rows={5} className="flex-1 text-[11px] px-3 py-2 rounded-xl outline-none resize-none"
-            style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
-          <button onClick={speak} disabled={speaking}
-            className="py-2.5 rounded-xl text-[12px] font-semibold flex items-center justify-center gap-2"
-            style={{ background: speaking ? c.cardAlt : c.accent, color: speaking ? c.textMuted : "#fff" }}>
-            <I d={ic.volume} s={16} c={speaking ? c.textMuted : "#fff"} />
-            {speaking ? "Speaking..." : `Speak as ${voice}`}
-          </button>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
