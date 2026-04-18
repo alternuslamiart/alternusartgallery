@@ -8732,7 +8732,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               <div className="flex flex-col h-full">
                 {/* Scrollable content — full width, no header */}
                 <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none", background: dk ? agBg : "#F7F8FA" }}>
-                  <div style={{ padding: "48px 32px 32px 32px" }}>
+                  <div style={{ maxWidth: 700, margin: "0 auto", padding: "48px 32px 32px 32px" }}>
 
                   {/* Big input card */}
                   <div className="mb-6 rounded-2xl overflow-hidden" style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 2px 16px rgba(0,0,0,0.07)" }}>
