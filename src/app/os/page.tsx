@@ -8730,44 +8730,9 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
             {msgs.filter(m => m.role === "user").length === 0 && !isThinking ? (
               /* ── DASHBOARD VIEW ── */
               <div className="flex flex-col h-full">
-                {/* Tab header */}
-                <div className="flex items-center flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}`, background: dk ? c.surface : "#fff" }}>
-                  <div className="flex items-center gap-2 px-4 py-3 border-r flex-shrink-0" style={{ borderColor: agBorder }}>
-                    <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: agAccentSoft }}>
-                      <I d={ic.sparkle} s={11} c={agAccent} f />
-                    </div>
-                    <p className="text-[11px] font-bold whitespace-nowrap" style={{ color: agText }}>Alternus AI</p>
-                  </div>
-                  <div className="flex items-center flex-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-                    {([
-                      { id: "all",      label: "All tasks",  icon: ic.sparkle },
-                      { id: "email",    label: "Email",      icon: ic.mail },
-                      { id: "docs",     label: "Documents",  icon: ic.fileText },
-                      { id: "files",    label: "Files",      icon: ic.folder },
-                      { id: "settings", label: "Settings",   icon: ic.settings },
-                    ] as { id: typeof agentCapability; label: string; icon: string }[]).map(tab => (
-                      <button key={tab.id} onClick={() => setAgentCapability(tab.id)}
-                        className="flex items-center gap-1.5 px-3.5 py-3.5 text-[10px] font-medium transition-all flex-shrink-0 relative"
-                        style={{ color: agentCapability === tab.id ? agAccent : agTextSec, borderBottom: agentCapability === tab.id ? `2px solid ${agAccent}` : "2px solid transparent" }}>
-                        <I d={tab.icon} s={10} c={agentCapability === tab.id ? agAccent : agTextMuted} />
-                        {tab.label}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex items-center gap-1 px-3 flex-shrink-0">
-                    <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[9px] font-medium transition-all"
-                      style={{ color: agTextMuted }}
-                      onMouseEnter={e => (e.currentTarget.style.background = agSelected)}
-                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                      <I d={ic.menu} s={11} c={agTextMuted} /> More
-                    </button>
-                  </div>
-                </div>
-
-                {/* Scrollable content */}
-                <div className="flex-1 overflow-y-auto py-6" style={{ scrollbarWidth: "none", background: dk ? agBg : "#F7F8FA" }}>
-                  {/* Centered max-width container */}
-                  <div style={{ maxWidth: 720, margin: "0 auto", paddingLeft: 32, paddingRight: 32 }}>
+                {/* Scrollable content — full width, no header */}
+                <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none", background: dk ? agBg : "#F7F8FA" }}>
+                  <div style={{ padding: "48px 32px 32px 32px" }}>
 
                   {/* Big input card */}
                   <div className="mb-6 rounded-2xl overflow-hidden" style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 2px 16px rgba(0,0,0,0.07)" }}>
