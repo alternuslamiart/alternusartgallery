@@ -8768,84 +8768,88 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                   </div>
                 </div>
               ))}
-              {/* ── WELCOME DASHBOARD (shown when chat is fresh) ── */}
+              {/* ── WELCOME DASHBOARD ── */}
               {msgs.filter(m => m.role === "user").length === 0 && !isThinking && (
-                <div className="mt-2 space-y-4">
+                <div className="mt-3 space-y-5">
 
-                  {/* Agent status bar */}
-                  <div className="flex items-center gap-3 px-4 py-3 rounded-2xl"
-                    style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
-                    <div className="flex items-center gap-2 flex-1">
-                      <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#10B981" }} />
+                  {/* Status row */}
+                  <div className="flex items-center gap-0 rounded-2xl overflow-hidden"
+                    style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+                    <div className="flex items-center gap-2 px-4 py-3 flex-1">
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
                       <span className="text-[10px] font-semibold" style={{ color: agText }}>Agent Online</span>
                     </div>
                     {[
                       { label: "Response", value: "~1.2s", color: "#10B981" },
                       { label: "Context", value: "200K", color: agAccent },
-                      { label: "Tasks", value: "0 today", color: "#3B82F6" },
+                      { label: "Tasks today", value: "0", color: "#6366F1" },
                     ].map(stat => (
-                      <div key={stat.label} className="flex flex-col items-center px-3" style={{ borderLeft: `1px solid ${agBorder}` }}>
-                        <span className="text-[11px] font-bold" style={{ color: stat.color }}>{stat.value}</span>
-                        <span className="text-[7.5px]" style={{ color: agTextMuted }}>{stat.label}</span>
+                      <div key={stat.label} className="flex flex-col items-center justify-center px-5 py-3"
+                        style={{ borderLeft: `1px solid ${agBorder}` }}>
+                        <span className="text-[12px] font-bold leading-tight" style={{ color: stat.color }}>{stat.value}</span>
+                        <span className="text-[7.5px] mt-0.5 font-medium" style={{ color: agTextMuted }}>{stat.label}</span>
                       </div>
                     ))}
                   </div>
 
-                  {/* Capability cards 3×2 */}
+                  {/* Capability cards — compact, white, single-color icon, grey hover */}
                   <div>
-                    <p className="text-[9px] font-bold uppercase tracking-widest mb-2.5 px-0.5" style={{ color: agTextMuted }}>Capabilities</p>
+                    <p className="text-[8px] font-bold uppercase tracking-[0.14em] mb-2.5" style={{ color: agTextMuted }}>What I can do</p>
                     <div className="grid grid-cols-3 gap-2">
                       {[
-                        { icon: ic.folder, label: "Files", desc: "Manage & organize", color: "#F59E0B", bg: "#FFFBEB", task: "Show me what you can do with files" },
-                        { icon: ic.mail, label: "Email", desc: "Draft & send", color: "#3B82F6", bg: "#EFF6FF", task: "Draft a professional email to the team" },
-                        { icon: ic.fileText, label: "Documents", desc: "Create & edit", color: "#10B981", bg: "#ECFDF5", task: "Create a new Word document" },
-                        { icon: ic.settings, label: "Settings", desc: "Configure system", color: "#6366F1", bg: "#EEF2FF", task: "Show me system settings options" },
-                        { icon: ic.monitor, label: "Apps", desc: "Launch & control", color: "#EC4899", bg: "#FDF2F8", task: "What applications can you open?" },
-                        { icon: ic.code, label: "Terminal", desc: "Run commands", color: "#8B5CF6", bg: "#F5F3FF", task: "Open the terminal" },
+                        { icon: ic.mail,     label: "Email",     desc: "Draft & send",      task: "Draft a professional email to the team" },
+                        { icon: ic.folder,   label: "Files",     desc: "Manage & organize",  task: "Show me what you can do with files" },
+                        { icon: ic.fileText, label: "Documents", desc: "Create & edit",      task: "Create a new Word document" },
+                        { icon: ic.settings, label: "Settings",  desc: "Configure system",   task: "Show me system settings options" },
+                        { icon: ic.monitor,  label: "Apps",      desc: "Launch & control",   task: "What applications can you open?" },
+                        { icon: ic.code,     label: "Terminal",  desc: "Run commands",       task: "Open the terminal" },
                       ].map(cap => (
                         <button key={cap.label} onClick={() => send(cap.task)}
-                          className="flex flex-col items-start gap-2 p-3 rounded-2xl transition-all text-left"
-                          style={{ background: dk ? c.card : cap.bg, border: `1px solid ${agBorder}`, transition: "all 0.15s ease" }}
-                          onMouseEnter={e => { e.currentTarget.style.borderColor = cap.color + "55"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 4px 16px ${cap.color}18`; }}
-                          onMouseLeave={e => { e.currentTarget.style.borderColor = agBorder; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
-                          <div className="w-7 h-7 rounded-xl flex items-center justify-center"
-                            style={{ background: cap.color + "1A" }}>
-                            <I d={cap.icon} s={13} c={cap.color} />
+                          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left"
+                          style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", transition: "background 0.12s, border-color 0.12s" }}
+                          onMouseEnter={e => { e.currentTarget.style.background = dk ? c.cardAlt : "#F4F4F6"; e.currentTarget.style.borderColor = "rgba(0,0,0,0.11)"; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = dk ? c.card : "#fff"; e.currentTarget.style.borderColor = agBorder; }}>
+                          <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{ background: agAccentSoft }}>
+                            <I d={cap.icon} s={11} c={agAccent} />
                           </div>
-                          <div>
-                            <p className="text-[10px] font-semibold" style={{ color: agText }}>{cap.label}</p>
-                            <p className="text-[8px]" style={{ color: agTextMuted }}>{cap.desc}</p>
+                          <div className="min-w-0">
+                            <p className="text-[10px] font-semibold leading-snug" style={{ color: agText }}>{cap.label}</p>
+                            <p className="text-[7.5px] leading-snug" style={{ color: agTextMuted }}>{cap.desc}</p>
                           </div>
                         </button>
                       ))}
                     </div>
                   </div>
 
-                  {/* Recent / Suggested tasks */}
+                  {/* Suggested tasks */}
                   <div>
-                    <p className="text-[9px] font-bold uppercase tracking-widest mb-2.5 px-0.5" style={{ color: agTextMuted }}>Try asking me</p>
-                    <div className="space-y-1.5">
+                    <p className="text-[8px] font-bold uppercase tracking-[0.14em] mb-2.5" style={{ color: agTextMuted }}>Try asking me</p>
+                    <div className="grid grid-cols-2 gap-2">
                       {[
-                        { label: "📧 Draft a project update email to the team", task: "Write a professional email to the team about the project progress" },
-                        { label: "📄 Create a new document with a professional layout", task: "Create a new Word document with a professional structure" },
-                        { label: "📊 Open the business dashboard", task: "Open the business dashboard" },
-                        { label: "🌙 Switch interface to dark mode", task: "Switch to dark mode" },
+                        { label: "Draft project update email", sub: "Write to the team", task: "Write a professional email to the team about the project progress" },
+                        { label: "Create a document", sub: "Professional layout", task: "Create a new Word document with a professional structure" },
+                        { label: "Open the dashboard", sub: "Business overview", task: "Open the business dashboard" },
+                        { label: "Switch to dark mode", sub: "Change appearance", task: "Switch to dark mode" },
                       ].map(s => (
                         <button key={s.label} onClick={() => send(s.task)}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left transition-all"
-                          style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.03)" }}
-                          onMouseEnter={e => { e.currentTarget.style.borderColor = agAccent + "45"; e.currentTarget.style.background = agAccentSoft; }}
-                          onMouseLeave={e => { e.currentTarget.style.borderColor = agBorder; e.currentTarget.style.background = dk ? c.card : "#fff"; }}>
-                          <span className="text-[10.5px] flex-1" style={{ color: agTextSec }}>{s.label}</span>
-                          <span className="text-[12px] flex-shrink-0" style={{ color: agTextMuted }}>→</span>
+                          className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-left"
+                          style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", transition: "background 0.12s, border-color 0.12s" }}
+                          onMouseEnter={e => { e.currentTarget.style.background = dk ? c.cardAlt : "#F4F4F6"; e.currentTarget.style.borderColor = "rgba(0,0,0,0.11)"; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = dk ? c.card : "#fff"; e.currentTarget.style.borderColor = agBorder; }}>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[10px] font-semibold leading-snug truncate" style={{ color: agText }}>{s.label}</p>
+                            <p className="text-[8px] leading-snug" style={{ color: agTextMuted }}>{s.sub}</p>
+                          </div>
+                          <span className="text-[11px] flex-shrink-0" style={{ color: agTextMuted }}>→</span>
                         </button>
                       ))}
                     </div>
                   </div>
 
-                  {/* Footer tip */}
-                  <p className="text-center text-[8.5px] pb-2" style={{ color: agTextMuted }}>
-                    Powered by <span style={{ color: agAccent, fontWeight: 600 }}>Claude Opus 4.6</span> · Real actions on your OS
+                  {/* Footer */}
+                  <p className="text-center text-[8px] pb-1" style={{ color: agTextMuted }}>
+                    Powered by{" "}<span style={{ color: agAccent, fontWeight: 700 }}>Claude Opus 4.6</span>{" "}· Real actions on your OS
                   </p>
                 </div>
               )}
