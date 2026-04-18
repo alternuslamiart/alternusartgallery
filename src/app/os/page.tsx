@@ -6905,12 +6905,12 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
     deepseek: ["Let me think step by step through your question...", "Applying chain-of-thought reasoning to your query...", "Deep analysis complete. Here's my reasoned answer..."],
   };
   const capabilities = [
-    { icon: ic.messageCircle, title: "Natural Conversation", desc: "Context-aware dialogue with memory across sessions", color: "#3B82F6" },
-    { icon: ic.code, title: "Code Generation", desc: "Write, debug, and refactor code in 50+ languages", color: "#10B981" },
-    { icon: ic.image, title: "Image Analysis", desc: "Understand and describe visual content in detail", color: "#F59E0B" },
-    { icon: ic.fileText, title: "Document Processing", desc: "Summarize, extract, and transform documents", color: "#8B5CF6" },
-    { icon: ic.globe, title: "Research & Analysis", desc: "Deep topic research with source attribution", color: "#EC4899" },
-    { icon: ic.layers, title: "Translation", desc: "Fluent translation across 100+ language pairs", color: "#06B6D4" },
+    { icon: ic.user, title: "AI Interview", desc: "Practice job interviews with AI coaching & feedback", color: "#7C3AED" },
+    { icon: ic.film, title: "Video Meetings", desc: "Join Zoom, Teams & video conferences with AI notes", color: "#3B82F6" },
+    { icon: ic.monitor, title: "Seminars", desc: "Attend & host online seminars and webinars", color: "#10B981" },
+    { icon: ic.mail, title: "Email Assistant", desc: "Compose, reply & manage professional emails", color: "#F59E0B" },
+    { icon: ic.fileText, title: "Documents", desc: "Create & edit Word .docx study documents", color: "#EC4899" },
+    { icon: ic.bookOpen, title: "Study & Research", desc: "Deep research, notes, flashcards & study materials", color: "#06B6D4" },
   ];
   const communities = [
     { id: "c1", name: "AI Researchers", members: "12.4k", color: "#7C3AED" },
@@ -7424,59 +7424,147 @@ function ImageGenApp({ c }: { c: typeof palette.dark }) {
 
 // ━━━━ AI VOICE APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AIVoiceApp({ c }: { c: typeof palette.dark }) {
-  const [mode, setMode] = useState<"stt" | "tts">("stt");
+  const [mode, setMode] = useState<"ask" | "tts">("ask");
   const [listening, setListening] = useState(false);
-  const [transcript, setTranscript] = useState("");
+  const [query, setQuery] = useState("");
+  const [answer, setAnswer] = useState<{ text: string; icon: string; color: string } | null>(null);
   const [ttsText, setTtsText] = useState("Type something and I'll speak it aloud.");
   const [voice, setVoice] = useState("Aria");
   const [speaking, setSpeaking] = useState(false);
   const voices = ["Aria", "Nova", "Echo", "Onyx", "Shimmer", "Fable"];
-  const mockTranscripts = [
-    "Open the gallery application and show me the latest uploads.",
-    "Create a new task: Review artist applications by Friday.",
-    "What is the weather forecast for tomorrow in New York?",
-    "Send an email to Sarah Mitchell about her recent submission.",
-  ];
-  const toggleListen = () => {
-    setListening(p => !p);
-    if (!listening) {
-      setTimeout(() => {
-        setTranscript(mockTranscripts[Math.floor(Math.random() * mockTranscripts.length)]);
-        setListening(false);
-      }, 2500);
+  const queryInputRef = useRef<HTMLInputElement>(null);
+
+  const getOsAnswer = (q: string): { text: string; icon: string; color: string } => {
+    const lower = q.toLowerCase();
+    const now = new Date();
+    if (/\bora\b|time|clock|koha|çfar ore|sa esh.*ora|what time/.test(lower)) {
+      return { text: now.toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" }), icon: ic.clock, color: "#7C3AED" };
     }
+    if (/\bdata\b|\bdate\b|sot|today|which day|what day|dita|javë|java/.test(lower)) {
+      return { text: now.toLocaleDateString("en", { weekday: "long", year: "numeric", month: "long", day: "numeric" }), icon: ic.calendar, color: "#3B82F6" };
+    }
+    if (/\bviti\b|\byear\b|which year|sa vit/.test(lower)) {
+      return { text: `Year ${now.getFullYear()}`, icon: ic.calendar, color: "#10B981" };
+    }
+    if (/\bmuaji\b|\bmonth\b|what month|cili muaj/.test(lower)) {
+      return { text: now.toLocaleDateString("en", { month: "long" }), icon: ic.calendar, color: "#F59E0B" };
+    }
+    if (/battery|bateri|charge|karikues/.test(lower)) {
+      return { text: "Battery info requires OS permission", icon: ic.battery, color: "#EC4899" };
+    }
+    if (/\bOS\b|sistem|version|alternus/.test(lower)) {
+      return { text: "Alternus OS v2.0 · AlternusCore 6.2", icon: ic.monitor, color: "#06B6D4" };
+    }
+    if (/resolution|screen|ekran|rezolucion/.test(lower)) {
+      return { text: `${window.innerWidth} × ${window.innerHeight} px`, icon: ic.monitor, color: "#8B5CF6" };
+    }
+    if (/hello|hi|hej|mirëdita|ciao|salut/.test(lower)) {
+      const hr = now.getHours();
+      const greet = hr < 12 ? "Good morning" : hr < 18 ? "Good afternoon" : "Good evening";
+      return { text: `${greet}! I'm your Alternus AI Voice assistant.`, icon: ic.sparkle, color: "#7C3AED" };
+    }
+    return {
+      text: `I don't know the answer to "${q}" yet. Try asking: time, date, OS version, resolution.`,
+      icon: ic.brain, color: c.accent,
+    };
   };
+
+  const askQuestion = () => {
+    if (!query.trim()) return;
+    setListening(true);
+    setTimeout(() => {
+      setAnswer(getOsAnswer(query));
+      setListening(false);
+    }, 1200);
+  };
+
   const speak = () => { setSpeaking(true); setTimeout(() => setSpeaking(false), 2000); };
-  const bars = Array.from({ length: 20 }, (_, i) => i);
+  const bars = Array.from({ length: 22 }, (_, i) => i);
+
+  const suggestions = ["Sa është ora?", "Cila është data sot?", "Çfarë viti jemi?", "OS version?", "Screen resolution?"];
+
   return (
-    <div className="flex flex-col h-full" style={{ background: c.bg }}>
+    <div className="flex flex-col h-full" style={{ background: c.bg, fontFamily: "'Segoe UI Variable','Segoe UI',system-ui,sans-serif" }}>
+      {/* Tabs */}
       <div className="flex flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        {[{ id: "stt", label: "🎤 Speech → Text" }, { id: "tts", label: "🔊 Text → Speech" }].map(m => (
-          <button key={m.id} onClick={() => setMode(m.id as "stt" | "tts")}
+        {[{ id: "ask", label: "🎤 Speech → Text" }, { id: "tts", label: "🔊 Text → Speech" }].map(m => (
+          <button key={m.id} onClick={() => setMode(m.id as "ask" | "tts")}
             className="flex-1 py-2.5 text-[11px] font-medium transition-colors"
             style={{ background: mode === m.id ? c.surface : "transparent", color: mode === m.id ? c.text : c.textMuted, borderBottom: mode === m.id ? `2px solid ${c.accent}` : "2px solid transparent" }}>
             {m.label}
           </button>
         ))}
       </div>
-      {mode === "stt" ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
-          <button onClick={toggleListen}
-            className="w-24 h-24 rounded-full flex items-center justify-center transition-all"
-            style={{ background: listening ? `${c.danger}20` : c.accentSoft, border: `2px solid ${listening ? c.danger : c.accent}`, boxShadow: listening ? `0 0 0 8px ${c.danger}15` : "none" }}>
-            <I d={ic.mic} s={36} c={listening ? c.danger : c.accent} />
+
+      {mode === "ask" ? (
+        <div className="flex-1 flex flex-col items-center p-5 gap-4 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+          {/* Mic button */}
+          <button onClick={() => { queryInputRef.current?.focus(); }}
+            className="w-20 h-20 rounded-full flex items-center justify-center transition-all mt-2"
+            style={{
+              background: listening ? `${c.danger}18` : c.accentSoft,
+              border: `2px solid ${listening ? c.danger : c.accent}`,
+              boxShadow: listening ? `0 0 0 10px ${c.danger}12, 0 0 0 20px ${c.danger}06` : `0 0 0 6px ${c.accent}12`,
+            }}>
+            <I d={ic.mic} s={32} c={listening ? c.danger : c.accent} />
           </button>
+
           {/* Waveform */}
-          <div className="flex items-center gap-0.5 h-10">
+          <div className="flex items-center gap-0.5 h-8 w-full justify-center">
             {bars.map(i => (
-              <div key={i} className="w-1 rounded-full transition-all"
-                style={{ height: listening ? `${Math.random() * 100}%` : "15%", background: listening ? c.danger : c.border, animation: listening ? `pulse ${0.3 + i * 0.05}s ease-in-out infinite alternate` : "none" }} />
+              <div key={i} className="w-1 rounded-full"
+                style={{
+                  height: listening ? `${20 + Math.abs(Math.sin(i * 0.8)) * 80}%` : "12%",
+                  background: listening ? c.danger : c.border,
+                  transition: `height 0.1s ease ${i * 0.02}s`,
+                }} />
             ))}
           </div>
-          <p className="text-[11px] font-medium" style={{ color: c.textSec }}>{listening ? "Listening..." : "Tap to speak"}</p>
-          {transcript && (
-            <div className="w-full p-3 rounded-xl text-[11px] leading-relaxed" style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }}>
-              &ldquo;{transcript}&rdquo;
+
+          <p className="text-[10.5px] font-medium" style={{ color: c.textSec }}>
+            {listening ? "Processing..." : "Tap mic or type your question"}
+          </p>
+
+          {/* Query input */}
+          <div className="w-full flex items-center gap-2 px-3 py-2 rounded-xl"
+            style={{ background: c.surface, border: `1.5px solid ${c.border}` }}>
+            <input ref={queryInputRef} value={query} onChange={e => setQuery(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && askQuestion()}
+              placeholder="Ask anything about your OS..."
+              className="flex-1 bg-transparent outline-none text-[11px]"
+              style={{ color: c.text }} />
+            <button onClick={askQuestion}
+              className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: query.trim() ? c.accent : c.cardAlt }}>
+              <I d={ic.send} s={11} c={query.trim() ? "#fff" : c.textMuted} />
+            </button>
+          </div>
+
+          {/* Suggestions */}
+          <div className="w-full flex flex-wrap gap-1.5">
+            {suggestions.map(s => (
+              <button key={s} onClick={() => { setQuery(s); setTimeout(askQuestion, 50); }}
+                className="px-2.5 py-1 rounded-full text-[9.5px] transition-all"
+                style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = c.accent)} onMouseLeave={e => (e.currentTarget.style.borderColor = c.border)}>
+                {s}
+              </button>
+            ))}
+          </div>
+
+          {/* Answer card */}
+          {answer && (
+            <div className="w-full rounded-2xl p-4 flex items-start gap-3"
+              style={{ background: `${answer.color}10`, border: `1.5px solid ${answer.color}30` }}>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${answer.color}20` }}>
+                <I d={answer.icon} s={16} c={answer.color} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[9px] font-semibold uppercase tracking-wide mb-1" style={{ color: answer.color }}>AI Voice Answer</p>
+                <p className="text-[13px] font-bold leading-snug" style={{ color: c.text }}>{answer.text}</p>
+                <p className="text-[9px] mt-1.5" style={{ color: c.textMuted }}>from Alternus OS · {new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}</p>
+              </div>
             </div>
           )}
         </div>
@@ -9599,6 +9687,11 @@ export default function AlternusOS() {
       if ((e.ctrlKey || e.metaKey) && e.key === "t") {
         e.preventDefault();
         setShowTaskView(p => !p);
+      }
+      // Alt+V — open AI Voice
+      if (e.altKey && e.key.toLowerCase() === "v") {
+        e.preventDefault();
+        openWin("aivoice");
       }
     };
     const handleKeyUp = (e: KeyboardEvent) => {
