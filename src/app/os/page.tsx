@@ -6927,7 +6927,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
   };
 
   return (
-    <div className="flex h-full overflow-hidden" style={{ background: c.bg, fontFamily: "-apple-system,'Inter',BlinkMacSystemFont,sans-serif" }}>
+    <div className="flex h-full overflow-hidden" style={{ background: c.bg, fontFamily: "'Segoe UI Variable','Segoe UI',system-ui,-apple-system,sans-serif" }}>
 
       {/* ── LEFT SIDEBAR ── */}
       <div className="flex flex-col flex-shrink-0" style={{ width: 168, borderRight: `1px solid ${c.border}`, background: c.surface }}>
@@ -7142,112 +7142,121 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
           /* ── CHAT VIEW ── */
           <>
             {/* Chat header */}
-            <div className="flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-              <div className="flex items-center justify-between px-5 py-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-[11px] font-bold text-white"
-                    style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}99)`, boxShadow: `0 6px 20px ${activeModel.color}50` }}>
+            <div className="flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
+              <div className="flex items-center justify-between px-5 pt-4 pb-3">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-[12px] font-bold text-white flex-shrink-0"
+                    style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}99)`, boxShadow: `0 6px 20px ${activeModel.color}45` }}>
                     {activeModel.initials}
                   </div>
                   <div>
-                    <p className="text-[13px] font-bold tracking-tight" style={{ color: c.text }}>{activeModel.name}</p>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <p className="text-[15px] font-semibold tracking-tight" style={{ color: c.text, letterSpacing: "-0.01em" }}>{activeModel.name}</p>
+                      <span className="text-[9px] font-semibold px-2 py-0.5 rounded-md"
+                        style={{ background: `${activeModel.color}15`, color: activeModel.color, border: `1px solid ${activeModel.color}28` }}>
+                        {activeModel.badge}
+                      </span>
+                    </div>
                     <div className="flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: activeModel.online ? "#10B981" : c.textMuted }} />
-                      <p className="text-[9px] font-medium" style={{ color: activeModel.online ? "#10B981" : c.textMuted }}>
-                        {activeModel.online ? "Online" : "Offline"} · {activeModel.company}
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: activeModel.online ? "#10B981" : c.textMuted }} />
+                      <p className="text-[10px]" style={{ color: activeModel.online ? "#10B981" : c.textMuted }}>
+                        {activeModel.online ? "Online" : "Offline"}
                       </p>
+                      <span style={{ color: c.border }}>·</span>
+                      <p className="text-[10px]" style={{ color: c.textMuted }}>{activeModel.company}</p>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[8px] font-bold px-2.5 py-1 rounded-lg"
-                    style={{ background: `${activeModel.color}14`, color: activeModel.color, border: `1px solid ${activeModel.color}25` }}>
-                    {activeModel.badge}
-                  </span>
                   <button onClick={() => setCallActive(true)}
-                    className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
-                    style={{ background: "#10B98112" }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "#10B98125")} onMouseLeave={e => (e.currentTarget.style.background = "#10B98112")}>
-                    <I d={ic.mic} s={14} c="#10B981" />
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-medium transition-all"
+                    style={{ background: "#10B98112", color: "#10B981", border: "1px solid #10B98122" }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "#10B98120")} onMouseLeave={e => (e.currentTarget.style.background = "#10B98112")}>
+                    <I d={ic.mic} s={12} c="#10B981" /> Voice
+                  </button>
+                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-medium transition-all"
+                    style={{ background: `${activeModel.color}12`, color: activeModel.color, border: `1px solid ${activeModel.color}22` }}
+                    onMouseEnter={e => (e.currentTarget.style.background = `${activeModel.color}20`)} onMouseLeave={e => (e.currentTarget.style.background = `${activeModel.color}12`)}>
+                    <I d={ic.monitor} s={12} c={activeModel.color} /> Share
                   </button>
                   <button className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
-                    style={{ background: `${activeModel.color}12` }}
-                    onMouseEnter={e => (e.currentTarget.style.background = `${activeModel.color}25`)} onMouseLeave={e => (e.currentTarget.style.background = `${activeModel.color}12`)}>
-                    <I d={ic.monitor} s={14} c={activeModel.color} />
-                  </button>
-                  <button className="w-8 h-8 rounded-xl flex items-center justify-center">
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                     <I d={ic.menu} s={14} c={c.textMuted} />
                   </button>
                 </div>
               </div>
               {/* Metrics strip */}
-              <div className="flex items-center gap-0 px-5 pb-2.5">
+              <div className="flex items-center px-5 pb-3 gap-0">
                 {[
                   { label: "Params", value: activeModel.params },
                   { label: "Context", value: activeModel.ctx },
-                  { label: "Latency", value: "~320ms" },
+                  { label: "Latency", value: "<20ms" },
                   { label: "Provider", value: activeModel.company },
                 ].map((stat, i) => (
                   <div key={stat.label} className="flex items-center gap-1.5">
-                    {i > 0 && <div className="w-px h-3 mx-2.5" style={{ background: c.border }} />}
-                    <span className="text-[8px]" style={{ color: c.textMuted }}>{stat.label}</span>
-                    <span className="text-[8px] font-semibold" style={{ color: c.text }}>{stat.value}</span>
+                    {i > 0 && <div className="w-px h-3.5 mx-3" style={{ background: c.border }} />}
+                    <span className="text-[9px]" style={{ color: c.textMuted }}>{stat.label}</span>
+                    <span className="text-[9px] font-semibold ml-1" style={{ color: c.text }}>{stat.value}</span>
                   </div>
                 ))}
-                <div className="ml-auto flex items-center gap-1.5">
+                <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-lg" style={{ background: "#10B98110" }}>
                   <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
-                  <span className="text-[8px] font-medium" style={{ color: "#10B981" }}>Live</span>
+                  <span className="text-[9px] font-semibold" style={{ color: "#10B981" }}>Live</span>
                 </div>
               </div>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4" style={{ scrollbarWidth: "none" }}>
+            <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4" style={{ scrollbarWidth: "none" }}>
               {msgs.map((m, i) => (
                 <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start gap-3"}`}>
                   {m.role === "ai" && (
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-white mt-0.5"
-                      style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}AA)`, boxShadow: `0 3px 10px ${activeModel.color}35` }}>
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-white mt-0.5"
+                      style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}AA)`, boxShadow: `0 3px 10px ${activeModel.color}30` }}>
                       {activeModel.initials}
                     </div>
                   )}
-                  <div className="max-w-[68%]">
+                  <div className="max-w-[70%]">
                     {m.role === "ai" && (
-                      <p className="text-[9px] font-semibold mb-1.5 flex items-center gap-1.5" style={{ color: activeModel.color }}>
+                      <p className="text-[9.5px] font-semibold mb-1.5 flex items-center gap-1.5" style={{ color: activeModel.color }}>
                         {m.model}
-                        <span className="font-normal" style={{ color: c.textMuted }}>· just now</span>
+                        <span className="font-normal text-[9px]" style={{ color: c.textMuted }}>· just now</span>
                       </p>
                     )}
-                    <div className="px-4 py-2.5 text-[11px] leading-relaxed"
+                    <div className="px-4 py-3 text-[12px] leading-relaxed"
                       style={{
-                        background: m.role === "user" ? `linear-gradient(135deg,${activeModel.color},${activeModel.color}CC)` : c.surface,
+                        background: m.role === "user" ? `linear-gradient(135deg,${activeModel.color},${activeModel.color}CC)` : c.card,
                         color: m.role === "user" ? "#fff" : c.text,
                         border: m.role === "ai" ? `1px solid ${c.border}` : "none",
-                        borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "4px 18px 18px 18px",
-                        boxShadow: m.role === "user" ? `0 4px 14px ${activeModel.color}35` : "0 1px 6px rgba(0,0,0,0.05)",
+                        borderLeft: m.role === "ai" ? `3px solid ${activeModel.color}40` : undefined,
+                        borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "4px 16px 16px 16px",
+                        boxShadow: m.role === "user" ? `0 4px 14px ${activeModel.color}30` : "0 1px 6px rgba(0,0,0,0.04)",
+                        fontWeight: 400,
                       }}>
                       {m.text}
                     </div>
                   </div>
                 </div>
               ))}
-              {/* Model capabilities — shown when conversation is fresh */}
+
+              {/* Capabilities — shown when conversation is fresh */}
               {msgs.filter(m => m.role === "user").length === 0 && (
-                <div className="mt-2 p-4 rounded-2xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-                  <p className="text-[8px] font-bold uppercase tracking-[0.14em] mb-3" style={{ color: c.textMuted }}>Capabilities</p>
-                  <div className="grid grid-cols-2 gap-2">
+                <div className="mt-3">
+                  <p className="text-[9px] font-semibold uppercase tracking-widest mb-3 px-1" style={{ color: c.textMuted, letterSpacing: "0.12em" }}>Capabilities</p>
+                  <div className="grid grid-cols-2 gap-2.5">
                     {capabilities.map(cap => (
-                      <button key={cap.title} onClick={() => { setInput(cap.title); }}
-                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all"
-                        style={{ background: c.surface, border: `1px solid ${c.border}` }}
-                        onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.borderColor = `${cap.color}40`; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; }}>
-                        <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${cap.color}12` }}>
-                          <I d={cap.icon} s={14} c={cap.color} />
+                      <button key={cap.title} onClick={() => setInput(cap.title)}
+                        className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all"
+                        style={{ background: c.card, border: `1px solid ${c.border}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = `${cap.color}50`; e.currentTarget.style.boxShadow = `0 4px 16px ${cap.color}18`; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                        >
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${cap.color}14` }}>
+                          <I d={cap.icon} s={16} c={cap.color} />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[9.5px] font-semibold leading-tight" style={{ color: c.text }}>{cap.title}</p>
-                          <p className="text-[7.5px] leading-snug mt-0.5 truncate" style={{ color: c.textMuted }}>{cap.desc}</p>
+                          <p className="text-[11px] font-semibold leading-tight" style={{ color: c.text }}>{cap.title}</p>
+                          <p className="text-[8.5px] leading-snug mt-0.5" style={{ color: c.textMuted }}>{cap.desc}</p>
                         </div>
                       </button>
                     ))}
@@ -7258,24 +7267,24 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
             </div>
 
             {/* Input */}
-            <div className="px-4 py-3 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-              <div className="flex items-center gap-2 px-3 py-2.5 rounded-2xl"
-                style={{ background: c.surface, border: `1.5px solid ${input.trim() ? activeModel.color + "55" : c.border}`, boxShadow: input.trim() ? `0 4px 20px ${activeModel.color}18` : "0 2px 16px rgba(0,0,0,0.07)", transition: "border-color 0.15s, box-shadow 0.15s" }}>
+            <div className="px-5 py-4 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}`, background: c.surface }}>
+              <div className="flex items-center gap-2.5 px-4 py-3 rounded-2xl"
+                style={{ background: c.card, border: `1.5px solid ${input.trim() ? activeModel.color + "60" : c.border}`, boxShadow: input.trim() ? `0 4px 20px ${activeModel.color}18` : "0 1px 8px rgba(0,0,0,0.06)", transition: "border-color 0.15s, box-shadow 0.15s" }}>
                 <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
-                  style={{ background: c.cardAlt }}
-                  onMouseEnter={e => (e.currentTarget.style.background = c.border)} onMouseLeave={e => (e.currentTarget.style.background = c.cardAlt)}>
-                  <I d={ic.upload} s={12} c={c.textMuted} />
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={ic.plus} s={14} c={c.textMuted} />
                 </button>
                 <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
                   placeholder={`Message ${activeModel.name}...`}
-                  className="flex-1 bg-transparent outline-none text-[11px]"
-                  style={{ color: c.text }} />
+                  className="flex-1 bg-transparent outline-none text-[12px]"
+                  style={{ color: c.text, fontWeight: 400 }} />
+                <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={ic.mic} s={13} c={c.textMuted} />
+                </button>
                 <button onClick={send}
-                  className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
-                  style={{
-                    background: input.trim() ? `linear-gradient(135deg,${activeModel.color},${activeModel.color}CC)` : c.cardAlt,
-                    boxShadow: input.trim() ? `0 2px 10px ${activeModel.color}40` : "none",
-                  }}>
+                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
+                  style={{ background: input.trim() ? `linear-gradient(135deg,${activeModel.color},${activeModel.color}CC)` : c.cardAlt, boxShadow: input.trim() ? `0 2px 12px ${activeModel.color}40` : "none" }}>
                   <I d={ic.send} s={13} c={input.trim() ? "#fff" : c.textMuted} />
                 </button>
               </div>
@@ -8400,7 +8409,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
   ];
 
   return (
-    <div className="flex h-full overflow-hidden" style={{ background: agBg, fontFamily: "-apple-system,'Inter',BlinkMacSystemFont,sans-serif" }}>
+    <div className="flex h-full overflow-hidden" style={{ background: agBg, fontFamily: "'Segoe UI Variable','Segoe UI',system-ui,-apple-system,sans-serif" }}>
       {/* ── LEFT SIDEBAR ─────────────────────────────────────── */}
       <div className="flex flex-col flex-shrink-0" style={{ width: 230, background: agSidebarBg, backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRight: `1px solid ${agBorder}` }}>
 
