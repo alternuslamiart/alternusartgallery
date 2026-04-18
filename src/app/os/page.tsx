@@ -8765,11 +8765,13 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 </div>
 
                 {/* Scrollable content */}
-                <div className="flex-1 overflow-y-auto px-6 py-5" style={{ scrollbarWidth: "none", background: dk ? agBg : "#F7F8FA" }}>
+                <div className="flex-1 overflow-y-auto py-6" style={{ scrollbarWidth: "none", background: dk ? agBg : "#F7F8FA" }}>
+                  {/* Centered max-width container */}
+                  <div style={{ maxWidth: 720, margin: "0 auto", paddingLeft: 32, paddingRight: 32 }}>
 
                   {/* Big input card */}
-                  <div className="mb-5 rounded-2xl overflow-hidden" style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 2px 16px rgba(0,0,0,0.07)" }}>
-                    <div className="px-4 pt-4 pb-2">
+                  <div className="mb-6 rounded-2xl overflow-hidden" style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 2px 16px rgba(0,0,0,0.07)" }}>
+                    <div className="px-5 pt-5 pb-3">
                       <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
                         onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
                         placeholder={
@@ -8779,35 +8781,35 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                           agentCapability === "settings" ? "Change a system setting..." :
                           "Enter content, Shift+Enter to send, support uploading files"
                         }
-                        className="w-full bg-transparent outline-none text-[12px]"
+                        className="w-full bg-transparent outline-none text-[13px]"
                         style={{ color: agText, caretColor: agAccent }} />
                     </div>
-                    <div className="px-4 pb-3.5 flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
+                    <div className="px-5 pb-4 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
                         {[
                           { icon: ic.image, label: "Upload" },
                           { icon: ic.globe, label: "Research" },
                           { icon: ic.code,  label: "Code" },
                         ].map(btn => (
-                          <button key={btn.label} className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[9px] font-medium transition-all"
+                          <button key={btn.label} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9.5px] font-medium transition-all"
                             style={{ color: agTextMuted, border: `1px solid ${agBorder}` }}
                             onMouseEnter={e => { e.currentTarget.style.color = agAccent; e.currentTarget.style.borderColor = agAccent + "40"; }}
                             onMouseLeave={e => { e.currentTarget.style.color = agTextMuted; e.currentTarget.style.borderColor = agBorder; }}>
-                            <I d={btn.icon} s={10} c={agTextMuted} /> {btn.label}
+                            <I d={btn.icon} s={11} c={agTextMuted} /> {btn.label}
                           </button>
                         ))}
                       </div>
                       <button onClick={() => send()} disabled={!input.trim()}
-                        className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
+                        className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
                         style={{ background: input.trim() ? agAccent : (dk ? c.cardAlt : "#EFEFEF"), boxShadow: input.trim() ? `0 2px 12px ${agAccent}44` : "none" }}>
-                        <I d={ic.send} s={13} c={input.trim() ? "#fff" : agTextMuted} />
+                        <I d={ic.send} s={14} c={input.trim() ? "#fff" : agTextMuted} />
                       </button>
                     </div>
                   </div>
 
                   {/* Capability cards */}
                   <p className="text-[8px] font-bold uppercase tracking-[0.14em] mb-3" style={{ color: agTextMuted }}>What I can do</p>
-                  <div className="grid grid-cols-3 gap-2.5 mb-5">
+                  <div className="grid grid-cols-3 gap-3 mb-6">
                     {[
                       { icon: ic.mail,     label: "Email",     desc: "Draft & send messages",  color: "#F97316", bg: "#FFF4ED", task: "Draft a professional email to the team" },
                       { icon: ic.fileText, label: "Documents", desc: "Create & edit docs",      color: "#3B82F6", bg: "#EFF6FF", task: "Create a new Word document" },
@@ -8817,17 +8819,17 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                       { icon: ic.code,     label: "Terminal",  desc: "Run system commands",     color: "#6B7280", bg: "#F9FAFB", task: "Open the terminal" },
                     ].map(cap => (
                       <button key={cap.label} onClick={() => send(cap.task)}
-                        className="flex flex-col gap-2.5 p-3.5 rounded-2xl text-left"
+                        className="flex flex-col gap-3 p-5 rounded-2xl text-left"
                         style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 6px rgba(0,0,0,0.05)", transition: "all 0.15s" }}
-                        onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,0,0,0.11)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                        onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 22px rgba(0,0,0,0.11)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
                         onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 6px rgba(0,0,0,0.05)"; e.currentTarget.style.transform = "translateY(0)"; }}>
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
                           style={{ background: dk ? c.cardAlt : cap.bg }}>
-                          <I d={cap.icon} s={14} c={cap.color} />
+                          <I d={cap.icon} s={16} c={cap.color} />
                         </div>
                         <div>
-                          <p className="text-[10.5px] font-semibold leading-snug" style={{ color: agText }}>{cap.label}</p>
-                          <p className="text-[8px] leading-snug mt-0.5" style={{ color: agTextMuted }}>{cap.desc}</p>
+                          <p className="text-[11px] font-semibold leading-snug" style={{ color: agText }}>{cap.label}</p>
+                          <p className="text-[8.5px] leading-snug mt-1" style={{ color: agTextMuted }}>{cap.desc}</p>
                         </div>
                       </button>
                     ))}
@@ -8835,7 +8837,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
                   {/* Try asking */}
                   <p className="text-[8px] font-bold uppercase tracking-[0.14em] mb-3" style={{ color: agTextMuted }}>Try asking</p>
-                  <div className="grid grid-cols-2 gap-2 mb-5">
+                  <div className="grid grid-cols-2 gap-2.5 mb-6">
                     {[
                       { label: "Draft project update email", sub: "Write to the team", task: "Write a professional email to the team about the project progress" },
                       { label: "Create a document", sub: "Professional layout", task: "Create a new Word document with a professional structure" },
@@ -8843,15 +8845,15 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                       { label: "Switch to dark mode", sub: "Change appearance", task: "Switch to dark mode" },
                     ].map(s => (
                       <button key={s.label} onClick={() => send(s.task)}
-                        className="flex items-center gap-3 px-3.5 py-3 rounded-xl text-left"
+                        className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-left"
                         style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)", transition: "all 0.12s" }}
                         onMouseEnter={e => { e.currentTarget.style.background = dk ? c.cardAlt : "#F5F5F7"; e.currentTarget.style.borderColor = agAccent + "30"; }}
                         onMouseLeave={e => { e.currentTarget.style.background = dk ? c.card : "#fff"; e.currentTarget.style.borderColor = agBorder; }}>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[10px] font-semibold leading-snug" style={{ color: agText }}>{s.label}</p>
-                          <p className="text-[8px] mt-0.5" style={{ color: agTextMuted }}>{s.sub}</p>
+                          <p className="text-[10.5px] font-semibold leading-snug" style={{ color: agText }}>{s.label}</p>
+                          <p className="text-[8.5px] mt-0.5" style={{ color: agTextMuted }}>{s.sub}</p>
                         </div>
-                        <span className="text-[13px] flex-shrink-0" style={{ color: agTextMuted }}>→</span>
+                        <span className="text-[14px] flex-shrink-0" style={{ color: agTextMuted }}>→</span>
                       </button>
                     ))}
                   </div>
@@ -8859,6 +8861,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                   <p className="text-center text-[8px] pb-2" style={{ color: agTextMuted }}>
                     Powered by <span style={{ color: agAccent, fontWeight: 700 }}>Claude Opus 4.6</span> · Real OS actions
                   </p>
+                  </div>
                 </div>
               </div>
             ) : (
