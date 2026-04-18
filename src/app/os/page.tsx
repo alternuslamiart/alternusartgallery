@@ -6935,10 +6935,12 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
         {/* Header */}
         <div className="px-3 pt-3 pb-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
           <div className="flex items-center gap-2.5 mb-2.5">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-[10px] font-black text-white"
-              style={{ background: `linear-gradient(135deg,${c.accent},${c.accent}AA)`, boxShadow: `0 4px 14px ${c.accent}45` }}>AI</div>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: `linear-gradient(135deg,${c.accent},${c.accent}AA)`, boxShadow: `0 4px 14px ${c.accent}45` }}>
+              <I d={ic.sparkle} s={15} c="#fff" f />
+            </div>
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-bold leading-tight" style={{ color: c.text }}>AI Hub</p>
+              <p className="text-[11px] font-bold leading-tight" style={{ color: c.text }}>Alternus AI</p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
                 <p className="text-[7.5px] leading-tight" style={{ color: c.textMuted }}>{models.filter(m => m.online).length} models online</p>
@@ -7233,15 +7235,21 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
               {msgs.filter(m => m.role === "user").length === 0 && (
                 <div className="mt-2 p-4 rounded-2xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
                   <p className="text-[8px] font-bold uppercase tracking-[0.14em] mb-3" style={{ color: c.textMuted }}>Capabilities</p>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {capabilities.map(cap => (
-                      <div key={cap.title} className="flex flex-col items-center gap-1.5 p-2.5 rounded-xl text-center"
-                        style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-                        <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: `${cap.color}14` }}>
-                          <I d={cap.icon} s={13} c={cap.color} />
+                      <button key={cap.title} onClick={() => { setInput(cap.title); }}
+                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all"
+                        style={{ background: c.surface, border: `1px solid ${c.border}` }}
+                        onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.borderColor = `${cap.color}40`; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = c.surface; e.currentTarget.style.borderColor = c.border; }}>
+                        <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${cap.color}12` }}>
+                          <I d={cap.icon} s={14} c={cap.color} />
                         </div>
-                        <p className="text-[8.5px] font-semibold leading-tight" style={{ color: c.text }}>{cap.title}</p>
-                      </div>
+                        <div className="min-w-0">
+                          <p className="text-[9.5px] font-semibold leading-tight" style={{ color: c.text }}>{cap.title}</p>
+                          <p className="text-[7.5px] leading-snug mt-0.5 truncate" style={{ color: c.textMuted }}>{cap.desc}</p>
+                        </div>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -8739,7 +8747,8 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4" style={{ scrollbarWidth: "none" }}>
+            <div className="flex-1 overflow-y-auto flex flex-col px-5 py-5 gap-4" style={{ scrollbarWidth: "none" }}>
+              <div className="flex-1" />
               {msgs.map(m => (
                 <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "gap-3"}`}>
                   {m.role === "agent" && (
@@ -9068,7 +9077,7 @@ export default function AlternusOS() {
     { id: "tasks", title: "Tasks", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 60, w: 420, h: 480 },
     { id: "mail", title: "Mail", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 50, w: 580, h: 460 },
     { id: "monaco", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 60, y: 30, w: 600, h: 480 },
-    { id: "aihub", title: "AI Hub", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 40, w: 720, h: 520 },
+    { id: "aihub", title: "AI Studio", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 40, w: 720, h: 520 },
     { id: "aivoice", title: "AI Voice", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 80, w: 380, h: 440 },
     { id: "knowledge", title: "Knowledge Base", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 560, h: 480 },
     { id: "sysmon", title: "System Monitor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 500, h: 480 },
@@ -9524,8 +9533,8 @@ export default function AlternusOS() {
         id: "mail", title: "Mail", icon: ic.mail, description: "Email client with inbox and compose" },
       { keys: ["vscode", "monaco", "ide", "editor", "code editor", "typescript", "javascript", "python", "syntax", "programming"],
         id: "monaco", title: "Code Editor", icon: ic.code, description: "VS Code-style code editor" },
-      { keys: ["ai hub", "multi model", "gpt", "claude", "gemini", "llama", "compare", "model", "chat ai", "ai chat"],
-        id: "aihub", title: "AI Hub", icon: ic.messageCircle, description: "Multi-model AI chat hub" },
+      { keys: ["ai hub", "ai studio", "multi model", "gpt", "claude", "gemini", "llama", "compare", "model", "chat ai", "ai chat"],
+        id: "aihub", title: "AI Studio", icon: ic.sparkle, description: "Multi-model AI studio" },
       { keys: ["voice", "speech", "microphone", "text to speech", "speech to text", "stt", "tts", "dictate", "transcribe"],
         id: "aivoice", title: "AI Voice", icon: ic.mic, description: "Speech-to-text and text-to-speech" },
       { keys: ["knowledge", "rag", "search docs", "knowledge base", "semantic search", "index", "upload doc", "qa", "document search"],
@@ -9681,7 +9690,7 @@ export default function AlternusOS() {
 
   const dockApps: { id: WinId; icon: string; label: string; color: string; category: "ai" | "productivity" | "media" | "system" | "web" }[] = [
     { id: "agent", icon: ic.sparkle, label: "Alternus AI Agent", color: "#7C3AED", category: "ai" },
-    { id: "aihub", icon: ic.messageCircle, label: "AI Hub", color: "#A78BFA", category: "ai" },
+    { id: "aihub", icon: ic.sparkle, label: "AI Studio", color: "#A78BFA", category: "ai" },
     { id: "aivoice", icon: ic.mic, label: "AI Voice", color: "#FBBF24", category: "ai" },
     { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316", category: "ai" },
     { id: "code", icon: ic.code, label: "Code", color: c.purple, category: "productivity" },
