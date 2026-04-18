@@ -83,48 +83,48 @@ const aiFileIndex = [
 // ━━━━ Colors ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const palette = {
   dark: {
-    bg: "#0C0C0C",
-    surface: "#141414",
-    card: "#1A1A1A",
-    cardAlt: "#222222",
-    border: "#2E2E2E",
-    text: "#F0F0F0",
-    textSec: "#A0A0A0",
-    textMuted: "#606060",
-    accent: "#D8D8D8",
-    accentSoft: "rgba(255,255,255,0.07)",
-    accentText: "#C8C8C8",
-    success: "#888888",
-    successSoft: "rgba(136,136,136,0.12)",
-    warning: "#888888",
-    warningSoft: "rgba(136,136,136,0.12)",
-    danger: "#888888",
-    purple: "#A0A0A0",
-    purpleSoft: "rgba(144,144,144,0.10)",
-    titlebar: "#141414",
-    titlebarBorder: "#2A2A2A",
+    bg: "#1C1D22",
+    surface: "#25262D",
+    card: "#2A2B33",
+    cardAlt: "#31323B",
+    border: "#383942",
+    text: "#F0F2F8",
+    textSec: "#A4A8B8",
+    textMuted: "#6B6F82",
+    accent: "#4F8EF7",
+    accentSoft: "rgba(79,142,247,0.13)",
+    accentText: "#6EA5FA",
+    success: "#3DD68C",
+    successSoft: "rgba(61,214,140,0.13)",
+    warning: "#F5B73B",
+    warningSoft: "rgba(245,183,59,0.13)",
+    danger: "#F47272",
+    purple: "#A78BFA",
+    purpleSoft: "rgba(167,139,250,0.13)",
+    titlebar: "#25262D",
+    titlebarBorder: "#383942",
   },
   light: {
-    bg: "#F5F5F5",
+    bg: "#F5F6FA",
     surface: "#FFFFFF",
     card: "#FFFFFF",
-    cardAlt: "#F0F0F0",
-    border: "#E2E2E2",
-    text: "#111111",
-    textSec: "#555555",
-    textMuted: "#9A9A9A",
-    accent: "#1A1A1A",
-    accentSoft: "rgba(0,0,0,0.06)",
-    accentText: "#333333",
-    success: "#666666",
-    successSoft: "rgba(0,0,0,0.06)",
-    warning: "#777777",
-    warningSoft: "rgba(0,0,0,0.06)",
-    danger: "#555555",
-    purple: "#666666",
-    purpleSoft: "rgba(0,0,0,0.06)",
-    titlebar: "#F0F0F0",
-    titlebarBorder: "#DCDCDC",
+    cardAlt: "#F0F1F5",
+    border: "#E4E5EC",
+    text: "#1A1C28",
+    textSec: "#5A5E72",
+    textMuted: "#8B8FA5",
+    accent: "#4F8EF7",
+    accentSoft: "rgba(79,142,247,0.10)",
+    accentText: "#3672D9",
+    success: "#22C07A",
+    successSoft: "rgba(34,192,122,0.10)",
+    warning: "#E5A117",
+    warningSoft: "rgba(229,161,23,0.10)",
+    danger: "#E85454",
+    purple: "#8B5CF6",
+    purpleSoft: "rgba(139,92,246,0.10)",
+    titlebar: "#F0F1F5",
+    titlebarBorder: "#DCDEE6",
   },
 };
 
@@ -6860,12 +6860,12 @@ function MonacoApp({ c }: { c: typeof palette.dark }) {
 // ━━━━ AI HUB APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AIHubApp({ c }: { c: typeof palette.dark }) {
   const models = [
-    { id: "claude", name: "Claude Opus", company: "Anthropic", color: "#1C1C1C", desc: "Advanced reasoning and deep analysis", params: "2T", ctx: "200K", badge: "Flagship", initials: "CO", lastMsg: "Hello! How can I assist you today?", time: "now", online: true },
-    { id: "gpt4", name: "GPT-4o", company: "OpenAI", color: "#3A3A3A", desc: "Versatile general-purpose intelligence", params: "1.8T", ctx: "128K", badge: "Popular", initials: "G4", lastMsg: "Great question! Here's what I think...", time: "2m", online: true },
-    { id: "gemini", name: "Gemini Ultra", company: "Google", color: "#505050", desc: "Multimodal vision, audio, and text", params: "1.5T", ctx: "1M", badge: "Multimodal", initials: "GU", lastMsg: "I can process visual content too!", time: "5m", online: true },
-    { id: "llama", name: "Llama 3.1", company: "Meta", color: "#686868", desc: "Open-source with transparent weights", params: "405B", ctx: "128K", badge: "Open Source", initials: "L3", lastMsg: "Open-source and transparent.", time: "12m", online: false },
-    { id: "mistral", name: "Mistral Large", company: "Mistral AI", color: "#808080", desc: "Fast, European frontier model", params: "123B", ctx: "32K", badge: "Fast", initials: "ML", lastMsg: "Ready for your next request.", time: "1h", online: false },
-    { id: "deepseek", name: "DeepSeek R1", company: "DeepSeek", color: "#282828", desc: "Reasoning-focused chain-of-thought model", params: "671B", ctx: "64K", badge: "Reasoning", initials: "DS", lastMsg: "Let me think step by step...", time: "3h", online: false },
+    { id: "claude", name: "Claude Opus", company: "Anthropic", color: "#F97316", desc: "Advanced reasoning and deep analysis", params: "2T", ctx: "200K", badge: "Flagship", initials: "CO", lastMsg: "Hello! How can I assist you today?", time: "now", online: true },
+    { id: "gpt4", name: "GPT-4o", company: "OpenAI", color: "#10B981", desc: "Versatile general-purpose intelligence", params: "1.8T", ctx: "128K", badge: "Popular", initials: "G4", lastMsg: "Great question! Here's what I think...", time: "2m", online: true },
+    { id: "gemini", name: "Gemini Ultra", company: "Google", color: "#3B82F6", desc: "Multimodal vision, audio, and text", params: "1.5T", ctx: "1M", badge: "Multimodal", initials: "GU", lastMsg: "I can process visual content too!", time: "5m", online: true },
+    { id: "llama", name: "Llama 3.1", company: "Meta", color: "#8B5CF6", desc: "Open-source with transparent weights", params: "405B", ctx: "128K", badge: "Open Source", initials: "L3", lastMsg: "Open-source and transparent.", time: "12m", online: false },
+    { id: "mistral", name: "Mistral Large", company: "Mistral AI", color: "#EC4899", desc: "Fast, European frontier model", params: "123B", ctx: "32K", badge: "Fast", initials: "ML", lastMsg: "Ready for your next request.", time: "1h", online: false },
+    { id: "deepseek", name: "DeepSeek R1", company: "DeepSeek", color: "#06B6D4", desc: "Reasoning-focused chain-of-thought model", params: "671B", ctx: "64K", badge: "Reasoning", initials: "DS", lastMsg: "Let me think step by step...", time: "3h", online: false },
   ];
   const [activeModel, setActiveModel] = useState(models[0]);
   const [msgs, setMsgs] = useState<{ role: "user" | "ai"; text: string; model?: string }[]>([
@@ -6899,12 +6899,12 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
     llama: ["Processing your request with open-source efficiency...", "Here's my response based on open-source training data...", "As an open model, I'll give you a transparent answer..."],
   };
   const capabilities = [
-    { icon: ic.messageCircle, title: "Natural Conversation", desc: "Context-aware dialogue with memory across sessions", color: c.textSec },
-    { icon: ic.code, title: "Code Generation", desc: "Write, debug, and refactor code in 50+ languages", color: c.textSec },
-    { icon: ic.image, title: "Image Analysis", desc: "Understand and describe visual content in detail", color: c.textSec },
-    { icon: ic.fileText, title: "Document Processing", desc: "Summarize, extract, and transform documents", color: c.textSec },
-    { icon: ic.globe, title: "Research & Analysis", desc: "Deep topic research with source attribution", color: c.textSec },
-    { icon: ic.layers, title: "Translation", desc: "Fluent translation across 100+ language pairs", color: c.textSec },
+    { icon: ic.messageCircle, title: "Natural Conversation", desc: "Context-aware dialogue with memory across sessions", color: "#3B82F6" },
+    { icon: ic.code, title: "Code Generation", desc: "Write, debug, and refactor code in 50+ languages", color: "#10B981" },
+    { icon: ic.image, title: "Image Analysis", desc: "Understand and describe visual content in detail", color: "#F59E0B" },
+    { icon: ic.fileText, title: "Document Processing", desc: "Summarize, extract, and transform documents", color: "#8B5CF6" },
+    { icon: ic.globe, title: "Research & Analysis", desc: "Deep topic research with source attribution", color: "#EC4899" },
+    { icon: ic.layers, title: "Translation", desc: "Fluent translation across 100+ language pairs", color: "#06B6D4" },
   ];
   const send = () => {
     if (!input.trim()) return;
@@ -6915,9 +6915,9 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
     setInput("");
   };
   const communities = [
-    { id: "c1", name: "AI Researchers", members: "12.4k", color: c.textSec },
-    { id: "c2", name: "LLM Builders", members: "8.9k", color: c.textMuted },
-    { id: "c3", name: "Prompt Engineers", members: "5.2k", color: c.textSec },
+    { id: "c1", name: "AI Researchers", members: "12.4k", color: "#7C3AED" },
+    { id: "c2", name: "LLM Builders", members: "8.9k", color: "#3B82F6" },
+    { id: "c3", name: "Prompt Engineers", members: "5.2k", color: "#10B981" },
   ];
 
   const selectModel = (m: typeof models[0]) => {
@@ -6942,7 +6942,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
             <div className="min-w-0 flex-1">
               <p className="text-[11px] font-bold leading-tight" style={{ color: c.text }}>Alternus AI</p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: c.success }} />
+                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
                 <p className="text-[7.5px] leading-tight" style={{ color: c.textMuted }}>{models.filter(m => m.online).length} models online</p>
               </div>
             </div>
@@ -7026,7 +7026,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
                   }}>
                   {m.initials}
                 </div>
-                {m.online && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2" style={{ background: c.success, borderColor: c.bg }} />}
+                {m.online && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2" style={{ background: "#10B981", borderColor: c.bg }} />}
               </div>
               <span className="text-[7.5px] truncate w-10 text-center" style={{ color: c.textMuted }}>{m.name.split(" ")[0]}</span>
             </button>
@@ -7049,7 +7049,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
                   style={{ background: `linear-gradient(135deg,${m.color},${m.color}99)`, boxShadow: `0 2px 8px ${m.color}28` }}>
                   {m.initials}
                 </div>
-                {m.online && <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full" style={{ background: c.success, border: `2px solid ${c.bg}` }} />}
+                {m.online && <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full" style={{ background: "#10B981", border: `2px solid ${c.bg}` }} />}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
@@ -7103,8 +7103,8 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
                 <p className="text-white text-[13px] font-semibold">{activeModel.name}</p>
                 <p className="text-white/50 text-[10px]">{activeModel.company}</p>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: c.success }} />
-                  <span className="text-[9px]" style={{ color: c.success }}>AI Session Active</span>
+                  <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#10B981" }} />
+                  <span className="text-[9px]" style={{ color: "#10B981" }}>AI Session Active</span>
                 </div>
               </div>
               {/* Mini self video (bottom right) */}
@@ -7152,8 +7152,8 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
                   <div>
                     <p className="text-[13px] font-bold tracking-tight" style={{ color: c.text }}>{activeModel.name}</p>
                     <div className="flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: activeModel.online ? c.success : c.textMuted }} />
-                      <p className="text-[9px] font-medium" style={{ color: activeModel.online ? c.success : c.textMuted }}>
+                      <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: activeModel.online ? "#10B981" : c.textMuted }} />
+                      <p className="text-[9px] font-medium" style={{ color: activeModel.online ? "#10B981" : c.textMuted }}>
                         {activeModel.online ? "Online" : "Offline"} · {activeModel.company}
                       </p>
                     </div>
@@ -7195,8 +7195,8 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
                   </div>
                 ))}
                 <div className="ml-auto flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: c.success }} />
-                  <span className="text-[8px] font-medium" style={{ color: c.success }}>Live</span>
+                  <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
+                  <span className="text-[8px] font-medium" style={{ color: "#10B981" }}>Live</span>
                 </div>
               </div>
             </div>
@@ -8348,16 +8348,16 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
   }, [activeWorkspace]);
 
   const dk = mode === "dark";
-  const agBg = c.bg;
-  const agSidebarBg = c.surface;
-  const agCardBg = c.card;
-  const agBorder = c.border;
-  const agText = c.text;
-  const agTextSec = c.textSec;
-  const agTextMuted = c.textMuted;
-  const agAccent = dk ? "#C8C8C8" : "#222222";
-  const agAccentSoft = dk ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)";
-  const agSelected = dk ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+  const agBg = dk ? c.bg : "#F7F5FF";
+  const agSidebarBg = dk ? c.surface : "linear-gradient(175deg,#F0EAFF 0%,#EDE8FF 40%,#EFF4FF 100%)";
+  const agCardBg = dk ? c.card : "#FFFFFF";
+  const agBorder = dk ? c.border : "rgba(120,80,220,0.10)";
+  const agText = dk ? c.text : "#1a1525";
+  const agTextSec = dk ? c.textSec : "#5a5470";
+  const agTextMuted = dk ? c.textMuted : "#9896ab";
+  const agAccent = "#7C3AED";
+  const agAccentSoft = dk ? "rgba(124,58,237,0.14)" : "rgba(124,58,237,0.10)";
+  const agSelected = dk ? "rgba(79,142,247,0.14)" : "rgba(124,58,237,0.10)";
 
   // Format menu items
   const formatItems = [
@@ -8414,7 +8414,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
             <div className="flex-1 min-w-0">
               <p className="text-[11px] font-bold leading-tight" style={{ color: agText }}>Alternus Agent</p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: c.success }} />
+                <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
                 <p className="text-[7.5px]" style={{ color: agTextMuted }}>Claude Opus 4.6 · Active</p>
               </div>
             </div>
@@ -8519,7 +8519,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 {/* From chip */}
                 <div className="px-6 pt-5 pb-2 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}` }}>
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: dk ? "#2A2A2A" : "#111111", border: `1px solid ${agBorder}` }}>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #7C3AED, #4F8EF7)" }}>
                       <I d={ic.sparkle} s={11} c="#fff" f />
                     </div>
                     <div>
@@ -8736,7 +8736,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               <div className="flex-1 min-w-0">
                 <p className="text-[12px] font-bold leading-tight" style={{ color: agText }}>Alternus AI Agent</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: c.success }} />
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
                   <p className="text-[8.5px]" style={{ color: agTextMuted }}>Active · Intelligent OS assistant · Claude Opus 4.6</p>
                 </div>
               </div>
@@ -8753,8 +8753,8 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "gap-3"}`}>
                   {m.role === "agent" && (
                     <div className="w-8 h-8 rounded-2xl flex items-center justify-center flex-shrink-0 mt-0.5"
-                      style={{ background: dk ? "#2A2A2A" : "#111111", border: `1px solid ${agBorder}`, boxShadow: "0 2px 8px rgba(0,0,0,0.18)" }}>
-                      <I d={ic.sparkle} s={12} c={dk ? "#D0D0D0" : "#FFFFFF"} f />
+                      style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 3px 10px rgba(124,58,237,0.35)" }}>
+                      <I d={ic.sparkle} s={12} c="#fff" f />
                     </div>
                   )}
                   <div style={{ maxWidth: "80%" }}>
@@ -8780,10 +8780,10 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                     {/* Bubble */}
                     <div className="px-4 py-3 rounded-2xl text-[11px] leading-relaxed"
                       style={{
-                        background: m.role === "user" ? (dk ? "#2A2A2A" : "#111111") : (dk ? c.surface : "#fff"),
-                        color: m.role === "user" ? (dk ? "#F0F0F0" : "#FFFFFF") : agText,
-                        border: m.role === "agent" ? `1px solid ${agBorder}` : `1px solid ${dk ? "#383838" : "transparent"}`,
-                        boxShadow: m.role === "user" ? "0 2px 10px rgba(0,0,0,0.25)" : "0 1px 8px rgba(0,0,0,0.06)",
+                        background: m.role === "user" ? "linear-gradient(135deg,#7C3AED,#4F8EF7)" : (dk ? c.surface : "#fff"),
+                        color: m.role === "user" ? "#fff" : agText,
+                        border: m.role === "agent" ? `1px solid ${agBorder}` : "none",
+                        boxShadow: m.role === "user" ? "0 4px 16px rgba(124,58,237,0.35)" : "0 1px 8px rgba(0,0,0,0.06)",
                         whiteSpace: "pre-line",
                         borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "4px 18px 18px 18px",
                       }}>
@@ -8826,13 +8826,13 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                   <div className="flex items-center gap-0 rounded-2xl overflow-hidden"
                     style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
                     <div className="flex items-center gap-2 px-4 py-3 flex-1">
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: c.success }} />
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
                       <span className="text-[10px] font-semibold" style={{ color: agText }}>Agent Online</span>
                     </div>
                     {[
-                      { label: "Response", value: "~1.2s", color: c.success },
+                      { label: "Response", value: "~1.2s", color: "#10B981" },
                       { label: "Context", value: "200K", color: agAccent },
-                      { label: "Tasks today", value: "0", color: c.textSec },
+                      { label: "Tasks today", value: "0", color: "#6366F1" },
                     ].map(stat => (
                       <div key={stat.label} className="flex flex-col items-center justify-center px-5 py-3"
                         style={{ borderLeft: `1px solid ${agBorder}` }}>
@@ -8907,8 +8907,8 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               {isThinking && (
                 <div className="flex gap-3">
                   <div className="w-8 h-8 rounded-2xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: dk ? "#2A2A2A" : "#111111", border: `1px solid ${agBorder}`, boxShadow: "0 2px 8px rgba(0,0,0,0.18)" }}>
-                    <I d={ic.sparkle} s={12} c={dk ? "#D0D0D0" : "#FFFFFF"} f />
+                    style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 3px 10px rgba(124,58,237,0.35)" }}>
+                    <I d={ic.sparkle} s={12} c="#fff" f />
                   </div>
                   <div className="px-4 py-3 rounded-2xl flex gap-1.5 items-center"
                     style={{ background: dk ? c.surface : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 8px rgba(0,0,0,0.06)", borderRadius: "4px 18px 18px 18px" }}>
@@ -8958,11 +8958,11 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 <button onClick={() => send()} disabled={isThinking || !input.trim()}
                   className="w-8 h-8 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
                   style={{
-                    background: input.trim() && !isThinking ? (dk ? "#E0E0E0" : "#111111") : c.cardAlt,
-                    boxShadow: input.trim() && !isThinking ? "0 2px 10px rgba(0,0,0,0.30)" : "none",
+                    background: input.trim() && !isThinking ? "linear-gradient(135deg,#7C3AED,#4F8EF7)" : c.cardAlt,
+                    boxShadow: input.trim() && !isThinking ? "0 2px 12px rgba(124,58,237,0.45)" : "none",
                     opacity: isThinking ? 0.5 : 1,
                   }}>
-                  <I d={ic.send} s={13} c={input.trim() && !isThinking ? (dk ? "#111111" : "#FFFFFF") : agTextMuted} />
+                  <I d={ic.send} s={13} c={input.trim() && !isThinking ? "#fff" : agTextMuted} />
                 </button>
               </div>
               <p className="text-[7.5px] text-center mt-1.5" style={{ color: agTextMuted }}>Enter → send · Shift+Enter → new line</p>
@@ -9689,34 +9689,34 @@ export default function AlternusOS() {
   };
 
   const dockApps: { id: WinId; icon: string; label: string; color: string; category: "ai" | "productivity" | "media" | "system" | "web" }[] = [
-    { id: "agent", icon: ic.sparkle, label: "Alternus AI Agent", color: c.textSec, category: "ai" },
-    { id: "aihub", icon: ic.sparkle, label: "AI Studio", color: c.textMuted, category: "ai" },
-    { id: "aivoice", icon: ic.mic, label: "AI Voice", color: c.textSec, category: "ai" },
-    { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: c.textMuted, category: "ai" },
-    { id: "code", icon: ic.code, label: "Code", color: c.textSec, category: "productivity" },
-    { id: "monaco", icon: ic.code, label: "VS Code", color: c.textMuted, category: "productivity" },
-    { id: "word", icon: ic.fileText, label: "Word", color: c.textSec, category: "productivity" },
-    { id: "notes", icon: ic.note, label: "Notes", color: c.textMuted, category: "productivity" },
-    { id: "tasks", icon: ic.checkSquare, label: "Tasks", color: c.textSec, category: "productivity" },
-    { id: "calculator", icon: ic.calc, label: "Calc", color: c.textMuted, category: "productivity" },
-    { id: "calendar", icon: ic.calendar, label: "Calendar", color: c.textSec, category: "productivity" },
-    { id: "dashboard", icon: ic.grid, label: "Dashboard", color: c.textMuted, category: "productivity" },
-    { id: "movies", icon: ic.film, label: "Movies", color: c.textSec, category: "media" },
-    { id: "music", icon: ic.music, label: "Music", color: c.textMuted, category: "media" },
-    { id: "studio", icon: ic.pen, label: "Studio", color: c.textSec, category: "media" },
-    { id: "terminal", icon: ic.terminal, label: "Terminal", color: c.textSec, category: "system" },
-    { id: "files", icon: ic.folder, label: "Files", color: c.textMuted, category: "system" },
+    { id: "agent", icon: ic.sparkle, label: "Alternus AI Agent", color: "#7C3AED", category: "ai" },
+    { id: "aihub", icon: ic.sparkle, label: "AI Studio", color: "#A78BFA", category: "ai" },
+    { id: "aivoice", icon: ic.mic, label: "AI Voice", color: "#FBBF24", category: "ai" },
+    { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316", category: "ai" },
+    { id: "code", icon: ic.code, label: "Code", color: c.purple, category: "productivity" },
+    { id: "monaco", icon: ic.code, label: "VS Code", color: "#007ACC", category: "productivity" },
+    { id: "word", icon: ic.fileText, label: "Word", color: c.accentText, category: "productivity" },
+    { id: "notes", icon: ic.note, label: "Notes", color: "#FBBF24", category: "productivity" },
+    { id: "tasks", icon: ic.checkSquare, label: "Tasks", color: "#34D399", category: "productivity" },
+    { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A", category: "productivity" },
+    { id: "calendar", icon: ic.calendar, label: "Calendar", color: "#60A5FA", category: "productivity" },
+    { id: "dashboard", icon: ic.grid, label: "Dashboard", color: "#60A5FA", category: "productivity" },
+    { id: "movies", icon: ic.film, label: "Movies", color: c.purple, category: "media" },
+    { id: "music", icon: ic.music, label: "Music", color: "#F472B6", category: "media" },
+    { id: "studio", icon: ic.pen, label: "Studio", color: "#A78BFA", category: "media" },
+    { id: "terminal", icon: ic.terminal, label: "Terminal", color: c.success, category: "system" },
+    { id: "files", icon: ic.folder, label: "Files", color: c.warning, category: "system" },
     { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec, category: "system" },
-    { id: "controlpanel", icon: ic.monitor, label: "Control Panel", color: c.textMuted, category: "system" },
-    { id: "recovery", icon: ic.shield, label: "Recovery", color: c.textSec, category: "system" },
-    { id: "downloads", icon: ic.download, label: "Downloads", color: c.textMuted, category: "system" },
-    { id: "sysmon", icon: ic.activity, label: "System Monitor", color: c.textSec, category: "system" },
-    { id: "browser", icon: ic.globe, label: "Browser", color: c.textSec, category: "web" },
-    { id: "weather", icon: ic.cloud, label: "Weather", color: c.textMuted, category: "web" },
-    { id: "news", icon: ic.newspaper, label: "News", color: c.textSec, category: "web" },
-    { id: "mail", icon: ic.mail, label: "Mail", color: c.textMuted, category: "web" },
-    { id: "store", icon: ic.store, label: "Store", color: c.textSec, category: "web" },
-    { id: "business", icon: ic.briefcase, label: "Business", color: c.textMuted, category: "web" },
+    { id: "controlpanel", icon: ic.monitor, label: "Control Panel", color: c.textSec, category: "system" },
+    { id: "recovery", icon: ic.shield, label: "Recovery", color: c.success, category: "system" },
+    { id: "downloads", icon: ic.download, label: "Downloads", color: "#34D399", category: "system" },
+    { id: "sysmon", icon: ic.activity, label: "System Monitor", color: "#34D399", category: "system" },
+    { id: "browser", icon: ic.globe, label: "Browser", color: c.accentText, category: "web" },
+    { id: "weather", icon: ic.cloud, label: "Weather", color: "#60A5FA", category: "web" },
+    { id: "news", icon: ic.newspaper, label: "News", color: c.danger, category: "web" },
+    { id: "mail", icon: ic.mail, label: "Mail", color: "#F97316", category: "web" },
+    { id: "store", icon: ic.store, label: "Store", color: c.accent, category: "web" },
+    { id: "business", icon: ic.briefcase, label: "Business", color: "#6366F1", category: "web" },
   ];
 
   // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -9765,8 +9765,8 @@ export default function AlternusOS() {
           <div className="w-64 h-[3px] rounded-full overflow-hidden" style={{ background: "#1a1a1a" }}>
             <div className="h-full rounded-full" style={{
               width: `${bootProgress * 100}%`,
-              background: "linear-gradient(90deg, #333333, #888888, #333333)",
-              boxShadow: "0 0 10px rgba(200,200,200,0.20)",
+              background: "linear-gradient(90deg, #7C3AED, #3B82F6, #06B6D4)",
+              boxShadow: "0 0 12px #3B82F6, 0 0 24px rgba(59,130,246,0.4)",
               transition: "width 0.1s linear",
             }} />
           </div>
