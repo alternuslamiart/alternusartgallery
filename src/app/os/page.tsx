@@ -6881,6 +6881,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
   const [callActive, setCallActive] = useState(false);
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(false);
+  const [convTab, setConvTab] = useState<"recent" | "favorite">("recent");
   const hubEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => { hubEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
 
@@ -7063,20 +7064,26 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
             </button>
           ))}
 
-          {msgs.filter(m => m.role === "user").length > 0 && (
-            <>
-              <div className="mx-2 my-2.5" style={{ height: 1, background: agBorder }} />
-              <p className="text-[7.5px] font-bold uppercase tracking-[0.14em] px-2 pb-1.5" style={{ color: agTextMuted }}>Recent</p>
-              {msgs.filter(m => m.role === "user").slice(-4).reverse().map((m, i) => (
-                <button key={i}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-left mb-0.5 transition-all"
-                  onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: agTextMuted }} />
-                  <p className="text-[9px] truncate" style={{ color: agTextSec }}>{m.text}</p>
-                </button>
-              ))}
-            </>
-          )}
+          <div className="mx-2 my-2.5" style={{ height: 1, background: agBorder }} />
+          <p className="text-[7.5px] font-bold uppercase tracking-[0.14em] px-2 pb-1.5" style={{ color: agTextMuted }}>Teams</p>
+          {[
+            { name: "Design Team", members: 5, color: "#3B82F6" },
+            { name: "Dev Team", members: 8, color: "#10B981" },
+            { name: "Marketing", members: 3, color: "#F59E0B" },
+          ].map(team => (
+            <button key={team.name}
+              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-left mb-0.5 transition-all"
+              onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <div className="w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center"
+                style={{ background: `${team.color}14`, border: `1px solid ${team.color}22` }}>
+                <I d={ic.users} s={10} c={team.color} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[9px] font-semibold truncate" style={{ color: agText }}>{team.name}</p>
+                <p className="text-[7px]" style={{ color: agTextMuted }}>{team.members} members</p>
+              </div>
+            </button>
+          ))}
         </div>
 
         {/* Footer */}
@@ -7094,73 +7101,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
         </div>
       </div>
 
-      {/* ── MIDDLE PANEL (model list) ── */}
-      <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{ width: 200, borderRight: `1px solid ${c.border}` }}>
-        {/* Search */}
-        <div className="px-3 pt-3 pb-2 flex-shrink-0">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-            <I d={ic.search} s={11} c={c.textMuted} />
-            <input placeholder="Search models..." className="flex-1 bg-transparent outline-none text-[10px]" style={{ color: c.text }} />
-          </div>
-        </div>
-
-        {/* Story-style model avatars */}
-        <div className="flex gap-2.5 px-3 pb-2 overflow-x-auto flex-shrink-0" style={{ scrollbarWidth: "none" }}>
-          {models.slice(0, 5).map(m => (
-            <button key={m.id} onClick={() => selectModel(m)} className="flex flex-col items-center gap-1 flex-shrink-0">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-                  style={{
-                    background: `linear-gradient(135deg,${m.color},${m.color}99)`,
-                    boxShadow: activeModel.id === m.id ? `0 0 0 2.5px ${m.color}` : `0 2px 8px ${m.color}28`,
-                    outline: activeModel.id === m.id ? `2.5px solid ${c.bg}` : "none",
-                    outlineOffset: "1px",
-                  }}>
-                  {m.initials}
-                </div>
-                {m.online && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2" style={{ background: "#10B981", borderColor: c.bg }} />}
-              </div>
-              <span className="text-[7.5px] truncate w-10 text-center" style={{ color: c.textMuted }}>{m.name.split(" ")[0]}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="mx-3 mb-1" style={{ height: 1, background: c.border }} />
-
-        {/* Model list */}
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-          {models.map(m => (
-            <button key={m.id} onClick={() => selectModel(m)}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 transition-all text-left relative"
-              style={{ background: activeModel.id === m.id ? `${m.color}18` : "transparent" }}
-              onMouseEnter={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = c.cardAlt; }}
-              onMouseLeave={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = "transparent"; }}>
-              {activeModel.id === m.id && <div className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r-full" style={{ background: m.color }} />}
-              <div className="relative flex-shrink-0">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[9px] font-bold text-white"
-                  style={{ background: `linear-gradient(135deg,${m.color},${m.color}99)`, boxShadow: `0 2px 8px ${m.color}28` }}>
-                  {m.initials}
-                </div>
-                {m.online && <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full" style={{ background: "#10B981", border: `2px solid ${c.bg}` }} />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[9.5px] truncate" style={{ color: c.text, fontWeight: activeModel.id === m.id ? 700 : 600 }}>{m.name}</span>
-                  <span className="text-[7px] font-semibold px-1.5 py-0.5 rounded-md flex-shrink-0 ml-1"
-                    style={{ background: activeModel.id === m.id ? m.color : `${m.color}14`, color: activeModel.id === m.id ? "#fff" : m.color }}>{m.badge}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-[7.5px]" style={{ color: c.textMuted }}>{m.params}</span>
-                  <span className="text-[7px]" style={{ color: c.border }}>·</span>
-                  <span className="text-[7.5px]" style={{ color: c.textMuted }}>{m.ctx} ctx</span>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── RIGHT CHAT PANEL ── */}
+      {/* ── CHAT PANEL (flex-1, middle) ── */}
       <div className="flex-1 flex flex-col overflow-hidden">
             {/* Chat header */}
             <div className="flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
@@ -7308,6 +7249,99 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
                 </button>
               </div>
             </div>
+      </div>
+
+      {/* ── RIGHT PANEL (Conversations + Model list) ── */}
+      <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{ width: 210, borderLeft: `1px solid ${c.border}`, background: c.surface }}>
+
+        {/* Conversations */}
+        <div className="px-3 pt-3 pb-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <p className="text-[10.5px] font-bold mb-2" style={{ color: c.text }}>Conversations</p>
+          <div className="flex gap-0.5 mb-2 p-0.5 rounded-lg" style={{ background: c.cardAlt }}>
+            {(["recent", "favorite"] as const).map(t => (
+              <button key={t} onClick={() => setConvTab(t)}
+                className="flex-1 py-1 rounded-md text-[9px] font-semibold capitalize transition-all"
+                style={{ background: convTab === t ? c.surface : "transparent", color: convTab === t ? c.text : c.textMuted, boxShadow: convTab === t ? "0 1px 4px rgba(0,0,0,0.08)" : "none" }}>
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
+          </div>
+          <div className="space-y-0.5">
+            {msgs.filter(m => m.role === "user").slice(-5).reverse().map((m, i) => (
+              <button key={i} onClick={() => setInput(m.text)}
+                className="w-full text-left px-2 py-1.5 rounded-lg transition-all"
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <p className="text-[9.5px] truncate" style={{ color: c.textSec }}>{m.text}</p>
+              </button>
+            ))}
+            {msgs.filter(m => m.role === "user").length === 0 && (
+              <p className="text-[9px] px-2 py-1" style={{ color: c.textMuted }}>No conversations yet</p>
+            )}
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="px-3 pt-2.5 pb-1.5 flex-shrink-0">
+          <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+            <I d={ic.search} s={10} c={c.textMuted} />
+            <input placeholder="Search models..." className="flex-1 bg-transparent outline-none text-[9.5px]" style={{ color: c.text }} />
+          </div>
+        </div>
+
+        {/* Story avatars */}
+        <div className="flex gap-2 px-3 pb-2 overflow-x-auto flex-shrink-0" style={{ scrollbarWidth: "none" }}>
+          {models.slice(0, 5).map(m => (
+            <button key={m.id} onClick={() => selectModel(m)} className="flex flex-col items-center gap-0.5 flex-shrink-0">
+              <div className="relative">
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
+                  style={{
+                    background: `linear-gradient(135deg,${m.color},${m.color}99)`,
+                    boxShadow: activeModel.id === m.id ? `0 0 0 2px ${m.color}` : `0 2px 8px ${m.color}28`,
+                    outline: activeModel.id === m.id ? `2px solid ${c.bg}` : "none",
+                    outlineOffset: "1px",
+                  }}>
+                  {m.initials}
+                </div>
+                {m.online && <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2" style={{ background: "#10B981", borderColor: c.bg }} />}
+              </div>
+              <span className="text-[7px] truncate w-9 text-center" style={{ color: c.textMuted }}>{m.name.split(" ")[0]}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="mx-3 mb-1" style={{ height: 1, background: c.border }} />
+
+        {/* Model list */}
+        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+          {models.map(m => (
+            <button key={m.id} onClick={() => selectModel(m)}
+              className="w-full flex items-center gap-2 px-3 py-2 transition-all text-left relative"
+              style={{ background: activeModel.id === m.id ? `${m.color}18` : "transparent" }}
+              onMouseEnter={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = "transparent"; }}>
+              {activeModel.id === m.id && <div className="absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full" style={{ background: m.color }} />}
+              <div className="relative flex-shrink-0">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center text-[8px] font-bold text-white"
+                  style={{ background: `linear-gradient(135deg,${m.color},${m.color}99)`, boxShadow: `0 2px 6px ${m.color}28` }}>
+                  {m.initials}
+                </div>
+                {m.online && <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full" style={{ background: "#10B981", border: `1.5px solid ${c.bg}` }} />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] truncate" style={{ color: c.text, fontWeight: activeModel.id === m.id ? 700 : 600 }}>{m.name}</span>
+                  <span className="text-[6.5px] font-semibold px-1 py-0.5 rounded flex-shrink-0 ml-1"
+                    style={{ background: activeModel.id === m.id ? m.color : `${m.color}14`, color: activeModel.id === m.id ? "#fff" : m.color }}>{m.badge}</span>
+                </div>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span className="text-[7px]" style={{ color: c.textMuted }}>{m.params}</span>
+                  <span className="text-[6px]" style={{ color: c.border }}>·</span>
+                  <span className="text-[7px]" style={{ color: c.textMuted }}>{m.ctx}</span>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
