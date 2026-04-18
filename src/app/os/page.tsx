@@ -6932,29 +6932,26 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
       {/* ── LEFT SIDEBAR ── */}
       <div className="flex flex-col flex-shrink-0" style={{ width: 168, borderRight: `1px solid ${c.border}`, background: c.surface }}>
 
-        {/* Gradient header */}
-        <div className="px-3 pt-3 pb-3 flex-shrink-0 relative overflow-hidden"
-          style={{ background: "linear-gradient(145deg,#1a0533,#0f1a3a)", borderBottom: `1px solid rgba(255,255,255,0.06)` }}>
-          <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(ellipse at 90% 10%, rgba(124,58,237,0.35) 0%, transparent 65%), radial-gradient(ellipse at 10% 90%, rgba(79,142,247,0.20) 0%, transparent 60%)" }} />
-          <div className="relative flex items-center gap-2 mb-2.5">
+        {/* Header */}
+        <div className="px-3 pt-3 pb-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <div className="flex items-center gap-2.5 mb-2.5">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-[9px] font-black text-white"
-              style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)", backdropFilter: "blur(8px)" }}>AI</div>
+              style={{ background: `linear-gradient(135deg,${c.accent},${c.accent}CC)`, boxShadow: `0 3px 10px ${c.accent}35` }}>AI</div>
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-bold text-white leading-tight">AI Hub</p>
-              <p className="text-[7.5px] text-white/45 leading-tight">{models.filter(m => m.online).length} models online</p>
+              <p className="text-[11px] font-bold leading-tight" style={{ color: c.text }}>AI Hub</p>
+              <p className="text-[7.5px] leading-tight" style={{ color: c.textMuted }}>{models.filter(m => m.online).length} models online</p>
             </div>
             <button className="w-6 h-6 rounded-lg flex items-center justify-center transition-all"
-              style={{ background: "rgba(255,255,255,0.08)" }}
-              onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.16)")} onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}>
-              <I d={ic.settings} s={11} c="rgba(255,255,255,0.65)" />
+              onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <I d={ic.settings} s={11} c={c.textMuted} />
             </button>
           </div>
           {/* Mini stats */}
-          <div className="relative flex gap-1.5">
+          <div className="flex gap-1.5">
             {[{ v: `${models.filter(m=>m.online).length}/${models.length}`, l: "Active" }, { v: "6", l: "Models" }, { v: "3", l: "Groups" }].map(s => (
-              <div key={s.l} className="flex-1 px-2 py-1.5 rounded-lg text-center" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <p className="text-[10px] font-bold text-white leading-none">{s.v}</p>
-                <p className="text-[6.5px] text-white/40 mt-0.5">{s.l}</p>
+              <div key={s.l} className="flex-1 px-2 py-1.5 rounded-lg text-center" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+                <p className="text-[10px] font-bold leading-none" style={{ color: c.accent }}>{s.v}</p>
+                <p className="text-[6.5px] mt-0.5" style={{ color: c.textMuted }}>{s.l}</p>
               </div>
             ))}
           </div>
@@ -8379,36 +8376,33 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
       {/* ── LEFT SIDEBAR ─────────────────────────────────────── */}
       <div className="flex flex-col flex-shrink-0" style={{ width: 230, background: agSidebarBg, backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRight: `1px solid ${agBorder}` }}>
 
-        {/* Gradient banner header */}
-        <div className="px-3 pt-3 pb-3 flex-shrink-0 relative overflow-hidden"
-          style={{ background: "linear-gradient(145deg,#3b0764,#1e1b4b,#0f2167)", borderBottom: `1px solid rgba(255,255,255,0.07)` }}>
-          <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(ellipse at 85% 15%, rgba(167,139,250,0.30) 0%, transparent 60%), radial-gradient(ellipse at 15% 85%, rgba(99,102,241,0.20) 0%, transparent 55%)" }} />
-          <div className="relative flex items-center gap-2.5 mb-2.5">
+        {/* Header */}
+        <div className="px-3 pt-3 pb-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}` }}>
+          <div className="flex items-center gap-2.5 mb-2.5">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: "rgba(255,255,255,0.13)", border: "1px solid rgba(255,255,255,0.20)", backdropFilter: "blur(8px)" }}>
-              <I d={ic.sparkle} s={14} c="#fff" f />
+              style={{ background: agAccentSoft, border: `1px solid ${agAccent}22` }}>
+              <I d={ic.sparkle} s={14} c={agAccent} f />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[12px] font-bold text-white leading-tight">Alternus Agent</p>
+              <p className="text-[11px] font-bold leading-tight" style={{ color: agText }}>Alternus Agent</p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#34d399" }} />
-                <p className="text-[7.5px] text-white/55">Claude Opus 4.6 · Active</p>
+                <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
+                <p className="text-[7.5px]" style={{ color: agTextMuted }}>Claude Opus 4.6 · Active</p>
               </div>
             </div>
-            <button className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{ background: "rgba(255,255,255,0.08)" }}
-              onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.15)")} onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}>
-              <I d={ic.settings} s={11} c="rgba(255,255,255,0.6)" />
+            <button className="w-6 h-6 rounded-lg flex items-center justify-center transition-all"
+              onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <I d={ic.settings} s={11} c={agTextMuted} />
             </button>
           </div>
           <button onClick={() => { setInput(""); inputRef.current?.focus(); setActiveWorkspace(null); }}
-            className="relative w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[10.5px] font-medium transition-all"
-            style={{ background: "rgba(255,255,255,0.12)", color: "#fff", border: "1px solid rgba(255,255,255,0.20)" }}
-            onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.20)")}
-            onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.12)")}>
-            <span className="text-[15px] leading-none font-light text-white/80">+</span>
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[10.5px] font-medium transition-all"
+            style={{ background: dk ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.9)", color: agText, border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}
+            onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.10)" : "#fff")}
+            onMouseLeave={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.9)")}>
+            <span className="text-[15px] leading-none font-light" style={{ color: agAccent }}>+</span>
             <span className="flex-1 text-left">New task</span>
-            <span className="text-[8.5px] text-white/40">⌘ N</span>
+            <span className="text-[8.5px]" style={{ color: agTextMuted }}>⌘ N</span>
           </button>
         </div>
 
@@ -8743,29 +8737,22 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           /* ── CHAT + INPUT VIEW (no workspace) ── */
           <div className="flex flex-col h-full" onClick={() => setShowFormatMenu(false)}>
             {/* Header bar */}
-            <div className="flex-shrink-0 relative overflow-hidden"
-              style={{ background: "linear-gradient(135deg,#3b0764,#1e1b4b,#0f2167)", borderBottom: `1px solid rgba(255,255,255,0.06)` }}>
-              <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "radial-gradient(ellipse at 80% 0%, rgba(167,139,250,0.25) 0%, transparent 60%)" }} />
-              <div className="relative flex items-center gap-3 px-5 py-3.5">
-                <div className="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: "rgba(255,255,255,0.13)", border: "1px solid rgba(255,255,255,0.20)", backdropFilter: "blur(8px)" }}>
-                  <I d={ic.sparkle} s={14} c="#fff" f />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-bold text-white leading-tight">Alternus AI Agent</p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#34d399" }} />
-                    <p className="text-[8.5px] text-white/55">Active · Intelligent OS assistant · Claude Opus 4.6</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <button className="w-7 h-7 rounded-xl flex items-center justify-center transition-all"
-                    style={{ background: "rgba(255,255,255,0.10)" }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.18)")} onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.10)")}>
-                    <I d={ic.menu} s={13} c="rgba(255,255,255,0.7)" />
-                  </button>
+            <div className="flex items-center gap-3 px-5 py-3.5 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}`, background: dk ? c.surface : agCardBg }}>
+              <div className="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0"
+                style={{ background: agAccentSoft, border: `1px solid ${agAccent}22` }}>
+                <I d={ic.sparkle} s={14} c={agAccent} f />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[12px] font-bold leading-tight" style={{ color: agText }}>Alternus AI Agent</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
+                  <p className="text-[8.5px]" style={{ color: agTextMuted }}>Active · Intelligent OS assistant · Claude Opus 4.6</p>
                 </div>
               </div>
+              <button className="w-7 h-7 rounded-xl flex items-center justify-center transition-all"
+                onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <I d={ic.menu} s={13} c={agTextMuted} />
+              </button>
             </div>
 
             {/* Messages */}
