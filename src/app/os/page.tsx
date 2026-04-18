@@ -262,6 +262,11 @@ const ic = {
   users: "M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 3a4 4 0 100 8 4 4 0 000-8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75",
   fileInvoice: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M8 13h8M8 17h8M8 9h2",
   barChart: "M18 20V10M12 20V4M6 20v-6",
+  copy: "M8 4v12a2 2 0 002 2h8a2 2 0 002-2V7.242a2 2 0 00-.602-1.43L16.083 2.57A2 2 0 0014.685 2H10a2 2 0 00-2 2zM4 8v12a2 2 0 002 2h8",
+  thumbUp: "M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14zm-7 11H4a2 2 0 01-2-2v-7a2 2 0 012-2h3",
+  thumbDown: "M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10zm7-13h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17",
+  paperclip: "M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48",
+  check: "M20 6L9 17l-5-5",
 };
 
 // ━━━━ Fill Icon Paths (closed shapes for filled rendering) ━━━━━━━━━━━━━━━━━━
@@ -334,8 +339,8 @@ function TitleBar({
     justifyContent: "center",
     position: "relative",
     overflow: "hidden",
-    background: dk ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-    border: `1px solid ${dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"}`,
+    background: "transparent",
+    border: "1px solid transparent",
     transition: "all 0.22s cubic-bezier(0.4,0,0.2,1)",
     cursor: "pointer",
   };
@@ -364,8 +369,8 @@ function TitleBar({
           }}
           onMouseLeave={e => {
             const el = e.currentTarget;
-            el.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
-            el.style.borderColor = dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+            el.style.background = "transparent";
+            el.style.borderColor = "transparent";
             el.style.boxShadow = "none";
             const s = el.querySelector("circle"); if (s) s.setAttribute("stroke", iconStroke);
           }}
@@ -391,8 +396,8 @@ function TitleBar({
           }}
           onMouseLeave={e => {
             const el = e.currentTarget;
-            el.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
-            el.style.borderColor = dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+            el.style.background = "transparent";
+            el.style.borderColor = "transparent";
             el.style.boxShadow = "none";
             const s = el.querySelector("rect"); if (s) s.setAttribute("stroke", iconStroke);
           }}
@@ -417,8 +422,8 @@ function TitleBar({
           }}
           onMouseLeave={e => {
             const el = e.currentTarget;
-            el.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
-            el.style.borderColor = dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+            el.style.background = "transparent";
+            el.style.borderColor = "transparent";
             el.style.boxShadow = "none";
             const s = el.querySelector("polygon"); if (s) s.setAttribute("stroke", iconStroke);
           }}
@@ -2234,7 +2239,7 @@ function WordApp({ c }: { c: typeof palette.dark }) {
                 { label: "Fix Grammar", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Grammar check complete. 3 corrections applied:\n• \"Enem\" → \"Enim\"\n• Comma added after \"purus\"\n• Period consistency fixed"); setAiLoading(false); }, 600); }},
                 { label: "Make Shorter", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Shortened version ready. Reduced from 144 to ~80 words while keeping key points. Click 'Apply' to replace."); setAiLoading(false); }, 700); }},
                 { label: "Make Longer", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Expanded version ready. Added details and transitions. Word count increased to ~220 words. Click 'Apply' to replace."); setAiLoading(false); }, 700); }},
-                { label: "Translate", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Translation ready (Albanian):\n\nLorem ipsum → Teksti placeholder per dokumentin tuaj..."); setAiLoading(false); }, 900); }},
+                { label: "Translate", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Translation complete:\n\nThe document has been translated and is ready for review."); setAiLoading(false); }, 900); }},
                 { label: "Change Tone", action: () => { setAiLoading(true); setTimeout(() => { setAiResult("Tone options:\n• Professional\n• Casual\n• Academic\n• Creative\n\nSelect a tone to rewrite the document."); setAiLoading(false); }, 500); }},
               ].map((item, i) => (
                 <button key={i} onClick={item.action}
@@ -5750,7 +5755,7 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
 function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
   type Customer = { id: number; name: string; email: string; phone: string; status: string };
   type Transaction = { id: number; type: "income" | "expense"; amount: number; category: string; desc: string; date: string };
-  type Task = { id: number; title: string; priority: "E ulët" | "Normale" | "E lartë" | "Urgjente"; status: "Në pritje" | "Në progres" | "Përfunduar"; due: string };
+  type Task = { id: number; title: string; priority: "Low" | "Normal" | "High" | "Urgent"; status: "Pending" | "In Progress" | "Done"; due: string };
 
   const load = <T,>(key: string, def: T): T => { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; } };
   const save = <T,>(key: string, v: T) => { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} };
@@ -5763,7 +5768,7 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
   // Forms
   const [cForm, setCForm] = useState({ name: "", email: "", phone: "", status: "Aktiv" });
   const [tForm, setTForm] = useState<{ type: "income" | "expense"; amount: string; category: string; desc: string; date: string }>({ type: "income", amount: "", category: "Shitje", desc: "", date: new Date().toISOString().slice(0, 10) });
-  const [tkForm, setTkForm] = useState({ title: "", priority: "Normale" as Task["priority"], due: "" });
+  const [tkForm, setTkForm] = useState({ title: "", priority: "Normal" as Task["priority"], due: "" });
 
   const nextId = (arr: { id: number }[]) => arr.length ? Math.max(...arr.map(x => x.id)) + 1 : 1;
 
@@ -5788,11 +5793,11 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
     if (!tkForm.title.trim()) return;
     const updated = [...tasks, { id: nextId(tasks), title: tkForm.title, priority: tkForm.priority, status: "Në pritje" as Task["status"], due: tkForm.due }];
     setTasks(updated); save("bm_tasks", updated);
-    setTkForm({ title: "", priority: "Normale", due: "" });
+    setTkForm({ title: "", priority: "Normal", due: "" });
   };
   const advanceTask = (id: number) => {
-    const map: Record<string, Task["status"]> = { "Në pritje": "Në progres", "Në progres": "Përfunduar" };
-    const u = tasks.map(t => t.id === id && t.status !== "Përfunduar" ? { ...t, status: map[t.status] } : t);
+    const map: Record<string, Task["status"]> = { "Pending": "In Progress", "In Progress": "Done" };
+    const u = tasks.map(t => t.id === id && t.status !== "Done" ? { ...t, status: map[t.status] } : t);
     setTasks(u); save("bm_tasks", u);
   };
   const delTask = (id: number) => { const u = tasks.filter(x => x.id !== id); setTasks(u); save("bm_tasks", u); };
@@ -5810,8 +5815,8 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
     </button>
   );
 
-  const pColors: Record<string, string> = { "E ulët": c.textMuted, "Normale": c.accent, "E lartë": c.warning, "Urgjente": c.danger };
-  const sColors: Record<string, string> = { "Në pritje": c.textMuted, "Në progres": c.accent, "Përfunduar": c.success };
+  const pColors: Record<string, string> = { "Low": c.textMuted, "Normal": c.accent, "High": c.warning, "Urgent": c.danger };
+  const sColors: Record<string, string> = { "Pending": c.textMuted, "In Progress": c.accent, "Done": c.success };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", background: c.bg, color: c.text, fontFamily: "Segoe UI, sans-serif" }}>
@@ -5835,9 +5840,9 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
               {[
                 { label: "👥 Klientë", val: customers.length.toString(), color: c.accent },
-                { label: "💰 Të Ardhura", val: `€${income.toFixed(2)}`, color: c.success },
-                { label: "💸 Shpenzime", val: `€${expense.toFixed(2)}`, color: c.danger },
-                { label: "📊 Bilanci", val: `€${balance.toFixed(2)}`, color: balance >= 0 ? c.success : c.danger },
+                { label: "💰 Income", val: `€${income.toFixed(2)}`, color: c.success },
+                { label: "💸 Expenses", val: `€${expense.toFixed(2)}`, color: c.danger },
+                { label: "📊 Balance", val: `€${balance.toFixed(2)}`, color: balance >= 0 ? c.success : c.danger },
               ].map(({ label, val, color }) => (
                 <div key={label} style={{ background: c.surface, borderRadius: 10, padding: "12px 14px", border: `1px solid ${c.border}` }}>
                   <div style={{ fontSize: 11, color: c.textMuted, marginBottom: 4 }}>{label}</div>
@@ -5854,7 +5859,7 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
                     <span style={{ color: sColors[t.status], fontSize: 11 }}>{t.status}</span>
                   </div>
                 ))}
-                {tasks.length === 0 && <div style={{ color: c.textMuted, fontSize: 12 }}>Nuk ka detyra.</div>}
+                {tasks.length === 0 && <div style={{ color: c.textMuted, fontSize: 12 }}>No tasks yet.</div>}
               </div>
               <div style={{ background: c.surface, borderRadius: 10, padding: "12px 14px", border: `1px solid ${c.border}` }}>
                 <div style={{ fontWeight: 600, marginBottom: 8, fontSize: 12 }}>💳 Transaksionet e fundit</div>
@@ -5866,7 +5871,7 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
                     </span>
                   </div>
                 ))}
-                {transactions.length === 0 && <div style={{ color: c.textMuted, fontSize: 12 }}>Nuk ka transaksione.</div>}
+                {transactions.length === 0 && <div style={{ color: c.textMuted, fontSize: 12 }}>No transactions yet.</div>}
               </div>
             </div>
           </div>
@@ -5877,15 +5882,15 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
           <div>
             <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
               {(["name", "email", "phone"] as const).map(f => (
-                <input key={f} placeholder={{ name: "Emri *", email: "Email", phone: "Telefon" }[f]}
+                <input key={f} placeholder={{ name: "Name *", email: "Email", phone: "Phone" }[f]}
                   value={cForm[f]} onChange={e => setCForm(p => ({ ...p, [f]: e.target.value }))}
                   onKeyDown={e => e.key === "Enter" && addCustomer()}
                   style={{ flex: 1, minWidth: 100, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
               ))}
-              <button onClick={addCustomer} style={{ padding: "6px 16px", borderRadius: 8, background: c.accent, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Shto</button>
+              <button onClick={addCustomer} style={{ padding: "6px 16px", borderRadius: 8, background: c.accent, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Add</button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {customers.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>Nuk ka klientë akoma.</div>}
+              {customers.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>No customers yet.</div>}
               {customers.map(cu => (
                 <div key={cu.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: c.surface, borderRadius: 8, border: `1px solid ${c.border}` }}>
                   <span style={{ width: 28, height: 28, borderRadius: "50%", background: c.accent, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{cu.name[0]?.toUpperCase()}</span>
@@ -5905,7 +5910,7 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
         {tab === "finance" && (
           <div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 }}>
-              {[{ l: "💰 Të Ardhura", v: `€${income.toFixed(2)}`, col: c.success }, { l: "💸 Shpenzime", v: `€${expense.toFixed(2)}`, col: c.danger }, { l: "📊 Bilanci", v: `€${balance.toFixed(2)}`, col: balance >= 0 ? c.success : c.danger }].map(({ l, v, col }) => (
+              {[{ l: "💰 Income", v: `€${income.toFixed(2)}`, col: c.success }, { l: "💸 Expenses", v: `€${expense.toFixed(2)}`, col: c.danger }, { l: "📊 Balance", v: `€${balance.toFixed(2)}`, col: balance >= 0 ? c.success : c.danger }].map(({ l, v, col }) => (
                 <div key={l} style={{ background: c.surface, borderRadius: 8, padding: "10px 12px", border: `1px solid ${c.border}`, textAlign: "center" }}>
                   <div style={{ fontSize: 11, color: c.textMuted }}>{l}</div>
                   <div style={{ fontSize: 18, fontWeight: 700, color: col }}>{v}</div>
@@ -5915,21 +5920,21 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
             <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
               <select value={tForm.type} onChange={e => setTForm(p => ({ ...p, type: e.target.value as "income" | "expense" }))}
                 style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12 }}>
-                <option value="income">⬆ Të Ardhura</option>
-                <option value="expense">⬇ Shpenzim</option>
+                <option value="income">⬆ Income</option>
+                <option value="expense">⬇ Expense</option>
               </select>
-              <input placeholder="Shuma €" value={tForm.amount} onChange={e => setTForm(p => ({ ...p, amount: e.target.value }))}
+              <input placeholder="Amount €" value={tForm.amount} onChange={e => setTForm(p => ({ ...p, amount: e.target.value }))}
                 style={{ width: 90, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
-              <input placeholder="Kategoria" value={tForm.category} onChange={e => setTForm(p => ({ ...p, category: e.target.value }))}
+              <input placeholder="Category" value={tForm.category} onChange={e => setTForm(p => ({ ...p, category: e.target.value }))}
                 style={{ width: 110, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
-              <input placeholder="Përshkrimi" value={tForm.desc} onChange={e => setTForm(p => ({ ...p, desc: e.target.value }))}
+              <input placeholder="Description" value={tForm.desc} onChange={e => setTForm(p => ({ ...p, desc: e.target.value }))}
                 style={{ flex: 1, minWidth: 100, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
               <input type="date" value={tForm.date} onChange={e => setTForm(p => ({ ...p, date: e.target.value }))}
                 style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12 }} />
-              <button onClick={addTransaction} style={{ padding: "6px 16px", borderRadius: 8, background: tForm.type === "income" ? c.success : c.danger, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Shto</button>
+              <button onClick={addTransaction} style={{ padding: "6px 16px", borderRadius: 8, background: tForm.type === "income" ? c.success : c.danger, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Add</button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-              {transactions.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>Nuk ka transaksione akoma.</div>}
+              {transactions.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>No transactions yet.</div>}
               {[...transactions].reverse().map(t => (
                 <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 12px", background: c.surface, borderRadius: 8, border: `1px solid ${c.border}` }}>
                   <span style={{ fontSize: 14 }}>{t.type === "income" ? "⬆" : "⬇"}</span>
@@ -5947,26 +5952,26 @@ function BusinessManagerApp({ c }: { c: typeof palette.dark }) {
         {tab === "tasks" && (
           <div>
             <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-              <input placeholder="Titulli i detyrës *" value={tkForm.title} onChange={e => setTkForm(p => ({ ...p, title: e.target.value }))}
+              <input placeholder="Task title *" value={tkForm.title} onChange={e => setTkForm(p => ({ ...p, title: e.target.value }))}
                 onKeyDown={e => e.key === "Enter" && addTask()}
                 style={{ flex: 1, minWidth: 150, padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12, outline: "none" }} />
               <select value={tkForm.priority} onChange={e => setTkForm(p => ({ ...p, priority: e.target.value as Task["priority"] }))}
                 style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12 }}>
-                {["E ulët", "Normale", "E lartë", "Urgjente"].map(p => <option key={p}>{p}</option>)}
+                {["Low", "Normal", "High", "Urgent"].map(p => <option key={p}>{p}</option>)}
               </select>
               <input type="date" value={tkForm.due} onChange={e => setTkForm(p => ({ ...p, due: e.target.value }))}
                 style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${c.border}`, background: c.cardAlt, color: c.text, fontSize: 12 }} />
-              <button onClick={addTask} style={{ padding: "6px 16px", borderRadius: 8, background: c.accent, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Shto</button>
+              <button onClick={addTask} style={{ padding: "6px 16px", borderRadius: 8, background: c.accent, color: "#fff", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>+ Add</button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {tasks.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>Nuk ka detyra akoma.</div>}
+              {tasks.length === 0 && <div style={{ color: c.textMuted, fontSize: 13, padding: "20px 0", textAlign: "center" }}>No tasks yet.</div>}
               {tasks.map(t => (
                 <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: c.surface, borderRadius: 8, border: `1px solid ${c.border}` }}>
                   <button onClick={() => advanceTask(t.id)}
-                    style={{ width: 22, height: 22, borderRadius: "50%", border: `2px solid ${sColors[t.status]}`, background: t.status === "Përfunduar" ? sColors[t.status] : "transparent", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {t.status === "Përfunduar" && <span style={{ color: "#fff", fontSize: 10 }}>✓</span>}
+                    style={{ width: 22, height: 22, borderRadius: "50%", border: `2px solid ${sColors[t.status]}`, background: t.status === "Done" ? sColors[t.status] : "transparent", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {t.status === "Done" && <span style={{ color: "#fff", fontSize: 10 }}>✓</span>}
                   </button>
-                  <span style={{ flex: 1, fontSize: 13, textDecoration: t.status === "Përfunduar" ? "line-through" : "none", color: t.status === "Përfunduar" ? c.textMuted : c.text }}>{t.title}</span>
+                  <span style={{ flex: 1, fontSize: 13, textDecoration: t.status === "Done" ? "line-through" : "none", color: t.status === "Done" ? c.textMuted : c.text }}>{t.title}</span>
                   <span style={{ fontSize: 10, color: pColors[t.priority], background: `${pColors[t.priority]}20`, padding: "2px 8px", borderRadius: 6 }}>{t.priority}</span>
                   <span style={{ fontSize: 10, color: sColors[t.status] }}>{t.status}</span>
                   {t.due && <span style={{ fontSize: 10, color: c.textMuted }}>📅 {t.due}</span>}
@@ -6320,91 +6325,289 @@ function TasksApp({ c }: { c: typeof palette.dark }) {
     { id: 5, text: "Backup database", desc: "Run full PostgreSQL backup and verify restore procedure", priority: "low" as const, done: false, deadline: "Dec 15", tag: "Ops" },
     { id: 6, text: "Send invoice to client", desc: "Generate and send invoice #1042 for commissioned artwork", priority: "high" as const, done: true, deadline: "Done", tag: "Finance" },
   ]);
-  const [input, setInput] = useState("");
-  const [filter, setFilter] = useState<"all" | "active" | "done">("all");
+  const [input, setInput]       = useState("");
+  const [filter, setFilter]     = useState<"all" | "active" | "done">("all");
+  const [view, setView]         = useState<"list" | "board">("list");
+  const [search, setSearch]     = useState("");
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [animIn, setAnimIn]     = useState<Set<number>>(new Set());
+  const [animOut, setAnimOut]   = useState<Set<number>>(new Set());
+  const [justChecked, setJustChecked]   = useState<Set<number>>(new Set());
+  const [priorityAnim, setPriorityAnim] = useState<Set<number>>(new Set());
+
   const priorityColor = { high: c.danger, medium: c.warning, low: c.success };
   const priorityLabel = { high: "Urgent", medium: "Medium", low: "Low" };
-  const filtered = tasks.filter(t => filter === "all" ? true : filter === "done" ? t.done : !t.done);
+  const priorityNext: Record<string, "high" | "medium" | "low"> = { high: "medium", medium: "low", low: "high" };
+
+  const filtered = tasks
+    .filter(t => filter === "all" ? true : filter === "done" ? t.done : !t.done)
+    .filter(t => !search || t.text.toLowerCase().includes(search.toLowerCase()) || t.tag.toLowerCase().includes(search.toLowerCase()));
+
   const completedPct = tasks.length > 0 ? Math.round((tasks.filter(t => t.done).length / tasks.length) * 100) : 0;
+
+  // ── Smart Animate helpers ──
   const addTask = () => {
     if (!input.trim()) return;
-    setTasks(p => [...p, { id: Date.now(), text: input.trim(), desc: "", priority: "medium", done: false, deadline: "No deadline", tag: "Task" }]);
+    const newId = Date.now();
+    setTasks(p => [...p, { id: newId, text: input.trim(), desc: "", priority: "medium" as const, done: false, deadline: "No deadline", tag: "Task" }]);
+    setAnimIn(s => { const n = new Set(s); n.add(newId); return n; });
+    setTimeout(() => setAnimIn(s => { const n = new Set(s); n.delete(newId); return n; }), 480);
     setInput("");
   };
+  const deleteTask = (id: number) => {
+    setAnimOut(s => { const n = new Set(s); n.add(id); return n; });
+    setTimeout(() => {
+      setTasks(p => p.filter(t => t.id !== id));
+      setAnimOut(s => { const n = new Set(s); n.delete(id); return n; });
+    }, 300);
+  };
+  const toggleTask = (id: number) => {
+    setJustChecked(s => { const n = new Set(s); n.add(id); return n; });
+    setTimeout(() => setJustChecked(s => { const n = new Set(s); n.delete(id); return n; }), 420);
+    setTasks(p => p.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  };
+  const cyclePriority = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPriorityAnim(s => { const n = new Set(s); n.add(id); return n; });
+    setTimeout(() => setPriorityAnim(s => { const n = new Set(s); n.delete(id); return n; }), 360);
+    setTasks(p => p.map(t => t.id === id ? { ...t, priority: priorityNext[t.priority] } : t));
+  };
+
+  // Board columns
+  const boardCols = [
+    { key: "urgent",   label: "Urgent",      color: c.danger,  dot: c.danger,  tasks: tasks.filter(t => !t.done && t.priority === "high") },
+    { key: "progress", label: "In Progress", color: c.warning, dot: c.warning, tasks: tasks.filter(t => !t.done && t.priority !== "high") },
+    { key: "done",     label: "Completed",   color: c.success, dot: c.success, tasks: tasks.filter(t => t.done) },
+  ];
+
   return (
-    <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      {/* Header */}
-      <div className="px-4 pt-4 pb-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #10B981, #059669)", boxShadow: "0 3px 12px rgba(16,185,129,0.35)" }}>
-            <I d={ic.checkSquare} s={16} c="#fff" />
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: c.bg }}>
+      <style>{`
+        @keyframes task-slide-in {
+          from { opacity:0; transform:translateY(10px) scale(0.97); }
+          to   { opacity:1; transform:translateY(0) scale(1); }
+        }
+        @keyframes task-slide-out {
+          from { opacity:1; transform:translateX(0) scale(1); max-height:120px; margin-bottom:7px; }
+          to   { opacity:0; transform:translateX(38px) scale(0.94); max-height:0; margin-bottom:0; padding-top:0; padding-bottom:0; }
+        }
+        @keyframes check-pop {
+          0%  { transform:scale(1); }
+          38% { transform:scale(1.45); }
+          68% { transform:scale(0.82); }
+          100%{ transform:scale(1); }
+        }
+        @keyframes pri-flip {
+          0%  { transform:scale(1) rotate(0deg); }
+          50% { transform:scale(1.22) rotate(-10deg); }
+          100%{ transform:scale(1) rotate(0deg); }
+        }
+        @keyframes view-fade {
+          from { opacity:0; transform:translateY(6px); }
+          to   { opacity:1; transform:translateY(0); }
+        }
+        .task-new   { animation: task-slide-in 0.38s cubic-bezier(.22,.68,0,1.12) both; }
+        .task-gone  { animation: task-slide-out 0.30s cubic-bezier(.4,0,1,1) forwards; overflow:hidden; }
+        .check-anim { animation: check-pop 0.4s cubic-bezier(.22,.68,0,1.2) both; }
+        .pri-anim   { animation: pri-flip 0.34s cubic-bezier(.22,.68,0,1.2) both; }
+        .view-enter { animation: view-fade 0.2s ease both; }
+      `}</style>
+
+      {/* ── Header ── */}
+      <div style={{ padding: "13px 14px 10px", borderBottom: `1px solid ${c.border}`, flexShrink: 0 }}>
+        {/* Title row */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+          <div style={{ width: 34, height: 34, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,#10B981,#059669)", boxShadow: "0 3px 12px rgba(16,185,129,0.35)", flexShrink: 0 }}>
+            <I d={ic.checkSquare} s={15} c="#fff" />
           </div>
-          <div className="flex-1">
-            <h3 className="text-[13px] font-bold" style={{ color: c.text }}>Task Manager</h3>
-            <p className="text-[10px]" style={{ color: c.textMuted }}>Organize, prioritize, and track your workflow</p>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: c.text, lineHeight: 1.2 }}>Task Manager</p>
+            <p style={{ fontSize: 9, color: c.textMuted }}>Smart organize · prioritize · track</p>
           </div>
-          <div className="text-right">
-            <p className="text-[16px] font-bold" style={{ color: c.accent }}>{completedPct}%</p>
-            <p className="text-[8px]" style={{ color: c.textMuted }}>complete</p>
+          {/* View toggle */}
+          <div style={{ display: "flex", background: c.surface, borderRadius: 8, border: `1px solid ${c.border}`, overflow: "hidden" }}>
+            {([
+              { id: "list"  as const, d: "M4 6h16M4 11h16M4 16h16" },
+              { id: "board" as const, d: "M3 3h5v18H3zM9.5 3h5v18h-5zM16 3h5v18h-5z" },
+            ] as { id: "list" | "board"; d: string }[]).map(v => (
+              <button key={v.id} onClick={() => setView(v.id)}
+                style={{ padding: "5px 9px", background: view === v.id ? c.accent : "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.18s" }}>
+                <I d={v.d} s={13} c={view === v.id ? "#fff" : c.textMuted} />
+              </button>
+            ))}
           </div>
         </div>
+
+        {/* Stats chips */}
+        <div style={{ display: "flex", gap: 5, marginBottom: 9, alignItems: "center" }}>
+          {[
+            { label: "Urgent", count: tasks.filter(t => !t.done && t.priority === "high").length, color: c.danger },
+            { label: "Active", count: tasks.filter(t => !t.done).length, color: c.warning },
+            { label: "Done",   count: tasks.filter(t => t.done).length,  color: c.success },
+          ].map(s => (
+            <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 4, background: `${s.color}12`, borderRadius: 6, padding: "3px 7px", border: `1px solid ${s.color}28` }}>
+              <div style={{ width: 5, height: 5, borderRadius: "50%", background: s.color }} />
+              <span style={{ fontSize: 10, fontWeight: 700, color: s.color }}>{s.count}</span>
+              <span style={{ fontSize: 8, color: c.textMuted }}>{s.label}</span>
+            </div>
+          ))}
+          <div style={{ flex: 1 }} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: c.accent }}>{completedPct}%</span>
+        </div>
+
         {/* Progress bar */}
-        <div className="h-1.5 rounded-full mb-3" style={{ background: c.border }}>
-          <div className="h-full rounded-full transition-all" style={{ width: `${completedPct}%`, background: "linear-gradient(90deg, #10B981, #3B82F6)" }} />
+        <div style={{ height: 4, borderRadius: 4, background: c.border, marginBottom: 9, overflow: "hidden" }}>
+          <div style={{ height: "100%", borderRadius: 4, width: `${completedPct}%`, background: "linear-gradient(90deg,#10B981,#3B82F6)", transition: "width 0.55s cubic-bezier(.4,0,.2,1)" }} />
         </div>
+
+        {/* Search */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, background: c.surface, border: `1px solid ${c.border}`, borderRadius: 9, padding: "0 10px", height: 30, marginBottom: 7 }}>
+          <I d={ic.search} s={12} c={c.textMuted} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search tasks..."
+            style={{ background: "transparent", border: "none", outline: "none", fontSize: 11, color: c.text, flex: 1 }} />
+          {search && <button onClick={() => setSearch("")} style={{ background: "none", border: "none", cursor: "pointer", display: "flex" }}><I d={ic.close} s={11} c={c.textMuted} /></button>}
+        </div>
+
         {/* Add task */}
-        <div className="flex items-center gap-2 mb-2.5">
+        <div style={{ display: "flex", gap: 6, marginBottom: 7 }}>
           <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && addTask()}
             placeholder="What needs to be done?"
-            className="flex-1 text-[11px] px-3 py-2.5 rounded-xl outline-none"
-            style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
-          <button onClick={addTask} className="px-4 py-2.5 rounded-xl text-[11px] font-semibold transition-all hover:scale-105"
-            style={{ background: c.accent, color: "#fff", boxShadow: `0 2px 8px ${c.accent}40` }}>
+            style={{ flex: 1, fontSize: 11, padding: "0 12px", height: 32, borderRadius: 9, background: c.surface, border: `1px solid ${c.border}`, color: c.text, outline: "none" }} />
+          <button onClick={addTask}
+            style={{ width: 32, height: 32, borderRadius: 9, background: c.accent, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 2px 8px ${c.accent}40`, flexShrink: 0 }}>
             <I d={ic.plus} s={14} c="#fff" />
           </button>
         </div>
-        {/* Filters */}
-        <div className="flex items-center gap-1">
+
+        {/* Filter tabs */}
+        <div style={{ display: "flex", gap: 2 }}>
           {(["all", "active", "done"] as const).map(f => (
-            <button key={f} onClick={() => setFilter(f)} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold capitalize transition-all"
-              style={{ background: filter === f ? c.accentSoft : "transparent", color: filter === f ? c.accentText : c.textMuted }}>
-              {f} {f === "all" ? `(${tasks.length})` : f === "active" ? `(${tasks.filter(t => !t.done).length})` : `(${tasks.filter(t => t.done).length})`}
+            <button key={f} onClick={() => setFilter(f)}
+              style={{ padding: "4px 10px", borderRadius: 7, fontSize: 10, fontWeight: 600, border: "none", cursor: "pointer", background: filter === f ? c.accentSoft : "transparent", color: filter === f ? c.accentText : c.textMuted, textTransform: "capitalize", transition: "all 0.15s" }}>
+              {f} ({f === "all" ? tasks.length : f === "active" ? tasks.filter(t => !t.done).length : tasks.filter(t => t.done).length})
             </button>
           ))}
         </div>
       </div>
-      {/* Task List */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2" style={{ scrollbarWidth: "none" }}>
-        {filtered.map(task => (
-          <div key={task.id} className="flex items-start gap-3 p-3 rounded-xl transition-all"
-            style={{ background: c.surface, border: `1px solid ${task.done ? c.border : `${priorityColor[task.priority]}20`}`, opacity: task.done ? 0.55 : 1 }}>
-            <button onClick={() => setTasks(p => p.map(t => t.id === task.id ? { ...t, done: !t.done } : t))}
-              className="mt-0.5 w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center transition-all"
-              style={{ border: `2px solid ${task.done ? c.success : priorityColor[task.priority]}`, background: task.done ? c.success : "transparent" }}>
-              {task.done && <I d="M20 6L9 17l-5-5" s={11} c="#fff" w={2.5} />}
-            </button>
-            <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-semibold leading-snug" style={{ color: c.text, textDecoration: task.done ? "line-through" : "none" }}>{task.text}</p>
-              {task.desc && <p className="text-[9px] mt-0.5 leading-snug" style={{ color: c.textMuted }}>{task.desc}</p>}
-              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: `${priorityColor[task.priority]}15`, color: priorityColor[task.priority] }}>{priorityLabel[task.priority]}</span>
-                <span className="text-[8px] px-1.5 py-0.5 rounded-md" style={{ background: c.cardAlt, color: c.textMuted }}>{task.tag}</span>
-                <span className="text-[8px] flex items-center gap-1" style={{ color: c.textMuted }}><I d={ic.clock} s={8} c={c.textMuted} />{task.deadline}</span>
+
+      {/* ── Content (key=view triggers fade animation on switch) ── */}
+      <div className="view-enter" key={view} style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+
+        {/* LIST VIEW */}
+        {view === "list" && (
+          <div style={{ flex: 1, overflowY: "auto", padding: "9px 11px", scrollbarWidth: "none" }}>
+            {filtered.length === 0 && (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 100, color: c.textMuted, gap: 8 }}>
+                <I d={ic.checkSquare} s={26} c={c.border} />
+                <p style={{ fontSize: 11 }}>{search ? "No matching tasks" : "All clear!"}</p>
               </div>
+            )}
+            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+              {filtered.map(task => {
+                const isNew      = animIn.has(task.id);
+                const isGone     = animOut.has(task.id);
+                const isChecked  = justChecked.has(task.id);
+                const isPriAnim  = priorityAnim.has(task.id);
+                const isExpanded = expandedId === task.id;
+                return (
+                  <div key={task.id}
+                    className={isNew ? "task-new" : isGone ? "task-gone" : ""}
+                    onClick={() => setExpandedId(isExpanded ? null : task.id)}
+                    style={{ background: c.surface, border: `1px solid ${task.done ? c.border : `${priorityColor[task.priority]}22`}`, borderRadius: 11, padding: "9px 11px", opacity: task.done ? 0.62 : 1, transition: "opacity 0.25s, border-color 0.25s", cursor: "pointer" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
+                      {/* Checkbox */}
+                      <button
+                        className={isChecked ? "check-anim" : ""}
+                        onClick={e => { e.stopPropagation(); toggleTask(task.id); }}
+                        style={{ marginTop: 2, width: 17, height: 17, borderRadius: 5, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${task.done ? c.success : priorityColor[task.priority]}`, background: task.done ? c.success : "transparent", cursor: "pointer", transition: "background 0.2s, border-color 0.2s" }}>
+                        {task.done && <I d="M20 6L9 17l-5-5" s={9} c="#fff" w={2.5} />}
+                      </button>
+
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: 11, fontWeight: 600, color: c.text, textDecoration: task.done ? "line-through" : "none", lineHeight: 1.3, transition: "text-decoration 0.2s" }}>{task.text}</p>
+                        {/* Collapsed desc preview */}
+                        {task.desc && !isExpanded && (
+                          <p style={{ fontSize: 9, color: c.textMuted, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{task.desc}</p>
+                        )}
+                        {/* Expanded desc */}
+                        {isExpanded && task.desc && (
+                          <p style={{ fontSize: 10, color: c.textSec, marginTop: 5, lineHeight: 1.5, animation: "task-slide-in 0.2s ease both" }}>{task.desc}</p>
+                        )}
+                        {/* Badges */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 5, flexWrap: "wrap" }}>
+                          <button
+                            className={isPriAnim ? "pri-anim" : ""}
+                            onClick={e => cyclePriority(task.id, e)}
+                            title="Click to change priority"
+                            style={{ fontSize: 8, fontWeight: 700, padding: "2px 6px", borderRadius: 5, background: `${priorityColor[task.priority]}18`, color: priorityColor[task.priority], border: "none", cursor: "pointer", transition: "background 0.2s, color 0.2s" }}>
+                            {priorityLabel[task.priority]}
+                          </button>
+                          <span style={{ fontSize: 8, padding: "2px 6px", borderRadius: 5, background: c.card, color: c.textMuted }}>{task.tag}</span>
+                          <span style={{ fontSize: 8, color: c.textMuted, display: "flex", alignItems: "center", gap: 3 }}>
+                            <I d={ic.clock} s={8} c={c.textMuted} />{task.deadline}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Delete */}
+                      <button onClick={e => { e.stopPropagation(); deleteTask(task.id); }}
+                        style={{ padding: 4, borderRadius: 6, background: "none", border: "none", cursor: "pointer", color: c.textMuted, flexShrink: 0, transition: "color 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.color = c.danger; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; }}>
+                        <I d={ic.trash} s={12} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <button onClick={() => setTasks(p => p.filter(t => t.id !== task.id))} className="p-1 rounded-md flex-shrink-0 transition-colors"
-              style={{ color: c.textMuted }} onMouseEnter={e => { e.currentTarget.style.color = c.danger; }} onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; }}>
-              <I d={ic.trash} s={12} />
-            </button>
           </div>
-        ))}
+        )}
+
+        {/* BOARD VIEW */}
+        {view === "board" && (
+          <div style={{ flex: 1, display: "flex", gap: 8, padding: "10px 10px", overflowX: "auto", overflowY: "hidden" }}>
+            {boardCols.map(col => (
+              <div key={col.key} style={{ flex: 1, minWidth: 120, display: "flex", flexDirection: "column", background: c.surface, borderRadius: 11, border: `1px solid ${col.color}28`, overflow: "hidden" }}>
+                {/* Column header */}
+                <div style={{ padding: "9px 11px 8px", borderBottom: `2px solid ${col.color}38`, flexShrink: 0, display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: col.dot, flexShrink: 0 }} />
+                  <span style={{ fontSize: 10, fontWeight: 700, color: col.color, flex: 1 }}>{col.label}</span>
+                  <span style={{ fontSize: 9, fontWeight: 600, color: c.textMuted, background: c.card, borderRadius: 5, padding: "1px 6px" }}>{col.tasks.length}</span>
+                </div>
+                {/* Cards */}
+                <div style={{ flex: 1, overflowY: "auto", padding: 7, display: "flex", flexDirection: "column", gap: 6, scrollbarWidth: "none" }}>
+                  {col.tasks.length === 0 && (
+                    <div style={{ textAlign: "center", color: c.textMuted, fontSize: 9, padding: "14px 0", opacity: 0.5 }}>Empty</div>
+                  )}
+                  {col.tasks.map(task => (
+                    <div key={task.id}
+                      onClick={() => toggleTask(task.id)}
+                      style={{ background: c.card, borderRadius: 9, padding: "8px 9px", border: `1px solid ${c.border}`, cursor: "pointer", transition: "transform 0.15s, box-shadow 0.15s" }}
+                      onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.22)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}>
+                      <p style={{ fontSize: 10, fontWeight: 600, color: task.done ? c.textMuted : c.text, lineHeight: 1.35, textDecoration: task.done ? "line-through" : "none", marginBottom: 5 }}>{task.text}</p>
+                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        <span style={{ fontSize: 7, fontWeight: 700, padding: "1px 5px", borderRadius: 4, background: `${priorityColor[task.priority]}18`, color: priorityColor[task.priority] }}>{priorityLabel[task.priority]}</span>
+                        <span style={{ fontSize: 7, color: c.textMuted, marginLeft: "auto", display: "flex", alignItems: "center", gap: 2 }}><I d={ic.clock} s={7} c={c.textMuted} />{task.deadline}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-      {/* Footer */}
-      <div className="px-4 py-2.5 flex items-center justify-between flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-        <p className="text-[9px] font-medium" style={{ color: c.textMuted }}>{tasks.filter(t => t.done).length} of {tasks.length} tasks completed</p>
-        <button onClick={() => setTasks(p => p.filter(t => !t.done))} className="text-[9px] font-semibold px-2 py-1 rounded-lg transition-all"
-          style={{ color: c.danger, background: `${c.danger}08` }}
-          onMouseEnter={e => { e.currentTarget.style.background = `${c.danger}15`; }} onMouseLeave={e => { e.currentTarget.style.background = `${c.danger}08`; }}>
+
+      {/* ── Footer ── */}
+      <div style={{ padding: "7px 14px", borderTop: `1px solid ${c.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+        <p style={{ fontSize: 9, color: c.textMuted }}>{tasks.filter(t => t.done).length} of {tasks.length} completed</p>
+        <button
+          onClick={() => { tasks.filter(t => t.done).forEach(t => deleteTask(t.id)); }}
+          style={{ fontSize: 9, fontWeight: 600, padding: "4px 8px", borderRadius: 6, background: `${c.danger}0A`, color: c.danger, border: "none", cursor: "pointer", transition: "background 0.15s" }}
+          onMouseEnter={e => { e.currentTarget.style.background = `${c.danger}18`; }}
+          onMouseLeave={e => { e.currentTarget.style.background = `${c.danger}0A`; }}>
           Clear completed
         </button>
       </div>
@@ -6662,352 +6865,472 @@ function MonacoApp({ c }: { c: typeof palette.dark }) {
 // ━━━━ AI HUB APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AIHubApp({ c }: { c: typeof palette.dark }) {
   const models = [
-    { id: "claude", name: "Claude Opus", company: "Anthropic", color: "#F97316", desc: "Advanced reasoning and deep analysis", params: "2T", ctx: "200K", badge: "Flagship" },
-    { id: "gpt4", name: "GPT-4o", company: "OpenAI", color: "#10B981", desc: "Versatile general-purpose intelligence", params: "1.8T", ctx: "128K", badge: "Popular" },
-    { id: "gemini", name: "Gemini Ultra", company: "Google", color: "#3B82F6", desc: "Multimodal vision, audio and text", params: "1.5T", ctx: "1M", badge: "Multimodal" },
-    { id: "llama", name: "Llama 3.1", company: "Meta", color: "#8B5CF6", desc: "Open-source with transparent weights", params: "405B", ctx: "128K", badge: "Open Source" },
+    { id: "claude", name: "Claude Opus", company: "Anthropic", color: "#F97316", desc: "Advanced reasoning and deep analysis", params: "2T", ctx: "200K", badge: "Flagship", initials: "CO", online: true },
+    { id: "gpt4", name: "GPT-4o", company: "OpenAI", color: "#10B981", desc: "Versatile general-purpose intelligence", params: "1.8T", ctx: "128K", badge: "Popular", initials: "G4", online: true },
+    { id: "gemini", name: "Gemini Ultra", company: "Google", color: "#3B82F6", desc: "Multimodal vision, audio, and text", params: "1.5T", ctx: "1M", badge: "Multimodal", initials: "GU", online: true },
+    { id: "llama", name: "Llama 3.1", company: "Meta", color: "#8B5CF6", desc: "Open-source with transparent weights", params: "405B", ctx: "128K", badge: "Open Source", initials: "L3", online: false },
+    { id: "mistral", name: "Mistral Large", company: "Mistral AI", color: "#EC4899", desc: "Fast, European frontier model", params: "123B", ctx: "32K", badge: "Fast", initials: "ML", online: false },
+    { id: "deepseek", name: "DeepSeek R1", company: "DeepSeek", color: "#06B6D4", desc: "Reasoning-focused chain-of-thought model", params: "671B", ctx: "64K", badge: "Reasoning", initials: "DS", online: false },
   ];
   const [activeModel, setActiveModel] = useState(models[0]);
   const [msgs, setMsgs] = useState<{ role: "user" | "ai"; text: string; model?: string }[]>([
     { role: "ai", text: `Hello! I'm ${models[0].name} by ${models[0].company}. I specialize in ${models[0].desc.toLowerCase()}. How can I assist you today?`, model: models[0].name },
   ]);
   const [input, setInput] = useState("");
-  const [tab, setTab] = useState<"chat" | "models" | "capabilities" | "pipelines" | "fine-tune" | "deploy">("chat");
-  const [modelDetailId, setModelDetailId] = useState<string | null>(null);
-  const modelDetail = modelDetailId ? models.find(m => m.id === modelDetailId) : null;
+  const [navSection, setNavSection] = useState<"chats" | "models" | "marketplace" | "archive">("chats");
+  const [callActive, setCallActive] = useState(false);
+  const [micOn, setMicOn] = useState(true);
+  const [camOn, setCamOn] = useState(false);
+  const [convTab, setConvTab] = useState<"recent" | "favorite">("recent");
+  const [channel, setChannel] = useState("general");
+  const channels = [
+    { id: "general",   label: "General",       color: "#7C3AED" },
+    { id: "interview", label: "AI Interview",   color: "#3B82F6" },
+    { id: "zoom",      label: "Zoom Meeting",   color: "#10B981" },
+    { id: "seminar",   label: "Seminar",        color: "#F59E0B" },
+    { id: "team",      label: "Team Chat",      color: "#EC4899" },
+  ];
+  const hubEndRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { hubEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
 
-  const pipelines = [
-    { name: "Art Classification", status: "active", steps: ["Ingest", "Resize", "Classify", "Tag", "Store"], lastRun: "2m ago", rate: "1,240/hr" },
-    { name: "Style Transfer", status: "training", steps: ["Load", "Encode", "Transfer", "Decode", "Save"], lastRun: "18m ago", rate: "—" },
-    { name: "Price Estimation", status: "idle", steps: ["Fetch", "Normalize", "Predict", "Output"], lastRun: "2h ago", rate: "—" },
-  ];
-  const deployments = [
-    { name: "Claude Opus – Prod", endpoint: "/api/v1/chat", model: "claude", status: "active", rps: "24", p99: "320ms", uptime: "99.98%" },
-    { name: "GPT-4o – Staging", endpoint: "/api/v1/chat-stg", model: "gpt4", status: "idle", rps: "2", p99: "180ms", uptime: "99.91%" },
-    { name: "Vision Classifier", endpoint: "/api/v1/classify", model: "gemini", status: "active", rps: "88", p99: "90ms", uptime: "100%" },
-  ];
+  // Agent-style sidebar color vars (matches AlternusAgentApp exactly)
+  const dk = c.bg === "#1C1D22";
+  const agSidebarBg = dk ? c.surface : "linear-gradient(175deg,#F0EAFF 0%,#EDE8FF 40%,#EFF4FF 100%)";
+  const agBorder = dk ? c.border : "rgba(120,80,220,0.10)";
+  const agText = dk ? c.text : "#1a1525";
+  const agTextSec = dk ? c.textSec : "#5a5470";
+  const agTextMuted = dk ? c.textMuted : "#9896ab";
+  const agAccent = "#7C3AED";
+  const agAccentSoft = dk ? "rgba(124,58,237,0.14)" : "rgba(124,58,237,0.10)";
+  const agSelected = dk ? "rgba(79,142,247,0.14)" : "rgba(124,58,237,0.10)";
+
   const responses: Record<string, string[]> = {
     claude: ["I'll analyze that carefully and provide a nuanced response...", "From a reasoning perspective, this involves multiple considerations...", "Let me break this down step by step for you..."],
     gpt4: ["Great question! Here's what I think...", "I can help with that! Let me explain...", "Based on my training, here's a comprehensive answer..."],
     gemini: ["I can process both text and visual information to help...", "Using multimodal analysis, I can see that...", "Let me provide a comprehensive response with multiple perspectives..."],
     llama: ["Processing your request with open-source efficiency...", "Here's my response based on open-source training data...", "As an open model, I'll give you a transparent answer..."],
+    mistral: ["Fast analysis complete. Here's what I found...", "Running fast inference — here's the result...", "European model response: here's my structured answer..."],
+    deepseek: ["Let me think step by step through your question...", "Applying chain-of-thought reasoning to your query...", "Deep analysis complete. Here's my reasoned answer..."],
   };
   const capabilities = [
-    { icon: ic.messageCircle, title: "Natural Conversation", desc: "Context-aware dialogue with memory across sessions", color: "#3B82F6" },
-    { icon: ic.code, title: "Code Generation", desc: "Write, debug, and refactor code in 50+ languages", color: "#10B981" },
-    { icon: ic.image, title: "Image Analysis", desc: "Understand and describe visual content in detail", color: "#F59E0B" },
-    { icon: ic.fileText, title: "Document Processing", desc: "Summarize, extract, and transform documents", color: "#8B5CF6" },
-    { icon: ic.globe, title: "Research & Analysis", desc: "Deep topic research with source attribution", color: "#EC4899" },
-    { icon: ic.layers, title: "Translation", desc: "Fluent translation across 100+ language pairs", color: "#06B6D4" },
+    { icon: ic.user, title: "AI Interview", desc: "Practice job interviews with AI coaching & feedback", color: "#7C3AED" },
+    { icon: ic.film, title: "Video Meetings", desc: "Join Zoom, Teams & video conferences with AI notes", color: "#3B82F6" },
+    { icon: ic.monitor, title: "Seminars", desc: "Attend & host online seminars and webinars", color: "#10B981" },
+    { icon: ic.mail, title: "Email Assistant", desc: "Compose, reply & manage professional emails", color: "#F59E0B" },
+    { icon: ic.fileText, title: "Documents", desc: "Create & edit Word .docx study documents", color: "#EC4899" },
+    { icon: ic.bookOpen, title: "Study & Research", desc: "Deep research, notes, flashcards & study materials", color: "#06B6D4" },
+  ];
+  const communities = [
+    { id: "c1", name: "AI Researchers", members: "12.4k", color: "#7C3AED" },
+    { id: "c2", name: "LLM Builders", members: "8.9k", color: "#3B82F6" },
+    { id: "c3", name: "Prompt Engineers", members: "5.2k", color: "#10B981" },
   ];
   const send = () => {
     if (!input.trim()) return;
     const userMsg = { role: "user" as const, text: input };
-    const opts = responses[activeModel.id];
+    const opts = responses[activeModel.id] || responses.claude;
     const aiMsg = { role: "ai" as const, text: opts[Math.floor(Math.random() * opts.length)] + " " + input.toLowerCase() + ".", model: activeModel.name };
     setMsgs(p => [...p, userMsg, aiMsg]);
     setInput("");
   };
-  return (
-    <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      {/* Header */}
-      <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <div className="flex items-center gap-3 mb-2.5">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}CC)`, boxShadow: `0 3px 12px ${activeModel.color}35` }}>
-            <I d={ic.sparkle} s={16} c="#fff" f />
+  const selectModel = (m: typeof models[0]) => {
+    setActiveModel(m);
+    setMsgs([{ role: "ai", text: `Hello! I'm ${m.name} by ${m.company}. I specialize in ${m.desc.toLowerCase()}. How can I assist?`, model: m.name }]);
+    setCallActive(false);
+  };
+
+  // fullscreen voice call — no sidebars
+  if (callActive) return (
+    <div className="flex flex-col h-full" style={{ background: "#0d0d14", fontFamily: "'Segoe UI Variable','Segoe UI',system-ui,-apple-system,sans-serif" }}>
+      <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
+        <button onClick={() => setCallActive(false)} className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.7)" }}>
+          <I d={ic.chevL} s={14} c="rgba(255,255,255,0.7)" />
+          <span className="text-[10px]">Back</span>
+        </button>
+        <div className="text-center">
+          <p className="text-[11px] font-semibold text-white">{activeModel.name}</p>
+          <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.5)" }}>AI Session · {new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}</p>
+        </div>
+        <div className="flex gap-1.5">
+          <button className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}><I d={ic.user} s={12} c="white" /></button>
+          <button className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}><I d={ic.menu} s={12} c="white" /></button>
+        </div>
+      </div>
+      <div className="flex-1 flex items-center justify-center relative">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-28 h-28 rounded-full flex items-center justify-center text-4xl font-bold text-white"
+            style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}99)`, boxShadow: `0 0 60px ${activeModel.color}40` }}>
+            {activeModel.initials}
           </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="text-[13px] font-bold" style={{ color: c.text }}>AI Foundry</h3>
-              <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider" style={{ background: `${activeModel.color}15`, color: activeModel.color }}>{activeModel.badge}</span>
-            </div>
-            <p className="text-[10px]" style={{ color: c.textMuted }}>Multi-model AI workspace — Switch models, compare outputs, build with AI</p>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
-            <span className="text-[9px] font-medium" style={{ color: c.textMuted }}>Online</span>
+          <p className="text-white text-[13px] font-semibold">{activeModel.name}</p>
+          <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.5)" }}>{activeModel.company}</p>
+          <div className="flex items-center gap-1.5 mt-1">
+            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#10B981" }} />
+            <span className="text-[9px]" style={{ color: "#10B981" }}>AI Session Active</span>
           </div>
         </div>
-        {/* Tabs */}
-        <div className="flex gap-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-          {(["chat", "models", "capabilities", "pipelines", "fine-tune", "deploy"] as const).map(t => (
-            <button key={t} onClick={() => { setTab(t); setModelDetailId(null); }}
-              className="px-3 py-1.5 rounded-lg text-[10px] font-semibold capitalize transition-all flex-shrink-0"
-              style={{ background: tab === t ? `${activeModel.color}15` : "transparent", color: tab === t ? activeModel.color : c.textMuted }}>
-              {t}
+        <div className="absolute bottom-4 right-4 w-20 h-16 rounded-2xl flex items-center justify-center"
+          style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}>
+          {camOn ? <span className="text-[9px] text-white/60">Camera</span> : <I d={ic.user} s={20} c="rgba(255,255,255,0.3)" />}
+        </div>
+      </div>
+      <div className="flex items-center justify-center gap-4 py-4 flex-shrink-0">
+        {[
+          { icon: ic.monitor, color: "rgba(255,255,255,0.1)", label: "Screen", toggle: undefined as undefined | (() => void) },
+          { icon: ic.mic, color: micOn ? "rgba(255,255,255,0.1)" : "#EF4444", label: "Mic", toggle: () => setMicOn(p => !p) },
+          { icon: ic.film, color: camOn ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.06)", label: "Cam", toggle: () => setCamOn(p => !p) },
+          { icon: ic.volume, color: "rgba(255,255,255,0.1)", label: "Sound", toggle: undefined },
+          { icon: ic.power, color: "#EF4444", label: "End", toggle: () => setCallActive(false) },
+        ].map((btn, i) => (
+          <button key={i} onClick={btn.toggle} className="flex flex-col items-center gap-1" title={btn.label}>
+            <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: btn.color }}>
+              <I d={btn.icon} s={16} c="white" />
+            </div>
+            <span className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>{btn.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex h-full overflow-hidden" style={{ background: c.bg, fontFamily: "'Segoe UI Variable','Segoe UI',system-ui,-apple-system,sans-serif" }}>
+
+      {/* ── LEFT SIDEBAR (identical to AlternusAgentApp) ── */}
+      <div className="flex flex-col flex-shrink-0" style={{ width: 230, background: agSidebarBg, backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRight: `1px solid ${agBorder}` }}>
+
+        {/* Header */}
+        <div className="px-3 pt-3 pb-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}` }}>
+          <div className="flex items-center gap-2.5 mb-2.5">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: agAccentSoft, border: `1px solid ${agAccent}22` }}>
+              <I d={ic.sparkle} s={14} c={agAccent} f />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] font-bold leading-tight" style={{ color: agText }}>Alternus Agent</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
+                <p className="text-[7.5px]" style={{ color: agTextMuted }}>{activeModel.name} · Active</p>
+              </div>
+            </div>
+            <button className="w-6 h-6 rounded-lg flex items-center justify-center transition-all"
+              onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <I d={ic.settings} s={11} c={agTextMuted} />
+            </button>
+          </div>
+          {/* New task button */}
+          <button className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[10.5px] font-medium transition-all"
+            style={{ background: dk ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.9)", color: agText, border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}
+            onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.10)" : "#fff")}
+            onMouseLeave={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.9)")}>
+            <span className="text-[15px] leading-none font-light" style={{ color: agAccent }}>+</span>
+            <span className="flex-1 text-left">New task</span>
+            <span className="text-[8.5px]" style={{ color: agTextMuted }}>⌘ N</span>
+          </button>
+        </div>
+
+        {/* Nav */}
+        <div className="flex-1 overflow-y-auto px-2 py-2" style={{ scrollbarWidth: "none" }}>
+          {[
+            { id: "chats",       icon: ic.sparkle,       label: "All tasks",   badge: msgs.filter(m => m.role === "user").length },
+            { id: "models",      icon: ic.mail,          label: "Email",       badge: 0 },
+            { id: "marketplace", icon: ic.fileText,      label: "Documents",   badge: 0 },
+            { id: "archive",     icon: ic.folder,        label: "Files",       badge: 0 },
+          ].map(item => (
+            <button key={item.id} onClick={() => setNavSection(item.id as typeof navSection)}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left mb-0.5 transition-all"
+              style={{ background: navSection === item.id ? agAccentSoft : "transparent" }}
+              onMouseEnter={e => { if (navSection !== item.id) e.currentTarget.style.background = agSelected; }}
+              onMouseLeave={e => { if (navSection !== item.id) e.currentTarget.style.background = "transparent"; }}>
+              <I d={item.icon} s={13} c={navSection === item.id ? agAccent : agTextMuted} />
+              <span className="text-[10.5px] font-medium flex-1" style={{ color: navSection === item.id ? agAccent : agTextSec }}>{item.label}</span>
+              {item.badge > 0 && (
+                <span className="text-[7px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: agAccent, color: "#fff" }}>{item.badge}</span>
+              )}
+            </button>
+          ))}
+          {/* Settings row */}
+          <button className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left mb-0.5 transition-all"
+            style={{ background: "transparent" }}
+            onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <I d={ic.settings} s={13} c={agTextMuted} />
+            <span className="text-[10.5px] font-medium" style={{ color: agTextSec }}>Settings</span>
+          </button>
+
+          <div className="mx-2 my-2.5" style={{ height: 1, background: agBorder }} />
+          <p className="text-[7.5px] font-bold uppercase tracking-[0.14em] px-2 pb-1.5" style={{ color: agTextMuted }}>Quick Actions</p>
+          {[
+            { icon: ic.monitor, label: "Open Apps",  action: () => {} },
+            { icon: ic.code,    label: "Terminal",   action: () => setInput("Open the terminal") },
+            { icon: ic.image,   label: "Wallpaper",  action: () => setInput("Change wallpaper") },
+          ].map(item => (
+            <button key={item.label} onClick={item.action}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left mb-0.5 transition-all"
+              onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <I d={item.icon} s={13} c={agTextMuted} />
+              <span className="text-[10.5px] font-medium" style={{ color: agTextSec }}>{item.label}</span>
+            </button>
+          ))}
+
+          <div className="mx-2 my-2.5" style={{ height: 1, background: agBorder }} />
+          <p className="text-[7.5px] font-bold uppercase tracking-[0.14em] px-2 pb-1.5" style={{ color: agTextMuted }}>Teams</p>
+          {[
+            { name: "Design Team", members: 5, color: "#3B82F6" },
+            { name: "Dev Team", members: 8, color: "#10B981" },
+            { name: "Marketing", members: 3, color: "#F59E0B" },
+          ].map(team => (
+            <button key={team.name}
+              className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-left mb-0.5 transition-all"
+              onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <div className="w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center"
+                style={{ background: `${team.color}14`, border: `1px solid ${team.color}22` }}>
+                <I d={ic.users} s={10} c={team.color} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[9px] font-semibold truncate" style={{ color: agText }}>{team.name}</p>
+                <p className="text-[7px]" style={{ color: agTextMuted }}>{team.members} members</p>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="px-3 py-2 flex-shrink-0" style={{ borderTop: `1px solid ${agBorder}` }}>
+          <div className="flex items-center gap-2 px-2.5 py-2 rounded-xl"
+            style={{ background: dk ? "rgba(255,255,255,0.04)" : "rgba(124,58,237,0.05)", border: `1px solid ${agBorder}` }}>
+            <div className="w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: agAccentSoft }}>
+              <I d={ic.brain} s={10} c={agAccent} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[9px] font-semibold truncate" style={{ color: agText }}>{activeModel.name}</p>
+              <p className="text-[7px]" style={{ color: agTextMuted }}>{activeModel.ctx} ctx · Real OS actions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── CHAT PANEL (flex-1, middle) ── */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Chat header */}
+            <div className="flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
+              <div className="flex items-center justify-between px-5 pt-4 pb-3">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-[12px] font-bold text-white flex-shrink-0"
+                    style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}99)`, boxShadow: `0 6px 20px ${activeModel.color}45` }}>
+                    {activeModel.initials}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <p className="text-[15px] font-semibold tracking-tight" style={{ color: c.text, letterSpacing: "-0.01em" }}>{activeModel.name}</p>
+                      <span className="text-[9px] font-semibold px-2 py-0.5 rounded-md"
+                        style={{ background: `${activeModel.color}15`, color: activeModel.color, border: `1px solid ${activeModel.color}28` }}>
+                        {activeModel.badge}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: activeModel.online ? "#10B981" : c.textMuted }} />
+                      <p className="text-[10px]" style={{ color: activeModel.online ? "#10B981" : c.textMuted }}>
+                        {activeModel.online ? "Online" : "Offline"}
+                      </p>
+                      <span style={{ color: c.border }}>·</span>
+                      <p className="text-[10px]" style={{ color: c.textMuted }}>{activeModel.company}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button onClick={() => setCallActive(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-medium transition-all"
+                    style={{ background: "#10B98112", color: "#10B981", border: "1px solid #10B98122" }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "#10B98120")} onMouseLeave={e => (e.currentTarget.style.background = "#10B98112")}>
+                    <I d={ic.mic} s={12} c="#10B981" /> Voice
+                  </button>
+                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-medium transition-all"
+                    style={{ background: `${activeModel.color}12`, color: activeModel.color, border: `1px solid ${activeModel.color}22` }}
+                    onMouseEnter={e => (e.currentTarget.style.background = `${activeModel.color}20`)} onMouseLeave={e => (e.currentTarget.style.background = `${activeModel.color}12`)}>
+                    <I d={ic.monitor} s={12} c={activeModel.color} /> Share
+                  </button>
+                  <button className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <I d={ic.menu} s={14} c={c.textMuted} />
+                  </button>
+                </div>
+              </div>
+              {/* Metrics strip */}
+              <div className="flex items-center px-5 pb-3 gap-0">
+                {[
+                  { label: "Params", value: activeModel.params },
+                  { label: "Context", value: activeModel.ctx },
+                  { label: "Latency", value: "<20ms" },
+                  { label: "Provider", value: activeModel.company },
+                ].map((stat, i) => (
+                  <div key={stat.label} className="flex items-center gap-1.5">
+                    {i > 0 && <div className="w-px h-3.5 mx-3" style={{ background: c.border }} />}
+                    <span className="text-[9px]" style={{ color: c.textMuted }}>{stat.label}</span>
+                    <span className="text-[9px] font-semibold ml-1" style={{ color: c.text }}>{stat.value}</span>
+                  </div>
+                ))}
+                <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-lg" style={{ background: "#10B98110" }}>
+                  <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
+                  <span className="text-[9px] font-semibold" style={{ color: "#10B981" }}>Live</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Channel tabs */}
+            <div className="flex items-center gap-1 px-4 py-1.5 flex-shrink-0 overflow-x-auto" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+              {channels.map(ch => (
+                <button key={ch.id} onClick={() => setChannel(ch.id)}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9.5px] font-semibold whitespace-nowrap flex-shrink-0 transition-all"
+                  style={{
+                    background: channel === ch.id ? `${ch.color}14` : "transparent",
+                    color: channel === ch.id ? ch.color : c.textMuted,
+                    borderBottom: channel === ch.id ? `2px solid ${ch.color}` : "2px solid transparent",
+                  }}>
+                  <span style={{ color: channel === ch.id ? ch.color : c.border }}>#</span>
+                  {ch.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto py-5 space-y-4" style={{ scrollbarWidth: "none", paddingLeft: 124, paddingRight: 124 }}>
+              {msgs.map((m, i) => (
+                <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start gap-3"}`}>
+                  {m.role === "ai" && (
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-white mt-0.5"
+                      style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}AA)`, boxShadow: `0 3px 10px ${activeModel.color}30` }}>
+                      {activeModel.initials}
+                    </div>
+                  )}
+                  <div className="max-w-[70%]">
+                    {m.role === "ai" && (
+                      <p className="text-[9.5px] font-semibold mb-1.5 flex items-center gap-1.5" style={{ color: activeModel.color }}>
+                        {m.model}
+                        <span className="font-normal text-[9px]" style={{ color: c.textMuted }}>· just now</span>
+                      </p>
+                    )}
+                    <div className="px-4 py-3 text-[12px] leading-relaxed"
+                      style={{
+                        background: m.role === "user" ? `linear-gradient(135deg,${activeModel.color},${activeModel.color}CC)` : c.card,
+                        color: m.role === "user" ? "#fff" : c.text,
+                        border: m.role === "ai" ? `1px solid ${c.border}` : "none",
+                        borderLeft: m.role === "ai" ? `3px solid ${activeModel.color}40` : undefined,
+                        borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "4px 16px 16px 16px",
+                        boxShadow: m.role === "user" ? `0 4px 14px ${activeModel.color}30` : "0 1px 6px rgba(0,0,0,0.04)",
+                      }}>
+                      {m.text}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Capabilities grid — shown when fresh */}
+              {msgs.filter(m => m.role === "user").length === 0 && (
+                <div className="mt-3">
+                  <p className="text-[9px] font-semibold uppercase tracking-widest mb-3 px-1" style={{ color: c.textMuted, letterSpacing: "0.12em" }}>Capabilities</p>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {capabilities.map(cap => (
+                      <button key={cap.title} onClick={() => setInput(cap.title)}
+                        className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all"
+                        style={{ background: c.card, border: `1px solid ${c.border}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = `${cap.color}50`; e.currentTarget.style.boxShadow = `0 4px 16px ${cap.color}18`; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}>
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${cap.color}14` }}>
+                          <I d={cap.icon} s={16} c={cap.color} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[11px] font-semibold leading-tight" style={{ color: c.text }}>{cap.title}</p>
+                          <p className="text-[8.5px] leading-snug mt-0.5" style={{ color: c.textMuted }}>{cap.desc}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div ref={hubEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="py-4 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}`, background: c.surface, paddingLeft: 124, paddingRight: 124 }}>
+              <div className="flex items-center gap-2.5 px-4 py-3 rounded-2xl"
+                style={{ background: c.card, border: `1.5px solid ${input.trim() ? activeModel.color + "60" : c.border}`, boxShadow: input.trim() ? `0 4px 20px ${activeModel.color}18` : "0 1px 8px rgba(0,0,0,0.06)", transition: "border-color 0.15s, box-shadow 0.15s" }}>
+                <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={ic.plus} s={14} c={c.textMuted} />
+                </button>
+                <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
+                  placeholder={`Message ${activeModel.name}...`}
+                  className="flex-1 bg-transparent outline-none text-[12px]"
+                  style={{ color: c.text }} />
+                <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={ic.mic} s={13} c={c.textMuted} />
+                </button>
+                <button onClick={send}
+                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
+                  style={{ background: input.trim() ? `linear-gradient(135deg,${activeModel.color},${activeModel.color}CC)` : c.cardAlt, boxShadow: input.trim() ? `0 2px 12px ${activeModel.color}40` : "none" }}>
+                  <I d={ic.send} s={13} c={input.trim() ? "#fff" : c.textMuted} />
+                </button>
+              </div>
+            </div>
+      </div>
+
+      {/* ── RIGHT PANEL (Conversations + Model list) ── */}
+      <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{ width: 210, borderLeft: `1px solid ${c.border}`, background: c.surface }}>
+
+        {/* Conversations */}
+        <div className="px-3 pt-3 pb-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <p className="text-[10.5px] font-bold mb-2" style={{ color: c.text }}>Conversations</p>
+          <div className="flex gap-0.5 mb-2 p-0.5 rounded-lg" style={{ background: c.cardAlt }}>
+            {(["recent", "favorite"] as const).map(t => (
+              <button key={t} onClick={() => setConvTab(t)}
+                className="flex-1 py-1 rounded-md text-[9px] font-semibold capitalize transition-all"
+                style={{ background: convTab === t ? c.surface : "transparent", color: convTab === t ? c.text : c.textMuted, boxShadow: convTab === t ? "0 1px 4px rgba(0,0,0,0.08)" : "none" }}>
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
+          </div>
+          <div className="space-y-0.5">
+            {msgs.filter(m => m.role === "user").slice(-5).reverse().map((m, i) => (
+              <button key={i} onClick={() => setInput(m.text)}
+                className="w-full text-left px-2 py-1.5 rounded-lg transition-all"
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <p className="text-[9.5px] truncate" style={{ color: c.textSec }}>{m.text}</p>
+              </button>
+            ))}
+            {msgs.filter(m => m.role === "user").length === 0 && (
+              <p className="text-[9px] px-2 py-1" style={{ color: c.textMuted }}>No conversations yet</p>
+            )}
+          </div>
+        </div>
+
+        {/* Models label */}
+        <div className="px-3 pt-2 pb-1 flex-shrink-0">
+          <p className="text-[9px] font-bold uppercase tracking-[0.12em]" style={{ color: c.textMuted }}>Models</p>
+        </div>
+
+        {/* Text-only model list */}
+        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+          {models.map(m => (
+            <button key={m.id} onClick={() => selectModel(m)}
+              className="w-full flex items-center justify-between px-3 py-2 transition-all text-left relative"
+              style={{ background: activeModel.id === m.id ? `${m.color}10` : "transparent" }}
+              onMouseEnter={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = "transparent"; }}>
+              {activeModel.id === m.id && <div className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r-full" style={{ background: m.color }} />}
+              <div className="min-w-0">
+                <p className="text-[10.5px] font-semibold truncate" style={{ color: m.color }}>{m.name}</p>
+                <p className="text-[7.5px]" style={{ color: c.textMuted }}>{m.company} · {m.ctx}</p>
+              </div>
+              <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                {m.online && <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />}
+                <span className="text-[6.5px] font-semibold px-1.5 py-0.5 rounded"
+                  style={{ background: `${m.color}14`, color: m.color }}>{m.badge}</span>
+              </div>
             </button>
           ))}
         </div>
       </div>
-
-      {/* Chat Tab */}
-      {tab === "chat" && (
-        <>
-          {/* Active model bar */}
-          <div className="px-4 py-2 flex items-center gap-3 flex-shrink-0" style={{ background: `${activeModel.color}06`, borderBottom: `1px solid ${c.border}` }}>
-            <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: `${activeModel.color}15` }}>
-              <I d={ic.sparkle} s={10} c={activeModel.color} f />
-            </div>
-            <div className="flex-1">
-              <p className="text-[10px] font-semibold" style={{ color: activeModel.color }}>{activeModel.name}</p>
-              <p className="text-[8px]" style={{ color: c.textMuted }}>{activeModel.company} \u00B7 {activeModel.params} params \u00B7 {activeModel.ctx} context</p>
-            </div>
-            <div className="flex gap-1">
-              {models.filter(m => m.id !== activeModel.id).slice(0, 2).map(m => (
-                <button key={m.id} onClick={() => { setActiveModel(m); setMsgs([{ role: "ai", text: `Hello! I'm ${m.name}. I specialize in ${m.desc.toLowerCase()}. How can I help?`, model: m.name }]); }}
-                  className="w-6 h-6 rounded-md flex items-center justify-center transition-all hover:scale-110"
-                  title={`Switch to ${m.name}`}
-                  style={{ background: `${m.color}15`, border: `1px solid ${m.color}25` }}>
-                  <span className="w-2 h-2 rounded-full" style={{ background: m.color }} />
-                </button>
-              ))}
-            </div>
-          </div>
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-            {msgs.map((m, i) => (
-              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start gap-2.5"}`}>
-                {m.role === "ai" && (
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${activeModel.color}12` }}>
-                    <I d={ic.sparkle} s={12} c={activeModel.color} f />
-                  </div>
-                )}
-                <div className="max-w-[78%]">
-                  {m.role === "ai" && <p className="text-[9px] font-bold mb-1 flex items-center gap-1.5" style={{ color: activeModel.color }}>{m.model}<span className="text-[8px] font-normal" style={{ color: c.textMuted }}>\u00B7 just now</span></p>}
-                  <div className="px-3.5 py-2.5 rounded-2xl text-[11px] leading-relaxed"
-                    style={{ background: m.role === "user" ? activeModel.color : c.surface, color: m.role === "user" ? "#fff" : c.text, border: m.role === "ai" ? `1px solid ${c.border}` : "none", borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px" }}>
-                    {m.text}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* Input */}
-          <div className="px-3 py-3 flex gap-2 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-            <button className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-              <I d={ic.upload} s={14} c={c.textMuted} />
-            </button>
-            <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
-              placeholder={`Message ${activeModel.name}...`}
-              className="flex-1 text-[11px] px-3 py-2 rounded-xl outline-none"
-              style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
-            <button onClick={send} className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105"
-              style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}CC)`, boxShadow: `0 2px 8px ${activeModel.color}40` }}>
-              <I d={ic.send} s={14} c="#fff" />
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* Models Tab — list OR detail view */}
-      {tab === "models" && !modelDetail && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>Available Models · click to inspect</p>
-          {models.map(m => (
-            <button key={m.id} onClick={() => setModelDetailId(m.id)}
-              className="w-full flex items-start gap-3 p-3.5 rounded-2xl text-left transition-all"
-              style={{ background: activeModel.id === m.id ? `${m.color}10` : c.surface, border: `1px solid ${activeModel.id === m.id ? `${m.color}40` : c.border}` }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = `${m.color}40`; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = activeModel.id === m.id ? `${m.color}40` : c.border; }}>
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `linear-gradient(135deg, ${m.color}, ${m.color}BB)` }}>
-                <I d={ic.sparkle} s={16} c="#fff" f />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <p className="text-[12px] font-bold" style={{ color: c.text }}>{m.name}</p>
-                  <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: `${m.color}12`, color: m.color }}>{m.badge}</span>
-                </div>
-                <p className="text-[10px] mb-1.5" style={{ color: c.textMuted }}>{m.company} — {m.desc}</p>
-                <div className="flex gap-3">
-                  <span className="text-[9px] flex items-center gap-1" style={{ color: c.textMuted }}><I d={ic.cpu} s={9} c={c.textMuted} /> {m.params} params</span>
-                  <span className="text-[9px] flex items-center gap-1" style={{ color: c.textMuted }}><I d={ic.layers} s={9} c={c.textMuted} /> {m.ctx} context</span>
-                </div>
-              </div>
-              <I d={ic.chevR} s={11} c={c.textMuted} />
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Model Detail View (3rd level: Models → Model name → full profile) */}
-      {tab === "models" && modelDetail && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-1 mb-1">
-            <button onClick={() => setModelDetailId(null)} className="text-[10px] transition-colors" style={{ color: c.accentText }}>← Models</button>
-            <I d={ic.chevR} s={9} c={c.textMuted} />
-            <span className="text-[10px] font-semibold" style={{ color: c.text }}>{modelDetail.name}</span>
-          </div>
-          {/* Header card */}
-          <div className="p-4 rounded-2xl" style={{ background: `${modelDetail.color}10`, border: `1px solid ${modelDetail.color}30` }}>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${modelDetail.color}, ${modelDetail.color}CC)` }}>
-                <I d={ic.sparkle} s={20} c="#fff" f />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="text-[14px] font-bold" style={{ color: c.text }}>{modelDetail.name}</p>
-                  <span className="text-[8px] font-bold px-2 py-0.5 rounded-full" style={{ background: `${modelDetail.color}20`, color: modelDetail.color }}>{modelDetail.badge}</span>
-                </div>
-                <p className="text-[10px]" style={{ color: c.textMuted }}>{modelDetail.company}</p>
-              </div>
-              <button onClick={() => { setActiveModel(modelDetail); setTab("chat"); setMsgs([{ role: "ai", text: `Hello! I'm ${modelDetail.name}. ${modelDetail.desc}. Ready to assist!`, model: modelDetail.name }]); setModelDetailId(null); }}
-                className="ml-auto px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all"
-                style={{ background: modelDetail.color, color: "#fff", boxShadow: `0 2px 8px ${modelDetail.color}40` }}>
-                Use this model
-              </button>
-            </div>
-            <p className="text-[11px]" style={{ color: c.textSec }}>{modelDetail.desc}</p>
-          </div>
-          {/* Specs */}
-          <p className="text-[9px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>Specifications</p>
-          <div className="grid grid-cols-2 gap-2">
-            {[["Parameters", modelDetail.params], ["Context Window", modelDetail.ctx + " tokens"], ["Provider", modelDetail.company], ["Status", "Available"], ["Modality", "Text + Vision"], ["License", modelDetail.id === "llama" ? "Open Source" : "Commercial"]].map(([k, v], i) => (
-              <div key={i} className="p-2.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-                <p className="text-[9px]" style={{ color: c.textMuted }}>{k}</p>
-                <p className="text-[11px] font-bold" style={{ color: c.text }}>{v}</p>
-              </div>
-            ))}
-          </div>
-          {/* Benchmarks */}
-          <p className="text-[9px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>Benchmarks</p>
-          {[{ name: "MMLU", score: modelDetail.id === "claude" ? 89 : modelDetail.id === "gpt4" ? 87 : modelDetail.id === "gemini" ? 90 : 82 }, { name: "HumanEval", score: modelDetail.id === "claude" ? 84 : modelDetail.id === "gpt4" ? 90 : modelDetail.id === "gemini" ? 74 : 72 }, { name: "MT-Bench", score: modelDetail.id === "claude" ? 91 : modelDetail.id === "gpt4" ? 93 : modelDetail.id === "gemini" ? 88 : 80 }].map((b, i) => (
-            <div key={i}>
-              <div className="flex justify-between text-[9px] mb-1" style={{ color: c.textMuted }}>
-                <span>{b.name}</span><span style={{ color: modelDetail.color }}>{b.score}/100</span>
-              </div>
-              <div className="h-1.5 rounded-full" style={{ background: c.cardAlt }}>
-                <div className="h-full rounded-full transition-all" style={{ width: `${b.score}%`, background: `linear-gradient(90deg, ${modelDetail.color}80, ${modelDetail.color})` }} />
-              </div>
-            </div>
-          ))}
-          {/* Actions */}
-          <div className="flex gap-2 pt-1">
-            {["Fine-tune", "Deploy", "Compare"].map((a, i) => (
-              <button key={i} onClick={() => { if (a === "Fine-tune") setTab("fine-tune"); if (a === "Deploy") setTab("deploy"); setModelDetailId(null); }}
-                className="flex-1 py-2 rounded-xl text-[10px] font-semibold transition-all"
-                style={{ background: i === 0 ? modelDetail.color : c.cardAlt, color: i === 0 ? "#fff" : c.textSec, border: `1px solid ${i === 0 ? "transparent" : c.border}` }}>
-                {a}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Capabilities Tab */}
-      {tab === "capabilities" && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: c.textMuted }}>AI Capabilities</p>
-          <div className="grid grid-cols-2 gap-2">
-            {capabilities.map((cap, i) => (
-              <div key={i} className="p-3 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-2" style={{ background: `${cap.color}12` }}>
-                  <I d={cap.icon} s={15} c={cap.color} />
-                </div>
-                <p className="text-[11px] font-bold mb-0.5" style={{ color: c.text }}>{cap.title}</p>
-                <p className="text-[9px] leading-snug" style={{ color: c.textMuted }}>{cap.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Pipelines Tab */}
-      {tab === "pipelines" && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>AI Pipelines</p>
-            <button className="text-[9px] px-2.5 py-1 rounded-lg font-semibold" style={{ background: c.accentSoft, color: c.accentText }}>+ New</button>
-          </div>
-          {pipelines.map((p, pi) => (
-            <div key={pi} className="p-3.5 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex-1">
-                  <p className="text-[11px] font-bold" style={{ color: c.text }}>{p.name}</p>
-                  <p className="text-[9px]" style={{ color: c.textMuted }}>Last run: {p.lastRun} · {p.rate !== "—" ? p.rate + " req/hr" : "Paused"}</p>
-                </div>
-                <span className="text-[8px] px-2 py-0.5 rounded-full font-semibold" style={{ background: p.status === "active" ? "#10B98118" : p.status === "training" ? "#3B82F618" : c.cardAlt, color: p.status === "active" ? "#10B981" : p.status === "training" ? "#3B82F6" : c.textMuted }}>{p.status}</span>
-              </div>
-              {/* Step chain */}
-              <div className="flex items-center gap-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-                {p.steps.map((s, si) => (
-                  <div key={si} className="flex items-center gap-1">
-                    <div className="text-[8px] px-2 py-0.5 rounded-md font-medium flex-shrink-0" style={{ background: si === 0 && p.status === "training" ? c.accentSoft : c.cardAlt, color: si === 0 && p.status === "training" ? c.accentText : c.textSec }}>{s}</div>
-                    {si < p.steps.length - 1 && <I d={ic.chevR} s={8} c={c.textMuted} />}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Fine-tune Tab */}
-      {tab === "fine-tune" && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: c.textMuted }}>Fine-Tuning</p>
-          <div className="p-3 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-            <p className="text-[10px] font-semibold mb-2" style={{ color: c.text }}>Base Model</p>
-            <div className="flex gap-1 flex-wrap">
-              {models.map(m => (
-                <button key={m.id} onClick={() => { setActiveModel(m); }}
-                  className="px-2.5 py-1 rounded-lg text-[9px] font-semibold transition-all"
-                  style={{ background: activeModel.id === m.id ? `${m.color}20` : c.cardAlt, color: activeModel.id === m.id ? m.color : c.textMuted, border: `1px solid ${activeModel.id === m.id ? m.color + "40" : "transparent"}` }}>
-                  {m.name}
-                </button>
-              ))}
-            </div>
-          </div>
-          {[{ label: "Training Dataset", placeholder: "Upload JSONL or paste dataset URL..." }, { label: "Validation Set", placeholder: "Optional validation dataset URL..." }].map((f, i) => (
-            <div key={i} className="p-3 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-              <p className="text-[10px] font-semibold mb-1.5" style={{ color: c.text }}>{f.label}</p>
-              <input className="w-full text-[10px] px-2.5 py-1.5 rounded-lg outline-none" style={{ background: c.cardAlt, border: `1px solid ${c.border}`, color: c.text }} placeholder={f.placeholder} />
-            </div>
-          ))}
-          {[{ label: "Epochs", def: "3" }, { label: "Learning Rate", def: "1e-5" }, { label: "Batch Size", def: "8" }, { label: "Max Seq Length", def: "2048" }].map((f, i) => (
-            <div key={i} className="flex items-center justify-between px-3 py-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-              <span className="text-[10px]" style={{ color: c.textSec }}>{f.label}</span>
-              <input className="w-20 text-[10px] text-right px-2 py-0.5 rounded-md outline-none" style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} defaultValue={f.def} />
-            </div>
-          ))}
-          <button className="w-full py-2 rounded-xl text-[11px] font-bold transition-all" style={{ background: c.accent, color: "#fff", boxShadow: `0 2px 8px ${c.accent}40` }}>Start Fine-Tuning Job</button>
-        </div>
-      )}
-
-      {/* Deploy Tab */}
-      {tab === "deploy" && (
-        <div className="flex-1 overflow-y-auto p-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>Deployments</p>
-            <button className="text-[9px] px-2.5 py-1 rounded-lg font-semibold" style={{ background: c.accentSoft, color: c.accentText }}>+ Deploy</button>
-          </div>
-          {deployments.map((d, di) => {
-            const m = models.find(mx => mx.id === d.model)!;
-            return (
-              <div key={di} className="p-3.5 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-                <div className="flex items-start gap-2 mb-2">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${m.color}15` }}>
-                    <I d={ic.sparkle} s={11} c={m.color} f />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-bold truncate" style={{ color: c.text }}>{d.name}</p>
-                    <p className="font-mono text-[9px] truncate" style={{ color: c.textMuted }}>{d.endpoint}</p>
-                  </div>
-                  <span className="text-[8px] px-2 py-0.5 rounded-full font-semibold" style={{ background: d.status === "active" ? "#10B98118" : c.cardAlt, color: d.status === "active" ? "#10B981" : c.textMuted }}>{d.status}</span>
-                </div>
-                <div className="flex gap-3">
-                  {[["RPS", d.rps], ["P99", d.p99], ["Uptime", d.uptime]].map(([k, v], i) => (
-                    <div key={i}>
-                      <p className="text-[8px]" style={{ color: c.textMuted }}>{k}</p>
-                      <p className="text-[10px] font-bold" style={{ color: c.text }}>{v}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }
@@ -7089,87 +7412,208 @@ function ImageGenApp({ c }: { c: typeof palette.dark }) {
 
 // ━━━━ AI VOICE APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AIVoiceApp({ c }: { c: typeof palette.dark }) {
-  const [mode, setMode] = useState<"stt" | "tts">("stt");
   const [listening, setListening] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const [ttsText, setTtsText] = useState("Type something and I'll speak it aloud.");
-  const [voice, setVoice] = useState("Aria");
   const [speaking, setSpeaking] = useState(false);
-  const voices = ["Aria", "Nova", "Echo", "Onyx", "Shimmer", "Fable"];
-  const mockTranscripts = [
-    "Open the gallery application and show me the latest uploads.",
-    "Create a new task: Review artist applications by Friday.",
-    "What is the weather forecast for tomorrow in New York?",
-    "Send an email to Sarah Mitchell about her recent submission.",
-  ];
-  const toggleListen = () => {
-    setListening(p => !p);
-    if (!listening) {
-      setTimeout(() => {
-        setTranscript(mockTranscripts[Math.floor(Math.random() * mockTranscripts.length)]);
-        setListening(false);
-      }, 2500);
+  const [transcript, setTranscript] = useState("");
+  const [answer, setAnswer] = useState<{ text: string; icon: string; color: string } | null>(null);
+  const [error, setError] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const transcriptRef = useRef("");
+  const bars = Array.from({ length: 22 }, (_, i) => i);
+
+  const getOsAnswer = (q: string): { text: string; icon: string; color: string } => {
+    const lower = q.toLowerCase();
+    const now = new Date();
+    if (/\btime\b|clock|what time|current time/.test(lower))
+      return { text: now.toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" }), icon: ic.clock, color: "#7C3AED" };
+    if (/\bdate\b|today|which day|what day|what's today/.test(lower))
+      return { text: now.toLocaleDateString("en", { weekday: "long", year: "numeric", month: "long", day: "numeric" }), icon: ic.calendar, color: "#3B82F6" };
+    if (/\byear\b|which year|current year/.test(lower))
+      return { text: `Year ${now.getFullYear()}`, icon: ic.calendar, color: "#10B981" };
+    if (/\bmonth\b|what month|current month/.test(lower))
+      return { text: now.toLocaleDateString("en", { month: "long" }), icon: ic.calendar, color: "#F59E0B" };
+    if (/battery|charge/.test(lower))
+      return { text: "Battery info requires OS permission.", icon: ic.battery, color: "#EC4899" };
+    if (/\bos\b|system|version|alternus/.test(lower))
+      return { text: "Alternus OS v2.0 · AlternusCore 6.2", icon: ic.monitor, color: "#06B6D4" };
+    if (/resolution|screen size|display/.test(lower))
+      return { text: `${window.innerWidth} × ${window.innerHeight} px`, icon: ic.monitor, color: "#8B5CF6" };
+    if (/hello|hi there|hey/.test(lower)) {
+      const hr = now.getHours();
+      const greet = hr < 12 ? "Good morning" : hr < 18 ? "Good afternoon" : "Good evening";
+      return { text: `${greet}! I'm your Alternus AI Voice assistant.`, icon: ic.sparkle, color: "#7C3AED" };
     }
+    return { text: `I heard: "${q}". Try asking: time, date, OS version, or screen resolution.`, icon: ic.brain, color: c.accent };
   };
-  const speak = () => { setSpeaking(true); setTimeout(() => setSpeaking(false), 2000); };
-  const bars = Array.from({ length: 20 }, (_, i) => i);
+
+  const speakText = (text: string) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = "en-US";
+    utt.rate = 1.05;
+    utt.pitch = 1;
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v => v.name.includes("Microsoft") || v.name.includes("Google") || v.lang === "en-US");
+    if (preferred) utt.voice = preferred;
+    setSpeaking(true);
+    utt.onend = () => setSpeaking(false);
+    utt.onerror = () => setSpeaking(false);
+    window.speechSynthesis.speak(utt);
+  };
+
+  const startListening = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const win = window as any;
+    const SR = win.SpeechRecognition || win.webkitSpeechRecognition;
+    if (!SR) { setError("Speech recognition not supported in this browser."); return; }
+    setError("");
+    setAnswer(null);
+    setTranscript("");
+    const rec = new SR();
+    rec.lang = "en-US";
+    rec.interimResults = true;
+    rec.maxAlternatives = 1;
+    recognitionRef.current = rec;
+    transcriptRef.current = "";
+    rec.onstart = () => setListening(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onresult = (e: any) => {
+      const t = Array.from(e.results as ArrayLike<SpeechRecognitionResult>).map(r => r[0].transcript).join("");
+      transcriptRef.current = t;
+      setTranscript(t);
+    };
+    rec.onend = () => {
+      setListening(false);
+      if (transcriptRef.current.trim()) {
+        const ans = getOsAnswer(transcriptRef.current);
+        setAnswer(ans);
+        speakText(ans.text);
+      }
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onerror = (e: any) => {
+      setListening(false);
+      if (e.error === "not-allowed" || e.error === "permission-denied") {
+        setError("Microphone access denied. Click the lock icon in your browser address bar → allow Microphone, then try again.");
+      } else if (e.error !== "no-speech") {
+        setError(`Mic error: ${e.error}`);
+      }
+    };
+    rec.start();
+  };
+
+  const stopListening = () => {
+    recognitionRef.current?.stop();
+  };
+
+  const suggestions = ["What time is it?", "What's today's date?", "What year is it?", "OS version?", "Screen resolution?"];
+
+  const handleSuggestion = (s: string) => {
+    setTranscript(s);
+    setAnswer(null);
+    const ans = getOsAnswer(s);
+    setAnswer(ans);
+    speakText(ans.text);
+  };
+
   return (
-    <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      <div className="flex flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        {[{ id: "stt", label: "🎤 Speech → Text" }, { id: "tts", label: "🔊 Text → Speech" }].map(m => (
-          <button key={m.id} onClick={() => setMode(m.id as "stt" | "tts")}
-            className="flex-1 py-2.5 text-[11px] font-medium transition-colors"
-            style={{ background: mode === m.id ? c.surface : "transparent", color: mode === m.id ? c.text : c.textMuted, borderBottom: mode === m.id ? `2px solid ${c.accent}` : "2px solid transparent" }}>
-            {m.label}
-          </button>
-        ))}
+    <div className="flex flex-col h-full" style={{ background: c.bg, fontFamily: "'Segoe UI Variable','Segoe UI',system-ui,sans-serif" }}>
+      {/* Header */}
+      <div className="flex items-center gap-2 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: c.accentSoft }}>
+          <I d={ic.mic} s={13} c={c.accent} />
+        </div>
+        <div>
+          <p className="text-[12px] font-bold" style={{ color: c.text }}>AI Voice Assistant</p>
+          <p className="text-[9px]" style={{ color: c.textMuted }}>Speak naturally — get instant answers</p>
+        </div>
+        {speaking && (
+          <div className="ml-auto flex items-center gap-1 px-2 py-1 rounded-full" style={{ background: "#7C3AED18" }}>
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#7C3AED" }} />
+            <span className="text-[9px] font-medium" style={{ color: "#7C3AED" }}>Speaking</span>
+          </div>
+        )}
       </div>
-      {mode === "stt" ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-6 gap-6">
-          <button onClick={toggleListen}
-            className="w-24 h-24 rounded-full flex items-center justify-center transition-all"
-            style={{ background: listening ? `${c.danger}20` : c.accentSoft, border: `2px solid ${listening ? c.danger : c.accent}`, boxShadow: listening ? `0 0 0 8px ${c.danger}15` : "none" }}>
-            <I d={ic.mic} s={36} c={listening ? c.danger : c.accent} />
-          </button>
-          {/* Waveform */}
-          <div className="flex items-center gap-0.5 h-10">
-            {bars.map(i => (
-              <div key={i} className="w-1 rounded-full transition-all"
-                style={{ height: listening ? `${Math.random() * 100}%` : "15%", background: listening ? c.danger : c.border, animation: listening ? `pulse ${0.3 + i * 0.05}s ease-in-out infinite alternate` : "none" }} />
+
+      <div className="flex-1 flex flex-col items-center px-5 py-4 gap-4 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+        {/* Mic button */}
+        <button
+          onClick={listening ? stopListening : startListening}
+          className="w-24 h-24 rounded-full flex items-center justify-center transition-all mt-2 active:scale-95"
+          style={{
+            background: listening ? `${c.danger}14` : c.accentSoft,
+            border: `2.5px solid ${listening ? c.danger : c.accent}`,
+            boxShadow: listening
+              ? `0 0 0 12px ${c.danger}10, 0 0 0 24px ${c.danger}06`
+              : `0 0 0 8px ${c.accent}10`,
+          }}>
+          <I d={ic.mic} s={36} c={listening ? c.danger : c.accent} />
+        </button>
+
+        {/* Waveform */}
+        <div className="flex items-center gap-0.5 h-10 w-full justify-center">
+          {bars.map(i => (
+            <div key={i} className="w-1 rounded-full"
+              style={{
+                height: (listening || speaking) ? `${15 + Math.abs(Math.sin(i * 0.7 + Date.now() * 0.001)) * 75}%` : "10%",
+                background: listening ? c.danger : speaking ? c.accent : c.border,
+                transition: `height ${listening || speaking ? "0.08" : "0.3"}s ease ${i * 0.015}s`,
+              }} />
+          ))}
+        </div>
+
+        <p className="text-[11px] font-semibold text-center" style={{ color: c.textSec }}>
+          {listening ? "Listening... speak now" : speaking ? "Speaking response..." : "Tap the mic and ask anything"}
+        </p>
+
+        {/* Transcript */}
+        {transcript && (
+          <div className="w-full px-3 py-2 rounded-xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
+            <p className="text-[9px] font-semibold uppercase tracking-wide mb-0.5" style={{ color: c.textMuted }}>You said</p>
+            <p className="text-[11px] italic" style={{ color: c.text }}>&ldquo;{transcript}&rdquo;</p>
+          </div>
+        )}
+
+        {/* Error */}
+        {error && <p className="text-[10px] text-center px-3 py-2 rounded-xl w-full" style={{ color: c.danger, background: `${c.danger}10` }}>{error}</p>}
+
+        {/* Answer card */}
+        {answer && (
+          <div className="w-full rounded-2xl p-4 flex items-start gap-3"
+            style={{ background: `${answer.color}10`, border: `1.5px solid ${answer.color}30` }}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: `${answer.color}20` }}>
+              <I d={answer.icon} s={16} c={answer.color} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[9px] font-semibold uppercase tracking-wide mb-1" style={{ color: answer.color }}>Answer</p>
+              <p className="text-[15px] font-bold leading-snug" style={{ color: c.text }}>{answer.text}</p>
+              <button onClick={() => speakText(answer.text)} className="flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full text-[9px]"
+                style={{ background: `${answer.color}15`, color: answer.color }}>
+                <I d={ic.volume} s={9} c={answer.color} /> Repeat
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Suggestions */}
+        <div className="w-full">
+          <p className="text-[9px] font-semibold uppercase tracking-wide mb-2" style={{ color: c.textMuted }}>Try asking</p>
+          <div className="flex flex-wrap gap-1.5">
+            {suggestions.map(s => (
+              <button key={s} onClick={() => handleSuggestion(s)}
+                className="px-2.5 py-1 rounded-full text-[9.5px] transition-all"
+                style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = c.accent)}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = c.border)}>
+                {s}
+              </button>
             ))}
           </div>
-          <p className="text-[11px] font-medium" style={{ color: c.textSec }}>{listening ? "Listening..." : "Tap to speak"}</p>
-          {transcript && (
-            <div className="w-full p-3 rounded-xl text-[11px] leading-relaxed" style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }}>
-              &ldquo;{transcript}&rdquo;
-            </div>
-          )}
         </div>
-      ) : (
-        <div className="flex-1 flex flex-col p-4 gap-4">
-          <div>
-            <p className="text-[10px] font-semibold mb-1.5" style={{ color: c.textMuted }}>Voice</p>
-            <div className="flex flex-wrap gap-1.5">
-              {voices.map(v => (
-                <button key={v} onClick={() => setVoice(v)}
-                  className="px-3 py-1 rounded-full text-[10px] transition-colors"
-                  style={{ background: voice === v ? c.accentSoft : c.surface, color: voice === v ? c.accentText : c.textMuted, border: `1px solid ${voice === v ? c.accent : c.border}` }}>
-                  {v}
-                </button>
-              ))}
-            </div>
-          </div>
-          <textarea value={ttsText} onChange={e => setTtsText(e.target.value)}
-            rows={5} className="flex-1 text-[11px] px-3 py-2 rounded-xl outline-none resize-none"
-            style={{ background: c.surface, border: `1px solid ${c.border}`, color: c.text }} />
-          <button onClick={speak} disabled={speaking}
-            className="py-2.5 rounded-xl text-[12px] font-semibold flex items-center justify-center gap-2"
-            style={{ background: speaking ? c.cardAlt : c.accent, color: speaking ? c.textMuted : "#fff" }}>
-            <I d={ic.volume} s={16} c={speaking ? c.textMuted : "#fff"} />
-            {speaking ? "Speaking..." : `Speak as ${voice}`}
-          </button>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -7939,9 +8383,9 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
     // Show thinking steps immediately
     const steps: AgentStep[] = [
-      { label: "Po analizoj kërkesën...", status: "running" },
-      { label: "Po planifikoj veprimet", status: "pending" },
-      { label: "Po ekzekutoj", status: "pending" },
+      { label: "Analyzing request...", status: "running" },
+      { label: "Planning actions", status: "pending" },
+      { label: "Executing", status: "pending" },
     ];
 
     const agentMsg: AgentMessage = { id: msgId, role: "agent", timestamp: new Date(), text: "", steps };
@@ -8031,7 +8475,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
       setMsgs(prev => prev.map(m =>
         m.id === msgId ? {
           ...m,
-          text: "Ndodhi një gabim gjatë procesimit të kërkesës. Ju lutemi provoni përsëri.",
+          text: "An error occurred while processing your request. Please try again.",
           steps: undefined,
         } : m
       ));
@@ -8053,231 +8497,725 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
     pending: c.textMuted, running: c.accent, done: c.success, error: c.danger,
   };
 
+  // ── New state for redesigned UI ────────────────────────────
+  const [showFormatMenu, setShowFormatMenu] = useState(false);
+  const [formatType, setFormatType] = useState("Text");
+  const [toField, setToField] = useState("team@alternusart.com");
+  const [subjectField, setSubjectField] = useState("");
+  const [editContent, setEditContent] = useState("");
+
+  // When workspace changes, populate editable content
+  useEffect(() => {
+    if (activeWorkspace) {
+      setEditContent(activeWorkspace.content);
+      if (activeWorkspace.type === "email") {
+        const lines = activeWorkspace.content.split("\n");
+        const subjLine = lines.find(l => l.startsWith("Subject:"));
+        if (subjLine) setSubjectField(subjLine.replace("Subject:", "").trim());
+      }
+    }
+  }, [activeWorkspace]);
+
+  const dk = mode === "dark";
+  const agBg = dk ? c.bg : "#F7F5FF";
+  const agSidebarBg = dk ? c.surface : "linear-gradient(175deg,#F0EAFF 0%,#EDE8FF 40%,#EFF4FF 100%)";
+  const agCardBg = dk ? c.card : "#FFFFFF";
+  const agBorder = dk ? c.border : "rgba(120,80,220,0.10)";
+  const agText = dk ? c.text : "#1a1525";
+  const agTextSec = dk ? c.textSec : "#5a5470";
+  const agTextMuted = dk ? c.textMuted : "#9896ab";
+  const agAccent = "#7C3AED";
+  const agAccentSoft = dk ? "rgba(124,58,237,0.14)" : "rgba(124,58,237,0.10)";
+  const agSelected = dk ? "rgba(79,142,247,0.14)" : "rgba(124,58,237,0.10)";
+
+  // Format menu items
+  const formatItems = [
+    { id: "Text", label: "Text", shortcut: "" },
+    { id: "H1", label: "Heading 1", shortcut: "H₁" },
+    { id: "H2", label: "Heading 2", shortcut: "H₂" },
+    { id: "H3", label: "Heading 3", shortcut: "H₃" },
+    { id: "bullet", label: "Bulleted list", shortcut: "≡" },
+    { id: "numbered", label: "Numbered list", shortcut: "#" },
+    { id: "image", label: "Image", shortcut: "🖼" },
+    { id: "attach", label: "Attachment", shortcut: "📎" },
+  ];
+
+  // Thread items from messages for sidebar
+  const threadItems = msgs.filter(m => m.id !== "welcome").slice(-12).reverse();
+
+  // Static inbox groups for sidebar (Image #4 style)
+  const inboxGroups = [
+    {
+      id: "projects", label: "Projects", iconBg: "#5B6CF9", iconChar: "P",
+      threads: [
+        { id: "t1", sender: "Linda", tag: "[main]", preview: "Needs a review before...", avatar: "L", avatarBg: "#F97316" },
+        { id: "t2", sender: "Newsletter", tag: "", preview: "", avatar: "N", avatarBg: "#10B981", isGroup: true, children: [
+          { id: "t2a", sender: "Linda", tag: "", preview: "Linear auto-closed...", avatar: "L", avatarBg: "#F97316" },
+          { id: "t2b", sender: "Linda", tag: "[main]", preview: "Needs a hover effect", avatar: "L", avatarBg: "#F97316" },
+        ]},
+      ],
+    },
+    {
+      id: "design", label: "Design", iconBg: "#0EA5E9", iconChar: "D",
+      threads: [],
+    },
+    {
+      id: "team", label: "My team", iconBg: "#6B7280", iconChar: "T",
+      threads: [
+        { id: "t3", sender: "Necati, João, Me", tag: "", preview: "Hello, what's the update?", avatar: "N", avatarBg: "#7C3AED" },
+        { id: "t4", sender: "Necati, Batu, Me", tag: "", preview: "UI feedback from client", avatar: "N", avatarBg: "#7C3AED" },
+      ],
+    },
+  ];
+
   return (
-    <div className="flex h-full overflow-hidden" style={{ background: c.bg, fontFamily: "'Inter', sans-serif" }}>
-      {/* ── Left: Chat panel ── */}
-      <div className="flex flex-col" style={{ width: 340, borderRight: `1px solid ${c.border}`, flexShrink: 0 }}>
+    <div className="flex h-full overflow-hidden" style={{ background: agBg, fontFamily: "'Segoe UI Variable','Segoe UI',system-ui,-apple-system,sans-serif" }}>
+      {/* ── LEFT SIDEBAR ─────────────────────────────────────── */}
+      <div className="flex flex-col flex-shrink-0" style={{ width: 230, background: agSidebarBg, backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRight: `1px solid ${agBorder}` }}>
+
         {/* Header */}
-        <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, #7C3AED, #4F8EF7)`, boxShadow: "0 3px 12px rgba(124,58,237,0.35)" }}>
-              <I d={ic.sparkle} s={18} c="#fff" f />
+        <div className="px-3 pt-3 pb-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}` }}>
+          <div className="flex items-center gap-2.5 mb-2.5">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: agAccentSoft, border: `1px solid ${agAccent}22` }}>
+              <I d={ic.sparkle} s={14} c={agAccent} f />
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <p className="text-[13px] font-bold" style={{ color: c.text }}>Alternus AI Agent</p>
-                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: "#7C3AED18", color: "#7C3AED" }}>AGENT</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full" style={{ background: c.success }} />
-                <p className="text-[9px]" style={{ color: c.textMuted }}>Online · Autonomous · Full OS Access</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] font-bold leading-tight" style={{ color: agText }}>Alternus Agent</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
+                <p className="text-[7.5px]" style={{ color: agTextMuted }}>Claude Opus 4.6 · Active</p>
               </div>
             </div>
-          </div>
-          {/* Capability filter */}
-          <div className="flex gap-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-            {(["all", "files", "email", "docs", "settings"] as const).map(cap => (
-              <button key={cap} onClick={() => setAgentCapability(cap)}
-                className="px-2.5 py-1 rounded-lg text-[9px] font-semibold capitalize flex-shrink-0 transition-all"
-                style={{ background: agentCapability === cap ? "#7C3AED18" : "transparent", color: agentCapability === cap ? "#7C3AED" : c.textMuted, border: agentCapability === cap ? "1px solid #7C3AED30" : "1px solid transparent" }}>
-                {cap === "all" ? "⚡ All" : cap === "files" ? "📂 Files" : cap === "email" ? "📧 Email" : cap === "docs" ? "📄 Docs" : "⚙️ Settings"}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3" style={{ scrollbarWidth: "none" }}>
-          {msgs.map(m => (
-            <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "gap-2"}`}>
-              {m.role === "agent" && (
-                <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "linear-gradient(135deg, #7C3AED, #4F8EF7)" }}>
-                  <I d={ic.sparkle} s={11} c="#fff" f />
-                </div>
-              )}
-              <div style={{ maxWidth: "85%" }}>
-                {/* Steps */}
-                {m.steps && m.steps.length > 0 && (
-                  <div className="mb-1.5 p-2.5 rounded-xl space-y-1" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-                    {m.steps.map((s, si) => (
-                      <div key={si} className="flex items-center gap-2">
-                        <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: statusColors[s.status] + "20" }}>
-                          {s.status === "done" ? (
-                            <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke={c.success} strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
-                          ) : s.status === "running" ? (
-                            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: c.accent }} />
-                          ) : s.status === "error" ? (
-                            <div className="w-1.5 h-1.5 rounded-full" style={{ background: c.danger }} />
-                          ) : (
-                            <div className="w-1 h-1 rounded-full" style={{ background: c.textMuted }} />
-                          )}
-                        </div>
-                        <span className="text-[9px]" style={{ color: s.status === "done" ? c.textSec : s.status === "running" ? c.accentText : c.textMuted }}>{s.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {/* Message bubble */}
-                <div className="px-3 py-2 rounded-2xl text-[11px] leading-relaxed" style={{
-                  background: m.role === "user" ? `linear-gradient(135deg, #7C3AED, #4F8EF7)` : c.surface,
-                  color: m.role === "user" ? "#fff" : c.textSec,
-                  border: m.role === "agent" ? `1px solid ${c.border}` : "none",
-                  whiteSpace: "pre-line",
-                }}>
-                  <AIFormattedText text={m.text} c={c} />
-                </div>
-                {/* Workspace preview link */}
-                {m.workspace && (
-                  <button onClick={() => setActiveWorkspace(m.workspace!)}
-                    className="mt-1 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9px] font-medium w-full transition-all"
-                    style={{ background: c.cardAlt, color: c.accentText, border: `1px solid ${c.border}` }}>
-                    <I d={ic.layers} s={10} c={c.accentText} />
-                    {m.workspace.title}
-                    <span className="ml-auto" style={{ color: c.textMuted }}>→</span>
-                  </button>
-                )}
-                <p className="text-[8px] mt-0.5 px-1" style={{ color: c.textMuted }}>
-                  {m.timestamp.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
-                </p>
-              </div>
-            </div>
-          ))}
-          {isThinking && (
-            <div className="flex gap-2">
-              <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #7C3AED, #4F8EF7)" }}>
-                <I d={ic.sparkle} s={11} c="#fff" f />
-              </div>
-              <div className="px-3 py-2 rounded-2xl flex gap-1 items-center" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-                {[0, 1, 2].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: c.textMuted, animationDelay: `${i * 0.15}s` }} />)}
-              </div>
-            </div>
-          )}
-          <div ref={endRef} />
-        </div>
-
-        {/* Quick actions */}
-        <div className="flex-shrink-0 px-3 pb-2" style={{ borderTop: `1px solid ${c.border}` }}>
-          <div className="pt-2 flex flex-wrap gap-1">
-            {QUICK_ACTIONS.filter(qa => agentCapability === "all" || (agentCapability === "email" && qa.label.includes("Email")) || (agentCapability === "docs" && qa.label.includes("Document")) || (agentCapability === "files" && qa.label.includes("Files")) || (agentCapability === "settings" && (qa.label.includes("Mode") || qa.label.includes("Wallpaper")))).map(qa => (
-              <button key={qa.label} onClick={() => send(qa.task)}
-                className="px-2 py-1 rounded-lg text-[9px] font-medium transition-all flex-shrink-0"
-                style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#7C3AED50"; e.currentTarget.style.color = "#7C3AED"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}>
-                {qa.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Input */}
-        <div className="flex-shrink-0 px-3 pb-3 pt-2">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-2xl" style={{ background: c.surface, border: `1px solid ${c.border}` }}>
-            <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
-              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-              placeholder="Type a task for the agent..." disabled={isThinking}
-              className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: c.text }} />
-            <button onClick={() => send()} disabled={isThinking || !input.trim()}
-              className="w-7 h-7 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
-              style={{ background: input.trim() && !isThinking ? "linear-gradient(135deg, #7C3AED, #4F8EF7)" : c.cardAlt, boxShadow: input.trim() && !isThinking ? "0 2px 8px rgba(124,58,237,0.4)" : "none" }}>
-              <I d={ic.send} s={12} c={input.trim() && !isThinking ? "#fff" : c.textMuted} />
+            <button className="w-6 h-6 rounded-lg flex items-center justify-center transition-all"
+              onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <I d={ic.settings} s={11} c={agTextMuted} />
             </button>
           </div>
-          <p className="text-[8px] text-center mt-1" style={{ color: c.textMuted }}>Enter → send · Shift+Enter → new line</p>
+          <button onClick={() => { setInput(""); inputRef.current?.focus(); setActiveWorkspace(null); }}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[10.5px] font-medium transition-all"
+            style={{ background: dk ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.9)", color: agText, border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}
+            onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.10)" : "#fff")}
+            onMouseLeave={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.9)")}>
+            <span className="text-[15px] leading-none font-light" style={{ color: agAccent }}>+</span>
+            <span className="flex-1 text-left">New task</span>
+            <span className="text-[8.5px]" style={{ color: agTextMuted }}>⌘ N</span>
+          </button>
+        </div>
+
+        {/* Scrollable nav */}
+        <div className="flex-1 overflow-y-auto px-2 py-2" style={{ scrollbarWidth: "none" }}>
+
+          {/* Primary capability nav */}
+          {[
+            { id: "all",      icon: ic.sparkle,  label: "All tasks",  badge: msgs.filter(m => m.role === "user").length },
+            { id: "email",    icon: ic.mail,     label: "Email",      badge: 0 },
+            { id: "docs",     icon: ic.fileText, label: "Documents",  badge: 0 },
+            { id: "files",    icon: ic.folder,   label: "Files",      badge: 0 },
+            { id: "settings", icon: ic.settings, label: "Settings",   badge: 0 },
+          ].map(item => (
+            <button key={item.id} onClick={() => setAgentCapability(item.id as typeof agentCapability)}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left mb-0.5 transition-all"
+              style={{ background: agentCapability === item.id ? agAccentSoft : "transparent" }}
+              onMouseEnter={e => { if (agentCapability !== item.id) e.currentTarget.style.background = agSelected; }}
+              onMouseLeave={e => { if (agentCapability !== item.id) e.currentTarget.style.background = "transparent"; }}>
+              <I d={item.icon} s={13} c={agentCapability === item.id ? agAccent : agTextMuted} />
+              <span className="text-[10.5px] font-medium flex-1" style={{ color: agentCapability === item.id ? agAccent : agTextSec }}>{item.label}</span>
+              {item.badge > 0 && (
+                <span className="text-[7px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: agAccent, color: "#fff" }}>{item.badge}</span>
+              )}
+            </button>
+          ))}
+
+          <div className="mx-2 my-2.5" style={{ height: 1, background: agBorder }} />
+          <p className="text-[7.5px] font-bold uppercase tracking-[0.14em] px-2 pb-1.5" style={{ color: agTextMuted }}>Quick Actions</p>
+
+          {[
+            { icon: ic.monitor, label: "Open Apps",    task: "What applications can you open?" },
+            { icon: ic.code,    label: "Terminal",     task: "Open the terminal" },
+            { icon: ic.image,   label: "Wallpaper",    task: "Change the wallpaper to OSwp 2" },
+          ].map(item => (
+            <button key={item.label} onClick={() => send(item.task)}
+              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left mb-0.5 transition-all"
+              onMouseEnter={e => (e.currentTarget.style.background = agSelected)}
+              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <I d={item.icon} s={13} c={agTextMuted} />
+              <span className="text-[10.5px] font-medium" style={{ color: agTextSec }}>{item.label}</span>
+            </button>
+          ))}
+
+          {msgs.filter(m => m.role === "user").length > 0 && (
+            <>
+              <div className="mx-2 my-2.5" style={{ height: 1, background: agBorder }} />
+              <p className="text-[7.5px] font-bold uppercase tracking-[0.14em] px-2 pb-1.5" style={{ color: agTextMuted }}>Recent</p>
+              {msgs.filter(m => m.role === "user").slice(-4).reverse().map(m => (
+                <button key={m.id}
+                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-left mb-0.5 transition-all"
+                  onMouseEnter={e => (e.currentTarget.style.background = agSelected)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: agTextMuted }} />
+                  <p className="text-[9px] truncate" style={{ color: agTextSec }}>{m.text}</p>
+                </button>
+              ))}
+            </>
+          )}
+        </div>
+
+        {/* Footer model info */}
+        <div className="px-3 py-2 flex-shrink-0" style={{ borderTop: `1px solid ${agBorder}` }}>
+          <div className="flex items-center gap-2 px-2.5 py-2 rounded-xl"
+            style={{ background: dk ? "rgba(255,255,255,0.04)" : "rgba(124,58,237,0.05)", border: `1px solid ${agBorder}` }}>
+            <div className="w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: agAccentSoft }}>
+              <I d={ic.brain} s={10} c={agAccent} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[9px] font-semibold truncate" style={{ color: agText }}>Claude Opus 4.6</p>
+              <p className="text-[7px]" style={{ color: agTextMuted }}>200K ctx · Real OS actions</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ── Right: Workspace panel ── */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Workspace header */}
-        <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: c.accentSoft }}>
-            <I d={ic.layers} s={13} c={c.accentText} />
-          </div>
-          <p className="text-[12px] font-bold" style={{ color: c.text }}>
-            {activeWorkspace ? activeWorkspace.title : "⚡ Workspace"}
-          </p>
-          {activeWorkspace && (
-            <button onClick={() => setActiveWorkspace(null)} className="ml-auto p-1.5 rounded-lg" style={{ color: c.textMuted }}
-              onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-              <I d={ic.close} s={12} />
-            </button>
-          )}
-        </div>
-
-        {/* Workspace content */}
+      {/* ── RIGHT MAIN PANEL ─────────────────────────────────── */}
+      <div className="flex-1 flex flex-col overflow-hidden" style={{ background: agCardBg }}>
         {activeWorkspace ? (
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Action bar */}
-            <div className="flex items-center gap-2 px-4 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-              {activeWorkspace.type === "email" && (
-                <>
-                  {[{ label: "📤 Send", primary: true }, { label: "💾 Save Draft" }, { label: "📋 Copy" }, { label: "🗑️ Delete" }].map(({ label, primary }) => (
-                    <button key={label} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
-                      style={{ background: primary ? c.accent : c.cardAlt, color: primary ? "#fff" : c.textSec, border: `1px solid ${primary ? "transparent" : c.border}` }}>
-                      {label}
-                    </button>
-                  ))}
-                </>
-              )}
-              {activeWorkspace.type === "doc" && (
-                <>
-                  {[{ label: "💾 Save DOCX", primary: true }, { label: "📤 Export PDF" }, { label: "✏️ Edit" }, { label: "📋 Copy" }].map(({ label, primary }) => (
-                    <button key={label} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
-                      style={{ background: primary ? c.accent : c.cardAlt, color: primary ? "#fff" : c.textSec, border: `1px solid ${primary ? "transparent" : c.border}` }}>
-                      {label}
-                    </button>
-                  ))}
-                </>
-              )}
-              {(activeWorkspace.type === "terminal" || activeWorkspace.type === "info" || activeWorkspace.type === "settings") && (
-                <>
-                  {[{ label: "📋 Copy" }, { label: "💾 Save Log" }, { label: "🔄 Refresh" }].map(({ label }) => (
-                    <button key={label} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
-                      style={{ background: c.cardAlt, color: c.textSec, border: `1px solid ${c.border}` }}>
-                      {label}
-                    </button>
-                  ))}
-                </>
-              )}
-            </div>
+          /* ── WORKSPACE VIEW (email / doc / terminal) ── */
+          <div className="flex flex-col h-full">
 
-            {/* Content area */}
-            <div className="flex-1 overflow-auto p-4">
-              <pre className="text-[11px] leading-relaxed whitespace-pre-wrap font-mono"
-                style={{ color: activeWorkspace.type === "terminal" ? c.success : c.textSec }}>
-                {activeWorkspace.content}
-              </pre>
-            </div>
+            {/* ── EMAIL COMPOSE VIEW ── */}
+            {activeWorkspace.type === "email" && (
+              <div className="flex flex-col h-full">
+                {/* From chip */}
+                <div className="px-6 pt-5 pb-2 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}` }}>
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #7C3AED, #4F8EF7)" }}>
+                      <I d={ic.sparkle} s={11} c="#fff" f />
+                    </div>
+                    <div>
+                      <span className="text-[12px] font-semibold" style={{ color: agText }}>Alternus AI Agent</span>
+                      <span className="text-[11px] ml-2" style={{ color: agTextMuted }}>agent@alternusart.com</span>
+                    </div>
+                  </div>
+                </div>
+                {/* To / Cc */}
+                <div className="px-6 py-2 flex items-center gap-2 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}` }}>
+                  <div className="flex items-center gap-1.5 flex-1 flex-wrap">
+                    {/* To avatars */}
+                    {["Necati Koçlu", "João Almeida"].map(name => (
+                      <div key={name} className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]"
+                        style={{ background: agAccentSoft, color: agAccent, border: `1px solid ${agAccent}22` }}>
+                        <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ background: agAccent, opacity: 0.8 }}>
+                          <span className="text-[7px] text-white font-bold">{name[0]}</span>
+                        </div>
+                        <span>{name}</span>
+                        <button className="ml-0.5 opacity-50 hover:opacity-100" style={{ color: agAccent }}>×</button>
+                      </div>
+                    ))}
+                    <input value={toField} onChange={e => setToField(e.target.value)}
+                      className="flex-1 bg-transparent outline-none text-[11px] min-w-[80px]"
+                      style={{ color: agText }} placeholder="Add recipient..." />
+                  </div>
+                  <button className="text-[10px] font-medium flex-shrink-0" style={{ color: agTextSec }}>Cc / Bcc</button>
+                </div>
+                {/* Subject */}
+                <div className="px-6 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}` }}>
+                  <input value={subjectField} onChange={e => setSubjectField(e.target.value)}
+                    className="w-full bg-transparent outline-none text-[14px] font-semibold"
+                    style={{ color: agText }} placeholder="Subject" />
+                </div>
+                {/* Body */}
+                <div className="flex-1 px-6 py-4 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                  <textarea value={editContent} onChange={e => setEditContent(e.target.value)}
+                    className="w-full h-full bg-transparent outline-none resize-none text-[12px] leading-relaxed"
+                    style={{ color: agText, fontFamily: "-apple-system, 'Inter', sans-serif" }} />
+                </div>
+                {/* Rich text toolbar */}
+                <div className="flex-shrink-0 px-4 py-2 flex items-center gap-1.5 relative" style={{ borderTop: `1px solid ${agBorder}` }}>
+                  {/* Rewrite with AI */}
+                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all flex-shrink-0"
+                    style={{ background: agAccentSoft, color: agAccent, border: `1px solid ${agAccent}25` }}
+                    onMouseEnter={e => (e.currentTarget.style.background = agAccent + "18")}
+                    onMouseLeave={e => (e.currentTarget.style.background = agAccentSoft)}>
+                    <I d={ic.sparkle} s={11} c={agAccent} f /> Rewrite with AI
+                  </button>
+                  {/* Divider */}
+                  <div className="w-px h-4 flex-shrink-0 mx-0.5" style={{ background: agBorder }} />
+                  {/* Format dropdown */}
+                  <div className="relative">
+                    <button onClick={() => setShowFormatMenu(v => !v)}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-medium transition-all"
+                      style={{ background: showFormatMenu ? agSelected : "transparent", color: agTextSec, border: `1px solid ${showFormatMenu ? agBorder : "transparent"}` }}
+                      onMouseEnter={e => { if (!showFormatMenu) e.currentTarget.style.background = agSelected + "60"; }}
+                      onMouseLeave={e => { if (!showFormatMenu) e.currentTarget.style.background = "transparent"; }}>
+                      {formatType} <I d={ic.chevD} s={9} c={agTextMuted} />
+                    </button>
+                    {showFormatMenu && (
+                      <div className="absolute bottom-full left-0 mb-1 w-44 rounded-xl overflow-hidden z-50 py-1"
+                        style={{ background: agCardBg, border: `1px solid ${agBorder}`, boxShadow: "0 8px 30px rgba(0,0,0,0.12)" }}>
+                        {formatItems.map(fi => (
+                          <button key={fi.id} onClick={() => { setFormatType(fi.label); setShowFormatMenu(false); }}
+                            className="w-full flex items-center gap-3 px-3 py-1.5 text-[11px] transition-all text-left"
+                            style={{ color: agText }}
+                            onMouseEnter={e => (e.currentTarget.style.background = agSelected + "80")}
+                            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                            <span className="w-4 text-center text-[10px]" style={{ color: agTextMuted }}>{fi.shortcut}</span>
+                            <span className="flex-1">{fi.label}</span>
+                            {formatType === fi.label && <span style={{ color: agAccent }}>✓</span>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {/* Divider */}
+                  <div className="w-px h-4 flex-shrink-0 mx-0.5" style={{ background: agBorder }} />
+                  {/* Format buttons */}
+                  {[
+                    { label: "B", title: "Bold", style: { fontWeight: 700 } },
+                    { label: "I", title: "Italic", style: { fontStyle: "italic" } },
+                    { label: "U", title: "Underline", style: { textDecoration: "underline" } },
+                    { label: "S", title: "Strikethrough", style: { textDecoration: "line-through" } },
+                  ].map(btn => (
+                    <button key={btn.label} title={btn.title}
+                      className="w-7 h-7 rounded-md flex items-center justify-center text-[12px] transition-all"
+                      style={{ color: agTextSec, ...btn.style }}
+                      onMouseEnter={e => (e.currentTarget.style.background = agSelected + "80")}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      {btn.label}
+                    </button>
+                  ))}
+                  <button title="Link" className="w-7 h-7 rounded-md flex items-center justify-center transition-all"
+                    onMouseEnter={e => (e.currentTarget.style.background = agSelected + "80")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <I d={ic.globe} s={12} c={agTextSec} />
+                  </button>
+                  <button title="Clear formatting" className="w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-bold transition-all"
+                    style={{ color: agTextSec }}
+                    onMouseEnter={e => (e.currentTarget.style.background = agSelected + "80")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    T<span style={{ fontSize: 7, verticalAlign: "super", opacity: 0.5 }}>x</span>
+                  </button>
+                </div>
+                {/* Footer */}
+                <div className="flex-shrink-0 px-4 py-3 flex items-center justify-between" style={{ borderTop: `1px solid ${agBorder}` }}>
+                  <div className="flex items-center gap-2">
+                    <button className="w-7 h-7 rounded-md flex items-center justify-center transition-all"
+                      onMouseEnter={e => (e.currentTarget.style.background = agSelected + "80")}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <I d={ic.trash} s={13} c={agTextMuted} />
+                    </button>
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium transition-all"
+                      style={{ color: agTextSec, border: `1px solid ${agBorder}` }}
+                      onMouseEnter={e => (e.currentTarget.style.borderColor = agAccent + "50")}
+                      onMouseLeave={e => (e.currentTarget.style.borderColor = agBorder)}>
+                      + Add
+                    </button>
+                  </div>
+                  {/* Send button */}
+                  <div className="flex items-center rounded-xl overflow-hidden" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.18)" }}>
+                    <button className="flex items-center gap-2 px-4 py-2 text-[11px] font-semibold"
+                      style={{ background: dk ? c.text : "#111", color: dk ? c.bg : "#fff" }}>
+                      <I d={ic.send} s={11} c={dk ? c.bg : "#fff"} /> Send
+                    </button>
+                    <div className="w-px h-5" style={{ background: "rgba(255,255,255,0.2)" }} />
+                    <button className="px-2 py-2" style={{ background: dk ? c.text : "#111", color: dk ? c.bg : "#fff" }}>
+                      <I d={ic.chevD} s={9} c={dk ? c.bg : "#fff"} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── DOCUMENT VIEW ── */}
+            {activeWorkspace.type === "doc" && (
+              <div className="flex flex-col h-full">
+                <div className="px-6 pt-5 pb-3 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}` }}>
+                  <input value={subjectField || activeWorkspace.title} onChange={e => setSubjectField(e.target.value)}
+                    className="w-full bg-transparent outline-none text-[17px] font-bold"
+                    style={{ color: agText }} placeholder="Document title" />
+                </div>
+                <div className="flex-1 px-6 py-4 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                  <textarea value={editContent} onChange={e => setEditContent(e.target.value)}
+                    className="w-full h-full bg-transparent outline-none resize-none text-[12px] leading-relaxed"
+                    style={{ color: agText, fontFamily: "-apple-system, 'Inter', sans-serif" }} />
+                </div>
+                {/* Toolbar (same as email) */}
+                <div className="flex-shrink-0 px-4 py-2 flex items-center gap-1.5" style={{ borderTop: `1px solid ${agBorder}` }}>
+                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-semibold"
+                    style={{ background: agAccentSoft, color: agAccent, border: `1px solid ${agAccent}25` }}>
+                    <I d={ic.sparkle} s={11} c={agAccent} f /> Rewrite with AI
+                  </button>
+                  <div className="w-px h-4 mx-0.5" style={{ background: agBorder }} />
+                  {["B", "I", "U"].map(b => (
+                    <button key={b} className="w-7 h-7 rounded-md flex items-center justify-center text-[12px] font-semibold transition-all"
+                      style={{ color: agTextSec }}
+                      onMouseEnter={e => (e.currentTarget.style.background = agSelected + "80")}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>{b}</button>
+                  ))}
+                  <div className="ml-auto flex items-center gap-2">
+                    {[{ label: "💾 Save DOCX", primary: true }, { label: "📤 Export PDF" }].map(({ label, primary }) => (
+                      <button key={label} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold"
+                        style={{ background: primary ? (dk ? c.text : "#111") : agCardBg, color: primary ? (dk ? c.bg : "#fff") : agTextSec, border: `1px solid ${primary ? "transparent" : agBorder}` }}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── TERMINAL / INFO / SETTINGS VIEW ── */}
+            {(activeWorkspace.type === "terminal" || activeWorkspace.type === "info" || activeWorkspace.type === "settings") && (
+              <div className="flex flex-col h-full">
+                <div className="px-4 py-3 flex items-center gap-3 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}` }}>
+                  <span className="text-[12px] font-semibold" style={{ color: agText }}>{activeWorkspace.title}</span>
+                  <div className="ml-auto flex items-center gap-2">
+                    {[{ label: "📋 Copy" }, { label: "💾 Save" }, { label: "🔄 Refresh" }].map(({ label }) => (
+                      <button key={label} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
+                        style={{ background: agAccentSoft, color: agTextSec, border: `1px solid ${agBorder}` }}
+                        onMouseEnter={e => (e.currentTarget.style.borderColor = agAccent + "50")}
+                        onMouseLeave={e => (e.currentTarget.style.borderColor = agBorder)}>
+                        {label}
+                      </button>
+                    ))}
+                    <button onClick={() => setActiveWorkspace(null)} className="w-6 h-6 rounded-md flex items-center justify-center" style={{ color: agTextMuted }}
+                      onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <I d={ic.close} s={11} />
+                    </button>
+                  </div>
+                </div>
+                <div className="flex-1 p-4 overflow-auto" style={{ scrollbarWidth: "none" }}>
+                  <pre className="text-[11px] leading-relaxed whitespace-pre-wrap"
+                    style={{ color: activeWorkspace.type === "terminal" ? c.success : agTextSec, fontFamily: activeWorkspace.type === "terminal" ? "monospace" : "inherit" }}>
+                    {activeWorkspace.content}
+                  </pre>
+                </div>
+              </div>
+            )}
           </div>
+
         ) : (
-          /* Empty state */
-          <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
-            <div className="w-20 h-20 rounded-3xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #7C3AED18, #4F8EF718)", border: `1px solid #7C3AED20` }}>
-              <I d={ic.sparkle} s={36} c="#7C3AED" f />
-            </div>
-            <div className="text-center">
-              <p className="text-sm font-bold mb-1" style={{ color: c.text }}>Agent Workspace</p>
-              <p className="text-[11px] max-w-xs" style={{ color: c.textMuted }}>The results of agent actions will appear here — emails, documents, terminal commands, and setting changes.</p>
-            </div>
-            <div className="grid grid-cols-2 gap-2 w-full max-w-xs mt-2">
-              {[
-                { icon: "📧", label: "Email", action: "Write a professional email" },
-                { icon: "📄", label: "Document", action: "Create a new document" },
-                { icon: "⚙️", label: "Settings", action: "Change the system settings" },
-                { icon: "💻", label: "Terminal", action: "Check the system status" },
-              ].map(it => (
-                <button key={it.label} onClick={() => send(it.action)}
-                  className="flex items-center gap-2 p-3 rounded-xl text-left transition-all"
-                  style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#7C3AED40"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; }}>
-                  <span className="text-lg">{it.icon}</span>
-                  <span className="text-[10px] font-semibold" style={{ color: c.text }}>{it.label}</span>
-                </button>
-              ))}
-            </div>
+          /* ── CHAT + INPUT VIEW (no workspace) ── */
+          <div className="flex flex-col h-full" onClick={() => setShowFormatMenu(false)}>
+            {msgs.filter(m => m.role === "user").length === 0 && !isThinking ? (
+              /* ── DASHBOARD VIEW ── */
+              <div className="flex flex-col h-full">
+                {/* Scrollable content — full width, no header */}
+                <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none", background: dk ? agBg : "#F7F8FA" }}>
+                  <div style={{ maxWidth: 948, margin: "0 auto", padding: "48px 32px 32px 32px" }}>
+
+                  {/* Big input card */}
+                  <div className="mb-7 rounded-2xl overflow-hidden" style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 2px 20px rgba(0,0,0,0.07)" }}>
+                    <div className="px-5 pt-5 pb-3">
+                      <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+                        placeholder="Ask me to do anything on your OS — email, files, apps, system..."
+                        className="w-full bg-transparent outline-none text-[13px]"
+                        style={{ color: agText, caretColor: agAccent }} />
+                    </div>
+                    <div className="px-5 pb-4 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {[
+                          { icon: ic.upload, label: "Upload", color: "#8B5CF6" },
+                          { icon: ic.globe,  label: "Research", color: "#3B82F6" },
+                          { icon: ic.code,   label: "Code", color: "#10B981" },
+                          { icon: ic.image,  label: "Image", color: "#F97316" },
+                        ].map(btn => (
+                          <button key={btn.label} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9.5px] font-medium transition-all"
+                            style={{ color: agTextMuted, border: `1px solid ${agBorder}` }}
+                            onMouseEnter={e => { e.currentTarget.style.color = btn.color; e.currentTarget.style.borderColor = btn.color + "50"; e.currentTarget.style.background = btn.color + "0D"; }}
+                            onMouseLeave={e => { e.currentTarget.style.color = agTextMuted; e.currentTarget.style.borderColor = agBorder; e.currentTarget.style.background = "transparent"; }}>
+                            <I d={btn.icon} s={11} c={agTextMuted} /> {btn.label}
+                          </button>
+                        ))}
+                      </div>
+                      <button onClick={() => send()} disabled={!input.trim()}
+                        className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+                        style={{ background: input.trim() ? agAccent : (dk ? c.cardAlt : "#EFEFEF"), boxShadow: input.trim() ? `0 2px 14px ${agAccent}44` : "none" }}>
+                        <I d={ic.send} s={14} c={input.trim() ? "#fff" : agTextMuted} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Core capabilities */}
+                  <p className="text-[8px] font-bold uppercase tracking-[0.14em] mb-3" style={{ color: agTextMuted }}>What I can do</p>
+                  <div className="grid grid-cols-3 gap-3 mb-3">
+                    {[
+                      { icon: ic.mail,     label: "Email",     desc: "Draft & send messages",  color: "#F97316", bg: "#FFF4ED", task: "Draft a professional email to the team" },
+                      { icon: ic.fileText, label: "Documents", desc: "Create & edit docs",      color: "#3B82F6", bg: "#EFF6FF", task: "Create a new Word document" },
+                      { icon: ic.folder,   label: "Files",     desc: "Manage & organize",       color: "#10B981", bg: "#ECFDF5", task: "Show me what you can do with files" },
+                      { icon: ic.globe,    label: "Research",  desc: "Browse & analyze info",   color: "#8B5CF6", bg: "#F5F3FF", task: "Research the latest AI trends" },
+                      { icon: ic.monitor,  label: "Apps",      desc: "Launch & control apps",   color: "#06B6D4", bg: "#ECFEFF", task: "What applications can you open?" },
+                      { icon: ic.terminal, label: "Terminal",  desc: "Run system commands",     color: "#6B7280", bg: "#F9FAFB", task: "Open the terminal" },
+                    ].map(cap => (
+                      <button key={cap.label} onClick={() => send(cap.task)}
+                        className="flex flex-col gap-3 p-5 rounded-2xl text-left"
+                        style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 6px rgba(0,0,0,0.05)", transition: "all 0.18s" }}
+                        onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 6px 24px ${cap.color}22`; e.currentTarget.style.borderColor = cap.color + "40"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 6px rgba(0,0,0,0.05)"; e.currentTarget.style.borderColor = agBorder; e.currentTarget.style.transform = "translateY(0)"; }}>
+                        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                          style={{ background: dk ? c.cardAlt : cap.bg }}>
+                          <I d={cap.icon} s={16} c={cap.color} />
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-semibold leading-snug" style={{ color: agText }}>{cap.label}</p>
+                          <p className="text-[8.5px] leading-snug mt-1" style={{ color: agTextMuted }}>{cap.desc}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* System / OS agent functions */}
+                  <div className="grid grid-cols-3 gap-3 mb-7">
+                    {[
+                      { icon: ic.sun,      label: "Theme",        desc: "Switch dark / light",      color: "#F59E0B", bg: "#FFFBEB", task: "Switch to dark mode" },
+                      { icon: ic.image,    label: "Wallpaper",    desc: "Change desktop background", color: "#EC4899", bg: "#FDF2F8", task: "Change the wallpaper to OSwp 2" },
+                      { icon: ic.wifi,     label: "Network",      desc: "WiFi & connection info",    color: "#0EA5E9", bg: "#F0F9FF", task: "Show me the network and WiFi status" },
+                      { icon: ic.cpu,      label: "System",       desc: "CPU, memory & status",      color: "#64748B", bg: "#F8FAFC", task: "Show me the current system status and performance" },
+                      { icon: ic.calendar, label: "Calendar",     desc: "Schedule & events",         color: "#7C3AED", bg: "#F5F3FF", task: "Open the calendar and show today's schedule" },
+                      { icon: ic.power,    label: "Power",        desc: "Restart or shut down",      color: "#EF4444", bg: "#FEF2F2", task: "Show me power and restart options" },
+                    ].map(cap => (
+                      <button key={cap.label} onClick={() => send(cap.task)}
+                        className="flex flex-col gap-3 p-5 rounded-2xl text-left"
+                        style={{ background: dk ? c.card : "#fff", border: `1px solid ${agBorder}`, boxShadow: "0 1px 6px rgba(0,0,0,0.05)", transition: "all 0.18s" }}
+                        onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 6px 24px ${cap.color}22`; e.currentTarget.style.borderColor = cap.color + "40"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 6px rgba(0,0,0,0.05)"; e.currentTarget.style.borderColor = agBorder; e.currentTarget.style.transform = "translateY(0)"; }}>
+                        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                          style={{ background: dk ? c.cardAlt : cap.bg }}>
+                          <I d={cap.icon} s={16} c={cap.color} />
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-semibold leading-snug" style={{ color: agText }}>{cap.label}</p>
+                          <p className="text-[8.5px] leading-snug mt-1" style={{ color: agTextMuted }}>{cap.desc}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Quick fire actions */}
+                  <p className="text-[8px] font-bold uppercase tracking-[0.14em] mb-3" style={{ color: agTextMuted }}>Quick actions</p>
+                  <div className="flex flex-wrap gap-2 mb-7">
+                    {[
+                      { label: "🌙 Dark mode",          task: "Switch to dark mode" },
+                      { label: "☀️ Light mode",         task: "Switch to light mode" },
+                      { label: "🖼 Change wallpaper",   task: "Change the wallpaper to OSwp 2" },
+                      { label: "📊 Open dashboard",     task: "Open the business dashboard" },
+                      { label: "💻 Open terminal",      task: "Open the terminal" },
+                      { label: "📂 Open files",         task: "Open the Files application" },
+                      { label: "📧 Draft email",        task: "Write a professional email to the team about the project progress" },
+                      { label: "📄 New document",       task: "Create a new Word document with a professional structure" },
+                    ].map(qa => (
+                      <button key={qa.label} onClick={() => send(qa.task)}
+                        className="px-3 py-1.5 rounded-full text-[9.5px] font-medium transition-all"
+                        style={{ background: dk ? c.card : "#fff", color: agTextSec, border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = agAccentSoft; e.currentTarget.style.color = agAccent; e.currentTarget.style.borderColor = agAccent + "40"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = dk ? c.card : "#fff"; e.currentTarget.style.color = agTextSec; e.currentTarget.style.borderColor = agBorder; }}>
+                        {qa.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <p className="text-center text-[8px] pb-2" style={{ color: agTextMuted }}>
+                    Powered by <span style={{ color: agAccent, fontWeight: 700 }}>Claude Opus 4.6</span> · Real OS actions
+                  </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* ── CHAT VIEW (has messages) ── */
+              <>
+                {/* Header */}
+                <div className="flex items-center gap-3 px-5 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}`, background: dk ? c.surface : "#FAFAFA" }}>
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 2px 8px rgba(124,58,237,0.28)" }}>
+                    <I d={ic.sparkle} s={13} c="#fff" f />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11.5px] font-bold leading-tight" style={{ color: agText }}>Alternus AI Agent</p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
+                      <p className="text-[8px]" style={{ color: agTextMuted }}>Active · Claude Opus 4.6</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setMsgs([{ id: "welcome", role: "agent", timestamp: new Date(), text: "" }])}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-medium transition-all flex-shrink-0"
+                    style={{ color: agTextMuted, border: `1px solid ${agBorder}` }}
+                    onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <I d={ic.plus} s={10} c={agTextMuted} /> New
+                  </button>
+                  <button className="w-7 h-7 rounded-lg flex items-center justify-center transition-all"
+                    onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <I d={ic.menu} s={12} c={agTextMuted} />
+                  </button>
+                </div>
+
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto flex flex-col gap-3 px-5 py-5" style={{ scrollbarWidth: "none" }}>
+                  <div className="flex-1" />
+                  {msgs.map(m => (
+                    <div key={m.id}>
+                      {m.id === "welcome" ? (
+                        /* ── Welcome card ── */
+                        <div className="flex flex-col items-center text-center py-4 px-2">
+                          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3"
+                            style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 6px 24px rgba(124,58,237,0.28)" }}>
+                            <I d={ic.sparkle} s={22} c="#fff" f />
+                          </div>
+                          <p className="text-[16px] font-bold mb-1" style={{ color: agText }}>
+                            Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}
+                          </p>
+                          <p className="text-[10.5px] mb-5" style={{ color: agTextMuted }}>
+                            I'm your intelligent OS assistant — ready to act on your system
+                          </p>
+                          <div className="grid grid-cols-3 gap-2 w-full" style={{ maxWidth: 420 }}>
+                            {[
+                              { icon: ic.mail,     label: "Draft Email",   color: "#F97316", bg: "#FFF4ED", task: "Draft a professional email to the team" },
+                              { icon: ic.fileText, label: "New Document",  color: "#3B82F6", bg: "#EFF6FF", task: "Create a new Word document" },
+                              { icon: ic.folder,   label: "Open Files",   color: "#10B981", bg: "#ECFDF5", task: "Open the Files application" },
+                              { icon: ic.sun,      label: "Dark Mode",    color: "#F59E0B", bg: "#FFFBEB", task: "Switch to dark mode" },
+                              { icon: ic.monitor,  label: "Launch App",   color: "#06B6D4", bg: "#ECFEFF", task: "What applications can you open?" },
+                              { icon: ic.cpu,      label: "System Info",  color: "#8B5CF6", bg: "#F5F3FF", task: "Show me the current system status" },
+                            ].map(cap => (
+                              <button key={cap.label} onClick={() => send(cap.task)}
+                                className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-left transition-all"
+                                style={{ background: dk ? c.card : cap.bg, border: `1px solid ${agBorder}` }}
+                                onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 4px 14px ${cap.color}22`; e.currentTarget.style.borderColor = cap.color + "40"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                                onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = agBorder; e.currentTarget.style.transform = "translateY(0)"; }}>
+                                <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                                  style={{ background: dk ? c.cardAlt : "#fff", boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
+                                  <I d={cap.icon} s={12} c={cap.color} />
+                                </div>
+                                <span className="text-[9.5px] font-semibold leading-snug" style={{ color: agText }}>{cap.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        /* ── Regular message ── */
+                        <div className={`flex ${m.role === "user" ? "justify-end" : "gap-2.5"}`}>
+                          {m.role === "agent" && (
+                            <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+                              style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 2px 8px rgba(124,58,237,0.28)" }}>
+                              <I d={ic.sparkle} s={11} c="#fff" f />
+                            </div>
+                          )}
+                          <div style={{ maxWidth: "78%" }}>
+                            {m.steps && m.steps.length > 0 && (
+                              <div className="mb-2 px-3 py-2.5 rounded-xl space-y-1.5" style={{ background: agAccentSoft, border: `1px solid ${agAccent}18` }}>
+                                {m.steps.map((s, si) => (
+                                  <div key={si} className="flex items-center gap-2">
+                                    <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: statusColors[s.status] + "22" }}>
+                                      {s.status === "done" ? (
+                                        <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke={c.success} strokeWidth="3.5"><polyline points="20 6 9 17 4 12" /></svg>
+                                      ) : s.status === "running" ? (
+                                        <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: agAccent }} />
+                                      ) : (
+                                        <div className="w-1 h-1 rounded-full" style={{ background: agTextMuted }} />
+                                      )}
+                                    </div>
+                                    <span className="text-[9px]" style={{ color: s.status === "running" ? agAccent : agTextSec }}>{s.label}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            {m.text.trim().length > 0 && (
+                              <div className="px-4 py-3 text-[11px] leading-relaxed"
+                                style={{
+                                  background: m.role === "user" ? "linear-gradient(135deg,#7C3AED,#5B6CF9)" : (dk ? c.surface : "#fff"),
+                                  color: m.role === "user" ? "#fff" : agText,
+                                  border: m.role === "agent" ? `1px solid ${agBorder}` : "none",
+                                  borderLeft: m.role === "agent" ? `3px solid ${agAccent}30` : undefined,
+                                  boxShadow: m.role === "user" ? "0 3px 14px rgba(124,58,237,0.28)" : "0 1px 6px rgba(0,0,0,0.05)",
+                                  whiteSpace: "pre-line",
+                                  borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "4px 16px 16px 16px",
+                                }}>
+                                <AIFormattedText text={m.text} c={c} />
+                              </div>
+                            )}
+                            {m.workspace && (
+                              <button onClick={() => setActiveWorkspace(m.workspace!)}
+                                className="mt-1.5 flex items-center gap-2 px-3 py-2 rounded-xl text-[9.5px] font-medium w-full transition-all"
+                                style={{ background: dk ? c.cardAlt : "#EDE8FF", color: agAccent, border: `1px solid ${agAccent}20` }}
+                                onMouseEnter={e => (e.currentTarget.style.background = agAccentSoft)}
+                                onMouseLeave={e => (e.currentTarget.style.background = dk ? c.cardAlt : "#EDE8FF")}>
+                                <I d={ic.layers} s={10} c={agAccent} />
+                                <span className="flex-1 text-left truncate font-semibold">{m.workspace.title}</span>
+                                <span className="opacity-50 text-[11px]">→</span>
+                              </button>
+                            )}
+                            <p className="text-[7px] mt-1 px-1" style={{ color: agTextMuted }}>
+                              {m.timestamp.toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {isThinking && (
+                    <div className="flex gap-2.5">
+                      <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 2px 8px rgba(124,58,237,0.28)" }}>
+                        <I d={ic.sparkle} s={11} c="#fff" f />
+                      </div>
+                      <div className="px-4 py-3 rounded-2xl flex gap-1.5 items-center"
+                        style={{ background: dk ? c.surface : "#fff", border: `1px solid ${agBorder}`, borderLeft: `3px solid ${agAccent}30`, boxShadow: "0 1px 6px rgba(0,0,0,0.05)", borderRadius: "4px 16px 16px 16px" }}>
+                        {[0, 1, 2].map(i => <div key={i} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: agAccent, animationDelay: `${i * 0.15}s` }} />)}
+                      </div>
+                    </div>
+                  )}
+                  <div ref={endRef} />
+                </div>
+
+                {/* Quick actions */}
+                <div className="flex-shrink-0 px-4 py-2 flex items-center gap-1.5 overflow-x-auto" style={{ scrollbarWidth: "none", borderTop: `1px solid ${agBorder}` }}>
+                  <span className="text-[7.5px] font-bold uppercase tracking-widest flex-shrink-0 mr-1" style={{ color: agTextMuted }}>Quick:</span>
+                  {[
+                    { icon: ic.folder,   label: "Files",      color: "#10B981", task: "Open the Files application" },
+                    { icon: ic.mail,     label: "Email",      color: "#F97316", task: "Write a professional email to the team about the project progress" },
+                    { icon: ic.fileText, label: "Document",   color: "#3B82F6", task: "Create a new Word document with a professional structure" },
+                    { icon: ic.moon,     label: "Dark",       color: "#6366F1", task: "Switch to dark mode" },
+                    { icon: ic.sun,      label: "Light",      color: "#F59E0B", task: "Switch to light mode" },
+                    { icon: ic.image,    label: "Wallpaper",  color: "#EC4899", task: "Change the wallpaper to OSwp 2" },
+                    { icon: ic.terminal, label: "Terminal",   color: "#6B7280", task: "Open the terminal" },
+                    { icon: ic.grid,     label: "Dashboard",  color: "#8B5CF6", task: "Open the business dashboard" },
+                  ].map(qa => (
+                    <button key={qa.label} onClick={() => send(qa.task)}
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[9px] font-medium flex-shrink-0 transition-all"
+                      style={{ background: dk ? c.card : "#fff", color: agTextSec, border: `1px solid ${agBorder}` }}
+                      onMouseEnter={e => { e.currentTarget.style.background = qa.color + "14"; e.currentTarget.style.color = qa.color; e.currentTarget.style.borderColor = qa.color + "45"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = dk ? c.card : "#fff"; e.currentTarget.style.color = agTextSec; e.currentTarget.style.borderColor = agBorder; }}>
+                      <I d={qa.icon} s={10} c={qa.color} />
+                      {qa.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Input */}
+                <div className="flex-shrink-0 px-4 pb-4 pt-2">
+                  <div className="flex items-center gap-2 px-3 py-2.5 rounded-2xl"
+                    style={{ background: dk ? c.surface : "#fff", border: `1.5px solid ${input.trim() ? agAccent + "55" : agBorder}`, boxShadow: input.trim() ? "0 4px 20px rgba(124,58,237,0.12)" : "0 1px 8px rgba(0,0,0,0.05)", transition: "border-color 0.15s, box-shadow 0.15s" }}>
+                    <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
+                      style={{ color: agTextMuted }}
+                      onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <I d={ic.plus} s={14} c={agTextMuted} />
+                    </button>
+                    <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+                      placeholder="Ask the agent to do anything on your OS..."
+                      disabled={isThinking}
+                      className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: agText }} />
+                    <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
+                      onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <I d={ic.mic} s={13} c={agTextMuted} />
+                    </button>
+                    <button onClick={() => send()} disabled={isThinking || !input.trim()}
+                      className="w-8 h-8 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
+                      style={{ background: input.trim() && !isThinking ? "linear-gradient(135deg,#7C3AED,#4F8EF7)" : (dk ? c.cardAlt : "#EFEFEF"), boxShadow: input.trim() && !isThinking ? "0 2px 10px rgba(124,58,237,0.40)" : "none", opacity: isThinking ? 0.5 : 1 }}>
+                      <I d={ic.send} s={12} c={input.trim() && !isThinking ? "#fff" : agTextMuted} />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -8349,9 +9287,12 @@ export default function AlternusOS() {
   const [paymentModal, setPaymentModal] = useState<{ name: string; price: string; icon: string; iconBg: string } | null>(null);
   const [showSpotlight, setShowSpotlight] = useState(false);
   const [showLaunchpad, setShowLaunchpad] = useState(false);
+  const [launchSearch, setLaunchSearch] = useState("");
+  const [launchCategory, setLaunchCategory] = useState<"all" | "ai" | "productivity" | "media" | "system" | "web">("all");
   const [spotlightQuery, setSpotlightQuery] = useState("");
   const [activeSpace, setActiveSpace] = useState(1);
   const [showSpacesView, setShowSpacesView] = useState(false);
+  const [showTaskView, setShowTaskView] = useState(false);
   const [draggedFile, setDraggedFile] = useState<string | null>(null);
   const [snapPreview, setSnapPreview] = useState<"left" | "right" | "top" | null>(null);
   const savePosTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -8385,7 +9326,7 @@ export default function AlternusOS() {
     { id: "tasks", title: "Tasks", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 60, w: 420, h: 480 },
     { id: "mail", title: "Mail", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 50, w: 580, h: 460 },
     { id: "monaco", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 60, y: 30, w: 600, h: 480 },
-    { id: "aihub", title: "AI Hub", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 150, y: 60, w: 480, h: 500 },
+    { id: "aihub", title: "AI Studio", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 40, w: 720, h: 520 },
     { id: "aivoice", title: "AI Voice", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 80, w: 380, h: 440 },
     { id: "knowledge", title: "Knowledge Base", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 560, h: 480 },
     { id: "sysmon", title: "System Monitor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 500, h: 480 },
@@ -8528,7 +9469,7 @@ export default function AlternusOS() {
       tasks: { w: 420, h: 480 },
       mail: { w: 580, h: 460 },
       monaco: { w: 680, h: 500 },
-      aihub: { w: 480, h: 500 },
+      aihub: { w: 720, h: 520 },
       aivoice: { w: 380, h: 440 },
       knowledge: { w: 580, h: 480 },
       sysmon: { w: 500, h: 480 },
@@ -8728,6 +9669,7 @@ export default function AlternusOS() {
         setShowLaunchpad(false);
         setShowSpotlight(false);
         setShowSpacesView(false);
+        setShowTaskView(false);
         setShowApps(false);
         setShowNotifications(false);
         setShowWifiPanel(false);
@@ -8761,6 +9703,16 @@ export default function AlternusOS() {
       if ((e.ctrlKey || e.metaKey) && e.key === "h") {
         e.preventDefault();
         setWins(p => p.map(w => w.isOpen && !w.isMinimized ? { ...w, isMinimized: true } : w));
+      }
+      // Ctrl+T — Task View (all open windows)
+      if ((e.ctrlKey || e.metaKey) && e.key === "t") {
+        e.preventDefault();
+        setShowTaskView(p => !p);
+      }
+      // Alt+V — open AI Voice
+      if (e.altKey && e.key.toLowerCase() === "v") {
+        e.preventDefault();
+        openWin("aivoice");
       }
     };
     const handleKeyUp = (e: KeyboardEvent) => {
@@ -8835,8 +9787,8 @@ export default function AlternusOS() {
         id: "mail", title: "Mail", icon: ic.mail, description: "Email client with inbox and compose" },
       { keys: ["vscode", "monaco", "ide", "editor", "code editor", "typescript", "javascript", "python", "syntax", "programming"],
         id: "monaco", title: "Code Editor", icon: ic.code, description: "VS Code-style code editor" },
-      { keys: ["ai hub", "multi model", "gpt", "claude", "gemini", "llama", "compare", "model", "chat ai", "ai chat"],
-        id: "aihub", title: "AI Hub", icon: ic.messageCircle, description: "Multi-model AI chat hub" },
+      { keys: ["ai hub", "ai studio", "multi model", "gpt", "claude", "gemini", "llama", "compare", "model", "chat ai", "ai chat"],
+        id: "aihub", title: "AI Studio", icon: ic.sparkle, description: "Multi-model AI studio" },
       { keys: ["voice", "speech", "microphone", "text to speech", "speech to text", "stt", "tts", "dictate", "transcribe"],
         id: "aivoice", title: "AI Voice", icon: ic.mic, description: "Speech-to-text and text-to-speech" },
       { keys: ["knowledge", "rag", "search docs", "knowledge base", "semantic search", "index", "upload doc", "qa", "document search"],
@@ -8990,35 +9942,35 @@ export default function AlternusOS() {
     agent: <AlternusAgentApp c={c} mode={mode} setMode={setMode} wallpaper={wallpaper} setWallpaper={setWallpaper} onOpenApp={openWin} onExecuteAIActions={executeAIActions} osContext={{ openApps: wins.filter(w => w.isOpen && !w.isMinimized).map(w => w.id), theme: mode }} />,
   };
 
-  const dockApps: { id: WinId; icon: string; label: string; color: string }[] = [
-    { id: "agent", icon: ic.sparkle, label: "Alternus AI Agent", color: "#7C3AED" },
-    { id: "terminal", icon: ic.terminal, label: "Terminal", color: c.success },
-    { id: "code", icon: ic.code, label: "Code", color: c.purple },
-    { id: "files", icon: ic.folder, label: "Files", color: c.warning },
-    { id: "browser", icon: ic.globe, label: "Browser", color: c.accentText },
-    { id: "store", icon: ic.store, label: "Store", color: c.accent },
-    { id: "movies", icon: ic.film, label: "Movies", color: c.purple },
-    { id: "music", icon: ic.music, label: "Music", color: "#F472B6" },
-    { id: "weather", icon: ic.cloud, label: "Weather", color: "#60A5FA" },
-    { id: "calendar", icon: ic.calendar, label: "Calendar", color: "#60A5FA" },
-    { id: "notes", icon: ic.note, label: "Notes", color: "#FBBF24" },
-    { id: "word", icon: ic.fileText, label: "Word", color: c.accentText },
-    { id: "downloads", icon: ic.download, label: "Downloads", color: "#34D399" },
-    { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A" },
-    { id: "studio", icon: ic.pen, label: "Studio", color: "#A78BFA" },
-    { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec },
-    { id: "controlpanel", icon: ic.monitor, label: "Control Panel", color: c.textSec },
-    { id: "recovery", icon: ic.shield, label: "Recovery", color: c.success },
-    { id: "news", icon: ic.newspaper, label: "News", color: c.danger },
-    { id: "dashboard", icon: ic.grid, label: "Dashboard", color: "#60A5FA" },
-    { id: "tasks", icon: ic.checkSquare, label: "Tasks", color: "#34D399" },
-    { id: "mail", icon: ic.mail, label: "Mail", color: "#F97316" },
-    { id: "monaco", icon: ic.code, label: "VS Code", color: "#007ACC" },
-    { id: "aihub", icon: ic.messageCircle, label: "AI Hub", color: "#A78BFA" },
-    { id: "aivoice", icon: ic.mic, label: "AI Voice", color: "#FBBF24" },
-    { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316" },
-    { id: "sysmon", icon: ic.activity, label: "System Monitor", color: "#34D399" },
-    { id: "business", icon: ic.briefcase, label: "Business", color: "#6366F1" },
+  const dockApps: { id: WinId; icon: string; label: string; color: string; category: "ai" | "productivity" | "media" | "system" | "web" }[] = [
+    { id: "agent", icon: ic.sparkle, label: "Alternus AI Agent", color: "#7C3AED", category: "ai" },
+    { id: "aihub", icon: ic.sparkle, label: "AI Studio", color: "#A78BFA", category: "ai" },
+    { id: "aivoice", icon: ic.mic, label: "AI Voice", color: "#FBBF24", category: "ai" },
+    { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316", category: "ai" },
+    { id: "code", icon: ic.code, label: "Code", color: c.purple, category: "productivity" },
+    { id: "monaco", icon: ic.code, label: "VS Code", color: "#007ACC", category: "productivity" },
+    { id: "word", icon: ic.fileText, label: "Word", color: c.accentText, category: "productivity" },
+    { id: "notes", icon: ic.note, label: "Notes", color: "#FBBF24", category: "productivity" },
+    { id: "tasks", icon: ic.checkSquare, label: "Tasks", color: "#34D399", category: "productivity" },
+    { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A", category: "productivity" },
+    { id: "calendar", icon: ic.calendar, label: "Calendar", color: "#60A5FA", category: "productivity" },
+    { id: "dashboard", icon: ic.grid, label: "Dashboard", color: "#60A5FA", category: "productivity" },
+    { id: "movies", icon: ic.film, label: "Movies", color: c.purple, category: "media" },
+    { id: "music", icon: ic.music, label: "Music", color: "#F472B6", category: "media" },
+    { id: "studio", icon: ic.pen, label: "Studio", color: "#A78BFA", category: "media" },
+    { id: "terminal", icon: ic.terminal, label: "Terminal", color: c.success, category: "system" },
+    { id: "files", icon: ic.folder, label: "Files", color: c.warning, category: "system" },
+    { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec, category: "system" },
+    { id: "controlpanel", icon: ic.monitor, label: "Control Panel", color: c.textSec, category: "system" },
+    { id: "recovery", icon: ic.shield, label: "Recovery", color: c.success, category: "system" },
+    { id: "downloads", icon: ic.download, label: "Downloads", color: "#34D399", category: "system" },
+    { id: "sysmon", icon: ic.activity, label: "System Monitor", color: "#34D399", category: "system" },
+    { id: "browser", icon: ic.globe, label: "Browser", color: c.accentText, category: "web" },
+    { id: "weather", icon: ic.cloud, label: "Weather", color: "#60A5FA", category: "web" },
+    { id: "news", icon: ic.newspaper, label: "News", color: c.danger, category: "web" },
+    { id: "mail", icon: ic.mail, label: "Mail", color: "#F97316", category: "web" },
+    { id: "store", icon: ic.store, label: "Store", color: c.accent, category: "web" },
+    { id: "business", icon: ic.briefcase, label: "Business", color: "#6366F1", category: "web" },
   ];
 
   // ━━━━ BOOT SCREEN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -9478,9 +10430,141 @@ export default function AlternusOS() {
           </div>
         )}
 
+        {/* ━━━━ Task View (Ctrl+T) ━━━━ */}
+        {showTaskView && (() => {
+          const openW = wins.filter(w => w.isOpen);
+          const topZ = Math.max(...openW.map(w => w.zIndex), 0);
+          const closeView = () => setShowTaskView(false);
+          return (
+            <div
+              className="absolute inset-0 z-[300] flex flex-col"
+              style={{ backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", background: "rgba(0,0,0,0.60)" }}
+              onClick={closeView}
+            >
+              <style>{`
+                @keyframes tv-in {
+                  from { opacity:0; transform:scale(0.94) translateY(16px); }
+                  to   { opacity:1; transform:scale(1) translateY(0); }
+                }
+                @keyframes tv-card-in {
+                  from { opacity:0; transform:translateY(20px) scale(0.95); }
+                  to   { opacity:1; transform:translateY(0) scale(1); }
+                }
+                .tv-root  { animation: tv-in 0.26s cubic-bezier(.22,.68,0,1.1) both; }
+                .tv-card  { animation: tv-card-in 0.28s cubic-bezier(.22,.68,0,1.1) both; }
+              `}</style>
+
+              {/* Header */}
+              <div className="tv-root" style={{ textAlign: "center", paddingTop: 44, paddingBottom: 0, flexShrink: 0 }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.45)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6 }}>Task View</p>
+                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.28)" }}>
+                  {openW.length === 0 ? "No open windows" : `${openW.length} window${openW.length !== 1 ? "s" : ""} open`} · Ctrl+T or Esc to close
+                </p>
+              </div>
+
+              {/* Window cards grid */}
+              <div
+                onClick={e => e.stopPropagation()}
+                style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "32px 60px 48px" }}
+              >
+                {openW.length === 0 ? (
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+                    <div style={{ width: 64, height: 64, borderRadius: 20, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <I d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" s={28} c="rgba(255,255,255,0.25)" />
+                    </div>
+                    <p style={{ fontSize: 14, color: "rgba(255,255,255,0.35)" }}>No windows open</p>
+                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)" }}>Open an app from the dock or All Apps</p>
+                  </div>
+                ) : (
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: openW.length <= 3 ? `repeat(${openW.length}, 260px)` : openW.length <= 6 ? "repeat(3, 260px)" : "repeat(4, 230px)",
+                    gap: 20,
+                    justifyContent: "center",
+                  }}>
+                    {openW.sort((a, b) => b.zIndex - a.zIndex).map((w, i) => {
+                      const app = dockApps.find(a => a.id === w.id);
+                      const color = app?.color ?? c.accent;
+                      const icon = app?.icon ?? ic.sparkle;
+                      const isActive = w.zIndex === topZ;
+                      const isMinimized = w.isMinimized;
+                      return (
+                        <div
+                          key={w.id}
+                          className="tv-card"
+                          style={{ animationDelay: `${i * 0.04}s`, cursor: "pointer" }}
+                          onClick={() => {
+                            if (isMinimized) setWins(p => p.map(ww => ww.id === w.id ? { ...ww, isMinimized: false } : ww));
+                            focusWin(w.id);
+                            closeView();
+                          }}
+                        >
+                          {/* Preview card */}
+                          <div style={{
+                            borderRadius: 14,
+                            overflow: "hidden",
+                            border: `2px solid ${isActive ? c.accent : "rgba(255,255,255,0.12)"}`,
+                            boxShadow: isActive ? `0 0 0 1px ${c.accent}40, 0 16px 40px rgba(0,0,0,0.45)` : "0 8px 28px rgba(0,0,0,0.4)",
+                            transition: "transform 0.15s, box-shadow 0.15s",
+                            background: c.bg,
+                            position: "relative",
+                          }}
+                            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px) scale(1.02)"; e.currentTarget.style.boxShadow = isActive ? `0 0 0 1px ${c.accent}60, 0 22px 48px rgba(0,0,0,0.55)` : "0 18px 44px rgba(0,0,0,0.55)"; }}
+                            onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = isActive ? `0 0 0 1px ${c.accent}40, 0 16px 40px rgba(0,0,0,0.45)` : "0 8px 28px rgba(0,0,0,0.4)"; }}
+                          >
+                            {/* Fake window preview */}
+                            <div style={{ height: 22, background: c.surface, display: "flex", alignItems: "center", paddingLeft: 10, gap: 5, borderBottom: `1px solid ${c.border}` }}>
+                              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#FF5F57" }} />
+                              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#FFBD2E" }} />
+                              <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#28CA41" }} />
+                              <span style={{ fontSize: 9, color: c.textMuted, marginLeft: 6, fontWeight: 500 }}>{w.title}</span>
+                            </div>
+                            {/* App visual area */}
+                            <div style={{ height: 140, background: `linear-gradient(135deg, ${color}14 0%, ${c.bg} 60%)`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+                              {/* Background pattern */}
+                              <div style={{ position: "absolute", inset: 0, backgroundImage: `radial-gradient(circle at 30% 40%, ${color}18 0%, transparent 60%)`, pointerEvents: "none" }} />
+                              <div style={{ width: 52, height: 52, borderRadius: 16, background: `linear-gradient(145deg, ${color}EE, ${color}77)`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 6px 20px ${color}50`, position: "relative", zIndex: 1 }}>
+                                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", borderRadius: "16px 16px 60% 60%", background: "linear-gradient(180deg,rgba(255,255,255,0.25) 0%,rgba(255,255,255,0) 100%)" }} />
+                                <I d={icon} s={22} f c={`${color}00`} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.75)"]} />
+                              </div>
+                              {/* Minimized badge */}
+                              {isMinimized && (
+                                <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.5)", borderRadius: 5, padding: "2px 6px" }}>
+                                  <span style={{ fontSize: 8, color: "rgba(255,255,255,0.6)" }}>Minimized</span>
+                                </div>
+                              )}
+                            </div>
+                            {/* Active glow bar */}
+                            {isActive && <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${c.accent}, transparent)` }} />}
+                          </div>
+
+                          {/* Label + close */}
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 8, padding: "0 4px" }}>
+                            <span style={{ fontSize: 11, fontWeight: isActive ? 600 : 400, color: isActive ? "#fff" : "rgba(255,255,255,0.65)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 180 }}>
+                              {w.title}
+                            </span>
+                            <button
+                              onClick={e => { e.stopPropagation(); closeWinWithAI(w.id); if (openW.length === 1) closeView(); }}
+                              style={{ width: 18, height: 18, borderRadius: "50%", background: "rgba(255,255,255,0.12)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background 0.12s" }}
+                              onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,0.7)"; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.12)"; }}
+                            >
+                              <I d={ic.close} s={9} c="#fff" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* ━━━━ Search Button — top center ━━━━ */}
         <button
-          onClick={() => { setShowSpotlight(true); setSpotlightQuery(""); }}
+          onClick={e => { e.stopPropagation(); setShowSpotlight(true); setSpotlightQuery(""); }}
           className="absolute top-4 left-1/2 -translate-x-1/2 z-[50] flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-200"
           style={{
             background: mode === "dark" ? "rgba(30,30,30,0.55)" : "rgba(255,255,255,0.5)",
@@ -10158,7 +11242,7 @@ export default function AlternusOS() {
                           style={{ background: `${modeAccent}12`, color: modeAccent }}
                           onMouseEnter={e => { e.currentTarget.style.background = `${modeAccent}20`; }}
                           onMouseLeave={e => { e.currentTarget.style.background = `${modeAccent}12`; }}
-                          onClick={() => { openWin("ai"); setShowCtrlAi(false); }}>
+                          onClick={() => { openWin("agent"); setShowCtrlAi(false); }}>
                           <I d={ic.maximize} s={10} c={modeAccent} />
                           Open Full AI
                         </button>
@@ -10171,64 +11255,180 @@ export default function AlternusOS() {
           );
         })()}
 
-        {/* ━━━━ Launchpad Overlay — all apps grid ━━━━ */}
-        {showLaunchpad && (
-          <div
-            className="absolute inset-0 z-[80] flex flex-col items-center justify-center"
-            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}
-            onClick={() => setShowLaunchpad(false)}
-          >
-            {/* Close button */}
-            <button
-              onClick={() => setShowLaunchpad(false)}
-              className="absolute top-5 right-6 flex items-center justify-center transition-all duration-150"
-              style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.18)"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
-            >
-              <I d={ic.close} s={14} c="rgba(255,255,255,0.8)" />
-            </button>
-            {/* Title */}
-            <p className="text-lg font-semibold mb-7 tracking-wide" style={{ color: "rgba(255,255,255,0.85)" }}>Applications</p>
-            {/* App Grid */}
+        {/* ━━━━ Launchpad Overlay — Full-screen Library ━━━━ */}
+        {showLaunchpad && (() => {
+          const closeLaunchpad = () => { setShowLaunchpad(false); setLaunchSearch(""); setLaunchCategory("all"); };
+          const filteredApps = dockApps.filter(app => {
+            const matchCat = launchCategory === "all" || app.category === launchCategory;
+            const matchSearch = app.label.toLowerCase().includes(launchSearch.toLowerCase());
+            return matchCat && matchSearch;
+          });
+          const categories: { id: "all" | "ai" | "productivity" | "media" | "system" | "web"; label: string; icon: string }[] = [
+            { id: "all",          label: "All",          icon: ic.grid },
+            { id: "ai",           label: "AI",           icon: ic.sparkle },
+            { id: "productivity", label: "Productivity", icon: ic.checkSquare },
+            { id: "media",        label: "Media",        icon: ic.film },
+            { id: "system",       label: "System",       icon: ic.monitor },
+            { id: "web",          label: "Web",          icon: ic.globe },
+          ];
+          return (
             <div
-              className="grid gap-5"
-              style={{ gridTemplateColumns: "repeat(6, 1fr)", maxWidth: 560 }}
-              onClick={e => e.stopPropagation()}
+              className="absolute inset-0 z-[80] flex flex-col"
+              style={{ backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", background: "rgba(0,0,0,0.62)" }}
+              onClick={closeLaunchpad}
             >
-              {dockApps.map(app => {
-                const fillPath = icFill[app.id] ?? app.icon;
-                return (
-                  <button
-                    key={app.id}
-                    title={app.label}
-                    onClick={() => { openWinWithAI(app.id); setShowLaunchpad(false); }}
-                    className="flex flex-col items-center gap-1.5 transition-all duration-150"
-                    onMouseEnter={e => { (e.currentTarget.querySelector(".lp-icon") as HTMLElement | null)?.style && ((e.currentTarget.querySelector(".lp-icon") as HTMLElement).style.transform = "translateY(-4px) scale(1.1)"); }}
-                    onMouseLeave={e => { (e.currentTarget.querySelector(".lp-icon") as HTMLElement | null)?.style && ((e.currentTarget.querySelector(".lp-icon") as HTMLElement).style.transform = "translateY(0) scale(1)"); }}
-                  >
-                    <div
-                      className="lp-icon relative overflow-hidden flex items-center justify-center transition-all duration-150"
-                      style={{
-                        width: 68, height: 68, borderRadius: 18,
-                        background: `linear-gradient(145deg, ${app.color}EE 0%, ${app.color}99 55%, ${app.color}66 100%)`,
-                        border: `1px solid ${app.color}55`,
-                        boxShadow: `0 4px 14px ${app.color}50, inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(0,0,0,0.1)`,
-                      }}
-                    >
-                      {/* Specular */}
-                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", borderRadius: "18px 18px 60% 60%", background: "linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 100%)", pointerEvents: "none" }} />
-                      <div style={{ position: "relative", zIndex: 1, filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.25))" }}>
-                        <I d={fillPath} s={28} f={true} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.78)"]} />
+              <style>{`
+                @keyframes lp-in {
+                  from { opacity:0; transform:scale(0.97) translateY(10px); }
+                  to   { opacity:1; transform:scale(1) translateY(0); }
+                }
+                .lp-enter { animation: lp-in 0.28s cubic-bezier(.22,.68,0,1.1) both; }
+              `}</style>
+
+              {/* ── Top header: title + search + ESC ── */}
+              <div className="lp-enter" onClick={e => e.stopPropagation()}
+                style={{ paddingTop: 48, paddingBottom: 0, textAlign: "center", flexShrink: 0, position: "relative" }}>
+                <h1 style={{ fontSize: 30, fontWeight: 700, color: "rgba(255,255,255,0.92)", letterSpacing: "-0.5px", marginBottom: 18 }}>Library</h1>
+                {/* Centered search bar */}
+                <div style={{ maxWidth: 360, margin: "0 auto 0", display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 12, padding: "0 16px", height: 40 }}>
+                  <I d={ic.search} s={14} c="rgba(255,255,255,0.5)" />
+                  <input
+                    autoFocus
+                    value={launchSearch}
+                    onChange={e => setLaunchSearch(e.target.value)}
+                    placeholder="Search"
+                    style={{ background: "transparent", border: "none", outline: "none", color: "rgba(255,255,255,0.9)", fontSize: 14, flex: 1, textAlign: "center" }}
+                  />
+                  {launchSearch && (
+                    <button onClick={() => setLaunchSearch("")} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
+                      <I d={ic.close} s={12} c="rgba(255,255,255,0.5)" />
+                    </button>
+                  )}
+                </div>
+                {/* ESC close hint — top right */}
+                <button
+                  onClick={closeLaunchpad}
+                  style={{ position: "absolute", top: 48, right: 52, display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "5px 12px", cursor: "pointer" }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.18)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.10)"; }}
+                >
+                  <I d={ic.close} s={12} c="rgba(255,255,255,0.7)" />
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", fontWeight: 500 }}>Esc</span>
+                </button>
+              </div>
+
+              {/* ── Body: sidebar + grid ── */}
+              <div className="lp-enter" onClick={e => e.stopPropagation()}
+                style={{ flex: 1, display: "flex", overflow: "hidden", padding: "32px 52px 44px", gap: 44, animationDelay: "0.04s" }}>
+
+                {/* Sidebar */}
+                <div style={{ width: 176, flexShrink: 0, display: "flex", flexDirection: "column", gap: 4, paddingTop: 4 }}>
+                  {categories.map(cat => {
+                    const isActive = launchCategory === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => setLaunchCategory(cat.id)}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 11,
+                          padding: "10px 14px", borderRadius: 10, border: "none", cursor: "pointer",
+                          background: isActive ? "rgba(255,255,255,0.18)" : "transparent",
+                          color: isActive ? "#fff" : "rgba(255,255,255,0.55)",
+                          fontWeight: isActive ? 700 : 400, fontSize: 14, textAlign: "left", width: "100%",
+                          transition: "background 0.15s, color 0.15s",
+                        }}
+                        onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; e.currentTarget.style.color = "rgba(255,255,255,0.8)"; } }}
+                        onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.55)"; } }}
+                      >
+                        <I d={cat.icon} s={16} c={isActive ? "#fff" : "rgba(255,255,255,0.45)"} />
+                        {cat.label}
+                      </button>
+                    );
+                  })}
+
+                  {/* Divider + count */}
+                  <div style={{ height: 1, background: "rgba(255,255,255,0.10)", margin: "8px 0" }} />
+                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", paddingLeft: 14 }}>
+                    {filteredApps.length} {filteredApps.length === 1 ? "app" : "apps"}
+                  </p>
+                </div>
+
+                {/* Right column: filter row + grid */}
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                  {/* Filter / Sort row — top right */}
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginBottom: 20, flexShrink: 0 }}>
+                    {[
+                      { label: "Filter: All" },
+                      { label: "Sort: Recent" },
+                    ].map(btn => (
+                      <button key={btn.label}
+                        style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: 8, padding: "6px 12px", color: "rgba(255,255,255,0.7)", fontSize: 12, cursor: "pointer", transition: "background 0.15s" }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.16)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.10)"; }}
+                      >
+                        {btn.label}
+                        <I d="M19 9l-7 7-7-7" s={11} c="rgba(255,255,255,0.5)" />
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* App grid — scrollable */}
+                  <div style={{ flex: 1, overflowY: "auto", scrollbarWidth: "none" }}>
+                    {filteredApps.length === 0 ? (
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "60%", gap: 12 }}>
+                        <I d={ic.search} s={36} c="rgba(255,255,255,0.2)" />
+                        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)" }}>No apps found</p>
                       </div>
-                    </div>
-                    <span className="text-[10px] font-medium text-center leading-tight" style={{ color: "rgba(255,255,255,0.8)", maxWidth: 68, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{app.label}</span>
-                  </button>
-                );
-              })}
+                    ) : (
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 88px)", gap: "6px", justifyContent: "center" }}>
+                        {filteredApps.map(app => {
+                          const fillPath = icFill[app.id] ?? app.icon;
+                          return (
+                            <button
+                              key={app.id}
+                              title={app.label}
+                              onClick={e => { e.stopPropagation(); closeLaunchpad(); openWinWithAI(app.id); }}
+                              style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7, padding: "8px 4px 8px", borderRadius: 13, border: "none", background: "transparent", cursor: "pointer", transition: "background 0.15s" }}
+                              onMouseEnter={e => {
+                                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                                const icon = e.currentTarget.querySelector(".lp3-icon") as HTMLElement | null;
+                                if (icon) { icon.style.transform = "translateY(-4px) scale(1.07)"; icon.style.boxShadow = `0 10px 24px ${app.color}65`; }
+                              }}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.background = "transparent";
+                                const icon = e.currentTarget.querySelector(".lp3-icon") as HTMLElement | null;
+                                if (icon) { icon.style.transform = "translateY(0) scale(1)"; icon.style.boxShadow = `0 4px 12px ${app.color}40`; }
+                              }}
+                            >
+                              <div
+                                className="lp3-icon relative overflow-hidden flex items-center justify-center"
+                                style={{
+                                  width: 72, height: 72, borderRadius: 20, flexShrink: 0,
+                                  background: `linear-gradient(145deg, ${app.color}F0 0%, ${app.color}A0 55%, ${app.color}70 100%)`,
+                                  border: `1px solid ${app.color}50`,
+                                  boxShadow: `0 4px 12px ${app.color}40, inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -1px 0 rgba(0,0,0,0.12)`,
+                                  transition: "all 0.18s cubic-bezier(.22,.68,0,1.1)",
+                                }}
+                              >
+                                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "46%", borderRadius: "20px 20px 60% 60%", background: "linear-gradient(180deg,rgba(255,255,255,0.26) 0%,rgba(255,255,255,0) 100%)", pointerEvents: "none" }} />
+                                <div style={{ position: "relative", zIndex: 1, filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.25))" }}>
+                                  <I d={fillPath} s={28} f={true} grad={["rgba(255,255,255,0.97)", "rgba(255,255,255,0.76)"]} />
+                                </div>
+                              </div>
+                              <span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,0.80)", maxWidth: 76, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "center" }}>
+                                {app.label}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Windows */}
         {wins.map(w => (
