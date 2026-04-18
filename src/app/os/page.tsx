@@ -6882,6 +6882,14 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
   const [micOn, setMicOn] = useState(true);
   const [camOn, setCamOn] = useState(false);
   const [convTab, setConvTab] = useState<"recent" | "favorite">("recent");
+  const [channel, setChannel] = useState("general");
+  const channels = [
+    { id: "general",   label: "General",       color: "#7C3AED" },
+    { id: "interview", label: "AI Interview",   color: "#3B82F6" },
+    { id: "zoom",      label: "Zoom Meeting",   color: "#10B981" },
+    { id: "seminar",   label: "Seminar",        color: "#F59E0B" },
+    { id: "team",      label: "Team Chat",      color: "#EC4899" },
+  ];
   const hubEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => { hubEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
 
@@ -7168,6 +7176,22 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
               </div>
             </div>
 
+            {/* Channel tabs */}
+            <div className="flex items-center gap-1 px-4 py-1.5 flex-shrink-0 overflow-x-auto" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+              {channels.map(ch => (
+                <button key={ch.id} onClick={() => setChannel(ch.id)}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9.5px] font-semibold whitespace-nowrap flex-shrink-0 transition-all"
+                  style={{
+                    background: channel === ch.id ? `${ch.color}14` : "transparent",
+                    color: channel === ch.id ? ch.color : c.textMuted,
+                    borderBottom: channel === ch.id ? `2px solid ${ch.color}` : "2px solid transparent",
+                  }}>
+                  <span style={{ color: channel === ch.id ? ch.color : c.border }}>#</span>
+                  {ch.label}
+                </button>
+              ))}
+            </div>
+
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4" style={{ scrollbarWidth: "none" }}>
               {msgs.map((m, i) => (
@@ -7280,64 +7304,28 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
           </div>
         </div>
 
-        {/* Search */}
-        <div className="px-3 pt-2.5 pb-1.5 flex-shrink-0">
-          <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-            <I d={ic.search} s={10} c={c.textMuted} />
-            <input placeholder="Search models..." className="flex-1 bg-transparent outline-none text-[9.5px]" style={{ color: c.text }} />
-          </div>
+        {/* Models label */}
+        <div className="px-3 pt-2 pb-1 flex-shrink-0">
+          <p className="text-[9px] font-bold uppercase tracking-[0.12em]" style={{ color: c.textMuted }}>Models</p>
         </div>
 
-        {/* Story avatars */}
-        <div className="flex gap-2 px-3 pb-2 overflow-x-auto flex-shrink-0" style={{ scrollbarWidth: "none" }}>
-          {models.slice(0, 5).map(m => (
-            <button key={m.id} onClick={() => selectModel(m)} className="flex flex-col items-center gap-0.5 flex-shrink-0">
-              <div className="relative">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
-                  style={{
-                    background: `linear-gradient(135deg,${m.color},${m.color}99)`,
-                    boxShadow: activeModel.id === m.id ? `0 0 0 2px ${m.color}` : `0 2px 8px ${m.color}28`,
-                    outline: activeModel.id === m.id ? `2px solid ${c.bg}` : "none",
-                    outlineOffset: "1px",
-                  }}>
-                  {m.initials}
-                </div>
-                {m.online && <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2" style={{ background: "#10B981", borderColor: c.bg }} />}
-              </div>
-              <span className="text-[7px] truncate w-9 text-center" style={{ color: c.textMuted }}>{m.name.split(" ")[0]}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="mx-3 mb-1" style={{ height: 1, background: c.border }} />
-
-        {/* Model list */}
+        {/* Text-only model list */}
         <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
           {models.map(m => (
             <button key={m.id} onClick={() => selectModel(m)}
-              className="w-full flex items-center gap-2 px-3 py-2 transition-all text-left relative"
-              style={{ background: activeModel.id === m.id ? `${m.color}18` : "transparent" }}
+              className="w-full flex items-center justify-between px-3 py-2 transition-all text-left relative"
+              style={{ background: activeModel.id === m.id ? `${m.color}10` : "transparent" }}
               onMouseEnter={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = c.cardAlt; }}
               onMouseLeave={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = "transparent"; }}>
-              {activeModel.id === m.id && <div className="absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full" style={{ background: m.color }} />}
-              <div className="relative flex-shrink-0">
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center text-[8px] font-bold text-white"
-                  style={{ background: `linear-gradient(135deg,${m.color},${m.color}99)`, boxShadow: `0 2px 6px ${m.color}28` }}>
-                  {m.initials}
-                </div>
-                {m.online && <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full" style={{ background: "#10B981", border: `1.5px solid ${c.bg}` }} />}
+              {activeModel.id === m.id && <div className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r-full" style={{ background: m.color }} />}
+              <div className="min-w-0">
+                <p className="text-[10.5px] font-semibold truncate" style={{ color: m.color }}>{m.name}</p>
+                <p className="text-[7.5px]" style={{ color: c.textMuted }}>{m.company} · {m.ctx}</p>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className="text-[9px] truncate" style={{ color: c.text, fontWeight: activeModel.id === m.id ? 700 : 600 }}>{m.name}</span>
-                  <span className="text-[6.5px] font-semibold px-1 py-0.5 rounded flex-shrink-0 ml-1"
-                    style={{ background: activeModel.id === m.id ? m.color : `${m.color}14`, color: activeModel.id === m.id ? "#fff" : m.color }}>{m.badge}</span>
-                </div>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <span className="text-[7px]" style={{ color: c.textMuted }}>{m.params}</span>
-                  <span className="text-[6px]" style={{ color: c.border }}>·</span>
-                  <span className="text-[7px]" style={{ color: c.textMuted }}>{m.ctx}</span>
-                </div>
+              <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                {m.online && <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />}
+                <span className="text-[6.5px] font-semibold px-1.5 py-0.5 rounded"
+                  style={{ background: `${m.color}14`, color: m.color }}>{m.badge}</span>
               </div>
             </button>
           ))}
@@ -7507,7 +7495,11 @@ function AIVoiceApp({ c }: { c: typeof palette.dark }) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rec.onerror = (e: any) => {
       setListening(false);
-      if (e.error !== "no-speech") setError(`Mic error: ${e.error}`);
+      if (e.error === "not-allowed" || e.error === "permission-denied") {
+        setError("Microphone access denied. Click the lock icon in your browser address bar → allow Microphone, then try again.");
+      } else if (e.error !== "no-speech") {
+        setError(`Mic error: ${e.error}`);
+      }
     };
     rec.start();
   };
