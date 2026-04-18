@@ -262,6 +262,11 @@ const ic = {
   users: "M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 3a4 4 0 100 8 4 4 0 000-8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75",
   fileInvoice: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M8 13h8M8 17h8M8 9h2",
   barChart: "M18 20V10M12 20V4M6 20v-6",
+  copy: "M8 4v12a2 2 0 002 2h8a2 2 0 002-2V7.242a2 2 0 00-.602-1.43L16.083 2.57A2 2 0 0014.685 2H10a2 2 0 00-2 2zM4 8v12a2 2 0 002 2h8",
+  thumbUp: "M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14zm-7 11H4a2 2 0 01-2-2v-7a2 2 0 012-2h3",
+  thumbDown: "M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10zm7-13h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17",
+  paperclip: "M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48",
+  check: "M20 6L9 17l-5-5",
 };
 
 // ━━━━ Fill Icon Paths (closed shapes for filled rendering) ━━━━━━━━━━━━━━━━━━
@@ -6860,437 +6865,297 @@ function MonacoApp({ c }: { c: typeof palette.dark }) {
 // ━━━━ AI HUB APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AIHubApp({ c }: { c: typeof palette.dark }) {
   const models = [
-    { id: "claude", name: "Claude Opus", company: "Anthropic", color: "#F97316", desc: "Advanced reasoning and deep analysis", params: "2T", ctx: "200K", badge: "Flagship", initials: "CO", lastMsg: "Hello! How can I assist you today?", time: "now", online: true },
-    { id: "gpt4", name: "GPT-4o", company: "OpenAI", color: "#10B981", desc: "Versatile general-purpose intelligence", params: "1.8T", ctx: "128K", badge: "Popular", initials: "G4", lastMsg: "Great question! Here's what I think...", time: "2m", online: true },
-    { id: "gemini", name: "Gemini Ultra", company: "Google", color: "#3B82F6", desc: "Multimodal vision, audio, and text", params: "1.5T", ctx: "1M", badge: "Multimodal", initials: "GU", lastMsg: "I can process visual content too!", time: "5m", online: true },
-    { id: "llama", name: "Llama 3.1", company: "Meta", color: "#8B5CF6", desc: "Open-source with transparent weights", params: "405B", ctx: "128K", badge: "Open Source", initials: "L3", lastMsg: "Open-source and transparent.", time: "12m", online: false },
-    { id: "mistral", name: "Mistral Large", company: "Mistral AI", color: "#EC4899", desc: "Fast, European frontier model", params: "123B", ctx: "32K", badge: "Fast", initials: "ML", lastMsg: "Ready for your next request.", time: "1h", online: false },
-    { id: "deepseek", name: "DeepSeek R1", company: "DeepSeek", color: "#06B6D4", desc: "Reasoning-focused chain-of-thought model", params: "671B", ctx: "64K", badge: "Reasoning", initials: "DS", lastMsg: "Let me think step by step...", time: "3h", online: false },
+    { id: "claude", name: "Claude Opus", company: "Anthropic", color: "#F97316", desc: "Advanced reasoning and deep analysis", params: "2T", ctx: "200K", badge: "Flagship", initials: "CO", online: true },
+    { id: "gpt4", name: "GPT-4o", company: "OpenAI", color: "#10B981", desc: "Versatile general-purpose intelligence", params: "1.8T", ctx: "128K", badge: "Popular", initials: "G4", online: true },
+    { id: "gemini", name: "Gemini Ultra", company: "Google", color: "#3B82F6", desc: "Multimodal vision, audio, and text", params: "1.5T", ctx: "1M", badge: "Multimodal", initials: "GU", online: true },
+    { id: "llama", name: "Llama 3.1", company: "Meta", color: "#8B5CF6", desc: "Open-source with transparent weights", params: "405B", ctx: "128K", badge: "Open Source", initials: "L3", online: false },
+    { id: "mistral", name: "Mistral Large", company: "Mistral AI", color: "#EC4899", desc: "Fast, European frontier model", params: "123B", ctx: "32K", badge: "Fast", initials: "ML", online: false },
+    { id: "deepseek", name: "DeepSeek R1", company: "DeepSeek", color: "#06B6D4", desc: "Reasoning-focused chain-of-thought model", params: "671B", ctx: "64K", badge: "Reasoning", initials: "DS", online: false },
   ];
+  type HubMsg = { role: "user" | "ai"; text: string; model?: string; steps?: { type: "think" | "search" | "found"; text: string; section?: string }[] };
   const [activeModel, setActiveModel] = useState(models[0]);
-  const [msgs, setMsgs] = useState<{ role: "user" | "ai"; text: string; model?: string }[]>([
-    { role: "ai", text: `Hello! I'm ${models[0].name} by ${models[0].company}. I specialize in ${models[0].desc.toLowerCase()}. How can I assist you today?`, model: models[0].name },
+  const [msgs, setMsgs] = useState<HubMsg[]>([
+    { role: "ai", text: `Hello! I'm ${models[0].name} by ${models[0].company}. ${models[0].desc}. How can I assist?`, model: models[0].name },
   ]);
   const [input, setInput] = useState("");
-  const [tab, setTab] = useState<"chat" | "models" | "capabilities" | "pipelines" | "fine-tune" | "deploy">("chat");
-  const [modelDetailId, setModelDetailId] = useState<string | null>(null);
-  const modelDetail = modelDetailId ? models.find(m => m.id === modelDetailId) : null;
-  const [navSection, setNavSection] = useState<"chats" | "models" | "marketplace" | "archive">("chats");
-  const [callActive, setCallActive] = useState(false);
-  const [micOn, setMicOn] = useState(true);
-  const [camOn, setCamOn] = useState(false);
+  const [convTab, setConvTab] = useState<"recent" | "favorite">("recent");
+  const [expandedColl, setExpandedColl] = useState<string[]>(["pa"]);
+  const [modelDropOpen, setModelDropOpen] = useState(false);
   const hubEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => { hubEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
 
-  const pipelines = [
-    { name: "Art Classification", status: "active", steps: ["Ingest", "Resize", "Classify", "Tag", "Store"], lastRun: "2m ago", rate: "1,240/hr" },
-    { name: "Style Transfer", status: "training", steps: ["Load", "Encode", "Transfer", "Decode", "Save"], lastRun: "18m ago", rate: "—" },
-    { name: "Price Estimation", status: "idle", steps: ["Fetch", "Normalize", "Predict", "Output"], lastRun: "2h ago", rate: "—" },
-  ];
-  const deployments = [
-    { name: "Claude Opus – Prod", endpoint: "/api/v1/chat", model: "claude", status: "active", rps: "24", p99: "320ms", uptime: "99.98%" },
-    { name: "GPT-4o – Staging", endpoint: "/api/v1/chat-stg", model: "gpt4", status: "idle", rps: "2", p99: "180ms", uptime: "99.91%" },
-    { name: "Vision Classifier", endpoint: "/api/v1/classify", model: "gemini", status: "active", rps: "88", p99: "90ms", uptime: "100%" },
-  ];
   const responses: Record<string, string[]> = {
-    claude: ["I'll analyze that carefully and provide a nuanced response...", "From a reasoning perspective, this involves multiple considerations...", "Let me break this down step by step for you..."],
-    gpt4: ["Great question! Here's what I think...", "I can help with that! Let me explain...", "Based on my training, here's a comprehensive answer..."],
-    gemini: ["I can process both text and visual information to help...", "Using multimodal analysis, I can see that...", "Let me provide a comprehensive response with multiple perspectives..."],
-    llama: ["Processing your request with open-source efficiency...", "Here's my response based on open-source training data...", "As an open model, I'll give you a transparent answer..."],
+    claude: [
+      "Based on my analysis, I found the relevant details. All contracts exceeding $100M in value or with a term of two years or longer shall require prior approval by the Board of Directors. Management may negotiate such agreements in principle; however, no contract within these thresholds shall be executed or deemed binding without formal Board authorization.",
+      "I carefully analyzed the provided information and identified the key constraints. The applicable policy section confirms that threshold-based approval requirements apply to all major commitments entered by the Company.",
+      "After reviewing the relevant documentation, I can confirm the applicable requirements. The authorization structure ensures proper governance for all high-value or long-term commitments.",
+    ],
+    gpt4: [
+      "Great question! Based on my review of the relevant material, here's what I found: the applicable section confirms that board approval is recommended for contracts exceeding $100M in value or with terms longer than two years.",
+      "I found the answer. After searching through the relevant information, the policy clearly states the thresholds and requirements for board-level authorization.",
+      "Based on my analysis, here's a structured answer: the governance policy requires escalation to the Board for any commitment that meets the defined value or duration criteria.",
+    ],
+    gemini: [
+      "Using multimodal analysis across the provided context, I identified the relevant section. The policy clearly defines when board approval becomes mandatory based on contract value and duration.",
+      "I processed your request across multiple data points and found the applicable governance rule. Contracts above the defined thresholds require board-level sign-off before execution.",
+      "After comprehensive analysis, I can confirm the applicable requirements and their scope within the organization's governance framework.",
+    ],
+    llama: ["Here's my transparent answer based on open reasoning: the relevant policy section defines clear thresholds for board approval based on contract value and term length.", "Open-source analysis complete. The governance requirements are clearly defined in the applicable policy document.", "Transparent reasoning applied. The applicable section defines board approval requirements for high-value or long-term agreements."],
+    mistral: ["Fast analysis complete. Board approval is required for contracts exceeding $100M or lasting over two years per the applicable governance policy.", "Running inference on your query — the relevant policy section clearly defines the approval thresholds and authorization requirements.", "European frontier model response: the governance document specifies board-level authorization requirements for threshold-exceeding contracts."],
+    deepseek: ["Step-by-step reasoning: (1) identify applicable policy, (2) locate threshold definitions, (3) confirm board approval requirements. Result: contracts above $100M or 2-year terms require board sign-off.", "Chain-of-thought complete. The policy clearly establishes when board authorization is required based on financial and temporal thresholds.", "Deep reasoning applied. The authorization framework requires board approval for all contracts meeting the defined value or duration criteria."],
   };
-  const capabilities = [
-    { icon: ic.messageCircle, title: "Natural Conversation", desc: "Context-aware dialogue with memory across sessions", color: "#3B82F6" },
-    { icon: ic.code, title: "Code Generation", desc: "Write, debug, and refactor code in 50+ languages", color: "#10B981" },
-    { icon: ic.image, title: "Image Analysis", desc: "Understand and describe visual content in detail", color: "#F59E0B" },
-    { icon: ic.fileText, title: "Document Processing", desc: "Summarize, extract, and transform documents", color: "#8B5CF6" },
-    { icon: ic.globe, title: "Research & Analysis", desc: "Deep topic research with source attribution", color: "#EC4899" },
-    { icon: ic.layers, title: "Translation", desc: "Fluent translation across 100+ language pairs", color: "#06B6D4" },
+
+  const recentConvs = [
+    "How do I reset my password?",
+    "What's on my schedule today?",
+    "Remind me to submit the project report...",
+    "Can you help me track my order?",
   ];
+
+  const collections = [
+    { id: "pm", name: "Project Management", icon: ic.folder, color: "#3B82F6", items: [] as string[] },
+    { id: "pa", name: "Personal Assistant", icon: ic.user, color: "#8B5CF6", items: ["Schedule a dentist appointment for...", "Remind me to call Sarah at 5 PM..."] },
+    { id: "cs", name: "Customer Support", icon: ic.messageCircle, color: "#10B981", items: [] as string[] },
+  ];
+
   const send = () => {
     if (!input.trim()) return;
-    const userMsg = { role: "user" as const, text: input };
-    const opts = responses[activeModel.id];
-    const aiMsg = { role: "ai" as const, text: opts[Math.floor(Math.random() * opts.length)] + " " + input.toLowerCase() + ".", model: activeModel.name };
+    const q = input;
+    const userMsg: HubMsg = { role: "user", text: q };
+    const opts = responses[activeModel.id] || responses.claude;
+    const steps: HubMsg["steps"] = [
+      { type: "think", text: "Thinking through the process to find relevant information." },
+      { type: "search", text: `Searching for mentions of ${q.substring(0, 36)}${q.length > 36 ? "..." : ""}`, section: `Section 4.2 – ${q.substring(0, 28)}${q.length > 28 ? "..." : ""}` },
+      { type: "found", text: "Found details regarding your query in the knowledge base." },
+    ];
+    const aiMsg: HubMsg = { role: "ai", text: opts[Math.floor(Math.random() * opts.length)], model: activeModel.name, steps };
     setMsgs(p => [...p, userMsg, aiMsg]);
     setInput("");
   };
-  const communities = [
-    { id: "c1", name: "AI Researchers", members: "12.4k", color: "#7C3AED" },
-    { id: "c2", name: "LLM Builders", members: "8.9k", color: "#3B82F6" },
-    { id: "c3", name: "Prompt Engineers", members: "5.2k", color: "#10B981" },
-  ];
 
   const selectModel = (m: typeof models[0]) => {
     setActiveModel(m);
-    setMsgs([{ role: "ai", text: `Hello! I'm ${m.name} by ${m.company}. I specialize in ${m.desc.toLowerCase()}. How can I assist?`, model: m.name }]);
-    setCallActive(false);
+    setMsgs([{ role: "ai", text: `Hello! I'm ${m.name} by ${m.company}. ${m.desc}. How can I assist?`, model: m.name }]);
+    setModelDropOpen(false);
   };
 
   return (
     <div className="flex h-full overflow-hidden" style={{ background: c.bg, fontFamily: "'Segoe UI Variable','Segoe UI',system-ui,-apple-system,sans-serif" }}>
 
-      {/* ── LEFT SIDEBAR ── */}
-      <div className="flex flex-col flex-shrink-0" style={{ width: 168, borderRight: `1px solid ${c.border}`, background: c.surface }}>
+      {/* ── ICON SIDEBAR ── */}
+      <div className="flex flex-col items-center pt-3 pb-3 gap-1 flex-shrink-0" style={{ width: 50, borderRight: `1px solid ${c.border}`, background: c.surface }}>
+        {[
+          { icon: ic.plus, label: "New Chat" },
+          { icon: ic.grid, label: "Models" },
+          { icon: ic.globe, label: "Browse" },
+          { icon: ic.settings, label: "Settings" },
+        ].map(n => (
+          <button key={n.label} title={n.label}
+            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <I d={n.icon} s={14} c={c.textMuted} />
+          </button>
+        ))}
+        <div className="flex-1" />
+        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
+          style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}99)` }}>
+          {activeModel.initials}
+        </div>
+      </div>
 
-        {/* Header */}
-        <div className="px-3 pt-3 pb-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-          <div className="flex items-center gap-2.5 mb-2.5">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: `linear-gradient(135deg,${c.accent},${c.accent}AA)`, boxShadow: `0 4px 14px ${c.accent}45` }}>
-              <I d={ic.sparkle} s={15} c="#fff" f />
+      {/* ── MAIN CHAT AREA ── */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Chat header */}
+        <div className="flex items-center justify-center px-4 py-3 flex-shrink-0 relative" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
+          <div className="flex items-center gap-2">
+            <I d={ic.sparkle} s={11} c={c.textMuted} />
+            <span className="text-[13px] font-semibold" style={{ color: c.text }}>{activeModel.name}</span>
+          </div>
+          <button className="absolute right-4 w-7 h-7 rounded-lg flex items-center justify-center"
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <I d={ic.chevR} s={12} c={c.textMuted} />
+          </button>
+        </div>
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto py-6 space-y-5" style={{ scrollbarWidth: "none", paddingLeft: 36, paddingRight: 28 }}>
+          {msgs.map((m, i) => (
+            <div key={i}>
+              {m.role === "user" ? (
+                <div className="flex justify-end">
+                  <div className="max-w-[62%] px-4 py-2.5 text-[12.5px] leading-relaxed"
+                    style={{ background: c.cardAlt, color: c.text, border: `1px solid ${c.border}`, borderRadius: "18px 18px 4px 18px" }}>
+                    {m.text}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2" style={{ maxWidth: "80%" }}>
+                  {/* Thinking/search steps */}
+                  {m.steps && m.steps.map((step, si) => (
+                    <div key={si} className="flex items-start gap-2.5 ml-0.5">
+                      <div className="w-[18px] h-[18px] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        style={{ background: step.type === "think" ? "#7C3AED14" : step.type === "search" ? "#3B82F614" : "#10B98114" }}>
+                        <I
+                          d={step.type === "think" ? ic.refresh : step.type === "search" ? ic.search : ic.check}
+                          s={9}
+                          c={step.type === "think" ? "#7C3AED" : step.type === "search" ? "#3B82F6" : "#10B981"}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10.5px] leading-snug" style={{ color: c.textSec }}>{step.text}</p>
+                        {step.section && (
+                          <span className="inline-flex items-center mt-1 text-[9px] font-medium px-2 py-0.5 rounded-md"
+                            style={{ background: "#3B82F610", color: "#3B82F6", border: "1px solid #3B82F620" }}>
+                            {step.section}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {/* Found bullet + AI answer */}
+                  {m.steps && (
+                    <div className="flex items-start gap-2.5 ml-0.5">
+                      <div className="w-[18px] h-[18px] flex-shrink-0 mt-0.5" />
+                      <p className="text-[10.5px] leading-snug" style={{ color: c.textSec }}>
+                        <span className="mr-1" style={{ color: "#10B981" }}>•</span>
+                        {m.steps.find(s => s.type === "found")?.text}
+                      </p>
+                    </div>
+                  )}
+                  {/* Main answer text */}
+                  <div className="relative group ml-0.5">
+                    {/* Hover reaction buttons */}
+                    <div className="absolute -left-8 top-0 flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {[ic.copy, ic.thumbUp, ic.thumbDown].map((icon, ri) => (
+                        <button key={ri} className="w-6 h-6 rounded-lg flex items-center justify-center"
+                          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                          <I d={icon} s={9} c={c.textMuted} />
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[12.5px] leading-relaxed font-medium" style={{ color: c.text }}>{m.text}</p>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-bold leading-tight" style={{ color: c.text }}>Alternus AI</p>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
-                <p className="text-[7.5px] leading-tight" style={{ color: c.textMuted }}>{models.filter(m => m.online).length} models online</p>
-              </div>
-            </div>
-            <button className="w-6 h-6 rounded-lg flex items-center justify-center transition-all"
+          ))}
+          <div ref={hubEndRef} />
+        </div>
+
+        {/* Input */}
+        <div className="px-5 py-4 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}`, background: c.surface }}>
+          <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl"
+            style={{ background: c.card, border: `1.5px solid ${input.trim() ? activeModel.color + "50" : c.border}`, transition: "border-color 0.15s" }}>
+            <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
               onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-              <I d={ic.settings} s={11} c={c.textMuted} />
+              <I d={ic.paperclip} s={13} c={c.textMuted} />
+            </button>
+            <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
+              placeholder={`Ask ${activeModel.name.split(" ")[0]} anything...`}
+              className="flex-1 bg-transparent outline-none text-[12px]"
+              style={{ color: c.text }} />
+            <button onClick={send}
+              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
+              style={{ background: input.trim() ? c.text : c.cardAlt }}>
+              <I d={ic.send} s={12} c={input.trim() ? c.bg : c.textMuted} />
             </button>
           </div>
-          {/* Mini stats */}
-          <div className="flex gap-1.5">
-            {[{ v: `${models.filter(m=>m.online).length}/${models.length}`, l: "Active", col: "#10B981" }, { v: "6", l: "Models", col: c.accent }, { v: "3", l: "Groups", col: c.accent }].map(s => (
-              <div key={s.l} className="flex-1 px-2 py-1.5 rounded-lg text-center" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-                <p className="text-[10px] font-bold leading-none" style={{ color: s.col }}>{s.v}</p>
-                <p className="text-[6.5px] mt-0.5" style={{ color: c.textMuted }}>{s.l}</p>
+        </div>
+      </div>
+
+      {/* ── RIGHT PANEL ── */}
+      <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{ width: 218, borderLeft: `1px solid ${c.border}`, background: c.surface }}>
+
+        {/* AI Module */}
+        <div className="px-4 pt-4 pb-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <p className="text-[11.5px] font-bold mb-2.5" style={{ color: c.text }}>AI Module</p>
+          <div className="relative">
+            <button onClick={() => setModelDropOpen(p => !p)}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl transition-all"
+              style={{ background: `${activeModel.color}10`, border: `1px solid ${activeModel.color}28` }}>
+              <div className="w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0 text-[8px] font-bold text-white"
+                style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}AA)` }}>
+                {activeModel.initials}
               </div>
+              <span className="flex-1 text-[10.5px] font-semibold text-left" style={{ color: activeModel.color }}>{activeModel.badge}</span>
+              <I d={ic.chevD} s={10} c={activeModel.color} />
+            </button>
+            {modelDropOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-10"
+                style={{ background: c.card, border: `1px solid ${c.border}`, boxShadow: "0 8px 32px rgba(0,0,0,0.14)" }}>
+                {models.map(m => (
+                  <button key={m.id} onClick={() => selectModel(m)}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-left transition-all"
+                    style={{ background: activeModel.id === m.id ? c.accentSoft : "transparent" }}
+                    onMouseEnter={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = "transparent"; }}>
+                    <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 text-[7px] font-bold text-white"
+                      style={{ background: `linear-gradient(135deg,${m.color},${m.color}99)` }}>
+                      {m.initials}
+                    </div>
+                    <span className="flex-1 text-[10px] font-medium" style={{ color: c.text }}>{m.name}</span>
+                    {m.online && <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Conversations */}
+        <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          <p className="text-[11.5px] font-bold mb-2.5" style={{ color: c.text }}>Conversations</p>
+          <div className="flex gap-0.5 mb-3 p-0.5 rounded-lg" style={{ background: c.cardAlt }}>
+            {(["recent", "favorite"] as const).map(t => (
+              <button key={t} onClick={() => setConvTab(t)}
+                className="flex-1 py-1 rounded-md text-[9.5px] font-semibold capitalize transition-all"
+                style={{ background: convTab === t ? c.surface : "transparent", color: convTab === t ? c.text : c.textMuted, boxShadow: convTab === t ? "0 1px 4px rgba(0,0,0,0.08)" : "none" }}>
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
+          </div>
+          <div className="space-y-0.5">
+            {recentConvs.map((conv, i) => (
+              <button key={i} onClick={() => setInput(conv)}
+                className="w-full text-left px-2 py-1.5 rounded-lg transition-all"
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <p className="text-[10px] truncate" style={{ color: c.textSec }}>{conv}</p>
+              </button>
             ))}
           </div>
         </div>
 
-        {/* Nav */}
-        <div className="flex-1 overflow-y-auto px-2 py-2" style={{ scrollbarWidth: "none" }}>
-          {[
-            { id: "chats", icon: ic.messageCircle, label: "Chats", badge: models.filter(m => m.online).length },
-            { id: "models", icon: ic.sparkle, label: "Models" },
-            { id: "marketplace", icon: ic.store, label: "Marketplace" },
-            { id: "archive", icon: ic.download, label: "Archive" },
-          ].map(item => (
-            <button key={item.id} onClick={() => setNavSection(item.id as typeof navSection)}
-              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left mb-0.5 transition-all"
-              style={{ background: navSection === item.id ? c.accentSoft : "transparent" }}
-              onMouseEnter={e => { if (navSection !== item.id) e.currentTarget.style.background = c.cardAlt; }}
-              onMouseLeave={e => { if (navSection !== item.id) e.currentTarget.style.background = "transparent"; }}>
-              <I d={item.icon} s={13} c={navSection === item.id ? c.accent : c.textMuted} />
-              <span className="text-[10.5px] font-semibold flex-1" style={{ color: navSection === item.id ? c.accent : c.textSec }}>{item.label}</span>
-              {item.badge != null && item.badge > 0 && (
-                <span className="text-[7px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: c.accent, color: "#fff" }}>{item.badge}</span>
-              )}
-            </button>
-          ))}
-
-          <div className="mx-2 my-2.5" style={{ height: 1, background: c.border }} />
-          <p className="text-[7.5px] font-bold uppercase tracking-[0.14em] px-2 pb-1.5" style={{ color: c.textMuted }}>Communities</p>
-          {communities.map(com => (
-            <button key={com.id}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-xl mb-0.5 transition-all text-left"
-              onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-              <div className="w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center"
-                style={{ background: `${com.color}14`, border: `1px solid ${com.color}22` }}>
-                <I d={ic.brain} s={11} c={com.color} />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[9px] font-semibold truncate" style={{ color: c.text }}>{com.name}</p>
-                <p className="text-[7px]" style={{ color: c.textMuted }}>{com.members}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── MIDDLE PANEL ── */}
-      <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{ width: 200, borderRight: `1px solid ${c.border}` }}>
-        {/* Search */}
-        <div className="px-3 pt-3 pb-2 flex-shrink-0">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-            <I d={ic.search} s={11} c={c.textMuted} />
-            <input placeholder="Search models..." className="flex-1 bg-transparent outline-none text-[10px]" style={{ color: c.text }} />
+        {/* Collections */}
+        <div className="flex-1 overflow-y-auto px-4 py-3" style={{ scrollbarWidth: "none" }}>
+          <div className="flex items-center justify-between mb-2.5">
+            <p className="text-[11.5px] font-bold" style={{ color: c.text }}>Collections</p>
+            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md"
+              style={{ background: "#10B98115", color: "#10B981", border: "1px solid #10B98125" }}>New</span>
           </div>
-        </div>
-
-        {/* Story-style model avatars */}
-        <div className="flex gap-2.5 px-3 pb-2 overflow-x-auto flex-shrink-0" style={{ scrollbarWidth: "none" }}>
-          {models.slice(0, 5).map(m => (
-            <button key={m.id} onClick={() => selectModel(m)} className="flex flex-col items-center gap-1 flex-shrink-0">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-                  style={{
-                    background: `linear-gradient(135deg,${m.color},${m.color}99)`,
-                    boxShadow: activeModel.id === m.id ? `0 0 0 2.5px ${m.color}` : `0 2px 8px ${m.color}28`,
-                    outline: activeModel.id === m.id ? `2.5px solid ${c.bg}` : "none",
-                    outlineOffset: "1px",
-                  }}>
-                  {m.initials}
-                </div>
-                {m.online && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2" style={{ background: "#10B981", borderColor: c.bg }} />}
-              </div>
-              <span className="text-[7.5px] truncate w-10 text-center" style={{ color: c.textMuted }}>{m.name.split(" ")[0]}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="mx-3 mb-1" style={{ height: 1, background: c.border }} />
-
-        {/* Model list */}
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-          {models.map(m => (
-            <button key={m.id} onClick={() => selectModel(m)}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 transition-all text-left relative"
-              style={{ background: activeModel.id === m.id ? `${m.color}18` : "transparent" }}
-              onMouseEnter={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = c.cardAlt; }}
-              onMouseLeave={e => { if (activeModel.id !== m.id) e.currentTarget.style.background = "transparent"; }}>
-              {activeModel.id === m.id && <div className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r-full" style={{ background: m.color }} />}
-              <div className="relative flex-shrink-0">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[9px] font-bold text-white"
-                  style={{ background: `linear-gradient(135deg,${m.color},${m.color}99)`, boxShadow: `0 2px 8px ${m.color}28` }}>
-                  {m.initials}
-                </div>
-                {m.online && <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full" style={{ background: "#10B981", border: `2px solid ${c.bg}` }} />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[9.5px] truncate" style={{ color: c.text, fontWeight: activeModel.id === m.id ? 700 : 600 }}>{m.name}</span>
-                  <span className="text-[7px] font-semibold px-1.5 py-0.5 rounded-md flex-shrink-0 ml-1"
-                    style={{ background: activeModel.id === m.id ? m.color : `${m.color}14`, color: activeModel.id === m.id ? "#fff" : m.color }}>{m.badge}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-[7.5px]" style={{ color: c.textMuted }}>{m.params}</span>
-                  <span className="text-[7px]" style={{ color: c.border }}>·</span>
-                  <span className="text-[7.5px]" style={{ color: c.textMuted }}>{m.ctx} ctx</span>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── RIGHT ACTIVE CHAT / CALL PANEL (flex-1) ── */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {callActive ? (
-          /* ── VIDEO CALL VIEW ── */
-          <div className="flex flex-col h-full" style={{ background: "#0d0d14" }}>
-            {/* Call header */}
-            <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
-              <button onClick={() => setCallActive(false)} className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
-                <I d={ic.chevL} s={14} c="rgba(255,255,255,0.7)" />
-                <span className="text-[10px]">Back</span>
-              </button>
-              <div className="text-center">
-                <p className="text-[11px] font-semibold text-white">{activeModel.name}</p>
-                <p className="text-[9px] text-white/50">AI Session · {new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}</p>
-              </div>
-              <div className="flex gap-1.5">
-                <button className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}>
-                  <I d={ic.user} s={12} c="white" />
-                </button>
-                <button className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}>
-                  <I d={ic.menu} s={12} c="white" />
-                </button>
-              </div>
-            </div>
-            {/* Main video area */}
-            <div className="flex-1 flex items-center justify-center relative">
-              {/* Model avatar as "video feed" */}
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-28 h-28 rounded-full flex items-center justify-center text-4xl font-bold text-white"
-                  style={{ background: `linear-gradient(135deg, ${activeModel.color}, ${activeModel.color}99)`, boxShadow: `0 0 60px ${activeModel.color}40` }}>
-                  {activeModel.initials}
-                </div>
-                <p className="text-white text-[13px] font-semibold">{activeModel.name}</p>
-                <p className="text-white/50 text-[10px]">{activeModel.company}</p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#10B981" }} />
-                  <span className="text-[9px]" style={{ color: "#10B981" }}>AI Session Active</span>
-                </div>
-              </div>
-              {/* Mini self video (bottom right) */}
-              <div className="absolute bottom-4 right-4 w-20 h-16 rounded-2xl flex items-center justify-center"
-                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}>
-                {camOn ? (
-                  <span className="text-[9px] text-white/60">Camera</span>
-                ) : (
-                  <I d={ic.user} s={20} c="rgba(255,255,255,0.3)" />
-                )}
-              </div>
-            </div>
-            {/* Call controls */}
-            <div className="flex items-center justify-center gap-4 py-4 flex-shrink-0">
-              {[
-                { icon: ic.monitor, on: true, color: "rgba(255,255,255,0.1)", label: "Screen" },
-                { icon: ic.mic, on: micOn, color: micOn ? "rgba(255,255,255,0.1)" : "#EF4444", label: "Mic", toggle: () => setMicOn(p => !p) },
-                { icon: ic.film, on: camOn, color: camOn ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.06)", label: "Cam", toggle: () => setCamOn(p => !p) },
-                { icon: ic.volume, on: true, color: "rgba(255,255,255,0.1)", label: "Sound" },
-                { icon: ic.power, on: false, color: "#EF4444", label: "End", toggle: () => setCallActive(false) },
-              ].map((btn, i) => (
-                <button key={i} onClick={btn.toggle}
-                  className="flex flex-col items-center gap-1"
-                  title={btn.label}>
-                  <div className="w-11 h-11 rounded-full flex items-center justify-center transition-all"
-                    style={{ background: btn.color }}>
-                    <I d={btn.icon} s={16} c="white" />
-                  </div>
-                  <span className="text-[7px] text-white/40">{btn.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
-          /* ── CHAT VIEW ── */
-          <>
-            {/* Chat header */}
-            <div className="flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
-              <div className="flex items-center justify-between px-5 pt-4 pb-3">
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-[12px] font-bold text-white flex-shrink-0"
-                    style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}99)`, boxShadow: `0 6px 20px ${activeModel.color}45` }}>
-                    {activeModel.initials}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <p className="text-[15px] font-semibold tracking-tight" style={{ color: c.text, letterSpacing: "-0.01em" }}>{activeModel.name}</p>
-                      <span className="text-[9px] font-semibold px-2 py-0.5 rounded-md"
-                        style={{ background: `${activeModel.color}15`, color: activeModel.color, border: `1px solid ${activeModel.color}28` }}>
-                        {activeModel.badge}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ background: activeModel.online ? "#10B981" : c.textMuted }} />
-                      <p className="text-[10px]" style={{ color: activeModel.online ? "#10B981" : c.textMuted }}>
-                        {activeModel.online ? "Online" : "Offline"}
-                      </p>
-                      <span style={{ color: c.border }}>·</span>
-                      <p className="text-[10px]" style={{ color: c.textMuted }}>{activeModel.company}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <button onClick={() => setCallActive(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-medium transition-all"
-                    style={{ background: "#10B98112", color: "#10B981", border: "1px solid #10B98122" }}
-                    onMouseEnter={e => (e.currentTarget.style.background = "#10B98120")} onMouseLeave={e => (e.currentTarget.style.background = "#10B98112")}>
-                    <I d={ic.mic} s={12} c="#10B981" /> Voice
-                  </button>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-medium transition-all"
-                    style={{ background: `${activeModel.color}12`, color: activeModel.color, border: `1px solid ${activeModel.color}22` }}
-                    onMouseEnter={e => (e.currentTarget.style.background = `${activeModel.color}20`)} onMouseLeave={e => (e.currentTarget.style.background = `${activeModel.color}12`)}>
-                    <I d={ic.monitor} s={12} c={activeModel.color} /> Share
-                  </button>
-                  <button className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                    <I d={ic.menu} s={14} c={c.textMuted} />
-                  </button>
-                </div>
-              </div>
-              {/* Metrics strip */}
-              <div className="flex items-center px-5 pb-3 gap-0">
-                {[
-                  { label: "Params", value: activeModel.params },
-                  { label: "Context", value: activeModel.ctx },
-                  { label: "Latency", value: "<20ms" },
-                  { label: "Provider", value: activeModel.company },
-                ].map((stat, i) => (
-                  <div key={stat.label} className="flex items-center gap-1.5">
-                    {i > 0 && <div className="w-px h-3.5 mx-3" style={{ background: c.border }} />}
-                    <span className="text-[9px]" style={{ color: c.textMuted }}>{stat.label}</span>
-                    <span className="text-[9px] font-semibold ml-1" style={{ color: c.text }}>{stat.value}</span>
-                  </div>
-                ))}
-                <div className="ml-auto flex items-center gap-1.5 px-2.5 py-1 rounded-lg" style={{ background: "#10B98110" }}>
-                  <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
-                  <span className="text-[9px] font-semibold" style={{ color: "#10B981" }}>Live</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4" style={{ scrollbarWidth: "none" }}>
-              {msgs.map((m, i) => (
-                <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start gap-3"}`}>
-                  {m.role === "ai" && (
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-white mt-0.5"
-                      style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}AA)`, boxShadow: `0 3px 10px ${activeModel.color}30` }}>
-                      {activeModel.initials}
-                    </div>
+          <div className="space-y-0.5">
+            {collections.map(col => (
+              <div key={col.id}>
+                <button
+                  onClick={() => col.items.length > 0 && setExpandedColl(p => p.includes(col.id) ? p.filter(x => x !== col.id) : [...p, col.id])}
+                  className="w-full flex items-center gap-2.5 px-2 py-2 rounded-xl transition-all text-left"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <I d={col.icon} s={12} c={col.color} />
+                  <span className="flex-1 text-[10px] font-semibold" style={{ color: c.text }}>{col.name}</span>
+                  {col.items.length > 0 && (
+                    <I d={expandedColl.includes(col.id) ? ic.chevU : ic.chevD} s={9} c={c.textMuted} />
                   )}
-                  <div className="max-w-[70%]">
-                    {m.role === "ai" && (
-                      <p className="text-[9.5px] font-semibold mb-1.5 flex items-center gap-1.5" style={{ color: activeModel.color }}>
-                        {m.model}
-                        <span className="font-normal text-[9px]" style={{ color: c.textMuted }}>· just now</span>
-                      </p>
-                    )}
-                    <div className="px-4 py-3 text-[12px] leading-relaxed"
-                      style={{
-                        background: m.role === "user" ? `linear-gradient(135deg,${activeModel.color},${activeModel.color}CC)` : c.card,
-                        color: m.role === "user" ? "#fff" : c.text,
-                        border: m.role === "ai" ? `1px solid ${c.border}` : "none",
-                        borderLeft: m.role === "ai" ? `3px solid ${activeModel.color}40` : undefined,
-                        borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "4px 16px 16px 16px",
-                        boxShadow: m.role === "user" ? `0 4px 14px ${activeModel.color}30` : "0 1px 6px rgba(0,0,0,0.04)",
-                        fontWeight: 400,
-                      }}>
-                      {m.text}
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Capabilities — shown when conversation is fresh */}
-              {msgs.filter(m => m.role === "user").length === 0 && (
-                <div className="mt-3">
-                  <p className="text-[9px] font-semibold uppercase tracking-widest mb-3 px-1" style={{ color: c.textMuted, letterSpacing: "0.12em" }}>Capabilities</p>
-                  <div className="grid grid-cols-2 gap-2.5">
-                    {capabilities.map(cap => (
-                      <button key={cap.title} onClick={() => setInput(cap.title)}
-                        className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all"
-                        style={{ background: c.card, border: `1px solid ${c.border}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = `${cap.color}50`; e.currentTarget.style.boxShadow = `0 4px 16px ${cap.color}18`; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                        >
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${cap.color}14` }}>
-                          <I d={cap.icon} s={16} c={cap.color} />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[11px] font-semibold leading-tight" style={{ color: c.text }}>{cap.title}</p>
-                          <p className="text-[8.5px] leading-snug mt-0.5" style={{ color: c.textMuted }}>{cap.desc}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div ref={hubEndRef} />
-            </div>
-
-            {/* Input */}
-            <div className="px-5 py-4 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}`, background: c.surface }}>
-              <div className="flex items-center gap-2.5 px-4 py-3 rounded-2xl"
-                style={{ background: c.card, border: `1.5px solid ${input.trim() ? activeModel.color + "60" : c.border}`, boxShadow: input.trim() ? `0 4px 20px ${activeModel.color}18` : "0 1px 8px rgba(0,0,0,0.06)", transition: "border-color 0.15s, box-shadow 0.15s" }}>
-                <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
-                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <I d={ic.plus} s={14} c={c.textMuted} />
                 </button>
-                <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()}
-                  placeholder={`Message ${activeModel.name}...`}
-                  className="flex-1 bg-transparent outline-none text-[12px]"
-                  style={{ color: c.text, fontWeight: 400 }} />
-                <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
-                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <I d={ic.mic} s={13} c={c.textMuted} />
-                </button>
-                <button onClick={send}
-                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
-                  style={{ background: input.trim() ? `linear-gradient(135deg,${activeModel.color},${activeModel.color}CC)` : c.cardAlt, boxShadow: input.trim() ? `0 2px 12px ${activeModel.color}40` : "none" }}>
-                  <I d={ic.send} s={13} c={input.trim() ? "#fff" : c.textMuted} />
-                </button>
+                {expandedColl.includes(col.id) && col.items.map((item, ii) => (
+                  <button key={ii}
+                    className="w-full text-left px-6 py-1.5 rounded-lg transition-all"
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <span className="text-[9px]" style={{ color: c.textMuted }}>• {item}</span>
+                  </button>
+                ))}
               </div>
-            </div>
-          </>
-        )}
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
