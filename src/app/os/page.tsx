@@ -6884,15 +6884,16 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
   const hubEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => { hubEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
 
-  // Agent-style sidebar color vars
-  const agSidebarBg = c.surface;
-  const agBorder = c.border;
-  const agText = c.text;
-  const agTextSec = c.textSec;
-  const agTextMuted = c.textMuted;
-  const agAccent = c.accent;
-  const agAccentSoft = c.accentSoft;
-  const agSelected = c.cardAlt;
+  // Agent-style sidebar color vars (matches AlternusAgentApp exactly)
+  const dk = c.bg === "#1C1D22";
+  const agSidebarBg = dk ? c.surface : "linear-gradient(175deg,#F0EAFF 0%,#EDE8FF 40%,#EFF4FF 100%)";
+  const agBorder = dk ? c.border : "rgba(120,80,220,0.10)";
+  const agText = dk ? c.text : "#1a1525";
+  const agTextSec = dk ? c.textSec : "#5a5470";
+  const agTextMuted = dk ? c.textMuted : "#9896ab";
+  const agAccent = "#7C3AED";
+  const agAccentSoft = dk ? "rgba(124,58,237,0.14)" : "rgba(124,58,237,0.10)";
+  const agSelected = dk ? "rgba(79,142,247,0.14)" : "rgba(124,58,237,0.10)";
 
   const responses: Record<string, string[]> = {
     claude: ["I'll analyze that carefully and provide a nuanced response...", "From a reasoning perspective, this involves multiple considerations...", "Let me break this down step by step for you..."],
@@ -6929,11 +6930,65 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
     setCallActive(false);
   };
 
+  // fullscreen voice call — no sidebars
+  if (callActive) return (
+    <div className="flex flex-col h-full" style={{ background: "#0d0d14", fontFamily: "'Segoe UI Variable','Segoe UI',system-ui,-apple-system,sans-serif" }}>
+      <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
+        <button onClick={() => setCallActive(false)} className="flex items-center gap-2" style={{ color: "rgba(255,255,255,0.7)" }}>
+          <I d={ic.chevL} s={14} c="rgba(255,255,255,0.7)" />
+          <span className="text-[10px]">Back</span>
+        </button>
+        <div className="text-center">
+          <p className="text-[11px] font-semibold text-white">{activeModel.name}</p>
+          <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.5)" }}>AI Session · {new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}</p>
+        </div>
+        <div className="flex gap-1.5">
+          <button className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}><I d={ic.user} s={12} c="white" /></button>
+          <button className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}><I d={ic.menu} s={12} c="white" /></button>
+        </div>
+      </div>
+      <div className="flex-1 flex items-center justify-center relative">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-28 h-28 rounded-full flex items-center justify-center text-4xl font-bold text-white"
+            style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}99)`, boxShadow: `0 0 60px ${activeModel.color}40` }}>
+            {activeModel.initials}
+          </div>
+          <p className="text-white text-[13px] font-semibold">{activeModel.name}</p>
+          <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.5)" }}>{activeModel.company}</p>
+          <div className="flex items-center gap-1.5 mt-1">
+            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#10B981" }} />
+            <span className="text-[9px]" style={{ color: "#10B981" }}>AI Session Active</span>
+          </div>
+        </div>
+        <div className="absolute bottom-4 right-4 w-20 h-16 rounded-2xl flex items-center justify-center"
+          style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}>
+          {camOn ? <span className="text-[9px] text-white/60">Camera</span> : <I d={ic.user} s={20} c="rgba(255,255,255,0.3)" />}
+        </div>
+      </div>
+      <div className="flex items-center justify-center gap-4 py-4 flex-shrink-0">
+        {[
+          { icon: ic.monitor, color: "rgba(255,255,255,0.1)", label: "Screen", toggle: undefined as undefined | (() => void) },
+          { icon: ic.mic, color: micOn ? "rgba(255,255,255,0.1)" : "#EF4444", label: "Mic", toggle: () => setMicOn(p => !p) },
+          { icon: ic.film, color: camOn ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.06)", label: "Cam", toggle: () => setCamOn(p => !p) },
+          { icon: ic.volume, color: "rgba(255,255,255,0.1)", label: "Sound", toggle: undefined },
+          { icon: ic.power, color: "#EF4444", label: "End", toggle: () => setCallActive(false) },
+        ].map((btn, i) => (
+          <button key={i} onClick={btn.toggle} className="flex flex-col items-center gap-1" title={btn.label}>
+            <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: btn.color }}>
+              <I d={btn.icon} s={16} c="white" />
+            </div>
+            <span className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)" }}>{btn.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex h-full overflow-hidden" style={{ background: c.bg, fontFamily: "'Segoe UI Variable','Segoe UI',system-ui,-apple-system,sans-serif" }}>
 
-      {/* ── LEFT SIDEBAR (AlternusAgent style) ── */}
-      <div className="flex flex-col flex-shrink-0" style={{ width: 230, background: agSidebarBg, borderRight: `1px solid ${agBorder}` }}>
+      {/* ── LEFT SIDEBAR (identical to AlternusAgentApp) ── */}
+      <div className="flex flex-col flex-shrink-0" style={{ width: 230, background: agSidebarBg, backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", borderRight: `1px solid ${agBorder}` }}>
 
         {/* Header */}
         <div className="px-3 pt-3 pb-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}` }}>
@@ -6943,10 +6998,10 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
               <I d={ic.sparkle} s={14} c={agAccent} f />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-bold leading-tight" style={{ color: agText }}>Alternus AI</p>
+              <p className="text-[11px] font-bold leading-tight" style={{ color: agText }}>Alternus Agent</p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
-                <p className="text-[7.5px]" style={{ color: agTextMuted }}>{models.filter(m => m.online).length} models online</p>
+                <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981" }} />
+                <p className="text-[7.5px]" style={{ color: agTextMuted }}>{activeModel.name} · Active</p>
               </div>
             </div>
             <button className="w-6 h-6 rounded-lg flex items-center justify-center transition-all"
@@ -6954,12 +7009,13 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
               <I d={ic.settings} s={11} c={agTextMuted} />
             </button>
           </div>
-          {/* New chat button */}
+          {/* New task button */}
           <button className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[10.5px] font-medium transition-all"
-            style={{ background: "rgba(255,255,255,0.06)", color: agText, border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}
-            onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.06)")}>
+            style={{ background: dk ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.9)", color: agText, border: `1px solid ${agBorder}`, boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}
+            onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.10)" : "#fff")}
+            onMouseLeave={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.9)")}>
             <span className="text-[15px] leading-none font-light" style={{ color: agAccent }}>+</span>
-            <span className="flex-1 text-left">New chat</span>
+            <span className="flex-1 text-left">New task</span>
             <span className="text-[8.5px]" style={{ color: agTextMuted }}>⌘ N</span>
           </button>
         </div>
@@ -6967,10 +7023,10 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
         {/* Nav */}
         <div className="flex-1 overflow-y-auto px-2 py-2" style={{ scrollbarWidth: "none" }}>
           {[
-            { id: "chats", icon: ic.messageCircle, label: "Chats", badge: models.filter(m => m.online).length },
-            { id: "models", icon: ic.sparkle, label: "Models", badge: 0 },
-            { id: "marketplace", icon: ic.store, label: "Marketplace", badge: 0 },
-            { id: "archive", icon: ic.download, label: "Archive", badge: 0 },
+            { id: "chats",       icon: ic.sparkle,       label: "All tasks",   badge: msgs.filter(m => m.role === "user").length },
+            { id: "models",      icon: ic.mail,          label: "Email",       badge: 0 },
+            { id: "marketplace", icon: ic.fileText,      label: "Documents",   badge: 0 },
+            { id: "archive",     icon: ic.folder,        label: "Files",       badge: 0 },
           ].map(item => (
             <button key={item.id} onClick={() => setNavSection(item.id as typeof navSection)}
               className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left mb-0.5 transition-all"
@@ -6984,13 +7040,20 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
               )}
             </button>
           ))}
+          {/* Settings row */}
+          <button className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left mb-0.5 transition-all"
+            style={{ background: "transparent" }}
+            onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <I d={ic.settings} s={13} c={agTextMuted} />
+            <span className="text-[10.5px] font-medium" style={{ color: agTextSec }}>Settings</span>
+          </button>
 
           <div className="mx-2 my-2.5" style={{ height: 1, background: agBorder }} />
           <p className="text-[7.5px] font-bold uppercase tracking-[0.14em] px-2 pb-1.5" style={{ color: agTextMuted }}>Quick Actions</p>
           {[
-            { icon: ic.mic, label: "Voice Call", action: () => setCallActive(true) },
-            { icon: ic.monitor, label: "Share Screen", action: () => {} },
-            { icon: ic.image, label: "Image Analysis", action: () => setInput("Analyze this image") },
+            { icon: ic.monitor, label: "Open Apps",  action: () => {} },
+            { icon: ic.code,    label: "Terminal",   action: () => setInput("Open the terminal") },
+            { icon: ic.image,   label: "Wallpaper",  action: () => setInput("Change wallpaper") },
           ].map(item => (
             <button key={item.label} onClick={item.action}
               className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left mb-0.5 transition-all"
@@ -7014,37 +7077,19 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
               ))}
             </>
           )}
-
-          <div className="mx-2 my-2.5" style={{ height: 1, background: agBorder }} />
-          <p className="text-[7.5px] font-bold uppercase tracking-[0.14em] px-2 pb-1.5" style={{ color: agTextMuted }}>Communities</p>
-          {communities.map(com => (
-            <button key={com.id}
-              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-xl mb-0.5 transition-all text-left"
-              onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-              <div className="w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center"
-                style={{ background: `${com.color}14`, border: `1px solid ${com.color}22` }}>
-                <I d={ic.brain} s={11} c={com.color} />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[9px] font-semibold truncate" style={{ color: agText }}>{com.name}</p>
-                <p className="text-[7px]" style={{ color: agTextMuted }}>{com.members}</p>
-              </div>
-            </button>
-          ))}
         </div>
 
         {/* Footer */}
         <div className="px-3 py-2 flex-shrink-0" style={{ borderTop: `1px solid ${agBorder}` }}>
           <div className="flex items-center gap-2 px-2.5 py-2 rounded-xl"
-            style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${agBorder}` }}>
+            style={{ background: dk ? "rgba(255,255,255,0.04)" : "rgba(124,58,237,0.05)", border: `1px solid ${agBorder}` }}>
             <div className="w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: agAccentSoft }}>
               <I d={ic.brain} s={10} c={agAccent} />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[9px] font-semibold truncate" style={{ color: agText }}>{activeModel.name}</p>
-              <p className="text-[7px]" style={{ color: agTextMuted }}>{activeModel.params} · {activeModel.ctx} ctx</p>
+              <p className="text-[7px]" style={{ color: agTextMuted }}>{activeModel.ctx} ctx · Real OS actions</p>
             </div>
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: activeModel.online ? "#10B981" : agTextMuted }} />
           </div>
         </div>
       </div>
@@ -7115,67 +7160,8 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
         </div>
       </div>
 
-      {/* ── RIGHT CHAT / CALL PANEL ── */}
+      {/* ── RIGHT CHAT PANEL ── */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {callActive ? (
-          /* ── VIDEO CALL VIEW ── */
-          <div className="flex flex-col h-full" style={{ background: "#0d0d14" }}>
-            <div className="flex items-center justify-between px-4 py-3 flex-shrink-0">
-              <button onClick={() => setCallActive(false)} className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
-                <I d={ic.chevL} s={14} c="rgba(255,255,255,0.7)" />
-                <span className="text-[10px]">Back</span>
-              </button>
-              <div className="text-center">
-                <p className="text-[11px] font-semibold text-white">{activeModel.name}</p>
-                <p className="text-[9px] text-white/50">AI Session · {new Date().toLocaleTimeString("en", { hour: "2-digit", minute: "2-digit" })}</p>
-              </div>
-              <div className="flex gap-1.5">
-                <button className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}>
-                  <I d={ic.user} s={12} c="white" />
-                </button>
-                <button className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}>
-                  <I d={ic.menu} s={12} c="white" />
-                </button>
-              </div>
-            </div>
-            <div className="flex-1 flex items-center justify-center relative">
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-28 h-28 rounded-full flex items-center justify-center text-4xl font-bold text-white"
-                  style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}99)`, boxShadow: `0 0 60px ${activeModel.color}40` }}>
-                  {activeModel.initials}
-                </div>
-                <p className="text-white text-[13px] font-semibold">{activeModel.name}</p>
-                <p className="text-white/50 text-[10px]">{activeModel.company}</p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#10B981" }} />
-                  <span className="text-[9px]" style={{ color: "#10B981" }}>AI Session Active</span>
-                </div>
-              </div>
-              <div className="absolute bottom-4 right-4 w-20 h-16 rounded-2xl flex items-center justify-center"
-                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}>
-                {camOn ? <span className="text-[9px] text-white/60">Camera</span> : <I d={ic.user} s={20} c="rgba(255,255,255,0.3)" />}
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-4 py-4 flex-shrink-0">
-              {[
-                { icon: ic.monitor, color: "rgba(255,255,255,0.1)", label: "Screen", toggle: undefined as undefined | (() => void) },
-                { icon: ic.mic, color: micOn ? "rgba(255,255,255,0.1)" : "#EF4444", label: "Mic", toggle: () => setMicOn(p => !p) },
-                { icon: ic.film, color: camOn ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.06)", label: "Cam", toggle: () => setCamOn(p => !p) },
-                { icon: ic.volume, color: "rgba(255,255,255,0.1)", label: "Sound", toggle: undefined },
-                { icon: ic.power, color: "#EF4444", label: "End", toggle: () => setCallActive(false) },
-              ].map((btn, i) => (
-                <button key={i} onClick={btn.toggle} className="flex flex-col items-center gap-1" title={btn.label}>
-                  <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: btn.color }}>
-                    <I d={btn.icon} s={16} c="white" />
-                  </div>
-                  <span className="text-[7px] text-white/40">{btn.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
-          /* ── CHAT VIEW ── */
-          <>
             {/* Chat header */}
             <div className="flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
               <div className="flex items-center justify-between px-5 pt-4 pb-3">
@@ -7322,8 +7308,6 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
                 </button>
               </div>
             </div>
-          </>
-        )}
       </div>
     </div>
   );
