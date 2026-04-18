@@ -339,8 +339,8 @@ function TitleBar({
     justifyContent: "center",
     position: "relative",
     overflow: "hidden",
-    background: dk ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-    border: `1px solid ${dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"}`,
+    background: "transparent",
+    border: "1px solid transparent",
     transition: "all 0.22s cubic-bezier(0.4,0,0.2,1)",
     cursor: "pointer",
   };
@@ -369,8 +369,8 @@ function TitleBar({
           }}
           onMouseLeave={e => {
             const el = e.currentTarget;
-            el.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
-            el.style.borderColor = dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+            el.style.background = "transparent";
+            el.style.borderColor = "transparent";
             el.style.boxShadow = "none";
             const s = el.querySelector("circle"); if (s) s.setAttribute("stroke", iconStroke);
           }}
@@ -396,8 +396,8 @@ function TitleBar({
           }}
           onMouseLeave={e => {
             const el = e.currentTarget;
-            el.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
-            el.style.borderColor = dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+            el.style.background = "transparent";
+            el.style.borderColor = "transparent";
             el.style.boxShadow = "none";
             const s = el.querySelector("rect"); if (s) s.setAttribute("stroke", iconStroke);
           }}
@@ -422,8 +422,8 @@ function TitleBar({
           }}
           onMouseLeave={e => {
             const el = e.currentTarget;
-            el.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)";
-            el.style.borderColor = dk ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+            el.style.background = "transparent";
+            el.style.borderColor = "transparent";
             el.style.boxShadow = "none";
             const s = el.querySelector("polygon"); if (s) s.setAttribute("stroke", iconStroke);
           }}
@@ -7113,7 +7113,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
       <div className="flex-1 flex flex-col overflow-hidden">
             {/* Chat header */}
             <div className="flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
-              <div className="flex items-center justify-between px-5 pt-4 pb-3">
+              <div className="flex items-center justify-between pt-4 pb-3" style={{ paddingLeft: 124, paddingRight: 124 }}>
                 <div className="flex items-center gap-3.5">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-[12px] font-bold text-white flex-shrink-0"
                     style={{ background: `linear-gradient(135deg,${activeModel.color},${activeModel.color}99)`, boxShadow: `0 6px 20px ${activeModel.color}45` }}>
@@ -7156,7 +7156,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
                 </div>
               </div>
               {/* Metrics strip */}
-              <div className="flex items-center px-5 pb-3 gap-0">
+              <div className="flex items-center pb-3 gap-0" style={{ paddingLeft: 124, paddingRight: 124 }}>
                 {[
                   { label: "Params", value: activeModel.params },
                   { label: "Context", value: activeModel.ctx },
@@ -7177,7 +7177,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
             </div>
 
             {/* Channel tabs */}
-            <div className="flex items-center gap-1 px-4 py-1.5 flex-shrink-0 overflow-x-auto" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+            <div className="flex items-center gap-1 py-1.5 flex-shrink-0 overflow-x-auto" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none", paddingLeft: 124, paddingRight: 124 }}>
               {channels.map(ch => (
                 <button key={ch.id} onClick={() => setChannel(ch.id)}
                   className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9.5px] font-semibold whitespace-nowrap flex-shrink-0 transition-all"
@@ -7193,7 +7193,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4" style={{ scrollbarWidth: "none" }}>
+            <div className="flex-1 overflow-y-auto py-5 space-y-4" style={{ scrollbarWidth: "none", paddingLeft: 124, paddingRight: 124 }}>
               {msgs.map((m, i) => (
                 <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start gap-3"}`}>
                   {m.role === "ai" && (
@@ -7251,7 +7251,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
             </div>
 
             {/* Input */}
-            <div className="px-5 py-4 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}`, background: c.surface }}>
+            <div className="py-4 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}`, background: c.surface, paddingLeft: 124, paddingRight: 124 }}>
               <div className="flex items-center gap-2.5 px-4 py-3 rounded-2xl"
                 style={{ background: c.card, border: `1.5px solid ${input.trim() ? activeModel.color + "60" : c.border}`, boxShadow: input.trim() ? `0 4px 20px ${activeModel.color}18` : "0 1px 8px rgba(0,0,0,0.06)", transition: "border-color 0.15s, box-shadow 0.15s" }}>
                 <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
