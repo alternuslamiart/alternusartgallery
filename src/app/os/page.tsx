@@ -10297,6 +10297,21 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
       overflow: "hidden",
       display: "flex", alignItems: "center", justifyContent: "center",
     }}>
+      {/* Wallpaper background (OSwp4) — softly blurred so the card stays the focus */}
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "url('/wallpapers/OSwp4.png') center/cover no-repeat",
+        filter: "blur(24px) saturate(1.05)",
+        transform: "scale(1.08)",
+        pointerEvents: "none",
+      }} />
+      {/* Light scrim so text/card has contrast regardless of wallpaper tones */}
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "rgba(245,246,250,0.55)",
+        pointerEvents: "none",
+      }} />
+
       {/* Main card */}
       <div style={{
         position: "relative",
