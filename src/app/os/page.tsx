@@ -3123,22 +3123,33 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
   const navigate = (input: string) => {
     const trimmed = input.trim();
     if (!trimmed) return;
-    // Detect URL vs search query:
-    //   - starts with http:// or https://  → URL
-    //   - single token with a dot and a TLD-ish tail → URL (e.g. "github.com", "example.co.uk")
-    //   - anything else → Google search
+    // Detect URL vs search query
     const hasScheme = /^https?:\/\//i.test(trimmed);
     const looksLikeDomain = !trimmed.includes(" ") && /^[\w-]+(\.[\w-]+)+\/?.*$/.test(trimmed);
+    // For searches we use DuckDuckGo's HTML endpoint, which allows iframe embedding.
+    // (google.com sets X-Frame-Options: SAMEORIGIN and refuses to render inside iframes.)
     const f = hasScheme
       ? trimmed
       : looksLikeDomain
         ? "https://" + trimmed
-        : `https://www.google.com/search?q=${encodeURIComponent(trimmed)}`;
+        : `https://html.duckduckgo.com/html/?q=${encodeURIComponent(trimmed)}`;
     setDisplayUrl(f); setUrl(f);
     setHistory(p => [...p, f]);
     setIsLoading(true); setLoadError(false);
     setTimeout(() => setIsLoading(false), 1500);
   };
+
+  // Extract search term back out of the current URL so we can offer a
+  // real-tab Google fallback.
+  const searchTerm = (() => {
+    try {
+      const u = new URL(url);
+      if (u.hostname.includes("duckduckgo.com") || u.hostname.includes("google.com")) {
+        return u.searchParams.get("q") ?? "";
+      }
+    } catch {}
+    return "";
+  })();
 
   const isAlternus = url.includes("alternus.art");
 
@@ -3294,11 +3305,39 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
                 title="Stratos" onError={()=>setLoadError(true)} />
               {loadError && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3" style={{ background: c.cardAlt }}>
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center" style={{ background: c.cardAlt }}>
                   <I d={ic.globe} s={32} c={c.textMuted} />
                   <p className="text-sm font-medium" style={{ color: c.text }}>Cannot display this page</p>
-                  <p className="text-xs" style={{ color: c.textMuted }}>{url} refused to connect</p>
-                  <button onClick={()=>navigate(url)} className="mt-2 px-4 py-1.5 rounded-lg text-xs font-medium" style={{ background: c.accent, color:"#fff" }}>Retry</button>
+                  <p className="text-xs max-w-[320px]" style={{ color: c.textMuted }}>
+                    <span style={{ color: c.textSec }}>{url}</span> refused to render inside Stratos. Many sites (Google, YouTube, banks) block embedding for security.
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <button onClick={()=>navigate(url)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                      style={{ background: c.surface, color: c.text, border: `1px solid ${c.border}` }}
+                      onMouseEnter={e=>(e.currentTarget.style.background=c.card)}
+                      onMouseLeave={e=>(e.currentTarget.style.background=c.surface)}>
+                      Retry
+                    </button>
+                    <button onClick={()=>window.open(url, "_blank", "noopener,noreferrer")}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-opacity"
+                      style={{ background: c.accent, color: "#fff" }}
+                      onMouseEnter={e=>(e.currentTarget.style.opacity="0.9")}
+                      onMouseLeave={e=>(e.currentTarget.style.opacity="1")}>
+                      <I d={ic.share} s={11} c="#fff" />
+                      Open in new tab
+                    </button>
+                    {searchTerm && (
+                      <button onClick={()=>window.open(`https://www.google.com/search?q=${encodeURIComponent(searchTerm)}`, "_blank", "noopener,noreferrer")}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                        style={{ background: c.surface, color: c.accentText, border: `1px solid ${c.accent}40` }}
+                        onMouseEnter={e=>(e.currentTarget.style.background=c.accentSoft)}
+                        onMouseLeave={e=>(e.currentTarget.style.background=c.surface)}>
+                        <I d={ic.search} s={11} c={c.accentText} />
+                        Search on Google
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </>
