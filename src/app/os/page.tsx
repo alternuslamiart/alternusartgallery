@@ -10979,23 +10979,13 @@ export default function AlternusOS() {
     requestAnimationFrame(animate);
   }, [isBooting]);
 
-  // Load previous OOBE profile (if any) and trigger first-run setup after boot
+  // Always run OOBE after boot completes — on every refresh / restart.
+  // (Persistence removed so the user sees the setup flow on each session.)
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const raw = localStorage.getItem("alternus_oobe_profile");
-      if (raw) {
-        const parsed = JSON.parse(raw) as OOBEData;
-        setOobeProfile(parsed);
-        return;
-      }
-    } catch {}
-    // Mark that OOBE should run once boot finishes
     if (!isBooting) setShowOOBE(true);
   }, [isBooting]);
 
   const finishOOBE = useCallback((profile: OOBEData) => {
-    try { localStorage.setItem("alternus_oobe_profile", JSON.stringify(profile)); } catch {}
     setOobeProfile(profile);
     setShowOOBE(false);
   }, []);
