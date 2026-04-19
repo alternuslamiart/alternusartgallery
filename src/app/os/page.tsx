@@ -5583,141 +5583,184 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
   );
 }
 
-// ━━━━ NEWS APP — CNN-style ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━━ FOCUS APP — Clean, soft curated reading ━━━━━━━━━━━━
 function NewsApp({ c }: { c: typeof palette.dark }) {
   const [activeCategory, setActiveCategory] = useState("top");
   const [savedArticles, setSavedArticles] = useState<Set<number>>(new Set());
   const [selectedId, setSelectedId] = useState<number | null>(null);
-
-  const CNN_RED = "#CC0000";
-  const CNN_RED_DARK = "#A30000";
+  const [search, setSearch] = useState("");
 
   const categories = [
-    { id: "top", label: "Top Stories" },
-    { id: "tech", label: "Tech" },
-    { id: "world", label: "World" },
-    { id: "business", label: "Business" },
-    { id: "science", label: "Science" },
-    { id: "sports", label: "Sports" },
+    { id: "top",      label: "For You",   icon: ic.sparkle },
+    { id: "tech",     label: "Tech",      icon: ic.cpu },
+    { id: "world",    label: "World",     icon: ic.globe },
+    { id: "business", label: "Business",  icon: ic.briefcase },
+    { id: "science",  label: "Science",   icon: ic.brain },
+    { id: "sports",   label: "Sports",    icon: ic.activity },
   ];
 
-  type Article = { id: number; title: string; source: string; time: string; summary: string; category: string; breaking?: boolean; hue?: [string, string]; body?: string };
+  type Article = {
+    id: number; title: string; source: string; time: string; summary: string;
+    category: string; readTime: number; hue: [string, string]; accent: string;
+  };
 
   const articles: Record<string, Article[]> = {
     top: [
-      { id: 1, title: "Global AI Summit Reaches Historic Agreement on Safety Standards", source: "CNN Wire", time: "12 min ago", summary: "World leaders have agreed on a landmark framework for AI safety, establishing international standards for development and deployment of advanced AI systems.", category: "Technology", breaking: true, hue: ["#1e3a8a", "#4338ca"] },
-      { id: 2, title: "Markets Surge as Central Banks Signal Rate Cuts", source: "CNN Business", time: "45 min ago", summary: "Stock markets worldwide rally as major central banks indicate a coordinated shift toward monetary easing in the coming quarter.", category: "Business", hue: ["#064e3b", "#065f46"] },
-      { id: 3, title: "Scientists Discover New Method for Carbon Capture", source: "CNN Science", time: "1 hour ago", summary: "Researchers at MIT have developed a revolutionary carbon capture technique that is 10x more efficient than current methods.", category: "Science", hue: ["#0c4a6e", "#0369a1"] },
-      { id: 4, title: "Historic Peace Deal Signed in Eastern Europe", source: "CNN World", time: "2 hours ago", summary: "After months of negotiations, a comprehensive peace agreement has been signed, ending years of regional conflict.", category: "World", hue: ["#7c2d12", "#9a3412"] },
-      { id: 5, title: "SpaceX Launches Largest Satellite Constellation", source: "CNN", time: "3 hours ago", summary: "SpaceX successfully deploys 120 next-generation satellites in a single mission, breaking its own record.", category: "Technology", hue: ["#18181b", "#27272a"] },
-      { id: 6, title: "World Cup 2026 Venues Officially Announced", source: "CNN Sport", time: "4 hours ago", summary: "FIFA reveals the complete list of stadiums and host cities for the upcoming World Cup tournament.", category: "Sports", hue: ["#166534", "#15803d"] },
+      { id: 1, title: "A Quieter Web: Designers Rediscover Calm Interfaces",                     source: "The Alternus Edit", time: "12 min",  readTime: 5, summary: "A new generation of product designers is pushing back against the noise, favouring soft surfaces, generous spacing, and deliberate typography.",          category: "Design",     hue: ["#5a7dff", "#8b66ff"], accent: "#7B8BF5" },
+      { id: 2, title: "Central Banks Hint at a Slower Quarter as Markets Steady",                source: "Ledger Weekly",     time: "45 min",  readTime: 3, summary: "Analysts see a coordinated shift toward easing, with forward guidance suggesting patience rather than urgency.",                                           category: "Business",   hue: ["#3dc29b", "#4dd2b1"], accent: "#3DD68C" },
+      { id: 3, title: "Scientists Describe a Cleaner, Faster Way to Capture Carbon",             source: "Field Notes",       time: "1 hr",    readTime: 6, summary: "An MIT team's reactor design uses a tenth of the energy of older methods, opening the door to distributed, low-cost climate tools.",                category: "Science",    hue: ["#3fa9ff", "#6bd0f5"], accent: "#4F8EF7" },
+      { id: 4, title: "Long Negotiations End in a Rare Peace Agreement",                         source: "Global Desk",       time: "2 hrs",   readTime: 8, summary: "Years of quiet diplomacy produced a framework that balances security, trade, and reconciliation — and now faces implementation.",                 category: "World",      hue: ["#f7a37b", "#f38a5a"], accent: "#F5B73B" },
+      { id: 5, title: "The Next Rocket Cadence: 120 Satellites in a Single Flight",              source: "Orbit Report",      time: "3 hrs",   readTime: 4, summary: "A milestone mission shows how rapid reuse is beginning to reshape what commercial launch can look like.",                                        category: "Technology", hue: ["#7a89a8", "#a6b3cc"], accent: "#A4A8B8" },
+      { id: 6, title: "World Cup 2026 Venues Officially Named",                                  source: "Field & Court",     time: "4 hrs",   readTime: 2, summary: "FIFA confirms stadiums across three nations. Transport, stay capacity, and supporter experience were all decisive.",                             category: "Sports",     hue: ["#a78bfa", "#c4a8ff"], accent: "#A78BFA" },
     ],
     tech: [
-      { id: 10, title: "Apple Unveils Revolutionary AR Glasses", source: "CNN Tech", time: "30 min ago", summary: "Apple's next-generation AR glasses feature holographic displays and all-day battery life, available next quarter.", category: "Technology", breaking: true, hue: ["#4c1d95", "#6d28d9"] },
-      { id: 11, title: "Quantum Computing Breakthrough Achieves Error Correction", source: "CNN Tech", time: "2 hours ago", summary: "Google's quantum team demonstrates reliable error correction, bringing practical quantum computing years closer.", category: "Technology", hue: ["#0c4a6e", "#075985"] },
-      { id: 12, title: "Open Source AI Model Surpasses GPT-5 Benchmarks", source: "CNN Business", time: "3 hours ago", summary: "A community-developed open source model has outperformed leading proprietary AI systems across multiple benchmarks.", category: "Technology", hue: ["#134e4a", "#115e59"] },
-      { id: 13, title: "Cybersecurity Alert: Major Vulnerability Found in IoT Devices", source: "CNN", time: "5 hours ago", summary: "Security researchers discover a critical flaw affecting millions of smart home devices worldwide.", category: "Technology", hue: ["#7f1d1d", "#991b1b"] },
-      { id: 14, title: "Tesla Announces Fully Autonomous Robotaxi Service", source: "CNN Business", time: "6 hours ago", summary: "Tesla begins rolling out its driverless taxi service in three major US cities starting next month.", category: "Technology", hue: ["#111827", "#1f2937"] },
+      { id: 10, title: "A Fresh Take on Ambient Computing: Glasses That Get Out of the Way",     source: "Interface",         time: "30 min",  readTime: 6, summary: "Next-gen AR glasses lean into minimal overlays and longer battery life, pairing soft UI with durable hardware.",                                category: "Technology", hue: ["#7b8bf5", "#a78bfa"], accent: "#7B8BF5" },
+      { id: 11, title: "Quantum, Quietly: Error Correction Reaches a Milestone",                 source: "Lab Notebook",      time: "2 hrs",   readTime: 7, summary: "Researchers demonstrate reliable logical qubits, moving practical quantum workloads from possible to plausible.",                               category: "Technology", hue: ["#4F8EF7", "#7b8bf5"], accent: "#4F8EF7" },
+      { id: 12, title: "An Open Model Matches the Best. That Changes the Economics.",            source: "The Alternus Edit", time: "3 hrs",   readTime: 5, summary: "A volunteer-led model tops recent benchmarks. The follow-on effects for enterprise AI budgets could be significant.",                          category: "Technology", hue: ["#3dd68c", "#4dd2b1"], accent: "#3DD68C" },
+      { id: 13, title: "A Quiet Advisory on Home Devices",                                        source: "Trust Bulletin",    time: "5 hrs",   readTime: 3, summary: "Security researchers identify a class of small bugs with outsized reach. Patches are rolling out throughout the week.",                          category: "Technology", hue: ["#F47272", "#f59393"], accent: "#F47272" },
+      { id: 14, title: "Autonomy, in Three Cities",                                               source: "Road Review",       time: "6 hrs",   readTime: 4, summary: "A driverless taxi service expands cautiously, with municipal partnerships shaping pace and coverage.",                                       category: "Technology", hue: ["#A78BFA", "#c4a8ff"], accent: "#A78BFA" },
     ],
     world: [
-      { id: 20, title: "UN General Assembly Adopts Climate Emergency Resolution", source: "CNN World", time: "1 hour ago", summary: "The United Nations passes a sweeping resolution declaring a global climate emergency with binding commitments.", category: "World", breaking: true, hue: ["#064e3b", "#047857"] },
-      { id: 21, title: "Japan Launches New Bullet Train Connecting Tokyo to Osaka in 1 Hour", source: "CNN Travel", time: "3 hours ago", summary: "The next-generation maglev train begins commercial operations, cutting travel time by more than half.", category: "World", hue: ["#881337", "#9f1239"] },
-      { id: 22, title: "EU Passes Comprehensive Digital Privacy Framework", source: "CNN World", time: "5 hours ago", summary: "The European Union enacts the most stringent digital privacy protections in history, affecting global tech companies.", category: "World", hue: ["#1e3a8a", "#1e40af"] },
-      { id: 23, title: "African Union Launches Continental Free Trade Zone", source: "CNN", time: "7 hours ago", summary: "The world's largest free trade area officially begins operations, connecting 1.3 billion people.", category: "World", hue: ["#78350f", "#92400e"] },
+      { id: 20, title: "UN Resolution Sets New Climate Ground Rules",                             source: "Global Desk",       time: "1 hr",    readTime: 6, summary: "Binding commitments replace pledges, with a review mechanism and independent reporting obligations.",                                          category: "World",      hue: ["#3dd68c", "#4dd2b1"], accent: "#3DD68C" },
+      { id: 21, title: "A Bullet Train That Feels Like a Flight",                                 source: "Transit Weekly",    time: "3 hrs",   readTime: 4, summary: "The next-generation maglev links Tokyo and Osaka in under an hour. The onboard experience deliberately echoes calm design.",                  category: "World",      hue: ["#4F8EF7", "#7b8bf5"], accent: "#4F8EF7" },
+      { id: 22, title: "Europe's New Privacy Framework, Explained Simply",                        source: "Civic Reader",      time: "5 hrs",   readTime: 7, summary: "Stricter rules on profiling, defaulted consent, and cross-border transfers — with a practical runway for implementers.",                     category: "World",      hue: ["#7b8bf5", "#a78bfa"], accent: "#7B8BF5" },
+      { id: 23, title: "Africa's Continental Free Trade Zone Begins Operations",                  source: "Ledger Weekly",     time: "7 hrs",   readTime: 5, summary: "The world's largest free trade area opens cautiously, prioritising logistics corridors and small-business tooling.",                           category: "World",      hue: ["#F5B73B", "#f7c86b"], accent: "#F5B73B" },
     ],
     business: [
-      { id: 30, title: "Nvidia Becomes World's Most Valuable Company", source: "CNN Business", time: "1 hour ago", summary: "Nvidia's market cap surpasses $4 trillion as AI chip demand continues to soar beyond expectations.", category: "Business", breaking: true, hue: ["#065f46", "#047857"] },
-      { id: 31, title: "Global Startup Funding Rebounds to Record Highs", source: "CNN Business", time: "3 hours ago", summary: "Venture capital investments surge 40% year-over-year, with AI and cleantech leading the charge.", category: "Business", hue: ["#713f12", "#854d0e"] },
-      { id: 32, title: "Amazon Opens First Fully Automated Warehouse", source: "CNN Business", time: "5 hours ago", summary: "The facility operates with zero human workers, processing 100,000 packages per day using advanced robotics.", category: "Business", hue: ["#312e81", "#3730a3"] },
+      { id: 30, title: "A New Most-Valuable Company, and What It Signals",                        source: "Ledger Weekly",     time: "1 hr",    readTime: 4, summary: "Chips, infrastructure, and sustained enterprise demand keep reshaping the top of the market.",                                                  category: "Business",   hue: ["#3dd68c", "#4dd2b1"], accent: "#3DD68C" },
+      { id: 31, title: "Startup Funding, Back at Record Highs",                                   source: "Pitch Book",        time: "3 hrs",   readTime: 5, summary: "Venture capital activity climbs year-over-year, with AI tooling and cleantech pulling the bulk of deploy.",                                  category: "Business",   hue: ["#F5B73B", "#f7c86b"], accent: "#F5B73B" },
+      { id: 32, title: "The First Fully Automated Warehouse Is Online",                           source: "Operations Today",  time: "5 hrs",   readTime: 4, summary: "A hundred-thousand-packages-a-day facility shows both what's possible and what's worth debating.",                                              category: "Business",   hue: ["#7b8bf5", "#a78bfa"], accent: "#7B8BF5" },
     ],
     science: [
-      { id: 40, title: "James Webb Telescope Discovers Signs of Life on Exoplanet", source: "CNN Science", time: "2 hours ago", summary: "Atmospheric analysis reveals biosignature gases on a planet 40 light-years away, the strongest evidence yet of extraterrestrial life.", category: "Science", breaking: true, hue: ["#0c0a1f", "#1e1b4b"] },
-      { id: 41, title: "CRISPR Gene Therapy Cures Hereditary Blindness in Trial", source: "CNN Health", time: "4 hours ago", summary: "A landmark clinical trial successfully restores vision in patients with inherited retinal disease using gene editing.", category: "Science", hue: ["#831843", "#9d174d"] },
-      { id: 42, title: "Fusion Reactor Achieves Net Energy Gain for 24 Hours", source: "CNN Science", time: "6 hours ago", summary: "European researchers sustain a net-positive fusion reaction for a full day, a major milestone toward clean energy.", category: "Science", hue: ["#7c2d12", "#c2410c"] },
+      { id: 40, title: "A Careful Claim About a Distant Atmosphere",                              source: "Field Notes",       time: "2 hrs",   readTime: 8, summary: "James Webb data shows signatures worth serious attention. The researchers are quick to stress what they have, and haven't, concluded.",        category: "Science",    hue: ["#4F8EF7", "#7b8bf5"], accent: "#4F8EF7" },
+      { id: 41, title: "A Trial That Restored Sight",                                             source: "Lab Notebook",      time: "4 hrs",   readTime: 6, summary: "Gene editing quietly reshapes what's possible in inherited retinal disease, with cautious early-phase results.",                              category: "Science",    hue: ["#a78bfa", "#c4a8ff"], accent: "#A78BFA" },
+      { id: 42, title: "Fusion's Longest Net-Positive Run So Far",                                source: "Field Notes",       time: "6 hrs",   readTime: 5, summary: "Twenty-four hours of net energy — not yet a grid, but a serious step toward one.",                                                          category: "Science",    hue: ["#3dd68c", "#4dd2b1"], accent: "#3DD68C" },
     ],
     sports: [
-      { id: 50, title: "Champions League Final: Historic Comeback Stuns Europe", source: "CNN Sport", time: "1 hour ago", summary: "In one of the greatest finals ever, the underdog team stages a remarkable 3-goal comeback in the second half.", category: "Sports", breaking: true, hue: ["#14532d", "#166534"] },
-      { id: 51, title: "Olympic Record Shattered in 100m Sprint", source: "CNN Sport", time: "3 hours ago", summary: "A new world record is set in the 100-meter dash, breaking a mark that stood for over a decade.", category: "Sports", hue: ["#1e3a8a", "#1e40af"] },
-      { id: 52, title: "NBA Expansion: Two New Teams Announced for 2027", source: "CNN Sport", time: "5 hours ago", summary: "The NBA confirms expansion to 32 teams with new franchises in Las Vegas and Seattle.", category: "Sports", hue: ["#4c1d95", "#5b21b6"] },
+      { id: 50, title: "A Champions League Final for the Archives",                               source: "Field & Court",     time: "1 hr",    readTime: 4, summary: "A second-half comeback few saw coming, built on possession, patience, and a quiet moment of audacity.",                                      category: "Sports",     hue: ["#3dd68c", "#4dd2b1"], accent: "#3DD68C" },
+      { id: 51, title: "A New 100m Record — And the Long Build to Get There",                     source: "Endurance",         time: "3 hrs",   readTime: 3, summary: "Marginal gains across years of training show up, at last, in a single ten-second run.",                                                      category: "Sports",     hue: ["#F5B73B", "#f7c86b"], accent: "#F5B73B" },
+      { id: 52, title: "Two New NBA Franchises Are Official",                                     source: "Field & Court",     time: "5 hrs",   readTime: 4, summary: "Las Vegas and Seattle join a 32-team league. Arena plans, rosters, and launch timelines are already in motion.",                             category: "Sports",     hue: ["#A78BFA", "#c4a8ff"], accent: "#A78BFA" },
     ],
   };
 
-  const currentArticles = articles[activeCategory] || articles.top;
-  const hero = currentArticles[0];
-  const rest = currentArticles.slice(1);
-  const breakingTicker = currentArticles.filter(a => a.breaking);
-  const toggleSave = (id: number) => setSavedArticles(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
-  const selected = selectedId != null ? Object.values(articles).flat().find(a => a.id === selectedId) : null;
+  const currentList = articles[activeCategory] || articles.top;
+  const filtered = search.trim()
+    ? currentList.filter(a =>
+        a.title.toLowerCase().includes(search.toLowerCase()) ||
+        a.summary.toLowerCase().includes(search.toLowerCase()) ||
+        a.source.toLowerCase().includes(search.toLowerCase()))
+    : currentList;
+  const hero = filtered[0];
+  const rest = filtered.slice(1);
 
-  // Simulated image placeholder: gradient with article glyph
-  const ImageBlock = ({ hue, h, big }: { hue?: [string, string]; h: number; big?: boolean }) => (
-    <div className="relative overflow-hidden flex-shrink-0" style={{ height: h, background: `linear-gradient(135deg, ${hue?.[0] ?? "#1f2937"}, ${hue?.[1] ?? "#374151"})` }}>
-      {/* decorative stripes */}
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15), transparent 50%)" }} />
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.55))" }} />
-      {big && (
-        <div style={{ position: "absolute", top: 8, left: 8, display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ background: CNN_RED, color: "#fff", fontSize: 9, fontWeight: 900, padding: "3px 6px", letterSpacing: 0.5 }}>LIVE</span>
-          <span style={{ background: "rgba(0,0,0,0.55)", color: "#fff", fontSize: 9, fontWeight: 700, padding: "3px 6px" }}>CNN</span>
-        </div>
+  const toggleSave = (id: number) => setSavedArticles(prev => {
+    const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s;
+  });
+
+  const selected = selectedId != null
+    ? Object.values(articles).flat().find(a => a.id === selectedId)
+    : null;
+
+  // Soft gradient cover block, matches Alternus OS aesthetic
+  const Cover = ({ hue, h, radius = 14, label }: { hue: [string, string]; h: number; radius?: number; label?: string }) => (
+    <div style={{
+      position: "relative",
+      height: h,
+      borderRadius: radius,
+      overflow: "hidden",
+      background: `linear-gradient(135deg, ${hue[0]}, ${hue[1]})`,
+      flexShrink: 0,
+    }}>
+      {/* soft highlight */}
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 20% 15%, rgba(255,255,255,0.28), transparent 55%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 85% 85%, rgba(0,0,0,0.18), transparent 60%)" }} />
+      {/* sparkle accent */}
+      <div style={{ position: "absolute", top: 12, right: 12, width: 24, height: 24, borderRadius: 8, background: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <I d={ic.sparkle} s={12} c="#fff" />
+      </div>
+      {label && (
+        <span style={{
+          position: "absolute", bottom: 10, left: 10,
+          background: "rgba(255,255,255,0.18)",
+          backdropFilter: "blur(10px)",
+          color: "#fff", fontSize: 9, fontWeight: 700, letterSpacing: 0.5,
+          padding: "3px 8px", borderRadius: 999,
+        }}>{label}</span>
       )}
     </div>
   );
 
-  // Detail view
+  // ━━━ Reading view ━━━
   if (selected) {
     return (
       <div className="flex flex-col h-full" style={{ background: c.bg }}>
         {/* Top bar */}
-        <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ background: "#000", borderBottom: `2px solid ${CNN_RED}` }}>
+        <div className="flex items-center gap-2 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
           <button onClick={() => setSelectedId(null)}
-            className="flex items-center gap-1 px-2 py-1 rounded transition-colors"
-            style={{ color: "#fff", fontSize: 11 }}
-            onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-colors"
+            style={{ color: c.textSec, fontSize: 11, fontWeight: 600 }}
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
             onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-            <I d={ic.chevL} s={13} c="#fff" />
+            <I d={ic.chevL} s={13} c={c.textSec} />
             Back
           </button>
-          <div className="flex items-center gap-1.5 ml-2">
-            <div style={{ width: 30, height: 18, background: CNN_RED, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ color: "#fff", fontWeight: 900, fontSize: 10, letterSpacing: 0.5 }}>CNN</span>
-            </div>
-            <span style={{ color: "#fff", fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>{selected.category}</span>
-          </div>
+          <div className="flex-1" />
+          <button onClick={() => toggleSave(selected.id)}
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+            style={{ color: savedArticles.has(selected.id) ? c.accent : c.textSec }}
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={13}
+              c={savedArticles.has(selected.id) ? c.accent : c.textSec}
+              f={savedArticles.has(selected.id)} />
+          </button>
+          <button className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
+            style={{ color: c.textSec }}
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <I d={ic.share} s={13} />
+          </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-          <ImageBlock hue={selected.hue} h={180} big />
-          <div className="px-4 py-3">
+        <div className="flex-1 overflow-y-auto px-5 py-4" style={{ scrollbarWidth: "none" }}>
+          <Cover hue={selected.hue} h={160} radius={16} label={selected.category} />
+          <div className="mt-4">
             <div className="flex items-center gap-2 mb-2">
-              {selected.breaking && (
-                <span style={{ background: CNN_RED, color: "#fff", fontSize: 8, fontWeight: 900, padding: "2px 6px", letterSpacing: 0.5 }}>BREAKING NEWS</span>
-              )}
-              <span style={{ fontSize: 9, fontWeight: 700, color: CNN_RED, textTransform: "uppercase", letterSpacing: 0.8 }}>{selected.source}</span>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: selected.accent }} />
+              <span style={{ fontSize: 10, fontWeight: 700, color: selected.accent, letterSpacing: 0.3 }}>{selected.source}</span>
+              <span style={{ fontSize: 10, color: c.textMuted }}>· {selected.time} · {selected.readTime} min read</span>
             </div>
-            <h1 className="font-bold leading-tight mb-2" style={{ color: c.text, fontSize: 18, fontFamily: "Georgia, serif" }}>{selected.title}</h1>
-            <p className="text-[10px] mb-3" style={{ color: c.textMuted }}>By CNN Staff · Updated {selected.time}</p>
-            <div style={{ height: 1, background: c.border, marginBottom: 12 }} />
-            <p className="text-[12px] leading-relaxed mb-3" style={{ color: c.text }}>
-              <span style={{ fontFamily: "Georgia, serif", fontWeight: 700 }}>({selected.source}) —</span> {selected.summary}
+            <h1 className="leading-tight mb-3" style={{ color: c.text, fontSize: 20, fontWeight: 700, letterSpacing: -0.2 }}>
+              {selected.title}
+            </h1>
+            <p className="leading-relaxed mb-4" style={{ color: c.textSec, fontSize: 13 }}>
+              {selected.summary}
             </p>
-            <p className="text-[11px] leading-relaxed mb-3" style={{ color: c.textSec }}>
-              The development marks a significant moment in the ongoing global conversation, with experts calling it &ldquo;a watershed moment&rdquo; that could reshape the landscape for years to come. Analysts across multiple institutions have weighed in, offering perspectives that highlight both the immediate implications and the longer-term strategic considerations at play.
+            <p className="leading-relaxed mb-4" style={{ color: c.textSec, fontSize: 12.5 }}>
+              The development reflects a broader shift in how leaders, practitioners, and users think about the problem. Analysts point to a quiet consensus forming across institutions — one that favours deliberate progress over dramatic announcements, and outcomes over optics.
             </p>
-            <p className="text-[11px] leading-relaxed mb-3" style={{ color: c.textSec }}>
-              Reporting from the ground suggests broad consensus among stakeholders, though questions remain about implementation timelines and the coordination required between major parties involved. CNN will continue to monitor the situation and provide updates as they become available.
+            <p className="leading-relaxed mb-4" style={{ color: c.textSec, fontSize: 12.5 }}>
+              What comes next is still being shaped. Implementation timelines are measured in quarters, coordination in conversations. But the direction, for once, feels unusually clear. Expect further updates as teams move from framing to execution.
             </p>
-            <div className="flex items-center gap-2 mt-4 pb-4">
+            <div className="mt-5 p-3 rounded-xl flex items-center gap-3" style={{ background: c.card, border: `1px solid ${c.border}` }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 12,
+                background: `linear-gradient(135deg, ${selected.hue[0]}, ${selected.hue[1]})`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <I d={ic.bookOpen} s={16} c="#fff" />
+              </div>
+              <div className="flex-1">
+                <p style={{ fontSize: 11, fontWeight: 700, color: c.text }}>Save for later</p>
+                <p style={{ fontSize: 10, color: c.textMuted }}>Keep this article in your Focus library</p>
+              </div>
               <button onClick={() => toggleSave(selected.id)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[10px] font-semibold transition-colors"
-                style={{ background: savedArticles.has(selected.id) ? CNN_RED : c.cardAlt, color: savedArticles.has(selected.id) ? "#fff" : c.text }}>
-                <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={11} c={savedArticles.has(selected.id) ? "#fff" : c.text} f={savedArticles.has(selected.id)} />
+                className="text-[10px] font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                style={{
+                  background: savedArticles.has(selected.id) ? c.accentSoft : c.accent,
+                  color: savedArticles.has(selected.id) ? c.accentText : "#fff",
+                }}>
                 {savedArticles.has(selected.id) ? "Saved" : "Save"}
-              </button>
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[10px] font-semibold transition-colors"
-                style={{ background: c.cardAlt, color: c.text }}>
-                <I d={ic.share} s={11} c={c.text} />
-                Share
               </button>
             </div>
           </div>
@@ -5726,142 +5769,205 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
     );
   }
 
+  // ━━━ Home view ━━━
   return (
     <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      {/* CNN Header — black bar with red logo */}
-      <div className="flex items-center flex-shrink-0" style={{ background: "#000", height: 36, paddingLeft: 10, paddingRight: 10, gap: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
-          <div style={{ width: 44, height: 22, background: CNN_RED, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 6px rgba(204,0,0,0.5)" }}>
-            <span style={{ color: "#fff", fontWeight: 900, fontSize: 13, letterSpacing: 0.5, fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>CNN</span>
+      {/* Header */}
+      <div className="flex-shrink-0 px-4 pt-4 pb-3">
+        <div className="flex items-center gap-3 mb-3">
+          <div style={{
+            width: 36, height: 36, borderRadius: 12,
+            background: `linear-gradient(135deg, ${c.accent}, ${c.purple})`,
+            boxShadow: `0 6px 16px ${c.accent}40`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <I d={ic.sparkle} s={16} c="#fff" f />
+          </div>
+          <div className="flex-1">
+            <h3 style={{ fontSize: 15, fontWeight: 700, color: c.text, letterSpacing: -0.2 }}>Focus</h3>
+            <p style={{ fontSize: 10.5, color: c.textMuted }}>Curated reads, calmly presented</p>
+          </div>
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full" style={{ background: c.card, border: `1px solid ${c.border}` }}>
+            <span style={{ width: 5, height: 5, borderRadius: "50%", background: c.success }} />
+            <span style={{ fontSize: 9, fontWeight: 700, color: c.textSec, letterSpacing: 0.3 }}>Synced</span>
           </div>
         </div>
-        <div className="flex items-center gap-1.5" style={{ flex: 1 }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: CNN_RED, boxShadow: `0 0 8px ${CNN_RED}`, animation: "pulse 2s ease-in-out infinite" }} />
-          <span style={{ color: "#fff", fontSize: 9, fontWeight: 800, letterSpacing: 1.2 }}>LIVE TV</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <button style={{ color: "#fff", opacity: 0.8 }} className="transition-opacity"
-            onMouseEnter={e=>(e.currentTarget.style.opacity="1")}
-            onMouseLeave={e=>(e.currentTarget.style.opacity="0.8")}>
-            <I d={ic.search} s={13} c="#fff" />
-          </button>
-          <button style={{ color: "#fff", opacity: 0.8 }} className="transition-opacity"
-            onMouseEnter={e=>(e.currentTarget.style.opacity="1")}
-            onMouseLeave={e=>(e.currentTarget.style.opacity="0.8")}>
-            <I d={ic.menu} s={13} c="#fff" />
-          </button>
+
+        {/* Search */}
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: c.card, border: `1px solid ${c.border}` }}>
+          <I d={ic.search} s={12} c={c.textMuted} />
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Search stories, sources, topics"
+            className="flex-1 bg-transparent outline-none"
+            style={{ color: c.text, fontSize: 11 }} />
+          {search && (
+            <button onClick={() => setSearch("")}>
+              <I d={ic.close} s={11} c={c.textMuted} />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Breaking news ticker */}
-      {breakingTicker.length > 0 && (
-        <div className="flex items-stretch flex-shrink-0" style={{ background: CNN_RED, height: 24 }}>
-          <div style={{ background: CNN_RED_DARK, display: "flex", alignItems: "center", padding: "0 8px" }}>
-            <span style={{ color: "#fff", fontSize: 9, fontWeight: 900, letterSpacing: 1 }}>BREAKING</span>
-          </div>
-          <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "0 10px", overflow: "hidden" }}>
-            <p style={{ color: "#fff", fontSize: 10, fontWeight: 600, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
-              {breakingTicker[0].title}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Category nav — white/dark theme aware, underline */}
-      <div className="flex items-center flex-shrink-0 overflow-x-auto" style={{ background: c.surface, borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
-        {categories.map(cat => (
-          <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-            className="whitespace-nowrap transition-colors"
-            style={{
-              padding: "8px 12px",
-              fontSize: 10,
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: 0.8,
-              background: "transparent",
-              color: activeCategory === cat.id ? c.text : c.textMuted,
-              borderBottom: activeCategory === cat.id ? `3px solid ${CNN_RED}` : "3px solid transparent",
-              marginBottom: -1,
-            }}
-            onMouseEnter={e => { if (activeCategory !== cat.id) e.currentTarget.style.color = c.textSec; }}
-            onMouseLeave={e => { if (activeCategory !== cat.id) e.currentTarget.style.color = c.textMuted; }}>
-            {cat.label}
-          </button>
-        ))}
+      {/* Category pills */}
+      <div className="flex-shrink-0 px-4 pb-2 flex items-center gap-1.5 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+        {categories.map(cat => {
+          const active = activeCategory === cat.id;
+          return (
+            <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
+              className="flex items-center gap-1.5 whitespace-nowrap transition-all"
+              style={{
+                padding: "5px 10px",
+                borderRadius: 999,
+                fontSize: 10.5,
+                fontWeight: 600,
+                background: active ? c.accentSoft : c.card,
+                color: active ? c.accentText : c.textSec,
+                border: `1px solid ${active ? c.accent + "30" : c.border}`,
+              }}
+              onMouseEnter={e => { if (!active) e.currentTarget.style.background = c.cardAlt; }}
+              onMouseLeave={e => { if (!active) e.currentTarget.style.background = c.card; }}>
+              <I d={cat.icon} s={11} c={active ? c.accentText : c.textMuted} />
+              {cat.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Content area */}
-      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-        {/* Hero */}
-        {hero && (
-          <div className="cursor-pointer" onClick={() => setSelectedId(hero.id)}>
-            <ImageBlock hue={hero.hue} h={150} big />
-            <div className="px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
-              <div className="flex items-center gap-2 mb-1.5">
-                {hero.breaking && (
-                  <span style={{ background: CNN_RED, color: "#fff", fontSize: 8, fontWeight: 900, padding: "2px 6px", letterSpacing: 0.5 }}>BREAKING</span>
-                )}
-                <span style={{ fontSize: 9, fontWeight: 800, color: CNN_RED, textTransform: "uppercase", letterSpacing: 0.8 }}>{hero.source}</span>
-                <span className="text-[9px]" style={{ color: c.textMuted }}>· {hero.time}</span>
-              </div>
-              <h2 className="font-bold leading-tight mb-1.5" style={{ color: c.text, fontSize: 15, fontFamily: "Georgia, serif" }}>{hero.title}</h2>
-              <p className="text-[11px] leading-relaxed" style={{ color: c.textSec }}>{hero.summary}</p>
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto px-4 pb-4" style={{ scrollbarWidth: "none" }}>
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full">
+            <div style={{ width: 44, height: 44, borderRadius: 14, background: c.card, border: `1px solid ${c.border}`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+              <I d={ic.search} s={18} c={c.textMuted} />
             </div>
+            <p style={{ fontSize: 11.5, fontWeight: 600, color: c.text }}>Nothing here yet</p>
+            <p style={{ fontSize: 10, color: c.textMuted, marginTop: 2 }}>Try a different search or category</p>
           </div>
-        )}
-
-        {/* Section heading */}
-        <div className="px-4 py-2 flex items-center gap-2 flex-shrink-0" style={{ background: c.cardAlt }}>
-          <span style={{ width: 3, height: 12, background: CNN_RED }} />
-          <span style={{ fontSize: 10, fontWeight: 900, color: c.text, textTransform: "uppercase", letterSpacing: 1 }}>More Top Stories</span>
-        </div>
-
-        {/* Article rows */}
-        {rest.map((article, idx) => (
-          <div key={article.id}
-            className="flex gap-3 px-4 py-3 transition-colors cursor-pointer"
-            style={{ borderBottom: idx < rest.length - 1 ? `1px solid ${c.border}` : "none" }}
-            onClick={() => setSelectedId(article.id)}
-            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-            {/* Thumb */}
-            <div style={{ width: 90, height: 68, flexShrink: 0, borderRadius: 2, overflow: "hidden" }}>
-              <ImageBlock hue={article.hue} h={68} />
+        ) : (
+          <>
+            {/* Section label */}
+            <div className="flex items-center justify-between mt-1 mb-2.5">
+              <span style={{ fontSize: 10, fontWeight: 700, color: c.textMuted, textTransform: "uppercase", letterSpacing: 1 }}>Featured</span>
+              <span style={{ fontSize: 10, color: c.textMuted }}>{filtered.length} stories</span>
             </div>
-            {/* Text */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 mb-1">
-                {article.breaking && (
-                  <span style={{ background: CNN_RED, color: "#fff", fontSize: 7, fontWeight: 900, padding: "1px 4px", letterSpacing: 0.5 }}>LIVE</span>
-                )}
-                <span style={{ fontSize: 8, fontWeight: 800, color: CNN_RED, textTransform: "uppercase", letterSpacing: 0.6 }}>{article.source}</span>
+
+            {/* Hero card */}
+            {hero && (
+              <button onClick={() => setSelectedId(hero.id)}
+                className="w-full text-left transition-all mb-4"
+                style={{
+                  borderRadius: 16,
+                  background: c.card,
+                  border: `1px solid ${c.border}`,
+                  overflow: "hidden",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = c.accent + "40"; e.currentTarget.style.boxShadow = `0 8px 22px ${c.accent}10`; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.boxShadow = "none"; }}>
+                <div style={{ padding: 10 }}>
+                  <Cover hue={hero.hue} h={130} radius={12} label={hero.category} />
+                </div>
+                <div className="px-3 pb-3">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span style={{ width: 5, height: 5, borderRadius: "50%", background: hero.accent }} />
+                    <span style={{ fontSize: 10, fontWeight: 700, color: hero.accent }}>{hero.source}</span>
+                    <span style={{ fontSize: 10, color: c.textMuted }}>· {hero.time}</span>
+                    <span style={{
+                      marginLeft: "auto",
+                      fontSize: 9.5, fontWeight: 600,
+                      color: c.textMuted,
+                      padding: "2px 7px", borderRadius: 999,
+                      background: c.cardAlt,
+                    }}>{hero.readTime} min</span>
+                  </div>
+                  <h2 style={{ fontSize: 14, fontWeight: 700, color: c.text, lineHeight: 1.3, letterSpacing: -0.15, marginBottom: 5 }}>
+                    {hero.title}
+                  </h2>
+                  <p style={{ fontSize: 11, color: c.textSec, lineHeight: 1.5 }}>{hero.summary}</p>
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center gap-1.5" style={{ fontSize: 10.5, fontWeight: 600, color: c.accentText }}>
+                      <span>Read story</span>
+                      <I d={ic.chevR} s={11} c={c.accentText} />
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button onClick={(e) => { e.stopPropagation(); toggleSave(hero.id); }}
+                        className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors"
+                        style={{ background: savedArticles.has(hero.id) ? c.accentSoft : "transparent" }}
+                        onMouseEnter={e => { if (!savedArticles.has(hero.id)) e.currentTarget.style.background = c.cardAlt; }}
+                        onMouseLeave={e => { if (!savedArticles.has(hero.id)) e.currentTarget.style.background = "transparent"; }}>
+                        <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={12}
+                          c={savedArticles.has(hero.id) ? c.accent : c.textMuted}
+                          f={savedArticles.has(hero.id)} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            )}
+
+            {/* Section label */}
+            {rest.length > 0 && (
+              <div className="flex items-center justify-between mt-1 mb-2">
+                <span style={{ fontSize: 10, fontWeight: 700, color: c.textMuted, textTransform: "uppercase", letterSpacing: 1 }}>More to read</span>
               </div>
-              <p className="font-bold leading-snug mb-1" style={{ color: c.text, fontSize: 12, fontFamily: "Georgia, serif" }}>{article.title}</p>
-              <div className="flex items-center gap-2">
-                <span className="text-[9px]" style={{ color: c.textMuted }}>{article.time}</span>
-                <button onClick={(e) => { e.stopPropagation(); toggleSave(article.id); }}
-                  className="ml-auto p-0.5 rounded transition-colors"
-                  onMouseEnter={e => (e.currentTarget.style.background = c.border)}
-                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={11}
-                    c={savedArticles.has(article.id) ? CNN_RED : c.textMuted}
-                    f={savedArticles.has(article.id)} />
+            )}
+
+            {/* Article list */}
+            <div className="flex flex-col gap-2">
+              {rest.map(article => (
+                <button key={article.id} onClick={() => setSelectedId(article.id)}
+                  className="text-left transition-all flex gap-3 p-2.5"
+                  style={{
+                    borderRadius: 14,
+                    background: c.card,
+                    border: `1px solid ${c.border}`,
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.borderColor = c.accent + "20"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = c.card; e.currentTarget.style.borderColor = c.border; }}>
+                  <div style={{ width: 64, height: 64, flexShrink: 0 }}>
+                    <Cover hue={article.hue} h={64} radius={10} />
+                  </div>
+                  <div className="flex-1 min-w-0 flex flex-col">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span style={{ width: 4, height: 4, borderRadius: "50%", background: article.accent }} />
+                      <span style={{ fontSize: 9.5, fontWeight: 700, color: article.accent }}>{article.source}</span>
+                      <span style={{ fontSize: 9.5, color: c.textMuted }}>· {article.time}</span>
+                    </div>
+                    <p style={{ fontSize: 11.5, fontWeight: 600, color: c.text, lineHeight: 1.35, letterSpacing: -0.1 }}>
+                      {article.title}
+                    </p>
+                    <div className="flex items-center gap-2 mt-auto pt-1.5">
+                      <span style={{
+                        fontSize: 9, fontWeight: 600,
+                        color: c.textMuted,
+                        padding: "1px 6px", borderRadius: 999,
+                        background: c.cardAlt,
+                      }}>{article.readTime} min</span>
+                      <span style={{ fontSize: 9.5, color: c.textMuted }}>{article.category}</span>
+                      <button onClick={(e) => { e.stopPropagation(); toggleSave(article.id); }}
+                        className="ml-auto w-6 h-6 rounded-md flex items-center justify-center transition-colors"
+                        onMouseEnter={e => (e.currentTarget.style.background = c.border)}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                        <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={11}
+                          c={savedArticles.has(article.id) ? c.accent : c.textMuted}
+                          f={savedArticles.has(article.id)} />
+                      </button>
+                    </div>
+                  </div>
                 </button>
-              </div>
+              ))}
             </div>
-          </div>
-        ))}
 
-        {/* Footer strap */}
-        <div className="px-4 py-3 flex items-center justify-between" style={{ background: "#000" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <div style={{ width: 34, height: 16, background: CNN_RED, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ color: "#fff", fontWeight: 900, fontSize: 9, letterSpacing: 0.4 }}>CNN</span>
+            {/* Footer note */}
+            <div className="flex items-center justify-between mt-4 pt-3" style={{ borderTop: `1px solid ${c.border}` }}>
+              <p style={{ fontSize: 9.5, color: c.textMuted }}>Curated by Alternus · Updated just now</p>
+              <button className="flex items-center gap-1 text-[10px] font-semibold transition-colors"
+                style={{ color: c.accentText }}>
+                <I d={ic.refresh} s={10} c={c.accentText} />
+                Refresh
+              </button>
             </div>
-            <span style={{ color: "#fff", fontSize: 9, opacity: 0.7 }}>© 2026 Cable News Network</span>
-          </div>
-          <span style={{ color: "#fff", fontSize: 9, opacity: 0.7 }}>Updated just now</span>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -6133,7 +6239,7 @@ function SysMonApp({ c }: { c: typeof palette.dark }) {
     { name: "Code Editor", pid: 3102, cpu: 4.2, ram: 380, status: "running" },
     { name: "Music", pid: 4023, cpu: 2.1, ram: 120, status: "running" },
     { name: "System (kernel)", pid: 1, cpu: 1.8, ram: 256, status: "system" },
-    { name: "News", pid: 5011, cpu: 0.9, ram: 98, status: "running" },
+    { name: "Focus", pid: 5011, cpu: 0.9, ram: 98, status: "running" },
     { name: "Dashboard", pid: 5200, cpu: 0.4, ram: 64, status: "running" },
   ];
 
@@ -9818,7 +9924,7 @@ export default function AlternusOS() {
     { id: "controlpanel", title: "Control Panel", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 40, w: 580, h: 440 },
     { id: "studio", title: "Alternus Studio", isOpen: false, isMinimized: false, isMaximized: true, zIndex: 1, x: 60, y: 30, w: 720, h: 520 },
     { id: "recovery", title: "Recovery", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 60, w: 520, h: 440 },
-    { id: "news", title: "News", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 180, y: 50, w: 500, h: 480 },
+    { id: "news", title: "Focus", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 180, y: 50, w: 500, h: 480 },
     { id: "dashboard", title: "Dashboard", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 40, w: 520, h: 460 },
     { id: "tasks", title: "Tasks", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 60, w: 420, h: 480 },
     { id: "mail", title: "Mail", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 50, w: 580, h: 460 },
@@ -10275,7 +10381,7 @@ export default function AlternusOS() {
       { keys: ["recovery", "recover", "restore", "undelete", "recycle", "trash", "deleted", "lost file", "deep scan"],
         id: "recovery", title: "Recovery", icon: ic.shield, description: "Recover deleted files and deep scan" },
       { keys: ["news", "breaking", "headline", "article", "press", "journalism", "newspaper", "media", "report", "bbc", "cnn", "reuters", "current events"],
-        id: "news", title: "News", icon: ic.newspaper, description: "Breaking news and world headlines" },
+        id: "news", title: "Focus", icon: ic.sparkle, description: "Curated reading, calmly presented" },
       { keys: ["dashboard", "overview", "stats", "system", "monitor", "home", "widgets", "summary", "quick view"],
         id: "dashboard", title: "Dashboard", icon: ic.grid, description: "System overview, stats and widgets" },
       { keys: ["task", "todo", "to-do", "checklist", "priority", "deadline", "reminder", "plan", "agenda", "productivity"],
@@ -10464,7 +10570,7 @@ export default function AlternusOS() {
     { id: "sysmon", icon: ic.activity, label: "System Monitor", color: "#34D399", category: "system" },
     { id: "browser", icon: ic.globe, label: "Browser", color: c.accentText, category: "web" },
     { id: "weather", icon: ic.cloud, label: "Weather", color: "#60A5FA", category: "web" },
-    { id: "news", icon: ic.newspaper, label: "News", color: c.danger, category: "web" },
+    { id: "news", icon: ic.sparkle, label: "Focus", color: c.accent, category: "web" },
     { id: "mail", icon: ic.mail, label: "Mail", color: "#F97316", category: "web" },
     { id: "store", icon: ic.store, label: "Store", color: c.accent, category: "web" },
     { id: "business", icon: ic.briefcase, label: "Business", color: "#6366F1", category: "web" },
@@ -10815,7 +10921,7 @@ export default function AlternusOS() {
                       { icon: ic.activity, label: "System Monitor", id: "sysmon", color: "#34D399" },
                       { icon: ic.sparkle, label: "Alternus AI", id: "ai", color: c.accent },
                       { icon: ic.mail, label: "Mail", id: "mail", color: "#F97316" },
-                      { icon: ic.newspaper, label: "News", id: "news", color: c.danger },
+                      { icon: ic.sparkle, label: "Focus", id: "news", color: c.accent },
                     ].map(item => (
                       <button key={item.id} onClick={() => { openWinWithAI(item.id as WinId); setShowSpotlight(false); }}
                         className="w-full flex items-center gap-3 px-5 py-2.5 transition-colors text-left"
