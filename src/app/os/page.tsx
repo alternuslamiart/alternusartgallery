@@ -5656,11 +5656,13 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
   const formatViewers = (v: number) => v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v.toString();
 
   // Reusable gradient "thumbnail" with soft overlay and sparkle
-  const Thumb = ({ hue, h, radius = 12, live, viewers, channel }: {
-    hue: [string, string]; h: number; radius?: number; live?: boolean; viewers?: number; channel?: string;
+  const Thumb = ({ hue, h, radius = 12, live, viewers, channel, aspect }: {
+    hue: [string, string]; h?: number; radius?: number; live?: boolean; viewers?: number; channel?: string; aspect?: string;
   }) => (
     <div style={{
-      position: "relative", height: h, borderRadius: radius, overflow: "hidden", flexShrink: 0,
+      position: "relative",
+      ...(aspect ? { aspectRatio: aspect, width: "100%" } : { height: h }),
+      borderRadius: radius, overflow: "hidden", flexShrink: 0,
       background: `linear-gradient(135deg, ${hue[0]}, ${hue[1]})`,
     }}>
       <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.28), transparent 55%)" }} />
@@ -5942,9 +5944,10 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
           </div>
 
           {/* Scrollable area */}
-          <div className="flex-1 overflow-y-auto px-3 py-3" style={{ scrollbarWidth: "none" }}>
+          <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+            <div style={{ maxWidth: 920, margin: "0 auto", padding: "12px 12px" }}>
             {filtered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full">
+              <div className="flex flex-col items-center justify-center" style={{ minHeight: 300 }}>
                 <div style={{ width: 44, height: 44, borderRadius: 14, background: c.card, border: `1px solid ${c.border}`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
                   <I d={ic.search} s={18} c={c.textMuted} />
                 </div>
@@ -5975,30 +5978,30 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
                     </div>
 
                     {/* Hero featured card with side peeks */}
-                    <div className="flex gap-2 mb-4" style={{ height: 138 }}>
+                    <div className="flex gap-2 mb-4" style={{ height: 210, maxWidth: 680, marginLeft: "auto", marginRight: "auto" }}>
                       {/* Left peek */}
                       {featured[1] && (
                         <button onClick={() => setSelectedId(featured[1].id)}
-                          style={{ width: 52, position: "relative", cursor: "pointer", opacity: 0.6, transition: "all 0.2s" }}
+                          style={{ width: 56, position: "relative", cursor: "pointer", opacity: 0.6, transition: "all 0.2s" }}
                           onMouseEnter={e => (e.currentTarget.style.opacity = "0.9")}
                           onMouseLeave={e => (e.currentTarget.style.opacity = "0.6")}>
-                          <Thumb hue={featured[1].hue} h={138} radius={12} live />
+                          <Thumb hue={featured[1].hue} h={210} radius={12} live />
                         </button>
                       )}
                       {/* Main */}
                       <button onClick={() => setSelectedId(featured[0].id)}
                         className="flex-1 text-left"
-                        style={{ position: "relative", cursor: "pointer" }}>
-                        <Thumb hue={featured[0].hue} h={138} radius={14} live viewers={featured[0].viewers} channel={featured[0].channel} />
+                        style={{ position: "relative", cursor: "pointer", minWidth: 0 }}>
+                        <Thumb hue={featured[0].hue} h={210} radius={14} live viewers={featured[0].viewers} channel={featured[0].channel} />
                       </button>
                       {/* Right peek with info card */}
                       {featured[2] && (
-                        <div style={{ position: "relative", width: 120 }}>
+                        <div style={{ position: "relative", width: 128, flexShrink: 0 }}>
                           <button onClick={() => setSelectedId(featured[2].id)}
                             style={{ width: "100%", position: "relative", cursor: "pointer", opacity: 0.7, transition: "all 0.2s" }}
                             onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
                             onMouseLeave={e => (e.currentTarget.style.opacity = "0.7")}>
-                            <Thumb hue={featured[2].hue} h={138} radius={12} live />
+                            <Thumb hue={featured[2].hue} h={210} radius={12} live />
                           </button>
                           {/* Floating info card */}
                           <div style={{
@@ -6047,8 +6050,8 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
                       </div>
                       <button style={{ fontSize: 9.5, fontWeight: 600, color: c.accentText }}>Show more <I d={ic.chevD} s={9} c={c.accentText} /></button>
                     </div>
-                    <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
-                      {grid.slice(0, 4).map(s => (
+                    <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
+                      {grid.slice(0, 6).map(s => (
                         <button key={s.id} onClick={() => setSelectedId(s.id)}
                           className="text-left transition-all"
                           style={{
@@ -6060,7 +6063,7 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
                           onMouseEnter={e => { e.currentTarget.style.borderColor = c.accent + "40"; e.currentTarget.style.boxShadow = `0 6px 18px ${c.accent}15`; }}
                           onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.boxShadow = "none"; }}>
                           <div style={{ padding: 6 }}>
-                            <Thumb hue={s.hue} h={72} radius={8} live viewers={s.viewers} />
+                            <Thumb hue={s.hue} aspect="16/9" radius={8} live viewers={s.viewers} />
                           </div>
                           <div className="px-2 pb-2">
                             <div className="flex items-start gap-1.5">
@@ -6137,6 +6140,7 @@ function NewsApp({ c }: { c: typeof palette.dark }) {
                 </div>
               </>
             )}
+            </div>
           </div>
         </div>
       </div>
