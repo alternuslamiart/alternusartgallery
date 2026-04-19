@@ -10326,39 +10326,43 @@ export default function AlternusOS() {
     setZCounter(z => z + 1);
     const sw = typeof window !== "undefined" ? window.innerWidth : 1400;
     const sh = typeof window !== "undefined" ? window.innerHeight - 40 : 700;
-    // Per-app ideal sizes
+    // Default launch size — used for all windows except the compact utilities below
+    const DEFAULT_W = 1080;
+    const DEFAULT_H = 712;
+    const D = { w: DEFAULT_W, h: DEFAULT_H };
     const sizes: Record<WinId, { w: number; h: number }> = {
-      ai: { w: 480, h: 400 },
-      terminal: { w: 620, h: 400 },
-      code: { w: 900, h: 560 },
-      files: { w: 640, h: 460 },
-      settings: { w: 660, h: 480 },
-      music: { w: 380, h: 420 },
+      ai: D,
+      terminal: D,
+      code: D,
+      files: D,
+      settings: D,
+      music: D,
+      // Utility popups keep their compact footprint
       weather: { w: 380, h: 420 },
-      calendar: { w: 360, h: 400 },
-      notes: { w: 480, h: 400 },
-      browser: { w: 820, h: 540 },
-      store: { w: 780, h: 540 },
-      movies: { w: 720, h: 500 },
-      word: { w: 760, h: 520 },
+      calendar: D,
+      notes: D,
+      browser: D,
+      store: D,
+      movies: D,
+      word: D,
       clock: { w: 380, h: 460 },
       calculator: { w: 320, h: 460 },
-      accounts: { w: 380, h: 440 },
-      downloads: { w: 440, h: 480 },
-      controlpanel: { w: 580, h: 440 },
-      studio: { w: 720, h: 520 },
-      recovery: { w: 520, h: 440 },
-      news: { w: 500, h: 480 },
-      dashboard: { w: 520, h: 460 },
-      tasks: { w: 420, h: 480 },
-      mail: { w: 580, h: 460 },
-      monaco: { w: 680, h: 500 },
-      aihub: { w: 720, h: 520 },
-      aivoice: { w: 380, h: 440 },
-      knowledge: { w: 580, h: 480 },
-      sysmon: { w: 500, h: 480 },
-      business: { w: 820, h: 540 },
-      agent: { w: 900, h: 600 },
+      accounts: D,
+      downloads: D,
+      controlpanel: D,
+      studio: D,
+      recovery: D,
+      news: D,
+      dashboard: D,
+      tasks: D,
+      mail: D,
+      monaco: D,
+      aihub: D,
+      aivoice: D,
+      knowledge: D,
+      sysmon: D,
+      business: D,
+      agent: D,
     };
     setWins(p => p.map(w => {
       if (w.id === id) {
