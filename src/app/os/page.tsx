@@ -10185,27 +10185,11 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
   const [scanning, setScanning] = useState(false);
   const [acceptScrolled, setAcceptScrolled] = useState(false);
 
-  // ── Futuristic palette (dark, no gradients, no heavy shadows) ──
-  const P = {
-    bg:        "#07080B",
-    surface:   "#0E1016",
-    card:      "#13161E",
-    cardAlt:   "#191C25",
-    border:    "#232733",
-    borderHi:  "#2C3142",
-    text:      "#EAECEF",
-    textSec:   "#9FA4B4",
-    textMuted: "#5F6476",
-    accent:    "#4F8EF7",
-    accentDim: "#1E2A40",
-    success:   "#3DD68C",
-    danger:    "#F47272",
-    mono:      "ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace",
-    sans:      "-apple-system, 'Inter', 'Segoe UI', sans-serif",
-  };
+  // Alternus OS light palette — OOBE always runs before theme mode is set
+  const c = palette.light;
 
   const steps = [
-    { id: "region",   label: "Region & Language" },
+    { id: "region",   label: "Region & language" },
     { id: "network",  label: "Network" },
     { id: "license",  label: "License" },
     { id: "account",  label: "Account" },
@@ -10216,11 +10200,11 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
   const keyboards  = ["Albanian", "English (US)", "English (UK)", "German", "Italian", "French", "Spanish"];
   const languages  = ["English (United States)", "Shqip", "Deutsch", "Italiano", "Français", "Español", "Türkçe"];
   const networks   = [
-    { ssid: "Alternus-Guest", signal: 3, secure: true,  freq: "5 GHz",   band: "AX" },
-    { ssid: "AlternusArt",    signal: 3, secure: true,  freq: "5 GHz",   band: "AX" },
-    { ssid: "Home-WiFi-2.4",  signal: 2, secure: true,  freq: "2.4 GHz", band: "N"  },
-    { ssid: "CafeLuna",       signal: 2, secure: false, freq: "2.4 GHz", band: "N"  },
-    { ssid: "NeighborNet",    signal: 1, secure: true,  freq: "2.4 GHz", band: "N"  },
+    { ssid: "Alternus-Guest", signal: 3, secure: true,  freq: "5 GHz"   },
+    { ssid: "AlternusArt",    signal: 3, secure: true,  freq: "5 GHz"   },
+    { ssid: "Home-WiFi-2.4",  signal: 2, secure: true,  freq: "2.4 GHz" },
+    { ssid: "CafeLuna",       signal: 2, secure: false, freq: "2.4 GHz" },
+    { ssid: "NeighborNet",    signal: 1, secure: true,  freq: "2.4 GHz" },
   ];
 
   const next = () => {
@@ -10242,39 +10226,34 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
     }
   })();
 
-  const pad = (n: number) => String(n).padStart(2, "0");
-
-  // ── Tiny primitives ──
+  // ── Primitives ──
   const inputBase: React.CSSProperties = {
     width: "100%",
-    padding: "11px 13px",
-    borderRadius: 6,
-    background: P.surface,
-    border: `1px solid ${P.border}`,
-    fontSize: 12.5,
-    color: P.text,
+    padding: "11px 14px",
+    borderRadius: 10,
+    background: c.surface,
+    border: `1px solid ${c.border}`,
+    fontSize: 13,
+    color: c.text,
     outline: "none",
-    fontFamily: P.sans,
+    fontFamily: "inherit",
     transition: "border-color 0.15s",
   };
 
-  const LabelRow = ({ label, hint }: { label: string; hint?: string }) => (
-    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 6 }}>
-      <span style={{ fontSize: 10, fontWeight: 600, color: P.textSec, fontFamily: P.mono, letterSpacing: 1, textTransform: "uppercase" }}>{label}</span>
-      {hint && <span style={{ fontSize: 10, color: P.textMuted, fontFamily: P.mono }}>{hint}</span>}
-    </div>
+  const Label = ({ children }: { children: React.ReactNode }) => (
+    <div style={{ fontSize: 11, fontWeight: 600, color: c.textSec, marginBottom: 6 }}>{children}</div>
   );
 
   const Selector = ({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) => (
     <div style={{ position: "relative" }}>
       <select value={value} onChange={e => onChange(e.target.value)}
-        onFocus={e => (e.currentTarget.style.borderColor = P.accent)}
-        onBlur={e => (e.currentTarget.style.borderColor = P.border)}
+        onFocus={e => (e.currentTarget.style.borderColor = c.accent)}
+        onBlur={e => (e.currentTarget.style.borderColor = c.border)}
         style={{ ...inputBase, appearance: "none", paddingRight: 34, cursor: "pointer" }}>
-        {options.map(o => <option key={o} value={o} style={{ background: P.surface, color: P.text }}>{o}</option>)}
+        {options.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
       <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
-        <I d={ic.chevD} s={11} c={P.textMuted} />
+        <I d={ic.chevD} s={12} c={c.textMuted} />
       </div>
     </div>
   );
@@ -10282,236 +10261,160 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
   const Toggle = ({ on, onChange }: { on: boolean; onChange: () => void }) => (
     <button onClick={onChange}
       style={{
-        width: 34, height: 18, borderRadius: 2,
-        background: on ? P.accent : P.cardAlt,
+        width: 38, height: 22, borderRadius: 999,
+        background: on ? c.accent : c.cardAlt,
         position: "relative",
-        border: `1px solid ${on ? P.accent : P.border}`,
-        cursor: "pointer", flexShrink: 0,
-        transition: "background-color 0.15s, border-color 0.15s",
+        border: "none", cursor: "pointer", flexShrink: 0,
+        transition: "background-color 0.15s",
       }}>
       <div style={{
-        position: "absolute", top: 1, left: on ? 17 : 1,
-        width: 14, height: 14, borderRadius: 1,
-        background: on ? "#EAECEF" : P.textSec,
-        transition: "left 0.15s, background-color 0.15s",
+        position: "absolute", top: 2, left: on ? 18 : 2,
+        width: 18, height: 18, borderRadius: "50%",
+        background: c.surface,
+        transition: "left 0.15s",
       }} />
     </button>
   );
 
   const SignalBars = ({ level }: { level: number }) => (
-    <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 13 }}>
+    <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 12 }}>
       {[1, 2, 3].map(i => (
         <div key={i} style={{
-          width: 3, height: 4 + i * 3, borderRadius: 0,
-          background: i <= level ? P.accent : P.border,
+          width: 3, height: 3 + i * 3, borderRadius: 1,
+          background: i <= level ? c.accent : c.border,
           transition: "background-color 0.15s",
         }} />
       ))}
     </div>
   );
 
-  // ── Component ──
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 100,
-      background: P.bg,
-      color: P.text,
-      fontFamily: P.sans,
+      background: c.bg,
+      color: c.text,
+      fontFamily: "-apple-system, 'Inter', 'Segoe UI', sans-serif",
       overflow: "hidden",
       display: "flex", alignItems: "center", justifyContent: "center",
     }}>
-      {/* Futuristic grid — extremely subtle */}
-      <div style={{
-        position: "absolute", inset: 0, pointerEvents: "none",
-        backgroundImage:
-          `linear-gradient(${P.border} 1px, transparent 1px), ` +
-          `linear-gradient(90deg, ${P.border} 1px, transparent 1px)`,
-        backgroundSize: "56px 56px",
-        maskImage: "radial-gradient(ellipse at center, #000 0%, transparent 75%)",
-        WebkitMaskImage: "radial-gradient(ellipse at center, #000 0%, transparent 75%)",
-        opacity: 0.18,
-      }} />
-      {/* Corner registration marks */}
-      {[
-        { top: 20, left: 20 },
-        { top: 20, right: 20 },
-        { bottom: 20, left: 20 },
-        { bottom: 20, right: 20 },
-      ].map((pos, i) => (
-        <div key={i} style={{ position: "absolute", ...pos, width: 14, height: 14, pointerEvents: "none" }}>
-          <div style={{ position: "absolute", top: 0, left: 0, width: 14, height: 1, background: P.borderHi }} />
-          <div style={{ position: "absolute", top: 0, left: 0, width: 1, height: 14, background: P.borderHi }} />
-        </div>
-      ))}
-
-      {/* Top status bar */}
-      <div style={{
-        position: "absolute", top: 20, left: "50%", transform: "translateX(-50%)",
-        display: "flex", alignItems: "center", gap: 14,
-        fontFamily: P.mono, fontSize: 10, color: P.textMuted, letterSpacing: 1,
-      }}>
-        <span>ALTERNUS OS · SETUP</span>
-        <span style={{ width: 1, height: 10, background: P.border }} />
-        <span>v6.2.0</span>
-        <span style={{ width: 1, height: 10, background: P.border }} />
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-          <span style={{ width: 5, height: 5, borderRadius: 0, background: P.success }} />
-          LIVE
-        </span>
-      </div>
-
       {/* Main card */}
       <div style={{
         position: "relative",
         width: "min(920px, 94vw)", height: "min(620px, 92vh)",
-        background: P.surface,
-        border: `1px solid ${P.border}`,
-        borderRadius: 8,
+        background: c.surface,
+        border: `1px solid ${c.border}`,
+        borderRadius: 16,
         display: "flex",
         overflow: "hidden",
       }}>
-        {/* Left rail */}
+        {/* ── Left rail ── */}
         <div style={{
           width: 260, flexShrink: 0,
-          background: P.bg,
-          borderRight: `1px solid ${P.border}`,
+          background: c.cardAlt,
+          borderRight: `1px solid ${c.border}`,
           padding: "28px 24px",
           display: "flex", flexDirection: "column",
         }}>
           {/* Brand */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 36 }}>
             <div style={{
-              width: 22, height: 22,
-              border: `1px solid ${P.accent}`,
-              position: "relative",
+              width: 26, height: 26, borderRadius: 8,
+              background: c.accent,
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
-              <div style={{ width: 8, height: 8, background: P.accent }} />
+              <I d={ic.sparkle} s={13} c="#fff" f />
             </div>
-            <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: -0.2 }}>ALTERNUS</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: c.text, letterSpacing: -0.2 }}>Alternus</div>
+              <div style={{ fontSize: 10, fontWeight: 500, color: c.textMuted, marginTop: 1 }}>Setup</div>
+            </div>
           </div>
-          <span style={{ fontSize: 9.5, fontFamily: P.mono, color: P.textMuted, letterSpacing: 1.4, marginBottom: 36 }}>
-            INITIAL_SETUP / v6.2
-          </span>
 
           {/* Steps */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 0, position: "relative" }}>
-            {/* vertical connector */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 2, position: "relative" }}>
+            {/* vertical connector line */}
             <div style={{
-              position: "absolute", left: 11, top: 10, bottom: 10,
-              width: 1, background: P.border,
+              position: "absolute", left: 13, top: 14, bottom: 14,
+              width: 1, background: c.border,
             }} />
             {steps.map((s, i) => {
               const done = i < step;
               const active = i === step;
-              const state = done ? "DONE" : active ? "NOW" : "WAIT";
               return (
                 <div key={s.id} style={{
                   display: "flex", alignItems: "center", gap: 14,
                   padding: "10px 0",
                   position: "relative",
-                  opacity: done || active ? 1 : 0.55,
                 }}>
                   <div style={{
-                    width: 22, height: 22,
-                    flexShrink: 0,
-                    background: P.bg,
-                    border: `1px solid ${active ? P.accent : done ? P.success : P.border}`,
+                    width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
+                    background: active ? c.accent : done ? c.success : c.surface,
+                    border: `1px solid ${active ? c.accent : done ? c.success : c.border}`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     zIndex: 1,
-                    transition: "border-color 0.15s",
+                    transition: "background-color 0.15s, border-color 0.15s",
                   }}>
                     {done ? (
-                      <I d={ic.check} s={10} c={P.success} />
+                      <I d={ic.check} s={12} c="#fff" />
                     ) : (
                       <span style={{
-                        fontSize: 9, fontFamily: P.mono, fontWeight: 700,
-                        color: active ? P.accent : P.textMuted,
-                      }}>{pad(i + 1)}</span>
+                        fontSize: 11, fontWeight: 700,
+                        color: active ? "#fff" : c.textMuted,
+                      }}>{i + 1}</span>
                     )}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 11.5, fontWeight: active || done ? 600 : 500, color: active ? P.text : done ? P.textSec : P.textMuted }}>{s.label}</div>
-                    <div style={{ fontSize: 9, fontFamily: P.mono, color: P.textMuted, letterSpacing: 1, marginTop: 2 }}>{state}</div>
+                    <div style={{
+                      fontSize: 12, fontWeight: active ? 700 : done ? 600 : 500,
+                      color: active ? c.text : done ? c.textSec : c.textMuted,
+                    }}>{s.label}</div>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          <div style={{ marginTop: "auto", paddingTop: 20, borderTop: `1px solid ${P.border}` }}>
-            <div style={{ fontSize: 9, fontFamily: P.mono, color: P.textMuted, letterSpacing: 1.2 }}>SESSION</div>
-            <div style={{ fontSize: 10, color: P.textSec, marginTop: 4, fontFamily: P.mono }}>
-              {pad(step + 1)}/{pad(steps.length)} · {Math.round(((step + 1) / steps.length) * 100)}%
+          <div style={{ marginTop: "auto" }}>
+            <div style={{ fontSize: 11, color: c.textMuted, marginBottom: 8 }}>
+              Step {step + 1} of {steps.length}
             </div>
-            <div style={{ marginTop: 8, height: 2, background: P.border, position: "relative" }}>
+            <div style={{ height: 4, background: c.border, borderRadius: 999, overflow: "hidden" }}>
               <div style={{
                 height: "100%",
                 width: `${((step + 1) / steps.length) * 100}%`,
-                background: P.accent,
+                background: c.accent,
+                borderRadius: 999,
                 transition: "width 0.25s",
               }} />
             </div>
           </div>
         </div>
 
-        {/* Right content */}
+        {/* ── Right content ── */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-          {/* Step header bar */}
-          <div style={{
-            flexShrink: 0,
-            padding: "20px 36px",
-            borderBottom: `1px solid ${P.border}`,
-            display: "flex", alignItems: "center", gap: 14,
-          }}>
-            <div style={{ fontSize: 9.5, fontFamily: P.mono, color: P.accent, letterSpacing: 1.5 }}>
-              STEP_{pad(step + 1)}
-            </div>
-            <div style={{ width: 1, height: 14, background: P.border }} />
-            <div style={{ fontSize: 10, fontFamily: P.mono, color: P.textMuted, letterSpacing: 1.2 }}>
-              {steps[step].label.toUpperCase()}
-            </div>
-            <div style={{ flex: 1 }} />
-            <div style={{ fontSize: 9.5, fontFamily: P.mono, color: P.textMuted, letterSpacing: 1.2 }}>
-              {new Date().toTimeString().slice(0, 8)}
-            </div>
-          </div>
-
-          <div style={{ flex: 1, overflowY: "auto", padding: "32px 36px" }}>
+          <div style={{ flex: 1, overflowY: "auto", padding: "44px 48px" }}>
             {/* ── Step 0: Region ── */}
             {step === 0 && (
               <div>
-                <h1 style={{ fontSize: 24, fontWeight: 600, color: P.text, letterSpacing: -0.4, marginBottom: 6 }}>
-                  Confirm region and input
+                <h1 style={{ fontSize: 24, fontWeight: 700, color: c.text, letterSpacing: -0.4, marginBottom: 8 }}>
+                  Let&apos;s set up your device
                 </h1>
-                <p style={{ fontSize: 12, color: P.textSec, marginBottom: 28, lineHeight: 1.5, maxWidth: 520 }}>
-                  Used to set timezone, regional formats, and keyboard defaults. Any of these can be changed later in Settings.
+                <p style={{ fontSize: 13, color: c.textSec, marginBottom: 32, lineHeight: 1.55, maxWidth: 480 }}>
+                  Confirm your region and preferred keyboard. These settings shape time, date, and input defaults.
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 18, maxWidth: 420 }}>
                   <div>
-                    <LabelRow label="Country / Region" />
+                    <Label>Country or region</Label>
                     <Selector value={data.region} onChange={v => setData(d => ({ ...d, region: v }))} options={countries} />
                   </div>
                   <div>
-                    <LabelRow label="Keyboard Layout" />
+                    <Label>Keyboard layout</Label>
                     <Selector value={data.keyboard} onChange={v => setData(d => ({ ...d, keyboard: v }))} options={keyboards} />
                   </div>
                   <div>
-                    <LabelRow label="System Language" />
+                    <Label>System language</Label>
                     <Selector value={data.language} onChange={v => setData(d => ({ ...d, language: v }))} options={languages} />
                   </div>
-                </div>
-                <div style={{
-                  marginTop: 24, padding: 14,
-                  border: `1px solid ${P.border}`, borderRadius: 4,
-                  background: P.card,
-                  display: "flex", gap: 10, alignItems: "flex-start",
-                  maxWidth: 520,
-                }}>
-                  <div style={{ width: 4, height: 4, background: P.accent, marginTop: 6, flexShrink: 0 }} />
-                  <p style={{ fontSize: 11, color: P.textSec, lineHeight: 1.55, fontFamily: P.mono, letterSpacing: 0.3 }}>
-                    Timezone and regional formats for <span style={{ color: P.text }}>{data.region}</span> will be applied. Keyboard mapped to <span style={{ color: P.text }}>{data.keyboard}</span>.
-                  </p>
                 </div>
               </div>
             )}
@@ -10519,77 +10422,80 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
             {/* ── Step 1: Network ── */}
             {step === 1 && (
               <div>
-                <h1 style={{ fontSize: 24, fontWeight: 600, color: P.text, letterSpacing: -0.4, marginBottom: 6 }}>
+                <h1 style={{ fontSize: 24, fontWeight: 700, color: c.text, letterSpacing: -0.4, marginBottom: 8 }}>
                   Connect to a network
                 </h1>
-                <p style={{ fontSize: 12, color: P.textSec, marginBottom: 20, lineHeight: 1.5, maxWidth: 520 }}>
-                  A wireless connection lets you sign in, download updates, and sync across devices.
+                <p style={{ fontSize: 13, color: c.textSec, marginBottom: 22, lineHeight: 1.55, maxWidth: 480 }}>
+                  A Wi-Fi connection lets you sign in, download updates, and sync across devices.
                 </p>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
                   <button onClick={() => { setScanning(true); setTimeout(() => setScanning(false), 1200); }}
                     style={{
                       display: "inline-flex", alignItems: "center", gap: 8,
-                      padding: "6px 12px", borderRadius: 4,
-                      background: P.card, color: P.text,
-                      fontSize: 10.5, fontWeight: 600, fontFamily: P.mono, letterSpacing: 1,
-                      border: `1px solid ${P.border}`, cursor: "pointer",
-                      transition: "border-color 0.15s, color 0.15s",
+                      padding: "7px 14px", borderRadius: 999,
+                      background: c.cardAlt, color: c.textSec,
+                      fontSize: 11.5, fontWeight: 600,
+                      border: `1px solid ${c.border}`, cursor: "pointer",
+                      transition: "color 0.15s, border-color 0.15s",
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = P.borderHi; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = P.border; }}>
+                    onMouseEnter={e => { e.currentTarget.style.color = c.text; e.currentTarget.style.borderColor = c.textMuted; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = c.textSec; e.currentTarget.style.borderColor = c.border; }}>
                     <div style={{ animation: scanning ? "oobe-spin 1s linear infinite" : "none", display: "flex" }}>
-                      <I d={ic.refresh} s={11} c={P.textSec} />
+                      <I d={ic.refresh} s={11} c={c.textSec} />
                     </div>
-                    {scanning ? "SCANNING" : "RESCAN"}
+                    {scanning ? "Scanning…" : "Rescan"}
                   </button>
-                  <span style={{ fontSize: 10, fontFamily: P.mono, color: P.textMuted, letterSpacing: 0.8 }}>
-                    · {pad(networks.length)} NETWORKS DETECTED
+                  <span style={{ fontSize: 11.5, color: c.textMuted }}>
+                    {networks.length} networks found
                   </span>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 0, border: `1px solid ${P.border}`, borderRadius: 4, overflow: "hidden" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 0, border: `1px solid ${c.border}`, borderRadius: 12, overflow: "hidden" }}>
                   {networks.map((n, i) => {
                     const selected = data.wifi === n.ssid;
                     return (
                       <button key={n.ssid} onClick={() => setData(d => ({ ...d, wifi: selected ? null : n.ssid }))}
                         style={{
                           display: "flex", alignItems: "center", gap: 14,
-                          padding: "12px 14px",
-                          background: selected ? P.cardAlt : "transparent",
-                          borderBottom: i < networks.length - 1 ? `1px solid ${P.border}` : "none",
-                          borderLeft: `2px solid ${selected ? P.accent : "transparent"}`,
+                          padding: "14px 16px",
+                          background: selected ? c.accentSoft : "transparent",
+                          borderBottom: i < networks.length - 1 ? `1px solid ${c.border}` : "none",
                           textAlign: "left", cursor: "pointer",
-                          transition: "background-color 0.15s, border-color 0.15s",
+                          transition: "background-color 0.15s",
                         }}
-                        onMouseEnter={e => { if (!selected) e.currentTarget.style.background = P.card; }}
+                        onMouseEnter={e => { if (!selected) e.currentTarget.style.background = c.cardAlt; }}
                         onMouseLeave={e => { if (!selected) e.currentTarget.style.background = "transparent"; }}>
                         <SignalBars level={n.signal} />
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 12, fontWeight: 600, color: P.text }}>{n.ssid}</div>
-                          <div style={{ fontSize: 9.5, fontFamily: P.mono, color: P.textMuted, letterSpacing: 0.6, marginTop: 2 }}>
-                            {n.secure ? "WPA2" : "OPEN"} · {n.freq} · {n.band}
+                          <div style={{ fontSize: 12.5, fontWeight: 600, color: c.text }}>{n.ssid}</div>
+                          <div style={{ fontSize: 11, color: c.textMuted, marginTop: 2 }}>
+                            {n.secure ? "Secured" : "Open network"} · {n.freq}
                           </div>
                         </div>
-                        {n.secure && <I d={ic.lock} s={11} c={P.textMuted} />}
-                        <div style={{
-                          fontSize: 9.5, fontFamily: P.mono, letterSpacing: 1,
-                          color: selected ? P.accent : P.textMuted,
-                          minWidth: 48, textAlign: "right",
-                        }}>
-                          {selected ? "LINKED" : "AVAIL"}
-                        </div>
+                        {n.secure && <I d={ic.lock} s={12} c={c.textMuted} />}
+                        {selected && (
+                          <span style={{
+                            display: "inline-flex", alignItems: "center", gap: 4,
+                            padding: "3px 9px", borderRadius: 999,
+                            background: c.accent, color: "#fff",
+                            fontSize: 10, fontWeight: 700,
+                          }}>
+                            <I d={ic.check} s={9} c="#fff" />
+                            Connected
+                          </span>
+                        )}
                       </button>
                     );
                   })}
                 </div>
                 <button onClick={next}
                   style={{
-                    marginTop: 14, background: "transparent", border: "none",
-                    color: P.textSec, fontSize: 10.5, fontFamily: P.mono, letterSpacing: 1,
+                    marginTop: 16, background: "transparent", border: "none",
+                    color: c.accentText, fontSize: 12, fontWeight: 600,
                     cursor: "pointer", padding: 0, transition: "color 0.15s",
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.color = P.accent)}
-                  onMouseLeave={e => (e.currentTarget.style.color = P.textSec)}>
-                  › SKIP — I DON'T HAVE INTERNET
+                  onMouseEnter={e => (e.currentTarget.style.color = c.accent)}
+                  onMouseLeave={e => (e.currentTarget.style.color = c.accentText)}>
+                  I don&apos;t have internet →
                 </button>
               </div>
             )}
@@ -10597,11 +10503,11 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
             {/* ── Step 2: License ── */}
             {step === 2 && (
               <div>
-                <h1 style={{ fontSize: 24, fontWeight: 600, color: P.text, letterSpacing: -0.4, marginBottom: 6 }}>
+                <h1 style={{ fontSize: 24, fontWeight: 700, color: c.text, letterSpacing: -0.4, marginBottom: 8 }}>
                   License agreement
                 </h1>
-                <p style={{ fontSize: 12, color: P.textSec, marginBottom: 16, lineHeight: 1.5, maxWidth: 520 }}>
-                  Read the Alternus OS license in full before continuing.
+                <p style={{ fontSize: 13, color: c.textSec, marginBottom: 18, lineHeight: 1.55, maxWidth: 480 }}>
+                  Please review the Alternus OS license before continuing.
                 </p>
                 <div
                   onScroll={(e) => {
@@ -10610,50 +10516,49 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
                   }}
                   style={{
                     height: 220, overflowY: "auto",
-                    background: P.bg, border: `1px solid ${P.border}`,
-                    borderRadius: 4, padding: 16,
-                    fontSize: 11, lineHeight: 1.7, color: P.textSec,
-                    fontFamily: P.mono, letterSpacing: 0.1,
+                    background: c.cardAlt, border: `1px solid ${c.border}`,
+                    borderRadius: 12, padding: 18,
+                    fontSize: 12, lineHeight: 1.7, color: c.textSec,
                   }}>
-                  <p style={{ fontWeight: 700, color: P.text, marginBottom: 10 }}>ALTERNUS_OS · END_USER_LICENSE</p>
-                  <p style={{ marginBottom: 10, color: P.textMuted, fontSize: 10 }}>VERSION_6.2 · UPDATED_2026-04</p>
+                  <p style={{ fontWeight: 700, color: c.text, marginBottom: 6, fontSize: 13 }}>Alternus OS — End User License Agreement</p>
+                  <p style={{ marginBottom: 12, fontSize: 11, color: c.textMuted }}>Version 6.2 · Updated April 2026</p>
                   <p style={{ marginBottom: 12 }}>This End-User License Agreement (&quot;EULA&quot;) is a legal agreement between you and Alternus Systems governing your use of Alternus OS and its bundled applications.</p>
-                  <p style={{ marginBottom: 12 }}><span style={{ color: P.text }}>01 · GRANT.</span> Alternus grants you a non-exclusive, non-transferable license to install and use Alternus OS on a single device for personal or business use.</p>
-                  <p style={{ marginBottom: 12 }}><span style={{ color: P.text }}>02 · UPDATES.</span> Your device will periodically receive software updates that may add, modify, or remove features. Critical security updates may install automatically.</p>
-                  <p style={{ marginBottom: 12 }}><span style={{ color: P.text }}>03 · PRIVACY.</span> Your use of Alternus OS is also subject to the Alternus Privacy Statement, which describes how we collect, use, and protect your information.</p>
-                  <p style={{ marginBottom: 12 }}><span style={{ color: P.text }}>04 · AI_SERVICES.</span> Certain features rely on cloud AI. When you opt in, your prompts and context may be transmitted to Alternus AI services. Conversations are not used to train foundation models without your explicit consent.</p>
-                  <p style={{ marginBottom: 12 }}><span style={{ color: P.text }}>05 · LIABILITY.</span> Alternus OS is provided &quot;as is&quot;. To the maximum extent permitted by law, Alternus shall not be liable for any indirect, incidental, or consequential damages.</p>
-                  <p style={{ marginBottom: 12 }}><span style={{ color: P.text }}>06 · TERMINATION.</span> This license is effective until terminated. You may terminate it at any time by uninstalling Alternus OS.</p>
-                  <p style={{ marginBottom: 12 }}><span style={{ color: P.text }}>07 · LAW.</span> This EULA is governed by the laws of your country of residence. Disputes will be resolved in the competent local courts.</p>
-                  <p style={{ color: P.textMuted, marginTop: 14 }}>— END_OF_AGREEMENT —</p>
+                  <p style={{ marginBottom: 12 }}><strong style={{ color: c.text }}>1. Grant of license.</strong> Alternus grants you a non-exclusive, non-transferable license to install and use Alternus OS on a single device for personal or business use.</p>
+                  <p style={{ marginBottom: 12 }}><strong style={{ color: c.text }}>2. Updates.</strong> Your device will periodically receive software updates that may add, modify, or remove features. Critical security updates may install automatically.</p>
+                  <p style={{ marginBottom: 12 }}><strong style={{ color: c.text }}>3. Privacy.</strong> Your use of Alternus OS is subject to the Alternus Privacy Statement, which describes how we collect, use, and protect your information.</p>
+                  <p style={{ marginBottom: 12 }}><strong style={{ color: c.text }}>4. AI services.</strong> Certain features rely on cloud AI. Conversations are not used to train foundation models without your explicit consent.</p>
+                  <p style={{ marginBottom: 12 }}><strong style={{ color: c.text }}>5. Limitation of liability.</strong> Alternus OS is provided &quot;as is&quot;. Alternus shall not be liable for indirect, incidental, or consequential damages.</p>
+                  <p style={{ marginBottom: 12 }}><strong style={{ color: c.text }}>6. Termination.</strong> This license is effective until terminated. You may terminate it at any time by uninstalling Alternus OS.</p>
+                  <p style={{ marginBottom: 12 }}><strong style={{ color: c.text }}>7. Governing law.</strong> This EULA is governed by the laws of your country of residence.</p>
+                  <p style={{ color: c.textMuted, marginTop: 14, fontSize: 11 }}>— End of agreement —</p>
                 </div>
                 {!acceptScrolled && (
-                  <p style={{ fontSize: 10, fontFamily: P.mono, letterSpacing: 0.8, color: P.textMuted, marginTop: 8 }}>
-                    › SCROLL_TO_BOTTOM_TO_CONTINUE
+                  <p style={{ fontSize: 11, color: c.textMuted, marginTop: 10, fontStyle: "italic" }}>
+                    Scroll to the bottom to continue
                   </p>
                 )}
                 <label
                   onClick={() => { if (acceptScrolled) setData(d => ({ ...d, acceptedLicense: !d.acceptedLicense })); }}
                   style={{
                     display: "flex", alignItems: "flex-start", gap: 12,
-                    marginTop: 14, padding: 13,
-                    background: data.acceptedLicense ? P.card : P.surface,
-                    border: `1px solid ${data.acceptedLicense ? P.accent : P.border}`,
-                    borderRadius: 4,
+                    marginTop: 14, padding: 14,
+                    background: data.acceptedLicense ? c.accentSoft : c.surface,
+                    border: `1px solid ${data.acceptedLicense ? c.accent : c.border}`,
+                    borderRadius: 12,
                     cursor: acceptScrolled ? "pointer" : "not-allowed",
-                    opacity: acceptScrolled ? 1 : 0.5,
-                    transition: "border-color 0.15s, background-color 0.15s",
+                    opacity: acceptScrolled ? 1 : 0.55,
+                    transition: "background-color 0.15s, border-color 0.15s",
                   }}>
                   <div style={{
-                    width: 16, height: 16, flexShrink: 0, marginTop: 1,
-                    background: data.acceptedLicense ? P.accent : "transparent",
-                    border: `1px solid ${data.acceptedLicense ? P.accent : P.borderHi}`,
+                    width: 18, height: 18, borderRadius: 5, flexShrink: 0, marginTop: 1,
+                    background: data.acceptedLicense ? c.accent : c.surface,
+                    border: `1.5px solid ${data.acceptedLicense ? c.accent : c.border}`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     transition: "all 0.15s",
                   }}>
-                    {data.acceptedLicense && <I d={ic.check} s={10} c={P.bg} />}
+                    {data.acceptedLicense && <I d={ic.check} s={11} c="#fff" />}
                   </div>
-                  <span style={{ fontSize: 11.5, color: P.textSec, lineHeight: 1.5 }}>
+                  <span style={{ fontSize: 12, color: c.text, lineHeight: 1.5 }}>
                     I have read and accept the Alternus OS License Agreement and Privacy Statement.
                   </span>
                 </label>
@@ -10663,51 +10568,39 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
             {/* ── Step 3: Account ── */}
             {step === 3 && (
               <div>
-                <h1 style={{ fontSize: 24, fontWeight: 600, color: P.text, letterSpacing: -0.4, marginBottom: 6 }}>
+                <h1 style={{ fontSize: 24, fontWeight: 700, color: c.text, letterSpacing: -0.4, marginBottom: 8 }}>
                   Create your account
                 </h1>
-                <p style={{ fontSize: 12, color: P.textSec, marginBottom: 24, lineHeight: 1.5, maxWidth: 520 }}>
+                <p style={{ fontSize: 13, color: c.textSec, marginBottom: 28, lineHeight: 1.55, maxWidth: 480 }}>
                   Your Alternus account syncs settings, files, and preferences across devices.
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 18, maxWidth: 420 }}>
                   <div>
-                    <LabelRow label="Display Name" />
+                    <Label>Your name</Label>
                     <input value={data.name} onChange={e => setData(d => ({ ...d, name: e.target.value }))}
                       placeholder="e.g. Arben Hoxha"
-                      onFocus={e => (e.currentTarget.style.borderColor = P.accent)}
-                      onBlur={e => (e.currentTarget.style.borderColor = P.border)}
+                      onFocus={e => (e.currentTarget.style.borderColor = c.accent)}
+                      onBlur={e => (e.currentTarget.style.borderColor = c.border)}
                       style={inputBase} />
                   </div>
                   <div>
-                    <LabelRow label="Email Address" />
+                    <Label>Email address</Label>
                     <input value={data.email} onChange={e => setData(d => ({ ...d, email: e.target.value }))}
                       placeholder="you@example.com" type="email"
-                      onFocus={e => (e.currentTarget.style.borderColor = P.accent)}
-                      onBlur={e => (e.currentTarget.style.borderColor = P.border)}
+                      onFocus={e => (e.currentTarget.style.borderColor = c.accent)}
+                      onBlur={e => (e.currentTarget.style.borderColor = c.border)}
                       style={inputBase} />
                   </div>
                   <div>
-                    <LabelRow label="Password" hint="MIN. 6 CHARS" />
+                    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 6 }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: c.textSec }}>Password</span>
+                      <span style={{ fontSize: 11, color: c.textMuted }}>Minimum 6 characters</span>
+                    </div>
                     <input value={password} onChange={e => setPassword(e.target.value)}
                       type="password" placeholder="••••••••"
-                      onFocus={e => (e.currentTarget.style.borderColor = P.accent)}
-                      onBlur={e => (e.currentTarget.style.borderColor = P.border)}
+                      onFocus={e => (e.currentTarget.style.borderColor = c.accent)}
+                      onBlur={e => (e.currentTarget.style.borderColor = c.border)}
                       style={inputBase} />
-                  </div>
-                </div>
-                <div style={{
-                  marginTop: 22, padding: 14,
-                  border: `1px solid ${P.border}`, borderRadius: 4,
-                  background: P.card,
-                  display: "flex", gap: 12, alignItems: "center",
-                  maxWidth: 520,
-                }}>
-                  <I d={ic.shield} s={14} c={P.success} />
-                  <div>
-                    <div style={{ fontSize: 10.5, fontFamily: P.mono, color: P.success, letterSpacing: 1 }}>ENCRYPTED · ON_DEVICE</div>
-                    <div style={{ fontSize: 10.5, color: P.textMuted, marginTop: 2, lineHeight: 1.5 }}>
-                      Password is hashed locally. Two-factor auth is available in Settings.
-                    </div>
                   </div>
                 </div>
               </div>
@@ -10716,35 +10609,29 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
             {/* ── Step 4: Privacy ── */}
             {step === 4 && (
               <div>
-                <h1 style={{ fontSize: 24, fontWeight: 600, color: P.text, letterSpacing: -0.4, marginBottom: 6 }}>
-                  Privacy preferences
+                <h1 style={{ fontSize: 24, fontWeight: 700, color: c.text, letterSpacing: -0.4, marginBottom: 8 }}>
+                  Choose privacy settings
                 </h1>
-                <p style={{ fontSize: 12, color: P.textSec, marginBottom: 22, lineHeight: 1.5, maxWidth: 520 }}>
+                <p style={{ fontSize: 13, color: c.textSec, marginBottom: 24, lineHeight: 1.55, maxWidth: 480 }}>
                   You are in control. Every setting can be changed later in Settings › Privacy.
                 </p>
-                <div style={{ display: "flex", flexDirection: "column", gap: 0, border: `1px solid ${P.border}`, borderRadius: 4, overflow: "hidden" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 0, border: `1px solid ${c.border}`, borderRadius: 12, overflow: "hidden" }}>
                   {[
-                    { key: "location" as const,     code: "LOC",  title: "Location services",     desc: "Let apps use your precise location for weather, maps, and nearby services." },
-                    { key: "findMyDevice" as const, code: "FMD",  title: "Find my device",        desc: "Locate a lost or stolen device from your Alternus account." },
-                    { key: "diagnostics" as const,  code: "DIAG", title: "Diagnostic data",       desc: "Send anonymous crash and performance reports to help improve Alternus OS." },
-                    { key: "tailored" as const,     code: "TLR",  title: "Tailored experiences",  desc: "Use diagnostic data to personalize tips and recommendations." },
-                    { key: "adId" as const,         code: "ADID", title: "Advertising identifier", desc: "Allow apps to show relevant ads based on your advertising identifier." },
+                    { key: "location" as const,     title: "Location",              desc: "Let apps use your precise location for weather, maps, and nearby services." },
+                    { key: "findMyDevice" as const, title: "Find my device",        desc: "Locate a lost or stolen device from your Alternus account." },
+                    { key: "diagnostics" as const,  title: "Diagnostic data",       desc: "Send anonymous crash and performance reports to help improve Alternus OS." },
+                    { key: "tailored" as const,     title: "Tailored experiences",  desc: "Use diagnostic data to personalize tips and recommendations." },
+                    { key: "adId" as const,         title: "Advertising identifier", desc: "Allow apps to show relevant ads based on your advertising identifier." },
                   ].map((item, i) => (
                     <div key={item.key} style={{
-                      display: "flex", alignItems: "center", gap: 14,
-                      padding: "14px 16px",
-                      borderBottom: i < 4 ? `1px solid ${P.border}` : "none",
-                      background: data.privacy[item.key] ? P.card : "transparent",
-                      transition: "background-color 0.15s",
+                      display: "flex", alignItems: "center", gap: 16,
+                      padding: "16px 18px",
+                      borderBottom: i < 4 ? `1px solid ${c.border}` : "none",
+                      background: c.surface,
                     }}>
-                      <div style={{
-                        width: 34, flexShrink: 0,
-                        fontSize: 9.5, fontFamily: P.mono, letterSpacing: 1,
-                        color: data.privacy[item.key] ? P.accent : P.textMuted,
-                      }}>{item.code}</div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: P.text, marginBottom: 2 }}>{item.title}</div>
-                        <div style={{ fontSize: 10.5, color: P.textSec, lineHeight: 1.5 }}>{item.desc}</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: c.text, marginBottom: 3 }}>{item.title}</div>
+                        <div style={{ fontSize: 11.5, color: c.textSec, lineHeight: 1.5 }}>{item.desc}</div>
                       </div>
                       <Toggle on={data.privacy[item.key]}
                         onChange={() => setData(d => ({ ...d, privacy: { ...d.privacy, [item.key]: !d.privacy[item.key] } }))} />
@@ -10758,43 +10645,40 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
           {/* Footer actions */}
           <div style={{
             flexShrink: 0, display: "flex", alignItems: "center",
-            padding: "18px 36px",
-            borderTop: `1px solid ${P.border}`,
-            background: P.bg,
+            padding: "18px 48px",
+            borderTop: `1px solid ${c.border}`,
+            background: c.surface,
           }}>
             <button onClick={back} disabled={step === 0}
               style={{
-                padding: "9px 18px", borderRadius: 4,
+                padding: "9px 18px", borderRadius: 10,
                 background: "transparent",
-                color: step === 0 ? P.textMuted : P.textSec,
-                fontSize: 11, fontFamily: P.mono, fontWeight: 600, letterSpacing: 1,
-                border: `1px solid ${P.border}`,
+                color: step === 0 ? c.textMuted : c.textSec,
+                fontSize: 12, fontWeight: 600,
+                border: `1px solid ${c.border}`,
                 cursor: step === 0 ? "not-allowed" : "pointer",
                 transition: "color 0.15s, border-color 0.15s",
               }}
-              onMouseEnter={e => { if (step !== 0) { e.currentTarget.style.color = P.text; e.currentTarget.style.borderColor = P.borderHi; } }}
-              onMouseLeave={e => { if (step !== 0) { e.currentTarget.style.color = P.textSec; e.currentTarget.style.borderColor = P.border; } }}>
-              ← BACK
+              onMouseEnter={e => { if (step !== 0) { e.currentTarget.style.color = c.text; e.currentTarget.style.borderColor = c.textMuted; } }}
+              onMouseLeave={e => { if (step !== 0) { e.currentTarget.style.color = c.textSec; e.currentTarget.style.borderColor = c.border; } }}>
+              Back
             </button>
             <div style={{ flex: 1 }} />
-            <span style={{ fontSize: 10, fontFamily: P.mono, color: P.textMuted, letterSpacing: 1.2, marginRight: 14 }}>
-              {pad(step + 1)} / {pad(steps.length)}
-            </span>
             <button onClick={next} disabled={!canAdvance}
               style={{
-                display: "inline-flex", alignItems: "center", gap: 10,
-                padding: "10px 20px", borderRadius: 4,
-                background: canAdvance ? P.accent : P.cardAlt,
-                color: canAdvance ? "#FFFFFF" : P.textMuted,
-                fontSize: 11, fontFamily: P.mono, fontWeight: 700, letterSpacing: 1.2,
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "10px 22px", borderRadius: 10,
+                background: canAdvance ? c.accent : c.cardAlt,
+                color: canAdvance ? "#fff" : c.textMuted,
+                fontSize: 12, fontWeight: 700,
                 border: "none",
                 cursor: canAdvance ? "pointer" : "not-allowed",
                 transition: "background-color 0.15s",
               }}
               onMouseEnter={e => { if (canAdvance) e.currentTarget.style.background = "#3F7DE3"; }}
-              onMouseLeave={e => { if (canAdvance) e.currentTarget.style.background = P.accent; }}>
-              {step === steps.length - 1 ? "FINISH" : "CONTINUE"}
-              <I d={ic.chevR} s={11} c={canAdvance ? "#fff" : P.textMuted} />
+              onMouseLeave={e => { if (canAdvance) e.currentTarget.style.background = c.accent; }}>
+              {step === steps.length - 1 ? "Finish" : "Continue"}
+              <I d={ic.chevR} s={11} c={canAdvance ? "#fff" : c.textMuted} />
             </button>
           </div>
         </div>
