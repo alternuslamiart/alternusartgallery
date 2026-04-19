@@ -827,10 +827,10 @@ function AIChat({ c, mode, setMode, onOpenApp, onExecuteAIActions, osContext }: 
   };
 
   const appKeywords: { keywords: string[]; id: WinId; label: string }[] = [
-    { keywords: ["browser", "web", "internet", "browse"], id: "browser", label: "Browser" },
+    { keywords: ["browser", "web", "internet", "browse", "stratos"], id: "browser", label: "Stratos" },
     { keywords: ["clock", "time", "alarm"], id: "clock", label: "Clock" },
     { keywords: ["code", "editor", "programming", "dev"], id: "code", label: "Code Editor" },
-    { keywords: ["studio", "3d", "design", "blender", "model"], id: "studio", label: "Studio" },
+    { keywords: ["studio", "3d", "design", "blender", "model", "structure"], id: "studio", label: "Structure" },
     { keywords: ["files", "file", "folder", "explorer"], id: "files", label: "Files" },
     { keywords: ["terminal", "console", "shell", "cmd"], id: "terminal", label: "Terminal" },
     { keywords: ["music", "player", "song"], id: "music", label: "Music" },
@@ -838,8 +838,8 @@ function AIChat({ c, mode, setMode, onOpenApp, onExecuteAIActions, osContext }: 
     { keywords: ["calendar", "date", "schedule"], id: "calendar", label: "Calendar" },
     { keywords: ["notes", "note", "notepad"], id: "notes", label: "Notes" },
     { keywords: ["word", "document", "doc"], id: "word", label: "Word" },
-    { keywords: ["store", "shop", "app store"], id: "store", label: "Store" },
-    { keywords: ["movies", "movie", "video", "cinema"], id: "movies", label: "Movies" },
+    { keywords: ["store", "shop", "app store", "core"], id: "store", label: "Core Store" },
+    { keywords: ["movies", "movie", "video", "cinema", "vision"], id: "movies", label: "Vision" },
     { keywords: ["calculator", "calc", "math"], id: "calculator", label: "Calculator" },
     { keywords: ["settings", "preferences", "config"], id: "settings", label: "Settings" },
     { keywords: ["control", "panel", "system"], id: "controlpanel", label: "Control Panel" },
@@ -1717,7 +1717,7 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
               <Toggle on={dndOn} onToggle={() => setDndOn(!dndOn)} />
             </div>
             <p className="text-xs font-medium px-1" style={{ color: c.textMuted }}>App Notifications</p>
-            {[{ app: "AI Assistant", icon: ic.sparkle, on: true }, { app: "Calendar", icon: ic.calendar, on: true }, { app: "Browser", icon: ic.globe, on: false }, { app: "Music", icon: ic.music, on: false }, { app: "System Updates", icon: ic.refresh, on: true }].map((n, i) => (
+            {[{ app: "AI Assistant", icon: ic.sparkle, on: true }, { app: "Calendar", icon: ic.calendar, on: true }, { app: "Stratos", icon: ic.globe, on: false }, { app: "Music", icon: ic.music, on: false }, { app: "System Updates", icon: ic.refresh, on: true }].map((n, i) => (
               <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
                 <div className="flex items-center gap-3">
                   <I d={n.icon} s={16} c={c.textSec} />
@@ -1862,7 +1862,7 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
               <button className="flex-1 py-3 rounded-xl text-xs font-medium text-center" style={{ background: c.cardAlt, color: c.text }}>Performance</button>
             </div>
             <p className="text-xs font-medium px-1" style={{ color: c.textMuted }}>Battery Usage</p>
-            {[{ app: "Browser", pct: 34, icon: ic.globe }, { app: "Code Editor", pct: 22, icon: ic.code }, { app: "AI Assistant", pct: 18, icon: ic.sparkle }, { app: "Display", pct: 15, icon: ic.monitor }, { app: "System", pct: 11, icon: ic.settings }].map((item, i) => (
+            {[{ app: "Stratos", pct: 34, icon: ic.globe }, { app: "Code Editor", pct: 22, icon: ic.code }, { app: "AI Assistant", pct: 18, icon: ic.sparkle }, { app: "Display", pct: 15, icon: ic.monitor }, { app: "System", pct: 11, icon: ic.settings }].map((item, i) => (
               <div key={i} className="px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2"><I d={item.icon} s={14} c={c.textSec} /><span className="text-xs" style={{ color: c.text }}>{item.app}</span></div>
@@ -1883,7 +1883,7 @@ function SettingsApp({ c, mode, setMode, wallpaper, setWallpaper }: { c: typeof 
               <Toggle on={locOn} onToggle={() => setLocOn(!locOn)} />
             </div>
             <p className="text-xs font-medium px-1" style={{ color: c.textMuted }}>App Permissions</p>
-            {[{ app: "Browser", perms: ["Camera", "Location", "Mic"] }, { app: "AI Assistant", perms: ["Files", "Mic"] }, { app: "Weather", perms: ["Location"] }, { app: "Music", perms: ["Storage"] }].map((item, i) => (
+            {[{ app: "Stratos", perms: ["Camera", "Location", "Mic"] }, { app: "AI Assistant", perms: ["Files", "Mic"] }, { app: "Weather", perms: ["Location"] }, { app: "Music", perms: ["Storage"] }].map((item, i) => (
               <div key={i} className="px-4 py-3 rounded-xl" style={{ background: c.cardAlt }}>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-sm" style={{ color: c.text }}>{item.app}</span>
@@ -3281,7 +3281,7 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
             <>
               <iframe src={url} className="w-full h-full border-0"
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                title="Browser" onError={()=>setLoadError(true)} />
+                title="Stratos" onError={()=>setLoadError(true)} />
               {loadError && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3" style={{ background: c.cardAlt }}>
                   <I d={ic.globe} s={32} c={c.textMuted} />
@@ -5583,391 +5583,562 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
   );
 }
 
-// ━━━━ FOCUS APP — Clean, soft curated reading ━━━━━━━━━━━━
+// ━━━━ FOCUS APP — Live streams browse, Alternus OS UI kit ━━━
 function NewsApp({ c }: { c: typeof palette.dark }) {
-  const [activeCategory, setActiveCategory] = useState("top");
-  const [savedArticles, setSavedArticles] = useState<Set<number>>(new Set());
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [search, setSearch] = useState("");
+  type Stream = {
+    id: number;
+    channel: string;
+    avatar: string;
+    topic: string;
+    title: string;
+    viewers: number;
+    tags: string[];
+    hue: [string, string];
+    accent: string;
+    isLive: boolean;
+  };
 
-  const categories = [
-    { id: "top",      label: "For You",   icon: ic.sparkle },
-    { id: "tech",     label: "Tech",      icon: ic.cpu },
-    { id: "world",    label: "World",     icon: ic.globe },
-    { id: "business", label: "Business",  icon: ic.briefcase },
-    { id: "science",  label: "Science",   icon: ic.brain },
-    { id: "sports",   label: "Sports",    icon: ic.activity },
+  const streams: Stream[] = [
+    { id: 1,  channel: "CNN Live",       avatar: "CN", topic: "Breaking News",   title: "Top of the hour — global market reactions and live press briefing from the capital", viewers: 4230, tags: ["News", "Live"],         hue: ["#4F8EF7", "#7B8BF5"], accent: "#4F8EF7", isLive: true },
+    { id: 2,  channel: "BBC World",      avatar: "BB", topic: "World News Now",  title: "On the ground: what the new trade framework means for the next quarter",          viewers: 1820, tags: ["World", "Analysis"],    hue: ["#A78BFA", "#C4A8FF"], accent: "#A78BFA", isLive: true },
+    { id: 3,  channel: "Reuters Live",   avatar: "RE", topic: "Markets Today",   title: "Futures are pointing higher — live coverage from the trading floor",               viewers: 2140, tags: ["Markets", "Finance"],   hue: ["#3DD68C", "#4DD2B1"], accent: "#3DD68C", isLive: true },
+    { id: 4,  channel: "Bloomberg",      avatar: "BL", topic: "Finance Pulse",   title: "Central banks signal a slower quarter ahead · analyst roundtable",                 viewers: 986,  tags: ["Markets", "Talk"],      hue: ["#F5B73B", "#F7C86B"], accent: "#F5B73B", isLive: true },
+    { id: 5,  channel: "Al Jazeera",     avatar: "AJ", topic: "Middle East Now", title: "Live: diplomatic updates from the regional summit",                                viewers: 1504, tags: ["World"],                hue: ["#F47272", "#F59393"], accent: "#F47272", isLive: true },
+    { id: 6,  channel: "AP News",        avatar: "AP", topic: "Morning Edition", title: "The headlines you need to start the day",                                          viewers: 724,  tags: ["News", "Daily"],        hue: ["#7B8BF5", "#A78BFA"], accent: "#7B8BF5", isLive: true },
+    { id: 7,  channel: "NPR",            avatar: "NP", topic: "Culture Hour",    title: "Longform interview: designing calmer interfaces for a noisy web",                  viewers: 456,  tags: ["Culture", "Talk"],      hue: ["#F472B6", "#EC4899"], accent: "#EC4899", isLive: true },
+    { id: 8,  channel: "Sky News",       avatar: "SK", topic: "UK Update",       title: "Westminster round-up and policy debate, live",                                     viewers: 1102, tags: ["World", "Politics"],    hue: ["#60A5FA", "#3B82F6"], accent: "#4F8EF7", isLive: true },
+    { id: 9,  channel: "DW News",        avatar: "DW", topic: "Europe Focus",    title: "Continental briefing and the week in Europe",                                      viewers: 688,  tags: ["World", "Europe"],      hue: ["#A78BFA", "#8B5CF6"], accent: "#A78BFA", isLive: true },
   ];
 
-  type Article = {
-    id: number; title: string; source: string; time: string; summary: string;
-    category: string; readTime: number; hue: [string, string]; accent: string;
-  };
+  const categories = [
+    { id: "foryou", label: "For You",  icon: ic.sparkle,    count: 18 },
+    { id: "news",   label: "News",     icon: ic.newspaper,  count: 24 },
+    { id: "world",  label: "World",    icon: ic.globe,      count: 16 },
+    { id: "markets",label: "Markets",  icon: ic.trendingUp, count: 12 },
+    { id: "talk",   label: "Talk",     icon: ic.messageCircle, count: 9 },
+    { id: "tech",   label: "Tech",     icon: ic.cpu,        count: 14 },
+  ];
 
-  const articles: Record<string, Article[]> = {
-    top: [
-      { id: 1, title: "A Quieter Web: Designers Rediscover Calm Interfaces",                     source: "The Alternus Edit", time: "12 min",  readTime: 5, summary: "A new generation of product designers is pushing back against the noise, favouring soft surfaces, generous spacing, and deliberate typography.",          category: "Design",     hue: ["#5a7dff", "#8b66ff"], accent: "#7B8BF5" },
-      { id: 2, title: "Central Banks Hint at a Slower Quarter as Markets Steady",                source: "Ledger Weekly",     time: "45 min",  readTime: 3, summary: "Analysts see a coordinated shift toward easing, with forward guidance suggesting patience rather than urgency.",                                           category: "Business",   hue: ["#3dc29b", "#4dd2b1"], accent: "#3DD68C" },
-      { id: 3, title: "Scientists Describe a Cleaner, Faster Way to Capture Carbon",             source: "Field Notes",       time: "1 hr",    readTime: 6, summary: "An MIT team's reactor design uses a tenth of the energy of older methods, opening the door to distributed, low-cost climate tools.",                category: "Science",    hue: ["#3fa9ff", "#6bd0f5"], accent: "#4F8EF7" },
-      { id: 4, title: "Long Negotiations End in a Rare Peace Agreement",                         source: "Global Desk",       time: "2 hrs",   readTime: 8, summary: "Years of quiet diplomacy produced a framework that balances security, trade, and reconciliation — and now faces implementation.",                 category: "World",      hue: ["#f7a37b", "#f38a5a"], accent: "#F5B73B" },
-      { id: 5, title: "The Next Rocket Cadence: 120 Satellites in a Single Flight",              source: "Orbit Report",      time: "3 hrs",   readTime: 4, summary: "A milestone mission shows how rapid reuse is beginning to reshape what commercial launch can look like.",                                        category: "Technology", hue: ["#7a89a8", "#a6b3cc"], accent: "#A4A8B8" },
-      { id: 6, title: "World Cup 2026 Venues Officially Named",                                  source: "Field & Court",     time: "4 hrs",   readTime: 2, summary: "FIFA confirms stadiums across three nations. Transport, stay capacity, and supporter experience were all decisive.",                             category: "Sports",     hue: ["#a78bfa", "#c4a8ff"], accent: "#A78BFA" },
-    ],
-    tech: [
-      { id: 10, title: "A Fresh Take on Ambient Computing: Glasses That Get Out of the Way",     source: "Interface",         time: "30 min",  readTime: 6, summary: "Next-gen AR glasses lean into minimal overlays and longer battery life, pairing soft UI with durable hardware.",                                category: "Technology", hue: ["#7b8bf5", "#a78bfa"], accent: "#7B8BF5" },
-      { id: 11, title: "Quantum, Quietly: Error Correction Reaches a Milestone",                 source: "Lab Notebook",      time: "2 hrs",   readTime: 7, summary: "Researchers demonstrate reliable logical qubits, moving practical quantum workloads from possible to plausible.",                               category: "Technology", hue: ["#4F8EF7", "#7b8bf5"], accent: "#4F8EF7" },
-      { id: 12, title: "An Open Model Matches the Best. That Changes the Economics.",            source: "The Alternus Edit", time: "3 hrs",   readTime: 5, summary: "A volunteer-led model tops recent benchmarks. The follow-on effects for enterprise AI budgets could be significant.",                          category: "Technology", hue: ["#3dd68c", "#4dd2b1"], accent: "#3DD68C" },
-      { id: 13, title: "A Quiet Advisory on Home Devices",                                        source: "Trust Bulletin",    time: "5 hrs",   readTime: 3, summary: "Security researchers identify a class of small bugs with outsized reach. Patches are rolling out throughout the week.",                          category: "Technology", hue: ["#F47272", "#f59393"], accent: "#F47272" },
-      { id: 14, title: "Autonomy, in Three Cities",                                               source: "Road Review",       time: "6 hrs",   readTime: 4, summary: "A driverless taxi service expands cautiously, with municipal partnerships shaping pace and coverage.",                                       category: "Technology", hue: ["#A78BFA", "#c4a8ff"], accent: "#A78BFA" },
-    ],
-    world: [
-      { id: 20, title: "UN Resolution Sets New Climate Ground Rules",                             source: "Global Desk",       time: "1 hr",    readTime: 6, summary: "Binding commitments replace pledges, with a review mechanism and independent reporting obligations.",                                          category: "World",      hue: ["#3dd68c", "#4dd2b1"], accent: "#3DD68C" },
-      { id: 21, title: "A Bullet Train That Feels Like a Flight",                                 source: "Transit Weekly",    time: "3 hrs",   readTime: 4, summary: "The next-generation maglev links Tokyo and Osaka in under an hour. The onboard experience deliberately echoes calm design.",                  category: "World",      hue: ["#4F8EF7", "#7b8bf5"], accent: "#4F8EF7" },
-      { id: 22, title: "Europe's New Privacy Framework, Explained Simply",                        source: "Civic Reader",      time: "5 hrs",   readTime: 7, summary: "Stricter rules on profiling, defaulted consent, and cross-border transfers — with a practical runway for implementers.",                     category: "World",      hue: ["#7b8bf5", "#a78bfa"], accent: "#7B8BF5" },
-      { id: 23, title: "Africa's Continental Free Trade Zone Begins Operations",                  source: "Ledger Weekly",     time: "7 hrs",   readTime: 5, summary: "The world's largest free trade area opens cautiously, prioritising logistics corridors and small-business tooling.",                           category: "World",      hue: ["#F5B73B", "#f7c86b"], accent: "#F5B73B" },
-    ],
-    business: [
-      { id: 30, title: "A New Most-Valuable Company, and What It Signals",                        source: "Ledger Weekly",     time: "1 hr",    readTime: 4, summary: "Chips, infrastructure, and sustained enterprise demand keep reshaping the top of the market.",                                                  category: "Business",   hue: ["#3dd68c", "#4dd2b1"], accent: "#3DD68C" },
-      { id: 31, title: "Startup Funding, Back at Record Highs",                                   source: "Pitch Book",        time: "3 hrs",   readTime: 5, summary: "Venture capital activity climbs year-over-year, with AI tooling and cleantech pulling the bulk of deploy.",                                  category: "Business",   hue: ["#F5B73B", "#f7c86b"], accent: "#F5B73B" },
-      { id: 32, title: "The First Fully Automated Warehouse Is Online",                           source: "Operations Today",  time: "5 hrs",   readTime: 4, summary: "A hundred-thousand-packages-a-day facility shows both what's possible and what's worth debating.",                                              category: "Business",   hue: ["#7b8bf5", "#a78bfa"], accent: "#7B8BF5" },
-    ],
-    science: [
-      { id: 40, title: "A Careful Claim About a Distant Atmosphere",                              source: "Field Notes",       time: "2 hrs",   readTime: 8, summary: "James Webb data shows signatures worth serious attention. The researchers are quick to stress what they have, and haven't, concluded.",        category: "Science",    hue: ["#4F8EF7", "#7b8bf5"], accent: "#4F8EF7" },
-      { id: 41, title: "A Trial That Restored Sight",                                             source: "Lab Notebook",      time: "4 hrs",   readTime: 6, summary: "Gene editing quietly reshapes what's possible in inherited retinal disease, with cautious early-phase results.",                              category: "Science",    hue: ["#a78bfa", "#c4a8ff"], accent: "#A78BFA" },
-      { id: 42, title: "Fusion's Longest Net-Positive Run So Far",                                source: "Field Notes",       time: "6 hrs",   readTime: 5, summary: "Twenty-four hours of net energy — not yet a grid, but a serious step toward one.",                                                          category: "Science",    hue: ["#3dd68c", "#4dd2b1"], accent: "#3DD68C" },
-    ],
-    sports: [
-      { id: 50, title: "A Champions League Final for the Archives",                               source: "Field & Court",     time: "1 hr",    readTime: 4, summary: "A second-half comeback few saw coming, built on possession, patience, and a quiet moment of audacity.",                                      category: "Sports",     hue: ["#3dd68c", "#4dd2b1"], accent: "#3DD68C" },
-      { id: 51, title: "A New 100m Record — And the Long Build to Get There",                     source: "Endurance",         time: "3 hrs",   readTime: 3, summary: "Marginal gains across years of training show up, at last, in a single ten-second run.",                                                      category: "Sports",     hue: ["#F5B73B", "#f7c86b"], accent: "#F5B73B" },
-      { id: 52, title: "Two New NBA Franchises Are Official",                                     source: "Field & Court",     time: "5 hrs",   readTime: 4, summary: "Las Vegas and Seattle join a 32-team league. Arena plans, rosters, and launch timelines are already in motion.",                             category: "Sports",     hue: ["#A78BFA", "#c4a8ff"], accent: "#A78BFA" },
-    ],
-  };
+  const categoryCovers = [
+    { label: "World News",     viewers: "18.2K", hue: ["#4F8EF7", "#7B8BF5"] as [string, string] },
+    { label: "Markets",        viewers: "9.4K",  hue: ["#3DD68C", "#4DD2B1"] as [string, string] },
+    { label: "Tech Briefing",  viewers: "7.1K",  hue: ["#A78BFA", "#8B5CF6"] as [string, string] },
+    { label: "Culture Talk",   viewers: "3.8K",  hue: ["#EC4899", "#F472B6"] as [string, string] },
+    { label: "Science",        viewers: "2.6K",  hue: ["#F5B73B", "#F7C86B"] as [string, string] },
+    { label: "Sport",          viewers: "5.9K",  hue: ["#F47272", "#F59393"] as [string, string] },
+  ];
 
-  const currentList = articles[activeCategory] || articles.top;
-  const filtered = search.trim()
-    ? currentList.filter(a =>
-        a.title.toLowerCase().includes(search.toLowerCase()) ||
-        a.summary.toLowerCase().includes(search.toLowerCase()) ||
-        a.source.toLowerCase().includes(search.toLowerCase()))
-    : currentList;
-  const hero = filtered[0];
-  const rest = filtered.slice(1);
+  const [activeCategory, setActiveCategory] = useState("foryou");
+  const [search, setSearch] = useState("");
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [followed, setFollowed] = useState<Set<number>>(new Set());
+  const [notifCount] = useState(4);
 
-  const toggleSave = (id: number) => setSavedArticles(prev => {
-    const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s;
+  const toggleFollow = (id: number) =>
+    setFollowed(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+
+  const filtered = streams.filter(s => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return s.channel.toLowerCase().includes(q) ||
+           s.topic.toLowerCase().includes(q) ||
+           s.title.toLowerCase().includes(q) ||
+           s.tags.some(t => t.toLowerCase().includes(q));
   });
 
-  const selected = selectedId != null
-    ? Object.values(articles).flat().find(a => a.id === selectedId)
-    : null;
+  const featured = filtered.slice(0, 3);
+  const grid = filtered.slice(3);
+  const sidebarStreams = streams.slice(0, 7);
 
-  // Soft gradient cover block, matches Alternus OS aesthetic
-  const Cover = ({ hue, h, radius = 14, label }: { hue: [string, string]; h: number; radius?: number; label?: string }) => (
+  const selected = selectedId != null ? streams.find(s => s.id === selectedId) : null;
+
+  const formatViewers = (v: number) => v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v.toString();
+
+  // Reusable gradient "thumbnail" with soft overlay and sparkle
+  const Thumb = ({ hue, h, radius = 12, live, viewers, channel }: {
+    hue: [string, string]; h: number; radius?: number; live?: boolean; viewers?: number; channel?: string;
+  }) => (
     <div style={{
-      position: "relative",
-      height: h,
-      borderRadius: radius,
-      overflow: "hidden",
+      position: "relative", height: h, borderRadius: radius, overflow: "hidden", flexShrink: 0,
       background: `linear-gradient(135deg, ${hue[0]}, ${hue[1]})`,
-      flexShrink: 0,
     }}>
-      {/* soft highlight */}
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 20% 15%, rgba(255,255,255,0.28), transparent 55%)" }} />
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 85% 85%, rgba(0,0,0,0.18), transparent 60%)" }} />
-      {/* sparkle accent */}
-      <div style={{ position: "absolute", top: 12, right: 12, width: 24, height: 24, borderRadius: 8, background: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <I d={ic.sparkle} s={12} c="#fff" />
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.28), transparent 55%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 85% 85%, rgba(0,0,0,0.22), transparent 60%)" }} />
+      <div style={{ position: "absolute", top: 8, right: 8, width: 22, height: 22, borderRadius: 7, background: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <I d={ic.sparkle} s={10} c="#fff" />
       </div>
-      {label && (
+      {live && (
+        <div style={{
+          position: "absolute", top: 8, left: 8,
+          display: "inline-flex", alignItems: "center", gap: 4,
+          background: "rgba(0,0,0,0.55)", backdropFilter: "blur(10px)",
+          padding: "3px 7px", borderRadius: 999,
+        }}>
+          <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#FF5A65", boxShadow: "0 0 6px #FF5A65" }} />
+          <span style={{ color: "#fff", fontSize: 8.5, fontWeight: 800, letterSpacing: 0.5 }}>LIVE</span>
+        </div>
+      )}
+      {viewers != null && (
+        <div style={{
+          position: "absolute", bottom: 8, left: 8,
+          display: "inline-flex", alignItems: "center", gap: 4,
+          background: "rgba(0,0,0,0.55)", backdropFilter: "blur(10px)",
+          padding: "3px 7px", borderRadius: 999,
+          color: "#fff", fontSize: 9, fontWeight: 700,
+        }}>
+          <I d={ic.user} s={8} c="#fff" />
+          {formatViewers(viewers)}
+        </div>
+      )}
+      {channel && (
         <span style={{
-          position: "absolute", bottom: 10, left: 10,
+          position: "absolute", bottom: 8, right: 8,
           background: "rgba(255,255,255,0.18)",
           backdropFilter: "blur(10px)",
-          color: "#fff", fontSize: 9, fontWeight: 700, letterSpacing: 0.5,
-          padding: "3px 8px", borderRadius: 999,
-        }}>{label}</span>
+          color: "#fff", fontSize: 9, fontWeight: 700,
+          padding: "3px 7px", borderRadius: 999,
+        }}>{channel}</span>
       )}
     </div>
   );
 
-  // ━━━ Reading view ━━━
+  // ━━━ Watch view ━━━
   if (selected) {
     return (
       <div className="flex flex-col h-full" style={{ background: c.bg }}>
-        {/* Top bar */}
-        <div className="flex items-center gap-2 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+        <div className="flex items-center gap-2 px-4 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
           <button onClick={() => setSelectedId(null)}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-colors"
             style={{ color: c.textSec, fontSize: 11, fontWeight: 600 }}
             onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
             onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
             <I d={ic.chevL} s={13} c={c.textSec} />
-            Back
+            Browse
           </button>
           <div className="flex-1" />
-          <button onClick={() => toggleSave(selected.id)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
-            style={{ color: savedArticles.has(selected.id) ? c.accent : c.textSec }}
-            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-            <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={13}
-              c={savedArticles.has(selected.id) ? c.accent : c.textSec}
-              f={savedArticles.has(selected.id)} />
-          </button>
-          <button className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
-            style={{ color: c.textSec }}
-            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-            <I d={ic.share} s={13} />
+          <button onClick={() => toggleFollow(selected.id)}
+            className="text-[10px] font-semibold px-3 py-1.5 rounded-lg transition-colors"
+            style={{
+              background: followed.has(selected.id) ? c.cardAlt : c.accent,
+              color: followed.has(selected.id) ? c.text : "#fff",
+              border: `1px solid ${followed.has(selected.id) ? c.border : c.accent}`,
+            }}>
+            {followed.has(selected.id) ? "Following" : "Follow"}
           </button>
         </div>
-
-        <div className="flex-1 overflow-y-auto px-5 py-4" style={{ scrollbarWidth: "none" }}>
-          <Cover hue={selected.hue} h={160} radius={16} label={selected.category} />
-          <div className="mt-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: selected.accent }} />
-              <span style={{ fontSize: 10, fontWeight: 700, color: selected.accent, letterSpacing: 0.3 }}>{selected.source}</span>
-              <span style={{ fontSize: 10, color: c.textMuted }}>· {selected.time} · {selected.readTime} min read</span>
-            </div>
-            <h1 className="leading-tight mb-3" style={{ color: c.text, fontSize: 20, fontWeight: 700, letterSpacing: -0.2 }}>
-              {selected.title}
-            </h1>
-            <p className="leading-relaxed mb-4" style={{ color: c.textSec, fontSize: 13 }}>
-              {selected.summary}
-            </p>
-            <p className="leading-relaxed mb-4" style={{ color: c.textSec, fontSize: 12.5 }}>
-              The development reflects a broader shift in how leaders, practitioners, and users think about the problem. Analysts point to a quiet consensus forming across institutions — one that favours deliberate progress over dramatic announcements, and outcomes over optics.
-            </p>
-            <p className="leading-relaxed mb-4" style={{ color: c.textSec, fontSize: 12.5 }}>
-              What comes next is still being shaped. Implementation timelines are measured in quarters, coordination in conversations. But the direction, for once, feels unusually clear. Expect further updates as teams move from framing to execution.
-            </p>
-            <div className="mt-5 p-3 rounded-xl flex items-center gap-3" style={{ background: c.card, border: `1px solid ${c.border}` }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: 12,
-                background: `linear-gradient(135deg, ${selected.hue[0]}, ${selected.hue[1]})`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                <I d={ic.bookOpen} s={16} c="#fff" />
-              </div>
-              <div className="flex-1">
-                <p style={{ fontSize: 11, fontWeight: 700, color: c.text }}>Save for later</p>
-                <p style={{ fontSize: 10, color: c.textMuted }}>Keep this article in your Focus library</p>
-              </div>
-              <button onClick={() => toggleSave(selected.id)}
-                className="text-[10px] font-semibold px-3 py-1.5 rounded-lg transition-colors"
-                style={{
-                  background: savedArticles.has(selected.id) ? c.accentSoft : c.accent,
-                  color: savedArticles.has(selected.id) ? c.accentText : "#fff",
+        <div className="flex-1 overflow-y-auto px-4 py-4" style={{ scrollbarWidth: "none" }}>
+          <Thumb hue={selected.hue} h={200} radius={14} live viewers={selected.viewers} />
+          <div className="mt-3 flex items-start gap-3">
+            <div style={{
+              width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+              background: `linear-gradient(135deg, ${selected.hue[0]}, ${selected.hue[1]})`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#fff", fontWeight: 700, fontSize: 12,
+              boxShadow: `0 4px 12px ${selected.accent}40`,
+            }}>{selected.avatar}</div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: c.text }}>{selected.channel}</span>
+                <div style={{
+                  display: "inline-flex", alignItems: "center", gap: 3,
+                  padding: "1px 5px", borderRadius: 999,
+                  background: "#FF5A6522", color: "#FF5A65",
+                  fontSize: 8, fontWeight: 800, letterSpacing: 0.5,
                 }}>
-                {savedArticles.has(selected.id) ? "Saved" : "Save"}
-              </button>
+                  <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#FF5A65" }} />
+                  LIVE
+                </div>
+              </div>
+              <p style={{ fontSize: 11, color: c.textSec, lineHeight: 1.4, marginBottom: 5 }}>{selected.title}</p>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {selected.tags.map(t => (
+                  <span key={t} style={{
+                    fontSize: 9, fontWeight: 600, color: c.textSec,
+                    padding: "2px 7px", borderRadius: 999,
+                    background: c.cardAlt, border: `1px solid ${c.border}`,
+                  }}>{t}</span>
+                ))}
+              </div>
+              <div className="flex items-center gap-3 mt-2">
+                <span style={{ fontSize: 10, fontWeight: 600, color: c.textMuted }}>
+                  <I d={ic.user} s={9} c={c.textMuted} /> {formatViewers(selected.viewers)} watching
+                </span>
+                <span style={{ fontSize: 10, color: c.textMuted }}>· {selected.topic}</span>
+              </div>
             </div>
+          </div>
+          <div className="mt-4 p-3 rounded-xl" style={{ background: c.card, border: `1px solid ${c.border}` }}>
+            <p style={{ fontSize: 10, fontWeight: 700, color: c.textMuted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>About this stream</p>
+            <p style={{ fontSize: 11.5, color: c.textSec, lineHeight: 1.55 }}>
+              {selected.channel} is broadcasting {selected.topic.toLowerCase()} with commentary, source material, and community chat. Tune in for live analysis, guest interviews, and real-time updates as stories develop.
+            </p>
           </div>
         </div>
       </div>
     );
   }
 
-  // ━━━ Home view ━━━
+  // ━━━ Browse home ━━━
   return (
     <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      {/* Header */}
-      <div className="flex-shrink-0 px-4 pt-4 pb-3">
-        <div className="flex items-center gap-3 mb-3">
+      {/* ── Top bar ── */}
+      <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
+        <button onClick={() => setSidebarOpen(o => !o)}
+          className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
+          style={{ color: c.textSec }}
+          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+          <I d={ic.menu} s={13} />
+        </button>
+        <div className="flex items-center gap-2 flex-shrink-0">
           <div style={{
-            width: 36, height: 36, borderRadius: 12,
+            width: 26, height: 26, borderRadius: 8,
             background: `linear-gradient(135deg, ${c.accent}, ${c.purple})`,
-            boxShadow: `0 6px 16px ${c.accent}40`,
+            boxShadow: `0 3px 10px ${c.accent}45`,
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>
-            <I d={ic.sparkle} s={16} c="#fff" f />
+            <I d={ic.sparkle} s={12} c="#fff" f />
           </div>
-          <div className="flex-1">
-            <h3 style={{ fontSize: 15, fontWeight: 700, color: c.text, letterSpacing: -0.2 }}>Focus</h3>
-            <p style={{ fontSize: 10.5, color: c.textMuted }}>Curated reads, calmly presented</p>
-          </div>
-          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full" style={{ background: c.card, border: `1px solid ${c.border}` }}>
-            <span style={{ width: 5, height: 5, borderRadius: "50%", background: c.success }} />
-            <span style={{ fontSize: 9, fontWeight: 700, color: c.textSec, letterSpacing: 0.3 }}>Synced</span>
-          </div>
+          <span style={{ fontSize: 12.5, fontWeight: 700, color: c.text, letterSpacing: -0.2 }}>Focus</span>
+          <span style={{ fontSize: 10, color: c.textMuted, fontWeight: 500 }}>· Browse</span>
         </div>
-
-        {/* Search */}
-        <div className="flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: c.card, border: `1px solid ${c.border}` }}>
-          <I d={ic.search} s={12} c={c.textMuted} />
+        <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-lg" style={{ background: c.card, border: `1px solid ${c.border}`, maxWidth: 260, margin: "0 auto" }}>
+          <I d={ic.search} s={11} c={c.textMuted} />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search stories, sources, topics"
-            className="flex-1 bg-transparent outline-none"
-            style={{ color: c.text, fontSize: 11 }} />
+            className="flex-1 bg-transparent outline-none" style={{ color: c.text, fontSize: 10.5 }}
+            placeholder="Search channels, topics, tags" />
           {search && (
-            <button onClick={() => setSearch("")}>
-              <I d={ic.close} s={11} c={c.textMuted} />
-            </button>
+            <button onClick={() => setSearch("")}><I d={ic.close} s={10} c={c.textMuted} /></button>
           )}
         </div>
+        <button className="relative w-7 h-7 rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
+          style={{ color: c.textSec }}
+          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+          <I d={ic.bell} s={13} />
+          {notifCount > 0 && (
+            <span style={{
+              position: "absolute", top: 2, right: 2,
+              minWidth: 12, height: 12, padding: "0 3px",
+              background: "#FF5A65", color: "#fff",
+              fontSize: 7.5, fontWeight: 800,
+              borderRadius: 999,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              border: `1.5px solid ${c.surface}`,
+            }}>{notifCount}</span>
+          )}
+        </button>
+        <button className="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors flex-shrink-0"
+          style={{ color: c.textSec, border: `1px solid ${c.border}` }}
+          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+          Log In
+        </button>
+        <button className="text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-all flex-shrink-0"
+          style={{ background: c.accent, color: "#fff", boxShadow: `0 2px 8px ${c.accent}55` }}
+          onMouseEnter={e => (e.currentTarget.style.opacity = "0.9")}
+          onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
+          Sign Up
+        </button>
       </div>
 
-      {/* Category pills */}
-      <div className="flex-shrink-0 px-4 pb-2 flex items-center gap-1.5 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-        {categories.map(cat => {
-          const active = activeCategory === cat.id;
-          return (
-            <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-              className="flex items-center gap-1.5 whitespace-nowrap transition-all"
-              style={{
-                padding: "5px 10px",
-                borderRadius: 999,
-                fontSize: 10.5,
-                fontWeight: 600,
-                background: active ? c.accentSoft : c.card,
-                color: active ? c.accentText : c.textSec,
-                border: `1px solid ${active ? c.accent + "30" : c.border}`,
-              }}
-              onMouseEnter={e => { if (!active) e.currentTarget.style.background = c.cardAlt; }}
-              onMouseLeave={e => { if (!active) e.currentTarget.style.background = c.card; }}>
-              <I d={cat.icon} s={11} c={active ? c.accentText : c.textMuted} />
-              {cat.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-4 pb-4" style={{ scrollbarWidth: "none" }}>
-        {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <div style={{ width: 44, height: 44, borderRadius: 14, background: c.card, border: `1px solid ${c.border}`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
-              <I d={ic.search} s={18} c={c.textMuted} />
-            </div>
-            <p style={{ fontSize: 11.5, fontWeight: 600, color: c.text }}>Nothing here yet</p>
-            <p style={{ fontSize: 10, color: c.textMuted, marginTop: 2 }}>Try a different search or category</p>
-          </div>
-        ) : (
-          <>
-            {/* Section label */}
-            <div className="flex items-center justify-between mt-1 mb-2.5">
-              <span style={{ fontSize: 10, fontWeight: 700, color: c.textMuted, textTransform: "uppercase", letterSpacing: 1 }}>Featured</span>
-              <span style={{ fontSize: 10, color: c.textMuted }}>{filtered.length} stories</span>
-            </div>
-
-            {/* Hero card */}
-            {hero && (
-              <button onClick={() => setSelectedId(hero.id)}
-                className="w-full text-left transition-all mb-4"
-                style={{
-                  borderRadius: 16,
-                  background: c.card,
-                  border: `1px solid ${c.border}`,
-                  overflow: "hidden",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = c.accent + "40"; e.currentTarget.style.boxShadow = `0 8px 22px ${c.accent}10`; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.boxShadow = "none"; }}>
-                <div style={{ padding: 10 }}>
-                  <Cover hue={hero.hue} h={130} radius={12} label={hero.category} />
-                </div>
-                <div className="px-3 pb-3">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span style={{ width: 5, height: 5, borderRadius: "50%", background: hero.accent }} />
-                    <span style={{ fontSize: 10, fontWeight: 700, color: hero.accent }}>{hero.source}</span>
-                    <span style={{ fontSize: 10, color: c.textMuted }}>· {hero.time}</span>
-                    <span style={{
-                      marginLeft: "auto",
-                      fontSize: 9.5, fontWeight: 600,
-                      color: c.textMuted,
-                      padding: "2px 7px", borderRadius: 999,
-                      background: c.cardAlt,
-                    }}>{hero.readTime} min</span>
-                  </div>
-                  <h2 style={{ fontSize: 14, fontWeight: 700, color: c.text, lineHeight: 1.3, letterSpacing: -0.15, marginBottom: 5 }}>
-                    {hero.title}
-                  </h2>
-                  <p style={{ fontSize: 11, color: c.textSec, lineHeight: 1.5 }}>{hero.summary}</p>
-                  <div className="flex items-center justify-between mt-3">
-                    <div className="flex items-center gap-1.5" style={{ fontSize: 10.5, fontWeight: 600, color: c.accentText }}>
-                      <span>Read story</span>
-                      <I d={ic.chevR} s={11} c={c.accentText} />
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button onClick={(e) => { e.stopPropagation(); toggleSave(hero.id); }}
-                        className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors"
-                        style={{ background: savedArticles.has(hero.id) ? c.accentSoft : "transparent" }}
-                        onMouseEnter={e => { if (!savedArticles.has(hero.id)) e.currentTarget.style.background = c.cardAlt; }}
-                        onMouseLeave={e => { if (!savedArticles.has(hero.id)) e.currentTarget.style.background = "transparent"; }}>
-                        <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={12}
-                          c={savedArticles.has(hero.id) ? c.accent : c.textMuted}
-                          f={savedArticles.has(hero.id)} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+      <div className="flex flex-1 min-h-0">
+        {/* ── Left sidebar: Live Channels ── */}
+        {sidebarOpen && (
+          <div className="flex-shrink-0 flex flex-col" style={{ width: 138, background: c.surface, borderRight: `1px solid ${c.border}` }}>
+            <div className="px-3 pt-3 pb-1.5 flex items-center justify-between">
+              <span style={{ fontSize: 9.5, fontWeight: 800, color: c.textMuted, textTransform: "uppercase", letterSpacing: 1 }}>Live Channels</span>
+              <button onClick={() => setSidebarOpen(false)}
+                className="w-4 h-4 rounded flex items-center justify-center transition-colors"
+                style={{ color: c.textMuted }}
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <I d={ic.chevL} s={9} />
               </button>
-            )}
-
-            {/* Section label */}
-            {rest.length > 0 && (
-              <div className="flex items-center justify-between mt-1 mb-2">
-                <span style={{ fontSize: 10, fontWeight: 700, color: c.textMuted, textTransform: "uppercase", letterSpacing: 1 }}>More to read</span>
-              </div>
-            )}
-
-            {/* Article list */}
-            <div className="flex flex-col gap-2">
-              {rest.map(article => (
-                <button key={article.id} onClick={() => setSelectedId(article.id)}
-                  className="text-left transition-all flex gap-3 p-2.5"
-                  style={{
-                    borderRadius: 14,
-                    background: c.card,
-                    border: `1px solid ${c.border}`,
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.background = c.cardAlt; e.currentTarget.style.borderColor = c.accent + "20"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = c.card; e.currentTarget.style.borderColor = c.border; }}>
-                  <div style={{ width: 64, height: 64, flexShrink: 0 }}>
-                    <Cover hue={article.hue} h={64} radius={10} />
-                  </div>
-                  <div className="flex-1 min-w-0 flex flex-col">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span style={{ width: 4, height: 4, borderRadius: "50%", background: article.accent }} />
-                      <span style={{ fontSize: 9.5, fontWeight: 700, color: article.accent }}>{article.source}</span>
-                      <span style={{ fontSize: 9.5, color: c.textMuted }}>· {article.time}</span>
-                    </div>
-                    <p style={{ fontSize: 11.5, fontWeight: 600, color: c.text, lineHeight: 1.35, letterSpacing: -0.1 }}>
-                      {article.title}
-                    </p>
-                    <div className="flex items-center gap-2 mt-auto pt-1.5">
+            </div>
+            <div className="flex-1 overflow-y-auto px-1.5 pb-2" style={{ scrollbarWidth: "none" }}>
+              {sidebarStreams.map(s => (
+                <button key={s.id} onClick={() => setSelectedId(s.id)}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-colors mb-0.5"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <div style={{ position: "relative", flexShrink: 0 }}>
+                    <div style={{
+                      width: 26, height: 26, borderRadius: "50%",
+                      background: `linear-gradient(135deg, ${s.hue[0]}, ${s.hue[1]})`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "#fff", fontSize: 9, fontWeight: 700,
+                    }}>{s.avatar}</div>
+                    {s.isLive && (
                       <span style={{
-                        fontSize: 9, fontWeight: 600,
-                        color: c.textMuted,
-                        padding: "1px 6px", borderRadius: 999,
-                        background: c.cardAlt,
-                      }}>{article.readTime} min</span>
-                      <span style={{ fontSize: 9.5, color: c.textMuted }}>{article.category}</span>
-                      <button onClick={(e) => { e.stopPropagation(); toggleSave(article.id); }}
-                        className="ml-auto w-6 h-6 rounded-md flex items-center justify-center transition-colors"
-                        onMouseEnter={e => (e.currentTarget.style.background = c.border)}
-                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                        <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={11}
-                          c={savedArticles.has(article.id) ? c.accent : c.textMuted}
-                          f={savedArticles.has(article.id)} />
-                      </button>
-                    </div>
+                        position: "absolute", bottom: -1, right: -1,
+                        width: 8, height: 8, borderRadius: "50%",
+                        background: "#FF5A65",
+                        border: `2px solid ${c.surface}`,
+                      }} />
+                    )}
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <p style={{ fontSize: 10.5, fontWeight: 600, color: c.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.channel}</p>
+                    <p style={{ fontSize: 9, color: c.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.topic}</p>
+                  </div>
+                  <span style={{
+                    display: "inline-flex", alignItems: "center", gap: 3,
+                    fontSize: 8.5, fontWeight: 700, color: "#FF5A65",
+                  }}>
+                    <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#FF5A65" }} />
+                    {formatViewers(s.viewers)}
+                  </span>
                 </button>
               ))}
-            </div>
-
-            {/* Footer note */}
-            <div className="flex items-center justify-between mt-4 pt-3" style={{ borderTop: `1px solid ${c.border}` }}>
-              <p style={{ fontSize: 9.5, color: c.textMuted }}>Curated by Alternus · Updated just now</p>
-              <button className="flex items-center gap-1 text-[10px] font-semibold transition-colors"
-                style={{ color: c.accentText }}>
-                <I d={ic.refresh} s={10} c={c.accentText} />
-                Refresh
+              {/* Show more */}
+              <button className="w-full flex items-center justify-center gap-1 px-2 py-1.5 mt-1 rounded-md transition-colors"
+                style={{ fontSize: 9.5, color: c.textMuted, fontWeight: 600 }}
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                Show more <I d={ic.chevD} s={9} c={c.textMuted} />
               </button>
             </div>
-          </>
+            <div className="px-3 py-2 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+              <div className="flex items-center gap-1.5">
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: c.success }} />
+                <span style={{ fontSize: 9, color: c.textMuted }}>{streams.length} channels live</span>
+              </div>
+            </div>
+          </div>
         )}
+
+        {/* ── Main content ── */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {/* Category chips */}
+          <div className="flex items-center gap-1.5 px-3 py-2 flex-shrink-0 overflow-x-auto" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+            {categories.map(cat => {
+              const active = activeCategory === cat.id;
+              return (
+                <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
+                  className="flex items-center gap-1.5 whitespace-nowrap transition-all"
+                  style={{
+                    padding: "4px 9px",
+                    borderRadius: 999,
+                    fontSize: 10, fontWeight: 600,
+                    background: active ? c.accentSoft : c.card,
+                    color: active ? c.accentText : c.textSec,
+                    border: `1px solid ${active ? c.accent + "30" : c.border}`,
+                  }}
+                  onMouseEnter={e => { if (!active) e.currentTarget.style.background = c.cardAlt; }}
+                  onMouseLeave={e => { if (!active) e.currentTarget.style.background = c.card; }}>
+                  <I d={cat.icon} s={10} c={active ? c.accentText : c.textMuted} />
+                  {cat.label}
+                  <span style={{
+                    fontSize: 9, fontWeight: 700,
+                    padding: "0 5px", borderRadius: 999,
+                    background: active ? c.accent + "20" : c.cardAlt,
+                    color: active ? c.accentText : c.textMuted,
+                  }}>{cat.count}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Scrollable area */}
+          <div className="flex-1 overflow-y-auto px-3 py-3" style={{ scrollbarWidth: "none" }}>
+            {filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full">
+                <div style={{ width: 44, height: 44, borderRadius: 14, background: c.card, border: `1px solid ${c.border}`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}>
+                  <I d={ic.search} s={18} c={c.textMuted} />
+                </div>
+                <p style={{ fontSize: 11.5, fontWeight: 600, color: c.text }}>No channels found</p>
+                <p style={{ fontSize: 10, color: c.textMuted, marginTop: 2 }}>Try another search or category</p>
+              </div>
+            ) : (
+              <>
+                {/* ── Featured carousel ── */}
+                {featured.length > 0 && (
+                  <>
+                    <div className="flex items-center justify-between mb-2">
+                      <span style={{ fontSize: 10, fontWeight: 800, color: c.textMuted, textTransform: "uppercase", letterSpacing: 1 }}>Featured Live</span>
+                      <div className="flex items-center gap-1">
+                        <button className="w-5 h-5 rounded-md flex items-center justify-center transition-colors"
+                          style={{ color: c.textSec, background: c.card, border: `1px solid ${c.border}` }}
+                          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                          onMouseLeave={e => (e.currentTarget.style.background = c.card)}>
+                          <I d={ic.chevL} s={10} />
+                        </button>
+                        <button className="w-5 h-5 rounded-md flex items-center justify-center transition-colors"
+                          style={{ color: c.textSec, background: c.card, border: `1px solid ${c.border}` }}
+                          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                          onMouseLeave={e => (e.currentTarget.style.background = c.card)}>
+                          <I d={ic.chevR} s={10} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Hero featured card with side peeks */}
+                    <div className="flex gap-2 mb-4" style={{ height: 138 }}>
+                      {/* Left peek */}
+                      {featured[1] && (
+                        <button onClick={() => setSelectedId(featured[1].id)}
+                          style={{ width: 52, position: "relative", cursor: "pointer", opacity: 0.6, transition: "all 0.2s" }}
+                          onMouseEnter={e => (e.currentTarget.style.opacity = "0.9")}
+                          onMouseLeave={e => (e.currentTarget.style.opacity = "0.6")}>
+                          <Thumb hue={featured[1].hue} h={138} radius={12} live />
+                        </button>
+                      )}
+                      {/* Main */}
+                      <button onClick={() => setSelectedId(featured[0].id)}
+                        className="flex-1 text-left"
+                        style={{ position: "relative", cursor: "pointer" }}>
+                        <Thumb hue={featured[0].hue} h={138} radius={14} live viewers={featured[0].viewers} channel={featured[0].channel} />
+                      </button>
+                      {/* Right peek with info card */}
+                      {featured[2] && (
+                        <div style={{ position: "relative", width: 120 }}>
+                          <button onClick={() => setSelectedId(featured[2].id)}
+                            style={{ width: "100%", position: "relative", cursor: "pointer", opacity: 0.7, transition: "all 0.2s" }}
+                            onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
+                            onMouseLeave={e => (e.currentTarget.style.opacity = "0.7")}>
+                            <Thumb hue={featured[2].hue} h={138} radius={12} live />
+                          </button>
+                          {/* Floating info card */}
+                          <div style={{
+                            position: "absolute", top: 8, right: 4,
+                            padding: 8, width: 108,
+                            background: c.card,
+                            border: `1px solid ${c.border}`,
+                            borderRadius: 10,
+                            boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
+                          }}>
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <div style={{
+                                width: 16, height: 16, borderRadius: "50%",
+                                background: `linear-gradient(135deg, ${featured[2].hue[0]}, ${featured[2].hue[1]})`,
+                                color: "#fff", fontSize: 7.5, fontWeight: 700,
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                              }}>{featured[2].avatar}</div>
+                              <span style={{ fontSize: 9.5, fontWeight: 700, color: c.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{featured[2].channel}</span>
+                            </div>
+                            <p style={{ fontSize: 8.5, color: c.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 4 }}>{featured[2].topic}</p>
+                            <div className="flex items-center gap-1" style={{ fontSize: 8.5, fontWeight: 700, color: "#FF5A65" }}>
+                              <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#FF5A65" }} />
+                              {formatViewers(featured[2].viewers)} viewers
+                            </div>
+                            {featured[2].tags.length > 0 && (
+                              <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                                {featured[2].tags.slice(0, 2).map(t => (
+                                  <span key={t} style={{ fontSize: 7.5, fontWeight: 600, padding: "1px 5px", borderRadius: 999, background: c.cardAlt, color: c.textSec }}>{t}</span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {/* ── Live grid ── */}
+                {grid.length > 0 && (
+                  <>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-1.5">
+                        <span style={{ fontSize: 10, fontWeight: 800, color: c.text, textTransform: "uppercase", letterSpacing: 1 }}>Live on Focus</span>
+                        <span style={{ fontSize: 9, fontWeight: 600, color: c.textMuted }}>· {grid.length} streams</span>
+                      </div>
+                      <button style={{ fontSize: 9.5, fontWeight: 600, color: c.accentText }}>Show more <I d={ic.chevD} s={9} c={c.accentText} /></button>
+                    </div>
+                    <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
+                      {grid.slice(0, 4).map(s => (
+                        <button key={s.id} onClick={() => setSelectedId(s.id)}
+                          className="text-left transition-all"
+                          style={{
+                            borderRadius: 12,
+                            background: c.card,
+                            border: `1px solid ${c.border}`,
+                            overflow: "hidden",
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = c.accent + "40"; e.currentTarget.style.boxShadow = `0 6px 18px ${c.accent}15`; }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.boxShadow = "none"; }}>
+                          <div style={{ padding: 6 }}>
+                            <Thumb hue={s.hue} h={72} radius={8} live viewers={s.viewers} />
+                          </div>
+                          <div className="px-2 pb-2">
+                            <div className="flex items-start gap-1.5">
+                              <div style={{
+                                width: 18, height: 18, borderRadius: "50%", flexShrink: 0,
+                                background: `linear-gradient(135deg, ${s.hue[0]}, ${s.hue[1]})`,
+                                color: "#fff", fontSize: 8, fontWeight: 700,
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                marginTop: 1,
+                              }}>{s.avatar}</div>
+                              <div className="flex-1 min-w-0">
+                                <p style={{ fontSize: 10, fontWeight: 700, color: c.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.title}</p>
+                                <p style={{ fontSize: 9, color: c.textSec, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.channel}</p>
+                                <p style={{ fontSize: 9, color: c.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.topic}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                              {s.tags.slice(0, 2).map(t => (
+                                <span key={t} style={{
+                                  fontSize: 8, fontWeight: 600,
+                                  padding: "1px 5px", borderRadius: 999,
+                                  background: c.cardAlt, color: c.textSec,
+                                }}>{t}</span>
+                              ))}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* ── Categories ── */}
+                <div className="flex items-center justify-between mt-4 mb-2">
+                  <span style={{ fontSize: 10, fontWeight: 800, color: c.text, textTransform: "uppercase", letterSpacing: 1 }}>
+                    Categories <span style={{ color: c.textMuted, fontWeight: 600 }}>we think you&apos;ll like</span>
+                  </span>
+                </div>
+                <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+                  {categoryCovers.map(cat => (
+                    <button key={cat.label}
+                      className="flex-shrink-0 text-left transition-all"
+                      style={{
+                        width: 96,
+                        borderRadius: 12,
+                        background: c.card,
+                        border: `1px solid ${c.border}`,
+                        overflow: "hidden",
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = c.accent + "40"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.transform = "translateY(0)"; }}>
+                      <div style={{ padding: 5 }}>
+                        <Thumb hue={cat.hue} h={100} radius={8} />
+                      </div>
+                      <div className="px-2 pb-2">
+                        <p style={{ fontSize: 10, fontWeight: 700, color: c.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cat.label}</p>
+                        <div className="flex items-center gap-1 mt-0.5" style={{ fontSize: 8.5, fontWeight: 600, color: "#FF5A65" }}>
+                          <span style={{ width: 4, height: 4, borderRadius: "50%", background: "#FF5A65" }} />
+                          {cat.viewers} viewers
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between mt-4 pt-3" style={{ borderTop: `1px solid ${c.border}` }}>
+                  <p style={{ fontSize: 9, color: c.textMuted }}>Curated by Alternus Focus · Updated just now</p>
+                  <button className="flex items-center gap-1 text-[10px] font-semibold transition-colors"
+                    style={{ color: c.accentText }}>
+                    <I d={ic.refresh} s={10} c={c.accentText} />
+                    Refresh
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -6235,7 +6406,7 @@ function SysMonApp({ c }: { c: typeof palette.dark }) {
 
   const processes = [
     { name: "Alternus AI", pid: 1201, cpu: 12.4, ram: 842, status: "running" },
-    { name: "Browser", pid: 2340, cpu: 8.1, ram: 1240, status: "running" },
+    { name: "Stratos", pid: 2340, cpu: 8.1, ram: 1240, status: "running" },
     { name: "Code Editor", pid: 3102, cpu: 4.2, ram: 380, status: "running" },
     { name: "Music", pid: 4023, cpu: 2.1, ram: 120, status: "running" },
     { name: "System (kernel)", pid: 1, cpu: 1.8, ram: 256, status: "system" },
@@ -8956,6 +9127,14 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
   const [isThinking, setIsThinking] = useState(false);
   const [activeWorkspace, setActiveWorkspace] = useState<AgentMessage["workspace"] | null>(null);
   const [agentCapability, setAgentCapability] = useState<"all" | "files" | "email" | "docs" | "settings">("all");
+  const AGENT_MODELS = [
+    { id: 1, name: "Synx",  tag: "1", description: "Fast responses · light reasoning",     grad: ["#4F8EF7", "#6EA5FA"] as [string, string] },
+    { id: 2, name: "Axon",  tag: "2", description: "Balanced · default for most tasks",    grad: ["#A78BFA", "#7C3AED"] as [string, string] },
+    { id: 3, name: "Unit",  tag: "3", description: "Deep reasoning · complex multi-step",  grad: ["#22C55E", "#10B981"] as [string, string] },
+  ] as const;
+  const [selectedModelId, setSelectedModelId] = useState<1 | 2 | 3>(2);
+  const [modelPickerOpen, setModelPickerOpen] = useState(false);
+  const selectedModel = AGENT_MODELS.find(m => m.id === selectedModelId) ?? AGENT_MODELS[1];
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -9617,8 +9796,41 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                     ))}
                   </div>
 
+                  {/* Model switcher — welcome screen */}
+                  <div className="flex items-center justify-center gap-2 mb-3">
+                    <span className="text-[9px] font-semibold" style={{ color: agTextMuted }}>Model</span>
+                    <div className="flex items-center gap-1 p-0.5 rounded-full" style={{ background: dk ? c.cardAlt : "#F3F4F6", border: `1px solid ${agBorder}` }}>
+                      {AGENT_MODELS.map(m => {
+                        const active = m.id === selectedModelId;
+                        return (
+                          <button key={m.id}
+                            onClick={() => setSelectedModelId(m.id)}
+                            title={m.description}
+                            style={{
+                              display: "flex", alignItems: "center", gap: 6,
+                              padding: "4px 10px",
+                              borderRadius: 999,
+                              background: active ? `linear-gradient(135deg,${m.grad[0]},${m.grad[1]})` : "transparent",
+                              color: active ? "#fff" : agTextSec,
+                              fontSize: 10, fontWeight: 700,
+                              border: "none", cursor: "pointer",
+                              boxShadow: active ? `0 2px 8px ${m.grad[0]}45` : "none",
+                              transition: "all 0.18s",
+                            }}>
+                            <span style={{
+                              width: 14, height: 14, borderRadius: 4,
+                              background: active ? "rgba(255,255,255,0.22)" : `linear-gradient(135deg,${m.grad[0]},${m.grad[1]})`,
+                              color: "#fff", fontSize: 8, fontWeight: 900,
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                            }}>{m.tag}</span>
+                            {m.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                   <p className="text-center text-[8px] pb-2" style={{ color: agTextMuted }}>
-                    Powered by <span style={{ color: agAccent, fontWeight: 700 }}>Claude Opus 4.6</span> · Real OS actions
+                    Powered by <span style={{ color: selectedModel.grad[0], fontWeight: 700 }}>{selectedModel.name}</span> · Claude Opus 4.6 · Real OS actions
                   </p>
                   </div>
                 </div>
@@ -9627,18 +9839,35 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               /* ── CHAT VIEW (has messages) ── */
               <>
                 {/* Header */}
-                <div className="flex items-center gap-3 px-5 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${agBorder}`, background: dk ? c.surface : "#FAFAFA" }}>
+                <div className="flex items-center gap-3 px-5 py-3 flex-shrink-0 relative" style={{ borderBottom: `1px solid ${agBorder}`, background: dk ? c.surface : "#FAFAFA" }}>
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 2px 8px rgba(124,58,237,0.28)" }}>
+                    style={{ background: `linear-gradient(135deg,${selectedModel.grad[0]},${selectedModel.grad[1]})`, boxShadow: `0 2px 8px ${selectedModel.grad[0]}45` }}>
                     <I d={ic.sparkle} s={13} c="#fff" f />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[11.5px] font-bold leading-tight" style={{ color: agText }}>Alternus AI Agent</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
-                      <p className="text-[8px]" style={{ color: agTextMuted }}>Active · Claude Opus 4.6</p>
+                      <p className="text-[8px]" style={{ color: agTextMuted }}>Active · {selectedModel.name} · Claude Opus 4.6</p>
                     </div>
                   </div>
+                  {/* Model picker */}
+                  <button onClick={() => setModelPickerOpen(o => !o)}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-semibold transition-all flex-shrink-0"
+                    style={{
+                      background: `linear-gradient(135deg,${selectedModel.grad[0]}15,${selectedModel.grad[1]}15)`,
+                      color: selectedModel.grad[0],
+                      border: `1px solid ${selectedModel.grad[0]}30`,
+                    }}>
+                    <span style={{
+                      width: 16, height: 16, borderRadius: 5,
+                      background: `linear-gradient(135deg,${selectedModel.grad[0]},${selectedModel.grad[1]})`,
+                      color: "#fff", fontSize: 8, fontWeight: 900,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>{selectedModel.tag}</span>
+                    {selectedModel.name}
+                    <I d={ic.chevD} s={9} c={selectedModel.grad[0]} />
+                  </button>
                   <button onClick={() => setMsgs([{ id: "welcome", role: "agent", timestamp: new Date(), text: "" }])}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-medium transition-all flex-shrink-0"
                     style={{ color: agTextMuted, border: `1px solid ${agBorder}` }}
@@ -9649,6 +9878,54 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                     onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                     <I d={ic.menu} s={12} c={agTextMuted} />
                   </button>
+                  {/* Model picker dropdown */}
+                  {modelPickerOpen && (
+                    <>
+                      <div onClick={() => setModelPickerOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 40 }} />
+                      <div style={{
+                        position: "absolute", top: "100%", right: 72, marginTop: 6,
+                        background: dk ? c.surface : "#fff",
+                        border: `1px solid ${agBorder}`,
+                        borderRadius: 12, padding: 6, width: 240,
+                        boxShadow: "0 12px 32px rgba(0,0,0,0.22)",
+                        zIndex: 50,
+                      }}>
+                        <p style={{ fontSize: 9, fontWeight: 700, color: agTextMuted, textTransform: "uppercase", letterSpacing: 1, padding: "6px 10px 4px" }}>Agent model</p>
+                        {AGENT_MODELS.map(m => {
+                          const active = m.id === selectedModelId;
+                          return (
+                            <button key={m.id}
+                              onClick={() => { setSelectedModelId(m.id); setModelPickerOpen(false); }}
+                              style={{
+                                width: "100%", display: "flex", alignItems: "center", gap: 10,
+                                padding: "8px 10px", borderRadius: 9,
+                                background: active ? `${m.grad[0]}12` : "transparent",
+                                border: `1px solid ${active ? m.grad[0] + "30" : "transparent"}`,
+                                textAlign: "left", cursor: "pointer",
+                                marginBottom: 2,
+                              }}
+                              onMouseEnter={e => { if (!active) e.currentTarget.style.background = agSelected; }}
+                              onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent"; }}>
+                              <div style={{
+                                width: 30, height: 30, borderRadius: 9, flexShrink: 0,
+                                background: `linear-gradient(135deg,${m.grad[0]},${m.grad[1]})`,
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "#fff", fontWeight: 900, fontSize: 13,
+                                boxShadow: `0 3px 10px ${m.grad[0]}45`,
+                              }}>{m.tag}</div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ fontSize: 11, fontWeight: 700, color: agText, letterSpacing: -0.1 }}>{m.name}</p>
+                                <p style={{ fontSize: 9.5, color: agTextMuted }}>{m.description}</p>
+                              </div>
+                              {active && (
+                                <I d={ic.check} s={12} c={m.grad[0]} />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* Messages */}
@@ -9913,23 +10190,23 @@ export default function AlternusOS() {
     { id: "weather", title: "Weather", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 350, y: 70, w: 360, h: 430 },
     { id: "calendar", title: "Calendar", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 380, y: 90, w: 320, h: 340 },
     { id: "notes", title: "Notes", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 80, w: 400, h: 340 },
-    { id: "browser", title: "Browser", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 540, h: 400 },
-    { id: "store", title: "Store", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 40, y: 40, w: 680, h: 500 },
-    { id: "movies", title: "Movies", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 40, w: 640, h: 460 },
+    { id: "browser", title: "Stratos", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 540, h: 400 },
+    { id: "store", title: "Core Store", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 40, y: 40, w: 680, h: 500 },
+    { id: "movies", title: "Vision", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 40, w: 640, h: 460 },
     { id: "word", title: "Alternus Word", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 140, y: 50, w: 540, h: 400 },
     { id: "clock", title: "Clock", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 400, y: 100, w: 360, h: 420 },
     { id: "calculator", title: "Calculator", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 500, y: 80, w: 320, h: 440 },
     { id: "accounts", title: "Accounts", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 90, w: 360, h: 400 },
     { id: "downloads", title: "Downloads", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 350, y: 80, w: 440, h: 480 },
     { id: "controlpanel", title: "Control Panel", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 120, y: 40, w: 580, h: 440 },
-    { id: "studio", title: "Alternus Studio", isOpen: false, isMinimized: false, isMaximized: true, zIndex: 1, x: 60, y: 30, w: 720, h: 520 },
+    { id: "studio", title: "Structure", isOpen: false, isMinimized: false, isMaximized: true, zIndex: 1, x: 60, y: 30, w: 720, h: 520 },
     { id: "recovery", title: "Recovery", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 200, y: 60, w: 520, h: 440 },
     { id: "news", title: "Focus", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 180, y: 50, w: 500, h: 480 },
     { id: "dashboard", title: "Dashboard", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 40, w: 520, h: 460 },
     { id: "tasks", title: "Tasks", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 220, y: 60, w: 420, h: 480 },
     { id: "mail", title: "Mail", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 50, w: 580, h: 460 },
     { id: "monaco", title: "Code Editor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 60, y: 30, w: 600, h: 480 },
-    { id: "aihub", title: "AI Studio", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 40, w: 720, h: 520 },
+    { id: "aihub", title: "Orbit", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 80, y: 40, w: 720, h: 520 },
     { id: "aivoice", title: "AI Voice", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 300, y: 80, w: 380, h: 440 },
     { id: "knowledge", title: "Knowledge Base", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 100, y: 50, w: 560, h: 480 },
     { id: "sysmon", title: "System Monitor", isOpen: false, isMinimized: false, isMaximized: false, zIndex: 1, x: 160, y: 50, w: 500, h: 480 },
@@ -10343,7 +10620,7 @@ export default function AlternusOS() {
     // ━━━ APP KEYWORD MAP — every keyword opens the right app ━━━
     const appMap: { keys: string[]; id: WinId; title: string; icon: string; description: string; extra?: { id: WinId; title: string; icon: string; description: string } }[] = [
       { keys: ["google", "browse", "browser", "web", "search", "internet", "url", "website", "http", "youtube", "facebook", "instagram", "twitter", "reddit", "wikipedia", "linkedin", "amazon", "ebay", "netflix", "spotify", "tiktok", "pinterest", "stackoverflow", "github"],
-        id: "browser", title: "Browser", icon: ic.globe, description: "Browse the web, search, and access websites" },
+        id: "browser", title: "Stratos", icon: ic.globe, description: "Stratos web browser — search and visit sites" },
       { keys: ["code", "program", "develop", "javascript", "python", "html", "css", "react", "typescript", "debug", "compile", "script", "function", "variable", "api", "claude", "ai code", "copilot", "vscode", "editor", "ide", "git", "npm", "node"],
         id: "code", title: "Code Editor", icon: ic.code, description: "Write, edit, and debug code" },
       { keys: ["terminal", "command", "shell", "bash", "cmd", "console", "cli", "ssh", "ping", "npm run", "yarn", "pip"],
@@ -10371,13 +10648,13 @@ export default function AlternusOS() {
       { keys: ["setting", "config", "theme", "dark mode", "light mode", "wifi", "bluetooth", "network", "display", "brightness", "language", "notification", "privacy", "security", "system", "preference", "storage", "battery"],
         id: "settings", title: "Settings", icon: ic.settings, description: "System settings and preferences" },
       { keys: ["store", "shop", "buy", "purchase", "app store", "download app", "marketplace", "shopping", "cart", "order", "product", "price", "deal", "sale", "discount", "ecommerce"],
-        id: "store", title: "Store", icon: ic.store, description: "Browse and install apps" },
+        id: "store", title: "Core Store", icon: ic.store, description: "Browse and install apps" },
       { keys: ["movie", "film", "video", "watch", "stream", "cinema", "series", "tv show", "anime", "documentary", "trailer", "imdb", "popcorn", "subtitle", "episode", "season"],
-        id: "movies", title: "Movies", icon: ic.film, description: "Watch movies, series, and videos" },
+        id: "movies", title: "Vision", icon: ic.film, description: "Watch movies, series, and videos" },
       { keys: ["ai", "chat", "assistant", "help me", "ask", "question", "explain", "translate", "summarize", "generate", "create", "analyze", "solve", "gpt", "claude", "chatbot", "conversation"],
         id: "ai", title: "Alternus AI", icon: ic.sparkle, description: "AI-powered assistant and chat" },
       { keys: ["illustrator", "design", "draw", "paint", "sketch", "art", "photoshop", "figma", "canvas", "graphic", "logo", "icon", "illustration", "vector", "pixel", "color", "gradient", "brush", "layer"],
-        id: "code", title: "Code Editor", icon: ic.code, description: "SVG/CSS design and creative coding", extra: { id: "browser", title: "Browser", icon: ic.globe, description: "Open Figma or design tools in browser" } },
+        id: "code", title: "Code Editor", icon: ic.code, description: "SVG/CSS design and creative coding", extra: { id: "browser", title: "Stratos", icon: ic.globe, description: "Open Figma or design tools in Stratos" } },
       { keys: ["recovery", "recover", "restore", "undelete", "recycle", "trash", "deleted", "lost file", "deep scan"],
         id: "recovery", title: "Recovery", icon: ic.shield, description: "Recover deleted files and deep scan" },
       { keys: ["news", "breaking", "headline", "article", "press", "journalism", "newspaper", "media", "report", "bbc", "cnn", "reuters", "current events"],
@@ -10391,7 +10668,7 @@ export default function AlternusOS() {
       { keys: ["vscode", "monaco", "ide", "editor", "code editor", "typescript", "javascript", "python", "syntax", "programming"],
         id: "monaco", title: "Code Editor", icon: ic.code, description: "VS Code-style code editor" },
       { keys: ["ai hub", "ai studio", "multi model", "gpt", "claude", "gemini", "llama", "compare", "model", "chat ai", "ai chat"],
-        id: "aihub", title: "AI Studio", icon: ic.sparkle, description: "Multi-model AI studio" },
+        id: "aihub", title: "Orbit", icon: ic.sparkle, description: "Multi-model AI studio" },
       { keys: ["voice", "speech", "microphone", "text to speech", "speech to text", "stt", "tts", "dictate", "transcribe"],
         id: "aivoice", title: "AI Voice", icon: ic.mic, description: "Speech-to-text and text-to-speech" },
       { keys: ["knowledge", "rag", "search docs", "knowledge base", "semantic search", "index", "upload doc", "qa", "document search"],
@@ -10547,7 +10824,7 @@ export default function AlternusOS() {
 
   const dockApps: { id: WinId; icon: string; label: string; color: string; category: "ai" | "productivity" | "media" | "system" | "web" }[] = [
     { id: "agent", icon: ic.sparkle, label: "Alternus AI Agent", color: "#7C3AED", category: "ai" },
-    { id: "aihub", icon: ic.sparkle, label: "AI Studio", color: "#A78BFA", category: "ai" },
+    { id: "aihub", icon: ic.sparkle, label: "Orbit", color: "#A78BFA", category: "ai" },
     { id: "aivoice", icon: ic.mic, label: "AI Voice", color: "#FBBF24", category: "ai" },
     { id: "knowledge", icon: ic.bookOpen, label: "Knowledge", color: "#F97316", category: "ai" },
     { id: "code", icon: ic.code, label: "Code", color: c.purple, category: "productivity" },
@@ -10558,9 +10835,9 @@ export default function AlternusOS() {
     { id: "calculator", icon: ic.calc, label: "Calc", color: "#8ABF8A", category: "productivity" },
     { id: "calendar", icon: ic.calendar, label: "Calendar", color: "#60A5FA", category: "productivity" },
     { id: "dashboard", icon: ic.grid, label: "Dashboard", color: "#60A5FA", category: "productivity" },
-    { id: "movies", icon: ic.film, label: "Movies", color: c.purple, category: "media" },
+    { id: "movies", icon: ic.film, label: "Vision", color: c.purple, category: "media" },
     { id: "music", icon: ic.music, label: "Music", color: "#F472B6", category: "media" },
-    { id: "studio", icon: ic.pen, label: "Studio", color: "#A78BFA", category: "media" },
+    { id: "studio", icon: ic.pen, label: "Structure", color: "#A78BFA", category: "media" },
     { id: "terminal", icon: ic.terminal, label: "Terminal", color: c.success, category: "system" },
     { id: "files", icon: ic.folder, label: "Files", color: c.warning, category: "system" },
     { id: "settings", icon: ic.settings, label: "Settings", color: c.textSec, category: "system" },
@@ -10568,11 +10845,11 @@ export default function AlternusOS() {
     { id: "recovery", icon: ic.shield, label: "Recovery", color: c.success, category: "system" },
     { id: "downloads", icon: ic.download, label: "Downloads", color: "#34D399", category: "system" },
     { id: "sysmon", icon: ic.activity, label: "System Monitor", color: "#34D399", category: "system" },
-    { id: "browser", icon: ic.globe, label: "Browser", color: c.accentText, category: "web" },
+    { id: "browser", icon: ic.globe, label: "Stratos", color: c.accentText, category: "web" },
     { id: "weather", icon: ic.cloud, label: "Weather", color: "#60A5FA", category: "web" },
     { id: "news", icon: ic.sparkle, label: "Focus", color: c.accent, category: "web" },
     { id: "mail", icon: ic.mail, label: "Mail", color: "#F97316", category: "web" },
-    { id: "store", icon: ic.store, label: "Store", color: c.accent, category: "web" },
+    { id: "store", icon: ic.store, label: "Core Store", color: c.accent, category: "web" },
     { id: "business", icon: ic.briefcase, label: "Business", color: "#6366F1", category: "web" },
   ];
 
@@ -10745,14 +11022,14 @@ export default function AlternusOS() {
         <div className="flex items-center gap-1">
           {(() => { const ic_ = mode === "dark" ? "#aaaaaa" : "#666666"; const icH = mode === "dark" ? "#ffffff" : "#000000"; return (<>
             {/* Quick launch apps */}
-            <button title="Browser" onClick={() => openWin("browser")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.globe} s={15} /></button>
+            <button title="Stratos" onClick={() => openWin("browser")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.globe} s={15} /></button>
             <button title="Settings" onClick={() => openWin("settings")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.settings} s={15} /></button>
             <button title="Code Editor" onClick={() => openWin("code")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.code} s={15} /></button>
             <button title="Terminal" onClick={() => openWin("terminal")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.terminal} s={15} /></button>
             <button title="Weather" onClick={() => openWin("weather")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.cloud} s={15} /></button>
             <button title="Calendar" onClick={() => openWin("calendar")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.calendar} s={15} /></button>
-            <button title="Store" onClick={() => openWin("store")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.store} s={15} /></button>
-            <button title="Movies" onClick={() => openWin("movies")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.film} s={15} /></button>
+            <button title="Core Store" onClick={() => openWin("store")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.store} s={15} /></button>
+            <button title="Vision" onClick={() => openWin("movies")} className="p-1.5 rounded-md transition-colors" style={{ color: ic_ }} onMouseEnter={e => (e.currentTarget.style.color = icH)} onMouseLeave={e => (e.currentTarget.style.color = ic_)}><I d={ic.film} s={15} /></button>
             {/* Separator */}
             <div className="w-px h-4 mx-1" style={{ background: c.border }} />
             {/* System tray */}
@@ -11340,7 +11617,7 @@ export default function AlternusOS() {
                   return (
                     <div className="flex flex-col items-center gap-0.5">
                       <button
-                        title="Browser"
+                        title="Stratos"
                         onClick={() => openWinWithAI("browser")}
                         className="flex items-center justify-center transition-all duration-180"
                         style={{ width: 38, height: 38, borderRadius: 10, background: "transparent" }}
