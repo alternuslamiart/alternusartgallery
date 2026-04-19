@@ -5583,169 +5583,285 @@ function ControlPanelApp({ c, mode, setMode, onOpenApp }: { c: typeof palette.da
   );
 }
 
-// ━━━━ NEWS APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━━ NEWS APP — CNN-style ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function NewsApp({ c }: { c: typeof palette.dark }) {
   const [activeCategory, setActiveCategory] = useState("top");
   const [savedArticles, setSavedArticles] = useState<Set<number>>(new Set());
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  const CNN_RED = "#CC0000";
+  const CNN_RED_DARK = "#A30000";
 
   const categories = [
     { id: "top", label: "Top Stories" },
-    { id: "tech", label: "Technology" },
+    { id: "tech", label: "Tech" },
     { id: "world", label: "World" },
     { id: "business", label: "Business" },
     { id: "science", label: "Science" },
     { id: "sports", label: "Sports" },
   ];
 
-  const articles: Record<string, { id: number; title: string; source: string; time: string; summary: string; category: string; breaking?: boolean; image?: string }[]> = {
+  type Article = { id: number; title: string; source: string; time: string; summary: string; category: string; breaking?: boolean; hue?: [string, string]; body?: string };
+
+  const articles: Record<string, Article[]> = {
     top: [
-      { id: 1, title: "Global AI Summit Reaches Historic Agreement on Safety Standards", source: "Reuters", time: "12 min ago", summary: "World leaders have agreed on a landmark framework for AI safety, establishing international standards for development and deployment of advanced AI systems.", category: "Technology", breaking: true },
-      { id: 2, title: "Markets Surge as Central Banks Signal Rate Cuts", source: "Bloomberg", time: "45 min ago", summary: "Stock markets worldwide rally as major central banks indicate a coordinated shift toward monetary easing in the coming quarter.", category: "Business" },
-      { id: 3, title: "Scientists Discover New Method for Carbon Capture", source: "Nature", time: "1 hour ago", summary: "Researchers at MIT have developed a revolutionary carbon capture technique that is 10x more efficient than current methods.", category: "Science" },
-      { id: 4, title: "Historic Peace Deal Signed in Eastern Europe", source: "AP News", time: "2 hours ago", summary: "After months of negotiations, a comprehensive peace agreement has been signed, ending years of regional conflict.", category: "World" },
-      { id: 5, title: "SpaceX Launches Largest Satellite Constellation", source: "Space.com", time: "3 hours ago", summary: "SpaceX successfully deploys 120 next-generation satellites in a single mission, breaking its own record.", category: "Technology" },
-      { id: 6, title: "World Cup 2026 Venues Officially Announced", source: "ESPN", time: "4 hours ago", summary: "FIFA reveals the complete list of stadiums and host cities for the upcoming World Cup tournament.", category: "Sports" },
+      { id: 1, title: "Global AI Summit Reaches Historic Agreement on Safety Standards", source: "CNN Wire", time: "12 min ago", summary: "World leaders have agreed on a landmark framework for AI safety, establishing international standards for development and deployment of advanced AI systems.", category: "Technology", breaking: true, hue: ["#1e3a8a", "#4338ca"] },
+      { id: 2, title: "Markets Surge as Central Banks Signal Rate Cuts", source: "CNN Business", time: "45 min ago", summary: "Stock markets worldwide rally as major central banks indicate a coordinated shift toward monetary easing in the coming quarter.", category: "Business", hue: ["#064e3b", "#065f46"] },
+      { id: 3, title: "Scientists Discover New Method for Carbon Capture", source: "CNN Science", time: "1 hour ago", summary: "Researchers at MIT have developed a revolutionary carbon capture technique that is 10x more efficient than current methods.", category: "Science", hue: ["#0c4a6e", "#0369a1"] },
+      { id: 4, title: "Historic Peace Deal Signed in Eastern Europe", source: "CNN World", time: "2 hours ago", summary: "After months of negotiations, a comprehensive peace agreement has been signed, ending years of regional conflict.", category: "World", hue: ["#7c2d12", "#9a3412"] },
+      { id: 5, title: "SpaceX Launches Largest Satellite Constellation", source: "CNN", time: "3 hours ago", summary: "SpaceX successfully deploys 120 next-generation satellites in a single mission, breaking its own record.", category: "Technology", hue: ["#18181b", "#27272a"] },
+      { id: 6, title: "World Cup 2026 Venues Officially Announced", source: "CNN Sport", time: "4 hours ago", summary: "FIFA reveals the complete list of stadiums and host cities for the upcoming World Cup tournament.", category: "Sports", hue: ["#166534", "#15803d"] },
     ],
     tech: [
-      { id: 10, title: "Apple Unveils Revolutionary AR Glasses", source: "The Verge", time: "30 min ago", summary: "Apple's next-generation AR glasses feature holographic displays and all-day battery life, available next quarter.", category: "Technology", breaking: true },
-      { id: 11, title: "Quantum Computing Breakthrough Achieves Error Correction", source: "Wired", time: "2 hours ago", summary: "Google's quantum team demonstrates reliable error correction, bringing practical quantum computing years closer.", category: "Technology" },
-      { id: 12, title: "Open Source AI Model Surpasses GPT-5 Benchmarks", source: "TechCrunch", time: "3 hours ago", summary: "A community-developed open source model has outperformed leading proprietary AI systems across multiple benchmarks.", category: "Technology" },
-      { id: 13, title: "Cybersecurity Alert: Major Vulnerability Found in IoT Devices", source: "Ars Technica", time: "5 hours ago", summary: "Security researchers discover a critical flaw affecting millions of smart home devices worldwide.", category: "Technology" },
-      { id: 14, title: "Tesla Announces Fully Autonomous Robotaxi Service", source: "Reuters", time: "6 hours ago", summary: "Tesla begins rolling out its driverless taxi service in three major US cities starting next month.", category: "Technology" },
+      { id: 10, title: "Apple Unveils Revolutionary AR Glasses", source: "CNN Tech", time: "30 min ago", summary: "Apple's next-generation AR glasses feature holographic displays and all-day battery life, available next quarter.", category: "Technology", breaking: true, hue: ["#4c1d95", "#6d28d9"] },
+      { id: 11, title: "Quantum Computing Breakthrough Achieves Error Correction", source: "CNN Tech", time: "2 hours ago", summary: "Google's quantum team demonstrates reliable error correction, bringing practical quantum computing years closer.", category: "Technology", hue: ["#0c4a6e", "#075985"] },
+      { id: 12, title: "Open Source AI Model Surpasses GPT-5 Benchmarks", source: "CNN Business", time: "3 hours ago", summary: "A community-developed open source model has outperformed leading proprietary AI systems across multiple benchmarks.", category: "Technology", hue: ["#134e4a", "#115e59"] },
+      { id: 13, title: "Cybersecurity Alert: Major Vulnerability Found in IoT Devices", source: "CNN", time: "5 hours ago", summary: "Security researchers discover a critical flaw affecting millions of smart home devices worldwide.", category: "Technology", hue: ["#7f1d1d", "#991b1b"] },
+      { id: 14, title: "Tesla Announces Fully Autonomous Robotaxi Service", source: "CNN Business", time: "6 hours ago", summary: "Tesla begins rolling out its driverless taxi service in three major US cities starting next month.", category: "Technology", hue: ["#111827", "#1f2937"] },
     ],
     world: [
-      { id: 20, title: "UN General Assembly Adopts Climate Emergency Resolution", source: "BBC", time: "1 hour ago", summary: "The United Nations passes a sweeping resolution declaring a global climate emergency with binding commitments.", category: "World", breaking: true },
-      { id: 21, title: "Japan Launches New Bullet Train Connecting Tokyo to Osaka in 1 Hour", source: "NHK", time: "3 hours ago", summary: "The next-generation maglev train begins commercial operations, cutting travel time by more than half.", category: "World" },
-      { id: 22, title: "EU Passes Comprehensive Digital Privacy Framework", source: "DW News", time: "5 hours ago", summary: "The European Union enacts the most stringent digital privacy protections in history, affecting global tech companies.", category: "World" },
-      { id: 23, title: "African Union Launches Continental Free Trade Zone", source: "Al Jazeera", time: "7 hours ago", summary: "The world's largest free trade area officially begins operations, connecting 1.3 billion people.", category: "World" },
+      { id: 20, title: "UN General Assembly Adopts Climate Emergency Resolution", source: "CNN World", time: "1 hour ago", summary: "The United Nations passes a sweeping resolution declaring a global climate emergency with binding commitments.", category: "World", breaking: true, hue: ["#064e3b", "#047857"] },
+      { id: 21, title: "Japan Launches New Bullet Train Connecting Tokyo to Osaka in 1 Hour", source: "CNN Travel", time: "3 hours ago", summary: "The next-generation maglev train begins commercial operations, cutting travel time by more than half.", category: "World", hue: ["#881337", "#9f1239"] },
+      { id: 22, title: "EU Passes Comprehensive Digital Privacy Framework", source: "CNN World", time: "5 hours ago", summary: "The European Union enacts the most stringent digital privacy protections in history, affecting global tech companies.", category: "World", hue: ["#1e3a8a", "#1e40af"] },
+      { id: 23, title: "African Union Launches Continental Free Trade Zone", source: "CNN", time: "7 hours ago", summary: "The world's largest free trade area officially begins operations, connecting 1.3 billion people.", category: "World", hue: ["#78350f", "#92400e"] },
     ],
     business: [
-      { id: 30, title: "Nvidia Becomes World's Most Valuable Company", source: "CNBC", time: "1 hour ago", summary: "Nvidia's market cap surpasses $4 trillion as AI chip demand continues to soar beyond expectations.", category: "Business", breaking: true },
-      { id: 31, title: "Global Startup Funding Rebounds to Record Highs", source: "Forbes", time: "3 hours ago", summary: "Venture capital investments surge 40% year-over-year, with AI and cleantech leading the charge.", category: "Business" },
-      { id: 32, title: "Amazon Opens First Fully Automated Warehouse", source: "WSJ", time: "5 hours ago", summary: "The facility operates with zero human workers, processing 100,000 packages per day using advanced robotics.", category: "Business" },
+      { id: 30, title: "Nvidia Becomes World's Most Valuable Company", source: "CNN Business", time: "1 hour ago", summary: "Nvidia's market cap surpasses $4 trillion as AI chip demand continues to soar beyond expectations.", category: "Business", breaking: true, hue: ["#065f46", "#047857"] },
+      { id: 31, title: "Global Startup Funding Rebounds to Record Highs", source: "CNN Business", time: "3 hours ago", summary: "Venture capital investments surge 40% year-over-year, with AI and cleantech leading the charge.", category: "Business", hue: ["#713f12", "#854d0e"] },
+      { id: 32, title: "Amazon Opens First Fully Automated Warehouse", source: "CNN Business", time: "5 hours ago", summary: "The facility operates with zero human workers, processing 100,000 packages per day using advanced robotics.", category: "Business", hue: ["#312e81", "#3730a3"] },
     ],
     science: [
-      { id: 40, title: "James Webb Telescope Discovers Signs of Life on Exoplanet", source: "NASA", time: "2 hours ago", summary: "Atmospheric analysis reveals biosignature gases on a planet 40 light-years away, the strongest evidence yet of extraterrestrial life.", category: "Science", breaking: true },
-      { id: 41, title: "CRISPR Gene Therapy Cures Hereditary Blindness in Trial", source: "The Lancet", time: "4 hours ago", summary: "A landmark clinical trial successfully restores vision in patients with inherited retinal disease using gene editing.", category: "Science" },
-      { id: 42, title: "Fusion Reactor Achieves Net Energy Gain for 24 Hours", source: "Science", time: "6 hours ago", summary: "European researchers sustain a net-positive fusion reaction for a full day, a major milestone toward clean energy.", category: "Science" },
+      { id: 40, title: "James Webb Telescope Discovers Signs of Life on Exoplanet", source: "CNN Science", time: "2 hours ago", summary: "Atmospheric analysis reveals biosignature gases on a planet 40 light-years away, the strongest evidence yet of extraterrestrial life.", category: "Science", breaking: true, hue: ["#0c0a1f", "#1e1b4b"] },
+      { id: 41, title: "CRISPR Gene Therapy Cures Hereditary Blindness in Trial", source: "CNN Health", time: "4 hours ago", summary: "A landmark clinical trial successfully restores vision in patients with inherited retinal disease using gene editing.", category: "Science", hue: ["#831843", "#9d174d"] },
+      { id: 42, title: "Fusion Reactor Achieves Net Energy Gain for 24 Hours", source: "CNN Science", time: "6 hours ago", summary: "European researchers sustain a net-positive fusion reaction for a full day, a major milestone toward clean energy.", category: "Science", hue: ["#7c2d12", "#c2410c"] },
     ],
     sports: [
-      { id: 50, title: "Champions League Final: Historic Comeback Stuns Europe", source: "ESPN", time: "1 hour ago", summary: "In one of the greatest finals ever, the underdog team stages a remarkable 3-goal comeback in the second half.", category: "Sports", breaking: true },
-      { id: 51, title: "Olympic Record Shattered in 100m Sprint", source: "BBC Sport", time: "3 hours ago", summary: "A new world record is set in the 100-meter dash, breaking a mark that stood for over a decade.", category: "Sports" },
-      { id: 52, title: "NBA Expansion: Two New Teams Announced for 2027", source: "Sports Illustrated", time: "5 hours ago", summary: "The NBA confirms expansion to 32 teams with new franchises in Las Vegas and Seattle.", category: "Sports" },
+      { id: 50, title: "Champions League Final: Historic Comeback Stuns Europe", source: "CNN Sport", time: "1 hour ago", summary: "In one of the greatest finals ever, the underdog team stages a remarkable 3-goal comeback in the second half.", category: "Sports", breaking: true, hue: ["#14532d", "#166534"] },
+      { id: 51, title: "Olympic Record Shattered in 100m Sprint", source: "CNN Sport", time: "3 hours ago", summary: "A new world record is set in the 100-meter dash, breaking a mark that stood for over a decade.", category: "Sports", hue: ["#1e3a8a", "#1e40af"] },
+      { id: 52, title: "NBA Expansion: Two New Teams Announced for 2027", source: "CNN Sport", time: "5 hours ago", summary: "The NBA confirms expansion to 32 teams with new franchises in Las Vegas and Seattle.", category: "Sports", hue: ["#4c1d95", "#5b21b6"] },
     ],
   };
 
   const currentArticles = articles[activeCategory] || articles.top;
+  const hero = currentArticles[0];
+  const rest = currentArticles.slice(1);
+  const breakingTicker = currentArticles.filter(a => a.breaking);
   const toggleSave = (id: number) => setSavedArticles(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+  const selected = selectedId != null ? Object.values(articles).flat().find(a => a.id === selectedId) : null;
 
-  const sourceColors: Record<string, string> = {
-    "Reuters": "#F97316", "Bloomberg": "#FBBF24", "Nature": "#34D399",
-    "AP News": "#F87171", "Space.com": "#60A5FA", "ESPN": "#A78BFA",
-    "The Verge": "#EC4899", "Wired": "#06B6D4", "TechCrunch": "#22C55E",
-    "Ars Technica": "#F59E0B", "BBC": "#E11D48", "NHK": "#EF4444",
-    "DW News": "#3B82F6", "Al Jazeera": "#10B981", "CNBC": "#FBBF24",
-    "Forbes": "#F97316", "WSJ": "#6366F1", "NASA": "#60A5FA",
-    "The Lancet": "#F472B6", "Science": "#34D399", "BBC Sport": "#E11D48",
-    "Sports Illustrated": "#F97316",
-  };
+  // Simulated image placeholder: gradient with article glyph
+  const ImageBlock = ({ hue, h, big }: { hue?: [string, string]; h: number; big?: boolean }) => (
+    <div className="relative overflow-hidden flex-shrink-0" style={{ height: h, background: `linear-gradient(135deg, ${hue?.[0] ?? "#1f2937"}, ${hue?.[1] ?? "#374151"})` }}>
+      {/* decorative stripes */}
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15), transparent 50%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.55))" }} />
+      {big && (
+        <div style={{ position: "absolute", top: 8, left: 8, display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ background: CNN_RED, color: "#fff", fontSize: 9, fontWeight: 900, padding: "3px 6px", letterSpacing: 0.5 }}>LIVE</span>
+          <span style={{ background: "rgba(0,0,0,0.55)", color: "#fff", fontSize: 9, fontWeight: 700, padding: "3px 6px" }}>CNN</span>
+        </div>
+      )}
+    </div>
+  );
+
+  // Detail view
+  if (selected) {
+    return (
+      <div className="flex flex-col h-full" style={{ background: c.bg }}>
+        {/* Top bar */}
+        <div className="flex items-center gap-2 px-3 py-2 flex-shrink-0" style={{ background: "#000", borderBottom: `2px solid ${CNN_RED}` }}>
+          <button onClick={() => setSelectedId(null)}
+            className="flex items-center gap-1 px-2 py-1 rounded transition-colors"
+            style={{ color: "#fff", fontSize: 11 }}
+            onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}
+            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <I d={ic.chevL} s={13} c="#fff" />
+            Back
+          </button>
+          <div className="flex items-center gap-1.5 ml-2">
+            <div style={{ width: 30, height: 18, background: CNN_RED, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ color: "#fff", fontWeight: 900, fontSize: 10, letterSpacing: 0.5 }}>CNN</span>
+            </div>
+            <span style={{ color: "#fff", fontSize: 10, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>{selected.category}</span>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+          <ImageBlock hue={selected.hue} h={180} big />
+          <div className="px-4 py-3">
+            <div className="flex items-center gap-2 mb-2">
+              {selected.breaking && (
+                <span style={{ background: CNN_RED, color: "#fff", fontSize: 8, fontWeight: 900, padding: "2px 6px", letterSpacing: 0.5 }}>BREAKING NEWS</span>
+              )}
+              <span style={{ fontSize: 9, fontWeight: 700, color: CNN_RED, textTransform: "uppercase", letterSpacing: 0.8 }}>{selected.source}</span>
+            </div>
+            <h1 className="font-bold leading-tight mb-2" style={{ color: c.text, fontSize: 18, fontFamily: "Georgia, serif" }}>{selected.title}</h1>
+            <p className="text-[10px] mb-3" style={{ color: c.textMuted }}>By CNN Staff · Updated {selected.time}</p>
+            <div style={{ height: 1, background: c.border, marginBottom: 12 }} />
+            <p className="text-[12px] leading-relaxed mb-3" style={{ color: c.text }}>
+              <span style={{ fontFamily: "Georgia, serif", fontWeight: 700 }}>({selected.source}) —</span> {selected.summary}
+            </p>
+            <p className="text-[11px] leading-relaxed mb-3" style={{ color: c.textSec }}>
+              The development marks a significant moment in the ongoing global conversation, with experts calling it &ldquo;a watershed moment&rdquo; that could reshape the landscape for years to come. Analysts across multiple institutions have weighed in, offering perspectives that highlight both the immediate implications and the longer-term strategic considerations at play.
+            </p>
+            <p className="text-[11px] leading-relaxed mb-3" style={{ color: c.textSec }}>
+              Reporting from the ground suggests broad consensus among stakeholders, though questions remain about implementation timelines and the coordination required between major parties involved. CNN will continue to monitor the situation and provide updates as they become available.
+            </p>
+            <div className="flex items-center gap-2 mt-4 pb-4">
+              <button onClick={() => toggleSave(selected.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[10px] font-semibold transition-colors"
+                style={{ background: savedArticles.has(selected.id) ? CNN_RED : c.cardAlt, color: savedArticles.has(selected.id) ? "#fff" : c.text }}>
+                <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={11} c={savedArticles.has(selected.id) ? "#fff" : c.text} f={savedArticles.has(selected.id)} />
+                {savedArticles.has(selected.id) ? "Saved" : "Save"}
+              </button>
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[10px] font-semibold transition-colors"
+                style={{ background: c.cardAlt, color: c.text }}>
+                <I d={ic.share} s={11} c={c.text} />
+                Share
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #EF4444, #DC2626)", boxShadow: "0 3px 12px rgba(239,68,68,0.3)" }}>
-          <I d={ic.newspaper} s={16} c="#fff" />
+      {/* CNN Header — black bar with red logo */}
+      <div className="flex items-center flex-shrink-0" style={{ background: "#000", height: 36, paddingLeft: 10, paddingRight: 10, gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
+          <div style={{ width: 44, height: 22, background: CNN_RED, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 6px rgba(204,0,0,0.5)" }}>
+            <span style={{ color: "#fff", fontWeight: 900, fontSize: 13, letterSpacing: 0.5, fontFamily: "'Helvetica Neue', Arial, sans-serif" }}>CNN</span>
+          </div>
         </div>
-        <div className="flex-1">
-          <h3 className="text-[13px] font-bold" style={{ color: c.text }}>News</h3>
-          <p className="text-[10px]" style={{ color: c.textMuted }}>Real-time headlines and world updates</p>
+        <div className="flex items-center gap-1.5" style={{ flex: 1 }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: CNN_RED, boxShadow: `0 0 8px ${CNN_RED}`, animation: "pulse 2s ease-in-out infinite" }} />
+          <span style={{ color: "#fff", fontSize: 9, fontWeight: 800, letterSpacing: 1.2 }}>LIVE TV</span>
         </div>
-        <span className="text-[9px] font-bold px-2 py-1 rounded-lg" style={{ background: c.cardAlt, color: c.textMuted }}>Live</span>
+        <div className="flex items-center gap-2">
+          <button style={{ color: "#fff", opacity: 0.8 }} className="transition-opacity"
+            onMouseEnter={e=>(e.currentTarget.style.opacity="1")}
+            onMouseLeave={e=>(e.currentTarget.style.opacity="0.8")}>
+            <I d={ic.search} s={13} c="#fff" />
+          </button>
+          <button style={{ color: "#fff", opacity: 0.8 }} className="transition-opacity"
+            onMouseEnter={e=>(e.currentTarget.style.opacity="1")}
+            onMouseLeave={e=>(e.currentTarget.style.opacity="0.8")}>
+            <I d={ic.menu} s={13} c="#fff" />
+          </button>
+        </div>
       </div>
-      {/* Breaking news bar — solid red */}
-      {currentArticles.some(a => a.breaking) && (
-        <div className="px-3 py-1.5 flex items-center gap-2 flex-shrink-0" style={{ background: "#EF4444" }}>
-          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: "rgba(0,0,0,0.25)", color: "#fff" }}>BREAKING</span>
-          <p className="text-[10px] font-medium truncate" style={{ color: "#fff" }}>
-            {currentArticles.find(a => a.breaking)?.title}
-          </p>
+
+      {/* Breaking news ticker */}
+      {breakingTicker.length > 0 && (
+        <div className="flex items-stretch flex-shrink-0" style={{ background: CNN_RED, height: 24 }}>
+          <div style={{ background: CNN_RED_DARK, display: "flex", alignItems: "center", padding: "0 8px" }}>
+            <span style={{ color: "#fff", fontSize: 9, fontWeight: 900, letterSpacing: 1 }}>BREAKING</span>
+          </div>
+          <div style={{ flex: 1, display: "flex", alignItems: "center", padding: "0 10px", overflow: "hidden" }}>
+            <p style={{ color: "#fff", fontSize: 10, fontWeight: 600, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
+              {breakingTicker[0].title}
+            </p>
+          </div>
         </div>
       )}
 
-      {/* Category tabs — underline style */}
-      <div className="flex items-center gap-0 px-2 flex-shrink-0 overflow-x-auto" style={{ borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
+      {/* Category nav — white/dark theme aware, underline */}
+      <div className="flex items-center flex-shrink-0 overflow-x-auto" style={{ background: c.surface, borderBottom: `1px solid ${c.border}`, scrollbarWidth: "none" }}>
         {categories.map(cat => (
           <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-            className="px-3 text-[10px] font-medium whitespace-nowrap transition-colors"
+            className="whitespace-nowrap transition-colors"
             style={{
-              paddingTop: "8px",
-              paddingBottom: "8px",
+              padding: "8px 12px",
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: 0.8,
               background: "transparent",
-              borderRadius: 0,
               color: activeCategory === cat.id ? c.text : c.textMuted,
-              borderBottom: activeCategory === cat.id ? `2px solid ${c.accent}` : "2px solid transparent",
-              marginBottom: "-1px",
+              borderBottom: activeCategory === cat.id ? `3px solid ${CNN_RED}` : "3px solid transparent",
+              marginBottom: -1,
             }}
-            onMouseEnter={e => { if (activeCategory !== cat.id) (e.currentTarget.style.color = c.textSec); }}
-            onMouseLeave={e => { if (activeCategory !== cat.id) (e.currentTarget.style.color = c.textMuted); }}>
+            onMouseEnter={e => { if (activeCategory !== cat.id) e.currentTarget.style.color = c.textSec; }}
+            onMouseLeave={e => { if (activeCategory !== cat.id) e.currentTarget.style.color = c.textMuted; }}>
             {cat.label}
           </button>
         ))}
       </div>
 
-      {/* Articles — flat rows with dividers */}
+      {/* Content area */}
       <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-        {currentArticles.map((article, idx) => (
+        {/* Hero */}
+        {hero && (
+          <div className="cursor-pointer" onClick={() => setSelectedId(hero.id)}>
+            <ImageBlock hue={hero.hue} h={150} big />
+            <div className="px-4 py-3" style={{ borderBottom: `1px solid ${c.border}` }}>
+              <div className="flex items-center gap-2 mb-1.5">
+                {hero.breaking && (
+                  <span style={{ background: CNN_RED, color: "#fff", fontSize: 8, fontWeight: 900, padding: "2px 6px", letterSpacing: 0.5 }}>BREAKING</span>
+                )}
+                <span style={{ fontSize: 9, fontWeight: 800, color: CNN_RED, textTransform: "uppercase", letterSpacing: 0.8 }}>{hero.source}</span>
+                <span className="text-[9px]" style={{ color: c.textMuted }}>· {hero.time}</span>
+              </div>
+              <h2 className="font-bold leading-tight mb-1.5" style={{ color: c.text, fontSize: 15, fontFamily: "Georgia, serif" }}>{hero.title}</h2>
+              <p className="text-[11px] leading-relaxed" style={{ color: c.textSec }}>{hero.summary}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Section heading */}
+        <div className="px-4 py-2 flex items-center gap-2 flex-shrink-0" style={{ background: c.cardAlt }}>
+          <span style={{ width: 3, height: 12, background: CNN_RED }} />
+          <span style={{ fontSize: 10, fontWeight: 900, color: c.text, textTransform: "uppercase", letterSpacing: 1 }}>More Top Stories</span>
+        </div>
+
+        {/* Article rows */}
+        {rest.map((article, idx) => (
           <div key={article.id}
-            className="px-4 py-3 transition-colors cursor-pointer"
-            style={{ borderBottom: idx < currentArticles.length - 1 ? `1px solid ${c.border}` : "none", background: "transparent" }}
+            className="flex gap-3 px-4 py-3 transition-colors cursor-pointer"
+            style={{ borderBottom: idx < rest.length - 1 ? `1px solid ${c.border}` : "none" }}
+            onClick={() => setSelectedId(article.id)}
             onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
             onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-            {/* Source + time */}
-            <div className="flex items-center gap-2 mb-1">
-              {article.breaking && (
-                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded flex-shrink-0" style={{ background: "#16A34A", color: "#fff" }}>LIVE</span>
-              )}
-              <span className="text-[9px] font-semibold" style={{ color: sourceColors[article.source] ?? c.accentText }}>{article.source}</span>
-              <span className="text-[9px]" style={{ color: c.textMuted }}>{article.time}</span>
+            {/* Thumb */}
+            <div style={{ width: 90, height: 68, flexShrink: 0, borderRadius: 2, overflow: "hidden" }}>
+              <ImageBlock hue={article.hue} h={68} />
             </div>
-            {/* Title */}
-            <p className="text-[12px] font-semibold leading-snug mb-1.5" style={{ color: c.text }}>{article.title}</p>
-            {/* Summary */}
-            <p className="text-[10px] leading-relaxed mb-2.5" style={{ color: c.textSec }}>{article.summary}</p>
-            {/* Category + icons */}
-            <div className="flex items-center justify-between">
-              <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ background: c.cardAlt, color: c.textMuted }}>{article.category}</span>
-              <div className="flex items-center gap-1">
+            {/* Text */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 mb-1">
+                {article.breaking && (
+                  <span style={{ background: CNN_RED, color: "#fff", fontSize: 7, fontWeight: 900, padding: "1px 4px", letterSpacing: 0.5 }}>LIVE</span>
+                )}
+                <span style={{ fontSize: 8, fontWeight: 800, color: CNN_RED, textTransform: "uppercase", letterSpacing: 0.6 }}>{article.source}</span>
+              </div>
+              <p className="font-bold leading-snug mb-1" style={{ color: c.text, fontSize: 12, fontFamily: "Georgia, serif" }}>{article.title}</p>
+              <div className="flex items-center gap-2">
+                <span className="text-[9px]" style={{ color: c.textMuted }}>{article.time}</span>
                 <button onClick={(e) => { e.stopPropagation(); toggleSave(article.id); }}
-                  className="p-1 rounded-md transition-colors"
-                  style={{ color: savedArticles.has(article.id) ? c.accent : c.textMuted }}
+                  className="ml-auto p-0.5 rounded transition-colors"
                   onMouseEnter={e => (e.currentTarget.style.background = c.border)}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={13}
-                    c={savedArticles.has(article.id) ? c.accent : c.textMuted}
+                  <I d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" s={11}
+                    c={savedArticles.has(article.id) ? CNN_RED : c.textMuted}
                     f={savedArticles.has(article.id)} />
-                </button>
-                <button className="p-1 rounded-md transition-colors" style={{ color: c.textMuted }}
-                  onMouseEnter={e => (e.currentTarget.style.background = c.border)}
-                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <I d={ic.share} s={13} />
                 </button>
               </div>
             </div>
           </div>
         ))}
-      </div>
 
-      {/* Footer */}
-      <div className="px-4 py-2 flex items-center justify-between flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-        <p className="text-[9px]" style={{ color: c.textMuted }}>Powered by Alternus News · Updated just now</p>
-        <button className="text-[10px] font-medium px-2 py-1 rounded-lg transition-colors" style={{ color: c.accentText }}
-          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-          Refresh
-        </button>
+        {/* Footer strap */}
+        <div className="px-4 py-3 flex items-center justify-between" style={{ background: "#000" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ width: 34, height: 16, background: CNN_RED, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ color: "#fff", fontWeight: 900, fontSize: 9, letterSpacing: 0.4 }}>CNN</span>
+            </div>
+            <span style={{ color: "#fff", fontSize: 9, opacity: 0.7 }}>© 2026 Cable News Network</span>
+          </div>
+          <span style={{ color: "#fff", fontSize: 9, opacity: 0.7 }}>Updated just now</span>
+        </div>
       </div>
     </div>
   );
@@ -6615,189 +6731,570 @@ function TasksApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
-// ━━━━ MAIL APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━━ MAIL APP — Professional email client ━━━━━━━━━━━━━━━
 function MailApp({ c }: { c: typeof palette.dark }) {
-  const contacts = [
-    { id: 1, name: "Jane Bons",     sub: "Chat with your cir...",     time: "1:23 PM", unread: 0, init: "JB", color: "#3B82F6" },
-    { id: 2, name: "Rans Smith",    sub: "Openplity with mi...",       time: "1:23 PM", unread: 3, init: "RS", color: "#8B5CF6" },
-    { id: 3, name: "Rama Mavdi",    sub: "Mianrut smith",              time: "1:26 PM", unread: 0, init: "RM", color: "#10B981" },
-    { id: 4, name: "Jana Bons",     sub: "Maman@gmail.com",            time: "1:28 PM", unread: 0, init: "JB", color: "#F59E0B" },
-    { id: 5, name: "Mary Smith",    sub: "Moxl@gmail.com",             time: "1:23 PM", unread: 0, init: "MS", color: "#EF4444" },
-    { id: 6, name: "Evan Smith",    sub: "Manages then ort...",        time: "1:33 PM", unread: 0, init: "ES", color: "#06B6D4" },
-    { id: 7, name: "Misa Kolanson", sub: "Contact@gmail.com",          time: "1:35 PM", unread: 0, init: "MK", color: "#EC4899" },
-    { id: 8, name: "Mark Towsy",    sub: "Boan.gkali.com",             time: "1:35 PM", unread: 0, init: "MT", color: "#84CC16" },
-  ];
-  const [selId, setSelId] = useState(1);
-  const [input, setInput] = useState("");
-  const [msgMap, setMsgMap] = useState<Record<number, { me: boolean; text: string; time: string }[]>>({
-    1: [
-      { me: false, text: "Hello, from renments you to your contact?", time: "1:20 PM" },
-      { me: true,  text: "Wov and selectng your contart?",            time: "1:21 PM" },
-      { me: false, text: "What does mms?",                            time: "1:22 PM" },
-      { me: false, text: "What can I reconnect for your contants??",  time: "1:23 PM" },
-      { me: true,  text: "Thank joy your possians?",                  time: "1:28 PM" },
-    ],
-    2: [
-      { me: false, text: "Hey! Are you available for a quick sync?", time: "1:18 PM" },
-      { me: true,  text: "Sure, what's up?",                         time: "1:19 PM" },
-      { me: false, text: "Let's discuss the new project scope.",      time: "1:23 PM" },
-    ],
-  });
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [selId, msgMap]);
-
-  const sel = contacts.find(c => c.id === selId)!;
-  const msgs = msgMap[selId] || [{ me: false, text: "Say hi to start a conversation!", time: "" }];
-
-  const sendMsg = () => {
-    if (!input.trim()) return;
-    const now = new Date();
-    const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")} PM`;
-    setMsgMap(p => ({ ...p, [selId]: [...(p[selId]||[]), { me: true, text: input.trim(), time }] }));
-    setInput("");
+  type Folder = "inbox" | "starred" | "sent" | "drafts" | "archive" | "spam" | "trash";
+  type Email = {
+    id: number;
+    folder: Folder;
+    from: string;
+    fromEmail: string;
+    avatar: string;
+    color: string;
+    subject: string;
+    preview: string;
+    body: string;
+    time: string;
+    date: string;
+    read: boolean;
+    starred: boolean;
+    important?: boolean;
+    hasAttachment?: boolean;
+    label?: { name: string; color: string };
   };
 
+  const initialEmails: Email[] = [
+    { id: 1, folder: "inbox", from: "Sophia Martinez", fromEmail: "sophia.martinez@alternus.art", avatar: "SM", color: "#4F8EF7",
+      subject: "Q2 Gallery exhibition proposal — ready for review",
+      preview: "Hi team, I've attached the finalized proposal for the Q2 exhibition featuring emerging digital artists. The curator meeting is scheduled for…",
+      body: "Hi team,\n\nI've attached the finalized proposal for the Q2 exhibition featuring emerging digital artists. The curator meeting is scheduled for next Tuesday at 2:00 PM in the main conference room.\n\nKey highlights:\n• 14 artists confirmed across 3 mediums\n• Opening reception on June 14\n• Marketing budget approved at $42,000\n• Partnership with Artforum for press coverage\n\nPlease review the attached deck and let me know if you have any questions or concerns before Tuesday's meeting.\n\nBest regards,\nSophia Martinez\nSenior Curator, Alternus Art Gallery",
+      time: "10:42 AM", date: "Today", read: false, starred: true, important: true, hasAttachment: true,
+      label: { name: "Work", color: "#4F8EF7" } },
+    { id: 2, folder: "inbox", from: "David Chen", fromEmail: "d.chen@artforum.com", avatar: "DC", color: "#A78BFA",
+      subject: "Press feature — interview request",
+      preview: "We'd love to schedule a 30-minute interview with you for our upcoming feature on contemporary digital galleries. Are you available next week?",
+      body: "Hello,\n\nWe'd love to schedule a 30-minute interview with you for our upcoming feature on contemporary digital galleries. Our readers have been particularly interested in how Alternus has been innovating the curator/collector experience.\n\nAre you available next week on Wednesday or Thursday afternoon? I'm happy to work around your schedule.\n\nBest,\nDavid Chen\nSenior Editor, Artforum",
+      time: "9:18 AM", date: "Today", read: false, starred: false, hasAttachment: false,
+      label: { name: "Press", color: "#A78BFA" } },
+    { id: 3, folder: "inbox", from: "Stripe", fromEmail: "receipts@stripe.com", avatar: "S", color: "#635BFF",
+      subject: "Your receipt from Alternus Art Gallery — $2,400.00",
+      preview: "Thanks for your purchase. Receipt #1042-5918 for the commissioned piece by artist Elena Voss has been processed successfully.",
+      body: "Hi,\n\nThank you for your purchase. Receipt #1042-5918 for the commissioned piece by artist Elena Voss has been processed successfully.\n\nAmount: $2,400.00 USD\nPayment method: Visa ending in 4242\nDate: April 19, 2026\n\nYou'll receive shipping details within 48 hours.\n\nStripe",
+      time: "8:05 AM", date: "Today", read: true, starred: false, hasAttachment: false,
+      label: { name: "Finance", color: "#22C55E" } },
+    { id: 4, folder: "inbox", from: "Elena Voss", fromEmail: "elena@voss-studio.co", avatar: "EV", color: "#EC4899",
+      subject: "Re: Commission update — final piece delivery",
+      preview: "The final piece is complete! I'm arranging delivery through the approved courier for next Monday. Please confirm the receiving hours at the gallery.",
+      body: "Hi,\n\nI'm so excited — the final piece is complete and exceeded my own expectations. I'm arranging delivery through the approved courier for next Monday, April 26.\n\nPlease confirm the receiving hours at the gallery so I can coordinate the delivery window. I'll send full condition report and installation notes separately.\n\nWarmly,\nElena Voss",
+      time: "Yesterday", date: "Yesterday", read: true, starred: true, hasAttachment: true },
+    { id: 5, folder: "inbox", from: "GitHub", fromEmail: "noreply@github.com", avatar: "GH", color: "#24292F",
+      subject: "[alternus/gallery] Pull request #284 approved",
+      preview: "Your pull request 'Add virtual gallery navigation' has been approved by 2 reviewers and is ready to merge.",
+      body: "Your pull request #284 'Add virtual gallery navigation' has been approved by 2 reviewers.\n\nReviewers:\n• @marcuslee approved\n• @ninabird approved\n\nThe branch is up to date with main and all checks have passed.\n\nView on GitHub →",
+      time: "Yesterday", date: "Yesterday", read: true, starred: false, hasAttachment: false,
+      label: { name: "Dev", color: "#6B7280" } },
+    { id: 6, folder: "inbox", from: "Marcus Lee", fromEmail: "m.lee@alternus.art", avatar: "ML", color: "#10B981",
+      subject: "Weekly team sync — agenda attached",
+      preview: "Hi everyone, the agenda for Friday's team sync is attached. Please add any additional topics by Thursday EOD.",
+      body: "Hi everyone,\n\nThe agenda for Friday's team sync is attached. Please add any additional topics by Thursday EOD.\n\nMain items:\n1. Q2 exhibition launch readiness\n2. Platform analytics review\n3. Artist onboarding pipeline\n4. Open discussion\n\nTalk soon,\nMarcus",
+      time: "Apr 17", date: "Apr 17", read: true, starred: false, hasAttachment: true,
+      label: { name: "Work", color: "#4F8EF7" } },
+    { id: 7, folder: "inbox", from: "Vercel", fromEmail: "notifications@vercel.com", avatar: "▲", color: "#000000",
+      subject: "Deployment successful — alternusartgallery.com",
+      preview: "Your latest deployment to production is live. Build time: 48s. All checks passed.",
+      body: "Deployment successful\n\nProject: alternusartgallery\nEnvironment: Production\nBuild time: 48s\nCommit: feat(os): redesign news and mail windows",
+      time: "Apr 16", date: "Apr 16", read: true, starred: false, hasAttachment: false,
+      label: { name: "Dev", color: "#6B7280" } },
+    { id: 8, folder: "inbox", from: "Nina Bird", fromEmail: "nina@creativecoalition.org", avatar: "NB", color: "#F59E0B",
+      subject: "Collaboration opportunity — Creative Coalition summit",
+      preview: "Would Alternus be interested in sponsoring a panel at this year's Creative Coalition summit in September?",
+      body: "Hi,\n\nI hope you're well. Would Alternus be interested in sponsoring a panel at this year's Creative Coalition summit in September?\n\nWe're expecting 800+ attendees and would love to feature Alternus's approach to digital curation.\n\nHappy to share the full sponsorship deck if there's interest.\n\nBest,\nNina Bird",
+      time: "Apr 15", date: "Apr 15", read: true, starred: false, hasAttachment: false },
+    { id: 9, folder: "sent", from: "You", fromEmail: "me@alternus.art", avatar: "ME", color: "#4F8EF7",
+      subject: "Re: Q2 Gallery exhibition proposal — thoughts",
+      preview: "Thanks Sophia — the proposal looks great. A few comments on the marketing plan section…",
+      body: "Thanks Sophia — the proposal looks great.\n\nA few comments on the marketing plan section…",
+      time: "11:02 AM", date: "Today", read: true, starred: false, hasAttachment: false },
+    { id: 10, folder: "drafts", from: "You", fromEmail: "me@alternus.art", avatar: "ME", color: "#4F8EF7",
+      subject: "(no subject)",
+      preview: "Hey, just wanted to follow up on the…",
+      body: "Hey, just wanted to follow up on the…",
+      time: "9:40 AM", date: "Today", read: true, starred: false, hasAttachment: false },
+    { id: 11, folder: "starred", from: "Sophia Martinez", fromEmail: "sophia.martinez@alternus.art", avatar: "SM", color: "#4F8EF7",
+      subject: "Q2 Gallery exhibition proposal — ready for review",
+      preview: "Hi team, I've attached the finalized proposal for the Q2 exhibition…",
+      body: "Same as inbox #1",
+      time: "10:42 AM", date: "Today", read: false, starred: true, hasAttachment: true },
+  ];
+
+  const [emails, setEmails] = useState<Email[]>(initialEmails);
+  const [folder, setFolder] = useState<Folder>("inbox");
+  const [selId, setSelId] = useState<number | null>(1);
+  const [search, setSearch] = useState("");
+  const [composing, setComposing] = useState(false);
+  const [compose, setCompose] = useState({ to: "", subject: "", body: "" });
+
+  const folderMeta: { id: Folder; label: string; icon: string }[] = [
+    { id: "inbox",   label: "Inbox",    icon: "M22 12h-6l-2 3h-4l-2-3H2M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z" },
+    { id: "starred", label: "Starred",  icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" },
+    { id: "sent",    label: "Sent",     icon: ic.send },
+    { id: "drafts",  label: "Drafts",   icon: ic.fileText },
+    { id: "archive", label: "Archive",  icon: "M20 8H4v13h16V8zM1 3h22v5H1zM10 12h4" },
+    { id: "spam",    label: "Spam",     icon: ic.alertTriangle },
+    { id: "trash",   label: "Trash",    icon: ic.trash },
+  ];
+
+  const counts = (id: Folder) => emails.filter(e => e.folder === id && (id === "starred" ? e.starred : true)).length;
+  const unreadCount = (id: Folder) => emails.filter(e => e.folder === id && !e.read && (id === "starred" ? e.starred : true)).length;
+
+  const visibleEmails = emails.filter(e => {
+    const inFolder = folder === "starred" ? e.starred : e.folder === folder;
+    if (!inFolder) return false;
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return e.from.toLowerCase().includes(q) || e.subject.toLowerCase().includes(q) || e.preview.toLowerCase().includes(q);
+  });
+
+  const selected = selId != null ? emails.find(e => e.id === selId) : null;
+
+  const toggleStar = (id: number) => setEmails(prev => prev.map(e => e.id === id ? { ...e, starred: !e.starred } : e));
+  const markRead = (id: number) => setEmails(prev => prev.map(e => e.id === id ? { ...e, read: true } : e));
+  const deleteEmail = (id: number) => {
+    setEmails(prev => prev.map(e => e.id === id ? { ...e, folder: "trash" as Folder } : e));
+    setSelId(null);
+  };
+  const archiveEmail = (id: number) => {
+    setEmails(prev => prev.map(e => e.id === id ? { ...e, folder: "archive" as Folder } : e));
+    setSelId(null);
+  };
+  const selectEmail = (id: number) => { setSelId(id); markRead(id); };
+  const sendCompose = () => {
+    if (!compose.to.trim() || !compose.subject.trim()) return;
+    const now = new Date();
+    const time = `${((now.getHours() % 12) || 12)}:${String(now.getMinutes()).padStart(2,"0")} ${now.getHours() >= 12 ? "PM" : "AM"}`;
+    const newEmail: Email = {
+      id: Math.max(...emails.map(e => e.id)) + 1,
+      folder: "sent",
+      from: "You",
+      fromEmail: "me@alternus.art",
+      avatar: "ME",
+      color: "#4F8EF7",
+      subject: compose.subject,
+      preview: compose.body.slice(0, 100),
+      body: compose.body,
+      time,
+      date: "Today",
+      read: true,
+      starred: false,
+    };
+    setEmails(prev => [newEmail, ...prev]);
+    setCompose({ to: "", subject: "", body: "" });
+    setComposing(false);
+  };
+
+  const folderLabel = folderMeta.find(f => f.id === folder)?.label ?? "Inbox";
+  const totalUnread = unreadCount("inbox");
+
   return (
-    <div className="flex flex-col h-full" style={{ background: c.bg }}>
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #F97316, #EA580C)", boxShadow: "0 3px 12px rgba(249,115,22,0.3)" }}>
-          <I d={ic.mail} s={16} c="#fff" />
-        </div>
-        <div className="flex-1">
-          <h3 className="text-[13px] font-bold" style={{ color: c.text }}>Mail</h3>
-          <p className="text-[10px]" style={{ color: c.textMuted }}>Messages and conversations</p>
-        </div>
-        {contacts.some(ct => ct.unread > 0) && (
-          <span className="text-[9px] font-bold px-2 py-1 rounded-lg" style={{ background: `${c.danger}15`, color: c.danger }}>
-            {contacts.reduce((s, ct) => s + ct.unread, 0)} new
-          </span>
-        )}
-      </div>
-      <div className="flex flex-1 min-h-0">
-      {/* ── Left sidebar: contact list ── */}
-      <div className="flex-shrink-0 flex flex-col" style={{ width: 200, borderRight: `1px solid ${c.border}` }}>
-        {/* Search */}
-        <div className="px-3 pt-3 pb-2 flex-shrink-0">
-          <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-            <I d={ic.search} s={12} c={c.textMuted} />
-            <input className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: c.text }} placeholder="Search" />
-            <I d={ic.settings} s={12} c={c.textMuted} />
+    <div className="flex flex-col h-full" style={{ background: c.bg, color: c.text }}>
+      {/* Top bar */}
+      <div className="flex items-center gap-3 px-3 py-2 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #4F8EF7, #3B6FD3)", boxShadow: "0 2px 8px rgba(79,142,247,0.35)" }}>
+            <I d={ic.mail} s={13} c="#fff" />
           </div>
+          <span className="text-[12px] font-bold tracking-tight" style={{ color: c.text }}>Mail</span>
         </div>
-        {/* Label */}
-        <div className="px-4 py-1 flex-shrink-0">
-          <span className="text-[10px] font-semibold" style={{ color: c.textMuted }}>Chats</span>
+        <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-lg max-w-[320px]" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
+          <I d={ic.search} s={12} c={c.textMuted} />
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: c.text }}
+            placeholder="Search mail" />
+          {search && (
+            <button onClick={() => setSearch("")}><I d={ic.close} s={11} c={c.textMuted} /></button>
+          )}
         </div>
-        {/* Today divider */}
-        <div className="px-4 py-0.5 flex-shrink-0">
-          <span className="text-[9px]" style={{ color: c.textMuted }}>Today</span>
-        </div>
-        {/* Contact list */}
-        <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-          {contacts.map(ct => (
-            <button key={ct.id} onClick={() => setSelId(ct.id)}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition-all"
-              style={{ background: selId === ct.id ? c.accentSoft : "transparent", borderLeft: selId === ct.id ? `2px solid ${c.accent}` : "2px solid transparent" }}
-              onMouseEnter={e => { if (selId !== ct.id) e.currentTarget.style.background = c.cardAlt; }}
-              onMouseLeave={e => { if (selId !== ct.id) e.currentTarget.style.background = "transparent"; }}>
-              {/* Avatar */}
-              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-white"
-                style={{ background: ct.color }}>
-                {ct.init}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium truncate" style={{ color: c.text }}>{ct.name}</span>
-                  <span className="text-[9px] flex-shrink-0 ml-1" style={{ color: c.textMuted }}>{ct.time}</span>
-                </div>
-                <div className="flex items-center justify-between mt-0.5">
-                  <p className="text-[10px] truncate" style={{ color: c.textMuted }}>{ct.sub}</p>
-                  {ct.unread > 0 && (
-                    <span className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white flex-shrink-0 ml-1"
-                      style={{ background: c.accent }}>{ct.unread}</span>
-                  )}
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Right panel: chat thread ── */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Chat header */}
-        <div className="flex items-center justify-between px-4 py-2.5 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
-              style={{ background: sel.color }}>{sel.init}</div>
-            <div>
-              <p className="text-[12px] font-semibold" style={{ color: c.text }}>{sel.name}</p>
-              <p className="text-[10px]" style={{ color: c.success }}>Chat</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1">
-            <button className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors" style={{ color: c.textMuted }}
-              onMouseEnter={e=>(e.currentTarget.style.background=c.cardAlt)}
-              onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
-              <I d={ic.volume} s={14} />
-            </button>
-            <button className="w-7 h-7 rounded-lg flex items-center justify-center transition-colors" style={{ color: c.textMuted }}
-              onMouseEnter={e=>(e.currentTarget.style.background=c.cardAlt)}
-              onMouseLeave={e=>(e.currentTarget.style.background="transparent")}>
-              <I d={ic.menu} s={14} />
-            </button>
-          </div>
-        </div>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2" style={{ scrollbarWidth: "none" }}>
-          {msgs.map((msg, i) => (
-            <div key={i} className={`flex ${msg.me ? "justify-end" : "justify-start"}`}>
-              {!msg.me && (
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0 mr-2 mt-1 self-end"
-                  style={{ background: sel.color }}>{sel.init[0]}</div>
-              )}
-              <div className="max-w-[65%]">
-                <div className="px-3 py-2 rounded-2xl text-[12px] leading-relaxed"
-                  style={{
-                    background: msg.me ? c.accent : c.cardAlt,
-                    color: msg.me ? "#fff" : c.text,
-                    borderBottomRightRadius: msg.me ? 4 : undefined,
-                    borderBottomLeftRadius: !msg.me ? 4 : undefined,
-                  }}>
-                  {msg.text}
-                </div>
-                {msg.time && <p className="text-[9px] mt-0.5 px-1" style={{ color: c.textMuted, textAlign: msg.me ? "right" : "left" }}>{msg.time}</p>}
-              </div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input bar */}
-        <div className="flex items-center gap-2 px-3 py-2.5 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-          <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-            <input className="flex-1 bg-transparent outline-none text-[12px]" style={{ color: c.text }}
-              placeholder="Type a message" value={input}
-              onChange={e=>setInput(e.target.value)}
-              onKeyDown={e=>{ if(e.key==="Enter") sendMsg(); }} />
-            <button style={{ color: c.textMuted }}
-              onMouseEnter={e=>(e.currentTarget.style.color=c.accentText)}
-              onMouseLeave={e=>(e.currentTarget.style.color=c.textMuted)}>
-              <I d={ic.mic} s={14} />
-            </button>
-          </div>
-          <button onClick={sendMsg}
-            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all"
-            style={{ background: c.accent, boxShadow: `0 0 10px ${c.accent}50` }}
-            onMouseEnter={e=>(e.currentTarget.style.opacity="0.85")}
-            onMouseLeave={e=>(e.currentTarget.style.opacity="1")}>
-            <I d={ic.send} s={14} c="#fff" />
+        <div className="flex items-center gap-1 ml-auto">
+          <button className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+            style={{ color: c.textSec }}
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <I d={ic.refresh} s={12} />
+          </button>
+          <button className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+            style={{ color: c.textSec }}
+            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <I d={ic.settings} s={12} />
           </button>
         </div>
       </div>
-      </div>
+
+      {composing ? (
+        // Compose modal
+        <div className="flex-1 flex flex-col min-h-0" style={{ background: c.bg }}>
+          <div className="flex items-center justify-between px-4 py-2 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
+            <span className="text-[12px] font-semibold" style={{ color: c.text }}>New message</span>
+            <button onClick={() => setComposing(false)} className="w-6 h-6 rounded flex items-center justify-center transition-colors"
+              style={{ color: c.textSec }}
+              onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <I d={ic.close} s={12} />
+            </button>
+          </div>
+          <div className="flex items-center gap-3 px-4 py-2" style={{ borderBottom: `1px solid ${c.border}` }}>
+            <span className="text-[10px] font-semibold w-10" style={{ color: c.textMuted }}>To</span>
+            <input value={compose.to} onChange={e => setCompose(s => ({ ...s, to: e.target.value }))}
+              className="flex-1 bg-transparent outline-none text-[12px]" style={{ color: c.text }}
+              placeholder="recipient@example.com" />
+          </div>
+          <div className="flex items-center gap-3 px-4 py-2" style={{ borderBottom: `1px solid ${c.border}` }}>
+            <span className="text-[10px] font-semibold w-10" style={{ color: c.textMuted }}>Subject</span>
+            <input value={compose.subject} onChange={e => setCompose(s => ({ ...s, subject: e.target.value }))}
+              className="flex-1 bg-transparent outline-none text-[12px] font-semibold" style={{ color: c.text }}
+              placeholder="Subject" />
+          </div>
+          <textarea value={compose.body} onChange={e => setCompose(s => ({ ...s, body: e.target.value }))}
+            className="flex-1 bg-transparent outline-none text-[12px] px-4 py-3 resize-none leading-relaxed"
+            style={{ color: c.text, scrollbarWidth: "none" }}
+            placeholder="Write your message…" />
+          <div className="flex items-center justify-between px-3 py-2 flex-shrink-0" style={{ background: c.surface, borderTop: `1px solid ${c.border}` }}>
+            <div className="flex items-center gap-1">
+              <button className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+                style={{ color: c.textSec }}
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <I d={ic.paperclip} s={13} />
+              </button>
+              <button className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+                style={{ color: c.textSec }}
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <I d={ic.image} s={13} />
+              </button>
+              <button className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+                style={{ color: c.textSec }}
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <I d={ic.type} s={13} />
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setComposing(false)}
+                className="text-[11px] font-medium px-3 py-1.5 rounded-md transition-colors"
+                style={{ color: c.textSec, background: "transparent" }}
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                Discard
+              </button>
+              <button onClick={sendCompose}
+                className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-md transition-opacity"
+                style={{ background: c.accent, color: "#fff", opacity: (compose.to && compose.subject) ? 1 : 0.5 }}>
+                <I d={ic.send} s={11} c="#fff" />
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-1 min-h-0">
+          {/* Folder sidebar */}
+          <div className="flex-shrink-0 flex flex-col" style={{ width: 130, background: c.surface, borderRight: `1px solid ${c.border}` }}>
+            <div className="p-2 flex-shrink-0">
+              <button onClick={() => setComposing(true)}
+                className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-semibold transition-all"
+                style={{ background: c.accent, color: "#fff", boxShadow: `0 2px 8px ${c.accent}50` }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = "0.9")}
+                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
+                <I d={ic.edit3} s={12} c="#fff" />
+                Compose
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-1.5 pb-2" style={{ scrollbarWidth: "none" }}>
+              {folderMeta.map(f => {
+                const isActive = folder === f.id;
+                const unread = unreadCount(f.id);
+                return (
+                  <button key={f.id} onClick={() => { setFolder(f.id); setSelId(null); }}
+                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-left transition-colors mb-0.5"
+                    style={{
+                      background: isActive ? c.accentSoft : "transparent",
+                      color: isActive ? c.accentText : c.textSec,
+                    }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
+                    <I d={f.icon} s={12} c={isActive ? c.accentText : c.textSec} f={isActive && f.id === "starred"} />
+                    <span className="text-[11px] font-medium flex-1" style={{ color: isActive ? c.text : c.textSec }}>{f.label}</span>
+                    {unread > 0 && (
+                      <span className="text-[9px] font-bold px-1.5 py-px rounded-full" style={{
+                        background: isActive ? c.accent : c.cardAlt,
+                        color: isActive ? "#fff" : c.textSec,
+                        minWidth: 16, textAlign: "center",
+                      }}>{unread}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Labels */}
+            <div className="px-2 pb-2 flex-shrink-0">
+              <span className="text-[9px] font-bold uppercase tracking-wider px-1 mb-1 block" style={{ color: c.textMuted }}>Labels</span>
+              {[
+                { name: "Work", color: "#4F8EF7" },
+                { name: "Press", color: "#A78BFA" },
+                { name: "Finance", color: "#22C55E" },
+                { name: "Dev", color: "#6B7280" },
+              ].map(l => (
+                <div key={l.name} className="flex items-center gap-2 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <span style={{ width: 8, height: 8, borderRadius: 2, background: l.color }} />
+                  <span className="text-[10px]" style={{ color: c.textSec }}>{l.name}</span>
+                </div>
+              ))}
+            </div>
+            {/* Storage meter */}
+            <div className="px-3 py-2 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[9px] font-semibold" style={{ color: c.textMuted }}>Storage</span>
+                <span className="text-[9px]" style={{ color: c.textMuted }}>6.2 / 15 GB</span>
+              </div>
+              <div style={{ height: 3, borderRadius: 2, background: c.cardAlt, overflow: "hidden" }}>
+                <div style={{ width: "41%", height: "100%", background: c.accent }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Email list */}
+          <div className="flex-shrink-0 flex flex-col" style={{ width: 210, borderRight: `1px solid ${c.border}`, background: c.bg }}>
+            <div className="px-3 py-2 flex items-center justify-between flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+              <div>
+                <span className="text-[12px] font-bold" style={{ color: c.text }}>{folderLabel}</span>
+                <p className="text-[9px]" style={{ color: c.textMuted }}>
+                  {visibleEmails.length} {visibleEmails.length === 1 ? "message" : "messages"}{folder === "inbox" && totalUnread > 0 ? ` · ${totalUnread} unread` : ""}
+                </p>
+              </div>
+              <button className="w-6 h-6 rounded flex items-center justify-center transition-colors"
+                style={{ color: c.textSec }}
+                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                <I d={ic.menu} s={12} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+              {visibleEmails.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full px-4 py-8">
+                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: c.cardAlt, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+                    <I d={ic.mail} s={20} c={c.textMuted} />
+                  </div>
+                  <p className="text-[11px] font-semibold text-center" style={{ color: c.textSec }}>No messages</p>
+                  <p className="text-[9px] text-center mt-1" style={{ color: c.textMuted }}>
+                    {search ? "Try a different search" : "Your folder is empty"}
+                  </p>
+                </div>
+              ) : (
+                visibleEmails.map(e => {
+                  const isSelected = selId === e.id;
+                  return (
+                    <button key={e.id} onClick={() => selectEmail(e.id)}
+                      className="w-full px-3 py-2.5 text-left transition-colors"
+                      style={{
+                        background: isSelected ? c.accentSoft : "transparent",
+                        borderLeft: isSelected ? `3px solid ${c.accent}` : "3px solid transparent",
+                        borderBottom: `1px solid ${c.border}`,
+                      }}
+                      onMouseEnter={ev => { if (!isSelected) ev.currentTarget.style.background = c.cardAlt; }}
+                      onMouseLeave={ev => { if (!isSelected) ev.currentTarget.style.background = "transparent"; }}>
+                      <div className="flex items-start gap-2">
+                        {/* Unread dot */}
+                        <div style={{ marginTop: 6, width: 6, height: 6, borderRadius: "50%", background: e.read ? "transparent" : c.accent, flexShrink: 0 }} />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="flex-1 truncate" style={{ fontSize: 11, fontWeight: e.read ? 500 : 700, color: c.text }}>
+                              {e.from}
+                            </span>
+                            <span className="text-[9px] flex-shrink-0" style={{ color: e.read ? c.textMuted : c.textSec, fontWeight: e.read ? 400 : 600 }}>
+                              {e.time}
+                            </span>
+                          </div>
+                          <p className="truncate mb-0.5" style={{ fontSize: 10.5, fontWeight: e.read ? 500 : 700, color: e.read ? c.textSec : c.text }}>
+                            {e.subject}
+                          </p>
+                          <p className="truncate text-[9.5px]" style={{ color: c.textMuted }}>
+                            {e.preview}
+                          </p>
+                          <div className="flex items-center gap-1 mt-1">
+                            {e.label && (
+                              <span className="text-[8px] font-semibold px-1.5 py-px rounded" style={{
+                                background: `${e.label.color}22`, color: e.label.color,
+                              }}>{e.label.name}</span>
+                            )}
+                            {e.hasAttachment && (
+                              <I d={ic.paperclip} s={9} c={c.textMuted} />
+                            )}
+                            {e.important && (
+                              <I d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" s={9} c="#F59E0B" f />
+                            )}
+                            <button onClick={(ev) => { ev.stopPropagation(); toggleStar(e.id); }}
+                              className="ml-auto">
+                              <I d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" s={10}
+                                c={e.starred ? "#FBBF24" : c.textMuted} f={e.starred} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Reading pane */}
+          <div className="flex-1 flex flex-col min-w-0" style={{ background: c.bg }}>
+            {selected ? (
+              <>
+                {/* Action bar */}
+                <div className="flex items-center gap-1 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
+                  <button onClick={() => archiveEmail(selected.id)}
+                    title="Archive"
+                    className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <I d="M20 8H4v13h16V8zM1 3h22v5H1zM10 12h4" s={13} />
+                  </button>
+                  <button onClick={() => deleteEmail(selected.id)}
+                    title="Delete"
+                    className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <I d={ic.trash} s={13} />
+                  </button>
+                  <div style={{ width: 1, height: 16, background: c.border, margin: "0 4px" }} />
+                  <button title="Mark unread"
+                    className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <I d={ic.mail} s={13} />
+                  </button>
+                  <button onClick={() => toggleStar(selected.id)} title="Star"
+                    className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <I d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" s={13}
+                      c={selected.starred ? "#FBBF24" : c.textSec} f={selected.starred} />
+                  </button>
+                  <button title="Print"
+                    className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <I d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z" s={13} />
+                  </button>
+                  <div className="ml-auto flex items-center gap-1">
+                    <button title="Previous"
+                      className="w-6 h-6 rounded flex items-center justify-center transition-colors"
+                      style={{ color: c.textSec }}
+                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <I d={ic.chevL} s={12} />
+                    </button>
+                    <button title="Next"
+                      className="w-6 h-6 rounded flex items-center justify-center transition-colors"
+                      style={{ color: c.textSec }}
+                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <I d={ic.chevR} s={12} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Email content */}
+                <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                  <div className="px-5 pt-4 pb-2">
+                    <div className="flex items-start justify-between mb-3">
+                      <h2 className="font-bold leading-tight pr-3" style={{ color: c.text, fontSize: 15 }}>{selected.subject}</h2>
+                      {selected.label && (
+                        <span className="text-[9px] font-semibold px-2 py-0.5 rounded flex-shrink-0" style={{
+                          background: `${selected.label.color}22`, color: selected.label.color,
+                        }}>{selected.label.name}</span>
+                      )}
+                    </div>
+                    <div className="flex items-start gap-2.5 mb-3">
+                      <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: selected.color, color: "#fff", fontWeight: 700, fontSize: 11 }}>
+                        {selected.avatar}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center flex-wrap gap-x-1.5">
+                          <span className="text-[12px] font-semibold" style={{ color: c.text }}>{selected.from}</span>
+                          <span className="text-[10px]" style={{ color: c.textMuted }}>&lt;{selected.fromEmail}&gt;</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[10px]" style={{ color: c.textMuted }}>to me</span>
+                          <I d={ic.chevD} s={9} c={c.textMuted} />
+                        </div>
+                      </div>
+                      <span className="text-[10px] flex-shrink-0" style={{ color: c.textMuted }}>{selected.date} · {selected.time}</span>
+                    </div>
+                  </div>
+                  <div style={{ height: 1, background: c.border, margin: "0 20px" }} />
+                  <div className="px-5 py-4">
+                    <div className="text-[12px] leading-relaxed whitespace-pre-wrap" style={{ color: c.text }}>
+                      {selected.body}
+                    </div>
+                    {selected.hasAttachment && (
+                      <div className="mt-4 pt-3" style={{ borderTop: `1px solid ${c.border}` }}>
+                        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>Attachments (1)</span>
+                        <div className="flex items-center gap-2 mt-2 p-2.5 rounded-lg transition-colors cursor-pointer"
+                          style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}
+                          onMouseEnter={e => (e.currentTarget.style.background = c.accentSoft)}
+                          onMouseLeave={e => (e.currentTarget.style.background = c.cardAlt)}>
+                          <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0"
+                            style={{ background: "#EF4444", color: "#fff" }}>
+                            <span className="text-[8px] font-bold">PDF</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>proposal-q2-exhibition.pdf</p>
+                            <p className="text-[9px]" style={{ color: c.textMuted }}>2.4 MB</p>
+                          </div>
+                          <button className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                            style={{ color: c.textSec }}
+                            onMouseEnter={e => (e.currentTarget.style.background = c.border)}
+                            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                            <I d={ic.download} s={12} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="px-5 pb-5 flex items-center gap-2">
+                    <button onClick={() => setComposing(true)}
+                      className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-md transition-colors"
+                      style={{ border: `1px solid ${c.border}`, color: c.text, background: c.surface }}
+                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                      onMouseLeave={e => (e.currentTarget.style.background = c.surface)}>
+                      <I d="M9 14l-4-4 4-4M5 10h9a5 5 0 015 5v5" s={12} c={c.text} />
+                      Reply
+                    </button>
+                    <button className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-md transition-colors"
+                      style={{ border: `1px solid ${c.border}`, color: c.text, background: c.surface }}
+                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                      onMouseLeave={e => (e.currentTarget.style.background = c.surface)}>
+                      <I d={ic.send} s={11} c={c.text} />
+                      Forward
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              // Empty state
+              <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: `linear-gradient(135deg, ${c.accent}, ${c.accentText})`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12, boxShadow: `0 8px 24px ${c.accent}30` }}>
+                  <I d={ic.mail} s={24} c="#fff" />
+                </div>
+                <p className="text-[13px] font-bold mb-1" style={{ color: c.text }}>Select a message</p>
+                <p className="text-[10.5px] leading-relaxed max-w-[220px]" style={{ color: c.textMuted }}>
+                  Pick an email from the list to read its contents here, or compose a new message.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
