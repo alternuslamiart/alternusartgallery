@@ -10764,7 +10764,7 @@ export default function AlternusOS() {
   const [smartDND, setSmartDND] = useState(false);
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   const [showTimeline, setShowTimeline] = useState(false);
-  const [wallpaper, setWallpaper] = useState(1);
+  const [wallpaper, setWallpaper] = useState(4);
   const [recoveryFiles, setRecoveryFiles] = useState<RecoveryFile[]>([]);
   const [installedApps, setInstalledApps] = useState<string[]>([]);
   const [installingApp, setInstallingApp] = useState<string | null>(null);
@@ -10951,7 +10951,7 @@ export default function AlternusOS() {
       music: D,
       // Utility popups keep their compact footprint
       weather: { w: 380, h: 420 },
-      calendar: D,
+      calendar: { w: 360, h: 400 },
       notes: D,
       browser: D,
       store: D,
@@ -10970,7 +10970,7 @@ export default function AlternusOS() {
       mail: D,
       monaco: D,
       aihub: D,
-      aivoice: D,
+      aivoice: { w: 380, h: 440 },
       knowledge: D,
       sysmon: D,
       business: D,
