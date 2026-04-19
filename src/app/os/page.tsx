@@ -10157,12 +10157,531 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
   );
 }
 
+// ━━━━ OOBE — Out-of-Box Experience (first-run setup) ━━━━━━━
+interface OOBEData {
+  region: string;
+  keyboard: string;
+  language: string;
+  wifi: string | null;
+  acceptedLicense: boolean;
+  name: string;
+  email: string;
+  privacy: { location: boolean; findMyDevice: boolean; diagnostics: boolean; tailored: boolean; adId: boolean };
+}
+
+function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
+  const [step, setStep] = useState(0);
+  const [data, setData] = useState<OOBEData>({
+    region: "Albania",
+    keyboard: "Albanian",
+    language: "English (United States)",
+    wifi: null,
+    acceptedLicense: false,
+    name: "",
+    email: "",
+    privacy: { location: true, findMyDevice: true, diagnostics: true, tailored: false, adId: false },
+  });
+  const [password, setPassword] = useState("");
+  const [scanning, setScanning] = useState(false);
+  const [acceptScrolled, setAcceptScrolled] = useState(false);
+
+  const steps = [
+    { id: "region",   label: "Region",   icon: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z" },
+    { id: "network",  label: "Network",  icon: "M5 13a10 10 0 0114 0M8.5 16.5a5 5 0 017 0M2 8.82a15 15 0 0120 0M12 20h.01" },
+    { id: "license",  label: "License",  icon: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM14 2v6h6M9 15l2 2 4-4" },
+    { id: "account",  label: "Account",  icon: "M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" },
+    { id: "privacy",  label: "Privacy",  icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
+  ];
+
+  const countries = ["Albania", "Kosovo", "North Macedonia", "Italy", "Germany", "United Kingdom", "United States", "France", "Spain", "Switzerland", "Greece", "Turkey", "Austria"];
+  const keyboards = ["Albanian", "English (US)", "English (UK)", "German", "Italian", "French", "Spanish"];
+  const languages = ["English (United States)", "Shqip", "Deutsch", "Italiano", "Français", "Español", "Türkçe"];
+  const networks = [
+    { ssid: "Alternus-Guest",    signal: 3, secure: true,  freq: "5 GHz" },
+    { ssid: "AlternusArt",       signal: 3, secure: true,  freq: "5 GHz" },
+    { ssid: "Home-WiFi-2.4",     signal: 2, secure: true,  freq: "2.4 GHz" },
+    { ssid: "CafeLuna",          signal: 2, secure: false, freq: "2.4 GHz" },
+    { ssid: "NeighborNet",       signal: 1, secure: true,  freq: "2.4 GHz" },
+  ];
+
+  const next = () => {
+    if (step < steps.length - 1) setStep(s => s + 1);
+    else onComplete(data);
+  };
+  const back = () => step > 0 && setStep(s => s - 1);
+
+  const canAdvance = (() => {
+    switch (step) {
+      case 0: return !!data.region && !!data.keyboard && !!data.language;
+      case 1: return true; // skippable
+      case 2: return data.acceptedLicense && acceptScrolled;
+      case 3: return data.name.trim().length > 1 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) && password.length >= 6;
+      case 4: return true;
+      default: return true;
+    }
+  })();
+
+  const SignalBars = ({ level }: { level: number }) => (
+    <div style={{ display: "flex", alignItems: "flex-end", gap: 1.5, height: 11 }}>
+      {[1, 2, 3].map(i => (
+        <div key={i} style={{
+          width: 3, height: 3 + i * 2.5, borderRadius: 1,
+          background: i <= level ? "#4F8EF7" : "#D1D5DB",
+        }} />
+      ))}
+    </div>
+  );
+
+  const Toggle = ({ on, onChange }: { on: boolean; onChange: () => void }) => (
+    <button onClick={onChange}
+      style={{
+        width: 36, height: 20, borderRadius: 999,
+        background: on ? "#4F8EF7" : "#D1D5DB",
+        position: "relative", transition: "all 0.2s",
+        border: "none", cursor: "pointer", flexShrink: 0,
+        boxShadow: on ? "0 2px 8px rgba(79,142,247,0.35)" : "none",
+      }}>
+      <div style={{
+        position: "absolute", top: 2, left: on ? 18 : 2,
+        width: 16, height: 16, borderRadius: "50%",
+        background: "#fff", transition: "all 0.2s",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
+      }} />
+    </button>
+  );
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 100,
+      background: "linear-gradient(135deg, #0B1128 0%, #111B3A 40%, #1B2952 100%)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontFamily: "-apple-system, 'Inter', 'Segoe UI', sans-serif",
+      overflow: "hidden",
+    }}>
+      {/* Ambient aurora */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
+        background: "radial-gradient(circle at 20% 15%, rgba(79,142,247,0.22), transparent 45%), radial-gradient(circle at 80% 85%, rgba(167,139,250,0.18), transparent 50%), radial-gradient(circle at 50% 50%, rgba(61,214,140,0.08), transparent 55%)",
+      }} />
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
+        background: "radial-gradient(circle at 50% 120%, rgba(255,255,255,0.04), transparent 50%)",
+      }} />
+
+      {/* Main setup card */}
+      <div style={{
+        position: "relative",
+        width: "min(860px, 94vw)", height: "min(600px, 94vh)",
+        borderRadius: 20, overflow: "hidden",
+        background: "#ffffff",
+        boxShadow: "0 30px 80px rgba(0,0,0,0.35), 0 12px 28px rgba(0,0,0,0.18)",
+        display: "flex",
+      }}>
+        {/* Left rail — step indicator */}
+        <div style={{
+          width: 220, flexShrink: 0,
+          background: "linear-gradient(160deg, #F8FAFF 0%, #EDF2FE 100%)",
+          borderRight: "1px solid #E5E7EB",
+          padding: "28px 20px",
+          display: "flex", flexDirection: "column",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 30 }}>
+            <div style={{
+              width: 30, height: 30, borderRadius: 9,
+              background: "linear-gradient(135deg,#4F8EF7,#A78BFA)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 4px 12px rgba(79,142,247,0.35)",
+            }}>
+              <I d={ic.sparkle} s={14} c="#fff" f />
+            </div>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 800, color: "#0F172A", letterSpacing: -0.2 }}>Alternus</p>
+              <p style={{ fontSize: 9, fontWeight: 600, color: "#64748B", letterSpacing: 0.3, textTransform: "uppercase" }}>Setup</p>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            {steps.map((s, i) => {
+              const done = i < step;
+              const active = i === step;
+              return (
+                <div key={s.id} style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  padding: "8px 10px", borderRadius: 10,
+                  background: active ? "rgba(79,142,247,0.10)" : "transparent",
+                  transition: "all 0.2s",
+                }}>
+                  <div style={{
+                    width: 24, height: 24, borderRadius: "50%", flexShrink: 0,
+                    background: done ? "#22C55E" : active ? "#4F8EF7" : "#E5E7EB",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    transition: "all 0.2s",
+                  }}>
+                    {done ? (
+                      <I d={ic.check} s={12} c="#fff" />
+                    ) : (
+                      <I d={s.icon} s={11} c={active ? "#fff" : "#94A3B8"} />
+                    )}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 11, fontWeight: done || active ? 700 : 500, color: active ? "#0F172A" : done ? "#334155" : "#94A3B8" }}>{s.label}</p>
+                    <p style={{ fontSize: 9, color: "#94A3B8" }}>Step {i + 1} of {steps.length}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ marginTop: "auto", paddingTop: 20, borderTop: "1px solid #E2E8F0" }}>
+            <p style={{ fontSize: 9, color: "#94A3B8", lineHeight: 1.5 }}>
+              You can change any of these settings later in the Settings app.
+            </p>
+          </div>
+        </div>
+
+        {/* Right content */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+          <div style={{ flex: 1, overflowY: "auto", padding: "32px 40px", scrollbarWidth: "thin" }}>
+            {/* ── Step 0: Region ── */}
+            {step === 0 && (
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 700, color: "#4F8EF7", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 6 }}>Welcome</p>
+                <h1 style={{ fontSize: 24, fontWeight: 700, color: "#0F172A", letterSpacing: -0.4, marginBottom: 6 }}>Let's set up your device</h1>
+                <p style={{ fontSize: 12, color: "#64748B", marginBottom: 22, lineHeight: 1.55 }}>
+                  Start by confirming your region and preferred keyboard. We use these to tailor time, date, and input defaults.
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  <Field label="Country or region">
+                    <Select value={data.region} onChange={v => setData(d => ({ ...d, region: v }))} options={countries} />
+                  </Field>
+                  <Field label="Keyboard layout">
+                    <Select value={data.keyboard} onChange={v => setData(d => ({ ...d, keyboard: v }))} options={keyboards} />
+                  </Field>
+                  <Field label="System language">
+                    <Select value={data.language} onChange={v => setData(d => ({ ...d, language: v }))} options={languages} />
+                  </Field>
+                </div>
+                <div style={{
+                  marginTop: 18, padding: 12, borderRadius: 12,
+                  background: "#F1F5F9", border: "1px solid #E2E8F0",
+                  display: "flex", alignItems: "flex-start", gap: 10,
+                }}>
+                  <I d={ic.globe} s={14} c="#4F8EF7" />
+                  <p style={{ fontSize: 10.5, color: "#475569", lineHeight: 1.5 }}>
+                    Timezone and regional formats for <strong>{data.region}</strong> will be applied automatically. Keyboard mapped to <strong>{data.keyboard}</strong>.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* ── Step 1: Network ── */}
+            {step === 1 && (
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 700, color: "#4F8EF7", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 6 }}>Connect</p>
+                <h1 style={{ fontSize: 24, fontWeight: 700, color: "#0F172A", letterSpacing: -0.4, marginBottom: 6 }}>Let's connect you to a network</h1>
+                <p style={{ fontSize: 12, color: "#64748B", marginBottom: 20, lineHeight: 1.55 }}>
+                  A Wi-Fi connection is needed to sign in, download updates, and keep your apps in sync.
+                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                  <button onClick={() => { setScanning(true); setTimeout(() => setScanning(false), 1200); }}
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: 6,
+                      padding: "6px 12px", borderRadius: 999,
+                      background: "#EFF6FF", color: "#4F8EF7",
+                      fontSize: 11, fontWeight: 600,
+                      border: "1px solid rgba(79,142,247,0.25)", cursor: "pointer",
+                    }}>
+                    <div style={{ animation: scanning ? "spin 1s linear infinite" : "none" }}>
+                      <I d={ic.refresh} s={11} c="#4F8EF7" />
+                    </div>
+                    {scanning ? "Scanning…" : "Scan again"}
+                  </button>
+                  <span style={{ fontSize: 11, color: "#94A3B8" }}>· {networks.length} networks found</span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  {networks.map(n => {
+                    const selected = data.wifi === n.ssid;
+                    return (
+                      <button key={n.ssid} onClick={() => setData(d => ({ ...d, wifi: selected ? null : n.ssid }))}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 12,
+                          padding: "10px 14px", borderRadius: 10,
+                          background: selected ? "#EFF6FF" : "#fff",
+                          border: `1px solid ${selected ? "#4F8EF7" : "#E5E7EB"}`,
+                          textAlign: "left", cursor: "pointer", transition: "all 0.18s",
+                        }}>
+                        <SignalBars level={n.signal} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ fontSize: 12, fontWeight: selected ? 700 : 600, color: "#0F172A" }}>{n.ssid}</p>
+                          <p style={{ fontSize: 10, color: "#94A3B8" }}>{n.secure ? "Secured" : "Open network"} · {n.freq}</p>
+                        </div>
+                        {n.secure && <I d={ic.lock} s={12} c="#94A3B8" />}
+                        {selected && (
+                          <span style={{
+                            display: "inline-flex", alignItems: "center", gap: 4,
+                            padding: "2px 8px", borderRadius: 999,
+                            background: "#4F8EF7", color: "#fff",
+                            fontSize: 9, fontWeight: 700,
+                          }}>
+                            <I d={ic.check} s={9} c="#fff" />
+                            Connected
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                <button onClick={next}
+                  style={{
+                    marginTop: 14, background: "transparent", border: "none",
+                    color: "#4F8EF7", fontSize: 11, fontWeight: 600, cursor: "pointer",
+                    padding: "6px 2px",
+                  }}>
+                  I don&apos;t have internet →
+                </button>
+              </div>
+            )}
+
+            {/* ── Step 2: License ── */}
+            {step === 2 && (
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 700, color: "#4F8EF7", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 6 }}>Agreement</p>
+                <h1 style={{ fontSize: 24, fontWeight: 700, color: "#0F172A", letterSpacing: -0.4, marginBottom: 6 }}>License Agreement</h1>
+                <p style={{ fontSize: 12, color: "#64748B", marginBottom: 16, lineHeight: 1.55 }}>
+                  Please read and accept the Alternus OS software license to continue.
+                </p>
+                <div
+                  onScroll={(e) => {
+                    const el = e.currentTarget;
+                    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 4) setAcceptScrolled(true);
+                  }}
+                  style={{
+                    height: 220, overflowY: "auto",
+                    background: "#F8FAFC", border: "1px solid #E2E8F0",
+                    borderRadius: 12, padding: 16,
+                    fontSize: 11, lineHeight: 1.65, color: "#475569",
+                  }}>
+                  <p style={{ fontWeight: 700, color: "#0F172A", marginBottom: 8 }}>Alternus OS — End User License Agreement</p>
+                  <p style={{ marginBottom: 10 }}>Last updated: April 2026</p>
+                  <p style={{ marginBottom: 10 }}>This End-User License Agreement (&quot;EULA&quot;) is a legal agreement between you and Alternus Systems governing your use of Alternus OS and its bundled applications.</p>
+                  <p style={{ marginBottom: 10 }}><strong>1. Grant of License.</strong> Alternus grants you a non-exclusive, non-transferable license to install and use Alternus OS on a single device for personal or business use, subject to the terms of this agreement.</p>
+                  <p style={{ marginBottom: 10 }}><strong>2. Updates.</strong> Your device will periodically receive software updates that may add, modify, or remove features. Critical security updates may install automatically.</p>
+                  <p style={{ marginBottom: 10 }}><strong>3. Privacy.</strong> Your use of Alternus OS is also subject to the Alternus Privacy Statement, which describes how we collect, use, and protect your information.</p>
+                  <p style={{ marginBottom: 10 }}><strong>4. AI Services.</strong> Certain features rely on cloud AI. When you opt in to these features, your prompts and context may be transmitted to Alternus AI services for processing. Conversations are not used to train foundation models without your explicit consent.</p>
+                  <p style={{ marginBottom: 10 }}><strong>5. Limitation of Liability.</strong> Alternus OS is provided &quot;as is&quot;. To the maximum extent permitted by law, Alternus shall not be liable for any indirect, incidental, or consequential damages.</p>
+                  <p style={{ marginBottom: 10 }}><strong>6. Termination.</strong> This license is effective until terminated. You may terminate it at any time by uninstalling Alternus OS.</p>
+                  <p style={{ marginBottom: 10 }}><strong>7. Governing Law.</strong> This EULA is governed by the laws of your country of residence. Disputes will be resolved in the competent local courts.</p>
+                  <p style={{ color: "#94A3B8", fontSize: 10, marginTop: 14 }}>— End of License Agreement —</p>
+                </div>
+                {!acceptScrolled && (
+                  <p style={{ fontSize: 10, color: "#94A3B8", marginTop: 8, fontStyle: "italic" }}>Scroll to the bottom to continue</p>
+                )}
+                <label style={{
+                  display: "flex", alignItems: "flex-start", gap: 10,
+                  marginTop: 14, padding: 12, borderRadius: 12,
+                  background: data.acceptedLicense ? "#EFF6FF" : "#fff",
+                  border: `1px solid ${data.acceptedLicense ? "#4F8EF7" : "#E5E7EB"}`,
+                  cursor: acceptScrolled ? "pointer" : "not-allowed",
+                  opacity: acceptScrolled ? 1 : 0.55,
+                  transition: "all 0.18s",
+                }}>
+                  <div style={{
+                    width: 18, height: 18, borderRadius: 5, flexShrink: 0, marginTop: 1,
+                    background: data.acceptedLicense ? "#4F8EF7" : "#fff",
+                    border: `1.5px solid ${data.acceptedLicense ? "#4F8EF7" : "#CBD5E1"}`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    transition: "all 0.18s",
+                  }}>
+                    {data.acceptedLicense && <I d={ic.check} s={11} c="#fff" />}
+                  </div>
+                  <input type="checkbox"
+                    checked={data.acceptedLicense}
+                    disabled={!acceptScrolled}
+                    onChange={e => setData(d => ({ ...d, acceptedLicense: e.target.checked }))}
+                    style={{ display: "none" }} />
+                  <span style={{ fontSize: 11, color: "#334155", lineHeight: 1.5 }}
+                    onClick={() => { if (acceptScrolled) setData(d => ({ ...d, acceptedLicense: !d.acceptedLicense })); }}>
+                    I have read and accept the Alternus OS License Agreement and Privacy Statement.
+                  </span>
+                </label>
+              </div>
+            )}
+
+            {/* ── Step 3: Account ── */}
+            {step === 3 && (
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 700, color: "#4F8EF7", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 6 }}>Account</p>
+                <h1 style={{ fontSize: 24, fontWeight: 700, color: "#0F172A", letterSpacing: -0.4, marginBottom: 6 }}>Sign in with your Alternus account</h1>
+                <p style={{ fontSize: 12, color: "#64748B", marginBottom: 20, lineHeight: 1.55 }}>
+                  Your Alternus account keeps your settings, files, and preferences in sync across every device you sign in to.
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <Field label="Your name">
+                    <input value={data.name} onChange={e => setData(d => ({ ...d, name: e.target.value }))}
+                      placeholder="e.g. Arben Hoxha"
+                      style={inputStyle} />
+                  </Field>
+                  <Field label="Email address">
+                    <input value={data.email} onChange={e => setData(d => ({ ...d, email: e.target.value }))}
+                      placeholder="you@example.com" type="email"
+                      style={inputStyle} />
+                  </Field>
+                  <Field label="Password" hint="Minimum 6 characters">
+                    <input value={password} onChange={e => setPassword(e.target.value)}
+                      type="password" placeholder="Create a strong password"
+                      style={inputStyle} />
+                  </Field>
+                </div>
+                <div style={{
+                  marginTop: 16, padding: 12, borderRadius: 12,
+                  background: "#F1F5F9", border: "1px solid #E2E8F0",
+                  display: "flex", alignItems: "flex-start", gap: 10,
+                }}>
+                  <I d={ic.shield} s={14} c="#22C55E" />
+                  <div>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: "#0F172A" }}>End-to-end encrypted</p>
+                    <p style={{ fontSize: 10, color: "#64748B", lineHeight: 1.5, marginTop: 2 }}>
+                      Your password is stored securely on-device. You can enable 2FA in Settings later.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── Step 4: Privacy ── */}
+            {step === 4 && (
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 700, color: "#4F8EF7", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 6 }}>Privacy</p>
+                <h1 style={{ fontSize: 24, fontWeight: 700, color: "#0F172A", letterSpacing: -0.4, marginBottom: 6 }}>Choose privacy settings</h1>
+                <p style={{ fontSize: 12, color: "#64748B", marginBottom: 20, lineHeight: 1.55 }}>
+                  You are in control. Toggle what you want Alternus to do on this device — every setting can be changed later.
+                </p>
+                {[
+                  { key: "location" as const,     title: "Location",                 desc: "Let apps use your precise location for weather, maps, and nearby services." },
+                  { key: "findMyDevice" as const, title: "Find My Device",           desc: "If you lose this device, you can locate it from your Alternus account." },
+                  { key: "diagnostics" as const,  title: "Send diagnostic data",     desc: "Share anonymous crash and performance reports to help improve Alternus OS." },
+                  { key: "tailored" as const,     title: "Tailored experiences",     desc: "Use diagnostic data to personalize tips, ads, and recommendations." },
+                  { key: "adId" as const,         title: "Advertising ID",           desc: "Allow apps to show you more relevant ads based on your advertising identifier." },
+                ].map(item => (
+                  <div key={item.key} style={{
+                    display: "flex", alignItems: "flex-start", gap: 14,
+                    padding: "12px 14px", borderRadius: 12, marginBottom: 8,
+                    background: data.privacy[item.key] ? "rgba(79,142,247,0.06)" : "#fff",
+                    border: `1px solid ${data.privacy[item.key] ? "rgba(79,142,247,0.3)" : "#E5E7EB"}`,
+                    transition: "all 0.18s",
+                  }}>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 12, fontWeight: 700, color: "#0F172A", marginBottom: 3 }}>{item.title}</p>
+                      <p style={{ fontSize: 10.5, color: "#64748B", lineHeight: 1.5 }}>{item.desc}</p>
+                    </div>
+                    <Toggle on={data.privacy[item.key]}
+                      onChange={() => setData(d => ({ ...d, privacy: { ...d.privacy, [item.key]: !d.privacy[item.key] } }))} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Footer actions */}
+          <div style={{
+            flexShrink: 0, display: "flex", alignItems: "center",
+            padding: "16px 40px", gap: 10,
+            borderTop: "1px solid #E5E7EB",
+            background: "#FAFAFB",
+          }}>
+            <button onClick={back} disabled={step === 0}
+              style={{
+                padding: "9px 18px", borderRadius: 10,
+                background: "transparent",
+                color: step === 0 ? "#CBD5E1" : "#334155",
+                fontSize: 12, fontWeight: 600,
+                border: "1px solid #E5E7EB",
+                cursor: step === 0 ? "not-allowed" : "pointer",
+                transition: "all 0.18s",
+              }}
+              onMouseEnter={e => { if (step !== 0) e.currentTarget.style.background = "#F1F5F9"; }}
+              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              ← Back
+            </button>
+            <div style={{ flex: 1 }} />
+            <p style={{ fontSize: 10.5, color: "#94A3B8", marginRight: 4 }}>
+              Step <strong style={{ color: "#334155" }}>{step + 1}</strong> of {steps.length}
+            </p>
+            <button onClick={next} disabled={!canAdvance}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                padding: "10px 20px", borderRadius: 10,
+                background: canAdvance ? "linear-gradient(135deg,#4F8EF7,#3B6FD3)" : "#CBD5E1",
+                color: "#fff", fontSize: 12, fontWeight: 700,
+                border: "none",
+                cursor: canAdvance ? "pointer" : "not-allowed",
+                boxShadow: canAdvance ? "0 4px 14px rgba(79,142,247,0.40)" : "none",
+                transition: "all 0.18s",
+              }}
+              onMouseEnter={e => { if (canAdvance) e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}>
+              {step === steps.length - 1 ? "Finish" : "Next"}
+              <I d={ic.chevR} s={12} c="#fff" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
+// Helper components reused only by OOBESetup
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "10px 12px",
+  borderRadius: 10,
+  background: "#fff",
+  border: "1px solid #E5E7EB",
+  fontSize: 12,
+  color: "#0F172A",
+  outline: "none",
+  transition: "all 0.18s",
+};
+
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 5 }}>
+        <span style={{ fontSize: 10.5, fontWeight: 700, color: "#334155", letterSpacing: 0.2 }}>{label}</span>
+        {hint && <span style={{ fontSize: 10, color: "#94A3B8" }}>{hint}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Select({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: string[] }) {
+  return (
+    <div style={{ position: "relative" }}>
+      <select value={value} onChange={e => onChange(e.target.value)}
+        style={{
+          ...inputStyle,
+          appearance: "none",
+          paddingRight: 32,
+          cursor: "pointer",
+        }}>
+        {options.map(o => <option key={o} value={o}>{o}</option>)}
+      </select>
+      <div style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+        <I d={ic.chevD} s={12} c="#94A3B8" />
+      </div>
+    </div>
+  );
+}
+
 // ━━━━ MAIN OS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function AlternusOS() {
   const [mode, setMode] = useState<ThemeMode>("light");
   const [time, setTime] = useState(new Date());
   const [isLocked, setIsLocked] = useState(true);
   const [isBooting, setIsBooting] = useState(true);
+  const [showOOBE, setShowOOBE] = useState(false);
+  const [oobeProfile, setOobeProfile] = useState<OOBEData | null>(null);
   const [bootProgress, setBootProgress] = useState(0);
   const [bootPhase, setBootPhase] = useState<BootPhase>("bios");
   const [zCounter, setZCounter] = useState(10);
@@ -10326,6 +10845,27 @@ export default function AlternusOS() {
     };
     requestAnimationFrame(animate);
   }, [isBooting]);
+
+  // Load previous OOBE profile (if any) and trigger first-run setup after boot
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem("alternus_oobe_profile");
+      if (raw) {
+        const parsed = JSON.parse(raw) as OOBEData;
+        setOobeProfile(parsed);
+        return;
+      }
+    } catch {}
+    // Mark that OOBE should run once boot finishes
+    if (!isBooting) setShowOOBE(true);
+  }, [isBooting]);
+
+  const finishOOBE = useCallback((profile: OOBEData) => {
+    try { localStorage.setItem("alternus_oobe_profile", JSON.stringify(profile)); } catch {}
+    setOobeProfile(profile);
+    setShowOOBE(false);
+  }, []);
 
   const fmt = (d: Date) => d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
 
@@ -11025,6 +11565,11 @@ export default function AlternusOS() {
         </div>
       </div>
     );
+  }
+
+  // ━━━━ OOBE (first-run Windows Setup) ━━━━━━━━━━━━━━━━━━━
+  if (showOOBE) {
+    return <OOBESetup onComplete={finishOOBE} />;
   }
 
   // ━━━━ DESKTOP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
