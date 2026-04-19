@@ -3120,9 +3120,20 @@ function BrowserApp({ c }: { c: typeof palette.dark }) {
     { name: "Stack Overflow",url:"https://stackoverflow.com",icon: ic.terminal},
   ];
 
-  const navigate = (newUrl: string) => {
-    let f = newUrl;
-    if (!f.startsWith("http")) f = "https://" + f;
+  const navigate = (input: string) => {
+    const trimmed = input.trim();
+    if (!trimmed) return;
+    // Detect URL vs search query:
+    //   - starts with http:// or https://  → URL
+    //   - single token with a dot and a TLD-ish tail → URL (e.g. "github.com", "example.co.uk")
+    //   - anything else → Google search
+    const hasScheme = /^https?:\/\//i.test(trimmed);
+    const looksLikeDomain = !trimmed.includes(" ") && /^[\w-]+(\.[\w-]+)+\/?.*$/.test(trimmed);
+    const f = hasScheme
+      ? trimmed
+      : looksLikeDomain
+        ? "https://" + trimmed
+        : `https://www.google.com/search?q=${encodeURIComponent(trimmed)}`;
     setDisplayUrl(f); setUrl(f);
     setHistory(p => [...p, f]);
     setIsLoading(true); setLoadError(false);
