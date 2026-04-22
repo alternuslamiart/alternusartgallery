@@ -7062,7 +7062,7 @@ function TasksApp({ c }: { c: typeof palette.dark }) {
   );
 }
 
-// ━━━━ MAIL APP — Professional email client ━━━━━━━━━━━━━━━
+// ━━━━ MAIL APP — Minimal, clean, professional ━━━━━━━━━━━━
 function MailApp({ c }: { c: typeof palette.dark }) {
   type Folder = "inbox" | "starred" | "sent" | "drafts" | "archive" | "spam" | "trash";
   type Email = {
@@ -7070,8 +7070,7 @@ function MailApp({ c }: { c: typeof palette.dark }) {
     folder: Folder;
     from: string;
     fromEmail: string;
-    avatar: string;
-    color: string;
+    initials: string;
     subject: string;
     preview: string;
     body: string;
@@ -7081,71 +7080,65 @@ function MailApp({ c }: { c: typeof palette.dark }) {
     starred: boolean;
     important?: boolean;
     hasAttachment?: boolean;
-    label?: { name: string; color: string };
+    category?: "work" | "press" | "finance" | "dev" | "personal";
   };
 
   const initialEmails: Email[] = [
-    { id: 1, folder: "inbox", from: "Sophia Martinez", fromEmail: "sophia.martinez@alternus.art", avatar: "SM", color: "#4F8EF7",
+    { id: 1, folder: "inbox", from: "Sophia Martinez", fromEmail: "sophia.martinez@alternus.art", initials: "SM",
       subject: "Q2 Gallery exhibition proposal — ready for review",
-      preview: "Hi team, I've attached the finalized proposal for the Q2 exhibition featuring emerging digital artists. The curator meeting is scheduled for…",
+      preview: "I've attached the finalized proposal for the Q2 exhibition featuring emerging digital artists. The curator meeting is scheduled for next Tuesday.",
       body: "Hi team,\n\nI've attached the finalized proposal for the Q2 exhibition featuring emerging digital artists. The curator meeting is scheduled for next Tuesday at 2:00 PM in the main conference room.\n\nKey highlights:\n• 14 artists confirmed across 3 mediums\n• Opening reception on June 14\n• Marketing budget approved at $42,000\n• Partnership with Artforum for press coverage\n\nPlease review the attached deck and let me know if you have any questions or concerns before Tuesday's meeting.\n\nBest regards,\nSophia Martinez\nSenior Curator, Alternus Art Gallery",
-      time: "10:42 AM", date: "Today", read: false, starred: true, important: true, hasAttachment: true,
-      label: { name: "Work", color: "#4F8EF7" } },
-    { id: 2, folder: "inbox", from: "David Chen", fromEmail: "d.chen@artforum.com", avatar: "DC", color: "#A78BFA",
+      time: "10:42", date: "Today", read: false, starred: true, important: true, hasAttachment: true, category: "work" },
+    { id: 2, folder: "inbox", from: "David Chen", fromEmail: "d.chen@artforum.com", initials: "DC",
       subject: "Press feature — interview request",
-      preview: "We'd love to schedule a 30-minute interview with you for our upcoming feature on contemporary digital galleries. Are you available next week?",
+      preview: "We'd love to schedule a 30-minute interview with you for our upcoming feature on contemporary digital galleries.",
       body: "Hello,\n\nWe'd love to schedule a 30-minute interview with you for our upcoming feature on contemporary digital galleries. Our readers have been particularly interested in how Alternus has been innovating the curator/collector experience.\n\nAre you available next week on Wednesday or Thursday afternoon? I'm happy to work around your schedule.\n\nBest,\nDavid Chen\nSenior Editor, Artforum",
-      time: "9:18 AM", date: "Today", read: false, starred: false, hasAttachment: false,
-      label: { name: "Press", color: "#A78BFA" } },
-    { id: 3, folder: "inbox", from: "Stripe", fromEmail: "receipts@stripe.com", avatar: "S", color: "#635BFF",
-      subject: "Your receipt from Alternus Art Gallery — $2,400.00",
-      preview: "Thanks for your purchase. Receipt #1042-5918 for the commissioned piece by artist Elena Voss has been processed successfully.",
+      time: "09:18", date: "Today", read: false, starred: false, category: "press" },
+    { id: 3, folder: "inbox", from: "Stripe", fromEmail: "receipts@stripe.com", initials: "S",
+      subject: "Receipt from Alternus Art Gallery — $2,400.00",
+      preview: "Thanks for your purchase. Receipt #1042-5918 for the commissioned piece by artist Elena Voss has been processed.",
       body: "Hi,\n\nThank you for your purchase. Receipt #1042-5918 for the commissioned piece by artist Elena Voss has been processed successfully.\n\nAmount: $2,400.00 USD\nPayment method: Visa ending in 4242\nDate: April 19, 2026\n\nYou'll receive shipping details within 48 hours.\n\nStripe",
-      time: "8:05 AM", date: "Today", read: true, starred: false, hasAttachment: false,
-      label: { name: "Finance", color: "#22C55E" } },
-    { id: 4, folder: "inbox", from: "Elena Voss", fromEmail: "elena@voss-studio.co", avatar: "EV", color: "#EC4899",
+      time: "08:05", date: "Today", read: true, starred: false, category: "finance" },
+    { id: 4, folder: "inbox", from: "Elena Voss", fromEmail: "elena@voss-studio.co", initials: "EV",
       subject: "Re: Commission update — final piece delivery",
-      preview: "The final piece is complete! I'm arranging delivery through the approved courier for next Monday. Please confirm the receiving hours at the gallery.",
+      preview: "The final piece is complete. I'm arranging delivery through the approved courier for next Monday.",
       body: "Hi,\n\nI'm so excited — the final piece is complete and exceeded my own expectations. I'm arranging delivery through the approved courier for next Monday, April 26.\n\nPlease confirm the receiving hours at the gallery so I can coordinate the delivery window. I'll send full condition report and installation notes separately.\n\nWarmly,\nElena Voss",
-      time: "Yesterday", date: "Yesterday", read: true, starred: true, hasAttachment: true },
-    { id: 5, folder: "inbox", from: "GitHub", fromEmail: "noreply@github.com", avatar: "GH", color: "#24292F",
+      time: "Yesterday", date: "Yesterday", read: true, starred: true, hasAttachment: true, category: "work" },
+    { id: 5, folder: "inbox", from: "GitHub", fromEmail: "noreply@github.com", initials: "GH",
       subject: "[alternus/gallery] Pull request #284 approved",
       preview: "Your pull request 'Add virtual gallery navigation' has been approved by 2 reviewers and is ready to merge.",
       body: "Your pull request #284 'Add virtual gallery navigation' has been approved by 2 reviewers.\n\nReviewers:\n• @marcuslee approved\n• @ninabird approved\n\nThe branch is up to date with main and all checks have passed.\n\nView on GitHub →",
-      time: "Yesterday", date: "Yesterday", read: true, starred: false, hasAttachment: false,
-      label: { name: "Dev", color: "#6B7280" } },
-    { id: 6, folder: "inbox", from: "Marcus Lee", fromEmail: "m.lee@alternus.art", avatar: "ML", color: "#10B981",
+      time: "Yesterday", date: "Yesterday", read: true, starred: false, category: "dev" },
+    { id: 6, folder: "inbox", from: "Marcus Lee", fromEmail: "m.lee@alternus.art", initials: "ML",
       subject: "Weekly team sync — agenda attached",
-      preview: "Hi everyone, the agenda for Friday's team sync is attached. Please add any additional topics by Thursday EOD.",
+      preview: "The agenda for Friday's team sync is attached. Please add any additional topics by Thursday EOD.",
       body: "Hi everyone,\n\nThe agenda for Friday's team sync is attached. Please add any additional topics by Thursday EOD.\n\nMain items:\n1. Q2 exhibition launch readiness\n2. Platform analytics review\n3. Artist onboarding pipeline\n4. Open discussion\n\nTalk soon,\nMarcus",
-      time: "Apr 17", date: "Apr 17", read: true, starred: false, hasAttachment: true,
-      label: { name: "Work", color: "#4F8EF7" } },
-    { id: 7, folder: "inbox", from: "Vercel", fromEmail: "notifications@vercel.com", avatar: "▲", color: "#000000",
+      time: "Apr 17", date: "Apr 17", read: true, starred: false, hasAttachment: true, category: "work" },
+    { id: 7, folder: "inbox", from: "Vercel", fromEmail: "notifications@vercel.com", initials: "V",
       subject: "Deployment successful — alternusartgallery.com",
-      preview: "Your latest deployment to production is live. Build time: 48s. All checks passed.",
+      preview: "Your latest deployment to production is live. Build time 48s. All checks passed.",
       body: "Deployment successful\n\nProject: alternusartgallery\nEnvironment: Production\nBuild time: 48s\nCommit: feat(os): redesign news and mail windows",
-      time: "Apr 16", date: "Apr 16", read: true, starred: false, hasAttachment: false,
-      label: { name: "Dev", color: "#6B7280" } },
-    { id: 8, folder: "inbox", from: "Nina Bird", fromEmail: "nina@creativecoalition.org", avatar: "NB", color: "#F59E0B",
-      subject: "Collaboration opportunity — Creative Coalition summit",
+      time: "Apr 16", date: "Apr 16", read: true, starred: false, category: "dev" },
+    { id: 8, folder: "inbox", from: "Nina Bird", fromEmail: "nina@creativecoalition.org", initials: "NB",
+      subject: "Collaboration — Creative Coalition summit",
       preview: "Would Alternus be interested in sponsoring a panel at this year's Creative Coalition summit in September?",
       body: "Hi,\n\nI hope you're well. Would Alternus be interested in sponsoring a panel at this year's Creative Coalition summit in September?\n\nWe're expecting 800+ attendees and would love to feature Alternus's approach to digital curation.\n\nHappy to share the full sponsorship deck if there's interest.\n\nBest,\nNina Bird",
-      time: "Apr 15", date: "Apr 15", read: true, starred: false, hasAttachment: false },
-    { id: 9, folder: "sent", from: "You", fromEmail: "me@alternus.art", avatar: "ME", color: "#4F8EF7",
+      time: "Apr 15", date: "Apr 15", read: true, starred: false, category: "personal" },
+    { id: 9, folder: "sent", from: "You", fromEmail: "me@alternus.art", initials: "ME",
       subject: "Re: Q2 Gallery exhibition proposal — thoughts",
-      preview: "Thanks Sophia — the proposal looks great. A few comments on the marketing plan section…",
+      preview: "Thanks Sophia — the proposal looks great. A few comments on the marketing plan section.",
       body: "Thanks Sophia — the proposal looks great.\n\nA few comments on the marketing plan section…",
-      time: "11:02 AM", date: "Today", read: true, starred: false, hasAttachment: false },
-    { id: 10, folder: "drafts", from: "You", fromEmail: "me@alternus.art", avatar: "ME", color: "#4F8EF7",
+      time: "11:02", date: "Today", read: true, starred: false },
+    { id: 10, folder: "drafts", from: "You", fromEmail: "me@alternus.art", initials: "ME",
       subject: "(no subject)",
       preview: "Hey, just wanted to follow up on the…",
       body: "Hey, just wanted to follow up on the…",
-      time: "9:40 AM", date: "Today", read: true, starred: false, hasAttachment: false },
-    { id: 11, folder: "starred", from: "Sophia Martinez", fromEmail: "sophia.martinez@alternus.art", avatar: "SM", color: "#4F8EF7",
+      time: "09:40", date: "Today", read: true, starred: false },
+    { id: 11, folder: "starred", from: "Sophia Martinez", fromEmail: "sophia.martinez@alternus.art", initials: "SM",
       subject: "Q2 Gallery exhibition proposal — ready for review",
-      preview: "Hi team, I've attached the finalized proposal for the Q2 exhibition…",
+      preview: "I've attached the finalized proposal for the Q2 exhibition featuring emerging digital artists.",
       body: "Same as inbox #1",
-      time: "10:42 AM", date: "Today", read: false, starred: true, hasAttachment: true },
+      time: "10:42", date: "Today", read: false, starred: true, hasAttachment: true, category: "work" },
   ];
 
   const [emails, setEmails] = useState<Email[]>(initialEmails);
@@ -7155,17 +7148,24 @@ function MailApp({ c }: { c: typeof palette.dark }) {
   const [composing, setComposing] = useState(false);
   const [compose, setCompose] = useState({ to: "", subject: "", body: "" });
 
-  const folderMeta: { id: Folder; label: string; icon: string }[] = [
-    { id: "inbox",   label: "Inbox",    icon: "M22 12h-6l-2 3h-4l-2-3H2M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z" },
-    { id: "starred", label: "Starred",  icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" },
-    { id: "sent",    label: "Sent",     icon: ic.send },
-    { id: "drafts",  label: "Drafts",   icon: ic.fileText },
-    { id: "archive", label: "Archive",  icon: "M20 8H4v13h16V8zM1 3h22v5H1zM10 12h4" },
-    { id: "spam",    label: "Spam",     icon: ic.alertTriangle },
-    { id: "trash",   label: "Trash",    icon: ic.trash },
+  const folderMeta: { id: Folder; label: string }[] = [
+    { id: "inbox",   label: "Inbox" },
+    { id: "starred", label: "Starred" },
+    { id: "sent",    label: "Sent" },
+    { id: "drafts",  label: "Drafts" },
+    { id: "archive", label: "Archive" },
+    { id: "spam",    label: "Spam" },
+    { id: "trash",   label: "Trash" },
   ];
 
-  const counts = (id: Folder) => emails.filter(e => e.folder === id && (id === "starred" ? e.starred : true)).length;
+  const categoryMeta: { id: NonNullable<Email["category"]>; label: string }[] = [
+    { id: "work",     label: "Work" },
+    { id: "press",    label: "Press" },
+    { id: "finance",  label: "Finance" },
+    { id: "dev",      label: "Dev" },
+    { id: "personal", label: "Personal" },
+  ];
+
   const unreadCount = (id: Folder) => emails.filter(e => e.folder === id && !e.read && (id === "starred" ? e.starred : true)).length;
 
   const visibleEmails = emails.filter(e => {
@@ -7192,14 +7192,13 @@ function MailApp({ c }: { c: typeof palette.dark }) {
   const sendCompose = () => {
     if (!compose.to.trim() || !compose.subject.trim()) return;
     const now = new Date();
-    const time = `${((now.getHours() % 12) || 12)}:${String(now.getMinutes()).padStart(2,"0")} ${now.getHours() >= 12 ? "PM" : "AM"}`;
+    const time = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
     const newEmail: Email = {
       id: Math.max(...emails.map(e => e.id)) + 1,
       folder: "sent",
       from: "You",
       fromEmail: "me@alternus.art",
-      avatar: "ME",
-      color: "#4F8EF7",
+      initials: "ME",
       subject: compose.subject,
       preview: compose.body.slice(0, 100),
       body: compose.body,
@@ -7216,102 +7215,110 @@ function MailApp({ c }: { c: typeof palette.dark }) {
   const folderLabel = folderMeta.find(f => f.id === folder)?.label ?? "Inbox";
   const totalUnread = unreadCount("inbox");
 
+  // Star path — reused
+  const starPath = "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z";
+
+  // Minimal "ghost" button — transparent hover, no background chrome
+  const ghostHover = (el: HTMLElement, on: boolean) => { el.style.background = on ? c.cardAlt : "transparent"; };
+
   return (
-    <div className="flex flex-col h-full" style={{ background: c.bg, color: c.text }}>
-      {/* Top bar */}
-      <div className="flex items-center gap-3 px-3 py-2 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, #4F8EF7, #3B6FD3)", boxShadow: "0 2px 8px rgba(79,142,247,0.35)" }}>
-            <I d={ic.mail} s={13} c="#fff" />
+    <div className="flex flex-col h-full" style={{ background: c.bg, color: c.text, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif" }}>
+      {/* ───── Top bar — minimal, single row ───── */}
+      <div className="flex items-center gap-4 px-5 flex-shrink-0" style={{ height: 44, borderBottom: `1px solid ${c.border}`, background: c.bg }}>
+        <div className="flex items-center gap-2.5">
+          <span className="text-[13px] font-semibold tracking-tight" style={{ color: c.text, letterSpacing: "-0.01em" }}>Mail</span>
+          <span className="text-[10px]" style={{ color: c.textMuted }}>·</span>
+          <span className="text-[11px]" style={{ color: c.textMuted }}>me@alternus.art</span>
+        </div>
+        <div className="flex-1 flex justify-center">
+          <div className="flex items-center gap-2 px-3 w-full max-w-[420px]" style={{ height: 28, borderRadius: 6, background: c.cardAlt }}>
+            <I d={ic.search} s={11} c={c.textMuted} />
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: c.text }}
+              placeholder="Search" />
+            {search && (
+              <button onClick={() => setSearch("")} style={{ color: c.textMuted }}><I d={ic.close} s={10} /></button>
+            )}
           </div>
-          <span className="text-[12px] font-bold tracking-tight" style={{ color: c.text }}>Mail</span>
         </div>
-        <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-lg max-w-[320px]" style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}>
-          <I d={ic.search} s={12} c={c.textMuted} />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: c.text }}
-            placeholder="Search mail" />
-          {search && (
-            <button onClick={() => setSearch("")}><I d={ic.close} s={11} c={c.textMuted} /></button>
-          )}
-        </div>
-        <div className="flex items-center gap-1 ml-auto">
-          <button className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+        <div className="flex items-center gap-0.5">
+          <button title="Refresh" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
             style={{ color: c.textSec }}
-            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            onMouseEnter={e => ghostHover(e.currentTarget, true)}
+            onMouseLeave={e => ghostHover(e.currentTarget, false)}>
             <I d={ic.refresh} s={12} />
           </button>
-          <button className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+          <button title="Settings" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
             style={{ color: c.textSec }}
-            onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            onMouseEnter={e => ghostHover(e.currentTarget, true)}
+            onMouseLeave={e => ghostHover(e.currentTarget, false)}>
             <I d={ic.settings} s={12} />
           </button>
         </div>
       </div>
 
       {composing ? (
-        // Compose modal
+        // ───── Compose — clean, editor-first ─────
         <div className="flex-1 flex flex-col min-h-0" style={{ background: c.bg }}>
-          <div className="flex items-center justify-between px-4 py-2 flex-shrink-0" style={{ background: c.surface, borderBottom: `1px solid ${c.border}` }}>
-            <span className="text-[12px] font-semibold" style={{ color: c.text }}>New message</span>
-            <button onClick={() => setComposing(false)} className="w-6 h-6 rounded flex items-center justify-center transition-colors"
+          <div className="flex items-center justify-between px-5 flex-shrink-0" style={{ height: 40, borderBottom: `1px solid ${c.border}` }}>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: c.textMuted }}>New message</span>
+            <button onClick={() => setComposing(false)} className="w-7 h-7 rounded flex items-center justify-center transition-colors"
               style={{ color: c.textSec }}
-              onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              onMouseEnter={e => ghostHover(e.currentTarget, true)}
+              onMouseLeave={e => ghostHover(e.currentTarget, false)}>
               <I d={ic.close} s={12} />
             </button>
           </div>
-          <div className="flex items-center gap-3 px-4 py-2" style={{ borderBottom: `1px solid ${c.border}` }}>
-            <span className="text-[10px] font-semibold w-10" style={{ color: c.textMuted }}>To</span>
-            <input value={compose.to} onChange={e => setCompose(s => ({ ...s, to: e.target.value }))}
-              className="flex-1 bg-transparent outline-none text-[12px]" style={{ color: c.text }}
-              placeholder="recipient@example.com" />
+          <div className="flex-1 flex flex-col min-h-0 max-w-[720px] w-full mx-auto">
+            <div className="flex items-center gap-3 px-5" style={{ height: 42, borderBottom: `1px solid ${c.border}` }}>
+              <span className="text-[10px] font-medium uppercase tracking-wider w-14" style={{ color: c.textMuted }}>To</span>
+              <input value={compose.to} onChange={e => setCompose(s => ({ ...s, to: e.target.value }))}
+                className="flex-1 bg-transparent outline-none text-[12px]" style={{ color: c.text }}
+                placeholder="recipient@example.com" />
+            </div>
+            <div className="flex items-center gap-3 px-5" style={{ height: 42, borderBottom: `1px solid ${c.border}` }}>
+              <span className="text-[10px] font-medium uppercase tracking-wider w-14" style={{ color: c.textMuted }}>Subject</span>
+              <input value={compose.subject} onChange={e => setCompose(s => ({ ...s, subject: e.target.value }))}
+                className="flex-1 bg-transparent outline-none text-[13px] font-semibold" style={{ color: c.text, letterSpacing: "-0.01em" }}
+                placeholder="Subject" />
+            </div>
+            <textarea value={compose.body} onChange={e => setCompose(s => ({ ...s, body: e.target.value }))}
+              className="flex-1 bg-transparent outline-none text-[12.5px] px-5 py-5 resize-none"
+              style={{ color: c.text, scrollbarWidth: "none", lineHeight: 1.75 }}
+              placeholder="Write your message…" />
           </div>
-          <div className="flex items-center gap-3 px-4 py-2" style={{ borderBottom: `1px solid ${c.border}` }}>
-            <span className="text-[10px] font-semibold w-10" style={{ color: c.textMuted }}>Subject</span>
-            <input value={compose.subject} onChange={e => setCompose(s => ({ ...s, subject: e.target.value }))}
-              className="flex-1 bg-transparent outline-none text-[12px] font-semibold" style={{ color: c.text }}
-              placeholder="Subject" />
-          </div>
-          <textarea value={compose.body} onChange={e => setCompose(s => ({ ...s, body: e.target.value }))}
-            className="flex-1 bg-transparent outline-none text-[12px] px-4 py-3 resize-none leading-relaxed"
-            style={{ color: c.text, scrollbarWidth: "none" }}
-            placeholder="Write your message…" />
-          <div className="flex items-center justify-between px-3 py-2 flex-shrink-0" style={{ background: c.surface, borderTop: `1px solid ${c.border}` }}>
+          <div className="flex items-center justify-between px-5 flex-shrink-0" style={{ height: 48, borderTop: `1px solid ${c.border}` }}>
             <div className="flex items-center gap-1">
-              <button className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+              <button title="Attach" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                 style={{ color: c.textSec }}
-                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                 <I d={ic.paperclip} s={13} />
               </button>
-              <button className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+              <button title="Image" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                 style={{ color: c.textSec }}
-                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                 <I d={ic.image} s={13} />
               </button>
-              <button className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+              <button title="Formatting" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                 style={{ color: c.textSec }}
-                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                 <I d={ic.type} s={13} />
               </button>
             </div>
             <div className="flex items-center gap-2">
               <button onClick={() => setComposing(false)}
-                className="text-[11px] font-medium px-3 py-1.5 rounded-md transition-colors"
+                className="text-[11px] font-medium px-3 h-7 rounded transition-colors"
                 style={{ color: c.textSec, background: "transparent" }}
-                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                 Discard
               </button>
               <button onClick={sendCompose}
-                className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-md transition-opacity"
-                style={{ background: c.accent, color: "#fff", opacity: (compose.to && compose.subject) ? 1 : 0.5 }}>
-                <I d={ic.send} s={11} c="#fff" />
+                className="flex items-center gap-1.5 text-[11px] font-semibold px-4 h-7 rounded transition-opacity"
+                style={{ background: c.text, color: c.bg, opacity: (compose.to && compose.subject) ? 1 : 0.35 }}>
                 Send
               </button>
             </div>
@@ -7319,151 +7326,154 @@ function MailApp({ c }: { c: typeof palette.dark }) {
         </div>
       ) : (
         <div className="flex flex-1 min-h-0">
-          {/* Folder sidebar */}
-          <div className="flex-shrink-0 flex flex-col" style={{ width: 130, background: c.surface, borderRight: `1px solid ${c.border}` }}>
-            <div className="p-2 flex-shrink-0">
+          {/* ───── Sidebar — text-first, no icons ───── */}
+          <div className="flex-shrink-0 flex flex-col" style={{ width: 180, background: c.bg, borderRight: `1px solid ${c.border}` }}>
+            <div className="px-4 pt-4 pb-3 flex-shrink-0">
               <button onClick={() => setComposing(true)}
-                className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-semibold transition-all"
-                style={{ background: c.accent, color: "#fff", boxShadow: `0 2px 8px ${c.accent}50` }}
-                onMouseEnter={e => (e.currentTarget.style.opacity = "0.9")}
+                className="w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold transition-opacity"
+                style={{ height: 30, borderRadius: 6, background: c.text, color: c.bg, letterSpacing: "-0.005em" }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
                 onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
-                <I d={ic.edit3} s={12} c="#fff" />
+                <I d={ic.edit3} s={11} c={c.bg} />
                 Compose
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto px-1.5 pb-2" style={{ scrollbarWidth: "none" }}>
+
+            <div className="flex-1 overflow-y-auto px-2" style={{ scrollbarWidth: "none" }}>
+              <div className="px-2 pt-1 pb-1.5">
+                <span className="text-[9px] font-semibold uppercase tracking-[0.1em]" style={{ color: c.textMuted }}>Mailbox</span>
+              </div>
               {folderMeta.map(f => {
                 const isActive = folder === f.id;
                 const unread = unreadCount(f.id);
                 return (
                   <button key={f.id} onClick={() => { setFolder(f.id); setSelId(null); }}
-                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-left transition-colors mb-0.5"
+                    className="w-full flex items-center px-2 text-left transition-colors"
                     style={{
-                      background: isActive ? c.accentSoft : "transparent",
-                      color: isActive ? c.accentText : c.textSec,
+                      height: 28,
+                      borderRadius: 5,
+                      background: isActive ? c.cardAlt : "transparent",
+                      marginBottom: 1,
                     }}
                     onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = c.cardAlt; }}
                     onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
-                    <I d={f.icon} s={12} c={isActive ? c.accentText : c.textSec} f={isActive && f.id === "starred"} />
-                    <span className="text-[11px] font-medium flex-1" style={{ color: isActive ? c.text : c.textSec }}>{f.label}</span>
+                    <span className="flex-1 text-[11.5px]" style={{ color: isActive ? c.text : c.textSec, fontWeight: isActive ? 600 : 500 }}>
+                      {f.label}
+                    </span>
                     {unread > 0 && (
-                      <span className="text-[9px] font-bold px-1.5 py-px rounded-full" style={{
-                        background: isActive ? c.accent : c.cardAlt,
-                        color: isActive ? "#fff" : c.textSec,
-                        minWidth: 16, textAlign: "center",
-                      }}>{unread}</span>
+                      <span className="text-[10px] font-medium tabular-nums" style={{ color: isActive ? c.text : c.textMuted }}>
+                        {unread}
+                      </span>
                     )}
                   </button>
                 );
               })}
-            </div>
-            {/* Labels */}
-            <div className="px-2 pb-2 flex-shrink-0">
-              <span className="text-[9px] font-bold uppercase tracking-wider px-1 mb-1 block" style={{ color: c.textMuted }}>Labels</span>
-              {[
-                { name: "Work", color: "#4F8EF7" },
-                { name: "Press", color: "#A78BFA" },
-                { name: "Finance", color: "#22C55E" },
-                { name: "Dev", color: "#6B7280" },
-              ].map(l => (
-                <div key={l.name} className="flex items-center gap-2 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
-                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                  <span style={{ width: 8, height: 8, borderRadius: 2, background: l.color }} />
-                  <span className="text-[10px]" style={{ color: c.textSec }}>{l.name}</span>
-                </div>
-              ))}
-            </div>
-            {/* Storage meter */}
-            <div className="px-3 py-2 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[9px] font-semibold" style={{ color: c.textMuted }}>Storage</span>
-                <span className="text-[9px]" style={{ color: c.textMuted }}>6.2 / 15 GB</span>
+
+              <div className="px-2 pt-4 pb-1.5">
+                <span className="text-[9px] font-semibold uppercase tracking-[0.1em]" style={{ color: c.textMuted }}>Categories</span>
               </div>
-              <div style={{ height: 3, borderRadius: 2, background: c.cardAlt, overflow: "hidden" }}>
-                <div style={{ width: "41%", height: "100%", background: c.accent }} />
+              {categoryMeta.map(cat => {
+                const count = emails.filter(em => em.category === cat.id && em.folder === "inbox").length;
+                return (
+                  <div key={cat.id}
+                    className="w-full flex items-center px-2 text-left transition-colors cursor-pointer"
+                    style={{ height: 26, borderRadius: 5, marginBottom: 1 }}
+                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <span className="flex-1 text-[11px]" style={{ color: c.textSec, fontWeight: 500 }}>
+                      {cat.label}
+                    </span>
+                    {count > 0 && (
+                      <span className="text-[10px] tabular-nums" style={{ color: c.textMuted }}>{count}</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Footer — storage as a single clean line */}
+            <div className="px-4 py-3 flex-shrink-0" style={{ borderTop: `1px solid ${c.border}` }}>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[9.5px] font-medium uppercase tracking-wider" style={{ color: c.textMuted }}>Storage</span>
+                <span className="text-[9.5px] tabular-nums" style={{ color: c.textSec }}>6.2 / 15 GB</span>
+              </div>
+              <div style={{ height: 2, borderRadius: 1, background: c.cardAlt, overflow: "hidden" }}>
+                <div style={{ width: "41%", height: "100%", background: c.textSec }} />
               </div>
             </div>
           </div>
 
-          {/* Email list */}
-          <div className="flex-shrink-0 flex flex-col" style={{ width: 210, borderRight: `1px solid ${c.border}`, background: c.bg }}>
-            <div className="px-3 py-2 flex items-center justify-between flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}` }}>
+          {/* ───── Email list — airy, typography-led ───── */}
+          <div className="flex-shrink-0 flex flex-col" style={{ width: 320, borderRight: `1px solid ${c.border}`, background: c.bg }}>
+            <div className="px-5 flex items-center justify-between flex-shrink-0" style={{ height: 56, borderBottom: `1px solid ${c.border}` }}>
               <div>
-                <span className="text-[12px] font-bold" style={{ color: c.text }}>{folderLabel}</span>
-                <p className="text-[9px]" style={{ color: c.textMuted }}>
-                  {visibleEmails.length} {visibleEmails.length === 1 ? "message" : "messages"}{folder === "inbox" && totalUnread > 0 ? ` · ${totalUnread} unread` : ""}
+                <h1 className="text-[16px] font-semibold leading-tight" style={{ color: c.text, letterSpacing: "-0.015em" }}>{folderLabel}</h1>
+                <p className="text-[10px] mt-0.5" style={{ color: c.textMuted }}>
+                  {visibleEmails.length} {visibleEmails.length === 1 ? "message" : "messages"}
+                  {folder === "inbox" && totalUnread > 0 ? ` · ${totalUnread} unread` : ""}
                 </p>
               </div>
-              <button className="w-6 h-6 rounded flex items-center justify-center transition-colors"
+              <button title="Filter" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                 style={{ color: c.textSec }}
-                onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                <I d={ic.menu} s={12} />
+                onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                <I d="M3 6h18M7 12h10M11 18h2" s={13} />
               </button>
             </div>
+
             <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
               {visibleEmails.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full px-4 py-8">
-                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: c.cardAlt, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
-                    <I d={ic.mail} s={20} c={c.textMuted} />
-                  </div>
-                  <p className="text-[11px] font-semibold text-center" style={{ color: c.textSec }}>No messages</p>
-                  <p className="text-[9px] text-center mt-1" style={{ color: c.textMuted }}>
-                    {search ? "Try a different search" : "Your folder is empty"}
+                <div className="flex flex-col items-center justify-center h-full px-6 text-center">
+                  <p className="text-[12px] font-medium" style={{ color: c.textSec }}>No messages</p>
+                  <p className="text-[10px] mt-1" style={{ color: c.textMuted }}>
+                    {search ? "Try a different search" : "Nothing here yet"}
                   </p>
                 </div>
               ) : (
-                visibleEmails.map(e => {
+                visibleEmails.map((e, idx) => {
                   const isSelected = selId === e.id;
+                  const isLast = idx === visibleEmails.length - 1;
                   return (
                     <button key={e.id} onClick={() => selectEmail(e.id)}
-                      className="w-full px-3 py-2.5 text-left transition-colors"
+                      className="w-full px-5 py-3.5 text-left transition-colors relative"
                       style={{
-                        background: isSelected ? c.accentSoft : "transparent",
-                        borderLeft: isSelected ? `3px solid ${c.accent}` : "3px solid transparent",
-                        borderBottom: `1px solid ${c.border}`,
+                        background: isSelected ? c.cardAlt : "transparent",
+                        borderBottom: isLast ? "none" : `1px solid ${c.border}`,
                       }}
                       onMouseEnter={ev => { if (!isSelected) ev.currentTarget.style.background = c.cardAlt; }}
                       onMouseLeave={ev => { if (!isSelected) ev.currentTarget.style.background = "transparent"; }}>
-                      <div className="flex items-start gap-2">
-                        {/* Unread dot */}
-                        <div style={{ marginTop: 6, width: 6, height: 6, borderRadius: "50%", background: e.read ? "transparent" : c.accent, flexShrink: 0 }} />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5 mb-0.5">
-                            <span className="flex-1 truncate" style={{ fontSize: 11, fontWeight: e.read ? 500 : 700, color: c.text }}>
-                              {e.from}
-                            </span>
-                            <span className="text-[9px] flex-shrink-0" style={{ color: e.read ? c.textMuted : c.textSec, fontWeight: e.read ? 400 : 600 }}>
-                              {e.time}
-                            </span>
-                          </div>
-                          <p className="truncate mb-0.5" style={{ fontSize: 10.5, fontWeight: e.read ? 500 : 700, color: e.read ? c.textSec : c.text }}>
-                            {e.subject}
-                          </p>
-                          <p className="truncate text-[9.5px]" style={{ color: c.textMuted }}>
-                            {e.preview}
-                          </p>
-                          <div className="flex items-center gap-1 mt-1">
-                            {e.label && (
-                              <span className="text-[8px] font-semibold px-1.5 py-px rounded" style={{
-                                background: `${e.label.color}22`, color: e.label.color,
-                              }}>{e.label.name}</span>
-                            )}
-                            {e.hasAttachment && (
-                              <I d={ic.paperclip} s={9} c={c.textMuted} />
-                            )}
-                            {e.important && (
-                              <I d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" s={9} c="#F59E0B" f />
-                            )}
-                            <button onClick={(ev) => { ev.stopPropagation(); toggleStar(e.id); }}
-                              className="ml-auto">
-                              <I d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" s={10}
-                                c={e.starred ? "#FBBF24" : c.textMuted} f={e.starred} />
-                            </button>
-                          </div>
-                        </div>
+                      {!e.read && (
+                        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 2, background: c.text }} />
+                      )}
+                      <div className="flex items-baseline gap-2 mb-1">
+                        <span className="flex-1 truncate text-[12px]" style={{ color: c.text, fontWeight: e.read ? 500 : 700, letterSpacing: "-0.005em" }}>
+                          {e.from}
+                        </span>
+                        <span className="text-[10px] flex-shrink-0 tabular-nums" style={{ color: c.textMuted }}>
+                          {e.time}
+                        </span>
                       </div>
+                      <p className="truncate mb-1 text-[11.5px]" style={{ color: c.text, fontWeight: e.read ? 400 : 600, letterSpacing: "-0.003em" }}>
+                        {e.subject}
+                      </p>
+                      <p className="truncate text-[10.5px] leading-relaxed" style={{ color: c.textMuted }}>
+                        {e.preview}
+                      </p>
+                      {(e.category || e.hasAttachment || e.starred) && (
+                        <div className="flex items-center gap-2 mt-2">
+                          {e.category && (
+                            <span className="text-[9px] font-medium uppercase tracking-wider" style={{ color: c.textMuted }}>
+                              {e.category}
+                            </span>
+                          )}
+                          {e.hasAttachment && (
+                            <I d={ic.paperclip} s={10} c={c.textMuted} />
+                          )}
+                          {e.starred && (
+                            <I d={starPath} s={10} c={c.textSec} f />
+                          )}
+                        </div>
+                      )}
                     </button>
                   );
                 })
@@ -7471,116 +7481,116 @@ function MailApp({ c }: { c: typeof palette.dark }) {
             </div>
           </div>
 
-          {/* Reading pane */}
+          {/* ───── Reading pane — generous whitespace ───── */}
           <div className="flex-1 flex flex-col min-w-0" style={{ background: c.bg }}>
             {selected ? (
               <>
-                {/* Action bar */}
-                <div className="flex items-center gap-1 px-3 py-2 flex-shrink-0" style={{ borderBottom: `1px solid ${c.border}`, background: c.surface }}>
-                  <button onClick={() => archiveEmail(selected.id)}
-                    title="Archive"
-                    className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+                {/* Action toolbar — minimal, ghost buttons */}
+                <div className="flex items-center gap-0.5 px-5 flex-shrink-0" style={{ height: 44, borderBottom: `1px solid ${c.border}` }}>
+                  <button onClick={() => archiveEmail(selected.id)} title="Archive"
+                    className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                     style={{ color: c.textSec }}
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                    onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                     <I d="M20 8H4v13h16V8zM1 3h22v5H1zM10 12h4" s={13} />
                   </button>
-                  <button onClick={() => deleteEmail(selected.id)}
-                    title="Delete"
-                    className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+                  <button onClick={() => deleteEmail(selected.id)} title="Delete"
+                    className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                     style={{ color: c.textSec }}
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                    onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                     <I d={ic.trash} s={13} />
                   </button>
-                  <div style={{ width: 1, height: 16, background: c.border, margin: "0 4px" }} />
                   <button title="Mark unread"
-                    className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+                    className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                     style={{ color: c.textSec }}
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                    onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                     <I d={ic.mail} s={13} />
                   </button>
                   <button onClick={() => toggleStar(selected.id)} title="Star"
-                    className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                    <I d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" s={13}
-                      c={selected.starred ? "#FBBF24" : c.textSec} f={selected.starred} />
+                    className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                    onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                    onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                    <I d={starPath} s={13} c={selected.starred ? c.text : c.textSec} f={selected.starred} />
                   </button>
-                  <button title="Print"
-                    className="w-7 h-7 rounded-md flex items-center justify-center transition-colors"
-                    style={{ color: c.textSec }}
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                    <I d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z" s={13} />
-                  </button>
-                  <div className="ml-auto flex items-center gap-1">
-                    <button title="Previous"
-                      className="w-6 h-6 rounded flex items-center justify-center transition-colors"
+                  <div className="ml-auto flex items-center gap-0.5">
+                    <button title="Previous" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                       style={{ color: c.textSec }}
-                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                      onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                       <I d={ic.chevL} s={12} />
                     </button>
-                    <button title="Next"
-                      className="w-6 h-6 rounded flex items-center justify-center transition-colors"
+                    <button title="Next" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                       style={{ color: c.textSec }}
-                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                      onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                       <I d={ic.chevR} s={12} />
                     </button>
                   </div>
                 </div>
 
-                {/* Email content */}
+                {/* Content — constrained width for readability */}
                 <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-                  <div className="px-5 pt-4 pb-2">
-                    <div className="flex items-start justify-between mb-3">
-                      <h2 className="font-bold leading-tight pr-3" style={{ color: c.text, fontSize: 15 }}>{selected.subject}</h2>
-                      {selected.label && (
-                        <span className="text-[9px] font-semibold px-2 py-0.5 rounded flex-shrink-0" style={{
-                          background: `${selected.label.color}22`, color: selected.label.color,
-                        }}>{selected.label.name}</span>
+                  <div className="max-w-[680px] mx-auto px-8 pt-10 pb-8">
+                    {/* Meta line */}
+                    <div className="flex items-center gap-2 mb-4">
+                      {selected.category && (
+                        <>
+                          <span className="text-[10px] font-medium uppercase tracking-[0.1em]" style={{ color: c.textMuted }}>
+                            {selected.category}
+                          </span>
+                          <span style={{ color: c.textMuted }}>·</span>
+                        </>
                       )}
+                      <span className="text-[10px]" style={{ color: c.textMuted }}>
+                        {selected.date} · {selected.time}
+                      </span>
                     </div>
-                    <div className="flex items-start gap-2.5 mb-3">
+
+                    {/* Subject — display type */}
+                    <h1 className="font-semibold mb-6 leading-tight" style={{ color: c.text, fontSize: 22, letterSpacing: "-0.022em" }}>
+                      {selected.subject}
+                    </h1>
+
+                    {/* Sender row */}
+                    <div className="flex items-center gap-3 pb-5 mb-6" style={{ borderBottom: `1px solid ${c.border}` }}>
                       <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ background: selected.color, color: "#fff", fontWeight: 700, fontSize: 11 }}>
-                        {selected.avatar}
+                        style={{ background: c.cardAlt, color: c.text, fontWeight: 600, fontSize: 11, letterSpacing: "0.01em" }}>
+                        {selected.initials}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center flex-wrap gap-x-1.5">
-                          <span className="text-[12px] font-semibold" style={{ color: c.text }}>{selected.from}</span>
-                          <span className="text-[10px]" style={{ color: c.textMuted }}>&lt;{selected.fromEmail}&gt;</span>
+                        <div className="text-[12.5px] font-semibold leading-tight" style={{ color: c.text, letterSpacing: "-0.005em" }}>
+                          {selected.from}
                         </div>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[10px]" style={{ color: c.textMuted }}>to me</span>
-                          <I d={ic.chevD} s={9} c={c.textMuted} />
+                        <div className="text-[10.5px] mt-0.5" style={{ color: c.textMuted }}>
+                          {selected.fromEmail} · to me
                         </div>
                       </div>
-                      <span className="text-[10px] flex-shrink-0" style={{ color: c.textMuted }}>{selected.date} · {selected.time}</span>
                     </div>
-                  </div>
-                  <div style={{ height: 1, background: c.border, margin: "0 20px" }} />
-                  <div className="px-5 py-4">
-                    <div className="text-[12px] leading-relaxed whitespace-pre-wrap" style={{ color: c.text }}>
+
+                    {/* Body */}
+                    <div className="whitespace-pre-wrap text-[13px]" style={{ color: c.text, lineHeight: 1.75, letterSpacing: "-0.003em" }}>
                       {selected.body}
                     </div>
+
+                    {/* Attachments */}
                     {selected.hasAttachment && (
-                      <div className="mt-4 pt-3" style={{ borderTop: `1px solid ${c.border}` }}>
-                        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: c.textMuted }}>Attachments (1)</span>
-                        <div className="flex items-center gap-2 mt-2 p-2.5 rounded-lg transition-colors cursor-pointer"
-                          style={{ background: c.cardAlt, border: `1px solid ${c.border}` }}
-                          onMouseEnter={e => (e.currentTarget.style.background = c.accentSoft)}
-                          onMouseLeave={e => (e.currentTarget.style.background = c.cardAlt)}>
-                          <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0"
-                            style={{ background: "#EF4444", color: "#fff" }}>
-                            <span className="text-[8px] font-bold">PDF</span>
+                      <div className="mt-8 pt-5" style={{ borderTop: `1px solid ${c.border}` }}>
+                        <p className="text-[10px] font-medium uppercase tracking-[0.1em] mb-3" style={{ color: c.textMuted }}>
+                          Attachment
+                        </p>
+                        <div className="flex items-center gap-3 p-3 transition-colors cursor-pointer"
+                          style={{ border: `1px solid ${c.border}`, borderRadius: 6 }}
+                          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                          <div className="w-9 h-9 rounded flex items-center justify-center flex-shrink-0"
+                            style={{ background: c.cardAlt, color: c.textSec }}>
+                            <I d={ic.fileText} s={14} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[11px] font-semibold truncate" style={{ color: c.text }}>proposal-q2-exhibition.pdf</p>
-                            <p className="text-[9px]" style={{ color: c.textMuted }}>2.4 MB</p>
+                            <p className="text-[12px] font-semibold truncate" style={{ color: c.text }}>proposal-q2-exhibition.pdf</p>
+                            <p className="text-[10px] mt-0.5" style={{ color: c.textMuted }}>PDF · 2.4 MB</p>
                           </div>
                           <button className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                             style={{ color: c.textSec }}
@@ -7591,35 +7601,38 @@ function MailApp({ c }: { c: typeof palette.dark }) {
                         </div>
                       </div>
                     )}
-                  </div>
-                  <div className="px-5 pb-5 flex items-center gap-2">
-                    <button onClick={() => setComposing(true)}
-                      className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-md transition-colors"
-                      style={{ border: `1px solid ${c.border}`, color: c.text, background: c.surface }}
-                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                      onMouseLeave={e => (e.currentTarget.style.background = c.surface)}>
-                      <I d="M9 14l-4-4 4-4M5 10h9a5 5 0 015 5v5" s={12} c={c.text} />
-                      Reply
-                    </button>
-                    <button className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-md transition-colors"
-                      style={{ border: `1px solid ${c.border}`, color: c.text, background: c.surface }}
-                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                      onMouseLeave={e => (e.currentTarget.style.background = c.surface)}>
-                      <I d={ic.send} s={11} c={c.text} />
-                      Forward
-                    </button>
+
+                    {/* Reply actions */}
+                    <div className="flex items-center gap-2 mt-10">
+                      <button onClick={() => setComposing(true)}
+                        className="flex items-center gap-1.5 text-[11.5px] font-semibold px-4 transition-opacity"
+                        style={{ height: 32, borderRadius: 6, background: c.text, color: c.bg }}
+                        onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
+                        onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
+                        Reply
+                      </button>
+                      <button className="flex items-center gap-1.5 text-[11.5px] font-medium px-4 transition-colors"
+                        style={{ height: 32, borderRadius: 6, border: `1px solid ${c.border}`, color: c.text, background: "transparent" }}
+                        onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                        Reply all
+                      </button>
+                      <button className="flex items-center gap-1.5 text-[11.5px] font-medium px-4 transition-colors"
+                        style={{ height: 32, borderRadius: 6, border: `1px solid ${c.border}`, color: c.text, background: "transparent" }}
+                        onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                        Forward
+                      </button>
+                    </div>
                   </div>
                 </div>
               </>
             ) : (
-              // Empty state
+              // Empty state — minimal, no glow
               <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-                <div style={{ width: 56, height: 56, borderRadius: 16, background: `linear-gradient(135deg, ${c.accent}, ${c.accentText})`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12, boxShadow: `0 8px 24px ${c.accent}30` }}>
-                  <I d={ic.mail} s={24} c="#fff" />
-                </div>
-                <p className="text-[13px] font-bold mb-1" style={{ color: c.text }}>Select a message</p>
-                <p className="text-[10.5px] leading-relaxed max-w-[220px]" style={{ color: c.textMuted }}>
-                  Pick an email from the list to read its contents here, or compose a new message.
+                <p className="text-[13px] font-semibold mb-1" style={{ color: c.text, letterSpacing: "-0.01em" }}>No message selected</p>
+                <p className="text-[11px] leading-relaxed max-w-[240px]" style={{ color: c.textMuted }}>
+                  Choose a conversation from the list to read it here.
                 </p>
               </div>
             )}
