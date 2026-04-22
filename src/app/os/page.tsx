@@ -10291,6 +10291,11 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
             )}
           </div>
 
+        ) : agentCapability === "email" ? (
+          /* ── EMAIL WORKSPACE — embed Mail app inline ── */
+          <div className="flex flex-col h-full">
+            <MailApp c={c} />
+          </div>
         ) : (
           /* ── CHAT + INPUT VIEW (no workspace) ── */
           <div className="flex flex-col h-full" onClick={() => setShowFormatMenu(false)}>
