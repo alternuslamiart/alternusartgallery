@@ -10428,6 +10428,13 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
   const [scanning, setScanning] = useState(false);
   const [acceptScrolled, setAcceptScrolled] = useState(false);
 
+  // Live clock for top status bar
+  const [now, setNow] = useState<Date>(() => new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000 * 15);
+    return () => clearInterval(t);
+  }, []);
+
   // Alternus OS light palette — OOBE always runs before theme mode is set
   const c = palette.light;
 
@@ -10554,6 +10561,76 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
         background: "rgba(245,246,250,0.55)",
         pointerEvents: "none",
       }} />
+
+      {/* ── Status bar (top · clock · wifi · battery) ── */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: 32,
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "0 18px",
+        background: "rgba(255,255,255,0.35)",
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
+        borderBottom: "1px solid rgba(120,80,220,0.08)",
+        zIndex: 2,
+        fontSize: 11,
+        color: c.text,
+        letterSpacing: 0.1,
+        pointerEvents: "none",
+      }}>
+        {/* Left: brand chip */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{
+            width: 16, height: 16, borderRadius: 5,
+            background: `linear-gradient(135deg, ${c.accent}, #A78BFA)`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: `0 2px 6px ${c.accent}55`,
+          }}>
+            <I d={ic.sparkle} s={9} c="#fff" f />
+          </div>
+          <span style={{ fontWeight: 600, fontSize: 10.5 }}>Alternus Setup</span>
+        </div>
+        {/* Right: indicators */}
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          {/* Signal bars */}
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 11 }}>
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} style={{
+                width: 2.5, height: 2 + i * 2, borderRadius: 1,
+                background: i <= 3 ? c.text : c.textMuted + "55",
+              }} />
+            ))}
+          </div>
+          {/* WiFi */}
+          <I d={ic.wifi} s={13} c={c.text} />
+          {/* Battery */}
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span style={{ fontSize: 10, fontWeight: 600, color: c.textSec }}>82%</span>
+            <div style={{
+              width: 22, height: 11, borderRadius: 3,
+              border: `1px solid ${c.text}`, padding: 1,
+              position: "relative", display: "flex", alignItems: "center",
+            }}>
+              <div style={{
+                width: "82%", height: "100%", borderRadius: 1.5,
+                background: c.text,
+              }} />
+              <div style={{
+                position: "absolute", right: -3, top: 3, width: 2, height: 5,
+                borderRadius: "0 1px 1px 0",
+                background: c.text,
+              }} />
+            </div>
+          </div>
+          {/* Clock */}
+          <span style={{ fontWeight: 600, fontSize: 11, fontVariantNumeric: "tabular-nums" }}>
+            {now.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false })}
+          </span>
+          {/* Date */}
+          <span style={{ fontSize: 10.5, color: c.textSec, fontVariantNumeric: "tabular-nums" }}>
+            {now.toLocaleDateString(undefined, { day: "2-digit", month: "short" })}
+          </span>
+        </div>
+      </div>
 
       {/* Main card */}
       <div style={{
