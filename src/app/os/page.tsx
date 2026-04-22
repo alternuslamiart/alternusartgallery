@@ -7307,7 +7307,7 @@ function MailApp({ c }: { c: typeof palette.dark }) {
   const ghostHover = (el: HTMLElement, on: boolean) => { el.style.background = on ? c.cardAlt : "transparent"; };
 
   return (
-    <div className="flex flex-col h-full" style={{ background: c.bg, color: c.text, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif" }}>
+    <div className="flex flex-col h-full" style={{ background: c.bg, color: c.text, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif", position: "relative" }}>
       {/* ───── Top bar — minimal, single row ───── */}
       <div className="flex items-center gap-4 px-5 flex-shrink-0" style={{ height: 44, borderBottom: `1px solid ${c.border}`, background: c.bg }}>
         <div className="flex items-center gap-2.5">
@@ -7561,9 +7561,10 @@ function MailApp({ c }: { c: typeof palette.dark }) {
                 onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                 Discard
               </button>
-              <button onClick={sendCompose}
+              <button type="button" onClick={sendCompose}
+                disabled={!compose.to.trim() || !compose.subject.trim()}
                 className="flex items-center gap-1.5 text-[11px] font-semibold px-4 h-7 rounded transition-opacity"
-                style={{ background: c.text, color: c.bg, opacity: (compose.to && compose.subject) ? 1 : 0.35 }}>
+                style={{ background: c.text, color: c.bg, opacity: (compose.to.trim() && compose.subject.trim()) ? 1 : 0.35, cursor: (compose.to.trim() && compose.subject.trim()) ? "pointer" : "not-allowed" }}>
                 Send
               </button>
             </div>
@@ -7714,7 +7715,7 @@ function MailApp({ c }: { c: typeof palette.dark }) {
                 </button>
               </div>
               {showSortMenu && (
-                <div className="absolute right-3 top-[50px] z-10 py-1" style={{
+                <div onClick={e => e.stopPropagation()} className="absolute right-3 top-[50px] z-20 py-1" style={{
                   minWidth: 160,
                   background: c.bg,
                   border: `1px solid ${c.border}`,
@@ -8047,9 +8048,10 @@ function MailApp({ c }: { c: typeof palette.dark }) {
                               onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                               Cancel
                             </button>
-                            <button onClick={sendReply}
+                            <button type="button" onClick={sendReply}
+                              disabled={!replyDraft.trim()}
                               className="text-[11px] font-semibold px-4 h-7 rounded transition-opacity"
-                              style={{ background: c.text, color: c.bg, opacity: replyDraft.trim() ? 1 : 0.35 }}>
+                              style={{ background: c.text, color: c.bg, opacity: replyDraft.trim() ? 1 : 0.35, cursor: replyDraft.trim() ? "pointer" : "not-allowed" }}>
                               Send reply
                             </button>
                           </div>
