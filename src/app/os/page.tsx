@@ -13265,32 +13265,51 @@ export default function AlternusOS() {
         })()}
 
         {/* Windows */}
-        {wins.map(w => (
-          <AppWindow
-            key={w.id}
-            win={w}
-            c={c}
-            onClose={() => closeWinWithAI(w.id)}
-            onMinimize={() => minimizeWin(w.id)}
-            onMaximize={() => maximizeWin(w.id)}
-            onFocus={() => focusWin(w.id)}
-            onMove={(x, y) => moveWin(w.id, x, y)}
-            onResize={(nw, nh) => resizeWin(w.id, nw, nh)}
-            onSnap={(side) => snapWin(w.id, side)}
-            onForceQuit={() => forceQuitWin(w.id)}
-            onSnapPreview={zone => setSnapPreview(zone)}
-            onFileDrop={draggedFile && (w.id === "terminal" || w.id === "notes" || w.id === "word" || w.id === "code") ? (name) => {
-              setDraggedFile(null);
-              // Notify user with a system modal
-              setSystemModal({ type: "info", title: "File Dropped", message: `"${name}" opened in ${w.title}.` });
-              setTimeout(() => setSystemModal(null), 2000);
-            } : undefined}
-            onOpenApp={openWinWithAI}
-            mode={mode}
-          >
-            {winContent[w.id]}
-          </AppWindow>
-        ))}
+        {wins.map(w => {
+          // Agent runs chrome-less fullscreen when maximized — no title bar, no window controls.
+          if (w.id === "agent" && w.isOpen && !w.isMinimized && w.isMaximized) {
+            return (
+              <div
+                key={w.id}
+                style={{
+                  position: "fixed",
+                  top: 0, left: 0, right: 0, bottom: 0,
+                  zIndex: w.zIndex,
+                  overflow: "hidden",
+                  background: c.bg,
+                }}
+              >
+                {winContent[w.id]}
+              </div>
+            );
+          }
+          return (
+            <AppWindow
+              key={w.id}
+              win={w}
+              c={c}
+              onClose={() => closeWinWithAI(w.id)}
+              onMinimize={() => minimizeWin(w.id)}
+              onMaximize={() => maximizeWin(w.id)}
+              onFocus={() => focusWin(w.id)}
+              onMove={(x, y) => moveWin(w.id, x, y)}
+              onResize={(nw, nh) => resizeWin(w.id, nw, nh)}
+              onSnap={(side) => snapWin(w.id, side)}
+              onForceQuit={() => forceQuitWin(w.id)}
+              onSnapPreview={zone => setSnapPreview(zone)}
+              onFileDrop={draggedFile && (w.id === "terminal" || w.id === "notes" || w.id === "word" || w.id === "code") ? (name) => {
+                setDraggedFile(null);
+                // Notify user with a system modal
+                setSystemModal({ type: "info", title: "File Dropped", message: `"${name}" opened in ${w.title}.` });
+                setTimeout(() => setSystemModal(null), 2000);
+              } : undefined}
+              onOpenApp={openWinWithAI}
+              mode={mode}
+            >
+              {winContent[w.id]}
+            </AppWindow>
+          );
+        })}
 
         {/* Alt+Tab Task Switcher */}
         {showTaskSwitcher && (() => {
