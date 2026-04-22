@@ -11044,18 +11044,8 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
         letterSpacing: 0.1,
         pointerEvents: "none",
       }}>
-        {/* Left: brand chip */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{
-            width: 16, height: 16, borderRadius: 5,
-            background: `linear-gradient(135deg, ${c.accent}, #A78BFA)`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: `0 2px 6px ${c.accent}55`,
-          }}>
-            <I d={ic.sparkle} s={9} c="#fff" f />
-          </div>
-          <span style={{ fontWeight: 600, fontSize: 10.5 }}>Alternus Setup</span>
-        </div>
+        {/* Left: empty — brand lives only in the card rail to avoid duplication */}
+        <div />
         {/* Right: indicators */}
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           {/* Signal bars */}
