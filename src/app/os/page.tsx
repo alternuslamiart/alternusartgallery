@@ -11207,6 +11207,15 @@ export default function AlternusOS() {
   const finishOOBE = useCallback((profile: OOBEData) => {
     setOobeProfile(profile);
     setShowOOBE(false);
+    // Auto-open the Alternus AI OS Agent fullscreen as the primary app after setup.
+    setZCounter(z => z + 1);
+    setWins(prev => prev.map(w => {
+      if (w.id === "agent") {
+        return { ...w, isOpen: true, isMinimized: false, isMaximized: true, zIndex: 9999 };
+      }
+      // Close everything else so only the Agent is in the foreground.
+      return { ...w, isOpen: false, isMinimized: false, isMaximized: false };
+    }));
   }, []);
 
   const fmt = (d: Date) => d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
