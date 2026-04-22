@@ -170,8 +170,8 @@ export function Header() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-3">
               <div className="flex flex-col">
-                <span className="text-3xl font-black leading-tight font-roboto">Alternus</span>
-                <span className="text-[10px] text-muted-foreground tracking-[0.25em] uppercase">Art Gallery</span>
+                <span className="text-[1.6rem] font-bold leading-none font-playfair tracking-tight">Alternus</span>
+                <span className="text-[8px] text-muted-foreground tracking-[0.35em] uppercase mt-0.5">Art Gallery</span>
               </div>
             </Link>
             <Link
@@ -224,7 +224,7 @@ export function Header() {
                               onClick={() => handleSelectArtist(artist.id)}
                               className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left"
                             >
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-stone-500 to-stone-700 flex items-center justify-center text-white text-xs font-medium">
                                 {artist.avatar}
                               </div>
                               <span className="text-sm font-medium">{artist.name}</span>
@@ -344,7 +344,7 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="hidden sm:flex items-center gap-1 px-4 py-2 text-blue-600 hover:bg-blue-50 hover:text-blue-700 font-medium"
+                className="hidden sm:flex items-center gap-1 px-4 py-2 text-sand-700 hover:bg-sand-100 hover:text-sand-900 font-medium"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -439,12 +439,12 @@ export function Header() {
                   {/* Verification CTA */}
                   <div className="px-2 py-1.5 mt-1">
                     <Link href="/apply" className="block">
-                      <div className="flex items-center gap-2.5 rounded-lg px-3 py-2 bg-blue-50 dark:bg-blue-950/30 hover:bg-blue-100 dark:hover:bg-blue-950/50 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500 flex-shrink-0">
+                      <div className="flex items-center gap-2.5 rounded-lg px-3 py-2 bg-sand-100 hover:bg-sand-200 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-sand-600 flex-shrink-0">
                           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
                           <path d="m9 12 2 2 4-4"/>
                         </svg>
-                        <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Get Verified</span>
+                        <span className="text-sm font-medium text-sand-800">Get Verified</span>
                       </div>
                     </Link>
                   </div>
@@ -803,7 +803,7 @@ export function Header() {
             {/* User info card */}
             {user && (
               <div className="p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-2xl flex items-center gap-4 mb-5">
-                <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 bg-gradient-to-br from-stone-500 to-stone-700 rounded-xl flex items-center justify-center shadow-md">
                   <span className="text-white font-semibold text-lg">
                     {(user.name || user.email || "U").charAt(0).toUpperCase()}
                   </span>

@@ -8,13 +8,13 @@ export function Footer() {
   const { t } = useLanguage();
 
   return (
-    <footer className="border-t bg-[#060411] text-white rounded-t-[24px] md:rounded-t-[32px] lg:rounded-t-[48px]">
+    <footer className="border-t bg-[#0D0904] text-white rounded-t-[24px] md:rounded-t-[32px] lg:rounded-t-[48px]">
       {/* Main Footer */}
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-8">
           {/* Brand */}
           <div className="col-span-1 sm:col-span-2 md:col-span-1 space-y-4">
-            <h3 className="text-3xl font-black font-roboto">Alternus</h3>
+            <h3 className="text-2xl font-bold font-playfair tracking-tight">Alternus</h3>
             <p className="text-sm text-gray-300">
               An exclusive art gallery where every piece tells a unique story.
             </p>
@@ -111,35 +111,35 @@ export function Footer() {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h4 className="font-semibold tracking-wider">{t("quickLinks")}</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60 mb-1">{t("quickLinks")}</h4>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="/" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   {t("home")}
                 </Link>
               </li>
               <li>
-                <Link href="/gallery" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/gallery" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   {t("gallery")}
                 </Link>
               </li>
               <li>
-                <Link href="/virtual-gallery" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/virtual-gallery" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   Virtual Gallery
                 </Link>
               </li>
               <li>
-                <Link href="/pre-order" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/pre-order" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   Pre-Order
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/about" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   {t("about")}
                 </Link>
               </li>
               <li>
-                <Link href="/support" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/support" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   Support
                 </Link>
               </li>
@@ -148,25 +148,25 @@ export function Footer() {
 
           {/* Services */}
           <div className="space-y-4">
-            <h4 className="font-semibold tracking-wider">{t("customerService")}</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60 mb-1">{t("customerService")}</h4>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="/commissions" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/commissions" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   {t("commissions")}
                 </Link>
               </li>
               <li>
-                <Link href="/gift-cards" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/gift-cards" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   {t("giftCards")}
                 </Link>
               </li>
               <li>
-                <Link href="/care-guide" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/care-guide" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   {t("careGuide")}
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/faq" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   {t("faq")}
                 </Link>
               </li>
@@ -175,25 +175,25 @@ export function Footer() {
 
           {/* Policies */}
           <div className="space-y-4">
-            <h4 className="font-semibold tracking-wider">{t("shipping")}</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60 mb-1">{t("shipping")}</h4>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="/shipping" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/shipping" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   {t("shipping")}
                 </Link>
               </li>
               <li>
-                <Link href="/returns" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/returns" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   {t("returns")}
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/privacy" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   {t("privacyPolicy")}
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/terms" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   {t("termsOfService")}
                 </Link>
               </li>
@@ -202,25 +202,25 @@ export function Footer() {
 
           {/* Legal */}
           <div className="space-y-4">
-            <h4 className="font-semibold tracking-wider">Legal</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60 mb-1">Legal</h4>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="/accessibility" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/accessibility" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   Accessibility
                 </Link>
               </li>
               <li>
-                <Link href="/cookie-notice" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/cookie-notice" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   Cookie Notice
                 </Link>
               </li>
               <li>
-                <Link href="/copyright" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/copyright" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   Copyright Policy
                 </Link>
               </li>
               <li>
-                <Link href="/support" className="inline-block py-1 hover:text-white transition-colors">
+                <Link href="/support" className="inline-block py-0.5 text-sm text-white/55 hover:text-white transition-colors">
                   Support
                 </Link>
               </li>
@@ -229,7 +229,7 @@ export function Footer() {
 
           {/* Help Center */}
           <div className="space-y-4">
-            <h4 className="font-semibold tracking-wider">{t("helpCenter")}</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60 mb-1">{t("helpCenter")}</h4>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
                 <Link href="/help" className="inline-block py-1 hover:text-white transition-colors flex items-center gap-2">

@@ -52,7 +52,19 @@ const config: Config = {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
-  			coffee: '#171C2E',
+  			coffee: '#14100B',
+  			sand: {
+  				'50':  '#FAF8F4',
+  				'100': '#F2EDE5',
+  				'200': '#E5DDD0',
+  				'300': '#D4C9B5',
+  				'400': '#BFB09A',
+  				'500': '#A89680',
+  				'600': '#8C7B66',
+  				'700': '#6E6050',
+  				'800': '#4E453A',
+  				'900': '#2E2820',
+  			},
   			chart: {
   				'1': 'hsl(var(--chart-1))',
   				'2': 'hsl(var(--chart-2))',
@@ -65,7 +77,16 @@ const config: Config = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+  		fontFamily: {
+  			sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+  			serif: ['var(--font-playfair)', 'Georgia', 'serif'],
+  			mono: ['var(--font-geist-mono)', 'monospace'],
+  		},
+  		letterSpacing: {
+  			gallery: '0.25em',
+  			label: '0.12em',
+  		},
   	}
   },
   plugins: [require("tailwindcss-animate")],
