@@ -7146,7 +7146,21 @@ function MailApp({ c }: { c: typeof palette.dark }) {
   const [selId, setSelId] = useState<number | null>(1);
   const [search, setSearch] = useState("");
   const [composing, setComposing] = useState(false);
-  const [compose, setCompose] = useState({ to: "", subject: "", body: "" });
+  const [compose, setCompose] = useState({ to: "", cc: "", bcc: "", subject: "", body: "" });
+  const [showCc, setShowCc] = useState(false);
+  const [showBcc, setShowBcc] = useState(false);
+  const [sortBy, setSortBy] = useState<"date" | "unread" | "sender">("date");
+  const [showSortMenu, setShowSortMenu] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<NonNullable<Email["category"]> | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [replyDraft, setReplyDraft] = useState("");
+  const [showReplyInline, setShowReplyInline] = useState(false);
+
+  const pushToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2200);
+  };
 
   const folderMeta: { id: Folder; label: string }[] = [
     { id: "inbox",   label: "Inbox" },
@@ -7171,24 +7185,45 @@ function MailApp({ c }: { c: typeof palette.dark }) {
   const visibleEmails = emails.filter(e => {
     const inFolder = folder === "starred" ? e.starred : e.folder === folder;
     if (!inFolder) return false;
+    if (activeCategory && e.category !== activeCategory) return false;
     if (!search.trim()) return true;
     const q = search.toLowerCase();
     return e.from.toLowerCase().includes(q) || e.subject.toLowerCase().includes(q) || e.preview.toLowerCase().includes(q);
+  }).sort((a, b) => {
+    if (sortBy === "unread") return (a.read === b.read) ? 0 : a.read ? 1 : -1;
+    if (sortBy === "sender") return a.from.localeCompare(b.from);
+    return 0;
   });
 
   const selected = selId != null ? emails.find(e => e.id === selId) : null;
 
-  const toggleStar = (id: number) => setEmails(prev => prev.map(e => e.id === id ? { ...e, starred: !e.starred } : e));
+  const toggleStar = (id: number) => {
+    const em = emails.find(x => x.id === id);
+    setEmails(prev => prev.map(e => e.id === id ? { ...e, starred: !e.starred } : e));
+    pushToast(em?.starred ? "Removed from starred" : "Starred");
+  };
   const markRead = (id: number) => setEmails(prev => prev.map(e => e.id === id ? { ...e, read: true } : e));
+  const markUnread = (id: number) => {
+    setEmails(prev => prev.map(e => e.id === id ? { ...e, read: false } : e));
+    pushToast("Marked as unread");
+  };
   const deleteEmail = (id: number) => {
     setEmails(prev => prev.map(e => e.id === id ? { ...e, folder: "trash" as Folder } : e));
     setSelId(null);
+    pushToast("Moved to Trash");
   };
   const archiveEmail = (id: number) => {
     setEmails(prev => prev.map(e => e.id === id ? { ...e, folder: "archive" as Folder } : e));
     setSelId(null);
+    pushToast("Archived");
   };
-  const selectEmail = (id: number) => { setSelId(id); markRead(id); };
+  const moveToSpam = (id: number) => {
+    setEmails(prev => prev.map(e => e.id === id ? { ...e, folder: "spam" as Folder } : e));
+    setSelId(null);
+    pushToast("Marked as spam");
+  };
+  const snoozeEmail = () => pushToast("Snoozed until tomorrow");
+  const selectEmail = (id: number) => { setSelId(id); markRead(id); setShowReplyInline(false); };
   const sendCompose = () => {
     if (!compose.to.trim() || !compose.subject.trim()) return;
     const now = new Date();
@@ -7208,8 +7243,58 @@ function MailApp({ c }: { c: typeof palette.dark }) {
       starred: false,
     };
     setEmails(prev => [newEmail, ...prev]);
-    setCompose({ to: "", subject: "", body: "" });
+    setCompose({ to: "", cc: "", bcc: "", subject: "", body: "" });
+    setShowCc(false);
+    setShowBcc(false);
     setComposing(false);
+    pushToast("Message sent");
+  };
+  const saveDraft = () => {
+    if (!compose.to.trim() && !compose.subject.trim() && !compose.body.trim()) {
+      setComposing(false);
+      return;
+    }
+    const newDraft: Email = {
+      id: Math.max(...emails.map(e => e.id)) + 1,
+      folder: "drafts",
+      from: "You",
+      fromEmail: "me@alternus.art",
+      initials: "ME",
+      subject: compose.subject || "(no subject)",
+      preview: compose.body.slice(0, 100) || "—",
+      body: compose.body,
+      time: `${String(new Date().getHours()).padStart(2,"0")}:${String(new Date().getMinutes()).padStart(2,"0")}`,
+      date: "Today",
+      read: true,
+      starred: false,
+    };
+    setEmails(prev => [newDraft, ...prev]);
+    setCompose({ to: "", cc: "", bcc: "", subject: "", body: "" });
+    setShowCc(false);
+    setShowBcc(false);
+    setComposing(false);
+    pushToast("Draft saved");
+  };
+  const sendReply = () => {
+    if (!selected || !replyDraft.trim()) return;
+    const newEmail: Email = {
+      id: Math.max(...emails.map(e => e.id)) + 1,
+      folder: "sent",
+      from: "You",
+      fromEmail: "me@alternus.art",
+      initials: "ME",
+      subject: `Re: ${selected.subject}`,
+      preview: replyDraft.slice(0, 100),
+      body: replyDraft,
+      time: `${String(new Date().getHours()).padStart(2,"0")}:${String(new Date().getMinutes()).padStart(2,"0")}`,
+      date: "Today",
+      read: true,
+      starred: false,
+    };
+    setEmails(prev => [newEmail, ...prev]);
+    setReplyDraft("");
+    setShowReplyInline(false);
+    pushToast("Reply sent");
   };
 
   const folderLabel = folderMeta.find(f => f.id === folder)?.label ?? "Inbox";
@@ -7242,11 +7327,19 @@ function MailApp({ c }: { c: typeof palette.dark }) {
           </div>
         </div>
         <div className="flex items-center gap-0.5">
-          <button title="Refresh" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+          <button title="Refresh" onClick={() => pushToast("Mailbox synced")}
+            className="w-7 h-7 rounded flex items-center justify-center transition-colors"
             style={{ color: c.textSec }}
             onMouseEnter={e => ghostHover(e.currentTarget, true)}
             onMouseLeave={e => ghostHover(e.currentTarget, false)}>
             <I d={ic.refresh} s={12} />
+          </button>
+          <button title="Keyboard shortcuts" onClick={() => setShowKeyboard(v => !v)}
+            className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+            style={{ color: showKeyboard ? c.text : c.textSec, background: showKeyboard ? c.cardAlt : "transparent" }}
+            onMouseEnter={e => { if (!showKeyboard) ghostHover(e.currentTarget, true); }}
+            onMouseLeave={e => { if (!showKeyboard) ghostHover(e.currentTarget, false); }}>
+            <I d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10M2 5h20v14H2z" s={12} />
           </button>
           <button title="Settings" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
             style={{ color: c.textSec }}
@@ -7256,6 +7349,29 @@ function MailApp({ c }: { c: typeof palette.dark }) {
           </button>
         </div>
       </div>
+
+      {/* Keyboard shortcuts panel — inline, clean */}
+      {showKeyboard && (
+        <div className="flex-shrink-0 px-5 py-3" style={{ background: c.cardAlt, borderBottom: `1px solid ${c.border}` }}>
+          <div className="max-w-[720px] mx-auto grid grid-cols-4 gap-x-6 gap-y-1.5">
+            {[
+              { k: "C", d: "Compose" },
+              { k: "R", d: "Reply" },
+              { k: "E", d: "Archive" },
+              { k: "#", d: "Delete" },
+              { k: "S", d: "Star" },
+              { k: "U", d: "Mark unread" },
+              { k: "/", d: "Search" },
+              { k: "J / K", d: "Next / Prev" },
+            ].map(s => (
+              <div key={s.k} className="flex items-center gap-2">
+                <span className="text-[9.5px] font-mono font-semibold px-1.5 py-0.5 tabular-nums" style={{ background: c.bg, border: `1px solid ${c.border}`, borderRadius: 3, color: c.text, minWidth: 22, textAlign: "center" }}>{s.k}</span>
+                <span className="text-[10.5px]" style={{ color: c.textSec }}>{s.d}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {composing ? (
         // ───── Compose — clean, editor-first ─────
@@ -7275,13 +7391,121 @@ function MailApp({ c }: { c: typeof palette.dark }) {
               <input value={compose.to} onChange={e => setCompose(s => ({ ...s, to: e.target.value }))}
                 className="flex-1 bg-transparent outline-none text-[12px]" style={{ color: c.text }}
                 placeholder="recipient@example.com" />
+              <div className="flex items-center gap-0.5">
+                {!showCc && (
+                  <button onClick={() => setShowCc(true)}
+                    className="text-[10px] font-medium px-1.5 h-6 rounded transition-colors"
+                    style={{ color: c.textMuted }}
+                    onMouseEnter={e => { e.currentTarget.style.color = c.text; e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; e.currentTarget.style.background = "transparent"; }}>
+                    Cc
+                  </button>
+                )}
+                {!showBcc && (
+                  <button onClick={() => setShowBcc(true)}
+                    className="text-[10px] font-medium px-1.5 h-6 rounded transition-colors"
+                    style={{ color: c.textMuted }}
+                    onMouseEnter={e => { e.currentTarget.style.color = c.text; e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; e.currentTarget.style.background = "transparent"; }}>
+                    Bcc
+                  </button>
+                )}
+              </div>
             </div>
+            {showCc && (
+              <div className="flex items-center gap-3 px-5" style={{ height: 42, borderBottom: `1px solid ${c.border}` }}>
+                <span className="text-[10px] font-medium uppercase tracking-wider w-14" style={{ color: c.textMuted }}>Cc</span>
+                <input value={compose.cc} onChange={e => setCompose(s => ({ ...s, cc: e.target.value }))}
+                  className="flex-1 bg-transparent outline-none text-[12px]" style={{ color: c.text }}
+                  placeholder="Carbon copy" />
+                <button onClick={() => { setShowCc(false); setCompose(s => ({ ...s, cc: "" })); }}
+                  className="w-5 h-5 rounded flex items-center justify-center transition-colors"
+                  style={{ color: c.textMuted }}
+                  onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                  onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                  <I d={ic.close} s={10} />
+                </button>
+              </div>
+            )}
+            {showBcc && (
+              <div className="flex items-center gap-3 px-5" style={{ height: 42, borderBottom: `1px solid ${c.border}` }}>
+                <span className="text-[10px] font-medium uppercase tracking-wider w-14" style={{ color: c.textMuted }}>Bcc</span>
+                <input value={compose.bcc} onChange={e => setCompose(s => ({ ...s, bcc: e.target.value }))}
+                  className="flex-1 bg-transparent outline-none text-[12px]" style={{ color: c.text }}
+                  placeholder="Blind carbon copy" />
+                <button onClick={() => { setShowBcc(false); setCompose(s => ({ ...s, bcc: "" })); }}
+                  className="w-5 h-5 rounded flex items-center justify-center transition-colors"
+                  style={{ color: c.textMuted }}
+                  onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                  onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                  <I d={ic.close} s={10} />
+                </button>
+              </div>
+            )}
             <div className="flex items-center gap-3 px-5" style={{ height: 42, borderBottom: `1px solid ${c.border}` }}>
               <span className="text-[10px] font-medium uppercase tracking-wider w-14" style={{ color: c.textMuted }}>Subject</span>
               <input value={compose.subject} onChange={e => setCompose(s => ({ ...s, subject: e.target.value }))}
                 className="flex-1 bg-transparent outline-none text-[13px] font-semibold" style={{ color: c.text, letterSpacing: "-0.01em" }}
                 placeholder="Subject" />
             </div>
+
+            {/* Formatting toolbar */}
+            <div className="flex items-center gap-0.5 px-3 flex-shrink-0" style={{ height: 34, borderBottom: `1px solid ${c.border}` }}>
+              {[
+                { k: "B", title: "Bold", style: { fontWeight: 700 } },
+                { k: "I", title: "Italic", style: { fontStyle: "italic" as const } },
+                { k: "U", title: "Underline", style: { textDecoration: "underline" as const } },
+                { k: "S", title: "Strikethrough", style: { textDecoration: "line-through" as const } },
+              ].map(f => (
+                <button key={f.k} title={f.title}
+                  className="w-7 h-6 rounded flex items-center justify-center text-[11px] transition-colors"
+                  style={{ color: c.textSec, ...f.style }}
+                  onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                  onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                  {f.k}
+                </button>
+              ))}
+              <div style={{ width: 1, height: 14, background: c.border, margin: "0 4px" }} />
+              {[
+                { d: "M3 6h18M3 12h18M3 18h18", title: "Align left" },
+                { d: "M6 6h12M3 12h18M6 18h12", title: "Align center" },
+                { d: "M3 6h18M3 12h18M6 18h15", title: "Align right" },
+              ].map((f, i) => (
+                <button key={i} title={f.title}
+                  className="w-7 h-6 rounded flex items-center justify-center transition-colors"
+                  style={{ color: c.textSec }}
+                  onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                  onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                  <I d={f.d} s={11} />
+                </button>
+              ))}
+              <div style={{ width: 1, height: 14, background: c.border, margin: "0 4px" }} />
+              <button title="Bulleted list"
+                className="w-7 h-6 rounded flex items-center justify-center transition-colors"
+                style={{ color: c.textSec }}
+                onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                <I d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" s={11} />
+              </button>
+              <button title="Numbered list"
+                className="w-7 h-6 rounded flex items-center justify-center transition-colors"
+                style={{ color: c.textSec }}
+                onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                <I d="M10 6h11M10 12h11M10 18h11M4 4h1v4M4 10h2M4 16h2v-2H4v-2h2" s={11} />
+              </button>
+              <button title="Link"
+                className="w-7 h-6 rounded flex items-center justify-center transition-colors"
+                style={{ color: c.textSec }}
+                onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                <I d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" s={11} />
+              </button>
+              <span className="ml-auto text-[9.5px] tabular-nums" style={{ color: c.textMuted }}>
+                {compose.body.length} chars · {compose.body.trim() ? compose.body.trim().split(/\s+/).length : 0} words
+              </span>
+            </div>
+
             <textarea value={compose.body} onChange={e => setCompose(s => ({ ...s, body: e.target.value }))}
               className="flex-1 bg-transparent outline-none text-[12.5px] px-5 py-5 resize-none"
               style={{ color: c.text, scrollbarWidth: "none", lineHeight: 1.75 }}
@@ -7289,27 +7513,48 @@ function MailApp({ c }: { c: typeof palette.dark }) {
           </div>
           <div className="flex items-center justify-between px-5 flex-shrink-0" style={{ height: 48, borderTop: `1px solid ${c.border}` }}>
             <div className="flex items-center gap-1">
-              <button title="Attach" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+              <button title="Attach file" onClick={() => pushToast("File picker opened")}
+                className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                 style={{ color: c.textSec }}
                 onMouseEnter={e => ghostHover(e.currentTarget, true)}
                 onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                 <I d={ic.paperclip} s={13} />
               </button>
-              <button title="Image" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+              <button title="Insert image" onClick={() => pushToast("Image picker opened")}
+                className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                 style={{ color: c.textSec }}
                 onMouseEnter={e => ghostHover(e.currentTarget, true)}
                 onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                 <I d={ic.image} s={13} />
               </button>
-              <button title="Formatting" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+              <button title="Insert emoji"
+                className="w-7 h-7 rounded flex items-center justify-center text-[13px] transition-colors"
                 style={{ color: c.textSec }}
                 onMouseEnter={e => ghostHover(e.currentTarget, true)}
                 onMouseLeave={e => ghostHover(e.currentTarget, false)}>
-                <I d={ic.type} s={13} />
+                <I d="M12 2a10 10 0 100 20 10 10 0 000-20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" s={13} />
               </button>
+              <button title="Schedule send" onClick={() => pushToast("Send scheduled for tomorrow 9:00")}
+                className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                style={{ color: c.textSec }}
+                onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                <I d="M12 8v4l3 3M12 2a10 10 0 100 20 10 10 0 000-20z" s={13} />
+              </button>
+              <div style={{ width: 1, height: 16, background: c.border, margin: "0 6px" }} />
+              <span className="text-[10px]" style={{ color: c.textMuted }}>
+                Auto-saved
+              </span>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => setComposing(false)}
+              <button onClick={saveDraft}
+                className="text-[11px] font-medium px-3 h-7 rounded transition-colors"
+                style={{ color: c.textSec, background: "transparent" }}
+                onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                Save draft
+              </button>
+              <button onClick={() => { setCompose({ to: "", cc: "", bcc: "", subject: "", body: "" }); setShowCc(false); setShowBcc(false); setComposing(false); pushToast("Draft discarded"); }}
                 className="text-[11px] font-medium px-3 h-7 rounded transition-colors"
                 style={{ color: c.textSec, background: "transparent" }}
                 onMouseEnter={e => ghostHover(e.currentTarget, true)}
@@ -7369,26 +7614,63 @@ function MailApp({ c }: { c: typeof palette.dark }) {
                 );
               })}
 
-              <div className="px-2 pt-4 pb-1.5">
+              <div className="px-2 pt-4 pb-1.5 flex items-center justify-between">
                 <span className="text-[9px] font-semibold uppercase tracking-[0.1em]" style={{ color: c.textMuted }}>Categories</span>
+                {activeCategory && (
+                  <button onClick={() => setActiveCategory(null)}
+                    className="text-[9px] font-medium px-1.5 h-4 rounded transition-colors"
+                    style={{ color: c.textMuted }}
+                    onMouseEnter={e => { e.currentTarget.style.color = c.text; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = c.textMuted; }}>
+                    Clear
+                  </button>
+                )}
               </div>
               {categoryMeta.map(cat => {
                 const count = emails.filter(em => em.category === cat.id && em.folder === "inbox").length;
+                const isActive = activeCategory === cat.id;
                 return (
-                  <div key={cat.id}
-                    className="w-full flex items-center px-2 text-left transition-colors cursor-pointer"
-                    style={{ height: 26, borderRadius: 5, marginBottom: 1 }}
-                    onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                    <span className="flex-1 text-[11px]" style={{ color: c.textSec, fontWeight: 500 }}>
+                  <button key={cat.id}
+                    onClick={() => setActiveCategory(isActive ? null : cat.id)}
+                    className="w-full flex items-center px-2 text-left transition-colors"
+                    style={{
+                      height: 26,
+                      borderRadius: 5,
+                      marginBottom: 1,
+                      background: isActive ? c.cardAlt : "transparent",
+                    }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = c.cardAlt; }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = "transparent"; }}>
+                    <span className="flex-1 text-[11px]" style={{ color: isActive ? c.text : c.textSec, fontWeight: isActive ? 600 : 500 }}>
                       {cat.label}
                     </span>
                     {count > 0 && (
-                      <span className="text-[10px] tabular-nums" style={{ color: c.textMuted }}>{count}</span>
+                      <span className="text-[10px] tabular-nums" style={{ color: isActive ? c.text : c.textMuted }}>{count}</span>
                     )}
-                  </div>
+                  </button>
                 );
               })}
+
+              {/* Quick tools */}
+              <div className="px-2 pt-4 pb-1.5">
+                <span className="text-[9px] font-semibold uppercase tracking-[0.1em]" style={{ color: c.textMuted }}>Tools</span>
+              </div>
+              {[
+                { label: "Contacts", action: () => pushToast("Contacts opened") },
+                { label: "Rules", action: () => pushToast("Filter rules opened") },
+                { label: "Templates", action: () => pushToast("Templates opened") },
+              ].map(t => (
+                <button key={t.label}
+                  onClick={t.action}
+                  className="w-full flex items-center px-2 text-left transition-colors"
+                  style={{ height: 26, borderRadius: 5, marginBottom: 1 }}
+                  onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                  onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                  <span className="flex-1 text-[11px]" style={{ color: c.textSec, fontWeight: 500 }}>
+                    {t.label}
+                  </span>
+                </button>
+              ))}
             </div>
 
             {/* Footer — storage as a single clean line */}
@@ -7405,20 +7687,59 @@ function MailApp({ c }: { c: typeof palette.dark }) {
 
           {/* ───── Email list — airy, typography-led ───── */}
           <div className="flex-shrink-0 flex flex-col" style={{ width: 320, borderRight: `1px solid ${c.border}`, background: c.bg }}>
-            <div className="px-5 flex items-center justify-between flex-shrink-0" style={{ height: 56, borderBottom: `1px solid ${c.border}` }}>
+            <div className="px-5 flex items-center justify-between flex-shrink-0 relative" style={{ height: 56, borderBottom: `1px solid ${c.border}` }}>
               <div>
-                <h1 className="text-[16px] font-semibold leading-tight" style={{ color: c.text, letterSpacing: "-0.015em" }}>{folderLabel}</h1>
+                <h1 className="text-[16px] font-semibold leading-tight" style={{ color: c.text, letterSpacing: "-0.015em" }}>
+                  {activeCategory ? categoryMeta.find(cm => cm.id === activeCategory)?.label : folderLabel}
+                </h1>
                 <p className="text-[10px] mt-0.5" style={{ color: c.textMuted }}>
                   {visibleEmails.length} {visibleEmails.length === 1 ? "message" : "messages"}
                   {folder === "inbox" && totalUnread > 0 ? ` · ${totalUnread} unread` : ""}
                 </p>
               </div>
-              <button title="Filter" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
-                style={{ color: c.textSec }}
-                onMouseEnter={e => ghostHover(e.currentTarget, true)}
-                onMouseLeave={e => ghostHover(e.currentTarget, false)}>
-                <I d="M3 6h18M7 12h10M11 18h2" s={13} />
-              </button>
+              <div className="flex items-center gap-0.5">
+                <button title="Select all" onClick={() => pushToast(`${visibleEmails.length} selected`)}
+                  className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                  style={{ color: c.textSec }}
+                  onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                  onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                  <I d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" s={12} />
+                </button>
+                <button title="Sort" onClick={() => setShowSortMenu(v => !v)}
+                  className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                  style={{ color: showSortMenu ? c.text : c.textSec, background: showSortMenu ? c.cardAlt : "transparent" }}
+                  onMouseEnter={e => { if (!showSortMenu) ghostHover(e.currentTarget, true); }}
+                  onMouseLeave={e => { if (!showSortMenu) ghostHover(e.currentTarget, false); }}>
+                  <I d="M3 6h18M7 12h10M11 18h2" s={13} />
+                </button>
+              </div>
+              {showSortMenu && (
+                <div className="absolute right-3 top-[50px] z-10 py-1" style={{
+                  minWidth: 160,
+                  background: c.bg,
+                  border: `1px solid ${c.border}`,
+                  borderRadius: 6,
+                  boxShadow: "0 4px 14px rgba(0,0,0,0.18)",
+                }}>
+                  <div className="px-3 py-1.5">
+                    <span className="text-[9px] font-semibold uppercase tracking-[0.08em]" style={{ color: c.textMuted }}>Sort by</span>
+                  </div>
+                  {([
+                    { id: "date", label: "Date" },
+                    { id: "unread", label: "Unread first" },
+                    { id: "sender", label: "Sender" },
+                  ] as const).map(opt => (
+                    <button key={opt.id} onClick={() => { setSortBy(opt.id); setShowSortMenu(false); }}
+                      className="w-full flex items-center justify-between px-3 py-1.5 text-left transition-colors"
+                      style={{ background: "transparent" }}
+                      onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <span className="text-[11px]" style={{ color: c.text, fontWeight: sortBy === opt.id ? 600 : 500 }}>{opt.label}</span>
+                      {sortBy === opt.id && <I d="M20 6L9 17l-5-5" s={11} c={c.text} />}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
@@ -7487,41 +7808,90 @@ function MailApp({ c }: { c: typeof palette.dark }) {
               <>
                 {/* Action toolbar — minimal, ghost buttons */}
                 <div className="flex items-center gap-0.5 px-5 flex-shrink-0" style={{ height: 44, borderBottom: `1px solid ${c.border}` }}>
-                  <button onClick={() => archiveEmail(selected.id)} title="Archive"
+                  <button onClick={() => archiveEmail(selected.id)} title="Archive (E)"
                     className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                     style={{ color: c.textSec }}
                     onMouseEnter={e => ghostHover(e.currentTarget, true)}
                     onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                     <I d="M20 8H4v13h16V8zM1 3h22v5H1zM10 12h4" s={13} />
                   </button>
-                  <button onClick={() => deleteEmail(selected.id)} title="Delete"
+                  <button onClick={() => deleteEmail(selected.id)} title="Delete (#)"
                     className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                     style={{ color: c.textSec }}
                     onMouseEnter={e => ghostHover(e.currentTarget, true)}
                     onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                     <I d={ic.trash} s={13} />
                   </button>
-                  <button title="Mark unread"
+                  <button onClick={() => moveToSpam(selected.id)} title="Mark as spam"
+                    className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                    onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                    <I d={ic.alertTriangle} s={13} />
+                  </button>
+                  <div style={{ width: 1, height: 14, background: c.border, margin: "0 4px" }} />
+                  <button onClick={() => markUnread(selected.id)} title="Mark unread (U)"
                     className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                     style={{ color: c.textSec }}
                     onMouseEnter={e => ghostHover(e.currentTarget, true)}
                     onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                     <I d={ic.mail} s={13} />
                   </button>
-                  <button onClick={() => toggleStar(selected.id)} title="Star"
+                  <button onClick={() => toggleStar(selected.id)} title="Star (S)"
                     className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                     onMouseEnter={e => ghostHover(e.currentTarget, true)}
                     onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                     <I d={starPath} s={13} c={selected.starred ? c.text : c.textSec} f={selected.starred} />
                   </button>
-                  <div className="ml-auto flex items-center gap-0.5">
-                    <button title="Previous" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                  <button onClick={snoozeEmail} title="Snooze"
+                    className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                    onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                    <I d="M12 2a10 10 0 100 20 10 10 0 000-20zM12 6v6l4 2" s={13} />
+                  </button>
+                  <button onClick={() => pushToast("Moved to folder")} title="Move to…"
+                    className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                    onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                    <I d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" s={13} />
+                  </button>
+                  <button onClick={() => pushToast("Label applied")} title="Label"
+                    className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                    onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                    <I d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82zM7 7h.01" s={13} />
+                  </button>
+                  <button onClick={() => pushToast("Printing")} title="Print"
+                    className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                    style={{ color: c.textSec }}
+                    onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                    onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                    <I d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z" s={13} />
+                  </button>
+                  <div className="ml-auto flex items-center gap-2">
+                    <span className="text-[10px] tabular-nums" style={{ color: c.textMuted }}>
+                      {visibleEmails.findIndex(em => em.id === selected.id) + 1} / {visibleEmails.length}
+                    </span>
+                    <button title="Previous (K)"
+                      onClick={() => {
+                        const idx = visibleEmails.findIndex(em => em.id === selected.id);
+                        if (idx > 0) selectEmail(visibleEmails[idx - 1].id);
+                      }}
+                      className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                       style={{ color: c.textSec }}
                       onMouseEnter={e => ghostHover(e.currentTarget, true)}
                       onMouseLeave={e => ghostHover(e.currentTarget, false)}>
                       <I d={ic.chevL} s={12} />
                     </button>
-                    <button title="Next" className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                    <button title="Next (J)"
+                      onClick={() => {
+                        const idx = visibleEmails.findIndex(em => em.id === selected.id);
+                        if (idx >= 0 && idx < visibleEmails.length - 1) selectEmail(visibleEmails[idx + 1].id);
+                      }}
+                      className="w-7 h-7 rounded flex items-center justify-center transition-colors"
                       style={{ color: c.textSec }}
                       onMouseEnter={e => ghostHover(e.currentTarget, true)}
                       onMouseLeave={e => ghostHover(e.currentTarget, false)}>
@@ -7603,27 +7973,89 @@ function MailApp({ c }: { c: typeof palette.dark }) {
                     )}
 
                     {/* Reply actions */}
-                    <div className="flex items-center gap-2 mt-10">
-                      <button onClick={() => setComposing(true)}
-                        className="flex items-center gap-1.5 text-[11.5px] font-semibold px-4 transition-opacity"
-                        style={{ height: 32, borderRadius: 6, background: c.text, color: c.bg }}
-                        onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
-                        onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
-                        Reply
-                      </button>
-                      <button className="flex items-center gap-1.5 text-[11.5px] font-medium px-4 transition-colors"
-                        style={{ height: 32, borderRadius: 6, border: `1px solid ${c.border}`, color: c.text, background: "transparent" }}
-                        onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                        Reply all
-                      </button>
-                      <button className="flex items-center gap-1.5 text-[11.5px] font-medium px-4 transition-colors"
-                        style={{ height: 32, borderRadius: 6, border: `1px solid ${c.border}`, color: c.text, background: "transparent" }}
-                        onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
-                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                        Forward
-                      </button>
-                    </div>
+                    {!showReplyInline ? (
+                      <div className="flex items-center gap-2 mt-10">
+                        <button onClick={() => setShowReplyInline(true)}
+                          className="flex items-center gap-1.5 text-[11.5px] font-semibold px-4 transition-opacity"
+                          style={{ height: 32, borderRadius: 6, background: c.text, color: c.bg }}
+                          onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
+                          onMouseLeave={e => (e.currentTarget.style.opacity = "1")}>
+                          Reply
+                        </button>
+                        <button onClick={() => setShowReplyInline(true)}
+                          className="flex items-center gap-1.5 text-[11.5px] font-medium px-4 transition-colors"
+                          style={{ height: 32, borderRadius: 6, border: `1px solid ${c.border}`, color: c.text, background: "transparent" }}
+                          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                          Reply all
+                        </button>
+                        <button onClick={() => { setComposing(true); setCompose(s => ({ ...s, subject: `Fwd: ${selected.subject}`, body: `\n\n---------- Forwarded ----------\nFrom: ${selected.from} <${selected.fromEmail}>\n\n${selected.body}` })); }}
+                          className="flex items-center gap-1.5 text-[11.5px] font-medium px-4 transition-colors"
+                          style={{ height: 32, borderRadius: 6, border: `1px solid ${c.border}`, color: c.text, background: "transparent" }}
+                          onMouseEnter={e => (e.currentTarget.style.background = c.cardAlt)}
+                          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                          Forward
+                        </button>
+                      </div>
+                    ) : (
+                      // Inline reply composer — clean, focused
+                      <div className="mt-8" style={{ border: `1px solid ${c.border}`, borderRadius: 8, overflow: "hidden" }}>
+                        <div className="flex items-center justify-between px-4 flex-shrink-0" style={{ height: 36, borderBottom: `1px solid ${c.border}`, background: c.cardAlt }}>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-medium uppercase tracking-[0.08em]" style={{ color: c.textMuted }}>Reply</span>
+                            <span style={{ color: c.textMuted }}>·</span>
+                            <span className="text-[10.5px]" style={{ color: c.textSec }}>to {selected.from}</span>
+                          </div>
+                          <button onClick={() => { setShowReplyInline(false); setReplyDraft(""); }}
+                            className="w-6 h-6 rounded flex items-center justify-center transition-colors"
+                            style={{ color: c.textMuted }}
+                            onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                            onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                            <I d={ic.close} s={10} />
+                          </button>
+                        </div>
+                        <textarea value={replyDraft} onChange={e => setReplyDraft(e.target.value)}
+                          className="w-full bg-transparent outline-none text-[12.5px] px-4 py-3 resize-none"
+                          style={{ color: c.text, scrollbarWidth: "none", lineHeight: 1.7, minHeight: 120 }}
+                          placeholder="Write your reply…"
+                          autoFocus />
+                        <div className="flex items-center justify-between px-3 flex-shrink-0" style={{ height: 40, borderTop: `1px solid ${c.border}` }}>
+                          <div className="flex items-center gap-0.5">
+                            <button title="Attach"
+                              className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                              style={{ color: c.textSec }}
+                              onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                              onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                              <I d={ic.paperclip} s={13} />
+                            </button>
+                            <button title="Format"
+                              className="w-7 h-7 rounded flex items-center justify-center transition-colors"
+                              style={{ color: c.textSec }}
+                              onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                              onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                              <I d={ic.type} s={13} />
+                            </button>
+                            <span className="ml-2 text-[9.5px] tabular-nums" style={{ color: c.textMuted }}>
+                              {replyDraft.length} chars
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button onClick={() => { setShowReplyInline(false); setReplyDraft(""); }}
+                              className="text-[11px] font-medium px-3 h-7 rounded transition-colors"
+                              style={{ color: c.textSec, background: "transparent" }}
+                              onMouseEnter={e => ghostHover(e.currentTarget, true)}
+                              onMouseLeave={e => ghostHover(e.currentTarget, false)}>
+                              Cancel
+                            </button>
+                            <button onClick={sendReply}
+                              className="text-[11px] font-semibold px-4 h-7 rounded transition-opacity"
+                              style={{ background: c.text, color: c.bg, opacity: replyDraft.trim() ? 1 : 0.35 }}>
+                              Send reply
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </>
@@ -7637,6 +8069,28 @@ function MailApp({ c }: { c: typeof palette.dark }) {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Toast — minimal, bottom-center */}
+      {toast && (
+        <div style={{
+          position: "absolute",
+          bottom: 20,
+          left: "50%",
+          transform: "translateX(-50%)",
+          padding: "8px 14px",
+          background: c.text,
+          color: c.bg,
+          borderRadius: 6,
+          fontSize: 11,
+          fontWeight: 500,
+          letterSpacing: "-0.005em",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.18)",
+          pointerEvents: "none",
+          zIndex: 50,
+        }}>
+          {toast}
         </div>
       )}
     </div>
