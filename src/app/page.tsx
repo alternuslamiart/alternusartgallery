@@ -51,6 +51,10 @@ const MUTED = "#9D9A96";
 const DIM = "#C0BCB7";
 const CARD = "#FFFFFF";
 const BORDER = "rgba(0,0,0,0.06)";
+const BRAND = "#3272EA";
+const BRAND_DARK = "#1E5BD1";
+const BRAND_SOFT = "rgba(50,114,234,0.08)";
+const BRAND_RING = "rgba(50,114,234,0.28)";
 
 export default function Home() {
   const router = useRouter();
@@ -115,14 +119,15 @@ export default function Home() {
               style={{
                 width: 30,
                 height: 30,
-                background: BLACK,
+                background: `linear-gradient(135deg, ${BRAND} 0%, ${BRAND_DARK} 100%)`,
                 borderRadius: 8,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                boxShadow: "0 4px 12px rgba(50,114,234,0.28), inset 0 1px 0 rgba(255,255,255,0.22)",
               }}
             >
-              <span style={{ color: BG, fontSize: 14, fontWeight: 700, letterSpacing: "-0.02em" }}>A</span>
+              <span style={{ color: "#FFFFFF", fontSize: 14, fontWeight: 700, letterSpacing: "-0.02em" }}>A</span>
             </div>
             <span style={{ fontSize: 15, fontWeight: 650, letterSpacing: "-0.025em", color: BLACK }}>
               Alternus
@@ -177,16 +182,18 @@ export default function Home() {
                 gap: 6,
                 height: 36,
                 padding: "0 16px",
-                background: BLACK,
-                color: BG,
-                borderRadius: 9,
+                background: `linear-gradient(180deg, ${BRAND} 0%, ${BRAND_DARK} 100%)`,
+                color: "#FFFFFF",
+                borderRadius: 10,
                 fontSize: 13.5,
                 fontWeight: 600,
                 letterSpacing: "-0.01em",
                 textDecoration: "none",
-                transition: "opacity 0.15s",
+                transition: "transform 0.15s, box-shadow 0.2s, filter 0.15s",
+                boxShadow:
+                  "0 6px 16px rgba(50,114,234,0.32), 0 1px 2px rgba(50,114,234,0.22), inset 0 1px 0 rgba(255,255,255,0.22)",
               }}
-              className="hover:opacity-90"
+              className="hover:brightness-[1.06] hover:-translate-y-[1px]"
             >
               Try in Chat
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -212,38 +219,52 @@ export default function Home() {
             style={{
               position: "absolute",
               left: "50%",
-              top: "-30%",
+              top: "-28%",
               transform: "translateX(-50%)",
-              width: 960,
-              height: 760,
+              width: 1040,
+              height: 800,
               borderRadius: "50%",
               background:
-                "radial-gradient(closest-side, rgba(110,90,200,0.065), rgba(110,90,200,0.025) 55%, transparent 74%)",
+                "radial-gradient(closest-side, rgba(50,114,234,0.13), rgba(50,114,234,0.05) 55%, transparent 74%)",
               filter: "blur(2px)",
             }}
           />
           <div
             style={{
               position: "absolute",
-              right: -80,
-              top: 40,
-              width: 520,
-              height: 520,
+              right: -100,
+              top: 20,
+              width: 540,
+              height: 540,
               borderRadius: "50%",
               background:
-                "radial-gradient(closest-side, rgba(50,130,220,0.055), transparent 70%)",
+                "radial-gradient(closest-side, rgba(110,140,255,0.09), transparent 70%)",
             }}
           />
           <div
             style={{
               position: "absolute",
-              left: -60,
-              bottom: 0,
-              width: 420,
-              height: 420,
+              left: -80,
+              bottom: -60,
+              width: 460,
+              height: 460,
               borderRadius: "50%",
               background:
-                "radial-gradient(closest-side, rgba(200,170,90,0.04), transparent 70%)",
+                "radial-gradient(closest-side, rgba(50,114,234,0.07), transparent 70%)",
+            }}
+          />
+          {/* Subtle grid */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage:
+                "linear-gradient(rgba(13,12,10,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(13,12,10,0.035) 1px, transparent 1px)",
+              backgroundSize: "56px 56px",
+              maskImage:
+                "radial-gradient(ellipse at 50% 30%, black 30%, transparent 72%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse at 50% 30%, black 30%, transparent 72%)",
             }}
           />
         </div>
@@ -263,14 +284,15 @@ export default function Home() {
             style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: 7,
+              gap: 8,
               height: 30,
               padding: "0 14px",
-              background: "rgba(255,255,255,0.72)",
+              background: "rgba(255,255,255,0.78)",
               border: `1px solid ${BORDER}`,
               borderRadius: 30,
               marginBottom: 32,
               backdropFilter: "blur(8px)",
+              boxShadow: "0 1px 2px rgba(13,12,10,0.04)",
             }}
           >
             <span
@@ -278,9 +300,9 @@ export default function Home() {
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                background: "#22C55E",
+                background: BRAND,
                 display: "block",
-                boxShadow: "0 0 0 2px rgba(34,197,94,0.2)",
+                boxShadow: `0 0 0 3px ${BRAND_RING}`,
               }}
             />
             <span style={{ fontSize: 12, fontWeight: 500, color: GRAY, letterSpacing: "0.01em" }}>
@@ -299,7 +321,18 @@ export default function Home() {
             }}
           >
             <span style={{ color: BLACK, display: "block" }}>The operating system</span>
-            <span style={{ color: DIM, display: "block" }}>that thinks with you.</span>
+            <span
+              style={{
+                display: "block",
+                background: `linear-gradient(90deg, ${BRAND} 0%, #6E92F5 60%, #9AB6FF 100%)`,
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                color: "transparent",
+              }}
+            >
+              that thinks with you.
+            </span>
           </h1>
 
           {/* Subtitle */}
@@ -323,11 +356,12 @@ export default function Home() {
           <form onSubmit={onSubmit} style={{ maxWidth: 660, margin: "0 auto" }}>
             <div
               style={{
+                position: "relative",
                 background: CARD,
                 border: `1px solid rgba(0,0,0,0.07)`,
                 borderRadius: 18,
                 boxShadow:
-                  "0 6px 28px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.8)",
+                  "0 10px 40px rgba(50,114,234,0.10), 0 2px 8px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.8)",
                 overflow: "hidden",
               }}
             >
@@ -380,7 +414,7 @@ export default function Home() {
                         transition: "background 0.15s, color 0.15s",
                         color: "inherit",
                       }}
-                      className="hover:bg-black/[0.04] hover:!text-[#6A6762]"
+                      className="hover:bg-[#3272EA]/[0.08] hover:!text-[#3272EA]"
                     >
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d={b.d} />
@@ -396,17 +430,19 @@ export default function Home() {
                     gap: 6,
                     height: 36,
                     padding: "0 18px",
-                    background: BLACK,
-                    color: BG,
+                    background: `linear-gradient(180deg, ${BRAND} 0%, ${BRAND_DARK} 100%)`,
+                    color: "#FFFFFF",
                     borderRadius: 10,
                     fontSize: 13,
                     fontWeight: 600,
                     border: "none",
                     cursor: "pointer",
                     letterSpacing: "-0.01em",
-                    transition: "opacity 0.15s",
+                    transition: "transform 0.15s, filter 0.15s",
+                    boxShadow:
+                      "0 6px 14px rgba(50,114,234,0.34), 0 1px 2px rgba(50,114,234,0.22), inset 0 1px 0 rgba(255,255,255,0.22)",
                   }}
-                  className="hover:opacity-90"
+                  className="hover:brightness-[1.06] hover:-translate-y-[1px]"
                 >
                   Try in Chat
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -444,7 +480,7 @@ export default function Home() {
                     fontWeight: 450,
                     transition: "all 0.15s",
                   }}
-                  className="hover:border-black/[0.18] hover:text-[#0D0C0A] hover:bg-white"
+                  className="hover:border-[#3272EA]/40 hover:text-[#3272EA] hover:bg-white"
                 >
                   {s}
                 </button>
@@ -513,7 +549,7 @@ export default function Home() {
               overflow: "hidden",
               border: `1px solid ${BORDER}`,
               boxShadow:
-                "0 24px 80px -16px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.04)",
+                "0 30px 80px -18px rgba(50,114,234,0.22), 0 2px 8px rgba(0,0,0,0.04)",
               display: "block",
               textDecoration: "none",
               transition: "box-shadow 0.25s",
@@ -537,7 +573,7 @@ export default function Home() {
               <span style={{ marginLeft: 12, fontSize: 11, color: MUTED }}>alternus.art/os</span>
               <span
                 style={{ marginLeft: "auto", fontSize: 10.5, color: DIM, transition: "color 0.15s" }}
-                className="group-hover:text-[#6A6762]"
+                className="group-hover:text-[#3272EA]"
               >
                 Click to open →
               </span>
@@ -579,9 +615,9 @@ export default function Home() {
                   <div style={{ height: 22, width: 110, background: "#E8E6E1", borderRadius: 4 }} />
                   <div style={{ height: 11, width: 76, background: "#EDEBE6", borderRadius: 4, marginTop: 14, marginBottom: 4 }} />
                   {["Inbox", "Starred", "Sent", "Drafts", "Archive"].map((f) => (
-                    <div key={f} style={{ display: "flex", justifyContent: "space-between", padding: "4px 6px", borderRadius: 6, background: f === "Inbox" ? "rgba(0,0,0,0.04)" : "transparent" }}>
-                      <span style={{ fontSize: 11, color: f === "Inbox" ? BLACK : MUTED, fontWeight: f === "Inbox" ? 500 : 400 }}>{f}</span>
-                      {f === "Inbox" && <span style={{ fontSize: 10, color: MUTED, fontWeight: 600 }}>2</span>}
+                    <div key={f} style={{ display: "flex", justifyContent: "space-between", padding: "4px 6px", borderRadius: 6, background: f === "Inbox" ? BRAND_SOFT : "transparent" }}>
+                      <span style={{ fontSize: 11, color: f === "Inbox" ? BRAND : MUTED, fontWeight: f === "Inbox" ? 600 : 400 }}>{f}</span>
+                      {f === "Inbox" && <span style={{ fontSize: 10, color: BRAND, fontWeight: 700 }}>2</span>}
                     </div>
                   ))}
                 </div>
@@ -613,7 +649,8 @@ export default function Home() {
                         padding: "10px 20px",
                         borderBottom: `1px solid rgba(0,0,0,0.04)`,
                         opacity: e.u ? 1 : 0.6,
-                        background: i === 0 ? "rgba(0,0,0,0.015)" : "transparent",
+                        background: i === 0 ? BRAND_SOFT : "transparent",
+                        borderLeft: i === 0 ? `2px solid ${BRAND}` : "2px solid transparent",
                       }}
                     >
                       <div style={{ fontSize: 12, fontWeight: e.u ? 650 : 500, color: BLACK }}>{e.f}</div>
@@ -645,13 +682,13 @@ export default function Home() {
                         width: 34,
                         height: 34,
                         borderRadius: "50%",
-                        background: "#EDEAE5",
+                        background: `linear-gradient(135deg, ${BRAND} 0%, ${BRAND_DARK} 100%)`,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         fontSize: 11,
-                        fontWeight: 650,
-                        color: GRAY,
+                        fontWeight: 700,
+                        color: "#FFFFFF",
                       }}
                     >
                       SM
@@ -671,8 +708,10 @@ export default function Home() {
                     <button
                       style={{
                         height: 32, padding: "0 16px", borderRadius: 8,
-                        background: BLACK, color: BG,
+                        background: `linear-gradient(180deg, ${BRAND} 0%, ${BRAND_DARK} 100%)`,
+                        color: "#FFFFFF",
                         fontSize: 11.5, fontWeight: 600, border: "none", cursor: "pointer",
+                        boxShadow: "0 4px 10px rgba(50,114,234,0.3), inset 0 1px 0 rgba(255,255,255,0.22)",
                       }}
                     >
                       Reply
@@ -712,7 +751,7 @@ export default function Home() {
                 fontWeight: 600,
                 textTransform: "uppercase",
                 letterSpacing: "0.16em",
-                color: MUTED,
+                color: BRAND,
                 marginBottom: 14,
               }}
             >
@@ -745,29 +784,30 @@ export default function Home() {
                   background: CARD,
                   border: `1px solid rgba(0,0,0,0.055)`,
                   boxShadow: "0 2px 8px rgba(0,0,0,0.03), 0 0 0 0.5px rgba(0,0,0,0.03)",
-                  transition: "box-shadow 0.2s, transform 0.2s",
+                  transition: "box-shadow 0.2s, transform 0.2s, border-color 0.2s",
                 }}
-                className="hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)] hover:-translate-y-[1px]"
+                className="hover:shadow-[0_10px_30px_rgba(50,114,234,0.14)] hover:-translate-y-[2px] hover:border-[#3272EA]/25"
               >
                 <div
                   style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 10,
-                    background: "#F2F1EE",
+                    width: 42,
+                    height: 42,
+                    borderRadius: 11,
+                    background: `linear-gradient(135deg, ${BRAND_SOFT} 0%, rgba(50,114,234,0.14) 100%)`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     marginBottom: 18,
+                    border: `1px solid rgba(50,114,234,0.14)`,
                   }}
                 >
                   <svg
-                    width="17"
-                    height="17"
+                    width="18"
+                    height="18"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="#4A4845"
-                    strokeWidth="1.8"
+                    stroke={BRAND}
+                    strokeWidth="1.9"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
@@ -810,7 +850,7 @@ export default function Home() {
                 fontWeight: 600,
                 textTransform: "uppercase",
                 letterSpacing: "0.16em",
-                color: MUTED,
+                color: BRAND,
                 marginBottom: 14,
               }}
             >
@@ -838,19 +878,31 @@ export default function Home() {
               <div
                 key={s.n}
                 style={{
+                  position: "relative",
                   padding: 30,
                   borderRadius: 14,
                   background: CARD,
                   border: `1px solid rgba(0,0,0,0.055)`,
                   boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
+                  overflow: "hidden",
                 }}
               >
                 <span
                   style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: 48,
+                    height: 3,
+                    background: `linear-gradient(90deg, ${BRAND} 0%, transparent 100%)`,
+                  }}
+                />
+                <span
+                  style={{
                     fontSize: 11,
-                    fontWeight: 600,
+                    fontWeight: 700,
                     fontFamily: "var(--font-geist-mono), monospace",
-                    color: DIM,
+                    color: BRAND,
                     letterSpacing: "0.06em",
                   }}
                 >
@@ -879,12 +931,28 @@ export default function Home() {
       {/* ─── CTA ─── */}
       <section
         style={{
+          position: "relative",
           paddingTop: 112,
           paddingBottom: 112,
           borderTop: `1px solid rgba(0,0,0,0.05)`,
+          overflow: "hidden",
         }}
       >
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 900,
+            height: 540,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(closest-side, rgba(50,114,234,0.10), transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
+        <div style={{ position: "relative", maxWidth: 680, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
           <h2
             style={{
               fontSize: "clamp(36px, 5.5vw, 62px)",
@@ -897,7 +965,17 @@ export default function Home() {
           >
             Stop clicking.
             <br />
-            <span style={{ color: DIM }}>Start asking.</span>
+            <span
+              style={{
+                background: `linear-gradient(90deg, ${BRAND} 0%, #6E92F5 100%)`,
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                color: "transparent",
+              }}
+            >
+              Start asking.
+            </span>
           </h2>
           <p style={{ fontSize: 16, color: GRAY, lineHeight: 1.68, maxWidth: 460, margin: "0 auto", marginBottom: 44 }}>
             Alternus is free to try. Launch the chat and explore a complete AI-native OS in your browser.
@@ -909,18 +987,20 @@ export default function Home() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
-                height: 48,
-                padding: "0 26px",
-                background: BLACK,
-                color: BG,
+                height: 50,
+                padding: "0 28px",
+                background: `linear-gradient(180deg, ${BRAND} 0%, ${BRAND_DARK} 100%)`,
+                color: "#FFFFFF",
                 borderRadius: 12,
-                fontSize: 14.5,
+                fontSize: 15,
                 fontWeight: 650,
                 letterSpacing: "-0.015em",
                 textDecoration: "none",
-                transition: "opacity 0.15s",
+                transition: "transform 0.15s, filter 0.15s",
+                boxShadow:
+                  "0 12px 28px rgba(50,114,234,0.38), 0 2px 4px rgba(50,114,234,0.22), inset 0 1px 0 rgba(255,255,255,0.25)",
               }}
-              className="hover:opacity-90"
+              className="hover:brightness-[1.06] hover:-translate-y-[1px]"
             >
               Try in Chat
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -932,18 +1012,19 @@ export default function Home() {
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                height: 48,
-                padding: "0 22px",
+                height: 50,
+                padding: "0 24px",
                 borderRadius: 12,
-                fontSize: 14.5,
-                fontWeight: 500,
-                color: GRAY,
-                border: `1px solid rgba(0,0,0,0.1)`,
-                background: "transparent",
+                fontSize: 15,
+                fontWeight: 550,
+                color: BRAND,
+                border: `1px solid ${BRAND_RING}`,
+                background: "rgba(255,255,255,0.7)",
                 textDecoration: "none",
                 transition: "all 0.15s",
+                backdropFilter: "blur(6px)",
               }}
-              className="hover:border-black/[0.22] hover:text-[#0D0C0A]"
+              className="hover:border-[#3272EA] hover:bg-white"
             >
               Browse Gallery
             </Link>
@@ -978,13 +1059,14 @@ export default function Home() {
                 width: 26,
                 height: 26,
                 borderRadius: 7,
-                background: BLACK,
+                background: `linear-gradient(135deg, ${BRAND} 0%, ${BRAND_DARK} 100%)`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                boxShadow: "0 3px 8px rgba(50,114,234,0.25)",
               }}
             >
-              <span style={{ color: BG, fontSize: 12, fontWeight: 700, letterSpacing: "-0.02em" }}>A</span>
+              <span style={{ color: "#FFFFFF", fontSize: 12, fontWeight: 700, letterSpacing: "-0.02em" }}>A</span>
             </div>
             <span style={{ fontSize: 14, fontWeight: 650, letterSpacing: "-0.02em", color: BLACK }}>Alternus</span>
           </Link>
@@ -1002,7 +1084,7 @@ export default function Home() {
                 key={label}
                 href={href}
                 style={{ fontSize: 13, color: MUTED, textDecoration: "none", transition: "color 0.15s" }}
-                className="hover:text-[#0D0C0A]"
+                className="hover:text-[#3272EA]"
               >
                 {label}
               </Link>
