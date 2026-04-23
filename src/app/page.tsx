@@ -487,7 +487,7 @@ export default function Home() {
         <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
           <Link
             href="/os"
-            className="group block"
+            className="group block hover:border-[#5865F2]/50 hover:shadow-[0_24px_80px_rgba(88,101,242,0.18)]"
             style={{
               borderRadius: 16,
               overflow: "hidden",
@@ -497,7 +497,6 @@ export default function Home() {
               textDecoration: "none",
               transition: "border-color 0.25s, box-shadow 0.25s",
             }}
-            className="hover:border-[#5865F2]/50 hover:shadow-[0_24px_80px_rgba(88,101,242,0.18)]"
           >
             {/* Browser chrome */}
             <div style={{
