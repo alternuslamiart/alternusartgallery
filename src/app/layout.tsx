@@ -7,7 +7,6 @@ import { Providers } from "@/components/providers";
 import { CartModal } from "@/components/cart-modal";
 import { ArtLoverModal } from "@/components/art-lover-modal";
 import { CookieModal } from "@/components/cookie-modal";
-import { AIChat } from "@/components/ai-chat";
 import { LayoutShell } from "@/components/layout-shell";
 
 const geistSans = localFont({
@@ -196,7 +195,6 @@ export default function RootLayout({
           <CartModal />
           <CookieModal />
           <ArtLoverModal />
-          <AIChat />
         </Providers>
       </body>
     </html>
