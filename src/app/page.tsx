@@ -119,13 +119,13 @@ export default function Home() {
           </nav>
 
           <div style={{ flex: 1 }} />
-          <button onClick={() => setIsDark(!isDark)} style={{ width: 34, height: 34, border: `1px solid ${faint}`, background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: muted }}>
+          <button onClick={() => setIsDark(!isDark)} style={{ width: 34, height: 34, border: `1px solid ${faint}`, background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: muted, borderRadius: 8 }}>
             {isDark
               ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
               : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
             }
           </button>
-          <Link href="/os" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", boxShadow: `0 0 0 0 ${COBALT}`, transition: "box-shadow 0.2s" }} className="hover:shadow-[0_0_0_4px_rgba(66,132,255,0.25)]">
+          <Link href="/os" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", boxShadow: `0 0 0 0 ${COBALT}`, transition: "box-shadow 0.2s", borderRadius: 8 }} className="hover:shadow-[0_0_0_4px_rgba(66,132,255,0.25)]">
             Launch OS
             <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
           </Link>
@@ -149,9 +149,9 @@ export default function Home() {
                 ALTERNUS · BROWSER OS · v0.9
               </div>
               <h1 style={{ fontSize: "clamp(52px,8vw,120px)", lineHeight: 0.88, letterSpacing: "-0.045em", fontWeight: 900, margin: 0, fontStretch: "85%" }}>
-                <span style={{ display: "block", color: fg }}>An operating</span>
-                <span style={{ display: "block", color: fg }}>system you</span>
-                <span style={{ display: "block", color: COBALT, fontStyle: "italic", fontWeight: 900 }}>talk to.</span>
+                <span style={{ display: "block", color: fg }}>Describe</span>
+                <span style={{ display: "block", color: fg }}>the outcome.</span>
+                <span style={{ display: "block", color: COBALT, fontStyle: "italic", fontWeight: 900 }}>Alternus ships it.</span>
               </h1>
               <div style={{ height: 1, background: faint, margin: "40px 0 32px", maxWidth: 520 }} />
               <p style={{ fontSize: 18, color: muted, lineHeight: 1.55, maxWidth: 520, fontWeight: 400 }}>
@@ -160,7 +160,7 @@ export default function Home() {
 
               {/* CLI-style input */}
               <form onSubmit={(e) => { e.preventDefault(); goToChat(); }} style={{ marginTop: 36, maxWidth: 640 }}>
-                <div style={{ position: "relative", background: raised, border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : faint}`, padding: 0, boxShadow: `8px 8px 0 0 ${COBALT}` }}>
+                <div style={{ position: "relative", background: raised, border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : faint}`, padding: 0, boxShadow: `8px 8px 0 0 ${COBALT}`, borderRadius: 12, overflow: "hidden" }}>
                   <div style={{ display: "flex", alignItems: "center", height: 28, padding: "0 12px", borderBottom: `1px solid ${faint}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(5,8,15,0.02)", gap: 6 }}>
                     <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#FF5F57" }} />
                     <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#FEBC2E" }} />
@@ -171,12 +171,12 @@ export default function Home() {
                   <div style={{ display: "flex", alignItems: "center", padding: "14px 16px", gap: 10 }}>
                     <span style={{ fontFamily: "var(--font-geist-mono),monospace", fontSize: 14, color: COBALT, fontWeight: 700 }}>$</span>
                     <input ref={inputRef} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="ask anything — 'summarize today's unread mail'" style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: fg, fontSize: 14.5, fontFamily: "var(--font-geist-mono),monospace" }} className="placeholder:opacity-40" />
-                    <button type="submit" style={{ background: COBALT, color: "#FFF", padding: "6px 14px", fontSize: 12, fontWeight: 800, border: "none", cursor: "pointer", letterSpacing: "0.04em", textTransform: "uppercase" }}>
+                    <button type="submit" style={{ background: COBALT, color: "#FFF", padding: "6px 14px", fontSize: 12, fontWeight: 800, border: "none", cursor: "pointer", letterSpacing: "0.04em", textTransform: "uppercase", borderRadius: 8 }}>
                       Run →
                     </button>
                   </div>
                 </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 0, marginTop: 18, borderTop: `1px solid ${faint}`, borderBottom: `1px solid ${faint}` }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 0, marginTop: 18, border: `1px solid ${faint}`, borderRadius: 12, overflow: "hidden" }}>
                   {["Draft an email to my team about Q2", "Find last month's invoices", "Open a new React project", "Summarize today's mail"].map((s, i, arr) => (
                     <button key={s} type="button" onClick={() => goToChat(s)} style={{ flex: "1 1 200px", fontSize: 12, color: muted, padding: "14px 16px", borderRight: i < arr.length - 1 ? `1px solid ${faint}` : "none", background: "transparent", cursor: "pointer", fontWeight: 500, textAlign: "left", transition: "color 0.15s,background 0.15s" }} className="hover:!text-[#4284FF] hover:bg-[#4284FF]/5">
                       <span style={{ color: COBALT, marginRight: 6, fontWeight: 700 }}>/</span>
@@ -189,7 +189,7 @@ export default function Home() {
 
             {/* R: stacked data panels */}
             <div className="lg:col-span-5" style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 12 }}>
-              <div style={{ border: `1px solid ${faint}`, padding: "18px 20px", background: surface }}>
+              <div style={{ border: `1px solid ${faint}`, padding: "18px 20px", background: surface, borderRadius: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
                   <span style={{ fontSize: 10, letterSpacing: "0.18em", fontWeight: 700, color: muted }}>LIVE STATUS</span>
                   <span className="pulse-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: GREEN }} />
@@ -206,7 +206,7 @@ export default function Home() {
               </div>
 
               {/* Rotating capability card */}
-              <div style={{ border: `1px solid ${faint}`, padding: 0, background: raised, position: "relative", overflow: "hidden" }}>
+              <div style={{ border: `1px solid ${faint}`, padding: 0, background: raised, position: "relative", overflow: "hidden", borderRadius: 12 }}>
                 <div style={{ position: "absolute", top: 0, left: 0, width: `${((activeCap + 1) / capabilities.length) * 100}%`, height: 2, background: COBALT, transition: "width 3s linear" }} />
                 <div className="rise" key={activeCap} style={{ padding: "24px 22px" }}>
                   <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 12 }}>
@@ -214,7 +214,7 @@ export default function Home() {
                     <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.02em", color: fg }}>{capabilities[activeCap].t}</span>
                   </div>
                   <p style={{ fontSize: 13.5, color: muted, lineHeight: 1.6, margin: 0, marginBottom: 14 }}>{capabilities[activeCap].d}</p>
-                  <div style={{ background: isDark ? "rgba(66,132,255,0.1)" : "rgba(66,132,255,0.07)", border: `1px solid ${COBALT}30`, padding: "8px 12px", fontFamily: "var(--font-geist-mono),monospace", fontSize: 12, color: COBALT }}>
+                  <div style={{ background: isDark ? "rgba(66,132,255,0.1)" : "rgba(66,132,255,0.07)", border: `1px solid ${COBALT}30`, padding: "8px 12px", fontFamily: "var(--font-geist-mono),monospace", fontSize: 12, color: COBALT, borderRadius: 8 }}>
                     <span style={{ opacity: 0.5 }}>{"> "}</span>
                     <span className="caret">{capabilities[activeCap].k}</span>
                   </div>
@@ -266,7 +266,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={{ border: `1px solid ${faint}`, background: raised }}>
+          <div style={{ border: `1px solid ${faint}`, background: raised, borderRadius: 12, overflow: "hidden" }}>
             {capabilities.map((c, i) => (
               <div key={c.n} style={{ display: "grid", gridTemplateColumns: "80px 1fr 1fr 120px", gap: 24, alignItems: "center", padding: "28px 28px", borderTop: i > 0 ? `1px solid ${faint}` : "none", cursor: "pointer", transition: "background 0.2s" }} className="hover:bg-[#4284FF]/5 group">
                 <span style={{ fontSize: 13, color: COBALT, fontFamily: "var(--font-geist-mono),monospace", fontWeight: 700, letterSpacing: "0.05em" }}>{c.n}</span>
@@ -290,7 +290,7 @@ export default function Home() {
             Software that <span style={{ color: COBALT, fontStyle: "italic" }}>works for you</span> — not the other way around.
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0" style={{ marginTop: 80, border: `1px solid ${faint}` }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0" style={{ marginTop: 80, border: `1px solid ${faint}`, borderRadius: 12, overflow: "hidden" }}>
             {pillars.map((p, i) => (
               <div key={p.k} style={{ padding: "36px 28px", borderRight: i < pillars.length - 1 ? `1px solid ${faint}` : "none", background: raised, position: "relative", minHeight: 220 }}>
                 <div style={{ fontSize: 10, color: muted, fontFamily: "var(--font-geist-mono),monospace", marginBottom: 20, letterSpacing: "0.08em" }}>
@@ -310,7 +310,7 @@ export default function Home() {
           <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 40 }}>
             §03 / VOICES
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-0" style={{ border: `1px solid ${faint}` }}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-0" style={{ border: `1px solid ${faint}`, borderRadius: 12, overflow: "hidden" }}>
             {quotes.map((q, i) => (
               <figure key={q.by} style={{ margin: 0, padding: "44px 36px", borderRight: i < quotes.length - 1 ? `1px solid ${faint}` : "none", background: raised, display: "flex", flexDirection: "column", gap: 24, minHeight: 360 }}>
                 <div style={{ fontSize: 56, fontWeight: 900, color: COBALT, lineHeight: 0.5, fontFamily: "var(--font-playfair),serif" }}>&ldquo;</div>
@@ -345,7 +345,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div style={{ border: `1px solid ${faint}`, boxShadow: `16px 16px 0 0 ${COBALT}`, background: "#0C1220" }}>
+          <div style={{ border: `1px solid ${faint}`, boxShadow: `16px 16px 0 0 ${COBALT}`, background: "#0C1220", borderRadius: 12, overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 16px", height: 40, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
               <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#FF5F57" }} />
               <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#FEBC2E" }} />
@@ -412,7 +412,7 @@ export default function Home() {
         <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 32px" }}>
           <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 24 }}>§05 / QUESTIONS</div>
           <h2 style={{ fontSize: "clamp(36px,5vw,64px)", fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1, margin: 0, marginBottom: 48, color: fg, fontStretch: "90%" }}>Frequently asked.</h2>
-          <div style={{ border: `1px solid ${faint}` }}>
+          <div style={{ border: `1px solid ${faint}`, borderRadius: 12, overflow: "hidden" }}>
             {faq.map((f, i) => (
               <div key={i} style={{ borderTop: i > 0 ? `1px solid ${faint}` : "none" }}>
                 <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: "100%", padding: "24px 28px", background: openFaq === i ? (isDark ? "rgba(66,132,255,0.06)" : "rgba(66,132,255,0.04)") : "transparent", border: "none", color: fg, display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", textAlign: "left", transition: "background 0.2s" }}>
@@ -445,7 +445,7 @@ export default function Home() {
           <p style={{ fontSize: 18, color: "rgba(255,255,255,0.85)", maxWidth: 540, margin: "36px auto 48px", lineHeight: 1.5 }}>
             Alternus is free to try. Open the OS, say hello, and let the agent do the rest.
           </p>
-          <Link href="/os" style={{ display: "inline-flex", alignItems: "center", gap: 12, height: 56, padding: "0 32px", background: "#FFF", color: COBALT, fontSize: 16, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.01em", boxShadow: `8px 8px 0 0 ${INK}` }}>
+          <Link href="/os" style={{ display: "inline-flex", alignItems: "center", gap: 12, height: 56, padding: "0 32px", background: "#FFF", color: COBALT, fontSize: 16, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.01em", boxShadow: `8px 8px 0 0 ${INK}`, borderRadius: 8 }}>
             Launch Alternus OS
             <span style={{ fontSize: 14 }}>↗</span>
           </Link>
