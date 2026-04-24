@@ -4,64 +4,63 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-/* ─── Static data ─── */
-const features = [
-  { title: "AI Agent", desc: "A native agent that reads files, drafts emails, opens apps, and runs commands.", icon: "M9.937 15.5A2 2 0 008.5 14.063l-6.135-1.582a.5.5 0 010-.962L8.5 9.936A2 2 0 009.937 8.5l1.582-6.135a.5.5 0 01.963 0L14.063 8.5A2 2 0 0015.5 9.937l6.135 1.582a.5.5 0 010 .963L15.5 14.063a2 2 0 00-1.437 1.437l-1.582 6.135a.5.5 0 01-.963 0z", color: "#DC84FF", bg: "linear-gradient(135deg,#2a1045,#5a2a8a)" },
-  { title: "Native Mail", desc: "Minimalist inbox with compose, threading, labels — controllable by the agent.", icon: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6", color: "#C060F5", bg: "linear-gradient(135deg,#3d1555,#6a2ea8)" },
-  { title: "Smart Files", desc: "Semantic search, drag-and-drop, AI assistant that understands your folder structure.", icon: "M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z", color: "#E8B4FF", bg: "linear-gradient(135deg,#4a1f6e,#7a3cb8)" },
-  { title: "Voice Mode", desc: "Talk naturally. Dictate, transcribe, run workflows, or have a full conversation.", icon: "M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3zM19 10v1a7 7 0 01-14 0v-1M12 19v4", color: "#F0C8FF", bg: "linear-gradient(135deg,#2e0845,#6a1fa8)" },
-  { title: "Code Studio", desc: "VS Code-style editor with an integrated AI pair-programmer on your project.", icon: "M16 18l6-6-6-6M8 6l-6 6 6 6", color: "#9747D4", bg: "linear-gradient(135deg,#3a0a55,#7d1fb8)" },
-  { title: "Knowledge Base", desc: "Private indexed knowledge layer. The agent cites your docs when answering.", icon: "M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2zM22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z", color: "#DC84FF", bg: "linear-gradient(135deg,#1e0a45,#4a1f8a)" },
+/* ═══ Brand ═══ */
+const COBALT = "#4284FF";
+const COBALT_DEEP = "#1E5ED4";
+const COBALT_LIGHT = "#7DA9FF";
+const INK = "#05080F";
+const PAPER = "#F4F6FB";
+const GREEN = "#2EC272";
+
+/* ═══ Content ═══ */
+const marquee = [
+  "Claude Opus 4.6",
+  "Native agent",
+  "File system",
+  "Voice mode",
+  "Code studio",
+  "Mail intelligence",
+  "Knowledge base",
+  "Task runner",
 ];
 
-const suggestions = [
-  "Draft an email to my team about the Q2 launch",
-  "Find last month's invoices in Files",
-  "Open the Code editor with a new React project",
-  "Summarize today's unread mail",
+const capabilities = [
+  { n: "01", t: "Agent", d: "A resident model that reads your files, drafts messages, opens apps and runs multi-step jobs.", k: "agent.run(goal)" },
+  { n: "02", t: "Mail", d: "Threaded inbox with compose, labels, filters — every action can be delegated to the agent.", k: "mail.draft(thread)" },
+  { n: "03", t: "Files", d: "Semantic search across a native FS. The assistant understands folders by meaning, not names.", k: "fs.find('invoices q1')" },
+  { n: "04", t: "Voice", d: "Speak naturally. Dictate, transcribe, or run full workflows hands-free.", k: "voice.listen()" },
+  { n: "05", t: "Code", d: "A VS Code-class editor with an AI pair-programmer that has read your whole project.", k: "code.open(repo)" },
+  { n: "06", t: "Knowledge", d: "Private indexed layer. The agent cites your docs inline when it answers.", k: "kb.cite(query)" },
 ];
 
-const featuredApps = [
-  { title: "AI Mail Assistant", desc: "Auto-draft, summarize threads, and reply with one command. Your inbox, finally under control.", tag: "Mail", tagColor: "#C060F5", gradient: "linear-gradient(135deg,#2a0845 0%,#5a2a8a 50%,#B85AE0 100%)", raised: 68, backers: 1240, funds: "$24,800" },
-  { title: "Smart File System", desc: "Semantic search across all your files. The AI finds anything by meaning, not just filename.", tag: "Files", tagColor: "#F0C8FF", gradient: "linear-gradient(135deg,#1e0a45 0%,#4a1f8a 50%,#9747D4 100%)", raised: 82, backers: 2180, funds: "$41,600" },
-  { title: "Code Studio Pro", desc: "VS Code-style editor with an AI pair-programmer that understands your full project context.", tag: "Code", tagColor: "#DC84FF", gradient: "linear-gradient(135deg,#14101F 0%,#3d1a5e 50%,#DC84FF 100%)", raised: 55, backers: 890, funds: "$17,200" },
+const pillars = [
+  { k: "Fast", v: "Sub-200ms agent turn-around on warm context." },
+  { k: "Private", v: "Your data never leaves the encrypted knowledge layer." },
+  { k: "Native", v: "Works in any browser. No install, no sync, no friction." },
+  { k: "Open", v: "Scriptable, automatable, embeddable into your own tools." },
 ];
 
-const exploreItems = [
-  { title: "Mail Composer", category: "Mail", c1: "#C060F5", c2: "#B85AE0", rating: 4.9, users: "12K", icon: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" },
-  { title: "File Vault", category: "Files", c1: "#B85AE0", c2: "#B85AE0", rating: 4.8, users: "8K", icon: "M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" },
-  { title: "Code AI", category: "Code", c1: "#DC84FF", c2: "#B85AE0", rating: 4.9, users: "15K", icon: "M16 18l6-6-6-6M8 6l-6 6 6 6" },
-  { title: "Voice Control", category: "Voice", c1: "#9747D4", c2: "#B85AE0", rating: 4.7, users: "6K", icon: "M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3z" },
-  { title: "Knowledge DB", category: "Docs", c1: "#E8B4FF", c2: "#9747D4", rating: 4.8, users: "9K", icon: "M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" },
-  { title: "Task Runner", category: "Workflow", c1: "#B85AE0", c2: "#C060F5", rating: 4.6, users: "5K", icon: "M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" },
-  { title: "Calendar AI", category: "Calendar", c1: "#B85AE0", c2: "#B85AE0", rating: 4.7, users: "7K", icon: "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" },
-  { title: "Analytics", category: "Data", c1: "#9747D4", c2: "#F0C8FF", rating: 4.5, users: "4K", icon: "M18 20V10M12 20V4M6 20v-6" },
+const quotes = [
+  { by: "Marcus Johnson", role: "Product Designer, Remote", q: "The line between asking and doing just disappeared. I describe the outcome, it does the work." },
+  { by: "Priya Sharma", role: "Staff Engineer, Berlin", q: "Code Studio reads my whole repo before it suggests anything. It's the first AI tool I haven't turned off." },
+  { by: "David Chen", role: "Founder, SF", q: "I replaced four tools with one window. Mail, files, docs, code — one agent, one memory." },
 ];
 
-const testimonials = [
-  { name: "Marcus Johnson", role: "Product Designer", avatar: "MJ", avatarColor: "#DC84FF", text: "Alternus completely changed how I work. I just describe what I need and the AI handles the rest. It's like having a senior assistant that never sleeps." },
-  { name: "Priya Sharma", role: "Software Engineer", avatar: "PS", avatarColor: "#C060F5", text: "The Code Studio with AI integration is phenomenal. It understands my entire codebase and suggests contextually relevant solutions every time." },
-  { name: "David Chen", role: "Startup Founder", avatar: "DC", avatarColor: "#F0C8FF", text: "I replaced 4 different tools with Alternus. Mail, files, code, and knowledge — all in one place with one AI that understands context across all of them." },
-  { name: "Elena Voss", role: "Content Creator", avatar: "EV", avatarColor: "#E8B4FF", text: "The voice mode is a game changer. I dictate my ideas and Alternus drafts emails, creates files, and organizes everything automatically." },
-  { name: "James Carter", role: "Freelance Developer", avatar: "JC", avatarColor: "#9747D4", text: "Being able to ask the AI to find last month's invoices across my files and emails at the same time — that alone saves me hours every week." },
-  { name: "Lena Spencer", role: "UX Researcher", avatar: "LS", avatarColor: "#DC84FF", text: "The knowledge base feature is what sold me. I indexed all my research docs and now the AI cites them directly. Incredibly powerful." },
+const faq = [
+  { q: "What exactly is Alternus?", a: "A browser-native OS powered by Claude Opus 4.6 — mail, files, voice, code and a research agent that shares one memory layer." },
+  { q: "Do I need to install anything?", a: "No. It runs in any modern browser. Log in, and your workspace is there." },
+  { q: "Where is my data stored?", a: "In your private knowledge layer, encrypted at rest. The agent cites it but never trains on it." },
+  { q: "Can the agent act on my behalf?", a: "Yes — it can draft, send, organize and open apps within the OS. High-risk actions always require confirmation." },
 ];
-
-/* ─── Theme tokens (Alternus purple) ─── */
-const BLURPLE = "#DC84FF";
-const BLURPLE_DARK_HEX = "#B85AE0";
-const GREEN = "#23A559";
-
-const DARK = { BG: "#14101F", SURFACE: "#1E1830", RAISED: "#231B38", OVERLAY: "#2C2246", CHROME: "#0F0B1A", TEXT: "#F5F0FA", MUTED: "#C4B8D4", DIM: "#8E819E", BORDER: "rgba(255,255,255,0.06)", STRONG: "rgba(255,255,255,0.1)", BSOFT: "rgba(220,132,255,0.15)" };
-const LIGHT = { BG: "#FFFFFF", SURFACE: "#F7F2FC", RAISED: "#FFFFFF", OVERLAY: "#EEE3F8", CHROME: "#EEE3F8", TEXT: "#1A0F2E", MUTED: "#5A4A6E", DIM: "#8E819E", BORDER: "rgba(26,15,46,0.08)", STRONG: "rgba(26,15,46,0.12)", BSOFT: "rgba(220,132,255,0.08)" };
 
 export default function Home() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [activeCap, setActiveCap] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const T = isDark ? DARK : LIGHT;
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 8);
@@ -69,668 +68,406 @@ export default function Home() {
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
+  useEffect(() => {
+    const id = setInterval(() => setActiveCap((c) => (c + 1) % capabilities.length), 3200);
+    return () => clearInterval(id);
+  }, []);
+
   const goToChat = (q?: string) => {
     const t = (q ?? prompt).trim();
     router.push(t ? `/os?prompt=${encodeURIComponent(t)}` : "/os");
   };
 
-  return (
-    <div style={{ minHeight: "100vh", background: T.BG, color: T.TEXT, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", transition: "background 0.3s,color 0.3s" }}>
+  const bg = isDark ? INK : PAPER;
+  const fg = isDark ? "#FFFFFF" : INK;
+  const muted = isDark ? "rgba(255,255,255,0.6)" : "rgba(5,8,15,0.62)";
+  const faint = isDark ? "rgba(255,255,255,0.1)" : "rgba(5,8,15,0.1)";
+  const surface = isDark ? "rgba(255,255,255,0.04)" : "rgba(5,8,15,0.035)";
+  const raised = isDark ? "#0C1220" : "#FFFFFF";
 
-      {/* ── Keyframe animations ── */}
+  return (
+    <div style={{ minHeight: "100vh", background: bg, color: fg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", transition: "background 0.3s,color 0.3s", overflowX: "hidden" }}>
+
       <style>{`
-        @keyframes floatA { 0%,100%{transform:translateY(0px) rotate(-2deg)} 50%{transform:translateY(-14px) rotate(-2deg)} }
-        @keyframes floatB { 0%,100%{transform:translateY(0px) rotate(3deg)} 50%{transform:translateY(-10px) rotate(3deg)} }
-        @keyframes floatC { 0%,100%{transform:translateY(-6px) rotate(-1deg)} 50%{transform:translateY(8px) rotate(-1deg)} }
-        @keyframes pulse  { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(0.96)} }
-        @keyframes spin   { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-        @keyframes gradX  { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0} }
-        .float-a{animation:floatA 4s ease-in-out infinite}
-        .float-b{animation:floatB 5s ease-in-out infinite}
-        .float-c{animation:floatC 6s ease-in-out infinite}
+        @keyframes marq { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.55;transform:scale(.92)} }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+        @keyframes gridShift { from{background-position:0 0} to{background-position:60px 60px} }
+        @keyframes rise { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        .marquee-track{animation:marq 32s linear infinite}
         .pulse-dot{animation:pulse 2s ease-in-out infinite}
-        .cursor-blink::after{content:'|';animation:blink 1s step-end infinite;margin-left:1px}
+        .caret::after{content:'▌';color:${COBALT};animation:blink 1.1s step-end infinite;margin-left:2px}
+        .grid-bg{animation:gridShift 30s linear infinite}
+        .rise{animation:rise .6s ease-out both}
       `}</style>
 
-      {/* ─── Nav ─── */}
-      <header style={{ position: "sticky", top: 0, zIndex: 40, width: "100%", transition: "background 0.25s,border-color 0.25s", backdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none", WebkitBackdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none", background: scrolled ? (isDark ? "rgba(30,31,34,0.92)" : "rgba(255,255,255,0.92)") : "transparent", borderBottom: `1px solid ${scrolled ? T.STRONG : "transparent"}` }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px", height: 60, display: "flex", alignItems: "center" }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, textDecoration: "none" }}>
-            <div style={{ width: 32, height: 32, background: `linear-gradient(135deg,${BLURPLE} 0%,${BLURPLE_DARK_HEX} 100%)`, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 14px rgba(220,132,255,0.45)", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: -6, left: -6, width: 20, height: 20, borderRadius: "50%", background: "rgba(255,255,255,0.15)" }} />
-              <span style={{ color: "#FFF", fontSize: 15, fontWeight: 800, position: "relative" }}>A</span>
+      {/* ═══ Nav ═══ */}
+      <header style={{ position: "sticky", top: 0, zIndex: 40, width: "100%", transition: "all 0.25s", backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", WebkitBackdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", background: scrolled ? (isDark ? "rgba(5,8,15,0.78)" : "rgba(244,246,251,0.82)") : "transparent", borderBottom: `1px solid ${scrolled ? faint : "transparent"}` }}>
+        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", height: 64, display: "flex", alignItems: "center", gap: 32 }}>
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+            <div style={{ width: 28, height: 28, background: COBALT, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+              <div style={{ position: "absolute", inset: 4, border: `2px solid ${INK}`, borderRight: 0, borderBottom: 0 }} />
             </div>
-            <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.025em", color: T.TEXT }}>Alternus</span>
+            <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: muted, padding: "2px 6px", border: `1px solid ${faint}`, borderRadius: 3, letterSpacing: "0.08em" }}>BETA</span>
           </Link>
 
-          <nav style={{ display: "flex", alignItems: "center", gap: 2, marginLeft: 40 }} className="hidden md:flex">
-            {[{ label: "Features", href: "#features" }, { label: "Explore", href: "#explore" }, { label: "Gallery", href: "/gallery" }, { label: "Pricing", href: "/pricing" }].map((l) => (
-              <Link key={l.label} href={l.href} style={{ fontSize: 14, color: T.MUTED, fontWeight: 500, textDecoration: "none", padding: "0 12px", height: 36, display: "flex", alignItems: "center", borderRadius: 6, transition: "color 0.15s,background 0.15s" }} className={isDark ? "hover:bg-white/[0.07] hover:!text-white" : "hover:bg-black/[0.05] hover:!text-black"}>
-                {l.label}
-              </Link>
+          <nav className="hidden md:flex" style={{ display: "flex", alignItems: "center", gap: 24 }}>
+            {[{ l: "Capabilities", h: "#caps" }, { l: "Manifesto", h: "#manifesto" }, { l: "Voices", h: "#voices" }, { l: "FAQ", h: "#faq" }].map((i) => (
+              <Link key={i.l} href={i.h} style={{ fontSize: 13, color: muted, fontWeight: 500, textDecoration: "none", letterSpacing: "-0.01em" }}>{i.l}</Link>
             ))}
           </nav>
 
           <div style={{ flex: 1 }} />
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button onClick={() => setIsDark(!isDark)} style={{ width: 36, height: 36, borderRadius: 6, border: `1px solid ${T.STRONG}`, background: T.SURFACE, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", color: T.MUTED }} title={isDark ? "Light mode" : "Dark mode"}>
-              {isDark
-                ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-              }
-            </button>
-            <Link href="/login" style={{ display: "none", alignItems: "center", height: 36, padding: "0 14px", borderRadius: 6, fontSize: 14, fontWeight: 500, color: T.MUTED, textDecoration: "none" }} className="sm:!inline-flex">Log in</Link>
-            <Link href="/os" style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, padding: "0 16px", background: BLURPLE, color: "#FFF", borderRadius: 6, fontSize: 14, fontWeight: 600, letterSpacing: "-0.01em", textDecoration: "none", transition: "background 0.15s", boxShadow: "0 2px 8px rgba(220,132,255,0.4)" }} className="hover:bg-[#B85AE0]">
-              Try in Chat
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            </Link>
-          </div>
+          <button onClick={() => setIsDark(!isDark)} style={{ width: 34, height: 34, border: `1px solid ${faint}`, background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: muted }}>
+            {isDark
+              ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+              : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+            }
+          </button>
+          <Link href="/os" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", boxShadow: `0 0 0 0 ${COBALT}`, transition: "box-shadow 0.2s" }} className="hover:shadow-[0_0_0_4px_rgba(66,132,255,0.25)]">
+            Launch OS
+            <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
+          </Link>
         </div>
       </header>
 
-      {/* ─── Hero (Alternus purple promo style) ─── */}
-      <section style={{ position: "relative", paddingTop: 80, paddingBottom: 80, overflow: "hidden", background: isDark ? "linear-gradient(180deg,#1a0a2e 0%,#3d1a5e 50%,#5a2a8a 100%)" : "linear-gradient(180deg,#5a2a8a 0%,#8a47c4 50%,#DC84FF 100%)" }} className="md:pt-[120px] md:pb-[120px]">
-        {/* Starry background */}
-        <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }}>
-          <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px,transparent 1px), radial-gradient(rgba(255,255,255,0.2) 1px,transparent 1px)", backgroundSize: "120px 120px, 60px 60px", backgroundPosition: "0 0, 30px 30px", opacity: 0.7 }} />
-          {/* Glow orbs */}
-          <div style={{ position: "absolute", left: "-10%", top: "20%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(closest-side,rgba(220,132,255,0.4),transparent 70%)", filter: "blur(40px)" }} />
-          <div style={{ position: "absolute", right: "-10%", bottom: "-10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(closest-side,rgba(184,90,224,0.45),transparent 70%)", filter: "blur(40px)" }} />
-        </div>
+      {/* ═══ Hero — editorial split ═══ */}
+      <section style={{ position: "relative", paddingTop: 40, paddingBottom: 40, borderBottom: `1px solid ${faint}`, overflow: "hidden" }}>
+        {/* Blueprint grid background */}
+        <div className="grid-bg" style={{ position: "absolute", inset: 0, backgroundImage: isDark
+          ? `linear-gradient(${faint} 1px,transparent 1px),linear-gradient(90deg,${faint} 1px,transparent 1px)`
+          : `linear-gradient(rgba(66,132,255,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(66,132,255,0.07) 1px,transparent 1px)`,
+          backgroundSize: "60px 60px", maskImage: "radial-gradient(ellipse at 70% 30%,black 30%,transparent 75%)", WebkitMaskImage: "radial-gradient(ellipse at 70% 30%,black 30%,transparent 75%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", right: "-20%", top: "-10%", width: 700, height: 700, borderRadius: "50%", background: `radial-gradient(closest-side,${COBALT}40,transparent 70%)`, filter: "blur(30px)", pointerEvents: "none" }} />
 
-        <div style={{ position: "relative", zIndex: 1, maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-
-            {/* Left: rounded card with OS mockup */}
-            <div style={{ position: "relative" }}>
-              <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", background: "linear-gradient(135deg,#6a2ea8 0%,#9747d4 50%,#DC84FF 100%)", aspectRatio: "1 / 0.82", boxShadow: "0 40px 80px -20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)" }}>
-                {/* Card inner glow */}
-                <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 30%,rgba(255,255,255,0.12),transparent 60%)" }} />
-                {/* Decorative stars inside card */}
-                <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(rgba(255,255,255,0.3) 1px,transparent 1px)", backgroundSize: "40px 40px", opacity: 0.5 }} />
-
-                {/* Floating OS window mockup */}
-                <div className="float-a" style={{ position: "absolute", left: "8%", top: "10%", width: "78%", background: "#FFFFFF", borderRadius: 16, overflow: "hidden", boxShadow: "0 24px 48px rgba(0,0,0,0.35)" }}>
-                  {/* Window header */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 16px", borderBottom: "1px solid #E3E5E8" }}>
-                    <button aria-label="back" style={{ background: "transparent", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4E5058" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    </button>
-                    <span style={{ fontSize: 14, color: "#4E5058", fontWeight: 600 }}>#</span>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: "#060607" }}>main-chat</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4E5058" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-                    <div style={{ flex: 1 }} />
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4E5058" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
-                  </div>
-
-                  {/* Chat messages */}
-                  <div style={{ padding: "16px 16px 8px" }}>
-                    <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#DC84FF,#B85AE0)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13 }}>A</div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 2 }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: "#DC84FF" }}>Alternus</span>
-                          <span style={{ fontSize: 10.5, color: "#80848E" }}>Today at 2:12 PM</span>
-                        </div>
-                        <div style={{ fontSize: 13, color: "#2E3035", lineHeight: 1.5 }}>drafted your email and organized files</div>
-                        <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
-                          <div style={{ width: 28, height: 28, borderRadius: 8, background: "#DC84FF22", border: "1px solid #DC84FF44", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC84FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6"/></svg>
-                          </div>
-                          <div style={{ width: 28, height: 28, borderRadius: 8, background: "#B85AE022", border: "1px solid #B85AE044", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B85AE0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div style={{ display: "flex", gap: 10, marginBottom: 8 }}>
-                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#F0C8FF,#B85AE0)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13 }}>Y</div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 2 }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: "#F0C8FF" }}>You</span>
-                          <span style={{ fontSize: 10.5, color: "#80848E" }}>Today at 2:13 PM</span>
-                        </div>
-                        <div style={{ fontSize: 13, color: "#2E3035", lineHeight: 1.5 }}>now summarize today&apos;s unread mail</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Input area */}
-                  <div style={{ padding: "10px 16px 14px", borderTop: "1px solid #E3E5E8" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, height: 38, padding: "0 12px", borderRadius: 10, background: "#F2F3F5" }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#80848E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                      <span style={{ fontSize: 12.5, color: "#80848E", flex: 1 }}>Ask Alternus anything…</span>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC84FF" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Decorative floating badge */}
-                <div className="float-b" style={{ position: "absolute", right: "6%", bottom: "10%", padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.95)", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 12px 30px rgba(0,0,0,0.25)" }}>
-                  <div className="pulse-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: GREEN }} />
-                  <span style={{ fontSize: 11.5, fontWeight: 700, color: "#060607" }}>47 tasks automated</span>
-                </div>
+        <div style={{ position: "relative", maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start" style={{ paddingTop: 60, paddingBottom: 60 }}>
+            {/* L: oversized type */}
+            <div className="lg:col-span-7">
+              <div style={{ fontSize: 11, letterSpacing: "0.24em", color: COBALT, fontWeight: 700, marginBottom: 28 }}>
+                ALTERNUS · BROWSER OS · v0.9
               </div>
-            </div>
-
-            {/* Right: headline + copy + CTA */}
-            <div style={{ color: "#FFFFFF" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 32, padding: "0 14px", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 6, marginBottom: 28, backdropFilter: "blur(8px)" }}>
-                <span className="pulse-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: GREEN, display: "block", boxShadow: "0 0 0 2px rgba(35,165,89,0.3)" }} />
-                <span style={{ fontSize: 12.5, fontWeight: 500, color: "#FFFFFF" }}>Claude Opus 4.6 · Online</span>
-              </div>
-
-              <h1 style={{ fontSize: "clamp(40px, 6vw, 76px)", lineHeight: 0.98, fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 28, color: "#FFFFFF", textTransform: "uppercase", fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", fontStretch: "125%" }}>
-                Run your<br />
-                digital life<br />
-                with one AI
+              <h1 style={{ fontSize: "clamp(52px,8vw,120px)", lineHeight: 0.88, letterSpacing: "-0.045em", fontWeight: 900, margin: 0, fontStretch: "85%" }}>
+                <span style={{ display: "block", color: fg }}>An operating</span>
+                <span style={{ display: "block", color: fg }}>system you</span>
+                <span style={{ display: "block", color: COBALT, fontStyle: "italic", fontWeight: 900 }}>talk to.</span>
               </h1>
-
-              <p style={{ fontSize: 17, color: "rgba(255,255,255,0.85)", lineHeight: 1.65, fontWeight: 400, marginBottom: 36, maxWidth: 520 }}>
-                Use AI agents, smart files, voice commands, and a built-in code studio to automate anything. Set up your workspace, write emails, open apps, and organize everything — your way.
+              <div style={{ height: 1, background: faint, margin: "40px 0 32px", maxWidth: 520 }} />
+              <p style={{ fontSize: 18, color: muted, lineHeight: 1.55, maxWidth: 520, fontWeight: 400 }}>
+                Ask Alternus in plain language — it writes mail, opens apps, finds files, ships code, and runs your day across a full browser desktop.
               </p>
 
-              {/* Input */}
-              <form onSubmit={(e) => { e.preventDefault(); goToChat(); }} style={{ maxWidth: 560 }}>
-                <div style={{ position: "relative", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 14, overflow: "hidden", backdropFilter: "blur(12px)", boxShadow: "0 12px 40px rgba(0,0,0,0.3)" }}>
-                  <input ref={inputRef} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Ask Alternus anything — try 'draft an email to my team'" style={{ width: "100%", padding: "16px 20px 10px", fontSize: 15, background: "transparent", border: "none", outline: "none", color: "#FFFFFF", boxSizing: "border-box" }} className="placeholder:text-white/50" />
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 10px 10px" }}>
-                    <div style={{ display: "flex", gap: 2, color: "rgba(255,255,255,0.6)" }}>
-                      {[{ d: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3", t: "Upload" }, { d: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20", t: "Research" }, { d: "M16 18l6-6-6-6M8 6l-6 6 6 6", t: "Code" }, { d: "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z", t: "Chat" }].map((b, i) => (
-                        <button key={i} type="button" title={b.t} style={{ width: 32, height: 32, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", cursor: "pointer", transition: "background 0.15s,color 0.15s", color: "inherit" }} className="hover:bg-white/[0.12] hover:!text-white">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={b.d}/></svg>
-                        </button>
-                      ))}
-                    </div>
-                    <button type="submit" style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 38, padding: "0 20px", background: BLURPLE, color: "#1A0F2E", borderRadius: 8, fontSize: 13.5, fontWeight: 800, border: "none", cursor: "pointer", transition: "all 0.15s", boxShadow: "0 4px 14px rgba(220,132,255,0.55)" }} className="hover:brightness-110">
-                      Try in Chat
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              {/* CLI-style input */}
+              <form onSubmit={(e) => { e.preventDefault(); goToChat(); }} style={{ marginTop: 36, maxWidth: 640 }}>
+                <div style={{ position: "relative", background: raised, border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : faint}`, padding: 0, boxShadow: `8px 8px 0 0 ${COBALT}` }}>
+                  <div style={{ display: "flex", alignItems: "center", height: 28, padding: "0 12px", borderBottom: `1px solid ${faint}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(5,8,15,0.02)", gap: 6 }}>
+                    <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#FF5F57" }} />
+                    <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#FEBC2E" }} />
+                    <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#28C840" }} />
+                    <div style={{ flex: 1 }} />
+                    <span style={{ fontSize: 10, color: muted, fontFamily: "var(--font-geist-mono),monospace" }}>~/alternus</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", padding: "14px 16px", gap: 10 }}>
+                    <span style={{ fontFamily: "var(--font-geist-mono),monospace", fontSize: 14, color: COBALT, fontWeight: 700 }}>$</span>
+                    <input ref={inputRef} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="ask anything — 'summarize today's unread mail'" style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: fg, fontSize: 14.5, fontFamily: "var(--font-geist-mono),monospace" }} className="placeholder:opacity-40" />
+                    <button type="submit" style={{ background: COBALT, color: "#FFF", padding: "6px 14px", fontSize: 12, fontWeight: 800, border: "none", cursor: "pointer", letterSpacing: "0.04em", textTransform: "uppercase" }}>
+                      Run →
                     </button>
                   </div>
                 </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 14 }}>
-                  {suggestions.map((s) => (
-                    <button key={s} type="button" onClick={() => goToChat(s)} style={{ fontSize: 12.5, color: "rgba(255,255,255,0.85)", padding: "0 14px", height: 30, borderRadius: 6, border: "1px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.06)", cursor: "pointer", fontWeight: 450, transition: "all 0.15s", backdropFilter: "blur(8px)" }} className="hover:bg-white/15 hover:border-white/40">
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 0, marginTop: 18, borderTop: `1px solid ${faint}`, borderBottom: `1px solid ${faint}` }}>
+                  {["Draft an email to my team about Q2", "Find last month's invoices", "Open a new React project", "Summarize today's mail"].map((s, i, arr) => (
+                    <button key={s} type="button" onClick={() => goToChat(s)} style={{ flex: "1 1 200px", fontSize: 12, color: muted, padding: "14px 16px", borderRight: i < arr.length - 1 ? `1px solid ${faint}` : "none", background: "transparent", cursor: "pointer", fontWeight: 500, textAlign: "left", transition: "color 0.15s,background 0.15s" }} className="hover:!text-[#4284FF] hover:bg-[#4284FF]/5">
+                      <span style={{ color: COBALT, marginRight: 6, fontWeight: 700 }}>/</span>
                       {s}
                     </button>
                   ))}
                 </div>
               </form>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* ─── Stats Bar ─── */}
-      <section style={{ borderTop: `1px solid ${T.BORDER}`, borderBottom: `1px solid ${T.BORDER}`, background: T.SURFACE }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <div className="grid grid-cols-2 md:grid-cols-4">
-            {[
-              { value: "50+", label: "AI Modules", color: BLURPLE, icon: "M9.937 15.5A2 2 0 008.5 14.063l-6.135-1.582a.5.5 0 010-.962L8.5 9.936A2 2 0 009.937 8.5l1.582-6.135a.5.5 0 01.963 0L14.063 8.5A2 2 0 0015.5 9.937l6.135 1.582a.5.5 0 010 .963L15.5 14.063a2 2 0 00-1.437 1.437l-1.582 6.135a.5.5 0 01-.963 0z" },
-              { value: "10K+", label: "Active Users", color: "#C060F5", icon: "M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" },
-              { value: "99.9%", label: "Uptime SLA", color: "#F0C8FF", icon: "M22 12h-4l-3 9L9 3l-3 9H2" },
-              { value: "4.9★", label: "Avg Rating", color: "#E8B4FF", icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" },
-            ].map((s, i) => (
-              <div key={i} style={{ padding: "28px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: 14, borderRight: i < 3 ? `1px solid ${T.BORDER}` : "none" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: `${s.color}18`, border: `1px solid ${s.color}30`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={s.color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={s.icon}/></svg>
+            {/* R: stacked data panels */}
+            <div className="lg:col-span-5" style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 12 }}>
+              <div style={{ border: `1px solid ${faint}`, padding: "18px 20px", background: surface }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                  <span style={{ fontSize: 10, letterSpacing: "0.18em", fontWeight: 700, color: muted }}>LIVE STATUS</span>
+                  <span className="pulse-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: GREEN }} />
                 </div>
-                <div>
-                  <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: "-0.04em", color: T.TEXT, lineHeight: 1 }}>{s.value}</div>
-                  <div style={{ fontSize: 12, color: T.MUTED, marginTop: 3 }}>{s.label}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── OS Preview ─── */}
-      <section style={{ paddingTop: 80, paddingBottom: 80 }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <Link href="/os" className="group block hover:border-[#DC84FF]/50" style={{ borderRadius: 18, overflow: "hidden", border: `1px solid ${T.STRONG}`, boxShadow: isDark ? "0 24px 64px -12px rgba(0,0,0,0.65),0 0 0 1px rgba(255,255,255,0.04)" : "0 24px 64px -12px rgba(0,0,0,0.14)", display: "block", textDecoration: "none", transition: "border-color 0.25s,box-shadow 0.25s" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 7, padding: "0 16px", height: 38, background: T.CHROME, borderBottom: `1px solid ${T.BORDER}` }}>
-              <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#9747D4" }} />
-              <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#E8B4FF" }} />
-              <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#F0C8FF" }} />
-              <div style={{ marginLeft: 16, height: 22, padding: "0 12px", borderRadius: 4, background: T.SURFACE, display: "flex", alignItems: "center" }}>
-                <span style={{ fontSize: 11, color: T.DIM }}>alternus.art/os</span>
-              </div>
-              <span style={{ marginLeft: "auto", fontSize: 10.5, color: T.DIM, transition: "color 0.15s" }} className="group-hover:!text-[#DC84FF]">Click to open →</span>
-            </div>
-            <div style={{ height: 440, background: T.BG, display: "flex" }} className="md:h-[520px]">
-              {/* Server sidebar */}
-              <div style={{ width: 72, background: T.CHROME, padding: "12px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, flexShrink: 0 }}>
-                <div style={{ width: 48, height: 48, borderRadius: 16, background: `linear-gradient(135deg,${BLURPLE},#B85AE0)`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 4, boxShadow: "0 4px 12px rgba(220,132,255,0.4)" }}>
-                  <span style={{ color: "#FFF", fontSize: 18, fontWeight: 800 }}>A</span>
-                </div>
-                <div style={{ width: 32, height: 1, background: T.OVERLAY, borderRadius: 1 }} />
-                {[{ icon: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z", active: false }, { icon: "M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z", active: true }, { icon: "M16 18l6-6-6-6M8 6l-6 6 6 6", active: false }, { icon: "M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z", active: false }].map((app, ai) => (
-                  <div key={ai} style={{ position: "relative" }}>
-                    {app.active && <div style={{ position: "absolute", left: -12, top: "50%", transform: "translateY(-50%)", width: 4, height: 32, background: isDark ? "white" : BLURPLE, borderRadius: "0 4px 4px 0" }} />}
-                    <div style={{ width: 48, height: 48, borderRadius: app.active ? 16 : 24, background: app.active ? BLURPLE : T.RAISED, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", cursor: "pointer" }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={app.active ? "#fff" : T.DIM} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={app.icon}/></svg>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {/* Channel list */}
-              <div style={{ width: 240, background: T.SURFACE, borderRight: `1px solid ${T.BORDER}`, display: "flex", flexDirection: "column", flexShrink: 0 }}>
-                <div style={{ padding: "16px 12px 10px", borderBottom: `1px solid ${T.BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: T.TEXT }}>Smart Files</span>
-                </div>
-                <div style={{ padding: "8px", flex: 1, overflow: "hidden" }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: T.DIM, padding: "4px 8px", marginBottom: 2 }}>Folders</div>
-                  {[{ name: "Projects", u: 0 }, { name: "Invoices", u: 2 }, { name: "Design Assets", u: 0 }, { name: "Contracts", u: 0 }, { name: "Archive", u: 0 }].map((ch) => (
-                    <div key={ch.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 8px", borderRadius: 4, cursor: "pointer", background: ch.name === "Invoices" ? T.OVERLAY : "transparent" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <span style={{ fontSize: 14, color: T.DIM }}>#</span>
-                        <span style={{ fontSize: 13, color: ch.u > 0 ? T.TEXT : T.MUTED, fontWeight: ch.u > 0 ? 600 : 400 }}>{ch.name}</span>
-                      </div>
-                      {ch.u > 0 && <div style={{ minWidth: 18, height: 18, borderRadius: 9, background: BLURPLE, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#FFF", padding: "0 5px" }}>{ch.u}</div>}
-                    </div>
-                  ))}
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", background: T.CHROME, borderTop: `1px solid ${T.BORDER}` }}>
-                  <div style={{ position: "relative" }}>
-                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: `linear-gradient(135deg,${BLURPLE},#B85AE0)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#FFF" }}>A</div>
-                    <div style={{ position: "absolute", bottom: 0, right: 0, width: 10, height: 10, borderRadius: "50%", background: GREEN, border: `2px solid ${T.CHROME}` }} />
-                  </div>
-                  <div><div style={{ fontSize: 12, fontWeight: 600, color: T.TEXT }}>You</div><div style={{ fontSize: 10, color: GREEN }}>● Online</div></div>
-                </div>
-              </div>
-              {/* Main */}
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                <div style={{ padding: "0 20px", height: 48, borderBottom: `1px solid ${T.BORDER}`, display: "flex", alignItems: "center", gap: 8, background: T.RAISED }}>
-                  <span style={{ fontSize: 14, color: T.DIM }}>#</span>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: T.TEXT }}>Invoices</span>
-                  <div style={{ width: 1, height: 16, background: T.STRONG, margin: "0 4px" }} />
-                  <span style={{ fontSize: 12, color: T.DIM }}>12 files · AI indexed</span>
-                </div>
-                <div style={{ flex: 1, padding: 20, overflow: "hidden" }}>
-                  <div style={{ display: "flex", gap: 12, padding: "12px 16px", borderRadius: 10, background: isDark ? "rgba(220,132,255,0.12)" : "rgba(220,132,255,0.06)", border: `1px solid rgba(220,132,255,0.2)`, marginBottom: 16 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: `linear-gradient(135deg,${BLURPLE},#B85AE0)`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 11, fontWeight: 800, color: "#FFF" }}>AI</div>
-                    <div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}><span style={{ fontSize: 12, fontWeight: 700, color: BLURPLE }}>Alternus AI</span><span style={{ fontSize: 10.5, color: T.DIM }}>Today at 10:42</span></div>
-                      <p style={{ fontSize: 12.5, color: T.MUTED, lineHeight: 1.6, margin: 0 }}>Found <strong style={{ color: T.TEXT }}>2 invoices from last month</strong> — Total: <strong style={{ color: T.TEXT }}>$4,820</strong>. Want me to export a summary?</p>
-                    </div>
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
-                    {[{ name: "Invoice_March_2026.pdf", size: "128 KB", color: "#9747D4" }, { name: "Design_Contract_Q2.pdf", size: "84 KB", color: BLURPLE }, { name: "Stripe_Receipt.pdf", size: "32 KB", color: "#F0C8FF" }].map((f) => (
-                      <div key={f.name} style={{ padding: "10px 12px", borderRadius: 8, background: T.RAISED, border: `1px solid ${T.BORDER}`, cursor: "pointer" }}>
-                        <div style={{ width: 28, height: 32, borderRadius: 4, background: `${f.color}22`, border: `1px solid ${f.color}44`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8, fontSize: 8, fontWeight: 800, color: f.color }}>PDF</div>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: T.TEXT, lineHeight: 1.3, marginBottom: 2 }}>{f.name}</div>
-                        <div style={{ fontSize: 10, color: T.DIM }}>{f.size}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div style={{ padding: "10px 16px 16px", background: T.RAISED, borderTop: `1px solid ${T.BORDER}` }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 14px", height: 40, borderRadius: 8, background: T.OVERLAY }}>
-                    <span style={{ fontSize: 12, color: T.DIM }}>Ask AI about these files...</span>
-                    <div style={{ flex: 1 }} />
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={BLURPLE} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* ─── Transform Split Section ─── */}
-      <section style={{ paddingTop: 96, paddingBottom: 96, borderTop: `1px solid ${T.BORDER}`, background: T.SURFACE, overflow: "hidden" }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            {/* Left text */}
-            <div>
-              <div style={{ display: "inline-flex", alignItems: "center", height: 26, padding: "0 10px", background: isDark ? "rgba(220,132,255,0.15)" : "rgba(220,132,255,0.08)", border: `1px solid rgba(220,132,255,0.3)`, borderRadius: 4, marginBottom: 20 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: BLURPLE }}>Transform your workflow</span>
-              </div>
-              <h2 style={{ fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.06, color: T.TEXT, marginBottom: 18 }}>
-                Digital Resources to<br />
-                <span style={{ background: "linear-gradient(90deg,#DC84FF,#C060F5)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  Transform Your Ideas
-                </span>
-              </h2>
-              <p style={{ fontSize: 15.5, color: T.MUTED, lineHeight: 1.7, marginBottom: 32 }}>
-                One AI-native OS that connects your mail, files, code, and knowledge. Stop switching between apps — let the agent work across all of them simultaneously.
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 36 }}>
-                {[
-                  { label: "Fully Customizable", desc: "Adapt every module to your workflow and preferences.", color: BLURPLE },
-                  { label: "Cross-Platform Ready", desc: "Works in any browser, on any device, without installs.", color: "#C060F5" },
-                  { label: "Privacy First", desc: "Your data stays in your private knowledge layer.", color: "#F0C8FF" },
-                ].map((item) => (
-                  <div key={item.label} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                    <div style={{ width: 22, height: 22, borderRadius: 6, background: `${item.color}20`, border: `1px solid ${item.color}35`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                    </div>
-                    <div>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: T.TEXT }}>{item.label} </span>
-                      <span style={{ fontSize: 13.5, color: T.MUTED }}>{item.desc}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Link href="/os" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 44, padding: "0 24px", background: BLURPLE, color: "#FFF", borderRadius: 8, fontSize: 14.5, fontWeight: 700, textDecoration: "none", boxShadow: "0 6px 20px rgba(220,132,255,0.4)", transition: "background 0.15s" }} className="hover:bg-[#B85AE0]">
-                Start for Free
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-              </Link>
-            </div>
-
-            {/* Right illustration */}
-            <div style={{ position: "relative" }}>
-              <div style={{ position: "absolute", inset: -40, background: isDark ? "radial-gradient(ellipse at 60% 40%,rgba(220,132,255,0.18),transparent 65%)" : "radial-gradient(ellipse at 60% 40%,rgba(220,132,255,0.1),transparent 65%)", pointerEvents: "none" }} />
-              <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", border: `1px solid ${T.STRONG}`, boxShadow: isDark ? "0 32px 72px rgba(0,0,0,0.5)" : "0 32px 72px rgba(0,0,0,0.12)" }}>
-                {/* Illustration header */}
-                <div style={{ height: 44, background: isDark ? "#0d0e10" : "#1a1b1e", display: "flex", alignItems: "center", padding: "0 16px", gap: 6, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#9747D4" }} />
-                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#E8B4FF" }} />
-                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#F0C8FF" }} />
-                  <div style={{ flex: 1, marginLeft: 12, height: 24, borderRadius: 4, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", padding: "0 10px" }}>
-                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>alternus.art/os · AI workspace</span>
-                  </div>
-                </div>
-                {/* Illustration body */}
-                <div style={{ background: isDark ? "#16181c" : "#1E1F22", padding: 20, minHeight: 360 }}>
-                  {/* Fake command input */}
-                  <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "14px 16px", marginBottom: 16 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: BLURPLE }} />
-                      <span className="cursor-blink" style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", fontFamily: "var(--font-geist-mono),monospace" }}>Organize all files by date and generate a summary report</span>
-                    </div>
-                  </div>
-                  {/* AI response stream */}
-                  <div style={{ background: "rgba(220,132,255,0.1)", border: "1px solid rgba(220,132,255,0.2)", borderRadius: 10, padding: "14px 16px", marginBottom: 12 }}>
-                    <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: "50%", background: BLURPLE, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 10, fontWeight: 800, color: "#fff" }}>AI</div>
-                      <div>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: BLURPLE, marginBottom: 4 }}>Alternus · Processing</div>
-                        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.65)", lineHeight: 1.6 }}>Scanning 47 files across 3 folders... Found <strong style={{ color: "#fff" }}>12 documents</strong> from March. Grouping by category and generating summary...</div>
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      {[["📁", "12 Files", BLURPLE], ["📧", "3 Emails", "#C060F5"], ["📝", "Summary", "#F0C8FF"]].map(([icon, label, color], i) => (
-                        <div key={i} style={{ flex: 1, padding: "8px 0", borderRadius: 6, background: `${color}18`, border: `1px solid ${color}30`, textAlign: "center" }}>
-                          <div style={{ fontSize: 14 }}>{icon}</div>
-                          <div style={{ fontSize: 10, color: color, fontWeight: 600 }}>{label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  {/* Fake progress bars */}
-                  {[{ label: "Files organized", pct: 100, color: "#F0C8FF" }, { label: "Summary generated", pct: 72, color: BLURPLE }].map((p) => (
-                    <div key={p.label} style={{ marginBottom: 10 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>{p.label}</span>
-                        <span style={{ fontSize: 11, color: p.color, fontWeight: 700 }}>{p.pct}%</span>
-                      </div>
-                      <div style={{ height: 4, borderRadius: 4, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
-                        <div style={{ height: "100%", width: `${p.pct}%`, borderRadius: 4, background: `linear-gradient(90deg,${p.color},${p.color}88)` }} />
-                      </div>
+                <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-0.03em", color: fg, lineHeight: 1 }}>Claude Opus 4.6</div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 0, marginTop: 18, borderTop: `1px solid ${faint}`, paddingTop: 14 }}>
+                  {[["200ms", "latency"], ["99.9%", "uptime"], ["10k+", "users"]].map(([v, l]) => (
+                    <div key={l}>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: fg, letterSpacing: "-0.02em" }}>{v}</div>
+                      <div style={{ fontSize: 10, color: muted, letterSpacing: "0.12em", marginTop: 2 }}>{l.toUpperCase()}</div>
                     </div>
                   ))}
                 </div>
               </div>
-              {/* Decorative floating mini badge */}
-              <div className="float-a" style={{ position: "absolute", top: -16, right: -16, padding: "8px 14px", borderRadius: 10, background: isDark ? DARK.RAISED : LIGHT.RAISED, border: `1px solid ${T.STRONG}`, boxShadow: isDark ? "0 8px 24px rgba(0,0,0,0.4)" : "0 8px 24px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#F0C8FF", boxShadow: "0 0 0 3px rgba(87,242,135,0.25)" }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: T.TEXT }}>47 tasks automated today</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* ─── Featured Apps ─── */}
-      <section style={{ paddingTop: 96, paddingBottom: 96, borderTop: `1px solid ${T.BORDER}` }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 44, flexWrap: "wrap", gap: 16 }}>
-            <div>
-              <h2 style={{ fontSize: "clamp(24px, 3.5vw, 38px)", fontWeight: 900, letterSpacing: "-0.04em", color: T.TEXT, marginBottom: 8 }}>New Featured Apps</h2>
-              <p style={{ fontSize: 14, color: T.MUTED }}>Check out the latest AI-powered modules. Let&apos;s start your journey from here.</p>
-            </div>
-            <Link href="/gallery" style={{ fontSize: 13.5, fontWeight: 600, color: BLURPLE, textDecoration: "none", display: "flex", alignItems: "center", gap: 4, whiteSpace: "nowrap" }}>
-              View All <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {featuredApps.map((app) => (
-              <div key={app.title} style={{ borderRadius: 16, overflow: "hidden", background: T.RAISED, border: `1px solid ${T.BORDER}`, boxShadow: isDark ? "0 4px 20px rgba(0,0,0,0.3)" : "0 4px 20px rgba(0,0,0,0.07)", transition: "transform 0.2s,box-shadow 0.2s" }} className="hover:-translate-y-1">
-                <div style={{ height: 168, background: app.gradient, position: "relative", overflow: "hidden" }}>
-                  <div style={{ position: "absolute", top: 12, left: 12, height: 22, padding: "0 10px", borderRadius: 4, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center" }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: app.tagColor }}>{app.tag}</span>
+              {/* Rotating capability card */}
+              <div style={{ border: `1px solid ${faint}`, padding: 0, background: raised, position: "relative", overflow: "hidden" }}>
+                <div style={{ position: "absolute", top: 0, left: 0, width: `${((activeCap + 1) / capabilities.length) * 100}%`, height: 2, background: COBALT, transition: "width 3s linear" }} />
+                <div className="rise" key={activeCap} style={{ padding: "24px 22px" }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 12 }}>
+                    <span style={{ fontSize: 11, color: COBALT, fontFamily: "var(--font-geist-mono),monospace", fontWeight: 700 }}>{capabilities[activeCap].n}</span>
+                    <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.02em", color: fg }}>{capabilities[activeCap].t}</span>
                   </div>
-                  <div style={{ position: "absolute", right: -24, bottom: -24, width: 130, height: 130, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
-                  <div style={{ position: "absolute", right: 28, top: 24, width: 64, height: 64, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
-                  <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 48, height: 48, borderRadius: 14, background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={features.find(f => f.title.includes(app.tag === "Mail" ? "Mail" : app.tag === "Files" ? "Files" : "Code"))?.icon || ""}/></svg>
+                  <p style={{ fontSize: 13.5, color: muted, lineHeight: 1.6, margin: 0, marginBottom: 14 }}>{capabilities[activeCap].d}</p>
+                  <div style={{ background: isDark ? "rgba(66,132,255,0.1)" : "rgba(66,132,255,0.07)", border: `1px solid ${COBALT}30`, padding: "8px 12px", fontFamily: "var(--font-geist-mono),monospace", fontSize: 12, color: COBALT }}>
+                    <span style={{ opacity: 0.5 }}>{"> "}</span>
+                    <span className="caret">{capabilities[activeCap].k}</span>
                   </div>
                 </div>
-                <div style={{ padding: "20px 20px 18px" }}>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, letterSpacing: "-0.02em", color: T.TEXT, marginBottom: 6, lineHeight: 1.3 }}>{app.title}</h3>
-                  <p style={{ fontSize: 13, color: T.MUTED, lineHeight: 1.6, marginBottom: 16 }}>{app.desc}</p>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                    <span style={{ fontSize: 11.5, color: T.DIM }}>{app.funds} Raised</span>
-                    <span style={{ fontSize: 11.5, fontWeight: 600, color: T.TEXT }}>{app.raised}%</span>
-                  </div>
-                  <div style={{ height: 5, borderRadius: 4, background: T.OVERLAY, marginBottom: 16, overflow: "hidden" }}>
-                    <div style={{ height: "100%", borderRadius: 4, width: `${app.raised}%`, background: `linear-gradient(90deg,${BLURPLE},#B85AE0)` }} />
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: 11.5, color: T.DIM }}><strong style={{ color: T.MUTED }}>{app.backers.toLocaleString()}</strong> Backers</span>
-                    <button style={{ height: 32, padding: "0 16px", borderRadius: 6, border: `1px solid ${BLURPLE}40`, background: isDark ? "rgba(220,132,255,0.12)" : "rgba(220,132,255,0.08)", color: BLURPLE, fontSize: 12.5, fontWeight: 600, cursor: "pointer", transition: "all 0.15s" }} className="hover:bg-[#DC84FF] hover:!text-white hover:border-[#DC84FF]">
-                      Open App
+                <div style={{ display: "flex", borderTop: `1px solid ${faint}` }}>
+                  {capabilities.map((_, i) => (
+                    <button key={i} onClick={() => setActiveCap(i)} style={{ flex: 1, height: 32, border: "none", borderRight: i < capabilities.length - 1 ? `1px solid ${faint}` : "none", background: i === activeCap ? COBALT : "transparent", color: i === activeCap ? "#FFF" : muted, fontSize: 10, fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-geist-mono),monospace" }}>
+                      {capabilities[i].n}
                     </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Features ─── */}
-      <section id="features" style={{ paddingTop: 96, paddingBottom: 96, borderTop: `1px solid ${T.BORDER}`, background: T.SURFACE }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ maxWidth: 560, marginBottom: 52 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", height: 26, padding: "0 10px", background: isDark ? "rgba(220,132,255,0.15)" : "rgba(220,132,255,0.08)", border: `1px solid rgba(220,132,255,0.3)`, borderRadius: 4, marginBottom: 16 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: BLURPLE }}>Built-in capabilities</span>
-            </div>
-            <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.08, color: T.TEXT, marginBottom: 16 }}>Every app, one intelligence.</h2>
-            <p style={{ fontSize: 15, color: T.MUTED, lineHeight: 1.65 }}>Mail, Files, Code, Voice, Knowledge — they all share the same agent and memory. Delegate anything, across any app.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {features.map((f) => (
-              <div key={f.title} style={{ borderRadius: 14, overflow: "hidden", border: `1px solid ${T.BORDER}`, transition: "transform 0.2s,border-color 0.2s", background: T.RAISED }} className="hover:border-[#DC84FF]/40 hover:-translate-y-[2px]">
-                <div style={{ height: 80, background: f.bg, position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <div style={{ position: "absolute", right: -20, top: -20, width: 80, height: 80, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
-                  <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d={f.icon}/></svg>
-                  </div>
-                </div>
-                <div style={{ padding: "18px 20px 20px" }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.015em", color: T.TEXT, marginBottom: 8 }}>{f.title}</h3>
-                  <p style={{ fontSize: 13.5, color: T.MUTED, lineHeight: 1.62 }}>{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Explore Digital Creations ─── */}
-      <section id="explore" style={{ paddingTop: 96, paddingBottom: 96, borderTop: `1px solid ${T.BORDER}` }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", height: 26, padding: "0 10px", background: isDark ? "rgba(220,132,255,0.15)" : "rgba(220,132,255,0.08)", border: `1px solid rgba(220,132,255,0.3)`, borderRadius: 4, marginBottom: 16 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: BLURPLE }}>Explore</span>
-            </div>
-            <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 900, letterSpacing: "-0.04em", color: T.TEXT, marginBottom: 12 }}>
-              Explore Unique Digital Creations<br />
-              <span style={{ background: "linear-gradient(90deg,#DC84FF,#C060F5)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}>Built for You</span>
-            </h2>
-            <p style={{ fontSize: 15, color: T.MUTED, maxWidth: 500, margin: "0 auto" }}>Every module is designed to work seamlessly with the AI agent and with each other.</p>
-          </div>
-
-          {/* Tab bar */}
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 32, padding: "4px", background: T.SURFACE, borderRadius: 10, border: `1px solid ${T.BORDER}` }} className="w-fit mx-auto">
-            {["All", "Mail", "Files", "Code", "Voice", "Docs", "Workflow", "Data"].map((tab, i) => (
-              <div key={tab} style={{ padding: "6px 14px", borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.15s", background: i === 0 ? T.RAISED : "transparent", color: i === 0 ? T.TEXT : T.DIM, boxShadow: i === 0 ? isDark ? "0 1px 4px rgba(0,0,0,0.4)" : "0 1px 4px rgba(0,0,0,0.08)" : "none" }}>
-                {tab}
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {exploreItems.map((item) => (
-              <div key={item.title} style={{ borderRadius: 14, overflow: "hidden", background: T.RAISED, border: `1px solid ${T.BORDER}`, boxShadow: isDark ? "0 2px 12px rgba(0,0,0,0.25)" : "0 2px 12px rgba(0,0,0,0.06)", transition: "transform 0.2s,box-shadow 0.2s", cursor: "pointer" }} className="hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(220,132,255,0.15)]">
-                {/* Card illustration */}
-                <div style={{ height: 130, background: `linear-gradient(135deg,${item.c1},${item.c2})`, position: "relative", overflow: "hidden" }}>
-                  <div style={{ position: "absolute", right: -16, bottom: -16, width: 80, height: 80, borderRadius: "50%", background: "rgba(255,255,255,0.1)" }} />
-                  <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={item.icon}/></svg>
-                  </div>
-                  <div style={{ position: "absolute", top: 10, right: 10, padding: "3px 8px", borderRadius: 4, background: "rgba(0,0,0,0.35)", backdropFilter: "blur(8px)" }}>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.85)" }}>{item.category}</span>
-                  </div>
-                </div>
-                <div style={{ padding: "14px 16px" }}>
-                  <h4 style={{ fontSize: 14, fontWeight: 700, color: T.TEXT, marginBottom: 10 }}>{item.title}</h4>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill={BLURPLE} stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: T.TEXT }}>{item.rating}</span>
-                    </div>
-                    <span style={{ fontSize: 11, color: T.DIM }}>{item.users} users</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── How it works ─── */}
-      <section id="how" style={{ paddingTop: 96, paddingBottom: 96, borderTop: `1px solid ${T.BORDER}`, background: T.SURFACE }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ maxWidth: 560, marginBottom: 52 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", height: 26, padding: "0 10px", background: isDark ? "rgba(220,132,255,0.15)" : "rgba(220,132,255,0.08)", border: `1px solid rgba(220,132,255,0.3)`, borderRadius: 4, marginBottom: 16 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: BLURPLE }}>How it works</span>
-            </div>
-            <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.08, color: T.TEXT }}>Three steps to a smarter desktop.</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { n: "01", t: "Describe what you want", d: "Type or speak a goal. The agent plans and confirms before taking action.", color: BLURPLE },
-              { n: "02", t: "Agent runs your apps", d: "It opens Mail, Files, Code, Calendar — whatever's needed — and runs the steps.", color: "#C060F5" },
-              { n: "03", t: "You review & ship", d: "Every change is visible in-app. Approve, tweak, or redo with one command.", color: "#F0C8FF" },
-            ].map((s) => (
-              <div key={s.n} style={{ position: "relative", padding: "28px 28px 32px", borderRadius: 14, background: T.RAISED, border: `1px solid ${T.BORDER}`, overflow: "hidden" }}>
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg,${s.color} 0%,transparent 100%)` }} />
-                <div style={{ position: "absolute", right: 20, top: 24, fontSize: 64, fontWeight: 900, color: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.04)", lineHeight: 1, userSelect: "none", fontFamily: "var(--font-geist-mono),monospace" }}>{s.n}</div>
-                <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 32, height: 32, borderRadius: 8, background: `${s.color}18`, border: `1px solid ${s.color}30`, marginBottom: 18 }}>
-                  <span style={{ fontSize: 12, fontWeight: 800, fontFamily: "var(--font-geist-mono),monospace", color: s.color }}>{s.n}</span>
-                </div>
-                <h3 style={{ fontSize: 17, fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 10, color: T.TEXT, lineHeight: 1.3 }}>{s.t}</h3>
-                <p style={{ fontSize: 14, color: T.MUTED, lineHeight: 1.64 }}>{s.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Testimonials ─── */}
-      <section style={{ paddingTop: 96, paddingBottom: 96, borderTop: `1px solid ${T.BORDER}` }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ textAlign: "center", marginBottom: 52 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", height: 26, padding: "0 10px", background: isDark ? "rgba(220,132,255,0.15)" : "rgba(220,132,255,0.08)", border: `1px solid rgba(220,132,255,0.3)`, borderRadius: 4, marginBottom: 16 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: BLURPLE }}>Testimonials</span>
-            </div>
-            <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.08, color: T.TEXT, marginBottom: 12 }}>
-              Hear How We&apos;ve Made a Difference
-            </h2>
-            <p style={{ fontSize: 15, color: T.MUTED, maxWidth: 460, margin: "0 auto" }}>Real users sharing how Alternus transformed their daily workflow.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {testimonials.map((t, i) => (
-              <div key={i} style={{ padding: "24px", borderRadius: 14, background: T.RAISED, border: `1px solid ${T.BORDER}`, boxShadow: isDark ? "0 2px 12px rgba(0,0,0,0.2)" : "0 2px 12px rgba(0,0,0,0.05)", transition: "transform 0.2s,border-color 0.2s" }} className="hover:-translate-y-[2px] hover:border-[#DC84FF]/30">
-                <div style={{ display: "flex", gap: 3, marginBottom: 16 }}>
-                  {[...Array(5)].map((_, si) => (
-                    <svg key={si} width="14" height="14" viewBox="0 0 24 24" fill={BLURPLE} stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                   ))}
                 </div>
-                <p style={{ fontSize: 14, color: T.MUTED, lineHeight: 1.72, marginBottom: 20 }}>&ldquo;{t.text}&rdquo;</p>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, paddingTop: 16, borderTop: `1px solid ${T.BORDER}` }}>
-                  <div style={{ width: 38, height: 38, borderRadius: "50%", background: `${t.avatarColor}20`, border: `2px solid ${t.avatarColor}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: t.avatarColor, flexShrink: 0 }}>{t.avatar}</div>
-                  <div><div style={{ fontSize: 13.5, fontWeight: 700, color: T.TEXT }}>{t.name}</div><div style={{ fontSize: 12, color: T.DIM }}>{t.role}</div></div>
-                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ Infinite marquee ═══ */}
+      <section style={{ borderBottom: `1px solid ${faint}`, padding: "22px 0", overflow: "hidden", background: COBALT }}>
+        <div className="marquee-track" style={{ display: "flex", whiteSpace: "nowrap", gap: 48 }}>
+          {[...marquee, ...marquee, ...marquee, ...marquee].map((w, i) => (
+            <span key={i} style={{ fontSize: 22, fontWeight: 900, color: "#FFF", letterSpacing: "-0.02em", display: "inline-flex", alignItems: "center", gap: 48 }}>
+              {w}
+              <span style={{ width: 8, height: 8, background: "#FFF", borderRadius: "50%" }} />
+            </span>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══ Capabilities grid — asymmetric ═══ */}
+      <section id="caps" style={{ padding: "120px 0", borderBottom: `1px solid ${faint}`, position: "relative" }}>
+        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16" style={{ alignItems: "end" }}>
+            <div className="lg:col-span-3">
+              <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 12 }}>
+                §01 / CAPABILITIES
+              </div>
+            </div>
+            <div className="lg:col-span-6">
+              <h2 style={{ fontSize: "clamp(36px,5vw,64px)", fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1, margin: 0, color: fg, fontStretch: "90%" }}>
+                Six modules.<br/>
+                <span style={{ color: muted }}>One memory.</span>
+              </h2>
+            </div>
+            <div className="lg:col-span-3">
+              <p style={{ fontSize: 13.5, color: muted, lineHeight: 1.65, margin: 0 }}>
+                Every module shares the same agent and the same context. Delegate once — it stays delegated.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ border: `1px solid ${faint}`, background: raised }}>
+            {capabilities.map((c, i) => (
+              <div key={c.n} style={{ display: "grid", gridTemplateColumns: "80px 1fr 1fr 120px", gap: 24, alignItems: "center", padding: "28px 28px", borderTop: i > 0 ? `1px solid ${faint}` : "none", cursor: "pointer", transition: "background 0.2s" }} className="hover:bg-[#4284FF]/5 group">
+                <span style={{ fontSize: 13, color: COBALT, fontFamily: "var(--font-geist-mono),monospace", fontWeight: 700, letterSpacing: "0.05em" }}>{c.n}</span>
+                <h3 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.025em", margin: 0, color: fg, transition: "transform 0.3s" }} className="group-hover:translate-x-2">{c.t}</h3>
+                <p style={{ fontSize: 13.5, color: muted, lineHeight: 1.55, margin: 0 }}>{c.d}</p>
+                <code style={{ fontSize: 11, fontFamily: "var(--font-geist-mono),monospace", color: COBALT, textAlign: "right" }}>{c.k}</code>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── CTA ─── */}
-      <section style={{ position: "relative", paddingTop: 120, paddingBottom: 120, borderTop: `1px solid ${T.BORDER}`, overflow: "hidden", background: T.SURFACE }}>
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-          <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 900, height: 560, borderRadius: "50%", background: isDark ? "radial-gradient(closest-side,rgba(220,132,255,0.18),transparent 70%)" : "radial-gradient(closest-side,rgba(220,132,255,0.1),transparent 70%)" }} />
-          <div style={{ position: "absolute", left: "15%", bottom: "20%", width: 240, height: 240, borderRadius: "50%", background: isDark ? "radial-gradient(closest-side,rgba(192,96,245,0.1),transparent 70%)" : "radial-gradient(closest-side,rgba(192,96,245,0.06),transparent 70%)" }} />
-          <div style={{ position: "absolute", right: "10%", top: "15%", width: 200, height: 200, borderRadius: "50%", background: isDark ? "radial-gradient(closest-side,rgba(87,242,135,0.08),transparent 70%)" : "radial-gradient(closest-side,rgba(87,242,135,0.05),transparent 70%)" }} />
-          {/* Decorative dots */}
-          <svg style={{ position: "absolute", left: "5%", top: "10%", opacity: isDark ? 0.15 : 0.08 }} width="120" height="120" viewBox="0 0 120 120">
-            {[...Array(25)].map((_, i) => <circle key={i} cx={(i % 5) * 24 + 12} cy={Math.floor(i / 5) * 24 + 12} r="2" fill={BLURPLE} />)}
-          </svg>
-          <svg style={{ position: "absolute", right: "5%", bottom: "10%", opacity: isDark ? 0.15 : 0.08 }} width="120" height="120" viewBox="0 0 120 120">
-            {[...Array(25)].map((_, i) => <circle key={i} cx={(i % 5) * 24 + 12} cy={Math.floor(i / 5) * 24 + 12} r="2" fill="#C060F5" />)}
-          </svg>
-        </div>
-        <div style={{ position: "relative", maxWidth: 680, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
-          <h2 style={{ fontSize: "clamp(38px,5.8vw,64px)", fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 1.02, marginBottom: 22, color: T.TEXT }}>
-            Stop clicking.
-            <br />
-            <span style={{ background: "linear-gradient(100deg,#DC84FF 0%,#B85AE0 40%,#C060F5 80%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", animation: "gradX 4s ease infinite" }}>
-              Start asking.
-            </span>
+      {/* ═══ Manifesto — numbered pillars ═══ */}
+      <section id="manifesto" style={{ padding: "120px 0", borderBottom: `1px solid ${faint}`, background: isDark ? "rgba(66,132,255,0.04)" : "rgba(66,132,255,0.03)", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", left: "-10%", top: "20%", width: 500, height: 500, borderRadius: "50%", background: `radial-gradient(closest-side,${COBALT}25,transparent 70%)`, filter: "blur(40px)", pointerEvents: "none" }} />
+        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", position: "relative" }}>
+          <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 24 }}>
+            §02 / MANIFESTO
+          </div>
+          <h2 style={{ fontSize: "clamp(42px,7vw,96px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.95, maxWidth: 1000, margin: 0, color: fg, fontStretch: "85%" }}>
+            Software that <span style={{ color: COBALT, fontStyle: "italic" }}>works for you</span> — not the other way around.
           </h2>
-          <p style={{ fontSize: 17, color: T.MUTED, lineHeight: 1.68, maxWidth: 480, margin: "0 auto", marginBottom: 48 }}>
-            Alternus is free to try. Launch the chat and explore a complete AI-native OS in your browser.
-          </p>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, flexWrap: "wrap" }}>
-            <Link href="/os" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 52, padding: "0 32px", background: BLURPLE, color: "#FFF", borderRadius: 10, fontSize: 16, fontWeight: 700, letterSpacing: "-0.015em", textDecoration: "none", transition: "background 0.15s", boxShadow: "0 10px 28px rgba(220,132,255,0.45)" }} className="hover:bg-[#B85AE0]">
-              Try in Chat — it&apos;s free
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            </Link>
-            <Link href="/gallery" style={{ display: "inline-flex", alignItems: "center", height: 52, padding: "0 28px", borderRadius: 10, fontSize: 16, fontWeight: 600, color: T.MUTED, border: `1px solid ${T.STRONG}`, background: T.RAISED, textDecoration: "none", transition: "all 0.15s" }} className="hover:border-[#DC84FF]/60 hover:!text-[#DC84FF]">
-              Browse Gallery
-            </Link>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0" style={{ marginTop: 80, border: `1px solid ${faint}` }}>
+            {pillars.map((p, i) => (
+              <div key={p.k} style={{ padding: "36px 28px", borderRight: i < pillars.length - 1 ? `1px solid ${faint}` : "none", background: raised, position: "relative", minHeight: 220 }}>
+                <div style={{ fontSize: 10, color: muted, fontFamily: "var(--font-geist-mono),monospace", marginBottom: 20, letterSpacing: "0.08em" }}>
+                  / 0{i + 1}
+                </div>
+                <div style={{ fontSize: 40, fontWeight: 900, letterSpacing: "-0.04em", color: COBALT, marginBottom: 14, fontStretch: "85%" }}>{p.k}.</div>
+                <p style={{ fontSize: 13.5, color: muted, lineHeight: 1.6, margin: 0 }}>{p.v}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ─── Footer ─── */}
-      <footer style={{ borderTop: `1px solid ${T.BORDER}`, padding: "36px 0", background: T.CHROME }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "16px 32px" }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: `linear-gradient(135deg,${BLURPLE},${BLURPLE_DARK_HEX})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 3px 8px rgba(220,132,255,0.35)" }}>
-              <span style={{ color: "#FFF", fontSize: 13, fontWeight: 700 }}>A</span>
-            </div>
-            <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: "-0.02em", color: T.TEXT }}>Alternus</span>
-          </Link>
-          <nav style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-            {[{ label: "About", href: "/about" }, { label: "Gallery", href: "/gallery" }, { label: "Artists", href: "/artists" }, { label: "Pricing", href: "/pricing" }, { label: "Contact", href: "/contact" }, { label: "Privacy", href: "/privacy" }, { label: "Terms", href: "/terms" }].map(({ label, href }) => (
-              <Link key={label} href={href} style={{ fontSize: 13, color: T.DIM, textDecoration: "none", padding: "4px 10px", borderRadius: 4, transition: "color 0.15s,background 0.15s" }} className={isDark ? "hover:!text-white hover:bg-white/[0.07]" : "hover:!text-black hover:bg-black/[0.06]"}>
-                {label}
-              </Link>
+      {/* ═══ Voices — full-bleed blockquote carousel ═══ */}
+      <section id="voices" style={{ padding: "120px 0", borderBottom: `1px solid ${faint}` }}>
+        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
+          <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 40 }}>
+            §03 / VOICES
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-0" style={{ border: `1px solid ${faint}` }}>
+            {quotes.map((q, i) => (
+              <figure key={q.by} style={{ margin: 0, padding: "44px 36px", borderRight: i < quotes.length - 1 ? `1px solid ${faint}` : "none", background: raised, display: "flex", flexDirection: "column", gap: 24, minHeight: 360 }}>
+                <div style={{ fontSize: 56, fontWeight: 900, color: COBALT, lineHeight: 0.5, fontFamily: "var(--font-playfair),serif" }}>&ldquo;</div>
+                <blockquote style={{ margin: 0, fontSize: 20, fontWeight: 500, letterSpacing: "-0.015em", lineHeight: 1.35, color: fg, flex: 1 }}>
+                  {q.q}
+                </blockquote>
+                <figcaption style={{ borderTop: `1px solid ${faint}`, paddingTop: 16, display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: "50%", background: COBALT, color: "#FFF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>
+                    {q.by.split(" ").map((w) => w[0]).join("")}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: fg }}>{q.by}</div>
+                    <div style={{ fontSize: 11, color: muted, letterSpacing: "0.04em" }}>{q.role}</div>
+                  </div>
+                </figcaption>
+              </figure>
             ))}
-          </nav>
-          <span style={{ fontSize: 12, color: T.DIM, marginLeft: "auto" }}>© {new Date().getFullYear()} Alternus Art Gallery</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ OS preview — single large screen ═══ */}
+      <section style={{ padding: "120px 0", borderBottom: `1px solid ${faint}` }}>
+        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
+          <div style={{ display: "flex", alignItems: "end", justifyContent: "space-between", marginBottom: 48, flexWrap: "wrap", gap: 20 }}>
+            <div>
+              <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 12 }}>§04 / PREVIEW</div>
+              <h2 style={{ fontSize: "clamp(36px,5vw,64px)", fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1, margin: 0, color: fg, fontStretch: "90%" }}>The workspace.</h2>
+            </div>
+            <Link href="/os" style={{ fontSize: 13, fontWeight: 700, color: COBALT, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6, borderBottom: `2px solid ${COBALT}`, paddingBottom: 4 }}>
+              Open it live →
+            </Link>
+          </div>
+
+          <div style={{ border: `1px solid ${faint}`, boxShadow: `16px 16px 0 0 ${COBALT}`, background: "#0C1220" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 16px", height: 40, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+              <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#FF5F57" }} />
+              <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#FEBC2E" }} />
+              <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#28C840" }} />
+              <div style={{ marginLeft: 24, padding: "4px 12px", background: "rgba(255,255,255,0.06)", fontSize: 11, color: "rgba(255,255,255,0.6)", fontFamily: "var(--font-geist-mono),monospace" }}>
+                alternus.art/os
+              </div>
+              <div style={{ flex: 1 }} />
+              <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontFamily: "var(--font-geist-mono),monospace" }}>agent:idle · opus-4.6</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "64px 240px 1fr", minHeight: 520 }}>
+              <div style={{ borderRight: "1px solid rgba(255,255,255,0.06)", padding: "14px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 40, height: 40, background: COBALT, display: "flex", alignItems: "center", justifyContent: "center", color: "#FFF", fontWeight: 900, fontSize: 14 }}>A</div>
+                <div style={{ width: 28, height: 1, background: "rgba(255,255,255,0.1)" }} />
+                {["M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z", "M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z", "M16 18l6-6-6-6M8 6l-6 6 6 6", "M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3z"].map((d, i) => (
+                  <div key={i} style={{ width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", color: i === 1 ? COBALT : "rgba(255,255,255,0.4)", background: i === 1 ? "rgba(66,132,255,0.1)" : "transparent" }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d}/></svg>
+                  </div>
+                ))}
+              </div>
+              <div style={{ borderRight: "1px solid rgba(255,255,255,0.06)", padding: 12 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", padding: "4px 8px", letterSpacing: "0.1em", marginBottom: 4 }}>FILES</div>
+                {["Projects", "Invoices", "Design", "Contracts"].map((n, i) => (
+                  <div key={n} style={{ padding: "7px 10px", background: i === 1 ? "rgba(66,132,255,0.15)" : "transparent", fontSize: 13, color: i === 1 ? "#FFF" : "rgba(255,255,255,0.7)", fontWeight: i === 1 ? 600 : 400, display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                    <span style={{ color: "rgba(255,255,255,0.3)" }}>▸</span>{n}
+                    {i === 1 && <span style={{ marginLeft: "auto", background: COBALT, color: "#FFF", fontSize: 10, fontWeight: 700, padding: "1px 6px" }}>2</span>}
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: 28, display: "flex", flexDirection: "column", gap: 16 }}>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "#FFF", letterSpacing: "-0.02em" }}># invoices</div>
+                <div style={{ background: "rgba(66,132,255,0.08)", border: `1px solid ${COBALT}40`, padding: 18 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                    <div style={{ width: 28, height: 28, background: COBALT, display: "flex", alignItems: "center", justifyContent: "center", color: "#FFF", fontWeight: 800, fontSize: 11 }}>AI</div>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: COBALT }}>ALTERNUS</span>
+                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontFamily: "var(--font-geist-mono),monospace" }}>10:42</span>
+                  </div>
+                  <div style={{ fontSize: 13.5, color: "rgba(255,255,255,0.85)", lineHeight: 1.6 }}>
+                    Found <strong style={{ color: "#FFF" }}>2 invoices</strong> from March. Total: <strong style={{ color: COBALT }}>$4,820</strong>. Export a summary?
+                  </div>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+                  {["Invoice_Mar.pdf", "Receipt_02.pdf", "Contract.pdf"].map((n, i) => (
+                    <div key={n} style={{ padding: 12, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.03)" }}>
+                      <div style={{ width: 28, height: 32, background: `${COBALT}22`, border: `1px solid ${COBALT}55`, marginBottom: 8, fontSize: 8, fontWeight: 800, color: COBALT, display: "flex", alignItems: "center", justifyContent: "center" }}>PDF</div>
+                      <div style={{ fontSize: 11, color: "#FFF", fontWeight: 600, marginBottom: 2 }}>{n}</div>
+                      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)" }}>{[128, 84, 32][i]} KB</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ marginTop: "auto", border: "1px solid rgba(255,255,255,0.08)", padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontFamily: "var(--font-geist-mono),monospace", color: COBALT, fontSize: 12 }}>$</span>
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", flex: 1, fontFamily: "var(--font-geist-mono),monospace" }}>ask agent about these files...</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={COBALT} strokeWidth="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ FAQ ═══ */}
+      <section id="faq" style={{ padding: "120px 0", borderBottom: `1px solid ${faint}` }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 32px" }}>
+          <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 24 }}>§05 / QUESTIONS</div>
+          <h2 style={{ fontSize: "clamp(36px,5vw,64px)", fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1, margin: 0, marginBottom: 48, color: fg, fontStretch: "90%" }}>Frequently asked.</h2>
+          <div style={{ border: `1px solid ${faint}` }}>
+            {faq.map((f, i) => (
+              <div key={i} style={{ borderTop: i > 0 ? `1px solid ${faint}` : "none" }}>
+                <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: "100%", padding: "24px 28px", background: openFaq === i ? (isDark ? "rgba(66,132,255,0.06)" : "rgba(66,132,255,0.04)") : "transparent", border: "none", color: fg, display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", textAlign: "left", transition: "background 0.2s" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 20 }}>
+                    <span style={{ fontSize: 11, color: COBALT, fontFamily: "var(--font-geist-mono),monospace", fontWeight: 700 }}>0{i + 1}</span>
+                    <span style={{ fontSize: 17, fontWeight: 700, letterSpacing: "-0.015em" }}>{f.q}</span>
+                  </span>
+                  <span style={{ fontSize: 20, color: COBALT, fontWeight: 300, transition: "transform 0.2s", transform: openFaq === i ? "rotate(45deg)" : "rotate(0)" }}>+</span>
+                </button>
+                {openFaq === i && (
+                  <div className="rise" style={{ padding: "0 28px 28px 72px", fontSize: 14.5, color: muted, lineHeight: 1.65 }}>
+                    {f.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ CTA ═══ */}
+      <section style={{ padding: "140px 0", background: COBALT, position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(rgba(255,255,255,0.15) 1px,transparent 1px)", backgroundSize: "32px 32px", opacity: 0.5, pointerEvents: "none" }} />
+        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", position: "relative", textAlign: "center" }}>
+          <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: "rgba(255,255,255,0.7)", marginBottom: 28 }}>§06 / BEGIN</div>
+          <h2 style={{ fontSize: "clamp(52px,9vw,140px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.85, color: "#FFF", margin: 0, fontStretch: "85%" }}>
+            Stop clicking.<br/>
+            <span style={{ fontStyle: "italic" }}>Start talking.</span>
+          </h2>
+          <p style={{ fontSize: 18, color: "rgba(255,255,255,0.85)", maxWidth: 540, margin: "36px auto 48px", lineHeight: 1.5 }}>
+            Alternus is free to try. Open the OS, say hello, and let the agent do the rest.
+          </p>
+          <Link href="/os" style={{ display: "inline-flex", alignItems: "center", gap: 12, height: 56, padding: "0 32px", background: "#FFF", color: COBALT, fontSize: 16, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.01em", boxShadow: `8px 8px 0 0 ${INK}` }}>
+            Launch Alternus OS
+            <span style={{ fontSize: 14 }}>↗</span>
+          </Link>
+        </div>
+      </section>
+
+      {/* ═══ Footer ═══ */}
+      <footer style={{ padding: "60px 0 40px", background: isDark ? INK : PAPER }}>
+        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 20, height: 20, background: COBALT }} />
+            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
+            <span style={{ fontSize: 11, color: muted }}>© 2026 — built with Claude</span>
+          </div>
+          <div style={{ display: "flex", gap: 20 }}>
+            {["Privacy", "Terms", "Contact", "Pricing"].map((l) => (
+              <Link key={l} href={`/${l.toLowerCase()}`} style={{ fontSize: 12, color: muted, textDecoration: "none" }}>{l}</Link>
+            ))}
+          </div>
         </div>
       </footer>
+
     </div>
   );
 }
