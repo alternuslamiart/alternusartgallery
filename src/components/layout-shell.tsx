@@ -6,12 +6,13 @@ import { Footer } from "@/components/footer";
 import { CategoryBar } from "@/components/category-bar";
 import { MobileNav } from "@/components/mobile-nav";
 
-const STANDALONE_ROUTES = ["/", "/login", "/signup", "/ai", "/admin/login", "/os"];
+const STANDALONE_ROUTES = ["/", "/login", "/signup", "/ai", "/admin/login", "/os", "/about", "/manifesto", "/careers", "/press", "/contact", "/privacy", "/terms", "/cookie-notice", "/security", "/pricing"];
+const STANDALONE_PREFIXES = ["/platform/", "/workspace/"];
 const NO_CATEGORY_BAR_ROUTES = ["/pricing"];
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthPage = STANDALONE_ROUTES.includes(pathname);
+  const isAuthPage = STANDALONE_ROUTES.includes(pathname) || STANDALONE_PREFIXES.some((p) => pathname.startsWith(p));
   const hideCategoryBar = NO_CATEGORY_BAR_ROUTES.includes(pathname);
 
   if (isAuthPage) {

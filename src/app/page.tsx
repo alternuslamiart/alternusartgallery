@@ -453,17 +453,95 @@ export default function Home() {
       </section>
 
       {/* ═══ Footer ═══ */}
-      <footer style={{ padding: "60px 0 40px", background: isDark ? INK : PAPER }}>
-        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 20, height: 20, background: COBALT }} />
-            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
-            <span style={{ fontSize: 11, color: muted }}>© 2026 — built with Claude</span>
-          </div>
-          <div style={{ display: "flex", gap: 20 }}>
-            {["Privacy", "Terms", "Contact", "Pricing"].map((l) => (
-              <Link key={l} href={`/${l.toLowerCase()}`} style={{ fontSize: 12, color: muted, textDecoration: "none" }}>{l}</Link>
+      <footer style={{ paddingTop: 96, paddingBottom: 40, background: isDark ? INK : PAPER, borderTop: `3px solid ${COBALT}` }}>
+        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
+
+          {/* ── 4-col link index ── */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-12" style={{ paddingBottom: 80 }}>
+            {[
+              { heading: "Platform", links: [
+                { l: "Overview",        h: "/platform/overview",   ext: false },
+                { l: "Agent SDK",       h: "/platform/agent-sdk",  ext: false },
+                { l: "API Reference",   h: "/platform/api",        ext: true  },
+                { l: "Changelog",       h: "/platform/changelog",  ext: false },
+                { l: "Status",          h: "/platform/status",     ext: false },
+              ]},
+              { heading: "Workspace", links: [
+                { l: "Launch OS",       h: "/os",                  ext: true  },
+                { l: "Mail",            h: "/workspace/mail",      ext: false },
+                { l: "Files",           h: "/workspace/files",     ext: false },
+                { l: "Code Studio",     h: "/workspace/code",      ext: false },
+                { l: "Knowledge Base",  h: "/workspace/knowledge", ext: false },
+                { l: "Voice Mode",      h: "/workspace/voice",     ext: false },
+              ]},
+              { heading: "Company", links: [
+                { l: "About",           h: "/about",               ext: false },
+                { l: "Manifesto",       h: "/manifesto",           ext: false },
+                { l: "Careers",         h: "/careers",             ext: true  },
+                { l: "Press Kit",       h: "/press",               ext: false },
+                { l: "Contact",         h: "/contact",             ext: false },
+              ]},
+              { heading: "Legal", links: [
+                { l: "Privacy Policy",  h: "/privacy",             ext: false },
+                { l: "Terms of Use",    h: "/terms",               ext: false },
+                { l: "Cookie Notice",   h: "/cookie-notice",       ext: false },
+                { l: "Security",        h: "/security",            ext: false },
+                { l: "Pricing",         h: "/pricing",             ext: false },
+              ]},
+            ].map((col) => (
+              <div key={col.heading}>
+                <div style={{ fontSize: 11, color: muted, fontWeight: 500, marginBottom: 22, letterSpacing: "-0.005em" }}>{col.heading}</div>
+                <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 16 }}>
+                  {col.links.map((item) => (
+                    <li key={item.l}>
+                      <Link href={item.h} style={{ fontSize: 14.5, color: fg, fontWeight: 500, textDecoration: "none", letterSpacing: "-0.005em", display: "inline-flex", alignItems: "center", gap: 4, transition: "color 0.15s" }} className="hover:!text-[#4284FF]">
+                        {item.l}
+                        {item.ext && <span style={{ fontSize: 11, opacity: 0.7 }}>↗</span>}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
+          </div>
+
+          {/* ── Bottom bar: socials / copyright / locale ── */}
+          <div style={{ borderTop: `1px solid ${faint}`, paddingTop: 28, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
+            {/* Socials */}
+            <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+              {[
+                { l: "X",         d: "M18.244 2H21l-6.54 7.47L22 22h-6.828l-5.34-6.99L3.6 22H0.84l7-8L0 2h6.914l4.82 6.38L18.244 2z" },
+                { l: "GitHub",    d: "M12 2a10 10 0 00-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.12-1.47-1.12-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.1.39-2 1.03-2.7-.1-.26-.45-1.29.1-2.68 0 0 .84-.27 2.75 1.03a9.57 9.57 0 015 0c1.91-1.3 2.75-1.03 2.75-1.03.55 1.39.2 2.42.1 2.68.64.7 1.03 1.6 1.03 2.7 0 3.85-2.34 4.7-4.57 4.94.36.31.68.92.68 1.86v2.76c0 .27.18.58.69.48A10 10 0 0012 2z" },
+                { l: "LinkedIn",  d: "M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43A2.07 2.07 0 113.27 5.36a2.07 2.07 0 012.07 2.07zM7.12 20.45H3.56V9h3.56v11.45z" },
+                { l: "YouTube",   d: "M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31 31 0 000 12a31 31 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31 31 0 0024 12a31 31 0 00-.5-5.8zM9.75 15.57V8.43L15.82 12l-6.07 3.57z" },
+                { l: "Discord",   d: "M20.32 4.37A19.79 19.79 0 0016.55 3c-.16.29-.35.68-.48.99a18.27 18.27 0 00-5.14 0C10.8 3.68 10.6 3.29 10.44 3a19.74 19.74 0 00-3.77 1.37C3.24 9.27 2.45 14.06 2.84 18.77a19.9 19.9 0 005.93 3.01c.48-.65.91-1.34 1.28-2.07-.71-.27-1.4-.6-2.05-1 .17-.13.34-.26.5-.4 3.92 1.82 8.17 1.82 12.04 0 .17.14.33.27.5.4-.65.4-1.34.73-2.05 1 .37.73.8 1.42 1.28 2.07a19.9 19.9 0 005.93-3.01c.46-5.47-.78-10.23-3.88-14.4zM8.52 16c-1.18 0-2.15-1.1-2.15-2.44s.95-2.44 2.15-2.44c1.2 0 2.17 1.1 2.15 2.44 0 1.34-.95 2.44-2.15 2.44zm6.96 0c-1.18 0-2.15-1.1-2.15-2.44s.95-2.44 2.15-2.44c1.2 0 2.17 1.1 2.15 2.44 0 1.34-.94 2.44-2.15 2.44z" },
+                { l: "RSS",       d: "M6.18 15.64a2.18 2.18 0 012.18 2.18 2.18 2.18 0 01-2.18 2.18A2.18 2.18 0 014 17.82a2.18 2.18 0 012.18-2.18M4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44m0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z" },
+              ].map((s) => (
+                <Link key={s.l} href="#" aria-label={s.l} style={{ color: muted, display: "flex", transition: "color 0.15s" }} className="hover:!text-[#4284FF]">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d={s.d}/></svg>
+                </Link>
+              ))}
+            </div>
+
+            {/* Brand + copy */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 16, height: 16, background: COBALT, borderRadius: 4 }} />
+                <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
+              </div>
+              <span style={{ fontSize: 11.5, color: muted }}>© 2015–2026 · Built with Claude</span>
+              <Link href="/cookie-notice" style={{ fontSize: 11.5, color: muted, textDecoration: "none", borderBottom: `1px dashed ${faint}`, paddingBottom: 1 }}>Manage Cookies</Link>
+            </div>
+
+            {/* Locale pill */}
+            <button style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 14px", border: `1px solid ${faint}`, background: "transparent", color: fg, fontSize: 12.5, fontWeight: 500, cursor: "pointer", borderRadius: 999, transition: "border-color 0.15s" }} className="hover:!border-[#4284FF]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/>
+              </svg>
+              English
+              <span style={{ color: muted }}>Albania</span>
+            </button>
           </div>
         </div>
       </footer>
