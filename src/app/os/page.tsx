@@ -8197,9 +8197,9 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
   const agText = dk ? c.text : "#1a1525";
   const agTextSec = dk ? c.textSec : "#5a5470";
   const agTextMuted = dk ? c.textMuted : "#9896ab";
-  const agAccent = "#7C3AED";
-  const agAccentSoft = dk ? "rgba(124,58,237,0.14)" : "rgba(124,58,237,0.10)";
-  const agSelected = dk ? "rgba(79,142,247,0.14)" : "rgba(124,58,237,0.10)";
+  const agAccent = "#4284FF";
+  const agAccentSoft = dk ? "rgba(66,132,255,0.14)" : "rgba(66,132,255,0.10)";
+  const agSelected = dk ? "rgba(79,142,247,0.14)" : "rgba(66,132,255,0.10)";
 
   const responses: Record<string, string[]> = {
     claude: ["I'll analyze that carefully and provide a nuanced response...", "From a reasoning perspective, this involves multiple considerations...", "Let me break this down step by step for you..."],
@@ -8394,7 +8394,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
         {/* Footer */}
         <div className="px-3 py-2 flex-shrink-0" style={{ borderTop: `1px solid ${agBorder}` }}>
           <div className="flex items-center gap-2 px-2.5 py-2 rounded-xl"
-            style={{ background: dk ? "rgba(255,255,255,0.04)" : "rgba(124,58,237,0.05)", border: `1px solid ${agBorder}` }}>
+            style={{ background: dk ? "rgba(255,255,255,0.04)" : "rgba(66,132,255,0.05)", border: `1px solid ${agBorder}` }}>
             <div className="w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: agAccentSoft }}>
               <I d={ic.brain} s={10} c={agAccent} />
             </div>
@@ -9823,7 +9823,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
   const dk = mode === "dark";
   const agBg = dk
-    ? "radial-gradient(1200px 800px at 12% -10%, rgba(124,58,237,0.22) 0%, transparent 55%), radial-gradient(900px 700px at 110% 110%, rgba(56,189,248,0.18) 0%, transparent 55%), linear-gradient(160deg,#0F0B1F 0%,#14102A 50%,#0B1428 100%)"
+    ? "radial-gradient(1200px 800px at 12% -10%, rgba(66,132,255,0.22) 0%, transparent 55%), radial-gradient(900px 700px at 110% 110%, rgba(56,189,248,0.18) 0%, transparent 55%), linear-gradient(160deg,#0F0B1F 0%,#14102A 50%,#0B1428 100%)"
     : "radial-gradient(1200px 900px at 10% -10%, #E6E0FF 0%, transparent 60%), radial-gradient(1000px 800px at 115% 115%, #D6EAFF 0%, transparent 55%), linear-gradient(155deg,#F5F2FF 0%,#F1F4FF 50%,#EDF4F8 100%)";
   const agSidebarBg = dk ? "rgba(20,14,40,0.55)" : "rgba(255,255,255,0.55)";
   const agCardBg = dk ? "rgba(28,22,48,0.55)" : "rgba(255,255,255,0.65)";
@@ -9834,9 +9834,9 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
   const agText = dk ? "#F3EEFF" : "#1a1525";
   const agTextSec = dk ? "#C8BFE0" : "#5a5470";
   const agTextMuted = dk ? "#8B82A8" : "#9896ab";
-  const agAccent = "#7C3AED";
-  const agAccentSoft = dk ? "rgba(124,58,237,0.20)" : "rgba(124,58,237,0.10)";
-  const agSelected = dk ? "rgba(124,58,237,0.22)" : "rgba(124,58,237,0.12)";
+  const agAccent = "#4284FF";
+  const agAccentSoft = dk ? "rgba(66,132,255,0.20)" : "rgba(66,132,255,0.10)";
+  const agSelected = dk ? "rgba(66,132,255,0.22)" : "rgba(66,132,255,0.12)";
   const agGlassShadow = dk
     ? "0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)"
     : "0 8px 32px rgba(80,80,160,0.10), inset 0 1px 0 rgba(255,255,255,0.9)";
@@ -9900,9 +9900,9 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0"
               style={{
-                background: "linear-gradient(135deg, rgba(124,58,237,0.22), rgba(56,189,248,0.22))",
-                border: "1px solid rgba(124,58,237,0.25)",
-                boxShadow: "0 4px 14px rgba(124,58,237,0.18), inset 0 1px 0 rgba(255,255,255,0.35)",
+                background: "linear-gradient(135deg, rgba(66,132,255,0.22), rgba(56,189,248,0.22))",
+                border: "1px solid rgba(66,132,255,0.25)",
+                boxShadow: "0 4px 14px rgba(66,132,255,0.18), inset 0 1px 0 rgba(255,255,255,0.35)",
               }}>
               <I d={icFill.files} s={14} c={agAccent} />
             </div>
@@ -9944,7 +9944,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           <button onClick={() => { setInput(""); inputRef.current?.focus(); setActiveWorkspace(null); }}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[10.5px] font-semibold transition-all"
             style={{
-              background: `linear-gradient(135deg, ${agAccent}, #A78BFA)`,
+              background: `linear-gradient(135deg, ${agAccent}, #7DA9FF)`,
               color: "#fff",
               boxShadow: `0 6px 18px ${agAccent}55, inset 0 1px 0 rgba(255,255,255,0.30)`,
             }}
@@ -9972,10 +9972,10 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               <button key={item.id} onClick={() => setAgentCapability(item.id as typeof agentCapability)}
                 className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-left mb-0.5 transition-all"
                 style={{
-                  background: active ? (dk ? "rgba(124,58,237,0.22)" : "rgba(124,58,237,0.10)") : "transparent",
-                  border: `1px solid ${active ? "rgba(124,58,237,0.25)" : "transparent"}`,
+                  background: active ? (dk ? "rgba(66,132,255,0.22)" : "rgba(66,132,255,0.10)") : "transparent",
+                  border: `1px solid ${active ? "rgba(66,132,255,0.25)" : "transparent"}`,
                 }}
-                onMouseEnter={e => { if (!active) e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(124,58,237,0.05)"; }}
+                onMouseEnter={e => { if (!active) e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(66,132,255,0.05)"; }}
                 onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent"; }}>
                 <I d={item.icon} s={13} c={active ? agAccent : agTextMuted} />
                 <span className="text-[10.5px] font-medium flex-1" style={{ color: active ? agAccent : agTextSec }}>{item.label}</span>
@@ -9996,7 +9996,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           ].map(item => (
             <button key={item.label} onClick={() => send(item.task)}
               className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-left mb-0.5 transition-all"
-              onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(124,58,237,0.05)")}
+              onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(66,132,255,0.05)")}
               onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
               <I d={item.icon} s={13} c={agTextMuted} />
               <span className="text-[10.5px] font-medium flex-1 truncate" style={{ color: agTextSec }}>{item.label}</span>
@@ -10013,7 +10013,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           ].map(item => (
             <button key={item.label} onClick={() => send(item.task)}
               className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-left mb-0.5 transition-all"
-              onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(124,58,237,0.05)")}
+              onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(66,132,255,0.05)")}
               onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
               <I d={item.icon} s={13} c={agTextMuted} />
               <span className="text-[10.5px] font-medium flex-1 truncate" style={{ color: agTextSec }}>{item.label}</span>
@@ -10029,7 +10029,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           ].map(item => (
             <button key={item.label} onClick={() => send(item.task)}
               className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-left mb-0.5 transition-all"
-              onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(124,58,237,0.05)")}
+              onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(66,132,255,0.05)")}
               onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
               <I d={item.icon} s={13} c={agTextMuted} />
               <span className="text-[10.5px] font-medium flex-1 truncate" style={{ color: agTextSec }}>{item.label}</span>
@@ -10042,7 +10042,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               {msgs.filter(m => m.role === "user").slice(-4).reverse().map(m => (
                 <button key={m.id}
                   className="w-full flex items-center gap-2 px-3 py-1.5 rounded-xl text-left mb-0.5 transition-all"
-                  onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(124,58,237,0.05)")}
+                  onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(66,132,255,0.05)")}
                   onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                   <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: agTextMuted }} />
                   <p className="text-[9px] truncate" style={{ color: agTextSec }}>{m.text}</p>
@@ -10387,7 +10387,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                     {/* ── App section ── */}
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-6 h-6 rounded-lg flex items-center justify-center"
-                        style={{ background: "linear-gradient(135deg,rgba(124,58,237,0.22),rgba(56,189,248,0.22))", border: `1px solid ${agBorderSoft}` }}>
+                        style={{ background: "linear-gradient(135deg,rgba(66,132,255,0.22),rgba(56,189,248,0.22))", border: `1px solid ${agBorderSoft}` }}>
                         <I d={icFill.files} s={11} c={agAccent} />
                       </div>
                       <p className="text-[13px] font-bold tracking-tight" style={{ color: agText }}>App</p>
@@ -10443,7 +10443,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                     {/* ── AI Integration section ── */}
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-6 h-6 rounded-lg flex items-center justify-center"
-                        style={{ background: "linear-gradient(135deg,rgba(124,58,237,0.22),rgba(167,139,250,0.22))", border: `1px solid ${agBorderSoft}` }}>
+                        style={{ background: "linear-gradient(135deg,rgba(66,132,255,0.22),rgba(167,139,250,0.22))", border: `1px solid ${agBorderSoft}` }}>
                         <I d={ic.sparkle} s={11} c={agAccent} f />
                       </div>
                       <p className="text-[13px] font-bold tracking-tight" style={{ color: agText }}>AI Integration</p>
@@ -10522,7 +10522,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                         onMouseEnter={e => { e.currentTarget.style.borderColor = agAccent + "55"; e.currentTarget.style.transform = "translateY(-1px)"; }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = agBorder; e.currentTarget.style.transform = "translateY(0)"; }}>
                         <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-                          style={{ background: "linear-gradient(135deg,rgba(124,58,237,0.25),rgba(56,189,248,0.25))" }}>
+                          style={{ background: "linear-gradient(135deg,rgba(66,132,255,0.25),rgba(56,189,248,0.25))" }}>
                           <span className="text-[11px] font-bold" style={{ color: agAccent }}>?</span>
                         </div>
                         <div className="text-left">
@@ -10708,7 +10708,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                         /* ── Welcome card ── */
                         <div className="flex flex-col items-center text-center py-4 px-2">
                           <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3"
-                            style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 6px 24px rgba(124,58,237,0.28)" }}>
+                            style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 6px 24px rgba(66,132,255,0.28)" }}>
                             <I d={ic.sparkle} s={22} c="#fff" f />
                           </div>
                           <p className="text-[16px] font-bold mb-1" style={{ color: agText }}>
@@ -10745,7 +10745,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                         <div className={`flex ${m.role === "user" ? "justify-end" : "gap-2.5"}`}>
                           {m.role === "agent" && (
                             <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-                              style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 2px 8px rgba(124,58,237,0.28)" }}>
+                              style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 2px 8px rgba(66,132,255,0.28)" }}>
                               <I d={ic.sparkle} s={11} c="#fff" f />
                             </div>
                           )}
@@ -10775,7 +10775,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                                   color: m.role === "user" ? "#fff" : agText,
                                   border: m.role === "agent" ? `1px solid ${agBorder}` : "none",
                                   borderLeft: m.role === "agent" ? `3px solid ${agAccent}30` : undefined,
-                                  boxShadow: m.role === "user" ? "0 3px 14px rgba(124,58,237,0.28)" : "0 1px 6px rgba(0,0,0,0.05)",
+                                  boxShadow: m.role === "user" ? "0 3px 14px rgba(66,132,255,0.28)" : "0 1px 6px rgba(0,0,0,0.05)",
                                   whiteSpace: "pre-line",
                                   borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "4px 16px 16px 16px",
                                 }}>
@@ -10804,7 +10804,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                   {isThinking && (
                     <div className="flex gap-2.5">
                       <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 2px 8px rgba(124,58,237,0.28)" }}>
+                        style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 2px 8px rgba(66,132,255,0.28)" }}>
                         <I d={ic.sparkle} s={11} c="#fff" f />
                       </div>
                       <div className="px-4 py-3 rounded-2xl flex gap-1.5 items-center"
@@ -10843,7 +10843,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 {/* Input */}
                 <div className="flex-shrink-0 px-4 pb-4 pt-2">
                   <div className="flex items-center gap-2 px-3 py-2.5 rounded-2xl"
-                    style={{ background: dk ? c.surface : "#fff", border: `1.5px solid ${input.trim() ? agAccent + "55" : agBorder}`, boxShadow: input.trim() ? "0 4px 20px rgba(124,58,237,0.12)" : "0 1px 8px rgba(0,0,0,0.05)", transition: "border-color 0.15s, box-shadow 0.15s" }}>
+                    style={{ background: dk ? c.surface : "#fff", border: `1.5px solid ${input.trim() ? agAccent + "55" : agBorder}`, boxShadow: input.trim() ? "0 4px 20px rgba(66,132,255,0.12)" : "0 1px 8px rgba(0,0,0,0.05)", transition: "border-color 0.15s, box-shadow 0.15s" }}>
                     <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
                       style={{ color: agTextMuted }}
                       onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
@@ -10860,7 +10860,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                     </button>
                     <button onClick={() => send()} disabled={isThinking || !input.trim()}
                       className="w-8 h-8 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
-                      style={{ background: input.trim() && !isThinking ? "linear-gradient(135deg,#7C3AED,#4F8EF7)" : (dk ? c.cardAlt : "#EFEFEF"), boxShadow: input.trim() && !isThinking ? "0 2px 10px rgba(124,58,237,0.40)" : "none", opacity: isThinking ? 0.5 : 1 }}>
+                      style={{ background: input.trim() && !isThinking ? "linear-gradient(135deg,#7C3AED,#4F8EF7)" : (dk ? c.cardAlt : "#EFEFEF"), boxShadow: input.trim() && !isThinking ? "0 2px 10px rgba(66,132,255,0.40)" : "none", opacity: isThinking ? 0.5 : 1 }}>
                       <I d={ic.send} s={12} c={input.trim() && !isThinking ? "#fff" : agTextMuted} />
                     </button>
                   </div>
@@ -11494,8 +11494,8 @@ function OOBESetup({ onComplete }: { onComplete: (data: OOBEData) => void }) {
 export default function AlternusOS() {
   const [mode, setMode] = useState<ThemeMode>("light");
   const [time, setTime] = useState(new Date());
-  const [isLocked, setIsLocked] = useState(true);
-  const [isBooting, setIsBooting] = useState(true);
+  const [isLocked, setIsLocked] = useState(false);
+  const [isBooting, setIsBooting] = useState(false);
   const [showOOBE, setShowOOBE] = useState(false);
   const [oobeProfile, setOobeProfile] = useState<OOBEData | null>(null);
   const [bootProgress, setBootProgress] = useState(0);
@@ -11662,11 +11662,15 @@ export default function AlternusOS() {
     requestAnimationFrame(animate);
   }, [isBooting]);
 
-  // Always run OOBE after boot completes — on every refresh / restart.
-  // (Persistence removed so the user sees the setup flow on each session.)
+  // Direct entry from homepage: skip boot + OOBE + lock, open Agent maximized.
   useEffect(() => {
-    if (!isBooting) setShowOOBE(true);
-  }, [isBooting]);
+    setZCounter(z => z + 1);
+    setWins(prev => prev.map(w => {
+      if (w.id === "agent") return { ...w, isOpen: true, isMinimized: false, isMaximized: true, zIndex: 9999 };
+      return { ...w, isOpen: false, isMinimized: false, isMaximized: false };
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const finishOOBE = useCallback((profile: OOBEData) => {
     setOobeProfile(profile);
