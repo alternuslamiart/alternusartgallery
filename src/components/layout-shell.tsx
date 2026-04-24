@@ -6,8 +6,8 @@ import { Footer } from "@/components/footer";
 import { CategoryBar } from "@/components/category-bar";
 import { MobileNav } from "@/components/mobile-nav";
 
-const STANDALONE_ROUTES = ["/", "/login", "/signup", "/ai", "/admin/login", "/os", "/about", "/manifesto", "/careers", "/press", "/contact", "/privacy", "/terms", "/cookie-notice", "/security", "/pricing"];
-const STANDALONE_PREFIXES = ["/platform/", "/workspace/"];
+const STANDALONE_ROUTES = ["/", "/login", "/signup", "/ai", "/admin/login", "/os", "/about", "/manifesto", "/careers", "/press", "/contact", "/privacy", "/terms", "/cookie-notice", "/security", "/pricing", "/account"];
+const STANDALONE_PREFIXES = ["/platform/", "/workspace/", "/account/"];
 const NO_CATEGORY_BAR_ROUTES = ["/pricing"];
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {

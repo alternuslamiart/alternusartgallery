@@ -128,6 +128,7 @@ export default function Home() {
           <Link href="/login" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}`, transition: "border-color 0.15s" }} className="hover:!border-[#4284FF]">
             Log in
           </Link>
+          <Link href="/account" aria-label="Account" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, fontSize: 12, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.02em" }}>AL</Link>
           <Link href="/os" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", boxShadow: `0 0 0 0 ${COBALT}`, transition: "box-shadow 0.2s", borderRadius: 8 }} className="hover:shadow-[0_0_0_4px_rgba(66,132,255,0.25)]">
             Launch OS
             <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
