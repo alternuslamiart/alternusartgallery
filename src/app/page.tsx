@@ -57,7 +57,7 @@ export default function Home() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
   const [scrolled, setScrolled] = useState(false);
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [activeCap, setActiveCap] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);

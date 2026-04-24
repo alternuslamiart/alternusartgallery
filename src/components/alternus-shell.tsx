@@ -9,7 +9,7 @@ export const INK = "#05080F";
 export const PAPER = "#F4F6FB";
 
 export function useAlternusTheme() {
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
