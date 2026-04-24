@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Roboto, Playfair_Display } from "next/font/google";
+import { Roboto, Roboto_Flex, Playfair_Display } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/components/providers";
@@ -25,6 +25,12 @@ const roboto = Roboto({
   subsets: ["latin"],
   weight: ["700", "900"],
   variable: "--font-roboto",
+});
+
+const robotoFlex = Roboto_Flex({
+  subsets: ["latin"],
+  variable: "--font-roboto-flex",
+  display: "swap",
 });
 
 const playfair = Playfair_Display({
@@ -183,7 +189,7 @@ export default function RootLayout({
         }}
       />
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} ${playfair.variable} antialiased min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} ${robotoFlex.variable} ${playfair.variable} antialiased min-h-screen flex flex-col`}
       >
         <Providers>
           <LayoutShell>{children}</LayoutShell>
