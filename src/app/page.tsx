@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 const COBALT = "#4284FF";
 const COBALT_DEEP = "#1E5ED4";
 const COBALT_LIGHT = "#7DA9FF";
-const INK = "#05080F";
+const INK = "#1F1F1F";
 const PAPER = "#F4F6FB";
 const GREEN = "#2EC272";
 
@@ -83,7 +83,7 @@ export default function Home() {
   const muted = isDark ? "rgba(255,255,255,0.6)" : "rgba(5,8,15,0.62)";
   const faint = isDark ? "rgba(255,255,255,0.1)" : "rgba(5,8,15,0.1)";
   const surface = isDark ? "rgba(255,255,255,0.04)" : "rgba(5,8,15,0.035)";
-  const raised = isDark ? "#0C1220" : "#FFFFFF";
+  const raised = isDark ? "#2A2A2A" : "#FFFFFF";
 
   return (
     <div style={{ minHeight: "100vh", background: bg, color: fg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", transition: "background 0.3s,color 0.3s", overflowX: "hidden" }}>
@@ -349,7 +349,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div style={{ border: `1px solid ${faint}`, boxShadow: `16px 16px 0 0 ${COBALT}`, background: "#0C1220", borderRadius: 12, overflow: "hidden" }}>
+          <div style={{ border: `1px solid ${faint}`, boxShadow: `16px 16px 0 0 ${COBALT}`, background: "#2A2A2A", borderRadius: 12, overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 16px", height: 40, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
               <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#FF5F57" }} />
               <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#FEBC2E" }} />

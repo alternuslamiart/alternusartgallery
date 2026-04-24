@@ -31,7 +31,7 @@ export default function CodeStudio() {
             </div>
 
             {/* Editor mockup */}
-            <div style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden", background: "#0A0E1A", boxShadow: `16px 16px 0 0 ${COBALT}` }}>
+            <div style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden", background: "#2A2A2A", boxShadow: `16px 16px 0 0 ${COBALT}` }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                 <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#FF5F57" }}/>
                 <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#FEBC2E" }}/>

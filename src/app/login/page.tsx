@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const COBALT = "#4284FF";
-const INK = "#05080F";
+const INK = "#1F1F1F";
 const PAPER = "#F4F6FB";
 
 export default function Login() {
@@ -21,7 +21,7 @@ export default function Login() {
   const muted = isDark ? "rgba(255,255,255,0.6)" : "rgba(5,8,15,0.62)";
   const faint = isDark ? "rgba(255,255,255,0.1)" : "rgba(5,8,15,0.1)";
   const surface = isDark ? "rgba(255,255,255,0.04)" : "rgba(5,8,15,0.035)";
-  const raised = isDark ? "#0C1220" : "#FFFFFF";
+  const raised = isDark ? "#2A2A2A" : "#FFFFFF";
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();

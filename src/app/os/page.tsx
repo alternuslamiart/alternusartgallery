@@ -83,11 +83,11 @@ const aiFileIndex = [
 // ━━━━ Colors ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const palette = {
   dark: {
-    bg: "#1C1D22",
-    surface: "#25262D",
-    card: "#2A2B33",
-    cardAlt: "#31323B",
-    border: "#383942",
+    bg: "#1F1F1F",
+    surface: "#2A2A2A",
+    card: "#2A2A2A",
+    cardAlt: "#333333",
+    border: "#3A3A3A",
     text: "#F0F2F8",
     textSec: "#A4A8B8",
     textMuted: "#6B6F82",
@@ -8191,7 +8191,7 @@ function AIHubApp({ c }: { c: typeof palette.dark }) {
   useEffect(() => { hubEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs]);
 
   // Agent-style sidebar color vars (matches AlternusAgentApp exactly)
-  const dk = c.bg === "#1C1D22";
+  const dk = c.bg === "#1F1F1F";
   const agSidebarBg = dk ? c.surface : "linear-gradient(175deg,#F0EAFF 0%,#EDE8FF 40%,#EFF4FF 100%)";
   const agBorder = dk ? c.border : "rgba(120,80,220,0.10)";
   const agText = dk ? c.text : "#1a1525";
@@ -9823,17 +9823,17 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
   const dk = mode === "dark";
   const agBg = dk
-    ? "radial-gradient(1200px 800px at 12% -10%, rgba(66,132,255,0.22) 0%, transparent 55%), radial-gradient(900px 700px at 110% 110%, rgba(56,189,248,0.18) 0%, transparent 55%), linear-gradient(160deg,#0F0B1F 0%,#14102A 50%,#0B1428 100%)"
+    ? "#1F1F1F"
     : "radial-gradient(1200px 900px at 10% -10%, #E6E0FF 0%, transparent 60%), radial-gradient(1000px 800px at 115% 115%, #D6EAFF 0%, transparent 55%), linear-gradient(155deg,#F5F2FF 0%,#F1F4FF 50%,#EDF4F8 100%)";
-  const agSidebarBg = dk ? "rgba(20,14,40,0.55)" : "rgba(255,255,255,0.55)";
-  const agCardBg = dk ? "rgba(28,22,48,0.55)" : "rgba(255,255,255,0.65)";
-  const agPanelBg = dk ? "rgba(22,18,42,0.42)" : "rgba(255,255,255,0.45)";
-  const agCardBgSolid = dk ? "rgba(32,26,54,0.88)" : "rgba(255,255,255,0.92)";
+  const agSidebarBg = dk ? "#2A2A2A" : "rgba(255,255,255,0.55)";
+  const agCardBg = dk ? "#2A2A2A" : "rgba(255,255,255,0.65)";
+  const agPanelBg = dk ? "#2A2A2A" : "rgba(255,255,255,0.45)";
+  const agCardBgSolid = dk ? "#2A2A2A" : "rgba(255,255,255,0.92)";
   const agBorder = dk ? "rgba(255,255,255,0.08)" : "rgba(160,170,210,0.22)";
   const agBorderSoft = dk ? "rgba(255,255,255,0.05)" : "rgba(200,210,240,0.18)";
-  const agText = dk ? "#F3EEFF" : "#1a1525";
-  const agTextSec = dk ? "#C8BFE0" : "#5a5470";
-  const agTextMuted = dk ? "#8B82A8" : "#9896ab";
+  const agText = dk ? "#F3F3F3" : "#1a1525";
+  const agTextSec = dk ? "#C8C8C8" : "#5a5470";
+  const agTextMuted = dk ? "#8E8E8E" : "#9896ab";
   const agAccent = "#4284FF";
   const agAccentSoft = dk ? "rgba(66,132,255,0.20)" : "rgba(66,132,255,0.10)";
   const agSelected = dk ? "rgba(66,132,255,0.22)" : "rgba(66,132,255,0.12)";

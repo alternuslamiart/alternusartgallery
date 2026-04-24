@@ -5,7 +5,7 @@ import { useEffect, useState, ReactNode } from "react";
 
 export const COBALT = "#4284FF";
 export const COBALT_DEEP = "#1E5ED4";
-export const INK = "#05080F";
+export const INK = "#1F1F1F";
 export const PAPER = "#F4F6FB";
 
 export function useAlternusTheme() {
@@ -23,7 +23,7 @@ export function useAlternusTheme() {
   const muted = isDark ? "rgba(255,255,255,0.6)" : "rgba(5,8,15,0.62)";
   const faint = isDark ? "rgba(255,255,255,0.1)" : "rgba(5,8,15,0.1)";
   const surface = isDark ? "rgba(255,255,255,0.04)" : "rgba(5,8,15,0.035)";
-  const raised = isDark ? "#0C1220" : "#FFFFFF";
+  const raised = isDark ? "#2A2A2A" : "#FFFFFF";
 
   return { isDark, setIsDark, scrolled, bg, fg, muted, faint, surface, raised };
 }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 const COBALT = "#4284FF";
-const INK = "#05080F";
+const INK = "#1F1F1F";
 const PAPER = "#F4F6FB";
 
 type SectionId =
@@ -41,7 +41,7 @@ export default function Account() {
   const muted = isDark ? "rgba(255,255,255,0.6)" : "rgba(5,8,15,0.62)";
   const faint = isDark ? "rgba(255,255,255,0.08)" : "rgba(5,8,15,0.08)";
   const faintBorder = isDark ? "rgba(255,255,255,0.05)" : "rgba(5,8,15,0.05)";
-  const raised = isDark ? "#0C1220" : "#FFFFFF";
+  const raised = isDark ? "#2A2A2A" : "#FFFFFF";
   const softFill = isDark ? "rgba(255,255,255,0.04)" : "#F5F7FB";
 
   const cardShadow = isDark ? "0 1px 3px rgba(0,0,0,0.2)" : "0 1px 4px rgba(5,8,15,0.04)";
