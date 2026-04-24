@@ -9885,25 +9885,19 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
   ];
 
   return (
-    <div className="flex h-full overflow-hidden" style={{ background: agBg, fontFamily: "'Segoe UI Variable','Segoe UI',system-ui,-apple-system,sans-serif" }}>
-      {/* ── LEFT SIDEBAR — Glass panel · Alternus AI OS ──────── */}
+    <div className="flex h-full overflow-hidden" style={{ background: agBg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" }}>
+      {/* ── LEFT SIDEBAR — Clean panel · Alternus AI OS ──────── */}
       <div className="flex flex-col flex-shrink-0 relative" style={{
         width: 250,
-        background: agSidebarBg,
-        backdropFilter: "blur(32px) saturate(160%)",
-        WebkitBackdropFilter: "blur(32px) saturate(160%)",
+        background: dk ? "rgba(20,16,31,0.6)" : "#FFFFFF",
         borderRight: `1px solid ${agBorder}`,
-        boxShadow: dk ? "inset -1px 0 0 rgba(255,255,255,0.04)" : "inset -1px 0 0 rgba(255,255,255,0.6)",
+        boxShadow: dk ? "none" : "1px 0 0 rgba(5,8,15,0.04)",
       }}>
         {/* Brand header */}
         <div className="px-4 pt-4 pb-2.5 flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0"
-              style={{
-                background: "linear-gradient(135deg, rgba(66,132,255,0.22), rgba(56,189,248,0.22))",
-                border: "1px solid rgba(66,132,255,0.25)",
-                boxShadow: "0 4px 14px rgba(66,132,255,0.18), inset 0 1px 0 rgba(255,255,255,0.35)",
-              }}>
+              style={{ background: `${agAccent}14` }}>
               <I d={icFill.files} s={14} c={agAccent} />
             </div>
             <div className="flex-1 min-w-0">
@@ -9913,24 +9907,19 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 <p className="text-[7.5px]" style={{ color: agTextMuted }}>Claude Opus 4.6 · Active</p>
               </div>
             </div>
-            <button className="w-7 h-7 rounded-xl flex items-center justify-center transition-all"
-              style={{ border: `1px solid ${agBorderSoft}` }}
-              onMouseEnter={e => (e.currentTarget.style.background = agSelected)}
-              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+            <button className="w-7 h-7 rounded-xl flex items-center justify-center"
+              style={{ border: `1px solid ${agBorderSoft}` }}>
               <I d={ic.settings} s={12} c={agTextMuted} />
             </button>
           </div>
         </div>
 
-        {/* Search bar (glass pill) */}
+        {/* Search bar (clean) */}
         <div className="px-4 pb-2.5 flex-shrink-0">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl transition-all"
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl"
             style={{
-              background: dk ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.55)",
-              border: `1px solid ${agBorderSoft}`,
-              backdropFilter: "blur(14px)",
-              WebkitBackdropFilter: "blur(14px)",
-              boxShadow: dk ? "inset 0 1px 0 rgba(255,255,255,0.04)" : "inset 0 1px 0 rgba(255,255,255,0.8)",
+              background: dk ? "rgba(255,255,255,0.04)" : "#F5F7FB",
+              border: `1px solid ${dk ? "rgba(255,255,255,0.06)" : "rgba(5,8,15,0.05)"}`,
             }}>
             <I d={ic.search} s={11} c={agTextMuted} />
             <input placeholder="Search"
@@ -9939,20 +9928,19 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           </div>
         </div>
 
-        {/* New task — primary gradient pill */}
+        {/* New task — solid soft-shadow pill */}
         <div className="px-4 pb-2 flex-shrink-0">
           <button onClick={() => { setInput(""); inputRef.current?.focus(); setActiveWorkspace(null); }}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[10.5px] font-semibold transition-all"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-semibold"
             style={{
-              background: `linear-gradient(135deg, ${agAccent}, #7DA9FF)`,
+              background: agAccent,
               color: "#fff",
-              boxShadow: `0 6px 18px ${agAccent}55, inset 0 1px 0 rgba(255,255,255,0.30)`,
-            }}
-            onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-1px)")}
-            onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}>
+              boxShadow: `0 2px 8px rgba(66,132,255,0.22)`,
+              letterSpacing: "-0.01em",
+            }}>
             <span className="text-[14px] leading-none font-light">+</span>
             <span className="flex-1 text-left">New task</span>
-            <span className="text-[8.5px] opacity-80">⌘ N</span>
+            <span className="text-[8.5px] opacity-75">⌘ N</span>
           </button>
         </div>
 
@@ -9970,13 +9958,11 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
             const active = agentCapability === item.id;
             return (
               <button key={item.id} onClick={() => setAgentCapability(item.id as typeof agentCapability)}
-                className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-left mb-0.5 transition-all"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left mb-0.5"
                 style={{
-                  background: active ? (dk ? "rgba(66,132,255,0.22)" : "rgba(66,132,255,0.10)") : "transparent",
-                  border: `1px solid ${active ? "rgba(66,132,255,0.25)" : "transparent"}`,
+                  background: active ? (dk ? "rgba(66,132,255,0.14)" : "rgba(66,132,255,0.08)") : "transparent",
                 }}
-                onMouseEnter={e => { if (!active) e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(66,132,255,0.05)"; }}
-                onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent"; }}>
+                >
                 <I d={item.icon} s={13} c={active ? agAccent : agTextMuted} />
                 <span className="text-[10.5px] font-medium flex-1" style={{ color: active ? agAccent : agTextSec }}>{item.label}</span>
                 {item.badge > 0 && (
@@ -9996,8 +9982,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           ].map(item => (
             <button key={item.label} onClick={() => send(item.task)}
               className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-left mb-0.5 transition-all"
-              onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(66,132,255,0.05)")}
-              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              >
               <I d={item.icon} s={13} c={agTextMuted} />
               <span className="text-[10.5px] font-medium flex-1 truncate" style={{ color: agTextSec }}>{item.label}</span>
             </button>
@@ -10013,8 +9998,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           ].map(item => (
             <button key={item.label} onClick={() => send(item.task)}
               className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-left mb-0.5 transition-all"
-              onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(66,132,255,0.05)")}
-              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              >
               <I d={item.icon} s={13} c={agTextMuted} />
               <span className="text-[10.5px] font-medium flex-1 truncate" style={{ color: agTextSec }}>{item.label}</span>
             </button>
@@ -10029,8 +10013,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           ].map(item => (
             <button key={item.label} onClick={() => send(item.task)}
               className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-left mb-0.5 transition-all"
-              onMouseEnter={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(66,132,255,0.05)")}
-              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              >
               <I d={item.icon} s={13} c={agTextMuted} />
               <span className="text-[10.5px] font-medium flex-1 truncate" style={{ color: agTextSec }}>{item.label}</span>
             </button>
@@ -10307,27 +10290,20 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                   <p className="text-[12.5px] font-bold tracking-tight" style={{ color: agText }}>Alternus AI OS</p>
                   <div className="flex items-center gap-2 flex-1 max-w-[360px] ml-4 px-3 py-1.5 rounded-xl"
                     style={{
-                      background: dk ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.55)",
-                      border: `1px solid ${agBorderSoft}`,
-                      backdropFilter: "blur(14px)",
-                      WebkitBackdropFilter: "blur(14px)",
-                      boxShadow: dk ? "inset 0 1px 0 rgba(255,255,255,0.04)" : "inset 0 1px 0 rgba(255,255,255,0.8)",
+                      background: dk ? "rgba(255,255,255,0.04)" : "#F5F7FB",
+                      border: `1px solid ${dk ? "rgba(255,255,255,0.05)" : "rgba(5,8,15,0.04)"}`,
                     }}>
                     <I d={ic.search} s={11} c={agTextMuted} />
                     <input placeholder="Search"
                       className="flex-1 bg-transparent outline-none text-[10.5px]"
-                      style={{ color: agText }} />
+                      style={{ color: agText, letterSpacing: "-0.01em" }} />
                   </div>
                   <div className="flex-1" />
-                  <button className="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
+                  <button className="w-8 h-8 rounded-xl flex items-center justify-center"
                     style={{
-                      background: dk ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.55)",
-                      border: `1px solid ${agBorderSoft}`,
-                      backdropFilter: "blur(14px)",
-                      WebkitBackdropFilter: "blur(14px)",
-                    }}
-                    onMouseEnter={e => (e.currentTarget.style.background = agSelected)}
-                    onMouseLeave={e => (e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.55)")}>
+                      background: dk ? "rgba(255,255,255,0.03)" : "#FFFFFF",
+                      border: `1px solid ${dk ? "rgba(255,255,255,0.05)" : "rgba(5,8,15,0.04)"}`,
+                    }}>
                     <I d={ic.settings} s={13} c={agTextMuted} />
                   </button>
                 </div>
@@ -10336,48 +10312,42 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
                   <div style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 32px 40px 32px" }}>
 
-                    {/* Hero input — glass card */}
-                    <div className="mb-8 rounded-3xl overflow-hidden" style={{
-                      background: agCardBg,
-                      border: `1px solid ${agBorder}`,
-                      backdropFilter: "blur(24px) saturate(150%)",
-                      WebkitBackdropFilter: "blur(24px) saturate(150%)",
-                      boxShadow: agGlassShadow,
+                    {/* Hero input — clean card */}
+                    <div className="mb-8 rounded-2xl overflow-hidden" style={{
+                      background: dk ? "rgba(255,255,255,0.03)" : "#FFFFFF",
+                      border: `1px solid ${dk ? "rgba(255,255,255,0.06)" : "rgba(5,8,15,0.06)"}`,
+                      boxShadow: dk ? "0 1px 3px rgba(0,0,0,0.2)" : "0 2px 12px rgba(5,8,15,0.04)",
                     }}>
                       <div className="px-6 pt-6 pb-3">
                         <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
                           onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
                           placeholder="Ask me to do anything on your OS — email, files, apps, system…"
                           className="w-full bg-transparent outline-none text-[13px]"
-                          style={{ color: agText, caretColor: agAccent }} />
+                          style={{ color: agText, caretColor: agAccent, letterSpacing: "-0.01em" }} />
                       </div>
                       <div className="px-6 pb-5 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           {[
-                            { icon: ic.upload, label: "Upload",   color: "#8B5CF6" },
-                            { icon: ic.globe,  label: "Research", color: "#3B82F6" },
-                            { icon: ic.code,   label: "Code",     color: "#10B981" },
-                            { icon: ic.image,  label: "Image",    color: "#F97316" },
+                            { icon: ic.upload, label: "Upload"   },
+                            { icon: ic.globe,  label: "Research" },
+                            { icon: ic.code,   label: "Code"     },
+                            { icon: ic.image,  label: "Image"    },
                           ].map(btn => (
-                            <button key={btn.label} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[9.5px] font-medium transition-all"
+                            <button key={btn.label} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9.5px] font-medium"
                               style={{
                                 color: agTextMuted,
-                                background: dk ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.55)",
-                                border: `1px solid ${agBorderSoft}`,
-                                backdropFilter: "blur(10px)",
-                                WebkitBackdropFilter: "blur(10px)",
-                              }}
-                              onMouseEnter={e => { e.currentTarget.style.color = btn.color; e.currentTarget.style.borderColor = btn.color + "55"; e.currentTarget.style.background = btn.color + "14"; }}
-                              onMouseLeave={e => { e.currentTarget.style.color = agTextMuted; e.currentTarget.style.borderColor = agBorderSoft; e.currentTarget.style.background = dk ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.55)"; }}>
+                                background: dk ? "rgba(255,255,255,0.03)" : "#F5F7FB",
+                                border: `1px solid ${dk ? "rgba(255,255,255,0.05)" : "rgba(5,8,15,0.04)"}`,
+                              }}>
                               <I d={btn.icon} s={11} c={agTextMuted} /> {btn.label}
                             </button>
                           ))}
                         </div>
                         <button onClick={() => send()} disabled={!input.trim()}
-                          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+                          className="w-9 h-9 rounded-lg flex items-center justify-center"
                           style={{
-                            background: input.trim() ? `linear-gradient(135deg, ${agAccent}, #A78BFA)` : (dk ? "rgba(255,255,255,0.06)" : "rgba(230,230,240,0.6)"),
-                            boxShadow: input.trim() ? `0 6px 18px ${agAccent}55, inset 0 1px 0 rgba(255,255,255,0.3)` : "none",
+                            background: input.trim() ? agAccent : (dk ? "rgba(255,255,255,0.06)" : "#EEF2F8"),
+                            boxShadow: input.trim() ? `0 2px 8px rgba(66,132,255,0.22)` : "none",
                           }}>
                           <I d={ic.send} s={14} c={input.trim() ? "#fff" : agTextMuted} />
                         </button>
@@ -10406,35 +10376,21 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                         { icon: ic.cloud,         label: "Cloud Storage Sync",   desc: "Backup & sync files",      color: "#7C3AED", task: "Show me what you can do with files" },
                       ].map(cap => (
                         <button key={cap.label} onClick={() => send(cap.task)}
-                          className="flex flex-col gap-3 p-4 rounded-2xl text-left transition-all"
+                          className="flex flex-col gap-3 p-4 rounded-2xl text-left"
                           style={{
-                            background: agCardBg,
-                            border: `1px solid ${agBorder}`,
-                            backdropFilter: "blur(20px) saturate(140%)",
-                            WebkitBackdropFilter: "blur(20px) saturate(140%)",
-                            boxShadow: agCardShadow,
-                          }}
-                          onMouseEnter={e => {
-                            e.currentTarget.style.boxShadow = `0 10px 32px ${cap.color}28, inset 0 1px 0 rgba(255,255,255,${dk ? 0.08 : 0.9})`;
-                            e.currentTarget.style.borderColor = cap.color + "50";
-                            e.currentTarget.style.transform = "translateY(-2px)";
-                          }}
-                          onMouseLeave={e => {
-                            e.currentTarget.style.boxShadow = agCardShadow;
-                            e.currentTarget.style.borderColor = agBorder;
-                            e.currentTarget.style.transform = "translateY(0)";
+                            background: dk ? "rgba(255,255,255,0.03)" : "#FFFFFF",
+                            border: `1px solid ${dk ? "rgba(255,255,255,0.06)" : "rgba(5,8,15,0.05)"}`,
+                            boxShadow: dk ? "0 1px 3px rgba(0,0,0,0.2)" : "0 1px 4px rgba(5,8,15,0.04)",
                           }}>
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                             style={{
-                              background: `linear-gradient(135deg, ${cap.color}22, ${cap.color}0F)`,
-                              border: `1px solid ${cap.color}30`,
-                              boxShadow: `inset 0 1px 0 rgba(255,255,255,${dk ? 0.08 : 0.6})`,
+                              background: `${cap.color}14`,
                             }}>
                             <I d={cap.icon} s={15} c={cap.color} />
                           </div>
                           <div>
-                            <p className="text-[10.5px] font-semibold leading-snug" style={{ color: agText }}>{cap.label}</p>
-                            <p className="text-[8.5px] leading-snug mt-1" style={{ color: agTextMuted }}>{cap.desc}</p>
+                            <p className="text-[11px] font-semibold leading-snug" style={{ color: agText, letterSpacing: "-0.01em" }}>{cap.label}</p>
+                            <p className="text-[9px] leading-snug mt-1" style={{ color: agTextMuted }}>{cap.desc}</p>
                           </div>
                         </button>
                       ))}
@@ -10458,35 +10414,19 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                         { icon: ic.pen,     label: "AI Writer · Compose",       desc: "Draft emails & documents", color: "#EC4899", task: "Write a professional email to the team about the project progress" },
                       ].map(cap => (
                         <button key={cap.label} onClick={() => send(cap.task)}
-                          className="flex items-center gap-3 p-4 rounded-2xl text-left transition-all"
+                          className="flex items-center gap-3 p-4 rounded-2xl text-left"
                           style={{
-                            background: agCardBg,
-                            border: `1px solid ${agBorder}`,
-                            backdropFilter: "blur(20px) saturate(140%)",
-                            WebkitBackdropFilter: "blur(20px) saturate(140%)",
-                            boxShadow: agCardShadow,
-                          }}
-                          onMouseEnter={e => {
-                            e.currentTarget.style.boxShadow = `0 10px 32px ${cap.color}28, inset 0 1px 0 rgba(255,255,255,${dk ? 0.08 : 0.9})`;
-                            e.currentTarget.style.borderColor = cap.color + "50";
-                            e.currentTarget.style.transform = "translateY(-2px)";
-                          }}
-                          onMouseLeave={e => {
-                            e.currentTarget.style.boxShadow = agCardShadow;
-                            e.currentTarget.style.borderColor = agBorder;
-                            e.currentTarget.style.transform = "translateY(0)";
+                            background: dk ? "rgba(255,255,255,0.03)" : "#FFFFFF",
+                            border: `1px solid ${dk ? "rgba(255,255,255,0.06)" : "rgba(5,8,15,0.05)"}`,
+                            boxShadow: dk ? "0 1px 3px rgba(0,0,0,0.2)" : "0 1px 4px rgba(5,8,15,0.04)",
                           }}>
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                            style={{
-                              background: `linear-gradient(135deg, ${cap.color}22, ${cap.color}0F)`,
-                              border: `1px solid ${cap.color}30`,
-                              boxShadow: `inset 0 1px 0 rgba(255,255,255,${dk ? 0.08 : 0.6})`,
-                            }}>
+                            style={{ background: `${cap.color}14` }}>
                             <I d={cap.icon} s={15} c={cap.color} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[10.5px] font-semibold leading-snug truncate" style={{ color: agText }}>{cap.label}</p>
-                            <p className="text-[8.5px] leading-snug mt-0.5" style={{ color: agTextMuted }}>{cap.desc}</p>
+                            <p className="text-[11px] font-semibold leading-snug truncate" style={{ color: agText, letterSpacing: "-0.01em" }}>{cap.label}</p>
+                            <p className="text-[9px] leading-snug mt-0.5" style={{ color: agTextMuted }}>{cap.desc}</p>
                           </div>
                           <I d={ic.chevR} s={11} c={agTextMuted} />
                         </button>
@@ -10497,36 +10437,30 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                     <div className="grid grid-cols-[1fr_auto] gap-3 mb-7">
                       <div className="flex items-center gap-2 px-4 py-3 rounded-2xl"
                         style={{
-                          background: agCardBg,
-                          border: `1px solid ${agBorder}`,
-                          backdropFilter: "blur(20px) saturate(140%)",
-                          WebkitBackdropFilter: "blur(20px) saturate(140%)",
-                          boxShadow: agCardShadow,
+                          background: dk ? "rgba(255,255,255,0.03)" : "#FFFFFF",
+                          border: `1px solid ${dk ? "rgba(255,255,255,0.06)" : "rgba(5,8,15,0.05)"}`,
+                          boxShadow: dk ? "0 1px 3px rgba(0,0,0,0.2)" : "0 1px 4px rgba(5,8,15,0.04)",
                         }}>
                         <I d={ic.search} s={12} c={agTextMuted} />
                         <input placeholder="Apps name"
                           className="flex-1 bg-transparent outline-none text-[10.5px]"
-                          style={{ color: agText }} />
-                        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: agAccentSoft }}>
+                          style={{ color: agText, letterSpacing: "-0.01em" }} />
+                        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${agAccent}14` }}>
                           <I d={ic.grid} s={12} c={agAccent} />
                         </div>
                       </div>
-                      <button className="flex items-center gap-2.5 px-4 py-3 rounded-2xl transition-all"
+                      <button className="flex items-center gap-2.5 px-4 py-3 rounded-2xl"
                         style={{
-                          background: agCardBg,
-                          border: `1px solid ${agBorder}`,
-                          backdropFilter: "blur(20px) saturate(140%)",
-                          WebkitBackdropFilter: "blur(20px) saturate(140%)",
-                          boxShadow: agCardShadow,
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = agAccent + "55"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = agBorder; e.currentTarget.style.transform = "translateY(0)"; }}>
+                          background: dk ? "rgba(255,255,255,0.03)" : "#FFFFFF",
+                          border: `1px solid ${dk ? "rgba(255,255,255,0.06)" : "rgba(5,8,15,0.05)"}`,
+                          boxShadow: dk ? "0 1px 3px rgba(0,0,0,0.2)" : "0 1px 4px rgba(5,8,15,0.04)",
+                        }}>
                         <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-                          style={{ background: "linear-gradient(135deg,rgba(66,132,255,0.25),rgba(56,189,248,0.25))" }}>
+                          style={{ background: `${agAccent}14` }}>
                           <span className="text-[11px] font-bold" style={{ color: agAccent }}>?</span>
                         </div>
                         <div className="text-left">
-                          <p className="text-[10px] font-semibold leading-tight" style={{ color: agText }}>AI Help</p>
+                          <p className="text-[10px] font-semibold leading-tight" style={{ color: agText, letterSpacing: "-0.01em" }}>AI Help</p>
                           <p className="text-[8px] leading-tight" style={{ color: agTextMuted }}>& Info</p>
                         </div>
                       </button>
