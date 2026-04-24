@@ -55,7 +55,7 @@ export function AlternusNav({ isDark, setIsDark, scrolled, fg, muted, faint }: R
           <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
         </Link>
         <nav className="hidden md:flex" style={{ alignItems: "center", gap: 24 }}>
-          {[{ l: "Platform", h: "/platform/overview" }, { l: "Workspace", h: "/workspace/mail" }, { l: "Company", h: "/about" }, { l: "Pricing", h: "/pricing" }].map((i) => (
+          {[{ l: "Platform", h: "/platform/overview" }, { l: "Bridges", h: "/platform/bridges" }, { l: "Company", h: "/about" }, { l: "Pricing", h: "/pricing" }].map((i) => (
             <Link key={i.l} href={i.h} style={{ fontSize: 13, color: muted, fontWeight: 500, textDecoration: "none", letterSpacing: "-0.01em" }}>{i.l}</Link>
           ))}
         </nav>
@@ -82,18 +82,19 @@ export function AlternusFooter({ isDark, fg, muted, faint }: ReturnType<typeof u
   const cols = [
     { heading: "Platform", links: [
       { l: "Overview", h: "/platform/overview", ext: false },
+      { l: "Bridges", h: "/platform/bridges", ext: false },
       { l: "Agent SDK", h: "/platform/agent-sdk", ext: false },
       { l: "API Reference", h: "/platform/api", ext: true },
       { l: "Changelog", h: "/platform/changelog", ext: false },
       { l: "Status", h: "/platform/status", ext: false },
     ]},
-    { heading: "Workspace", links: [
+    { heading: "Creative", links: [
       { l: "Launch OS", h: "/os", ext: true },
-      { l: "Mail", h: "/workspace/mail", ext: false },
-      { l: "Files", h: "/workspace/files", ext: false },
-      { l: "Code Studio", h: "/workspace/code", ext: false },
-      { l: "Knowledge Base", h: "/workspace/knowledge", ext: false },
-      { l: "Voice Mode", h: "/workspace/voice", ext: false },
+      { l: "Edit", h: "/workspace/mail", ext: false },
+      { l: "Media library", h: "/workspace/files", ext: false },
+      { l: "FX & 3D", h: "/workspace/code", ext: false },
+      { l: "Boards", h: "/workspace/knowledge", ext: false },
+      { l: "Voice & sound", h: "/workspace/voice", ext: false },
     ]},
     { heading: "Company", links: [
       { l: "About", h: "/about", ext: false },

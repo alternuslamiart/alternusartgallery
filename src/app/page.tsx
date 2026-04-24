@@ -16,42 +16,45 @@ const GREEN = "#2EC272";
 /* ═══ Content ═══ */
 const marquee = [
   "Claude Opus 4.6",
-  "Native agent",
-  "File system",
-  "Voice mode",
-  "Code studio",
-  "Mail intelligence",
-  "Knowledge base",
-  "Task runner",
+  "After Effects bridge",
+  "Premiere Pro bridge",
+  "Blender 4.0 bridge",
+  "DaVinci Resolve",
+  "Storyboard agent",
+  "Color grading",
+  "VFX pipeline",
+  "Motion design",
+  "Sound design",
 ];
 
 const capabilities = [
-  { n: "01", t: "Agent", d: "A resident model that reads your files, drafts messages, opens apps and runs multi-step jobs.", k: "agent.run(goal)" },
-  { n: "02", t: "Mail", d: "Threaded inbox with compose, labels, filters — every action can be delegated to the agent.", k: "mail.draft(thread)" },
-  { n: "03", t: "Files", d: "Semantic search across a native FS. The assistant understands folders by meaning, not names.", k: "fs.find('invoices q1')" },
-  { n: "04", t: "Voice", d: "Speak naturally. Dictate, transcribe, or run full workflows hands-free.", k: "voice.listen()" },
-  { n: "05", t: "Code", d: "A VS Code-class editor with an AI pair-programmer that has read your whole project.", k: "code.open(repo)" },
-  { n: "06", t: "Knowledge", d: "Private indexed layer. The agent cites your docs inline when it answers.", k: "kb.cite(query)" },
+  { n: "01", t: "Edit",      d: "Rough-cut sequences from raw footage. The agent reads transcripts, markers, and LUTs — drops an EDL straight into Premiere.", k: "edit.rough(footage)" },
+  { n: "02", t: "Motion",    d: "Keyframes, expressions, null rigs. Ask for 'smooth 2-second fade with ease-out' and get the curve in After Effects.", k: "motion.ae(prompt)" },
+  { n: "03", t: "3D",        d: "Drive Blender 4.0 from a prompt. Geometry nodes, shader graphs, render queues — all through a Python bridge.", k: "blender.scene(spec)" },
+  { n: "04", t: "Color",     d: "Grade a whole timeline against a reference still. LUTs exported for Resolve, Premiere, Final Cut.", k: "color.grade(ref)" },
+  { n: "05", t: "Sound",     d: "Dialog cleanup, music search by vibe, SFX layering. Keyframed audio drops straight into your NLE.", k: "sound.design(cut)" },
+  { n: "06", t: "Storyboard", d: "Turn a script into panels. Shot list, lens, lighting notes — exported as PDF or straight into the timeline.", k: "story.board(script)" },
 ];
 
 const pillars = [
-  { k: "Fast", v: "Sub-200ms agent turn-around on warm context." },
-  { k: "Private", v: "Your data never leaves the encrypted knowledge layer." },
-  { k: "Native", v: "Works in any browser. No install, no sync, no friction." },
-  { k: "Open", v: "Scriptable, automatable, embeddable into your own tools." },
+  { k: "Fast",       v: "Sub-200ms agent turn-around. You iterate on cuts, not on loading screens." },
+  { k: "Pro-grade",  v: "Speaks EDL, XML, AAF, .aep, .blend, OpenTimelineIO — not just MP4s." },
+  { k: "In-tool",    v: "Lives as a panel inside After Effects, Premiere, and Blender — not another app to switch to." },
+  { k: "Yours",      v: "Your footage, renders, and boards never train a shared model. Encrypted at rest." },
 ];
 
 const quotes = [
-  { by: "Marcus Johnson", role: "Product Designer, Remote", q: "The line between asking and doing just disappeared. I describe the outcome, it does the work." },
-  { by: "Priya Sharma", role: "Staff Engineer, Berlin", q: "Code Studio reads my whole repo before it suggests anything. It's the first AI tool I haven't turned off." },
-  { by: "David Chen", role: "Founder, SF", q: "I replaced four tools with one window. Mail, files, docs, code — one agent, one memory." },
+  { by: "Marcus Johnson", role: "Motion Designer, Remote", q: "I described the shot in one sentence and it gave me a working AE comp with the curves already on the timeline. It's the first AI tool I haven't turned off." },
+  { by: "Priya Sharma",    role: "Colorist, London",        q: "I loaded a reference still, said 'match this across the hero sequence,' and Alternus wrote me a Resolve node tree. That used to be a full day." },
+  { by: "David Chen",      role: "Indie Filmmaker, LA",      q: "Script in, storyboard out, rough cut assembled from selects. I went from outline to picture-lock in a week, solo." },
 ];
 
 const faq = [
-  { q: "What exactly is Alternus?", a: "A browser-native OS powered by Claude Opus 4.6 — mail, files, voice, code and a research agent that shares one memory layer." },
-  { q: "Do I need to install anything?", a: "No. It runs in any modern browser. Log in, and your workspace is there." },
-  { q: "Where is my data stored?", a: "In your private knowledge layer, encrypted at rest. The agent cites it but never trains on it." },
-  { q: "Can the agent act on my behalf?", a: "Yes — it can draft, send, organize and open apps within the OS. High-risk actions always require confirmation." },
+  { q: "What exactly is Alternus?",              a: "A creative AI workspace powered by Claude Opus 4.6. It edits, grades, storyboards, composites, and animates — and it plugs into After Effects, Premiere, Blender, and DaVinci Resolve." },
+  { q: "Does it really run inside Adobe apps?",  a: "Yes. Alternus ships as a UXP panel for After Effects 23+ and Premiere 24+. It reads your comp or sequence and writes back layers, keyframes, markers, and EDLs natively." },
+  { q: "How does the Blender integration work?", a: "A signed Python add-on registers an `alternus.*` operator. The agent generates scenes, geometry-node graphs, and render queues; Blender executes them headlessly or in-session." },
+  { q: "Can I keep working in my existing NLE?", a: "Yes. If you use Final Cut, Avid, or Resolve, Alternus exports industry-standard EDL / XML / AAF / OpenTimelineIO so the agent's work lands natively in your timeline." },
+  { q: "Where is my footage stored?",             a: "In your private knowledge layer, encrypted at rest. The agent references your media but never trains shared models on it." },
 ];
 
 export default function Home() {
@@ -149,16 +152,16 @@ export default function Home() {
             {/* L: oversized type */}
             <div className="lg:col-span-7">
               <div style={{ fontSize: 11, letterSpacing: "0.24em", color: COBALT, fontWeight: 700, marginBottom: 28 }}>
-                ALTERNUS · BROWSER OS · v0.9
+                ALTERNUS · DESIGN & FILM AI · v0.9
               </div>
               <h1 style={{ fontSize: "clamp(52px,8vw,120px)", lineHeight: 0.88, letterSpacing: "-0.045em", fontWeight: 900, margin: 0, fontStretch: "85%" }}>
-                <span style={{ display: "block", color: fg }}>Describe</span>
-                <span style={{ display: "block", color: fg }}>the outcome.</span>
-                <span style={{ display: "block", color: COBALT, fontStyle: "italic", fontWeight: 900 }}>Alternus ships it.</span>
+                <span style={{ display: "block", color: fg }}>An AI trained</span>
+                <span style={{ display: "block", color: fg }}>for the reel.</span>
+                <span style={{ display: "block", color: COBALT, fontStyle: "italic", fontWeight: 900 }}>Not the spreadsheet.</span>
               </h1>
               <div style={{ height: 1, background: faint, margin: "40px 0 32px", maxWidth: 520 }} />
               <p style={{ fontSize: 18, color: muted, lineHeight: 1.55, maxWidth: 520, fontWeight: 400 }}>
-                Ask Alternus in plain language — it writes mail, opens apps, finds files, ships code, and runs your day across a full browser desktop.
+                Alternus is a specialised agent for designers and filmmakers. It cuts sequences in Premiere, keyframes comps in After Effects, and runs scenes in Blender — from a single prompt.
               </p>
 
               {/* CLI-style input */}
@@ -173,14 +176,14 @@ export default function Home() {
                   </div>
                   <div style={{ display: "flex", alignItems: "center", padding: "14px 16px", gap: 10 }}>
                     <span style={{ fontFamily: "var(--font-geist-mono),monospace", fontSize: 14, color: COBALT, fontWeight: 700 }}>$</span>
-                    <input ref={inputRef} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="ask anything — 'summarize today's unread mail'" style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: fg, fontSize: 14.5, fontFamily: "var(--font-geist-mono),monospace" }} className="placeholder:opacity-40" />
+                    <input ref={inputRef} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="ask anything — 'cut a 30s trailer from these selects'" style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: fg, fontSize: 14.5, fontFamily: "var(--font-geist-mono),monospace" }} className="placeholder:opacity-40" />
                     <button type="submit" style={{ background: COBALT, color: "#FFF", padding: "6px 14px", fontSize: 12, fontWeight: 800, border: "none", cursor: "pointer", letterSpacing: "0.04em", textTransform: "uppercase", borderRadius: 8 }}>
                       Run →
                     </button>
                   </div>
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 0, marginTop: 18, border: `1px solid ${faint}`, borderRadius: 12, overflow: "hidden" }}>
-                  {["Draft an email to my team about Q2", "Find last month's invoices", "Open a new React project", "Summarize today's mail"].map((s, i, arr) => (
+                  {["Cut a 30s trailer from these selects", "Match the grade of this reference in Resolve", "Animate this logo with an ease-out bounce in AE", "Build a cinematic hallway scene in Blender"].map((s, i, arr) => (
                     <button key={s} type="button" onClick={() => goToChat(s)} style={{ flex: "1 1 200px", fontSize: 12, color: muted, padding: "14px 16px", borderRight: i < arr.length - 1 ? `1px solid ${faint}` : "none", background: "transparent", cursor: "pointer", fontWeight: 500, textAlign: "left", transition: "color 0.15s,background 0.15s" }} className="hover:!text-[#4284FF] hover:bg-[#4284FF]/5">
                       <span style={{ color: COBALT, marginRight: 6, fontWeight: 700 }}>/</span>
                       {s}
@@ -258,13 +261,13 @@ export default function Home() {
             </div>
             <div className="lg:col-span-6">
               <h2 style={{ fontSize: "clamp(36px,5vw,64px)", fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1, margin: 0, color: fg, fontStretch: "90%" }}>
-                Six modules.<br/>
-                <span style={{ color: muted }}>One memory.</span>
+                Six crafts.<br/>
+                <span style={{ color: muted }}>One agent.</span>
               </h2>
             </div>
             <div className="lg:col-span-3">
               <p style={{ fontSize: 13.5, color: muted, lineHeight: 1.65, margin: 0 }}>
-                Every module shares the same agent and the same context. Delegate once — it stays delegated.
+                From the first storyboard to the final master — every discipline shares the same brief, the same media, and the same memory.
               </p>
             </div>
           </div>
@@ -290,7 +293,7 @@ export default function Home() {
             §02 / MANIFESTO
           </div>
           <h2 style={{ fontSize: "clamp(42px,7vw,96px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.95, maxWidth: 1000, margin: 0, color: fg, fontStretch: "85%" }}>
-            Software that <span style={{ color: COBALT, fontStyle: "italic" }}>works for you</span> — not the other way around.
+            An AI that <span style={{ color: COBALT, fontStyle: "italic" }}>speaks your craft</span> — not just your calendar.
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0" style={{ marginTop: 80, border: `1px solid ${faint}`, borderRadius: 12, overflow: "hidden" }}>
@@ -442,11 +445,11 @@ export default function Home() {
         <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", position: "relative", textAlign: "center" }}>
           <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: "rgba(255,255,255,0.7)", marginBottom: 28 }}>§06 / BEGIN</div>
           <h2 style={{ fontSize: "clamp(52px,9vw,140px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.85, color: "#FFF", margin: 0, fontStretch: "85%" }}>
-            Stop clicking.<br/>
-            <span style={{ fontStyle: "italic" }}>Start talking.</span>
+            Stop keyframing.<br/>
+            <span style={{ fontStyle: "italic" }}>Start directing.</span>
           </h2>
           <p style={{ fontSize: 18, color: "rgba(255,255,255,0.85)", maxWidth: 540, margin: "36px auto 48px", lineHeight: 1.5 }}>
-            Alternus is free to try. Open the OS, say hello, and let the agent do the rest.
+            Alternus is free to try — plug it into After Effects, Premiere, or Blender and let the agent do the grunt work.
           </p>
           <Link href="/os" style={{ display: "inline-flex", alignItems: "center", gap: 12, height: 56, padding: "0 32px", background: "#FFF", color: COBALT, fontSize: 16, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.01em", boxShadow: `8px 8px 0 0 ${INK}`, borderRadius: 8 }}>
             Launch Alternus OS
@@ -464,18 +467,19 @@ export default function Home() {
             {[
               { heading: "Platform", links: [
                 { l: "Overview",        h: "/platform/overview",   ext: false },
+                { l: "Bridges",         h: "/platform/bridges",    ext: false },
                 { l: "Agent SDK",       h: "/platform/agent-sdk",  ext: false },
                 { l: "API Reference",   h: "/platform/api",        ext: true  },
                 { l: "Changelog",       h: "/platform/changelog",  ext: false },
                 { l: "Status",          h: "/platform/status",     ext: false },
               ]},
-              { heading: "Workspace", links: [
+              { heading: "Creative", links: [
                 { l: "Launch OS",       h: "/os",                  ext: true  },
-                { l: "Mail",            h: "/workspace/mail",      ext: false },
-                { l: "Files",           h: "/workspace/files",     ext: false },
-                { l: "Code Studio",     h: "/workspace/code",      ext: false },
-                { l: "Knowledge Base",  h: "/workspace/knowledge", ext: false },
-                { l: "Voice Mode",      h: "/workspace/voice",     ext: false },
+                { l: "Edit",            h: "/workspace/mail",      ext: false },
+                { l: "Media library",   h: "/workspace/files",     ext: false },
+                { l: "FX & 3D",         h: "/workspace/code",      ext: false },
+                { l: "Boards",          h: "/workspace/knowledge", ext: false },
+                { l: "Voice & sound",   h: "/workspace/voice",     ext: false },
               ]},
               { heading: "Company", links: [
                 { l: "About",           h: "/about",               ext: false },
