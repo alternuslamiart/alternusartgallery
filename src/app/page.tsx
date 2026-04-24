@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { AlternusLogo } from "@/components/alternus-shell";
 
 /* ═══ Brand ═══ */
 const COBALT = "#4284FF";
@@ -105,9 +106,7 @@ export default function Home() {
       <header style={{ position: "sticky", top: 0, zIndex: 40, width: "100%", transition: "all 0.25s", backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", WebkitBackdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", background: scrolled ? (isDark ? "rgba(5,8,15,0.78)" : "rgba(244,246,251,0.82)") : "transparent", borderBottom: `1px solid ${scrolled ? faint : "transparent"}` }}>
         <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", height: 64, display: "flex", alignItems: "center", gap: 32 }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <div style={{ width: 28, height: 28, background: COBALT, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-              <div style={{ position: "absolute", inset: 4, border: `2px solid ${INK}`, borderRight: 0, borderBottom: 0 }} />
-            </div>
+            <AlternusLogo size={28} radius={8} />
             <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
             <span style={{ fontSize: 10, fontWeight: 600, color: muted, padding: "2px 6px", border: `1px solid ${faint}`, borderRadius: 3, letterSpacing: "0.08em" }}>BETA</span>
           </Link>
@@ -530,7 +529,7 @@ export default function Home() {
             {/* Brand + copy */}
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 16, height: 16, background: COBALT, borderRadius: 4 }} />
+                <AlternusLogo size={18} radius={5} />
                 <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
               </div>
               <span style={{ fontSize: 11.5, color: muted }}>© 2015–2026 · Built with Claude</span>

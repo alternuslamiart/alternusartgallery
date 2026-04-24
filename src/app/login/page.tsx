@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { AlternusLogo } from "@/components/alternus-shell";
 
 const COBALT = "#4284FF";
 const INK = "#1F1F1F";
@@ -48,9 +49,7 @@ export default function Login() {
       {/* Slim top bar */}
       <header style={{ padding: "20px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <div style={{ width: 28, height: 28, background: COBALT, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-            <div style={{ position: "absolute", inset: 4, border: `2px solid ${INK}`, borderRight: 0, borderBottom: 0 }} />
-          </div>
+          <AlternusLogo size={28} radius={8} />
           <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { AlternusLogo } from "@/components/alternus-shell";
 
 const COBALT = "#4284FF";
 const INK = "#1F1F1F";
@@ -54,9 +55,7 @@ export default function Account() {
       <header style={{ padding: "16px 24px", borderBottom: `1px solid ${faintBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between", background: raised }}>
         <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <div style={{ width: 26, height: 26, background: COBALT, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-              <div style={{ position: "absolute", inset: 4, border: `2px solid ${INK}`, borderRight: 0, borderBottom: 0, borderTopLeftRadius: 2 }} />
-            </div>
+            <AlternusLogo size={26} radius={7} />
             <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
             <span style={{ fontSize: 10, fontWeight: 600, color: muted, padding: "2px 6px", border: `1px solid ${faintBorder}`, borderRadius: 4, letterSpacing: "0.08em" }}>ACCOUNT</span>
           </Link>

@@ -8,6 +8,24 @@ export const COBALT_DEEP = "#1E5ED4";
 export const INK = "#1F1F1F";
 export const PAPER = "#F4F6FB";
 
+/**
+ * AI-branded Alternus mark. A cobalt rounded tile with a 4-point sparkle
+ * plus one smaller satellite spark — the universal 'AI' glyph.
+ */
+export function AlternusLogo({ size = 28, radius = 8 }: { size?: number; radius?: number }) {
+  const spark = size * 0.64;
+  return (
+    <div style={{ width: size, height: size, background: COBALT, borderRadius: radius, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, position: "relative" }}>
+      <svg width={spark} height={spark} viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden>
+        {/* Main 4-point sparkle */}
+        <path d="M12 2 L13.4 10.6 L22 12 L13.4 13.4 L12 22 L10.6 13.4 L2 12 L10.6 10.6 Z" />
+        {/* Satellite spark (top-right) */}
+        <path d="M19 4 L19.5 6.5 L22 7 L19.5 7.5 L19 10 L18.5 7.5 L16 7 L18.5 6.5 Z" opacity="0.85" />
+      </svg>
+    </div>
+  );
+}
+
 export function useAlternusTheme() {
   const [isDark, setIsDark] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -33,9 +51,7 @@ export function AlternusNav({ isDark, setIsDark, scrolled, fg, muted, faint }: R
     <header style={{ position: "sticky", top: 0, zIndex: 40, width: "100%", transition: "all 0.25s", backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", WebkitBackdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", background: scrolled ? (isDark ? "rgba(5,8,15,0.78)" : "rgba(244,246,251,0.82)") : "transparent", borderBottom: `1px solid ${scrolled ? faint : "transparent"}` }}>
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", height: 64, display: "flex", alignItems: "center", gap: 32 }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <div style={{ width: 28, height: 28, background: COBALT, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-            <div style={{ position: "absolute", inset: 4, border: `2px solid ${INK}`, borderRight: 0, borderBottom: 0 }} />
-          </div>
+          <AlternusLogo size={28} radius={8} />
           <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
         </Link>
         <nav className="hidden md:flex" style={{ alignItems: "center", gap: 24 }}>
@@ -133,7 +149,7 @@ export function AlternusFooter({ isDark, fg, muted, faint }: ReturnType<typeof u
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 16, height: 16, background: COBALT, borderRadius: 4 }} />
+              <AlternusLogo size={18} radius={5} />
               <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
             </div>
             <span style={{ fontSize: 11.5, color: muted }}>© 2015–2026 · Built with Claude</span>
