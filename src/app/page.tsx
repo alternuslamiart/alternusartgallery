@@ -130,117 +130,137 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ─── Hero ─── */}
-      <section style={{ position: "relative", paddingTop: 100, paddingBottom: 60, overflow: "hidden" }} className="md:pt-[136px] md:pb-[80px]">
-        {/* Mesh gradient bg */}
+      {/* ─── Hero (Discord-promo style) ─── */}
+      <section style={{ position: "relative", paddingTop: 80, paddingBottom: 80, overflow: "hidden", background: isDark ? "linear-gradient(180deg,#0b0f3d 0%,#1a1f7a 50%,#1e2a9e 100%)" : "linear-gradient(180deg,#1e2a9e 0%,#3b4fe0 50%,#5865F2 100%)" }} className="md:pt-[120px] md:pb-[120px]">
+        {/* Starry background */}
         <div style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none" }}>
-          <div style={{ position: "absolute", left: "50%", top: "-30%", transform: "translateX(-50%)", width: 1100, height: 800, borderRadius: "50%", background: isDark ? "radial-gradient(closest-side,rgba(88,101,242,0.22),rgba(88,101,242,0.06) 50%,transparent 72%)" : "radial-gradient(closest-side,rgba(88,101,242,0.14),rgba(88,101,242,0.04) 50%,transparent 72%)" }} />
-          <div style={{ position: "absolute", right: "5%", top: "10%", width: 340, height: 340, borderRadius: "50%", background: isDark ? "radial-gradient(closest-side,rgba(235,69,158,0.14),transparent 70%)" : "radial-gradient(closest-side,rgba(235,69,158,0.07),transparent 70%)" }} />
-          <div style={{ position: "absolute", left: "8%", bottom: "0%", width: 280, height: 280, borderRadius: "50%", background: isDark ? "radial-gradient(closest-side,rgba(87,242,135,0.1),transparent 70%)" : "radial-gradient(closest-side,rgba(87,242,135,0.06),transparent 70%)" }} />
-          {/* Dot grid */}
-          <div style={{ position: "absolute", inset: 0, backgroundImage: isDark ? "radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px)" : "radial-gradient(rgba(0,0,0,0.07) 1px,transparent 1px)", backgroundSize: "28px 28px", maskImage: "radial-gradient(ellipse at 50% 30%,black 20%,transparent 68%)", WebkitMaskImage: "radial-gradient(ellipse at 50% 30%,black 20%,transparent 68%)" }} />
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(rgba(255,255,255,0.35) 1px,transparent 1px), radial-gradient(rgba(255,255,255,0.2) 1px,transparent 1px)", backgroundSize: "120px 120px, 60px 60px", backgroundPosition: "0 0, 30px 30px", opacity: 0.7 }} />
+          {/* Glow orbs */}
+          <div style={{ position: "absolute", left: "-10%", top: "20%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(closest-side,rgba(120,140,255,0.35),transparent 70%)", filter: "blur(40px)" }} />
+          <div style={{ position: "absolute", right: "-10%", bottom: "-10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(closest-side,rgba(88,101,242,0.4),transparent 70%)", filter: "blur(40px)" }} />
         </div>
 
-        {/* Floating illustrative cards */}
-        <div className="hidden lg:block" style={{ position: "absolute", left: "calc(50% - 560px)", top: 140, zIndex: 2, pointerEvents: "none" }}>
-          <div className="float-a" style={{ width: 220, padding: "14px 16px", borderRadius: 14, background: isDark ? "rgba(43,45,49,0.9)" : "rgba(255,255,255,0.95)", border: `1px solid ${T.STRONG}`, backdropFilter: "blur(16px)", boxShadow: isDark ? "0 20px 40px rgba(0,0,0,0.5)" : "0 20px 40px rgba(0,0,0,0.12)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-              <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg,#EB459E,#8B5CF6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6"/></svg>
-              </div>
-              <div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: T.TEXT }}>Email drafted</div>
-                <div style={{ fontSize: 10, color: T.DIM }}>2 seconds ago</div>
-              </div>
-              <div className="pulse-dot" style={{ marginLeft: "auto", width: 8, height: 8, borderRadius: "50%", background: GREEN }} />
-            </div>
-            <div style={{ height: 8, borderRadius: 4, background: T.OVERLAY, overflow: "hidden", marginBottom: 6 }}><div style={{ height: "100%", width: "78%", borderRadius: 4, background: "linear-gradient(90deg,#EB459E,#8B5CF6)" }} /></div>
-            <div style={{ fontSize: 10, color: T.DIM }}>To: team@company.com · Q2 Launch brief</div>
-          </div>
-        </div>
+        <div style={{ position: "relative", zIndex: 1, maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
-        <div className="hidden lg:block" style={{ position: "absolute", right: "calc(50% - 560px)", top: 160, zIndex: 2, pointerEvents: "none" }}>
-          <div className="float-b" style={{ width: 200, padding: "14px 16px", borderRadius: 14, background: isDark ? "rgba(43,45,49,0.9)" : "rgba(255,255,255,0.95)", border: `1px solid ${T.STRONG}`, backdropFilter: "blur(16px)", boxShadow: isDark ? "0 20px 40px rgba(0,0,0,0.5)" : "0 20px 40px rgba(0,0,0,0.12)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-              <div style={{ width: 30, height: 30, borderRadius: 8, background: "linear-gradient(135deg,#06B6D4,#5865F2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-              </div>
-              <div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: T.TEXT }}>3 files found</div>
-                <div style={{ fontSize: 10, color: T.DIM }}>Invoices · March</div>
-              </div>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-              {["Invoice_03.pdf", "Receipt_02.pdf", "Contract.pdf"].map((f, i) => (
-                <div key={f} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <div style={{ width: 16, height: 18, borderRadius: 3, background: ["#ED424522", "#57F28722", "#5865F222"][i], border: `1px solid ${["#ED424540", "#57F28740", "#5865F240"][i]}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 5, fontWeight: 800, color: ["#ED4245", "#57F287", "#5865F2"][i] }}>PDF</div>
-                  <span style={{ fontSize: 10, color: T.MUTED }}>{f}</span>
+            {/* Left: rounded card with OS mockup */}
+            <div style={{ position: "relative" }}>
+              <div style={{ position: "relative", borderRadius: 28, overflow: "hidden", background: "linear-gradient(135deg,#2336c9 0%,#4456e8 50%,#6074ff 100%)", aspectRatio: "1 / 0.82", boxShadow: "0 40px 80px -20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)" }}>
+                {/* Card inner glow */}
+                <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 30%,rgba(255,255,255,0.12),transparent 60%)" }} />
+                {/* Decorative stars inside card */}
+                <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(rgba(255,255,255,0.3) 1px,transparent 1px)", backgroundSize: "40px 40px", opacity: 0.5 }} />
+
+                {/* Floating OS window mockup */}
+                <div className="float-a" style={{ position: "absolute", left: "8%", top: "10%", width: "78%", background: "#FFFFFF", borderRadius: 16, overflow: "hidden", boxShadow: "0 24px 48px rgba(0,0,0,0.35)" }}>
+                  {/* Window header */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 16px", borderBottom: "1px solid #E3E5E8" }}>
+                    <button aria-label="back" style={{ background: "transparent", border: "none", cursor: "pointer", padding: 0, display: "flex" }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4E5058" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    </button>
+                    <span style={{ fontSize: 14, color: "#4E5058", fontWeight: 600 }}>#</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: "#060607" }}>main-chat</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4E5058" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+                    <div style={{ flex: 1 }} />
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4E5058" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+                  </div>
+
+                  {/* Chat messages */}
+                  <div style={{ padding: "16px 16px 8px" }}>
+                    <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#8B5CF6,#EB459E)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13 }}>A</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 2 }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: "#5865F2" }}>Alternus</span>
+                          <span style={{ fontSize: 10.5, color: "#80848E" }}>Today at 2:12 PM</span>
+                        </div>
+                        <div style={{ fontSize: 13, color: "#2E3035", lineHeight: 1.5 }}>drafted your email and organized files</div>
+                        <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                          <div style={{ width: 28, height: 28, borderRadius: 8, background: "#EB459E22", border: "1px solid #EB459E44", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EB459E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6"/></svg>
+                          </div>
+                          <div style={{ width: 28, height: 28, borderRadius: 8, background: "#5865F222", border: "1px solid #5865F244", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5865F2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", gap: 10, marginBottom: 8 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#57F287,#06B6D4)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 13 }}>Y</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 2 }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: "#57F287" }}>You</span>
+                          <span style={{ fontSize: 10.5, color: "#80848E" }}>Today at 2:13 PM</span>
+                        </div>
+                        <div style={{ fontSize: 13, color: "#2E3035", lineHeight: 1.5 }}>now summarize today&apos;s unread mail</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Input area */}
+                  <div style={{ padding: "10px 16px 14px", borderTop: "1px solid #E3E5E8" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, height: 38, padding: "0 12px", borderRadius: 10, background: "#F2F3F5" }}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#80848E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                      <span style={{ fontSize: 12.5, color: "#80848E", flex: 1 }}>Ask Alternus anything…</span>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5865F2" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
 
-        <div className="hidden xl:block" style={{ position: "absolute", left: "calc(50% - 460px)", bottom: 80, zIndex: 2, pointerEvents: "none" }}>
-          <div className="float-c" style={{ width: 180, padding: "12px 14px", borderRadius: 12, background: isDark ? "rgba(43,45,49,0.9)" : "rgba(255,255,255,0.95)", border: `1px solid ${T.STRONG}`, backdropFilter: "blur(16px)", boxShadow: isDark ? "0 16px 32px rgba(0,0,0,0.4)" : "0 16px 32px rgba(0,0,0,0.1)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <div style={{ width: 26, height: 26, borderRadius: 7, background: "linear-gradient(135deg,#10B981,#06B6D4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3z"/><path d="M19 10v1a7 7 0 01-14 0v-1"/></svg>
+                {/* Decorative floating badge */}
+                <div className="float-b" style={{ position: "absolute", right: "6%", bottom: "10%", padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.95)", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 12px 30px rgba(0,0,0,0.25)" }}>
+                  <div className="pulse-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: GREEN }} />
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: "#060607" }}>47 tasks automated</span>
+                </div>
               </div>
-              <span style={{ fontSize: 11, fontWeight: 700, color: T.TEXT }}>Voice captured</span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
-              {[4, 7, 5, 9, 6, 8, 4, 7, 5, 6, 8, 4, 7, 9, 5].map((h, i) => (
-                <div key={i} style={{ width: 3, height: h * 2, borderRadius: 2, background: `rgba(16,185,129,${0.4 + i * 0.04})` }} />
-              ))}
-            </div>
-          </div>
-        </div>
 
-        {/* Hero text */}
-        <div style={{ position: "relative", zIndex: 1, maxWidth: 820, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 32, padding: "0 14px", background: T.SURFACE, border: `1px solid ${T.STRONG}`, borderRadius: 6, marginBottom: 32 }}>
-            <span className="pulse-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: GREEN, display: "block", boxShadow: "0 0 0 2px rgba(35,165,89,0.3)" }} />
-            <span style={{ fontSize: 12.5, fontWeight: 500, color: T.MUTED }}>Claude Opus 4.6 · Online</span>
-          </div>
+            {/* Right: headline + copy + CTA */}
+            <div style={{ color: "#FFFFFF" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 32, padding: "0 14px", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 6, marginBottom: 28, backdropFilter: "blur(8px)" }}>
+                <span className="pulse-dot" style={{ width: 8, height: 8, borderRadius: "50%", background: GREEN, display: "block", boxShadow: "0 0 0 2px rgba(35,165,89,0.3)" }} />
+                <span style={{ fontSize: 12.5, fontWeight: 500, color: "#FFFFFF" }}>Claude Opus 4.6 · Online</span>
+              </div>
 
-          <h1 style={{ fontSize: "clamp(42px, 6.8vw, 76px)", lineHeight: 1.02, fontWeight: 900, letterSpacing: "-0.045em", marginBottom: 22 }}>
-            <span style={{ color: T.TEXT, display: "block" }}>The operating system</span>
-            <span style={{ display: "block", background: "linear-gradient(100deg,#5865F2 0%,#7289DA 40%,#EB459E 80%,#F59E0B 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", animation: "gradX 4s ease infinite" }}>
-              that thinks with you.
-            </span>
-          </h1>
+              <h1 style={{ fontSize: "clamp(40px, 6vw, 76px)", lineHeight: 0.98, fontWeight: 900, letterSpacing: "-0.02em", marginBottom: 28, color: "#FFFFFF", textTransform: "uppercase", fontFamily: "var(--font-geist-sans),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" }}>
+                Run your<br />
+                digital life<br />
+                with one AI
+              </h1>
 
-          <p style={{ fontSize: 17.5, color: T.MUTED, maxWidth: 540, margin: "0 auto", lineHeight: 1.7, fontWeight: 400, marginBottom: 48 }}>
-            Alternus is an AI-native desktop. Ask it in plain language — it drafts emails, opens apps, finds files, and runs your workflows across a fully functional OS in your browser.
-          </p>
+              <p style={{ fontSize: 17, color: "rgba(255,255,255,0.85)", lineHeight: 1.65, fontWeight: 400, marginBottom: 36, maxWidth: 520 }}>
+                Use AI agents, smart files, voice commands, and a built-in code studio to automate anything. Set up your workspace, write emails, open apps, and organize everything — your way.
+              </p>
 
-          {/* Input */}
-          <form onSubmit={(e) => { e.preventDefault(); goToChat(); }} style={{ maxWidth: 640, margin: "0 auto" }}>
-            <div style={{ position: "relative", background: T.RAISED, border: `1px solid ${T.STRONG}`, borderRadius: 14, overflow: "hidden", boxShadow: isDark ? "0 12px 40px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.04)" : "0 12px 40px rgba(0,0,0,0.1),0 0 0 1px rgba(0,0,0,0.04)" }}>
-              <input ref={inputRef} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Ask Alternus anything — try 'draft an email to my team'" style={{ width: "100%", padding: "18px 20px 10px", fontSize: 15, background: "transparent", border: "none", outline: "none", color: T.TEXT, boxSizing: "border-box" }} className={isDark ? "placeholder:text-[#4E5058]" : "placeholder:text-[#C4C9D4]"} />
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 10px 10px" }}>
-                <div style={{ display: "flex", gap: 2, color: T.DIM }}>
-                  {[{ d: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3", t: "Upload" }, { d: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20", t: "Research" }, { d: "M16 18l6-6-6-6M8 6l-6 6 6 6", t: "Code" }, { d: "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z", t: "Chat" }].map((b, i) => (
-                    <button key={i} type="button" title={b.t} style={{ width: 32, height: 32, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", cursor: "pointer", transition: "background 0.15s,color 0.15s", color: "inherit" }} className={isDark ? "hover:bg-white/[0.07] hover:!text-white" : "hover:bg-black/[0.06] hover:!text-black"}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={b.d}/></svg>
+              {/* Input */}
+              <form onSubmit={(e) => { e.preventDefault(); goToChat(); }} style={{ maxWidth: 560 }}>
+                <div style={{ position: "relative", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 14, overflow: "hidden", backdropFilter: "blur(12px)", boxShadow: "0 12px 40px rgba(0,0,0,0.3)" }}>
+                  <input ref={inputRef} value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Ask Alternus anything — try 'draft an email to my team'" style={{ width: "100%", padding: "16px 20px 10px", fontSize: 15, background: "transparent", border: "none", outline: "none", color: "#FFFFFF", boxSizing: "border-box" }} className="placeholder:text-white/50" />
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 10px 10px" }}>
+                    <div style={{ display: "flex", gap: 2, color: "rgba(255,255,255,0.6)" }}>
+                      {[{ d: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3", t: "Upload" }, { d: "M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20", t: "Research" }, { d: "M16 18l6-6-6-6M8 6l-6 6 6 6", t: "Code" }, { d: "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z", t: "Chat" }].map((b, i) => (
+                        <button key={i} type="button" title={b.t} style={{ width: 32, height: 32, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", cursor: "pointer", transition: "background 0.15s,color 0.15s", color: "inherit" }} className="hover:bg-white/[0.12] hover:!text-white">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={b.d}/></svg>
+                        </button>
+                      ))}
+                    </div>
+                    <button type="submit" style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 38, padding: "0 20px", background: "#FFFFFF", color: "#1a1f7a", borderRadius: 8, fontSize: 13.5, fontWeight: 800, border: "none", cursor: "pointer", transition: "all 0.15s", boxShadow: "0 4px 12px rgba(0,0,0,0.2)" }} className="hover:bg-white/90">
+                      Try in Chat
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 14 }}>
+                  {suggestions.map((s) => (
+                    <button key={s} type="button" onClick={() => goToChat(s)} style={{ fontSize: 12.5, color: "rgba(255,255,255,0.85)", padding: "0 14px", height: 30, borderRadius: 6, border: "1px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.06)", cursor: "pointer", fontWeight: 450, transition: "all 0.15s", backdropFilter: "blur(8px)" }} className="hover:bg-white/15 hover:border-white/40">
+                      {s}
                     </button>
                   ))}
                 </div>
-                <button type="submit" style={{ display: "inline-flex", alignItems: "center", gap: 6, height: 36, padding: "0 18px", background: BLURPLE, color: "#FFF", borderRadius: 8, fontSize: 13.5, fontWeight: 700, border: "none", cursor: "pointer", transition: "background 0.15s", boxShadow: "0 4px 12px rgba(88,101,242,0.45)" }} className="hover:bg-[#4752C4]">
-                  Try in Chat
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-                </button>
-              </div>
+              </form>
             </div>
-            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8, marginTop: 14 }}>
-              {suggestions.map((s) => (
-                <button key={s} type="button" onClick={() => goToChat(s)} style={{ fontSize: 12.5, color: T.MUTED, padding: "0 14px", height: 30, borderRadius: 6, border: `1px solid ${T.STRONG}`, background: T.SURFACE, cursor: "pointer", fontWeight: 450, transition: "all 0.15s" }} className="hover:border-[#5865F2]/60 hover:!text-[#5865F2] hover:bg-[#5865F2]/10">
-                  {s}
-                </button>
-              ))}
-            </div>
-          </form>
+          </div>
         </div>
       </section>
 
