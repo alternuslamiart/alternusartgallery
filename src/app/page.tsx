@@ -125,6 +125,9 @@ export default function Home() {
               : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
             }
           </button>
+          <Link href="/login" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}`, transition: "border-color 0.15s" }} className="hover:!border-[#4284FF]">
+            Log in
+          </Link>
           <Link href="/os" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", boxShadow: `0 0 0 0 ${COBALT}`, transition: "box-shadow 0.2s", borderRadius: 8 }} className="hover:shadow-[0_0_0_4px_rgba(66,132,255,0.25)]">
             Launch OS
             <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
