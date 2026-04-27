@@ -1,0 +1,23 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="10" y1="8" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#75B7FF"/>
+      <stop offset="0.52" stop-color="#4284FF"/>
+      <stop offset="1" stop-color="#1D52D8"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(22 20) rotate(39.6) scale(28.8349 28.8516)">
+      <stop stop-color="white" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="white" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="stroke" x1="12" y1="10" x2="52" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="white" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="white" stop-opacity="0.08"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="18" fill="url(#bg)"/>
+  <rect x="4.75" y="4.75" width="54.5" height="54.5" rx="17.25" stroke="url(#stroke)" stroke-width="1.5"/>
+  <rect x="10" y="10" width="44" height="44" rx="14" fill="url(#glow)"/>
+  <path d="M24.3069 43L31.8919 19.7273H35.6893L43.2898 43H39.598L37.7989 37.1023H29.7362L27.9371 43H24.3069ZM30.6278 34.169H36.9073L33.8435 24.0909H33.6916L30.6278 34.169Z" fill="white"/>
+  <path d="M39.9261 20.4503L41.0208 17L42.1154 20.4503L45.5657 21.5449L42.1154 22.6396L41.0208 26.0899L39.9261 22.6396L36.4758 21.5449L39.9261 20.4503Z" fill="white"/>
+  <circle cx="47.5" cy="45.5" r="2.5" fill="white" fill-opacity="0.94"/>
+</svg>

@@ -483,27 +483,30 @@ export default function Home() {
           <div className="landing-container relative">
             <div className="grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
               <div className="max-w-[44rem]">
-                <div className="mb-6 flex flex-wrap gap-2">
-                  <span className="landing-chip">Design and film AI</span>
-                  <span className="landing-chip">Claude Opus 4.6</span>
-                  <span className="landing-chip">In-tool workflows</span>
+                <div className="mb-5 flex items-center gap-3">
+                  <span className="landing-section-label !mb-0 !gap-2 before:!w-6">
+                    Creative AI workspace
+                  </span>
+                  <span className="rounded-full border border-[var(--landing-line)] bg-white/70 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
+                    Claude Opus 4.6
+                  </span>
                 </div>
 
-                <div className="mb-7 max-w-[18ch] sm:max-w-[19ch] lg:max-w-[20ch]">
+                <div className="mb-6 max-w-[16ch] sm:max-w-[17ch] lg:max-w-[18ch]">
                   <h1 className="landing-heading-xl">
-                    <span className="block sm:whitespace-nowrap">An AI trained</span>
-                    <span className="block sm:whitespace-nowrap">for the reel.</span>
-                    <span className="landing-emphasis block sm:whitespace-nowrap">Not the spreadsheet.</span>
+                    <span className="block sm:whitespace-nowrap">Direct the reel.</span>
+                    <span className="block sm:whitespace-nowrap">Let the agent</span>
+                    <span className="landing-emphasis block sm:whitespace-nowrap">handle the frames.</span>
                   </h1>
                 </div>
 
-                <p className="landing-copy-lg">
-                  Alternus is a specialized agent for designers and filmmakers. It cuts
-                  sequences in Premiere, keyframes comps in After Effects, and runs scenes
-                  in Blender from a single prompt.
+                <p className="max-w-[34rem] text-[1.03rem] leading-8 text-[var(--landing-muted)] sm:text-[1.08rem]">
+                  Alternus is built for designers and filmmakers who want one AI layer
+                  across edit, motion, grade, and 3D. You stay in the tools. The agent
+                  handles the production work.
                 </p>
 
-                <div className="mt-7 flex flex-wrap items-center gap-3">
+                <div className="mt-8 flex flex-wrap items-center gap-3">
                   <Button
                     asChild
                     size="lg"
@@ -525,14 +528,21 @@ export default function Home() {
                   </Button>
                 </div>
 
-                <div className="landing-panel mt-8 max-w-[46rem] overflow-hidden">
-                  <div className="flex items-center gap-2 border-b border-[var(--landing-line)] bg-white/65 px-4 py-3">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
-                    <span className="ml-auto rounded-full border border-[var(--landing-line)] bg-white/90 px-2.5 py-1 font-mono text-[11px] text-[var(--landing-muted)]">
-                      ~/alternus
-                    </span>
+                <div className="landing-panel mt-8 max-w-[43rem] overflow-hidden">
+                  <div className="border-b border-[var(--landing-line)] bg-white/72 px-4 py-3 sm:px-5">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--landing-accent)]">
+                          Prompt workspace
+                        </div>
+                        <div className="mt-1 text-sm text-[var(--landing-muted)]">
+                          One command layer across edit, motion, grade, and 3D.
+                        </div>
+                      </div>
+                      <div className="hidden rounded-full border border-[var(--landing-line)] bg-white px-3 py-1 font-mono text-[11px] text-[var(--landing-muted)] sm:block">
+                        ~/alternus
+                      </div>
+                    </div>
                   </div>
 
                   <form
@@ -542,63 +552,55 @@ export default function Home() {
                     }}
                     className="space-y-4 p-4 sm:p-5"
                   >
-                    <div className="rounded-[1.1rem] border border-[var(--landing-line-strong)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(242,247,255,0.92))] p-3 shadow-sm sm:p-4">
-                      <div className="mb-3 flex items-center gap-3">
-                        <span className="rounded-xl bg-blue-50 px-2.5 py-1 font-mono text-xs font-bold text-[var(--landing-accent)]">
-                          PROMPT
-                        </span>
-                        <span className="text-sm font-medium text-[var(--landing-muted)]">
-                          Ask the agent to cut, animate, grade, or build.
-                        </span>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                      <div className="flex h-14 flex-1 items-center gap-3 rounded-[1.4rem] border border-[var(--landing-line-strong)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(242,247,255,0.92))] px-4 shadow-sm">
+                        <span className="font-mono text-sm font-bold text-[var(--landing-accent)]">$</span>
+                        <input
+                          value={prompt}
+                          onChange={(event) => setPrompt(event.target.value)}
+                          placeholder="Cut a 30s trailer from these selects"
+                          className="h-full flex-1 border-0 bg-transparent text-[15px] text-[var(--landing-fg)] outline-none placeholder:text-[color:rgba(15,23,42,0.38)]"
+                        />
                       </div>
 
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <div className="flex h-14 flex-1 items-center gap-3 rounded-2xl border border-[var(--landing-line)] bg-white px-4 shadow-inner shadow-blue-950/5">
-                          <span className="font-mono text-sm font-bold text-[var(--landing-accent)]">$</span>
-                          <input
-                            value={prompt}
-                            onChange={(event) => setPrompt(event.target.value)}
-                            placeholder="Ask anything - cut a 30s trailer from these selects"
-                            className="h-full flex-1 border-0 bg-transparent text-[15px] text-[var(--landing-fg)] outline-none placeholder:text-[color:rgba(15,23,42,0.38)]"
-                          />
-                        </div>
-
-                        <Button
-                          type="submit"
-                          size="lg"
-                          className="h-14 rounded-2xl bg-[var(--landing-accent)] px-6 text-sm font-bold uppercase tracking-[0.18em] text-white shadow-lg shadow-blue-500/20 hover:bg-[var(--landing-accent-strong)]"
-                        >
-                          Run
-                        </Button>
-                      </div>
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="h-14 rounded-[1.4rem] bg-[var(--landing-accent)] px-6 text-sm font-bold uppercase tracking-[0.18em] text-white shadow-lg shadow-blue-500/20 hover:bg-[var(--landing-accent-strong)]"
+                      >
+                        Run
+                      </Button>
                     </div>
 
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      {quickPrompts.map((item) => (
+                    <div className="grid gap-2 sm:grid-cols-3">
+                      {quickPrompts.slice(0, 3).map((item) => (
                         <button
                           key={item}
                           type="button"
                           onClick={() => goToChat(item)}
-                          className="group flex min-h-[60px] items-start gap-2 rounded-2xl border border-[var(--landing-line)] bg-white/70 px-4 py-3 text-left transition-all hover:-translate-y-0.5 hover:border-[var(--landing-accent)] hover:bg-white"
+                          className="group rounded-[1.25rem] border border-[var(--landing-line)] bg-white/72 px-4 py-3 text-left transition-all hover:border-[var(--landing-accent)] hover:bg-white"
                         >
-                          <span className="mt-0.5 font-mono text-xs font-bold text-[var(--landing-accent)]">
-                            /
-                          </span>
-                          <span className="text-sm leading-6 text-[var(--landing-muted-strong)]">
+                          <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
+                            Prompt
+                          </div>
+                          <div className="mt-2 text-sm leading-6 text-[var(--landing-muted-strong)]">
                             {item}
-                          </span>
+                          </div>
                         </button>
                       ))}
                     </div>
-                  </form>
-                </div>
 
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {bridgeApps.map((app) => (
-                    <span key={app} className="landing-chip">
-                      {app}
-                    </span>
-                  ))}
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {bridgeApps.map((app) => (
+                        <span
+                          key={app}
+                          className="rounded-full border border-[var(--landing-line)] bg-[var(--landing-surface-soft)] px-3 py-1.5 text-[12px] font-semibold tracking-[-0.01em] text-[var(--landing-muted-strong)]"
+                        >
+                          {app}
+                        </span>
+                      ))}
+                    </div>
+                  </form>
                 </div>
               </div>
 

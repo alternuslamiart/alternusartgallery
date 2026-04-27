@@ -39,41 +39,60 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://alternusart.com'),
+  metadataBase: new URL("https://www.alternusart.com"),
+  applicationName: "Alternus AI Studio",
   title: {
-    default: "Alternus Art Gallery | Original Artworks & Paintings",
-    template: "%s | Alternus Art Gallery",
+    default: "Alternus AI Studio | Creative AI Workspace",
+    template: "%s | Alternus AI Studio",
   },
-  description: "Discover and purchase exclusive original artworks from talented artists worldwide. Alternus Gallery features unique paintings, prints, and commissioned art pieces.",
-  keywords: ["art gallery", "original artworks", "paintings", "art for sale", "buy art online", "contemporary art", "abstract art", "impressionism", "artists", "art collectors"],
-  authors: [{ name: "Alternus Art Gallery" }],
-  creator: "Alternus Art Gallery",
-  publisher: "Alternus Art Gallery",
+  description:
+    "Alternus AI Studio is a creative AI workspace for design, film, motion, and in-tool production workflows.",
+  keywords: [
+    "AI studio",
+    "creative AI",
+    "design AI",
+    "film AI",
+    "AI workspace",
+    "motion design AI",
+    "Alternus AI",
+    "creative operating system",
+    "After Effects AI",
+    "Premiere AI",
+    "Blender AI",
+  ],
+  authors: [{ name: "Alternus AI Studio" }],
+  creator: "Alternus AI Studio",
+  publisher: "Alternus AI Studio",
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
+    icon: [
+      { url: "/alternus-ai-favicon.svg", type: "image/svg+xml" },
+      { url: "/logo.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/alternus-ai-favicon.svg",
     apple: "/logo.png",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://alternusart.com",
-    siteName: "Alternus Art Gallery",
-    title: "Alternus Art Gallery | Original Artworks & Paintings",
-    description: "Discover and purchase exclusive original artworks from talented artists worldwide.",
+    url: "https://www.alternusart.com",
+    siteName: "Alternus AI Studio",
+    title: "Alternus AI Studio | Creative AI Workspace",
+    description:
+      "Creative AI workspace for designers and filmmakers. Build, direct, animate, and ship inside Alternus.",
     images: [
       {
         url: "/logo.png",
         width: 512,
         height: 512,
-        alt: "Alternus Art Gallery",
+        alt: "Alternus AI Studio",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Alternus Art Gallery | Original Artworks & Paintings",
-    description: "Discover and purchase exclusive original artworks from talented artists worldwide.",
+    title: "Alternus AI Studio | Creative AI Workspace",
+    description:
+      "Creative AI workspace for designers and filmmakers. Alternus turns prompts into real production work.",
     images: ["/logo.png"],
   },
   robots: {
@@ -130,34 +149,33 @@ export default function RootLayout({
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Organization",
-            "@id": "https://alternusart.com/#organization",
-            "name": "Alternus Art Gallery",
+            "@id": "https://www.alternusart.com/#organization",
+            "name": "Alternus AI Studio",
             "alternateName": "Alternus",
-            "url": "https://alternusart.com",
+            "url": "https://www.alternusart.com",
             "logo": {
               "@type": "ImageObject",
-              "url": "https://alternusart.com/logo.png",
+              "url": "https://www.alternusart.com/logo.png",
               "width": 512,
               "height": 512
             },
-            "image": "https://alternusart.com/logo.png",
-            "description": "Discover and purchase exclusive original artworks from talented artists worldwide. Alternus Gallery features unique paintings, prints, and commissioned art pieces.",
+            "image": "https://www.alternusart.com/logo.png",
+            "description": "Creative AI workspace for design, film, motion, and in-tool production workflows.",
             "email": "contact@alternusart.com",
             "foundingDate": "2024",
             "sameAs": [
               "https://www.instagram.com/alternusart",
-              "https://www.facebook.com/alternusart",
-              "https://www.trustpilot.com/review/alternusart.com"
+              "https://www.facebook.com/alternusart"
             ],
             "areaServed": "Worldwide",
             "knowsAbout": [
-              "Art Gallery",
-              "Original Artworks",
-              "Abstract Art",
-              "Contemporary Art",
-              "Landscape Paintings",
-              "Still Life Art",
-              "Oil Paintings"
+              "Creative AI",
+              "Motion Design AI",
+              "Film Workflows",
+              "After Effects Automation",
+              "Premiere Pro Workflows",
+              "Blender Workflows",
+              "AI-Powered Production"
             ]
           })
         }}
@@ -169,18 +187,18 @@ export default function RootLayout({
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "@id": "https://alternusart.com/#website",
-            "url": "https://alternusart.com",
-            "name": "Alternus Art Gallery",
-            "description": "Online art gallery featuring original artworks and paintings from artists worldwide",
+            "@id": "https://www.alternusart.com/#website",
+            "url": "https://www.alternusart.com",
+            "name": "Alternus AI Studio",
+            "description": "Creative AI workspace for design, film, and production workflows",
             "publisher": {
-              "@id": "https://alternusart.com/#organization"
+              "@id": "https://www.alternusart.com/#organization"
             },
             "potentialAction": {
               "@type": "SearchAction",
               "target": {
                 "@type": "EntryPoint",
-                "urlTemplate": "https://alternusart.com/gallery?search={search_term_string}"
+                "urlTemplate": "https://www.alternusart.com/gallery?search={search_term_string}"
               },
               "query-input": "required name=search_term_string"
             }
