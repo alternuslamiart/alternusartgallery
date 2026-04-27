@@ -489,11 +489,11 @@ export default function Home() {
                   <span className="landing-chip">In-tool workflows</span>
                 </div>
 
-                <div className="mb-7 max-w-[15ch] sm:max-w-[16ch] lg:max-w-[15ch]">
+                <div className="mb-7 max-w-[18ch] sm:max-w-[19ch] lg:max-w-[20ch]">
                   <h1 className="landing-heading-xl">
-                    <span className="block">An AI trained</span>
-                    <span className="block">for the reel.</span>
-                    <span className="landing-emphasis block">Not the spreadsheet.</span>
+                    <span className="block sm:whitespace-nowrap">An AI trained</span>
+                    <span className="block sm:whitespace-nowrap">for the reel.</span>
+                    <span className="landing-emphasis block sm:whitespace-nowrap">Not the spreadsheet.</span>
                   </h1>
                 </div>
 
@@ -603,37 +603,43 @@ export default function Home() {
               </div>
 
               <div className="grid gap-5">
-                <div className="landing-card overflow-hidden p-5 sm:p-6">
+                <div className="landing-card overflow-hidden p-4 sm:p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="landing-section-label !mb-0 !gap-2 !text-[0.62rem] before:!w-0">
                         Live status
                       </div>
-                      <div className="mt-4 text-[2rem] font-black tracking-[-0.05em] text-[var(--landing-fg)] sm:text-[2.7rem]">
+                      <div className="mt-3 text-[1.45rem] font-black tracking-[-0.045em] text-[var(--landing-fg)] sm:text-[2.05rem]">
                         Claude Opus 4.6
                       </div>
+                      <p className="mt-2 max-w-[18rem] text-sm leading-6 text-[var(--landing-muted)]">
+                        A smaller status surface that keeps the hero cleaner while still showing runtime health.
+                      </p>
                     </div>
-                    <span className="alternus-pulse-dot mt-2 h-3 w-3 rounded-full bg-[#2EC272]" />
+                    <span className="alternus-pulse-dot mt-1 h-3 w-3 rounded-full bg-[#2EC272]" />
                   </div>
 
-                  <div className="mt-6 grid grid-cols-3 gap-3 border-t border-[var(--landing-line)] pt-5">
+                  <div className="mt-5 grid grid-cols-3 gap-2 border-t border-[var(--landing-line)] pt-4">
                     {heroStats.map((stat) => (
-                      <div key={stat.label} className="space-y-1">
-                        <div className="text-lg font-extrabold tracking-[-0.03em] text-[var(--landing-fg)] sm:text-xl">
+                      <div
+                        key={stat.label}
+                        className="rounded-[1.15rem] border border-[var(--landing-line)] bg-[var(--landing-surface-soft)] px-3 py-3"
+                      >
+                        <div className="text-base font-extrabold tracking-[-0.03em] text-[var(--landing-fg)] sm:text-lg">
                           {stat.value}
                         </div>
-                        <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--landing-muted)]">
+                        <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--landing-muted)]">
                           {stat.label}
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="mt-6 grid gap-2 sm:grid-cols-2">
+                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
                     {bridgeApps.map((app) => (
                       <div
                         key={app}
-                        className="rounded-2xl border border-[var(--landing-line)] bg-[var(--landing-surface-soft)] px-4 py-3 text-sm font-semibold tracking-[-0.02em] text-[var(--landing-muted-strong)]"
+                        className="rounded-[1rem] border border-[var(--landing-line)] bg-white/75 px-3.5 py-2.5 text-[13px] font-semibold tracking-[-0.02em] text-[var(--landing-muted-strong)]"
                       >
                         {app}
                       </div>
@@ -1056,20 +1062,20 @@ export default function Home() {
 
         <section className="landing-section border-b-0">
           <div className="landing-container">
-            <div className="overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#4284FF_0%,#2D6EEF_54%,#1E5ED4_100%)] px-6 py-14 text-center shadow-[0_30px_80px_rgba(42,103,255,0.28)] sm:px-10 sm:py-20">
-              <div className="mx-auto max-w-[860px]">
-                <div className="mb-6 text-[11px] font-bold uppercase tracking-[0.22em] text-white/72">
+            <div className="mx-auto max-w-[980px] rounded-[2.6rem] border border-[rgba(66,132,255,0.12)] bg-[linear-gradient(180deg,#4B87FF_0%,#2E69E2_100%)] px-6 py-14 text-center shadow-[0_34px_90px_rgba(42,103,255,0.2)] sm:px-12 sm:py-20">
+              <div className="mx-auto max-w-[760px]">
+                <div className="mb-7 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-950/72">
                   Section 06 / Begin
                 </div>
-                <h2 className="landing-heading-lg text-white sm:text-[clamp(3rem,7vw,6.4rem)]">
+                <h2 className="landing-heading-lg text-white sm:text-[clamp(3rem,6vw,5.2rem)]">
                   Stop keyframing. <br />
                   <span className="italic">Start directing.</span>
                 </h2>
-                <p className="mx-auto mt-6 max-w-[36rem] text-base leading-8 text-white/84 sm:text-[1.05rem]">
+                <p className="mx-auto mt-6 max-w-[34rem] text-base leading-8 text-white/84 sm:text-[1.02rem]">
                   Alternus is free to try. Plug it into After Effects, Premiere, or
                   Blender and let the agent take care of the grunt work.
                 </p>
-                <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
                   <Button
                     asChild
                     size="lg"
@@ -1084,7 +1090,7 @@ export default function Home() {
                     asChild
                     variant="outline"
                     size="lg"
-                    className="h-12 rounded-2xl border-white/30 bg-white/10 px-6 text-[15px] font-semibold tracking-[-0.02em] text-white hover:bg-white/16"
+                    className="h-12 rounded-2xl border-white/25 bg-transparent px-6 text-[15px] font-semibold tracking-[-0.02em] text-white hover:bg-white/10"
                   >
                     <Link href="/platform/overview">See the platform</Link>
                   </Button>
