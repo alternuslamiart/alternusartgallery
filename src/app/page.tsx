@@ -157,21 +157,6 @@ const heroStats = [
   { value: "10k+", label: "Users" },
 ];
 
-const workflowSteps = [
-  {
-    title: "Ingest footage",
-    detail: "Transcripts, markers, LUTs, and references stay in one memory layer.",
-  },
-  {
-    title: "Direct the agent",
-    detail: "Ask for cuts, boards, rigs, or grades in plain language.",
-  },
-  {
-    title: "Send it back to the timeline",
-    detail: "Outputs land in Premiere, AE, Blender, or Resolve with the right format.",
-  },
-];
-
 const workspaceFiles = [
   { name: "Projects", badge: null },
   { name: "Invoices", badge: "2" },
@@ -375,6 +360,10 @@ export default function Home() {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
         }
+        @keyframes alternus-float-soft {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-10px) rotate(4deg); }
+        }
         .alternus-marquee-track {
           animation: alternus-marquee 34s linear infinite;
         }
@@ -392,6 +381,9 @@ export default function Home() {
           margin-left: 2px;
           color: ${COBALT};
           animation: alternus-caret 1.1s step-end infinite;
+        }
+        .alternus-float-soft {
+          animation: alternus-float-soft 6s ease-in-out infinite;
         }
       `}</style>
 
@@ -481,243 +473,142 @@ export default function Home() {
           </div>
 
           <div className="landing-container relative">
-            <div className="grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
-              <div className="max-w-[44rem]">
-                <div className="mb-5 flex items-center gap-3">
-                  <span className="landing-section-label !mb-0 !gap-2 before:!w-6">
-                    Creative AI workspace
-                  </span>
-                  <span className="rounded-full border border-[var(--landing-line)] bg-white/70 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
-                    Claude Opus 4.6
-                  </span>
-                </div>
-
-                <div className="mb-6 max-w-[16ch] sm:max-w-[17ch] lg:max-w-[18ch]">
-                  <h1 className="landing-heading-xl">
-                    <span className="block sm:whitespace-nowrap">Direct the reel.</span>
-                    <span className="block sm:whitespace-nowrap">Let the agent</span>
-                    <span className="landing-emphasis block sm:whitespace-nowrap">handle the frames.</span>
-                  </h1>
-                </div>
-
-                <p className="max-w-[34rem] text-[1.03rem] leading-8 text-[var(--landing-muted)] sm:text-[1.08rem]">
-                  Alternus is built for designers and filmmakers who want one AI layer
-                  across edit, motion, grade, and 3D. You stay in the tools. The agent
-                  handles the production work.
-                </p>
-
-                <div className="mt-8 flex flex-wrap items-center gap-3">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="h-12 rounded-2xl bg-[var(--landing-accent)] px-6 text-[15px] font-bold tracking-[-0.02em] text-white shadow-lg shadow-blue-500/20 hover:bg-[var(--landing-accent-strong)]"
-                  >
-                    <Link href="/os">
-                      Launch Alternus OS
-                      <ArrowIcon className="h-3.5 w-3.5" />
-                    </Link>
-                  </Button>
-
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="lg"
-                    className="h-12 rounded-2xl border-[var(--landing-line-strong)] bg-white/70 px-6 text-[15px] font-semibold tracking-[-0.02em] text-[var(--landing-fg)] shadow-sm hover:border-[var(--landing-accent)] hover:bg-white"
-                  >
-                    <Link href="#caps">Explore capabilities</Link>
-                  </Button>
-                </div>
-
-                <div className="landing-panel mt-8 max-w-[43rem] overflow-hidden">
-                  <div className="border-b border-[var(--landing-line)] bg-white/72 px-4 py-3 sm:px-5">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--landing-accent)]">
-                          Prompt workspace
-                        </div>
-                        <div className="mt-1 text-sm text-[var(--landing-muted)]">
-                          One command layer across edit, motion, grade, and 3D.
-                        </div>
-                      </div>
-                      <div className="hidden rounded-full border border-[var(--landing-line)] bg-white px-3 py-1 font-mono text-[11px] text-[var(--landing-muted)] sm:block">
-                        ~/alternus
-                      </div>
-                    </div>
-                  </div>
-
-                  <form
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      goToChat();
-                    }}
-                    className="space-y-4 p-4 sm:p-5"
-                  >
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                      <div className="flex h-14 flex-1 items-center gap-3 rounded-[1.4rem] border border-[var(--landing-line-strong)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(242,247,255,0.92))] px-4 shadow-sm">
-                        <span className="font-mono text-sm font-bold text-[var(--landing-accent)]">$</span>
-                        <input
-                          value={prompt}
-                          onChange={(event) => setPrompt(event.target.value)}
-                          placeholder="Cut a 30s trailer from these selects"
-                          className="h-full flex-1 border-0 bg-transparent text-[15px] text-[var(--landing-fg)] outline-none placeholder:text-[color:rgba(15,23,42,0.38)]"
-                        />
-                      </div>
-
-                      <Button
-                        type="submit"
-                        size="lg"
-                        className="h-14 rounded-[1.4rem] bg-[var(--landing-accent)] px-6 text-sm font-bold uppercase tracking-[0.18em] text-white shadow-lg shadow-blue-500/20 hover:bg-[var(--landing-accent-strong)]"
-                      >
-                        Run
-                      </Button>
-                    </div>
-
-                    <div className="grid gap-2 sm:grid-cols-3">
-                      {quickPrompts.slice(0, 3).map((item) => (
-                        <button
-                          key={item}
-                          type="button"
-                          onClick={() => goToChat(item)}
-                          className="group rounded-[1.25rem] border border-[var(--landing-line)] bg-white/72 px-4 py-3 text-left transition-all hover:border-[var(--landing-accent)] hover:bg-white"
-                        >
-                          <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
-                            Prompt
-                          </div>
-                          <div className="mt-2 text-sm leading-6 text-[var(--landing-muted-strong)]">
-                            {item}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {bridgeApps.map((app) => (
-                        <span
-                          key={app}
-                          className="rounded-full border border-[var(--landing-line)] bg-[var(--landing-surface-soft)] px-3 py-1.5 text-[12px] font-semibold tracking-[-0.01em] text-[var(--landing-muted-strong)]"
-                        >
-                          {app}
-                        </span>
-                      ))}
-                    </div>
-                  </form>
-                </div>
+            <div className="relative overflow-hidden rounded-[2.6rem] border border-white/45 bg-[linear-gradient(135deg,rgba(255,248,244,0.96)_0%,rgba(247,232,255,0.92)_42%,rgba(231,241,255,0.95)_100%)] px-6 py-8 shadow-[0_40px_100px_rgba(110,126,177,0.18)] sm:px-9 sm:py-10 lg:px-12 lg:py-12">
+              <div className="pointer-events-none absolute inset-0">
+                <div className="absolute left-[-8%] top-[6%] h-[20rem] w-[20rem] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.82),transparent_66%)] blur-3xl" />
+                <div className="absolute right-[-6%] top-[8%] h-[16rem] w-[16rem] rounded-full bg-[radial-gradient(circle,rgba(255,193,223,0.42),transparent_70%)] blur-3xl" />
+                <div className="absolute bottom-[-8%] left-[42%] h-[18rem] w-[18rem] rounded-full bg-[radial-gradient(circle,rgba(168,212,255,0.32),transparent_72%)] blur-3xl" />
+                <div className="alternus-float-soft absolute right-[8%] top-[18%] h-16 w-16 rounded-[1.4rem] border border-white/50 bg-[linear-gradient(180deg,rgba(199,133,255,0.46),rgba(255,255,255,0.2))] shadow-[0_18px_40px_rgba(197,132,255,0.18)]" />
+                <div className="alternus-float-soft absolute bottom-[18%] right-[20%] h-10 w-10 rounded-[1rem] border border-white/50 bg-[linear-gradient(180deg,rgba(104,168,255,0.42),rgba(255,255,255,0.16))] [animation-delay:1.1s]" />
               </div>
 
-              <div className="grid gap-5">
-                <div className="landing-card overflow-hidden p-4 sm:p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="landing-section-label !mb-0 !gap-2 !text-[0.62rem] before:!w-0">
-                        Live status
-                      </div>
-                      <div className="mt-3 text-[1.45rem] font-black tracking-[-0.045em] text-[var(--landing-fg)] sm:text-[2.05rem]">
-                        Claude Opus 4.6
-                      </div>
-                      <p className="mt-2 max-w-[18rem] text-sm leading-6 text-[var(--landing-muted)]">
-                        A smaller status surface that keeps the hero cleaner while still showing runtime health.
-                      </p>
-                    </div>
-                    <span className="alternus-pulse-dot mt-1 h-3 w-3 rounded-full bg-[#2EC272]" />
+              <div className="relative grid gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center">
+                <div className="max-w-[34rem]">
+                  <div className="mb-5 inline-flex rounded-full border border-white/60 bg-white/55 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)] shadow-sm">
+                    Supercharge your AI workflows
                   </div>
 
-                  <div className="mt-5 grid grid-cols-3 gap-2 border-t border-[var(--landing-line)] pt-4">
+                  <h1 className="max-w-[10ch] text-[clamp(3rem,6vw,5.1rem)] font-black leading-[0.92] tracking-[-0.06em] text-[#2E223E]">
+                    The AI-powered creative workspace.
+                  </h1>
+
+                  <p className="mt-5 max-w-[31rem] text-[1rem] leading-8 text-[rgba(46,34,62,0.72)] sm:text-[1.04rem]">
+                    Direct edits, motion, grading, and 3D work from one command layer.
+                    Alternus keeps the craft tools in place and moves the repetitive production work to the agent.
+                  </p>
+
+                  <div className="mt-7 flex flex-wrap items-center gap-3">
+                    <Button
+                      asChild
+                      size="lg"
+                      className="h-12 rounded-2xl bg-[#2D2043] px-6 text-[15px] font-bold tracking-[-0.02em] text-white shadow-[0_18px_40px_rgba(45,32,67,0.26)] hover:bg-[#241734]"
+                    >
+                      <Link href="/os">
+                        Get started
+                        <ArrowIcon className="h-3.5 w-3.5" />
+                      </Link>
+                    </Button>
+
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="lg"
+                      className="h-12 rounded-2xl border-white/70 bg-white/58 px-6 text-[15px] font-semibold tracking-[-0.02em] text-[#2E223E] shadow-sm hover:bg-white/80"
+                    >
+                      <Link href="#caps">Book a demo</Link>
+                    </Button>
+                  </div>
+
+                  <div className="mt-7 flex flex-wrap gap-2">
                     {heroStats.map((stat) => (
                       <div
                         key={stat.label}
-                        className="rounded-[1.15rem] border border-[var(--landing-line)] bg-[var(--landing-surface-soft)] px-3 py-3"
+                        className="rounded-full border border-white/60 bg-white/52 px-3.5 py-2 text-[12px] font-semibold tracking-[-0.01em] text-[#4C4060] shadow-sm"
                       >
-                        <div className="text-base font-extrabold tracking-[-0.03em] text-[var(--landing-fg)] sm:text-lg">
-                          {stat.value}
-                        </div>
-                        <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--landing-muted)]">
-                          {stat.label}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                    {bridgeApps.map((app) => (
-                      <div
-                        key={app}
-                        className="rounded-[1rem] border border-[var(--landing-line)] bg-white/75 px-3.5 py-2.5 text-[13px] font-semibold tracking-[-0.02em] text-[var(--landing-muted-strong)]"
-                      >
-                        {app}
+                        <span className="font-black text-[#2E223E]">{stat.value}</span> {stat.label}
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="landing-card overflow-hidden">
-                  <div className="h-1 bg-[linear-gradient(90deg,var(--landing-accent)_0%,rgba(66,132,255,0.18)_100%)]" />
-                  <div className="alternus-rise p-5 sm:p-6" key={activeCap}>
-                    <div className="mb-4 flex items-center gap-3">
-                      <span className="rounded-xl bg-blue-50 px-2.5 py-1 font-mono text-xs font-bold text-[var(--landing-accent)]">
-                        {capabilities[activeCap].n}
-                      </span>
-                      <h3 className="landing-heading-md text-[var(--landing-fg)]">
-                        {capabilities[activeCap].t}
-                      </h3>
-                    </div>
-                    <p className="landing-copy">{capabilities[activeCap].d}</p>
-                    <div className="mt-5 rounded-2xl border border-blue-100 bg-blue-50/70 px-4 py-3 font-mono text-sm text-[var(--landing-accent)]">
-                      <span className="opacity-55">{"> "}</span>
-                      <span className="alternus-caret">{capabilities[activeCap].k}</span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 border-t border-[var(--landing-line)] sm:grid-cols-6">
-                    {capabilities.map((item, index) => (
-                      <button
-                        key={item.n}
-                        onClick={() => setActiveCap(index)}
-                        className={cn(
-                          "h-11 border-r border-[var(--landing-line)] text-[11px] font-bold tracking-[0.16em] transition-all last:border-r-0",
-                          index === activeCap
-                            ? "bg-[var(--landing-accent)] text-white"
-                            : "bg-transparent text-[var(--landing-muted)] hover:bg-blue-50/60 hover:text-[var(--landing-accent)]",
-                        )}
-                      >
-                        {item.n}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="landing-card-quiet grid gap-4 p-5 sm:p-6">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <div className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--landing-muted)]">
-                        Workflow memory
-                      </div>
-                      <div className="mt-2 text-lg font-extrabold tracking-[-0.03em] text-[var(--landing-fg)]">
-                        One brief across every craft
-                      </div>
-                    </div>
-                    <div className="rounded-2xl border border-[var(--landing-line)] bg-white/70 px-3 py-2 text-xs font-semibold text-[var(--landing-accent)]">
-                      Shared context
+                <div className="relative mx-auto w-full max-w-[36rem] lg:mx-0">
+                  <div className="absolute left-[9%] top-[10%] z-20 max-w-[17rem] rounded-[1.2rem] border border-white/60 bg-white/88 px-4 py-3 shadow-[0_24px_40px_rgba(86,66,128,0.12)] backdrop-blur-sm">
+                    <div className="text-[13px] leading-6 text-[#4C4060]">
+                      Hey, I need help sending out a campaign to all new subscribers. Can you set that up?
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    {workflowSteps.map((step, index) => (
-                      <div
-                        key={step.title}
-                        className="flex gap-4 rounded-2xl border border-[var(--landing-line)] bg-white/75 px-4 py-4"
+                  <div className="absolute left-[14%] top-[29%] z-20 max-w-[18rem] rounded-[1.2rem] border border-white/60 bg-white/92 px-4 py-3 shadow-[0_24px_40px_rgba(86,66,128,0.12)] backdrop-blur-sm">
+                    <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
+                      {capabilities[activeCap].t}
+                    </div>
+                    <div className="text-[13px] leading-6 text-[#4C4060]">
+                      {capabilities[activeCap].d}
+                    </div>
+                  </div>
+
+                  <div className="relative rounded-[2rem] border border-white/55 bg-[linear-gradient(180deg,rgba(255,255,255,0.46),rgba(255,255,255,0.22))] p-4 pt-36 shadow-[0_30px_70px_rgba(111,91,155,0.14)] backdrop-blur-xl sm:p-5 sm:pt-40">
+                    <div className="rounded-[1.4rem] border border-white/60 bg-white/88 p-4 shadow-[0_20px_45px_rgba(86,66,128,0.1)]">
+                      <div className="mb-3 flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-[rgba(45,32,67,0.08)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#2D2043]">
+                          GPT 4.5
+                        </span>
+                        <span className="rounded-full bg-[rgba(66,132,255,0.08)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
+                          Search
+                        </span>
+                      </div>
+
+                      <form
+                        onSubmit={(event) => {
+                          event.preventDefault();
+                          goToChat();
+                        }}
+                        className="space-y-4"
                       >
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-[var(--landing-accent)] text-sm font-black text-white">
-                          0{index + 1}
+                        <div className="rounded-[1.2rem] border border-[rgba(46,34,62,0.1)] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(247,245,255,0.92))] px-4 py-4">
+                          <input
+                            value={prompt}
+                            onChange={(event) => setPrompt(event.target.value)}
+                            placeholder="Ask anything..."
+                            className="w-full border-0 bg-transparent text-[15px] text-[#2E223E] outline-none placeholder:text-[rgba(76,64,96,0.54)]"
+                          />
                         </div>
-                        <div>
-                          <div className="text-sm font-bold tracking-[-0.02em] text-[var(--landing-fg)]">
-                            {step.title}
+
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          {quickPrompts.slice(0, 2).map((item) => (
+                            <button
+                              key={item}
+                              type="button"
+                              onClick={() => goToChat(item)}
+                              className="rounded-[1rem] border border-[rgba(46,34,62,0.08)] bg-[rgba(255,255,255,0.82)] px-3 py-3 text-left text-[12.5px] leading-5 text-[#4C4060] transition-colors hover:bg-white"
+                            >
+                              {item}
+                            </button>
+                          ))}
+                        </div>
+
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex flex-wrap gap-2">
+                            {bridgeApps.slice(0, 3).map((app) => (
+                              <span
+                                key={app}
+                                className="rounded-full border border-[rgba(46,34,62,0.08)] bg-white px-2.5 py-1 text-[10px] font-semibold text-[#4C4060]"
+                              >
+                                {app}
+                              </span>
+                            ))}
                           </div>
-                          <p className="mt-1 text-sm leading-6 text-[var(--landing-muted)]">
-                            {step.detail}
-                          </p>
+
+                          <button
+                            type="submit"
+                            className="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#D95DFF_0%,#6E78FF_100%)] text-white shadow-[0_12px_24px_rgba(110,120,255,0.28)]"
+                            aria-label="Run prompt"
+                          >
+                            <ArrowIcon className="h-3.5 w-3.5" />
+                          </button>
                         </div>
-                      </div>
-                    ))}
+                      </form>
+                    </div>
                   </div>
                 </div>
               </div>
