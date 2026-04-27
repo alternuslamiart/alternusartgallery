@@ -473,13 +473,13 @@ export default function Home() {
           </div>
 
           <div className="landing-container relative">
-            <div className="relative overflow-hidden rounded-[2.6rem] border border-white/45 bg-[linear-gradient(135deg,rgba(255,248,244,0.96)_0%,rgba(247,232,255,0.92)_42%,rgba(231,241,255,0.95)_100%)] px-6 py-8 shadow-[0_40px_100px_rgba(110,126,177,0.18)] sm:px-9 sm:py-10 lg:px-12 lg:py-12">
+            <div className="relative overflow-hidden rounded-[2.6rem] border border-white/50 bg-[linear-gradient(135deg,rgba(244,249,255,0.96)_0%,rgba(236,244,255,0.94)_48%,rgba(228,239,255,0.96)_100%)] px-6 py-8 shadow-[0_40px_100px_rgba(66,132,255,0.16)] sm:px-9 sm:py-10 lg:px-12 lg:py-12">
               <div className="pointer-events-none absolute inset-0">
                 <div className="absolute left-[-8%] top-[6%] h-[20rem] w-[20rem] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.82),transparent_66%)] blur-3xl" />
-                <div className="absolute right-[-6%] top-[8%] h-[16rem] w-[16rem] rounded-full bg-[radial-gradient(circle,rgba(255,193,223,0.42),transparent_70%)] blur-3xl" />
-                <div className="absolute bottom-[-8%] left-[42%] h-[18rem] w-[18rem] rounded-full bg-[radial-gradient(circle,rgba(168,212,255,0.32),transparent_72%)] blur-3xl" />
-                <div className="alternus-float-soft absolute right-[8%] top-[18%] h-16 w-16 rounded-[1.4rem] border border-white/50 bg-[linear-gradient(180deg,rgba(199,133,255,0.46),rgba(255,255,255,0.2))] shadow-[0_18px_40px_rgba(197,132,255,0.18)]" />
-                <div className="alternus-float-soft absolute bottom-[18%] right-[20%] h-10 w-10 rounded-[1rem] border border-white/50 bg-[linear-gradient(180deg,rgba(104,168,255,0.42),rgba(255,255,255,0.16))] [animation-delay:1.1s]" />
+                <div className="absolute right-[-6%] top-[8%] h-[16rem] w-[16rem] rounded-full bg-[radial-gradient(circle,rgba(124,175,255,0.26),transparent_70%)] blur-3xl" />
+                <div className="absolute bottom-[-8%] left-[42%] h-[18rem] w-[18rem] rounded-full bg-[radial-gradient(circle,rgba(88,144,255,0.24),transparent_72%)] blur-3xl" />
+                <div className="alternus-float-soft absolute right-[8%] top-[18%] h-16 w-16 rounded-[1.4rem] border border-white/55 bg-[linear-gradient(180deg,rgba(121,173,255,0.45),rgba(255,255,255,0.2))] shadow-[0_18px_40px_rgba(66,132,255,0.16)]" />
+                <div className="alternus-float-soft absolute bottom-[18%] right-[20%] h-10 w-10 rounded-[1rem] border border-white/55 bg-[linear-gradient(180deg,rgba(66,132,255,0.42),rgba(255,255,255,0.16))] [animation-delay:1.1s]" />
               </div>
 
               <div className="relative grid gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center">
@@ -488,11 +488,11 @@ export default function Home() {
                     Supercharge your AI workflows
                   </div>
 
-                  <h1 className="max-w-[10ch] text-[clamp(3rem,6vw,5.1rem)] font-black leading-[0.92] tracking-[-0.06em] text-[#2E223E]">
+                  <h1 className="max-w-[10ch] text-[clamp(3rem,6vw,5.1rem)] font-black leading-[0.92] tracking-[-0.06em] text-[#1F2B4D]">
                     The AI-powered creative workspace.
                   </h1>
 
-                  <p className="mt-5 max-w-[31rem] text-[1rem] leading-8 text-[rgba(46,34,62,0.72)] sm:text-[1.04rem]">
+                  <p className="mt-5 max-w-[31rem] text-[1rem] leading-8 text-[rgba(31,43,77,0.7)] sm:text-[1.04rem]">
                     Direct edits, motion, grading, and 3D work from one command layer.
                     Alternus keeps the craft tools in place and moves the repetitive production work to the agent.
                   </p>
@@ -501,7 +501,7 @@ export default function Home() {
                     <Button
                       asChild
                       size="lg"
-                      className="h-12 rounded-2xl bg-[#2D2043] px-6 text-[15px] font-bold tracking-[-0.02em] text-white shadow-[0_18px_40px_rgba(45,32,67,0.26)] hover:bg-[#241734]"
+                      className="h-12 rounded-2xl bg-[var(--landing-accent)] px-6 text-[15px] font-bold tracking-[-0.02em] text-white shadow-[0_18px_40px_rgba(66,132,255,0.24)] hover:bg-[var(--landing-accent-strong)]"
                     >
                       <Link href="/os">
                         Get started
@@ -513,7 +513,7 @@ export default function Home() {
                       asChild
                       variant="outline"
                       size="lg"
-                      className="h-12 rounded-2xl border-white/70 bg-white/58 px-6 text-[15px] font-semibold tracking-[-0.02em] text-[#2E223E] shadow-sm hover:bg-white/80"
+                      className="h-12 rounded-2xl border-white/70 bg-white/58 px-6 text-[15px] font-semibold tracking-[-0.02em] text-[#1F2B4D] shadow-sm hover:bg-white/80"
                     >
                       <Link href="#caps">Book a demo</Link>
                     </Button>
@@ -523,9 +523,9 @@ export default function Home() {
                     {heroStats.map((stat) => (
                       <div
                         key={stat.label}
-                        className="rounded-full border border-white/60 bg-white/52 px-3.5 py-2 text-[12px] font-semibold tracking-[-0.01em] text-[#4C4060] shadow-sm"
+                        className="rounded-full border border-white/60 bg-white/52 px-3.5 py-2 text-[12px] font-semibold tracking-[-0.01em] text-[#476089] shadow-sm"
                       >
-                        <span className="font-black text-[#2E223E]">{stat.value}</span> {stat.label}
+                        <span className="font-black text-[#1F2B4D]">{stat.value}</span> {stat.label}
                       </div>
                     ))}
                   </div>
@@ -533,7 +533,7 @@ export default function Home() {
 
                 <div className="relative mx-auto w-full max-w-[36rem] lg:mx-0">
                   <div className="absolute left-[9%] top-[10%] z-20 max-w-[17rem] rounded-[1.2rem] border border-white/60 bg-white/88 px-4 py-3 shadow-[0_24px_40px_rgba(86,66,128,0.12)] backdrop-blur-sm">
-                    <div className="text-[13px] leading-6 text-[#4C4060]">
+                    <div className="text-[13px] leading-6 text-[#476089]">
                       Hey, I need help sending out a campaign to all new subscribers. Can you set that up?
                     </div>
                   </div>
@@ -542,15 +542,15 @@ export default function Home() {
                     <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
                       {capabilities[activeCap].t}
                     </div>
-                    <div className="text-[13px] leading-6 text-[#4C4060]">
+                    <div className="text-[13px] leading-6 text-[#476089]">
                       {capabilities[activeCap].d}
                     </div>
                   </div>
 
-                  <div className="relative rounded-[2rem] border border-white/55 bg-[linear-gradient(180deg,rgba(255,255,255,0.46),rgba(255,255,255,0.22))] p-4 pt-36 shadow-[0_30px_70px_rgba(111,91,155,0.14)] backdrop-blur-xl sm:p-5 sm:pt-40">
+                  <div className="relative rounded-[2rem] border border-white/55 bg-[linear-gradient(180deg,rgba(244,249,255,0.58),rgba(230,239,255,0.34))] p-4 pt-36 shadow-[0_30px_70px_rgba(66,132,255,0.14)] backdrop-blur-xl sm:p-5 sm:pt-40">
                     <div className="rounded-[1.4rem] border border-white/60 bg-white/88 p-4 shadow-[0_20px_45px_rgba(86,66,128,0.1)]">
                       <div className="mb-3 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-[rgba(45,32,67,0.08)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#2D2043]">
+                        <span className="rounded-full bg-[rgba(31,43,77,0.08)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#1F2B4D]">
                           GPT 4.5
                         </span>
                         <span className="rounded-full bg-[rgba(66,132,255,0.08)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
@@ -565,12 +565,12 @@ export default function Home() {
                         }}
                         className="space-y-4"
                       >
-                        <div className="rounded-[1.2rem] border border-[rgba(46,34,62,0.1)] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(247,245,255,0.92))] px-4 py-4">
+                        <div className="rounded-[1.2rem] border border-[rgba(31,43,77,0.1)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(243,248,255,0.94))] px-4 py-4">
                           <input
                             value={prompt}
                             onChange={(event) => setPrompt(event.target.value)}
                             placeholder="Ask anything..."
-                            className="w-full border-0 bg-transparent text-[15px] text-[#2E223E] outline-none placeholder:text-[rgba(76,64,96,0.54)]"
+                            className="w-full border-0 bg-transparent text-[15px] text-[#1F2B4D] outline-none placeholder:text-[rgba(71,96,137,0.54)]"
                           />
                         </div>
 
@@ -580,7 +580,7 @@ export default function Home() {
                               key={item}
                               type="button"
                               onClick={() => goToChat(item)}
-                              className="rounded-[1rem] border border-[rgba(46,34,62,0.08)] bg-[rgba(255,255,255,0.82)] px-3 py-3 text-left text-[12.5px] leading-5 text-[#4C4060] transition-colors hover:bg-white"
+                              className="rounded-[1rem] border border-[rgba(31,43,77,0.08)] bg-[rgba(255,255,255,0.82)] px-3 py-3 text-left text-[12.5px] leading-5 text-[#476089] transition-colors hover:bg-white"
                             >
                               {item}
                             </button>
@@ -592,7 +592,7 @@ export default function Home() {
                             {bridgeApps.slice(0, 3).map((app) => (
                               <span
                                 key={app}
-                                className="rounded-full border border-[rgba(46,34,62,0.08)] bg-white px-2.5 py-1 text-[10px] font-semibold text-[#4C4060]"
+                                className="rounded-full border border-[rgba(31,43,77,0.08)] bg-white px-2.5 py-1 text-[10px] font-semibold text-[#476089]"
                               >
                                 {app}
                               </span>
@@ -601,7 +601,7 @@ export default function Home() {
 
                           <button
                             type="submit"
-                            className="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#D95DFF_0%,#6E78FF_100%)] text-white shadow-[0_12px_24px_rgba(110,120,255,0.28)]"
+                            className="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#4284FF_0%,#6EA4FF_100%)] text-white shadow-[0_12px_24px_rgba(66,132,255,0.28)]"
                             aria-label="Run prompt"
                           >
                             <ArrowIcon className="h-3.5 w-3.5" />
