@@ -473,13 +473,13 @@ export default function Home() {
           </div>
 
           <div className="landing-container relative">
-            <div className="relative overflow-hidden rounded-[2.6rem] border border-white/50 bg-[linear-gradient(135deg,rgba(244,249,255,0.96)_0%,rgba(236,244,255,0.94)_48%,rgba(228,239,255,0.96)_100%)] px-6 py-8 shadow-[0_40px_100px_rgba(66,132,255,0.16)] sm:px-9 sm:py-10 lg:px-12 lg:py-12">
+            <div className="relative overflow-hidden rounded-[2.6rem] border border-white/55 bg-[linear-gradient(135deg,rgba(238,246,255,0.98)_0%,rgba(219,235,255,0.96)_46%,rgba(198,222,255,0.94)_100%)] px-6 py-8 shadow-[0_40px_110px_rgba(66,132,255,0.24)] sm:px-9 sm:py-10 lg:px-12 lg:py-12">
               <div className="pointer-events-none absolute inset-0">
-                <div className="absolute left-[-8%] top-[6%] h-[20rem] w-[20rem] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.82),transparent_66%)] blur-3xl" />
-                <div className="absolute right-[-6%] top-[8%] h-[16rem] w-[16rem] rounded-full bg-[radial-gradient(circle,rgba(124,175,255,0.26),transparent_70%)] blur-3xl" />
-                <div className="absolute bottom-[-8%] left-[42%] h-[18rem] w-[18rem] rounded-full bg-[radial-gradient(circle,rgba(88,144,255,0.24),transparent_72%)] blur-3xl" />
-                <div className="alternus-float-soft absolute right-[8%] top-[18%] h-16 w-16 rounded-[1.4rem] border border-white/55 bg-[linear-gradient(180deg,rgba(121,173,255,0.45),rgba(255,255,255,0.2))] shadow-[0_18px_40px_rgba(66,132,255,0.16)]" />
-                <div className="alternus-float-soft absolute bottom-[18%] right-[20%] h-10 w-10 rounded-[1rem] border border-white/55 bg-[linear-gradient(180deg,rgba(66,132,255,0.42),rgba(255,255,255,0.16))] [animation-delay:1.1s]" />
+                <div className="absolute left-[-8%] top-[6%] h-[20rem] w-[20rem] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.78),transparent_66%)] blur-3xl" />
+                <div className="absolute right-[-6%] top-[8%] h-[16rem] w-[16rem] rounded-full bg-[radial-gradient(circle,rgba(66,132,255,0.36),transparent_70%)] blur-3xl" />
+                <div className="absolute bottom-[-8%] left-[42%] h-[18rem] w-[18rem] rounded-full bg-[radial-gradient(circle,rgba(46,105,226,0.25),transparent_72%)] blur-3xl" />
+                <div className="alternus-float-soft absolute right-[8%] top-[18%] h-16 w-16 rounded-[1.4rem] border border-white/60 bg-[linear-gradient(180deg,rgba(66,132,255,0.58),rgba(255,255,255,0.18))] shadow-[0_18px_44px_rgba(66,132,255,0.24)]" />
+                <div className="alternus-float-soft absolute bottom-[18%] right-[20%] h-10 w-10 rounded-[1rem] border border-white/60 bg-[linear-gradient(180deg,rgba(30,94,212,0.5),rgba(255,255,255,0.16))] shadow-[0_16px_34px_rgba(66,132,255,0.18)] [animation-delay:1.1s]" />
               </div>
 
               <div className="relative grid gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center">
@@ -532,13 +532,13 @@ export default function Home() {
                 </div>
 
                 <div className="relative mx-auto w-full max-w-[36rem] lg:mx-0">
-                  <div className="absolute left-[9%] top-[10%] z-20 max-w-[17rem] rounded-[1.2rem] border border-white/60 bg-white/88 px-4 py-3 shadow-[0_24px_40px_rgba(86,66,128,0.12)] backdrop-blur-sm">
+                  <div className="absolute left-[9%] top-[10%] z-20 max-w-[17rem] rounded-[1.2rem] border border-white/65 bg-white/90 px-4 py-3 shadow-[0_24px_44px_rgba(42,103,255,0.14)] backdrop-blur-sm">
                     <div className="text-[13px] leading-6 text-[#476089]">
                       Hey, I need help sending out a campaign to all new subscribers. Can you set that up?
                     </div>
                   </div>
 
-                  <div className="absolute left-[14%] top-[29%] z-20 max-w-[18rem] rounded-[1.2rem] border border-white/60 bg-white/92 px-4 py-3 shadow-[0_24px_40px_rgba(86,66,128,0.12)] backdrop-blur-sm">
+                  <div className="absolute left-[14%] top-[29%] z-20 max-w-[18rem] rounded-[1.2rem] border border-white/65 bg-white/92 px-4 py-3 shadow-[0_24px_44px_rgba(42,103,255,0.14)] backdrop-blur-sm">
                     <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
                       {capabilities[activeCap].t}
                     </div>
@@ -547,8 +547,8 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="relative rounded-[2rem] border border-white/55 bg-[linear-gradient(180deg,rgba(244,249,255,0.58),rgba(230,239,255,0.34))] p-4 pt-36 shadow-[0_30px_70px_rgba(66,132,255,0.14)] backdrop-blur-xl sm:p-5 sm:pt-40">
-                    <div className="rounded-[1.4rem] border border-white/60 bg-white/88 p-4 shadow-[0_20px_45px_rgba(86,66,128,0.1)]">
+                  <div className="relative rounded-[2rem] border border-white/60 bg-[linear-gradient(180deg,rgba(235,244,255,0.68),rgba(207,226,255,0.42))] p-4 pt-36 shadow-[0_30px_76px_rgba(66,132,255,0.2)] backdrop-blur-xl sm:p-5 sm:pt-40">
+                    <div className="rounded-[1.4rem] border border-white/65 bg-white/90 p-4 shadow-[0_20px_48px_rgba(42,103,255,0.13)]">
                       <div className="mb-3 flex flex-wrap items-center gap-2">
                         <span className="rounded-full bg-[rgba(31,43,77,0.08)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#1F2B4D]">
                           GPT 4.5
