@@ -201,7 +201,7 @@ export default function OSLandingPage() {
             </a>
           ))}
           <Link
-            href="/os"
+            href="/main"
             className="text-sm font-medium no-underline px-4 py-1.5 rounded-lg transition-all"
             style={{ background: t.accent, color: "#fff" }}
             onMouseEnter={e => (e.currentTarget.style.background = t.accentHover)}
@@ -235,7 +235,7 @@ export default function OSLandingPage() {
             </a>
           ))}
           <Link
-            href="/os"
+            href="/main"
             onClick={() => setMobileMenu(false)}
             className="text-lg font-medium no-underline px-6 py-2 rounded-lg mt-4"
             style={{ background: t.accent, color: "#fff" }}
@@ -280,7 +280,7 @@ export default function OSLandingPage() {
 
         <div className="flex flex-col sm:flex-row gap-3 mb-16">
           <Link
-            href="/os"
+            href="/main"
             className="px-7 py-3 rounded-lg text-sm font-medium no-underline flex items-center gap-2 transition-all"
             style={{ background: t.accent, color: "#fff" }}
             onMouseEnter={e => (e.currentTarget.style.background = t.accentHover)}
@@ -611,7 +611,7 @@ export default function OSLandingPage() {
                 </div>
                 <p style={{ color: t.textSec }} className="text-xs leading-relaxed mb-4">{app.desc}</p>
                 <div className="flex flex-col gap-1.5" style={{ borderTop: `1px solid ${t.border}`, paddingTop: "12px" }}>
-                  <Link href="/os" className="flex items-center gap-1.5 text-xs no-underline" style={{ color: t.accentText }}>
+                  <Link href="/main" className="flex items-center gap-1.5 text-xs no-underline" style={{ color: t.accentText }}>
                     <I d={ic.arrowRight} s={11} color={t.accentText} /> Launch in OS
                   </Link>
                   <a href="#" className="flex items-center gap-1.5 text-xs no-underline" style={{ color: t.accentText }}>
@@ -689,7 +689,7 @@ export default function OSLandingPage() {
                 ))}
               </div>
               <Link
-                href="/os"
+                href="/main"
                 className="w-full py-2.5 rounded-lg text-sm font-medium text-center no-underline transition-all block"
                 style={{
                   background: tier.highlighted ? t.accent : "transparent",
@@ -720,7 +720,7 @@ export default function OSLandingPage() {
             No download required. Launch the full desktop experience in your browser right now.
           </p>
           <Link
-            href="/os"
+            href="/main"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg text-sm font-medium no-underline transition-all"
             style={{ background: t.accent, color: "#fff" }}
             onMouseEnter={e => (e.currentTarget.style.background = t.accentHover)}
@@ -813,7 +813,7 @@ export default function OSLandingPage() {
               <h4 style={{ color: t.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Operating System</h4>
               <div className="flex flex-col gap-2">
                 {[
-                  { label: "Try Alternus OS", href: "/os" },
+                  { label: "Try Alternus OS", href: "/main" },
                   { label: "Alternus ART", href: "#pricing" },
                   { label: "Alternus Ultra", href: "#pricing" },
                   { label: "System Requirements", href: "#" },
@@ -832,7 +832,7 @@ export default function OSLandingPage() {
               <h4 style={{ color: t.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Download & Support</h4>
               <div className="flex flex-col gap-2">
                 {[
-                  { label: "Download OS", href: "/os" },
+                  { label: "Download OS", href: "/main" },
                   { label: "Installation Guide", href: "#" },
                   { label: "Help Center", href: "#" },
                   { label: "Report a Bug", href: "#" },

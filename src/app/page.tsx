@@ -194,7 +194,7 @@ const footerColumns = [
   {
     heading: "Creative",
     links: [
-      { l: "Launch OS", h: "/os", ext: true },
+      { l: "Launch OS", h: "/main", ext: true },
       { l: "Edit", h: "/workspace/mail", ext: false },
       { l: "Media library", h: "/workspace/files", ext: false },
       { l: "FX & 3D", h: "/workspace/code", ext: false },
@@ -325,7 +325,7 @@ export default function Home() {
 
   const goToChat = (value?: string) => {
     const text = (value ?? prompt).trim();
-    router.push(text ? `/os?prompt=${encodeURIComponent(text)}` : "/os");
+    router.push(text ? `/main?prompt=${encodeURIComponent(text)}` : "/main");
   };
 
   const themeStyle: ThemeVars = {
@@ -509,7 +509,7 @@ export default function Home() {
               </Link>
 
               <Link
-                href="/os"
+                href="/main"
                 className="inline-flex h-10 items-center gap-2 rounded-2xl bg-[var(--landing-accent)] px-4 text-sm font-bold tracking-[-0.01em] text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[var(--landing-accent-strong)] hover:shadow-xl hover:shadow-blue-500/25 sm:h-11 sm:px-5"
               >
                 Launch OS
@@ -570,7 +570,7 @@ export default function Home() {
                       size="lg"
                       className="h-12 rounded-2xl bg-[var(--landing-accent)] px-6 text-[15px] font-bold tracking-[-0.02em] text-white shadow-[0_18px_40px_rgba(66,132,255,0.24)] hover:bg-[var(--landing-accent-strong)]"
                     >
-                      <Link href="/os">
+                      <Link href="/main">
                         Get started
                         <ArrowIcon className="h-3.5 w-3.5" />
                       </Link>
@@ -836,7 +836,7 @@ export default function Home() {
               title={<>The workspace.</>}
               copy="The landing page should feel close to the product. This preview keeps the editorial voice, but the UI is organized enough to read as real software."
               action={
-                <Link href="/os" className="landing-link">
+                <Link href="/main" className="landing-link">
                   Open it live
                   <ArrowIcon className="h-3.5 w-3.5" />
                 </Link>
@@ -850,7 +850,7 @@ export default function Home() {
                   <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
                   <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
                   <div className="ml-4 rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[11px] text-white/60">
-                    alternus.art/os
+                    alternus.art/main
                   </div>
                   <div className="ml-auto hidden font-mono text-[11px] text-white/40 sm:block">
                     agent:idle · opus-4.6
@@ -1041,7 +1041,7 @@ export default function Home() {
                     size="lg"
                     className="h-12 rounded-2xl bg-white px-6 text-[15px] font-bold tracking-[-0.02em] text-[var(--landing-accent)] shadow-lg shadow-blue-950/20 hover:bg-white/95"
                   >
-                    <Link href="/os">
+                    <Link href="/main">
                       Launch Alternus OS
                       <ArrowIcon className="h-3.5 w-3.5" />
                     </Link>

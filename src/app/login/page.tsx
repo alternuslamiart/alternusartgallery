@@ -63,7 +63,7 @@ export default function Login() {
         setErr("Email and password are required.");
         return;
       }
-      router.push("/os");
+      router.push("/main");
     }, 600);
   };
 
@@ -270,7 +270,7 @@ export default function Login() {
                 {socialProviders.map((provider) => (
                   <button
                     key={provider.id}
-                    onClick={() => router.push("/os")}
+                    onClick={() => router.push("/main")}
                     style={{
                       height: 50,
                       display: "flex",

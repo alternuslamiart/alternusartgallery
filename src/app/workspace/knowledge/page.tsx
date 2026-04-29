@@ -45,7 +45,7 @@ export default function Knowledge() {
                 ))}
               </div>
               <div style={{ marginTop: 56, textAlign: "center" }}>
-                <Link href="/os" style={{ height: 48, padding: "0 24px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}>Open Knowledge →</Link>
+                <Link href="/main" style={{ height: 48, padding: "0 24px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}>Open Knowledge →</Link>
               </div>
             </div>
           </section>

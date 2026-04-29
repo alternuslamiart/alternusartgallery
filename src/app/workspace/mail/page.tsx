@@ -27,7 +27,7 @@ export default function Mail() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/os" style={{ marginTop: 36, height: 48, padding: "0 24px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}>Open in OS →</Link>
+                <Link href="/main" style={{ marginTop: 36, height: 48, padding: "0 24px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}>Open in OS →</Link>
               </div>
 
               {/* Mail mockup */}

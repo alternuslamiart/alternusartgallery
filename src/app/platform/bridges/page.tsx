@@ -148,7 +148,7 @@ export default function Bridges() {
   comp:   <span style={{ color: "#22C55E" }}>&quot;Main · V01&quot;</span>,
   layer:  <span style={{ color: "#22C55E" }}>&quot;title_01&quot;</span>,
 {'}'}){'\n'}
-<span style={{ color: t.muted }}>// ✓ read composition · found layer · wrote 4 keyframes · 200ms</span>
+<span style={{ color: t.muted }}>{"// read composition · found layer · wrote 4 keyframes · 200ms"}</span>
                 </pre>
               </div>
             </div>
@@ -161,7 +161,7 @@ export default function Bridges() {
                 Keep your tools.<br/><span style={{ color: COBALT, fontStyle: "italic" }}>Add an agent.</span>
               </h2>
               <div style={{ marginTop: 40, display: "inline-flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
-                <Link href="/os" style={{ height: 48, padding: "0 22px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>Try in the OS →</Link>
+                <Link href="/main" style={{ height: 48, padding: "0 22px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>Try in the OS →</Link>
                 <Link href="/platform/agent-sdk" style={{ height: 48, padding: "0 22px", background: "transparent", color: t.fg, fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", border: `1px solid ${t.faint}` }}>Build your own bridge</Link>
               </div>
             </div>

@@ -263,7 +263,7 @@ export default function Pricing() {
                       </span>
                     </div>
                     <Link
-                      href="/os"
+                      href="/main"
                       style={{
                         marginTop: 24,
                         height: 46,
@@ -435,7 +435,7 @@ export default function Pricing() {
                       Alternus is free to try. Move into paid plans only when the workflow starts returning real value.
                     </p>
                     <div style={{ marginTop: 36, display: "inline-flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
-                      <Link href="/os" style={{ height: 48, padding: "0 24px", background: "#fff", color: COBALT, fontSize: 15, fontWeight: 800, borderRadius: 18, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10, boxShadow: "0 16px 28px rgba(18,46,120,0.18)" }}>
+                      <Link href="/main" style={{ height: 48, padding: "0 24px", background: "#fff", color: COBALT, fontSize: 15, fontWeight: 800, borderRadius: 18, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10, boxShadow: "0 16px 28px rgba(18,46,120,0.18)" }}>
                         Launch Alternus OS <span style={{ fontSize: 13 }}>↗</span>
                       </Link>
                       <Link href="/contact" style={{ height: 48, padding: "0 24px", background: "transparent", color: "#fff", fontSize: 15, fontWeight: 700, borderRadius: 18, textDecoration: "none", display: "inline-flex", alignItems: "center", border: "1px solid rgba(255,255,255,0.28)" }}>

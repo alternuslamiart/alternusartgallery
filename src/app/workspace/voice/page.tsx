@@ -46,7 +46,7 @@ export default function Voice() {
               ))}
             </div>
             <div style={{ marginTop: 56, textAlign: "center" }}>
-              <Link href="/os" style={{ height: 48, padding: "0 24px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}>Start talking →</Link>
+              <Link href="/main" style={{ height: 48, padding: "0 24px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}>Start talking →</Link>
             </div>
           </div>
 
