@@ -23,75 +23,75 @@ const COBALT_DEEP = "#1E5ED4";
 const INK = "#1F1F1F";
 const PAPER = "#F4F6FB";
 const marquee = [
-  "Claude Opus 4.6",
-  "After Effects bridge",
-  "Premiere Pro bridge",
-  "Blender 4.0 bridge",
-  "DaVinci Resolve",
-  "Storyboard agent",
-  "Color grading",
-  "VFX pipeline",
-  "Motion design",
-  "Sound design",
+  "Figma bridge",
+  "Blender bridge",
+  "Website design agent",
+  "Code agent",
+  "Blender 3D scenes",
+  "Figma components",
+  "Responsive website sections",
+  "Design systems",
+  "3D product visuals",
+  "Production-ready layouts",
 ];
 
 const capabilities = [
   {
     n: "01",
-    t: "Edit",
-    d: "Rough-cut sequences from raw footage. The agent reads transcripts, markers, and LUTs - drops an EDL straight into Premiere.",
-    k: "edit.rough(footage)",
-    output: "Cuts, selects, EDL",
+    t: "Figma",
+    d: "Turn a product idea into clean website screens, components, tokens, and responsive layout notes directly for Figma.",
+    k: "figma.site(prompt)",
+    output: "Frames, tokens, components",
   },
   {
     n: "02",
-    t: "Motion",
-    d: "Keyframes, expressions, null rigs. Ask for a smooth 2-second fade with ease-out and get the curve in After Effects.",
-    k: "motion.ae(prompt)",
-    output: "Curves, rigs, comps",
+    t: "Code",
+    d: "Convert Figma structure into production-ready website sections with clean React, Tailwind, spacing, and responsive states.",
+    k: "code.website(figma)",
+    output: "Pages, sections, UI code",
   },
   {
     n: "03",
-    t: "3D",
-    d: "Drive Blender 4.0 from a prompt. Geometry nodes, shader graphs, render queues - all through a Python bridge.",
+    t: "Blender",
+    d: "Drive Blender from a prompt. Build 3D scenes, product visuals, materials, lighting, and render queues through a Python bridge.",
     k: "blender.scene(spec)",
     output: "Scenes, nodes, renders",
   },
   {
     n: "04",
-    t: "Color",
-    d: "Grade a whole timeline against a reference still. LUTs exported for Resolve, Premiere, and Final Cut.",
-    k: "color.grade(ref)",
-    output: "Grades, LUTs, timelines",
+    t: "Design",
+    d: "Keep Figma and code aligned. The agent manages colors, typography, spacing, cards, nav, and clean website systems.",
+    k: "figma.system(site)",
+    output: "Styles, grids, variants",
   },
   {
     n: "05",
-    t: "Sound",
-    d: "Dialog cleanup, music search by vibe, SFX layering. Keyframed audio drops straight into your NLE.",
-    k: "sound.design(cut)",
-    output: "Dialogue, beds, SFX",
+    t: "3D Assets",
+    d: "Create Blender 3D assets for website heroes, product previews, studio scenes, and polished visual sections.",
+    k: "blender.asset(site)",
+    output: "Models, materials, renders",
   },
   {
     n: "06",
-    t: "Storyboard",
-    d: "Turn a script into panels. Shot list, lens, lighting notes - exported as PDF or straight into the timeline.",
-    k: "story.board(script)",
-    output: "Boards, shots, notes",
+    t: "Prototype",
+    d: "Plan website flows in Figma, then send the same structure to the code agent so the live page matches the design.",
+    k: "figma.flow(code)",
+    output: "Flows, pages, states",
   },
 ];
 
 const pillars = [
   {
     k: "Fast",
-    v: "Sub-200ms agent turnaround. You iterate on cuts, not on loading screens.",
+    v: "Sub-200ms agent turnaround. You iterate on Figma frames, website code, and Blender scenes without waiting.",
   },
   {
     k: "Pro-grade",
-    v: "Speaks EDL, XML, AAF, .aep, .blend, and OpenTimelineIO - not just MP4s.",
+    v: "Speaks Figma components, responsive website structure, and .blend scene workflows - not just static mockups.",
   },
   {
     k: "In-tool",
-    v: "Lives as a panel inside After Effects, Premiere, and Blender - not another app to switch to.",
+    v: "Lives around Figma and Blender so design, code, and 3D production stay in one workflow.",
   },
   {
     k: "Yours",
@@ -102,49 +102,49 @@ const pillars = [
 const quotes = [
   {
     by: "Marcus Johnson",
-    role: "Motion Designer, Remote",
-    q: "I described the shot in one sentence and it gave me a working AE comp with the curves already on the timeline. It is the first AI tool I have not turned off.",
+    role: "Website Designer, Remote",
+    q: "I described the website section once and Alternus returned a Figma frame plus the coded layout. The design and build finally stayed together.",
   },
   {
     by: "Priya Sharma",
-    role: "Colorist, London",
-    q: "I loaded a reference still, said match this across the hero sequence, and Alternus wrote me a Resolve node tree. That used to be a full day.",
+    role: "Product Designer, London",
+    q: "I asked for a cleaner landing page system and got Figma components, spacing, and responsive code direction in one pass.",
   },
   {
     by: "David Chen",
-    role: "Indie Filmmaker, LA",
-    q: "Script in, storyboard out, rough cut assembled from selects. I went from outline to picture lock in a week, solo.",
+    role: "3D Web Artist, LA",
+    q: "The Blender bridge built the hero scene, materials, and render queue from the same website brief I used for the Figma design.",
   },
 ];
 
 const faq = [
   {
     q: "What exactly is Alternus?",
-    a: "A creative AI workspace powered by Claude Opus 4.6. It edits, grades, storyboards, composites, and animates - and it plugs into After Effects, Premiere, Blender, and DaVinci Resolve.",
+    a: "A creative AI workspace for website design, coding, Figma systems, and Blender 3D. It helps you direct design and production from one agent.",
   },
   {
-    q: "Does it really run inside Adobe apps?",
-    a: "Yes. Alternus ships as a UXP panel for After Effects 23+ and Premiere 24+. It reads your comp or sequence and writes back layers, keyframes, markers, and EDLs natively.",
+    q: "How does the Figma workflow work?",
+    a: "Alternus plans website screens, components, tokens, and responsive states for Figma, then keeps the same structure ready for the code agent.",
   },
   {
     q: "How does the Blender integration work?",
-    a: "A signed Python add-on registers an alternus.* operator. The agent generates scenes, geometry-node graphs, and render queues; Blender executes them headlessly or in-session.",
+    a: "A signed Python add-on registers an alternus.* operator. The agent generates scenes, geometry-node graphs, materials, lighting, and render queues; Blender executes them headlessly or in-session.",
   },
   {
-    q: "Can I keep working in my existing NLE?",
-    a: "Yes. If you use Final Cut, Avid, or Resolve, Alternus exports industry-standard EDL, XML, AAF, and OpenTimelineIO so the agent's work lands natively in your timeline.",
+    q: "Can it code the website from the design?",
+    a: "Yes. The agent turns Figma structure into clean website sections with responsive layout, reusable components, and production-ready styling.",
   },
   {
-    q: "Where is my footage stored?",
-    a: "In your private knowledge layer, encrypted at rest. The agent references your media but never trains shared models on it.",
+    q: "Where are my files stored?",
+    a: "In your private knowledge layer, encrypted at rest. The agent references your Figma, code, and Blender files but never trains shared models on them.",
   },
 ];
 
 const quickPrompts = [
-  "Cut a 30s trailer from these selects",
-  "Match the grade of this reference in Resolve",
-  "Animate this logo with an ease-out bounce in AE",
-  "Build a cinematic hallway scene in Blender",
+  "Design a clean SaaS homepage in Figma",
+  "Code this Figma section as a responsive website",
+  "Create a Blender 3D hero scene for this website",
+  "Build a Blender product visual with soft lighting",
 ];
 
 const navItems = [
@@ -155,10 +155,8 @@ const navItems = [
 ];
 
 const bridgeApps = [
-  "After Effects",
-  "Premiere Pro",
-  "Blender 4.0",
-  "Resolve",
+  "Figma",
+  "Blender",
 ];
 
 const heroStats = [
@@ -195,11 +193,11 @@ const footerColumns = [
     heading: "Creative",
     links: [
       { l: "Launch OS", h: "/main", ext: true },
-      { l: "Edit", h: "/workspace/mail", ext: false },
+      { l: "Website design", h: "/workspace/mail", ext: false },
       { l: "Media library", h: "/workspace/files", ext: false },
-      { l: "FX & 3D", h: "/workspace/code", ext: false },
-      { l: "Boards", h: "/workspace/knowledge", ext: false },
-      { l: "Voice & sound", h: "/workspace/voice", ext: false },
+      { l: "Figma + code", h: "/workspace/code", ext: false },
+      { l: "Blender 3D", h: "/workspace/knowledge", ext: false },
+      { l: "Design notes", h: "/workspace/voice", ext: false },
     ],
   },
   {
@@ -560,8 +558,8 @@ export default function Home() {
                   </h1>
 
                   <p className="landing-hero-copy mt-5 max-w-[31rem] text-[1rem] leading-8 text-[rgba(31,43,77,0.7)] sm:text-[1.04rem]">
-                    Direct edits, motion, grading, and 3D work from one command layer.
-                    Alternus keeps the craft tools in place and moves the repetitive production work to the agent.
+                    Website design, Figma systems, coded sections, and Blender 3D work from one command layer.
+                    Alternus keeps the craft tools in place and moves repetitive design production to the agent.
                   </p>
 
                   <div className="mt-7 flex flex-wrap items-center gap-3">
@@ -791,7 +789,7 @@ export default function Home() {
                   People shipping with <span className="landing-emphasis">Alternus</span>
                 </>
               }
-              copy="The system has to feel credible in motion, not just attractive in screenshots. These quotes are framed as product proof, not decoration."
+              copy="The system has to feel credible in Figma, code, and Blender 3D, not just attractive in screenshots. These quotes are framed as product proof, not decoration."
             />
 
             <div className="grid gap-5 xl:grid-cols-3">
@@ -1022,12 +1020,12 @@ export default function Home() {
                   Section 06 / Begin
                 </div>
                 <h2 className="landing-heading-lg text-white sm:text-[clamp(3rem,6vw,5.2rem)]">
-                  Stop keyframing. <br />
+                  Stop rebuilding. <br />
                   <span className="italic">Start directing.</span>
                 </h2>
                 <p className="mx-auto mt-6 max-w-[34rem] text-base leading-8 text-white/84 sm:text-[1.02rem]">
-                  Alternus is free to try. Plug it into After Effects, Premiere, or
-                  Blender and let the agent take care of the grunt work.
+                  Alternus is free to try. Plug it into Figma and Blender,
+                  then let the agent handle website design, code, and 3D production.
                 </p>
                 <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
                   <Button

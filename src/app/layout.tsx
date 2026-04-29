@@ -46,19 +46,18 @@ export const metadata: Metadata = {
     template: "%s | Alternus AI Studio",
   },
   description:
-    "Alternus AI Studio is a creative AI workspace for design, film, motion, and in-tool production workflows.",
+    "Alternus AI Studio is a creative AI workspace for Figma website design, coding agents, and Blender 3D production workflows.",
   keywords: [
     "AI studio",
     "creative AI",
-    "design AI",
-    "film AI",
+    "Figma AI",
+    "website design AI",
+    "Blender AI",
+    "Blender 3D AI",
+    "code agent",
     "AI workspace",
-    "motion design AI",
     "Alternus AI",
     "creative operating system",
-    "After Effects AI",
-    "Premiere AI",
-    "Blender AI",
   ],
   authors: [{ name: "Alternus AI Studio" }],
   creator: "Alternus AI Studio",
@@ -78,7 +77,7 @@ export const metadata: Metadata = {
     siteName: "Alternus AI Studio",
     title: "Alternus AI Studio | Creative AI Workspace",
     description:
-      "Creative AI workspace for designers and filmmakers. Build, direct, animate, and ship inside Alternus.",
+      "Creative AI workspace for Figma website design, coding agents, and Blender 3D production.",
     images: [
       {
         url: "/logo.png",
@@ -92,7 +91,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Alternus AI Studio | Creative AI Workspace",
     description:
-      "Creative AI workspace for designers and filmmakers. Alternus turns prompts into real production work.",
+      "Creative AI workspace for Figma website design and Blender 3D. Alternus turns prompts into real production work.",
     images: ["/logo.png"],
   },
   robots: {
@@ -160,7 +159,7 @@ export default function RootLayout({
               "height": 512
             },
             "image": "https://www.alternusart.com/logo.png",
-            "description": "Creative AI workspace for design, film, motion, and in-tool production workflows.",
+            "description": "Creative AI workspace for Figma website design, coding agents, and Blender 3D production workflows.",
             "email": "contact@alternusart.com",
             "foundingDate": "2024",
             "sameAs": [
@@ -170,11 +169,9 @@ export default function RootLayout({
             "areaServed": "Worldwide",
             "knowsAbout": [
               "Creative AI",
-              "Motion Design AI",
-              "Film Workflows",
-              "After Effects Automation",
-              "Premiere Pro Workflows",
-              "Blender Workflows",
+              "Figma Website Design",
+              "Website Coding Agents",
+              "Blender 3D Workflows",
               "AI-Powered Production"
             ]
           })
@@ -190,7 +187,7 @@ export default function RootLayout({
             "@id": "https://www.alternusart.com/#website",
             "url": "https://www.alternusart.com",
             "name": "Alternus AI Studio",
-            "description": "Creative AI workspace for design, film, and production workflows",
+            "description": "Creative AI workspace for Figma website design, coding agents, and Blender 3D production workflows",
             "publisher": {
               "@id": "https://www.alternusart.com/#organization"
             },

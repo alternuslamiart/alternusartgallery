@@ -14,7 +14,7 @@ export default function PlatformOverview() {
                 One platform.<br/><span style={{ color: COBALT, fontStyle: "italic" }}>Every surface.</span>
               </h1>
               <p style={{ marginTop: 32, fontSize: 18, color: t.muted, maxWidth: 640, lineHeight: 1.55 }}>
-                Alternus is a browser-native OS with a shared agent memory across mail, files, code, voice, and knowledge — plus an SDK to embed the same agent anywhere.
+                Alternus is a browser-native OS with a shared agent workflow for Figma website design, coding, and Blender 3D production.
               </p>
             </div>
           </section>
@@ -23,9 +23,9 @@ export default function PlatformOverview() {
             <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-0" style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden" }}>
                 {[
-                  { t: "Agent runtime", d: "Claude Opus 4.6 with tool use, streaming, and checkpointed memory." },
-                  { t: "Shared context", d: "Every module writes into the same knowledge layer — one brain per user." },
-                  { t: "Open SDK", d: "Embed the agent into your own tools with 3 lines of TypeScript." },
+                  { t: "Figma workflow", d: "Plan website frames, components, tokens, and responsive states with one agent." },
+                  { t: "Coding agent", d: "Turn Figma structure into clean website sections and reusable UI code." },
+                  { t: "Blender 3D", d: "Create 3D scenes, materials, lighting, and render assets for website production." },
                 ].map((c, i, a) => (
                   <div key={c.t} style={{ padding: "40px 32px", borderRight: i < a.length - 1 ? `1px solid ${t.faint}` : "none", background: t.raised, minHeight: 260 }}>
                     <div style={{ width: 36, height: 36, background: COBALT, color: "#fff", fontWeight: 900, fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24, borderRadius: 8 }}>0{i + 1}</div>

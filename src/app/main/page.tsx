@@ -8174,7 +8174,7 @@ function MonacoApp({ c }: { c: typeof palette.dark }) {
 // ━━━━ AI HUB APP ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AIHubApp({ c }: { c: typeof palette.dark }) {
   const models = [
-    { id: "claude", name: "Claude Opus", company: "Anthropic", color: "#F97316", desc: "Advanced reasoning and deep analysis", params: "2T", ctx: "200K", badge: "Flagship", initials: "CO", online: true },
+    { id: "figma-blender", name: "Figma + Blender Agent", company: "Alternus", color: "#4284FF", desc: "Website design, code, and Blender 3D production", params: "2T", ctx: "200K", badge: "Flagship", initials: "FB", online: true },
     { id: "gpt4", name: "GPT-4o", company: "OpenAI", color: "#10B981", desc: "Versatile general-purpose intelligence", params: "1.8T", ctx: "128K", badge: "Popular", initials: "G4", online: true },
     { id: "gemini", name: "Gemini Ultra", company: "Google", color: "#3B82F6", desc: "Multimodal vision, audio, and text", params: "1.5T", ctx: "1M", badge: "Multimodal", initials: "GU", online: true },
     { id: "llama", name: "Llama 3.1", company: "Meta", color: "#8B5CF6", desc: "Open-source with transparent weights", params: "405B", ctx: "128K", badge: "Open Source", initials: "L3", online: false },
@@ -9915,7 +9915,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               <p className="text-[12px] font-bold leading-tight tracking-tight" style={{ color: agText }}>Alternus AI OS</p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#10B981", boxShadow: "0 0 6px #10B98180" }} />
-                <p className="text-[7.5px]" style={{ color: agTextMuted }}>Claude Opus 4.6 · Active</p>
+                <p className="text-[7.5px]" style={{ color: agTextMuted }}>Figma + Blender Agent - Active</p>
               </div>
             </div>
             <button className="w-7 h-7 rounded-xl flex items-center justify-center"
@@ -10007,7 +10007,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               title: "Services",
               icon: ic.briefcase,
               items: [
-                { icon: ic.code, label: "Code / 3D Studio", task: "Open the code editor" },
+                { icon: ic.code, label: "Figma / Blender", task: "Open the code editor" },
                 { icon: ic.briefcase, label: "Delivery / Payment", task: "Open the business dashboard" },
                 { icon: ic.users, label: "Social Interactions", task: "Draft a professional email to the team" },
               ],
@@ -10062,7 +10062,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               <I d={ic.brain} s={11} c="#fff" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[9.5px] font-semibold truncate" style={{ color: agText }}>Claude Opus 4.6</p>
+              <p className="text-[9.5px] font-semibold truncate" style={{ color: agText }}>Figma + Blender Agent</p>
               <p className="text-[7.5px]" style={{ color: agTextMuted }}>200K ctx · Real OS actions</p>
             </div>
           </div>
@@ -10440,7 +10440,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
                     <div className="agent-integration-grid grid grid-cols-1 gap-3 mb-8 lg:grid-cols-2">
                       {[
-                        { icon: ic.code, label: "Code / 3D Studio - DevOps", desc: "Build, debug, and deploy", color: "#10B981", task: "Open the code editor" },
+                        { icon: ic.code, label: "Figma / Blender - Website Agent", desc: "Design, code, and build 3D", color: "#10B981", task: "Open the code editor" },
                         { icon: ic.terminal, label: "Code Editor (Python)", desc: "Write and run scripts", color: "#3B82F6", task: "Open the terminal" },
                         { icon: ic.briefcase, label: "Delivery - Payment - Trip", desc: "Business & logistics", color: "#F97316", task: "Open the business dashboard" },
                         { icon: ic.pen, label: "AI Writer - Compose", desc: "Draft emails & documents", color: "#EC4899", task: "Write a professional email to the team about the project progress" },
@@ -10490,7 +10490,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                     <p className="text-[11.5px] font-bold leading-tight" style={{ color: agText }}>Alternus AI Agent</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#10B981" }} />
-                      <p className="text-[8px]" style={{ color: agTextMuted }}>Active · {selectedModel.name} · Claude Opus 4.6</p>
+                      <p className="text-[8px]" style={{ color: agTextMuted }}>Active - {selectedModel.name} - Figma + Blender</p>
                     </div>
                   </div>
                   {/* Model picker */}
