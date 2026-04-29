@@ -9957,7 +9957,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
   return (
     <div className="relative flex h-full overflow-hidden" style={{ background: agBg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" }}>
-      <div className="absolute left-4 top-4 z-[60] flex items-center gap-3">
+      <div className="absolute left-4 top-4 z-[60] flex flex-col items-center gap-2">
         <button
           onClick={() => setShowStudioLibrary(open => !open)}
           aria-label={showStudioLibrary ? "Close sidebar" : "Open sidebar"}
@@ -9974,20 +9974,17 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
         </button>
         <button
           onClick={() => send("Open Alternus AI Studio")}
-          className="hidden items-center gap-2 rounded-full pr-3 text-[12px] font-black tracking-tight sm:flex"
-          style={{ color: agTextMuted }}
+          aria-label="Alternus AI Studio"
+          title="Alternus AI Studio"
+          className="flex h-9 w-9 items-center justify-center rounded-2xl transition-all"
+          style={{
+            background: dk ? "#343438" : "rgba(63,63,66,0.72)",
+            color: "#fff",
+            border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.48)"}`,
+            boxShadow: dk ? "none" : "0 12px 30px rgba(66,132,255,0.12)",
+          }}
         >
-          <span
-            className="flex h-8 w-8 items-center justify-center rounded-xl"
-            style={{
-              background: dk ? "#343438" : "rgba(63,63,66,0.72)",
-              color: "#fff",
-              border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.48)"}`,
-            }}
-          >
-            <I d={ic.sparkle} s={13} c="currentColor" f />
-          </span>
-          Alternus AI Studio
+          <I d={ic.sparkle} s={14} c="currentColor" f />
         </button>
       </div>
 
@@ -9995,7 +9992,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
         <div
           className="absolute inset-0 z-50 pointer-events-none"
           style={{
-            background: dk ? "rgba(20,20,22,0.38)" : "rgba(239,247,255,0.32)",
+            background: dk ? "rgba(20,20,22,0.38)" : "rgba(239,247,255,0.20)",
           }}
         >
           <button
@@ -10007,17 +10004,17 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           <div
             className="pointer-events-auto relative h-full w-[min(376px,calc(100vw-18px))] overflow-y-auto p-3 sm:p-4"
             style={{
-              background: dk ? "#141416" : "rgba(247,251,255,0.92)",
+              background: dk ? "#141416" : "linear-gradient(145deg,#EFF7FF 0%,#FFF1F7 50%,#FFF4E3 100%)",
               borderRight: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
               boxShadow: dk ? "none" : "18px 0 58px rgba(66,132,255,0.16)",
               scrollbarWidth: "none",
             }}
           >
             <div
-              className="min-h-full rounded-[1.6rem] p-5"
+              className="min-h-full p-5"
               style={{
-                background: dk ? "#1F1F23" : "rgba(255,255,255,0.66)",
-                border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
+                background: "transparent",
+                border: "0",
               }}
             >
             <div className="mb-8 flex items-center justify-between gap-4">
@@ -10572,8 +10569,8 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 inset: 0;
                 background:
                   radial-gradient(880px 520px at 14% 10%, rgba(66,132,255,0.20), transparent 58%),
-                  radial-gradient(720px 420px at 86% 16%, rgba(86,154,255,0.18), transparent 62%),
-                  radial-gradient(620px 360px at 50% 100%, rgba(66,132,255,0.16), transparent 66%);
+                  radial-gradient(720px 420px at 84% 12%, rgba(255,149,188,0.18), transparent 62%),
+                  radial-gradient(620px 360px at 50% 100%, rgba(255,180,86,0.16), transparent 66%);
                 pointer-events: none;
               }
               .studio-gloss-panel {
@@ -10609,7 +10606,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                   style={{
                     background: dk
                       ? "#141416"
-                      : "linear-gradient(135deg,#F1F7FF 0%,#FFFFFF 42%,#E2F0FF 100%)",
+                      : "linear-gradient(135deg,#EEF7FF 0%,#FFFFFF 42%,#FFF0F7 70%,#FFF4E1 100%)",
                   }}
                 >
                   <div className="studio-glow-bg" />
@@ -10621,25 +10618,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                       boxShadow: "none",
                     }}
                   >
-                    <div className="flex items-center justify-between px-5 py-4">
-                      <button
-                        onClick={() => send("Open Alternus AI Studio component library")}
-                        className="flex items-center gap-2 rounded-full text-[13px] font-black tracking-tight"
-                        style={{ color: agText }}
-                      >
-                        <span
-                          className="flex h-8 w-8 items-center justify-center rounded-xl"
-                          style={{
-                            background: dk ? "#343438" : "#3F3F42",
-                            color: "#fff",
-                            border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.55)"}`,
-                            boxShadow: dk ? "none" : "0 16px 38px rgba(66,132,255,0.15)",
-                          }}
-                        >
-                          <I d={ic.sparkle} s={14} c="currentColor" f />
-                        </span>
-                        Alternus AI Studio
-                      </button>
+                    <div className="flex items-center justify-end px-5 py-4">
                       <button
                         className="flex h-8 w-8 items-center justify-center rounded-full"
                         style={{
