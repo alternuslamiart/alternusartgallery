@@ -9957,7 +9957,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
   return (
     <div className="relative flex h-full overflow-hidden" style={{ background: agBg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" }}>
-      <div className="absolute left-4 top-4 z-[60] flex flex-col items-center gap-2">
+      <div className={`${showStudioLibrary ? "hidden" : "flex"} absolute left-4 top-4 z-[60] flex-col items-center gap-2`}>
         <button
           onClick={() => setShowStudioLibrary(open => !open)}
           aria-label={showStudioLibrary ? "Close sidebar" : "Open sidebar"}
@@ -10002,27 +10002,42 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
             style={{ background: "transparent" }}
           />
           <div
-            className="pointer-events-auto relative h-full w-[min(376px,calc(100vw-18px))] overflow-y-auto p-3 sm:p-4"
+            className="pointer-events-auto relative h-full w-[min(392px,calc(100vw-18px))] overflow-y-auto p-4"
             style={{
-              background: dk ? "#141416" : "linear-gradient(145deg,#EFF7FF 0%,#FFF1F7 50%,#FFF4E3 100%)",
+              background: dk ? "#141416" : "linear-gradient(145deg,#F2F8FF 0%,#FFF6FA 54%,#FFF5E8 100%)",
               borderRight: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
-              boxShadow: dk ? "none" : "18px 0 58px rgba(66,132,255,0.16)",
+              boxShadow: dk ? "none" : "18px 0 60px rgba(66,132,255,0.13)",
               scrollbarWidth: "none",
             }}
           >
             <div
-              className="min-h-full p-5"
+              className="min-h-full"
               style={{
                 background: "transparent",
                 border: "0",
               }}
             >
-            <div className="mb-8 flex items-center justify-between gap-4">
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.22em]" style={{ color: agTextMuted }}>Components</p>
-                <h2 className="mt-2 text-[clamp(1.8rem,8vw,2.6rem)] font-black tracking-[-0.05em]" style={{ color: agText }}>
-                  Alternus AI Studio
-                </h2>
+            <div className="mb-7 flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className="flex h-10 w-10 items-center justify-center rounded-2xl"
+                    style={{
+                      background: dk ? "#2A2A2E" : "rgba(255,255,255,0.68)",
+                      border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
+                      color: agAccent,
+                    }}
+                  >
+                    <I d={ic.sparkle} s={16} c="currentColor" f />
+                  </span>
+                  <div>
+                    <p className="text-[13px] font-black tracking-tight" style={{ color: agText }}>Alternus AI Studio</p>
+                    <p className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.18em]" style={{ color: agTextMuted }}>Components</p>
+                  </div>
+                </div>
+                <p className="mt-4 max-w-[270px] text-[11px] leading-5" style={{ color: agTextMuted }}>
+                  Build Figma website systems, coded sections, and Blender 3D assets from one focused library.
+                </p>
               </div>
               <button
                 onClick={() => setShowStudioLibrary(false)}
@@ -10042,7 +10057,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               {studioSections.map(section => (
                 <section key={section.title}>
                   <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-[14px] font-black tracking-tight" style={{ color: agText }}>{section.title}</h3>
+                    <h3 className="text-[12px] font-black tracking-tight" style={{ color: agText }}>{section.title}</h3>
                     <I d={ic.chevD} s={12} c={agTextMuted} />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -10053,17 +10068,17 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                               setShowStudioLibrary(false);
                               send(item.task);
                             }}
-                            className="studio-glass-card min-h-[132px] rounded-2xl p-4 text-left transition-all"
+                            className="studio-glass-card min-h-[118px] rounded-[1.15rem] p-4 text-left transition-all"
                             style={{
-                              background: dk ? "#232327" : "rgba(255,255,255,0.66)",
+                              background: dk ? "#232327" : "rgba(255,255,255,0.72)",
                               border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
-                              boxShadow: dk ? "none" : "0 12px 26px rgba(66,132,255,0.08)",
+                              boxShadow: dk ? "none" : "0 12px 26px rgba(66,132,255,0.07)",
                             }}
                           >
-                        <span className="mb-5 flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: `${item.color}18`, color: item.color }}>
-                          <I d={item.icon} s={16} c="currentColor" />
+                        <span className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl" style={{ background: `${item.color}16`, color: item.color }}>
+                          <I d={item.icon} s={15} c="currentColor" />
                         </span>
-                        <span className="block text-[13px] font-black leading-tight" style={{ color: agText }}>{item.label}</span>
+                        <span className="block text-[12px] font-black leading-tight" style={{ color: agText }}>{item.label}</span>
                         <span className="mt-1 block text-[10px] leading-4" style={{ color: agTextMuted }}>{item.desc}</span>
                       </button>
                     ))}
