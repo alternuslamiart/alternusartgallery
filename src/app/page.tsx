@@ -953,9 +953,9 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="landing-section border-b-0">
+        <section className="landing-section border-b-0 bg-transparent">
           <div className="landing-container">
-            <div className="mx-auto max-w-[980px] rounded-[2.6rem] border border-[rgba(66,132,255,0.12)] bg-[linear-gradient(180deg,#4B87FF_0%,#2E69E2_100%)] px-6 py-14 text-center shadow-[0_34px_90px_rgba(42,103,255,0.2)] sm:px-12 sm:py-20">
+            <div className="mx-auto max-w-[980px] rounded-[2.6rem] bg-[linear-gradient(180deg,#4B87FF_0%,#2E69E2_100%)] px-6 py-14 text-center shadow-[0_34px_90px_rgba(42,103,255,0.16)] sm:px-12 sm:py-20">
               <div className="mx-auto max-w-[760px]">
                 <div className="mb-7 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-950/72">
                   Section 06 / Begin
