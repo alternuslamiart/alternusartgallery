@@ -394,9 +394,27 @@ export default function Home() {
         .alternus-float-soft {
           animation: alternus-float-soft 6s ease-in-out infinite;
         }
-        .landing-page[data-theme="dark"] .landing-card,
-        .landing-page[data-theme="dark"] .landing-card-quiet {
+        .landing-page[data-theme="dark"] {
+          background: #141416 !important;
+        }
+        .landing-page[data-theme="dark"] *,
+        .landing-page[data-theme="dark"] *::before,
+        .landing-page[data-theme="dark"] *::after {
+          background-image: none !important;
           box-shadow: none !important;
+        }
+        .landing-page[data-theme="dark"] .landing-card,
+        .landing-page[data-theme="dark"] .landing-card-quiet,
+        .landing-page[data-theme="dark"] .landing-dark-frame {
+          background: #1F1F23 !important;
+          border-color: rgba(255,255,255,0.16) !important;
+          box-shadow: none !important;
+        }
+        .landing-page[data-theme="dark"] .landing-card:hover,
+        .landing-page[data-theme="dark"] .landing-card-quiet:hover,
+        .landing-page[data-theme="dark"] .landing-dark-frame:hover {
+          background: #232327 !important;
+          border-color: rgba(66,132,255,0.62) !important;
         }
         .landing-page[data-theme="dark"] .landing-chip,
         .landing-page[data-theme="dark"] .landing-social-button,
@@ -405,9 +423,26 @@ export default function Home() {
           border-color: rgba(255,255,255,0.12) !important;
           color: rgba(255,255,255,0.72) !important;
         }
+        .landing-page[data-theme="dark"] .landing-chip:hover,
+        .landing-page[data-theme="dark"] .landing-social-button:hover,
+        .landing-page[data-theme="dark"] .landing-language-button:hover {
+          background: rgba(255,255,255,0.07) !important;
+          border-color: rgba(66,132,255,0.62) !important;
+          color: #F5F5F7 !important;
+        }
+        .landing-page[data-theme="dark"] .landing-grid,
+        .landing-page[data-theme="dark"] .landing-hero-effects,
+        .landing-page[data-theme="dark"] .landing-dark-orb {
+          display: none !important;
+        }
+        .landing-page[data-theme="dark"] .landing-section-soft,
+        .landing-page[data-theme="dark"] .landing-marquee,
+        .landing-page[data-theme="dark"] .landing-final-cta {
+          background: #141416 !important;
+        }
         .landing-page[data-theme="dark"] .landing-hero-shell {
           border-color: rgba(255,255,255,0.12) !important;
-          background: linear-gradient(180deg, rgba(21,21,24,0.98), rgba(18,18,20,0.96)) !important;
+          background: #141416 !important;
           box-shadow: none !important;
         }
         .landing-page[data-theme="dark"] .landing-hero-kicker,
@@ -423,6 +458,17 @@ export default function Home() {
           color: rgba(255,255,255,0.72) !important;
           box-shadow: none !important;
         }
+        .landing-page[data-theme="dark"] .landing-hero-kicker:hover,
+        .landing-page[data-theme="dark"] .landing-hero-secondary:hover,
+        .landing-page[data-theme="dark"] .landing-hero-stat:hover,
+        .landing-page[data-theme="dark"] .landing-hero-bubble:hover,
+        .landing-page[data-theme="dark"] .landing-hero-panel:hover,
+        .landing-page[data-theme="dark"] .landing-hero-form:hover,
+        .landing-page[data-theme="dark"] .landing-hero-quick:hover,
+        .landing-page[data-theme="dark"] .landing-hero-pill:hover {
+          background: rgba(255,255,255,0.07) !important;
+          border-color: rgba(66,132,255,0.62) !important;
+        }
         .landing-page[data-theme="dark"] .landing-hero-title,
         .landing-page[data-theme="dark"] .landing-hero-stat strong,
         .landing-page[data-theme="dark"] .landing-hero-input {
@@ -433,12 +479,52 @@ export default function Home() {
           color: ${DARK_MUTED} !important;
         }
         .landing-page[data-theme="dark"] .landing-hero-preview {
-          border-color: rgba(255,255,255,0.1) !important;
-          background: rgba(255,255,255,0.035) !important;
+          border-color: rgba(255,255,255,0.16) !important;
+          background: #1F1F23 !important;
           box-shadow: none !important;
+        }
+        .landing-page[data-theme="dark"] .landing-hero-preview:hover {
+          border-color: rgba(66,132,255,0.62) !important;
         }
         .landing-page[data-theme="dark"] .landing-hero-input::placeholder {
           color: rgba(255,255,255,0.38) !important;
+        }
+        .landing-page[data-theme="dark"] [class*="bg-blue-50"],
+        .landing-page[data-theme="dark"] [class*="bg-blue-500/"],
+        .landing-page[data-theme="dark"] [class*="bg-white/"] {
+          background: rgba(255,255,255,0.04) !important;
+        }
+        .landing-page[data-theme="dark"] [class*="border-blue-"] {
+          border-color: rgba(255,255,255,0.16) !important;
+        }
+        .landing-page[data-theme="dark"] .landing-dark-solid {
+          background: ${COBALT} !important;
+          color: #FFFFFF !important;
+          border-color: ${COBALT} !important;
+          background-image: none !important;
+        }
+        .landing-page[data-theme="dark"] .landing-dark-solid:hover {
+          background: ${COBALT_DEEP} !important;
+          border-color: ${COBALT_DEEP} !important;
+        }
+        .landing-page[data-theme="dark"] .landing-final-cta,
+        .landing-page[data-theme="dark"] .landing-preview-shell,
+        .landing-page[data-theme="dark"] .landing-preview-rail,
+        .landing-page[data-theme="dark"] .landing-preview-pane,
+        .landing-page[data-theme="dark"] .landing-preview-card,
+        .landing-page[data-theme="dark"] .landing-preview-input {
+          background: #1F1F23 !important;
+          border-color: rgba(255,255,255,0.16) !important;
+          color: #F5F5F7 !important;
+        }
+        .landing-page[data-theme="dark"] .landing-final-cta:hover,
+        .landing-page[data-theme="dark"] .landing-preview-shell:hover,
+        .landing-page[data-theme="dark"] .landing-preview-card:hover,
+        .landing-page[data-theme="dark"] .landing-preview-input:hover {
+          border-color: rgba(66,132,255,0.62) !important;
+        }
+        .landing-page[data-theme="dark"] .landing-final-label {
+          color: rgba(245,245,247,0.72) !important;
         }
       `}</style>
 
@@ -508,7 +594,7 @@ export default function Home() {
 
               <Link
                 href="/main"
-                className="inline-flex h-10 items-center gap-2 rounded-2xl bg-[var(--landing-accent)] px-4 text-sm font-bold tracking-[-0.01em] text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[var(--landing-accent-strong)] hover:shadow-xl hover:shadow-blue-500/25 sm:h-11 sm:px-5"
+                className="landing-dark-solid inline-flex h-10 items-center gap-2 rounded-2xl bg-[var(--landing-accent)] px-4 text-sm font-bold tracking-[-0.01em] text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[var(--landing-accent-strong)] hover:shadow-xl hover:shadow-blue-500/25 sm:h-11 sm:px-5"
               >
                 Launch OS
                 <ArrowIcon className="h-3.5 w-3.5" />
@@ -530,13 +616,13 @@ export default function Home() {
         <section className="landing-section overflow-hidden pt-10 sm:pt-12">
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="landing-grid alternus-grid-motion absolute inset-x-0 top-0 h-[82%] opacity-90 [mask-image:radial-gradient(ellipse_at_top,black_38%,transparent_84%)]" />
-            <div className="absolute right-[-12rem] top-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(66,132,255,0.24),transparent_68%)] blur-3xl" />
-            <div className="absolute left-[-8rem] top-[10rem] h-[18rem] w-[18rem] rounded-full bg-[radial-gradient(circle,rgba(125,169,255,0.18),transparent_68%)] blur-3xl" />
+            <div className="landing-dark-orb absolute right-[-12rem] top-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(66,132,255,0.24),transparent_68%)] blur-3xl" />
+            <div className="landing-dark-orb absolute left-[-8rem] top-[10rem] h-[18rem] w-[18rem] rounded-full bg-[radial-gradient(circle,rgba(125,169,255,0.18),transparent_68%)] blur-3xl" />
           </div>
 
           <div className="landing-container relative">
             <div className="landing-hero-shell relative overflow-hidden rounded-[2.6rem] border border-white/55 bg-[linear-gradient(135deg,rgba(238,246,255,0.98)_0%,rgba(219,235,255,0.96)_46%,rgba(198,222,255,0.94)_100%)] px-6 py-8 shadow-[0_40px_110px_rgba(66,132,255,0.24)] sm:px-9 sm:py-10 lg:px-12 lg:py-12">
-              <div className="pointer-events-none absolute inset-0">
+              <div className="landing-hero-effects pointer-events-none absolute inset-0">
                 <div className="absolute left-[-8%] top-[6%] h-[20rem] w-[20rem] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.78),transparent_66%)] blur-3xl" />
                 <div className="absolute right-[-6%] top-[8%] h-[16rem] w-[16rem] rounded-full bg-[radial-gradient(circle,rgba(66,132,255,0.36),transparent_70%)] blur-3xl" />
                 <div className="absolute bottom-[-8%] left-[42%] h-[18rem] w-[18rem] rounded-full bg-[radial-gradient(circle,rgba(46,105,226,0.25),transparent_72%)] blur-3xl" />
@@ -566,7 +652,7 @@ export default function Home() {
                     <Button
                       asChild
                       size="lg"
-                      className="h-12 rounded-2xl bg-[var(--landing-accent)] px-6 text-[15px] font-bold tracking-[-0.02em] text-white shadow-[0_18px_40px_rgba(66,132,255,0.24)] hover:bg-[var(--landing-accent-strong)]"
+                      className="landing-dark-solid h-12 rounded-2xl bg-[var(--landing-accent)] px-6 text-[15px] font-bold tracking-[-0.02em] text-white shadow-[0_18px_40px_rgba(66,132,255,0.24)] hover:bg-[var(--landing-accent-strong)]"
                     >
                       <Link href="/main">
                         Get started
@@ -660,7 +746,7 @@ export default function Home() {
 
                           <button
                             type="submit"
-                            className="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#4284FF_0%,#6EA4FF_100%)] text-white shadow-[0_12px_24px_rgba(66,132,255,0.28)]"
+                            className="landing-dark-solid flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#4284FF_0%,#6EA4FF_100%)] text-white shadow-[0_12px_24px_rgba(66,132,255,0.28)]"
                             aria-label="Run prompt"
                           >
                             <ArrowIcon className="h-3.5 w-3.5" />
@@ -675,7 +761,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="overflow-hidden border-b border-[var(--landing-line)] bg-[var(--landing-accent)] py-5">
+        <section className="landing-marquee overflow-hidden border-b border-[var(--landing-line)] bg-[var(--landing-accent)] py-5">
           <div className="alternus-marquee-track flex w-max items-center gap-12 whitespace-nowrap">
             {[...marquee, ...marquee, ...marquee].map((item, index) => (
               <span
@@ -836,7 +922,7 @@ export default function Home() {
             />
 
             <div className="landing-card overflow-hidden p-3 sm:p-4">
-              <div className="overflow-hidden rounded-[1.35rem] border border-white/10 bg-[#161a24] shadow-[0_24px_60px_rgba(8,15,32,0.38)]">
+              <div className="landing-preview-shell overflow-hidden rounded-[1.35rem] border border-white/10 bg-[#161a24] shadow-[0_24px_60px_rgba(8,15,32,0.38)]">
                 <div className="flex items-center gap-2 border-b border-white/10 bg-white/5 px-4 py-3">
                   <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
                   <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
@@ -850,7 +936,7 @@ export default function Home() {
                 </div>
 
                 <div className="grid gap-0 lg:grid-cols-[78px_240px_minmax(0,1fr)]">
-                  <div className="flex border-b border-white/10 px-3 py-3 lg:min-h-[560px] lg:flex-col lg:items-center lg:gap-3 lg:border-b-0 lg:border-r lg:px-0 lg:py-5">
+                  <div className="landing-preview-rail flex border-b border-white/10 px-3 py-3 lg:min-h-[560px] lg:flex-col lg:items-center lg:gap-3 lg:border-b-0 lg:border-r lg:px-0 lg:py-5">
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--landing-accent)] text-sm font-black text-white">
                       A
                     </div>
@@ -886,7 +972,7 @@ export default function Home() {
                     ))}
                   </div>
 
-                  <div className="border-b border-white/10 p-4 lg:min-h-[560px] lg:border-b-0 lg:border-r lg:p-4">
+                  <div className="landing-preview-pane border-b border-white/10 p-4 lg:min-h-[560px] lg:border-b-0 lg:border-r lg:p-4">
                     <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-white/45">
                       Files
                     </div>
@@ -923,7 +1009,7 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <div className="rounded-[1.2rem] border border-blue-400/20 bg-blue-500/10 p-4">
+                    <div className="landing-preview-card rounded-[1.2rem] border border-blue-400/20 bg-blue-500/10 p-4">
                       <div className="mb-3 flex items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--landing-accent)] text-[11px] font-black text-white">
                           AI
@@ -940,7 +1026,7 @@ export default function Home() {
                       {workspaceDocs.map((doc, index) => (
                         <div
                           key={doc}
-                          className="rounded-[1.15rem] border border-white/10 bg-white/5 p-3"
+                          className="landing-preview-card rounded-[1.15rem] border border-white/10 bg-white/5 p-3"
                         >
                           <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl border border-blue-300/30 bg-blue-500/12 text-[10px] font-black text-[var(--landing-accent)]">
                             PDF
@@ -953,7 +1039,7 @@ export default function Home() {
                       ))}
                     </div>
 
-                    <div className="mt-auto flex items-center gap-3 rounded-[1.2rem] border border-white/10 bg-white/5 px-4 py-3">
+                    <div className="landing-preview-input mt-auto flex items-center gap-3 rounded-[1.2rem] border border-white/10 bg-white/5 px-4 py-3">
                       <span className="font-mono text-sm font-bold text-[var(--landing-accent)]">$</span>
                       <span className="flex-1 font-mono text-sm text-white/45">
                         ask agent about these files...
@@ -1014,9 +1100,9 @@ export default function Home() {
 
         <section className="landing-section border-b-0 bg-transparent">
           <div className="landing-container">
-            <div className="mx-auto max-w-[980px] rounded-[2.6rem] bg-[linear-gradient(180deg,#4B87FF_0%,#2E69E2_100%)] px-6 py-14 text-center shadow-[0_34px_90px_rgba(42,103,255,0.16)] sm:px-12 sm:py-20">
+            <div className="landing-final-cta mx-auto max-w-[980px] rounded-[2.6rem] border border-[var(--landing-line)] bg-[linear-gradient(180deg,#4B87FF_0%,#2E69E2_100%)] px-6 py-14 text-center shadow-[0_34px_90px_rgba(42,103,255,0.16)] sm:px-12 sm:py-20">
               <div className="mx-auto max-w-[760px]">
-                <div className="mb-7 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-950/72">
+                <div className="landing-final-label mb-7 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-950/72">
                   Section 06 / Begin
                 </div>
                 <h2 className="landing-heading-lg text-white sm:text-[clamp(3rem,6vw,5.2rem)]">
@@ -1031,7 +1117,7 @@ export default function Home() {
                   <Button
                     asChild
                     size="lg"
-                    className="h-12 rounded-2xl bg-white px-6 text-[15px] font-bold tracking-[-0.02em] text-[var(--landing-accent)] shadow-lg shadow-blue-950/20 hover:bg-white/95"
+                    className="landing-dark-solid h-12 rounded-2xl bg-white px-6 text-[15px] font-bold tracking-[-0.02em] text-[var(--landing-accent)] shadow-lg shadow-blue-950/20 hover:bg-white/95"
                   >
                     <Link href="/main">
                       Launch Alternus OS
