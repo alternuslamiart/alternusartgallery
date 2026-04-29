@@ -192,7 +192,7 @@ const footerColumns = [
   {
     heading: "Creative",
     links: [
-      { l: "Launch OS", h: "/main", ext: true },
+      { l: "Launch Studio", h: "/main", ext: true },
       { l: "Website design", h: "/workspace/mail", ext: false },
       { l: "Media library", h: "/workspace/files", ext: false },
       { l: "Figma + code", h: "/workspace/code", ext: false },
@@ -596,7 +596,7 @@ export default function Home() {
                 href="/main"
                 className="landing-dark-solid inline-flex h-10 items-center gap-2 rounded-2xl bg-[var(--landing-accent)] px-4 text-sm font-bold tracking-[-0.01em] text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[var(--landing-accent-strong)] hover:shadow-xl hover:shadow-blue-500/25 sm:h-11 sm:px-5"
               >
-                Launch OS
+                Launch Studio
                 <ArrowIcon className="h-3.5 w-3.5" />
               </Link>
             </div>

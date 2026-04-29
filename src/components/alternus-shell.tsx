@@ -101,7 +101,7 @@ export function AlternusNav({ isDark, setIsDark, scrolled, fg, muted, faint }: R
         </Link>
         <Link href="/account" aria-label="Account" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, fontSize: 12, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.02em" }}>AL</Link>
         <Link href="/main" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
-          Launch OS <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
+          Launch Studio <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
         </Link>
       </div>
     </header>
@@ -119,7 +119,7 @@ export function AlternusFooter({ isDark, fg, muted, faint }: ReturnType<typeof u
       { l: "Status", h: "/platform/status", ext: false },
     ]},
     { heading: "Creative", links: [
-      { l: "Launch OS", h: "/main", ext: true },
+      { l: "Launch Studio", h: "/main", ext: true },
       { l: "Edit", h: "/workspace/mail", ext: false },
       { l: "Media library", h: "/workspace/files", ext: false },
       { l: "FX & 3D", h: "/workspace/code", ext: false },

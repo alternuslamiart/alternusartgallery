@@ -78,7 +78,7 @@ export default function Account() {
             }
           </button>
           <Link href="/main" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 32, padding: "0 14px", background: COBALT, color: "#FFF", fontSize: 12.5, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
-            Launch OS <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
+            Launch Studio <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
           </Link>
           <div style={{ width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, letterSpacing: "-0.02em" }}>AL</div>
         </div>
