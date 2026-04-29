@@ -12667,8 +12667,24 @@ export default function AlternusOS() {
   const desktopBg = wallpaper === 0 ? c.bg : wallpapers[wallpaper] || c.bg;
 
   return (
-    <div data-os-theme={mode} style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
+    <div
+      data-os-theme={mode}
+      style={{
+        background: desktopBg,
+        width: "100vw",
+        height: "100dvh",
+        minHeight: "100dvh",
+      }}
+      className="fixed inset-0 overflow-hidden"
+    >
       <style>{`
+        html, body {
+          margin: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
+          overflow: hidden !important;
+          background: ${mode === "dark" ? "#141416" : "#EEF7FF"} !important;
+        }
         * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
         *::-webkit-scrollbar { display: none !important; }
         [data-os-theme="dark"] *,
@@ -12693,14 +12709,13 @@ export default function AlternusOS() {
       <div className="absolute top-0 left-0 right-0 h-2 z-[300]" onMouseEnter={() => setShowTopBar(true)} />
       {/* Top Bar */}
       <div
-        className="relative flex items-center justify-between px-4 h-9 flex-shrink-0 transition-all duration-300 z-[200]"
+        className="absolute left-0 right-0 top-0 flex items-center justify-between px-4 h-9 transition-all duration-300 z-[200]"
         style={{
           background: mode === "dark" ? "rgba(44,44,44,0.6)" : "rgba(255,255,255,0.6)",
           backdropFilter: "blur(20px) saturate(1.4)",
           WebkitBackdropFilter: "blur(20px) saturate(1.4)",
           borderBottom: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
           transform: showTopBar ? "translateY(0)" : "translateY(-100%)",
-          position: showTopBar ? "relative" : "absolute",
           top: 0, left: 0, right: 0,
         }}
         onMouseEnter={() => setShowTopBar(true)}
@@ -12836,7 +12851,7 @@ export default function AlternusOS() {
       </div>
 
       {/* Desktop Area - fixed, no scroll */}
-      <div className="flex-1 relative overflow-hidden"
+      <div className="absolute inset-0 overflow-hidden"
         style={{ background: desktopBg }}
         onClick={() => { if (showApps) setShowApps(false); setShowWifiPanel(false); setShowProfilePanel(false); setShowAISidebar(false); setContextMenu(null); if (showAIFrame && !aiResponse) setShowAIFrame(false); setShowAiFixMenu(false); setShowNotifications(false); setShowCtrlAi(false); setShowSpotlight(false); setShowSpacesView(false); setShowAiChat(false); }}
         onDoubleClick={() => { setShowAIFrame(true); setShowAiFixMenu(false); setTimeout(() => aiFrameInputRef.current?.focus(), 50); }}
