@@ -52,6 +52,9 @@ export default function Login() {
   const surface = isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.86)";
   const card = isDark ? "rgba(21,21,24,0.96)" : "rgba(255,255,255,0.94)";
   const field = isDark ? DARK_SURFACE : "rgba(245,247,252,0.92)";
+  const softShadow = isDark ? "none" : "0 24px 60px rgba(66,132,255,0.12)";
+  const cardShadow = isDark ? "none" : "0 30px 90px rgba(66,132,255,0.15)";
+  const ctaShadow = isDark ? "none" : "0 18px 34px rgba(66,132,255,0.24)";
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,9 +205,7 @@ export default function Login() {
               background: surface,
               padding: 22,
               backdropFilter: "blur(18px)",
-              boxShadow: isDark
-                ? "0 24px 60px rgba(0,0,0,0.35)"
-                : "0 24px 60px rgba(66,132,255,0.12)",
+              boxShadow: softShadow,
             }}
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
@@ -240,9 +241,7 @@ export default function Login() {
                 borderRadius: 32,
                 background: card,
                 backdropFilter: "blur(20px)",
-                boxShadow: isDark
-                  ? "0 28px 80px rgba(0,0,0,0.38)"
-                  : "0 30px 90px rgba(66,132,255,0.15)",
+                boxShadow: cardShadow,
                 padding: 32,
               }}
             >
@@ -389,7 +388,7 @@ export default function Login() {
                     alignItems: "center",
                     justifyContent: "center",
                     opacity: loading ? 0.72 : 1,
-                    boxShadow: "0 18px 34px rgba(66,132,255,0.24)",
+                    boxShadow: ctaShadow,
                   }}
                 >
                   {loading ? "Signing in..." : "Sign in"}

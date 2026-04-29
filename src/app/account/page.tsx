@@ -55,7 +55,7 @@ export default function Account() {
   const raised = isDark ? DARK_SURFACE : "#FFFFFF";
   const softFill = isDark ? DARK_SURFACE_SOFT : "#F5F7FB";
 
-  const cardShadow = isDark ? "0 18px 48px rgba(0,0,0,0.24)" : "0 1px 4px rgba(5,8,15,0.04)";
+  const cardShadow = isDark ? "none" : "0 1px 4px rgba(5,8,15,0.04)";
   const baseCard: React.CSSProperties = { background: raised, border: `1px solid ${faintBorder}`, borderRadius: 12, boxShadow: cardShadow };
 
   return (

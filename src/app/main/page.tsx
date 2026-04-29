@@ -83,17 +83,17 @@ const aiFileIndex = [
 // ━━━━ Colors ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const palette = {
   dark: {
-    bg: "#1F1F1F",
-    surface: "#2A2A2A",
-    card: "#2A2A2A",
-    cardAlt: "#333333",
-    border: "#3A3A3A",
-    text: "#F0F2F8",
-    textSec: "#A4A8B8",
-    textMuted: "#6B6F82",
-    accent: "#4F8EF7",
-    accentSoft: "rgba(79,142,247,0.13)",
-    accentText: "#6EA5FA",
+    bg: "#141416",
+    surface: "#1F1F23",
+    card: "#1F1F23",
+    cardAlt: "#242428",
+    border: "#3A3A40",
+    text: "#F5F5F7",
+    textSec: "#C6C6CC",
+    textMuted: "#8E8E97",
+    accent: "#4284FF",
+    accentSoft: "rgba(66,132,255,0.14)",
+    accentText: "#6EA4FF",
     success: "#3DD68C",
     successSoft: "rgba(61,214,140,0.13)",
     warning: "#F5B73B",
@@ -12274,10 +12274,16 @@ export default function AlternusOS() {
   const desktopBg = wallpaper === 0 ? c.bg : wallpapers[wallpaper] || c.bg;
 
   return (
-    <div style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
+    <div data-os-theme={mode} style={{ background: c.bg }} className="fixed inset-0 flex flex-col overflow-hidden">
       <style>{`
         * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
         *::-webkit-scrollbar { display: none !important; }
+        [data-os-theme="dark"] *,
+        [data-os-theme="dark"] *::before,
+        [data-os-theme="dark"] *::after {
+          box-shadow: none !important;
+          text-shadow: none !important;
+        }
         .ai-bar-input::placeholder { color: rgba(255,255,255,0.65); }
         @keyframes os-page-in {
           from { opacity: 0; transform: translateY(6px); }

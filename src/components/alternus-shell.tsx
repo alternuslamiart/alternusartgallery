@@ -7,13 +7,13 @@ export const COBALT = "#4284FF";
 export const COBALT_DEEP = "#1E5ED4";
 export const INK = "#1F1F1F";
 export const PAPER = "#F4F6FB";
-export const DARK_BG = "#121214";
-export const DARK_SURFACE = "#1E1E22";
-export const DARK_SURFACE_SOFT = "#18181B";
-export const DARK_BORDER = "rgba(255,255,255,0.12)";
-export const DARK_BORDER_SOFT = "rgba(255,255,255,0.08)";
-export const DARK_MUTED = "rgba(255,255,255,0.62)";
-export const DARK_TEXT = "#F8F8FA";
+export const DARK_BG = "#141416";
+export const DARK_SURFACE = "#1F1F23";
+export const DARK_SURFACE_SOFT = "#19191C";
+export const DARK_BORDER = "rgba(255,255,255,0.16)";
+export const DARK_BORDER_SOFT = "rgba(255,255,255,0.10)";
+export const DARK_MUTED = "rgba(245,245,247,0.70)";
+export const DARK_TEXT = "#F5F5F7";
 const THEME_KEY = "alternus_theme";
 
 /**

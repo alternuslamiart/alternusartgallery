@@ -120,6 +120,42 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <style
+        id="alternus-dark-flat"
+        dangerouslySetInnerHTML={{
+          __html: `
+            html[data-alternus-theme="dark"],
+            .dark {
+              --background: 240 5% 8%;
+              --foreground: 240 11% 96%;
+              --card: 240 6% 13%;
+              --card-foreground: 240 11% 96%;
+              --popover: 240 6% 13%;
+              --popover-foreground: 240 11% 96%;
+              --primary: 218 100% 63%;
+              --primary-foreground: 0 0% 100%;
+              --secondary: 240 5% 15%;
+              --secondary-foreground: 240 11% 96%;
+              --muted: 240 5% 15%;
+              --muted-foreground: 240 5% 70%;
+              --accent: 240 5% 15%;
+              --accent-foreground: 240 11% 96%;
+              --border: 240 5% 25%;
+              --input: 240 5% 25%;
+              --ring: 218 100% 63%;
+            }
+            html[data-alternus-theme="dark"] *,
+            html[data-alternus-theme="dark"] *::before,
+            html[data-alternus-theme="dark"] *::after,
+            .dark *,
+            .dark *::before,
+            .dark *::after {
+              box-shadow: none !important;
+              text-shadow: none !important;
+            }
+          `,
+        }}
+      />
       {/* Google AdSense - Auto Ads */}
       <Script
         async

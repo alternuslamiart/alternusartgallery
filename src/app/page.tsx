@@ -396,7 +396,7 @@ export default function Home() {
         }
         .landing-page[data-theme="dark"] .landing-card,
         .landing-page[data-theme="dark"] .landing-card-quiet {
-          box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 24px 70px rgba(0,0,0,0.36);
+          box-shadow: none !important;
         }
         .landing-page[data-theme="dark"] .landing-chip,
         .landing-page[data-theme="dark"] .landing-social-button,
@@ -408,7 +408,7 @@ export default function Home() {
         .landing-page[data-theme="dark"] .landing-hero-shell {
           border-color: rgba(255,255,255,0.12) !important;
           background: linear-gradient(180deg, rgba(21,21,24,0.98), rgba(18,18,20,0.96)) !important;
-          box-shadow: 0 32px 90px rgba(0,0,0,0.44) !important;
+          box-shadow: none !important;
         }
         .landing-page[data-theme="dark"] .landing-hero-kicker,
         .landing-page[data-theme="dark"] .landing-hero-secondary,
@@ -435,7 +435,7 @@ export default function Home() {
         .landing-page[data-theme="dark"] .landing-hero-preview {
           border-color: rgba(255,255,255,0.1) !important;
           background: rgba(255,255,255,0.035) !important;
-          box-shadow: 0 24px 70px rgba(0,0,0,0.32) !important;
+          box-shadow: none !important;
         }
         .landing-page[data-theme="dark"] .landing-hero-input::placeholder {
           color: rgba(255,255,255,0.38) !important;
