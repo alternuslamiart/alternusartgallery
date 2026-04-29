@@ -548,6 +548,7 @@ function AppWindow({
 
   return (
     <div
+      className="alternus-window"
       style={{
         ...style,
         background: isAI ? "transparent" : isDark ? "rgba(30,31,38,0.72)" : "rgba(255,255,255,0.68)",
@@ -582,6 +583,17 @@ function AppWindow({
         onForceQuit={onForceQuit}
         mode={mode}
       />}
+      <style>{`
+        @media (max-width: 640px) {
+          .alternus-window {
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            border-radius: 0 !important;
+          }
+        }
+      `}</style>
       <div style={{ flex: 1, overflow: "hidden", position: "relative", margin: isAI ? 0 : "0 6px 6px 6px", pointerEvents: isAI ? "auto" : undefined }}>
         <div style={{ background: isAI ? "transparent" : isDark ? "rgba(37,38,45,0.6)" : "rgba(255,255,255,0.5)", borderRadius: isAI ? 0 : 14, border: isAI ? "none" : `1px solid ${isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)"}`, height: "100%", overflow: "auto", position: "relative" }}>
         {children}
@@ -10282,12 +10294,39 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
         ) : (
           /* ── CHAT + INPUT VIEW (no workspace) ── */
           <div className="flex flex-col h-full" onClick={() => setShowFormatMenu(false)}>
+            <style>{`
+              @media (max-width: 768px) {
+                .agent-home-topbar { padding: 12px 14px !important; gap: 10px !important; }
+                .agent-home-title { font-size: 12px !important; }
+                .agent-home-content { max-width: 100% !important; padding: 20px 14px 28px !important; }
+                .agent-prompt-frame { max-width: 520px !important; margin-left: auto !important; margin-right: auto !important; margin-bottom: 22px !important; border-radius: 22px !important; }
+                .agent-prompt-input-wrap { padding: 18px 16px 8px !important; }
+                .agent-prompt-actions { gap: 8px !important; padding: 0 14px 14px !important; }
+                .agent-prompt-tools { gap: 6px !important; }
+                .agent-prompt-tool { padding: 7px 9px !important; font-size: 8.5px !important; }
+                .agent-section-heading { margin-bottom: 12px !important; gap: 10px !important; }
+                .agent-app-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; margin-bottom: 24px !important; }
+                .agent-app-card { min-height: 112px !important; padding: 13px !important; border-radius: 18px !important; gap: 12px !important; }
+                .agent-app-icon { width: 36px !important; height: 36px !important; border-radius: 12px !important; }
+                .agent-integration-grid { grid-template-columns: 1fr !important; gap: 10px !important; margin-bottom: 24px !important; }
+                .agent-integration-card { padding: 13px !important; border-radius: 18px !important; }
+                .agent-quick-actions { justify-content: center !important; gap: 7px !important; margin-top: 0 !important; }
+                .agent-quick-action { padding: 7px 11px !important; font-size: 9px !important; }
+              }
+              @media (max-width: 380px) {
+                .agent-home-content { padding-left: 12px !important; padding-right: 12px !important; }
+                .agent-app-grid { gap: 8px !important; }
+                .agent-app-card { min-height: 106px !important; padding: 12px !important; }
+                .agent-prompt-tools { width: 100% !important; }
+                .agent-prompt-tool { flex: 1 1 calc(50% - 6px) !important; justify-content: center !important; }
+              }
+            `}</style>
             {msgs.filter(m => m.role === "user").length === 0 && !isThinking ? (
               /* ── DASHBOARD VIEW — Glassmorphism · Alternus AI OS ── */
               <div className="flex flex-col h-full">
                 {/* Top bar */}
-                <div className="flex-shrink-0 px-6 py-4 flex items-center gap-4" style={{ borderBottom: `1px solid ${agBorderSoft}`, background: dk ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.48)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}>
-                  <p className="text-[12.5px] font-bold tracking-tight" style={{ color: agText }}>Alternus AI OS</p>
+                <div className="agent-home-topbar flex-shrink-0 px-6 py-4 flex items-center gap-4" style={{ borderBottom: `1px solid ${agBorderSoft}`, background: dk ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.48)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}>
+                  <p className="agent-home-title text-[12.5px] font-bold tracking-tight" style={{ color: agText }}>Alternus AI OS</p>
                   <div className="hidden md:flex items-center gap-2 flex-1 max-w-[360px] px-3.5 py-2 rounded-2xl"
                     style={{
                       background: dk ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.75)",
@@ -10323,28 +10362,28 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
                 {/* Scrollable content */}
                 <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-                  <div style={{ maxWidth: 936, margin: "0 auto", padding: "32px 28px 40px" }}>
-                    <div className="mx-auto mb-8 max-w-[640px] overflow-hidden rounded-[1.35rem]" style={{
+                  <div className="agent-home-content" style={{ maxWidth: 936, margin: "0 auto", padding: "32px 28px 40px" }}>
+                    <div className="agent-prompt-frame mx-auto mb-8 max-w-[640px] overflow-hidden rounded-[1.35rem]" style={{
                       background: agCardBgSolid,
                       border: `1px solid ${agBorderSoft}`,
                       boxShadow: agGlassShadow,
                     }}>
-                      <div className="px-5 pt-5 pb-2">
+                      <div className="agent-prompt-input-wrap px-5 pt-5 pb-2">
                         <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
                           onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
                           placeholder="Ask Alternus AI..."
                           className="w-full bg-transparent text-center outline-none text-[12.5px]"
                           style={{ color: agText, caretColor: agAccent, letterSpacing: "-0.01em" }} />
                       </div>
-                      <div className="px-5 pb-4 flex items-center justify-center gap-3">
-                        <div className="flex flex-wrap items-center justify-center gap-2">
+                      <div className="agent-prompt-actions px-5 pb-4 flex items-center justify-center gap-3">
+                        <div className="agent-prompt-tools flex flex-wrap items-center justify-center gap-2">
                           {[
                             { icon: ic.upload, label: "Upload" },
                             { icon: ic.globe, label: "Research" },
                             { icon: ic.code, label: "Code" },
                             { icon: ic.image, label: "Image" },
                           ].map(btn => (
-                            <button key={btn.label} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9px] font-medium"
+                            <button key={btn.label} className="agent-prompt-tool flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9px] font-medium"
                               style={{ color: agTextMuted, background: dk ? "rgba(255,255,255,0.03)" : "#F4F7FD", border: `1px solid ${agBorderSoft}` }}>
                               <I d={btn.icon} s={11} c={agTextMuted} /> {btn.label}
                             </button>
@@ -10358,7 +10397,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 mb-4">
+                    <div className="agent-section-heading flex items-center gap-3 mb-4">
                       <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: agAccentSoft, border: `1px solid ${agAccent}18` }}>
                         <I d={icFill.files} s={11} c={agAccent} />
                       </div>
@@ -10366,7 +10405,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                       <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${agBorder}, transparent)` }} />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 mb-8 xl:grid-cols-4">
+                    <div className="agent-app-grid grid grid-cols-2 gap-3 mb-8 xl:grid-cols-4">
                       {[
                         { icon: ic.folder, label: "File Manager", desc: "Browse & organize files", color: "#F59E0B", task: "Open the Files application" },
                         { icon: ic.wifi, label: "Network Monitor", desc: "Watch connection status", color: "#0EA5E9", task: "Show me the network and WiFi status" },
@@ -10378,9 +10417,9 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                         { icon: ic.cloud, label: "Cloud Storage Sync", desc: "Backup & sync files", color: "#7C3AED", task: "Show me what you can do with files" },
                       ].map(cap => (
                         <button key={cap.label} onClick={() => send(cap.task)}
-                          className="flex flex-col gap-3 rounded-[1.35rem] p-4 text-left transition-all"
+                          className="agent-app-card flex flex-col gap-3 rounded-[1.35rem] p-4 text-left transition-all"
                           style={{ background: agCardBgSolid, border: `1px solid ${agBorderSoft}`, boxShadow: agCardShadow }}>
-                          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${cap.color}12` }}>
+                          <div className="agent-app-icon w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${cap.color}12` }}>
                             <I d={cap.icon} s={15} c={cap.color} />
                           </div>
                           <div>
@@ -10391,7 +10430,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                       ))}
                     </div>
 
-                    <div className="flex items-center gap-3 mb-4">
+                    <div className="agent-section-heading flex items-center gap-3 mb-4">
                       <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: agAccentSoft, border: `1px solid ${agAccent}18` }}>
                         <I d={ic.sparkle} s={11} c={agAccent} f />
                       </div>
@@ -10399,7 +10438,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                       <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${agBorder}, transparent)` }} />
                     </div>
 
-                    <div className="grid grid-cols-1 gap-3 mb-8 lg:grid-cols-2">
+                    <div className="agent-integration-grid grid grid-cols-1 gap-3 mb-8 lg:grid-cols-2">
                       {[
                         { icon: ic.code, label: "Code / 3D Studio - DevOps", desc: "Build, debug, and deploy", color: "#10B981", task: "Open the code editor" },
                         { icon: ic.terminal, label: "Code Editor (Python)", desc: "Write and run scripts", color: "#3B82F6", task: "Open the terminal" },
@@ -10407,7 +10446,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                         { icon: ic.pen, label: "AI Writer - Compose", desc: "Draft emails & documents", color: "#EC4899", task: "Write a professional email to the team about the project progress" },
                       ].map(cap => (
                         <button key={cap.label} onClick={() => send(cap.task)}
-                          className="flex items-center gap-3 rounded-[1.35rem] p-4 text-left transition-all"
+                          className="agent-integration-card flex items-center gap-3 rounded-[1.35rem] p-4 text-left transition-all"
                           style={{ background: agCardBgSolid, border: `1px solid ${agBorderSoft}`, boxShadow: agCardShadow }}>
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${cap.color}12` }}>
                             <I d={cap.icon} s={15} c={cap.color} />
@@ -10421,7 +10460,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                       ))}
                     </div>
 
-                    <div className="mt-2 flex flex-wrap gap-2">
+                    <div className="agent-quick-actions mt-2 flex flex-wrap gap-2">
                       {[
                         { label: "Open files", task: "Open the Files application" },
                         { label: "Open terminal", task: "Open the terminal" },
@@ -10429,7 +10468,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                         { label: "New document", task: "Create a new Word document with a professional structure" },
                       ].map(qa => (
                         <button key={qa.label} onClick={() => send(qa.task)}
-                          className="px-3 py-1.5 rounded-full text-[9.5px] font-medium transition-all"
+                          className="agent-quick-action px-3 py-1.5 rounded-full text-[9.5px] font-medium transition-all"
                           style={{ background: dk ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.74)", color: agTextSec, border: `1px solid ${agBorderSoft}`, boxShadow: "0 8px 18px rgba(31,43,77,0.04)" }}>
                           {qa.label}
                         </button>
