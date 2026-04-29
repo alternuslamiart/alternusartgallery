@@ -9669,6 +9669,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
   ] as const;
   const [selectedModelId, setSelectedModelId] = useState<1 | 2 | 3>(2);
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
+  const [showStudioLibrary, setShowStudioLibrary] = useState(false);
   const selectedModel = AGENT_MODELS.find(m => m.id === selectedModelId) ?? AGENT_MODELS[1];
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -9896,7 +9897,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
   ];
 
   const studioRail = [
-    { icon: ic.grid, label: "Komponente", active: true },
+    { icon: ic.grid, label: "Components", active: true },
     { icon: ic.code, label: "Code" },
     { icon: ic.sparkle, label: "Agent" },
     { icon: ic.folder, label: "Files" },
@@ -9907,27 +9908,27 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
     {
       title: "Web",
       items: [
-        { icon: ic.menu, label: "Navigator", desc: "Strukture responsive", color: "#0EA5E9", task: "Design a responsive website navigation in Figma and code" },
-        { icon: ic.grid, label: "Butona", desc: "Button set", color: "#8B5CF6", task: "Create a clean button component system" },
-        { icon: ic.fileText, label: "Karta", desc: "Reusable cards", color: "#06B6D4", task: "Create modern website card components" },
-        { icon: ic.pen, label: "Formulare", desc: "Input fields", color: "#3B82F6", task: "Design a clean form component system" },
+        { icon: ic.menu, label: "Navigator", desc: "Responsive structure", color: "#0EA5E9", task: "Design a responsive website navigation in Figma and code" },
+        { icon: ic.grid, label: "Buttons", desc: "Button set", color: "#8B5CF6", task: "Create a clean button component system" },
+        { icon: ic.fileText, label: "Cards", desc: "Reusable cards", color: "#06B6D4", task: "Create modern website card components" },
+        { icon: ic.pen, label: "Forms", desc: "Input fields", color: "#3B82F6", task: "Design a clean form component system" },
       ],
     },
     {
-      title: "Dizajn (Figma)",
+      title: "Design (Figma)",
       items: [
-        { icon: ic.sparkle, label: "Ngjyrat", desc: "Design tokens", color: "#10B981", task: "Create Figma color tokens for this website" },
-        { icon: ic.type, label: "Tipografia", desc: "Font scale", color: "#64748B", task: "Create a Figma typography system" },
-        { icon: ic.layers, label: "Ikonat", desc: "Icon set", color: "#8B5CF6", task: "Create a clean icon system for the website" },
+        { icon: ic.sparkle, label: "Colors", desc: "Design tokens", color: "#10B981", task: "Create Figma color tokens for this website" },
+        { icon: ic.type, label: "Typography", desc: "Font scale", color: "#64748B", task: "Create a Figma typography system" },
+        { icon: ic.layers, label: "Icons", desc: "Icon set", color: "#8B5CF6", task: "Create a clean icon system for the website" },
         { icon: ic.grid, label: "Layouts", desc: "Responsive grids", color: "#4284FF", task: "Create responsive Figma layouts for a SaaS website" },
       ],
     },
     {
       title: "3D (Blender)",
       items: [
-        { icon: ic.layers, label: "Modele Baze", desc: "Hero objects", color: "#F59E0B", task: "Create a Blender 3D hero model for the website" },
-        { icon: ic.moon, label: "Materialis", desc: "Soft materials", color: "#94A3B8", task: "Create Blender materials for a clean website hero scene" },
-        { icon: ic.sun, label: "Ndricim", desc: "Studio lighting", color: "#EAB308", task: "Set up Blender studio lighting for a product visual" },
+        { icon: ic.layers, label: "Base Models", desc: "Hero objects", color: "#F59E0B", task: "Create a Blender 3D hero model for the website" },
+        { icon: ic.moon, label: "Materials", desc: "Soft materials", color: "#94A3B8", task: "Create Blender materials for a clean website hero scene" },
+        { icon: ic.sun, label: "Lighting", desc: "Studio lighting", color: "#EAB308", task: "Set up Blender studio lighting for a product visual" },
         { icon: ic.image, label: "Render", desc: "Web assets", color: "#EC4899", task: "Render Blender assets for the website homepage" },
       ],
     },
@@ -9955,9 +9956,101 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
   ];
 
   return (
-    <div className="flex h-full overflow-hidden" style={{ background: agBg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" }}>
+    <div className="relative flex h-full overflow-hidden" style={{ background: agBg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" }}>
+      <button
+        onClick={() => setShowStudioLibrary(true)}
+        aria-label="Open components"
+        title="Open components"
+        className="absolute left-4 top-4 z-40 flex h-10 w-10 items-center justify-center rounded-2xl transition-all"
+        style={{
+          background: dk ? "#232327" : "rgba(255,255,255,0.74)",
+          border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
+          color: agText,
+          boxShadow: dk ? "none" : "0 12px 30px rgba(31,43,77,0.08)",
+        }}
+      >
+        <I d={ic.grid} s={17} c="currentColor" />
+      </button>
+
+      {showStudioLibrary && (
+        <div
+          className="absolute inset-0 z-50 overflow-y-auto p-4 sm:p-8"
+          style={{
+            background: dk
+              ? "#141416"
+              : "linear-gradient(135deg,#F7FAFF 0%,#FFF7F8 52%,#F8ECFF 100%)",
+            scrollbarWidth: "none",
+          }}
+        >
+          <div
+            className="mx-auto min-h-full max-w-6xl rounded-[2rem] p-5 sm:p-8"
+            style={{
+              background: dk ? "#1F1F23" : "rgba(255,255,255,0.42)",
+              border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
+              boxShadow: dk ? "none" : "0 22px 70px rgba(31,43,77,0.08)",
+            }}
+          >
+            <div className="mb-8 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.22em]" style={{ color: agTextMuted }}>Components</p>
+                <h2 className="mt-2 text-[clamp(2rem,4vw,3.4rem)] font-black tracking-[-0.05em]" style={{ color: agText }}>
+                  Alternus AI Studio
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowStudioLibrary(false)}
+                aria-label="Close components"
+                className="flex h-10 w-10 items-center justify-center rounded-2xl"
+                style={{
+                  background: dk ? "#232327" : "rgba(255,255,255,0.72)",
+                  border: `1px solid ${agBorderSoft}`,
+                  color: agTextMuted,
+                }}
+              >
+                <I d={ic.close} s={15} c="currentColor" />
+              </button>
+            </div>
+
+            <div className="grid gap-8 lg:grid-cols-3">
+              {studioSections.map(section => (
+                <section key={section.title}>
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="text-[14px] font-black tracking-tight" style={{ color: agText }}>{section.title}</h3>
+                    <I d={ic.chevD} s={12} c={agTextMuted} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {section.items.map(item => (
+                      <button
+                        key={item.label}
+                        onClick={() => {
+                          setShowStudioLibrary(false);
+                          send(item.task);
+                        }}
+                        className="min-h-[132px] rounded-2xl p-4 text-left transition-all"
+                        style={{
+                          background: dk ? "#232327" : "rgba(255,255,255,0.66)",
+                          border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
+                          boxShadow: dk ? "none" : "0 12px 26px rgba(31,43,77,0.07)",
+                        }}
+                      >
+                        <span className="mb-5 flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: `${item.color}18`, color: item.color }}>
+                          <I d={item.icon} s={16} c="currentColor" />
+                        </span>
+                        <span className="block text-[13px] font-black leading-tight" style={{ color: agText }}>{item.label}</span>
+                        <span className="mt-1 block text-[10px] leading-4" style={{ color: agTextMuted }}>{item.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── LEFT SIDEBAR — Clean panel · Alternus AI Studio ──────── */}
       <div className="agent-studio-sidebar flex flex-col flex-shrink-0 relative" style={{
+        display: "none",
         width: 324,
         background: dk ? "rgba(20,16,31,0.6)" : "#FFFFFF",
         borderRight: `1px solid ${agBorder}`,
@@ -9987,7 +10080,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
             <div className="flex items-center justify-between px-4 pb-3 pt-5">
               <div>
                 <p className="text-[15px] font-black tracking-tight" style={{ color: agText }}>Alternus AI Studio</p>
-                <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: agTextMuted }}>Komponentet</p>
+                <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: agTextMuted }}>Components</p>
               </div>
               <button className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ border: `1px solid ${agBorderSoft}`, color: agTextMuted }}>
                 <I d={ic.menu} s={13} c="currentColor" />
