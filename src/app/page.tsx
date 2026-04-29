@@ -319,6 +319,7 @@ export default function Home() {
   };
 
   const themeStyle: ThemeVars = {
+    fontFamily: "var(--font-roboto), 'Roboto', ui-sans-serif, system-ui, sans-serif",
     "--landing-bg": isDark ? INK : PAPER,
     "--landing-fg": isDark ? "#FFFFFF" : INK,
     "--landing-muted": isDark ? "rgba(255,255,255,0.68)" : "rgba(15,23,42,0.66)",
@@ -488,7 +489,10 @@ export default function Home() {
                     Supercharge your AI workflows
                   </div>
 
-                  <h1 className="max-w-[10ch] text-[clamp(3rem,6vw,5.1rem)] font-black leading-[0.92] tracking-[-0.06em] text-[#1F2B4D]">
+                  <h1
+                    className="max-w-[10ch] text-[clamp(3rem,6vw,5.1rem)] font-black leading-[0.92] tracking-[-0.06em] text-[#1F2B4D]"
+                    style={{ fontFamily: "var(--font-roboto-flex), var(--font-roboto), ui-sans-serif, system-ui, sans-serif" }}
+                  >
                     The AI-powered creative workspace.
                   </h1>
 
