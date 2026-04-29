@@ -9895,15 +9895,109 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
     },
   ];
 
+  const studioRail = [
+    { icon: ic.grid, label: "Komponente", active: true },
+    { icon: ic.code, label: "Code" },
+    { icon: ic.sparkle, label: "Agent" },
+    { icon: ic.folder, label: "Files" },
+    { icon: ic.settings, label: "Settings" },
+  ];
+
+  const studioSections = [
+    {
+      title: "Web",
+      items: [
+        { icon: ic.menu, label: "Navigator", desc: "Strukture responsive", color: "#0EA5E9", task: "Design a responsive website navigation in Figma and code" },
+        { icon: ic.grid, label: "Butona", desc: "Button set", color: "#8B5CF6", task: "Create a clean button component system" },
+        { icon: ic.fileText, label: "Karta", desc: "Reusable cards", color: "#06B6D4", task: "Create modern website card components" },
+        { icon: ic.pen, label: "Formulare", desc: "Input fields", color: "#3B82F6", task: "Design a clean form component system" },
+      ],
+    },
+    {
+      title: "Dizajn (Figma)",
+      items: [
+        { icon: ic.sparkle, label: "Ngjyrat", desc: "Design tokens", color: "#10B981", task: "Create Figma color tokens for this website" },
+        { icon: ic.type, label: "Tipografia", desc: "Font scale", color: "#64748B", task: "Create a Figma typography system" },
+        { icon: ic.layers, label: "Ikonat", desc: "Icon set", color: "#8B5CF6", task: "Create a clean icon system for the website" },
+        { icon: ic.grid, label: "Layouts", desc: "Responsive grids", color: "#4284FF", task: "Create responsive Figma layouts for a SaaS website" },
+      ],
+    },
+    {
+      title: "3D (Blender)",
+      items: [
+        { icon: ic.layers, label: "Modele Baze", desc: "Hero objects", color: "#F59E0B", task: "Create a Blender 3D hero model for the website" },
+        { icon: ic.moon, label: "Materialis", desc: "Soft materials", color: "#94A3B8", task: "Create Blender materials for a clean website hero scene" },
+        { icon: ic.sun, label: "Ndricim", desc: "Studio lighting", color: "#EAB308", task: "Set up Blender studio lighting for a product visual" },
+        { icon: ic.image, label: "Render", desc: "Web assets", color: "#EC4899", task: "Render Blender assets for the website homepage" },
+      ],
+    },
+  ];
+
   return (
     <div className="flex h-full overflow-hidden" style={{ background: agBg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" }}>
       {/* ── LEFT SIDEBAR — Clean panel · Alternus AI OS ──────── */}
-      <div className="flex flex-col flex-shrink-0 relative" style={{
-        width: 250,
+      <div className="agent-studio-sidebar flex flex-col flex-shrink-0 relative" style={{
+        width: 324,
         background: dk ? "rgba(20,16,31,0.6)" : "#FFFFFF",
         borderRight: `1px solid ${agBorder}`,
         boxShadow: dk ? "none" : "1px 0 0 rgba(5,8,15,0.04)",
+        overflow: "hidden",
       }}>
+        <div className="absolute inset-0 z-10 flex" style={{ background: dk ? "#141416" : "rgba(255,255,255,0.94)" }}>
+          <div className="flex w-[58px] flex-col items-center py-4" style={{ borderRight: `1px solid ${agBorderSoft}`, background: dk ? "#151518" : "rgba(248,251,255,0.82)" }}>
+            <div className="mb-5 text-[22px] font-black tracking-tight" style={{ color: agAccent }}>AI</div>
+            <div className="flex flex-1 flex-col items-center gap-2">
+              {studioRail.map(item => (
+                <button key={item.label} title={item.label} className="flex h-9 w-9 items-center justify-center rounded-xl transition-all"
+                  style={{ background: item.active ? agAccent : "transparent", color: item.active ? "#fff" : agTextMuted }}>
+                  <I d={item.icon} s={15} c="currentColor" />
+                </button>
+              ))}
+            </div>
+            <button className="mb-2 flex h-9 w-9 items-center justify-center rounded-xl" style={{ color: agTextMuted }}>
+              <I d={ic.folder} s={15} c="currentColor" />
+            </button>
+            <button className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: agAccentSoft, color: agAccent }}>
+              <I d={ic.user} s={15} c="currentColor" />
+            </button>
+          </div>
+
+          <div className="flex min-w-0 flex-1 flex-col">
+            <div className="flex items-center justify-between px-4 pb-3 pt-5">
+              <div>
+                <p className="text-[15px] font-black tracking-tight" style={{ color: agText }}>Alternus AI OS</p>
+                <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.18em]" style={{ color: agTextMuted }}>Komponentet</p>
+              </div>
+              <button className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ border: `1px solid ${agBorderSoft}`, color: agTextMuted }}>
+                <I d={ic.menu} s={13} c="currentColor" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-3 pb-4" style={{ scrollbarWidth: "none" }}>
+              {studioSections.map(section => (
+                <details key={section.title} open className="mb-4">
+                  <summary className="mb-2 flex cursor-pointer list-none items-center justify-between text-[11px] font-black tracking-tight" style={{ color: agText }}>
+                    <span>{section.title}</span>
+                    <I d={ic.chevD} s={11} c={agTextMuted} />
+                  </summary>
+                  <div className="grid grid-cols-2 gap-2">
+                    {section.items.map(item => (
+                      <button key={item.label} onClick={() => send(item.task)}
+                        className="min-h-[64px] rounded-xl p-2.5 text-left transition-all"
+                        style={{ background: dk ? "#1F1F23" : "rgba(241,246,255,0.82)", border: `1px solid ${agBorderSoft}` }}>
+                        <div className="mb-2 flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: `${item.color}18`, color: item.color }}>
+                          <I d={item.icon} s={13} c="currentColor" />
+                        </div>
+                        <p className="truncate text-[10px] font-bold" style={{ color: agText }}>{item.label}</p>
+                        <p className="mt-0.5 truncate text-[7.5px]" style={{ color: agTextMuted }}>{item.desc}</p>
+                      </button>
+                    ))}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </div>
         {/* Brand header */}
         <div className="px-4 pt-4 pb-2.5 flex-shrink-0">
           <div className="flex items-center gap-2.5">
@@ -10296,6 +10390,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           <div className="flex flex-col h-full" onClick={() => setShowFormatMenu(false)}>
             <style>{`
               @media (max-width: 768px) {
+                .agent-studio-sidebar { display: none !important; }
                 .agent-home-topbar { padding: 12px 14px !important; gap: 10px !important; }
                 .agent-home-title { font-size: 12px !important; }
                 .agent-home-content { max-width: 100% !important; padding: 20px 14px 28px !important; }
@@ -10323,7 +10418,86 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
             `}</style>
             {msgs.filter(m => m.role === "user").length === 0 && !isThinking ? (
               /* ── DASHBOARD VIEW — Glassmorphism · Alternus AI OS ── */
-              <div className="flex flex-col h-full">
+              <div className="relative flex flex-col h-full">
+                <div className="absolute inset-0 z-20 overflow-hidden" style={{ background: agBg }}>
+                  <div className="flex h-full flex-col">
+                    <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: `1px solid ${agBorderSoft}`, background: dk ? "rgba(20,20,22,0.72)" : "rgba(255,255,255,0.42)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}>
+                      <p className="text-[13px] font-black tracking-tight" style={{ color: agText }}>Alternus AI OS</p>
+                      <div className="flex items-center gap-2">
+                        <button className="rounded-xl px-3 py-2 text-[10px] font-black" style={{ background: `linear-gradient(135deg,${agAccent},#7C3AED)`, color: "#fff" }}>
+                          Komponente
+                        </button>
+                        <button className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ background: dk ? "#1F1F23" : "#fff", border: `1px solid ${agBorderSoft}`, color: agTextMuted }}>
+                          <I d={ic.bell} s={13} c="currentColor" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto px-6 py-8" style={{ scrollbarWidth: "none" }}>
+                      <div className="mx-auto flex min-h-full max-w-[860px] flex-col items-center justify-center py-8">
+                        <div className="relative mb-[-18px] h-[170px] w-full max-w-[520px] overflow-hidden rounded-[1.4rem]" style={{ opacity: 0.9 }}>
+                          <div className="absolute left-[12%] top-5 w-[58%] rounded-2xl p-4" style={{ background: "linear-gradient(135deg,rgba(66,132,255,0.16),rgba(124,58,237,0.20))", border: `1px solid ${agBorderSoft}` }}>
+                            <div className="mb-2 flex justify-end gap-1.5">
+                              <span className="h-1.5 w-1.5 rounded-full" style={{ background: agAccent }} />
+                              <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#7C3AED" }} />
+                            </div>
+                            <div className="h-2 w-3/4 rounded-full" style={{ background: "rgba(31,43,77,0.18)" }} />
+                            <div className="mt-2 h-2 w-1/2 rounded-full" style={{ background: "rgba(66,132,255,0.28)" }} />
+                            <div className="mt-5 grid grid-cols-3 gap-2">
+                              <div className="h-10 rounded-lg" style={{ background: "rgba(66,132,255,0.18)" }} />
+                              <div className="h-10 rounded-lg" style={{ background: "rgba(16,185,129,0.14)" }} />
+                              <div className="h-10 rounded-lg" style={{ background: "rgba(124,58,237,0.14)" }} />
+                            </div>
+                          </div>
+                          <div className="absolute right-[12%] top-9 flex gap-7 rounded-2xl px-10 py-10" style={{ border: `1px solid ${agBorderSoft}`, background: dk ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.50)" }}>
+                            {["M6 6h12v12H6z", "M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z", "M12 2l9 5v10l-9 5-9-5V7l9-5z"].map((d, i) => (
+                              <svg key={i} width="46" height="46" viewBox="0 0 24 24" fill="none" stroke={i === 1 ? agTextSec : agTextMuted} strokeWidth="1.1">
+                                <path d={d} />
+                              </svg>
+                            ))}
+                          </div>
+                        </div>
+
+                        <h1 className="text-center text-[clamp(2rem,4vw,3.4rem)] font-black tracking-[-0.04em]" style={{ color: agText }}>
+                          AI Chat Search
+                        </h1>
+                        <p className="mt-2 max-w-[520px] text-center text-[13px] leading-6" style={{ color: agTextMuted }}>
+                          Pershkruani projektin tuaj ketu: Figma website design, responsive code, ose Blender 3D.
+                        </p>
+
+                        <div className="mt-6 flex w-full max-w-[720px] items-center gap-3 rounded-2xl px-4 py-3"
+                          style={{ background: dk ? "#1F1F23" : "#FFFFFF", border: `2px solid ${agAccent}`, boxShadow: dk ? "none" : "0 0 0 4px rgba(66,132,255,0.08)" }}>
+                          <I d={ic.search} s={18} c={agTextMuted} />
+                          <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+                            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+                            placeholder='P.sh., "Krijo nje faqe interneti moderne per AI Studio".'
+                            className="min-w-0 flex-1 bg-transparent text-[13px] outline-none"
+                            style={{ color: agText, caretColor: agAccent }} />
+                          <button onClick={() => send()} disabled={!input.trim()} className="flex h-9 w-9 items-center justify-center rounded-xl"
+                            style={{ background: input.trim() ? agAccent : agAccentSoft, color: input.trim() ? "#fff" : agAccent }}>
+                            <I d={ic.send} s={14} c="currentColor" />
+                          </button>
+                        </div>
+
+                        <div className="mt-8 grid w-full max-w-[720px] grid-cols-1 gap-3 sm:grid-cols-3">
+                          {[
+                            { title: "Figma UI", desc: "Website frames, tokens, layouts", icon: ic.grid },
+                            { title: "Code Agent", desc: "React sections, clean styling", icon: ic.code },
+                            { title: "Blender 3D", desc: "Hero scenes and web renders", icon: ic.layers },
+                          ].map(card => (
+                            <button key={card.title} onClick={() => send(card.desc)}
+                              className="rounded-2xl p-4 text-left"
+                              style={{ background: dk ? "#1F1F23" : "rgba(255,255,255,0.74)", border: `1px solid ${agBorderSoft}` }}>
+                              <I d={card.icon} s={20} c={agAccent} />
+                              <p className="mt-3 text-[12px] font-black" style={{ color: agText }}>{card.title}</p>
+                              <p className="mt-1 text-[9px] leading-4" style={{ color: agTextMuted }}>{card.desc}</p>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 {/* Top bar */}
                 <div className="agent-home-topbar flex-shrink-0 px-6 py-4 flex items-center gap-4" style={{ borderBottom: `1px solid ${agBorderSoft}`, background: dk ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.48)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)" }}>
                   <p className="agent-home-title text-[12.5px] font-bold tracking-tight" style={{ color: agText }}>Alternus AI OS</p>
