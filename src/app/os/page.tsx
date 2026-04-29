@@ -10324,36 +10324,36 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 {/* Scrollable content */}
                 <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
                   <div style={{ maxWidth: 936, margin: "0 auto", padding: "32px 28px 40px" }}>
-                    <div className="mb-8 overflow-hidden rounded-[1.35rem]" style={{
+                    <div className="mx-auto mb-8 max-w-[640px] overflow-hidden rounded-[1.35rem]" style={{
                       background: agCardBgSolid,
                       border: `1px solid ${agBorderSoft}`,
                       boxShadow: agGlassShadow,
                     }}>
-                      <div className="px-6 pt-6 pb-3">
+                      <div className="px-5 pt-5 pb-2">
                         <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
                           onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-                          placeholder="Ask me to do anything on your OS - email, files, apps, system..."
-                          className="w-full bg-transparent outline-none text-[13px]"
+                          placeholder="Ask Alternus AI..."
+                          className="w-full bg-transparent text-center outline-none text-[12.5px]"
                           style={{ color: agText, caretColor: agAccent, letterSpacing: "-0.01em" }} />
                       </div>
-                      <div className="px-6 pb-5 flex items-center justify-between gap-4">
-                        <div className="flex flex-wrap items-center gap-2">
+                      <div className="px-5 pb-4 flex items-center justify-center gap-3">
+                        <div className="flex flex-wrap items-center justify-center gap-2">
                           {[
                             { icon: ic.upload, label: "Upload" },
                             { icon: ic.globe, label: "Research" },
                             { icon: ic.code, label: "Code" },
                             { icon: ic.image, label: "Image" },
                           ].map(btn => (
-                            <button key={btn.label} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9.5px] font-medium"
+                            <button key={btn.label} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[9px] font-medium"
                               style={{ color: agTextMuted, background: dk ? "rgba(255,255,255,0.03)" : "#F4F7FD", border: `1px solid ${agBorderSoft}` }}>
                               <I d={btn.icon} s={11} c={agTextMuted} /> {btn.label}
                             </button>
                           ))}
                         </div>
                         <button onClick={() => send()} disabled={!input.trim()}
-                          className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                           style={{ background: input.trim() ? agAccent : (dk ? "rgba(255,255,255,0.06)" : "#EEF3FB"), boxShadow: input.trim() ? "0 10px 22px rgba(66,132,255,0.2)" : "none" }}>
-                          <I d={ic.send} s={14} c={input.trim() ? "#fff" : agTextMuted} />
+                          <I d={ic.send} s={13} c={input.trim() ? "#fff" : agTextMuted} />
                         </button>
                       </div>
                     </div>
