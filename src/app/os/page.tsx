@@ -9971,51 +9971,52 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
             );
           })}
 
-          {/* ── App Settings ── */}
-          <p className="text-[7px] font-bold uppercase tracking-[0.18em] px-3 pt-3 pb-0.5" style={{ color: agTextMuted }}>App Settings</p>
-          <p className="text-[8px] px-3 pb-1.5" style={{ color: agTextMuted, opacity: 0.65 }}>Window mode · Font style</p>
+          <p className="text-[7px] font-bold uppercase tracking-[0.18em] px-3 pt-3 pb-1.5" style={{ color: agTextMuted }}>Menus</p>
           {[
-            { icon: ic.sun,     label: "Appearance",           task: "Switch between dark and light mode" },
-            { icon: ic.grid,    label: "Panel Integration",    task: "Show me open panels and integrations" },
-            { icon: ic.monitor, label: "Display & Brightness", task: "Change the wallpaper to OSwp 2" },
-          ].map(item => (
-            <button key={item.label} onClick={() => send(item.task)}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-left mb-0.5 transition-all"
-              >
-              <I d={item.icon} s={13} c={agTextMuted} />
-              <span className="text-[10.5px] font-medium flex-1 truncate" style={{ color: agTextSec }}>{item.label}</span>
-            </button>
-          ))}
-
-          {/* ── System ── */}
-          <p className="text-[7px] font-bold uppercase tracking-[0.18em] px-3 pt-3 pb-1.5" style={{ color: agTextMuted }}>System</p>
-          {[
-            { icon: ic.user, label: "Accessibility",      task: "Show me accessibility options" },
-            { icon: ic.wifi, label: "Network & Internet", task: "Show me the network and WiFi status" },
-            { icon: ic.cpu,  label: "Control Center",     task: "What applications can you open?" },
-            { icon: ic.lock, label: "Privacy & Security", task: "Check device security status" },
-          ].map(item => (
-            <button key={item.label} onClick={() => send(item.task)}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-left mb-0.5 transition-all"
-              >
-              <I d={item.icon} s={13} c={agTextMuted} />
-              <span className="text-[10.5px] font-medium flex-1 truncate" style={{ color: agTextSec }}>{item.label}</span>
-            </button>
-          ))}
-
-          {/* ── Services ── */}
-          <p className="text-[7px] font-bold uppercase tracking-[0.18em] px-3 pt-3 pb-1.5" style={{ color: agTextMuted }}>Services</p>
-          {[
-            { icon: ic.code,      label: "Code / 3D Studio",       task: "Open the code editor" },
-            { icon: ic.briefcase, label: "Delivery · Payment",     task: "Open the business dashboard" },
-            { icon: ic.users,     label: "Social Interactions",    task: "Draft a professional email to the team" },
-          ].map(item => (
-            <button key={item.label} onClick={() => send(item.task)}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-left mb-0.5 transition-all"
-              >
-              <I d={item.icon} s={13} c={agTextMuted} />
-              <span className="text-[10.5px] font-medium flex-1 truncate" style={{ color: agTextSec }}>{item.label}</span>
-            </button>
+            {
+              title: "Settings",
+              icon: ic.settings,
+              items: [
+                { icon: ic.sun, label: "Appearance", task: "Switch between dark and light mode" },
+                { icon: ic.grid, label: "Panel Integration", task: "Show me open panels and integrations" },
+                { icon: ic.monitor, label: "Display & Brightness", task: "Change the wallpaper to OSwp 2" },
+              ],
+            },
+            {
+              title: "System",
+              icon: ic.cpu,
+              items: [
+                { icon: ic.user, label: "Accessibility", task: "Show me accessibility options" },
+                { icon: ic.wifi, label: "Network & Internet", task: "Show me the network and WiFi status" },
+                { icon: ic.lock, label: "Privacy & Security", task: "Check device security status" },
+              ],
+            },
+            {
+              title: "Services",
+              icon: ic.briefcase,
+              items: [
+                { icon: ic.code, label: "Code / 3D Studio", task: "Open the code editor" },
+                { icon: ic.briefcase, label: "Delivery / Payment", task: "Open the business dashboard" },
+                { icon: ic.users, label: "Social Interactions", task: "Draft a professional email to the team" },
+              ],
+            },
+          ].map(group => (
+            <details key={group.title} className="mb-1">
+              <summary className="flex cursor-pointer list-none items-center gap-2.5 rounded-xl px-3 py-2 text-left transition-all" style={{ color: agTextSec }}>
+                <I d={group.icon} s={13} c={agTextMuted} />
+                <span className="flex-1 text-[10.5px] font-semibold">{group.title}</span>
+                <I d={ic.chevR} s={10} c={agTextMuted} />
+              </summary>
+              <div className="mt-1 space-y-0.5 pl-5">
+                {group.items.map(item => (
+                  <button key={item.label} onClick={() => send(item.task)}
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left transition-all">
+                    <I d={item.icon} s={11} c={agTextMuted} />
+                    <span className="flex-1 truncate text-[10px] font-medium" style={{ color: agTextMuted }}>{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </details>
           ))}
 
           {msgs.filter(m => m.role === "user").length > 0 && (
@@ -10297,6 +10298,19 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                       className="flex-1 bg-transparent outline-none text-[10.5px]"
                       style={{ color: agText, letterSpacing: "-0.01em" }} />
                   </div>
+                  <div className="hidden items-center gap-1.5 xl:flex">
+                    {["Overview", "Apps", "Integrations", "More"].map((item, index) => (
+                      <button key={item}
+                        className="rounded-full px-3 py-1.5 text-[10px] font-semibold"
+                        style={{
+                          background: index === 0 ? agAccentSoft : "transparent",
+                          color: index === 0 ? agAccent : agTextMuted,
+                          border: `1px solid ${index === 0 ? agAccent + "20" : "transparent"}`,
+                        }}>
+                        {item}
+                      </button>
+                    ))}
+                  </div>
                   <div className="flex-1" />
                   <button className="w-8 h-8 rounded-xl flex items-center justify-center"
                     style={{
@@ -10407,34 +10421,10 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                       ))}
                     </div>
 
-                    <div className="grid grid-cols-[1fr_auto] gap-3 mb-7">
-                      <div className="flex items-center gap-2 px-4 py-3 rounded-[1.35rem]" style={{ background: agCardBgSolid, border: `1px solid ${agBorderSoft}`, boxShadow: agCardShadow }}>
-                        <I d={ic.search} s={12} c={agTextMuted} />
-                        <input placeholder="Apps name" className="flex-1 bg-transparent outline-none text-[10.5px]" style={{ color: agText, letterSpacing: "-0.01em" }} />
-                        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: agAccentSoft }}>
-                          <I d={ic.grid} s={12} c={agAccent} />
-                        </div>
-                      </div>
-                      <button className="flex items-center gap-2.5 px-4 py-3 rounded-[1.35rem]" style={{ background: agCardBgSolid, border: `1px solid ${agBorderSoft}`, boxShadow: agCardShadow }}>
-                        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: agAccentSoft }}>
-                          <span className="text-[11px] font-bold" style={{ color: agAccent }}>?</span>
-                        </div>
-                        <div className="text-left">
-                          <p className="text-[10px] font-semibold leading-tight" style={{ color: agText, letterSpacing: "-0.01em" }}>AI Help</p>
-                          <p className="text-[8px] leading-tight" style={{ color: agTextMuted }}>& Info</p>
-                        </div>
-                      </button>
-                    </div>
-
-                    <p className="text-[7.5px] font-bold uppercase tracking-[0.18em] mb-3" style={{ color: agTextMuted }}>Quick actions</p>
-                    <div className="flex flex-wrap gap-2 mb-6">
+                    <div className="mt-2 flex flex-wrap gap-2">
                       {[
-                        { label: "Dark mode", task: "Switch to dark mode" },
-                        { label: "Light mode", task: "Switch to light mode" },
-                        { label: "Change wallpaper", task: "Change the wallpaper to OSwp 2" },
-                        { label: "Open dashboard", task: "Open the business dashboard" },
-                        { label: "Open terminal", task: "Open the terminal" },
                         { label: "Open files", task: "Open the Files application" },
+                        { label: "Open terminal", task: "Open the terminal" },
                         { label: "Draft email", task: "Write a professional email to the team about the project progress" },
                         { label: "New document", task: "Create a new Word document with a professional structure" },
                       ].map(qa => (
