@@ -10020,19 +10020,19 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     {section.items.map(item => (
-                      <button
-                        key={item.label}
-                        onClick={() => {
-                          setShowStudioLibrary(false);
-                          send(item.task);
-                        }}
-                        className="min-h-[132px] rounded-2xl p-4 text-left transition-all"
-                        style={{
-                          background: dk ? "#232327" : "rgba(255,255,255,0.66)",
-                          border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
-                          boxShadow: dk ? "none" : "0 12px 26px rgba(31,43,77,0.07)",
-                        }}
-                      >
+                          <button
+                            key={item.label}
+                            onClick={() => {
+                              setShowStudioLibrary(false);
+                              send(item.task);
+                            }}
+                            className="studio-glass-card min-h-[132px] rounded-2xl p-4 text-left transition-all"
+                            style={{
+                              background: dk ? "#232327" : "rgba(255,255,255,0.66)",
+                              border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
+                              boxShadow: dk ? "none" : "0 12px 26px rgba(66,132,255,0.08)",
+                            }}
+                          >
                         <span className="mb-5 flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: `${item.color}18`, color: item.color }}>
                           <I d={item.icon} s={16} c="currentColor" />
                         </span>
@@ -10536,6 +10536,39 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 .agent-prompt-tool { flex: 1 1 calc(50% - 6px) !important; justify-content: center !important; }
                 .studio-home-title { font-size: 24px !important; }
               }
+              .studio-glow-bg {
+                position: absolute;
+                inset: 0;
+                background:
+                  radial-gradient(900px 520px at 14% 12%, rgba(66,132,255,0.26), transparent 58%),
+                  radial-gradient(700px 380px at 84% 18%, rgba(124,58,237,0.10), transparent 62%),
+                  radial-gradient(560px 340px at 50% 100%, rgba(66,132,255,0.12), transparent 65%);
+                pointer-events: none;
+              }
+              .studio-gloss-panel {
+                position: relative;
+                overflow: hidden;
+              }
+              .studio-gloss-panel::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background:
+                  linear-gradient(135deg, rgba(255,255,255,0.32), transparent 26%),
+                  linear-gradient(180deg, rgba(255,255,255,0.18), transparent 34%);
+                pointer-events: none;
+              }
+              .studio-glass-card {
+                position: relative;
+                overflow: hidden;
+              }
+              .studio-glass-card::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, rgba(255,255,255,0.22), transparent 28%);
+                pointer-events: none;
+              }
             `}</style>
             {msgs.filter(m => m.role === "user").length === 0 && !isThinking ? (
               /* ── DASHBOARD VIEW — Alternus AI Studio ── */
@@ -10545,15 +10578,16 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                   style={{
                     background: dk
                       ? "#141416"
-                      : "linear-gradient(135deg,#F7FAFF 0%,#FFF7F8 52%,#F8ECFF 100%)",
+                      : "linear-gradient(135deg,#F7FAFF 0%,#FFFFFF 44%,#EEF5FF 100%)",
                   }}
                 >
+                  <div className="studio-glow-bg" />
                   <div
-                    className="studio-home-content relative flex h-full min-h-[620px] flex-col overflow-hidden rounded-[2rem]"
+                    className="studio-home-content studio-gloss-panel relative flex h-full min-h-[620px] flex-col overflow-hidden rounded-[2rem]"
                     style={{
-                      background: dk ? "#1F1F23" : "rgba(255,255,255,0.28)",
+                      background: dk ? "#1F1F23" : "rgba(255,255,255,0.34)",
                       border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
-                      boxShadow: dk ? "none" : "0 22px 70px rgba(31,43,77,0.08)",
+                      boxShadow: dk ? "none" : "0 24px 72px rgba(66,132,255,0.12)",
                     }}
                   >
                     <div className="flex items-center justify-between px-5 py-4">
@@ -10588,7 +10622,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
                     <div className="flex flex-1 flex-col items-center px-6 pb-5 pt-8 text-center">
                       <div
-                        className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl"
+                        className="studio-glass-card mb-5 flex h-14 w-14 items-center justify-center rounded-2xl"
                         style={{
                           background: dk ? "#343438" : "#3F3F42",
                           color: "#fff",
@@ -10612,11 +10646,11 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                           <button
                             key={card.title}
                             onClick={() => send(card.task)}
-                            className="min-h-[126px] rounded-2xl p-4 text-left transition-all"
+                            className="studio-glass-card min-h-[126px] rounded-2xl p-4 text-left transition-all"
                             style={{
                               background: dk ? "#232327" : "rgba(255,255,255,0.62)",
                               border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
-                              boxShadow: dk ? "none" : "0 12px 26px rgba(31,43,77,0.07)",
+                              boxShadow: dk ? "none" : "0 12px 26px rgba(66,132,255,0.08)",
                             }}
                           >
                             <span
@@ -10640,9 +10674,9 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
                       <div className="studio-home-search mt-8 flex w-full max-w-[460px] items-center gap-2 rounded-full px-2 py-2"
                         style={{
-                          background: dk ? "#232327" : "rgba(255,255,255,0.72)",
+                          background: dk ? "#232327" : "rgba(255,255,255,0.78)",
                           border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
-                          boxShadow: dk ? "none" : "0 12px 30px rgba(31,43,77,0.08)",
+                          boxShadow: dk ? "none" : "0 12px 30px rgba(66,132,255,0.10)",
                         }}>
                         <button className="flex h-8 w-8 items-center justify-center rounded-full" style={{ color: agTextMuted }}>
                           <I d={ic.paperclip} s={13} c="currentColor" />
