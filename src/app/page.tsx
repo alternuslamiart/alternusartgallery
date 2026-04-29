@@ -599,12 +599,6 @@ export default function Home() {
                 </div>
 
                 <div className="relative mx-auto w-full max-w-[36rem] lg:mx-0">
-                  <div className="landing-hero-bubble absolute left-[9%] top-[10%] z-20 max-w-[17rem] rounded-[1.2rem] border border-white/65 bg-white/90 px-4 py-3 shadow-[0_24px_44px_rgba(42,103,255,0.14)] backdrop-blur-sm">
-                    <div className="landing-hero-bubble-copy text-[13px] leading-6 text-[#476089]">
-                      Hey, I need help sending out a campaign to all new subscribers. Can you set that up?
-                    </div>
-                  </div>
-
                   <div className="landing-hero-bubble absolute left-[14%] top-[29%] z-20 max-w-[18rem] rounded-[1.2rem] border border-white/65 bg-white/92 px-4 py-3 shadow-[0_24px_44px_rgba(42,103,255,0.14)] backdrop-blur-sm">
                     <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
                       {capabilities[activeCap].t}
