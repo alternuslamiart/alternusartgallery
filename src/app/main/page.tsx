@@ -9957,43 +9957,73 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
   return (
     <div className="relative flex h-full overflow-hidden" style={{ background: agBg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif" }}>
-      <button
-        onClick={() => setShowStudioLibrary(true)}
-        aria-label="Open components"
-        title="Open components"
-        className="absolute left-4 top-4 z-40 flex h-10 w-10 items-center justify-center rounded-2xl transition-all"
-        style={{
-          background: dk ? "#232327" : "#3F3F42",
-          border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.55)"}`,
-          color: "#fff",
-          boxShadow: dk ? "none" : "0 16px 38px rgba(66,132,255,0.16)",
-        }}
-      >
-        <I d={ic.grid} s={17} c="currentColor" />
-      </button>
+      <div className="absolute left-4 top-4 z-[60] flex items-center gap-3">
+        <button
+          onClick={() => setShowStudioLibrary(open => !open)}
+          aria-label={showStudioLibrary ? "Close sidebar" : "Open sidebar"}
+          title={showStudioLibrary ? "Close sidebar" : "Open sidebar"}
+          className="flex h-10 w-10 items-center justify-center rounded-2xl transition-all"
+          style={{
+            background: dk ? "#232327" : "#3F3F42",
+            border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.55)"}`,
+            color: "#fff",
+            boxShadow: dk ? "none" : "0 16px 38px rgba(66,132,255,0.16)",
+          }}
+        >
+          <I d={showStudioLibrary ? ic.close : ic.menu} s={17} c="currentColor" />
+        </button>
+        <button
+          onClick={() => send("Open Alternus AI Studio")}
+          className="hidden items-center gap-2 rounded-full pr-3 text-[12px] font-black tracking-tight sm:flex"
+          style={{ color: agTextMuted }}
+        >
+          <span
+            className="flex h-8 w-8 items-center justify-center rounded-xl"
+            style={{
+              background: dk ? "#343438" : "rgba(63,63,66,0.72)",
+              color: "#fff",
+              border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.48)"}`,
+            }}
+          >
+            <I d={ic.sparkle} s={13} c="currentColor" f />
+          </span>
+          Alternus AI Studio
+        </button>
+      </div>
 
       {showStudioLibrary && (
         <div
-          className="absolute inset-0 z-50 overflow-y-auto p-4 sm:p-8"
+          className="absolute inset-0 z-50 pointer-events-none"
           style={{
-            background: dk
-              ? "#141416"
-              : "linear-gradient(135deg,#F2F8FF 0%,#FFFFFF 46%,#E6F1FF 100%)",
-            scrollbarWidth: "none",
+            background: dk ? "rgba(20,20,22,0.38)" : "rgba(239,247,255,0.32)",
           }}
         >
+          <button
+            aria-label="Close sidebar backdrop"
+            onClick={() => setShowStudioLibrary(false)}
+            className="absolute inset-0 pointer-events-auto"
+            style={{ background: "transparent" }}
+          />
           <div
-            className="mx-auto min-h-full max-w-6xl rounded-[2rem] p-5 sm:p-8"
+            className="pointer-events-auto relative h-full w-[min(376px,calc(100vw-18px))] overflow-y-auto p-3 sm:p-4"
             style={{
-              background: dk ? "#1F1F23" : "rgba(255,255,255,0.42)",
-              border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
-              boxShadow: dk ? "none" : "0 22px 70px rgba(31,43,77,0.08)",
+              background: dk ? "#141416" : "rgba(247,251,255,0.92)",
+              borderRight: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
+              boxShadow: dk ? "none" : "18px 0 58px rgba(66,132,255,0.16)",
+              scrollbarWidth: "none",
             }}
           >
+            <div
+              className="min-h-full rounded-[1.6rem] p-5"
+              style={{
+                background: dk ? "#1F1F23" : "rgba(255,255,255,0.66)",
+                border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
+              }}
+            >
             <div className="mb-8 flex items-center justify-between gap-4">
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.22em]" style={{ color: agTextMuted }}>Components</p>
-                <h2 className="mt-2 text-[clamp(2rem,4vw,3.4rem)] font-black tracking-[-0.05em]" style={{ color: agText }}>
+                <h2 className="mt-2 text-[clamp(1.8rem,8vw,2.6rem)] font-black tracking-[-0.05em]" style={{ color: agText }}>
                   Alternus AI Studio
                 </h2>
               </div>
@@ -10011,7 +10041,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               </button>
             </div>
 
-            <div className="grid gap-8 lg:grid-cols-3">
+            <div className="grid gap-6">
               {studioSections.map(section => (
                 <section key={section.title}>
                   <div className="mb-3 flex items-center justify-between">
@@ -10043,6 +10073,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                   </div>
                 </section>
               ))}
+            </div>
             </div>
           </div>
         </div>
