@@ -9936,13 +9936,13 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
   const studioSuggestions = [
     {
-      icon: ic.send,
+      icon: ic.grid,
       title: "Figma Website",
       desc: "Clean homepage frame",
       task: "Design a clean website homepage in Figma with responsive frames",
     },
     {
-      icon: ic.sparkle,
+      icon: ic.code,
       title: "Code Section",
       desc: "React + Tailwind",
       task: "Code this Figma section as a responsive website component",
@@ -9963,10 +9963,10 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
         title="Open components"
         className="absolute left-4 top-4 z-40 flex h-10 w-10 items-center justify-center rounded-2xl transition-all"
         style={{
-          background: dk ? "#232327" : "rgba(255,255,255,0.74)",
-          border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
-          color: agText,
-          boxShadow: dk ? "none" : "0 12px 30px rgba(31,43,77,0.08)",
+          background: dk ? "#232327" : "#3F3F42",
+          border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.55)"}`,
+          color: "#fff",
+          boxShadow: dk ? "none" : "0 16px 38px rgba(66,132,255,0.16)",
         }}
       >
         <I d={ic.grid} s={17} c="currentColor" />
@@ -9978,7 +9978,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           style={{
             background: dk
               ? "#141416"
-              : "linear-gradient(135deg,#F7FAFF 0%,#FFF7F8 52%,#F8ECFF 100%)",
+              : "linear-gradient(135deg,#F2F8FF 0%,#FFFFFF 46%,#E6F1FF 100%)",
             scrollbarWidth: "none",
           }}
         >
@@ -10521,8 +10521,8 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 .agent-integration-card { padding: 13px !important; border-radius: 18px !important; }
                 .agent-quick-actions { justify-content: center !important; gap: 7px !important; margin-top: 0 !important; }
                 .agent-quick-action { padding: 7px 11px !important; font-size: 9px !important; }
-                .studio-home-shell { padding: 16px !important; }
-                .studio-home-content { min-height: 100% !important; padding: 54px 18px 18px !important; border-radius: 24px !important; }
+                .studio-home-shell { padding: 0 !important; }
+                .studio-home-content { min-height: 100% !important; padding: 54px 18px 18px !important; border-radius: 0 !important; }
                 .studio-home-title { font-size: 28px !important; line-height: 1.08 !important; }
                 .studio-home-copy { max-width: 300px !important; }
                 .studio-home-cards { grid-template-columns: 1fr !important; max-width: 320px !important; margin-top: 48px !important; }
@@ -10540,9 +10540,9 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 position: absolute;
                 inset: 0;
                 background:
-                  radial-gradient(900px 520px at 14% 12%, rgba(66,132,255,0.26), transparent 58%),
-                  radial-gradient(700px 380px at 84% 18%, rgba(124,58,237,0.10), transparent 62%),
-                  radial-gradient(560px 340px at 50% 100%, rgba(66,132,255,0.12), transparent 65%);
+                  radial-gradient(880px 520px at 14% 10%, rgba(66,132,255,0.20), transparent 58%),
+                  radial-gradient(720px 420px at 86% 16%, rgba(86,154,255,0.18), transparent 62%),
+                  radial-gradient(620px 360px at 50% 100%, rgba(66,132,255,0.16), transparent 66%);
                 pointer-events: none;
               }
               .studio-gloss-panel {
@@ -10578,16 +10578,16 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                   style={{
                     background: dk
                       ? "#141416"
-                      : "linear-gradient(135deg,#F7FAFF 0%,#FFFFFF 44%,#EEF5FF 100%)",
+                      : "linear-gradient(135deg,#F1F7FF 0%,#FFFFFF 42%,#E2F0FF 100%)",
                   }}
                 >
                   <div className="studio-glow-bg" />
                   <div
-                    className="studio-home-content studio-gloss-panel relative flex h-full min-h-[620px] flex-col overflow-hidden rounded-[2rem]"
+                    className="studio-home-content studio-gloss-panel relative flex h-full min-h-full flex-col overflow-hidden rounded-none"
                     style={{
-                      background: dk ? "#1F1F23" : "rgba(255,255,255,0.34)",
-                      border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
-                      boxShadow: dk ? "none" : "0 24px 72px rgba(66,132,255,0.12)",
+                      background: dk ? "#1F1F23" : "transparent",
+                      border: dk ? "1px solid rgba(255,255,255,0.12)" : "0",
+                      boxShadow: "none",
                     }}
                   >
                     <div className="flex items-center justify-between px-5 py-4">
@@ -10601,7 +10601,8 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                           style={{
                             background: dk ? "#343438" : "#3F3F42",
                             color: "#fff",
-                            border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
+                            border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.55)"}`,
+                            boxShadow: dk ? "none" : "0 16px 38px rgba(66,132,255,0.15)",
                           }}
                         >
                           <I d={ic.sparkle} s={14} c="currentColor" f />
@@ -10626,7 +10627,8 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                         style={{
                           background: dk ? "#343438" : "#3F3F42",
                           color: "#fff",
-                          border: `1px solid ${dk ? "rgba(255,255,255,0.14)" : "rgba(31,43,77,0.08)"}`,
+                          border: `1px solid ${dk ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.55)"}`,
+                          boxShadow: dk ? "none" : "0 18px 44px rgba(66,132,255,0.16)",
                         }}
                       >
                         <I d={ic.sparkle} s={22} c="currentColor" f />
@@ -10648,9 +10650,9 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                             onClick={() => send(card.task)}
                             className="studio-glass-card min-h-[126px] rounded-2xl p-4 text-left transition-all"
                             style={{
-                              background: dk ? "#232327" : "rgba(255,255,255,0.62)",
+                              background: dk ? "#232327" : "rgba(255,255,255,0.68)",
                               border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
-                              boxShadow: dk ? "none" : "0 12px 26px rgba(66,132,255,0.08)",
+                              boxShadow: dk ? "none" : "0 18px 42px rgba(66,132,255,0.10)",
                             }}
                           >
                             <span
@@ -10673,10 +10675,10 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                       </div>
 
                       <div className="studio-home-search mt-8 flex w-full max-w-[460px] items-center gap-2 rounded-full px-2 py-2"
-                        style={{
-                          background: dk ? "#232327" : "rgba(255,255,255,0.78)",
+                          style={{
+                          background: dk ? "#232327" : "rgba(255,255,255,0.82)",
                           border: `1px solid ${dk ? "rgba(255,255,255,0.12)" : "rgba(31,43,77,0.08)"}`,
-                          boxShadow: dk ? "none" : "0 12px 30px rgba(66,132,255,0.10)",
+                          boxShadow: dk ? "none" : "0 18px 48px rgba(66,132,255,0.14)",
                         }}>
                         <button className="flex h-8 w-8 items-center justify-center rounded-full" style={{ color: agTextMuted }}>
                           <I d={ic.paperclip} s={13} c="currentColor" />
@@ -10695,7 +10697,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                           disabled={!input.trim()}
                           className="flex h-8 items-center gap-1.5 rounded-full px-3 text-[11px] font-bold"
                           style={{
-                            background: input.trim() ? agAccent : dk ? "#343438" : "#F09B83",
+                            background: input.trim() ? agAccent : dk ? "#343438" : "#8DB5FF",
                             color: "#fff",
                           }}
                         >
