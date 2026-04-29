@@ -402,14 +402,24 @@ function Usage({ t }: { t: Tokens }) {
       {/* Stat triplet */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, maxWidth: 820, marginBottom: 20 }}>
         {[
-          { v: "3,482", l: "Agent runs",    pct: 34, max: "of unlimited" },
-          { v: "42.8 GB", l: "Knowledge",   pct: 43, max: "of 100 GB" },
-          { v: "12.4 h", l: "Voice minutes", pct: 21, max: "of 60 h" },
+          { v: "3,482", l: "Agent runs", pct: 34, max: "of unlimited", consumed: "Unlimited", remaining: "No cap" },
+          { v: "42.8 GB", l: "Knowledge", pct: 43, max: "of 100 GB", consumed: "42.8%", remaining: "57.2 GB left" },
+          { v: "12.4 h", l: "Voice minutes", pct: 21, max: "of 60 h", consumed: "20.7%", remaining: "47.6 h left" },
         ].map((s) => (
           <div key={s.l} style={{ ...t.baseCard, padding: "20px 22px" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: t.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>{s.l}</div>
             <div style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-0.035em", fontStretch: "88%", color: t.fg }}>{s.v}</div>
             <div style={{ fontSize: 11, color: t.muted, marginTop: 4 }}>{s.max}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 14 }}>
+              <div>
+                <div style={{ fontSize: 9, fontWeight: 800, color: t.muted, letterSpacing: "0.12em", textTransform: "uppercase" }}>Consumed</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: COBALT, marginTop: 3 }}>{s.consumed}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 9, fontWeight: 800, color: t.muted, letterSpacing: "0.12em", textTransform: "uppercase" }}>Remaining</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: t.fg, marginTop: 3 }}>{s.remaining}</div>
+              </div>
+            </div>
             <div style={{ marginTop: 14, height: 4, background: t.softFill, borderRadius: 2, overflow: "hidden" }}>
               <div style={{ width: `${s.pct}%`, height: "100%", background: COBALT, borderRadius: 2 }} />
             </div>
@@ -453,7 +463,7 @@ function Limits({ t }: { t: Tokens }) {
           { l: "Agent runs per day",   v: "∞",     max: "unlimited on Pro" },
           { l: "Knowledge upload",     v: "100 MB", max: "per file" },
           { l: "Voice minutes per day", v: "120",   max: "of 60h / month" },
-        ].map((r, i, a) => (
+        ].map((r, i) => (
           <div key={r.l} style={{ display: "grid", gridTemplateColumns: "1fr 140px 140px", gap: 16, padding: "18px 0", borderTop: i > 0 ? `1px solid ${t.faintBorder}` : "none", alignItems: "center" }}>
             <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: "-0.01em" }}>{r.l}</div>
             <div style={{ fontSize: 18, fontWeight: 900, color: COBALT, letterSpacing: "-0.02em", fontStretch: "88%" }}>{r.v}</div>
