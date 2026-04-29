@@ -10889,7 +10889,15 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
               /* ── CHAT VIEW (has messages) ── */
               <>
                 {/* Header */}
-                <div className="flex items-center gap-3 px-5 py-3 flex-shrink-0 relative" style={{ borderBottom: `1px solid ${agBorder}`, background: dk ? c.surface : "#FAFAFA" }}>
+                <div
+                  className="flex items-center gap-3 px-5 py-3 flex-shrink-0 relative"
+                  style={{
+                    borderBottom: `1px solid ${agBorderSoft}`,
+                    background: dk ? "#18181B" : "rgba(255,255,255,0.72)",
+                    backdropFilter: "blur(18px)",
+                    WebkitBackdropFilter: "blur(18px)",
+                  }}
+                >
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
                     style={{ background: `linear-gradient(135deg,${selectedModel.grad[0]},${selectedModel.grad[1]})`, boxShadow: `0 2px 8px ${selectedModel.grad[0]}45` }}>
                     <I d={ic.sparkle} s={13} c="#fff" f />
@@ -10979,24 +10987,31 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto flex flex-col gap-3 px-5 py-5" style={{ scrollbarWidth: "none" }}>
-                  <div className="flex-1" />
+                <div className="flex-1 overflow-y-auto px-6 py-8" style={{ scrollbarWidth: "none" }}>
+                  <div className="mx-auto flex min-h-full w-full max-w-[920px] flex-col justify-center gap-4">
                   {msgs.map(m => (
                     <div key={m.id}>
                       {m.id === "welcome" ? (
                         /* ── Welcome card ── */
-                        <div className="flex flex-col items-center text-center py-4 px-2">
-                          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3"
-                            style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 6px 24px rgba(66,132,255,0.28)" }}>
+                        <div
+                          className="mx-auto flex w-full max-w-[620px] flex-col items-center rounded-[1.75rem] px-8 py-7 text-center"
+                          style={{
+                            background: dk ? "rgba(31,31,35,0.72)" : "rgba(255,255,255,0.62)",
+                            border: `1px solid ${agBorderSoft}`,
+                            boxShadow: dk ? "none" : "0 18px 56px rgba(66,132,255,0.10)",
+                          }}
+                        >
+                          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
+                            style={{ background: "linear-gradient(135deg,#7C3AED,#4F8EF7)", boxShadow: "0 10px 28px rgba(66,132,255,0.24)" }}>
                             <I d={ic.sparkle} s={22} c="#fff" f />
                           </div>
-                          <p className="text-[16px] font-bold mb-1" style={{ color: agText }}>
+                          <p className="text-[24px] font-black tracking-[-0.04em] mb-1" style={{ color: agText }}>
                             Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}
                           </p>
-                          <p className="text-[10.5px] mb-5" style={{ color: agTextMuted }}>
-                            I&apos;m your intelligent OS assistant - ready to act on your system
+                          <p className="max-w-[380px] text-[11px] leading-5 mb-6" style={{ color: agTextMuted }}>
+                            I&apos;m your intelligent studio agent for Figma website design, responsive code, and Blender 3D work.
                           </p>
-                          <div className="grid grid-cols-3 gap-2 w-full" style={{ maxWidth: 420 }}>
+                          <div className="grid w-full grid-cols-3 gap-2.5" style={{ maxWidth: 500 }}>
                             {[
                               { icon: ic.mail,     label: "Draft Email",   color: "#F97316", bg: "#FFF4ED", task: "Draft a professional email to the team" },
                               { icon: ic.fileText, label: "New Document",  color: "#3B82F6", bg: "#EFF6FF", task: "Create a new Word document" },
@@ -11006,7 +11021,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                               { icon: ic.cpu,      label: "System Info",  color: "#8B5CF6", bg: "#F5F3FF", task: "Show me the current system status" },
                             ].map(cap => (
                               <button key={cap.label} onClick={() => send(cap.task)}
-                                className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-left transition-all"
+                                className="flex items-center gap-2.5 rounded-2xl px-3 py-3 text-left transition-all"
                                 style={{ background: dk ? c.card : cap.bg, border: `1px solid ${agBorder}` }}
                                 onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 4px 14px ${cap.color}22`; e.currentTarget.style.borderColor = cap.color + "40"; e.currentTarget.style.transform = "translateY(-1px)"; }}
                                 onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = agBorder; e.currentTarget.style.transform = "translateY(0)"; }}>
@@ -11014,7 +11029,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                                   style={{ background: dk ? c.cardAlt : "#fff", boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
                                   <I d={cap.icon} s={12} c={cap.color} />
                                 </div>
-                                <span className="text-[9.5px] font-semibold leading-snug" style={{ color: agText }}>{cap.label}</span>
+                                <span className="text-[10px] font-bold leading-snug" style={{ color: agText }}>{cap.label}</span>
                               </button>
                             ))}
                           </div>
@@ -11093,11 +11108,20 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                     </div>
                   )}
                   <div ref={endRef} />
+                  </div>
                 </div>
 
                 {/* Quick actions */}
-                <div className="flex-shrink-0 px-4 py-2 flex items-center gap-1.5 overflow-x-auto" style={{ scrollbarWidth: "none", borderTop: `1px solid ${agBorder}` }}>
-                  <span className="text-[7.5px] font-bold uppercase tracking-widest flex-shrink-0 mr-1" style={{ color: agTextMuted }}>Quick:</span>
+                <div className="flex-shrink-0 px-6 pb-2">
+                  <div
+                    className="mx-auto flex max-w-[980px] items-center gap-1.5 overflow-x-auto rounded-full px-2 py-2"
+                    style={{
+                      scrollbarWidth: "none",
+                      background: dk ? "rgba(31,31,35,0.58)" : "rgba(255,255,255,0.52)",
+                      border: `1px solid ${agBorderSoft}`,
+                    }}
+                  >
+                  <span className="text-[7.5px] font-bold uppercase tracking-widest flex-shrink-0 ml-2 mr-1" style={{ color: agTextMuted }}>Quick</span>
                   {[
                     { icon: ic.folder,   label: "Files",      color: "#10B981", task: "Open the Files application" },
                     { icon: ic.mail,     label: "Email",      color: "#F97316", task: "Write a professional email to the team about the project progress" },
@@ -11117,12 +11141,13 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                       {qa.label}
                     </button>
                   ))}
+                  </div>
                 </div>
 
                 {/* Input */}
-                <div className="flex-shrink-0 px-4 pb-4 pt-2">
-                  <div className="flex items-center gap-2 px-3 py-2.5 rounded-2xl"
-                    style={{ background: dk ? c.surface : "#fff", border: `1.5px solid ${input.trim() ? agAccent + "55" : agBorder}`, boxShadow: input.trim() ? "0 4px 20px rgba(66,132,255,0.12)" : "0 1px 8px rgba(0,0,0,0.05)", transition: "border-color 0.15s, box-shadow 0.15s" }}>
+                <div className="flex-shrink-0 px-6 pb-5 pt-1">
+                  <div className="mx-auto flex max-w-[980px] items-center gap-2 rounded-[1.35rem] px-3 py-3"
+                    style={{ background: dk ? c.surface : "rgba(255,255,255,0.86)", border: `1.5px solid ${input.trim() ? agAccent + "55" : agBorder}`, boxShadow: input.trim() ? "0 10px 32px rgba(66,132,255,0.14)" : "0 10px 30px rgba(31,43,77,0.08)", transition: "border-color 0.15s, box-shadow 0.15s" }}>
                     <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
                       style={{ color: agTextMuted }}
                       onMouseEnter={e => (e.currentTarget.style.background = agSelected)} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
@@ -11130,7 +11155,7 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                     </button>
                     <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
                       onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-                      placeholder="Ask the agent to do anything on your OS..."
+                      placeholder="Ask Alternus AI Agent to design, code, or create Blender 3D assets..."
                       disabled={isThinking}
                       className="flex-1 bg-transparent outline-none text-[11px]" style={{ color: agText }} />
                     <button className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all"
