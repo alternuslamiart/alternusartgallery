@@ -4,7 +4,17 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AlternusLogo } from "@/components/alternus-shell";
+import {
+  AlternusLogo,
+  DARK_BG,
+  DARK_BORDER,
+  DARK_BORDER_SOFT,
+  DARK_MUTED,
+  DARK_SURFACE,
+  DARK_SURFACE_SOFT,
+  DARK_TEXT,
+  useAlternusMode,
+} from "@/components/alternus-shell";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -295,7 +305,7 @@ export default function Home() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("");
   const [scrolled, setScrolled] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useAlternusMode();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [activeCap, setActiveCap] = useState(0);
 
@@ -320,26 +330,26 @@ export default function Home() {
 
   const themeStyle: ThemeVars = {
     fontFamily: "var(--font-roboto), 'Roboto', ui-sans-serif, system-ui, sans-serif",
-    "--landing-bg": isDark ? INK : PAPER,
-    "--landing-fg": isDark ? "#FFFFFF" : INK,
-    "--landing-muted": isDark ? "rgba(255,255,255,0.68)" : "rgba(15,23,42,0.66)",
+    "--landing-bg": isDark ? DARK_BG : PAPER,
+    "--landing-fg": isDark ? DARK_TEXT : INK,
+    "--landing-muted": isDark ? DARK_MUTED : "rgba(15,23,42,0.66)",
     "--landing-muted-strong": isDark
       ? "rgba(255,255,255,0.82)"
       : "rgba(15,23,42,0.88)",
-    "--landing-line": isDark ? "rgba(255,255,255,0.11)" : "rgba(15,23,42,0.10)",
+    "--landing-line": isDark ? DARK_BORDER_SOFT : "rgba(15,23,42,0.10)",
     "--landing-line-strong": isDark
-      ? "rgba(255,255,255,0.16)"
+      ? DARK_BORDER
       : "rgba(15,23,42,0.14)",
-    "--landing-surface": isDark ? "rgba(37,41,52,0.88)" : "rgba(255,255,255,0.84)",
+    "--landing-surface": isDark ? DARK_SURFACE : "rgba(255,255,255,0.84)",
     "--landing-surface-soft": isDark
-      ? "rgba(255,255,255,0.04)"
+      ? DARK_SURFACE_SOFT
       : "rgba(247,250,255,0.72)",
     "--landing-accent": COBALT,
     "--landing-accent-strong": COBALT_DEEP,
   };
 
   return (
-    <div className="landing-page" style={themeStyle}>
+    <div className="landing-page" data-theme={isDark ? "dark" : "light"} style={themeStyle}>
       <style>{`
         @keyframes alternus-marquee {
           from { transform: translateX(0); }
@@ -386,15 +396,68 @@ export default function Home() {
         .alternus-float-soft {
           animation: alternus-float-soft 6s ease-in-out infinite;
         }
+        .landing-page[data-theme="dark"] .landing-card,
+        .landing-page[data-theme="dark"] .landing-card-quiet {
+          box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 24px 70px rgba(0,0,0,0.36);
+        }
+        .landing-page[data-theme="dark"] .landing-chip,
+        .landing-page[data-theme="dark"] .landing-social-button,
+        .landing-page[data-theme="dark"] .landing-language-button {
+          background: rgba(255,255,255,0.04) !important;
+          border-color: rgba(255,255,255,0.12) !important;
+          color: rgba(255,255,255,0.72) !important;
+        }
+        .landing-page[data-theme="dark"] .landing-hero-shell {
+          border-color: rgba(255,255,255,0.12) !important;
+          background: linear-gradient(180deg, rgba(21,21,24,0.98), rgba(18,18,20,0.96)) !important;
+          box-shadow: 0 32px 90px rgba(0,0,0,0.44) !important;
+        }
+        .landing-page[data-theme="dark"] .landing-hero-kicker,
+        .landing-page[data-theme="dark"] .landing-hero-secondary,
+        .landing-page[data-theme="dark"] .landing-hero-stat,
+        .landing-page[data-theme="dark"] .landing-hero-bubble,
+        .landing-page[data-theme="dark"] .landing-hero-panel,
+        .landing-page[data-theme="dark"] .landing-hero-form,
+        .landing-page[data-theme="dark"] .landing-hero-quick,
+        .landing-page[data-theme="dark"] .landing-hero-pill {
+          border-color: rgba(255,255,255,0.12) !important;
+          background: rgba(255,255,255,0.04) !important;
+          color: rgba(255,255,255,0.72) !important;
+          box-shadow: none !important;
+        }
+        .landing-page[data-theme="dark"] .landing-hero-title,
+        .landing-page[data-theme="dark"] .landing-hero-stat strong,
+        .landing-page[data-theme="dark"] .landing-hero-input {
+          color: ${DARK_TEXT} !important;
+        }
+        .landing-page[data-theme="dark"] .landing-hero-copy,
+        .landing-page[data-theme="dark"] .landing-hero-bubble-copy {
+          color: ${DARK_MUTED} !important;
+        }
+        .landing-page[data-theme="dark"] .landing-hero-preview {
+          border-color: rgba(255,255,255,0.1) !important;
+          background: rgba(255,255,255,0.035) !important;
+          box-shadow: 0 24px 70px rgba(0,0,0,0.32) !important;
+        }
+        .landing-page[data-theme="dark"] .landing-hero-input::placeholder {
+          color: rgba(255,255,255,0.38) !important;
+        }
       `}</style>
 
       <header
         className={cn(
           "sticky top-0 z-40 transition-all duration-200",
           scrolled
-            ? "border-b border-[var(--landing-line)] bg-[color:rgba(244,246,251,0.82)] backdrop-blur-xl supports-[backdrop-filter]:bg-[color:rgba(244,246,251,0.72)]"
+            ? "border-b border-[var(--landing-line)] backdrop-blur-xl"
             : "bg-transparent",
         )}
+        style={{
+          background: scrolled
+            ? isDark
+              ? "rgba(18,18,20,0.84)"
+              : "rgba(244,246,251,0.82)"
+            : "transparent",
+        }}
       >
         <div className="landing-container">
           <div className="flex min-h-[76px] items-center gap-3 py-3 sm:gap-4">
@@ -423,7 +486,7 @@ export default function Home() {
             <div className="ml-auto flex items-center gap-2 sm:gap-3">
               <button
                 onClick={() => setIsDark((value) => !value)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--landing-line)] bg-white/60 text-[var(--landing-muted)] transition-all hover:border-[var(--landing-line-strong)] hover:text-[var(--landing-fg)]"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--landing-line)] bg-[var(--landing-surface)] text-[var(--landing-muted)] transition-all hover:border-[var(--landing-line-strong)] hover:text-[var(--landing-fg)]"
                 aria-label="Toggle theme"
               >
                 {isDark ? (
@@ -474,7 +537,7 @@ export default function Home() {
           </div>
 
           <div className="landing-container relative">
-            <div className="relative overflow-hidden rounded-[2.6rem] border border-white/55 bg-[linear-gradient(135deg,rgba(238,246,255,0.98)_0%,rgba(219,235,255,0.96)_46%,rgba(198,222,255,0.94)_100%)] px-6 py-8 shadow-[0_40px_110px_rgba(66,132,255,0.24)] sm:px-9 sm:py-10 lg:px-12 lg:py-12">
+            <div className="landing-hero-shell relative overflow-hidden rounded-[2.6rem] border border-white/55 bg-[linear-gradient(135deg,rgba(238,246,255,0.98)_0%,rgba(219,235,255,0.96)_46%,rgba(198,222,255,0.94)_100%)] px-6 py-8 shadow-[0_40px_110px_rgba(66,132,255,0.24)] sm:px-9 sm:py-10 lg:px-12 lg:py-12">
               <div className="pointer-events-none absolute inset-0">
                 <div className="absolute left-[-8%] top-[6%] h-[20rem] w-[20rem] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.78),transparent_66%)] blur-3xl" />
                 <div className="absolute right-[-6%] top-[8%] h-[16rem] w-[16rem] rounded-full bg-[radial-gradient(circle,rgba(66,132,255,0.36),transparent_70%)] blur-3xl" />
@@ -485,18 +548,18 @@ export default function Home() {
 
               <div className="relative grid gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center">
                 <div className="max-w-[34rem]">
-                  <div className="mb-5 inline-flex rounded-full border border-white/60 bg-white/55 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)] shadow-sm">
+                  <div className="landing-hero-kicker mb-5 inline-flex rounded-full border border-white/60 bg-white/55 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)] shadow-sm">
                     Supercharge your AI workflows
                   </div>
 
                   <h1
-                    className="max-w-[10ch] text-[clamp(3rem,6vw,5.1rem)] font-black leading-[0.92] tracking-[-0.06em] text-[#1F2B4D]"
+                    className="landing-hero-title max-w-[10ch] text-[clamp(3rem,6vw,5.1rem)] font-black leading-[0.92] tracking-[-0.06em] text-[#1F2B4D]"
                     style={{ fontFamily: "var(--font-roboto-flex), var(--font-roboto), ui-sans-serif, system-ui, sans-serif" }}
                   >
                     The AI-powered creative workspace.
                   </h1>
 
-                  <p className="mt-5 max-w-[31rem] text-[1rem] leading-8 text-[rgba(31,43,77,0.7)] sm:text-[1.04rem]">
+                  <p className="landing-hero-copy mt-5 max-w-[31rem] text-[1rem] leading-8 text-[rgba(31,43,77,0.7)] sm:text-[1.04rem]">
                     Direct edits, motion, grading, and 3D work from one command layer.
                     Alternus keeps the craft tools in place and moves the repetitive production work to the agent.
                   </p>
@@ -517,7 +580,7 @@ export default function Home() {
                       asChild
                       variant="outline"
                       size="lg"
-                      className="h-12 rounded-2xl border-white/70 bg-white/58 px-6 text-[15px] font-semibold tracking-[-0.02em] text-[#1F2B4D] shadow-sm hover:bg-white/80"
+                      className="landing-hero-secondary h-12 rounded-2xl border-white/70 bg-white/58 px-6 text-[15px] font-semibold tracking-[-0.02em] text-[#1F2B4D] shadow-sm hover:bg-white/80"
                     >
                       <Link href="#caps">Book a demo</Link>
                     </Button>
@@ -527,7 +590,7 @@ export default function Home() {
                     {heroStats.map((stat) => (
                       <div
                         key={stat.label}
-                        className="rounded-full border border-white/60 bg-white/52 px-3.5 py-2 text-[12px] font-semibold tracking-[-0.01em] text-[#476089] shadow-sm"
+                        className="landing-hero-stat rounded-full border border-white/60 bg-white/52 px-3.5 py-2 text-[12px] font-semibold tracking-[-0.01em] text-[#476089] shadow-sm"
                       >
                         <span className="font-black text-[#1F2B4D]">{stat.value}</span> {stat.label}
                       </div>
@@ -536,23 +599,23 @@ export default function Home() {
                 </div>
 
                 <div className="relative mx-auto w-full max-w-[36rem] lg:mx-0">
-                  <div className="absolute left-[9%] top-[10%] z-20 max-w-[17rem] rounded-[1.2rem] border border-white/65 bg-white/90 px-4 py-3 shadow-[0_24px_44px_rgba(42,103,255,0.14)] backdrop-blur-sm">
-                    <div className="text-[13px] leading-6 text-[#476089]">
+                  <div className="landing-hero-bubble absolute left-[9%] top-[10%] z-20 max-w-[17rem] rounded-[1.2rem] border border-white/65 bg-white/90 px-4 py-3 shadow-[0_24px_44px_rgba(42,103,255,0.14)] backdrop-blur-sm">
+                    <div className="landing-hero-bubble-copy text-[13px] leading-6 text-[#476089]">
                       Hey, I need help sending out a campaign to all new subscribers. Can you set that up?
                     </div>
                   </div>
 
-                  <div className="absolute left-[14%] top-[29%] z-20 max-w-[18rem] rounded-[1.2rem] border border-white/65 bg-white/92 px-4 py-3 shadow-[0_24px_44px_rgba(42,103,255,0.14)] backdrop-blur-sm">
+                  <div className="landing-hero-bubble absolute left-[14%] top-[29%] z-20 max-w-[18rem] rounded-[1.2rem] border border-white/65 bg-white/92 px-4 py-3 shadow-[0_24px_44px_rgba(42,103,255,0.14)] backdrop-blur-sm">
                     <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
                       {capabilities[activeCap].t}
                     </div>
-                    <div className="text-[13px] leading-6 text-[#476089]">
+                    <div className="landing-hero-bubble-copy text-[13px] leading-6 text-[#476089]">
                       {capabilities[activeCap].d}
                     </div>
                   </div>
 
-                  <div className="relative rounded-[2rem] border border-white/60 bg-[linear-gradient(180deg,rgba(235,244,255,0.68),rgba(207,226,255,0.42))] p-4 pt-36 shadow-[0_30px_76px_rgba(66,132,255,0.2)] backdrop-blur-xl sm:p-5 sm:pt-40">
-                    <div className="rounded-[1.4rem] border border-white/65 bg-white/90 p-4 shadow-[0_20px_48px_rgba(42,103,255,0.13)]">
+                  <div className="landing-hero-preview relative rounded-[2rem] border border-white/60 bg-[linear-gradient(180deg,rgba(235,244,255,0.68),rgba(207,226,255,0.42))] p-4 pt-36 shadow-[0_30px_76px_rgba(66,132,255,0.2)] backdrop-blur-xl sm:p-5 sm:pt-40">
+                    <div className="landing-hero-panel rounded-[1.4rem] border border-white/65 bg-white/90 p-4 shadow-[0_20px_48px_rgba(42,103,255,0.13)]">
                       <div className="mb-3 flex flex-wrap items-center gap-2">
                         <span className="rounded-full bg-[rgba(31,43,77,0.08)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#1F2B4D]">
                           GPT 4.5
@@ -569,12 +632,12 @@ export default function Home() {
                         }}
                         className="space-y-4"
                       >
-                        <div className="rounded-[1.2rem] border border-[rgba(31,43,77,0.1)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(243,248,255,0.94))] px-4 py-4">
+                        <div className="landing-hero-form rounded-[1.2rem] border border-[rgba(31,43,77,0.1)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(243,248,255,0.94))] px-4 py-4">
                           <input
                             value={prompt}
                             onChange={(event) => setPrompt(event.target.value)}
                             placeholder="Ask anything..."
-                            className="w-full border-0 bg-transparent text-[15px] text-[#1F2B4D] outline-none placeholder:text-[rgba(71,96,137,0.54)]"
+                            className="landing-hero-input w-full border-0 bg-transparent text-[15px] text-[#1F2B4D] outline-none placeholder:text-[rgba(71,96,137,0.54)]"
                           />
                         </div>
 
@@ -584,7 +647,7 @@ export default function Home() {
                               key={item}
                               type="button"
                               onClick={() => goToChat(item)}
-                              className="rounded-[1rem] border border-[rgba(31,43,77,0.08)] bg-[rgba(255,255,255,0.82)] px-3 py-3 text-left text-[12.5px] leading-5 text-[#476089] transition-colors hover:bg-white"
+                              className="landing-hero-quick rounded-[1rem] border border-[rgba(31,43,77,0.08)] bg-[rgba(255,255,255,0.82)] px-3 py-3 text-left text-[12.5px] leading-5 text-[#476089] transition-colors hover:bg-white"
                             >
                               {item}
                             </button>
@@ -596,7 +659,7 @@ export default function Home() {
                             {bridgeApps.slice(0, 3).map((app) => (
                               <span
                                 key={app}
-                                className="rounded-full border border-[rgba(31,43,77,0.08)] bg-white px-2.5 py-1 text-[10px] font-semibold text-[#476089]"
+                                className="landing-hero-pill rounded-full border border-[rgba(31,43,77,0.08)] bg-white px-2.5 py-1 text-[10px] font-semibold text-[#476089]"
                               >
                                 {app}
                               </span>
@@ -1030,7 +1093,7 @@ export default function Home() {
                   key={social.l}
                   href="#"
                   aria-label={social.l}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--landing-line)] bg-white/65 text-[var(--landing-muted)] transition-all hover:border-[var(--landing-accent)] hover:text-[var(--landing-accent)]"
+                  className="landing-social-button inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--landing-line)] bg-white/65 text-[var(--landing-muted)] transition-all hover:border-[var(--landing-accent)] hover:text-[var(--landing-accent)]"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d={social.d} />
@@ -1052,7 +1115,7 @@ export default function Home() {
               </Link>
             </div>
 
-            <button className="inline-flex h-10 items-center gap-2 self-start rounded-full border border-[var(--landing-line)] bg-white/70 px-4 text-sm font-medium text-[var(--landing-fg)] transition-all hover:border-[var(--landing-accent)]">
+            <button className="landing-language-button inline-flex h-10 items-center gap-2 self-start rounded-full border border-[var(--landing-line)] bg-white/70 px-4 text-sm font-medium text-[var(--landing-fg)] transition-all hover:border-[var(--landing-accent)]">
               <svg
                 width="14"
                 height="14"

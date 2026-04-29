@@ -1,12 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, ReactNode } from "react";
+import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useState } from "react";
 
 export const COBALT = "#4284FF";
 export const COBALT_DEEP = "#1E5ED4";
 export const INK = "#1F1F1F";
 export const PAPER = "#F4F6FB";
+export const DARK_BG = "#121214";
+export const DARK_SURFACE = "#1E1E22";
+export const DARK_SURFACE_SOFT = "#18181B";
+export const DARK_BORDER = "rgba(255,255,255,0.12)";
+export const DARK_BORDER_SOFT = "rgba(255,255,255,0.08)";
+export const DARK_MUTED = "rgba(255,255,255,0.62)";
+export const DARK_TEXT = "#F8F8FA";
+const THEME_KEY = "alternus_theme";
 
 /**
  * AI-branded Alternus mark. A cobalt rounded tile with a 4-point sparkle
@@ -26,8 +34,30 @@ export function AlternusLogo({ size = 28, radius = 8 }: { size?: number; radius?
   );
 }
 
-export function useAlternusTheme() {
+export function useAlternusMode() {
   const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem(THEME_KEY);
+    const next = saved ? saved === "dark" : false;
+    setIsDark(next);
+    document.documentElement.dataset.alternusTheme = next ? "dark" : "light";
+  }, []);
+
+  const setMode: Dispatch<SetStateAction<boolean>> = useCallback((next) => {
+    setIsDark((current) => {
+      const value = typeof next === "function" ? next(current) : next;
+      window.localStorage.setItem(THEME_KEY, value ? "dark" : "light");
+      document.documentElement.dataset.alternusTheme = value ? "dark" : "light";
+      return value;
+    });
+  }, []);
+
+  return [isDark, setMode] as const;
+}
+
+export function useAlternusTheme() {
+  const [isDark, setIsDark] = useAlternusMode();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -36,19 +66,19 @@ export function useAlternusTheme() {
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  const bg = isDark ? INK : PAPER;
-  const fg = isDark ? "#FFFFFF" : INK;
-  const muted = isDark ? "rgba(255,255,255,0.6)" : "rgba(5,8,15,0.62)";
-  const faint = isDark ? "rgba(255,255,255,0.1)" : "rgba(5,8,15,0.1)";
+  const bg = isDark ? DARK_BG : PAPER;
+  const fg = isDark ? DARK_TEXT : INK;
+  const muted = isDark ? DARK_MUTED : "rgba(5,8,15,0.62)";
+  const faint = isDark ? DARK_BORDER : "rgba(5,8,15,0.1)";
   const surface = isDark ? "rgba(255,255,255,0.04)" : "rgba(5,8,15,0.035)";
-  const raised = isDark ? "#2A2A2A" : "#FFFFFF";
+  const raised = isDark ? DARK_SURFACE : "#FFFFFF";
 
   return { isDark, setIsDark, scrolled, bg, fg, muted, faint, surface, raised };
 }
 
 export function AlternusNav({ isDark, setIsDark, scrolled, fg, muted, faint }: ReturnType<typeof useAlternusTheme>) {
   return (
-    <header style={{ position: "sticky", top: 0, zIndex: 40, width: "100%", transition: "all 0.25s", backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", WebkitBackdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", background: scrolled ? (isDark ? "rgba(5,8,15,0.78)" : "rgba(244,246,251,0.82)") : "transparent", borderBottom: `1px solid ${scrolled ? faint : "transparent"}` }}>
+    <header style={{ position: "sticky", top: 0, zIndex: 40, width: "100%", transition: "all 0.25s", backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", WebkitBackdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", background: scrolled ? (isDark ? "rgba(18,18,20,0.84)" : "rgba(244,246,251,0.82)") : "transparent", borderBottom: `1px solid ${scrolled ? faint : "transparent"}` }}>
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", height: 64, display: "flex", alignItems: "center", gap: 32 }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
           <AlternusLogo size={28} radius={8} />
@@ -60,7 +90,7 @@ export function AlternusNav({ isDark, setIsDark, scrolled, fg, muted, faint }: R
           ))}
         </nav>
         <div style={{ flex: 1 }} />
-        <button onClick={() => setIsDark(!isDark)} style={{ width: 34, height: 34, border: `1px solid ${faint}`, background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: muted, borderRadius: 8 }}>
+        <button onClick={() => setIsDark(!isDark)} style={{ width: 34, height: 34, border: `1px solid ${faint}`, background: isDark ? "rgba(255,255,255,0.04)" : "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: muted, borderRadius: 8 }}>
           {isDark
             ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
             : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
@@ -121,7 +151,7 @@ export function AlternusFooter({ isDark, fg, muted, faint }: ReturnType<typeof u
   ];
 
   return (
-    <footer style={{ paddingTop: 96, paddingBottom: 40, background: isDark ? INK : PAPER, borderTop: `3px solid ${COBALT}` }}>
+    <footer style={{ paddingTop: 96, paddingBottom: 40, background: isDark ? DARK_BG : PAPER, borderTop: `3px solid ${COBALT}` }}>
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-12" style={{ paddingBottom: 80 }}>
           {cols.map((col) => (

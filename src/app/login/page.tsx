@@ -3,7 +3,16 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AlternusLogo } from "@/components/alternus-shell";
+import {
+  AlternusLogo,
+  DARK_BG,
+  DARK_BORDER,
+  DARK_MUTED,
+  DARK_SURFACE,
+  DARK_SURFACE_SOFT,
+  DARK_TEXT,
+  useAlternusMode,
+} from "@/components/alternus-shell";
 
 const COBALT = "#4284FF";
 const INK = "#1F1F1F";
@@ -29,20 +38,20 @@ const socialProviders = [
 
 export default function Login() {
   const router = useRouter();
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useAlternusMode();
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const bg = isDark ? INK : PAPER;
-  const fg = isDark ? "#FFFFFF" : INK;
-  const muted = isDark ? "rgba(255,255,255,0.62)" : "rgba(15,23,42,0.58)";
-  const faint = isDark ? "rgba(255,255,255,0.12)" : "rgba(15,23,42,0.1)";
+  const bg = isDark ? DARK_BG : PAPER;
+  const fg = isDark ? DARK_TEXT : INK;
+  const muted = isDark ? DARK_MUTED : "rgba(15,23,42,0.58)";
+  const faint = isDark ? DARK_BORDER : "rgba(15,23,42,0.1)";
   const line = isDark ? "rgba(255,255,255,0.1)" : "rgba(66,132,255,0.1)";
   const surface = isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.86)";
-  const card = isDark ? "rgba(21,21,24,0.92)" : "rgba(255,255,255,0.94)";
-  const field = isDark ? "rgba(255,255,255,0.03)" : "rgba(245,247,252,0.92)";
+  const card = isDark ? "rgba(21,21,24,0.96)" : "rgba(255,255,255,0.94)";
+  const field = isDark ? DARK_SURFACE : "rgba(245,247,252,0.92)";
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,7 +152,7 @@ export default function Login() {
               width: 38,
               height: 38,
               border: `1px solid ${faint}`,
-              background: surface,
+              background: isDark ? DARK_SURFACE_SOFT : surface,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",

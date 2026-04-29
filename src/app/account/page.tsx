@@ -2,7 +2,17 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { AlternusLogo } from "@/components/alternus-shell";
+import {
+  AlternusLogo,
+  DARK_BG,
+  DARK_BORDER,
+  DARK_BORDER_SOFT,
+  DARK_MUTED,
+  DARK_SURFACE,
+  DARK_SURFACE_SOFT,
+  DARK_TEXT,
+  useAlternusMode,
+} from "@/components/alternus-shell";
 
 const COBALT = "#4284FF";
 const INK = "#1F1F1F";
@@ -34,18 +44,18 @@ const nav: { heading: string; items: { id: SectionId; label: string }[] }[] = [
 ];
 
 export default function Account() {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useAlternusMode();
   const [active, setActive] = useState<SectionId>("usage");
 
-  const bg = isDark ? INK : PAPER;
-  const fg = isDark ? "#FFFFFF" : INK;
-  const muted = isDark ? "rgba(255,255,255,0.6)" : "rgba(5,8,15,0.62)";
-  const faint = isDark ? "rgba(255,255,255,0.08)" : "rgba(5,8,15,0.08)";
-  const faintBorder = isDark ? "rgba(255,255,255,0.05)" : "rgba(5,8,15,0.05)";
-  const raised = isDark ? "#2A2A2A" : "#FFFFFF";
-  const softFill = isDark ? "rgba(255,255,255,0.04)" : "#F5F7FB";
+  const bg = isDark ? DARK_BG : PAPER;
+  const fg = isDark ? DARK_TEXT : INK;
+  const muted = isDark ? DARK_MUTED : "rgba(5,8,15,0.62)";
+  const faint = isDark ? DARK_BORDER_SOFT : "rgba(5,8,15,0.08)";
+  const faintBorder = isDark ? DARK_BORDER : "rgba(5,8,15,0.05)";
+  const raised = isDark ? DARK_SURFACE : "#FFFFFF";
+  const softFill = isDark ? DARK_SURFACE_SOFT : "#F5F7FB";
 
-  const cardShadow = isDark ? "0 1px 3px rgba(0,0,0,0.2)" : "0 1px 4px rgba(5,8,15,0.04)";
+  const cardShadow = isDark ? "0 18px 48px rgba(0,0,0,0.24)" : "0 1px 4px rgba(5,8,15,0.04)";
   const baseCard: React.CSSProperties = { background: raised, border: `1px solid ${faintBorder}`, borderRadius: 12, boxShadow: cardShadow };
 
   return (
@@ -61,7 +71,7 @@ export default function Account() {
           </Link>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <button onClick={() => setIsDark(!isDark)} style={{ width: 32, height: 32, border: `1px solid ${faintBorder}`, background: "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: muted, borderRadius: 8 }}>
+          <button onClick={() => setIsDark(!isDark)} style={{ width: 32, height: 32, border: `1px solid ${faintBorder}`, background: isDark ? softFill : "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: muted, borderRadius: 8 }}>
             {isDark
               ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
               : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
