@@ -231,11 +231,11 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           <button
             onClick={() => setSignOutOpen(true)}
             className={[
-              "flex h-8 w-full items-center rounded-xl px-2.5 text-[12px] font-medium text-[#4B5563] transition-all hover:bg-white hover:shadow-[0_8px_18px_rgba(31,43,77,0.06)]",
+              "group flex h-8 w-full items-center rounded-xl px-2.5 text-[12px] font-medium text-[#4B5563] transition-all hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
               isCollapsed ? "justify-center" : "gap-2",
             ].join(" ")}
           >
-            <Upload className="h-[13px] w-[13px] rotate-90 text-[#6B7280]" />
+            <Upload className="h-[13px] w-[13px] rotate-90 text-[#6B7280] group-hover:text-[#4A9BFF]" />
             {!isCollapsed && <span>Sign Out</span>}
           </button>
         </div>
@@ -353,17 +353,17 @@ function SidebarLink({
       onClick={onNavigate}
       title={collapsed ? item.label : undefined}
       className={[
-        "flex h-8 w-full items-center rounded-xl px-2.5 text-left text-[12px] font-medium transition-all hover:bg-white hover:shadow-[0_8px_18px_rgba(31,43,77,0.06)]",
+        "group flex h-8 w-full items-center rounded-xl px-2.5 text-left text-[12px] font-medium transition-all hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
         collapsed ? "justify-center" : "gap-2",
       ].join(" ")}
       style={{
         background: active ? "#FFFFFF" : undefined,
         border: active ? "1px solid rgba(229,231,235,0.95)" : undefined,
         boxShadow: active ? "0 8px 18px rgba(31,43,77,0.06)" : undefined,
-        color: active ? "#171717" : "#4B5563",
+        color: active ? "#171717" : undefined,
       }}
     >
-      <Icon className="h-[13px] w-[13px] flex-shrink-0" color={active ? "#1DA1F2" : "#6B7280"} />
+      <Icon className={`h-[13px] w-[13px] flex-shrink-0 group-hover:text-[#4A9BFF] ${active ? "text-[#1DA1F2]" : "text-[#6B7280]"}`} />
       {!collapsed && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
       {!collapsed && item.badge && (
         <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF3B6B] px-1 text-[10px] font-bold text-white">{item.badge}</span>
