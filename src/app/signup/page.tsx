@@ -357,7 +357,13 @@ export default function SignUpPage() {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#f4f6fb] text-[#1f1f1f]">
+    <div
+      className="relative min-h-screen overflow-hidden bg-[#f4f6fb] text-[#1f1f1f]"
+      style={{
+        fontFamily:
+          "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif",
+      }}
+    >
       <div className="pointer-events-none absolute inset-0 opacity-100 [background-image:linear-gradient(rgba(66,132,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(66,132,255,0.08)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(circle_at_center,black_34%,transparent_88%)]" />
       <div className="pointer-events-none absolute left-[8%] top-[18%] h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(66,132,255,0.14),transparent_72%)] blur-3xl" />
       <div className="pointer-events-none absolute bottom-[8%] right-[10%] h-80 w-80 rounded-full bg-[radial-gradient(circle,rgba(114,161,255,0.12),transparent_72%)] blur-3xl" />
@@ -375,17 +381,17 @@ export default function SignUpPage() {
         </div>
       </header>
 
-      <main className="relative z-10 flex min-h-[calc(100vh-72px)] items-center justify-center px-5 py-10 sm:px-6 sm:py-14">
-        <div className="w-full max-w-[1180px]">
-          <div className="mx-auto w-full max-w-[620px] rounded-[2rem] border border-[rgba(66,132,255,0.1)] bg-white/95 p-6 shadow-[0_30px_90px_rgba(66,132,255,0.14)] backdrop-blur-xl sm:p-8">
-            <div className="mb-7 text-center">
-              <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-[#4284FF]">
+      <main className="relative z-10 flex min-h-[calc(100vh-76px)] items-center justify-center px-5 py-7 pb-12">
+        <div className="w-full max-w-[1120px]">
+          <div className="mx-auto w-full max-w-[520px] rounded-[2rem] border border-[rgba(66,132,255,0.1)] bg-white/[0.94] p-8 shadow-[0_30px_90px_rgba(66,132,255,0.15)] backdrop-blur-xl">
+            <div className="mb-6 text-center">
+              <div className="mb-3.5 text-[11px] font-bold uppercase tracking-[0.24em] text-[#4284FF]">
                 {showVerification ? "Verify / Workspace" : "Sign up / Workspace"}
               </div>
-              <h1 className="text-[clamp(2rem,4vw,3rem)] font-black tracking-[-0.05em] text-slate-950">
+              <h1 className="m-0 text-[clamp(2.125rem,4vw,3rem)] font-black leading-[0.92] tracking-[-0.045em] text-[#1f1f1f]">
                 {showVerification ? "Check your email." : "Create your account."}
               </h1>
-              <p className="mx-auto mt-3 max-w-[30rem] text-sm leading-6 text-slate-500 sm:text-[15px]">
+              <p className="mx-auto mt-3.5 max-w-[22.5rem] text-[14.5px] leading-[1.6] text-slate-500">
                 {showVerification
                   ? "Enter the 6-digit code we sent to continue into Alternus."
                   : "A cleaner account flow with one focused card, centered on the page."}
@@ -434,7 +440,7 @@ export default function SignUpPage() {
 
                 <Button
                   onClick={() => handleVerifyCode()}
-                  className="h-12 w-full rounded-2xl bg-[#4284FF] text-sm font-bold text-white shadow-[0_18px_34px_rgba(66,132,255,0.22)] hover:bg-[#3273f2]"
+                  className="h-[54px] w-full rounded-2xl bg-[linear-gradient(135deg,#4284FF_0%,#2F6CF1_100%)] text-sm font-extrabold text-white shadow-[0_18px_34px_rgba(66,132,255,0.24)] hover:opacity-95"
                   disabled={isVerifying || verificationCode.join("").length !== 6}
                 >
                   {isVerifying ? (
@@ -471,11 +477,11 @@ export default function SignUpPage() {
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid gap-2.5">
                   <button
                     type="button"
                     onClick={() => handleOAuthSignIn("google")}
-                    className="flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-slate-200 bg-slate-50/70 text-sm font-semibold text-slate-700 transition-all hover:border-[#4284FF]/30 hover:bg-white"
+                    className="flex h-[50px] items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white/80 text-sm font-bold tracking-[-0.01em] text-[#1f1f1f] transition-all hover:border-[#4284FF]/30 hover:bg-slate-50"
                   >
                     <svg className="h-4 w-4" viewBox="0 0 24 24">
                       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -488,7 +494,7 @@ export default function SignUpPage() {
                   <button
                     type="button"
                     onClick={() => handleOAuthSignIn("github")}
-                    className="flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-slate-200 bg-slate-50/70 text-sm font-semibold text-slate-700 transition-all hover:border-[#4284FF]/30 hover:bg-white"
+                    className="flex h-[50px] items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white/80 text-sm font-bold tracking-[-0.01em] text-[#1f1f1f] transition-all hover:border-[#4284FF]/30 hover:bg-slate-50"
                   >
                     <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
@@ -503,8 +509,8 @@ export default function SignUpPage() {
                   <div className="h-px flex-1 bg-slate-200" />
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div className="grid gap-4 sm:grid-cols-2">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName" className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">
                         First name
@@ -519,7 +525,7 @@ export default function SignUpPage() {
                             setFormData({ ...formData, firstName: e.target.value });
                             if (errors.firstName) setErrors({ ...errors, firstName: "" });
                           }}
-                          className={`h-12 rounded-2xl border-slate-200 bg-slate-50/70 pl-10 focus:border-[#4284FF] focus:bg-white ${errors.firstName ? "border-red-300 bg-red-50/30" : ""}`}
+                          className={`h-[54px] rounded-2xl border-slate-200 bg-[#f5f7fc]/90 pl-10 text-[15px] focus:border-[#4284FF] focus:bg-white ${errors.firstName ? "border-red-300 bg-red-50/30" : ""}`}
                         />
                       </div>
                       {errors.firstName ? <p className="text-xs text-red-500">{errors.firstName}</p> : null}
@@ -539,7 +545,7 @@ export default function SignUpPage() {
                             setFormData({ ...formData, lastName: e.target.value });
                             if (errors.lastName) setErrors({ ...errors, lastName: "" });
                           }}
-                          className={`h-12 rounded-2xl border-slate-200 bg-slate-50/70 pl-10 focus:border-[#4284FF] focus:bg-white ${errors.lastName ? "border-red-300 bg-red-50/30" : ""}`}
+                          className={`h-[54px] rounded-2xl border-slate-200 bg-[#f5f7fc]/90 pl-10 text-[15px] focus:border-[#4284FF] focus:bg-white ${errors.lastName ? "border-red-300 bg-red-50/30" : ""}`}
                         />
                       </div>
                       {errors.lastName ? <p className="text-xs text-red-500">{errors.lastName}</p> : null}
@@ -561,14 +567,14 @@ export default function SignUpPage() {
                           setFormData({ ...formData, email: e.target.value });
                           if (errors.email) setErrors({ ...errors, email: "" });
                         }}
-                        className={`h-12 rounded-2xl border-slate-200 bg-slate-50/70 pl-10 focus:border-[#4284FF] focus:bg-white ${errors.email ? "border-red-300 bg-red-50/30" : ""}`}
+                        className={`h-[54px] rounded-2xl border-slate-200 bg-[#f5f7fc]/90 pl-10 text-[15px] focus:border-[#4284FF] focus:bg-white ${errors.email ? "border-red-300 bg-red-50/30" : ""}`}
                         autoComplete="email"
                       />
                     </div>
                     {errors.email ? <p className="text-xs text-red-500">{errors.email}</p> : null}
                   </div>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="country" className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">
                         Country
@@ -582,7 +588,7 @@ export default function SignUpPage() {
                             setFormData({ ...formData, country: e.target.value });
                             if (errors.country) setErrors({ ...errors, country: "" });
                           }}
-                          className={`flex h-12 w-full appearance-none rounded-2xl border bg-slate-50/70 pl-10 pr-3 text-sm outline-none transition-all focus:border-[#4284FF] focus:bg-white ${
+                          className={`flex h-[54px] w-full appearance-none rounded-2xl border bg-[#f5f7fc]/90 pl-10 pr-3 text-[15px] outline-none transition-all focus:border-[#4284FF] focus:bg-white ${
                             errors.country ? "border-red-300 bg-red-50/30" : "border-slate-200"
                           }`}
                         >
@@ -616,7 +622,7 @@ export default function SignUpPage() {
                             setFormData({ ...formData, phone: e.target.value });
                             if (errors.phone) setErrors({ ...errors, phone: "" });
                           }}
-                          className={`h-12 rounded-2xl border-slate-200 bg-slate-50/70 pl-10 focus:border-[#4284FF] focus:bg-white ${errors.phone ? "border-red-300 bg-red-50/30" : ""}`}
+                          className={`h-[54px] rounded-2xl border-slate-200 bg-[#f5f7fc]/90 pl-10 text-[15px] focus:border-[#4284FF] focus:bg-white ${errors.phone ? "border-red-300 bg-red-50/30" : ""}`}
                           autoComplete="tel"
                         />
                       </div>
@@ -639,7 +645,7 @@ export default function SignUpPage() {
                           setFormData({ ...formData, password: e.target.value });
                           if (errors.password) setErrors({ ...errors, password: "" });
                         }}
-                        className={`h-12 rounded-2xl border-slate-200 bg-slate-50/70 pl-10 pr-10 focus:border-[#4284FF] focus:bg-white ${errors.password ? "border-red-300 bg-red-50/30" : ""}`}
+                        className={`h-[54px] rounded-2xl border-slate-200 bg-[#f5f7fc]/90 pl-10 pr-10 text-[15px] focus:border-[#4284FF] focus:bg-white ${errors.password ? "border-red-300 bg-red-50/30" : ""}`}
                         autoComplete="new-password"
                       />
                       <button
@@ -685,7 +691,7 @@ export default function SignUpPage() {
                           setFormData({ ...formData, confirmPassword: e.target.value });
                           if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: "" });
                         }}
-                        className={`h-12 rounded-2xl border-slate-200 bg-slate-50/70 pl-10 pr-10 focus:border-[#4284FF] focus:bg-white ${errors.confirmPassword ? "border-red-300 bg-red-50/30" : ""}`}
+                        className={`h-[54px] rounded-2xl border-slate-200 bg-[#f5f7fc]/90 pl-10 pr-10 text-[15px] focus:border-[#4284FF] focus:bg-white ${errors.confirmPassword ? "border-red-300 bg-red-50/30" : ""}`}
                         autoComplete="new-password"
                       />
                       <button
@@ -742,7 +748,7 @@ export default function SignUpPage() {
 
                   <Button
                     type="submit"
-                    className="h-12 w-full rounded-2xl bg-[#4284FF] text-sm font-bold text-white shadow-[0_18px_34px_rgba(66,132,255,0.22)] hover:bg-[#3273f2]"
+                    className="h-[54px] w-full rounded-2xl bg-[linear-gradient(135deg,#4284FF_0%,#2F6CF1_100%)] text-sm font-extrabold text-white shadow-[0_18px_34px_rgba(66,132,255,0.24)] hover:opacity-95"
                     disabled={!termsAccepted || !privacyAccepted || isSubmitting}
                   >
                     {isSubmitting ? (
@@ -763,7 +769,9 @@ export default function SignUpPage() {
                       Sign in
                     </Link>
                   </span>
-                  <span className="text-xs">Secure workspace onboarding</span>
+                  <Link href="/contact" className="text-xs text-slate-500 no-underline hover:text-[#4284FF]">
+                    Having trouble?
+                  </Link>
                 </div>
 
                 <p className="text-center text-[11px] leading-relaxed text-slate-400">
