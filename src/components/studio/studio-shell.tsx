@@ -231,7 +231,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           <button
             onClick={() => setSignOutOpen(true)}
             className={[
-              "flex h-8 w-full items-center rounded-xl px-2.5 text-[12px] font-medium text-[#4B5563] hover:bg-white/65",
+              "flex h-8 w-full items-center rounded-xl px-2.5 text-[12px] font-medium text-[#4B5563] transition-all hover:bg-white hover:shadow-[0_8px_18px_rgba(31,43,77,0.06)]",
               isCollapsed ? "justify-center" : "gap-2",
             ].join(" ")}
           >
@@ -353,13 +353,13 @@ function SidebarLink({
       onClick={onNavigate}
       title={collapsed ? item.label : undefined}
       className={[
-        "flex h-8 w-full items-center rounded-xl px-2.5 text-left text-[12px] font-medium transition-colors",
+        "flex h-8 w-full items-center rounded-xl px-2.5 text-left text-[12px] font-medium transition-all hover:bg-white hover:shadow-[0_8px_18px_rgba(31,43,77,0.06)]",
         collapsed ? "justify-center" : "gap-2",
       ].join(" ")}
       style={{
-        background: active ? "#FFFFFF" : "transparent",
-        border: active ? "1px solid rgba(229,231,235,0.95)" : "1px solid transparent",
-        boxShadow: active ? "0 8px 18px rgba(31,43,77,0.06)" : "none",
+        background: active ? "#FFFFFF" : undefined,
+        border: active ? "1px solid rgba(229,231,235,0.95)" : undefined,
+        boxShadow: active ? "0 8px 18px rgba(31,43,77,0.06)" : undefined,
         color: active ? "#171717" : "#4B5563",
       }}
     >
