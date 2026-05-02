@@ -10,16 +10,21 @@ import {
   CheckCircle2,
   ChevronDown,
   Code2,
+  CreditCard,
+  Database,
   Download,
   FileText,
   Folder,
   Grid2X2,
   ImageIcon,
+  KeyRound,
   Layers3,
   Monitor,
+  Moon,
   Paperclip,
   PanelLeft,
   PenLine,
+  Plug,
   Plus,
   RefreshCw,
   Search,
@@ -27,12 +32,13 @@ import {
   Settings,
   Shield,
   Sparkles,
+  Sun,
   Upload,
   UserRound,
   X,
   type LucideIcon,
 } from "lucide-react";
-import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
+import { ChangeEvent, ReactNode, createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 export type StudioRouteKey =
   | "studio-overview"
@@ -97,6 +103,22 @@ type Attachment = {
   kind: "file" | "image" | "document";
 };
 
+type StudioTheme = "light" | "dark";
+
+const StudioThemeContext = createContext<{
+  theme: StudioTheme;
+  setTheme: (theme: StudioTheme) => void;
+  toggleTheme: () => void;
+} | null>(null);
+
+function useStudioTheme() {
+  const context = useContext(StudioThemeContext);
+  if (!context) {
+    throw new Error("useStudioTheme must be used inside StudioShell");
+  }
+  return context;
+}
+
 export function StudioRoutePage({ route }: StudioPageProps) {
   const pathname = usePathname();
   const activeRoute = route ?? routeByPath[pathname] ?? "ai-assistant";
@@ -110,6 +132,7 @@ export function StudioRoutePage({ route }: StudioPageProps) {
 
 function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; children: ReactNode }) {
   const router = useRouter();
+  const [theme, setTheme] = useState<StudioTheme>("light");
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
@@ -121,6 +144,26 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const notificationRef = useRef<HTMLDivElement>(null);
   const displayRef = useRef<HTMLDivElement>(null);
   const currentTitle = getRouteTitle(activeRoute);
+
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem("alternus-studio-theme");
+    if (savedTheme === "light" || savedTheme === "dark") {
+      setTheme(savedTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("alternus-studio-theme", theme);
+  }, [theme]);
+
+  const themeValue = useMemo(
+    () => ({
+      theme,
+      setTheme,
+      toggleTheme: () => setTheme((value) => (value === "dark" ? "light" : "dark")),
+    }),
+    [theme],
+  );
 
   useEffect(() => {
     function onPointerDown(event: MouseEvent) {
@@ -244,7 +287,68 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   );
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-[#F6FAFC] font-sans text-[#171717]">
+    <StudioThemeContext.Provider value={themeValue}>
+      <div className={`fixed inset-0 overflow-hidden bg-[#F6FAFC] font-sans text-[#171717] ${theme === "dark" ? "studio-shell-dark" : ""}`}>
+      <style jsx global>{`
+        .studio-shell-dark {
+          background: #0f172a !important;
+          color: #e5edf7 !important;
+        }
+        .studio-shell-dark aside {
+          background: linear-gradient(180deg, #111c2e 0%, #0f172a 100%) !important;
+          border-color: rgba(148, 163, 184, 0.16) !important;
+        }
+        .studio-shell-dark section {
+          background: #111827 !important;
+          border-color: rgba(148, 163, 184, 0.18) !important;
+          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24) !important;
+        }
+        .studio-shell-dark [class*="bg-white"],
+        .studio-shell-dark [class*="bg-\\[\\#FCFDFE\\]"],
+        .studio-shell-dark [class*="bg-\\[\\#F8FAFC\\]"],
+        .studio-shell-dark [class*="bg-\\[\\#F4F8FB\\]"],
+        .studio-shell-dark [class*="bg-\\[\\#F3F6F8\\]"] {
+          background-color: rgba(15, 23, 42, 0.72) !important;
+        }
+        .studio-shell-dark [class*="bg-\\[\\#EEF7FC\\]"] {
+          background-color: rgba(29, 161, 242, 0.12) !important;
+        }
+        .studio-shell-dark [class*="text-\\[\\#171717\\]"],
+        .studio-shell-dark [class*="text-\\[\\#1F2937\\]"],
+        .studio-shell-dark [class*="text-slate-900"] {
+          color: #f8fafc !important;
+        }
+        .studio-shell-dark [class*="text-\\[\\#4B5563\\]"],
+        .studio-shell-dark [class*="text-\\[\\#6B7280\\]"],
+        .studio-shell-dark [class*="text-\\[\\#8A94A3\\]"],
+        .studio-shell-dark [class*="text-\\[\\#9CA3AF\\]"],
+        .studio-shell-dark [class*="text-\\[\\#A1A7B0\\]"] {
+          color: #a8b3c6 !important;
+        }
+        .studio-shell-dark [class*="border-\\[\\#E5E7EB\\]"],
+        .studio-shell-dark [class*="border-\\[\\#E8EEF2\\]"],
+        .studio-shell-dark [class*="border-\\[\\#EAECEF\\]"],
+        .studio-shell-dark [class*="border-\\[\\#EEF2F5\\]"],
+        .studio-shell-dark [class*="border-white"] {
+          border-color: rgba(148, 163, 184, 0.18) !important;
+        }
+        .studio-shell-dark input,
+        .studio-shell-dark textarea,
+        .studio-shell-dark select {
+          background-color: rgba(15, 23, 42, 0.64) !important;
+          color: #e5edf7 !important;
+        }
+        .studio-shell-dark input::placeholder,
+        .studio-shell-dark textarea::placeholder {
+          color: #64748b !important;
+        }
+        .studio-shell-dark [class*="hover:bg-\\[\\#DDEEFF\\]"]:hover,
+        .studio-shell-dark [class*="hover:bg-white"]:hover,
+        .studio-shell-dark [class*="hover:bg-\\[\\#F4F8FB\\]"]:hover {
+          background-color: rgba(74, 155, 255, 0.14) !important;
+          color: #7dd3fc !important;
+        }
+      `}</style>
       <div className="flex h-full">
         <div className="hidden lg:block">{sidebar}</div>
         {isMobileOpen && (
@@ -330,7 +434,8 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </StudioThemeContext.Provider>
   );
 }
 
@@ -415,6 +520,8 @@ function NotificationsDropdown({ align = "right" }: { align?: "left" | "right" }
 }
 
 function DisplayDropdown() {
+  const { theme } = useStudioTheme();
+
   return (
     <DropdownPanel className="right-0 top-9 w-60">
       <div className="px-3 py-2">
@@ -423,7 +530,7 @@ function DisplayDropdown() {
       </div>
       <DropdownButton icon={Monitor} label="Preview workspace" muted />
       <DropdownButton icon={Grid2X2} label="Compact density" muted />
-      <DropdownButton icon={CheckCircle2} label="Light mode active" />
+      <DropdownButton icon={CheckCircle2} label={`${theme === "dark" ? "Dark" : "Light"} mode active`} />
     </DropdownPanel>
   );
 }
@@ -910,27 +1017,139 @@ function ExportsPage() {
 }
 
 function SettingsPage() {
+  const { theme, setTheme, toggleTheme } = useStudioTheme();
+  const isDark = theme === "dark";
+
   return (
     <div>
-      <PageHeader title="Settings" subtitle="Manage profile, workspace, plan, and preferences." />
-      <div className="grid gap-4 lg:grid-cols-2">
+      <PageHeader
+        title="Settings"
+        subtitle="Manage profile, workspace, plan, appearance, and preferences."
+        action={
+          <button
+            onClick={toggleTheme}
+            className="inline-flex h-9 items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-4 text-[12px] font-semibold text-[#171717] shadow-sm hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"
+          >
+            {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            {isDark ? "Switch to light" : "Switch to dark"}
+          </button>
+        }
+      />
+
+      <div className="mb-4 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
         <SoftCard>
-          <h3 className="text-[13px] font-semibold text-[#171717]">Profile settings</h3>
-          <p className="mt-2 text-[11px] text-[#6B7280]">Name, email, avatar, and account details placeholder.</p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
+                {isDark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+              </div>
+              <h3 className="text-[14px] font-semibold text-[#171717]">Appearance</h3>
+              <p className="mt-2 max-w-md text-[11px] leading-5 text-[#6B7280]">
+                Choose a softer light workspace or a calm dark workspace. Your preference is saved on this browser.
+              </p>
+            </div>
+            <div className="inline-flex rounded-2xl border border-[#E5E7EB] bg-white p-1">
+              <button
+                onClick={() => setTheme("light")}
+                className={[
+                  "inline-flex h-8 items-center gap-2 rounded-xl px-3 text-[11px] font-semibold transition-all",
+                  theme === "light" ? "bg-[#DDEEFF] text-[#4A9BFF]" : "text-[#6B7280] hover:bg-[#F4F8FB]",
+                ].join(" ")}
+              >
+                <Sun className="h-3.5 w-3.5" />
+                Light
+              </button>
+              <button
+                onClick={() => setTheme("dark")}
+                className={[
+                  "inline-flex h-8 items-center gap-2 rounded-xl px-3 text-[11px] font-semibold transition-all",
+                  theme === "dark" ? "bg-[#DDEEFF] text-[#4A9BFF]" : "text-[#6B7280] hover:bg-[#F4F8FB]",
+                ].join(" ")}
+              >
+                <Moon className="h-3.5 w-3.5" />
+                Dark
+              </button>
+            </div>
+          </div>
         </SoftCard>
         <SoftCard>
-          <h3 className="text-[13px] font-semibold text-[#171717]">Workspace settings</h3>
-          <p className="mt-2 text-[11px] text-[#6B7280]">Personal workspace controls and collaboration settings.</p>
-        </SoftCard>
-        <SoftCard>
-          <h3 className="text-[13px] font-semibold text-[#171717]">Billing and plan</h3>
-          <p className="mt-2 text-[11px] text-[#6B7280]">Trial status, upgrade placeholder, and billing history.</p>
-        </SoftCard>
-        <SoftCard>
-          <h3 className="text-[13px] font-semibold text-[#171717]">Preferences</h3>
-          <p className="mt-2 text-[11px] text-[#6B7280]">Light interface, notifications, and workspace defaults.</p>
+          <h3 className="text-[13px] font-semibold text-[#171717]">Lumen AI Trial</h3>
+          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">12 days left on the Personal workspace trial.</p>
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#EEF7FC]">
+            <div className="h-full w-[58%] rounded-full bg-[#4A9BFF]" />
+          </div>
+          <button className="mt-4 inline-flex h-9 items-center rounded-xl bg-[#4A9BFF] px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]">
+            Upgrade plan
+          </button>
         </SoftCard>
       </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <SoftCard>
+          <SettingCardHeader icon={UserRound} title="Profile settings" />
+          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Name, email, avatar, role, and account details placeholder.</p>
+          <SettingsRows rows={["Display name: Julie", "Email: personal workspace", "Profile photo placeholder"]} />
+        </SoftCard>
+        <SoftCard>
+          <SettingCardHeader icon={Shield} title="Workspace settings" />
+          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Personal workspace controls, members, permissions, and collaboration settings.</p>
+          <SettingsRows rows={["Workspace: Personal", "Member invites placeholder", "Default project: AI Assistant"]} />
+        </SoftCard>
+        <SoftCard>
+          <SettingCardHeader icon={CreditCard} title="Billing and plan" />
+          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Trial status, upgrade placeholder, invoices, and billing history.</p>
+          <SettingsRows rows={["Current plan: Trial", "Billing history placeholder", "Payment method placeholder"]} />
+        </SoftCard>
+        <SoftCard>
+          <SettingCardHeader icon={Bell} title="Notifications" />
+          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Control alerts for prompt lab updates, exports, and workspace changes.</p>
+          <SettingsRows rows={["Prompt Lab badge alerts", "Export completion alerts", "Weekly summary placeholder"]} />
+        </SoftCard>
+        <SoftCard>
+          <SettingCardHeader icon={KeyRound} title="Security" />
+          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Password, sessions, two-factor authentication, and trusted devices.</p>
+          <SettingsRows rows={["Password change placeholder", "Active sessions placeholder", "Two-factor authentication placeholder"]} />
+        </SoftCard>
+        <SoftCard>
+          <SettingCardHeader icon={Plug} title="Integrations" />
+          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Connect Figma, Blender, code repositories, and export destinations.</p>
+          <SettingsRows rows={["Figma connection placeholder", "Blender bridge placeholder", "Git provider placeholder"]} />
+        </SoftCard>
+        <SoftCard>
+          <SettingCardHeader icon={Database} title="Data and exports" />
+          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Manage workspace data, download history, retention, and import defaults.</p>
+          <SettingsRows rows={["Export archive placeholder", "Import defaults placeholder", "Data retention placeholder"]} />
+        </SoftCard>
+        <SoftCard>
+          <SettingCardHeader icon={Monitor} title="Display defaults" />
+          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Sidebar behavior, compact preview, and dashboard density.</p>
+          <SettingsRows rows={["Sidebar collapse preference", "Preview mode placeholder", "Density: Comfortable"]} />
+        </SoftCard>
+      </div>
+    </div>
+  );
+}
+
+function SettingCardHeader({ icon: Icon, title }: { icon: LucideIcon; title: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
+        <Icon className="h-4 w-4" />
+      </span>
+      <h3 className="text-[13px] font-semibold text-[#171717]">{title}</h3>
+    </div>
+  );
+}
+
+function SettingsRows({ rows }: { rows: string[] }) {
+  return (
+    <div className="mt-4 space-y-2">
+      {rows.map((row) => (
+        <div key={row} className="flex items-center justify-between rounded-xl border border-[#E5E7EB] bg-white px-3 py-2">
+          <span className="text-[11px] font-medium text-[#4B5563]">{row}</span>
+          <span className="text-[10px] font-semibold text-[#A1A7B0]">Soon</span>
+        </div>
+      ))}
     </div>
   );
 }
