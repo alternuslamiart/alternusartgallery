@@ -10574,15 +10574,15 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
 
                 <nav className="space-y-1">
                   {[
-                    { icon: ic.grid, label: "Dashboard" },
-                    { icon: ic.store, label: "Wallet" },
-                    { icon: ic.fileInvoice, label: "Transactions" },
-                    { icon: ic.barChart, label: "Report" },
-                    { icon: ic.trendingUp, label: "Cash Flow" },
+                    { icon: ic.grid, label: "Studio Overview" },
+                    { icon: ic.pen, label: "Figma Design" },
+                    { icon: ic.code, label: "Code Builder" },
+                    { icon: ic.layers, label: "Blender 3D" },
+                    { icon: ic.image, label: "Asset Library" },
                     { icon: ic.sparkle, label: "AI Assistant", active: true },
-                    { icon: ic.calc, label: "Budget", badge: "2" },
-                    { icon: ic.checkSquare, label: "Goals" },
-                    { icon: ic.activity, label: "Investments" },
+                    { icon: ic.messageCircle, label: "Prompt Lab", badge: "2" },
+                    { icon: ic.folder, label: "Projects" },
+                    { icon: ic.upload, label: "Exports" },
                   ].map(item => (
                     <button
                       key={item.label}
