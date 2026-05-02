@@ -231,7 +231,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           <button
             onClick={() => setSignOutOpen(true)}
             className={[
-              "flex h-8 w-full items-center rounded-lg px-2.5 text-[12px] font-medium text-[#4B5563] hover:bg-white/65",
+              "flex h-8 w-full items-center rounded-xl px-2.5 text-[12px] font-medium text-[#4B5563] hover:bg-white/65",
               isCollapsed ? "justify-center" : "gap-2",
             ].join(" ")}
           >
@@ -353,7 +353,7 @@ function SidebarLink({
       onClick={onNavigate}
       title={collapsed ? item.label : undefined}
       className={[
-        "flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[12px] font-medium transition-colors",
+        "flex h-8 w-full items-center rounded-xl px-2.5 text-left text-[12px] font-medium transition-colors",
         collapsed ? "justify-center" : "gap-2",
       ].join(" ")}
       style={{
