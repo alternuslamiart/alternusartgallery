@@ -10545,147 +10545,177 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
         ) : (
           /* ── CHAT + INPUT VIEW (no workspace) ── */
           <div className="relative flex flex-col h-full" onClick={() => setShowFormatMenu(false)}>
-            <div className="absolute inset-0 z-[80] flex overflow-hidden bg-[#F6F6F6] font-sans">
-              <aside className="flex w-[262px] flex-shrink-0 flex-col border-r border-[#ECEEF2] bg-white px-5 py-5">
-                <div className="mb-11 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-[52px] w-[52px] items-center justify-center rounded-[14px] bg-[#6A73F7] shadow-[0_8px_22px_rgba(90,101,241,0.28)] ring-4 ring-[#E5E7FF]">
-                      <I d={ic.fileText} s={25} c="#fff" />
-                    </div>
-                    <p className="text-[29px] font-black tracking-[-0.02em] text-[#11131A]">Writify</p>
-                  </div>
-                  <button aria-label="Collapse sidebar" className="flex h-8 w-8 items-center justify-center rounded-lg text-[#344055] hover:bg-[#F5F6FA]">
-                    <I d={ic.monitor} s={18} c="currentColor" />
+            <div className="absolute inset-0 z-[100] flex overflow-hidden bg-[#F6FAFC] font-sans text-[#171717]">
+              <aside className="flex w-[230px] flex-shrink-0 flex-col border-r border-white/70 bg-[linear-gradient(180deg,#EAF3F8_0%,#F6FAFC_100%)] px-3 py-3">
+                <div className="mb-4 flex items-center justify-between px-1">
+                  <button className="flex items-center gap-2 rounded-xl px-1.5 py-1 text-[13px] font-semibold text-[#1F2937] hover:bg-white/60">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white">
+                      <I d={ic.store} s={11} c="currentColor" />
+                    </span>
+                    Personal
+                    <I d={ic.chevD} s={12} c="#6B7280" />
                   </button>
+                  <div className="flex items-center gap-2 text-[#6B7280]">
+                    <span className="relative flex h-7 w-7 items-center justify-center rounded-lg hover:bg-white/70">
+                      <I d={ic.bell} s={13} c="currentColor" />
+                      <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#FF3B6B]" />
+                    </span>
+                    <button className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-white/70">
+                      <I d={ic.settings} s={13} c="currentColor" />
+                    </button>
+                  </div>
                 </div>
 
-                <nav className="space-y-3">
+                <div className="mb-5 flex h-9 items-center gap-2 rounded-xl border border-white/80 bg-white/72 px-3 shadow-[0_8px_22px_rgba(31,43,77,0.04)]">
+                  <I d={ic.search} s={13} c="#9CA3AF" />
+                  <input placeholder="Search..." className="min-w-0 flex-1 bg-transparent text-[12px] outline-none placeholder:text-[#9CA3AF]" />
+                  <span className="rounded-md bg-[#F3F6F8] px-1.5 py-0.5 text-[10px] font-semibold text-[#9CA3AF]">/</span>
+                </div>
+
+                <nav className="space-y-1">
                   {[
-                    { icon: ic.home, label: "Home", active: false },
-                    { icon: ic.folder, label: "Cover Letters", active: true },
-                    { icon: ic.fileText, label: "Resumes", active: false },
-                    { icon: ic.monitor, label: "Websites", active: false },
-                    { icon: ic.user, label: "Users", active: false },
+                    { icon: ic.grid, label: "Dashboard" },
+                    { icon: ic.store, label: "Wallet" },
+                    { icon: ic.fileInvoice, label: "Transactions" },
+                    { icon: ic.barChart, label: "Report" },
+                    { icon: ic.trendingUp, label: "Cash Flow" },
+                    { icon: ic.sparkle, label: "AI Assistant", active: true },
+                    { icon: ic.calc, label: "Budget", badge: "2" },
+                    { icon: ic.checkSquare, label: "Goals" },
+                    { icon: ic.activity, label: "Investments" },
                   ].map(item => (
                     <button
                       key={item.label}
-                      className="flex w-full items-center gap-4 rounded-lg px-4 py-3 text-left text-[24px] font-medium transition-colors"
+                      className="flex h-8 w-full items-center gap-2 rounded-lg px-2.5 text-left text-[12px] font-medium transition-colors"
                       style={{
-                        background: item.active ? "#F5F6FA" : "transparent",
-                        color: item.active ? "#151820" : "#5D6675",
+                        background: item.active ? "#FFFFFF" : "transparent",
+                        border: item.active ? "1px solid rgba(229,231,235,0.95)" : "1px solid transparent",
+                        boxShadow: item.active ? "0 8px 18px rgba(31,43,77,0.06)" : "none",
+                        color: item.active ? "#171717" : "#4B5563",
                       }}
                     >
-                      <I d={item.icon} s={22} c={item.active ? "#5367E9" : "#344055"} />
-                      <span>{item.label}</span>
+                      <I d={item.icon} s={13} c={item.active ? "#1DA1F2" : "#6B7280"} />
+                      <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                      {item.badge && (
+                        <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF3B6B] px-1 text-[10px] font-bold text-white">{item.badge}</span>
+                      )}
                     </button>
                   ))}
                 </nav>
+
+                <div className="mt-auto">
+                  <div className="mb-5 rounded-2xl border border-white/80 bg-white/72 p-3 shadow-[0_14px_36px_rgba(31,43,77,0.07)]">
+                    <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white shadow-[0_10px_22px_rgba(29,161,242,0.24)]">
+                      <I d={ic.sparkle} s={15} c="currentColor" f />
+                    </div>
+                    <p className="text-[12px] font-bold text-[#171717]">Lumen AI Trial</p>
+                    <p className="mt-1 text-[10px] leading-4 text-[#6B7280]">There are 12 days left for you to enjoy the various features.</p>
+                    <button className="mt-3 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-[10px] font-semibold text-[#171717] shadow-sm hover:border-[#CFE8F8]">
+                      Upgrade to Pro
+                    </button>
+                  </div>
+                  <div className="space-y-1 pb-1">
+                    {[
+                      { icon: ic.settings, label: "Setting" },
+                      { icon: ic.alertTriangle, label: "Help Center" },
+                      { icon: ic.share, label: "Sign Out" },
+                    ].map(item => (
+                      <button key={item.label} className="flex h-8 w-full items-center gap-2 rounded-lg px-2.5 text-[12px] font-medium text-[#4B5563] hover:bg-white/65">
+                        <I d={item.icon} s={13} c="#6B7280" />
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </aside>
 
-              <main className="flex min-w-0 flex-1 flex-col bg-[#F8F8F8]">
-                {msgs.filter(m => m.role === "user").length === 0 && !isThinking ? (
-                  <div className="flex h-full items-center justify-center px-8">
-                    <div className="flex max-w-[270px] flex-col items-center text-center">
-                      <div className="relative mb-6 flex h-[98px] w-[98px] items-center justify-center rounded-[24px] bg-[#E9EBFF] shadow-[0_18px_48px_rgba(116,126,242,0.24)]">
-                        <div className="absolute -right-16 top-5 h-16 w-24 rounded-full bg-[#F8D9DE] opacity-40 blur-2xl" />
-                        <div className="absolute -left-16 bottom-2 h-16 w-24 rounded-full bg-[#F6E5BB] opacity-45 blur-2xl" />
-                        <div className="relative flex h-[76px] w-[76px] items-center justify-center rounded-[20px] border border-white/70 bg-gradient-to-b from-[#F4F5FF] to-[#7180F8] shadow-inner">
-                          <I d={ic.fileText} s={42} c="#fff" />
-                          <span className="absolute bottom-5 left-5 h-2 w-2 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.95)]" />
-                          <span className="absolute bottom-8 right-4 h-1.5 w-1.5 rounded-full bg-white/90" />
+              <main className="flex min-w-0 flex-1 flex-col p-3">
+                <header className="mb-3 flex h-8 items-center justify-between px-1">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 text-[#6B7280]">
+                      <span className="relative flex h-7 w-7 items-center justify-center rounded-lg bg-white/70 shadow-sm">
+                        <I d={ic.bell} s={13} c="currentColor" />
+                        <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#FF3B6B]" />
+                      </span>
+                      <button className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/70 shadow-sm"><I d={ic.settings} s={13} c="currentColor" /></button>
+                      <button className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/70 shadow-sm"><I d={ic.monitor} s={13} c="currentColor" /></button>
+                    </div>
+                    <h1 className="text-[15px] font-semibold tracking-[-0.01em] text-[#171717]">AI Assistant</h1>
+                  </div>
+                  <button className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-[#6B7280] shadow-sm">
+                    <I d={ic.menu} s={15} c="currentColor" />
+                  </button>
+                </header>
+
+                <section className="flex min-h-0 flex-1 items-center justify-center rounded-3xl border border-[#E8EEF2] bg-white px-8 py-12 shadow-[0_24px_60px_rgba(31,43,77,0.06)]">
+                  <div className="flex w-full max-w-[620px] flex-col items-center text-center">
+                    <div className="mb-5 flex h-[62px] w-[62px] items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_16px_38px_rgba(29,161,242,0.32)]">
+                      <I d={ic.sparkle} s={28} c="currentColor" f />
+                    </div>
+                    <h2 className="text-[28px] font-semibold tracking-[-0.03em] text-[#171717]">Good Morning, Julie!</h2>
+                    <p className="mt-3 text-[12px] leading-5 text-[#6B7280]">Your money story today starts with Lumen - clear, simple, and made for you.</p>
+
+                    <div className="mt-7 w-full overflow-hidden rounded-3xl border border-[#E5E7EB] bg-white text-left shadow-[0_18px_42px_rgba(31,43,77,0.08)]">
+                      <div className="flex items-center gap-3 border-b border-[#EEF2F5] bg-[#FAFCFD] px-4 py-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] to-[#1DA1F2] text-white shadow-[0_8px_18px_rgba(29,161,242,0.25)]">
+                          <I d={ic.sparkle} s={14} c="currentColor" f />
+                        </div>
+                        <div>
+                          <p className="text-[12px] font-semibold text-[#171717]">Work with GPT-5.0 &amp; Gemini 2.5</p>
+                          <p className="mt-0.5 text-[10px] text-[#6B7280]">Great for deep research and calculation</p>
                         </div>
                       </div>
-                      <h2 className="text-[18px] font-black text-[#11131A]">Answer the prompts</h2>
-                      <p className="mt-2 text-[13px] leading-5 text-[#4F5664]">
-                        Get the best preview results by filling in several inputs on the left.
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex h-full flex-col">
-                    <div className="flex-1 overflow-y-auto px-8 py-10" style={{ scrollbarWidth: "none" }}>
-                      <div className="mx-auto flex w-full max-w-[1040px] flex-col gap-5">
-                        {msgs.filter(m => m.id !== "welcome").map(m => (
-                          <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex gap-3"}>
-                            {m.role === "agent" && (
-                              <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#40C7FF] to-[#5368F0] text-white shadow-[0_8px_18px_rgba(64,157,255,0.24)]">
-                                <I d={ic.sparkle} s={14} c="currentColor" f />
-                              </div>
-                            )}
-                            <div className={m.role === "user" ? "max-w-[68%] rounded-full border border-[#E6E6E6] bg-white px-4 py-2 text-[13px] text-[#17181D] shadow-sm" : "max-w-[92%] flex-1 text-[13px] leading-6 text-[#17181D]"}>
-                              {m.steps && m.steps.length > 0 && (
-                                <div className="mb-3 rounded-xl border border-[#E7EAF3] bg-white px-4 py-3">
-                                  {m.steps.map((s, si) => (
-                                    <div key={si} className="flex items-center gap-2 text-[12px] text-[#5D6675]">
-                                      <span className="h-1.5 w-1.5 rounded-full" style={{ background: statusColors[s.status] }} />
-                                      {s.label}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                              {m.text.trim().length > 0 && (
-                                m.role === "agent" ? (
-                                  <div className="space-y-3">
-                                    <AIFormattedText text={m.text} c={palette.light} />
-                                  </div>
-                                ) : (
-                                  m.text
-                                )
-                              )}
-                            </div>
-                          </div>
-                        ))}
-
-                        {isThinking && (
-                          <div className="flex gap-3">
-                            <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#40C7FF] to-[#5368F0] text-white">
-                              <I d={ic.sparkle} s={14} c="currentColor" f />
-                            </div>
-                            <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
-                              <div className="flex gap-1.5">
-                                {[0, 1, 2].map(i => <span key={i} className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#4AAAF5]" style={{ animationDelay: `${i * 0.15}s` }} />)}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        <div ref={endRef} />
-                      </div>
-                    </div>
-
-                    <div className="px-8 pb-8">
-                      <div className="mx-auto flex min-h-[122px] w-full max-w-[1040px] flex-col rounded-[26px] border border-[#E5E5E5] bg-white px-4 py-4 shadow-[0_12px_34px_rgba(0,0,0,0.04)]">
-                        <div className="flex items-start gap-3">
-                          <I d={ic.sparkle} s={15} c="#35A9F4" f />
+                      <div className="flex min-h-[118px] flex-col px-4 py-3">
+                        <div className="flex items-start gap-2">
+                          <I d={ic.sparkle} s={13} c="#1DA1F2" f />
                           <input
+                            ref={inputRef}
                             value={input}
                             onChange={e => setInput(e.target.value)}
                             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
                             placeholder="Ask Lumen AI Assistant..."
                             disabled={isThinking}
-                            className="min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-[#A1A5AE]"
-                            style={{ color: "#17181D", letterSpacing: 0 }}
+                            className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]"
+                            style={{ color: "#171717", letterSpacing: 0 }}
                           />
                         </div>
-                        <div className="mt-auto flex items-center gap-4">
+                        <div className="mt-auto flex items-center gap-3 text-[#A1A7B0]">
                           {[ic.plus, ic.paperclip, ic.image, ic.fileText].map((icon, index) => (
-                            <button key={index} className="flex h-7 w-7 items-center justify-center rounded-lg text-[#A1A5AE] hover:bg-[#F6F6F6] hover:text-[#4F5664]">
-                              <I d={icon} s={14} c="currentColor" />
+                            <button key={index} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#F4F8FB] hover:text-[#6B7280]">
+                              <I d={icon} s={13} c="currentColor" />
                             </button>
                           ))}
                           <button
                             onClick={() => send()}
                             disabled={isThinking || !input.trim()}
-                            aria-label="Send message"
-                            className="ml-auto flex h-9 w-9 items-center justify-center rounded-full text-white shadow-[0_8px_18px_rgba(42,159,239,0.26)] transition-opacity disabled:opacity-60"
-                            style={{ background: "linear-gradient(135deg,#46C7FF,#386EF4)" }}
+                            aria-label="Send prompt"
+                            className="ml-auto flex h-9 w-9 items-center justify-center rounded-full text-white shadow-[0_12px_24px_rgba(29,161,242,0.28)] transition-opacity disabled:opacity-70"
+                            style={{ background: "linear-gradient(135deg,#38BDF8,#1DA1F2)" }}
                           >
                             <I d={ic.send} s={16} c="currentColor" />
                           </button>
                         </div>
                       </div>
                     </div>
+
+                    <div className="mt-4 grid w-full grid-cols-3 gap-3">
+                      {[
+                        { title: "Smart Budget", desc: "Create a budget that adapts to your lifestyle and goals." },
+                        { title: "Calculation", desc: "Easily crunch the numbers for clearer money choices." },
+                        { title: "Spending", desc: "See your spending habits and spot useful patterns." },
+                      ].map(card => (
+                        <button key={card.title} className="rounded-2xl border border-[#EAECEF] bg-[#FCFDFE] p-4 text-left shadow-[0_10px_24px_rgba(31,43,77,0.035)] transition-all hover:-translate-y-0.5 hover:border-[#D4EAF8] hover:bg-white">
+                          <p className="text-[12px] font-semibold text-[#171717]">{card.title}</p>
+                          <p className="mt-2 text-[10.5px] leading-4 text-[#6B7280]">{card.desc}</p>
+                        </button>
+                      ))}
+                    </div>
+
+                    <button className="mt-4 self-start text-[11px] font-medium text-[#6B7280] hover:text-[#171717]">
+                      Refresh prompts <I d={ic.refresh} s={11} c="currentColor" />
+                    </button>
                   </div>
-                )}
+                </section>
               </main>
             </div>
             <style>{`
