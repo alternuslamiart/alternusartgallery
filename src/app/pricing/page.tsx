@@ -419,8 +419,8 @@ export default function Pricing() {
 
           <section style={{ padding: "120px 0", background: t.bg, position: "relative" }}>
             <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 32px" }}>
-              <div style={{ background: "rgba(66,132,255,0.08)", borderRadius: 26, padding: "28px 20px" }}>
-                <div style={{ maxWidth: 980, margin: "0 auto", position: "relative", overflow: "hidden", borderRadius: 34, background: "linear-gradient(180deg,#4B87FF 0%, #2E69E2 100%)", padding: "70px 32px", textAlign: "center", boxShadow: "0 34px 90px rgba(42,103,255,0.2)" }}>
+              <div style={{ padding: "0 20px" }}>
+                <div style={{ maxWidth: 980, margin: "0 auto", position: "relative", overflow: "hidden", borderRadius: 34, background: "linear-gradient(180deg,#4B87FF 0%, #2E69E2 100%)", padding: "70px 32px", textAlign: "center", boxShadow: "0 34px 90px rgba(42,103,255,0.18), 0 0 140px rgba(66,132,255,0.18)" }}>
                   <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(rgba(255,255,255,0.16) 1px,transparent 1px)", backgroundSize: "32px 32px", opacity: 0.38, pointerEvents: "none" }} />
                   <div style={{ position: "relative", maxWidth: 760, margin: "0 auto" }}>
                     <div style={{ marginBottom: 18, fontSize: 11, fontWeight: 700, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(15,23,42,0.72)" }}>
