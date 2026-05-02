@@ -10564,15 +10564,14 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 .agent-integration-card { padding: 13px !important; border-radius: 18px !important; }
                 .agent-quick-actions { justify-content: center !important; gap: 7px !important; margin-top: 0 !important; }
                 .agent-quick-action { padding: 7px 11px !important; font-size: 9px !important; }
-                .studio-home-shell { padding: 14px !important; }
-                .studio-home-content { min-height: 100% !important; padding: 18px !important; }
-                .studio-home-header { padding-left: 52px !important; }
-                .studio-home-main { grid-template-columns: 1fr !important; gap: 18px !important; padding-top: 18px !important; }
+                .studio-home-shell { padding: 0 !important; }
+                .studio-home-sidebar { width: 40px !important; }
+                .studio-home-content { padding: 74px 18px 26px 58px !important; }
+                .studio-home-inner { max-width: 100% !important; }
                 .studio-home-title { font-size: 34px !important; line-height: 1.03 !important; }
-                .studio-home-copy { max-width: 100% !important; }
-                .studio-home-cards { grid-template-columns: 1fr !important; }
-                .studio-home-workspace { min-height: 260px !important; }
-                .studio-home-search { position: sticky !important; bottom: 0 !important; margin-top: 18px !important; width: 100% !important; }
+                .studio-home-copy { max-width: 300px !important; }
+                .studio-prompt-grid { grid-template-columns: 1fr !important; }
+                .studio-input-panel { min-height: 132px !important; }
               }
               @media (max-width: 380px) {
                 .agent-home-content { padding-left: 12px !important; padding-right: 12px !important; }
@@ -10580,15 +10579,12 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
                 .agent-app-card { min-height: 106px !important; padding: 12px !important; }
                 .agent-prompt-tools { width: 100% !important; }
                 .agent-prompt-tool { flex: 1 1 calc(50% - 6px) !important; justify-content: center !important; }
-                .studio-home-title { font-size: 28px !important; }
+                .studio-home-title { font-size: 29px !important; }
               }
               .studio-glow-bg {
                 position: absolute;
                 inset: 0;
-                background:
-                  linear-gradient(90deg, rgba(31,43,77,0.045) 1px, transparent 1px),
-                  linear-gradient(180deg, rgba(31,43,77,0.045) 1px, transparent 1px);
-                background-size: 56px 56px;
+                background: transparent;
                 pointer-events: none;
               }
               .studio-gloss-panel {
@@ -10618,215 +10614,117 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
             {msgs.filter(m => m.role === "user").length === 0 && !isThinking ? (
               /* ── DASHBOARD VIEW — Alternus AI Studio ── */
               <div className="relative flex flex-col h-full">
-                <div
-                  className="studio-home-shell absolute inset-0 z-20 overflow-hidden p-5"
-                  style={{
-                    background: dk
-                      ? "#121316"
-                      : "linear-gradient(180deg,#F7F9FC 0%,#F2F5F8 100%)",
-                  }}
-                >
-                  <div className="studio-glow-bg" />
-                  <div
-                    className="studio-home-content studio-gloss-panel relative flex h-full min-h-full flex-col overflow-hidden rounded-[28px] p-6"
-                    style={{
-                      background: dk ? "#191A1E" : "rgba(255,255,255,0.78)",
-                      border: `1px solid ${dk ? "rgba(255,255,255,0.09)" : "rgba(31,43,77,0.08)"}`,
-                      boxShadow: dk ? "0 24px 70px rgba(0,0,0,0.35)" : "0 24px 80px rgba(31,43,77,0.08)",
-                    }}
-                  >
-                    <div className="studio-home-header relative z-10 flex items-center justify-between gap-4">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div
-                          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl"
-                          style={{
-                            background: dk ? "#24262B" : "#F8FAFC",
-                            border: `1px solid ${agBorderSoft}`,
-                            color: agAccent,
-                          }}
+                <div className="studio-home-shell absolute inset-0 z-20 overflow-hidden" style={{ background: "#ECECEC" }}>
+                  <div className="studio-home-sidebar absolute left-0 top-0 z-20 flex h-full w-10 flex-col items-center border-r border-[#DADADA] bg-[#F2F2F2] py-2">
+                    <button aria-label="Alternus" className="mb-8 flex h-7 w-7 items-center justify-center rounded-lg bg-[#202124] text-white">
+                      <I d={ic.sparkle} s={15} c="currentColor" f />
+                    </button>
+                    <div className="flex flex-col items-center gap-4">
+                      {[
+                        { icon: ic.plus, label: "New" },
+                        { icon: ic.search, label: "Search" },
+                        { icon: ic.home, label: "Home" },
+                        { icon: ic.folder, label: "Files" },
+                        { icon: ic.clock, label: "History" },
+                      ].map((item, index) => (
+                        <button
+                          key={item.label}
+                          aria-label={item.label}
+                          onClick={() => index === 0 ? inputRef.current?.focus() : undefined}
+                          className="flex h-6 w-6 items-center justify-center rounded-md text-[#70727A] transition-colors hover:bg-white hover:text-[#22242A]"
                         >
-                          <I d={ic.sparkle} s={17} c="currentColor" f />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[14px] font-black leading-tight" style={{ color: agText, letterSpacing: 0 }}>
-                            Alternus Studio
-                          </p>
-                          <p className="mt-1 truncate text-[10px] font-semibold" style={{ color: agTextMuted, letterSpacing: 0 }}>
-                            Figma, code, and Blender production workspace
-                          </p>
-                        </div>
-                      </div>
-                      <div className="hidden items-center gap-2 md:flex">
-                        {["Design", "Build", "Render"].map((item, index) => (
+                          <I d={item.icon} s={14} c="currentColor" />
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-auto flex flex-col items-center gap-5">
+                      <button aria-label="Settings" className="flex h-6 w-6 items-center justify-center rounded-md text-[#70727A] hover:bg-white hover:text-[#22242A]">
+                        <I d={ic.settings} s={14} c="currentColor" />
+                      </button>
+                      <button aria-label="Account" className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-[#D1D1D1] bg-[#F9E0C8] text-[11px] font-black text-[#7A3D1E]">
+                        A
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="studio-home-content flex h-full min-h-full items-start justify-center px-8 pb-10 pt-[184px]">
+                    <div className="studio-home-inner w-full max-w-[608px]">
+                      <h1 className="studio-home-title text-[38px] font-black leading-[0.96]" style={{ color: "#14141A", letterSpacing: 0 }}>
+                        Hi there, <span style={{ background: "linear-gradient(90deg,#B23D8F 0%,#6E43D6 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>John</span>
+                        <br />
+                        What would like to know?
+                      </h1>
+                      <p className="studio-home-copy mt-2 max-w-[325px] text-[13px] leading-[1.25]" style={{ color: "#898A91" }}>
+                        Use one of the most common prompts below or use your own to begin
+                      </p>
+
+                      <div className="studio-prompt-grid mt-4 grid grid-cols-4 gap-2.5">
+                        {[
+                          { icon: ic.user, task: "Write a to-do list for a personal project or task", label: "Write a to-do list for a personal project or task" },
+                          { icon: ic.mail, task: "Generate an email to reply to a job offer", label: "Generate an email to reply to a job offer" },
+                          { icon: ic.messageCircle, task: "Summarise this article or text for me in one paragraph", label: "Summarise this article or text for me in one paragraph" },
+                          { icon: ic.settings, task: "How does AI work in a technical capacity", label: "How does AI work in a technical capacity" },
+                        ].map(card => (
                           <button
-                            key={item}
-                            onClick={() => send(index === 0 ? "Design a clean website homepage in Figma" : index === 1 ? "Code a responsive website section" : "Create a Blender 3D hero scene")}
-                            className="rounded-full px-3 py-1.5 text-[10px] font-bold"
-                            style={{
-                              background: index === 0 ? agAccent : dk ? "#22242A" : "#F8FAFC",
-                              border: `1px solid ${index === 0 ? "transparent" : agBorderSoft}`,
-                              color: index === 0 ? "#fff" : agTextSec,
-                              letterSpacing: 0,
-                            }}
+                            key={card.label}
+                            onClick={() => send(card.task)}
+                            className="flex min-h-[96px] flex-col justify-between rounded-lg border border-[#D9D9D9] bg-[#F0F0F0] p-3 text-left transition-colors hover:border-[#C9C9C9] hover:bg-white"
                           >
-                            {item}
+                            <span className="text-[10px] font-bold leading-[1.18]" style={{ color: "#15161C", letterSpacing: 0 }}>{card.label}</span>
+                            <I d={card.icon} s={14} c="#7B7D84" />
                           </button>
                         ))}
-                        <button
-                          className="flex h-9 w-9 items-center justify-center rounded-full"
-                          style={{
-                            background: dk ? "#22242A" : "#F8FAFC",
-                            border: `1px solid ${agBorderSoft}`,
-                            color: agTextMuted,
-                          }}
-                        >
-                          <I d={ic.user} s={13} c="currentColor" />
-                        </button>
                       </div>
-                    </div>
 
-                    <div className="studio-home-main relative z-10 grid flex-1 grid-cols-[minmax(0,1fr)_minmax(360px,0.72fr)] gap-6 overflow-y-auto pt-8" style={{ scrollbarWidth: "none" }}>
-                      <section className="flex min-h-0 flex-col justify-between gap-8">
-                        <div>
-                          <div className="mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5"
-                            style={{
-                              background: dk ? "rgba(66,132,255,0.12)" : "rgba(66,132,255,0.08)",
-                              border: `1px solid ${dk ? "rgba(66,132,255,0.24)" : "rgba(66,132,255,0.14)"}`,
-                              color: agAccent,
-                            }}>
-                            <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#10B981" }} />
-                            <span className="text-[10px] font-bold" style={{ letterSpacing: 0 }}>Studio agent online</span>
-                          </div>
-                          <h1 className="studio-home-title max-w-[760px] text-[56px] font-black leading-[0.98]" style={{ color: agText, letterSpacing: 0 }}>
-                            What should we create today?
-                          </h1>
-                          <p className="studio-home-copy mt-5 max-w-[560px] text-[14px] leading-6" style={{ color: agTextSec }}>
-                            A focused workspace for shipping clean web pages, production-ready React sections, and polished Blender scenes from a single prompt.
-                          </p>
-                        </div>
-
-                        <div className="studio-home-cards grid grid-cols-3 gap-3">
-                          {studioSuggestions.map((card, index) => (
-                            <button
-                              key={card.title}
-                              onClick={() => send(card.task)}
-                              className="studio-glass-card min-h-[148px] rounded-[18px] p-4 text-left transition-all hover:-translate-y-0.5"
-                              style={{
-                                background: dk ? "#202227" : "#FFFFFF",
-                                border: `1px solid ${dk ? "rgba(255,255,255,0.09)" : "rgba(31,43,77,0.08)"}`,
-                                boxShadow: dk ? "none" : "0 14px 34px rgba(31,43,77,0.06)",
-                              }}
-                            >
-                              <span
-                                className="mb-5 flex h-10 w-10 items-center justify-center rounded-2xl"
-                                style={{
-                                  background: index === 0 ? "rgba(66,132,255,0.12)" : index === 1 ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.14)",
-                                  color: index === 0 ? agAccent : index === 1 ? "#10B981" : "#D97706",
-                                }}
-                              >
-                                <I d={card.icon} s={16} c="currentColor" />
-                              </span>
-                              <span className="block text-[13px] font-black leading-tight" style={{ color: agText, letterSpacing: 0 }}>
-                                {card.title}
-                              </span>
-                              <span className="mt-2 block text-[10px] leading-4" style={{ color: agTextMuted }}>
-                                {card.desc}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      </section>
-
-                      <aside
-                        className="studio-home-workspace flex min-h-0 flex-col rounded-[22px] p-4"
-                        style={{
-                          background: dk ? "#202227" : "#FFFFFF",
-                          border: `1px solid ${dk ? "rgba(255,255,255,0.09)" : "rgba(31,43,77,0.08)"}`,
-                          boxShadow: dk ? "none" : "0 18px 44px rgba(31,43,77,0.07)",
-                        }}
-                      >
-                        <div className="mb-4 flex items-center justify-between gap-3">
-                          <div>
-                            <p className="text-[13px] font-black" style={{ color: agText, letterSpacing: 0 }}>Today&apos;s workspace</p>
-                            <p className="mt-1 text-[10px]" style={{ color: agTextMuted }}>Clean project setup</p>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            {["#4284FF", "#10B981", "#F59E0B"].map(color => (
-                              <span key={color} className="h-2.5 w-2.5 rounded-full" style={{ background: color }} />
-                            ))}
-                          </div>
-                        </div>
-                        <div className="grid gap-3">
-                          {[
-                            { icon: ic.grid, label: "Website frame", desc: "Responsive Figma layout", color: agAccent },
-                            { icon: ic.code, label: "Code section", desc: "React and Tailwind handoff", color: "#10B981" },
-                            { icon: ic.layers, label: "3D asset", desc: "Blender hero render", color: "#D97706" },
-                          ].map(item => (
-                            <button
-                              key={item.label}
-                              onClick={() => send(item.desc)}
-                              className="flex items-center gap-3 rounded-2xl p-3 text-left transition-all"
-                              style={{
-                                background: dk ? "#191A1E" : "#F8FAFC",
-                                border: `1px solid ${agBorderSoft}`,
-                              }}
-                            >
-                              <span className="flex h-10 w-10 items-center justify-center rounded-2xl" style={{ background: `${item.color}16`, color: item.color }}>
-                                <I d={item.icon} s={15} c="currentColor" />
-                              </span>
-                              <span className="min-w-0 flex-1">
-                                <span className="block truncate text-[12px] font-black" style={{ color: agText, letterSpacing: 0 }}>{item.label}</span>
-                                <span className="mt-0.5 block truncate text-[9px]" style={{ color: agTextMuted }}>{item.desc}</span>
-                              </span>
-                              <I d={ic.chevR} s={12} c={agTextMuted} />
-                            </button>
-                          ))}
-                        </div>
-                        <div className="mt-auto grid grid-cols-3 gap-2 pt-4">
-                          {[
-                            { label: "3", value: "Modes" },
-                            { label: "12", value: "Blocks" },
-                            { label: "1", value: "Prompt" },
-                          ].map(stat => (
-                            <div key={stat.value} className="rounded-2xl p-3 text-center" style={{ background: dk ? "#191A1E" : "#F8FAFC", border: `1px solid ${agBorderSoft}` }}>
-                              <p className="text-[15px] font-black" style={{ color: agText }}>{stat.label}</p>
-                              <p className="mt-1 text-[9px]" style={{ color: agTextMuted }}>{stat.value}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </aside>
-                    </div>
-
-                    <div className="studio-home-search relative z-10 mt-5 flex w-full items-center gap-2 rounded-[22px] px-2.5 py-2"
-                      style={{
-                        background: dk ? "#202227" : "#FFFFFF",
-                        border: `1px solid ${dk ? "rgba(255,255,255,0.10)" : "rgba(31,43,77,0.10)"}`,
-                        boxShadow: dk ? "0 18px 42px rgba(0,0,0,0.18)" : "0 18px 52px rgba(31,43,77,0.10)",
-                      }}>
-                      <button className="flex h-10 w-10 items-center justify-center rounded-2xl" style={{ color: agTextMuted, background: dk ? "#191A1E" : "#F8FAFC" }}>
-                        <I d={ic.paperclip} s={14} c="currentColor" />
-                      </button>
-                      <input
-                        ref={inputRef}
-                        value={input}
-                        onChange={e => setInput(e.target.value)}
-                        onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-                        placeholder="Ask for a Figma homepage, coded section, or Blender hero scene..."
-                        className="min-w-0 flex-1 bg-transparent text-[13px] outline-none"
-                        style={{ color: agText, caretColor: agAccent, letterSpacing: 0 }}
-                      />
                       <button
-                        onClick={() => send()}
-                        disabled={!input.trim()}
-                        className="flex h-10 items-center gap-2 rounded-2xl px-4 text-[12px] font-bold"
-                        style={{
-                          background: input.trim() ? agAccent : dk ? "#2A2D33" : "#DCE6F6",
-                          color: input.trim() ? "#fff" : agTextMuted,
-                          letterSpacing: 0,
-                        }}
+                        onClick={() => setInput("")}
+                        className="mt-3 flex items-center gap-2 text-[12px] font-medium text-[#73757C] transition-colors hover:text-[#14141A]"
                       >
-                        Send <I d={ic.send} s={12} c="currentColor" />
+                        <I d={ic.refresh} s={13} c="currentColor" />
+                        Refresh Prompts
                       </button>
+
+                      <div className="studio-input-panel mt-8 flex min-h-[120px] flex-col rounded-lg bg-white px-3.5 py-3 shadow-[0_1px_0_rgba(255,255,255,0.9),0_10px_28px_rgba(0,0,0,0.04)]">
+                        <div className="flex items-start gap-3">
+                          <input
+                            ref={inputRef}
+                            value={input}
+                            onChange={e => setInput(e.target.value)}
+                            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+                            placeholder="Ask whatever you want...."
+                            className="min-w-0 flex-1 bg-transparent text-[12px] font-semibold outline-none placeholder:text-[#22242A]"
+                            style={{ color: "#14141A", letterSpacing: 0 }}
+                          />
+                          <button className="flex items-center gap-1 rounded-full bg-[#F4F4F4] px-2.5 py-1.5 text-[10px] font-bold text-[#202124]">
+                            <I d={ic.globe} s={11} c="currentColor" />
+                            All Web
+                            <I d={ic.chevD} s={10} c="#8A8C92" />
+                          </button>
+                        </div>
+
+                        <div className="mt-auto flex items-center gap-5">
+                          <button className="flex items-center gap-1.5 text-[11px] font-medium text-[#72747C]">
+                            <I d={ic.plus} s={12} c="currentColor" />
+                            Add Attachment
+                          </button>
+                          <button className="flex items-center gap-1.5 text-[11px] font-medium text-[#72747C]">
+                            <I d={ic.image} s={12} c="currentColor" />
+                            Use Image
+                          </button>
+                          <div className="ml-auto flex items-center gap-2">
+                            <span className="text-[10px] font-semibold text-[#777981]">{input.length}/1000</span>
+                            <button
+                              onClick={() => send()}
+                              disabled={!input.trim()}
+                              aria-label="Send prompt"
+                              className="flex h-7 w-7 items-center justify-center rounded-lg text-white transition-opacity disabled:opacity-60"
+                              style={{ background: "#6D45D8" }}
+                            >
+                              <I d={ic.chevR} s={14} c="currentColor" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
