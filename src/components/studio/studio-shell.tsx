@@ -639,6 +639,7 @@ function AIAssistantPage() {
   const [input, setInput] = useState("");
   const [actionsOpen, setActionsOpen] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [hasConversation, setHasConversation] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
@@ -655,6 +656,122 @@ function AIAssistantPage() {
     ]);
     event.target.value = "";
   };
+
+  const sendPrompt = () => {
+    if (!input.trim()) return;
+    setHasConversation(true);
+    setInput("");
+  };
+
+  const composer = (
+    <div className="w-full overflow-visible rounded-3xl border border-[#E5E7EB] bg-white text-left shadow-[0_18px_42px_rgba(31,43,77,0.06)]">
+      <div className="relative flex min-h-[150px] flex-col px-5 py-4">
+        <div className="flex items-start gap-2">
+          <Sparkles className="mt-0.5 h-[13px] w-[13px] fill-[#1DA1F2] text-[#1DA1F2]" />
+          <input
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                sendPrompt();
+              }
+            }}
+            placeholder="Ask Lumen AI Assistant..."
+            className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]"
+            style={{ color: "#171717", letterSpacing: 0 }}
+          />
+        </div>
+        {attachments.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {attachments.map((attachment) => (
+              <span key={attachment.id} className="inline-flex max-w-full items-center gap-2 rounded-full border border-[#E5E7EB] bg-[#F8FAFC] px-2.5 py-1 text-[10px] font-medium text-[#4B5563]">
+                <span className="truncate">{attachment.name}</span>
+                <button
+                  onClick={() => setAttachments((current) => current.filter((item) => item.id !== attachment.id))}
+                  className="rounded-full text-[#9CA3AF] hover:text-[#171717]"
+                  aria-label={`Remove ${attachment.name}`}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+        <div className="mt-auto flex items-center gap-3 pt-5 text-[#A1A7B0]">
+          <div className="relative">
+            <button onClick={() => setActionsOpen((value) => !value)} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Open assistant actions">
+              <Plus className="h-[13px] w-[13px]" />
+            </button>
+            {actionsOpen && (
+              <DropdownPanel className="bottom-9 left-0 w-44">
+                <DropdownButton icon={Sparkles} label="New task" onClick={() => setActionsOpen(false)} />
+                <DropdownButton icon={FileText} label="New prompt" onClick={() => setActionsOpen(false)} />
+                <DropdownButton icon={Upload} label="Import file" onClick={() => fileInputRef.current?.click()} />
+              </DropdownPanel>
+            )}
+          </div>
+          <button onClick={() => fileInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach file">
+            <Paperclip className="h-[13px] w-[13px]" />
+          </button>
+          <button onClick={() => imageInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach image">
+            <ImageIcon className="h-[13px] w-[13px]" />
+          </button>
+          <button onClick={() => documentInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach document">
+            <FileText className="h-[13px] w-[13px]" />
+          </button>
+          <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
+          <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
+          <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
+          <button
+            onClick={sendPrompt}
+            disabled={!input.trim()}
+            aria-label="Send prompt"
+            className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-[#4A9BFF] text-white shadow-[0_12px_24px_rgba(74,155,255,0.28)] transition-colors disabled:opacity-70 hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"
+          >
+            <Send className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (!hasConversation) {
+    const suggestions = [
+      { title: "Smart Budget", desc: "Create a budget that adapts to your lifestyle and goals." },
+      { title: "Calculation", desc: "Easily crunch the numbers for clearer money choices." },
+      { title: "Spending", desc: "See your spending habits and spot useful patterns." },
+    ];
+
+    return (
+      <div className="flex min-h-full items-center justify-center py-8">
+        <div className="flex w-full max-w-[620px] flex-col items-center text-center">
+          <div className="mb-5 flex h-[62px] w-[62px] items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_16px_38px_rgba(29,161,242,0.32)]">
+            <Sparkles className="h-7 w-7 fill-current" />
+          </div>
+          <h2 className="text-[28px] font-semibold tracking-[-0.03em] text-[#171717]">Good Morning, Julie!</h2>
+          <p className="mt-3 text-[12px] leading-5 text-[#6B7280]">Your money story today starts with Lumen - clear, simple, and made for you.</p>
+
+          <div className="mt-7 w-full">{composer}</div>
+
+          <div className="mt-4 grid w-full gap-3 sm:grid-cols-3">
+            {suggestions.map((card) => (
+              <button key={card.title} className="rounded-2xl border border-[#EAECEF] bg-[#FCFDFE] p-4 text-left shadow-[0_10px_24px_rgba(31,43,77,0.035)] transition-all hover:-translate-y-0.5 hover:border-[#D4EAF8] hover:bg-white">
+                <p className="text-[12px] font-semibold text-[#171717]">{card.title}</p>
+                <p className="mt-2 text-[10.5px] leading-4 text-[#6B7280]">{card.desc}</p>
+              </button>
+            ))}
+          </div>
+
+          <button className="mt-4 self-start text-[11px] font-medium text-[#6B7280] hover:text-[#171717]">
+            <span className="inline-flex items-center gap-1">
+              Refresh prompts <RefreshCw className="h-[11px] w-[11px]" />
+            </span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto flex min-h-full w-full max-w-[900px] flex-col justify-end">
@@ -719,69 +836,7 @@ function AIAssistantPage() {
         </div>
       </div>
 
-      <div className="w-full overflow-visible rounded-3xl border border-[#E5E7EB] bg-white text-left shadow-[0_18px_42px_rgba(31,43,77,0.06)]">
-        <div className="relative flex min-h-[150px] flex-col px-5 py-4">
-          <div className="flex items-start gap-2">
-            <Sparkles className="mt-0.5 h-[13px] w-[13px] fill-[#1DA1F2] text-[#1DA1F2]" />
-            <input
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder="Ask Lumen AI Assistant..."
-              className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]"
-              style={{ color: "#171717", letterSpacing: 0 }}
-            />
-          </div>
-          {attachments.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {attachments.map((attachment) => (
-                <span key={attachment.id} className="inline-flex max-w-full items-center gap-2 rounded-full border border-[#E5E7EB] bg-[#F8FAFC] px-2.5 py-1 text-[10px] font-medium text-[#4B5563]">
-                  <span className="truncate">{attachment.name}</span>
-                  <button
-                    onClick={() => setAttachments((current) => current.filter((item) => item.id !== attachment.id))}
-                    className="rounded-full text-[#9CA3AF] hover:text-[#171717]"
-                    aria-label={`Remove ${attachment.name}`}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-          <div className="mt-auto flex items-center gap-3 pt-5 text-[#A1A7B0]">
-            <div className="relative">
-              <button onClick={() => setActionsOpen((value) => !value)} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Open assistant actions">
-                <Plus className="h-[13px] w-[13px]" />
-              </button>
-              {actionsOpen && (
-                <DropdownPanel className="bottom-9 left-0 w-44">
-                  <DropdownButton icon={Sparkles} label="New task" onClick={() => setActionsOpen(false)} />
-                  <DropdownButton icon={FileText} label="New prompt" onClick={() => setActionsOpen(false)} />
-                  <DropdownButton icon={Upload} label="Import file" onClick={() => fileInputRef.current?.click()} />
-                </DropdownPanel>
-              )}
-            </div>
-            <button onClick={() => fileInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach file">
-              <Paperclip className="h-[13px] w-[13px]" />
-            </button>
-            <button onClick={() => imageInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach image">
-              <ImageIcon className="h-[13px] w-[13px]" />
-            </button>
-            <button onClick={() => documentInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach document">
-              <FileText className="h-[13px] w-[13px]" />
-            </button>
-            <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
-            <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
-            <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
-            <button
-              disabled={!input.trim()}
-              aria-label="Send prompt"
-              className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-[#4A9BFF] text-white shadow-[0_12px_24px_rgba(74,155,255,0.28)] transition-colors disabled:opacity-70 hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"
-            >
-              <Send className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      </div>
+      {composer}
     </div>
   );
 }
