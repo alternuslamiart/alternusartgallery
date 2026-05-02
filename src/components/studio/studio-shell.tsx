@@ -331,7 +331,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
               </button>
               <button
                 onClick={() => signOut({ callbackUrl: "/login" })}
-                className="rounded-xl bg-[#1DA1F2] px-4 py-2 text-[12px] font-semibold text-white shadow-[0_10px_22px_rgba(29,161,242,0.22)] hover:bg-[#168CE0]"
+                className="rounded-xl bg-[#4A9BFF] px-4 py-2 text-[12px] font-semibold text-white shadow-[0_10px_22px_rgba(74,155,255,0.22)] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"
               >
                 Sign Out
               </button>
@@ -483,7 +483,7 @@ function SoftCard({ children, className = "" }: { children: ReactNode; className
 
 function PrimaryButton({ children, icon: Icon }: { children: ReactNode; icon?: LucideIcon }) {
   return (
-    <button className="inline-flex h-9 items-center gap-2 rounded-xl bg-[#1DA1F2] px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(29,161,242,0.22)] hover:bg-[#168CE0]">
+    <button className="inline-flex h-9 items-center gap-2 rounded-xl bg-[#4A9BFF] px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]">
       {Icon && <Icon className="h-3.5 w-3.5" />}
       {children}
     </button>
@@ -722,7 +722,7 @@ function AIAssistantPage() {
             )}
             <div className="mt-auto flex items-center gap-3 pt-5 text-[#A1A7B0]">
               <div className="relative">
-                <button onClick={() => setActionsOpen((value) => !value)} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#F4F8FB] hover:text-[#6B7280]" aria-label="Open assistant actions">
+                <button onClick={() => setActionsOpen((value) => !value)} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Open assistant actions">
                   <Plus className="h-[13px] w-[13px]" />
                 </button>
                 {actionsOpen && (
@@ -733,13 +733,13 @@ function AIAssistantPage() {
                   </DropdownPanel>
                 )}
               </div>
-              <button onClick={() => fileInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#F4F8FB] hover:text-[#6B7280]" aria-label="Attach file">
+              <button onClick={() => fileInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach file">
                 <Paperclip className="h-[13px] w-[13px]" />
               </button>
-              <button onClick={() => imageInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#F4F8FB] hover:text-[#6B7280]" aria-label="Attach image">
+              <button onClick={() => imageInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach image">
                 <ImageIcon className="h-[13px] w-[13px]" />
               </button>
-              <button onClick={() => documentInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#F4F8FB] hover:text-[#6B7280]" aria-label="Attach document">
+              <button onClick={() => documentInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach document">
                 <FileText className="h-[13px] w-[13px]" />
               </button>
               <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
@@ -748,8 +748,7 @@ function AIAssistantPage() {
               <button
                 disabled={!input.trim()}
                 aria-label="Send prompt"
-                className="ml-auto flex h-9 w-9 items-center justify-center rounded-full text-white shadow-[0_12px_24px_rgba(29,161,242,0.28)] transition-opacity disabled:opacity-70"
-                style={{ background: "linear-gradient(135deg,#38BDF8,#1DA1F2)" }}
+                className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-[#4A9BFF] text-white shadow-[0_12px_24px_rgba(74,155,255,0.28)] transition-colors disabled:opacity-70 hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"
               >
                 <Send className="h-4 w-4" />
               </button>
