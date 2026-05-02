@@ -32,7 +32,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { ChangeEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
 
 export type StudioRouteKey =
   | "studio-overview"
@@ -56,12 +56,12 @@ type NavItem = {
 };
 
 export const studioNavigation: NavItem[] = [
+  { key: "ai-assistant", label: "AI Assistant", href: "/ai-assistant", icon: Sparkles },
   { key: "studio-overview", label: "Studio Overview", href: "/studio-overview", icon: Grid2X2 },
   { key: "figma-design", label: "Figma Design", href: "/figma-design", icon: PenLine },
   { key: "code-builder", label: "Code Builder", href: "/code-builder", icon: Code2 },
   { key: "blender-3d", label: "Blender 3D", href: "/blender-3d", icon: Layers3 },
   { key: "asset-library", label: "Asset Library", href: "/asset-library", icon: ImageIcon },
-  { key: "ai-assistant", label: "AI Assistant", href: "/ai-assistant", icon: Sparkles },
   { key: "prompt-lab", label: "Prompt Lab", href: "/prompt-lab", icon: FileText, badge: "2" },
   { key: "projects", label: "Projects", href: "/projects", icon: Folder },
   { key: "exports", label: "Exports", href: "/exports", icon: Upload },
@@ -643,15 +643,6 @@ function AIAssistantPage() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
 
-  const suggestions = useMemo(
-    () => [
-      { title: "Smart Budget", desc: "Create a budget that adapts to your lifestyle and goals." },
-      { title: "Calculation", desc: "Easily crunch the numbers for clearer money choices." },
-      { title: "Spending", desc: "See your spending habits and spot useful patterns." },
-    ],
-    [],
-  );
-
   const onFiles = (event: ChangeEvent<HTMLInputElement>, kind: Attachment["kind"]) => {
     const files = Array.from(event.target.files ?? []);
     setAttachments((current) => [
@@ -666,101 +657,130 @@ function AIAssistantPage() {
   };
 
   return (
-    <div className="flex min-h-full items-center justify-center py-8">
-      <div className="flex w-full max-w-[620px] flex-col items-center text-center">
-        <div className="mb-5 flex h-[62px] w-[62px] items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_16px_38px_rgba(29,161,242,0.32)]">
-          <Sparkles className="h-7 w-7 fill-current" />
-        </div>
-        <h2 className="text-[28px] font-semibold tracking-[-0.03em] text-[#171717]">Good Morning, Julie!</h2>
-        <p className="mt-3 text-[12px] leading-5 text-[#6B7280]">Your money story today starts with Lumen - clear, simple, and made for you.</p>
-
-        <div className="mt-7 w-full overflow-visible rounded-3xl border border-[#E5E7EB] bg-white text-left shadow-[0_18px_42px_rgba(31,43,77,0.08)]">
-          <div className="flex items-center gap-3 border-b border-[#EEF2F5] bg-[#FAFCFD] px-4 py-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] to-[#1DA1F2] text-white shadow-[0_8px_18px_rgba(29,161,242,0.25)]">
-              <Sparkles className="h-3.5 w-3.5 fill-current" />
+    <div className="mx-auto flex min-h-full w-full max-w-[900px] flex-col justify-end">
+      <div className="flex flex-1 flex-col justify-end pb-6">
+        <div className="mb-10 flex min-h-[250px] items-end justify-end">
+          <div className="relative h-[150px] w-[230px]">
+            <div className="absolute right-9 top-3 h-[126px] w-[70px] -rotate-6 rounded-[10px] bg-white p-2 text-[5px] leading-[1.15] text-[#111827] opacity-80 shadow-[0_18px_45px_rgba(31,43,77,0.10)] blur-[0.2px]">
+              <p className="text-center text-[8px] font-bold">TESCO</p>
+              <p className="mt-1">MILK 2.99</p>
+              <p>BREAD 1.75</p>
+              <p>EGGS 3.40</p>
+              <p>COFFEE 8.20</p>
+              <p>PASTA 2.10</p>
+              <p className="mt-1 border-t border-[#D1D5DB] pt-1 font-bold">TOTAL 592.07</p>
             </div>
-            <div>
-              <p className="text-[12px] font-semibold text-[#171717]">Work with GPT-5.0 &amp; Gemini 2.5</p>
-              <p className="mt-0.5 text-[10px] text-[#6B7280]">Great for deep research and calculation</p>
+            <div className="absolute right-0 top-8 h-[132px] w-[100px] rotate-8 rounded-[14px] bg-[#F9FAFB] p-3 text-center text-[#111827] shadow-[0_22px_50px_rgba(31,43,77,0.13)]">
+              <p className="text-[16px] font-semibold tracking-[-0.04em]">Walmart</p>
+              <p className="text-[5px] font-medium text-[#6B7280]">Save money. Live better.</p>
+              <div className="mt-2 space-y-0.5 text-left text-[5px] leading-[1.05] text-[#111827]">
+                <p>HOUSEHOLD 420.00</p>
+                <p>CLEANING 88.12</p>
+                <p>STORAGE 72.40</p>
+                <p>HOME 415.60</p>
+                <p className="border-t border-[#D1D5DB] pt-1 font-bold">TOTAL 996.12</p>
+              </div>
             </div>
           </div>
-          <div className="relative flex min-h-[118px] flex-col px-4 py-3">
-            <div className="flex items-start gap-2">
-              <Sparkles className="mt-0.5 h-[13px] w-[13px] fill-[#1DA1F2] text-[#1DA1F2]" />
-              <input
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                placeholder="Ask Lumen AI Assistant..."
-                className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]"
-                style={{ color: "#171717", letterSpacing: 0 }}
-              />
-            </div>
-            {attachments.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {attachments.map((attachment) => (
-                  <span key={attachment.id} className="inline-flex max-w-full items-center gap-2 rounded-full border border-[#E5E7EB] bg-[#F8FAFC] px-2.5 py-1 text-[10px] font-medium text-[#4B5563]">
-                    <span className="truncate">{attachment.name}</span>
-                    <button
-                      onClick={() => setAttachments((current) => current.filter((item) => item.id !== attachment.id))}
-                      className="rounded-full text-[#9CA3AF] hover:text-[#171717]"
-                      aria-label={`Remove ${attachment.name}`}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-            <div className="mt-auto flex items-center gap-3 pt-5 text-[#A1A7B0]">
-              <div className="relative">
-                <button onClick={() => setActionsOpen((value) => !value)} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Open assistant actions">
-                  <Plus className="h-[13px] w-[13px]" />
-                </button>
-                {actionsOpen && (
-                  <DropdownPanel className="bottom-9 left-0 w-44">
-                    <DropdownButton icon={Sparkles} label="New task" onClick={() => setActionsOpen(false)} />
-                    <DropdownButton icon={FileText} label="New prompt" onClick={() => setActionsOpen(false)} />
-                    <DropdownButton icon={Upload} label="Import file" onClick={() => fileInputRef.current?.click()} />
-                  </DropdownPanel>
-                )}
-              </div>
-              <button onClick={() => fileInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach file">
-                <Paperclip className="h-[13px] w-[13px]" />
-              </button>
-              <button onClick={() => imageInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach image">
-                <ImageIcon className="h-[13px] w-[13px]" />
-              </button>
-              <button onClick={() => documentInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach document">
-                <FileText className="h-[13px] w-[13px]" />
-              </button>
-              <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
-              <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
-              <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
-              <button
-                disabled={!input.trim()}
-                aria-label="Send prompt"
-                className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-[#4A9BFF] text-white shadow-[0_12px_24px_rgba(74,155,255,0.28)] transition-colors disabled:opacity-70 hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"
-              >
-                <Send className="h-4 w-4" />
-              </button>
-            </div>
+
+          <div className="ml-auto max-w-[440px] rounded-full border border-[#E5E7EB] bg-white px-4 py-2 text-[13px] text-[#171717] shadow-[0_10px_28px_rgba(31,43,77,0.04)]">
+            Hi Lumen, can you help me log 3 shopping receipts today?
           </div>
         </div>
 
-        <div className="mt-4 grid w-full gap-3 sm:grid-cols-3">
-          {suggestions.map((card) => (
-            <button key={card.title} className="rounded-2xl border border-[#EAECEF] bg-[#FCFDFE] p-4 text-left shadow-[0_10px_24px_rgba(31,43,77,0.035)] transition-all hover:-translate-y-0.5 hover:border-[#D4EAF8] hover:bg-white">
-              <p className="text-[12px] font-semibold text-[#171717]">{card.title}</p>
-              <p className="mt-2 text-[10.5px] leading-4 text-[#6B7280]">{card.desc}</p>
+        <div className="flex gap-3">
+          <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_12px_26px_rgba(29,161,242,0.28)]">
+            <Sparkles className="h-4 w-4 fill-current" />
+          </div>
+          <div className="min-w-0 flex-1 text-[13px] leading-6 text-[#171717]">
+            <p className="mb-3">Got it, Julie.</p>
+            <div className="border-t border-[#E5E7EB] pt-3">
+              <ul className="list-disc space-y-2 pl-4">
+                <li>Added Tesco receipt: <strong>$592.07</strong> (Groceries)</li>
+                <li>Added Walmart receipt: <strong>$996.12</strong> (Household)</li>
+                <li>Added Coffee Shop receipt: <strong>$492.42</strong> (Food &amp; Drink)</li>
+              </ul>
+              <p className="mt-3">All three have been logged into your transactions for today. Would you like me to create a quick summary?</p>
+            </div>
+
+            <div className="my-4 flex justify-end">
+              <span className="rounded-full border border-[#E5E7EB] bg-white px-4 py-2 text-[12px] shadow-[0_10px_28px_rgba(31,43,77,0.04)]">Yes, please.</span>
+            </div>
+
+            <div className="border-t border-[#E5E7EB] pt-4">
+              <p>
+                Today you&apos;ve spent a total of <strong>$2,080.61</strong>. Most went to household (60%), followed by food &amp; drinks (11%) and groceries (29%).
+              </p>
+            </div>
+            <div className="mt-4 border-t border-[#E5E7EB] pt-4">
+              <p>Do you want me to compare this with your weekly average?</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full overflow-visible rounded-3xl border border-[#E5E7EB] bg-white text-left shadow-[0_18px_42px_rgba(31,43,77,0.06)]">
+        <div className="relative flex min-h-[150px] flex-col px-5 py-4">
+          <div className="flex items-start gap-2">
+            <Sparkles className="mt-0.5 h-[13px] w-[13px] fill-[#1DA1F2] text-[#1DA1F2]" />
+            <input
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              placeholder="Ask Lumen AI Assistant..."
+              className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]"
+              style={{ color: "#171717", letterSpacing: 0 }}
+            />
+          </div>
+          {attachments.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {attachments.map((attachment) => (
+                <span key={attachment.id} className="inline-flex max-w-full items-center gap-2 rounded-full border border-[#E5E7EB] bg-[#F8FAFC] px-2.5 py-1 text-[10px] font-medium text-[#4B5563]">
+                  <span className="truncate">{attachment.name}</span>
+                  <button
+                    onClick={() => setAttachments((current) => current.filter((item) => item.id !== attachment.id))}
+                    className="rounded-full text-[#9CA3AF] hover:text-[#171717]"
+                    aria-label={`Remove ${attachment.name}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="mt-auto flex items-center gap-3 pt-5 text-[#A1A7B0]">
+            <div className="relative">
+              <button onClick={() => setActionsOpen((value) => !value)} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Open assistant actions">
+                <Plus className="h-[13px] w-[13px]" />
+              </button>
+              {actionsOpen && (
+                <DropdownPanel className="bottom-9 left-0 w-44">
+                  <DropdownButton icon={Sparkles} label="New task" onClick={() => setActionsOpen(false)} />
+                  <DropdownButton icon={FileText} label="New prompt" onClick={() => setActionsOpen(false)} />
+                  <DropdownButton icon={Upload} label="Import file" onClick={() => fileInputRef.current?.click()} />
+                </DropdownPanel>
+              )}
+            </div>
+            <button onClick={() => fileInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach file">
+              <Paperclip className="h-[13px] w-[13px]" />
             </button>
-          ))}
+            <button onClick={() => imageInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach image">
+              <ImageIcon className="h-[13px] w-[13px]" />
+            </button>
+            <button onClick={() => documentInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach document">
+              <FileText className="h-[13px] w-[13px]" />
+            </button>
+            <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
+            <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
+            <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
+            <button
+              disabled={!input.trim()}
+              aria-label="Send prompt"
+              className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-[#4A9BFF] text-white shadow-[0_12px_24px_rgba(74,155,255,0.28)] transition-colors disabled:opacity-70 hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-
-        <button className="mt-4 self-start text-[11px] font-medium text-[#6B7280] hover:text-[#171717]">
-          <span className="inline-flex items-center gap-1">
-            Refresh prompts <RefreshCw className="h-[11px] w-[11px]" />
-          </span>
-        </button>
       </div>
     </div>
   );
