@@ -137,6 +137,7 @@ export function StudioRoutePage({ route }: StudioPageProps) {
 function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; children: ReactNode }) {
   const router = useRouter();
   const [theme, setTheme] = useState<StudioTheme>("light");
+  const dark = theme === "dark";
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
@@ -197,15 +198,18 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const sidebar = (
     <aside
       className={[
-        "flex h-full flex-shrink-0 flex-col border-r border-white/70 bg-[linear-gradient(180deg,#EAF3F8_0%,#F6FAFC_100%)] py-3 transition-all duration-200 ease-out",
-        isCollapsed ? "w-[64px] px-2" : "w-[230px] px-3",
+        "flex h-full flex-shrink-0 flex-col py-3 transition-all duration-200 ease-out",
+        dark
+          ? "border-r border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,#181A1F_0%,#14161A_100%)]"
+          : "border-r border-white/70 bg-[linear-gradient(180deg,#EAF3F8_0%,#F6FAFC_100%)]",
+        isCollapsed ? "w-[60px] px-2" : "w-[230px] px-3",
       ].join(" ")}
     >
       <div ref={workspaceRef} className="relative mb-4 flex items-center justify-between px-1">
         {isCollapsed ? (
           <button
             onClick={toggleMenu}
-            className="mx-auto flex h-7 w-7 items-center justify-center rounded-lg text-[#6B7280] hover:bg-white/70 hover:text-[#171717]"
+            className={`mx-auto flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "text-[#A8B0BA] hover:bg-white/6 hover:text-[#F4F6F8]" : "text-[#6B7280] hover:bg-white/70 hover:text-[#171717]"}`}
             aria-label="Expand sidebar"
           >
             <PanelLeft className="h-[14px] w-[14px]" />
@@ -214,18 +218,18 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           <>
             <button
               onClick={() => setWorkspaceOpen((value) => !value)}
-              className="flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 text-[13px] font-semibold text-[#1F2937] hover:bg-white/60"
+              className={`flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 text-[13px] font-semibold ${dark ? "text-[#F4F6F8] hover:bg-white/6" : "text-[#1F2937] hover:bg-white/60"}`}
               aria-expanded={workspaceOpen}
             >
               <span className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white">
                 <Shield className="h-[11px] w-[11px]" />
               </span>
               <span className="truncate">Personal</span>
-              <ChevronDown className="h-3 w-3 text-[#6B7280]" />
+              <ChevronDown className={`h-3 w-3 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`} />
             </button>
             <button
               onClick={toggleMenu}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-[#6B7280] hover:bg-white/70 hover:text-[#171717]"
+              className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "text-[#A8B0BA] hover:bg-white/6 hover:text-[#F4F6F8]" : "text-[#6B7280] hover:bg-white/70 hover:text-[#171717]"}`}
               aria-label="Collapse sidebar"
             >
               <PanelLeft className="h-[14px] w-[14px]" />
@@ -236,8 +240,8 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         {workspaceOpen && !isCollapsed && (
           <DropdownPanel className="left-0 top-9 w-56">
             <div className="px-3 py-2">
-              <p className="text-[10px] font-medium text-[#8A94A3]">Current workspace</p>
-              <p className="mt-1 text-[13px] font-semibold text-[#171717]">Personal</p>
+              <p className={`text-[10px] font-medium ${dark ? "text-[#6F7782]" : "text-[#8A94A3]"}`}>Current workspace</p>
+              <p className={`mt-1 text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Personal</p>
             </div>
             <DropdownButton onClick={() => router.push("/settings")} icon={Settings} label="Workspace settings" />
             <DropdownButton icon={RefreshCw} label="Switch workspace" muted />
@@ -247,10 +251,10 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
       </div>
 
       {!isCollapsed && (
-        <div className="mb-5 flex h-9 items-center gap-2 rounded-xl border border-white/80 bg-white/72 px-3 shadow-[0_8px_22px_rgba(31,43,77,0.04)]">
-          <Search className="h-[13px] w-[13px] text-[#9CA3AF]" />
-          <input placeholder="Search..." className="min-w-0 flex-1 bg-transparent text-[12px] outline-none placeholder:text-[#9CA3AF]" />
-          <span className="rounded-md bg-[#F3F6F8] px-1.5 py-0.5 text-[10px] font-semibold text-[#9CA3AF]">/</span>
+        <div className={`mb-5 flex h-9 items-center gap-2 rounded-xl border px-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_22px_rgba(0,0,0,0.16)]" : "border-white/80 bg-white/72 shadow-[0_8px_22px_rgba(31,43,77,0.04)]"}`}>
+          <Search className={`h-[13px] w-[13px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} />
+          <input placeholder="Search..." className={`min-w-0 flex-1 bg-transparent text-[12px] outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#9CA3AF]"}`} />
+          <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F3F6F8] text-[#9CA3AF]"}`}>/</span>
         </div>
       )}
 
@@ -262,15 +266,15 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
       <div className="mt-auto">
         {!isCollapsed && (
-          <div className="mb-5 rounded-2xl border border-white/80 bg-white/72 p-3 shadow-[0_14px_36px_rgba(31,43,77,0.07)]">
+          <div className={`mb-5 rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#17191D] shadow-[0_14px_36px_rgba(0,0,0,0.22)]" : "border-white/80 bg-white/72 shadow-[0_14px_36px_rgba(31,43,77,0.07)]"}`}>
             <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white shadow-[0_10px_22px_rgba(29,161,242,0.24)]">
               <Sparkles className="h-[15px] w-[15px] fill-current" />
             </div>
-            <p className="text-[12px] font-bold text-[#171717]">Alternus AI Trial</p>
-            <p className="mt-1 text-[10px] leading-4 text-[#6B7280]">There are 12 days left for you to enjoy the various features.</p>
+            <p className={`text-[12px] font-bold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Alternus AI Trial</p>
+            <p className={`mt-1 text-[10px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>There are 12 days left for you to enjoy the various features.</p>
             <button
               onClick={() => router.push("/pricing")}
-              className="mt-3 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-[10px] font-semibold text-[#171717] shadow-sm hover:border-[#CFE8F8]"
+              className={`mt-3 rounded-lg border px-3 py-1.5 text-[10px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:border-[rgba(59,167,255,0.24)]" : "border-[#E5E7EB] bg-white text-[#171717] shadow-sm hover:border-[#CFE8F8]"}`}
             >
               Upgrade to Pro
             </button>
@@ -283,11 +287,12 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           <button
             onClick={() => setSignOutOpen(true)}
             className={[
-              "group flex h-8 w-full items-center rounded-xl px-2.5 text-[12px] font-medium text-[#4B5563] transition-all hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
+              "group flex h-8 w-full items-center rounded-xl px-2.5 text-[12px] font-medium transition-all",
+              dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#4B5563] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
               isCollapsed ? "justify-center" : "gap-2",
             ].join(" ")}
           >
-            <Upload className="h-[13px] w-[13px] rotate-90 text-[#6B7280] group-hover:text-[#4A9BFF]" />
+            <Upload className={`h-[13px] w-[13px] rotate-90 ${dark ? "text-[#6F7782] group-hover:text-[#F4F6F8]" : "text-[#6B7280] group-hover:text-[#4A9BFF]"}`} />
             {!isCollapsed && <span>Sign Out</span>}
           </button>
         </div>
@@ -297,29 +302,29 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
   return (
     <StudioThemeContext.Provider value={themeValue}>
-      <div className={`fixed inset-0 overflow-hidden bg-[#F6FAFC] font-sans text-[#171717] ${theme === "dark" ? "studio-shell-dark" : ""}`}>
+      <div className={`fixed inset-0 overflow-hidden font-sans ${dark ? "bg-[#0F1013] text-[#F4F6F8] studio-shell-dark" : "bg-[#F6FAFC] text-[#171717]"}`}>
       <style jsx global>{`
         .studio-shell-dark {
-          background: #141416 !important;
-          color: #f5f5f7 !important;
+          background: #0f1013 !important;
+          color: #f4f6f8 !important;
         }
         .studio-shell-dark aside {
-          background: linear-gradient(180deg, #1f1f23 0%, #141416 100%) !important;
-          border-color: rgba(255, 255, 255, 0.1) !important;
+          background: linear-gradient(180deg, #181a1f 0%, #14161a 100%) !important;
+          border-color: rgba(255, 255, 255, 0.08) !important;
         }
         .studio-shell-dark section {
-          background: #1f1f23 !important;
-          border-color: rgba(255, 255, 255, 0.1) !important;
+          background: #17191d !important;
+          border-color: rgba(255, 255, 255, 0.08) !important;
           box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22) !important;
         }
         .studio-shell-dark main {
-          background: #141416 !important;
+          background: #0f1013 !important;
         }
         .studio-shell-dark header button,
         .studio-shell-dark aside button,
         .studio-shell-dark nav a,
         .studio-shell-dark [role="button"] {
-          border-color: rgba(255, 255, 255, 0.1) !important;
+          border-color: rgba(255, 255, 255, 0.08) !important;
         }
         .studio-shell-dark [class*="bg-white"],
         .studio-shell-dark [class*="bg-\\[\\#FFFFFF\\]"],
@@ -329,14 +334,14 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         .studio-shell-dark [class*="bg-\\[\\#F8FAFC\\]"],
         .studio-shell-dark [class*="bg-\\[\\#F4F8FB\\]"],
         .studio-shell-dark [class*="bg-\\[\\#F3F6F8\\]"] {
-          background-color: rgba(255, 255, 255, 0.04) !important;
+          background-color: #202328 !important;
         }
         .studio-shell-dark [class*="bg-\\[\\#DDEEFF\\]"] {
           background-color: rgba(66, 132, 255, 0.16) !important;
           color: #6ea4ff !important;
         }
         .studio-shell-dark [class*="bg-\\[\\#EEF7FC\\]"] {
-          background-color: rgba(66, 132, 255, 0.12) !important;
+          background-color: rgba(59, 167, 255, 0.12) !important;
         }
         .studio-shell-dark [class*="bg-\\[\\#4A9BFF\\]"] {
           background-color: #4284ff !important;
@@ -373,22 +378,22 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           border-color: rgba(255, 255, 255, 0.1) !important;
         }
         .studio-shell-dark nav a[style] {
-          background: rgba(255, 255, 255, 0.065) !important;
-          border-color: rgba(255, 255, 255, 0.16) !important;
-          box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18) !important;
+          background: rgba(59, 167, 255, 0.14) !important;
+          border-color: rgba(59, 167, 255, 0.18) !important;
+          box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22) !important;
           color: #f5f5f7 !important;
         }
         .studio-shell-dark nav a[style] svg {
-          color: #4284ff !important;
+          color: #3ba7ff !important;
         }
         .studio-shell-dark a:hover,
         .studio-shell-dark button:hover {
-          border-color: rgba(66, 132, 255, 0.34) !important;
+          border-color: rgba(59, 167, 255, 0.34) !important;
         }
         .studio-shell-dark input,
         .studio-shell-dark textarea,
         .studio-shell-dark select {
-          background-color: rgba(255, 255, 255, 0.04) !important;
+          background-color: #181b20 !important;
           color: #f5f5f7 !important;
         }
         .studio-shell-dark input::placeholder,
@@ -404,7 +409,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           color: #6ea4ff !important;
         }
         .studio-shell-dark [class*="shadow-"] {
-          box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18) !important;
+          box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22) !important;
         }
         .studio-shell-dark [class*="text-white"] {
           color: #ffffff !important;
@@ -414,7 +419,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         <div className="hidden lg:block">{sidebar}</div>
         {isMobileOpen && (
           <div className="fixed inset-0 z-40 lg:hidden">
-            <button className="absolute inset-0 bg-[#1F2937]/20 backdrop-blur-[2px]" onClick={() => setIsMobileOpen(false)} aria-label="Close sidebar" />
+            <button className={`absolute inset-0 ${dark ? "bg-black/40 backdrop-blur-[2px]" : "bg-[#1F2937]/20 backdrop-blur-[2px]"}`} onClick={() => setIsMobileOpen(false)} aria-label="Close sidebar" />
             <div className="relative h-full w-[230px] shadow-[18px_0_50px_rgba(31,43,77,0.16)]">{sidebar}</div>
           </div>
         )}
@@ -422,11 +427,11 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         <main className="flex min-w-0 flex-1 flex-col p-3">
           <header className={`mb-3 flex h-8 items-center justify-between px-1 ${activeRoute === "ai-assistant" ? "max-sm:hidden" : ""}`}>
             <div className="flex min-w-0 items-center gap-3">
-              <div className="relative flex items-center gap-2 text-[#6B7280]">
+              <div className={`relative flex items-center gap-2 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
                 <div ref={notificationRef} className="relative">
                   <button
                     onClick={() => setNotificationsOpen((value) => !value)}
-                    className="relative flex h-7 w-7 items-center justify-center rounded-lg bg-white/70 shadow-sm hover:bg-white"
+                    className={`relative flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white/70 shadow-sm hover:bg-white"}`}
                     aria-label="Notifications"
                   >
                     <Bell className="h-[13px] w-[13px]" />
@@ -436,7 +441,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
                 </div>
                 <button
                   onClick={() => router.push("/settings")}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/70 shadow-sm hover:bg-white"
+                  className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white/70 shadow-sm hover:bg-white"}`}
                   aria-label="Open settings"
                 >
                   <Settings className="h-[13px] w-[13px]" />
@@ -444,7 +449,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
                 <div ref={displayRef} className="relative">
                   <button
                     onClick={() => setDisplayOpen((value) => !value)}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/70 shadow-sm hover:bg-white"
+                    className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white/70 shadow-sm hover:bg-white"}`}
                     aria-label="Display preview"
                   >
                     <Monitor className="h-[13px] w-[13px]" />
@@ -452,11 +457,11 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
                   {displayOpen && <DisplayDropdown />}
                 </div>
               </div>
-              <h1 className="truncate text-[15px] font-semibold tracking-[-0.01em] text-[#171717]">{currentTitle}</h1>
+              <h1 className={`truncate text-[15px] font-semibold tracking-[-0.01em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{currentTitle}</h1>
             </div>
             <button
               onClick={() => router.push("/account")}
-              className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-[#6B7280] shadow-sm hover:bg-[#FAFCFD]"
+              className={`flex h-8 w-8 items-center justify-center rounded-xl ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white text-[#6B7280] shadow-sm hover:bg-[#FAFCFD]"}`}
               aria-label="Open profile"
             >
               <UserRound className="h-[15px] w-[15px]" />
@@ -465,7 +470,10 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
           <section
             className={[
-              "min-h-0 flex-1 overflow-auto rounded-3xl border border-[#E8EEF2] bg-white px-8 py-8 shadow-[0_24px_60px_rgba(31,43,77,0.06)]",
+              "min-h-0 flex-1 overflow-auto rounded-3xl px-8 py-8",
+              dark
+                ? "border border-[rgba(255,255,255,0.08)] bg-[#17191D] shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
+                : "border border-[#E8EEF2] bg-white shadow-[0_24px_60px_rgba(31,43,77,0.06)]",
               activeRoute === "ai-assistant" ? "max-sm:px-4 max-sm:py-0" : "",
             ].join(" ")}
           >
@@ -475,24 +483,24 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
       </div>
 
       {signOutOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1F2937]/20 px-4 backdrop-blur-[2px]">
-          <div className="w-full max-w-sm rounded-3xl border border-[#E5E7EB] bg-white p-5 shadow-[0_24px_70px_rgba(31,43,77,0.16)]">
+        <div className={`fixed inset-0 z-50 flex items-center justify-center px-4 backdrop-blur-[2px] ${dark ? "bg-black/45" : "bg-[#1F2937]/20"}`}>
+          <div className={`w-full max-w-sm rounded-3xl border p-5 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_24px_70px_rgba(0,0,0,0.28)]" : "border-[#E5E7EB] bg-white shadow-[0_24px_70px_rgba(31,43,77,0.16)]"}`}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-[16px] font-semibold tracking-[-0.02em] text-[#171717]">Sign out</h2>
-                <p className="mt-2 text-[13px] leading-5 text-[#6B7280]">Are you sure you want to sign out?</p>
+                <h2 className={`text-[16px] font-semibold tracking-[-0.02em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Sign out</h2>
+                <p className={`mt-2 text-[13px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Are you sure you want to sign out?</p>
               </div>
-              <button onClick={() => setSignOutOpen(false)} className="rounded-lg p-1 text-[#9CA3AF] hover:bg-[#F4F8FB]">
+              <button onClick={() => setSignOutOpen(false)} className={`rounded-lg p-1 ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#9CA3AF] hover:bg-[#F4F8FB]"}`}>
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="mt-6 flex justify-end gap-2">
-              <button onClick={() => setSignOutOpen(false)} className="rounded-xl border border-[#E5E7EB] bg-white px-4 py-2 text-[12px] font-semibold text-[#4B5563] hover:bg-[#F8FAFC]">
+              <button onClick={() => setSignOutOpen(false)} className={`rounded-xl border px-4 py-2 text-[12px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-[#F8FAFC]"}`}>
                 Cancel
               </button>
               <button
                 onClick={() => signOut({ callbackUrl: "/login" })}
-                className="rounded-xl bg-[#4A9BFF] px-4 py-2 text-[12px] font-semibold text-white shadow-[0_10px_22px_rgba(74,155,255,0.22)] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"
+                className={`rounded-xl px-4 py-2 text-[12px] font-semibold text-white shadow-[0_10px_22px_rgba(74,155,255,0.22)] ${dark ? "bg-[#3BA7FF] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
               >
                 Sign Out
               </button>
@@ -516,6 +524,8 @@ function SidebarLink({
   collapsed: boolean;
   onNavigate: () => void;
 }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
   const Icon = item.icon;
 
   return (
@@ -524,17 +534,18 @@ function SidebarLink({
       onClick={onNavigate}
       title={collapsed ? item.label : undefined}
       className={[
-        "group flex h-8 w-full items-center rounded-xl px-2.5 text-left text-[12px] font-medium transition-all hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
+        "group flex h-8 w-full items-center rounded-xl px-2.5 text-left text-[12px] font-medium transition-all",
+        dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
         collapsed ? "justify-center" : "gap-2",
       ].join(" ")}
       style={{
-        background: active ? "#FFFFFF" : undefined,
-        border: active ? "1px solid rgba(229,231,235,0.95)" : undefined,
-        boxShadow: active ? "0 8px 18px rgba(31,43,77,0.06)" : undefined,
-        color: active ? "#171717" : undefined,
+        background: active ? (dark ? "rgba(59,167,255,0.14)" : "#FFFFFF") : undefined,
+        border: active ? (dark ? "1px solid rgba(59,167,255,0.18)" : "1px solid rgba(229,231,235,0.95)") : undefined,
+        boxShadow: active ? (dark ? "0 10px 24px rgba(0,0,0,0.22)" : "0 8px 18px rgba(31,43,77,0.06)") : undefined,
+        color: active ? (dark ? "#F4F6F8" : "#171717") : undefined,
       }}
     >
-      <Icon className={`h-[13px] w-[13px] flex-shrink-0 group-hover:text-[#4A9BFF] ${active ? "text-[#1DA1F2]" : "text-[#6B7280]"}`} />
+      <Icon className={`h-[13px] w-[13px] flex-shrink-0 ${dark ? "group-hover:text-[#F4F6F8]" : "group-hover:text-[#4A9BFF]"} ${active ? "text-[#3BA7FF]" : dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`} />
       {!collapsed && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
       {!collapsed && item.badge && (
         <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF3B6B] px-1 text-[10px] font-bold text-white">{item.badge}</span>
@@ -544,41 +555,47 @@ function SidebarLink({
 }
 
 function DropdownPanel({ children, className = "" }: { children: ReactNode; className?: string }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
   return (
-    <div className={`absolute z-50 rounded-2xl border border-[#E8EEF2] bg-white p-1.5 shadow-[0_18px_48px_rgba(31,43,77,0.12)] ${className}`}>
+    <div className={`absolute z-50 rounded-2xl border p-1.5 shadow-[0_18px_48px_rgba(31,43,77,0.12)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_18px_48px_rgba(0,0,0,0.24)]" : "border-[#E8EEF2] bg-white"} ${className}`}>
       {children}
     </div>
   );
 }
 
 function DropdownButton({ icon: Icon, label, onClick, muted }: { icon: LucideIcon; label: string; onClick?: () => void; muted?: boolean }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
   return (
     <button
       onClick={onClick}
-      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-[12px] font-medium text-[#4B5563] hover:bg-[#F4F8FB]"
+      className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-[12px] font-medium ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#4B5563] hover:bg-[#F4F8FB]"}`}
     >
-      <Icon className="h-3.5 w-3.5 text-[#6B7280]" />
+      <Icon className={`h-3.5 w-3.5 ${dark ? "text-[#6F7782]" : "text-[#6B7280]"}`} />
       <span>{label}</span>
-      {muted && <span className="ml-auto text-[10px] text-[#A1A7B0]">Soon</span>}
+      {muted && <span className={`ml-auto text-[10px] ${dark ? "text-[#6F7782]" : "text-[#A1A7B0]"}`}>Soon</span>}
     </button>
   );
 }
 
 function NotificationsDropdown({ align = "right" }: { align?: "left" | "right" }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
   return (
     <DropdownPanel className={`${align === "left" ? "left-0" : "right-0"} top-9 w-72`}>
       <div className="px-3 py-2">
-        <p className="text-[13px] font-semibold text-[#171717]">Notifications</p>
-        <p className="mt-1 text-[11px] text-[#6B7280]">Recent workspace updates</p>
+        <p className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Notifications</p>
+        <p className={`mt-1 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Recent workspace updates</p>
       </div>
       {[
         ["Prompt Lab", "2 prompts are ready for review."],
         ["Exports", "Latest render is queued for download."],
         ["Workspace", "Personal workspace synced locally."],
       ].map(([title, desc]) => (
-        <div key={title} className="rounded-xl px-3 py-2 hover:bg-[#F4F8FB]">
-          <p className="text-[12px] font-semibold text-[#171717]">{title}</p>
-          <p className="mt-0.5 text-[11px] text-[#6B7280]">{desc}</p>
+        <div key={title} className={`rounded-xl px-3 py-2 ${dark ? "hover:bg-[rgba(255,255,255,0.06)]" : "hover:bg-[#F4F8FB]"}`}>
+          <p className={`text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{title}</p>
+          <p className={`mt-0.5 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{desc}</p>
         </div>
       ))}
     </DropdownPanel>
@@ -587,12 +604,13 @@ function NotificationsDropdown({ align = "right" }: { align?: "left" | "right" }
 
 function DisplayDropdown() {
   const { theme } = useStudioTheme();
+  const dark = theme === "dark";
 
   return (
     <DropdownPanel className="right-0 top-9 w-60">
       <div className="px-3 py-2">
-        <p className="text-[13px] font-semibold text-[#171717]">Display preview</p>
-        <p className="mt-1 text-[11px] text-[#6B7280]">Layout and preview controls</p>
+        <p className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Display preview</p>
+        <p className={`mt-1 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Layout and preview controls</p>
       </div>
       <DropdownButton icon={Monitor} label="Preview workspace" muted />
       <DropdownButton icon={Grid2X2} label="Compact density" muted />
@@ -630,11 +648,13 @@ function StudioContent({ route }: { route: StudioRouteKey }) {
 }
 
 function PageHeader({ title, subtitle, action }: { title: string; subtitle: string; action?: ReactNode }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        <h2 className="text-[26px] font-semibold tracking-[-0.03em] text-[#171717]">{title}</h2>
-        <p className="mt-2 text-[12px] leading-5 text-[#6B7280]">{subtitle}</p>
+        <h2 className={`text-[26px] font-semibold tracking-[-0.03em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{title}</h2>
+        <p className={`mt-2 text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{subtitle}</p>
       </div>
       {action}
     </div>
@@ -642,12 +662,16 @@ function PageHeader({ title, subtitle, action }: { title: string; subtitle: stri
 }
 
 function SoftCard({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-2xl border border-[#EAECEF] bg-[#FCFDFE] p-4 shadow-[0_10px_24px_rgba(31,43,77,0.035)] ${className}`}>{children}</div>;
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  return <div className={`rounded-2xl border p-4 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_10px_24px_rgba(0,0,0,0.22)]" : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_10px_24px_rgba(31,43,77,0.035)]"} ${className}`}>{children}</div>;
 }
 
 function PrimaryButton({ children, icon: Icon }: { children: ReactNode; icon?: LucideIcon }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
   return (
-    <button className="inline-flex h-9 items-center gap-2 rounded-xl bg-[#4A9BFF] px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]">
+    <button className={`inline-flex h-9 items-center gap-2 rounded-xl px-4 text-[12px] font-semibold ${dark ? "bg-[#3BA7FF] text-white shadow-[0_12px_24px_rgba(59,167,255,0.24)] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}>
       {Icon && <Icon className="h-3.5 w-3.5" />}
       {children}
     </button>
@@ -655,8 +679,10 @@ function PrimaryButton({ children, icon: Icon }: { children: ReactNode; icon?: L
 }
 
 function SecondaryButton({ children, icon: Icon }: { children: ReactNode; icon?: LucideIcon }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
   return (
-    <button className="inline-flex h-9 items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-4 text-[12px] font-semibold text-[#4B5563] shadow-sm hover:border-[#CFE8F8] hover:text-[#171717]">
+    <button className={`inline-flex h-9 items-center gap-2 rounded-xl border px-4 text-[12px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:border-[rgba(59,167,255,0.24)] hover:text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm hover:border-[#CFE8F8] hover:text-[#171717]"}`}>
       {Icon && <Icon className="h-3.5 w-3.5" />}
       {children}
     </button>
@@ -809,6 +835,8 @@ function AssetLibraryPage() {
 }
 
 function AIAssistantPage() {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
   const [input, setInput] = useState("");
   const [actionsOpen, setActionsOpen] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -837,7 +865,7 @@ function AIAssistantPage() {
   };
 
   const composer = (
-    <div className="w-full overflow-visible rounded-3xl border border-[#E5E7EB] bg-white text-left shadow-[0_18px_42px_rgba(31,43,77,0.06)] max-sm:rounded-[1.35rem] max-sm:shadow-[0_12px_30px_rgba(31,43,77,0.08)]">
+    <div className={`w-full overflow-visible rounded-3xl border text-left max-sm:rounded-[1.35rem] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_18px_42px_rgba(0,0,0,0.22)] max-sm:shadow-[0_12px_30px_rgba(0,0,0,0.26)]" : "border-[#E5E7EB] bg-white shadow-[0_18px_42px_rgba(31,43,77,0.06)] max-sm:shadow-[0_12px_30px_rgba(31,43,77,0.08)]"}`}>
       <div className="relative flex min-h-[150px] flex-col px-5 py-4 max-sm:min-h-[112px] max-sm:px-4 max-sm:py-3">
         <div className="flex items-start gap-2">
           <Sparkles className="mt-0.5 h-[13px] w-[13px] fill-[#1DA1F2] text-[#1DA1F2]" />
@@ -851,18 +879,18 @@ function AIAssistantPage() {
               }
             }}
             placeholder="Ask Lumen AI Assistant..."
-            className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]"
-            style={{ color: "#171717", letterSpacing: 0 }}
+            className={`min-w-0 flex-1 bg-transparent text-[13px] outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#A1A7B0]"}`}
+            style={{ color: dark ? "#F4F6F8" : "#171717", letterSpacing: 0 }}
           />
         </div>
         {attachments.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {attachments.map((attachment) => (
-              <span key={attachment.id} className="inline-flex max-w-full items-center gap-2 rounded-full border border-[#E5E7EB] bg-[#F8FAFC] px-2.5 py-1 text-[10px] font-medium text-[#4B5563]">
+              <span key={attachment.id} className={`inline-flex max-w-full items-center gap-2 rounded-full border px-2.5 py-1 text-[10px] font-medium ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]" : "border-[#E5E7EB] bg-[#F8FAFC] text-[#4B5563]"}`}>
                 <span className="truncate">{attachment.name}</span>
                 <button
                   onClick={() => setAttachments((current) => current.filter((item) => item.id !== attachment.id))}
-                  className="rounded-full text-[#9CA3AF] hover:text-[#171717]"
+                  className={`rounded-full ${dark ? "text-[#6F7782] hover:text-[#F4F6F8]" : "text-[#9CA3AF] hover:text-[#171717]"}`}
                   aria-label={`Remove ${attachment.name}`}
                 >
                   <X className="h-3 w-3" />
@@ -871,9 +899,9 @@ function AIAssistantPage() {
             ))}
           </div>
         )}
-        <div className="mt-auto flex items-center gap-3 pt-5 text-[#A1A7B0] max-sm:gap-1.5 max-sm:pt-3">
+        <div className={`mt-auto flex items-center gap-3 pt-5 max-sm:gap-1.5 max-sm:pt-3 ${dark ? "text-[#A8B0BA]" : "text-[#A1A7B0]"}`}>
           <div className="relative">
-            <button onClick={() => setActionsOpen((value) => !value)} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Open assistant actions">
+            <button onClick={() => setActionsOpen((value) => !value)} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Open assistant actions">
               <Plus className="h-[13px] w-[13px]" />
             </button>
             {actionsOpen && (
@@ -884,13 +912,13 @@ function AIAssistantPage() {
               </DropdownPanel>
             )}
           </div>
-          <button onClick={() => fileInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach file">
+          <button onClick={() => fileInputRef.current?.click()} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach file">
             <Paperclip className="h-[13px] w-[13px]" />
           </button>
-          <button onClick={() => imageInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach image">
+          <button onClick={() => imageInputRef.current?.click()} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach image">
             <ImageIcon className="h-[13px] w-[13px]" />
           </button>
-          <button onClick={() => documentInputRef.current?.click()} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Attach document">
+          <button onClick={() => documentInputRef.current?.click()} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach document">
             <FileText className="h-[13px] w-[13px]" />
           </button>
           <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
@@ -900,7 +928,7 @@ function AIAssistantPage() {
             onClick={sendPrompt}
             disabled={!input.trim()}
             aria-label="Send prompt"
-            className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-[#4A9BFF] text-white shadow-[0_12px_24px_rgba(74,155,255,0.28)] transition-colors disabled:opacity-70 hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"
+            className={`ml-auto flex h-9 w-9 items-center justify-center rounded-full text-white shadow-[0_12px_24px_rgba(74,155,255,0.28)] transition-colors disabled:opacity-70 ${dark ? "bg-[#3BA7FF] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
           >
             <Send className="h-4 w-4" />
           </button>
@@ -928,25 +956,25 @@ function AIAssistantPage() {
       <div className="flex min-h-full items-center justify-center py-8 max-sm:items-stretch max-sm:justify-start max-sm:py-0">
         <div className="flex w-full max-w-[620px] flex-col items-center text-center max-sm:min-h-full max-sm:max-w-none max-sm:pb-3">
           <div className="hidden h-12 w-full items-center justify-center sm:hidden max-sm:flex">
-            <button className="absolute left-1 flex h-9 w-9 items-center justify-center rounded-full text-[#171717] hover:bg-[#F4F8FB]" aria-label="Back">
+            <button className={`absolute left-1 flex h-9 w-9 items-center justify-center rounded-full ${dark ? "text-[#F4F6F8] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#171717] hover:bg-[#F4F8FB]"}`} aria-label="Back">
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <p className="text-[13px] font-medium text-[#171717]">Lumen AI Assistant</p>
+            <p className={`text-[13px] font-medium ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Lumen AI Assistant</p>
           </div>
 
           <div className="mb-5 flex h-[62px] w-[62px] items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_16px_38px_rgba(29,161,242,0.32)] max-sm:mt-24 max-sm:h-[54px] max-sm:w-[54px]">
             <Sparkles className="h-7 w-7 fill-current max-sm:h-6 max-sm:w-6" />
           </div>
-          <h2 className="text-[28px] font-semibold tracking-[-0.03em] text-[#171717] max-sm:text-[17px]">Good Morning, Julie!</h2>
-          <p className="mt-3 text-[12px] leading-5 text-[#6B7280] max-sm:mt-1 max-sm:text-[11px]">Your money story today starts with Lumen - clear, simple, and made for you.</p>
+          <h2 className={`text-[28px] font-semibold tracking-[-0.03em] max-sm:text-[17px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Good Morning, Julie!</h2>
+          <p className={`mt-3 text-[12px] leading-5 max-sm:mt-1 max-sm:text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Your money story today starts with Lumen - clear, simple, and made for you.</p>
 
           <div className="mt-7 hidden w-full sm:block">{composer}</div>
 
           <div className="mt-4 hidden w-full gap-3 sm:grid sm:grid-cols-3">
             {suggestions.map((card) => (
-              <button key={card.title} className="rounded-2xl border border-[#EAECEF] bg-[#FCFDFE] p-4 text-left shadow-[0_10px_24px_rgba(31,43,77,0.035)] transition-all hover:-translate-y-0.5 hover:border-[#D4EAF8] hover:bg-white">
-                <p className="text-[12px] font-semibold text-[#171717]">{card.title}</p>
-                <p className="mt-2 text-[10.5px] leading-4 text-[#6B7280]">{card.desc}</p>
+              <button key={card.title} className={`rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_10px_24px_rgba(0,0,0,0.22)] hover:border-[rgba(59,167,255,0.22)] hover:bg-[#23262C]" : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_10px_24px_rgba(31,43,77,0.035)] hover:border-[#D4EAF8] hover:bg-white"}`}>
+                <p className={`text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{card.title}</p>
+                <p className={`mt-2 text-[10.5px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{card.desc}</p>
               </button>
             ))}
           </div>
@@ -954,28 +982,28 @@ function AIAssistantPage() {
             {mobileSuggestions.map((item) => {
               const Icon = item.icon;
               return (
-                <button key={item.title} className="inline-flex h-7 items-center gap-1.5 rounded-full border border-[#E5E7EB] bg-white px-3 text-[10.5px] font-medium text-[#171717] shadow-[0_8px_20px_rgba(31,43,77,0.04)]">
-                  <Icon className="h-3 w-3 text-[#4B5563]" />
+                <button key={item.title} className={`inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-[10.5px] font-medium shadow-[0_8px_20px_rgba(31,43,77,0.04)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#171717]"}`}>
+                  <Icon className={`h-3 w-3 ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`} />
                   {item.title}
                 </button>
               );
             })}
           </div>
 
-          <button className="mt-4 self-start text-[11px] font-medium text-[#6B7280] hover:text-[#171717] max-sm:hidden">
+          <button className={`mt-4 self-start text-[11px] font-medium max-sm:hidden ${dark ? "text-[#A8B0BA] hover:text-[#F4F6F8]" : "text-[#6B7280] hover:text-[#171717]"}`}>
             <span className="inline-flex items-center gap-1">
               Refresh prompts <RefreshCw className="h-[11px] w-[11px]" />
             </span>
           </button>
 
           <div className="mt-auto hidden w-full pt-4 max-sm:block">
-            <div className="mb-2 flex items-start gap-2 rounded-2xl border border-[#E8EEF2] bg-[#FCFDFE] px-3 py-2 text-left shadow-[0_10px_24px_rgba(31,43,77,0.04)]">
+            <div className={`mb-2 flex items-start gap-2 rounded-2xl border px-3 py-2 text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_10px_24px_rgba(0,0,0,0.22)]" : "border-[#E8EEF2] bg-[#FCFDFE] shadow-[0_10px_24px_rgba(31,43,77,0.04)]"}`}>
               <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white">
                 <Sparkles className="h-3.5 w-3.5 fill-current" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10.5px] font-medium text-[#171717]">Collaborate with Nova AI &amp; Orion 2.0</p>
-                <p className="mt-0.5 text-[9.5px] leading-3 text-[#6B7280]">Ideal for comprehensive analysis and insights</p>
+                <p className={`text-[10.5px] font-medium ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Collaborate with Nova AI &amp; Orion 2.0</p>
+                <p className={`mt-0.5 text-[9.5px] leading-3 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Ideal for comprehensive analysis and insights</p>
               </div>
             </div>
             {composer}
@@ -990,7 +1018,7 @@ function AIAssistantPage() {
       <div className="flex flex-1 flex-col justify-end pb-6">
         <div className="mb-10 flex min-h-[250px] items-end justify-end">
           <div className="relative h-[150px] w-[230px]">
-            <div className="absolute right-9 top-3 h-[126px] w-[70px] -rotate-6 rounded-[10px] bg-white p-2 text-[5px] leading-[1.15] text-[#111827] opacity-80 shadow-[0_18px_45px_rgba(31,43,77,0.10)] blur-[0.2px]">
+            <div className={`absolute right-9 top-3 h-[126px] w-[70px] -rotate-6 rounded-[10px] p-2 text-[5px] leading-[1.15] opacity-80 shadow-[0_18px_45px_rgba(31,43,77,0.10)] blur-[0.2px] ${dark ? "bg-[#202328] text-[#F4F6F8]" : "bg-white text-[#111827]"}`}>
               <p className="text-center text-[8px] font-bold">TESCO</p>
               <p className="mt-1">MILK 2.99</p>
               <p>BREAD 1.75</p>
@@ -999,20 +1027,20 @@ function AIAssistantPage() {
               <p>PASTA 2.10</p>
               <p className="mt-1 border-t border-[#D1D5DB] pt-1 font-bold">TOTAL 592.07</p>
             </div>
-            <div className="absolute right-0 top-8 h-[132px] w-[100px] rotate-8 rounded-[14px] bg-[#F9FAFB] p-3 text-center text-[#111827] shadow-[0_22px_50px_rgba(31,43,77,0.13)]">
+            <div className={`absolute right-0 top-8 h-[132px] w-[100px] rotate-8 rounded-[14px] p-3 text-center shadow-[0_22px_50px_rgba(31,43,77,0.13)] ${dark ? "bg-[#202328] text-[#F4F6F8]" : "bg-[#F9FAFB] text-[#111827]"}`}>
               <p className="text-[16px] font-semibold tracking-[-0.04em]">Walmart</p>
-              <p className="text-[5px] font-medium text-[#6B7280]">Save money. Live better.</p>
-              <div className="mt-2 space-y-0.5 text-left text-[5px] leading-[1.05] text-[#111827]">
+              <p className={`text-[5px] font-medium ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Save money. Live better.</p>
+              <div className={`mt-2 space-y-0.5 text-left text-[5px] leading-[1.05] ${dark ? "text-[#F4F6F8]" : "text-[#111827]"}`}>
                 <p>HOUSEHOLD 420.00</p>
                 <p>CLEANING 88.12</p>
                 <p>STORAGE 72.40</p>
                 <p>HOME 415.60</p>
-                <p className="border-t border-[#D1D5DB] pt-1 font-bold">TOTAL 996.12</p>
+                <p className={`border-t pt-1 font-bold ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#D1D5DB]"}`}>TOTAL 996.12</p>
               </div>
             </div>
           </div>
 
-          <div className="ml-auto max-w-[440px] rounded-full border border-[#E5E7EB] bg-white px-4 py-2 text-[13px] text-[#171717] shadow-[0_10px_28px_rgba(31,43,77,0.04)]">
+          <div className={`ml-auto max-w-[440px] rounded-full border px-4 py-2 text-[13px] shadow-[0_10px_28px_rgba(31,43,77,0.04)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#171717]"}`}>
             Hi Lumen, can you help me log 3 shopping receipts today?
           </div>
         </div>
@@ -1021,9 +1049,9 @@ function AIAssistantPage() {
           <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_12px_26px_rgba(29,161,242,0.28)]">
             <Sparkles className="h-4 w-4 fill-current" />
           </div>
-          <div className="min-w-0 flex-1 text-[13px] leading-6 text-[#171717]">
+          <div className={`min-w-0 flex-1 text-[13px] leading-6 ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
             <p className="mb-3">Got it, Julie.</p>
-            <div className="border-t border-[#E5E7EB] pt-3">
+            <div className={`border-t pt-3 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#E5E7EB]"}`}>
               <ul className="list-disc space-y-2 pl-4">
                 <li>Added Tesco receipt: <strong>$592.07</strong> (Groceries)</li>
                 <li>Added Walmart receipt: <strong>$996.12</strong> (Household)</li>
@@ -1033,15 +1061,15 @@ function AIAssistantPage() {
             </div>
 
             <div className="my-4 flex justify-end">
-              <span className="rounded-full border border-[#E5E7EB] bg-white px-4 py-2 text-[12px] shadow-[0_10px_28px_rgba(31,43,77,0.04)]">Yes, please.</span>
+              <span className={`rounded-full border px-4 py-2 text-[12px] shadow-[0_10px_28px_rgba(31,43,77,0.04)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#171717]"}`}>Yes, please.</span>
             </div>
 
-            <div className="border-t border-[#E5E7EB] pt-4">
+            <div className={`border-t pt-4 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#E5E7EB]"}`}>
               <p>
                 Today you&apos;ve spent a total of <strong>$2,080.61</strong>. Most went to household (60%), followed by food &amp; drinks (11%) and groceries (29%).
               </p>
             </div>
-            <div className="mt-4 border-t border-[#E5E7EB] pt-4">
+            <div className={`mt-4 border-t pt-4 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#E5E7EB]"}`}>
               <p>Do you want me to compare this with your weekly average?</p>
             </div>
           </div>
@@ -1133,7 +1161,7 @@ function SettingsPage() {
         action={
           <button
             onClick={toggleTheme}
-            className="inline-flex h-9 items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-4 text-[12px] font-semibold text-[#171717] shadow-sm hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"
+            className={`inline-flex h-9 items-center gap-2 rounded-xl border px-4 text-[12px] font-semibold ${isDark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#171717] shadow-sm hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
           >
             {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
             {isDark ? "Switch to light" : "Switch to dark"}
@@ -1145,20 +1173,20 @@ function SettingsPage() {
         <SoftCard>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
+              <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${isDark ? "bg-[#181B20] text-[#3BA7FF]" : "bg-[#EEF7FC] text-[#1DA1F2]"}`}>
                 {isDark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
               </div>
-              <h3 className="text-[14px] font-semibold text-[#171717]">Appearance</h3>
-              <p className="mt-2 max-w-md text-[11px] leading-5 text-[#6B7280]">
+              <h3 className={`text-[14px] font-semibold ${isDark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Appearance</h3>
+              <p className={`mt-2 max-w-md text-[11px] leading-5 ${isDark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
                 Choose a softer light workspace or a calm dark workspace. Your preference is saved on this browser.
               </p>
             </div>
-            <div className="inline-flex rounded-2xl border border-[#E5E7EB] bg-white p-1">
+            <div className={`inline-flex rounded-2xl border p-1 ${isDark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5E7EB] bg-white"}`}>
               <button
                 onClick={() => setTheme("light")}
                 className={[
                   "inline-flex h-8 items-center gap-2 rounded-xl px-3 text-[11px] font-semibold transition-all",
-                  theme === "light" ? "bg-[#DDEEFF] text-[#4A9BFF]" : "text-[#6B7280] hover:bg-[#F4F8FB]",
+                  theme === "light" ? (isDark ? "bg-[rgba(59,167,255,0.14)] text-[#F4F6F8]" : "bg-[#DDEEFF] text-[#4A9BFF]") : (isDark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#6B7280] hover:bg-[#F4F8FB]"),
                 ].join(" ")}
               >
                 <Sun className="h-3.5 w-3.5" />
@@ -1168,7 +1196,7 @@ function SettingsPage() {
                 onClick={() => setTheme("dark")}
                 className={[
                   "inline-flex h-8 items-center gap-2 rounded-xl px-3 text-[11px] font-semibold transition-all",
-                  theme === "dark" ? "bg-[#DDEEFF] text-[#4A9BFF]" : "text-[#6B7280] hover:bg-[#F4F8FB]",
+                  theme === "dark" ? (isDark ? "bg-[rgba(59,167,255,0.14)] text-[#F4F6F8]" : "bg-[#DDEEFF] text-[#4A9BFF]") : (isDark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#6B7280] hover:bg-[#F4F8FB]"),
                 ].join(" ")}
               >
                 <Moon className="h-3.5 w-3.5" />
@@ -1178,12 +1206,12 @@ function SettingsPage() {
           </div>
         </SoftCard>
         <SoftCard>
-          <h3 className="text-[13px] font-semibold text-[#171717]">Alternus AI Trial</h3>
-          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">12 days left on the Personal workspace trial.</p>
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#EEF7FC]">
+          <h3 className={`text-[13px] font-semibold ${isDark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Alternus AI Trial</h3>
+          <p className={`mt-2 text-[11px] leading-5 ${isDark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>12 days left on the Personal workspace trial.</p>
+          <div className={`mt-4 h-2 overflow-hidden rounded-full ${isDark ? "bg-[#181B20]" : "bg-[#EEF7FC]"}`}>
             <div className="h-full w-[58%] rounded-full bg-[#4A9BFF]" />
           </div>
-          <button className="mt-4 inline-flex h-9 items-center rounded-xl bg-[#4A9BFF] px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]">
+          <button className={`mt-4 inline-flex h-9 items-center rounded-xl px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] ${isDark ? "bg-[#3BA7FF] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}>
             Upgrade plan
           </button>
         </SoftCard>
@@ -1236,23 +1264,27 @@ function SettingsPage() {
 }
 
 function SettingCardHeader({ icon: Icon, title }: { icon: LucideIcon; title: string }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
   return (
     <div className="flex items-center gap-3">
-      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
+      <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ? "bg-[#181B20] text-[#3BA7FF]" : "bg-[#EEF7FC] text-[#1DA1F2]"}`}>
         <Icon className="h-4 w-4" />
       </span>
-      <h3 className="text-[13px] font-semibold text-[#171717]">{title}</h3>
+      <h3 className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{title}</h3>
     </div>
   );
 }
 
 function SettingsRows({ rows }: { rows: string[] }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
   return (
     <div className="mt-4 space-y-2">
       {rows.map((row) => (
-        <div key={row} className="flex items-center justify-between rounded-xl border border-[#E5E7EB] bg-white px-3 py-2">
-          <span className="text-[11px] font-medium text-[#4B5563]">{row}</span>
-          <span className="text-[10px] font-semibold text-[#A1A7B0]">Soon</span>
+        <div key={row} className={`flex items-center justify-between rounded-xl border px-3 py-2 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5E7EB] bg-white"}`}>
+          <span className={`text-[11px] font-medium ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>{row}</span>
+          <span className={`text-[10px] font-semibold ${dark ? "text-[#6F7782]" : "text-[#A1A7B0]"}`}>Soon</span>
         </div>
       ))}
     </div>
