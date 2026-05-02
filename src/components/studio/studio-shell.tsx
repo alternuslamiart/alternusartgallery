@@ -19,6 +19,7 @@ import {
   Menu,
   Monitor,
   Paperclip,
+  PanelLeft,
   PenLine,
   Plus,
   RefreshCw,
@@ -171,26 +172,13 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         </button>
 
         {!isCollapsed && (
-          <div className="flex items-center gap-2 text-[#6B7280]">
-            <div ref={sidebarNotificationRef} className="relative">
-              <button
-                onClick={() => setNotificationsOpen((value) => !value)}
-                className="relative flex h-7 w-7 items-center justify-center rounded-lg hover:bg-white/70"
-                aria-label="Notifications"
-              >
-                <Bell className="h-[13px] w-[13px]" />
-                <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#FF3B6B]" />
-              </button>
-              {notificationsOpen && <NotificationsDropdown align="left" />}
-            </div>
-            <button
-              onClick={() => router.push("/settings")}
-              className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-white/70"
-              aria-label="Settings"
-            >
-              <Settings className="h-[13px] w-[13px]" />
-            </button>
-          </div>
+          <button
+            onClick={toggleMenu}
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-[#6B7280] hover:bg-white/70 hover:text-[#171717]"
+            aria-label="Toggle sidebar"
+          >
+            <PanelLeft className="h-[14px] w-[14px]" />
+          </button>
         )}
 
         {workspaceOpen && !isCollapsed && (
