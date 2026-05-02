@@ -10544,7 +10544,150 @@ function AlternusAgentApp({ c, mode, setMode, wallpaper, setWallpaper, onOpenApp
           </div>
         ) : (
           /* ── CHAT + INPUT VIEW (no workspace) ── */
-          <div className="flex flex-col h-full" onClick={() => setShowFormatMenu(false)}>
+          <div className="relative flex flex-col h-full" onClick={() => setShowFormatMenu(false)}>
+            <div className="absolute inset-0 z-[80] flex overflow-hidden bg-[#F6F6F6] font-sans">
+              <aside className="flex w-[262px] flex-shrink-0 flex-col border-r border-[#ECEEF2] bg-white px-5 py-5">
+                <div className="mb-11 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-[52px] w-[52px] items-center justify-center rounded-[14px] bg-[#6A73F7] shadow-[0_8px_22px_rgba(90,101,241,0.28)] ring-4 ring-[#E5E7FF]">
+                      <I d={ic.fileText} s={25} c="#fff" />
+                    </div>
+                    <p className="text-[29px] font-black tracking-[-0.02em] text-[#11131A]">Writify</p>
+                  </div>
+                  <button aria-label="Collapse sidebar" className="flex h-8 w-8 items-center justify-center rounded-lg text-[#344055] hover:bg-[#F5F6FA]">
+                    <I d={ic.monitor} s={18} c="currentColor" />
+                  </button>
+                </div>
+
+                <nav className="space-y-3">
+                  {[
+                    { icon: ic.home, label: "Home", active: false },
+                    { icon: ic.folder, label: "Cover Letters", active: true },
+                    { icon: ic.fileText, label: "Resumes", active: false },
+                    { icon: ic.monitor, label: "Websites", active: false },
+                    { icon: ic.user, label: "Users", active: false },
+                  ].map(item => (
+                    <button
+                      key={item.label}
+                      className="flex w-full items-center gap-4 rounded-lg px-4 py-3 text-left text-[24px] font-medium transition-colors"
+                      style={{
+                        background: item.active ? "#F5F6FA" : "transparent",
+                        color: item.active ? "#151820" : "#5D6675",
+                      }}
+                    >
+                      <I d={item.icon} s={22} c={item.active ? "#5367E9" : "#344055"} />
+                      <span>{item.label}</span>
+                    </button>
+                  ))}
+                </nav>
+              </aside>
+
+              <main className="flex min-w-0 flex-1 flex-col bg-[#F8F8F8]">
+                {msgs.filter(m => m.role === "user").length === 0 && !isThinking ? (
+                  <div className="flex h-full items-center justify-center px-8">
+                    <div className="flex max-w-[270px] flex-col items-center text-center">
+                      <div className="relative mb-6 flex h-[98px] w-[98px] items-center justify-center rounded-[24px] bg-[#E9EBFF] shadow-[0_18px_48px_rgba(116,126,242,0.24)]">
+                        <div className="absolute -right-16 top-5 h-16 w-24 rounded-full bg-[#F8D9DE] opacity-40 blur-2xl" />
+                        <div className="absolute -left-16 bottom-2 h-16 w-24 rounded-full bg-[#F6E5BB] opacity-45 blur-2xl" />
+                        <div className="relative flex h-[76px] w-[76px] items-center justify-center rounded-[20px] border border-white/70 bg-gradient-to-b from-[#F4F5FF] to-[#7180F8] shadow-inner">
+                          <I d={ic.fileText} s={42} c="#fff" />
+                          <span className="absolute bottom-5 left-5 h-2 w-2 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.95)]" />
+                          <span className="absolute bottom-8 right-4 h-1.5 w-1.5 rounded-full bg-white/90" />
+                        </div>
+                      </div>
+                      <h2 className="text-[18px] font-black text-[#11131A]">Answer the prompts</h2>
+                      <p className="mt-2 text-[13px] leading-5 text-[#4F5664]">
+                        Get the best preview results by filling in several inputs on the left.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex h-full flex-col">
+                    <div className="flex-1 overflow-y-auto px-8 py-10" style={{ scrollbarWidth: "none" }}>
+                      <div className="mx-auto flex w-full max-w-[1040px] flex-col gap-5">
+                        {msgs.filter(m => m.id !== "welcome").map(m => (
+                          <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex gap-3"}>
+                            {m.role === "agent" && (
+                              <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#40C7FF] to-[#5368F0] text-white shadow-[0_8px_18px_rgba(64,157,255,0.24)]">
+                                <I d={ic.sparkle} s={14} c="currentColor" f />
+                              </div>
+                            )}
+                            <div className={m.role === "user" ? "max-w-[68%] rounded-full border border-[#E6E6E6] bg-white px-4 py-2 text-[13px] text-[#17181D] shadow-sm" : "max-w-[92%] flex-1 text-[13px] leading-6 text-[#17181D]"}>
+                              {m.steps && m.steps.length > 0 && (
+                                <div className="mb-3 rounded-xl border border-[#E7EAF3] bg-white px-4 py-3">
+                                  {m.steps.map((s, si) => (
+                                    <div key={si} className="flex items-center gap-2 text-[12px] text-[#5D6675]">
+                                      <span className="h-1.5 w-1.5 rounded-full" style={{ background: statusColors[s.status] }} />
+                                      {s.label}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                              {m.text.trim().length > 0 && (
+                                m.role === "agent" ? (
+                                  <div className="space-y-3">
+                                    <AIFormattedText text={m.text} c={palette.light} />
+                                  </div>
+                                ) : (
+                                  m.text
+                                )
+                              )}
+                            </div>
+                          </div>
+                        ))}
+
+                        {isThinking && (
+                          <div className="flex gap-3">
+                            <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#40C7FF] to-[#5368F0] text-white">
+                              <I d={ic.sparkle} s={14} c="currentColor" f />
+                            </div>
+                            <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+                              <div className="flex gap-1.5">
+                                {[0, 1, 2].map(i => <span key={i} className="h-1.5 w-1.5 animate-bounce rounded-full bg-[#4AAAF5]" style={{ animationDelay: `${i * 0.15}s` }} />)}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        <div ref={endRef} />
+                      </div>
+                    </div>
+
+                    <div className="px-8 pb-8">
+                      <div className="mx-auto flex min-h-[122px] w-full max-w-[1040px] flex-col rounded-[26px] border border-[#E5E5E5] bg-white px-4 py-4 shadow-[0_12px_34px_rgba(0,0,0,0.04)]">
+                        <div className="flex items-start gap-3">
+                          <I d={ic.sparkle} s={15} c="#35A9F4" f />
+                          <input
+                            value={input}
+                            onChange={e => setInput(e.target.value)}
+                            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+                            placeholder="Ask Lumen AI Assistant..."
+                            disabled={isThinking}
+                            className="min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-[#A1A5AE]"
+                            style={{ color: "#17181D", letterSpacing: 0 }}
+                          />
+                        </div>
+                        <div className="mt-auto flex items-center gap-4">
+                          {[ic.plus, ic.paperclip, ic.image, ic.fileText].map((icon, index) => (
+                            <button key={index} className="flex h-7 w-7 items-center justify-center rounded-lg text-[#A1A5AE] hover:bg-[#F6F6F6] hover:text-[#4F5664]">
+                              <I d={icon} s={14} c="currentColor" />
+                            </button>
+                          ))}
+                          <button
+                            onClick={() => send()}
+                            disabled={isThinking || !input.trim()}
+                            aria-label="Send message"
+                            className="ml-auto flex h-9 w-9 items-center justify-center rounded-full text-white shadow-[0_8px_18px_rgba(42,159,239,0.26)] transition-opacity disabled:opacity-60"
+                            style={{ background: "linear-gradient(135deg,#46C7FF,#386EF4)" }}
+                          >
+                            <I d={ic.send} s={16} c="currentColor" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </main>
+            </div>
             <style>{`
               @media (max-width: 768px) {
                 .agent-studio-sidebar { display: none !important; }
