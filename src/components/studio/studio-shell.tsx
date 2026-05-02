@@ -7,8 +7,11 @@ import {
   AlertTriangle,
   Bell,
   Box,
+  Calculator,
   CheckCircle2,
   ChevronDown,
+  ChevronLeft,
+  CircleDollarSign,
   Code2,
   CreditCard,
   Database,
@@ -35,6 +38,7 @@ import {
   Sun,
   Upload,
   UserRound,
+  Wallet,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -364,7 +368,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         )}
 
         <main className="flex min-w-0 flex-1 flex-col p-3">
-          <header className="mb-3 flex h-8 items-center justify-between px-1">
+          <header className={`mb-3 flex h-8 items-center justify-between px-1 ${activeRoute === "ai-assistant" ? "max-sm:hidden" : ""}`}>
             <div className="flex min-w-0 items-center gap-3">
               <div className="relative flex items-center gap-2 text-[#6B7280]">
                 <div ref={notificationRef} className="relative">
@@ -407,7 +411,12 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
             </button>
           </header>
 
-          <section className="min-h-0 flex-1 overflow-auto rounded-3xl border border-[#E8EEF2] bg-white px-8 py-8 shadow-[0_24px_60px_rgba(31,43,77,0.06)]">
+          <section
+            className={[
+              "min-h-0 flex-1 overflow-auto rounded-3xl border border-[#E8EEF2] bg-white px-8 py-8 shadow-[0_24px_60px_rgba(31,43,77,0.06)]",
+              activeRoute === "ai-assistant" ? "max-sm:px-4 max-sm:py-0" : "",
+            ].join(" ")}
+          >
             {children}
           </section>
         </main>
@@ -776,8 +785,8 @@ function AIAssistantPage() {
   };
 
   const composer = (
-    <div className="w-full overflow-visible rounded-3xl border border-[#E5E7EB] bg-white text-left shadow-[0_18px_42px_rgba(31,43,77,0.06)]">
-      <div className="relative flex min-h-[150px] flex-col px-5 py-4">
+    <div className="w-full overflow-visible rounded-3xl border border-[#E5E7EB] bg-white text-left shadow-[0_18px_42px_rgba(31,43,77,0.06)] max-sm:rounded-[1.35rem] max-sm:shadow-[0_12px_30px_rgba(31,43,77,0.08)]">
+      <div className="relative flex min-h-[150px] flex-col px-5 py-4 max-sm:min-h-[112px] max-sm:px-4 max-sm:py-3">
         <div className="flex items-start gap-2">
           <Sparkles className="mt-0.5 h-[13px] w-[13px] fill-[#1DA1F2] text-[#1DA1F2]" />
           <input
@@ -810,7 +819,7 @@ function AIAssistantPage() {
             ))}
           </div>
         )}
-        <div className="mt-auto flex items-center gap-3 pt-5 text-[#A1A7B0]">
+        <div className="mt-auto flex items-center gap-3 pt-5 text-[#A1A7B0] max-sm:gap-1.5 max-sm:pt-3">
           <div className="relative">
             <button onClick={() => setActionsOpen((value) => !value)} className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[#DDEEFF] hover:text-[#4A9BFF]" aria-label="Open assistant actions">
               <Plus className="h-[13px] w-[13px]" />
@@ -854,19 +863,34 @@ function AIAssistantPage() {
       { title: "Calculation", desc: "Easily crunch the numbers for clearer money choices." },
       { title: "Spending", desc: "See your spending habits and spot useful patterns." },
     ];
+    const mobileSuggestions: { title: string; icon: LucideIcon }[] = [
+      { title: "Calculation", icon: Calculator },
+      { title: "Smart Budget", icon: Wallet },
+      { title: "Spending", icon: CircleDollarSign },
+      { title: "Research", icon: FileText },
+      { title: "Saving", icon: RefreshCw },
+      { title: "Overspend", icon: AlertTriangle },
+    ];
 
     return (
-      <div className="flex min-h-full items-center justify-center py-8">
-        <div className="flex w-full max-w-[620px] flex-col items-center text-center">
-          <div className="mb-5 flex h-[62px] w-[62px] items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_16px_38px_rgba(29,161,242,0.32)]">
-            <Sparkles className="h-7 w-7 fill-current" />
+      <div className="flex min-h-full items-center justify-center py-8 max-sm:items-stretch max-sm:justify-start max-sm:py-0">
+        <div className="flex w-full max-w-[620px] flex-col items-center text-center max-sm:min-h-full max-sm:max-w-none max-sm:pb-3">
+          <div className="hidden h-12 w-full items-center justify-center sm:hidden max-sm:flex">
+            <button className="absolute left-1 flex h-9 w-9 items-center justify-center rounded-full text-[#171717] hover:bg-[#F4F8FB]" aria-label="Back">
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <p className="text-[13px] font-medium text-[#171717]">Lumen AI Assistant</p>
           </div>
-          <h2 className="text-[28px] font-semibold tracking-[-0.03em] text-[#171717]">Good Morning, Julie!</h2>
-          <p className="mt-3 text-[12px] leading-5 text-[#6B7280]">Your money story today starts with Lumen - clear, simple, and made for you.</p>
 
-          <div className="mt-7 w-full">{composer}</div>
+          <div className="mb-5 flex h-[62px] w-[62px] items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_16px_38px_rgba(29,161,242,0.32)] max-sm:mt-24 max-sm:h-[54px] max-sm:w-[54px]">
+            <Sparkles className="h-7 w-7 fill-current max-sm:h-6 max-sm:w-6" />
+          </div>
+          <h2 className="text-[28px] font-semibold tracking-[-0.03em] text-[#171717] max-sm:text-[17px]">Good Morning, Julie!</h2>
+          <p className="mt-3 text-[12px] leading-5 text-[#6B7280] max-sm:mt-1 max-sm:text-[11px]">Your money story today starts with Lumen - clear, simple, and made for you.</p>
 
-          <div className="mt-4 grid w-full gap-3 sm:grid-cols-3">
+          <div className="mt-7 hidden w-full sm:block">{composer}</div>
+
+          <div className="mt-4 hidden w-full gap-3 sm:grid sm:grid-cols-3">
             {suggestions.map((card) => (
               <button key={card.title} className="rounded-2xl border border-[#EAECEF] bg-[#FCFDFE] p-4 text-left shadow-[0_10px_24px_rgba(31,43,77,0.035)] transition-all hover:-translate-y-0.5 hover:border-[#D4EAF8] hover:bg-white">
                 <p className="text-[12px] font-semibold text-[#171717]">{card.title}</p>
@@ -874,12 +898,36 @@ function AIAssistantPage() {
               </button>
             ))}
           </div>
+          <div className="mt-4 hidden flex-wrap justify-center gap-2 max-sm:flex">
+            {mobileSuggestions.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button key={item.title} className="inline-flex h-7 items-center gap-1.5 rounded-full border border-[#E5E7EB] bg-white px-3 text-[10.5px] font-medium text-[#171717] shadow-[0_8px_20px_rgba(31,43,77,0.04)]">
+                  <Icon className="h-3 w-3 text-[#4B5563]" />
+                  {item.title}
+                </button>
+              );
+            })}
+          </div>
 
-          <button className="mt-4 self-start text-[11px] font-medium text-[#6B7280] hover:text-[#171717]">
+          <button className="mt-4 self-start text-[11px] font-medium text-[#6B7280] hover:text-[#171717] max-sm:hidden">
             <span className="inline-flex items-center gap-1">
               Refresh prompts <RefreshCw className="h-[11px] w-[11px]" />
             </span>
           </button>
+
+          <div className="mt-auto hidden w-full pt-4 max-sm:block">
+            <div className="mb-2 flex items-start gap-2 rounded-2xl border border-[#E8EEF2] bg-[#FCFDFE] px-3 py-2 text-left shadow-[0_10px_24px_rgba(31,43,77,0.04)]">
+              <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white">
+                <Sparkles className="h-3.5 w-3.5 fill-current" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10.5px] font-medium text-[#171717]">Collaborate with Nova AI &amp; Orion 2.0</p>
+                <p className="mt-0.5 text-[9.5px] leading-3 text-[#6B7280]">Ideal for comprehensive analysis and insights</p>
+              </div>
+            </div>
+            {composer}
+          </div>
         </div>
       </div>
     );
