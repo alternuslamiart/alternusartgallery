@@ -296,62 +296,62 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
       <div className={`fixed inset-0 overflow-hidden bg-[#F6FAFC] font-sans text-[#171717] ${theme === "dark" ? "studio-shell-dark" : ""}`}>
       <style jsx global>{`
         .studio-shell-dark {
-          background: #0f172a !important;
-          color: #e5edf7 !important;
+          background: #141416 !important;
+          color: #f5f5f7 !important;
         }
         .studio-shell-dark aside {
-          background: linear-gradient(180deg, #111c2e 0%, #0f172a 100%) !important;
-          border-color: rgba(148, 163, 184, 0.16) !important;
+          background: linear-gradient(180deg, #1f1f23 0%, #141416 100%) !important;
+          border-color: rgba(255, 255, 255, 0.1) !important;
         }
         .studio-shell-dark section {
-          background: #111827 !important;
-          border-color: rgba(148, 163, 184, 0.18) !important;
-          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24) !important;
+          background: #1f1f23 !important;
+          border-color: rgba(255, 255, 255, 0.1) !important;
+          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22) !important;
         }
         .studio-shell-dark [class*="bg-white"],
         .studio-shell-dark [class*="bg-\\[\\#FCFDFE\\]"],
         .studio-shell-dark [class*="bg-\\[\\#F8FAFC\\]"],
         .studio-shell-dark [class*="bg-\\[\\#F4F8FB\\]"],
         .studio-shell-dark [class*="bg-\\[\\#F3F6F8\\]"] {
-          background-color: rgba(15, 23, 42, 0.72) !important;
+          background-color: rgba(255, 255, 255, 0.04) !important;
         }
         .studio-shell-dark [class*="bg-\\[\\#EEF7FC\\]"] {
-          background-color: rgba(29, 161, 242, 0.12) !important;
+          background-color: rgba(66, 132, 255, 0.12) !important;
         }
         .studio-shell-dark [class*="text-\\[\\#171717\\]"],
         .studio-shell-dark [class*="text-\\[\\#1F2937\\]"],
         .studio-shell-dark [class*="text-slate-900"] {
-          color: #f8fafc !important;
+          color: #f5f5f7 !important;
         }
         .studio-shell-dark [class*="text-\\[\\#4B5563\\]"],
         .studio-shell-dark [class*="text-\\[\\#6B7280\\]"],
         .studio-shell-dark [class*="text-\\[\\#8A94A3\\]"],
         .studio-shell-dark [class*="text-\\[\\#9CA3AF\\]"],
         .studio-shell-dark [class*="text-\\[\\#A1A7B0\\]"] {
-          color: #a8b3c6 !important;
+          color: rgba(245, 245, 247, 0.7) !important;
         }
         .studio-shell-dark [class*="border-\\[\\#E5E7EB\\]"],
         .studio-shell-dark [class*="border-\\[\\#E8EEF2\\]"],
         .studio-shell-dark [class*="border-\\[\\#EAECEF\\]"],
         .studio-shell-dark [class*="border-\\[\\#EEF2F5\\]"],
         .studio-shell-dark [class*="border-white"] {
-          border-color: rgba(148, 163, 184, 0.18) !important;
+          border-color: rgba(255, 255, 255, 0.1) !important;
         }
         .studio-shell-dark input,
         .studio-shell-dark textarea,
         .studio-shell-dark select {
-          background-color: rgba(15, 23, 42, 0.64) !important;
-          color: #e5edf7 !important;
+          background-color: rgba(255, 255, 255, 0.04) !important;
+          color: #f5f5f7 !important;
         }
         .studio-shell-dark input::placeholder,
         .studio-shell-dark textarea::placeholder {
-          color: #64748b !important;
+          color: rgba(245, 245, 247, 0.42) !important;
         }
         .studio-shell-dark [class*="hover:bg-\\[\\#DDEEFF\\]"]:hover,
         .studio-shell-dark [class*="hover:bg-white"]:hover,
         .studio-shell-dark [class*="hover:bg-\\[\\#F4F8FB\\]"]:hover {
-          background-color: rgba(74, 155, 255, 0.14) !important;
-          color: #7dd3fc !important;
+          background-color: rgba(66, 132, 255, 0.14) !important;
+          color: #4284ff !important;
         }
       `}</style>
       <div className="flex h-full">
