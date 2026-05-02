@@ -266,7 +266,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
             <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white shadow-[0_10px_22px_rgba(29,161,242,0.24)]">
               <Sparkles className="h-[15px] w-[15px] fill-current" />
             </div>
-            <p className="text-[12px] font-bold text-[#171717]">Lumen AI Trial</p>
+            <p className="text-[12px] font-bold text-[#171717]">Alternus AI Trial</p>
             <p className="mt-1 text-[10px] leading-4 text-[#6B7280]">There are 12 days left for you to enjoy the various features.</p>
             <button
               onClick={() => router.push("/pricing")}
@@ -1178,7 +1178,7 @@ function SettingsPage() {
           </div>
         </SoftCard>
         <SoftCard>
-          <h3 className="text-[13px] font-semibold text-[#171717]">Lumen AI Trial</h3>
+          <h3 className="text-[13px] font-semibold text-[#171717]">Alternus AI Trial</h3>
           <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">12 days left on the Personal workspace trial.</p>
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#EEF7FC]">
             <div className="h-full w-[58%] rounded-full bg-[#4A9BFF]" />
