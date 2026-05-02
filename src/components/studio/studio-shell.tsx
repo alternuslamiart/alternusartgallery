@@ -193,35 +193,40 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const sidebar = (
     <aside
       className={[
-        "flex h-full flex-shrink-0 flex-col border-r border-white/70 bg-[linear-gradient(180deg,#EAF3F8_0%,#F6FAFC_100%)] px-3 py-3 transition-all duration-200 ease-out",
-        isCollapsed ? "w-[76px]" : "w-[230px]",
+        "flex h-full flex-shrink-0 flex-col border-r border-white/70 bg-[linear-gradient(180deg,#EAF3F8_0%,#F6FAFC_100%)] py-3 transition-all duration-200 ease-out",
+        isCollapsed ? "w-[64px] px-2" : "w-[230px] px-3",
       ].join(" ")}
     >
       <div ref={workspaceRef} className="relative mb-4 flex items-center justify-between px-1">
-        <button
-          onClick={() => setWorkspaceOpen((value) => !value)}
-          className="flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 text-[13px] font-semibold text-[#1F2937] hover:bg-white/60"
-          aria-expanded={workspaceOpen}
-        >
-          <span className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white">
-            <Shield className="h-[11px] w-[11px]" />
-          </span>
-          {!isCollapsed && (
-            <>
-              <span className="truncate">Personal</span>
-              <ChevronDown className="h-3 w-3 text-[#6B7280]" />
-            </>
-          )}
-        </button>
-
-        {!isCollapsed && (
+        {isCollapsed ? (
           <button
             onClick={toggleMenu}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-[#6B7280] hover:bg-white/70 hover:text-[#171717]"
-            aria-label="Toggle sidebar"
+            className="mx-auto flex h-7 w-7 items-center justify-center rounded-lg text-[#6B7280] hover:bg-white/70 hover:text-[#171717]"
+            aria-label="Expand sidebar"
           >
             <PanelLeft className="h-[14px] w-[14px]" />
           </button>
+        ) : (
+          <>
+            <button
+              onClick={() => setWorkspaceOpen((value) => !value)}
+              className="flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 text-[13px] font-semibold text-[#1F2937] hover:bg-white/60"
+              aria-expanded={workspaceOpen}
+            >
+              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white">
+                <Shield className="h-[11px] w-[11px]" />
+              </span>
+              <span className="truncate">Personal</span>
+              <ChevronDown className="h-3 w-3 text-[#6B7280]" />
+            </button>
+            <button
+              onClick={toggleMenu}
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-[#6B7280] hover:bg-white/70 hover:text-[#171717]"
+              aria-label="Collapse sidebar"
+            >
+              <PanelLeft className="h-[14px] w-[14px]" />
+            </button>
+          </>
         )}
 
         {workspaceOpen && !isCollapsed && (
