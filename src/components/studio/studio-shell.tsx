@@ -228,7 +228,10 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
             </div>
             <p className="text-[12px] font-bold text-[#171717]">Lumen AI Trial</p>
             <p className="mt-1 text-[10px] leading-4 text-[#6B7280]">There are 12 days left for you to enjoy the various features.</p>
-            <button className="mt-3 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-[10px] font-semibold text-[#171717] shadow-sm hover:border-[#CFE8F8]">
+            <button
+              onClick={() => router.push("/pricing")}
+              className="mt-3 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-[10px] font-semibold text-[#171717] shadow-sm hover:border-[#CFE8F8]"
+            >
               Upgrade to Pro
             </button>
           </div>
