@@ -16,7 +16,6 @@ import {
   Grid2X2,
   ImageIcon,
   Layers3,
-  Menu,
   Monitor,
   Paperclip,
   PanelLeft,
@@ -29,6 +28,7 @@ import {
   Shield,
   Sparkles,
   Upload,
+  UserRound,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -290,11 +290,11 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
               <h1 className="truncate text-[15px] font-semibold tracking-[-0.01em] text-[#171717]">{currentTitle}</h1>
             </div>
             <button
-              onClick={toggleMenu}
+              onClick={() => router.push("/account")}
               className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-[#6B7280] shadow-sm hover:bg-[#FAFCFD]"
-              aria-label="Toggle navigation"
+              aria-label="Open profile"
             >
-              <Menu className="h-[15px] w-[15px]" />
+              <UserRound className="h-[15px] w-[15px]" />
             </button>
           </header>
 
