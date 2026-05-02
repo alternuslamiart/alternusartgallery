@@ -6,9 +6,8 @@ import { useState } from "react";
 import {
   AlternusLogo,
   DARK_BG,
-  DARK_BORDER,
+  DARK_BORDER_SOFT,
   DARK_MUTED,
-  DARK_SURFACE,
   DARK_SURFACE_SOFT,
   DARK_TEXT,
   useAlternusMode,
@@ -47,14 +46,14 @@ export default function Login() {
   const bg = isDark ? DARK_BG : PAPER;
   const fg = isDark ? DARK_TEXT : INK;
   const muted = isDark ? DARK_MUTED : "rgba(15,23,42,0.58)";
-  const faint = isDark ? DARK_BORDER : "rgba(15,23,42,0.1)";
-  const line = isDark ? "rgba(255,255,255,0.1)" : "rgba(66,132,255,0.1)";
-  const surface = isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.86)";
-  const card = isDark ? "rgba(21,21,24,0.96)" : "rgba(255,255,255,0.94)";
-  const field = isDark ? DARK_SURFACE : "rgba(245,247,252,0.92)";
-  const softShadow = isDark ? "none" : "0 24px 60px rgba(66,132,255,0.12)";
-  const cardShadow = isDark ? "none" : "0 30px 90px rgba(66,132,255,0.15)";
-  const ctaShadow = isDark ? "none" : "0 18px 34px rgba(66,132,255,0.24)";
+  const faint = isDark ? DARK_BORDER_SOFT : "rgba(15,23,42,0.1)";
+  const line = isDark ? "rgba(255,255,255,0.08)" : "rgba(66,132,255,0.1)";
+  const surface = isDark ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.86)";
+  const card = isDark ? "rgba(31,31,35,0.98)" : "rgba(255,255,255,0.94)";
+  const field = isDark ? "rgba(255,255,255,0.035)" : "rgba(245,247,252,0.92)";
+  const softShadow = isDark ? "0 18px 48px rgba(0,0,0,0.18)" : "0 24px 60px rgba(66,132,255,0.12)";
+  const cardShadow = isDark ? "0 24px 72px rgba(0,0,0,0.22)" : "0 30px 90px rgba(66,132,255,0.15)";
+  const ctaShadow = isDark ? "0 18px 36px rgba(66,132,255,0.18)" : "0 18px 34px rgba(66,132,255,0.24)";
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,8 +85,8 @@ export default function Login() {
         @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .6; transform: scale(.92); } }
         .login-grid {
           background-image:
-            linear-gradient(rgba(66,132,255,0.08) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(66,132,255,0.08) 1px, transparent 1px);
+            linear-gradient(rgba(66,132,255,0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(66,132,255,0.06) 1px, transparent 1px);
           background-size: 64px 64px;
         }
         .login-pulse { animation: pulse 2s ease-in-out infinite; }
@@ -105,29 +104,33 @@ export default function Login() {
         }}
       />
       <div
-        style={{
-          position: "absolute",
-          inset: "auto auto 10% 8%",
-          width: 320,
-          height: 320,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(66,132,255,0.16), transparent 72%)",
-          filter: "blur(28px)",
-          pointerEvents: "none",
-        }}
-      />
+          style={{
+            position: "absolute",
+            inset: "auto auto 10% 8%",
+            width: 320,
+            height: 320,
+            borderRadius: "50%",
+            background: isDark
+              ? "radial-gradient(circle, rgba(66,132,255,0.08), transparent 70%)"
+              : "radial-gradient(circle, rgba(66,132,255,0.16), transparent 72%)",
+            filter: "blur(30px)",
+            pointerEvents: "none",
+          }}
+        />
       <div
-        style={{
-          position: "absolute",
-          inset: "8% 8% auto auto",
-          width: 280,
-          height: 280,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(113,157,255,0.16), transparent 72%)",
-          filter: "blur(24px)",
-          pointerEvents: "none",
-        }}
-      />
+          style={{
+            position: "absolute",
+            inset: "8% 8% auto auto",
+            width: 280,
+            height: 280,
+            borderRadius: "50%",
+            background: isDark
+              ? "radial-gradient(circle, rgba(113,157,255,0.06), transparent 70%)"
+              : "radial-gradient(circle, rgba(113,157,255,0.16), transparent 72%)",
+            filter: "blur(26px)",
+            pointerEvents: "none",
+          }}
+        />
 
       <header
         style={{
@@ -193,20 +196,20 @@ export default function Login() {
       >
         <div style={{ width: "100%", maxWidth: 1120, position: "relative" }}>
           <div
-            className="hidden xl:block"
-            style={{
-              position: "absolute",
-              left: 0,
-              top: "50%",
-              transform: "translateY(-50%)",
-              width: 260,
-              border: `1px solid ${line}`,
-              borderRadius: 28,
-              background: surface,
-              padding: 22,
-              backdropFilter: "blur(18px)",
-              boxShadow: softShadow,
-            }}
+              className="hidden xl:block"
+              style={{
+                position: "absolute",
+                left: 0,
+                top: "50%",
+                transform: "translateY(-50%)",
+                width: 260,
+                border: `1px solid ${line}`,
+                borderRadius: 28,
+                background: surface,
+                padding: 22,
+                backdropFilter: "blur(18px)",
+                boxShadow: softShadow,
+              }}
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
               <span style={{ fontSize: 10, letterSpacing: "0.18em", fontWeight: 700, color: muted }}>LIVE STATUS</span>
@@ -361,8 +364,8 @@ export default function Login() {
                       padding: "12px 14px",
                       fontSize: 12.5,
                       color: "#DC2626",
-                      background: "rgba(248,113,113,0.08)",
-                      border: "1px solid rgba(248,113,113,0.24)",
+                      background: isDark ? "rgba(248,113,113,0.10)" : "rgba(248,113,113,0.08)",
+                      border: "1px solid rgba(248,113,113,0.22)",
                       borderRadius: 14,
                     }}
                   >
@@ -373,24 +376,24 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={loading}
-                  style={{
-                    marginTop: 6,
-                    height: 54,
-                    background: "linear-gradient(135deg, #4284FF 0%, #2F6CF1 100%)",
-                    color: "#FFF",
+                    style={{
+                      marginTop: 6,
+                      height: 54,
+                      background: "linear-gradient(135deg, #4284FF 0%, #2F6CF1 100%)",
+                      color: "#FFF",
                     fontSize: 14,
                     fontWeight: 800,
                     letterSpacing: "-0.01em",
                     border: "none",
-                    borderRadius: 16,
-                    cursor: loading ? "not-allowed" : "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    opacity: loading ? 0.72 : 1,
-                    boxShadow: ctaShadow,
-                  }}
-                >
+                      borderRadius: 16,
+                      cursor: loading ? "not-allowed" : "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      opacity: loading ? 0.72 : 1,
+                      boxShadow: ctaShadow,
+                    }}
+                  >
                   {loading ? "Signing in..." : "Sign in"}
                 </button>
               </form>
