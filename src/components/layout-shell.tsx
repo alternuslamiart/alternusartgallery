@@ -37,7 +37,7 @@ const STANDALONE_ROUTES = [
   "/pricing",
   "/account",
 ];
-const STANDALONE_PREFIXES = ["/platform/", "/workspace/", "/account/"];
+const STANDALONE_PREFIXES = ["/platform/", "/workspace/", "/account/", "/ai-assistant/tools/"];
 const NO_CATEGORY_BAR_ROUTES = ["/pricing"];
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
