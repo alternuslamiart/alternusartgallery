@@ -7,11 +7,9 @@ import {
   AlertTriangle,
   Bell,
   Box,
-  Calculator,
   CheckCircle2,
   ChevronDown,
   ChevronLeft,
-  CircleDollarSign,
   Code2,
   CreditCard,
   Database,
@@ -38,7 +36,6 @@ import {
   Sun,
   Upload,
   UserRound,
-  Wallet,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -95,10 +92,14 @@ const routeByPath: Record<string, StudioRouteKey> = {
   "/exports": "exports",
   "/settings": "settings",
   "/help-center": "help-center",
+  "/ai-assistant/tools/code": "ai-assistant",
+  "/ai-assistant/tools/blender": "ai-assistant",
+  "/ai-assistant/tools/figma": "ai-assistant",
 };
 
 type StudioPageProps = {
   route?: StudioRouteKey;
+  assistantTool?: AssistantToolKey;
 };
 
 type Attachment = {
@@ -108,6 +109,108 @@ type Attachment = {
 };
 
 type StudioTheme = "light" | "dark";
+type AssistantToolKey = "code" | "blender" | "figma";
+
+type ToolSelectorConfig = {
+  label: string;
+  options: string[];
+};
+
+type ToolWorkspaceConfig = {
+  key: AssistantToolKey;
+  href: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  placeholder: string;
+  actionLabel: string;
+  quickActions: { title: string; desc: string; icon: LucideIcon }[];
+  selectors: ToolSelectorConfig[];
+  previewTabs?: string[];
+  previewType: "code" | "blender" | "figma";
+  emptyState: string;
+};
+
+const assistantToolByPath: Record<string, AssistantToolKey> = {
+  "/ai-assistant/tools/code": "code",
+  "/ai-assistant/tools/blender": "blender",
+  "/ai-assistant/tools/figma": "figma",
+};
+
+const toolWorkspaces: Record<AssistantToolKey, ToolWorkspaceConfig> = {
+  code: {
+    key: "code",
+    href: "/ai-assistant/tools/code",
+    title: "AI for Code",
+    description: "Build websites, apps, and digital tools with guided AI coding support.",
+    icon: Code2,
+    placeholder: "Describe the app, component, bug, or feature you want to build...",
+    actionLabel: "Generate",
+    quickActions: [
+      { title: "Create React Component", desc: "Draft a reusable UI component.", icon: Code2 },
+      { title: "Build Landing Page", desc: "Plan a polished conversion page.", icon: Monitor },
+      { title: "Fix Code Issue", desc: "Debug errors or broken behavior.", icon: AlertTriangle },
+      { title: "Generate API Endpoint", desc: "Create route logic and payloads.", icon: Plug },
+      { title: "Explain Existing Code", desc: "Understand files and patterns.", icon: FileText },
+      { title: "Convert Design to Code", desc: "Translate UI into components.", icon: PenLine },
+    ],
+    selectors: [
+      { label: "Project type", options: ["Website", "Web App", "API", "Component", "Bug Fix"] },
+      { label: "Tech stack", options: ["React", "Next.js", "Vue", "Node.js", "Go", "Rust"] },
+    ],
+    previewTabs: ["Plan", "Code", "Preview"],
+    previewType: "code",
+    emptyState: "Your generated plan, code, or preview will appear here.",
+  },
+  blender: {
+    key: "blender",
+    href: "/ai-assistant/tools/blender",
+    title: "Blender 3D",
+    description: "Create 3D models, scenes, and visual assets from text prompts.",
+    icon: Layers3,
+    placeholder: "Describe the 3D object, scene, material, or animation you want to create...",
+    actionLabel: "Create",
+    quickActions: [
+      { title: "Create 3D Model", desc: "Generate a focused object brief.", icon: Box },
+      { title: "Generate Product Scene", desc: "Stage products with lighting.", icon: Grid2X2 },
+      { title: "Design Character", desc: "Shape a stylized character.", icon: Sparkles },
+      { title: "Create Materials", desc: "Define textures and surfaces.", icon: ImageIcon },
+      { title: "Lighting Setup", desc: "Prepare mood and render lighting.", icon: Monitor },
+      { title: "Export Asset", desc: "Package assets for delivery.", icon: Download },
+    ],
+    selectors: [
+      { label: "Asset type", options: ["Object", "Scene", "Character", "Product", "Environment"] },
+      { label: "Style", options: ["Realistic", "Low-poly", "Stylized", "Isometric", "Game-ready"] },
+      { label: "Output format", options: ["BLEND", "FBX", "OBJ", "GLB"] },
+    ],
+    previewType: "blender",
+    emptyState: "Your 3D preview or generated asset will appear here.",
+  },
+  figma: {
+    key: "figma",
+    href: "/ai-assistant/tools/figma",
+    title: "Figma",
+    description: "Design clean interfaces, prototypes, and layouts for modern web experiences.",
+    icon: PenLine,
+    placeholder: "Describe the UI screen, component, flow, or prototype you want to design...",
+    actionLabel: "Design",
+    quickActions: [
+      { title: "Create UI Screen", desc: "Generate a clean screen concept.", icon: Monitor },
+      { title: "Design Dashboard", desc: "Layout metrics and controls.", icon: Grid2X2 },
+      { title: "Build Mobile App Flow", desc: "Plan mobile screens and flow.", icon: UserRound },
+      { title: "Generate Design System", desc: "Create tokens and components.", icon: Settings },
+      { title: "Create Wireframe", desc: "Draft low-fidelity structure.", icon: PenLine },
+      { title: "Export Layout", desc: "Prepare specs for delivery.", icon: Upload },
+    ],
+    selectors: [
+      { label: "Design type", options: ["Landing Page", "Dashboard", "Mobile App", "Component", "Wireframe"] },
+      { label: "Style", options: ["Minimal", "SaaS", "Finance", "Creative", "Enterprise"] },
+      { label: "Device", options: ["Desktop", "Tablet", "Mobile"] },
+    ],
+    previewType: "figma",
+    emptyState: "Your generated interface preview will appear here.",
+  },
+};
 
 const StudioThemeContext = createContext<{
   theme: StudioTheme;
@@ -123,13 +226,14 @@ function useStudioTheme() {
   return context;
 }
 
-export function StudioRoutePage({ route }: StudioPageProps) {
+export function StudioRoutePage({ route, assistantTool }: StudioPageProps) {
   const pathname = usePathname();
+  const activeTool = assistantTool ?? assistantToolByPath[pathname];
   const activeRoute = route ?? routeByPath[pathname] ?? "ai-assistant";
 
   return (
     <StudioShell activeRoute={activeRoute}>
-      <StudioContent route={activeRoute} />
+      <StudioContent route={activeRoute} assistantTool={activeTool} />
     </StudioShell>
   );
 }
@@ -619,7 +723,7 @@ function DisplayDropdown() {
   );
 }
 
-function StudioContent({ route }: { route: StudioRouteKey }) {
+function StudioContent({ route, assistantTool }: { route: StudioRouteKey; assistantTool?: AssistantToolKey }) {
   switch (route) {
     case "studio-overview":
       return <OverviewPage />;
@@ -643,6 +747,7 @@ function StudioContent({ route }: { route: StudioRouteKey }) {
       return <HelpCenterPage />;
     case "ai-assistant":
     default:
+      if (assistantTool) return <ToolWorkspace config={toolWorkspaces[assistantTool]} />;
       return <AIAssistantPage />;
   }
 }
@@ -686,6 +791,203 @@ function SecondaryButton({ children, icon: Icon }: { children: ReactNode; icon?:
       {Icon && <Icon className="h-3.5 w-3.5" />}
       {children}
     </button>
+  );
+}
+
+function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  const Icon = config.icon;
+  const [activeTab, setActiveTab] = useState(config.previewTabs?.[0] ?? "Preview");
+
+  return (
+    <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-5 pb-2">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className={`flex items-center gap-1.5 text-[12px] font-medium ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
+          <Link href="/ai-assistant" className={`${dark ? "hover:text-[#F4F6F8]" : "hover:text-[#171717]"}`}>AI Assistant</Link>
+          <span>/</span>
+          <span className={dark ? "text-[#F4F6F8]" : "text-[#171717]"}>{config.title}</span>
+        </div>
+        <Link
+          href="/ai-assistant"
+          className={`inline-flex h-9 items-center gap-2 rounded-xl border px-3 text-[12px] font-semibold transition-all active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.24)] hover:text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm hover:border-[#CFE8F8] hover:text-[#171717]"}`}
+        >
+          <ChevronLeft className="h-3.5 w-3.5" />
+          Back to AI Assistant
+        </Link>
+      </div>
+
+      <div className={`rounded-3xl border p-5 shadow-[0_18px_44px_rgba(31,43,77,0.05)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E8EEF2] bg-[#FCFDFE]"}`}>
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex min-w-0 items-start gap-4">
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_16px_34px_rgba(29,161,242,0.24)]">
+              <Icon className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <h2 className={`text-[25px] font-semibold tracking-[-0.03em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{config.title}</h2>
+              <p className={`mt-2 max-w-2xl text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{config.description}</p>
+            </div>
+          </div>
+          <div className={`flex min-h-[58px] w-full items-center gap-2 rounded-2xl border px-3 py-2 lg:max-w-[460px] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-white shadow-[0_12px_30px_rgba(31,43,77,0.04)]"}`}>
+            <Sparkles className="h-4 w-4 flex-shrink-0 text-[#4A9BFF]" />
+            <input
+              className={`min-w-0 flex-1 bg-transparent text-[12px] outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#171717] placeholder:text-[#A1A7B0]"}`}
+              placeholder={config.placeholder}
+            />
+            <button className={`inline-flex h-9 flex-shrink-0 items-center gap-2 rounded-full px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] transition-all active:scale-[0.98] ${dark ? "bg-[#3BA7FF] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}>
+              {config.actionLabel}
+              <Send className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        {config.quickActions.map((action) => {
+          const ActionIcon = action.icon;
+          return (
+            <button
+              key={action.title}
+              className={`group rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_10px_24px_rgba(0,0,0,0.22)] hover:border-[rgba(59,167,255,0.24)]" : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_10px_24px_rgba(31,43,77,0.035)] hover:border-[#CFE8F8] hover:bg-white hover:shadow-[0_16px_34px_rgba(31,43,77,0.08)]"}`}
+            >
+              <div className="flex items-start gap-3">
+                <span className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl ${dark ? "bg-[rgba(59,167,255,0.14)] text-[#6EA4FF]" : "bg-[#EEF7FF] text-[#4A9BFF]"}`}>
+                  <ActionIcon className="h-4 w-4" />
+                </span>
+                <span className="min-w-0">
+                  <span className={`block text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{action.title}</span>
+                  <span className={`mt-1 block text-[10.5px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{action.desc}</span>
+                </span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="grid min-h-[460px] gap-4 xl:grid-cols-[380px_minmax(0,1fr)]">
+        <SoftCard className="flex flex-col gap-4">
+          <div>
+            <p className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Prompt builder</p>
+            <p className={`mt-1 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Refine the request before generation.</p>
+          </div>
+          <textarea
+            rows={7}
+            placeholder={config.placeholder}
+            className={`w-full resize-none rounded-2xl border p-3 text-[12px] leading-5 outline-none transition-colors focus:border-[#9BD2FF] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#6F7782]" : "border-[#E5EAF0] bg-white text-[#171717] placeholder:text-[#A1A7B0]"}`}
+          />
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+            {config.selectors.map((selector) => (
+              <label key={selector.label} className="block">
+                <span className={`mb-1.5 block text-[11px] font-semibold ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>{selector.label}</span>
+                <select className={`h-10 w-full rounded-xl border px-3 text-[12px] outline-none focus:border-[#9BD2FF] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8]" : "border-[#E5EAF0] bg-white text-[#171717]"}`}>
+                  {selector.options.map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
+            ))}
+          </div>
+          <div className="mt-auto flex flex-wrap gap-2">
+            {[
+              { label: "Image", icon: ImageIcon },
+              { label: "File", icon: Paperclip },
+              { label: "Document", icon: FileText },
+            ].map((attachment) => {
+              const AttachmentIcon = attachment.icon;
+              return (
+                <button key={attachment.label} className={`inline-flex h-9 items-center gap-2 rounded-xl border px-3 text-[11px] font-semibold transition-all active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#CFE8F8] hover:text-[#171717]"}`}>
+                  <AttachmentIcon className="h-3.5 w-3.5" />
+                  {attachment.label}
+                </button>
+              );
+            })}
+          </div>
+        </SoftCard>
+
+        <SoftCard className="flex min-h-[420px] flex-col gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{config.previewType === "code" ? "Code output" : config.previewType === "blender" ? "3D preview" : "UI preview"}</p>
+              <p className={`mt-1 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Outputs stay empty until you run an action.</p>
+            </div>
+            {config.previewTabs && (
+              <div className={`flex rounded-xl border p-1 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-white"}`}>
+                {config.previewTabs.map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`h-7 rounded-lg px-3 text-[11px] font-semibold transition-all ${activeTab === tab ? "bg-[#4A9BFF] text-white shadow-[0_8px_16px_rgba(74,155,255,0.18)]" : dark ? "text-[#A8B0BA] hover:text-[#F4F6F8]" : "text-[#6B7280] hover:text-[#171717]"}`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <ToolPreviewPlaceholder config={config} />
+        </SoftCard>
+      </div>
+
+      <SoftCard>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Recent projects</p>
+            <p className={`mt-1 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Saved outputs and recent prompts for this workspace.</p>
+          </div>
+          <button className={`inline-flex h-9 items-center gap-2 rounded-xl border px-3 text-[11px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]" : "border-[#E5E7EB] bg-white text-[#6B7280]"}`}>
+            <Search className="h-3.5 w-3.5" />
+            Browse
+          </button>
+        </div>
+        <div className={`mt-4 flex min-h-[96px] items-center justify-center rounded-2xl border border-dashed text-center ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]" : "border-[#E5EAF0] bg-[#FAFCFD] text-[#6B7280]"}`}>
+          <p className="px-4 text-[12px] leading-5">No recent items yet. Start with a prompt or quick action to create your first saved output.</p>
+        </div>
+      </SoftCard>
+    </div>
+  );
+}
+
+function ToolPreviewPlaceholder({ config }: { config: ToolWorkspaceConfig }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  const Icon = config.icon;
+  const gridColor = dark ? "rgba(255,255,255,0.055)" : "rgba(74,155,255,0.105)";
+
+  return (
+    <div
+      className={`relative flex min-h-[340px] flex-1 items-center justify-center overflow-hidden rounded-2xl border ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-white"}`}
+      style={{
+        backgroundImage:
+          config.previewType === "code"
+            ? undefined
+            : `linear-gradient(${gridColor} 1px, transparent 1px), linear-gradient(90deg, ${gridColor} 1px, transparent 1px)`,
+        backgroundSize: config.previewType === "figma" ? "26px 26px" : "32px 32px",
+      }}
+    >
+      {config.previewType === "code" && (
+        <div className={`absolute left-4 top-4 flex gap-1.5 ${dark ? "text-[#6F7782]" : "text-[#CBD5E1]"}`}>
+          <span className="h-2.5 w-2.5 rounded-full bg-current" />
+          <span className="h-2.5 w-2.5 rounded-full bg-current" />
+          <span className="h-2.5 w-2.5 rounded-full bg-current" />
+        </div>
+      )}
+      {config.previewType === "figma" && (
+        <>
+          <div className={`absolute left-[12%] top-[16%] h-20 w-32 rounded-2xl border ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E8EEF2] bg-[#FCFDFE]"}`} />
+          <div className={`absolute bottom-[18%] right-[12%] h-28 w-44 rounded-2xl border ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E8EEF2] bg-[#FCFDFE]"}`} />
+        </>
+      )}
+      {config.previewType === "blender" && (
+        <div className="absolute inset-x-[14%] bottom-[22%] h-px bg-gradient-to-r from-transparent via-[#8EC9FF] to-transparent" />
+      )}
+      <div className="relative z-10 flex max-w-xs flex-col items-center px-5 text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_16px_34px_rgba(29,161,242,0.22)]">
+          <Icon className="h-6 w-6" />
+        </div>
+        <p className={`mt-4 text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Ready when you are</p>
+        <p className={`mt-2 text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{config.emptyState}</p>
+      </div>
+    </div>
   );
 }
 
@@ -939,14 +1241,14 @@ function AIAssistantPage() {
 
   if (!hasConversation) {
     const suggestions = [
-      { title: "AI for Code", desc: "Build websites, apps, and digital tools with guided AI coding support." },
-      { title: "Blender 3D", desc: "Create 3D models, scenes, and visual assets for your projects." },
-      { title: "Figma", desc: "Design clean interfaces, prototypes, and layouts for modern web experiences." },
+      toolWorkspaces.code,
+      toolWorkspaces.blender,
+      toolWorkspaces.figma,
     ];
-    const mobileSuggestions: { title: string; icon: LucideIcon }[] = [
-      { title: "AI for Code", icon: Calculator },
-      { title: "Blender 3D", icon: Wallet },
-      { title: "Figma", icon: CircleDollarSign },
+    const mobileSuggestions: { title: string; icon: LucideIcon; href?: string }[] = [
+      { title: "AI for Code", icon: Code2, href: toolWorkspaces.code.href },
+      { title: "Blender 3D", icon: Layers3, href: toolWorkspaces.blender.href },
+      { title: "Figma", icon: PenLine, href: toolWorkspaces.figma.href },
       { title: "Research", icon: FileText },
       { title: "Saving", icon: RefreshCw },
       { title: "Overspend", icon: AlertTriangle },
@@ -972,19 +1274,32 @@ function AIAssistantPage() {
 
           <div className="mt-4 hidden w-full gap-3 sm:grid sm:grid-cols-3">
             {suggestions.map((card) => (
-              <button key={card.title} className={`rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_10px_24px_rgba(0,0,0,0.22)] hover:border-[rgba(59,167,255,0.22)] hover:bg-[#23262C]" : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_10px_24px_rgba(31,43,77,0.035)] hover:border-[#D4EAF8] hover:bg-white"}`}>
+              <Link key={card.title} href={card.href} className={`cursor-pointer rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_10px_24px_rgba(0,0,0,0.22)] hover:border-[rgba(59,167,255,0.24)] hover:bg-[#23262C] hover:shadow-[0_16px_34px_rgba(0,0,0,0.28)]" : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_10px_24px_rgba(31,43,77,0.035)] hover:border-[#CFE8F8] hover:bg-white hover:shadow-[0_16px_34px_rgba(31,43,77,0.08)]"}`}>
                 <p className={`text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{card.title}</p>
-                <p className={`mt-2 text-[10.5px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{card.desc}</p>
-              </button>
+                <p className={`mt-2 text-[10.5px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{card.description}</p>
+              </Link>
             ))}
           </div>
           <div className="mt-4 hidden flex-wrap justify-center gap-2 max-sm:flex">
             {mobileSuggestions.map((item) => {
               const Icon = item.icon;
-              return (
-                <button key={item.title} className={`inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-[10.5px] font-medium shadow-[0_8px_20px_rgba(31,43,77,0.04)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#171717]"}`}>
+              const className = `inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-[10.5px] font-medium shadow-[0_8px_20px_rgba(31,43,77,0.04)] transition-all active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#171717]"}`;
+              const content = (
+                <>
                   <Icon className={`h-3 w-3 ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`} />
                   {item.title}
+                </>
+              );
+              if (item.href) {
+                return (
+                  <Link key={item.title} href={item.href} className={className}>
+                    {content}
+                  </Link>
+                );
+              }
+              return (
+                <button key={item.title} className={className}>
+                  {content}
                 </button>
               );
             })}
