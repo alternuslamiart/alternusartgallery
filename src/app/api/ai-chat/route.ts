@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
 const SYSTEM_PROMPT = `You are Alternus AI, a friendly and knowledgeable art assistant for Alternus Gallery - a premium online art marketplace connecting passionate collectors with exceptional artists worldwide.
 
@@ -121,20 +122,21 @@ async function getOpenAIResponse(message: string, conversationHistory: Array<{ r
 
   const client = new OpenAI({ apiKey });
   const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  const chatMessages: ChatCompletionMessageParam[] = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...conversationHistory.map((msg): ChatCompletionMessageParam => ({
+      role: msg.role === 'assistant' ? 'assistant' : 'user',
+      content: msg.content,
+    })),
+    { role: 'user', content: message },
+  ];
 
   try {
     const response = await client.chat.completions.create({
       model,
       temperature: 0.7,
       max_tokens: 1024,
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        ...conversationHistory.map((msg) => ({
-          role: msg.role === 'assistant' ? 'assistant' : 'user',
-          content: msg.content,
-        })),
-        { role: 'user', content: message },
-      ],
+      messages: chatMessages,
     });
 
     const text = response.choices[0]?.message?.content;
