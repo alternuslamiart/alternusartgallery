@@ -51,6 +51,7 @@ export type StudioRouteKey =
   | "prompt-lab"
   | "projects"
   | "exports"
+  | "recents"
   | "settings"
   | "help-center";
 
@@ -72,6 +73,7 @@ export const studioNavigation: NavItem[] = [
   { key: "prompt-lab", label: "Prompt Lab", href: "/prompt-lab", icon: FileText, badge: "2" },
   { key: "projects", label: "Projects", href: "/projects", icon: Folder },
   { key: "exports", label: "Exports", href: "/exports", icon: Upload },
+  { key: "recents", label: "Recents", href: "/recents", icon: RefreshCw },
 ];
 
 const bottomNavigation = [
@@ -90,6 +92,7 @@ const routeByPath: Record<string, StudioRouteKey> = {
   "/prompt-lab": "prompt-lab",
   "/projects": "projects",
   "/exports": "exports",
+  "/recents": "recents",
   "/settings": "settings",
   "/help-center": "help-center",
   "/ai-assistant/tools/code": "ai-assistant",
@@ -1100,6 +1103,8 @@ function StudioContent({ route, assistantTool }: { route: StudioRouteKey; assist
       return <ProjectsPage />;
     case "exports":
       return <ExportsPage />;
+    case "recents":
+      return <RecentsPage />;
     case "settings":
       return <SettingsPage />;
     case "help-center":
@@ -1956,6 +1961,49 @@ function ExportsPage() {
             </button>
           </div>
         ))}
+      </SoftCard>
+    </div>
+  );
+}
+
+function RecentsPage() {
+  const { showToast } = useStudioActions();
+  const recentItems = [
+    ["AI for Code", "React component draft", "Plan generated", "2 min ago", Code2],
+    ["Blender 3D", "Product scene lighting", "Preview prepared", "14 min ago", Layers3],
+    ["AutoCAD", "Floor plan layer setup", "CAD draft saved", "31 min ago", PenLine],
+    ["Asset Library", "Reference image upload", "Asset added", "1 hr ago", ImageIcon],
+    ["Prompt Lab", "Website audit prompt", "Template edited", "Yesterday", FileText],
+  ] as const;
+
+  return (
+    <div>
+      <PageHeader title="Recents" subtitle="Recent generations, uploads, prompts, and workspace actions." />
+      <div className="grid gap-3 md:grid-cols-2">
+        {recentItems.map(([tool, title, status, time, ItemIcon]) => (
+          <ClickableSoftCard key={`${tool}-${title}`} onClick={() => showToast(`${title} opened`)} ariaLabel={`Open recent ${title}`}>
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
+                <ItemIcon className="h-4.5 w-4.5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-[12px] font-semibold text-[#171717]">{title}</p>
+                  <span className="rounded-full bg-[#EEF7FC] px-2.5 py-1 text-[10px] font-semibold text-[#1DA1F2]">{time}</span>
+                </div>
+                <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#8A94A3]">{tool}</p>
+                <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">{status}</p>
+              </div>
+            </div>
+          </ClickableSoftCard>
+        ))}
+      </div>
+      <SoftCard className="mt-5 flex min-h-[110px] items-center justify-center border-dashed text-center">
+        <div>
+          <RefreshCw className="mx-auto h-6 w-6 text-[#1DA1F2]" />
+          <p className="mt-3 text-[13px] font-semibold text-[#171717]">More recents will appear here</p>
+          <p className="mt-1 text-[11px] text-[#6B7280]">Generate, upload, or edit something to keep building this timeline.</p>
+        </div>
       </SoftCard>
     </div>
   );
