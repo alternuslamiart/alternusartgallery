@@ -1177,6 +1177,7 @@ function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
   const [activeTab, setActiveTab] = useState(config.previewTabs?.[0] ?? "Preview");
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [hasOutput, setHasOutput] = useState(false);
 
   const runWorkspaceAction = () => {
     if (!prompt.trim()) {
@@ -1185,6 +1186,7 @@ function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
     }
     setIsGenerating(true);
     window.setTimeout(() => {
+      setHasOutput(true);
       setIsGenerating(false);
       showToast(`${config.title} request prepared`);
     }, 900);
@@ -1314,6 +1316,8 @@ function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
+                    role="tab"
+                    aria-selected={activeTab === tab}
                     className={`h-7 rounded-lg px-3 text-[11px] font-semibold transition-all ${activeTab === tab ? "bg-[#4A9BFF] text-white shadow-[0_8px_16px_rgba(74,155,255,0.18)]" : dark ? "text-[#A8B0BA] hover:text-[#F4F6F8]" : "text-[#6B7280] hover:text-[#171717]"}`}
                   >
                     {tab}
@@ -1322,7 +1326,7 @@ function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
               </div>
             )}
           </div>
-          <ToolPreviewPlaceholder config={config} />
+          <ToolPreviewPlaceholder config={config} activeTab={activeTab} hasOutput={hasOutput} prompt={prompt} />
         </SoftCard>
       </div>
 
@@ -1345,11 +1349,76 @@ function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
   );
 }
 
-function ToolPreviewPlaceholder({ config }: { config: ToolWorkspaceConfig }) {
+function ToolPreviewPlaceholder({ config, activeTab, hasOutput, prompt }: { config: ToolWorkspaceConfig; activeTab: string; hasOutput: boolean; prompt: string }) {
   const { theme } = useStudioTheme();
   const dark = theme === "dark";
   const Icon = config.icon;
   const gridColor = dark ? "rgba(255,255,255,0.055)" : "rgba(74,155,255,0.105)";
+  const cleanPrompt = prompt.trim() || "your request";
+
+  if (config.previewType === "code" && hasOutput) {
+    return (
+      <div className={`relative min-h-[340px] flex-1 overflow-hidden rounded-2xl border ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-white"}`}>
+        <div className={`flex gap-1.5 border-b px-4 py-3 ${dark ? "border-[rgba(255,255,255,0.08)] text-[#6F7782]" : "border-[#EEF2F5] text-[#CBD5E1]"}`}>
+          <span className="h-2.5 w-2.5 rounded-full bg-current" />
+          <span className="h-2.5 w-2.5 rounded-full bg-current" />
+          <span className="h-2.5 w-2.5 rounded-full bg-current" />
+        </div>
+        {activeTab === "Plan" && (
+          <div className="p-5">
+            <p className={`text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Generated plan</p>
+            <div className="mt-4 grid gap-3">
+              {[
+                ["1", `Clarify scope for "${cleanPrompt}".`],
+                ["2", "Create the component/page structure and required states."],
+                ["3", "Wire interactions, accessibility labels, loading and empty states."],
+                ["4", "Verify responsive layout and run checks before shipping."],
+              ].map(([step, text]) => (
+                <div key={step} className={`flex gap-3 rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-[#FCFDFE]"}`}>
+                  <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#4A9BFF] text-[11px] font-bold text-white">{step}</span>
+                  <p className={`text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>{text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {activeTab === "Code" && (
+          <pre className={`m-5 overflow-auto rounded-2xl border p-4 text-[12px] leading-6 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#111318] text-[#DDE7F2]" : "border-[#E5EAF0] bg-[#FAFCFD] text-[#334155]"}`}>
+{`export function GeneratedFeature() {
+  return (
+    <section className="rounded-2xl border bg-white p-4">
+      <h2>${cleanPrompt}</h2>
+      <p>Generated starter structure is ready to refine.</p>
+    </section>
+  );
+}`}
+          </pre>
+        )}
+        {activeTab === "Preview" && (
+          <div className="flex min-h-[280px] items-center justify-center p-5">
+            <div className={`w-full max-w-md rounded-3xl border p-5 text-center shadow-[0_18px_42px_rgba(31,43,77,0.06)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-[#FCFDFE]"}`}>
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white">
+                <Icon className="h-5 w-5" />
+              </div>
+              <p className={`mt-4 text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Preview draft ready</p>
+              <p className={`mt-2 text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
+                A clean preview frame for <span className={dark ? "text-[#F4F6F8]" : "text-[#171717]"}>{cleanPrompt}</span> is ready for the next refinement step.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const emptyCopy =
+    config.previewType === "code" && activeTab === "Plan"
+      ? "Your generated implementation plan will appear here."
+      : config.previewType === "code" && activeTab === "Code"
+        ? "Your generated code will appear here."
+        : config.previewType === "code" && activeTab === "Preview"
+          ? "Your generated preview will appear here."
+          : config.emptyState;
 
   return (
     <div
@@ -1383,7 +1452,7 @@ function ToolPreviewPlaceholder({ config }: { config: ToolWorkspaceConfig }) {
           <Icon className="h-6 w-6" />
         </div>
         <p className={`mt-4 text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Ready when you are</p>
-        <p className={`mt-2 text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{config.emptyState}</p>
+        <p className={`mt-2 text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{emptyCopy}</p>
       </div>
     </div>
   );
