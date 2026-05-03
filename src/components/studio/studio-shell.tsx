@@ -939,14 +939,14 @@ function AIAssistantPage() {
 
   if (!hasConversation) {
     const suggestions = [
-      { title: "Smart Budget", desc: "Create a budget that adapts to your lifestyle and goals." },
-      { title: "Calculation", desc: "Easily crunch the numbers for clearer money choices." },
-      { title: "Spending", desc: "See your spending habits and spot useful patterns." },
+      { title: "AI for Code", desc: "Build websites, apps, and digital tools with guided AI coding support." },
+      { title: "Blender 3D", desc: "Create 3D models, scenes, and visual assets for your projects." },
+      { title: "Figma", desc: "Design clean interfaces, prototypes, and layouts for modern web experiences." },
     ];
     const mobileSuggestions: { title: string; icon: LucideIcon }[] = [
-      { title: "Calculation", icon: Calculator },
-      { title: "Smart Budget", icon: Wallet },
-      { title: "Spending", icon: CircleDollarSign },
+      { title: "AI for Code", icon: Calculator },
+      { title: "Blender 3D", icon: Wallet },
+      { title: "Figma", icon: CircleDollarSign },
       { title: "Research", icon: FileText },
       { title: "Saving", icon: RefreshCw },
       { title: "Overspend", icon: AlertTriangle },
