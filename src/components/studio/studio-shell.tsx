@@ -39,7 +39,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { ChangeEvent, ReactNode, createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 export type StudioRouteKey =
   | "studio-overview"
@@ -110,6 +110,20 @@ type Attachment = {
 
 type StudioTheme = "light" | "dark";
 type AssistantToolKey = "code" | "blender" | "autocad";
+type StudioModalKey =
+  | "search"
+  | "quick-settings"
+  | "workspace-switch"
+  | "workspace-create"
+  | "upgrade"
+  | "upload-file"
+  | "upload-image"
+  | "upload-document"
+  | "prompt-editor"
+  | "project-create"
+  | "asset-upload"
+  | "support";
+type StudioDrawerKey = "profile" | "notifications" | "asset-preview" | "project-detail" | "help-preview";
 
 type ToolSelectorConfig = {
   label: string;
@@ -190,25 +204,25 @@ const toolWorkspaces: Record<AssistantToolKey, ToolWorkspaceConfig> = {
     key: "autocad",
     href: "/ai-assistant/tools/autocad",
     title: "AutoCAD",
-    description: "Design clean interfaces, prototypes, and layouts for modern web experiences.",
+    description: "Create CAD drawings, technical layouts, and clean drafting plans with guided AI support.",
     icon: PenLine,
-    placeholder: "Describe the UI screen, component, flow, or prototype you want to design...",
-    actionLabel: "Design",
+    placeholder: "Describe the CAD drawing, dimensions, layers, or technical plan you want to create...",
+    actionLabel: "Draft",
     quickActions: [
-      { title: "Create UI Screen", desc: "Generate a clean screen concept.", icon: Monitor },
-      { title: "Design Dashboard", desc: "Layout metrics and controls.", icon: Grid2X2 },
-      { title: "Build Mobile App Flow", desc: "Plan mobile screens and flow.", icon: UserRound },
-      { title: "Generate Design System", desc: "Create tokens and components.", icon: Settings },
-      { title: "Create Wireframe", desc: "Draft low-fidelity structure.", icon: PenLine },
-      { title: "Export Layout", desc: "Prepare specs for delivery.", icon: Upload },
+      { title: "Create CAD Drawing", desc: "Start a clean technical drawing.", icon: PenLine },
+      { title: "Floor Plan Layout", desc: "Draft rooms, walls, and dimensions.", icon: Grid2X2 },
+      { title: "Layer Setup", desc: "Organize geometry and annotations.", icon: Layers3 },
+      { title: "Dimension Plan", desc: "Prepare measurements and units.", icon: Monitor },
+      { title: "DXF Cleanup", desc: "Review imported CAD structure.", icon: FileText },
+      { title: "Export DWG/DXF", desc: "Package drawings for delivery.", icon: Upload },
     ],
     selectors: [
-      { label: "Design type", options: ["Landing Page", "Dashboard", "Mobile App", "Component", "Wireframe"] },
-      { label: "Style", options: ["Minimal", "SaaS", "Finance", "Creative", "Enterprise"] },
-      { label: "Device", options: ["Desktop", "Tablet", "Mobile"] },
+      { label: "Drawing type", options: ["Floor Plan", "Elevation", "Section", "Site Plan", "Detail"] },
+      { label: "Units", options: ["Millimeters", "Centimeters", "Meters", "Inches", "Feet"] },
+      { label: "Layer options", options: ["Standard", "Architecture", "Mechanical", "Electrical", "Custom"] },
     ],
     previewType: "autocad",
-    emptyState: "Your generated interface preview will appear here.",
+    emptyState: "Your CAD drawing preview will appear here.",
   },
 };
 
@@ -218,10 +232,26 @@ const StudioThemeContext = createContext<{
   toggleTheme: () => void;
 } | null>(null);
 
+const StudioActionContext = createContext<{
+  openModal: (modal: StudioModalKey) => void;
+  closeModal: () => void;
+  openDrawer: (drawer: StudioDrawerKey) => void;
+  closeDrawer: () => void;
+  showToast: (message: string) => void;
+} | null>(null);
+
 function useStudioTheme() {
   const context = useContext(StudioThemeContext);
   if (!context) {
     throw new Error("useStudioTheme must be used inside StudioShell");
+  }
+  return context;
+}
+
+function useStudioActions() {
+  const context = useContext(StudioActionContext);
+  if (!context) {
+    throw new Error("useStudioActions must be used inside StudioShell");
   }
   return context;
 }
@@ -248,6 +278,9 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [displayOpen, setDisplayOpen] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<StudioModalKey | null>(null);
+  const [activeDrawer, setActiveDrawer] = useState<StudioDrawerKey | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const sidebarNotificationRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -273,6 +306,41 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
     }),
     [theme],
   );
+
+  const showToast = useCallback((message: string) => {
+    setToast(message);
+    window.setTimeout(() => setToast(null), 2600);
+  }, []);
+
+  const actionValue = useMemo(
+    () => ({
+      openModal: (modal: StudioModalKey) => setActiveModal(modal),
+      closeModal: () => setActiveModal(null),
+      openDrawer: (drawer: StudioDrawerKey) => setActiveDrawer(drawer),
+      closeDrawer: () => setActiveDrawer(null),
+      showToast,
+    }),
+    [showToast],
+  );
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setActiveModal(null);
+        setActiveDrawer(null);
+        setActionsOpenSafe();
+      }
+    }
+
+    function setActionsOpenSafe() {
+      setWorkspaceOpen(false);
+      setNotificationsOpen(false);
+      setDisplayOpen(false);
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   useEffect(() => {
     function onPointerDown(event: MouseEvent) {
@@ -349,18 +417,18 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
               <p className={`mt-1 text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Personal</p>
             </div>
             <DropdownButton onClick={() => router.push("/settings")} icon={Settings} label="Workspace settings" />
-            <DropdownButton icon={RefreshCw} label="Switch workspace" muted />
-            <DropdownButton icon={Plus} label="Create workspace" muted />
+            <DropdownButton icon={RefreshCw} label="Switch workspace" onClick={() => setActiveModal("workspace-switch")} />
+            <DropdownButton icon={Plus} label="Create workspace" onClick={() => setActiveModal("workspace-create")} />
           </DropdownPanel>
         )}
       </div>
 
       {!isCollapsed && (
-        <div className={`mb-5 flex h-9 items-center gap-2 rounded-xl border px-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_22px_rgba(0,0,0,0.16)]" : "border-white/80 bg-white/72 shadow-[0_8px_22px_rgba(31,43,77,0.04)]"}`}>
+        <button onClick={() => setActiveModal("search")} className={`mb-5 flex h-9 w-full cursor-pointer items-center gap-2 rounded-xl border px-3 text-left transition-all active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_22px_rgba(0,0,0,0.16)] hover:border-[rgba(59,167,255,0.24)]" : "border-white/80 bg-white/72 shadow-[0_8px_22px_rgba(31,43,77,0.04)] hover:border-[#CFE8F8]"}`} aria-label="Open search">
           <Search className={`h-[13px] w-[13px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} />
-          <input placeholder="Search..." className={`min-w-0 flex-1 bg-transparent text-[12px] outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#9CA3AF]"}`} />
+          <span className={`min-w-0 flex-1 text-[12px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`}>Search...</span>
           <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F3F6F8] text-[#9CA3AF]"}`}>/</span>
-        </div>
+        </button>
       )}
 
       <nav className="space-y-1">
@@ -378,7 +446,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
             <p className={`text-[12px] font-bold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Alternus AI Trial</p>
             <p className={`mt-1 text-[10px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>There are 12 days left for you to enjoy the various features.</p>
             <button
-              onClick={() => router.push("/pricing")}
+              onClick={() => setActiveModal("upgrade")}
               className={`mt-3 rounded-lg border px-3 py-1.5 text-[10px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:border-[rgba(59,167,255,0.24)]" : "border-[#E5E7EB] bg-white text-[#171717] shadow-sm hover:border-[#CFE8F8]"}`}
             >
               Upgrade to Pro
@@ -408,8 +476,28 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
   return (
     <StudioThemeContext.Provider value={themeValue}>
+      <StudioActionContext.Provider value={actionValue}>
       <div className={`fixed inset-0 overflow-hidden font-sans ${dark ? "bg-[#0F1013] text-[#F4F6F8] studio-shell-dark" : "bg-[#F6FAFC] text-[#171717]"}`}>
       <style jsx global>{`
+        .studio-shell-dark button,
+        .studio-shell-dark a,
+        button,
+        a {
+          cursor: pointer;
+        }
+        .studio-shell-dark button:focus-visible,
+        .studio-shell-dark a:focus-visible,
+        .studio-shell-dark input:focus-visible,
+        .studio-shell-dark textarea:focus-visible,
+        .studio-shell-dark select:focus-visible,
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible,
+        select:focus-visible {
+          outline: 2px solid rgba(74, 155, 255, 0.48) !important;
+          outline-offset: 2px !important;
+        }
         .studio-shell-dark {
           background: #0f1013 !important;
           color: #f4f6f8 !important;
@@ -536,7 +624,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
               <div className={`relative flex items-center gap-2 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
                 <div ref={notificationRef} className="relative">
                   <button
-                    onClick={() => setNotificationsOpen((value) => !value)}
+                    onClick={() => setActiveDrawer("notifications")}
                     className={`relative flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white/70 shadow-sm hover:bg-white"}`}
                     aria-label="Notifications"
                   >
@@ -546,7 +634,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
                   {notificationsOpen && <NotificationsDropdown align="left" />}
                 </div>
                 <button
-                  onClick={() => router.push("/settings")}
+                  onClick={() => setActiveModal("quick-settings")}
                   className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white/70 shadow-sm hover:bg-white"}`}
                   aria-label="Open settings"
                 >
@@ -566,7 +654,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
               <h1 className={`truncate text-[15px] font-semibold tracking-[-0.01em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{currentTitle}</h1>
             </div>
             <button
-              onClick={() => router.push("/account")}
+              onClick={() => setActiveDrawer("profile")}
               className={`flex h-8 w-8 items-center justify-center rounded-xl ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white text-[#6B7280] shadow-sm hover:bg-[#FAFCFD]"}`}
               aria-label="Open profile"
             >
@@ -614,9 +702,270 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           </div>
         </div>
       )}
+      {activeModal && <StudioModal modal={activeModal} onClose={() => setActiveModal(null)} />}
+      {activeDrawer && <StudioDrawer drawer={activeDrawer} onClose={() => setActiveDrawer(null)} />}
+      {toast && <StudioToast message={toast} />}
       </div>
+      </StudioActionContext.Provider>
     </StudioThemeContext.Provider>
   );
+}
+
+function StudioModal({ modal, onClose }: { modal: StudioModalKey; onClose: () => void }) {
+  const { theme, toggleTheme } = useStudioTheme();
+  const { showToast } = useStudioActions();
+  const dark = theme === "dark";
+  const content = getModalContent(modal);
+
+  const submitAction = () => {
+    showToast(content.success);
+    onClose();
+  };
+
+  return (
+    <div className={`fixed inset-0 z-50 flex items-center justify-center px-4 backdrop-blur-[2px] ${dark ? "bg-black/45" : "bg-[#1F2937]/20"}`} onMouseDown={onClose}>
+      <div
+        className={`w-full max-w-xl rounded-3xl border p-5 shadow-[0_24px_70px_rgba(31,43,77,0.16)] transition-all ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5E7EB] bg-white"}`}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className={`text-[17px] font-semibold tracking-[-0.02em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{content.title}</h2>
+            <p className={`mt-2 text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{content.description}</p>
+          </div>
+          <button onClick={onClose} className={`flex h-8 w-8 items-center justify-center rounded-xl ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#9CA3AF] hover:bg-[#F4F8FB]"}`} aria-label="Close">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {modal === "search" && <SearchFrame />}
+        {modal === "quick-settings" && (
+          <div className="mt-5 space-y-3">
+            <ModalRow icon={theme === "dark" ? Moon : Sun} title={`${theme === "dark" ? "Dark" : "Light"} mode`} desc="Toggle the workspace appearance." action="Toggle" onClick={toggleTheme} />
+            <ModalRow icon={Bell} title="Notifications" desc="Review workspace notification preferences." action="Open" onClick={() => showToast("Notification settings opened")} />
+            <ModalRow icon={UserRound} title="Account settings" desc="Manage your profile and plan." action="Settings" href="/settings" />
+            <ModalRow icon={Shield} title="Workspace settings" desc="Manage the Personal workspace." action="Manage" href="/settings" />
+          </div>
+        )}
+        {modal === "upgrade" && <UpgradeFrame />}
+        {modal === "workspace-switch" && <ChoiceList items={["Personal", "Studio Team", "Client Workspace"]} active="Personal" />}
+        {modal === "workspace-create" && <SimpleForm placeholder="New workspace name" />}
+        {modal === "prompt-editor" && <PromptEditorFrame />}
+        {modal === "project-create" && <SimpleForm placeholder="Project name" extra="Choose a short project name and start from a clean workspace." />}
+        {modal === "asset-upload" && <UploadFrame kind="asset" />}
+        {modal === "upload-file" && <UploadFrame kind="file" />}
+        {modal === "upload-image" && <UploadFrame kind="image" />}
+        {modal === "upload-document" && <UploadFrame kind="document" />}
+        {modal === "support" && <SimpleForm placeholder="How can support help?" extra="Send a short support request. The team will follow up in your workspace." />}
+
+        <div className="mt-6 flex justify-end gap-2">
+          <button onClick={onClose} className={`rounded-xl border px-4 py-2 text-[12px] font-semibold transition-all active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-[#F8FAFC]"}`}>Cancel</button>
+          <button onClick={submitAction} className="rounded-xl bg-[#4A9BFF] px-4 py-2 text-[12px] font-semibold text-white shadow-[0_10px_22px_rgba(74,155,255,0.22)] transition-all hover:bg-[#2D8FF0] active:scale-[0.98]">
+            {content.action}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StudioDrawer({ drawer, onClose }: { drawer: StudioDrawerKey; onClose: () => void }) {
+  const { theme } = useStudioTheme();
+  const { showToast } = useStudioActions();
+  const dark = theme === "dark";
+  const title = drawer === "profile" ? "Profile" : drawer === "notifications" ? "Notifications" : drawer === "asset-preview" ? "Asset details" : drawer === "project-detail" ? "Project details" : "Help article";
+
+  return (
+    <div className={`fixed inset-0 z-50 flex justify-end backdrop-blur-[2px] ${dark ? "bg-black/35" : "bg-[#1F2937]/20"}`} onMouseDown={onClose}>
+      <aside
+        className={`h-full w-full max-w-md border-l p-5 shadow-[-24px_0_70px_rgba(31,43,77,0.14)] transition-all ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5E7EB] bg-white"}`}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className={`text-[17px] font-semibold tracking-[-0.02em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{title}</h2>
+            <p className={`mt-2 text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>A clean side panel for contextual workspace actions.</p>
+          </div>
+          <button onClick={onClose} className={`flex h-8 w-8 items-center justify-center rounded-xl ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#9CA3AF] hover:bg-[#F4F8FB]"}`} aria-label="Close drawer">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {drawer === "profile" && (
+          <div className="mt-5 space-y-3">
+            <div className={`rounded-2xl border p-4 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5E7EB] bg-[#FCFDFE]"}`}>
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white">
+                  <UserRound className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Personal workspace</p>
+                  <p className={`mt-1 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Trial plan - 12 days left</p>
+                </div>
+              </div>
+            </div>
+            <DrawerAction icon={Settings} label="Account settings" href="/settings" />
+            <DrawerAction icon={CreditCard} label="Billing and plan" href="/settings" />
+            <DrawerAction icon={RefreshCw} label="Switch workspace" onClick={() => showToast("Workspace switcher opened")} />
+            <DrawerAction icon={Upload} label="Sign out" onClick={() => showToast("Use the sidebar Sign Out confirmation")} />
+          </div>
+        )}
+
+        {drawer === "notifications" && (
+          <div className="mt-5 space-y-3">
+            <button onClick={() => showToast("All notifications marked as read")} className="mb-2 rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 text-[11px] font-semibold text-[#4B5563] transition-all hover:border-[#CFE8F8] active:scale-[0.98]">Mark all as read</button>
+            {["Prompt Lab has 2 drafts ready", "Latest export is available", "Workspace settings synced"].map((item) => (
+              <div key={item} className={`rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5E7EB] bg-[#FCFDFE]"}`}>
+                <p className={`text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{item}</p>
+                <p className={`mt-1 text-[10.5px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Just now</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {drawer !== "profile" && drawer !== "notifications" && (
+          <div className={`mt-5 rounded-2xl border border-dashed p-6 text-center ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5E7EB] bg-[#FCFDFE]"}`}>
+            <Sparkles className="mx-auto h-6 w-6 text-[#4A9BFF]" />
+            <p className={`mt-3 text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Details will appear here</p>
+            <p className={`mt-2 text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Select an item to inspect it without leaving the workspace.</p>
+          </div>
+        )}
+      </aside>
+    </div>
+  );
+}
+
+function StudioToast({ message }: { message: string }) {
+  return (
+    <div className="fixed bottom-5 right-5 z-[60] rounded-2xl border border-[#DCEBFA] bg-white px-4 py-3 text-[12px] font-semibold text-[#171717] shadow-[0_18px_48px_rgba(31,43,77,0.14)]">
+      {message}
+    </div>
+  );
+}
+
+function getModalContent(modal: StudioModalKey) {
+  const map: Record<StudioModalKey, { title: string; description: string; action: string; success: string }> = {
+    search: { title: "Search workspace", description: "Find projects, prompts, assets, exports, and help without leaving this screen.", action: "Search", success: "Search opened" },
+    "quick-settings": { title: "Quick settings", description: "Adjust common workspace preferences or jump into full settings.", action: "Done", success: "Settings updated" },
+    "workspace-switch": { title: "Switch workspace", description: "Choose another workspace or continue in Personal.", action: "Switch", success: "Workspace switched" },
+    "workspace-create": { title: "Create workspace", description: "Start a clean workspace for a new client, team, or project.", action: "Create", success: "Workspace created" },
+    upgrade: { title: "Upgrade to Pro", description: "Review your current trial and unlock higher limits for production workflows.", action: "Upgrade", success: "Upgrade flow started" },
+    "upload-file": { title: "Import file", description: "Upload common project files and attach them to the current workspace.", action: "Upload", success: "File added" },
+    "upload-image": { title: "Upload image", description: "Add an image reference with preview support.", action: "Upload image", success: "Image added" },
+    "upload-document": { title: "Upload document", description: "Attach PDFs, docs, text files, and markdown documents.", action: "Upload document", success: "Document added" },
+    "prompt-editor": { title: "Create prompt", description: "Save a reusable prompt template for future workflows.", action: "Save prompt", success: "Prompt saved" },
+    "project-create": { title: "Create project", description: "Create a project container for generated outputs and assets.", action: "Create project", success: "Project created" },
+    "asset-upload": { title: "Upload asset", description: "Add images, 3D models, CAD files, documents, or generated outputs.", action: "Upload asset", success: "Asset uploaded" },
+    support: { title: "Contact support", description: "Send a short support request from your workspace.", action: "Send request", success: "Support request sent" },
+  };
+  return map[modal];
+}
+
+function SearchFrame() {
+  return (
+    <div className="mt-5 space-y-4">
+      <div className="flex h-11 items-center gap-2 rounded-2xl border border-[#E5EAF0] bg-[#FCFDFE] px-4">
+        <Search className="h-4 w-4 text-[#9CA3AF]" />
+        <input autoFocus className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]" placeholder="Search projects, prompts, assets, exports, and help..." />
+        <span className="rounded-md bg-[#F3F6F8] px-1.5 py-0.5 text-[10px] font-semibold text-[#9CA3AF]">Enter</span>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {["Recent searches", "Suggested actions", "Projects", "Assets"].map((title) => (
+          <div key={title} className="rounded-2xl border border-[#E5E7EB] bg-[#FCFDFE] p-3">
+            <p className="text-[12px] font-semibold text-[#171717]">{title}</p>
+            <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">No results yet. Start typing to preview matches.</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function UploadFrame({ kind }: { kind: "file" | "image" | "document" | "asset" }) {
+  const label = kind === "image" ? "PNG, JPG, WEBP" : kind === "document" ? "PDF, DOCX, TXT, MD" : kind === "asset" ? "Images, 3D models, CAD files, documents" : "Any supported workspace file";
+  return (
+    <div className="mt-5 rounded-2xl border border-dashed border-[#CFE8F8] bg-[#FAFCFD] p-6 text-center">
+      <Upload className="mx-auto h-7 w-7 text-[#4A9BFF]" />
+      <p className="mt-3 text-[13px] font-semibold text-[#171717]">Drop files here or browse</p>
+      <p className="mt-2 text-[12px] text-[#6B7280]">{label}</p>
+      <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#EEF7FC]">
+        <div className="h-full w-[18%] rounded-full bg-[#4A9BFF]" />
+      </div>
+    </div>
+  );
+}
+
+function UpgradeFrame() {
+  return (
+    <div className="mt-5 grid gap-3 sm:grid-cols-3">
+      {["More generations", "Larger exports", "Priority workspace"].map((benefit) => (
+        <div key={benefit} className="rounded-2xl border border-[#E5E7EB] bg-[#FCFDFE] p-3">
+          <CheckCircle2 className="h-4 w-4 text-[#4A9BFF]" />
+          <p className="mt-3 text-[12px] font-semibold text-[#171717]">{benefit}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ChoiceList({ items, active }: { items: string[]; active: string }) {
+  return (
+    <div className="mt-5 space-y-2">
+      {items.map((item) => (
+        <button key={item} className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left text-[12px] font-semibold transition-all active:scale-[0.99] ${item === active ? "border-[#CFE8F8] bg-[#EEF7FF] text-[#171717]" : "border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#CFE8F8]"}`}>
+          {item}
+          {item === active && <CheckCircle2 className="h-4 w-4 text-[#4A9BFF]" />}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function SimpleForm({ placeholder, extra }: { placeholder: string; extra?: string }) {
+  return (
+    <div className="mt-5 space-y-3">
+      <input className="h-11 w-full rounded-2xl border border-[#E5EAF0] bg-white px-4 text-[13px] outline-none placeholder:text-[#A1A7B0] focus:border-[#9BD2FF]" placeholder={placeholder} />
+      {extra && <p className="text-[11px] leading-5 text-[#6B7280]">{extra}</p>}
+    </div>
+  );
+}
+
+function PromptEditorFrame() {
+  return (
+    <div className="mt-5 space-y-3">
+      <input className="h-11 w-full rounded-2xl border border-[#E5EAF0] bg-white px-4 text-[13px] outline-none placeholder:text-[#A1A7B0] focus:border-[#9BD2FF]" placeholder="Prompt title" />
+      <textarea className="min-h-[120px] w-full resize-none rounded-2xl border border-[#E5EAF0] bg-white p-4 text-[13px] outline-none placeholder:text-[#A1A7B0] focus:border-[#9BD2FF]" placeholder="Write the reusable prompt..." />
+    </div>
+  );
+}
+
+function ModalRow({ icon: Icon, title, desc, action, onClick, href }: { icon: LucideIcon; title: string; desc: string; action: string; onClick?: () => void; href?: string }) {
+  const content = (
+    <>
+      <Icon className="h-4 w-4 text-[#4A9BFF]" />
+      <span className="min-w-0 flex-1">
+        <span className="block text-[12px] font-semibold text-[#171717]">{title}</span>
+        <span className="mt-1 block text-[10.5px] leading-4 text-[#6B7280]">{desc}</span>
+      </span>
+      <span className="text-[11px] font-semibold text-[#4A9BFF]">{action}</span>
+    </>
+  );
+  if (href) {
+    return <Link href={href} className="flex items-center gap-3 rounded-2xl border border-[#E5E7EB] bg-[#FCFDFE] p-3 transition-all hover:border-[#CFE8F8] active:scale-[0.99]">{content}</Link>;
+  }
+  return <button onClick={onClick} className="flex w-full items-center gap-3 rounded-2xl border border-[#E5E7EB] bg-[#FCFDFE] p-3 text-left transition-all hover:border-[#CFE8F8] active:scale-[0.99]">{content}</button>;
+}
+
+function DrawerAction({ icon: Icon, label, href, onClick }: { icon: LucideIcon; label: string; href?: string; onClick?: () => void }) {
+  const className = "flex h-10 w-full items-center gap-3 rounded-2xl border border-[#E5E7EB] bg-[#FCFDFE] px-3 text-[12px] font-semibold text-[#4B5563] transition-all hover:border-[#CFE8F8] active:scale-[0.99]";
+  const content = (
+    <>
+      <Icon className="h-4 w-4 text-[#4A9BFF]" />
+      {label}
+    </>
+  );
+  if (href) return <Link href={href} className={className}>{content}</Link>;
+  return <button onClick={onClick} className={className}>{content}</button>;
 }
 
 function SidebarLink({
@@ -672,10 +1021,11 @@ function DropdownPanel({ children, className = "" }: { children: ReactNode; clas
 
 function DropdownButton({ icon: Icon, label, onClick, muted }: { icon: LucideIcon; label: string; onClick?: () => void; muted?: boolean }) {
   const { theme } = useStudioTheme();
+  const { showToast } = useStudioActions();
   const dark = theme === "dark";
   return (
     <button
-      onClick={onClick}
+      onClick={() => (onClick ? onClick() : showToast(`${label} is ready to configure`))}
       className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-[12px] font-medium ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#4B5563] hover:bg-[#F4F8FB]"}`}
     >
       <Icon className={`h-3.5 w-3.5 ${dark ? "text-[#6F7782]" : "text-[#6B7280]"}`} />
@@ -710,7 +1060,12 @@ function NotificationsDropdown({ align = "right" }: { align?: "left" | "right" }
 
 function DisplayDropdown() {
   const { theme } = useStudioTheme();
+  const { showToast } = useStudioActions();
   const dark = theme === "dark";
+  const enterFullscreen = () => {
+    document.documentElement.requestFullscreen?.();
+    showToast("Fullscreen requested");
+  };
 
   return (
     <DropdownPanel className="right-0 top-9 w-60">
@@ -718,8 +1073,8 @@ function DisplayDropdown() {
         <p className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Display preview</p>
         <p className={`mt-1 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Layout and preview controls</p>
       </div>
-      <DropdownButton icon={Monitor} label="Preview workspace" muted />
-      <DropdownButton icon={Grid2X2} label="Compact density" muted />
+      <DropdownButton icon={Monitor} label="Preview workspace" onClick={enterFullscreen} />
+      <DropdownButton icon={Grid2X2} label="Compact density" onClick={() => showToast("Compact density applied")} />
       <DropdownButton icon={CheckCircle2} label={`${theme === "dark" ? "Dark" : "Light"} mode active`} />
     </DropdownPanel>
   );
@@ -774,22 +1129,38 @@ function SoftCard({ children, className = "" }: { children: ReactNode; className
   return <div className={`rounded-2xl border p-4 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_10px_24px_rgba(0,0,0,0.22)]" : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_10px_24px_rgba(31,43,77,0.035)]"} ${className}`}>{children}</div>;
 }
 
-function PrimaryButton({ children, icon: Icon }: { children: ReactNode; icon?: LucideIcon }) {
+function ClickableSoftCard({ children, className = "", onClick, ariaLabel }: { children: ReactNode; className?: string; onClick: () => void; ariaLabel: string }) {
   const { theme } = useStudioTheme();
   const dark = theme === "dark";
   return (
-    <button className={`inline-flex h-9 items-center gap-2 rounded-xl px-4 text-[12px] font-semibold ${dark ? "bg-[#3BA7FF] text-white shadow-[0_12px_24px_rgba(59,167,255,0.24)] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}>
+    <button
+      onClick={onClick}
+      aria-label={ariaLabel}
+      className={`rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_10px_24px_rgba(0,0,0,0.22)] hover:border-[rgba(59,167,255,0.24)]" : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_10px_24px_rgba(31,43,77,0.035)] hover:border-[#CFE8F8] hover:bg-white hover:shadow-[0_16px_34px_rgba(31,43,77,0.08)]"} ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function PrimaryButton({ children, icon: Icon, onClick }: { children: ReactNode; icon?: LucideIcon; onClick?: () => void }) {
+  const { theme } = useStudioTheme();
+  const { showToast } = useStudioActions();
+  const dark = theme === "dark";
+  return (
+    <button onClick={() => (onClick ? onClick() : showToast("Action opened"))} className={`inline-flex h-9 items-center gap-2 rounded-xl px-4 text-[12px] font-semibold transition-all active:scale-[0.98] ${dark ? "bg-[#3BA7FF] text-white shadow-[0_12px_24px_rgba(59,167,255,0.24)] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}>
       {Icon && <Icon className="h-3.5 w-3.5" />}
       {children}
     </button>
   );
 }
 
-function SecondaryButton({ children, icon: Icon }: { children: ReactNode; icon?: LucideIcon }) {
+function SecondaryButton({ children, icon: Icon, onClick }: { children: ReactNode; icon?: LucideIcon; onClick?: () => void }) {
   const { theme } = useStudioTheme();
+  const { showToast } = useStudioActions();
   const dark = theme === "dark";
   return (
-    <button className={`inline-flex h-9 items-center gap-2 rounded-xl border px-4 text-[12px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:border-[rgba(59,167,255,0.24)] hover:text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm hover:border-[#CFE8F8] hover:text-[#171717]"}`}>
+    <button onClick={() => (onClick ? onClick() : showToast("Action opened"))} className={`inline-flex h-9 items-center gap-2 rounded-xl border px-4 text-[12px] font-semibold transition-all active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:border-[rgba(59,167,255,0.24)] hover:text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm hover:border-[#CFE8F8] hover:text-[#171717]"}`}>
       {Icon && <Icon className="h-3.5 w-3.5" />}
       {children}
     </button>
@@ -798,9 +1169,24 @@ function SecondaryButton({ children, icon: Icon }: { children: ReactNode; icon?:
 
 function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
   const { theme } = useStudioTheme();
+  const { openModal, showToast } = useStudioActions();
   const dark = theme === "dark";
   const Icon = config.icon;
   const [activeTab, setActiveTab] = useState(config.previewTabs?.[0] ?? "Preview");
+  const [prompt, setPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const runWorkspaceAction = () => {
+    if (!prompt.trim()) {
+      showToast("Describe what you want to create first");
+      return;
+    }
+    setIsGenerating(true);
+    window.setTimeout(() => {
+      setIsGenerating(false);
+      showToast(`${config.title} request prepared`);
+    }, 900);
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-5 pb-2">
@@ -833,11 +1219,13 @@ function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
           <div className={`flex min-h-[58px] w-full items-center gap-2 rounded-2xl border px-3 py-2 lg:max-w-[460px] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-white shadow-[0_12px_30px_rgba(31,43,77,0.04)]"}`}>
             <Sparkles className="h-4 w-4 flex-shrink-0 text-[#4A9BFF]" />
             <input
+              value={prompt}
+              onChange={(event) => setPrompt(event.target.value)}
               className={`min-w-0 flex-1 bg-transparent text-[12px] outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#171717] placeholder:text-[#A1A7B0]"}`}
               placeholder={config.placeholder}
             />
-            <button className={`inline-flex h-9 flex-shrink-0 items-center gap-2 rounded-full px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] transition-all active:scale-[0.98] ${dark ? "bg-[#3BA7FF] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}>
-              {config.actionLabel}
+            <button onClick={runWorkspaceAction} disabled={isGenerating} className={`inline-flex h-9 flex-shrink-0 items-center gap-2 rounded-full px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] transition-all active:scale-[0.98] disabled:opacity-60 ${dark ? "bg-[#3BA7FF] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}>
+              {isGenerating ? "Working..." : config.actionLabel}
               <Send className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -850,6 +1238,10 @@ function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
           return (
             <button
               key={action.title}
+              onClick={() => {
+                setPrompt(action.title);
+                showToast(`${action.title} selected`);
+              }}
               className={`group rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_10px_24px_rgba(0,0,0,0.22)] hover:border-[rgba(59,167,255,0.24)]" : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_10px_24px_rgba(31,43,77,0.035)] hover:border-[#CFE8F8] hover:bg-white hover:shadow-[0_16px_34px_rgba(31,43,77,0.08)]"}`}
             >
               <div className="flex items-start gap-3">
@@ -873,6 +1265,8 @@ function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
             <p className={`mt-1 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Refine the request before generation.</p>
           </div>
           <textarea
+            value={prompt}
+            onChange={(event) => setPrompt(event.target.value)}
             rows={7}
             placeholder={config.placeholder}
             className={`w-full resize-none rounded-2xl border p-3 text-[12px] leading-5 outline-none transition-colors focus:border-[#9BD2FF] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#6F7782]" : "border-[#E5EAF0] bg-white text-[#171717] placeholder:text-[#A1A7B0]"}`}
@@ -897,7 +1291,7 @@ function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
             ].map((attachment) => {
               const AttachmentIcon = attachment.icon;
               return (
-                <button key={attachment.label} className={`inline-flex h-9 items-center gap-2 rounded-xl border px-3 text-[11px] font-semibold transition-all active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#CFE8F8] hover:text-[#171717]"}`}>
+                <button key={attachment.label} onClick={() => openModal(attachment.label === "Image" ? "upload-image" : attachment.label === "Document" ? "upload-document" : "upload-file")} className={`inline-flex h-9 items-center gap-2 rounded-xl border px-3 text-[11px] font-semibold transition-all active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#4B5563] hover:border-[#CFE8F8] hover:text-[#171717]"}`}>
                   <AttachmentIcon className="h-3.5 w-3.5" />
                   {attachment.label}
                 </button>
@@ -909,7 +1303,7 @@ function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
         <SoftCard className="flex min-h-[420px] flex-col gap-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{config.previewType === "code" ? "Code output" : config.previewType === "blender" ? "3D preview" : "UI preview"}</p>
+              <p className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{config.previewType === "code" ? "Code output" : config.previewType === "blender" ? "3D preview" : "CAD preview"}</p>
               <p className={`mt-1 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Outputs stay empty until you run an action.</p>
             </div>
             {config.previewTabs && (
@@ -936,7 +1330,7 @@ function ToolWorkspace({ config }: { config: ToolWorkspaceConfig }) {
             <p className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Recent projects</p>
             <p className={`mt-1 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Saved outputs and recent prompts for this workspace.</p>
           </div>
-          <button className={`inline-flex h-9 items-center gap-2 rounded-xl border px-3 text-[11px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]" : "border-[#E5E7EB] bg-white text-[#6B7280]"}`}>
+          <button onClick={() => showToast("Recent projects browser opened")} className={`inline-flex h-9 items-center gap-2 rounded-xl border px-3 text-[11px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]" : "border-[#E5E7EB] bg-white text-[#6B7280]"}`}>
             <Search className="h-3.5 w-3.5" />
             Browse
           </button>
@@ -994,6 +1388,9 @@ function ToolPreviewPlaceholder({ config }: { config: ToolWorkspaceConfig }) {
 }
 
 function OverviewPage() {
+  const router = useRouter();
+  const { openModal, showToast } = useStudioActions();
+
   return (
     <div>
       <PageHeader title="Studio Overview" subtitle="Overview of workspace activity." />
@@ -1016,19 +1413,19 @@ function OverviewPage() {
           <h3 className="text-[13px] font-semibold text-[#171717]">Recent activity</h3>
           <div className="mt-4 space-y-3">
             {["AutoCAD homepage concept updated", "Code Builder prepared landing route", "Blender material preview generated"].map((item) => (
-              <div key={item} className="flex items-center gap-3 rounded-xl bg-white px-3 py-2">
+              <button key={item} onClick={() => showToast(`${item} opened`)} className="flex w-full items-center gap-3 rounded-xl bg-white px-3 py-2 text-left transition-all hover:bg-[#F8FAFC] active:scale-[0.99]">
                 <span className="h-2 w-2 rounded-full bg-[#1DA1F2]" />
                 <span className="text-[12px] text-[#4B5563]">{item}</span>
-              </div>
+              </button>
             ))}
           </div>
         </SoftCard>
         <SoftCard>
           <h3 className="text-[13px] font-semibold text-[#171717]">Quick actions</h3>
           <div className="mt-4 grid gap-2">
-            <SecondaryButton icon={Plus}>New project</SecondaryButton>
-            <SecondaryButton icon={Upload}>Import asset</SecondaryButton>
-            <SecondaryButton icon={Sparkles}>Start AI task</SecondaryButton>
+            <SecondaryButton icon={Plus} onClick={() => openModal("project-create")}>New project</SecondaryButton>
+            <SecondaryButton icon={Upload} onClick={() => openModal("asset-upload")}>Import asset</SecondaryButton>
+            <SecondaryButton icon={Sparkles} onClick={() => router.push("/ai-assistant")}>Start AI task</SecondaryButton>
           </div>
         </SoftCard>
       </div>
@@ -1037,22 +1434,24 @@ function OverviewPage() {
 }
 
 function AutoCADPage() {
+  const { openModal, showToast } = useStudioActions();
+
   return (
     <div>
-      <PageHeader title="AutoCAD Design" subtitle="Import files and manage recent design workspaces." action={<PrimaryButton icon={Upload}>Import AutoCAD file</PrimaryButton>} />
-      <SoftCard className="mb-5 flex min-h-[150px] flex-col items-center justify-center border-dashed text-center">
+      <PageHeader title="AutoCAD Design" subtitle="Create CAD drawings, technical plans, and export-ready drafting files." action={<PrimaryButton icon={Upload} onClick={() => openModal("upload-file")}>Import AutoCAD file</PrimaryButton>} />
+      <button onClick={() => openModal("upload-file")} className="mb-5 flex min-h-[150px] w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#EAECEF] bg-[#FCFDFE] p-4 text-center shadow-[0_10px_24px_rgba(31,43,77,0.035)] transition-all hover:-translate-y-0.5 hover:border-[#CFE8F8] active:scale-[0.99]">
         <PenLine className="h-8 w-8 text-[#1DA1F2]" />
-        <p className="mt-3 text-[13px] font-semibold text-[#171717]">Upload or import a AutoCAD file</p>
-        <p className="mt-1 text-[11px] text-[#6B7280]">Drop a design file here or connect a AutoCAD link.</p>
-      </SoftCard>
-      <h3 className="mb-3 text-[13px] font-semibold text-[#171717]">Recent designs</h3>
+        <p className="mt-3 text-[13px] font-semibold text-[#171717]">Upload or import an AutoCAD file</p>
+        <p className="mt-1 text-[11px] text-[#6B7280]">Drop a DWG, DXF, PDF, or technical reference file here.</p>
+      </button>
+      <h3 className="mb-3 text-[13px] font-semibold text-[#171717]">Recent drawings</h3>
       <div className="grid gap-3 md:grid-cols-3">
-        {["Landing system", "Mobile checkout", "Gallery cards"].map((name) => (
-          <SoftCard key={name} className="min-h-[130px]">
+        {["Floor plan study", "Gallery elevation", "Display detail"].map((name) => (
+          <ClickableSoftCard key={name} className="min-h-[130px]" onClick={() => showToast(`${name} drawing opened`)} ariaLabel={`Open ${name}`}>
             <div className="mb-4 h-16 rounded-xl bg-[#EEF7FC]" />
             <p className="text-[12px] font-semibold text-[#171717]">{name}</p>
-            <p className="mt-1 text-[10px] text-[#6B7280]">No synced edits yet.</p>
-          </SoftCard>
+            <p className="mt-1 text-[10px] text-[#6B7280]">No generated preview yet.</p>
+          </ClickableSoftCard>
         ))}
       </div>
     </div>
@@ -1060,6 +1459,8 @@ function AutoCADPage() {
 }
 
 function CodeBuilderPage() {
+  const { openModal, showToast } = useStudioActions();
+
   return (
     <div>
       <PageHeader title="Code Builder" subtitle="Describe a feature and prepare build-ready project work." />
@@ -1067,16 +1468,16 @@ function CodeBuilderPage() {
         <label className="text-[12px] font-semibold text-[#171717]">Project prompt</label>
         <textarea className="mt-3 min-h-[130px] w-full resize-none rounded-2xl border border-[#E5E7EB] bg-white p-4 text-[13px] outline-none placeholder:text-[#A1A7B0]" placeholder="Describe the route, component, or app behavior you want to build..." />
         <div className="mt-3 flex flex-wrap gap-2">
-          <PrimaryButton icon={Code2}>Generate plan</PrimaryButton>
-          <SecondaryButton icon={Folder}>Open recent project</SecondaryButton>
+          <PrimaryButton icon={Code2} onClick={() => showToast("Code plan generation queued")}>Generate plan</PrimaryButton>
+          <SecondaryButton icon={Folder} onClick={() => openModal("project-create")}>Open recent project</SecondaryButton>
         </div>
       </SoftCard>
       <div className="mt-5 grid gap-3 md:grid-cols-3">
         {["Studio shell", "Checkout polish", "Asset upload"].map((name) => (
-          <SoftCard key={name}>
+          <ClickableSoftCard key={name} onClick={() => showToast(`${name} project opened`)} ariaLabel={`Open ${name}`}>
             <p className="text-[12px] font-semibold text-[#171717]">{name}</p>
             <p className="mt-2 text-[11px] text-[#6B7280]">Recent build placeholder</p>
-          </SoftCard>
+          </ClickableSoftCard>
         ))}
       </div>
     </div>
@@ -1084,27 +1485,29 @@ function CodeBuilderPage() {
 }
 
 function BlenderPage() {
+  const { openModal, showToast } = useStudioActions();
+
   return (
     <div>
-      <PageHeader title="Blender 3D" subtitle="Generate, import, and organize 3D production assets." action={<PrimaryButton icon={Box}>New 3D task</PrimaryButton>} />
+      <PageHeader title="Blender 3D" subtitle="Generate, import, and organize 3D production assets." action={<PrimaryButton icon={Box} onClick={() => showToast("New Blender task prepared")}>New 3D task</PrimaryButton>} />
       <div className="grid gap-4 lg:grid-cols-2">
-        <SoftCard className="flex min-h-[180px] flex-col items-center justify-center border-dashed text-center">
+        <button onClick={() => openModal("asset-upload")} className="flex min-h-[180px] flex-col items-center justify-center rounded-2xl border border-dashed border-[#EAECEF] bg-[#FCFDFE] p-4 text-center shadow-[0_10px_24px_rgba(31,43,77,0.035)] transition-all hover:-translate-y-0.5 hover:border-[#CFE8F8] active:scale-[0.99]">
           <Layers3 className="h-8 w-8 text-[#1DA1F2]" />
           <p className="mt-3 text-[13px] font-semibold text-[#171717]">Upload asset or model</p>
           <p className="mt-1 text-[11px] text-[#6B7280]">OBJ, FBX, GLB, and blend files can be staged here.</p>
-        </SoftCard>
+        </button>
         <SoftCard>
           <label className="text-[12px] font-semibold text-[#171717]">Generation prompt</label>
           <textarea className="mt-3 min-h-[116px] w-full resize-none rounded-2xl border border-[#E5E7EB] bg-white p-4 text-[13px] outline-none placeholder:text-[#A1A7B0]" placeholder="Describe the model, material, lighting, or scene..." />
-          <PrimaryButton icon={Sparkles}>Prepare generation</PrimaryButton>
+          <PrimaryButton icon={Sparkles} onClick={() => showToast("Blender generation prepared")}>Prepare generation</PrimaryButton>
         </SoftCard>
       </div>
       <div className="mt-5 grid gap-3 md:grid-cols-4">
         {["Material study", "Product scene", "Gallery room", "Character base"].map((name) => (
-          <SoftCard key={name} className="min-h-[120px]">
+          <ClickableSoftCard key={name} className="min-h-[120px]" onClick={() => showToast(`${name} asset opened`)} ariaLabel={`Open ${name}`}>
             <div className="mb-3 h-14 rounded-xl bg-[#EEF7FC]" />
             <p className="text-[12px] font-semibold text-[#171717]">{name}</p>
-          </SoftCard>
+          </ClickableSoftCard>
         ))}
       </div>
     </div>
@@ -1112,26 +1515,28 @@ function BlenderPage() {
 }
 
 function AssetLibraryPage() {
+  const { openDrawer, openModal, showToast } = useStudioActions();
+
   return (
     <div>
-      <PageHeader title="Asset Library" subtitle="Search, filter, and upload creative assets." action={<PrimaryButton icon={Upload}>Upload asset</PrimaryButton>} />
+      <PageHeader title="Asset Library" subtitle="Search, filter, and upload creative assets." action={<PrimaryButton icon={Upload} onClick={() => openModal("asset-upload")}>Upload asset</PrimaryButton>} />
       <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-[#EAECEF] bg-[#FCFDFE] p-3 sm:flex-row">
         <div className="flex h-10 flex-1 items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3">
           <Search className="h-4 w-4 text-[#9CA3AF]" />
           <input className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]" placeholder="Search assets..." />
         </div>
-        <SecondaryButton>All types</SecondaryButton>
-        <SecondaryButton>Recent</SecondaryButton>
+        <SecondaryButton onClick={() => showToast("All asset types selected")}>All types</SecondaryButton>
+        <SecondaryButton onClick={() => showToast("Recent assets selected")}>Recent</SecondaryButton>
       </div>
       <div className="grid gap-3 md:grid-cols-4">
         {["Image", "Vector", "Model", "Document", "Texture", "Reference", "Export", "Audio"].map((name) => (
-          <SoftCard key={name}>
+          <ClickableSoftCard key={name} onClick={() => openDrawer("asset-preview")} ariaLabel={`Preview ${name} asset`}>
             <div className="mb-3 flex h-20 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
               <ImageIcon className="h-6 w-6" />
             </div>
             <p className="text-[12px] font-semibold text-[#171717]">{name} asset</p>
             <p className="mt-1 text-[10px] text-[#6B7280]">Placeholder</p>
-          </SoftCard>
+          </ClickableSoftCard>
         ))}
       </div>
     </div>
@@ -1140,11 +1545,13 @@ function AssetLibraryPage() {
 
 function AIAssistantPage() {
   const { theme } = useStudioTheme();
+  const { openModal, showToast } = useStudioActions();
   const dark = theme === "dark";
   const [input, setInput] = useState("");
   const [actionsOpen, setActionsOpen] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [hasConversation, setHasConversation] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
@@ -1159,13 +1566,22 @@ function AIAssistantPage() {
         kind,
       })),
     ]);
+    if (files.length) showToast(`${files.length} ${kind} attachment${files.length > 1 ? "s" : ""} added`);
     event.target.value = "";
   };
 
   const sendPrompt = () => {
-    if (!input.trim()) return;
-    setHasConversation(true);
-    setInput("");
+    if (!input.trim()) {
+      showToast("Write a prompt before sending");
+      return;
+    }
+    setIsSending(true);
+    window.setTimeout(() => {
+      setHasConversation(true);
+      setInput("");
+      setIsSending(false);
+      showToast("Prompt submitted");
+    }, 700);
   };
 
   const composer = (
@@ -1210,19 +1626,21 @@ function AIAssistantPage() {
             </button>
             {actionsOpen && (
               <DropdownPanel className="bottom-9 left-0 w-44">
-                <DropdownButton icon={Sparkles} label="New task" onClick={() => setActionsOpen(false)} />
-                <DropdownButton icon={FileText} label="New prompt" onClick={() => setActionsOpen(false)} />
-                <DropdownButton icon={Upload} label="Import file" onClick={() => fileInputRef.current?.click()} />
+                <DropdownButton icon={Sparkles} label="New task" onClick={() => { setActionsOpen(false); setInput(""); showToast("New prompt started"); }} />
+                <DropdownButton icon={FileText} label="New prompt" onClick={() => { setActionsOpen(false); openModal("prompt-editor"); }} />
+                <DropdownButton icon={Folder} label="Create project" onClick={() => { setActionsOpen(false); openModal("project-create"); }} />
+                <DropdownButton icon={ImageIcon} label="Upload asset" onClick={() => { setActionsOpen(false); openModal("asset-upload"); }} />
+                <DropdownButton icon={Upload} label="Import file" onClick={() => { setActionsOpen(false); openModal("upload-file"); }} />
               </DropdownPanel>
             )}
           </div>
-          <button onClick={() => fileInputRef.current?.click()} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach file">
+          <button onClick={() => openModal("upload-file")} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach file">
             <Paperclip className="h-[13px] w-[13px]" />
           </button>
-          <button onClick={() => imageInputRef.current?.click()} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach image">
+          <button onClick={() => openModal("upload-image")} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach image">
             <ImageIcon className="h-[13px] w-[13px]" />
           </button>
-          <button onClick={() => documentInputRef.current?.click()} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach document">
+          <button onClick={() => openModal("upload-document")} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach document">
             <FileText className="h-[13px] w-[13px]" />
           </button>
           <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
@@ -1230,11 +1648,11 @@ function AIAssistantPage() {
           <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
           <button
             onClick={sendPrompt}
-            disabled={!input.trim()}
+            disabled={isSending}
             aria-label="Send prompt"
             className={`ml-auto flex h-9 w-9 items-center justify-center rounded-full text-white shadow-[0_12px_24px_rgba(74,155,255,0.28)] transition-colors disabled:opacity-70 ${dark ? "bg-[#3BA7FF] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
           >
-            <Send className="h-4 w-4" />
+            {isSending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </button>
         </div>
       </div>
@@ -1399,22 +1817,24 @@ function AIAssistantPage() {
 }
 
 function PromptLabPage() {
+  const { openModal, showToast } = useStudioActions();
+
   return (
     <div>
-      <PageHeader title="Prompt Lab" subtitle="Test, save, and organize reusable prompt workflows." action={<PrimaryButton icon={Plus}>Create new prompt</PrimaryButton>} />
+      <PageHeader title="Prompt Lab" subtitle="Test, save, and organize reusable prompt workflows." action={<PrimaryButton icon={Plus} onClick={() => openModal("prompt-editor")}>Create new prompt</PrimaryButton>} />
       <div className="mb-5 flex flex-wrap gap-2">
         {["All", "Design", "Code", "3D", "Research"].map((filter) => (
-          <button key={filter} className="rounded-full border border-[#E5E7EB] bg-white px-3 py-1.5 text-[11px] font-semibold text-[#4B5563] hover:border-[#CFE8F8]">
+          <button key={filter} onClick={() => showToast(`${filter} prompts selected`)} className="rounded-full border border-[#E5E7EB] bg-white px-3 py-1.5 text-[11px] font-semibold text-[#4B5563] transition-all hover:border-[#CFE8F8] active:scale-[0.98]">
             {filter}
           </button>
         ))}
       </div>
       <div className="grid gap-3 md:grid-cols-3">
         {["Website audit", "Component builder", "Scene generator", "Copy polish", "Budget planner", "Asset namer"].map((name) => (
-          <SoftCard key={name}>
+          <ClickableSoftCard key={name} onClick={() => openModal("prompt-editor")} ariaLabel={`Edit ${name} prompt`}>
             <p className="text-[12px] font-semibold text-[#171717]">{name}</p>
             <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Prompt card placeholder for testing and reuse.</p>
-          </SoftCard>
+          </ClickableSoftCard>
         ))}
       </div>
     </div>
@@ -1422,18 +1842,20 @@ function PromptLabPage() {
 }
 
 function ProjectsPage() {
+  const { openDrawer, openModal } = useStudioActions();
+
   return (
     <div>
-      <PageHeader title="Projects" subtitle="Manage studio projects and production status." action={<PrimaryButton icon={Plus}>New project</PrimaryButton>} />
+      <PageHeader title="Projects" subtitle="Manage studio projects and production status." action={<PrimaryButton icon={Plus} onClick={() => openModal("project-create")}>New project</PrimaryButton>} />
       <div className="grid gap-3 md:grid-cols-3">
         {["Alternus dashboard", "Gallery redesign", "3D catalog"].map((name) => (
-          <SoftCard key={name} className="min-h-[150px]">
+          <ClickableSoftCard key={name} className="min-h-[150px]" onClick={() => openDrawer("project-detail")} ariaLabel={`Open ${name} project`}>
             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
               <Folder className="h-5 w-5" />
             </div>
             <p className="text-[13px] font-semibold text-[#171717]">{name}</p>
             <p className="mt-2 text-[11px] text-[#6B7280]">Project card placeholder</p>
-          </SoftCard>
+          </ClickableSoftCard>
         ))}
       </div>
     </div>
@@ -1441,6 +1863,8 @@ function ProjectsPage() {
 }
 
 function ExportsPage() {
+  const { showToast } = useStudioActions();
+
   return (
     <div>
       <PageHeader title="Exports" subtitle="Review exported files and download history." />
@@ -1456,7 +1880,7 @@ function ExportsPage() {
               <p className="mt-1 text-[10px] text-[#6B7280]">{type}</p>
             </div>
             <span className="rounded-full bg-[#EEF7FC] px-2.5 py-1 text-[10px] font-semibold text-[#1DA1F2]">{status}</span>
-            <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white text-[#6B7280] hover:text-[#171717]" aria-label={`Download ${name}`}>
+            <button onClick={() => showToast(status === "Ready" ? `${name} download started` : `${name} is still processing`)} className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white text-[#6B7280] transition-all hover:border-[#CFE8F8] hover:text-[#171717] active:scale-[0.98]" aria-label={`Download ${name}`}>
               <Download className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -1468,6 +1892,7 @@ function ExportsPage() {
 
 function SettingsPage() {
   const { theme, setTheme, toggleTheme } = useStudioTheme();
+  const { openModal, showToast } = useStudioActions();
   const isDark = theme === "dark";
 
   return (
@@ -1528,7 +1953,7 @@ function SettingsPage() {
           <div className={`mt-4 h-2 overflow-hidden rounded-full ${isDark ? "bg-[#181B20]" : "bg-[#EEF7FC]"}`}>
             <div className="h-full w-[58%] rounded-full bg-[#4A9BFF]" />
           </div>
-          <button className={`mt-4 inline-flex h-9 items-center rounded-xl px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] ${isDark ? "bg-[#3BA7FF] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}>
+          <button onClick={() => openModal("upgrade")} className={`mt-4 inline-flex h-9 items-center rounded-xl px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] transition-all active:scale-[0.98] ${isDark ? "bg-[#3BA7FF] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}>
             Upgrade plan
           </button>
         </SoftCard>
@@ -1538,42 +1963,42 @@ function SettingsPage() {
         <SoftCard>
           <SettingCardHeader icon={UserRound} title="Profile settings" />
           <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Name, email, avatar, role, and account details placeholder.</p>
-          <SettingsRows rows={["Display name: Julie", "Email: personal workspace", "Profile photo placeholder"]} />
+          <SettingsRows rows={["Display name: Julie", "Email: personal workspace", "Profile photo placeholder"]} onRowClick={showToast} />
         </SoftCard>
         <SoftCard>
           <SettingCardHeader icon={Shield} title="Workspace settings" />
           <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Personal workspace controls, members, permissions, and collaboration settings.</p>
-          <SettingsRows rows={["Workspace: Personal", "Member invites placeholder", "Default project: AI Assistant"]} />
+          <SettingsRows rows={["Workspace: Personal", "Member invites placeholder", "Default project: AI Assistant"]} onRowClick={showToast} />
         </SoftCard>
         <SoftCard>
           <SettingCardHeader icon={CreditCard} title="Billing and plan" />
           <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Trial status, upgrade placeholder, invoices, and billing history.</p>
-          <SettingsRows rows={["Current plan: Trial", "Billing history placeholder", "Payment method placeholder"]} />
+          <SettingsRows rows={["Current plan: Trial", "Billing history placeholder", "Payment method placeholder"]} onRowClick={showToast} />
         </SoftCard>
         <SoftCard>
           <SettingCardHeader icon={Bell} title="Notifications" />
           <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Control alerts for prompt lab updates, exports, and workspace changes.</p>
-          <SettingsRows rows={["Prompt Lab badge alerts", "Export completion alerts", "Weekly summary placeholder"]} />
+          <SettingsRows rows={["Prompt Lab badge alerts", "Export completion alerts", "Weekly summary placeholder"]} onRowClick={showToast} />
         </SoftCard>
         <SoftCard>
           <SettingCardHeader icon={KeyRound} title="Security" />
           <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Password, sessions, two-factor authentication, and trusted devices.</p>
-          <SettingsRows rows={["Password change placeholder", "Active sessions placeholder", "Two-factor authentication placeholder"]} />
+          <SettingsRows rows={["Password change placeholder", "Active sessions placeholder", "Two-factor authentication placeholder"]} onRowClick={showToast} />
         </SoftCard>
         <SoftCard>
           <SettingCardHeader icon={Plug} title="Integrations" />
           <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Connect AutoCAD, Blender, code repositories, and export destinations.</p>
-          <SettingsRows rows={["AutoCAD connection placeholder", "Blender bridge placeholder", "Git provider placeholder"]} />
+          <SettingsRows rows={["AutoCAD connection placeholder", "Blender bridge placeholder", "Git provider placeholder"]} onRowClick={showToast} />
         </SoftCard>
         <SoftCard>
           <SettingCardHeader icon={Database} title="Data and exports" />
           <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Manage workspace data, download history, retention, and import defaults.</p>
-          <SettingsRows rows={["Export archive placeholder", "Import defaults placeholder", "Data retention placeholder"]} />
+          <SettingsRows rows={["Export archive placeholder", "Import defaults placeholder", "Data retention placeholder"]} onRowClick={showToast} />
         </SoftCard>
         <SoftCard>
           <SettingCardHeader icon={Monitor} title="Display defaults" />
           <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Sidebar behavior, compact preview, and dashboard density.</p>
-          <SettingsRows rows={["Sidebar collapse preference", "Preview mode placeholder", "Density: Comfortable"]} />
+          <SettingsRows rows={["Sidebar collapse preference", "Preview mode placeholder", "Density: Comfortable"]} onRowClick={showToast} />
         </SoftCard>
       </div>
     </div>
@@ -1593,22 +2018,24 @@ function SettingCardHeader({ icon: Icon, title }: { icon: LucideIcon; title: str
   );
 }
 
-function SettingsRows({ rows }: { rows: string[] }) {
+function SettingsRows({ rows, onRowClick }: { rows: string[]; onRowClick?: (message: string) => void }) {
   const { theme } = useStudioTheme();
   const dark = theme === "dark";
   return (
     <div className="mt-4 space-y-2">
       {rows.map((row) => (
-        <div key={row} className={`flex items-center justify-between rounded-xl border px-3 py-2 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5E7EB] bg-white"}`}>
+        <button key={row} onClick={() => onRowClick?.(`${row} opened`)} className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left transition-all hover:border-[#CFE8F8] active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5E7EB] bg-white"}`}>
           <span className={`text-[11px] font-medium ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>{row}</span>
           <span className={`text-[10px] font-semibold ${dark ? "text-[#6F7782]" : "text-[#A1A7B0]"}`}>Soon</span>
-        </div>
+        </button>
       ))}
     </div>
   );
 }
 
 function HelpCenterPage() {
+  const { openDrawer, openModal } = useStudioActions();
+
   return (
     <div>
       <PageHeader title="Help Center" subtitle="Find help articles and contact support." />
@@ -1618,10 +2045,10 @@ function HelpCenterPage() {
       </div>
       <div className="grid gap-3 md:grid-cols-3">
         {["How do imports work?", "Where are exports saved?", "How do I manage workspaces?"].map((question) => (
-          <SoftCard key={question}>
+          <ClickableSoftCard key={question} onClick={() => openDrawer("help-preview")} ariaLabel={`Open help article ${question}`}>
             <p className="text-[12px] font-semibold text-[#171717]">{question}</p>
             <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">FAQ card placeholder with concise support guidance.</p>
-          </SoftCard>
+          </ClickableSoftCard>
         ))}
       </div>
       <SoftCard className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -1629,7 +2056,7 @@ function HelpCenterPage() {
           <p className="text-[13px] font-semibold text-[#171717]">Contact support</p>
           <p className="mt-1 text-[11px] text-[#6B7280]">Support request placeholder for the Personal workspace.</p>
         </div>
-        <SecondaryButton>Open support</SecondaryButton>
+        <SecondaryButton onClick={() => openModal("support")}>Open support</SecondaryButton>
       </SoftCard>
     </div>
   );
