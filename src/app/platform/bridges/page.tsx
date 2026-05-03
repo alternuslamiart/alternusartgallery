@@ -5,14 +5,14 @@ import { AlternusPage, COBALT } from "@/components/alternus-shell";
 
 const bridges = [
   {
-    app: "Figma",
-    slug: "figma",
+    app: "AutoCAD",
+    slug: "autocad",
     v: "Latest",
     kind: "Design bridge",
     blurb:
       "Plan website screens, design systems, components, variants, and responsive states with the coding agent ready beside the design.",
     verbs: ["build frames", "sync tokens", "create components", "prepare code"],
-    install: "Figma Community plugin",
+    install: "AutoCAD Community plugin",
   },
   {
     app: "Blender",
@@ -50,11 +50,11 @@ export default function Bridges() {
                 PLATFORM / BRIDGES
               </div>
               <h1 style={{ fontSize: "clamp(48px,8vw,128px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.88, margin: 0, fontStretch: "82%", maxWidth: 1100 }}>
-                Design in <span style={{ color: COBALT, fontStyle: "italic" }}>Figma</span>.<br />
+                Design in <span style={{ color: COBALT, fontStyle: "italic" }}>AutoCAD</span>.<br />
                 Build in Blender.
               </h1>
               <p style={{ marginTop: 32, fontSize: 18, color: t.muted, maxWidth: 640, lineHeight: 1.55 }}>
-                Alternus connects the coding agent with Figma for website design systems and Blender for 3D scenes, product visuals, and render-ready assets.
+                Alternus connects the coding agent with AutoCAD for website design systems and Blender for 3D scenes, product visuals, and render-ready assets.
               </p>
             </div>
           </section>
@@ -116,16 +116,16 @@ export default function Bridges() {
                 HOW IT CONNECTS
               </div>
               <h2 style={{ fontSize: "clamp(32px,5vw,56px)", fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1, margin: 0, marginBottom: 48, fontStretch: "88%" }}>
-                Figma for website design. Blender for 3D.
+                AutoCAD for website design. Blender for 3D.
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0" style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden" }}>
                 {[
                   {
                     n: "01",
-                    title: "Figma to code",
-                    d: "The agent reads website structure, components, tokens, and layout intent from Figma, then prepares responsive code sections.",
-                    tags: ["Figma", "Code", "Website"],
+                    title: "AutoCAD to code",
+                    d: "The agent reads website structure, components, tokens, and layout intent from AutoCAD, then prepares responsive code sections.",
+                    tags: ["AutoCAD", "Code", "Website"],
                   },
                   {
                     n: "02",
@@ -153,17 +153,17 @@ export default function Bridges() {
                 <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
                   <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E" }} />
                   <span style={{ fontSize: 11, color: t.muted, fontFamily: "var(--font-geist-mono),monospace", letterSpacing: "0.06em" }}>
-                    alternus.figma.code - v0.9.4
+                    alternus.autocad.code - v0.9.4
                   </span>
                 </div>
                 <pre style={{ margin: 0, fontSize: 12.5, fontFamily: "var(--font-geist-mono),monospace", lineHeight: 1.7, color: t.fg }}>
-                  <span style={{ color: COBALT }}>&gt;</span> alternus.figma.code({"{"}
+                  <span style={{ color: COBALT }}>&gt;</span> alternus.autocad.code({"{"}
                   {"\n"}  goal:   <span style={{ color: "#22C55E" }}>&quot;build a clean responsive pricing section&quot;</span>,
                   {"\n"}  frame:  <span style={{ color: "#22C55E" }}>&quot;Website / Pricing&quot;</span>,
                   {"\n"}  output: <span style={{ color: "#22C55E" }}>&quot;React + Tailwind&quot;</span>,
                   {"\n"}
                   {"}"}){"\n"}
-                  <span style={{ color: t.muted }}>{"// read Figma frame - mapped tokens - wrote responsive code - 200ms"}</span>
+                  <span style={{ color: t.muted }}>{"// read AutoCAD frame - mapped tokens - wrote responsive code - 200ms"}</span>
                 </pre>
               </div>
             </div>
@@ -172,7 +172,7 @@ export default function Bridges() {
           <section style={{ padding: "96px 0", borderTop: `1px solid ${t.faint}` }}>
             <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
               <h2 style={{ fontSize: "clamp(40px,6vw,80px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.95, margin: 0, fontStretch: "86%" }}>
-                Figma and Blender.<br />
+                AutoCAD and Blender.<br />
                 <span style={{ color: COBALT, fontStyle: "italic" }}>One agent.</span>
               </h2>
               <div style={{ marginTop: 40, display: "inline-flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>

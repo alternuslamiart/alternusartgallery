@@ -14,7 +14,7 @@ export default function PlatformOverview() {
                 One platform.<br/><span style={{ color: COBALT, fontStyle: "italic" }}>Every surface.</span>
               </h1>
               <p style={{ marginTop: 32, fontSize: 18, color: t.muted, maxWidth: 640, lineHeight: 1.55 }}>
-                Alternus is a browser-native OS with a shared agent workflow for Figma website design, coding, and Blender 3D production.
+                Alternus is a browser-native OS with a shared agent workflow for AutoCAD website design, coding, and Blender 3D production.
               </p>
             </div>
           </section>
@@ -23,8 +23,8 @@ export default function PlatformOverview() {
             <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-0" style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden" }}>
                 {[
-                  { t: "Figma workflow", d: "Plan website frames, components, tokens, and responsive states with one agent." },
-                  { t: "Coding agent", d: "Turn Figma structure into clean website sections and reusable UI code." },
+                  { t: "AutoCAD workflow", d: "Plan website frames, components, tokens, and responsive states with one agent." },
+                  { t: "Coding agent", d: "Turn AutoCAD structure into clean website sections and reusable UI code." },
                   { t: "Blender 3D", d: "Create 3D scenes, materials, lighting, and render assets for website production." },
                 ].map((c, i, a) => (
                   <div key={c.t} style={{ padding: "40px 32px", borderRight: i < a.length - 1 ? `1px solid ${t.faint}` : "none", background: t.raised, minHeight: 260 }}>

@@ -23,12 +23,12 @@ const COBALT_DEEP = "#1E5ED4";
 const INK = "#1F1F1F";
 const PAPER = "#F4F6FB";
 const marquee = [
-  "Figma bridge",
+  "AutoCAD bridge",
   "Blender bridge",
   "Website design agent",
   "Code agent",
   "Blender 3D scenes",
-  "Figma components",
+  "AutoCAD components",
   "Responsive website sections",
   "Design systems",
   "3D product visuals",
@@ -38,16 +38,16 @@ const marquee = [
 const capabilities = [
   {
     n: "01",
-    t: "Figma",
-    d: "Turn a product idea into clean website screens, components, tokens, and responsive layout notes directly for Figma.",
-    k: "figma.site(prompt)",
+    t: "AutoCAD",
+    d: "Turn a product idea into clean website screens, components, tokens, and responsive layout notes directly for AutoCAD.",
+    k: "autocad.site(prompt)",
     output: "Frames, tokens, components",
   },
   {
     n: "02",
     t: "Code",
-    d: "Convert Figma structure into production-ready website sections with clean React, Tailwind, spacing, and responsive states.",
-    k: "code.website(figma)",
+    d: "Convert AutoCAD structure into production-ready website sections with clean React, Tailwind, spacing, and responsive states.",
+    k: "code.website(autocad)",
     output: "Pages, sections, UI code",
   },
   {
@@ -60,8 +60,8 @@ const capabilities = [
   {
     n: "04",
     t: "Design",
-    d: "Keep Figma and code aligned. The agent manages colors, typography, spacing, cards, nav, and clean website systems.",
-    k: "figma.system(site)",
+    d: "Keep AutoCAD and code aligned. The agent manages colors, typography, spacing, cards, nav, and clean website systems.",
+    k: "autocad.system(site)",
     output: "Styles, grids, variants",
   },
   {
@@ -74,8 +74,8 @@ const capabilities = [
   {
     n: "06",
     t: "Prototype",
-    d: "Plan website flows in Figma, then send the same structure to the code agent so the live page matches the design.",
-    k: "figma.flow(code)",
+    d: "Plan website flows in AutoCAD, then send the same structure to the code agent so the live page matches the design.",
+    k: "autocad.flow(code)",
     output: "Flows, pages, states",
   },
 ];
@@ -83,15 +83,15 @@ const capabilities = [
 const pillars = [
   {
     k: "Fast",
-    v: "Sub-200ms agent turnaround. You iterate on Figma frames, website code, and Blender scenes without waiting.",
+    v: "Sub-200ms agent turnaround. You iterate on AutoCAD frames, website code, and Blender scenes without waiting.",
   },
   {
     k: "Pro-grade",
-    v: "Speaks Figma components, responsive website structure, and .blend scene workflows - not just static mockups.",
+    v: "Speaks AutoCAD components, responsive website structure, and .blend scene workflows - not just static mockups.",
   },
   {
     k: "In-tool",
-    v: "Lives around Figma and Blender so design, code, and 3D production stay in one workflow.",
+    v: "Lives around AutoCAD and Blender so design, code, and 3D production stay in one workflow.",
   },
   {
     k: "Yours",
@@ -103,28 +103,28 @@ const quotes = [
   {
     by: "Marcus Johnson",
     role: "Website Designer, Remote",
-    q: "I described the website section once and Alternus returned a Figma frame plus the coded layout. The design and build finally stayed together.",
+    q: "I described the website section once and Alternus returned a AutoCAD frame plus the coded layout. The design and build finally stayed together.",
   },
   {
     by: "Priya Sharma",
     role: "Product Designer, London",
-    q: "I asked for a cleaner landing page system and got Figma components, spacing, and responsive code direction in one pass.",
+    q: "I asked for a cleaner landing page system and got AutoCAD components, spacing, and responsive code direction in one pass.",
   },
   {
     by: "David Chen",
     role: "3D Web Artist, LA",
-    q: "The Blender bridge built the hero scene, materials, and render queue from the same website brief I used for the Figma design.",
+    q: "The Blender bridge built the hero scene, materials, and render queue from the same website brief I used for the AutoCAD design.",
   },
 ];
 
 const faq = [
   {
     q: "What exactly is Alternus?",
-    a: "A creative AI workspace for website design, coding, Figma systems, and Blender 3D. It helps you direct design and production from one agent.",
+    a: "A creative AI workspace for website design, coding, AutoCAD systems, and Blender 3D. It helps you direct design and production from one agent.",
   },
   {
-    q: "How does the Figma workflow work?",
-    a: "Alternus plans website screens, components, tokens, and responsive states for Figma, then keeps the same structure ready for the code agent.",
+    q: "How does the AutoCAD workflow work?",
+    a: "Alternus plans website screens, components, tokens, and responsive states for AutoCAD, then keeps the same structure ready for the code agent.",
   },
   {
     q: "How does the Blender integration work?",
@@ -132,17 +132,17 @@ const faq = [
   },
   {
     q: "Can it code the website from the design?",
-    a: "Yes. The agent turns Figma structure into clean website sections with responsive layout, reusable components, and production-ready styling.",
+    a: "Yes. The agent turns AutoCAD structure into clean website sections with responsive layout, reusable components, and production-ready styling.",
   },
   {
     q: "Where are my files stored?",
-    a: "In your private knowledge layer, encrypted at rest. The agent references your Figma, code, and Blender files but never trains shared models on them.",
+    a: "In your private knowledge layer, encrypted at rest. The agent references your AutoCAD, code, and Blender files but never trains shared models on them.",
   },
 ];
 
 const quickPrompts = [
-  "Design a clean SaaS homepage in Figma",
-  "Code this Figma section as a responsive website",
+  "Design a clean SaaS homepage in AutoCAD",
+  "Code this AutoCAD section as a responsive website",
   "Create a Blender 3D hero scene for this website",
   "Build a Blender product visual with soft lighting",
 ];
@@ -155,7 +155,7 @@ const navItems = [
 ];
 
 const bridgeApps = [
-  "Figma",
+  "AutoCAD",
   "Blender",
 ];
 
@@ -195,7 +195,7 @@ const footerColumns = [
       { l: "Launch Studio", h: "/main", ext: true },
       { l: "Website design", h: "/workspace/mail", ext: false },
       { l: "Media library", h: "/workspace/files", ext: false },
-      { l: "Figma + code", h: "/workspace/code", ext: false },
+      { l: "AutoCAD + code", h: "/workspace/code", ext: false },
       { l: "Blender 3D", h: "/workspace/knowledge", ext: false },
       { l: "Design notes", h: "/workspace/voice", ext: false },
     ],
@@ -644,7 +644,7 @@ export default function Home() {
                   </h1>
 
                   <p className="landing-hero-copy mt-5 max-w-[31rem] text-[1rem] leading-8 text-[rgba(31,43,77,0.7)] sm:text-[1.04rem]">
-                    Website design, Figma systems, coded sections, and Blender 3D work from one command layer.
+                    Website design, AutoCAD systems, coded sections, and Blender 3D work from one command layer.
                     Alternus keeps the craft tools in place and moves repetitive design production to the agent.
                   </p>
 
@@ -875,7 +875,7 @@ export default function Home() {
                   People shipping with <span className="landing-emphasis">Alternus</span>
                 </>
               }
-              copy="The system has to feel credible in Figma, code, and Blender 3D, not just attractive in screenshots. These quotes are framed as product proof, not decoration."
+              copy="The system has to feel credible in AutoCAD, code, and Blender 3D, not just attractive in screenshots. These quotes are framed as product proof, not decoration."
             />
 
             <div className="grid gap-5 xl:grid-cols-3">
@@ -1110,7 +1110,7 @@ export default function Home() {
                   <span className="italic">Start directing.</span>
                 </h2>
                 <p className="mx-auto mt-6 max-w-[34rem] text-base leading-8 text-white/84 sm:text-[1.02rem]">
-                  Alternus is free to try. Plug it into Figma and Blender,
+                  Alternus is free to try. Plug it into AutoCAD and Blender,
                   then let the agent handle website design, code, and 3D production.
                 </p>
                 <div className="mt-9 flex flex-wrap items-center justify-center gap-3">

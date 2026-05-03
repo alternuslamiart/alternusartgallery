@@ -43,7 +43,7 @@ import { ChangeEvent, ReactNode, createContext, useContext, useEffect, useMemo, 
 
 export type StudioRouteKey =
   | "studio-overview"
-  | "figma-design"
+  | "autocad-design"
   | "code-builder"
   | "blender-3d"
   | "asset-library"
@@ -65,7 +65,7 @@ type NavItem = {
 export const studioNavigation: NavItem[] = [
   { key: "ai-assistant", label: "AI Assistant", href: "/ai-assistant", icon: Sparkles },
   { key: "studio-overview", label: "Studio Overview", href: "/studio-overview", icon: Grid2X2 },
-  { key: "figma-design", label: "Figma Design", href: "/figma-design", icon: PenLine },
+  { key: "autocad-design", label: "AutoCAD Design", href: "/autocad-design", icon: PenLine },
   { key: "code-builder", label: "Code Builder", href: "/code-builder", icon: Code2 },
   { key: "blender-3d", label: "Blender 3D", href: "/blender-3d", icon: Layers3 },
   { key: "asset-library", label: "Asset Library", href: "/asset-library", icon: ImageIcon },
@@ -82,7 +82,7 @@ const bottomNavigation = [
 const routeByPath: Record<string, StudioRouteKey> = {
   "/main": "ai-assistant",
   "/studio-overview": "studio-overview",
-  "/figma-design": "figma-design",
+  "/autocad-design": "autocad-design",
   "/code-builder": "code-builder",
   "/blender-3d": "blender-3d",
   "/asset-library": "asset-library",
@@ -94,7 +94,7 @@ const routeByPath: Record<string, StudioRouteKey> = {
   "/help-center": "help-center",
   "/ai-assistant/tools/code": "ai-assistant",
   "/ai-assistant/tools/blender": "ai-assistant",
-  "/ai-assistant/tools/figma": "ai-assistant",
+  "/ai-assistant/tools/autocad": "ai-assistant",
 };
 
 type StudioPageProps = {
@@ -109,7 +109,7 @@ type Attachment = {
 };
 
 type StudioTheme = "light" | "dark";
-type AssistantToolKey = "code" | "blender" | "figma";
+type AssistantToolKey = "code" | "blender" | "autocad";
 
 type ToolSelectorConfig = {
   label: string;
@@ -127,14 +127,14 @@ type ToolWorkspaceConfig = {
   quickActions: { title: string; desc: string; icon: LucideIcon }[];
   selectors: ToolSelectorConfig[];
   previewTabs?: string[];
-  previewType: "code" | "blender" | "figma";
+  previewType: "code" | "blender" | "autocad";
   emptyState: string;
 };
 
 const assistantToolByPath: Record<string, AssistantToolKey> = {
   "/ai-assistant/tools/code": "code",
   "/ai-assistant/tools/blender": "blender",
-  "/ai-assistant/tools/figma": "figma",
+  "/ai-assistant/tools/autocad": "autocad",
 };
 
 const toolWorkspaces: Record<AssistantToolKey, ToolWorkspaceConfig> = {
@@ -186,10 +186,10 @@ const toolWorkspaces: Record<AssistantToolKey, ToolWorkspaceConfig> = {
     previewType: "blender",
     emptyState: "Your 3D preview or generated asset will appear here.",
   },
-  figma: {
-    key: "figma",
-    href: "/ai-assistant/tools/figma",
-    title: "Figma",
+  autocad: {
+    key: "autocad",
+    href: "/ai-assistant/tools/autocad",
+    title: "AutoCAD",
     description: "Design clean interfaces, prototypes, and layouts for modern web experiences.",
     icon: PenLine,
     placeholder: "Describe the UI screen, component, flow, or prototype you want to design...",
@@ -207,7 +207,7 @@ const toolWorkspaces: Record<AssistantToolKey, ToolWorkspaceConfig> = {
       { label: "Style", options: ["Minimal", "SaaS", "Finance", "Creative", "Enterprise"] },
       { label: "Device", options: ["Desktop", "Tablet", "Mobile"] },
     ],
-    previewType: "figma",
+    previewType: "autocad",
     emptyState: "Your generated interface preview will appear here.",
   },
 };
@@ -727,8 +727,8 @@ function StudioContent({ route, assistantTool }: { route: StudioRouteKey; assist
   switch (route) {
     case "studio-overview":
       return <OverviewPage />;
-    case "figma-design":
-      return <FigmaPage />;
+    case "autocad-design":
+      return <AutoCADPage />;
     case "code-builder":
       return <CodeBuilderPage />;
     case "blender-3d":
@@ -961,7 +961,7 @@ function ToolPreviewPlaceholder({ config }: { config: ToolWorkspaceConfig }) {
           config.previewType === "code"
             ? undefined
             : `linear-gradient(${gridColor} 1px, transparent 1px), linear-gradient(90deg, ${gridColor} 1px, transparent 1px)`,
-        backgroundSize: config.previewType === "figma" ? "26px 26px" : "32px 32px",
+        backgroundSize: config.previewType === "autocad" ? "26px 26px" : "32px 32px",
       }}
     >
       {config.previewType === "code" && (
@@ -971,7 +971,7 @@ function ToolPreviewPlaceholder({ config }: { config: ToolWorkspaceConfig }) {
           <span className="h-2.5 w-2.5 rounded-full bg-current" />
         </div>
       )}
-      {config.previewType === "figma" && (
+      {config.previewType === "autocad" && (
         <>
           <div className={`absolute left-[12%] top-[16%] h-20 w-32 rounded-2xl border ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E8EEF2] bg-[#FCFDFE]"}`} />
           <div className={`absolute bottom-[18%] right-[12%] h-28 w-44 rounded-2xl border ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E8EEF2] bg-[#FCFDFE]"}`} />
@@ -1013,7 +1013,7 @@ function OverviewPage() {
         <SoftCard>
           <h3 className="text-[13px] font-semibold text-[#171717]">Recent activity</h3>
           <div className="mt-4 space-y-3">
-            {["Figma homepage concept updated", "Code Builder prepared landing route", "Blender material preview generated"].map((item) => (
+            {["AutoCAD homepage concept updated", "Code Builder prepared landing route", "Blender material preview generated"].map((item) => (
               <div key={item} className="flex items-center gap-3 rounded-xl bg-white px-3 py-2">
                 <span className="h-2 w-2 rounded-full bg-[#1DA1F2]" />
                 <span className="text-[12px] text-[#4B5563]">{item}</span>
@@ -1034,14 +1034,14 @@ function OverviewPage() {
   );
 }
 
-function FigmaPage() {
+function AutoCADPage() {
   return (
     <div>
-      <PageHeader title="Figma Design" subtitle="Import files and manage recent design workspaces." action={<PrimaryButton icon={Upload}>Import Figma file</PrimaryButton>} />
+      <PageHeader title="AutoCAD Design" subtitle="Import files and manage recent design workspaces." action={<PrimaryButton icon={Upload}>Import AutoCAD file</PrimaryButton>} />
       <SoftCard className="mb-5 flex min-h-[150px] flex-col items-center justify-center border-dashed text-center">
         <PenLine className="h-8 w-8 text-[#1DA1F2]" />
-        <p className="mt-3 text-[13px] font-semibold text-[#171717]">Upload or import a Figma file</p>
-        <p className="mt-1 text-[11px] text-[#6B7280]">Drop a design file here or connect a Figma link.</p>
+        <p className="mt-3 text-[13px] font-semibold text-[#171717]">Upload or import a AutoCAD file</p>
+        <p className="mt-1 text-[11px] text-[#6B7280]">Drop a design file here or connect a AutoCAD link.</p>
       </SoftCard>
       <h3 className="mb-3 text-[13px] font-semibold text-[#171717]">Recent designs</h3>
       <div className="grid gap-3 md:grid-cols-3">
@@ -1243,12 +1243,12 @@ function AIAssistantPage() {
     const suggestions = [
       toolWorkspaces.code,
       toolWorkspaces.blender,
-      toolWorkspaces.figma,
+      toolWorkspaces.autocad,
     ];
     const mobileSuggestions: { title: string; icon: LucideIcon; href?: string }[] = [
       { title: "AI for Code", icon: Code2, href: toolWorkspaces.code.href },
       { title: "Blender 3D", icon: Layers3, href: toolWorkspaces.blender.href },
-      { title: "Figma", icon: PenLine, href: toolWorkspaces.figma.href },
+      { title: "AutoCAD", icon: PenLine, href: toolWorkspaces.autocad.href },
       { title: "Research", icon: FileText },
       { title: "Saving", icon: RefreshCw },
       { title: "Overspend", icon: AlertTriangle },
@@ -1560,8 +1560,8 @@ function SettingsPage() {
         </SoftCard>
         <SoftCard>
           <SettingCardHeader icon={Plug} title="Integrations" />
-          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Connect Figma, Blender, code repositories, and export destinations.</p>
-          <SettingsRows rows={["Figma connection placeholder", "Blender bridge placeholder", "Git provider placeholder"]} />
+          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Connect AutoCAD, Blender, code repositories, and export destinations.</p>
+          <SettingsRows rows={["AutoCAD connection placeholder", "Blender bridge placeholder", "Git provider placeholder"]} />
         </SoftCard>
         <SoftCard>
           <SettingCardHeader icon={Database} title="Data and exports" />

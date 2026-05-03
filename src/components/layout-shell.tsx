@@ -15,7 +15,7 @@ const STANDALONE_ROUTES = [
   "/main",
   "/os",
   "/studio-overview",
-  "/figma-design",
+  "/autocad-design",
   "/code-builder",
   "/blender-3d",
   "/asset-library",
