@@ -1733,14 +1733,20 @@ function AIAssistantPage() {
   const { theme } = useStudioTheme();
   const { openModal, showToast } = useStudioActions();
   const dark = theme === "dark";
+  const [messages, setMessages] = useState<Array<{ id: string; role: "user" | "assistant"; content: string }>>([]);
   const [input, setInput] = useState("");
   const [actionsOpen, setActionsOpen] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [hasConversation, setHasConversation] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const conversationEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
+  const hasConversation = messages.length > 0;
+
+  useEffect(() => {
+    conversationEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages, isSending]);
 
   const onFiles = (event: ChangeEvent<HTMLInputElement>, kind: Attachment["kind"]) => {
     const files = Array.from(event.target.files ?? []);
@@ -1756,18 +1762,61 @@ function AIAssistantPage() {
     event.target.value = "";
   };
 
-  const sendPrompt = () => {
+  const sendPrompt = async () => {
     if (!input.trim()) {
       showToast("Write a prompt before sending");
       return;
     }
+
+    const prompt = input.trim();
+    const conversationHistory = messages.map((message) => ({
+      role: message.role,
+      content: message.content,
+    }));
+
+    setMessages((current) => [
+      ...current,
+      { id: `user-${Date.now()}`, role: "user", content: prompt },
+    ]);
+    setInput("");
     setIsSending(true);
-    window.setTimeout(() => {
-      setHasConversation(true);
-      setInput("");
+
+    try {
+      const response = await fetch("/api/ai-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: prompt,
+          conversationHistory,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || "Failed to get response");
+      }
+
+      setMessages((current) => [
+        ...current,
+        {
+          id: `assistant-${Date.now()}`,
+          role: "assistant",
+          content: typeof data?.content === "string" ? data.content : "No response received.",
+        },
+      ]);
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : "Unknown error";
+      setMessages((current) => [
+        ...current,
+        {
+          id: `assistant-error-${Date.now()}`,
+          role: "assistant",
+          content: `I couldn't complete that request. Error: ${errMsg}`,
+        },
+      ]);
+    } finally {
       setIsSending(false);
-      showToast("Prompt submitted");
-    }, 700);
+    }
   };
 
   const composer = (
@@ -1781,10 +1830,10 @@ function AIAssistantPage() {
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();
-                sendPrompt();
+                void sendPrompt();
               }
             }}
-            placeholder="Ask Lumen AI Assistant..."
+            placeholder="Ask Alternus AI Assistant..."
             className={`min-w-0 flex-1 bg-transparent text-[13px] outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#A1A7B0]"}`}
             style={{ color: dark ? "#F4F6F8" : "#171717", letterSpacing: 0 }}
           />
@@ -1833,7 +1882,7 @@ function AIAssistantPage() {
           <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
           <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
           <button
-            onClick={sendPrompt}
+            onClick={() => void sendPrompt()}
             disabled={isSending}
             aria-label="Send prompt"
             className={`ml-auto flex h-9 w-9 items-center justify-center rounded-full text-white shadow-[0_12px_24px_rgba(74,155,255,0.28)] transition-colors disabled:opacity-70 ${dark ? "bg-[#3BA7FF] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
@@ -1873,8 +1922,8 @@ function AIAssistantPage() {
           <div className="mb-5 flex h-[62px] w-[62px] items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_16px_38px_rgba(29,161,242,0.32)] max-sm:mt-24 max-sm:h-[54px] max-sm:w-[54px]">
             <Sparkles className="h-7 w-7 fill-current max-sm:h-6 max-sm:w-6" />
           </div>
-          <h2 className={`text-[28px] font-semibold tracking-[-0.03em] max-sm:text-[17px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Good Morning, Julie!</h2>
-          <p className={`mt-3 text-[12px] leading-5 max-sm:mt-1 max-sm:text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Your money story today starts with Lumen - clear, simple, and made for you.</p>
+          <h2 className={`text-[28px] font-semibold tracking-[-0.03em] max-sm:text-[17px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Alternus AI Assistant</h2>
+          <p className={`mt-3 text-[12px] leading-5 max-sm:mt-1 max-sm:text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Ask about art, artists, styles, commissions, shipping, or anything else on Alternus.</p>
 
           <div className="mt-7 hidden w-full sm:block">{composer}</div>
 
@@ -1923,8 +1972,8 @@ function AIAssistantPage() {
                 <Sparkles className="h-3.5 w-3.5 fill-current" />
               </div>
               <div className="min-w-0">
-                <p className={`text-[10.5px] font-medium ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Collaborate with Nova AI &amp; Orion 2.0</p>
-                <p className={`mt-0.5 text-[9.5px] leading-3 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Ideal for comprehensive analysis and insights</p>
+                <p className={`text-[10.5px] font-medium ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Connected to the live Alternus assistant</p>
+                <p className={`mt-0.5 text-[9.5px] leading-3 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Your prompts are sent to the same API used by the web chat.</p>
               </div>
             </div>
             {composer}
@@ -1937,62 +1986,42 @@ function AIAssistantPage() {
   return (
     <div className="mx-auto flex min-h-full w-full max-w-[900px] flex-col justify-end">
       <div className="flex flex-1 flex-col justify-end pb-6">
-        <div className="mb-10 flex min-h-[250px] items-end justify-end">
-          <div className="relative h-[150px] w-[230px]">
-            <div className={`absolute right-9 top-3 h-[126px] w-[70px] -rotate-6 rounded-[10px] p-2 text-[5px] leading-[1.15] opacity-80 shadow-[0_18px_45px_rgba(31,43,77,0.10)] blur-[0.2px] ${dark ? "bg-[#202328] text-[#F4F6F8]" : "bg-white text-[#111827]"}`}>
-              <p className="text-center text-[8px] font-bold">TESCO</p>
-              <p className="mt-1">MILK 2.99</p>
-              <p>BREAD 1.75</p>
-              <p>EGGS 3.40</p>
-              <p>COFFEE 8.20</p>
-              <p>PASTA 2.10</p>
-              <p className="mt-1 border-t border-[#D1D5DB] pt-1 font-bold">TOTAL 592.07</p>
-            </div>
-            <div className={`absolute right-0 top-8 h-[132px] w-[100px] rotate-8 rounded-[14px] p-3 text-center shadow-[0_22px_50px_rgba(31,43,77,0.13)] ${dark ? "bg-[#202328] text-[#F4F6F8]" : "bg-[#F9FAFB] text-[#111827]"}`}>
-              <p className="text-[16px] font-semibold tracking-[-0.04em]">Walmart</p>
-              <p className={`text-[5px] font-medium ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Save money. Live better.</p>
-              <div className={`mt-2 space-y-0.5 text-left text-[5px] leading-[1.05] ${dark ? "text-[#F4F6F8]" : "text-[#111827]"}`}>
-                <p>HOUSEHOLD 420.00</p>
-                <p>CLEANING 88.12</p>
-                <p>STORAGE 72.40</p>
-                <p>HOME 415.60</p>
-                <p className={`border-t pt-1 font-bold ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#D1D5DB]"}`}>TOTAL 996.12</p>
+        <div className="mb-8 flex flex-1 flex-col justify-end gap-5">
+          {messages.map((message) => (
+            <div key={message.id} className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+              {message.role === "assistant" && (
+                <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_12px_26px_rgba(29,161,242,0.28)]">
+                  <Sparkles className="h-4 w-4 fill-current" />
+                </div>
+              )}
+              <div
+                className={`max-w-[720px] rounded-[24px] px-4 py-3 text-[13px] leading-6 shadow-[0_10px_28px_rgba(31,43,77,0.04)] ${
+                  message.role === "user"
+                    ? dark
+                      ? "border border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]"
+                      : "border border-[#E5E7EB] bg-white text-[#171717]"
+                    : dark
+                      ? "text-[#F4F6F8]"
+                      : "text-[#171717]"
+                }`}
+              >
+                <p className="whitespace-pre-wrap">{message.content}</p>
               </div>
             </div>
-          </div>
-
-          <div className={`ml-auto max-w-[440px] rounded-full border px-4 py-2 text-[13px] shadow-[0_10px_28px_rgba(31,43,77,0.04)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#171717]"}`}>
-            Hi Lumen, can you help me log 3 shopping receipts today?
-          </div>
-        </div>
-
-        <div className="flex gap-3">
-          <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_12px_26px_rgba(29,161,242,0.28)]">
-            <Sparkles className="h-4 w-4 fill-current" />
-          </div>
-          <div className={`min-w-0 flex-1 text-[13px] leading-6 ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
-            <p className="mb-3">Got it, Julie.</p>
-            <div className={`border-t pt-3 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#E5E7EB]"}`}>
-              <ul className="list-disc space-y-2 pl-4">
-                <li>Added Tesco receipt: <strong>$592.07</strong> (Groceries)</li>
-                <li>Added Walmart receipt: <strong>$996.12</strong> (Household)</li>
-                <li>Added Coffee Shop receipt: <strong>$492.42</strong> (Food &amp; Drink)</li>
-              </ul>
-              <p className="mt-3">All three have been logged into your transactions for today. Would you like me to create a quick summary?</p>
+          ))}
+          {isSending && (
+            <div className="flex gap-3">
+              <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_12px_26px_rgba(29,161,242,0.28)]">
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              </div>
+              <div className={`rounded-[24px] px-4 py-3 text-[13px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
+                Thinking...
+              </div>
             </div>
-
-            <div className="my-4 flex justify-end">
-              <span className={`rounded-full border px-4 py-2 text-[12px] shadow-[0_10px_28px_rgba(31,43,77,0.04)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#171717]"}`}>Yes, please.</span>
-            </div>
-
-            <div className={`border-t pt-4 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#E5E7EB]"}`}>
-              <p>
-                Today you&apos;ve spent a total of <strong>$2,080.61</strong>. Most went to household (60%), followed by food &amp; drinks (11%) and groceries (29%).
-              </p>
-            </div>
-            <div className={`mt-4 border-t pt-4 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#E5E7EB]"}`}>
-              <p>Do you want me to compare this with your weekly average?</p>
-            </div>
+          )}
+          <div ref={conversationEndRef} />
+          <div className={`text-center text-[11px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`}>
+            Connected to `/api/ai-chat`
           </div>
         </div>
       </div>
