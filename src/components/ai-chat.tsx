@@ -13,6 +13,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { WELCOME_MESSAGE, SUGGESTED_QUESTIONS } from "@/lib/ai-assistant";
+import { PlanLimitBanner } from "@/components/plan-limit-banner";
+import { forceAIPlanLimitReached, getAIPlanLimitState, recordAIPlanUsage } from "@/lib/ai-plan-limit";
 
 interface Message {
   id: string;
@@ -86,6 +88,7 @@ export function AIChat() {
   const [selectedMode, setSelectedMode] = useState<string>("smart");
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
   const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
+  const [isPlanLimitReached, setIsPlanLimitReached] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const expandedInputRef = useRef<HTMLTextAreaElement>(null);
@@ -122,6 +125,7 @@ export function AIChat() {
       if (savedMode) {
         setSelectedMode(savedMode);
       }
+      setIsPlanLimitReached(getAIPlanLimitState().reached);
     } catch {}
     hydratedRef.current = true;
   }, []);
@@ -162,6 +166,10 @@ export function AIChat() {
     if (isExpanded && expandedInputRef.current) expandedInputRef.current.focus();
   }, [isExpanded]);
 
+  const markPlanLimitReached = () => {
+    setIsPlanLimitReached(forceAIPlanLimitReached().reached);
+  };
+
   // Ctrl+A — toggle the floating bar
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -178,6 +186,8 @@ export function AIChat() {
   }, []);
 
   const sendMessage = async (text: string) => {
+    if (isPlanLimitReached) return;
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -201,8 +211,13 @@ export function AIChat() {
       });
 
       const data = await response.json();
+      if (response.status === 429 || data?.code === "PLAN_LIMIT_REACHED") {
+        markPlanLimitReached();
+        return;
+      }
       if (!response.ok) throw new Error(data.error || "Failed to get response");
 
+      setIsPlanLimitReached(recordAIPlanUsage().reached);
       setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -225,7 +240,7 @@ export function AIChat() {
   };
 
   const handleSend = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isPlanLimitReached) return;
     sendMessage(input.trim());
   };
 
@@ -350,9 +365,10 @@ export function AIChat() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {DEFAULT_QUICK_ACTIONS.filter((a) => !!a.prompt).map((action) => (
-                  <DropdownMenuItem
+                <DropdownMenuItem
                     key={action.id}
                     onClick={() => { setIsExpanded(true); sendMessage(action.prompt!); }}
+                    disabled={isPlanLimitReached}
                     className="cursor-pointer"
                   >
                     <span className="mr-2 text-blue-400">→</span>
@@ -369,14 +385,15 @@ export function AIChat() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && input.trim()) {
+                if (e.key === "Enter" && input.trim() && !isPlanLimitReached) {
                   setIsExpanded(true);
                   sendMessage(input.trim());
                 }
               }}
               onClick={() => setIsOpen(true)}
-              placeholder="Ask AI anything..."
-              className="flex-1 bg-transparent text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none px-2 cursor-text transition-colors duration-150"
+              placeholder={isPlanLimitReached ? "Free plan limit reached. Upgrade to continue." : "Ask AI anything..."}
+              disabled={isPlanLimitReached}
+              className="flex-1 bg-transparent px-2 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60"
             />
 
             {/* Right: chevron-down button — mode selection dropdown */}
@@ -465,6 +482,8 @@ export function AIChat() {
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4 bg-[#f7f7f8]">
+              {isPlanLimitReached && <PlanLimitBanner />}
+
               {messages.map((message) => (
                 <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                   {message.role === "assistant" && (
@@ -509,8 +528,8 @@ export function AIChat() {
                 <p className="text-[11px] text-stone-400 mb-2">Suggested questions:</p>
                 <div className="flex flex-wrap gap-1.5">
                   {currentSuggestions.map((question) => (
-                    <button key={question} onClick={() => sendMessage(question)}
-                      className="px-3 py-1.5 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-full text-[11px] text-stone-600 transition-colors">
+                    <button key={question} onClick={() => sendMessage(question)} disabled={isPlanLimitReached}
+                      className="rounded-full border border-stone-200 bg-stone-50 px-3 py-1.5 text-[11px] text-stone-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:bg-stone-100">
                       {question}
                     </button>
                   ))}
@@ -522,8 +541,8 @@ export function AIChat() {
             <div className="px-4 py-3 bg-white border-t border-stone-100">
               <div className="flex items-center gap-2 bg-stone-50 rounded-full px-4 py-1 border border-stone-200 focus-within:border-stone-400 transition-colors">
                 <input ref={inputRef} type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={handleKeyPress}
-                  placeholder="Search or ask AI anything..." className="flex-1 py-2.5 bg-transparent text-[13px] text-stone-900 placeholder:text-stone-400 focus:outline-none" />
-                <button onClick={handleSend} disabled={!input.trim() || isTyping}
+                  placeholder={isPlanLimitReached ? "Free plan limit reached. Upgrade to continue." : "Search or ask AI anything..."} disabled={isPlanLimitReached} className="flex-1 bg-transparent py-2.5 text-[13px] text-stone-900 placeholder:text-stone-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60" />
+                <button onClick={handleSend} disabled={!input.trim() || isTyping || isPlanLimitReached}
                   className="w-9 h-9 bg-coffee hover:bg-stone-800 text-white rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
@@ -648,6 +667,12 @@ export function AIChat() {
                 <h2 className="text-xl font-bold text-stone-900 mb-1">Good afternoon!</h2>
                 <p className="text-stone-500 text-sm mb-8">What can I help you with today?</p>
 
+                {isPlanLimitReached && (
+                  <div className="mb-5 w-full max-w-xl">
+                    <PlanLimitBanner />
+                  </div>
+                )}
+
                 {/* Input */}
                 <div className="w-full max-w-xl mb-4">
                   <div className="flex items-end gap-3 bg-white rounded-2xl border border-stone-200 shadow-sm px-4 py-3 focus-within:border-stone-400 focus-within:shadow-md transition-all">
@@ -656,9 +681,10 @@ export function AIChat() {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      placeholder="Search or ask AI anything..."
+                      placeholder={isPlanLimitReached ? "Free plan limit reached. Upgrade to continue." : "Search or ask AI anything..."}
+                      disabled={isPlanLimitReached}
                       rows={1}
-                      className="flex-1 resize-none bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none min-h-[24px] max-h-[120px]"
+                      className="flex-1 resize-none bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none min-h-[24px] max-h-[120px] disabled:cursor-not-allowed disabled:opacity-60"
                       style={{ height: "24px" }}
                       onInput={(e) => {
                         const t = e.target as HTMLTextAreaElement;
@@ -666,7 +692,7 @@ export function AIChat() {
                         t.style.height = t.scrollHeight + "px";
                       }}
                     />
-                    <button onClick={handleSend} disabled={!input.trim() || isTyping}
+                    <button onClick={handleSend} disabled={!input.trim() || isTyping || isPlanLimitReached}
                       className="w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>
@@ -679,7 +705,7 @@ export function AIChat() {
                 <div className="flex items-center gap-2 mb-4 max-w-xl w-full px-2">
                   <DropdownMenu open={isModeMenuOpen} onOpenChange={setIsModeMenuOpen}>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-sm text-stone-600 transition-colors">
+                      <button disabled={isPlanLimitReached} className="flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-sm text-stone-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:bg-stone-200">
                         <Sparkles size={14} />
                         {AI_MODES.find(m => m.id === selectedMode)?.label ?? "Smart"}
                         <ChevronDown size={14} />
@@ -706,7 +732,7 @@ export function AIChat() {
 
                   <DropdownMenu open={isAddMenuOpen} onOpenChange={setIsAddMenuOpen}>
                     <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-sm text-stone-600 transition-colors">
+                      <button disabled={isPlanLimitReached} className="flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-sm text-stone-600 transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:bg-stone-200">
                         <Plus size={14} />
                         Add
                       </button>
@@ -737,11 +763,12 @@ export function AIChat() {
                         if (action.link) { closeAll(); router.push(action.link); }
                         else if (action.prompt) { sendMessage(action.prompt); }
                       }}
+                        disabled={isPlanLimitReached && !action.link}
                         className={`px-4 py-2 rounded-full border text-sm transition-all ${
                           action.link
                             ? "bg-coffee/5 border-coffee/20 text-coffee hover:bg-coffee/10 font-medium"
                             : "bg-white border-stone-200 hover:border-stone-300 hover:shadow-sm text-stone-600"
-                        }`}>
+                        } disabled:cursor-not-allowed disabled:opacity-50`}>
                         {action.link && <span className="mr-1.5">→</span>}
                         {action.label}
                       </button>
@@ -762,6 +789,8 @@ export function AIChat() {
               /* ---- Chat State ---- */
               <>
                 <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
+                  {isPlanLimitReached && <PlanLimitBanner />}
+
                   {messages.filter(m => m.id !== "welcome").map((message) => (
                     <div key={message.id} className={`flex gap-3 ${message.role === "user" ? "justify-end" : ""}`}>
                       {message.role === "assistant" && (
@@ -807,9 +836,10 @@ export function AIChat() {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      placeholder="Search or ask AI anything..."
+                      placeholder={isPlanLimitReached ? "Free plan limit reached. Upgrade to continue." : "Search or ask AI anything..."}
+                      disabled={isPlanLimitReached}
                       rows={1}
-                      className="flex-1 resize-none bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none min-h-[24px] max-h-[120px]"
+                      className="flex-1 resize-none bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none min-h-[24px] max-h-[120px] disabled:cursor-not-allowed disabled:opacity-60"
                       style={{ height: "24px" }}
                       onInput={(e) => {
                         const t = e.target as HTMLTextAreaElement;
@@ -817,7 +847,7 @@ export function AIChat() {
                         t.style.height = t.scrollHeight + "px";
                       }}
                     />
-                    <button onClick={handleSend} disabled={!input.trim() || isTyping}
+                    <button onClick={handleSend} disabled={!input.trim() || isTyping || isPlanLimitReached}
                       className="w-10 h-10 bg-coffee hover:bg-stone-800 text-white rounded-xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>

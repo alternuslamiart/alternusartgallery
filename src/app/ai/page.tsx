@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { PlanLimitBanner } from "@/components/plan-limit-banner";
+import { forceAIPlanLimitReached, getAIPlanLimitState, recordAIPlanUsage } from "@/lib/ai-plan-limit";
 
 interface Message {
   id: string;
@@ -23,6 +25,7 @@ export default function AIPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isPlanLimitReached, setIsPlanLimitReached] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -38,7 +41,17 @@ export default function AIPage() {
     inputRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    setIsPlanLimitReached(getAIPlanLimitState().reached);
+  }, []);
+
+  const markPlanLimitReached = () => {
+    setIsPlanLimitReached(forceAIPlanLimitReached().reached);
+  };
+
   const sendMessage = async (text: string) => {
+    if (isPlanLimitReached) return;
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -63,8 +76,13 @@ export default function AIPage() {
       });
 
       const data = await response.json();
+      if (response.status === 429 || data?.code === "PLAN_LIMIT_REACHED") {
+        markPlanLimitReached();
+        return;
+      }
       if (!response.ok) throw new Error(data.error || "Failed to get response");
 
+      setIsPlanLimitReached(recordAIPlanUsage().reached);
       setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -86,7 +104,7 @@ export default function AIPage() {
   };
 
   const handleSend = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isPlanLimitReached) return;
     sendMessage(input.trim());
   };
 
@@ -145,12 +163,19 @@ export default function AIPage() {
               Your personal art assistant. Ask about art history, styles, techniques, or create stunning AI-generated artwork.
             </p>
 
+            {isPlanLimitReached && (
+              <div className="mb-6 w-full max-w-2xl">
+                <PlanLimitBanner />
+              </div>
+            )}
+
             {/* Quick Actions */}
             <div className="grid grid-cols-2 gap-3 w-full max-w-lg mb-10">
               {QUICK_ACTIONS.map((action) => (
                 <button
                   key={action.label}
                   onClick={() => sendMessage(action.prompt)}
+                  disabled={isPlanLimitReached}
                   className="flex items-center gap-3 px-4 py-3.5 bg-white rounded-xl border border-stone-200 hover:border-stone-300 hover:shadow-md transition-all text-left group"
                 >
                   <div className="w-9 h-9 rounded-lg bg-stone-100 group-hover:bg-coffee/10 flex items-center justify-center flex-shrink-0 transition-colors">
@@ -180,7 +205,8 @@ export default function AIPage() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask anything about art, or describe an image to create..."
+                  placeholder={isPlanLimitReached ? "Free plan limit reached. Upgrade to continue." : "Ask anything about art, or describe an image to create..."}
+                  disabled={isPlanLimitReached}
                   rows={1}
                   className="flex-1 resize-none bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none min-h-[24px] max-h-[120px]"
                   style={{ height: "24px" }}
@@ -209,6 +235,8 @@ export default function AIPage() {
           /* Chat State */
           <>
             <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+              {isPlanLimitReached && <PlanLimitBanner />}
+
               {messages.map((message) => (
                 <div key={message.id} className={`flex gap-3 ${message.role === "user" ? "justify-end" : ""}`}>
                   {message.role === "assistant" && (
@@ -258,7 +286,8 @@ export default function AIPage() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Ask anything about art..."
+                    placeholder={isPlanLimitReached ? "Free plan limit reached. Upgrade to continue." : "Ask anything about art..."}
+                    disabled={isPlanLimitReached}
                     rows={1}
                     className="flex-1 resize-none bg-transparent text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none min-h-[24px] max-h-[120px]"
                     style={{ height: "24px" }}

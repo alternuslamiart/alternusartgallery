@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { WELCOME_MESSAGE, SUGGESTED_QUESTIONS } from "@/lib/ai-assistant";
+import { PlanLimitBanner } from "@/components/plan-limit-banner";
+import { forceAIPlanLimitReached, getAIPlanLimitState, recordAIPlanUsage } from "@/lib/ai-plan-limit";
 
 interface Message {
   id: string;
@@ -29,6 +31,7 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isPlanLimitReached, setIsPlanLimitReached] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -46,6 +49,10 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    setIsPlanLimitReached(getAIPlanLimitState().reached);
+  }, []);
+
   // Prevent body scroll when chat is open
   useEffect(() => {
     if (isOpen) {
@@ -58,8 +65,12 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
     };
   }, [isOpen]);
 
+  const markPlanLimitReached = () => {
+    setIsPlanLimitReached(forceAIPlanLimitReached().reached);
+  };
+
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isPlanLimitReached) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -94,10 +105,16 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
 
       const data = await response.json();
 
+      if (response.status === 429 || data?.code === "PLAN_LIMIT_REACHED") {
+        markPlanLimitReached();
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(data.error || "Failed to get response");
       }
 
+      setIsPlanLimitReached(recordAIPlanUsage().reached);
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -185,6 +202,8 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
         {/* Messages - Scrollable */}
         <main className="flex-1 overflow-y-auto overscroll-contain bg-gray-100 dark:bg-gray-800">
           <div className="p-4 space-y-3 min-h-full">
+            {isPlanLimitReached && <PlanLimitBanner dark />}
+
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -229,7 +248,10 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
               {currentSuggestions.map((question) => (
                 <button
                   key={question}
+                  disabled={isPlanLimitReached}
                   onClick={async () => {
+                    if (isPlanLimitReached) return;
+
                     const userMessage: Message = {
                       id: Date.now().toString(),
                       role: "user",
@@ -260,10 +282,16 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
 
                       const data = await response.json();
 
+                      if (response.status === 429 || data?.code === "PLAN_LIMIT_REACHED") {
+                        markPlanLimitReached();
+                        return;
+                      }
+
                       if (!response.ok) {
                         throw new Error(data.error || "Failed to get response");
                       }
 
+                      setIsPlanLimitReached(recordAIPlanUsage().reached);
                       const assistantMessage: Message = {
                         id: (Date.now() + 1).toString(),
                         role: "assistant",
@@ -284,7 +312,7 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
                       setIsTyping(false);
                     }
                   }}
-                  className="flex-shrink-0 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 active:bg-gray-200 rounded-full text-xs text-gray-700 dark:text-gray-300 transition-colors"
+                  className="flex-shrink-0 rounded-full bg-gray-100 px-3 py-1.5 text-xs text-gray-700 transition-colors active:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-800 dark:text-gray-300"
                 >
                   {question}
                 </button>
@@ -302,12 +330,13 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Type a message..."
-              className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 rounded-full text-sm text-gray-900 dark:text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-900/20 transition-all"
+              placeholder={isPlanLimitReached ? "Free plan limit reached. Upgrade to continue." : "Type a message..."}
+              disabled={isPlanLimitReached}
+              className="flex-1 rounded-full bg-gray-100 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 transition-all focus:outline-none focus:ring-2 focus:ring-gray-900/20 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-gray-800 dark:text-white"
             />
             <button
               onClick={handleSend}
-              disabled={!input.trim() || isTyping}
+              disabled={!input.trim() || isTyping || isPlanLimitReached}
               className="w-11 h-11 bg-gray-900 active:bg-gray-700 text-white rounded-full flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
