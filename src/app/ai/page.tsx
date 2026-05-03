@@ -92,10 +92,11 @@ export default function AIPage() {
       }]);
     } catch (error) {
       console.error("AI error:", error);
+      const errMsg = error instanceof Error ? error.message : "Unknown error";
       setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
+        content: `I apologize, but I'm having trouble connecting right now. Error: ${errMsg}`,
         timestamp: new Date(),
       }]);
     } finally {

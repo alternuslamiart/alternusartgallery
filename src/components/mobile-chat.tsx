@@ -124,10 +124,11 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error("AI Chat error:", error);
+      const errMsg = error instanceof Error ? error.message : "Unknown error";
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "I apologize, but I'm having trouble connecting right now. Please try again in a moment, or contact us at info@alternusart.com for assistance.",
+        content: `I apologize, but I'm having trouble connecting right now. Error: ${errMsg}\n\nPlease try again in a moment, or contact us at info@alternusart.com for assistance.`,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -301,10 +302,11 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
                       setMessages((prev) => [...prev, assistantMessage]);
                     } catch (error) {
                       console.error("AI Chat error:", error);
+                      const errMsg = error instanceof Error ? error.message : "Unknown error";
                       const errorMessage: Message = {
                         id: (Date.now() + 1).toString(),
                         role: "assistant",
-                        content: "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
+                        content: `I apologize, but I'm having trouble connecting right now. Error: ${errMsg}`,
                         timestamp: new Date(),
                       };
                       setMessages((prev) => [...prev, errorMessage]);

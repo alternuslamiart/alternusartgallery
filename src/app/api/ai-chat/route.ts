@@ -152,14 +152,10 @@ async function getOpenAIResponse(message: string, conversationHistory: Array<{ r
   }
 }
 
-async function getAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
-  if (process.env.OPENAI_API_KEY) {
-    return getOpenAIResponse(message, conversationHistory);
-  }
-
+async function getAnthropicResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
   const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
   if (!anthropicApiKey) {
-    return { text: null, error: 'No AI provider configured' };
+    return { text: null, error: 'ANTHROPIC_API_KEY not set' };
   }
 
   const messages = [
@@ -207,6 +203,33 @@ async function getAIResponse(message: string, conversationHistory: Array<{ role:
   }
 }
 
+async function getAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
+  const hasOpenAI = Boolean(process.env.OPENAI_API_KEY);
+  const hasAnthropic = Boolean(process.env.ANTHROPIC_API_KEY);
+
+  if (!hasOpenAI && !hasAnthropic) {
+    return { text: null, error: 'No AI provider configured. Set OPENAI_API_KEY or ANTHROPIC_API_KEY.' };
+  }
+
+  if (hasOpenAI) {
+    const openAIResult = await getOpenAIResponse(message, conversationHistory);
+    if (openAIResult.text) return openAIResult;
+
+    console.error('OpenAI provider failed:', openAIResult.error);
+    if (!hasAnthropic) {
+      return { text: null, error: `OpenAI failed: ${openAIResult.error}` };
+    }
+  }
+
+  if (hasAnthropic) {
+    const anthropicResult = await getAnthropicResponse(message, conversationHistory);
+    if (anthropicResult.text) return anthropicResult;
+    return { text: null, error: `Anthropic failed: ${anthropicResult.error}` };
+  }
+
+  return { text: null, error: 'No AI provider available.' };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -218,7 +241,10 @@ export async function POST(request: NextRequest) {
 
     if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
       console.error('No AI provider API key configured');
-      return NextResponse.json({ error: 'Our AI assistant is temporarily unavailable. Please try again later or contact us at info@alternusart.com.' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'AI provider is not configured. Set OPENAI_API_KEY or ANTHROPIC_API_KEY on the server.' },
+        { status: 500 }
+      );
     }
 
     const result = await getAIResponse(message, conversationHistory);
@@ -226,7 +252,7 @@ export async function POST(request: NextRequest) {
     if (!result.text) {
       console.error('AI provider failed:', result.error);
       return NextResponse.json(
-        { error: 'Our AI assistant is temporarily unavailable. Please try again later or contact us at info@alternusart.com.' },
+        { error: result.error || 'Our AI assistant is temporarily unavailable. Please try again later.' },
         { status: 500 }
       );
     }
