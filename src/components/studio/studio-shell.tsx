@@ -286,7 +286,6 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const notificationRef = useRef<HTMLDivElement>(null);
   const displayRef = useRef<HTMLDivElement>(null);
   const currentTitle = getRouteTitle(activeRoute);
-  const sidebarInnerClass = isCollapsed ? "flex min-h-0 flex-1 flex-col px-2.5" : "flex min-h-0 flex-1 flex-col px-4";
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("alternus-studio-theme");
@@ -378,7 +377,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         isCollapsed ? "w-[60px]" : "w-[230px]",
       ].join(" ")}
     >
-      <div className={sidebarInnerClass}>
+      <div className={isCollapsed ? "flex min-h-0 flex-1 flex-col px-2" : "flex min-h-0 flex-1 flex-col px-3"}>
       <div ref={workspaceRef} className="relative mb-4 flex items-center justify-between">
         {isCollapsed ? (
           <button
@@ -392,7 +391,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           <>
             <button
               onClick={() => setWorkspaceOpen((value) => !value)}
-              className={`flex min-w-0 flex-1 items-center gap-2 rounded-xl px-2.5 py-1 text-[13px] font-semibold transition-all active:scale-[0.99] ${dark ? "text-[#F4F6F8] hover:bg-white/6" : "text-[#1F2937] hover:bg-white/60"}`}
+              className={`flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 text-[13px] font-semibold ${dark ? "text-[#F4F6F8] hover:bg-white/6" : "text-[#1F2937] hover:bg-white/60"}`}
               aria-expanded={workspaceOpen}
             >
               <span className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white">
@@ -619,8 +618,8 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           </div>
         )}
 
-        <main className="flex min-w-0 flex-1 flex-col p-4 max-sm:p-2">
-          <header className={`mb-3 flex h-8 items-center justify-between px-1.5 ${activeRoute === "ai-assistant" ? "max-sm:hidden" : ""}`}>
+        <main className="flex min-w-0 flex-1 flex-col p-3">
+          <header className={`mb-3 flex h-8 items-center justify-between px-1 ${activeRoute === "ai-assistant" ? "max-sm:hidden" : ""}`}>
             <div className="flex min-w-0 items-center gap-3">
               <div className={`relative flex items-center gap-2 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
                 <div ref={notificationRef} className="relative">
@@ -672,7 +671,9 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
               activeRoute === "ai-assistant" ? "max-sm:px-4 max-sm:py-0" : "",
             ].join(" ")}
           >
-            {children}
+            <div className="mx-auto w-full max-w-[1180px]">
+              {children}
+            </div>
           </section>
         </main>
       </div>
