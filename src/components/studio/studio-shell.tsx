@@ -51,7 +51,6 @@ export type StudioRouteKey =
   | "prompt-lab"
   | "projects"
   | "exports"
-  | "recents"
   | "settings"
   | "help-center";
 
@@ -61,6 +60,16 @@ type NavItem = {
   href: string;
   icon: LucideIcon;
   badge?: string;
+};
+
+type GeneratedRecent = {
+  id: string;
+  title: string;
+  tool: string;
+  meta: string;
+  time: string;
+  icon: LucideIcon;
+  output: string;
 };
 
 export const studioNavigation: NavItem[] = [
@@ -73,7 +82,36 @@ export const studioNavigation: NavItem[] = [
   { key: "prompt-lab", label: "Prompt Lab", href: "/prompt-lab", icon: FileText, badge: "2" },
   { key: "projects", label: "Projects", href: "/projects", icon: Folder },
   { key: "exports", label: "Exports", href: "/exports", icon: Upload },
-  { key: "recents", label: "Recents", href: "/recents", icon: RefreshCw },
+];
+
+const generatedRecents: GeneratedRecent[] = [
+  {
+    id: "recent-3d-environment",
+    title: "Create 3D Environment",
+    tool: "Blender 3D",
+    meta: "Generated scene",
+    time: "14m",
+    icon: Layers3,
+    output: "A light studio environment with soft grid floor, product lighting, and export-ready GLB scene setup.",
+  },
+  {
+    id: "recent-react-component",
+    title: "React Component Draft",
+    tool: "AI for Code",
+    meta: "Generated plan",
+    time: "22m",
+    icon: Code2,
+    output: "A reusable React component structure with responsive states, accessible controls, and clean Tailwind styling.",
+  },
+  {
+    id: "recent-floor-plan",
+    title: "Floor Plan Layer Setup",
+    tool: "AutoCAD",
+    meta: "CAD draft",
+    time: "31m",
+    icon: PenLine,
+    output: "A CAD floor-plan draft with wall, dimension, annotation, furniture, and export layers prepared.",
+  },
 ];
 
 const bottomNavigation = [
@@ -92,7 +130,6 @@ const routeByPath: Record<string, StudioRouteKey> = {
   "/prompt-lab": "prompt-lab",
   "/projects": "projects",
   "/exports": "exports",
-  "/recents": "recents",
   "/settings": "settings",
   "/help-center": "help-center",
   "/ai-assistant/tools/code": "ai-assistant",
@@ -283,6 +320,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const [signOutOpen, setSignOutOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<StudioModalKey | null>(null);
   const [activeDrawer, setActiveDrawer] = useState<StudioDrawerKey | null>(null);
+  const [activeRecent, setActiveRecent] = useState<GeneratedRecent | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const sidebarNotificationRef = useRef<HTMLDivElement>(null);
@@ -331,6 +369,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
       if (event.key === "Escape") {
         setActiveModal(null);
         setActiveDrawer(null);
+        setActiveRecent(null);
         setActionsOpenSafe();
       }
     }
@@ -439,6 +478,36 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           <SidebarLink key={item.key} item={item} active={item.key === activeRoute} collapsed={isCollapsed} onNavigate={() => setIsMobileOpen(false)} />
         ))}
       </nav>
+
+      <div className={`mt-3 border-t pt-3 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-white/70"}`}>
+        {!isCollapsed && <p className={`mb-2 px-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${dark ? "text-[#6F7782]" : "text-[#8A94A3]"}`}>Recents</p>}
+        <div className="space-y-1">
+          {generatedRecents.map((recent) => {
+            const RecentIcon = recent.icon;
+            return (
+              <button
+                key={recent.id}
+                onClick={() => setActiveRecent(recent)}
+                title={isCollapsed ? recent.title : undefined}
+                className={[
+                  "group flex min-h-8 w-full items-center rounded-xl px-2.5 py-1.5 text-left text-[11px] font-medium transition-all active:scale-[0.99]",
+                  dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#4B5563] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
+                  isCollapsed ? "justify-center" : "gap-2",
+                ].join(" ")}
+              >
+                <RecentIcon className={`h-[13px] w-[13px] flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#F4F6F8]" : "text-[#6B7280] group-hover:text-[#4A9BFF]"}`} />
+                {!isCollapsed && (
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate">{recent.title}</span>
+                    <span className={`mt-0.5 block truncate text-[9.5px] ${dark ? "text-[#6F7782]" : "text-[#8A94A3]"}`}>{recent.meta}</span>
+                  </span>
+                )}
+                {!isCollapsed && <span className={`text-[9.5px] font-semibold ${dark ? "text-[#6F7782]" : "text-[#8A94A3]"}`}>{recent.time}</span>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="mt-auto">
         {!isCollapsed && (
@@ -709,6 +778,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
       )}
       {activeModal && <StudioModal modal={activeModal} onClose={() => setActiveModal(null)} />}
       {activeDrawer && <StudioDrawer drawer={activeDrawer} onClose={() => setActiveDrawer(null)} />}
+      {activeRecent && <RecentOutputDrawer recent={activeRecent} onClose={() => setActiveRecent(null)} />}
       {toast && <StudioToast message={toast} />}
       </div>
       </StudioActionContext.Provider>
@@ -835,6 +905,48 @@ function StudioDrawer({ drawer, onClose }: { drawer: StudioDrawerKey; onClose: (
             <p className={`mt-2 text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Select an item to inspect it without leaving the workspace.</p>
           </div>
         )}
+      </aside>
+    </div>
+  );
+}
+
+function RecentOutputDrawer({ recent, onClose }: { recent: GeneratedRecent; onClose: () => void }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  const RecentIcon = recent.icon;
+
+  return (
+    <div className={`fixed inset-0 z-50 flex justify-end backdrop-blur-[2px] ${dark ? "bg-black/35" : "bg-[#1F2937]/20"}`} onMouseDown={onClose}>
+      <aside
+        className={`h-full w-full max-w-md border-l p-5 shadow-[-24px_0_70px_rgba(31,43,77,0.14)] transition-all ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5E7EB] bg-white"}`}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white">
+              <RecentIcon className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <p className={`text-[10px] font-semibold uppercase tracking-[0.08em] ${dark ? "text-[#6F7782]" : "text-[#8A94A3]"}`}>{recent.tool}</p>
+              <h2 className={`mt-1 truncate text-[17px] font-semibold tracking-[-0.02em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{recent.title}</h2>
+              <p className={`mt-1 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{recent.meta} - {recent.time}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#9CA3AF] hover:bg-[#F4F8FB]"}`} aria-label="Close recent output">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className={`mt-5 rounded-3xl border p-4 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-[#FCFDFE]"}`}>
+          <p className={`text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Generated output</p>
+          <p className={`mt-3 text-[12px] leading-6 ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>{recent.output}</p>
+        </div>
+
+        <div className={`mt-4 rounded-3xl border border-dashed p-6 text-center ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#DCEBFA] bg-white"}`}>
+          <RecentIcon className="mx-auto h-7 w-7 text-[#4A9BFF]" />
+          <p className={`mt-3 text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Ready to continue</p>
+          <p className={`mt-2 text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Review the generated output, then continue refining it from the matching workspace.</p>
+        </div>
       </aside>
     </div>
   );
@@ -1103,8 +1215,6 @@ function StudioContent({ route, assistantTool }: { route: StudioRouteKey; assist
       return <ProjectsPage />;
     case "exports":
       return <ExportsPage />;
-    case "recents":
-      return <RecentsPage />;
     case "settings":
       return <SettingsPage />;
     case "help-center":
@@ -1961,49 +2071,6 @@ function ExportsPage() {
             </button>
           </div>
         ))}
-      </SoftCard>
-    </div>
-  );
-}
-
-function RecentsPage() {
-  const { showToast } = useStudioActions();
-  const recentItems = [
-    ["AI for Code", "React component draft", "Plan generated", "2 min ago", Code2],
-    ["Blender 3D", "Product scene lighting", "Preview prepared", "14 min ago", Layers3],
-    ["AutoCAD", "Floor plan layer setup", "CAD draft saved", "31 min ago", PenLine],
-    ["Asset Library", "Reference image upload", "Asset added", "1 hr ago", ImageIcon],
-    ["Prompt Lab", "Website audit prompt", "Template edited", "Yesterday", FileText],
-  ] as const;
-
-  return (
-    <div>
-      <PageHeader title="Recents" subtitle="Recent generations, uploads, prompts, and workspace actions." />
-      <div className="grid gap-3 md:grid-cols-2">
-        {recentItems.map(([tool, title, status, time, ItemIcon]) => (
-          <ClickableSoftCard key={`${tool}-${title}`} onClick={() => showToast(`${title} opened`)} ariaLabel={`Open recent ${title}`}>
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
-                <ItemIcon className="h-4.5 w-4.5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-[12px] font-semibold text-[#171717]">{title}</p>
-                  <span className="rounded-full bg-[#EEF7FC] px-2.5 py-1 text-[10px] font-semibold text-[#1DA1F2]">{time}</span>
-                </div>
-                <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#8A94A3]">{tool}</p>
-                <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">{status}</p>
-              </div>
-            </div>
-          </ClickableSoftCard>
-        ))}
-      </div>
-      <SoftCard className="mt-5 flex min-h-[110px] items-center justify-center border-dashed text-center">
-        <div>
-          <RefreshCw className="mx-auto h-6 w-6 text-[#1DA1F2]" />
-          <p className="mt-3 text-[13px] font-semibold text-[#171717]">More recents will appear here</p>
-          <p className="mt-1 text-[11px] text-[#6B7280]">Generate, upload, or edit something to keep building this timeline.</p>
-        </div>
       </SoftCard>
     </div>
   );
