@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import OpenAI from 'openai';
 
 const SYSTEM_PROMPT = `You are Alternus AI, a friendly and knowledgeable art assistant for Alternus Gallery - a premium online art marketplace connecting passionate collectors with exceptional artists worldwide.
 
@@ -112,10 +113,51 @@ Remember: You're an art expert passionate about helping people discover and appr
 
 export const dynamic = 'force-dynamic';
 
-async function getAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+async function getOpenAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    return { text: null, error: 'ANTHROPIC_API_KEY not set' };
+    return { text: null, error: 'OPENAI_API_KEY not set' };
+  }
+
+  const client = new OpenAI({ apiKey });
+  const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+
+  try {
+    const response = await client.chat.completions.create({
+      model,
+      temperature: 0.7,
+      max_tokens: 1024,
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...conversationHistory.map((msg) => ({
+          role: msg.role === 'assistant' ? 'assistant' : 'user',
+          content: msg.content,
+        })),
+        { role: 'user', content: message },
+      ],
+    });
+
+    const text = response.choices[0]?.message?.content;
+    if (text) {
+      return { text, error: null };
+    }
+
+    return { text: null, error: 'No response from OpenAI' };
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error('OpenAI error:', errMsg);
+    return { text: null, error: errMsg };
+  }
+}
+
+async function getAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
+  if (process.env.OPENAI_API_KEY) {
+    return getOpenAIResponse(message, conversationHistory);
+  }
+
+  const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+  if (!anthropicApiKey) {
+    return { text: null, error: 'No AI provider configured' };
   }
 
   const messages = [
@@ -131,7 +173,7 @@ async function getAIResponse(message: string, conversationHistory: Array<{ role:
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
+        'x-api-key': anthropicApiKey,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
@@ -172,15 +214,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    if (!process.env.ANTHROPIC_API_KEY) {
-      console.error('ANTHROPIC_API_KEY not configured');
+    if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+      console.error('No AI provider API key configured');
       return NextResponse.json({ error: 'Our AI assistant is temporarily unavailable. Please try again later or contact us at info@alternusart.com.' }, { status: 500 });
     }
 
     const result = await getAIResponse(message, conversationHistory);
 
     if (!result.text) {
-      console.error('Gemini failed:', result.error);
+      console.error('AI provider failed:', result.error);
       return NextResponse.json(
         { error: 'Our AI assistant is temporarily unavailable. Please try again later or contact us at info@alternusart.com.' },
         { status: 500 }
