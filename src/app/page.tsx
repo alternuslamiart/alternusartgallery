@@ -625,26 +625,28 @@ export default function Home() {
                         Billing
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/dashboard" className="flex items-center gap-2 cursor-pointer">
-                        Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/orders" className="flex items-center gap-2 cursor-pointer">
-                        Orders
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/favorites" className="flex items-center gap-2 cursor-pointer">
-                        Favorites
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/help" className="flex items-center gap-2 cursor-pointer">
-                        Help
-                      </Link>
-                    </DropdownMenuItem>
+                    <div className="border-t mt-1 pt-1">
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard" className="flex items-center gap-2 cursor-pointer">
+                          Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/orders" className="flex items-center gap-2 cursor-pointer">
+                          Orders
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/favorites" className="flex items-center gap-2 cursor-pointer">
+                          Favorites
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/help" className="flex items-center gap-2 cursor-pointer">
+                          Help
+                        </Link>
+                      </DropdownMenuItem>
+                    </div>
                     <div className="border-t mt-1 pt-1">
                       <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })} className="cursor-pointer text-red-600">
                         Sign out
