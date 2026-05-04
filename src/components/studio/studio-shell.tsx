@@ -74,6 +74,11 @@ type GeneratedRecent = {
   output: string;
 };
 
+function isPaidStudioPlan() {
+  const plan = process.env.NEXT_PUBLIC_ALTERNUS_PLAN?.toLowerCase();
+  return plan === "pro" || plan === "team" || plan === "premium" || plan === "paid" || plan === "enterprise";
+}
+
 export const studioNavigation: NavItem[] = [
   { key: "ai-assistant", label: "AI Assistant", href: "/ai-assistant", icon: Sparkles },
   { key: "studio-overview", label: "Studio Overview", href: "/studio-overview", icon: Grid2X2 },
@@ -1611,6 +1616,7 @@ function AlternusDesignPage() {
   const { theme } = useStudioTheme();
   const { showToast } = useStudioActions();
   const dark = theme === "dark";
+  const isPaidPlan = isPaidStudioPlan();
   const shell = dark
     ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_18px_42px_rgba(0,0,0,0.24)]"
     : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_18px_42px_rgba(31,43,77,0.06)]";
@@ -1622,6 +1628,52 @@ function AlternusDesignPage() {
     { label: "Website", icon: Monitor, desc: "Landing pages" },
     { label: "Mobile app", icon: Layers3, desc: "iOS/Android" },
   ];
+
+  if (!isPaidPlan) {
+    return (
+      <div>
+        <PageHeader
+          title="Alternus Design"
+          subtitle="Design website, app, and mobile prototypes in the same Alternus AI workspace."
+        />
+        <div className={`overflow-hidden rounded-[32px] border p-6 ${shell}`}>
+          <div className="grid gap-6 lg:grid-cols-[1fr_0.85fr] lg:items-center">
+            <div>
+              <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_18px_36px_rgba(29,161,242,0.24)]">
+                <CreditCard className="h-6 w-6" />
+              </div>
+              <p className={`mt-6 text-[11px] font-semibold uppercase tracking-[0.12em] ${muted}`}>Paid plan required</p>
+              <h3 className={`mt-2 max-w-xl text-[30px] font-semibold tracking-[-0.04em] ${strong}`}>Alternus Design is available only on paid plans.</h3>
+              <p className={`mt-3 max-w-2xl text-[13px] leading-6 ${muted}`}>
+                Free Plan users can use AI Assistant and the basic workspace. Website, app, and mobile prototype generation is reserved for Pro, Team, Premium, or Enterprise plans.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link href="/pricing" className="inline-flex h-10 items-center gap-2 rounded-2xl bg-[#4A9BFF] px-4 text-[12px] font-semibold text-white shadow-[0_14px_28px_rgba(74,155,255,0.22)] transition-all hover:bg-[#2D8FF0] active:scale-[0.98]">
+                  <CreditCard className="h-4 w-4" />
+                  Upgrade to Pro
+                </Link>
+                <button onClick={() => showToast("Alternus Design unlocks after a paid plan is active")} className={`inline-flex h-10 items-center gap-2 rounded-2xl border px-4 text-[12px] font-semibold transition-all active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:text-[#F4F6F8]" : "border-[#E5EAF0] bg-white text-[#4B5563] hover:border-[#CFE8F8] hover:text-[#171717]"}`}>
+                  <KeyRound className="h-4 w-4" />
+                  Check access
+                </button>
+              </div>
+            </div>
+            <div className={`rounded-[28px] border p-4 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-white"}`}>
+              <p className={`text-[13px] font-semibold ${strong}`}>Locked features</p>
+              <div className="mt-4 grid gap-3">
+                {["Website prototype generation", "Mobile app screens", "High fidelity UI systems", "Design token exports"].map((feature) => (
+                  <div key={feature} className={`flex items-center gap-3 rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-[#FAFCFD]"}`}>
+                    <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-[#4A9BFF]" />
+                    <span className={`text-[12px] font-semibold ${strong}`}>{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
