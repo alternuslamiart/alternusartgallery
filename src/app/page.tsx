@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 import {
   AlternusLogo,
   DARK_BG,
@@ -15,6 +16,12 @@ import {
   DARK_TEXT,
   useAlternusMode,
 } from "@/components/alternus-shell";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -306,6 +313,9 @@ export default function Home() {
   const [isDark, setIsDark] = useAlternusMode();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [activeCap, setActiveCap] = useState(0);
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === "authenticated";
+  const user = session?.user || null;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -585,12 +595,71 @@ export default function Home() {
                 )}
               </button>
 
-              <Link
-                href="/login"
-                className="hidden h-10 items-center rounded-2xl border border-[var(--landing-line)] px-4 text-sm font-semibold tracking-[-0.01em] text-[var(--landing-fg)] transition-all hover:border-[var(--landing-accent)] sm:inline-flex"
-              >
-                Log in
-              </Link>
+              {isLoggedIn ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="hidden h-10 items-center gap-2 rounded-2xl border border-[var(--landing-line)] bg-[var(--landing-surface)] px-3 pr-4 text-sm font-semibold tracking-[-0.01em] text-[var(--landing-fg)] transition-all hover:border-[var(--landing-accent)] sm:inline-flex">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--landing-accent)] text-[11px] font-bold text-white">
+                        {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
+                      </span>
+                      <span className="max-w-28 truncate">{user?.name || user?.email?.split("@")[0] || "Profile"}</span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-64">
+                    <div className="px-3 py-2 border-b">
+                      <p className="text-sm font-semibold text-foreground">{user?.name || user?.email?.split("@")[0]}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email}</p>
+                    </div>
+                    <DropdownMenuItem asChild>
+                      <Link href="/account" className="flex items-center gap-2 cursor-pointer">
+                        Usage
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
+                        Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/pricing" className="flex items-center gap-2 cursor-pointer">
+                        Billing
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard" className="flex items-center gap-2 cursor-pointer">
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/orders" className="flex items-center gap-2 cursor-pointer">
+                        Orders
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/favorites" className="flex items-center gap-2 cursor-pointer">
+                        Favorites
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/help" className="flex items-center gap-2 cursor-pointer">
+                        Help
+                      </Link>
+                    </DropdownMenuItem>
+                    <div className="border-t mt-1 pt-1">
+                      <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })} className="cursor-pointer text-red-600">
+                        Sign out
+                      </DropdownMenuItem>
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  href="/login"
+                  className="hidden h-10 items-center rounded-2xl border border-[var(--landing-line)] px-4 text-sm font-semibold tracking-[-0.01em] text-[var(--landing-fg)] transition-all hover:border-[var(--landing-accent)] sm:inline-flex"
+                >
+                  Log in
+                </Link>
+              )}
 
               <Link
                 href="/main"
