@@ -1616,7 +1616,8 @@ function AlternusDesignPage() {
   const { theme } = useStudioTheme();
   const { showToast } = useStudioActions();
   const dark = theme === "dark";
-  const isPaidPlan = isPaidStudioPlan();
+  const [previewUnlocked, setPreviewUnlocked] = useState(false);
+  const isPaidPlan = isPaidStudioPlan() || previewUnlocked;
   const shell = dark
     ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_18px_42px_rgba(0,0,0,0.24)]"
     : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_18px_42px_rgba(31,43,77,0.06)]";
@@ -1648,10 +1649,10 @@ function AlternusDesignPage() {
                 Free Plan users can use AI Assistant and the basic workspace. Website, app, and mobile prototype generation is reserved for Pro, Team, Premium, or Enterprise plans.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/pricing" className="inline-flex h-10 items-center gap-2 rounded-2xl bg-[#4A9BFF] px-4 text-[12px] font-semibold text-white shadow-[0_14px_28px_rgba(74,155,255,0.22)] transition-all hover:bg-[#2D8FF0] active:scale-[0.98]">
+                <button onClick={() => { setPreviewUnlocked(true); showToast("Alternus Design unlocked for this preview"); }} className="inline-flex h-10 items-center gap-2 rounded-2xl bg-[#4A9BFF] px-4 text-[12px] font-semibold text-white shadow-[0_14px_28px_rgba(74,155,255,0.22)] transition-all hover:bg-[#2D8FF0] active:scale-[0.98]">
                   <CreditCard className="h-4 w-4" />
                   Upgrade to Pro
-                </Link>
+                </button>
                 <button onClick={() => showToast("Alternus Design unlocks after a paid plan is active")} className={`inline-flex h-10 items-center gap-2 rounded-2xl border px-4 text-[12px] font-semibold transition-all active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:text-[#F4F6F8]" : "border-[#E5EAF0] bg-white text-[#4B5563] hover:border-[#CFE8F8] hover:text-[#171717]"}`}>
                   <KeyRound className="h-4 w-4" />
                   Check access
