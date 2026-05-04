@@ -20,6 +20,7 @@ import {
   ImageIcon,
   KeyRound,
   Layers3,
+  MessageCircle,
   Monitor,
   Moon,
   Paperclip,
@@ -436,7 +437,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           <>
             <button
               onClick={() => setWorkspaceOpen((value) => !value)}
-              className={`flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 text-[13px] font-semibold ${dark ? "text-[#F4F6F8] hover:bg-white/6" : "text-[#1F2937] hover:bg-white/60"}`}
+              className={`flex min-w-0 flex-1 items-center gap-2 rounded-xl px-1.5 py-1 text-[13px] font-semibold ${dark ? "text-[#F4F6F8] hover:bg-white/6" : "text-[#1F2937] hover:bg-white/60"}`}
               aria-expanded={workspaceOpen}
             >
               <span className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white">
@@ -444,6 +445,14 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
               </span>
               <span className="truncate">Personal</span>
               <ChevronDown className={`h-3 w-3 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`} />
+            </button>
+            <button
+              onClick={() => showToast("Temporary chat started")}
+              className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg ${dark ? "text-[#A8B0BA] hover:bg-white/6 hover:text-[#F4F6F8]" : "text-[#6B7280] hover:bg-white/70 hover:text-[#171717]"}`}
+              aria-label="Temporary Chat"
+              title="Temporary Chat"
+            >
+              <MessageCircle className="h-[14px] w-[14px]" />
             </button>
             <button
               onClick={toggleMenu}
@@ -469,7 +478,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
       </div>
 
       {!isCollapsed && (
-        <button onClick={() => setActiveModal("search")} className={`mb-5 flex h-9 w-full cursor-pointer items-center gap-2 rounded-xl border px-3 text-left transition-all active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_22px_rgba(0,0,0,0.16)] hover:border-[rgba(59,167,255,0.24)]" : "border-white/80 bg-white/72 shadow-[0_8px_22px_rgba(31,43,77,0.04)] hover:border-[#CFE8F8]"}`} aria-label="Open search">
+        <button onClick={() => setActiveModal("search")} className={`mb-5 flex h-10 w-full cursor-pointer items-center gap-2 rounded-2xl border px-3 text-left transition-all active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_22px_rgba(0,0,0,0.16)] hover:border-[rgba(59,167,255,0.24)]" : "border-white/80 bg-white/72 shadow-[0_8px_22px_rgba(31,43,77,0.04)] hover:border-[#CFE8F8]"}`} aria-label="Open search">
           <Search className={`h-[13px] w-[13px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} />
           <span className={`min-w-0 flex-1 text-[12px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`}>Search...</span>
           <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F3F6F8] text-[#9CA3AF]"}`}>/</span>
@@ -484,32 +493,6 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
       <div className={`mt-3 border-t pt-3 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-white/70"}`}>
         {!isCollapsed && <p className={`mb-2 px-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${dark ? "text-[#6F7782]" : "text-[#8A94A3]"}`}>Recents</p>}
-        <div className="space-y-1">
-          {generatedRecents.map((recent) => {
-            const RecentIcon = recent.icon;
-            return (
-              <button
-                key={recent.id}
-                onClick={() => setActiveRecent(recent)}
-                title={isCollapsed ? recent.title : undefined}
-                className={[
-                  "group flex min-h-8 w-full items-center rounded-xl px-2.5 py-1.5 text-left text-[11px] font-medium transition-all active:scale-[0.99]",
-                  dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#4B5563] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
-                  isCollapsed ? "justify-center" : "gap-2",
-                ].join(" ")}
-              >
-                <RecentIcon className={`h-[13px] w-[13px] flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#F4F6F8]" : "text-[#6B7280] group-hover:text-[#4A9BFF]"}`} />
-                {!isCollapsed && (
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate">{recent.title}</span>
-                    <span className={`mt-0.5 block truncate text-[9.5px] ${dark ? "text-[#6F7782]" : "text-[#8A94A3]"}`}>{recent.meta}</span>
-                  </span>
-                )}
-                {!isCollapsed && <span className={`text-[9.5px] font-semibold ${dark ? "text-[#6F7782]" : "text-[#8A94A3]"}`}>{recent.time}</span>}
-              </button>
-            );
-          })}
-        </div>
       </div>
 
       <div className="mt-auto">
