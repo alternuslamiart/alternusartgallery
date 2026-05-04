@@ -43,6 +43,7 @@ import { ChangeEvent, ReactNode, createContext, useCallback, useContext, useEffe
 
 export type StudioRouteKey =
   | "studio-overview"
+  | "alternus-design"
   | "autocad-design"
   | "code-builder"
   | "blender-3d"
@@ -75,6 +76,7 @@ type GeneratedRecent = {
 export const studioNavigation: NavItem[] = [
   { key: "ai-assistant", label: "AI Assistant", href: "/ai-assistant", icon: Sparkles },
   { key: "studio-overview", label: "Studio Overview", href: "/studio-overview", icon: Grid2X2 },
+  { key: "alternus-design", label: "Alternus Design", href: "/alternus-design", icon: Monitor },
   { key: "autocad-design", label: "AutoCAD Design", href: "/autocad-design", icon: PenLine },
   { key: "code-builder", label: "Code Builder", href: "/code-builder", icon: Code2 },
   { key: "blender-3d", label: "Blender 3D", href: "/blender-3d", icon: Layers3 },
@@ -122,6 +124,7 @@ const bottomNavigation = [
 const routeByPath: Record<string, StudioRouteKey> = {
   "/main": "ai-assistant",
   "/studio-overview": "studio-overview",
+  "/alternus-design": "alternus-design",
   "/autocad-design": "autocad-design",
   "/code-builder": "code-builder",
   "/blender-3d": "blender-3d",
@@ -1201,6 +1204,8 @@ function StudioContent({ route, assistantTool }: { route: StudioRouteKey; assist
   switch (route) {
     case "studio-overview":
       return <OverviewPage />;
+    case "alternus-design":
+      return <AlternusDesignPage />;
     case "autocad-design":
       return <AutoCADPage />;
     case "code-builder":
@@ -1614,6 +1619,143 @@ function OverviewPage() {
             <SecondaryButton icon={Sparkles} onClick={() => router.push("/ai-assistant")}>Start AI task</SecondaryButton>
           </div>
         </SoftCard>
+      </div>
+    </div>
+  );
+}
+
+function AlternusDesignPage() {
+  const { theme } = useStudioTheme();
+  const { showToast } = useStudioActions();
+  const dark = theme === "dark";
+  const shell = dark
+    ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_18px_42px_rgba(0,0,0,0.24)]"
+    : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_18px_42px_rgba(31,43,77,0.06)]";
+  const muted = dark ? "text-[#A8B0BA]" : "text-[#6B7280]";
+  const strong = dark ? "text-[#F4F6F8]" : "text-[#171717]";
+  const prototypeModes: Array<{ label: string; icon: LucideIcon; desc: string }> = [
+    { label: "Wireframe", icon: Grid2X2, desc: "Fast layout" },
+    { label: "High fidelity", icon: PenLine, desc: "Visual polish" },
+    { label: "Website", icon: Monitor, desc: "Landing pages" },
+    { label: "Mobile app", icon: Layers3, desc: "iOS/Android" },
+  ];
+
+  return (
+    <div>
+      <PageHeader
+        title="Alternus Design"
+        subtitle="Design website, app, and mobile prototypes in the same Alternus AI workspace."
+        action={<PrimaryButton icon={Sparkles} onClick={() => showToast("New Alternus Design prototype created")}>Create prototype</PrimaryButton>}
+      />
+
+      <div className="grid gap-5 xl:grid-cols-[320px_1fr]">
+        <section className={`rounded-[28px] border p-4 ${shell}`}>
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_14px_30px_rgba(29,161,242,0.24)]">
+              <Monitor className="h-4 w-4" />
+            </div>
+            <div>
+              <p className={`text-[13px] font-semibold ${strong}`}>New prototype</p>
+              <p className={`text-[11px] ${muted}`}>Website, app, mobile UI</p>
+            </div>
+          </div>
+
+          <div className={`mt-5 rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-white"}`}>
+            <label className={`text-[11px] font-semibold ${strong}`}>Project name</label>
+            <input className={`mt-2 h-10 w-full rounded-xl border px-3 text-[12px] outline-none ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8] placeholder:text-[#6F7782]" : "border-[#E5E7EB] bg-[#FAFCFD] text-[#171717] placeholder:text-[#A1A7B0]"}`} placeholder="Marketplace mobile refresh" />
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            {prototypeModes.map(({ label, icon: Icon, desc }, index) => (
+              <button key={label} onClick={() => showToast(`${label} mode selected`)} className={`group min-h-[108px] rounded-2xl border p-3 text-left transition-all hover:-translate-y-0.5 active:scale-[0.99] ${index === 1 ? "border-[#9BD2FF] bg-[#EEF7FF]" : dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] hover:border-[rgba(59,167,255,0.24)]" : "border-[#E5EAF0] bg-white hover:border-[#CFE8F8]"}`}>
+                <div className={`mb-3 flex h-10 items-center justify-center rounded-xl ${index === 1 ? "bg-white text-[#4A9BFF]" : dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F4F8FB] text-[#6B7280]"}`}>
+                  <Icon className="h-4 w-4" />
+                </div>
+                <p className={`text-[12px] font-semibold ${index === 1 ? "text-[#171717]" : strong}`}>{label}</p>
+                <p className={`mt-1 text-[10px] ${index === 1 ? "text-[#4B5563]" : muted}`}>{desc}</p>
+              </button>
+            ))}
+          </div>
+
+          <button onClick={() => showToast("Alternus Design generation queued")} className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#4A9BFF] to-[#1DA1F2] text-[12px] font-semibold text-white shadow-[0_16px_34px_rgba(29,161,242,0.24)] transition-all hover:-translate-y-0.5 active:scale-[0.99]">
+            <Plus className="h-4 w-4" />
+            Create
+          </button>
+          <p className={`mt-3 text-center text-[10px] ${muted}`}>Only you can see your prototype by default.</p>
+        </section>
+
+        <section className="space-y-4">
+          <div className={`rounded-[28px] border p-4 ${shell}`}>
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className={`text-[13px] font-semibold ${strong}`}>Designs</p>
+                <p className={`mt-1 text-[11px] ${muted}`}>Recent prototypes and UI systems generated with Alternus AI.</p>
+              </div>
+              <div className={`flex rounded-2xl p-1 ${dark ? "bg-[#181B20]" : "bg-[#EEF3F7]"}`}>
+                {["Recent", "Your designs", "Design systems"].map((tab, index) => (
+                  <button key={tab} onClick={() => showToast(`${tab} selected`)} className={`rounded-xl px-3 py-1.5 text-[11px] font-semibold ${index === 0 ? "bg-white text-[#171717] shadow-sm" : muted}`}>
+                    {tab}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              {[
+                ["Gallery checkout redesign", "Website", "Today", "Checkout"],
+                ["Collector mobile app", "Mobile app", "Yesterday", "App"],
+                ["Artist dashboard system", "Design system", "2d ago", "System"],
+              ].map(([title, type, time, tag]) => (
+                <ClickableSoftCard key={title} className="overflow-hidden p-0" onClick={() => showToast(`${title} opened`)} ariaLabel={`Open ${title}`}>
+                  <div className="relative h-32 overflow-hidden rounded-t-2xl bg-gradient-to-br from-[#DDF2FF] via-[#F8FBFF] to-[#EAF7F2]">
+                    <div className="absolute left-4 top-4 h-16 w-24 rounded-2xl border border-white/80 bg-white/70 shadow-[0_10px_24px_rgba(31,43,77,0.08)]" />
+                    <div className="absolute bottom-4 right-4 h-20 w-28 rounded-2xl border border-white/80 bg-white/82 p-2 shadow-[0_12px_28px_rgba(31,43,77,0.10)]">
+                      <div className="h-2 w-14 rounded-full bg-[#4A9BFF]" />
+                      <div className="mt-2 h-2 w-20 rounded-full bg-[#D7E5EF]" />
+                      <div className="mt-2 h-8 rounded-xl bg-[#F7BFA3]" />
+                    </div>
+                    <span className="absolute right-3 top-3 rounded-full bg-white/82 px-2 py-1 text-[10px] font-semibold text-[#4A5563]">{tag}</span>
+                  </div>
+                  <div className="p-4">
+                    <p className={`text-[12px] font-semibold ${strong}`}>{title}</p>
+                    <p className={`mt-1 text-[10.5px] ${muted}`}>{type} - {time}</p>
+                  </div>
+                </ClickableSoftCard>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className={`rounded-[28px] border p-4 ${shell}`}>
+              <p className={`text-[13px] font-semibold ${strong}`}>Prototype brief</p>
+              <textarea className={`mt-3 min-h-[118px] w-full resize-none rounded-2xl border p-4 text-[13px] outline-none ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#6F7782]" : "border-[#E5EAF0] bg-white text-[#171717] placeholder:text-[#A1A7B0]"}`} placeholder="Describe the website, dashboard, mobile flow, or app screen you want Alternus Design to create..." />
+              <div className="mt-3 flex flex-wrap gap-2">
+                {["Responsive", "Design tokens", "Components", "Prototype flow"].map((chip) => (
+                  <button key={chip} onClick={() => showToast(`${chip} added to brief`)} className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA]" : "border-[#E5EAF0] bg-[#FAFCFD] text-[#4B5563]"}`}>{chip}</button>
+                ))}
+              </div>
+            </div>
+
+            <div className={`rounded-[28px] border p-4 ${shell}`}>
+              <p className={`text-[13px] font-semibold ${strong}`}>Design system</p>
+              <div className="mt-4 space-y-3">
+                {[
+                  ["Color", "Sky, paper, graphite", "#4A9BFF"],
+                  ["Typography", "Clean UI scale", "#171717"],
+                  ["Spacing", "8px rhythm", "#CFE8F8"],
+                ].map(([label, desc, color]) => (
+                  <div key={label} className={`flex items-center gap-3 rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-white"}`}>
+                    <span className="h-9 w-9 rounded-xl" style={{ background: color }} />
+                    <span>
+                      <span className={`block text-[12px] font-semibold ${strong}`}>{label}</span>
+                      <span className={`mt-0.5 block text-[10.5px] ${muted}`}>{desc}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
