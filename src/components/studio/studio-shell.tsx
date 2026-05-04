@@ -326,6 +326,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [displayOpen, setDisplayOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<StudioModalKey | null>(null);
   const [activeDrawer, setActiveDrawer] = useState<StudioDrawerKey | null>(null);
@@ -335,6 +336,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const sidebarNotificationRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
   const displayRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
   const currentTitle = getRouteTitle(activeRoute);
 
   useEffect(() => {
@@ -386,7 +388,8 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
     function setActionsOpenSafe() {
       setWorkspaceOpen(false);
       setNotificationsOpen(false);
-      setDisplayOpen(false);
+        setDisplayOpen(false);
+        setProfileOpen(false);
     }
 
     document.addEventListener("keydown", onKeyDown);
@@ -403,6 +406,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         setNotificationsOpen(false);
       }
       if (displayRef.current && !displayRef.current.contains(target)) setDisplayOpen(false);
+      if (profileRef.current && !profileRef.current.contains(target)) setProfileOpen(false);
     }
 
     document.addEventListener("mousedown", onPointerDown);
@@ -716,13 +720,16 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
               </div>
               <h1 className={`truncate text-[15px] font-semibold tracking-[-0.01em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{currentTitle}</h1>
             </div>
-            <button
-              onClick={() => setActiveDrawer("profile")}
-              className={`flex h-8 w-8 items-center justify-center rounded-xl ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white text-[#6B7280] shadow-sm hover:bg-[#FAFCFD]"}`}
-              aria-label="Open profile"
-            >
-              <UserRound className="h-[15px] w-[15px]" />
-            </button>
+            <div ref={profileRef} className="relative">
+              <button
+                onClick={() => setProfileOpen((value) => !value)}
+                className={`flex h-8 w-8 items-center justify-center rounded-xl ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white text-[#6B7280] shadow-sm hover:bg-[#FAFCFD]"}`}
+                aria-label="Open profile"
+              >
+                <UserRound className="h-[15px] w-[15px]" />
+              </button>
+              {profileOpen && <ProfileDropdown />}
+            </div>
           </header>
 
           <section
@@ -1184,6 +1191,25 @@ function DisplayDropdown() {
       <DropdownButton icon={Monitor} label="Preview workspace" onClick={enterFullscreen} />
       <DropdownButton icon={Grid2X2} label="Compact density" onClick={() => showToast("Compact density applied")} />
       <DropdownButton icon={CheckCircle2} label={`${theme === "dark" ? "Dark" : "Light"} mode active`} />
+    </DropdownPanel>
+  );
+}
+
+function ProfileDropdown() {
+  const { theme } = useStudioTheme();
+  const { showToast } = useStudioActions();
+  const dark = theme === "dark";
+
+  return (
+    <DropdownPanel className="right-0 top-10 w-64">
+      <div className="px-3 py-2">
+        <p className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Profile</p>
+        <p className={`mt-1 text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Personal workspace - trial plan</p>
+      </div>
+      <DropdownButton icon={Settings} label="Account settings" onClick={() => showToast("Account settings opened")} />
+      <DropdownButton icon={CreditCard} label="Billing and plan" onClick={() => showToast("Billing and plan opened")} />
+      <DropdownButton icon={RefreshCw} label="Switch workspace" onClick={() => showToast("Workspace switcher opened")} />
+      <DropdownButton icon={Upload} label="Sign out" onClick={() => showToast("Use the sidebar Sign Out confirmation")} />
     </DropdownPanel>
   );
 }
