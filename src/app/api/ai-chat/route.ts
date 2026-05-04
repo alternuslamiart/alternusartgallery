@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import OpenAI from 'openai';
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
@@ -156,6 +157,93 @@ async function getOpenAIResponse(message: string, conversationHistory: Array<{ r
   }
 }
 
+async function getOpenRouterResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    return { text: null, error: 'OPENROUTER_API_KEY not set' };
+  }
+
+  const client = new OpenAI({
+    apiKey,
+    baseURL: 'https://openrouter.ai/api/v1',
+    defaultHeaders: {
+      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'https://alternusart.com',
+      'X-Title': 'Alternus Art Gallery',
+    },
+  });
+  const model = process.env.OPENROUTER_MODEL || 'openrouter/free';
+  const chatMessages: ChatCompletionMessageParam[] = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...conversationHistory.map((msg): ChatCompletionMessageParam => ({
+      role: msg.role === 'assistant' ? 'assistant' : 'user',
+      content: msg.content,
+    })),
+    { role: 'user', content: message },
+  ];
+
+  try {
+    const response = await client.chat.completions.create({
+      model,
+      temperature: 0.7,
+      max_tokens: 1024,
+      messages: chatMessages,
+    });
+
+    const text = response.choices[0]?.message?.content;
+    if (text) {
+      return { text, error: null };
+    }
+
+    return { text: null, error: 'No response from OpenRouter' };
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error('OpenRouter error:', errMsg);
+    return { text: null, error: errMsg };
+  }
+}
+
+async function getGeminiResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return { text: null, error: 'GEMINI_API_KEY not set' };
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
+    systemInstruction: SYSTEM_PROMPT,
+  });
+
+  const contents = [
+    ...conversationHistory.map((msg) => ({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }],
+    })),
+    { role: 'user', parts: [{ text: message }] },
+  ];
+
+  try {
+    const response = await model.generateContent({
+      contents,
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 1024,
+      },
+    });
+
+    const text = response.response.text();
+    if (text) {
+      return { text, error: null };
+    }
+
+    return { text: null, error: 'No response from Gemini' };
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error('Gemini error:', errMsg);
+    return { text: null, error: errMsg };
+  }
+}
+
 async function getAnthropicResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
   const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
   if (!anthropicApiKey) {
@@ -209,10 +297,12 @@ async function getAnthropicResponse(message: string, conversationHistory: Array<
 
 async function getAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
   const hasOpenAI = Boolean(getOpenAIApiKey());
+  const hasOpenRouter = Boolean(process.env.OPENROUTER_API_KEY);
+  const hasGemini = Boolean(process.env.GEMINI_API_KEY);
   const hasAnthropic = Boolean(process.env.ANTHROPIC_API_KEY);
 
-  if (!hasOpenAI && !hasAnthropic) {
-    return { text: null, error: 'No AI provider configured. Set OPENAI_API_KEY, OPENAI_ART_KEY, or ANTHROPIC_API_KEY.' };
+  if (!hasOpenAI && !hasOpenRouter && !hasGemini && !hasAnthropic) {
+    return { text: null, error: 'No AI provider configured. Set OPENAI_API_KEY, OPENAI_ART_KEY, OPENROUTER_API_KEY, GEMINI_API_KEY, or ANTHROPIC_API_KEY.' };
   }
 
   if (hasOpenAI) {
@@ -222,6 +312,26 @@ async function getAIResponse(message: string, conversationHistory: Array<{ role:
     console.error('OpenAI provider failed:', openAIResult.error);
     if (!hasAnthropic) {
       return { text: null, error: `OpenAI failed: ${openAIResult.error}` };
+    }
+  }
+
+  if (hasOpenRouter) {
+    const openRouterResult = await getOpenRouterResponse(message, conversationHistory);
+    if (openRouterResult.text) return openRouterResult;
+
+    console.error('OpenRouter provider failed:', openRouterResult.error);
+    if (!hasGemini && !hasAnthropic) {
+      return { text: null, error: `OpenRouter failed: ${openRouterResult.error}` };
+    }
+  }
+
+  if (hasGemini) {
+    const geminiResult = await getGeminiResponse(message, conversationHistory);
+    if (geminiResult.text) return geminiResult;
+
+    console.error('Gemini provider failed:', geminiResult.error);
+    if (!hasAnthropic) {
+      return { text: null, error: `Gemini failed: ${geminiResult.error}` };
     }
   }
 
@@ -243,10 +353,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    if (!getOpenAIApiKey() && !process.env.ANTHROPIC_API_KEY) {
+    if (!getOpenAIApiKey() && !process.env.OPENROUTER_API_KEY && !process.env.GEMINI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
       console.error('No AI provider API key configured');
       return NextResponse.json(
-        { error: 'AI provider is not configured. Set OPENAI_API_KEY, OPENAI_ART_KEY, or ANTHROPIC_API_KEY on the server.' },
+        { error: 'AI provider is not configured. Set OPENAI_API_KEY, OPENAI_ART_KEY, OPENROUTER_API_KEY, GEMINI_API_KEY, or ANTHROPIC_API_KEY on the server.' },
         { status: 500 }
       );
     }
