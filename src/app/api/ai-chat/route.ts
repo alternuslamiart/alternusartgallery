@@ -119,6 +119,14 @@ function getOpenAIApiKey() {
   return process.env.OPENAI_API_KEY || process.env.OPENAI_ART_KEY;
 }
 
+function getOpenRouterApiKey() {
+  return process.env.OPENROUTER_API_KEY || process.env.OPENROUTER_KEY;
+}
+
+function getGeminiApiKey() {
+  return process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_AI_API_KEY;
+}
+
 async function getOpenAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
   const apiKey = getOpenAIApiKey();
   if (!apiKey) {
@@ -158,9 +166,9 @@ async function getOpenAIResponse(message: string, conversationHistory: Array<{ r
 }
 
 async function getOpenRouterResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = getOpenRouterApiKey();
   if (!apiKey) {
-    return { text: null, error: 'OPENROUTER_API_KEY not set' };
+    return { text: null, error: 'OPENROUTER_API_KEY or OPENROUTER_KEY not set' };
   }
 
   const client = new OpenAI({
@@ -203,9 +211,9 @@ async function getOpenRouterResponse(message: string, conversationHistory: Array
 }
 
 async function getGeminiResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = getGeminiApiKey();
   if (!apiKey) {
-    return { text: null, error: 'GEMINI_API_KEY not set' };
+    return { text: null, error: 'GEMINI_API_KEY, GOOGLE_API_KEY, or GOOGLE_AI_API_KEY not set' };
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -297,12 +305,12 @@ async function getAnthropicResponse(message: string, conversationHistory: Array<
 
 async function getAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
   const hasOpenAI = Boolean(getOpenAIApiKey());
-  const hasOpenRouter = Boolean(process.env.OPENROUTER_API_KEY);
-  const hasGemini = Boolean(process.env.GEMINI_API_KEY);
+  const hasOpenRouter = Boolean(getOpenRouterApiKey());
+  const hasGemini = Boolean(getGeminiApiKey());
   const hasAnthropic = Boolean(process.env.ANTHROPIC_API_KEY);
 
   if (!hasOpenAI && !hasOpenRouter && !hasGemini && !hasAnthropic) {
-    return { text: null, error: 'No AI provider configured. Set OPENAI_API_KEY, OPENAI_ART_KEY, OPENROUTER_API_KEY, GEMINI_API_KEY, or ANTHROPIC_API_KEY.' };
+    return { text: null, error: 'No AI provider configured. Set OPENAI_API_KEY, OPENAI_ART_KEY, OPENROUTER_API_KEY, OPENROUTER_KEY, GEMINI_API_KEY, GOOGLE_API_KEY, GOOGLE_AI_API_KEY, or ANTHROPIC_API_KEY.' };
   }
 
   if (hasOpenAI) {
@@ -353,10 +361,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    if (!getOpenAIApiKey() && !process.env.OPENROUTER_API_KEY && !process.env.GEMINI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+    if (!getOpenAIApiKey() && !getOpenRouterApiKey() && !getGeminiApiKey() && !process.env.ANTHROPIC_API_KEY) {
       console.error('No AI provider API key configured');
       return NextResponse.json(
-        { error: 'AI provider is not configured. Set OPENAI_API_KEY, OPENAI_ART_KEY, OPENROUTER_API_KEY, GEMINI_API_KEY, or ANTHROPIC_API_KEY on the server.' },
+        { error: 'AI provider is not configured. Set OPENAI_API_KEY, OPENAI_ART_KEY, OPENROUTER_API_KEY, OPENROUTER_KEY, GEMINI_API_KEY, GOOGLE_API_KEY, GOOGLE_AI_API_KEY, or ANTHROPIC_API_KEY on the server.' },
         { status: 500 }
       );
     }
@@ -383,4 +391,28 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+export async function GET() {
+  return NextResponse.json(
+    {
+      ok: true,
+      providers: {
+        openai: Boolean(getOpenAIApiKey()),
+        openrouter: Boolean(getOpenRouterApiKey()),
+        gemini: Boolean(getGeminiApiKey()),
+        anthropic: Boolean(process.env.ANTHROPIC_API_KEY),
+      },
+      models: {
+        openai: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+        openrouter: process.env.OPENROUTER_MODEL || 'openrouter/free',
+        gemini: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
+      },
+    },
+    {
+      headers: {
+        'Cache-Control': 'no-store',
+      },
+    }
+  );
 }
