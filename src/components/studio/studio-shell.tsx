@@ -287,6 +287,10 @@ const StudioActionContext = createContext<{
   openDrawer: (drawer: StudioDrawerKey) => void;
   closeDrawer: () => void;
   showToast: (message: string) => void;
+  isTemporaryChat: boolean;
+  temporaryChatId: number | null;
+  startTemporaryChat: () => void;
+  endTemporaryChat: () => void;
 } | null>(null);
 
 function useStudioTheme() {
@@ -332,6 +336,8 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const [activeDrawer, setActiveDrawer] = useState<StudioDrawerKey | null>(null);
   const [activeRecent, setActiveRecent] = useState<GeneratedRecent | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [isTemporaryChat, setIsTemporaryChat] = useState(false);
+  const [temporaryChatId, setTemporaryChatId] = useState<number | null>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const sidebarNotificationRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -364,6 +370,27 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
     window.setTimeout(() => setToast(null), 2600);
   }, []);
 
+  const startTemporaryChat = useCallback(() => {
+    setActiveModal(null);
+    setActiveDrawer(null);
+    setActiveRecent(null);
+    setWorkspaceOpen(false);
+    setNotificationsOpen(false);
+    setDisplayOpen(false);
+    setProfileOpen(false);
+    setIsTemporaryChat(true);
+    setTemporaryChatId(Date.now());
+    setIsMobileOpen(false);
+    router.push("/ai-assistant");
+    showToast("Temporary chat started");
+  }, [router, showToast]);
+
+  const endTemporaryChat = useCallback(() => {
+    setIsTemporaryChat(false);
+    setTemporaryChatId(null);
+    showToast("Temporary chat ended");
+  }, [showToast]);
+
   const actionValue = useMemo(
     () => ({
       openModal: (modal: StudioModalKey) => setActiveModal(modal),
@@ -371,8 +398,12 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
       openDrawer: (drawer: StudioDrawerKey) => setActiveDrawer(drawer),
       closeDrawer: () => setActiveDrawer(null),
       showToast,
+      isTemporaryChat,
+      temporaryChatId,
+      startTemporaryChat,
+      endTemporaryChat,
     }),
-    [showToast],
+    [endTemporaryChat, isTemporaryChat, showToast, startTemporaryChat, temporaryChatId],
   );
 
   useEffect(() => {
@@ -456,10 +487,10 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
               <ChevronDown className={`h-3 w-3 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`} />
             </button>
             <button
-              onClick={() => showToast("Temporary chat started")}
-              className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg ${dark ? "text-[#A8B0BA] hover:bg-white/6 hover:text-[#F4F6F8]" : "text-[#6B7280] hover:bg-white/70 hover:text-[#171717]"}`}
+              onClick={startTemporaryChat}
+              className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg ${isTemporaryChat ? (dark ? "bg-[rgba(59,167,255,0.14)] text-[#3BA7FF]" : "bg-[#DDEEFF] text-[#4A9BFF]") : (dark ? "text-[#A8B0BA] hover:bg-white/6 hover:text-[#F4F6F8]" : "text-[#6B7280] hover:bg-white/70 hover:text-[#171717]")}`}
               aria-label="Temporary Chat"
-              title="Temporary Chat"
+              title="Start temporary chat"
             >
               <MessageCircle className="h-[14px] w-[14px]" />
             </button>
@@ -1935,7 +1966,7 @@ function AssetLibraryPage() {
 
 function AIAssistantPage() {
   const { theme } = useStudioTheme();
-  const { openModal, showToast } = useStudioActions();
+  const { openModal, showToast, isTemporaryChat, temporaryChatId, endTemporaryChat } = useStudioActions();
   const dark = theme === "dark";
   const [messages, setMessages] = useState<Array<{ id: string; role: "user" | "assistant"; content: string }>>([]);
   const [input, setInput] = useState("");
@@ -1951,6 +1982,24 @@ function AIAssistantPage() {
   useEffect(() => {
     conversationEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, isSending]);
+
+  useEffect(() => {
+    if (!temporaryChatId) return;
+    setMessages([]);
+    setInput("");
+    setAttachments([]);
+    setActionsOpen(false);
+    setIsSending(false);
+  }, [temporaryChatId]);
+
+  const closeTemporaryChat = () => {
+    setMessages([]);
+    setInput("");
+    setAttachments([]);
+    setActionsOpen(false);
+    setIsSending(false);
+    endTemporaryChat();
+  };
 
   const onFiles = (event: ChangeEvent<HTMLInputElement>, kind: Attachment["kind"]) => {
     const files = Array.from(event.target.files ?? []);
@@ -2098,6 +2147,29 @@ function AIAssistantPage() {
     </div>
   );
 
+  const temporaryChatNotice = isTemporaryChat ? (
+    <div className={`w-full rounded-2xl border px-4 py-3 text-left ${dark ? "border-[rgba(59,167,255,0.24)] bg-[rgba(59,167,255,0.09)]" : "border-[#BFE2FF] bg-[#F2F9FF]"}`}>
+      <div className="flex items-start gap-3">
+        <div className={`mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl ${dark ? "bg-[rgba(59,167,255,0.16)] text-[#7DD3FC]" : "bg-[#DDEEFF] text-[#1D9BF0]"}`}>
+          <MessageCircle className="h-4 w-4" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className={`text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Temporary chat</p>
+            <span className={`rounded-full px-2 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.08em] ${dark ? "bg-[rgba(255,255,255,0.08)] text-[#A8B0BA]" : "bg-white text-[#6B7280]"}`}>Not saved</span>
+          </div>
+          <p className={`mt-1 text-[11px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>This conversation stays only in this session and starts without previous context.</p>
+        </div>
+        <button
+          onClick={closeTemporaryChat}
+          className={`flex h-7 flex-shrink-0 items-center rounded-lg px-2.5 text-[10.5px] font-semibold ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#4B5563] hover:bg-white hover:text-[#171717]"}`}
+        >
+          End
+        </button>
+      </div>
+    </div>
+  ) : null;
+
   if (!hasConversation) {
     const suggestions = [
       toolWorkspaces.code,
@@ -2128,6 +2200,8 @@ function AIAssistantPage() {
           </div>
           <h2 className={`text-[28px] font-semibold tracking-[-0.03em] max-sm:text-[17px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Alternus AI Assistant</h2>
           <p className={`mt-3 text-[12px] leading-5 max-sm:mt-1 max-sm:text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Ask about art, artists, styles, commissions, shipping, or anything else on Alternus.</p>
+
+          {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
 
           <div className="mt-7 hidden w-full sm:block">{composer}</div>
 
@@ -2191,6 +2265,7 @@ function AIAssistantPage() {
     <div className="mx-auto flex min-h-full w-full max-w-[900px] flex-col justify-end">
       <div className="flex flex-1 flex-col justify-end pb-6">
         <div className="mb-8 flex flex-1 flex-col justify-end gap-5">
+          {temporaryChatNotice}
           {messages.map((message) => (
             <div key={message.id} className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
               {message.role === "assistant" && (
