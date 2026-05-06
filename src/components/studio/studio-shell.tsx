@@ -798,14 +798,15 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
           <section
             className={[
-              "min-h-0 flex-1 overflow-auto rounded-3xl px-8 py-8",
+              "min-h-0 flex-1 overflow-auto rounded-3xl",
+              activeRoute === "code-builder" ? "px-4 py-4" : "px-8 py-8",
               dark
                 ? "border border-[rgba(255,255,255,0.08)] bg-[#17191D] shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
                 : "border border-[#E8EEF2] bg-white shadow-[0_24px_60px_rgba(31,43,77,0.06)]",
               activeRoute === "ai-assistant" ? "max-sm:px-4 max-sm:py-0" : "",
             ].join(" ")}
           >
-            <div className="mx-auto w-full max-w-[1180px]">
+            <div className={activeRoute === "code-builder" ? "w-full" : "mx-auto w-full max-w-[1180px]"}>
               {children}
             </div>
           </section>
@@ -2294,7 +2295,7 @@ function CodeBuilderPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-5 pb-2">
+    <div className="flex w-full flex-col gap-5 pb-2">
       <PageHeader title="Code Builder" subtitle="Describe a website and generate a plan-ready builder workspace." />
       <form onSubmit={generatePlan} className="overflow-hidden rounded-[8px] border border-[#E1E6EA] bg-[#FCFDFE] shadow-[0_18px_44px_rgba(31,43,77,0.05)]">
         <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -2382,6 +2383,142 @@ type BuilderChatMessage = {
   content: string;
 };
 
+type CodeBuilderFile = {
+  path: string;
+  language: "tsx" | "css";
+  content: string;
+};
+
+function createCodeBuilderFiles(plan: CodeBuilderPlan): CodeBuilderFile[] {
+  const navItems = plan.pages.slice(0, 4).map((page) => `"${page}"`).join(", ");
+  const featureCards = plan.layers
+    .slice(0, 3)
+    .map((layer) => `  { title: "${layer.canvasLabel}", description: "${layer.description}" }`)
+    .join(",\n");
+
+  return [
+    {
+      path: "app/page.tsx",
+      language: "tsx",
+      content: `import { Hero } from "@/components/Hero";
+import { Navbar } from "@/components/Navbar";
+
+const sections = [
+${featureCards}
+];
+
+export default function Page() {
+  return (
+    <main className="min-h-screen bg-white text-neutral-950">
+      <Navbar />
+      <Hero />
+      <section className="mx-auto grid max-w-6xl gap-4 px-6 py-16 md:grid-cols-3">
+        {sections.map((section) => (
+          <article key={section.title} className="rounded-lg border border-neutral-200 p-5">
+            <h2 className="text-sm font-semibold">{section.title}</h2>
+            <p className="mt-3 text-sm leading-6 text-neutral-600">{section.description}</p>
+          </article>
+        ))}
+      </section>
+    </main>
+  );
+}
+`,
+    },
+    {
+      path: "app/layout.tsx",
+      language: "tsx",
+      content: `import type { Metadata } from "next";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "${plan.projectName}",
+  description: "${plan.summary}",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+`,
+    },
+    {
+      path: "components/Hero.tsx",
+      language: "tsx",
+      content: `export function Hero() {
+  return (
+    <section className="bg-neutral-600 px-6 py-24 text-center">
+      <p className="text-xs font-semibold uppercase tracking-widest text-white/70">
+        ${plan.websiteType}
+      </p>
+      <h1 className="mx-auto mt-4 max-w-3xl text-5xl font-semibold leading-tight text-black">
+        Website Building Template
+      </h1>
+      <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-black/70">
+        ${plan.designDirection}
+      </p>
+      <div className="mt-8 flex justify-center gap-3">
+        <a className="rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white" href="#start">
+          Launch preview
+        </a>
+        <a className="rounded-lg border border-black/20 px-5 py-3 text-sm font-semibold text-black" href="#plan">
+          View plan
+        </a>
+      </div>
+    </section>
+  );
+}
+`,
+    },
+    {
+      path: "components/Navbar.tsx",
+      language: "tsx",
+      content: `const navItems = [${navItems}];
+
+export function Navbar() {
+  return (
+    <header className="flex items-center justify-between border-b border-neutral-200 px-6 py-4">
+      <div className="flex items-center gap-3">
+        <span className="h-7 w-7 rounded-lg bg-neutral-950" />
+        <span className="text-sm font-semibold">${plan.projectName}</span>
+      </div>
+      <nav className="hidden items-center gap-6 text-xs font-semibold text-neutral-500 md:flex">
+        {navItems.map((item) => (
+          <a key={item} href={\`#\${item.toLowerCase()}\`}>{item}</a>
+        ))}
+      </nav>
+    </header>
+  );
+}
+`,
+    },
+    {
+      path: "app/globals.css",
+      language: "css",
+      content: `@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #ffffff;
+}
+`,
+    },
+  ];
+}
+
 function CodeBuilderWorkspace({
   plan,
   activeLayerId,
@@ -2401,7 +2538,16 @@ function CodeBuilderWorkspace({
   const [messages, setMessages] = useState<BuilderChatMessage[]>([
     { id: "assistant-ready", role: "assistant", content: "Plan generated. Select a layer or describe the next adjustment." },
   ]);
+  const [files, setFiles] = useState<CodeBuilderFile[]>(() => createCodeBuilderFiles(plan));
+  const [activeFilePath, setActiveFilePath] = useState(() => createCodeBuilderFiles(plan)[0]?.path ?? "app/page.tsx");
   const activeLayer = plan.layers.find((layer) => layer.id === activeLayerId) ?? plan.layers[0];
+  const activeFile = files.find((file) => file.path === activeFilePath) ?? files[0];
+
+  useEffect(() => {
+    const nextFiles = createCodeBuilderFiles(plan);
+    setFiles(nextFiles);
+    setActiveFilePath(nextFiles[0]?.path ?? "app/page.tsx");
+  }, [plan]);
 
   const sendChatMessage = () => {
     const content = chatInput.trim();
@@ -2413,10 +2559,16 @@ function CodeBuilderWorkspace({
     setChatInput("");
   };
 
+  const updateActiveFile = (content: string) => {
+    setFiles((current) =>
+      current.map((file) => (file.path === activeFile.path ? { ...file, content } : file)),
+    );
+  };
+
   return (
-    <div className="flex h-[calc(100vh-88px)] min-h-[660px] flex-col overflow-hidden rounded-[8px] border border-[#DDE3EA] bg-[#F2F5F8] shadow-[0_18px_44px_rgba(31,43,77,0.08)]">
+    <div className="flex h-[calc(100vh-76px)] min-h-[720px] w-full flex-col overflow-hidden rounded-[8px] border border-[#DDE3EA] bg-[#F2F5F8] shadow-[0_18px_44px_rgba(31,43,77,0.08)]">
       <BuilderHeader plan={plan} onRegenerate={onRegenerate} onSave={onSave} onExport={onExport} />
-      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)]">
+      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] 2xl:grid-cols-[320px_minmax(0,1fr)]">
         <CodeLayerSidebar
           plan={plan}
           activeLayerId={activeLayerId}
@@ -2429,7 +2581,15 @@ function CodeBuilderWorkspace({
         <main className="min-h-0 overflow-hidden bg-[#E9EDF1]">
           <div className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)]">
             <GeneratedPlanSummary plan={plan} activeLayer={activeLayer} />
-            <PreviewCanvas plan={plan} activeLayerId={activeLayerId} />
+            <div className="grid min-h-0 gap-3 p-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(420px,0.95fr)] 2xl:grid-cols-[minmax(0,1.1fr)_minmax(520px,0.9fr)]">
+              <PreviewCanvas plan={plan} activeLayerId={activeLayerId} />
+              <CodeWorkspace
+                files={files}
+                activeFile={activeFile}
+                onSelectFile={setActiveFilePath}
+                onChangeFile={updateActiveFile}
+              />
+            </div>
           </div>
         </main>
       </div>
@@ -2569,6 +2729,80 @@ function BuilderChatPanel({ messages, input, onInputChange, onSubmit }: { messag
   );
 }
 
+function CodeWorkspace({
+  files,
+  activeFile,
+  onSelectFile,
+  onChangeFile,
+}: {
+  files: CodeBuilderFile[];
+  activeFile: CodeBuilderFile;
+  onSelectFile: (path: string) => void;
+  onChangeFile: (content: string) => void;
+}) {
+  const lines = activeFile.content.split("\n");
+
+  return (
+    <section className="flex min-h-[420px] min-w-0 flex-col overflow-hidden rounded-[8px] border border-[#CCD4DD] bg-[#F7F9FB] shadow-[0_12px_32px_rgba(31,43,77,0.08)]">
+      <div className="flex min-h-[46px] items-center justify-between gap-3 border-b border-[#DDE3EA] bg-white px-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-[7px] bg-[#EEF7FC] text-[#1DA1F2]">
+            <Code2 className="h-3.5 w-3.5" />
+          </span>
+          <div className="min-w-0">
+            <p className="truncate text-[12px] font-semibold text-[#171717]">{activeFile.path}</p>
+            <p className="text-[10px] font-semibold uppercase text-[#8A94A3]">{activeFile.language}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="inline-flex h-7 items-center gap-1.5 rounded-[7px] border border-[#E5EAF0] bg-white px-2.5 text-[10px] font-semibold text-[#4B5563] transition-all hover:border-[#CFE8F8] hover:text-[#171717]">
+            <RefreshCw className="h-3 w-3" />
+            Format
+          </button>
+          <button className="inline-flex h-7 items-center gap-1.5 rounded-[7px] bg-[#171717] px-2.5 text-[10px] font-semibold text-white transition-all hover:bg-[#2B2F34]">
+            <CheckCircle2 className="h-3 w-3" />
+            Apply
+          </button>
+        </div>
+      </div>
+      <div className="flex min-h-0 flex-1 flex-col xl:grid xl:grid-cols-[190px_minmax(0,1fr)]">
+        <div className="border-b border-[#DDE3EA] bg-[#FBFCFD] p-2 xl:border-b-0 xl:border-r">
+          <div className="flex gap-1 overflow-x-auto xl:block xl:space-y-1">
+            {files.map((file) => {
+              const active = file.path === activeFile.path;
+              return (
+                <button
+                  key={file.path}
+                  type="button"
+                  onClick={() => onSelectFile(file.path)}
+                  className={`flex min-w-[150px] items-center gap-2 rounded-[7px] px-2.5 py-2 text-left transition-all xl:w-full xl:min-w-0 ${active ? "bg-[#EEF7FC] text-[#171717]" : "text-[#6B7280] hover:bg-white hover:text-[#171717]"}`}
+                >
+                  <FileText className={`h-3.5 w-3.5 flex-shrink-0 ${active ? "text-[#1DA1F2]" : "text-[#A1A7B0]"}`} />
+                  <span className="min-w-0 truncate text-[11px] font-semibold">{file.path}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="grid min-h-[360px] min-w-0 grid-cols-[44px_minmax(0,1fr)] bg-[#111318] font-mono text-[12px] leading-5">
+          <div className="select-none border-r border-white/10 bg-[#0D0F13] px-2 py-3 text-right text-[#6F7782]">
+            {lines.map((_, index) => (
+              <div key={`${activeFile.path}-${index}`}>{index + 1}</div>
+            ))}
+          </div>
+          <textarea
+            value={activeFile.content}
+            onChange={(event) => onChangeFile(event.target.value)}
+            spellCheck={false}
+            className="h-full min-h-[360px] w-full resize-none overflow-auto bg-[#111318] px-4 py-3 font-mono text-[12px] leading-5 text-[#DDE7F2] outline-none placeholder:text-[#6F7782]"
+            aria-label={`Edit ${activeFile.path}`}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function GeneratedPlanSummary({ plan, activeLayer }: { plan: CodeBuilderPlan; activeLayer?: CodeBuilderLayer }) {
   return (
     <section className="border-b border-[#DDE3EA] bg-[#F9FAFB] p-4">
@@ -2601,8 +2835,8 @@ function PlanMetric({ label, value }: { label: string; value: string }) {
 
 function PreviewCanvas({ plan, activeLayerId }: { plan: CodeBuilderPlan; activeLayerId: CodeBuilderLayer["id"] }) {
   return (
-    <div className="h-full min-h-0 overflow-auto p-5">
-      <div className="mx-auto min-h-full w-full max-w-[960px] rounded-[8px] border border-[#C9D1D9] bg-[#D7DBDF] p-5 shadow-[0_22px_54px_rgba(31,43,77,0.12)]">
+    <section className="h-full min-h-[420px] min-w-0 overflow-auto rounded-[8px] border border-[#CCD4DD] bg-[#D7DBDF] p-4 shadow-[0_12px_32px_rgba(31,43,77,0.08)]">
+      <div className="mx-auto min-h-full w-full rounded-[8px] border border-[#C8D0D8] bg-[#D7DBDF] p-4">
         <div className="overflow-hidden rounded-[8px] border border-[#C8D0D8] bg-white shadow-[0_12px_30px_rgba(31,43,77,0.08)]">
           <PreviewNavbar plan={plan} active={activeLayerId === "header"} />
           <PreviewHero plan={plan} active={activeLayerId === "hero"} />
@@ -2613,7 +2847,7 @@ function PreviewCanvas({ plan, activeLayerId }: { plan: CodeBuilderPlan; activeL
           <PreviewFooter plan={plan} active={activeLayerId === "footer"} />
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
