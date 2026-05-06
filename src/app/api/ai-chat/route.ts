@@ -1,418 +1,166 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import OpenAI from 'openai';
-import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextRequest, NextResponse } from "next/server";
 
-const SYSTEM_PROMPT = `You are Alternus AI, a friendly and knowledgeable art assistant for Alternus Gallery - a premium online art marketplace connecting passionate collectors with exceptional artists worldwide.
+export const dynamic = "force-dynamic";
 
-## Your Core Identity
-- Name: Alternus AI
-- Role: Art assistant, gallery guide, and art expert
-- Personality: Friendly, knowledgeable, helpful, passionate about art
-- Languages: Bilingual - fluently respond in English or Albanian based on user's language
+const DEFAULT_GEMINI_MODEL = "gemini-2.0-flash";
+const MAX_HISTORY_MESSAGES = 16;
 
-## Language Detection
-- If the user writes in Albanian (uses Albanian words like "pershendetje", "tung", "cfare", "si", "ku", contains ë or ç characters), respond in Albanian
-- Otherwise respond in English
-- Match the user's language throughout the conversation
+const SYSTEM_PROMPT = `You are Alternus AI Assistant. Answer clearly, directly, and helpfully. For coding, design, business, and product questions, give practical, structured answers. Do not claim to perform actions you cannot perform. If the user asks for implementation guidance, provide concrete steps. Keep replies concise and respond in the user's language when clear.`;
 
-## Gallery Knowledge
+type ChatRole = "user" | "assistant";
+type ChatMessage = {
+  role: ChatRole;
+  content: string;
+};
 
-### What is Alternus
-Alternus is a premium online art marketplace that connects passionate collectors with exceptional artists worldwide. We offer:
-- Original paintings and artworks
-- Curated selection of diverse styles
-- Direct connection with artists
-- Certificate of authenticity for every piece
-- Secure worldwide shipping
-- 14-day satisfaction guarantee
-
-### Buying Process
-1. Browse & Discover - Explore by style, price, or artist at /gallery
-2. View Details - See dimensions, medium, artist info, and room preview
-3. Add to Cart - Select framing options if available
-4. Secure Checkout - Enter shipping info and payment method
-5. Receive Your Art - Track orders, 14-day return policy
-
-### Pricing Information
-- Under €500: Prints and smaller original works
-- €500 - €2,000: Mid-size original paintings
-- €2,000 - €5,000: Large original works
-- €5,000+: Premium masterpieces
-
-### Shipping
-- Free shipping on orders over €100
-- Europe: 5-10 business days
-- USA/Canada: 7-14 business days
-- Rest of World: 10-21 business days
-- All orders include tracking
-
-### Returns
-- 14-day return policy
-- Artwork must be in original condition
-- Contact info@alternusart.com for returns
-- Custom commissions are non-refundable
-
-### Commission Process
-1. Browse artists and find one whose style you love
-2. Contact the artist through their profile
-3. Discuss your vision: ideas, size, colors, subject
-4. Get a quote with pricing and timeline
-5. Approve & pay securely through the platform
-6. Receive progress updates and final artwork
-
-## Art Knowledge
-
-### Art Movements
-You have deep knowledge of art history and movements including:
-
-**Impressionism (1860s-1880s)**: Light & color focus, loose brushstrokes, everyday scenes, en plein air painting. Key artists: Claude Monet, Pierre-Auguste Renoir, Edgar Degas, Camille Pissarro.
-
-**Expressionism (1905-1920s)**: Emotion over reality, distorted forms, bold non-naturalistic colors, psychological depth. Key artists: Edvard Munch, Wassily Kandinsky, Ernst Ludwig Kirchner.
-
-**Abstract Art**: Non-representational, pure form (color, shape, line, texture), emotional expression. Key artists: Wassily Kandinsky, Piet Mondrian, Kazimir Malevich, Jackson Pollock.
-
-**Baroque (1600-1750)**: Dramatic, theatrical compositions, strong chiaroscuro, rich detail. Key artists: Caravaggio, Rembrandt, Peter Paul Rubens, Vermeer.
-
-**Realism (1840s-1880s)**: Truthful depiction of everyday subjects, social commentary. Key artists: Gustave Courbet, Jean-François Millet, Honoré Daumier.
-
-**Minimalism**: Essential elements only, clean geometric forms, limited palette. Key artists: Donald Judd, Frank Stella, Agnes Martin.
-
-**Renaissance (1400-1600)**: Rebirth of classical ideals, perspective, humanism. Key artists: Leonardo da Vinci, Michelangelo, Raphael, Botticelli.
-
-**Surrealism (1920s-1950s)**: Dreams, unconscious mind, bizarre imagery. Key artists: Salvador Dalí, René Magritte, Max Ernst, Frida Kahlo.
-
-**Pop Art (1950s-1960s)**: Mass culture, advertising, bold colors, irony. Key artists: Andy Warhol, Roy Lichtenstein.
-
-**Romanticism (1800-1850)**: Emotion, nature, individualism, sublime. Key artists: Caspar David Friedrich, J.M.W. Turner, Eugène Delacroix.
-
-### Art Techniques & Mediums
-- Oil Painting: Rich, luminous colors, slow drying, traditional and highly valued
-- Acrylic Painting: Fast drying, versatile, vibrant colors
-- Watercolor: Transparent, flowing effects, delicate and luminous
-- Mixed Media: Combines multiple techniques, contemporary and innovative
-- Digital Art: Created digitally, printed on high-quality media
-- Sculpture: Three-dimensional art in various materials
-
-### Original vs Prints
-- Originals: One-of-a-kind, higher value, investment potential, certificate of authenticity
-- Prints: Beautiful reproductions, more affordable, often limited editions
-
-## Response Guidelines
-1. Keep responses concise but informative (2-4 paragraphs max)
-2. When relevant, include links: "Browse at /gallery" or "/gallery?category=Abstract"
-3. Be enthusiastic about art while remaining professional
-4. For account issues, direct to /login or /signup
-5. For support issues, direct to /support or info@alternusart.com
-
-## Contact Information
-- Email: info@alternusart.com
-- Curator: curator@alternusart.com
-- CEO: ceo@alternusart.com
-- Support page: /support
-
-Remember: You're an art expert passionate about helping people discover and appreciate art!`;
-
-export const dynamic = 'force-dynamic';
-
-function getOpenAIApiKey() {
-  return process.env.OPENAI_API_KEY || process.env.OPENAI_ART_KEY;
-}
-
-function getOpenRouterApiKey() {
-  return process.env.OPENROUTER_API_KEY || process.env.OPENROUTER_KEY;
-}
+type RequestBody = {
+  message?: unknown;
+  history?: unknown;
+  conversationHistory?: unknown;
+};
 
 function getGeminiApiKey() {
-  return process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_AI_API_KEY;
+  return process.env.GEMINI_API_KEY;
 }
 
-async function getOpenAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
-  const apiKey = getOpenAIApiKey();
-  if (!apiKey) {
-    return { text: null, error: 'OPENAI_API_KEY or OPENAI_ART_KEY not set' };
+function getGeminiModel() {
+  return process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL;
+}
+
+function normalizeHistory(value: unknown): ChatMessage[] {
+  if (!Array.isArray(value)) return [];
+
+  const messages = value
+    .map((item): ChatMessage | null => {
+      if (!item || typeof item !== "object") return null;
+
+      const record = item as Record<string, unknown>;
+      const content = typeof record.content === "string" ? record.content.trim() : "";
+      if (!content) return null;
+
+      return {
+        role: record.role === "assistant" ? "assistant" : "user",
+        content,
+      };
+    })
+    .filter((item): item is ChatMessage => Boolean(item))
+    .slice(-MAX_HISTORY_MESSAGES);
+
+  const normalized: ChatMessage[] = [];
+  for (const message of messages) {
+    if (normalized.length === 0 && message.role === "assistant") continue;
+
+    const previous = normalized[normalized.length - 1];
+    if (previous?.role === message.role) {
+      previous.content = `${previous.content}\n\n${message.content}`;
+    } else {
+      normalized.push({ ...message });
+    }
   }
 
-  const client = new OpenAI({ apiKey });
-  const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
-  const chatMessages: ChatCompletionMessageParam[] = [
-    { role: 'system', content: SYSTEM_PROMPT },
-    ...conversationHistory.map((msg): ChatCompletionMessageParam => ({
-      role: msg.role === 'assistant' ? 'assistant' : 'user',
-      content: msg.content,
-    })),
-    { role: 'user', content: message },
-  ];
+  return normalized;
+}
 
+function toGeminiHistory(messages: ChatMessage[]) {
+  return messages.map((message) => ({
+    role: message.role === "assistant" ? "model" : "user",
+    parts: [{ text: message.content }],
+  }));
+}
+
+function getGeminiError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  const lower = message.toLowerCase();
+
+  if (lower.includes("quota") || lower.includes("rate") || lower.includes("429")) {
+    return {
+      status: 429,
+      error: "Gemini quota or rate limit reached. Please try again later.",
+      code: "GEMINI_RATE_LIMIT",
+    };
+  }
+
+  if (lower.includes("api key") || lower.includes("permission") || lower.includes("unauthorized")) {
+    return {
+      status: 500,
+      error: "Gemini API request failed. Check the server AI configuration.",
+      code: "GEMINI_CONFIGURATION_ERROR",
+    };
+  }
+
+  return {
+    status: 502,
+    error: "Gemini API request failed. Please try again.",
+    code: "GEMINI_REQUEST_FAILED",
+  };
+}
+
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    provider: "gemini",
+    model: getGeminiModel(),
+    configured: Boolean(getGeminiApiKey()),
+  });
+}
+
+export async function POST(request: NextRequest) {
   try {
-    const response = await client.chat.completions.create({
-      model,
-      temperature: 0.7,
-      max_tokens: 1024,
-      messages: chatMessages,
-    });
+    const body = (await request.json()) as RequestBody;
+    const message = typeof body.message === "string" ? body.message.trim() : "";
 
-    const text = response.choices[0]?.message?.content;
-    if (text) {
-      return { text, error: null };
+    if (!message) {
+      return NextResponse.json(
+        { error: "Message is required.", code: "EMPTY_MESSAGE" },
+        { status: 400 },
+      );
     }
 
-    return { text: null, error: 'No response from OpenAI' };
-  } catch (error: unknown) {
-    const errMsg = error instanceof Error ? error.message : String(error);
-    console.error('OpenAI error:', errMsg);
-    return { text: null, error: errMsg };
-  }
-}
-
-async function getOpenRouterResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
-  const apiKey = getOpenRouterApiKey();
-  if (!apiKey) {
-    return { text: null, error: 'OPENROUTER_API_KEY or OPENROUTER_KEY not set' };
-  }
-
-  const client = new OpenAI({
-    apiKey,
-    baseURL: 'https://openrouter.ai/api/v1',
-    defaultHeaders: {
-      'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL || 'https://alternusart.com',
-      'X-Title': 'Alternus Art Gallery',
-    },
-  });
-  const model = process.env.OPENROUTER_MODEL || 'openrouter/free';
-  const chatMessages: ChatCompletionMessageParam[] = [
-    { role: 'system', content: SYSTEM_PROMPT },
-    ...conversationHistory.map((msg): ChatCompletionMessageParam => ({
-      role: msg.role === 'assistant' ? 'assistant' : 'user',
-      content: msg.content,
-    })),
-    { role: 'user', content: message },
-  ];
-
-  try {
-    const response = await client.chat.completions.create({
-      model,
-      temperature: 0.7,
-      max_tokens: 1024,
-      messages: chatMessages,
-    });
-
-    const text = response.choices[0]?.message?.content;
-    if (text) {
-      return { text, error: null };
+    const apiKey = getGeminiApiKey();
+    if (!apiKey) {
+      return NextResponse.json(
+        {
+          error: "Missing Gemini API key. Set GEMINI_API_KEY on the server.",
+          code: "MISSING_GEMINI_API_KEY",
+        },
+        { status: 500 },
+      );
     }
 
-    return { text: null, error: 'No response from OpenRouter' };
-  } catch (error: unknown) {
-    const errMsg = error instanceof Error ? error.message : String(error);
-    console.error('OpenRouter error:', errMsg);
-    return { text: null, error: errMsg };
-  }
-}
+    const history = normalizeHistory(body.history ?? body.conversationHistory);
+    const client = new GoogleGenerativeAI(apiKey);
+    const model = client.getGenerativeModel({
+      model: getGeminiModel(),
+      systemInstruction: SYSTEM_PROMPT,
+    });
 
-async function getGeminiResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
-  const apiKey = getGeminiApiKey();
-  if (!apiKey) {
-    return { text: null, error: 'GEMINI_API_KEY, GOOGLE_API_KEY, or GOOGLE_AI_API_KEY not set' };
-  }
-
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
-    systemInstruction: SYSTEM_PROMPT,
-  });
-
-  const contents = [
-    ...conversationHistory.map((msg) => ({
-      role: msg.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: msg.content }],
-    })),
-    { role: 'user', parts: [{ text: message }] },
-  ];
-
-  try {
-    const response = await model.generateContent({
-      contents,
+    const chat = model.startChat({
+      history: toGeminiHistory(history),
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 1024,
       },
     });
 
-    const text = response.response.text();
-    if (text) {
-      return { text, error: null };
-    }
+    const result = await chat.sendMessage(message);
+    const answer = result.response.text()?.trim();
 
-    return { text: null, error: 'No response from Gemini' };
-  } catch (error: unknown) {
-    const errMsg = error instanceof Error ? error.message : String(error);
-    console.error('Gemini error:', errMsg);
-    return { text: null, error: errMsg };
-  }
-}
-
-async function getAnthropicResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
-  const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
-  if (!anthropicApiKey) {
-    return { text: null, error: 'ANTHROPIC_API_KEY not set' };
-  }
-
-  const messages = [
-    ...conversationHistory.map((msg) => ({
-      role: msg.role === 'assistant' ? 'assistant' : 'user',
-      content: msg.content,
-    })),
-    { role: 'user', content: message },
-  ];
-
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': anthropicApiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-opus-4-6',
-        max_tokens: 1024,
-        system: SYSTEM_PROMPT,
-        messages,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Anthropic API error:', response.status, errorData);
-      return { text: null, error: `Anthropic API error: ${response.status}` };
-    }
-
-    const data = await response.json();
-    const text = data?.content?.[0]?.text;
-
-    if (text) {
-      return { text, error: null };
-    }
-
-    return { text: null, error: 'No response from Claude' };
-  } catch (error: unknown) {
-    const errMsg = error instanceof Error ? error.message : String(error);
-    console.error('Anthropic error:', errMsg);
-    return { text: null, error: errMsg };
-  }
-}
-
-async function getAIResponse(message: string, conversationHistory: Array<{ role: string; content: string }>) {
-  const hasOpenAI = Boolean(getOpenAIApiKey());
-  const hasOpenRouter = Boolean(getOpenRouterApiKey());
-  const hasGemini = Boolean(getGeminiApiKey());
-  const hasAnthropic = Boolean(process.env.ANTHROPIC_API_KEY);
-
-  if (!hasOpenAI && !hasOpenRouter && !hasGemini && !hasAnthropic) {
-    return { text: null, error: 'No AI provider configured. Set OPENAI_API_KEY, OPENAI_ART_KEY, OPENROUTER_API_KEY, OPENROUTER_KEY, GEMINI_API_KEY, GOOGLE_API_KEY, GOOGLE_AI_API_KEY, or ANTHROPIC_API_KEY.' };
-  }
-
-  if (hasOpenAI) {
-    const openAIResult = await getOpenAIResponse(message, conversationHistory);
-    if (openAIResult.text) return openAIResult;
-
-    console.error('OpenAI provider failed:', openAIResult.error);
-    if (!hasAnthropic) {
-      return { text: null, error: `OpenAI failed: ${openAIResult.error}` };
-    }
-  }
-
-  if (hasOpenRouter) {
-    const openRouterResult = await getOpenRouterResponse(message, conversationHistory);
-    if (openRouterResult.text) return openRouterResult;
-
-    console.error('OpenRouter provider failed:', openRouterResult.error);
-    if (!hasGemini && !hasAnthropic) {
-      return { text: null, error: `OpenRouter failed: ${openRouterResult.error}` };
-    }
-  }
-
-  if (hasGemini) {
-    const geminiResult = await getGeminiResponse(message, conversationHistory);
-    if (geminiResult.text) return geminiResult;
-
-    console.error('Gemini provider failed:', geminiResult.error);
-    if (!hasAnthropic) {
-      return { text: null, error: `Gemini failed: ${geminiResult.error}` };
-    }
-  }
-
-  if (hasAnthropic) {
-    const anthropicResult = await getAnthropicResponse(message, conversationHistory);
-    if (anthropicResult.text) return anthropicResult;
-    return { text: null, error: `Anthropic failed: ${anthropicResult.error}` };
-  }
-
-  return { text: null, error: 'No AI provider available.' };
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { message, conversationHistory = [] } = body;
-
-    if (!message) {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
-    }
-
-    if (!getOpenAIApiKey() && !getOpenRouterApiKey() && !getGeminiApiKey() && !process.env.ANTHROPIC_API_KEY) {
-      console.error('No AI provider API key configured');
+    if (!answer) {
       return NextResponse.json(
-        { error: 'AI provider is not configured. Set OPENAI_API_KEY, OPENAI_ART_KEY, OPENROUTER_API_KEY, OPENROUTER_KEY, GEMINI_API_KEY, GOOGLE_API_KEY, GOOGLE_AI_API_KEY, or ANTHROPIC_API_KEY on the server.' },
-        { status: 500 }
+        { error: "Invalid Gemini response.", code: "INVALID_GEMINI_RESPONSE" },
+        { status: 502 },
       );
     }
 
-    const result = await getAIResponse(message, conversationHistory);
-
-    if (!result.text) {
-      console.error('AI provider failed:', result.error);
-      return NextResponse.json(
-        { error: result.error || 'Our AI assistant is temporarily unavailable. Please try again later.' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      content: result.text,
-      imageUrl: null,
-    });
+    return NextResponse.json({ content: answer, answer, provider: "gemini" });
   } catch (error) {
-    console.error('AI Chat error:', error);
+    const geminiError = getGeminiError(error);
+    console.error("Gemini AI chat error:", error);
+
     return NextResponse.json(
-      { error: 'Failed to get AI response. Please try again.' },
-      { status: 500 }
+      { error: geminiError.error, code: geminiError.code },
+      { status: geminiError.status },
     );
   }
-}
-
-export async function GET() {
-  return NextResponse.json(
-    {
-      ok: true,
-      providers: {
-        openai: Boolean(getOpenAIApiKey()),
-        openrouter: Boolean(getOpenRouterApiKey()),
-        gemini: Boolean(getGeminiApiKey()),
-        anthropic: Boolean(process.env.ANTHROPIC_API_KEY),
-      },
-      models: {
-        openai: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-        openrouter: process.env.OPENROUTER_MODEL || 'openrouter/free',
-        gemini: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
-      },
-    },
-    {
-      headers: {
-        'Cache-Control': 'no-store',
-      },
-    }
-  );
 }

@@ -70,7 +70,7 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
   };
 
   const handleSend = async () => {
-    if (!input.trim() || isPlanLimitReached) return;
+    if (!input.trim() || isTyping || isPlanLimitReached) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -118,17 +118,16 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: data.content,
+        content: data.content || data.answer,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error("AI Chat error:", error);
-      const errMsg = error instanceof Error ? error.message : "Unknown error";
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: `I apologize, but I'm having trouble connecting right now. Error: ${errMsg}\n\nPlease try again in a moment, or contact us at info@alternusart.com for assistance.`,
+        content: "I couldn't complete that request. Please check the AI configuration or try again.",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -192,11 +191,11 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
         <div className="flex-shrink-0 px-4 py-2 bg-gray-800 flex items-center gap-2 border-t border-gray-700">
           <span className="text-[11px] text-gray-400 mr-1">Write to:</span>
           <a
-            href="mailto:curator@alternusart.com?subject=Inquiry from Alternus Gallery"
+            href="mailto:studio@alternusart.com?subject=Inquiry from Alternus AI Studio"
             className="px-3 py-1 bg-gray-700 active:bg-gray-600 text-white text-[11px] rounded-full transition-colors flex items-center gap-1.5"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            Curator
+            Studio
           </a>
         </div>
 
@@ -296,17 +295,16 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
                       const assistantMessage: Message = {
                         id: (Date.now() + 1).toString(),
                         role: "assistant",
-                        content: data.content,
+                        content: data.content || data.answer,
                         timestamp: new Date(),
                       };
                       setMessages((prev) => [...prev, assistantMessage]);
                     } catch (error) {
                       console.error("AI Chat error:", error);
-                      const errMsg = error instanceof Error ? error.message : "Unknown error";
                       const errorMessage: Message = {
                         id: (Date.now() + 1).toString(),
                         role: "assistant",
-                        content: `I apologize, but I'm having trouble connecting right now. Error: ${errMsg}`,
+                        content: "I couldn't complete that request. Please check the AI configuration or try again.",
                         timestamp: new Date(),
                       };
                       setMessages((prev) => [...prev, errorMessage]);

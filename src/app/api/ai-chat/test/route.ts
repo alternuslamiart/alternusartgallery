@@ -6,12 +6,14 @@ export async function GET() {
   const results: Record<string, string> = {};
 
   const apiKey = process.env.GEMINI_API_KEY;
-  results.gemini_key_set = apiKey ? `Yes (${apiKey.slice(0, 8)}...)` : 'No';
+  const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+  results.gemini_key_set = apiKey ? 'Yes' : 'No';
+  results.gemini_model = model;
 
   if (apiKey) {
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

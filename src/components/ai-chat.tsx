@@ -33,30 +33,30 @@ interface QuickAction {
 }
 
 const DEFAULT_QUICK_ACTIONS: QuickAction[] = [
-  { id: "browse-gallery", label: "Browse Gallery", link: "/gallery" },
-  { id: "view-artists", label: "View Artists", link: "/artists" },
-  { id: "create-image", label: "Create an image", prompt: "Create a beautiful impressionist painting of a sunset over the sea" },
-  { id: "how-to-buy", label: "How to buy art?", prompt: "How do I buy art on Alternus? Walk me through the process." },
-  { id: "sell-art", label: "Sell your Art", link: "/apply" },
-  { id: "shipping-returns", label: "Shipping & Returns", prompt: "What are your shipping times and return policy?" },
-  { id: "art-styles", label: "Art styles guide", prompt: "Tell me about different art styles and movements available on Alternus" },
-  { id: "commission", label: "Commission artwork", prompt: "How can I commission a custom artwork from an artist?" },
+  { id: "launch-studio", label: "Launch Studio", link: "/main" },
+  { id: "autocad-design", label: "AutoCAD Design", link: "/autocad-design" },
+  { id: "code-builder", label: "Code Builder", link: "/code-builder" },
+  { id: "blender-3d", label: "Blender 3D", link: "/blender-3d" },
+  { id: "studio-overview", label: "Studio Overview", link: "/studio-overview" },
+  { id: "asset-library", label: "Asset Library", link: "/asset-library" },
+  { id: "prompt-lab", label: "Prompt Lab", link: "/prompt-lab" },
+  { id: "help", label: "How do I use it?", prompt: "How do I use Alternus AI Studio to design a website and app flow?" },
 ];
 
 const ADDABLE_ACTIONS: QuickAction[] = [
-  { id: "generate-image", label: "Generate image", prompt: "Generate a unique art image for me" },
-  { id: "art-news", label: "Art news today", prompt: "What's happening in the art world today?" },
-  { id: "price-guide", label: "Art price guide", prompt: "Help me understand art pricing and valuation" },
-  { id: "frame-advice", label: "Framing advice", prompt: "What framing options do you recommend for artwork?" },
-  { id: "color-palette", label: "Color palette ideas", prompt: "Suggest a color palette for my space" },
-  { id: "gift-ideas", label: "Art gift ideas", prompt: "Suggest art gifts for different occasions" },
+  { id: "homepage", label: "Homepage layout", prompt: "Create a clean homepage layout for a creative AI studio." },
+  { id: "dashboard", label: "Dashboard layout", prompt: "Design a dashboard layout for Alternus AI Studio." },
+  { id: "mobile-flow", label: "Mobile flow", prompt: "Plan a mobile app flow with onboarding, workspace, and settings screens." },
+  { id: "design-system", label: "Design system", prompt: "Outline a design system with typography, spacing, buttons, and cards." },
+  { id: "3d-brief", label: "3D brief", prompt: "Prepare a Blender 3D scene brief with lighting, materials, and camera direction." },
+  { id: "component-draft", label: "Component draft", prompt: "Draft reusable UI components for the studio workspace." },
 ];
 
 const AI_MODES = [
   { id: "smart", label: "Smart", description: "Balanced speed and quality", icon: Sparkles },
   { id: "think-deeper", label: "Think deeper", description: "More thorough analysis", icon: Sparkles },
   { id: "study-learn", label: "Study and learn", description: "Educational explanations", icon: Sparkles },
-  { id: "search", label: "Search", description: "Find artworks and artists", icon: Sparkles },
+  { id: "search", label: "Search", description: "Find studio tools and workspace files", icon: Sparkles },
 ] as const;
 
 interface ChatSession {
@@ -186,7 +186,7 @@ export function AIChat() {
   }, []);
 
   const sendMessage = async (text: string) => {
-    if (isPlanLimitReached) return;
+    if (isTyping || isPlanLimitReached) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -221,17 +221,16 @@ export function AIChat() {
       setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: data.content,
+        content: data.content || data.answer,
         timestamp: new Date(),
         imageUrl: data.imageUrl || undefined,
       }]);
     } catch (error: unknown) {
       console.error("AI Chat error:", error);
-      const errMsg = error instanceof Error ? error.message : "Unknown error";
       setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: `I'm having trouble connecting right now. Error: ${errMsg}\n\nPlease try again or contact us at info@alternusart.com for assistance.`,
+        content: "I couldn't complete that request. Please check the AI configuration or try again.",
         timestamp: new Date(),
       }]);
     } finally {
@@ -240,7 +239,7 @@ export function AIChat() {
   };
 
   const handleSend = () => {
-    if (!input.trim() || isPlanLimitReached) return;
+    if (!input.trim() || isTyping || isPlanLimitReached) return;
     sendMessage(input.trim());
   };
 
@@ -338,14 +337,13 @@ export function AIChat() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {[
-                  { id: "home", label: "Home", link: "/home", icon: "🏠" },
-                  { id: "gallery-nav", label: "Gallery", link: "/gallery", icon: "🖼️" },
-                  { id: "artists-nav", label: "Artists", link: "/artists", icon: "🎨" },
+                  { id: "home", label: "Home", link: "/main", icon: "🏠" },
                   { id: "ai-page", label: "AI Assistant", link: "/ai", icon: "✨" },
-                  { id: "apply-nav", label: "Sell your Art", link: "/apply", icon: "💼" },
-                  { id: "dashboard-nav", label: "My Dashboard", link: "/dashboard", icon: "📊" },
-                  { id: "orders-nav", label: "My Orders", link: "/orders", icon: "📦" },
-                  { id: "cart-nav", label: "Cart", link: "/cart", icon: "🛒" },
+                  { id: "studio-nav", label: "Studio Overview", link: "/studio-overview", icon: "🧭" },
+                  { id: "autocad-nav", label: "AutoCAD Design", link: "/autocad-design", icon: "📐" },
+                  { id: "code-nav", label: "Code Builder", link: "/code-builder", icon: "💻" },
+                  { id: "blender-nav", label: "Blender 3D", link: "/blender-3d", icon: "🧊" },
+                  { id: "assets-nav", label: "Asset Library", link: "/asset-library", icon: "🗂️" },
                 ].map((item) => (
                   <DropdownMenuItem
                     key={item.id}
@@ -783,7 +781,7 @@ export function AIChat() {
                   ))}
                 </div>
 
-                <p className="text-[11px] text-stone-400 mt-6">Powered by Claude AI & DALL-E</p>
+                <p className="text-[11px] text-stone-400 mt-6">Powered by Gemini via /api/ai-chat</p>
               </div>
             ) : (
               /* ---- Chat State ---- */
@@ -854,7 +852,7 @@ export function AIChat() {
                       </svg>
                     </button>
                   </div>
-                  <p className="text-[10px] text-stone-400 text-center mt-2">Powered by Claude AI & DALL-E</p>
+                  <p className="text-[10px] text-stone-400 text-center mt-2">Powered by Gemini via /api/ai-chat</p>
                 </div>
               </>
             )}

@@ -3397,17 +3397,22 @@ function AIAssistantPage() {
         {
           id: `assistant-${Date.now()}`,
           role: "assistant",
-          content: typeof data?.content === "string" ? data.content : "No response received.",
+          content:
+            typeof data?.content === "string"
+              ? data.content
+              : typeof data?.answer === "string"
+                ? data.answer
+                : "No response received.",
         },
       ]);
     } catch (error) {
-      const errMsg = error instanceof Error ? error.message : "Unknown error";
+      console.error("AI Assistant error:", error);
       setMessages((current) => [
         ...current,
         {
           id: `assistant-error-${Date.now()}`,
           role: "assistant",
-          content: `I couldn't complete that request. Error: ${errMsg}`,
+          content: "I couldn't complete that request. Please check the AI configuration or try again.",
         },
       ]);
     } finally {
@@ -3643,7 +3648,7 @@ function AIAssistantPage() {
           )}
           <div ref={conversationEndRef} />
           <div className={`text-center text-[11px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`}>
-            Connected to `/api/ai-chat`
+            Connected to Gemini via `/api/ai-chat`
           </div>
         </div>
       </div>

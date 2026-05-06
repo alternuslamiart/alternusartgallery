@@ -50,7 +50,7 @@ export default function AIPage() {
   };
 
   const sendMessage = async (text: string) => {
-    if (isPlanLimitReached) return;
+    if (isTyping || isPlanLimitReached) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -86,17 +86,16 @@ export default function AIPage() {
       setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: data.content,
+        content: data.content || data.answer,
         timestamp: new Date(),
         imageUrl: data.imageUrl || undefined,
       }]);
     } catch (error) {
       console.error("AI error:", error);
-      const errMsg = error instanceof Error ? error.message : "Unknown error";
       setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: `I apologize, but I'm having trouble connecting right now. Error: ${errMsg}`,
+        content: "I couldn't complete that request. Please check the AI configuration or try again.",
         timestamp: new Date(),
       }]);
     } finally {
@@ -105,7 +104,7 @@ export default function AIPage() {
   };
 
   const handleSend = () => {
-    if (!input.trim() || isPlanLimitReached) return;
+    if (!input.trim() || isTyping || isPlanLimitReached) return;
     sendMessage(input.trim());
   };
 
@@ -219,7 +218,7 @@ export default function AIPage() {
                 />
                 <button
                   onClick={handleSend}
-                  disabled={!input.trim() || isTyping}
+                  disabled={!input.trim() || isTyping || isPlanLimitReached}
                   className="w-10 h-10 bg-coffee hover:bg-stone-800 text-white rounded-xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -228,7 +227,7 @@ export default function AIPage() {
                 </button>
               </div>
               <p className="text-[11px] text-stone-400 text-center mt-3">
-                Powered by Claude AI & DALL-E. Alternus AI can make mistakes.
+                Powered by Gemini via /api/ai-chat. Alternus AI can make mistakes.
               </p>
             </div>
           </div>
@@ -300,7 +299,7 @@ export default function AIPage() {
                   />
                   <button
                     onClick={handleSend}
-                    disabled={!input.trim() || isTyping}
+                    disabled={!input.trim() || isTyping || isPlanLimitReached}
                     className="w-10 h-10 bg-coffee hover:bg-stone-800 text-white rounded-xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -309,7 +308,7 @@ export default function AIPage() {
                   </button>
                 </div>
                 <p className="text-[11px] text-stone-400 text-center mt-2">
-                  Powered by Claude AI & DALL-E
+                  Powered by Gemini via /api/ai-chat
                 </p>
               </div>
             </div>
