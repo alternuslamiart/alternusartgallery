@@ -54,6 +54,13 @@ import {
   formatFileSize,
   prototypeRepository,
 } from "@/lib/studio-repositories";
+import {
+  type CodeBuilderLayer,
+  type CodeBuilderPhase,
+  type CodeBuilderPlan,
+  generateWebsitePlanFromPrompt,
+  normalizeCodeBuilderPlan,
+} from "@/lib/code-builder-plan";
 
 export type StudioRouteKey =
   | "studio-overview"
@@ -2214,27 +2221,495 @@ function AutoCADPage() {
 
 function CodeBuilderPage() {
   const { openModal, showToast } = useStudioActions();
+  const [phase, setPhase] = useState<CodeBuilderPhase>("idle");
+  const [prompt, setPrompt] = useState("");
+  const [plan, setPlan] = useState<CodeBuilderPlan | null>(null);
+  const [activeLayerId, setActiveLayerId] = useState<CodeBuilderLayer["id"]>("hero");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const promptRef = useRef<HTMLTextAreaElement>(null);
+
+  const generatePlan = async (event?: FormEvent) => {
+    event?.preventDefault();
+    const cleanPrompt = prompt.trim();
+    if (!cleanPrompt) {
+      setPhase("error");
+      setErrorMessage("Write a website prompt before generating a plan.");
+      promptRef.current?.focus();
+      return;
+    }
+
+    setPhase("generatingPlan");
+    setErrorMessage(null);
+
+    try {
+      const response = await fetch("/api/code/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: cleanPrompt,
+          input: { workflow: "website_builder_plan" },
+        }),
+      });
+      const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+      if (!response.ok) {
+        const error = data.error as { message?: string } | undefined;
+        throw new Error(error?.message ?? "Plan generation failed.");
+      }
+
+      const job = data.job as { output?: { plan?: unknown } } | undefined;
+      const nextPlan =
+        normalizeCodeBuilderPlan(data.plan, cleanPrompt) ??
+        normalizeCodeBuilderPlan(job?.output?.plan, cleanPrompt) ??
+        generateWebsitePlanFromPrompt(cleanPrompt);
+
+      setPlan(nextPlan);
+      setActiveLayerId(nextPlan.layers[1]?.id ?? nextPlan.layers[0]?.id ?? "hero");
+      setPhase("planReady");
+      showToast("Code plan generated");
+    } catch (error) {
+      setPhase("error");
+      setErrorMessage(error instanceof Error ? error.message : "Plan generation failed.");
+    }
+  };
+
+  if (phase === "planReady" && plan) {
+    return (
+      <CodeBuilderWorkspace
+        plan={plan}
+        activeLayerId={activeLayerId}
+        onSelectLayer={setActiveLayerId}
+        onRegenerate={() => void generatePlan()}
+        onSave={() => showToast("Workspace saved")}
+        onExport={() => showToast("Export prepared")}
+      />
+    );
+  }
 
   return (
-    <div>
-      <PageHeader title="Code Builder" subtitle="Describe a feature and prepare build-ready project work." />
-      <SoftCard>
-        <label className="text-[12px] font-semibold text-[#171717]">Project prompt</label>
-        <textarea className="mt-3 min-h-[130px] w-full resize-none rounded-2xl border border-[#E5E7EB] bg-white p-4 text-[13px] outline-none placeholder:text-[#A1A7B0]" placeholder="Describe the route, component, or app behavior you want to build..." />
-        <div className="mt-3 flex flex-wrap gap-2">
-          <PrimaryButton icon={Code2} onClick={() => showToast("Code plan generation queued")}>Generate plan</PrimaryButton>
-          <SecondaryButton icon={Folder} onClick={() => openModal("project-create")}>Open recent project</SecondaryButton>
+    <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-5 pb-2">
+      <PageHeader title="Code Builder" subtitle="Describe a website and generate a plan-ready builder workspace." />
+      <form onSubmit={generatePlan} className="overflow-hidden rounded-[8px] border border-[#E1E6EA] bg-[#FCFDFE] shadow-[0_18px_44px_rgba(31,43,77,0.05)]">
+        <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="border-b border-[#E8EEF2] p-5 lg:border-b-0 lg:border-r">
+            <div className="mb-4 flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-[#EEF7FC] text-[#1DA1F2]">
+                <Code2 className="h-4 w-4" />
+              </span>
+              <div>
+                <label htmlFor="code-builder-prompt" className="text-[13px] font-semibold text-[#171717]">Project prompt</label>
+                <p className="mt-1 text-[11px] text-[#6B7280]">This creates the first website plan, layers, and preview canvas.</p>
+              </div>
+            </div>
+            <textarea
+              ref={promptRef}
+              id="code-builder-prompt"
+              value={prompt}
+              onChange={(event) => {
+                setPrompt(event.target.value);
+                if (phase === "error") setErrorMessage(null);
+              }}
+              disabled={phase === "generatingPlan"}
+              className="min-h-[170px] w-full resize-none rounded-[8px] border border-[#E5EAF0] bg-white p-4 text-[13px] leading-6 text-[#171717] outline-none transition-colors placeholder:text-[#A1A7B0] focus:border-[#9BD2FF] disabled:cursor-not-allowed disabled:opacity-60"
+              placeholder="Describe the website you want to build. Example: a modern SaaS landing page for a design automation platform with pricing, testimonials, and a strong CTA."
+            />
+            {errorMessage && (
+              <p className="mt-3 flex items-center gap-2 text-[11px] font-medium text-[#B42318]">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                {errorMessage}
+              </p>
+            )}
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <button
+                type="submit"
+                disabled={!prompt.trim() || phase === "generatingPlan"}
+                className="inline-flex h-9 items-center gap-2 rounded-[8px] bg-[#4A9BFF] px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(74,155,255,0.18)] transition-all hover:bg-[#2D8FF0] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {phase === "generatingPlan" ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Code2 className="h-3.5 w-3.5" />}
+                {phase === "generatingPlan" ? "Generating plan..." : "Generate plan"}
+              </button>
+              <button
+                type="button"
+                onClick={() => openModal("project-create")}
+                className="inline-flex h-9 items-center gap-2 rounded-[8px] border border-[#E5E7EB] bg-white px-3 text-[12px] font-semibold text-[#4B5563] transition-all hover:border-[#CFE8F8] hover:text-[#171717] active:scale-[0.98]"
+              >
+                <Folder className="h-3.5 w-3.5" />
+                Open recent project
+              </button>
+            </div>
+          </div>
+          <div className="bg-[#F7FAFC] p-5">
+            <p className="text-[12px] font-semibold text-[#171717]">Builder output</p>
+            <div className="mt-4 space-y-3">
+              {["Plan summary", "Code layers", "Live preview"].map((item, index) => (
+                <div key={item} className="flex items-center gap-3 rounded-[8px] border border-[#E5EAF0] bg-white px-3 py-3">
+                  <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold ${phase === "generatingPlan" && index === 0 ? "bg-[#4A9BFF] text-white" : "bg-[#EEF7FC] text-[#1DA1F2]"}`}>
+                    {phase === "generatingPlan" && index === 0 ? <RefreshCw className="h-3 w-3 animate-spin" /> : index + 1}
+                  </span>
+                  <span className="text-[12px] font-medium text-[#4B5563]">{item}</span>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setPrompt("Modern website building template with a strong hero, feature cards, pricing, testimonials, and a clean footer.");
+                promptRef.current?.focus();
+              }}
+              disabled={phase === "generatingPlan"}
+              className="mt-5 inline-flex h-9 items-center gap-2 rounded-[8px] border border-[#E5E7EB] bg-white px-3 text-[11px] font-semibold text-[#4B5563] transition-all hover:border-[#CFE8F8] hover:text-[#171717] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-[#4A9BFF]" />
+              Use website template prompt
+            </button>
+          </div>
         </div>
-      </SoftCard>
-      <div className="mt-5 grid gap-3 md:grid-cols-3">
-        {["Studio shell", "Checkout polish", "Asset upload"].map((name) => (
-          <ClickableSoftCard key={name} onClick={() => showToast(`${name} project opened`)} ariaLabel={`Open ${name}`}>
-            <p className="text-[12px] font-semibold text-[#171717]">{name}</p>
-            <p className="mt-2 text-[11px] text-[#6B7280]">Recent build placeholder</p>
-          </ClickableSoftCard>
-        ))}
+      </form>
+    </div>
+  );
+}
+
+type BuilderChatMessage = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+};
+
+function CodeBuilderWorkspace({
+  plan,
+  activeLayerId,
+  onSelectLayer,
+  onRegenerate,
+  onSave,
+  onExport,
+}: {
+  plan: CodeBuilderPlan;
+  activeLayerId: CodeBuilderLayer["id"];
+  onSelectLayer: (layerId: CodeBuilderLayer["id"]) => void;
+  onRegenerate: () => void;
+  onSave: () => void;
+  onExport: () => void;
+}) {
+  const [chatInput, setChatInput] = useState("");
+  const [messages, setMessages] = useState<BuilderChatMessage[]>([
+    { id: "assistant-ready", role: "assistant", content: "Plan generated. Select a layer or describe the next adjustment." },
+  ]);
+  const activeLayer = plan.layers.find((layer) => layer.id === activeLayerId) ?? plan.layers[0];
+
+  const sendChatMessage = () => {
+    const content = chatInput.trim();
+    if (!content) return;
+    setMessages((current) => [
+      ...current,
+      { id: `user-${Date.now()}`, role: "user", content },
+    ]);
+    setChatInput("");
+  };
+
+  return (
+    <div className="flex h-[calc(100vh-88px)] min-h-[660px] flex-col overflow-hidden rounded-[8px] border border-[#DDE3EA] bg-[#F2F5F8] shadow-[0_18px_44px_rgba(31,43,77,0.08)]">
+      <BuilderHeader plan={plan} onRegenerate={onRegenerate} onSave={onSave} onExport={onExport} />
+      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <CodeLayerSidebar
+          plan={plan}
+          activeLayerId={activeLayerId}
+          onSelectLayer={onSelectLayer}
+          messages={messages}
+          chatInput={chatInput}
+          onChatInputChange={setChatInput}
+          onSendMessage={sendChatMessage}
+        />
+        <main className="min-h-0 overflow-hidden bg-[#E9EDF1]">
+          <div className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)]">
+            <GeneratedPlanSummary plan={plan} activeLayer={activeLayer} />
+            <PreviewCanvas plan={plan} activeLayerId={activeLayerId} />
+          </div>
+        </main>
       </div>
     </div>
+  );
+}
+
+function BuilderHeader({ plan, onRegenerate, onSave, onExport }: { plan: CodeBuilderPlan; onRegenerate: () => void; onSave: () => void; onExport: () => void }) {
+  return (
+    <header className="flex min-h-[58px] flex-wrap items-center justify-between gap-3 border-b border-[#DDE3EA] bg-white px-4 py-3">
+      <div className="flex min-w-0 items-center gap-3">
+        <span className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#EEF7FC] text-[#1DA1F2]">
+          <Monitor className="h-4 w-4" />
+        </span>
+        <div className="min-w-0">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <h2 className="truncate text-[15px] font-semibold text-[#171717]">{plan.projectName || "Website Building Template"}</h2>
+            <span className="inline-flex h-6 items-center gap-1 rounded-full border border-[#BFE6D1] bg-[#EEFDF4] px-2 text-[10px] font-semibold text-[#087443]">
+              <CheckCircle2 className="h-3 w-3" />
+              Plan generated
+            </span>
+          </div>
+          <p className="mt-0.5 truncate text-[11px] text-[#6B7280]">{plan.websiteType}</p>
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <BuilderToolButton icon={Monitor} label="Preview" onClick={() => undefined} />
+        <BuilderToolButton icon={Download} label="Export" onClick={onExport} />
+        <BuilderToolButton icon={RefreshCw} label="Regenerate" onClick={onRegenerate} />
+        <button onClick={onSave} className="inline-flex h-8 items-center gap-2 rounded-[8px] bg-[#171717] px-3 text-[11px] font-semibold text-white transition-all hover:bg-[#2B2F34] active:scale-[0.98]">
+          <CheckCircle2 className="h-3.5 w-3.5" />
+          Save
+        </button>
+      </div>
+    </header>
+  );
+}
+
+function BuilderToolButton({ icon: Icon, label, onClick }: { icon: LucideIcon; label: string; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="inline-flex h-8 items-center gap-2 rounded-[8px] border border-[#E5E7EB] bg-white px-3 text-[11px] font-semibold text-[#4B5563] transition-all hover:border-[#CFE8F8] hover:text-[#171717] active:scale-[0.98]">
+      <Icon className="h-3.5 w-3.5" />
+      {label}
+    </button>
+  );
+}
+
+function CodeLayerSidebar({
+  plan,
+  activeLayerId,
+  onSelectLayer,
+  messages,
+  chatInput,
+  onChatInputChange,
+  onSendMessage,
+}: {
+  plan: CodeBuilderPlan;
+  activeLayerId: CodeBuilderLayer["id"];
+  onSelectLayer: (layerId: CodeBuilderLayer["id"]) => void;
+  messages: BuilderChatMessage[];
+  chatInput: string;
+  onChatInputChange: (value: string) => void;
+  onSendMessage: () => void;
+}) {
+  return (
+    <aside className="flex min-h-0 flex-col border-r border-[#DDE3EA] bg-[#FBFCFD]">
+      <div className="border-b border-[#E5EAF0] p-4">
+        <div className="flex items-center gap-2">
+          <Layers3 className="h-4 w-4 text-[#1DA1F2]" />
+          <h3 className="text-[18px] font-semibold text-[#171717]">Code Layer Space</h3>
+        </div>
+        <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">{plan.layers.length} generated layers</p>
+      </div>
+      <div className="min-h-0 flex-1 overflow-y-auto p-3">
+        <div className="space-y-1.5">
+          {plan.layers.map((layer) => {
+            const active = activeLayerId === layer.id;
+            return (
+              <button
+                key={layer.id}
+                type="button"
+                onClick={() => onSelectLayer(layer.id)}
+                className={`flex w-full items-start gap-3 rounded-[8px] border px-3 py-3 text-left transition-all active:scale-[0.99] ${active ? "border-[#9BD2FF] bg-[#EEF7FC] shadow-[0_10px_24px_rgba(74,155,255,0.08)]" : "border-transparent bg-transparent hover:border-[#E5EAF0] hover:bg-white"}`}
+              >
+                <span className={`mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-[7px] ${active ? "bg-[#4A9BFF] text-white" : "bg-[#EEF2F5] text-[#6B7280]"}`}>
+                  <FileText className="h-3.5 w-3.5" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[12px] font-semibold text-[#171717]">{layer.label}</span>
+                  <span className="mt-1 block text-[10.5px] leading-4 text-[#6B7280]">{layer.description}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <BuilderChatPanel messages={messages} input={chatInput} onInputChange={onChatInputChange} onSubmit={onSendMessage} />
+    </aside>
+  );
+}
+
+function BuilderChatPanel({ messages, input, onInputChange, onSubmit }: { messages: BuilderChatMessage[]; input: string; onInputChange: (value: string) => void; onSubmit: () => void }) {
+  return (
+    <div className="border-t border-[#E5EAF0] bg-white p-3">
+      <div className="mb-3 max-h-[132px] space-y-2 overflow-y-auto pr-1">
+        {messages.map((message) => (
+          <div key={message.id} className={`rounded-[8px] px-3 py-2 text-[11px] leading-5 ${message.role === "user" ? "ml-5 bg-[#EEF7FC] text-[#1F2937]" : "mr-5 bg-[#F3F6F8] text-[#4B5563]"}`}>
+            {message.content}
+          </div>
+        ))}
+      </div>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          onSubmit();
+        }}
+        className="flex min-h-[88px] items-end gap-2 rounded-[8px] border border-[#D4DAE1] bg-[#F3F4F6] p-3 focus-within:border-[#9BD2FF]"
+      >
+        <textarea
+          value={input}
+          onChange={(event) => onInputChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              onSubmit();
+            }
+          }}
+          rows={2}
+          className="min-w-0 flex-1 resize-none bg-transparent text-[12px] leading-5 text-[#171717] outline-none placeholder:text-[#6B7280]"
+          placeholder="Chat for building website from prompt"
+        />
+        <button type="submit" disabled={!input.trim()} aria-label="Send builder message" className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[8px] bg-[#1497BC] text-white transition-all hover:bg-[#0F7898] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-40">
+          <Send className="h-3.5 w-3.5" />
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function GeneratedPlanSummary({ plan, activeLayer }: { plan: CodeBuilderPlan; activeLayer?: CodeBuilderLayer }) {
+  return (
+    <section className="border-b border-[#DDE3EA] bg-[#F9FAFB] p-4">
+      <div className="grid gap-3 xl:grid-cols-[1.1fr_0.9fr_0.9fr]">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6B7280]">Generated plan</p>
+          <p className="mt-2 text-[13px] leading-5 text-[#171717]">{plan.summary}</p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <PlanMetric label="Website type" value={plan.websiteType} />
+          <PlanMetric label="Pages" value={plan.pages.join(", ")} />
+        </div>
+        <div className="rounded-[8px] border border-[#E5EAF0] bg-white p-3">
+          <p className="text-[11px] font-semibold text-[#171717]">{activeLayer?.label ?? "Selected layer"}</p>
+          <p className="mt-1 text-[10.5px] leading-4 text-[#6B7280]">{activeLayer?.description ?? plan.designDirection}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PlanMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-[8px] border border-[#E5EAF0] bg-white p-3">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#8A94A3]">{label}</p>
+      <p className="mt-1 truncate text-[11px] font-semibold text-[#171717]">{value}</p>
+    </div>
+  );
+}
+
+function PreviewCanvas({ plan, activeLayerId }: { plan: CodeBuilderPlan; activeLayerId: CodeBuilderLayer["id"] }) {
+  return (
+    <div className="h-full min-h-0 overflow-auto p-5">
+      <div className="mx-auto min-h-full w-full max-w-[960px] rounded-[8px] border border-[#C9D1D9] bg-[#D7DBDF] p-5 shadow-[0_22px_54px_rgba(31,43,77,0.12)]">
+        <div className="overflow-hidden rounded-[8px] border border-[#C8D0D8] bg-white shadow-[0_12px_30px_rgba(31,43,77,0.08)]">
+          <PreviewNavbar plan={plan} active={activeLayerId === "header"} />
+          <PreviewHero plan={plan} active={activeLayerId === "hero"} />
+          <PreviewFeatureGrid plan={plan} active={activeLayerId === "features"} />
+          {plan.layers.some((layer) => layer.id === "pricing") && <PreviewPricing active={activeLayerId === "pricing"} />}
+          <PreviewTestimonials active={activeLayerId === "testimonials"} />
+          <PreviewCta active={activeLayerId === "cta"} />
+          <PreviewFooter plan={plan} active={activeLayerId === "footer"} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function previewSectionClass(active: boolean, extra = "") {
+  return `transition-all ${active ? "ring-2 ring-[#4A9BFF] ring-inset" : ""} ${extra}`;
+}
+
+function PreviewNavbar({ plan, active }: { plan: CodeBuilderPlan; active: boolean }) {
+  return (
+    <div className={previewSectionClass(active, "flex items-center justify-between border-b border-[#E5EAF0] bg-white px-7 py-4")}>
+      <div className="flex items-center gap-2">
+        <span className="h-7 w-7 rounded-[7px] bg-[#171717]" />
+        <span className="text-[13px] font-semibold text-[#171717]">{plan.projectName}</span>
+      </div>
+      <div className="hidden items-center gap-5 text-[11px] font-semibold text-[#6B7280] sm:flex">
+        {plan.pages.slice(0, 4).map((page) => <span key={page}>{page}</span>)}
+      </div>
+      <span className="rounded-[8px] bg-[#171717] px-3 py-2 text-[11px] font-semibold text-white">Start</span>
+    </div>
+  );
+}
+
+function PreviewHero({ plan, active }: { plan: CodeBuilderPlan; active: boolean }) {
+  return (
+    <section className={previewSectionClass(active, "bg-[#727272] px-7 py-16 text-center")}>
+      <p className="mx-auto max-w-md text-[11px] font-semibold uppercase tracking-[0.14em] text-white/70">{plan.websiteType}</p>
+      <h1 className="mx-auto mt-3 max-w-xl text-[34px] font-semibold leading-tight text-black">Website Building Template</h1>
+      <p className="mx-auto mt-4 max-w-lg text-[13px] leading-6 text-black/70">{plan.designDirection}</p>
+      <div className="mt-7 flex justify-center gap-2">
+        <span className="rounded-[8px] bg-black px-4 py-2 text-[12px] font-semibold text-white">Launch preview</span>
+        <span className="rounded-[8px] border border-black/20 bg-white/60 px-4 py-2 text-[12px] font-semibold text-black">View plan</span>
+      </div>
+    </section>
+  );
+}
+
+function PreviewFeatureGrid({ plan, active }: { plan: CodeBuilderPlan; active: boolean }) {
+  const cards = plan.layers.slice(0, 3);
+  return (
+    <section className={previewSectionClass(active, "bg-[#666666] px-7 py-8")}>
+      <div className="grid gap-4 md:grid-cols-3">
+        {cards.map((layer) => (
+          <div key={layer.id} className="min-h-[132px] rounded-[8px] bg-[#D9D9D9] p-4">
+            <p className="text-[12px] font-semibold text-[#171717]">{layer.canvasLabel}</p>
+            <p className="mt-3 text-[11px] leading-5 text-[#4B5563]">{layer.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PreviewPricing({ active }: { active: boolean }) {
+  return (
+    <section className={previewSectionClass(active, "bg-[#F2F4F6] px-7 py-9")}>
+      <div className="mb-4 flex items-end justify-between gap-4">
+        <h3 className="text-[20px] font-semibold text-[#171717]">Pricing Section</h3>
+        <span className="text-[11px] font-semibold text-[#6B7280]">3 plans</span>
+      </div>
+      <div className="grid gap-3 md:grid-cols-3">
+        {["Starter", "Growth", "Scale"].map((tier) => (
+          <div key={tier} className="rounded-[8px] border border-[#E5EAF0] bg-white p-4">
+            <p className="text-[12px] font-semibold text-[#171717]">{tier}</p>
+            <div className="mt-4 h-2 w-20 rounded-full bg-[#D9D9D9]" />
+            <div className="mt-2 h-2 w-28 rounded-full bg-[#E5EAF0]" />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PreviewTestimonials({ active }: { active: boolean }) {
+  return (
+    <section className={previewSectionClass(active, "bg-white px-7 py-9")}>
+      <h3 className="text-[20px] font-semibold text-[#171717]">Testimonials</h3>
+      <div className="mt-5 grid gap-3 md:grid-cols-2">
+        {[1, 2].map((item) => (
+          <div key={item} className="rounded-[8px] border border-[#E5EAF0] bg-[#FCFDFE] p-4">
+            <div className="h-2 w-24 rounded-full bg-[#D9D9D9]" />
+            <div className="mt-3 h-2 w-full rounded-full bg-[#E5EAF0]" />
+            <div className="mt-2 h-2 w-3/4 rounded-full bg-[#E5EAF0]" />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PreviewCta({ active }: { active: boolean }) {
+  return (
+    <section className={previewSectionClass(active, "bg-[#D9D9D9] px-7 py-10 text-center")}>
+      <h3 className="text-[24px] font-semibold text-[#171717]">CTA Area</h3>
+      <p className="mx-auto mt-3 max-w-md text-[12px] leading-5 text-[#4B5563]">Final conversion section generated from the website plan.</p>
+    </section>
+  );
+}
+
+function PreviewFooter({ plan, active }: { plan: CodeBuilderPlan; active: boolean }) {
+  return (
+    <footer className={previewSectionClass(active, "flex flex-wrap items-center justify-between gap-3 bg-[#171717] px-7 py-5 text-white")}>
+      <span className="text-[12px] font-semibold">{plan.projectName}</span>
+      <span className="text-[11px] text-white/60">{plan.pages.join(" / ")}</span>
+    </footer>
   );
 }
 
