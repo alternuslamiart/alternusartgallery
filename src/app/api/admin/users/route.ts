@@ -66,13 +66,6 @@ export async function GET(request: NextRequest) {
           createdAt: true,
           isActive: true,
           emailVerified: true,
-          artist: {
-            select: {
-              id: true,
-              displayName: true,
-              applicationStatus: true,
-            }
-          }
         },
         orderBy: { createdAt: 'desc' },
         take: limit,
@@ -109,8 +102,6 @@ export async function GET(request: NextRequest) {
         createdAt: u.createdAt,
         isActive: u.isActive,
         emailVerified: u.emailVerified,
-        isArtist: !!u.artist,
-        artistStatus: u.artist?.applicationStatus || null,
       })),
       total,
       todayCount,

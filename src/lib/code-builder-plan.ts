@@ -46,7 +46,7 @@ function titleCase(value: string) {
 function inferWebsiteType(prompt: string) {
   const lower = prompt.toLowerCase();
   if (/(shop|store|ecommerce|commerce|product catalog)/.test(lower)) return "E-commerce storefront";
-  if (/(portfolio|artist|designer|photographer|creative director)/.test(lower)) return "Creative portfolio";
+  if (/(portfolio|designer|photographer|creative director)/.test(lower)) return "Creative portfolio";
   if (/(agency|studio|branding|marketing)/.test(lower)) return "Agency website";
   if (/(saas|software|platform|dashboard|app)/.test(lower)) return "SaaS landing page";
   if (/(restaurant|cafe|bar|hotel|hospitality)/.test(lower)) return "Hospitality website";
@@ -57,8 +57,8 @@ function inferWebsiteType(prompt: string) {
 function inferDesignDirection(prompt: string) {
   const lower = prompt.toLowerCase();
   if (lower.includes("minimal")) return "Minimal, airy layout with strong spacing and quiet typography.";
-  if (lower.includes("bold")) return "Bold editorial layout with high contrast sections and confident CTAs.";
-  if (lower.includes("luxury")) return "Refined luxury presentation with soft contrast and premium spacing.";
+  if (lower.includes("bold")) return "Bold product layout with high contrast sections and confident CTAs.";
+  if (lower.includes("premium")) return "Premium SaaS presentation with soft contrast and crisp spacing.";
   if (lower.includes("playful")) return "Friendly, approachable layout with rounded cards and lighter rhythm.";
   if (lower.includes("dark")) return "Dark canvas with crisp surfaces and a high-contrast product feel.";
   return "Neutral product-grade layout with layered sections and focused conversion flow.";
@@ -108,7 +108,7 @@ function buildLayers(websiteType: string): CodeBuilderLayer[] {
     return [
       commonLayers[0],
       commonLayers[1],
-      { id: "features", label: "Product Highlights", description: "Best sellers, collections, and merchandising.", canvasLabel: "Product cards" },
+    { id: "features", label: "Product Highlights", description: "Core capabilities, modules, and conversion points.", canvasLabel: "Product cards" },
       { id: "pricing", label: "Offers Section", description: "Bundles, offers, or price anchors.", canvasLabel: "Offers" },
       commonLayers[3],
       commonLayers[4],

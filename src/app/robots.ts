@@ -15,6 +15,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: 'https://alternusart.com/sitemap.xml',
+    sitemap: 'https://www.alternusart.com/sitemap.xml',
   };
 }

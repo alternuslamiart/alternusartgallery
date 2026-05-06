@@ -1,123 +1,21 @@
-import { MetadataRoute } from 'next';
-import { prisma } from '@/lib/prisma';
+import { MetadataRoute } from "next";
 
-export const dynamic = 'force-dynamic';
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = "https://www.alternusart.com";
+  const now = new Date();
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://alternusart.com';
-
-  // Static pages
-  const staticPages: MetadataRoute.Sitemap = [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/gallery`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/support`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/faq`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/shipping`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/returns`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/privacy`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/terms`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/accessibility`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/cookie-notice`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/copyright`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
+  return [
+    { url: baseUrl, lastModified: now, changeFrequency: "daily", priority: 1 },
+    { url: `${baseUrl}/main`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    { url: `${baseUrl}/ai-assistant`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
+    { url: `${baseUrl}/code-builder`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/cerevix-design`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/blender-3d`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${baseUrl}/pricing`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${baseUrl}/platform/overview`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${baseUrl}/platform/api`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${baseUrl}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${baseUrl}/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${baseUrl}/cookie-notice`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
-
-  // Dynamic artwork pages
-  let artworkPages: MetadataRoute.Sitemap = [];
-  try {
-    const artworks = await prisma.artwork.findMany({
-      where: { status: 'APPROVED' },
-      select: { id: true, updatedAt: true },
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    artworkPages = artworks.map((artwork: any) => ({
-      url: `${baseUrl}/gallery/${artwork.id}`,
-      lastModified: artwork.updatedAt,
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    }));
-  } catch (error) {
-    console.error('Error fetching artworks for sitemap:', error);
-  }
-
-  // Dynamic artist pages
-  let artistPages: MetadataRoute.Sitemap = [];
-  try {
-    const artists = await prisma.artist.findMany({
-      select: { id: true, updatedAt: true },
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    artistPages = artists.map((artist: any) => ({
-      url: `${baseUrl}/artists/${artist.id}`,
-      lastModified: artist.updatedAt,
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-    }));
-  } catch (error) {
-    console.error('Error fetching artists for sitemap:', error);
-  }
-
-  return [...staticPages, ...artworkPages, ...artistPages];
 }

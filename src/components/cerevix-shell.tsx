@@ -14,7 +14,7 @@ export const DARK_BORDER = "rgba(255,255,255,0.16)";
 export const DARK_BORDER_SOFT = "rgba(255,255,255,0.10)";
 export const DARK_MUTED = "rgba(245,245,247,0.70)";
 export const DARK_TEXT = "#F5F5F7";
-const THEME_KEY = "alternus_theme";
+const THEME_KEY = "cerevix_theme";
 
 /**
  * AI-branded Cerevix mark. A cobalt rounded tile with a 4-point sparkle
@@ -41,14 +41,14 @@ export function useCerevixMode() {
     const saved = window.localStorage.getItem(THEME_KEY);
     const next = saved ? saved === "dark" : false;
     setIsDark(next);
-    document.documentElement.dataset.alternusTheme = next ? "dark" : "light";
+    document.documentElement.dataset.cerevixTheme = next ? "dark" : "light";
   }, []);
 
   const setMode: Dispatch<SetStateAction<boolean>> = useCallback((next) => {
     setIsDark((current) => {
       const value = typeof next === "function" ? next(current) : next;
       window.localStorage.setItem(THEME_KEY, value ? "dark" : "light");
-      document.documentElement.dataset.alternusTheme = value ? "dark" : "light";
+      document.documentElement.dataset.cerevixTheme = value ? "dark" : "light";
       return value;
     });
   }, []);

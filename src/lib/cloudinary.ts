@@ -12,7 +12,7 @@ export { cloudinary }
 // Upload image to Cloudinary
 export async function uploadImage(
   file: string, // base64 or URL
-  folder: string = 'artworks'
+  folder: string = 'cerevix-assets'
 ): Promise<{ url: string; publicId: string }> {
   try {
     const result = await cloudinary.uploader.upload(file, {

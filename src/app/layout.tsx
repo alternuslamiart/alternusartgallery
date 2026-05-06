@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Roboto, Roboto_Flex, Playfair_Display } from "next/font/google";
+import { Roboto, Roboto_Flex } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/components/providers";
-import { CartModal } from "@/components/cart-modal";
-import { ArtLoverModal } from "@/components/art-lover-modal";
 import { CookieModal } from "@/components/cookie-modal";
 import { LayoutShell } from "@/components/layout-shell";
 
@@ -30,12 +28,6 @@ const robotoFlex = Roboto_Flex({
   subsets: ["latin"],
   variable: "--font-roboto-flex",
   display: "swap",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-playfair",
 });
 
 export const metadata: Metadata = {
@@ -121,10 +113,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <style
-        id="alternus-dark-flat"
+        id="cerevix-dark-flat"
         dangerouslySetInnerHTML={{
           __html: `
-            html[data-alternus-theme="dark"],
+            html[data-cerevix-theme="dark"],
             .dark {
               --background: 240 5% 8%;
               --foreground: 240 11% 96%;
@@ -144,9 +136,9 @@ export default function RootLayout({
               --input: 240 5% 25%;
               --ring: 218 100% 63%;
             }
-            html[data-alternus-theme="dark"] *,
-            html[data-alternus-theme="dark"] *::before,
-            html[data-alternus-theme="dark"] *::after,
+            html[data-cerevix-theme="dark"] *,
+            html[data-cerevix-theme="dark"] *::before,
+            html[data-cerevix-theme="dark"] *::after,
             .dark *,
             .dark *::before,
             .dark *::after {
@@ -231,7 +223,7 @@ export default function RootLayout({
               "@type": "SearchAction",
               "target": {
                 "@type": "EntryPoint",
-                "urlTemplate": "https://www.alternusart.com/gallery?search={search_term_string}"
+              "urlTemplate": "https://www.alternusart.com/main?query={search_term_string}"
               },
               "query-input": "required name=search_term_string"
             }
@@ -239,13 +231,11 @@ export default function RootLayout({
         }}
       />
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} ${robotoFlex.variable} ${playfair.variable} antialiased min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} ${robotoFlex.variable} antialiased min-h-screen flex flex-col`}
       >
         <Providers>
           <LayoutShell>{children}</LayoutShell>
-          <CartModal />
           <CookieModal />
-          <ArtLoverModal />
         </Providers>
       </body>
     </html>

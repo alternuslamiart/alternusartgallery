@@ -2073,7 +2073,7 @@ function PresetEditor({
   const [draft, setDraft] = useState(value);
   const options: Record<keyof DesignSystemSettings, string[]> = {
     colorPreset: ["Sky / Paper / Graphite", "Ocean / Paper / Ink", "Mono / Cloud / Graphite"],
-    typographyPreset: ["Clean UI scale", "Editorial scale", "Compact product scale"],
+    typographyPreset: ["Clean UI scale", "Platform scale", "Compact product scale"],
     spacingPreset: ["8px rhythm", "6px compact rhythm", "12px spacious rhythm"],
   };
   const title = presetKey === "colorPreset" ? "Color preset" : presetKey === "typographyPreset" ? "Typography preset" : "Spacing preset";
@@ -2206,7 +2206,7 @@ function AutoCADPage() {
       </button>
       <h3 className="mb-3 text-[13px] font-semibold text-[#171717]">Recent drawings</h3>
       <div className="grid gap-3 md:grid-cols-3">
-        {["Floor plan study", "Gallery elevation", "Display detail"].map((name) => (
+        {["Floor plan study", "Workspace elevation", "System detail"].map((name) => (
           <ClickableSoftCard key={name} className="min-h-[130px]" onClick={() => showToast(`${name} drawing opened`)} ariaLabel={`Open ${name}`}>
             <div className="mb-4 h-16 rounded-xl bg-[#EEF7FC]" />
             <p className="text-[12px] font-semibold text-[#171717]">{name}</p>
@@ -2972,7 +2972,7 @@ function BlenderPage() {
         </SoftCard>
       </div>
       <div className="mt-5 grid gap-3 md:grid-cols-4">
-        {["Material study", "Product scene", "Gallery room", "Character base"].map((name) => (
+        {["Material study", "Product scene", "Workspace lab", "Character base"].map((name) => (
           <ClickableSoftCard key={name} className="min-h-[120px]" onClick={() => showToast(`${name} asset opened`)} ariaLabel={`Open ${name}`}>
             <div className="mb-3 h-14 rounded-xl bg-[#EEF7FC]" />
             <p className="text-[12px] font-semibold text-[#171717]">{name}</p>
@@ -3652,7 +3652,7 @@ function AIAssistantPage() {
             <Sparkles className="h-7 w-7 fill-current max-sm:h-6 max-sm:w-6" />
           </div>
           <h2 className={`text-[28px] font-semibold tracking-[-0.03em] max-sm:text-[17px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Cerevix AI Assistant</h2>
-          <p className={`mt-3 text-[12px] leading-5 max-sm:mt-1 max-sm:text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Ask about art, artists, styles, commissions, shipping, or anything else on Cerevix.</p>
+          <p className={`mt-3 text-[12px] leading-5 max-sm:mt-1 max-sm:text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Build workflows, generate assets, automate tasks, and coordinate AI tools from one Cerevix AI workspace.</p>
 
           {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
 
@@ -3866,7 +3866,7 @@ function ProjectsPage() {
     <div>
       <PageHeader title="Projects" subtitle="Manage studio projects and production status." action={<PrimaryButton icon={Plus} onClick={() => openModal("project-create")}>New project</PrimaryButton>} />
       <div className="grid gap-3 md:grid-cols-3">
-        {["Cerevix dashboard", "Gallery redesign", "3D catalog"].map((name) => (
+        {["Cerevix command center", "Automation workflow", "3D product system"].map((name) => (
           <ClickableSoftCard key={name} className="min-h-[150px]" onClick={() => openDrawer("project-detail")} ariaLabel={`Open ${name} project`}>
             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
               <Folder className="h-5 w-5" />

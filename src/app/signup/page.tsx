@@ -313,7 +313,7 @@ export default function SignUpPage() {
     e.preventDefault();
 
     if (!termsAccepted || !privacyAccepted) {
-      alert("Please accept Cerevix Art Gallery policies to continue.");
+      alert("Please accept Cerevix AI policies to continue.");
       return;
     }
 

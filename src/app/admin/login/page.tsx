@@ -178,7 +178,7 @@ export default function AdminLogin() {
 
         {/* Footer */}
         <p className="text-center text-muted-foreground text-xs mt-6">
-          © 2024 Cerevix Art Gallery. All rights reserved.
+          © 2024 Cerevix AI. All rights reserved.
         </p>
       </div>
     </div>

@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { image, folder = 'artworks' } = body
+    const { image, folder = 'cerevix-assets' } = body
 
     if (!image) {
       return NextResponse.json(

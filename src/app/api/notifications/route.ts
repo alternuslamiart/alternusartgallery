@@ -30,52 +30,19 @@ function toNotificationResponse(notification: {
 }
 
 async function getPublicStudioNotifications(limit: number) {
-  const [recentArtworks, recentArtists] = await Promise.all([
-    prisma.artwork.findMany({
-      where: {
-        status: "APPROVED",
-        createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-      },
-      include: { artist: { select: { displayName: true } } },
-      orderBy: { createdAt: "desc" },
-      take: Math.min(limit, 4),
-    }),
-    prisma.artist.findMany({
-      where: {
-        applicationStatus: "APPROVED",
-        approvedDate: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-      },
-      orderBy: { approvedDate: "desc" },
-      take: Math.min(limit, 2),
-    }),
-  ]);
-
   return [
-    ...recentArtworks.map((artwork) => ({
-      id: `artwork-${artwork.id}`,
-      type: "new_artwork",
-      title: "New Artwork",
-      message: `"${artwork.title}" by ${artwork.artist.displayName}`,
-      linkUrl: `/main?prompt=${encodeURIComponent(artwork.title)}`,
-      actionUrl: `/main?prompt=${encodeURIComponent(artwork.title)}`,
+    {
+      id: "studio-welcome",
+      type: "workspace_update",
+      title: "Cerevix Studio is ready",
+      message: "Open the studio to generate assets, run prompts, and coordinate AI tools.",
+      linkUrl: "/main",
+      actionUrl: "/main",
       isRead: false,
       readAt: null,
-      createdAt: artwork.createdAt,
-    })),
-    ...recentArtists.map((artist) => ({
-      id: `artist-${artist.id}`,
-      type: "new_artist",
-      title: "New Artist",
-      message: `${artist.displayName} joined the studio`,
-      linkUrl: "/studio-overview",
-      actionUrl: "/studio-overview",
-      isRead: false,
-      readAt: null,
-      createdAt: artist.approvedDate ?? artist.createdAt,
-    })),
-  ]
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-    .slice(0, limit);
+      createdAt: new Date(),
+    },
+  ].slice(0, limit);
 }
 
 export async function GET(request: NextRequest) {
@@ -120,7 +87,7 @@ export async function POST(request: NextRequest) {
 
     const body = (await request.json().catch(() => ({}))) as { notificationIds?: unknown };
     const notificationIds = Array.isArray(body.notificationIds)
-      ? body.notificationIds.filter((id): id is string => typeof id === "string" && !id.startsWith("artwork-") && !id.startsWith("artist-"))
+      ? body.notificationIds.filter((id): id is string => typeof id === "string" && id !== "studio-welcome")
       : [];
 
     await prisma.notification.updateMany({

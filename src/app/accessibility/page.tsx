@@ -5,18 +5,17 @@ import { Separator } from "@/components/ui/separator";
 
 export default function AccessibilityPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Hero Section */}
-      <div className="bg-coffee text-white py-16 sm:py-20">
+    <div className="min-h-screen bg-[#F7F8FB] text-[#111827]">
+      <div className="border-b border-[#E5E7EB] bg-[#0B1120] text-white">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-orange-400 mb-3 sm:mb-4">
-            Commitment
+          <p className="mb-3 pt-16 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300 sm:pt-20 sm:text-sm">
+            Cerevix AI
           </p>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
             Accessibility
           </h1>
-          <p className="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto">
-            We are committed to making art accessible to everyone. Learn about our efforts to ensure an inclusive experience.
+          <p className="mx-auto max-w-2xl pb-16 text-base text-slate-300 sm:pb-20 sm:text-lg">
+            We build Cerevix AI so teams can operate an AI workspace with clear navigation, readable interfaces, and inclusive product flows.
           </p>
         </div>
       </div>
@@ -35,7 +34,7 @@ export default function AccessibilityPage() {
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Our Commitment</h2>
               <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                Cerevix Art Gallery is dedicated to ensuring that our website and digital experiences are accessible to all users, including those with disabilities. We strive to meet or exceed the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards.
+                Cerevix AI is dedicated to ensuring that our website, studio, and digital experiences are accessible to all users, including those with disabilities. We strive to meet or exceed the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards.
               </p>
             </div>
           </div>
@@ -93,8 +92,8 @@ export default function AccessibilityPage() {
                     description: "Our website adapts to different screen sizes and supports zoom up to 200% without loss of content or functionality.",
                   },
                   {
-                    title: "Alt Text for Artworks",
-                    description: "All artwork images include descriptive alternative text to convey the visual content to users who rely on assistive technologies.",
+                    title: "Accessible Outputs",
+                    description: "Generated assets, workspace previews, and product imagery use descriptive labels where possible for users who rely on assistive technologies.",
                   },
                   {
                     title: "Focus Indicators",
@@ -142,10 +141,10 @@ export default function AccessibilityPage() {
             <section className="bg-gray-50 rounded-2xl p-6 sm:p-8">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">Feedback & Assistance</h2>
               <p className="text-gray-600 leading-relaxed mb-6">
-                If you experience any difficulty accessing any part of our website, or if you have suggestions for improvement, we want to hear from you. Your feedback helps us make art accessible to everyone.
+                If you experience any difficulty accessing any part of our website or studio, or if you have suggestions for improvement, we want to hear from you. Your feedback helps us make Cerevix AI accessible to everyone.
               </p>
               <Link
-                href="/support"
+                href="/help-center"
                 className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors text-sm sm:text-base"
               >
                 Contact Support
@@ -166,7 +165,7 @@ export default function AccessibilityPage() {
             <div className="flex gap-6">
               <Link href="/privacy" className="hover:text-gray-700 transition-colors">Privacy Policy</Link>
               <Link href="/terms" className="hover:text-gray-700 transition-colors">Terms of Service</Link>
-              <Link href="/support" className="hover:text-gray-700 transition-colors">Support</Link>
+              <Link href="/help-center" className="hover:text-gray-700 transition-colors">Support</Link>
             </div>
           </div>
         </div>

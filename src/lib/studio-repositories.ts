@@ -6,7 +6,7 @@ export type PrototypeOrigin = "seed" | "user";
 
 export type DesignSystemSettings = {
   colorPreset: "Sky / Paper / Graphite" | "Ocean / Paper / Ink" | "Mono / Cloud / Graphite";
-  typographyPreset: "Clean UI scale" | "Editorial scale" | "Compact product scale";
+  typographyPreset: "Clean UI scale" | "Platform scale" | "Compact product scale";
   spacingPreset: "8px rhythm" | "6px compact rhythm" | "12px spacious rhythm";
 };
 
@@ -61,43 +61,43 @@ export const defaultDesignSystem: DesignSystemSettings = {
 
 const seededPrototypes: PrototypeItem[] = [
   {
-    id: "seed-gallery-checkout-redesign",
-    name: "Gallery checkout redesign",
+    id: "seed-agent-workflow-builder",
+    name: "Agent workflow builder",
     type: "website",
     quality: "high-fidelity",
     createdAt: "2026-05-06T08:30:00.000Z",
     updatedAt: "2026-05-06T08:30:00.000Z",
     status: "Ready",
     visibility: "private",
-    brief: "Redesign the gallery checkout with a cleaner buyer flow, responsive summary, and reusable checkout components.",
-    tags: ["Responsive", "Components", "Prototype flow"],
+    brief: "Design a clear workflow builder for chaining prompts, tools, approvals, and generated outputs.",
+    tags: ["Automation", "Components", "Prototype flow"],
     designSystem: defaultDesignSystem,
     origin: "seed",
   },
   {
-    id: "seed-collector-mobile-app",
-    name: "Collector mobile app",
+    id: "seed-mobile-ai-command",
+    name: "Mobile AI command app",
     type: "mobile-app",
     quality: "high-fidelity",
     createdAt: "2026-05-05T10:15:00.000Z",
     updatedAt: "2026-05-05T10:15:00.000Z",
     status: "Draft",
     visibility: "private",
-    brief: "A mobile collection tracker for saved artworks, artist notes, and quick inquiry actions.",
-    tags: ["Responsive", "Prototype flow"],
+    brief: "A compact mobile command surface for launching tools, reviewing outputs, and saving generated assets.",
+    tags: ["Mobile", "Command UI"],
     designSystem: defaultDesignSystem,
     origin: "seed",
   },
   {
-    id: "seed-artist-dashboard-system",
-    name: "Artist dashboard system",
+    id: "seed-operator-dashboard-system",
+    name: "Operator dashboard system",
     type: "design-system",
     quality: "wireframe",
     createdAt: "2026-05-04T13:00:00.000Z",
     updatedAt: "2026-05-04T13:00:00.000Z",
     status: "Ready",
     visibility: "private",
-    brief: "A dashboard-oriented UI system for artist inventory, messages, analytics, and publishing workflows.",
+    brief: "A dashboard-oriented UI system for workspace telemetry, automation runs, assets, and team activity.",
     tags: ["Design tokens", "Components"],
     designSystem: defaultDesignSystem,
     origin: "seed",

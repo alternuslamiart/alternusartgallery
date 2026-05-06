@@ -33,18 +33,18 @@ function normalizeMode(mode: unknown): BlenderChatMode {
 
 function inferScene(prompt: string) {
   const lower = prompt.toLowerCase();
-  const isGallery = hasAny(lower, ["gallery", "museum", "exhibition", "art"]);
-  const isRoom = isGallery || hasAny(lower, ["room", "interior", "house", "apartment", "studio"]);
+  const isWorkspace = hasAny(lower, ["workspace", "studio", "lab", "command center", "showroom", "product scene"]);
+  const isRoom = isWorkspace || hasAny(lower, ["room", "interior", "house", "apartment", "studio"]);
   const isProduct = hasAny(lower, ["product", "bottle", "chair", "lamp", "phone", "watch"]);
   const isCity = hasAny(lower, ["city", "street", "building", "architecture", "urban"]);
   const wantsSculptures = hasAny(lower, ["sculpture", "statue", "sculptures"]);
   const wantsTrees = hasAny(lower, ["tree", "forest", "park", "landscape"]);
 
-  if (isGallery) {
+  if (isWorkspace) {
     return {
-      title: "AI Gallery Room",
-      objects: ["gallery room", "white walls", "wood floor", "spotlights", wantsSculptures ? "sculptures" : "art blocks"],
-      kind: "gallery",
+      title: "AI Workspace Lab",
+      objects: ["workspace shell", "white walls", "technical floor", "area lights", wantsSculptures ? "reference objects" : "display panels"],
+      kind: "workspace",
     };
   }
 
@@ -160,21 +160,21 @@ def add_label(text, location):
     label.data.materials.append(make_material("Label Black", (0.02, 0.02, 0.02, 1), 0.4))
     return label
 
-def build_gallery_scene(mats):
-    floor = add_cube("Wood Floor", (0, 0, -0.08), (5.5, 4.0, 0.08), mats["wood"])
+def build_workspace_scene(mats):
+    floor = add_cube("Technical Floor", (0, 0, -0.08), (5.5, 4.0, 0.08), mats["concrete"])
     back_wall = add_cube("White Back Wall", (0, 2.05, 1.35), (5.5, 0.08, 1.45), mats["wall"])
     left_wall = add_cube("Left Wall", (-2.8, 0, 1.35), (0.08, 4.0, 1.45), mats["wall"])
     right_wall = add_cube("Right Wall", (2.8, 0, 1.35), (0.08, 4.0, 1.45), mats["wall"])
-    add_cube("Gallery Plinth 01", (-1.5, 0.35, 0.35), (0.45, 0.45, 0.35), mats["stone"])
-    add_cube("Gallery Plinth 02", (0, 0.1, 0.45), (0.55, 0.55, 0.45), mats["stone"])
-    add_cube("Gallery Plinth 03", (1.5, 0.35, 0.35), (0.45, 0.45, 0.35), mats["stone"])
-    add_uv_sphere("Sculpture 01", (-1.5, 0.35, 0.95), (0.28, 0.28, 0.42), mats["clay"])
-    add_cylinder("Sculpture 02", (0, 0.1, 1.12), 0.22, 0.7, mats["dark"])
-    add_uv_sphere("Sculpture 03", (1.5, 0.35, 0.95), (0.35, 0.2, 0.35), mats["blue"])
+    add_cube("Module Plinth 01", (-1.5, 0.35, 0.35), (0.45, 0.45, 0.35), mats["stone"])
+    add_cube("Module Plinth 02", (0, 0.1, 0.45), (0.55, 0.55, 0.45), mats["stone"])
+    add_cube("Module Plinth 03", (1.5, 0.35, 0.35), (0.45, 0.45, 0.35), mats["stone"])
+    add_uv_sphere("Reference Object 01", (-1.5, 0.35, 0.95), (0.28, 0.28, 0.42), mats["blue"])
+    add_cylinder("Reference Object 02", (0, 0.1, 1.12), 0.22, 0.7, mats["dark"])
+    add_uv_sphere("Reference Object 03", (1.5, 0.35, 0.95), (0.35, 0.2, 0.35), mats["glass"])
     for index, x in enumerate([-1.8, 0, 1.8]):
-        add_cube(f"Wall Artwork {index + 1}", (x, 1.96, 1.45), (0.55, 0.03, 0.38), mats["art"])
+        add_cube(f"Interface Panel {index + 1}", (x, 1.96, 1.45), (0.55, 0.03, 0.38), mats["panel"])
     for index, x in enumerate([-2.0, 0, 2.0]):
-        add_light(f"Gallery Spotlight {index + 1}", (x, -0.8, 3.2), 350, 1.1)
+        add_light(f"Workspace Area Light {index + 1}", (x, -0.8, 3.2), 350, 1.1)
 
 def build_city_scene(mats):
     add_cube("Street Plane", (0, 0, -0.04), (5.5, 4.0, 0.04), mats["concrete"])
@@ -230,14 +230,14 @@ mats = {
     "clay": make_material("Terracotta Clay", (0.72, 0.35, 0.22, 1), 0.68),
     "blue": make_material("Cerevix Blue", (0.1, 0.52, 0.9, 1), 0.45),
     "dark": make_material("Graphite", (0.03, 0.035, 0.04, 1), 0.5),
-    "art": make_material("Artwork Surface", (0.82, 0.84, 0.88, 1), 0.4),
+    "panel": make_material("Interface Panel Surface", (0.82, 0.84, 0.88, 1), 0.4),
     "concrete": make_material("Concrete", (0.48, 0.5, 0.52, 1), 0.75),
     "glass": make_material("Blue Glass", (0.28, 0.55, 0.78, 0.7), 0.2),
     "grass": make_material("Deep Green", (0.18, 0.42, 0.22, 1), 0.7),
 }
 
-if SCENE_KIND == "gallery":
-    build_gallery_scene(mats)
+if SCENE_KIND == "workspace":
+    build_workspace_scene(mats)
 elif SCENE_KIND == "city":
     build_city_scene(mats)
 elif SCENE_KIND == "product":
@@ -278,14 +278,14 @@ print(f"Cerevix AI generated scene: {SCENE_TITLE} from prompt: {PROMPT}")
 
 function inferAdditions(prompt: string) {
   const lower = prompt.toLowerCase();
-  const additions: Array<"chair" | "table" | "plant" | "light" | "sculpture" | "artwork" | "window" | "roof"> = [];
+  const additions: Array<"chair" | "table" | "plant" | "light" | "sculpture" | "displayPanel" | "window" | "roof"> = [];
 
   if (hasAny(lower, ["chair", "chairs", "seat", "seating"])) additions.push("chair");
   if (hasAny(lower, ["table", "desk", "coffee table"])) additions.push("table");
   if (hasAny(lower, ["plant", "plants", "tree", "green"])) additions.push("plant");
   if (hasAny(lower, ["light", "lights", "spotlight", "lamp", "warm"])) additions.push("light");
   if (hasAny(lower, ["sculpture", "statue", "object", "art piece"])) additions.push("sculpture");
-  if (hasAny(lower, ["painting", "artwork", "frame", "poster"])) additions.push("artwork");
+  if (hasAny(lower, ["panel", "screen", "interface", "dashboard", "poster", "frame"])) additions.push("displayPanel");
   if (hasAny(lower, ["window", "glass", "view"])) additions.push("window");
   if (hasAny(lower, ["roof", "ceiling", "skylight"])) additions.push("roof");
 
@@ -392,9 +392,9 @@ for addition in ADDITIONS:
     elif addition == "sculpture":
         created.append(add_cube("AI Added Sculpture Plinth", (x, y, 0.28), (0.32, 0.32, 0.28), materials["white"]))
         created.append(add_sphere("AI Added Sculpture", (x, y, 0.72), (0.24, 0.18, 0.34), materials["clay"]))
-    elif addition == "artwork":
-        created.append(add_cube("AI Added Wall Artwork", (x, 1.92, 1.38), (0.5, 0.03, 0.34), materials["glass"]))
-        created.append(add_cube("AI Added Artwork Frame", (x, 1.9, 1.38), (0.56, 0.025, 0.4), materials["frame"]))
+    elif addition == "displayPanel":
+        created.append(add_cube("AI Added Interface Panel", (x, 1.92, 1.38), (0.5, 0.03, 0.34), materials["glass"]))
+        created.append(add_cube("AI Added Panel Frame", (x, 1.9, 1.38), (0.56, 0.025, 0.4), materials["frame"]))
     elif addition == "window":
         created.append(add_cube("AI Added Window Glass", (x, 1.93, 1.48), (0.52, 0.03, 0.42), materials["glass"]))
         created.append(add_cube("AI Added Window Frame", (x, 1.9, 1.48), (0.6, 0.025, 0.48), materials["frame"]))
