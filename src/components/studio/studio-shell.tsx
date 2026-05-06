@@ -1211,6 +1211,26 @@ function DropdownButton({ icon: Icon, label, onClick, muted }: { icon: LucideIco
   );
 }
 
+function VoiceSpeakIcon() {
+  return (
+    <svg className="h-[15px] w-[15px]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="8.4" y="3.2" width="7.2" height="11.2" rx="3.6" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M5.8 10.6v.9a6.2 6.2 0 0 0 12.4 0v-.9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M12 17.7v2.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M9.3 20.8h5.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M18.1 7.2c1.1.8 1.8 2 1.8 3.4s-.7 2.6-1.8 3.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" opacity="0.72">
+        <animate attributeName="opacity" values="0.35;0.95;0.35" dur="1.6s" repeatCount="indefinite" />
+      </path>
+      <path d="M20.4 4.9a8 8 0 0 1 0 11.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" opacity="0.46">
+        <animate attributeName="opacity" values="0.18;0.8;0.18" dur="1.6s" begin="0.18s" repeatCount="indefinite" />
+      </path>
+      <path d="M5.9 7.2c-1.1.8-1.8 2-1.8 3.4s.7 2.6 1.8 3.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" opacity="0.72">
+        <animate attributeName="opacity" values="0.35;0.95;0.35" dur="1.6s" begin="0.08s" repeatCount="indefinite" />
+      </path>
+    </svg>
+  );
+}
+
 function NotificationsDropdown({ align = "right" }: { align?: "left" | "right" }) {
   const { theme } = useStudioTheme();
   const dark = theme === "dark";
@@ -3285,6 +3305,7 @@ function AssetDetailDrawer({
 }
 
 function AIAssistantPage() {
+  const router = useRouter();
   const { theme } = useStudioTheme();
   const { openModal, showToast, isTemporaryChat, temporaryChatId, endTemporaryChat } = useStudioActions();
   const dark = theme === "dark";
@@ -3542,6 +3563,17 @@ function AIAssistantPage() {
               </DropdownPanel>
             )}
           </div>
+          <button
+            onClick={() => {
+              router.push("/workspace/voice");
+              showToast("Voice Speak opened");
+            }}
+            className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(59,167,255,0.14)] hover:text-[#7DD3FC]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
+            aria-label="Open Voice Speak"
+            title="Voice Speak"
+          >
+            <VoiceSpeakIcon />
+          </button>
           <button onClick={() => openModal("upload-file")} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach file">
             <Paperclip className="h-[13px] w-[13px]" />
           </button>
