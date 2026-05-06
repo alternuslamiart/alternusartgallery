@@ -113,7 +113,7 @@ const bottomNavigation = [
 ];
 
 const routeByPath: Record<string, StudioRouteKey> = {
-  "/main": "ai-assistant",
+  "/main": "studio-overview",
   "/studio-overview": "studio-overview",
   "/alternus-design": "alternus-design",
   "/autocad-design": "autocad-design",
