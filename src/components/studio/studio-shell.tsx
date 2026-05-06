@@ -2241,6 +2241,13 @@ function CodeBuilderPage() {
     setPhase("generatingPlan");
     setErrorMessage(null);
 
+    const openPlan = (nextPlan: CodeBuilderPlan, toastMessage: string) => {
+      setPlan(nextPlan);
+      setActiveLayerId(nextPlan.layers[1]?.id ?? nextPlan.layers[0]?.id ?? "hero");
+      setPhase("planReady");
+      showToast(toastMessage);
+    };
+
     try {
       const response = await fetch("/api/code/generate", {
         method: "POST",
@@ -2251,9 +2258,13 @@ function CodeBuilderPage() {
         }),
       });
       const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+      const apiError = data.error as { code?: string; message?: string } | undefined;
       if (!response.ok) {
-        const error = data.error as { message?: string } | undefined;
-        throw new Error(error?.message ?? "Plan generation failed.");
+        if (response.status === 401 || apiError?.code === "UNAUTHENTICATED") {
+          openPlan(generateWebsitePlanFromPrompt(cleanPrompt), "Local code plan generated");
+          return;
+        }
+        throw new Error(apiError?.message ?? "Plan generation failed.");
       }
 
       const job = data.job as { output?: { plan?: unknown } } | undefined;
@@ -2262,10 +2273,7 @@ function CodeBuilderPage() {
         normalizeCodeBuilderPlan(job?.output?.plan, cleanPrompt) ??
         generateWebsitePlanFromPrompt(cleanPrompt);
 
-      setPlan(nextPlan);
-      setActiveLayerId(nextPlan.layers[1]?.id ?? nextPlan.layers[0]?.id ?? "hero");
-      setPhase("planReady");
-      showToast("Code plan generated");
+      openPlan(nextPlan, "Code plan generated");
     } catch (error) {
       setPhase("error");
       setErrorMessage(error instanceof Error ? error.message : "Plan generation failed.");
