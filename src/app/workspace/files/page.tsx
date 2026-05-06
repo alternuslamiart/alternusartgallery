@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { AlternusPage, COBALT } from "@/components/alternus-shell";
+import { CerevixPage, COBALT } from "@/components/cerevix-shell";
 
 const folders = [
   { n: "Invoices",  c: 12, d: "2h ago" },
@@ -13,7 +13,7 @@ const folders = [
 
 export default function Files() {
   return (
-    <AlternusPage>
+    <CerevixPage>
       {(t) => (
         <>
           <section style={{ padding: "80px 0 40px" }}>
@@ -59,6 +59,6 @@ export default function Files() {
           </section>
         </>
       )}
-    </AlternusPage>
+    </CerevixPage>
   );
 }

@@ -170,7 +170,7 @@ export function Header() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-3">
               <div className="flex flex-col">
-                <span className="text-[1.6rem] font-bold leading-none font-playfair tracking-tight">Alternus</span>
+                <span className="text-[1.6rem] font-bold leading-none font-playfair tracking-tight">Cerevix</span>
                 <span className="text-[8px] text-muted-foreground tracking-[0.35em] uppercase mt-0.5">Art Gallery</span>
               </div>
             </Link>

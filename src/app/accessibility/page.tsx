@@ -35,7 +35,7 @@ export default function AccessibilityPage() {
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Our Commitment</h2>
               <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                Alternus Art Gallery is dedicated to ensuring that our website and digital experiences are accessible to all users, including those with disabilities. We strive to meet or exceed the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards.
+                Cerevix Art Gallery is dedicated to ensuring that our website and digital experiences are accessible to all users, including those with disabilities. We strive to meet or exceed the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards.
               </p>
             </div>
           </div>

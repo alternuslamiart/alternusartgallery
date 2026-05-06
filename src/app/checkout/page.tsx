@@ -14,7 +14,7 @@ import { ShieldCheck, Truck, RotateCcw, User, MapPin, CreditCard, ArrowRight, Ar
 // Bank details configuration
 const bankDetails = {
   bankName: "Raiffeisen Bank",
-  accountHolder: "Alternus Art Gallery",
+  accountHolder: "Cerevix Art Gallery",
   iban: "AL35 2021 1109 0000 0000 1234 5678",
   bic: "SGSBALTX",
 };

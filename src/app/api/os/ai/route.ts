@@ -164,7 +164,7 @@ async function getUserId(): Promise<string | null> {
 
 // ── Build system prompt ───────────────────────────────────────────────────────
 function buildSystemPrompt(osContext: OSChatRequest['osContext']): string {
-  return `You are Alternus AI Agent, an intelligent operating system assistant integrated into Alternus OS — a browser-based AI-powered desktop OS.
+  return `You are Cerevix AI Agent, an intelligent operating system assistant integrated into Cerevix OS — a browser-based AI-powered desktop OS.
 
 ## Current OS State
 - Theme: ${osContext.theme} mode
@@ -188,7 +188,7 @@ You have direct control over this OS. You can:
 6. Always respond in English regardless of the language the user writes in
 7. For app IDs, use lowercase: terminal, code, files, settings, music, weather, calendar, notes, browser, store, movies, word, clock, calculator, downloads, controlpanel, studio, news, dashboard, tasks, mail, monaco, aihub, aivoice, knowledge, sysmon, business, agent, ai
 
-## About Alternus OS
+## About Cerevix OS
 This is a full-featured browser-based desktop OS with 36 applications including a code editor, terminal, file manager, music player, AI hub, and more. You are the brain of this OS.`;
 }
 

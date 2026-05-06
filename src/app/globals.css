@@ -64,9 +64,9 @@
 
   .landing-heading-xl {
     font-family: var(--font-roboto-flex), ui-sans-serif, system-ui, sans-serif;
-    font-size: clamp(3rem, 7.4vw, 6.2rem);
-    line-height: 0.94;
-    letter-spacing: -0.055em;
+    font-size: clamp(2.6rem, 5.6vw, 4.95rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
     font-weight: 900;
     text-wrap: balance;
   }

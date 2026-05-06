@@ -13,7 +13,7 @@ interface PlanLimitBannerProps {
 export function PlanLimitBanner({
   dark = false,
   title = "You have used 100% of your free credits.",
-  description = "Your free plan limit has been reached. Upgrade now to continue chatting with Alternus AI.",
+  description = "Your free plan limit has been reached. Upgrade now to continue chatting with Cerevix AI.",
   ctaLabel = "Upgrade Now",
   ctaHref = "/pricing",
 }: PlanLimitBannerProps) {

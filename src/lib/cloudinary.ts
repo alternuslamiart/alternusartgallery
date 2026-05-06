@@ -16,7 +16,7 @@ export async function uploadImage(
 ): Promise<{ url: string; publicId: string }> {
   try {
     const result = await cloudinary.uploader.upload(file, {
-      folder: `alternus/${folder}`,
+      folder: `Cerevix/${folder}`,
       resource_type: 'image',
       transformation: [
         { quality: 'auto:best' },

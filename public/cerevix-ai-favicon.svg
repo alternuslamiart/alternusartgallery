@@ -1,0 +1,18 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="8" y1="6" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8FB9FF"/>
+      <stop offset="0.48" stop-color="#4A84FF"/>
+      <stop offset="1" stop-color="#6D42F5"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(22 18) rotate(42) scale(31)">
+      <stop stop-color="white" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="white" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="18" fill="url(#bg)"/>
+  <rect x="5" y="5" width="54" height="54" rx="17" stroke="white" stroke-opacity="0.22" stroke-width="2"/>
+  <rect x="10" y="10" width="44" height="44" rx="14" fill="url(#glow)"/>
+  <path d="M34.7 43.6c-7.5 0-13.2-5.2-13.2-12.1 0-7 5.7-12.2 13.2-12.2 3.7 0 6.9 1.2 9.2 3.5l-3.7 4.3c-1.5-1.5-3.1-2.2-5.1-2.2-3.8 0-6.4 2.7-6.4 6.6 0 3.8 2.6 6.5 6.4 6.5 2 0 3.6-.7 5.1-2.2l3.7 4.3c-2.3 2.3-5.5 3.5-9.2 3.5Z" fill="white"/>
+  <text x="32" y="52" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="700" letter-spacing="0.6" fill="white">AI</text>
+</svg>

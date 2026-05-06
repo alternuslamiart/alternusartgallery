@@ -17,10 +17,10 @@ export const DARK_TEXT = "#F5F5F7";
 const THEME_KEY = "alternus_theme";
 
 /**
- * AI-branded Alternus mark. A cobalt rounded tile with a 4-point sparkle
+ * AI-branded Cerevix mark. A cobalt rounded tile with a 4-point sparkle
  * plus one smaller satellite spark — the universal 'AI' glyph.
  */
-export function AlternusLogo({ size = 28, radius = 8 }: { size?: number; radius?: number }) {
+export function CerevixLogo({ size = 28, radius = 8 }: { size?: number; radius?: number }) {
   const spark = size * 0.64;
   return (
     <div style={{ width: size, height: size, background: COBALT, borderRadius: radius, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, position: "relative" }}>
@@ -34,7 +34,7 @@ export function AlternusLogo({ size = 28, radius = 8 }: { size?: number; radius?
   );
 }
 
-export function useAlternusMode() {
+export function useCerevixMode() {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -56,8 +56,8 @@ export function useAlternusMode() {
   return [isDark, setMode] as const;
 }
 
-export function useAlternusTheme() {
-  const [isDark, setIsDark] = useAlternusMode();
+export function useCerevixTheme() {
+  const [isDark, setIsDark] = useCerevixMode();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -76,13 +76,13 @@ export function useAlternusTheme() {
   return { isDark, setIsDark, scrolled, bg, fg, muted, faint, surface, raised };
 }
 
-export function AlternusNav({ isDark, setIsDark, scrolled, fg, muted, faint }: ReturnType<typeof useAlternusTheme>) {
+export function CerevixNav({ isDark, setIsDark, scrolled, fg, muted, faint }: ReturnType<typeof useCerevixTheme>) {
   return (
     <header style={{ position: "sticky", top: 0, zIndex: 40, width: "100%", transition: "all 0.25s", backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", WebkitBackdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", background: scrolled ? (isDark ? "rgba(18,18,20,0.84)" : "rgba(244,246,251,0.82)") : "transparent", borderBottom: `1px solid ${scrolled ? faint : "transparent"}` }}>
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", height: 64, display: "flex", alignItems: "center", gap: 32 }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <AlternusLogo size={28} radius={8} />
-          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
+          <CerevixLogo size={28} radius={8} />
+          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>Cerevix</span>
         </Link>
         <nav className="hidden md:flex" style={{ alignItems: "center", gap: 24 }}>
           {[{ l: "Platform", h: "/platform/overview" }, { l: "Bridges", h: "/platform/bridges" }, { l: "Company", h: "/about" }, { l: "Pricing", h: "/pricing" }].map((i) => (
@@ -108,7 +108,7 @@ export function AlternusNav({ isDark, setIsDark, scrolled, fg, muted, faint }: R
   );
 }
 
-export function AlternusFooter({ isDark, fg, muted, faint }: ReturnType<typeof useAlternusTheme>) {
+export function CerevixFooter({ isDark, fg, muted, faint }: ReturnType<typeof useCerevixTheme>) {
   const cols = [
     { heading: "Platform", links: [
       { l: "Overview", h: "/platform/overview", ext: false },
@@ -180,8 +180,8 @@ export function AlternusFooter({ isDark, fg, muted, faint }: ReturnType<typeof u
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <AlternusLogo size={18} radius={5} />
-              <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
+              <CerevixLogo size={18} radius={5} />
+              <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>Cerevix</span>
             </div>
             <span style={{ fontSize: 11.5, color: muted }}>© 2015–2026 · Built with Claude</span>
             <Link href="/cookie-notice" style={{ fontSize: 11.5, color: muted, textDecoration: "none", borderBottom: `1px dashed ${faint}`, paddingBottom: 1 }}>Manage Cookies</Link>
@@ -198,15 +198,15 @@ export function AlternusFooter({ isDark, fg, muted, faint }: ReturnType<typeof u
   );
 }
 
-export type AlternusTheme = ReturnType<typeof useAlternusTheme>;
+export type CerevixTheme = ReturnType<typeof useCerevixTheme>;
 
-export function AlternusPage({ children }: { children: ReactNode | ((t: AlternusTheme) => ReactNode) }) {
-  const theme = useAlternusTheme();
+export function CerevixPage({ children }: { children: ReactNode | ((t: CerevixTheme) => ReactNode) }) {
+  const theme = useCerevixTheme();
   return (
     <div style={{ minHeight: "100vh", background: theme.bg, color: theme.fg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", transition: "background 0.3s,color 0.3s", overflowX: "hidden" }}>
-      <AlternusNav {...theme} />
+      <CerevixNav {...theme} />
       {typeof children === "function" ? children(theme) : children}
-      <AlternusFooter {...theme} />
+      <CerevixFooter {...theme} />
     </div>
   );
 }

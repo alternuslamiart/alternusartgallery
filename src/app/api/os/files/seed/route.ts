@@ -83,7 +83,7 @@ export async function POST(_request: NextRequest) {
   // Create sample files inside Projects
   const projectFiles = [
     { name: 'API Documentation.md', content: '# API Documentation\n\n## Endpoints\n- GET /api/os/files\n- POST /api/os/ai', mimeType: 'text/markdown' },
-    { name: 'README.md', content: '# Alternus OS\n\nAI-powered desktop operating system built with Next.js', mimeType: 'text/markdown' },
+    { name: 'README.md', content: '# Cerevix OS\n\nAI-powered desktop operating system built with Next.js', mimeType: 'text/markdown' },
   ];
 
   for (const file of projectFiles) {

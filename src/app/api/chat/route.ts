@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       chatId,
       text,
       sender,
-      senderName: senderName || (sender === 'support' ? 'Alternus CEO' : 'Visitor'),
+      senderName: senderName || (sender === 'support' ? 'Cerevix CEO' : 'Visitor'),
       senderEmail,
       timestamp: new Date().toISOString(),
       read: false,

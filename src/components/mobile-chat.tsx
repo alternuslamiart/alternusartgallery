@@ -160,7 +160,7 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
               <div className="w-12 h-12 rounded-full bg-gray-900 flex items-center justify-center overflow-hidden border-2 border-gray-700">
                 <Image
                   src="/logo.png"
-                  alt="Alternus AI"
+                  alt="Cerevix AI"
                   width={40}
                   height={40}
                   className="object-cover"
@@ -169,7 +169,7 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900" />
             </div>
             <div>
-              <h3 className="font-bold text-white text-base">Alternus AI</h3>
+              <h3 className="font-bold text-white text-base">Cerevix AI</h3>
               <p className="text-white/70 text-xs flex items-center gap-1">
                 <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
                 Online
@@ -191,7 +191,7 @@ export function MobileChat({ isOpen, onClose }: MobileChatProps) {
         <div className="flex-shrink-0 px-4 py-2 bg-gray-800 flex items-center gap-2 border-t border-gray-700">
           <span className="text-[11px] text-gray-400 mr-1">Write to:</span>
           <a
-            href="mailto:studio@alternusart.com?subject=Inquiry from Alternus AI Studio"
+            href="mailto:studio@alternusart.com?subject=Inquiry from Cerevix AI Studio"
             className="px-3 py-1 bg-gray-700 active:bg-gray-600 text-white text-[11px] rounded-full transition-colors flex items-center gap-1.5"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>

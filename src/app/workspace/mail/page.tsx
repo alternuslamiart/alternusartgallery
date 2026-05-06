@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
-import { AlternusPage, COBALT } from "@/components/alternus-shell";
+import { CerevixPage, COBALT } from "@/components/cerevix-shell";
 
 export default function Mail() {
   return (
-    <AlternusPage>
+    <CerevixPage>
       {(t) => (
         <section style={{ padding: "80px 0 120px" }}>
           <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
@@ -66,6 +66,6 @@ export default function Mail() {
           </div>
         </section>
       )}
-    </AlternusPage>
+    </CerevixPage>
   );
 }

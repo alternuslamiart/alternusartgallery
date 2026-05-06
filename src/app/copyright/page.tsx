@@ -35,7 +35,7 @@ export default function CopyrightPolicyPage() {
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Protecting Creative Work</h2>
               <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                Alternus Art Gallery respects the intellectual property rights of artists and creators. All artworks displayed and sold on our platform are protected by copyright law. We take copyright infringement seriously and act promptly to address any violations.
+                Cerevix Art Gallery respects the intellectual property rights of artists and creators. All artworks displayed and sold on our platform are protected by copyright law. We take copyright infringement seriously and act promptly to address any violations.
               </p>
             </div>
           </div>
@@ -47,7 +47,7 @@ export default function CopyrightPolicyPage() {
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">1. Artwork Copyright</h2>
               <div className="space-y-4">
                 <p className="text-gray-600 leading-relaxed">
-                  All artworks listed on Alternus Art Gallery are the intellectual property of their respective artists. By purchasing an artwork, you acquire the physical piece (or digital file for digital art), but the copyright remains with the artist unless explicitly transferred in writing.
+                  All artworks listed on Cerevix Art Gallery are the intellectual property of their respective artists. By purchasing an artwork, you acquire the physical piece (or digital file for digital art), but the copyright remains with the artist unless explicitly transferred in writing.
                 </p>
                 <div className="bg-white rounded-xl border border-gray-100 p-5 sm:p-6">
                   <h3 className="font-semibold text-gray-900 mb-3">What You Can Do</h3>
@@ -98,11 +98,11 @@ export default function CopyrightPolicyPage() {
             <section>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">2. Website Content</h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                All content on the Alternus Art Gallery website, including but not limited to text, graphics, logos, icons, images, design elements, and software, is the property of Alternus Art Gallery or its content suppliers and is protected by international copyright laws.
+                All content on the Cerevix Art Gallery website, including but not limited to text, graphics, logos, icons, images, design elements, and software, is the property of Cerevix Art Gallery or its content suppliers and is protected by international copyright laws.
               </p>
               <div className="grid sm:grid-cols-2 gap-4">
                 {[
-                  { title: "Logo & Branding", description: "The Alternus name, logo, and brand elements are trademarks of Alternus Art Gallery." },
+                  { title: "Logo & Branding", description: "The Cerevix name, logo, and brand elements are trademarks of Cerevix Art Gallery." },
                   { title: "Website Design", description: "The overall layout, design, and user interface of our website are copyrighted." },
                   { title: "Written Content", description: "All articles, descriptions, and editorial content are our intellectual property." },
                   { title: "Photography", description: "Product photos and lifestyle images are copyrighted and may not be reused." },
@@ -119,14 +119,14 @@ export default function CopyrightPolicyPage() {
             <section>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">3. Artist Rights</h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Artists who list their work on Alternus Art Gallery retain full copyright ownership of their artwork. By listing on our platform, artists grant us a limited, non-exclusive license to:
+                Artists who list their work on Cerevix Art Gallery retain full copyright ownership of their artwork. By listing on our platform, artists grant us a limited, non-exclusive license to:
               </p>
               <ul className="space-y-3 mb-4">
                 {[
                   "Display artwork images on our website and mobile app",
                   "Use artwork images in marketing and promotional materials related to the platform",
                   "Create thumbnail and preview versions of artwork images",
-                  "Share artwork listings on social media channels associated with Alternus",
+                  "Share artwork listings on social media channels associated with Cerevix",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-gray-600">
                     <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-2 flex-shrink-0" />
@@ -179,7 +179,7 @@ export default function CopyrightPolicyPage() {
             <section>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">6. Repeat Infringers</h2>
               <p className="text-gray-600 leading-relaxed">
-                Alternus Art Gallery maintains a policy of terminating the accounts of users who are repeat copyright infringers. If an artist or user is found to have repeatedly uploaded copyrighted content without authorization, their account will be suspended or permanently removed from our platform.
+                Cerevix Art Gallery maintains a policy of terminating the accounts of users who are repeat copyright infringers. If an artist or user is found to have repeatedly uploaded copyrighted content without authorization, their account will be suspended or permanently removed from our platform.
               </p>
             </section>
 

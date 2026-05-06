@@ -96,7 +96,7 @@ export default function GiftCardsPage() {
                             <span className="text-white font-bold text-lg">A</span>
                           </div>
                         </div>
-                        <p className="text-white font-semibold tracking-wide">Alternus</p>
+                        <p className="text-white font-semibold tracking-wide">Cerevix</p>
                         <p className="text-[10px] text-gray-400 uppercase tracking-[0.2em]">Art Gallery</p>
                       </div>
 

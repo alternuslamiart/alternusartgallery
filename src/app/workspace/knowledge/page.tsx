@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { AlternusPage, COBALT } from "@/components/alternus-shell";
+import { CerevixPage, COBALT } from "@/components/cerevix-shell";
 
 const cards = [
   { t: "Meeting notes",    n: 128, c: "notes.json" },
@@ -13,7 +13,7 @@ const cards = [
 
 export default function Knowledge() {
   return (
-    <AlternusPage>
+    <CerevixPage>
       {(t) => (
         <>
           <section style={{ padding: "80px 0 40px", borderBottom: `1px solid ${t.faint}`, position: "relative", overflow: "hidden" }}>
@@ -51,6 +51,6 @@ export default function Knowledge() {
           </section>
         </>
       )}
-    </AlternusPage>
+    </CerevixPage>
   );
 }

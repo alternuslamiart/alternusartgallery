@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
-  AlternusLogo,
+  CerevixLogo,
   DARK_BG,
   DARK_BORDER,
   DARK_BORDER_SOFT,
@@ -11,8 +11,8 @@ import {
   DARK_SURFACE,
   DARK_SURFACE_SOFT,
   DARK_TEXT,
-  useAlternusMode,
-} from "@/components/alternus-shell";
+  useCerevixMode,
+} from "@/components/cerevix-shell";
 
 const COBALT = "#4284FF";
 const INK = "#1F1F1F";
@@ -44,7 +44,7 @@ const nav: { heading: string; items: { id: SectionId; label: string }[] }[] = [
 ];
 
 export default function Account() {
-  const [isDark, setIsDark] = useAlternusMode();
+  const [isDark, setIsDark] = useCerevixMode();
   const [active, setActive] = useState<SectionId>("usage");
 
   const bg = isDark ? DARK_BG : PAPER;
@@ -65,8 +65,8 @@ export default function Account() {
       <header style={{ padding: "16px 24px", borderBottom: `1px solid ${faintBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between", background: raised }}>
         <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <AlternusLogo size={26} radius={7} />
-            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>ALTERNUS</span>
+            <CerevixLogo size={26} radius={7} />
+            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>Cerevix</span>
             <span style={{ fontSize: 10, fontWeight: 600, color: muted, padding: "2px 6px", border: `1px solid ${faintBorder}`, borderRadius: 4, letterSpacing: "0.08em" }}>ACCOUNT</span>
           </Link>
         </div>
@@ -92,8 +92,8 @@ export default function Account() {
           <div style={{ ...baseCard, padding: "14px 14px", marginBottom: 24, display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 36, height: 36, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>AL</div>
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: fg, letterSpacing: "-0.01em" }}>Alternus User</div>
-              <div style={{ fontSize: 11, color: muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>you@alternus.ai</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: fg, letterSpacing: "-0.01em" }}>Cerevix User</div>
+              <div style={{ fontSize: 11, color: muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>you@Cerevix.ai</div>
             </div>
           </div>
 
@@ -185,9 +185,9 @@ function Organization({ t }: { t: Tokens }) {
       <SectionHeading eyebrow="§ ORGANIZATION" title="Your organization." desc="Public name, logo, and domain that everyone in your workspace sees." t={t} />
       <div style={{ ...t.baseCard, padding: 28, maxWidth: 720 }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-          <Field label="Organization name" value="Alternus" t={t} />
-          <Field label="Primary domain"    value="alternus.ai" t={t} />
-          <Field label="Billing email"     value="billing@alternus.ai" t={t} />
+          <Field label="Organization name" value="Cerevix" t={t} />
+          <Field label="Primary domain"    value="Cerevix.ai" t={t} />
+          <Field label="Billing email"     value="billing@Cerevix.ai" t={t} />
           <Field label="Country"           value="Albania" t={t} />
         </div>
         <div style={{ marginTop: 24, paddingTop: 20, borderTop: `1px solid ${t.faintBorder}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -231,11 +231,11 @@ function Access({ t }: { t: Tokens }) {
 
 function Members({ t }: { t: Tokens }) {
   const people = [
-    { n: "Alternus User",  e: "you@alternus.ai",    r: "Owner",  c: "AL" },
-    { n: "Maya Ibrahim",   e: "maya@alternus.ai",   r: "Admin",  c: "MI" },
-    { n: "Luca Ferrari",   e: "luca@alternus.ai",   r: "Member", c: "LF" },
-    { n: "Priya Sharma",   e: "priya@alternus.ai",  r: "Member", c: "PS" },
-    { n: "David Chen",     e: "david@alternus.ai",  r: "Guest",  c: "DC" },
+    { n: "Cerevix User",  e: "you@Cerevix.ai",    r: "Owner",  c: "AL" },
+    { n: "Maya Ibrahim",   e: "maya@Cerevix.ai",   r: "Admin",  c: "MI" },
+    { n: "Luca Ferrari",   e: "luca@Cerevix.ai",   r: "Member", c: "LF" },
+    { n: "Priya Sharma",   e: "priya@Cerevix.ai",  r: "Member", c: "PS" },
+    { n: "David Chen",     e: "david@Cerevix.ai",  r: "Guest",  c: "DC" },
   ];
   return (
     <>
@@ -315,7 +315,7 @@ function Billing({ t }: { t: Tokens }) {
         <div style={{ ...t.baseCard, padding: 22 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: t.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Billing address</div>
           <div style={{ fontSize: 13.5, lineHeight: 1.55 }}>
-            Alternus Labs sh.p.k.<br/>
+            Cerevix Labs sh.p.k.<br/>
             Rr. e Kavajës, Tirana 1001<br/>
             Albania
           </div>

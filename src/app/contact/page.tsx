@@ -1,11 +1,11 @@
 "use client";
 import { useState } from "react";
-import { AlternusPage, COBALT } from "@/components/alternus-shell";
+import { CerevixPage, COBALT } from "@/components/cerevix-shell";
 
 export default function Contact() {
   const [sent, setSent] = useState(false);
   return (
-    <AlternusPage>
+    <CerevixPage>
       {(t) => (
         <section style={{ padding: "120px 0 120px" }}>
           <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
@@ -21,10 +21,10 @@ export default function Contact() {
                 </p>
                 <div style={{ marginTop: 40, display: "flex", flexDirection: "column", gap: 0, border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden" }}>
                   {[
-                    { l: "General",  e: "hello@alternus.ai" },
-                    { l: "Sales",    e: "sales@alternus.ai" },
-                    { l: "Security", e: "security@alternus.ai" },
-                    { l: "Press",    e: "press@alternus.ai" },
+                    { l: "General",  e: "hello@Cerevix.ai" },
+                    { l: "Sales",    e: "sales@Cerevix.ai" },
+                    { l: "Security", e: "security@Cerevix.ai" },
+                    { l: "Press",    e: "press@Cerevix.ai" },
                   ].map((c, i, a) => (
                     <a key={c.l} href={`mailto:${c.e}`} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderTop: i > 0 ? `1px solid ${t.faint}` : "none", textDecoration: "none", color: t.fg }}>
                       <span style={{ fontSize: 13, fontWeight: 700, color: t.muted, letterSpacing: "0.08em", textTransform: "uppercase" }}>{c.l}</span>
@@ -68,6 +68,6 @@ export default function Contact() {
           </div>
         </section>
       )}
-    </AlternusPage>
+    </CerevixPage>
   );
 }

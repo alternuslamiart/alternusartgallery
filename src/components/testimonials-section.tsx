@@ -27,7 +27,7 @@ const testimonials: Testimonial[] = [
     role: "Interior Designer",
     image: "https://randomuser.me/api/portraits/men/32.jpg",
     rating: 5,
-    comment: "As an interior designer, I'm always looking for unique pieces for my clients. Alternus has become my go-to source for high-quality contemporary art. The selection is outstanding.",
+    comment: "As an interior designer, I'm always looking for unique pieces for my clients. Cerevix has become my go-to source for high-quality contemporary art. The selection is outstanding.",
   },
   {
     id: 3,
@@ -43,7 +43,7 @@ const testimonials: Testimonial[] = [
     role: "Gallery Owner",
     image: "https://randomuser.me/api/portraits/men/75.jpg",
     rating: 5,
-    comment: "Working with Alternus has been a pleasure. The artists they represent are talented, and the platform makes it easy to discover and purchase exceptional pieces. A truly professional operation.",
+    comment: "Working with Cerevix has been a pleasure. The artists they represent are talented, and the platform makes it easy to discover and purchase exceptional pieces. A truly professional operation.",
   },
   {
     id: 5,
@@ -59,7 +59,7 @@ const testimonials: Testimonial[] = [
     role: "Corporate Buyer",
     image: "https://randomuser.me/api/portraits/men/86.jpg",
     rating: 5,
-    comment: "We've furnished our office spaces with multiple pieces from Alternus. The quality is consistent, prices are fair, and the entire process was seamless. Great for corporate art needs.",
+    comment: "We've furnished our office spaces with multiple pieces from Cerevix. The quality is consistent, prices are fair, and the entire process was seamless. Great for corporate art needs.",
   },
 ];
 
@@ -115,7 +115,7 @@ export default function TestimonialsSection() {
             What Our Clients Say
           </h2>
           <p className="text-stone-500 text-lg max-w-2xl mx-auto">
-            Join thousands of satisfied customers who have found their perfect artwork with Alternus
+            Join thousands of satisfied customers who have found their perfect artwork with Cerevix
           </p>
         </div>
 

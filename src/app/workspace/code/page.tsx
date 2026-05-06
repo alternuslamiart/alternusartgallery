@@ -1,13 +1,13 @@
 "use client";
 import Link from "next/link";
-import { AlternusPage, COBALT } from "@/components/alternus-shell";
+import { CerevixPage, COBALT } from "@/components/cerevix-shell";
 
 const snippet = [
-  { n: 1,  t: `import { Agent } from "@alternus/agent";`, k: "kw" },
+  { n: 1,  t: `import { Agent } from "@Cerevix/agent";`, k: "kw" },
   { n: 2,  t: `` },
   { n: 3,  t: `// Agent has read every file in this repo.` , k: "c" },
   { n: 4,  t: `const review = await Agent.review({` },
-  { n: 5,  t: `  branch: "feat/checkout-flow",` },
+  { n: 5,  t: `  branch: "feat/design-flow",` },
   { n: 6,  t: `  depth: "full",` },
   { n: 7,  t: `});` },
   { n: 8,  t: `` },
@@ -16,7 +16,7 @@ const snippet = [
 
 export default function CodeStudio() {
   return (
-    <AlternusPage>
+    <CerevixPage>
       {(t) => (
         <section style={{ padding: "80px 0 120px" }}>
           <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
@@ -60,7 +60,7 @@ export default function CodeStudio() {
               </div>
               <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "12px 16px", background: "rgba(66,132,255,0.08)", display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 22, height: 22, background: COBALT, borderRadius: 5, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>AI</div>
-                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.8)" }}>Line 5: <strong style={{ color: "#fff" }}>branch</strong> is already merged into main — did you mean <code style={{ color: COBALT }}>&ldquo;feat/checkout-v2&rdquo;</code>?</span>
+                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.8)" }}>Line 5: <strong style={{ color: "#fff" }}>branch</strong> is already merged into main — did you mean <code style={{ color: COBALT }}>&ldquo;feat/design-flow-v2&rdquo;</code>?</span>
               </div>
             </div>
 
@@ -70,6 +70,6 @@ export default function CodeStudio() {
           </div>
         </section>
       )}
-    </AlternusPage>
+    </CerevixPage>
   );
 }

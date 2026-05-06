@@ -315,7 +315,7 @@ export default function BlogDetailPage() {
                 <p className="text-xs uppercase tracking-[0.2em] text-gray-400 mb-1">Written by</p>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{post.author}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">
-                  A passionate art enthusiast and writer contributing to the Alternus Art Gallery blog. Covering topics from collecting tips to artist spotlights.
+                  A passionate art enthusiast and writer contributing to the Cerevix Art Gallery blog. Covering topics from collecting tips to artist spotlights.
                 </p>
               </div>
             </div>

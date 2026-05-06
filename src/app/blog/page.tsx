@@ -58,7 +58,7 @@ export default function BlogPage() {
             {today}
           </p>
           <h1 className="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-2">
-            The Alternus Art Journal
+            The Cerevix Art Journal
           </h1>
           <p className="font-playfair italic text-sm md:text-base tracking-[0.15em] text-muted-foreground">
             Original Art &middot; Collecting &middot; Culture
@@ -460,7 +460,7 @@ export default function BlogPage() {
         <div className="flex items-center justify-center gap-4 mt-8">
           <div className="h-px flex-1 max-w-[120px] bg-gradient-to-r from-transparent to-[#c4b5a4]" />
           <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-            Powered by Alternus
+            Powered by Cerevix
           </span>
           <div className="h-px flex-1 max-w-[120px] bg-gradient-to-l from-transparent to-[#c4b5a4]" />
         </div>

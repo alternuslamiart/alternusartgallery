@@ -24,7 +24,7 @@ Many first-time collectors worry they need vast resources or deep expertise. The
 
 ## Finding Your Taste
 
-Before purchasing your first piece, spend time exploring. Visit galleries, browse online platforms like Alternus, and attend art fairs. Pay attention to what catches your eye — not what you think *should* catch your eye.
+Before purchasing your first piece, spend time exploring. Visit galleries, browse online platforms like Cerevix, and attend art fairs. Pay attention to what catches your eye — not what you think *should* catch your eye.
 
 **Ask yourself:**
 - What colors and compositions do I gravitate toward?
@@ -58,7 +58,7 @@ When assessing a piece, consider:
 
 ## Where to Buy
 
-Online galleries like Alternus make it easy to discover and purchase art from verified artists worldwide. Benefits of buying online include:
+Online galleries like Cerevix make it easy to discover and purchase art from verified artists worldwide. Benefits of buying online include:
 
 - Access to a much wider selection than local galleries
 - Detailed photographs and descriptions
@@ -235,7 +235,7 @@ Early intervention is always more effective and less expensive than delayed trea
     excerpt: "Get an exclusive look into the creative process of featured artist Lamiart. Discover what inspires their work and their journey to becoming a professional artist.",
     content: `## Meet Lamiart
 
-In the first installment of our *Behind the Canvas* series, we sit down with Lamiart — one of Alternus Gallery's most celebrated artists. Known for blending abstract expressionism with modern digital techniques, Lamiart's work has captivated collectors across Europe and beyond.
+In the first installment of our *Behind the Canvas* series, we sit down with Lamiart — one of Cerevix Gallery's most celebrated artists. Known for blending abstract expressionism with modern digital techniques, Lamiart's work has captivated collectors across Europe and beyond.
 
 ## The Early Years
 
@@ -277,7 +277,7 @@ In the first installment of our *Behind the Canvas* series, we sit down with Lam
 
 **Q: Any upcoming projects?**
 
-*"I'm working on a series exploring the relationship between natural and urban landscapes — how cities grow organically despite our attempts to impose order. It's the most ambitious project I've undertaken, and I'm excited to share it through Alternus."*
+*"I'm working on a series exploring the relationship between natural and urban landscapes — how cities grow organically despite our attempts to impose order. It's the most ambitious project I've undertaken, and I'm excited to share it through Cerevix."*
 
 ---
 
@@ -335,9 +335,9 @@ For reproducible media:
 
 Where a piece has been shown and who has owned it affects value. Works from notable exhibitions or previously owned by recognized collectors carry additional market confidence.
 
-## How Alternus Prices Artwork
+## How Cerevix Prices Artwork
 
-At Alternus, we work directly with artists to ensure fair, transparent pricing. Our approach:
+At Cerevix, we work directly with artists to ensure fair, transparent pricing. Our approach:
 
 1. **Artist sets the base price** based on their experience and market position
 2. **We review for market consistency** — ensuring prices align with comparable works

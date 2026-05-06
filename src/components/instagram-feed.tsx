@@ -26,15 +26,15 @@ export default function InstagramFeed() {
             <h2 className="text-2xl md:text-3xl font-bold">Follow Us on Instagram</h2>
           </div>
           <p className="text-muted-foreground">
-            <a href="https://instagram.com/alternus.art" target="_blank" rel="noopener noreferrer" className="hover:text-pink-600 transition-colors">
-              @alternus.art
+            <a href="https://instagram.com/Cerevix.art" target="_blank" rel="noopener noreferrer" className="hover:text-pink-600 transition-colors">
+              @Cerevix.art
             </a>
           </p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {instagramPosts.map((post) => (
-            <Link key={post.id} href="https://instagram.com/alternus.art" target="_blank" rel="noopener noreferrer"
+            <Link key={post.id} href="https://instagram.com/Cerevix.art" target="_blank" rel="noopener noreferrer"
               className="group relative aspect-square rounded-lg overflow-hidden bg-muted">
               <Image src={post.image} alt={`Instagram post ${post.id}`} fill className="object-cover transition-transform duration-300 group-hover:scale-110" />
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -50,7 +50,7 @@ export default function InstagramFeed() {
         </div>
 
         <div className="text-center mt-8">
-          <a href="https://instagram.com/alternus.art" target="_blank" rel="noopener noreferrer"
+          <a href="https://instagram.com/Cerevix.art" target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full font-semibold hover:shadow-lg transition-all">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>

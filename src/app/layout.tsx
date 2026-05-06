@@ -40,13 +40,13 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.alternusart.com"),
-  applicationName: "Alternus AI Studio",
+  applicationName: "Cerevix AI",
   title: {
-    default: "Alternus AI Studio | Creative AI Workspace",
-    template: "%s | Alternus AI Studio",
+    default: "Cerevix AI | Creative AI Workspace",
+    template: "%s | Cerevix AI",
   },
   description:
-    "Alternus AI Studio is a creative AI workspace for AutoCAD website design, coding agents, and Blender 3D production workflows.",
+    "Cerevix AI is a creative AI workspace for AutoCAD website design, coding agents, and Blender 3D production workflows.",
   keywords: [
     "AI studio",
     "creative AI",
@@ -56,26 +56,26 @@ export const metadata: Metadata = {
     "Blender 3D AI",
     "code agent",
     "AI workspace",
-    "Alternus AI",
+    "Cerevix AI",
     "creative operating system",
   ],
-  authors: [{ name: "Alternus AI Studio" }],
-  creator: "Alternus AI Studio",
-  publisher: "Alternus AI Studio",
+  authors: [{ name: "Cerevix AI" }],
+  creator: "Cerevix AI",
+  publisher: "Cerevix AI",
   icons: {
     icon: [
-      { url: "/alternus-ai-favicon.svg", type: "image/svg+xml" },
+      { url: "/cerevix-ai-favicon.svg", type: "image/svg+xml" },
       { url: "/logo.png", sizes: "512x512", type: "image/png" },
     ],
-    shortcut: "/alternus-ai-favicon.svg",
+    shortcut: "/cerevix-ai-favicon.svg",
     apple: "/logo.png",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://www.alternusart.com",
-    siteName: "Alternus AI Studio",
-    title: "Alternus AI Studio | Creative AI Workspace",
+    siteName: "Cerevix AI",
+    title: "Cerevix AI | Creative AI Workspace",
     description:
       "Creative AI workspace for AutoCAD website design, coding agents, and Blender 3D production.",
     images: [
@@ -83,15 +83,15 @@ export const metadata: Metadata = {
         url: "/logo.png",
         width: 512,
         height: 512,
-        alt: "Alternus AI Studio",
+        alt: "Cerevix AI",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Alternus AI Studio | Creative AI Workspace",
+    title: "Cerevix AI | Creative AI Workspace",
     description:
-      "Creative AI workspace for AutoCAD website design and Blender 3D. Alternus turns prompts into real production work.",
+      "Creative AI workspace for AutoCAD website design and Blender 3D. Cerevix turns prompts into real production work.",
     images: ["/logo.png"],
   },
   robots: {
@@ -185,8 +185,8 @@ export default function RootLayout({
             "@context": "https://schema.org",
             "@type": "Organization",
             "@id": "https://www.alternusart.com/#organization",
-            "name": "Alternus AI Studio",
-            "alternateName": "Alternus",
+            "name": "Cerevix AI",
+            "alternateName": "Cerevix",
             "url": "https://www.alternusart.com",
             "logo": {
               "@type": "ImageObject",
@@ -222,7 +222,7 @@ export default function RootLayout({
             "@type": "WebSite",
             "@id": "https://www.alternusart.com/#website",
             "url": "https://www.alternusart.com",
-            "name": "Alternus AI Studio",
+            "name": "Cerevix AI",
             "description": "Creative AI workspace for AutoCAD website design, coding agents, and Blender 3D production workflows",
             "publisher": {
               "@id": "https://www.alternusart.com/#organization"

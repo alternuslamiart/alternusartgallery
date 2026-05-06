@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     const paypalOrder = await createPayPalOrder(
       Number(order.total),
       order.currency,
-      `Alternus Art Gallery - ${itemDescriptions}`,
+      `Cerevix Art Gallery - ${itemDescriptions}`,
       order.orderNumber
     )
 

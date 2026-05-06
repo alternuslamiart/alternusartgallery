@@ -4,14 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
-  AlternusLogo,
+  CerevixLogo,
   DARK_BG,
   DARK_BORDER_SOFT,
   DARK_MUTED,
   DARK_SURFACE_SOFT,
   DARK_TEXT,
-  useAlternusMode,
-} from "@/components/alternus-shell";
+  useCerevixMode,
+} from "@/components/cerevix-shell";
 
 const COBALT = "#4284FF";
 const INK = "#1F1F1F";
@@ -37,7 +37,7 @@ const socialProviders = [
 
 export default function Login() {
   const router = useRouter();
-  const [isDark, setIsDark] = useAlternusMode();
+  const [isDark, setIsDark] = useCerevixMode();
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [loading, setLoading] = useState(false);
@@ -144,8 +144,8 @@ export default function Login() {
         }}
       >
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <AlternusLogo size={28} radius={8} />
-          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg }}>ALTERNUS</span>
+          <CerevixLogo size={28} radius={8} />
+          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg }}>Cerevix</span>
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -261,7 +261,7 @@ export default function Login() {
                     margin: 0,
                   }}
                 >
-                  Sign in to Alternus.
+                  Sign in to Cerevix.
                 </h1>
                 <p style={{ margin: "14px auto 0", maxWidth: 360, fontSize: 14.5, lineHeight: 1.6, color: muted }}>
                   Centered, quieter, and ready to get you back into the workspace.

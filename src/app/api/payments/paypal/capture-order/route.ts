@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
         postalCode: shippingAddress?.postalCode || '',
         country: shippingAddress?.country || '',
       },
-    }).catch(err => console.error('Failed to send admin notification:', err))
+    }).catch((err: unknown) => console.error('Failed to send admin notification:', err))
 
     return NextResponse.json({
       success: true,

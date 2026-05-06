@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AlternusPage, COBALT } from "@/components/alternus-shell";
+import { CerevixPage, COBALT } from "@/components/cerevix-shell";
 
 const bridges = [
   {
@@ -22,13 +22,13 @@ const bridges = [
     blurb:
       "Drive website hero scenes, 3D assets, geometry nodes, materials, lighting, and render queues through a signed Blender add-on.",
     verbs: ["build scene", "geometry nodes", "materials", "render assets"],
-    install: "alternus.ai/bridges/blender.zip",
+    install: "Cerevix.ai/bridges/blender.zip",
   },
 ];
 
 export default function Bridges() {
   return (
-    <AlternusPage>
+    <CerevixPage>
       {(t) => (
         <>
           <section style={{ padding: "120px 0 60px", position: "relative", overflow: "hidden" }}>
@@ -54,7 +54,7 @@ export default function Bridges() {
                 Build in Blender.
               </h1>
               <p style={{ marginTop: 32, fontSize: 18, color: t.muted, maxWidth: 640, lineHeight: 1.55 }}>
-                Alternus connects the coding agent with AutoCAD for website design systems and Blender for 3D scenes, product visuals, and render-ready assets.
+                Cerevix connects the coding agent with AutoCAD for website design systems and Blender for 3D scenes, product visuals, and render-ready assets.
               </p>
             </div>
           </section>
@@ -153,11 +153,11 @@ export default function Bridges() {
                 <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
                   <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E" }} />
                   <span style={{ fontSize: 11, color: t.muted, fontFamily: "var(--font-geist-mono),monospace", letterSpacing: "0.06em" }}>
-                    alternus.autocad.code - v0.9.4
+                    Cerevix.autocad.code - v0.9.4
                   </span>
                 </div>
                 <pre style={{ margin: 0, fontSize: 12.5, fontFamily: "var(--font-geist-mono),monospace", lineHeight: 1.7, color: t.fg }}>
-                  <span style={{ color: COBALT }}>&gt;</span> alternus.autocad.code({"{"}
+                  <span style={{ color: COBALT }}>&gt;</span> Cerevix.autocad.code({"{"}
                   {"\n"}  goal:   <span style={{ color: "#22C55E" }}>&quot;build a clean responsive pricing section&quot;</span>,
                   {"\n"}  frame:  <span style={{ color: "#22C55E" }}>&quot;Website / Pricing&quot;</span>,
                   {"\n"}  output: <span style={{ color: "#22C55E" }}>&quot;React + Tailwind&quot;</span>,
@@ -177,7 +177,7 @@ export default function Bridges() {
               </h2>
               <div style={{ marginTop: 40, display: "inline-flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
                 <Link href="/main" style={{ height: 48, padding: "0 22px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
-                  Launch Alternus OS
+                  Launch Cerevix OS
                 </Link>
                 <Link href="/platform/agent-sdk" style={{ height: 48, padding: "0 22px", background: "transparent", color: t.fg, fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", border: `1px solid ${t.faint}` }}>
                   Build the bridge
@@ -187,6 +187,6 @@ export default function Bridges() {
           </section>
         </>
       )}
-    </AlternusPage>
+    </CerevixPage>
   );
 }

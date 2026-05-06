@@ -103,7 +103,7 @@ export function LiveChat() {
     setShowNameForm(false);
 
     // Send welcome message
-    sendMessage("Përshëndetje! Si mund t'ju ndihmoj sot?", "support", "Alternus CEO");
+    sendMessage("Përshëndetje! Si mund t'ju ndihmoj sot?", "support", "Cerevix CEO");
   };
 
   const sendMessage = async (text: string, sender: "user" | "support", senderName?: string) => {

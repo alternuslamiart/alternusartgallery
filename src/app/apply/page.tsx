@@ -219,7 +219,7 @@ export default function ApplyPage() {
               </svg>
             </div>
             <div>
-              <p className="text-white font-semibold text-sm leading-none">Alternus Art Gallery</p>
+              <p className="text-white font-semibold text-sm leading-none">Cerevix Art Gallery</p>
               <p className="text-white/70 text-xs mt-0.5">Join our curated community of artists</p>
             </div>
           </div>
@@ -656,7 +656,7 @@ export default function ApplyPage() {
 
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">
-                  Why do you want to join Alternus? <span className="text-red-400">*</span>
+                  Why do you want to join Cerevix? <span className="text-red-400">*</span>
                 </label>
                 <textarea
                   required

@@ -275,7 +275,7 @@ export default function ShippingPage() {
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Full Insurance Coverage</h3>
             <div className="space-y-4 text-gray-600">
-              <p>Every artwork shipped through Alternus is fully insured against:</p>
+              <p>Every artwork shipped through Cerevix is fully insured against:</p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-emerald-500"><polyline points="20 6 9 17 4 12"/></svg>

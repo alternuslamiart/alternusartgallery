@@ -11,7 +11,7 @@ function isAuthorized(request: NextRequest) {
 
   const authHeader = request.headers.get("authorization") ?? "";
   const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
-  const headerToken = request.headers.get("x-alternus-blender-token")?.trim() ?? "";
+  const headerToken = request.headers.get("x-cerevix-blender-token")?.trim() ?? "";
   return bearerToken === expectedToken || headerToken === expectedToken;
 }
 
@@ -21,7 +21,7 @@ export async function OPTIONS() {
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Alternus-Blender-Token",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Cerevix-Blender-Token",
     },
   });
 }

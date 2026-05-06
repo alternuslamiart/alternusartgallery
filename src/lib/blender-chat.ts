@@ -228,7 +228,7 @@ mats = {
     "wood": make_material("Soft Wood", (0.52, 0.34, 0.19, 1), 0.5),
     "stone": make_material("Matte Stone", (0.64, 0.66, 0.66, 1), 0.72),
     "clay": make_material("Terracotta Clay", (0.72, 0.35, 0.22, 1), 0.68),
-    "blue": make_material("Alternus Blue", (0.1, 0.52, 0.9, 1), 0.45),
+    "blue": make_material("Cerevix Blue", (0.1, 0.52, 0.9, 1), 0.45),
     "dark": make_material("Graphite", (0.03, 0.035, 0.04, 1), 0.5),
     "art": make_material("Artwork Surface", (0.82, 0.84, 0.88, 1), 0.4),
     "concrete": make_material("Concrete", (0.48, 0.5, 0.52, 1), 0.75),
@@ -261,7 +261,7 @@ bpy.context.scene.render.resolution_y = 1000
 for obj in bpy.context.scene.objects:
     obj.select_set(False)
 
-print(f"Alternus AI generated scene: {SCENE_TITLE} from prompt: {PROMPT}")
+print(f"Cerevix AI generated scene: {SCENE_TITLE} from prompt: {PROMPT}")
 `;
 
   return {
@@ -405,7 +405,7 @@ for addition in ADDITIONS:
 for obj in created:
     obj.select_set(True)
 
-print(f"Alternus AI added {len(created)} objects from prompt: {PROMPT}. Existing context objects: {len(EXISTING_OBJECTS)}")
+print(f"Cerevix AI added {len(created)} objects from prompt: {PROMPT}. Existing context objects: {len(EXISTING_OBJECTS)}")
 `;
 
   return {

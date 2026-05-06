@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
       artStyles: artStyle,
       yearsExperience: yearsExperience || 'Not specified',
       portfolioUrl: portfolio || undefined,
-    }).catch(err => console.error('Failed to send admin artist application notification:', err))
+    }).catch((err: unknown) => console.error('Failed to send admin artist application notification:', err))
 
     return NextResponse.json({
       success: true,

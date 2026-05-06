@@ -14,7 +14,7 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-8">
           {/* Brand */}
           <div className="col-span-1 sm:col-span-2 md:col-span-1 space-y-4">
-            <h3 className="text-2xl font-bold font-playfair tracking-tight">Alternus</h3>
+            <h3 className="text-2xl font-bold font-playfair tracking-tight">Cerevix</h3>
             <p className="text-sm text-gray-300">
               An exclusive art gallery where every piece tells a unique story.
             </p>
@@ -55,7 +55,7 @@ export function Footer() {
                 </svg>
               </a>
               <a
-                href="https://x.com/Alternusart"
+                href="https://x.com/Cerevixart"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-white transition-colors"
@@ -106,7 +106,7 @@ export function Footer() {
                 </svg>
               </a>
             </div>
-            <p className="text-xs text-gray-300 pt-2">&copy; {new Date().getFullYear()} Alternus Art Gallery. {t("allRights")}</p>
+            <p className="text-xs text-gray-300 pt-2">&copy; {new Date().getFullYear()} Cerevix Art Gallery. {t("allRights")}</p>
           </div>
 
           {/* Quick Links */}
@@ -284,16 +284,16 @@ export function Footer() {
       <div className="overflow-hidden border-t border-white/5">
         <div className="animate-marquee">
           <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
-            Alternus
+            Cerevix
           </span>
           <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
-            Alternus
+            Cerevix
           </span>
           <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
-            Alternus
+            Cerevix
           </span>
           <span className="text-[256px] font-bold bg-gradient-to-r from-gray-400 via-gray-200 to-gray-400 bg-clip-text text-transparent mx-16 leading-none whitespace-nowrap">
-            Alternus
+            Cerevix
           </span>
         </div>
       </div>
@@ -303,7 +303,7 @@ export function Footer() {
         <div className="animate-marquee-slow">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="flex items-center gap-8 md:gap-14 px-4 md:px-8">
-              <span className="font-playfair text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap select-none">Alternus</span>
+              <span className="font-playfair text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap select-none">Cerevix</span>
               <span className="text-white/20 text-lg select-none">&bull;</span>
               <span className="font-playfair text-2xl md:text-3xl font-bold text-white/20 whitespace-nowrap select-none">Art Gallery</span>
               <span className="text-white/20 text-lg select-none">&bull;</span>

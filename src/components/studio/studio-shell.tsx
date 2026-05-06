@@ -69,7 +69,7 @@ import {
 
 export type StudioRouteKey =
   | "studio-overview"
-  | "alternus-design"
+  | "cerevix-design"
   | "autocad-design"
   | "code-builder"
   | "blender-3d"
@@ -102,7 +102,7 @@ type GeneratedRecent = {
 export const studioNavigation: NavItem[] = [
   { key: "ai-assistant", label: "AI Assistant", href: "/ai-assistant", icon: Sparkles },
   { key: "studio-overview", label: "Studio Overview", href: "/studio-overview", icon: Grid2X2 },
-  { key: "alternus-design", label: "Alternus Design", href: "/alternus-design", icon: Monitor },
+  { key: "cerevix-design", label: "Cerevix Design", href: "/cerevix-design", icon: Monitor },
   { key: "autocad-design", label: "AutoCAD Design", href: "/autocad-design", icon: PenLine },
   { key: "code-builder", label: "Code Builder", href: "/code-builder", icon: Code2 },
   { key: "blender-3d", label: "Blender 3D", href: "/blender-3d", icon: Layers3 },
@@ -120,7 +120,7 @@ const bottomNavigation = [
 const routeByPath: Record<string, StudioRouteKey> = {
   "/main": "studio-overview",
   "/studio-overview": "studio-overview",
-  "/alternus-design": "alternus-design",
+  "/cerevix-design": "cerevix-design",
   "/autocad-design": "autocad-design",
   "/code-builder": "code-builder",
   "/blender-3d": "blender-3d",
@@ -351,14 +351,14 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   );
 
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem("alternus-studio-theme");
+    const savedTheme = window.localStorage.getItem("Cerevix-studio-theme");
     if (savedTheme === "light" || savedTheme === "dark") {
       setTheme(savedTheme);
     }
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem("alternus-studio-theme", theme);
+    window.localStorage.setItem("Cerevix-studio-theme", theme);
   }, [theme]);
 
   const themeValue = useMemo(
@@ -574,7 +574,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
             <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white shadow-[0_10px_22px_rgba(29,161,242,0.24)]">
               <Sparkles className="h-[15px] w-[15px] fill-current" />
             </div>
-            <p className={`text-[12px] font-bold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Alternus AI Trial</p>
+            <p className={`text-[12px] font-bold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Cerevix AI Trial</p>
             <p className={`mt-1 text-[10px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>There are 12 days left for you to enjoy the various features.</p>
             <button
               onClick={() => setActiveModal("upgrade")}
@@ -1281,8 +1281,8 @@ function StudioContent({ route, assistantTool }: { route: StudioRouteKey; assist
   switch (route) {
     case "studio-overview":
       return <OverviewPage />;
-    case "alternus-design":
-      return <AlternusDesignPage />;
+    case "cerevix-design":
+      return <CerevixDesignPage />;
     case "autocad-design":
       return <AutoCADPage />;
     case "code-builder":
@@ -1701,7 +1701,7 @@ function OverviewPage() {
   );
 }
 
-function AlternusDesignPage() {
+function CerevixDesignPage() {
   const { theme } = useStudioTheme();
   const { showToast } = useStudioActions();
   const dark = theme === "dark";
@@ -1828,8 +1828,8 @@ function AlternusDesignPage() {
   return (
     <div>
       <PageHeader
-        title="Alternus Design"
-        subtitle="Design website, app, and mobile prototypes in the same Alternus AI workspace."
+        title="Cerevix Design"
+        subtitle="Design website, app, and mobile prototypes in the same Cerevix AI workspace."
         action={<PrimaryButton icon={Sparkles} onClick={() => projectInputRef.current?.focus()}>Create prototype</PrimaryButton>}
       />
 
@@ -1898,7 +1898,7 @@ function AlternusDesignPage() {
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className={`text-[13px] font-semibold ${strong}`}>Designs</p>
-                <p className={`mt-1 text-[11px] ${muted}`}>Recent prototypes and UI systems generated with Alternus AI.</p>
+                <p className={`mt-1 text-[11px] ${muted}`}>Recent prototypes and UI systems generated with Cerevix AI.</p>
               </div>
               <div className={`flex rounded-2xl p-1 ${dark ? "bg-[#181B20]" : "bg-[#EEF3F7]"}`}>
                 {(["Recent", "Your designs", "Design systems"] as const).map((tab) => (
@@ -1931,7 +1931,7 @@ function AlternusDesignPage() {
                 value={brief}
                 onChange={(event) => setBrief(event.target.value)}
                 className={`mt-3 min-h-[118px] w-full resize-none rounded-2xl border p-4 text-[13px] outline-none ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#6F7782]" : "border-[#E5EAF0] bg-white text-[#171717] placeholder:text-[#A1A7B0]"}`}
-                placeholder="Describe the website, dashboard, mobile flow, or app screen you want Alternus Design to create..."
+                placeholder="Describe the website, dashboard, mobile flow, or app screen you want Cerevix Design to create..."
               />
               <div className="mt-3 flex flex-wrap gap-2">
                 {["Responsive", "Design tokens", "Components", "Prototype flow"].map((chip) => (
@@ -3434,7 +3434,7 @@ function AIAssistantPage() {
   const shareAssistantMessage = async (content: string) => {
     try {
       if (navigator.share) {
-        await navigator.share({ title: "Alternus AI response", text: content });
+        await navigator.share({ title: "Cerevix AI response", text: content });
         showToast("Response shared");
         return;
       }
@@ -3450,7 +3450,7 @@ function AIAssistantPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `alternus-ai-response-${message.id}.txt`;
+    link.download = `Cerevix-ai-response-${message.id}.txt`;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -3528,7 +3528,7 @@ function AIAssistantPage() {
                 void sendPrompt();
               }
             }}
-            placeholder="Ask Alternus AI Assistant..."
+            placeholder="Ask Cerevix AI Assistant..."
             className={`min-w-0 flex-1 bg-transparent text-[13px] outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#A1A7B0]"}`}
             style={{ color: dark ? "#F4F6F8" : "#171717", letterSpacing: 0 }}
           />
@@ -3651,8 +3651,8 @@ function AIAssistantPage() {
           <div className="mb-5 flex h-[62px] w-[62px] items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_16px_38px_rgba(29,161,242,0.32)] max-sm:mt-24 max-sm:h-[54px] max-sm:w-[54px]">
             <Sparkles className="h-7 w-7 fill-current max-sm:h-6 max-sm:w-6" />
           </div>
-          <h2 className={`text-[28px] font-semibold tracking-[-0.03em] max-sm:text-[17px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Alternus AI Assistant</h2>
-          <p className={`mt-3 text-[12px] leading-5 max-sm:mt-1 max-sm:text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Ask about art, artists, styles, commissions, shipping, or anything else on Alternus.</p>
+          <h2 className={`text-[28px] font-semibold tracking-[-0.03em] max-sm:text-[17px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Cerevix AI Assistant</h2>
+          <p className={`mt-3 text-[12px] leading-5 max-sm:mt-1 max-sm:text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Ask about art, artists, styles, commissions, shipping, or anything else on Cerevix.</p>
 
           {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
 
@@ -3703,7 +3703,7 @@ function AIAssistantPage() {
                 <Sparkles className="h-3.5 w-3.5 fill-current" />
               </div>
               <div className="min-w-0">
-                <p className={`text-[10.5px] font-medium ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Connected to the live Alternus assistant</p>
+                <p className={`text-[10.5px] font-medium ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Connected to the live Cerevix assistant</p>
                 <p className={`mt-0.5 text-[9.5px] leading-3 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Your prompts are sent to the same API used by the web chat.</p>
               </div>
             </div>
@@ -3866,7 +3866,7 @@ function ProjectsPage() {
     <div>
       <PageHeader title="Projects" subtitle="Manage studio projects and production status." action={<PrimaryButton icon={Plus} onClick={() => openModal("project-create")}>New project</PrimaryButton>} />
       <div className="grid gap-3 md:grid-cols-3">
-        {["Alternus dashboard", "Gallery redesign", "3D catalog"].map((name) => (
+        {["Cerevix dashboard", "Gallery redesign", "3D catalog"].map((name) => (
           <ClickableSoftCard key={name} className="min-h-[150px]" onClick={() => openDrawer("project-detail")} ariaLabel={`Open ${name} project`}>
             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
               <Folder className="h-5 w-5" />
@@ -3910,50 +3910,18 @@ function ExportsPage() {
 
 function SettingsPage() {
   const { theme, toggleTheme } = useStudioTheme();
-  const { showToast } = useStudioActions();
   const isDark = theme === "dark";
-
-  const navItems: Array<{ label: string; icon: LucideIcon; active?: boolean }> = [
-    { label: "General", icon: Settings, active: true },
-    { label: "Notifications", icon: Bell },
-    { label: "Personalization", icon: Sparkles },
-    { label: "Apps", icon: Grid2X2 },
-    { label: "Schedules", icon: RefreshCw },
-    { label: "Data controls", icon: Database },
-    { label: "Security", icon: Shield },
-    { label: "Parental controls", icon: KeyRound },
-    { label: "Account", icon: UserRound },
-  ];
 
   const frameClass = isDark
     ? "border-[rgba(255,255,255,0.08)] bg-[#1F1F1F] text-[#F5F5F5] shadow-[0_32px_80px_rgba(0,0,0,0.34)]"
     : "border-[#E5E7EB] bg-white text-[#101113] shadow-[0_32px_80px_rgba(15,23,42,0.08)]";
-  const sidebarClass = isDark ? "bg-[#202020]" : "bg-[#F7F8FA]";
   const panelClass = isDark ? "bg-[rgba(31,31,31,0.9)]" : "bg-[rgba(255,255,255,0.92)]";
   const borderClass = isDark ? "border-[#333333]" : "border-[#E5E7EB]";
-  const mutedClass = isDark ? "text-[#AFAFAF]" : "text-[#6B7280]";
 
   return (
-    <div className="mx-auto flex w-full max-w-[980px] justify-center py-3">
-      <div className={`grid min-h-[620px] w-full overflow-hidden rounded-2xl border backdrop-blur-xl lg:grid-cols-[196px_1fr] ${frameClass}`}>
-        <aside className={`border-r ${borderClass} ${sidebarClass}`}>
-          <div className="flex h-14 items-center px-4">
-            <button
-              onClick={() => showToast("Settings panel remains open")}
-              className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${isDark ? "text-[#EDEDED] hover:bg-[#303030]" : "text-[#111827] hover:bg-[#ECEFF3]"}`}
-              aria-label="Close settings"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          <nav className="space-y-1 px-3 pb-5">
-            {navItems.map((item) => (
-              <SettingsNavItem key={item.label} icon={item.icon} label={item.label} active={Boolean(item.active)} />
-            ))}
-          </nav>
-        </aside>
-
-        <main className={`px-8 py-6 ${panelClass}`}>
+    <div className="mx-auto flex w-full justify-center py-3">
+      <div className={`min-h-[620px] w-full max-w-[784px] overflow-hidden rounded-2xl border backdrop-blur-xl ${frameClass}`}>
+        <main className={`h-full px-8 py-6 ${panelClass}`}>
           <div className={`flex items-center justify-between border-b pb-5 ${borderClass}`}>
             <h1 className="text-[18px] font-medium tracking-[-0.01em]">General</h1>
             <button
@@ -3983,26 +3951,13 @@ function SettingsPage() {
             <VoiceSettingRow />
             <GeneralSettingRow
               label="Separate Voice"
-              description="Keep Alternus Voice in a separate full screen, without real time transcripts and visuals."
+              description="Keep Cerevix Voice in a separate full screen, without real time transcripts and visuals."
               control={<SettingsSwitch enabled={false} label="Separate Voice" />}
             />
           </div>
         </main>
       </div>
     </div>
-  );
-}
-
-function SettingsNavItem({ icon: Icon, label, active }: { icon: LucideIcon; label: string; active: boolean }) {
-  const { theme } = useStudioTheme();
-  const dark = theme === "dark";
-  return (
-    <button
-      className={`flex h-9 w-full items-center gap-3 rounded-[9px] px-3 text-left text-[13px] transition-colors ${active ? (dark ? "bg-[#3A3A3A] text-white" : "bg-white text-[#111827] shadow-sm") : (dark ? "text-[#F1F1F1] hover:bg-[#2B2B2B]" : "text-[#3F4652] hover:bg-white")}`}
-    >
-      <Icon className="h-4 w-4 flex-shrink-0" />
-      <span className="truncate">{label}</span>
-    </button>
   );
 }
 

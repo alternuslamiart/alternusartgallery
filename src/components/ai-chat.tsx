@@ -40,12 +40,12 @@ const DEFAULT_QUICK_ACTIONS: QuickAction[] = [
   { id: "studio-overview", label: "Studio Overview", link: "/studio-overview" },
   { id: "asset-library", label: "Asset Library", link: "/asset-library" },
   { id: "prompt-lab", label: "Prompt Lab", link: "/prompt-lab" },
-  { id: "help", label: "How do I use it?", prompt: "How do I use Alternus AI Studio to design a website and app flow?" },
+  { id: "help", label: "How do I use it?", prompt: "How do I use Cerevix AI Studio to design a website and app flow?" },
 ];
 
 const ADDABLE_ACTIONS: QuickAction[] = [
   { id: "homepage", label: "Homepage layout", prompt: "Create a clean homepage layout for a creative AI studio." },
-  { id: "dashboard", label: "Dashboard layout", prompt: "Design a dashboard layout for Alternus AI Studio." },
+  { id: "dashboard", label: "Dashboard layout", prompt: "Design a dashboard layout for Cerevix AI Studio." },
   { id: "mobile-flow", label: "Mobile flow", prompt: "Plan a mobile app flow with onboarding, workspace, and settings screens." },
   { id: "design-system", label: "Design system", prompt: "Outline a design system with typography, spacing, buttons, and cards." },
   { id: "3d-brief", label: "3D brief", prompt: "Prepare a Blender 3D scene brief with lighting, materials, and camera direction." },
@@ -445,12 +445,12 @@ export function AIChat() {
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border border-white/20">
-                    <Image src="/logo.png" alt="Alternus AI" width={36} height={36} className="object-cover" />
+                    <Image src="/logo.png" alt="Cerevix AI" width={36} height={36} className="object-cover" />
                   </div>
                   <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-coffee" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white text-sm">Alternus AI</h3>
+                  <h3 className="font-semibold text-white text-sm">Cerevix AI</h3>
                   <p className="text-white/50 text-[11px] flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
                     Art Assistant
@@ -547,7 +547,7 @@ export function AIChat() {
                   </svg>
                 </button>
               </div>
-              <p className="text-[10px] text-stone-300 text-center mt-2">Powered by Alternus AI</p>
+              <p className="text-[10px] text-stone-300 text-center mt-2">Powered by Cerevix AI</p>
             </div>
           </div>
         </div>
@@ -615,12 +615,12 @@ export function AIChat() {
                 <div className="flex items-center gap-2.5 ml-1">
                   <div className="relative">
                     <div className="w-8 h-8 rounded-full bg-coffee flex items-center justify-center overflow-hidden">
-                      <Image src="/logo.png" alt="Alternus AI" width={22} height={22} className="object-cover" />
+                      <Image src="/logo.png" alt="Cerevix AI" width={22} height={22} className="object-cover" />
                     </div>
                     <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-white" />
                   </div>
                   <div>
-                    <h1 className="text-sm font-semibold text-stone-900">Alternus AI</h1>
+                    <h1 className="text-sm font-semibold text-stone-900">Cerevix AI</h1>
                     <p className="text-[10px] text-stone-400">Art Assistant & Image Creator</p>
                   </div>
                 </div>
@@ -658,7 +658,7 @@ export function AIChat() {
               <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-6">
                 <div className="relative mb-5">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-coffee to-stone-700 flex items-center justify-center shadow-lg">
-                    <Image src="/logo.png" alt="Alternus AI" width={40} height={40} className="object-cover" />
+                    <Image src="/logo.png" alt="Cerevix AI" width={40} height={40} className="object-cover" />
                   </div>
                 </div>
 

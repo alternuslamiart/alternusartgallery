@@ -38,9 +38,9 @@ function AdminProfileContent() {
     firstName: "Admin",
     username: "alternus_admin",
     role: "Gallery Administrator",
-    bio: "Managing the Alternus Art Gallery platform and supporting our talented artists. Dedicated to providing the best experience for both artists and collectors.",
+    bio: "Managing the Cerevix Art Gallery platform and supporting our talented artists. Dedicated to providing the best experience for both artists and collectors.",
     location: "Tirana, Albania",
-    website: "www.alternus.gallery",
+    website: "www.Cerevix.gallery",
     joinedDate: "January 2024",
     specialties: ["Gallery Management", "Art Curation", "Artist Support", "Platform Admin"],
     stats: {

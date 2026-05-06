@@ -1,5 +1,5 @@
 "use client";
-import { AlternusPage, COBALT } from "@/components/alternus-shell";
+import { CerevixPage, COBALT } from "@/components/cerevix-shell";
 
 const roles = [
   { t: "Staff Product Engineer — Agent",    loc: "Remote · EU", team: "Engineering" },
@@ -12,7 +12,7 @@ const roles = [
 
 export default function Careers() {
   return (
-    <AlternusPage>
+    <CerevixPage>
       {(t) => (
         <>
           <section style={{ padding: "120px 0 60px" }}>
@@ -46,13 +46,13 @@ export default function Careers() {
               <div style={{ marginTop: 64, padding: "40px 36px", border: `1px solid ${t.faint}`, borderRadius: 12, background: t.surface }}>
                 <h2 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.025em", margin: 0, marginBottom: 20 }}>Don&apos;t see your role?</h2>
                 <p style={{ fontSize: 15, color: t.muted, lineHeight: 1.6, margin: 0, maxWidth: 580 }}>
-                  If you&apos;re exceptional and passionate about agents, send us your work at <a href="mailto:hiring@alternus.ai" style={{ color: COBALT }}>hiring@alternus.ai</a>. We always make room for exceptional people.
+                  If you&apos;re exceptional and passionate about agents, send us your work at <a href="mailto:hiring@Cerevix.ai" style={{ color: COBALT }}>hiring@Cerevix.ai</a>. We always make room for exceptional people.
                 </p>
               </div>
             </div>
           </section>
         </>
       )}
-    </AlternusPage>
+    </CerevixPage>
   );
 }

@@ -66,7 +66,7 @@ export function ArtLoverModal() {
             {/* Subtle overlay text */}
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/50 to-transparent">
               <p className="text-white/80 text-xs font-medium tracking-wide">
-                ALTERNUS ART GALLERY
+                Cerevix ART GALLERY
               </p>
             </div>
           </div>
@@ -93,7 +93,7 @@ export function ArtLoverModal() {
                   </svg>
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  Welcome to Alternus!
+                  Welcome to Cerevix!
                 </h2>
                 <p className="text-gray-500 text-sm">
                   Check your email for your exclusive 10% discount code.

@@ -14,7 +14,7 @@ const accordionItems: AccordionItem[] = [
   {
     id: "artists",
     title: "Verified Artists",
-    description: "Every artist on Alternus is carefully vetted to ensure authenticity and quality. We work directly with creators to bring you original works from talented artists worldwide.",
+    description: "Every artist on Cerevix is carefully vetted to ensure authenticity and quality. We work directly with creators to bring you original works from talented artists worldwide.",
     image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=1200&q=80",
   },
   {

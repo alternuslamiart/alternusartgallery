@@ -1,8 +1,8 @@
 "use client";
-import { AlternusPage, COBALT } from "@/components/alternus-shell";
+import { CerevixPage, COBALT } from "@/components/cerevix-shell";
 
-const install = `npm install @alternus/agent`;
-const example = `import { Agent } from "@alternus/agent";
+const install = `npm install @Cerevix/agent`;
+const example = `import { Agent } from "@Cerevix/agent";
 
 const agent = new Agent({ model: "claude-opus-4-6" });
 
@@ -13,17 +13,17 @@ await agent.run({
 
 export default function AgentSDK() {
   return (
-    <AlternusPage>
+    <CerevixPage>
       {(t) => (
         <>
           <section style={{ padding: "80px 0 40px" }}>
             <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
-              <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 20 }}>/ @alternus/agent</div>
+              <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 20 }}>/ @Cerevix/agent</div>
               <h1 style={{ fontSize: "clamp(40px,6vw,80px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.95, margin: 0, fontStretch: "88%" }}>
                 Three lines<br/>to a working agent.
               </h1>
               <p style={{ marginTop: 28, fontSize: 17, color: t.muted, maxWidth: 560, lineHeight: 1.55 }}>
-                The same runtime that powers Alternus OS — shipped as a typed TypeScript SDK. Bring your own tools, your own memory, your own UI.
+                The same runtime that powers Cerevix OS — shipped as a typed TypeScript SDK. Bring your own tools, your own memory, your own UI.
               </p>
             </div>
           </section>
@@ -80,6 +80,6 @@ export default function AgentSDK() {
           </section>
         </>
       )}
-    </AlternusPage>
+    </CerevixPage>
   );
 }

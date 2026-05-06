@@ -143,7 +143,7 @@ export async function PATCH(request: NextRequest) {
           userId: artist.userId,
           type: 'artist_approved',
           title: 'Application Approved',
-          message: 'Your artist application has been approved! Welcome to Alternus Art Gallery.',
+          message: 'Your artist application has been approved! Welcome to Cerevix Art Gallery.',
           linkUrl: '/gallery',
         },
       })

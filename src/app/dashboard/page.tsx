@@ -866,7 +866,7 @@ function DashboardContent() {
                         <label className="text-sm font-medium text-muted-foreground">Email</label>
                         <input
                           type="email"
-                          defaultValue="elena@alternus.art"
+                          defaultValue="elena@Cerevix.art"
                           className="w-full mt-1 px-3 py-2 border rounded-lg bg-background"
                         />
                       </div>

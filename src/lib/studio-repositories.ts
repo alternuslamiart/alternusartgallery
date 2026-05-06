@@ -50,8 +50,8 @@ export type StudioAsset = {
   status: "Ready";
 };
 
-const PROTOTYPES_KEY = "alternus-design-prototypes";
-const ASSETS_KEY = "alternus-asset-library";
+const PROTOTYPES_KEY = "cerevix-design-prototypes";
+const ASSETS_KEY = "Cerevix-asset-library";
 
 export const defaultDesignSystem: DesignSystemSettings = {
   colorPreset: "Sky / Paper / Graphite",

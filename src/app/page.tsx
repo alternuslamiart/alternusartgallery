@@ -1,1290 +1,1445 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useSession, signOut } from "next-auth/react";
-import {
-  AlternusLogo,
-  DARK_BG,
-  DARK_BORDER,
-  DARK_BORDER_SOFT,
-  DARK_MUTED,
-  DARK_SURFACE,
-  DARK_SURFACE_SOFT,
-  DARK_TEXT,
-  useAlternusMode,
-} from "@/components/alternus-shell";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { useLanguage, useCart, useWishlist } from "@/components/providers";
+import AccordionSection from "@/components/accordion-section";
+import TestimonialsSection from "@/components/testimonials-section";
+import { AdBanner } from "@/components/adsense";
 
-const COBALT = "#4284FF";
-const COBALT_DEEP = "#1E5ED4";
-const INK = "#1F1F1F";
-const PAPER = "#F4F6FB";
-const marquee = [
-  "AutoCAD bridge",
-  "Blender bridge",
-  "Website design agent",
-  "Code agent",
-  "Blender 3D scenes",
-  "AutoCAD components",
-  "Responsive website sections",
-  "Design systems",
-  "3D product visuals",
-  "Production-ready layouts",
-];
-
-const capabilities = [
-  {
-    n: "01",
-    t: "AutoCAD",
-    d: "Turn a product idea into clean website screens, components, tokens, and responsive layout notes directly for AutoCAD.",
-    k: "autocad.site(prompt)",
-    output: "Frames, tokens, components",
-  },
-  {
-    n: "02",
-    t: "Code",
-    d: "Convert AutoCAD structure into production-ready website sections with clean React, Tailwind, spacing, and responsive states.",
-    k: "code.website(autocad)",
-    output: "Pages, sections, UI code",
-  },
-  {
-    n: "03",
-    t: "Blender",
-    d: "Drive Blender from a prompt. Build 3D scenes, product visuals, materials, lighting, and render queues through a Python bridge.",
-    k: "blender.scene(spec)",
-    output: "Scenes, nodes, renders",
-  },
-  {
-    n: "04",
-    t: "Design",
-    d: "Keep AutoCAD and code aligned. The agent manages colors, typography, spacing, cards, nav, and clean website systems.",
-    k: "autocad.system(site)",
-    output: "Styles, grids, variants",
-  },
-  {
-    n: "05",
-    t: "3D Assets",
-    d: "Create Blender 3D assets for website heroes, product previews, studio scenes, and polished visual sections.",
-    k: "blender.asset(site)",
-    output: "Models, materials, renders",
-  },
-  {
-    n: "06",
-    t: "Prototype",
-    d: "Plan website flows in AutoCAD, then send the same structure to the code agent so the live page matches the design.",
-    k: "autocad.flow(code)",
-    output: "Flows, pages, states",
-  },
-];
-
-const pillars = [
-  {
-    k: "Fast",
-    v: "Sub-200ms agent turnaround. You iterate on AutoCAD frames, website code, and Blender scenes without waiting.",
-  },
-  {
-    k: "Pro-grade",
-    v: "Speaks AutoCAD components, responsive website structure, and .blend scene workflows - not just static mockups.",
-  },
-  {
-    k: "In-tool",
-    v: "Lives around AutoCAD and Blender so design, code, and 3D production stay in one workflow.",
-  },
-  {
-    k: "Yours",
-    v: "Your footage, renders, and boards never train a shared model. Encrypted at rest.",
-  },
-];
-
-const quotes = [
-  {
-    by: "Marcus Johnson",
-    role: "Website Designer, Remote",
-    q: "I described the website section once and Alternus returned a AutoCAD frame plus the coded layout. The design and build finally stayed together.",
-  },
-  {
-    by: "Priya Sharma",
-    role: "Product Designer, London",
-    q: "I asked for a cleaner landing page system and got AutoCAD components, spacing, and responsive code direction in one pass.",
-  },
-  {
-    by: "David Chen",
-    role: "3D Web Artist, LA",
-    q: "The Blender bridge built the hero scene, materials, and render queue from the same website brief I used for the AutoCAD design.",
-  },
-];
-
-const faq = [
-  {
-    q: "What exactly is Alternus?",
-    a: "A creative AI workspace for website design, coding, AutoCAD systems, and Blender 3D. It helps you direct design and production from one agent.",
-  },
-  {
-    q: "How does the AutoCAD workflow work?",
-    a: "Alternus plans website screens, components, tokens, and responsive states for AutoCAD, then keeps the same structure ready for the code agent.",
-  },
-  {
-    q: "How does the Blender integration work?",
-    a: "A signed Python add-on registers an alternus.* operator. The agent generates scenes, geometry-node graphs, materials, lighting, and render queues; Blender executes them headlessly or in-session.",
-  },
-  {
-    q: "Can it code the website from the design?",
-    a: "Yes. The agent turns AutoCAD structure into clean website sections with responsive layout, reusable components, and production-ready styling.",
-  },
-  {
-    q: "Where are my files stored?",
-    a: "In your private knowledge layer, encrypted at rest. The agent references your AutoCAD, code, and Blender files but never trains shared models on them.",
-  },
-];
-
-const quickPrompts = [
-  "Design a clean SaaS homepage in AutoCAD",
-  "Code this AutoCAD section as a responsive website",
-  "Create a Blender 3D hero scene for this website",
-  "Build a Blender product visual with soft lighting",
-];
-
-const navItems = [
-  { l: "Capabilities", h: "#caps" },
-  { l: "Manifesto", h: "#manifesto" },
-  { l: "Voices", h: "#voices" },
-  { l: "FAQ", h: "#faq" },
-];
-
-const bridgeApps = [
-  "AutoCAD",
-  "Blender",
-];
-
-const heroStats = [
-  { value: "200ms", label: "Latency" },
-  { value: "99.9%", label: "Uptime" },
-  { value: "10k+", label: "Users" },
-];
-
-const workspaceFiles = [
-  { name: "Projects", badge: null },
-  { name: "Invoices", badge: "2" },
-  { name: "Design", badge: null },
-  { name: "Contracts", badge: null },
-];
-
-const workspaceLead =
-  "Found 2 invoices from March. Total: $4,820. Export a summary?";
-
-const workspaceDocs = ["Invoice_Mar.pdf", "Receipt_02.pdf", "Contract.pdf"];
-
-const footerColumns = [
-  {
-    heading: "Platform",
-    links: [
-      { l: "Overview", h: "/platform/overview", ext: false },
-      { l: "Bridges", h: "/platform/bridges", ext: false },
-      { l: "Agent SDK", h: "/platform/agent-sdk", ext: false },
-      { l: "API Reference", h: "/platform/api", ext: true },
-      { l: "Changelog", h: "/platform/changelog", ext: false },
-      { l: "Status", h: "/platform/status", ext: false },
-    ],
-  },
-  {
-    heading: "Creative",
-    links: [
-      { l: "Launch Studio", h: "/main", ext: true },
-      { l: "Website design", h: "/workspace/mail", ext: false },
-      { l: "Media library", h: "/workspace/files", ext: false },
-      { l: "AutoCAD + code", h: "/workspace/code", ext: false },
-      { l: "Blender 3D", h: "/workspace/knowledge", ext: false },
-      { l: "Design notes", h: "/workspace/voice", ext: false },
-    ],
-  },
-  {
-    heading: "Company",
-    links: [
-      { l: "About", h: "/about", ext: false },
-      { l: "Manifesto", h: "/manifesto", ext: false },
-      { l: "Careers", h: "/careers", ext: true },
-      { l: "Press Kit", h: "/press", ext: false },
-      { l: "Contact", h: "/contact", ext: false },
-    ],
-  },
-  {
-    heading: "Legal",
-    links: [
-      { l: "Privacy Policy", h: "/privacy", ext: false },
-      { l: "Terms of Use", h: "/terms", ext: false },
-      { l: "Cookie Notice", h: "/cookie-notice", ext: false },
-      { l: "Security", h: "/security", ext: false },
-      { l: "Pricing", h: "/pricing", ext: false },
-    ],
-  },
-];
-
-const socials = [
-  {
-    l: "X",
-    d: "M18.244 2H21l-6.54 7.47L22 22h-6.828l-5.34-6.99L3.6 22H0.84l7-8L0 2h6.914l4.82 6.38L18.244 2z",
-  },
-  {
-    l: "GitHub",
-    d: "M12 2a10 10 0 00-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.12-1.47-1.12-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.1.39-2 1.03-2.7-.1-.26-.45-1.29.1-2.68 0 0 .84-.27 2.75 1.03a9.57 9.57 0 015 0c1.91-1.3 2.75-1.03 2.75-1.03.55 1.39.2 2.42.1 2.68.64.7 1.03 1.6 1.03 2.7 0 3.85-2.34 4.7-4.57 4.94.36.31.68.92.68 1.86v2.76c0 .27.18.58.69.48A10 10 0 0012 2z",
-  },
-  {
-    l: "LinkedIn",
-    d: "M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43A2.07 2.07 0 113.27 5.36a2.07 2.07 0 012.07 2.07zM7.12 20.45H3.56V9h3.56v11.45z",
-  },
-  {
-    l: "YouTube",
-    d: "M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31 31 0 000 12a31 31 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31 31 0 0024 12a31 31 0 00-.5-5.8zM9.75 15.57V8.43L15.82 12l-6.07 3.57z",
-  },
-];
-
-type ThemeVars = CSSProperties & {
-  "--landing-bg": string;
-  "--landing-fg": string;
-  "--landing-muted": string;
-  "--landing-muted-strong": string;
-  "--landing-line": string;
-  "--landing-line-strong": string;
-  "--landing-surface": string;
-  "--landing-surface-soft": string;
-  "--landing-accent": string;
-  "--landing-accent-strong": string;
-};
-
-function ArrowIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M7 17 17 7" />
-      <path d="M7 7h10v10" />
-    </svg>
-  );
-}
-
-function SectionHeading({
-  label,
-  title,
-  copy,
-  action,
-}: {
-  label: string;
-  title: React.ReactNode;
-  copy?: string;
-  action?: React.ReactNode;
-}) {
-  return (
-    <div className="mb-12 grid gap-6 lg:mb-16 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.8fr)] lg:items-end">
-      <div className="landing-section-label">{label}</div>
-      <div>
-        <h2 className="landing-heading-lg">{title}</h2>
-      </div>
-      <div className="space-y-4">
-        {copy ? <p className="landing-copy">{copy}</p> : null}
-        {action}
-      </div>
-    </div>
-  );
+interface Artwork {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  image: string;
+  medium: string;
+  style: string;
+  category: string;
+  dimensions: string;
+  year: number;
+  available: boolean;
+  artist?: {
+    id: string;
+    displayName: string;
+  };
 }
 
 export default function Home() {
   const router = useRouter();
-  const [prompt, setPrompt] = useState("");
-  const [scrolled, setScrolled] = useState(false);
-  const [isDark, setIsDark] = useAlternusMode();
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [activeCap, setActiveCap] = useState(0);
-  const { data: session, status } = useSession();
-  const isLoggedIn = status === "authenticated";
-  const user = session?.user || null;
+  const { t, formatPrice } = useLanguage();
+  const { addToCart } = useCart();
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const [email, setEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<"idle" | "success" | "error">("idle");
+  const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [visiblePaintings, setVisiblePaintings] = useState(12);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const heroScrollRef = useRef<HTMLDivElement>(null);
 
+  // Fetch artworks from API
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const fetchArtworks = async () => {
+      try {
+        const response = await fetch('/api/artworks?limit=50');
+        if (response.ok) {
+          const data = await response.json();
+          setArtworks(data.artworks || []);
+        }
+      } catch (error) {
+        console.error('Error fetching artworks:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchArtworks();
   }, []);
 
-  useEffect(() => {
-    const id = window.setInterval(
-      () => setActiveCap((value) => (value + 1) % capabilities.length),
-      3400,
-    );
-    return () => window.clearInterval(id);
-  }, []);
+  const featuredPaintings = artworks.slice(0, visiblePaintings);
 
-  const goToChat = (value?: string) => {
-    const text = (value ?? prompt).trim();
-    router.push(text ? `/main?prompt=${encodeURIComponent(text)}` : "/main");
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -340, behavior: "smooth" });
+    }
   };
 
-  const themeStyle: ThemeVars = {
-    fontFamily: "var(--font-roboto), 'Roboto', ui-sans-serif, system-ui, sans-serif",
-    "--landing-bg": isDark ? DARK_BG : PAPER,
-    "--landing-fg": isDark ? DARK_TEXT : INK,
-    "--landing-muted": isDark ? DARK_MUTED : "rgba(15,23,42,0.66)",
-    "--landing-muted-strong": isDark
-      ? "rgba(255,255,255,0.82)"
-      : "rgba(15,23,42,0.88)",
-    "--landing-line": isDark ? DARK_BORDER_SOFT : "rgba(15,23,42,0.10)",
-    "--landing-line-strong": isDark
-      ? DARK_BORDER
-      : "rgba(15,23,42,0.14)",
-    "--landing-surface": isDark ? DARK_SURFACE : "rgba(255,255,255,0.84)",
-    "--landing-surface-soft": isDark
-      ? DARK_SURFACE_SOFT
-      : "rgba(247,250,255,0.72)",
-    "--landing-accent": COBALT,
-    "--landing-accent-strong": COBALT_DEEP,
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 340, behavior: "smooth" });
+    }
+  };
+
+  const heroScrollLeft = () => {
+    if (heroScrollRef.current) {
+      const slide = heroScrollRef.current.firstElementChild as HTMLElement;
+      if (slide) {
+        heroScrollRef.current.scrollBy({ left: -(slide.offsetWidth + 24), behavior: "smooth" });
+      }
+    }
+  };
+
+  const heroScrollRight = () => {
+    if (heroScrollRef.current) {
+      const slide = heroScrollRef.current.firstElementChild as HTMLElement;
+      if (slide) {
+        heroScrollRef.current.scrollBy({ left: slide.offsetWidth + 24, behavior: "smooth" });
+      }
+    }
+  };
+
+  // Handle newsletter subscription
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      setSubscriptionStatus("error");
+      return;
+    }
+
+    setIsSubscribing(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      setSubscriptionStatus("success");
+      setEmail("");
+      setIsSubscribing(false);
+
+      // Reset success message after 5 seconds
+      setTimeout(() => {
+        setSubscriptionStatus("idle");
+      }, 5000);
+    }, 1000);
   };
 
   return (
-    <div className="landing-page" data-theme={isDark ? "dark" : "light"} style={themeStyle}>
-      <style>{`
-        @keyframes alternus-marquee {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-        @keyframes alternus-pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.55; transform: scale(0.9); }
-        }
-        @keyframes alternus-grid-shift {
-          from { background-position: 0 0; }
-          to { background-position: 72px 72px; }
-        }
-        @keyframes alternus-rise {
-          from { opacity: 0; transform: translateY(14px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes alternus-caret {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
-        }
-        @keyframes alternus-float-soft {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-10px) rotate(4deg); }
-        }
-        .alternus-marquee-track {
-          animation: alternus-marquee 34s linear infinite;
-        }
-        .alternus-grid-motion {
-          animation: alternus-grid-shift 34s linear infinite;
-        }
-        .alternus-pulse-dot {
-          animation: alternus-pulse 2.2s ease-in-out infinite;
-        }
-        .alternus-rise {
-          animation: alternus-rise 0.48s ease-out both;
-        }
-        .alternus-caret::after {
-          content: "|";
-          margin-left: 2px;
-          color: ${COBALT};
-          animation: alternus-caret 1.1s step-end infinite;
-        }
-        .alternus-float-soft {
-          animation: alternus-float-soft 6s ease-in-out infinite;
-        }
-        .landing-page[data-theme="dark"] {
-          background: #141416 !important;
-        }
-        .landing-page[data-theme="dark"] *,
-        .landing-page[data-theme="dark"] *::before,
-        .landing-page[data-theme="dark"] *::after {
-          background-image: none !important;
-          box-shadow: none !important;
-        }
-        .landing-page[data-theme="dark"] .landing-card,
-        .landing-page[data-theme="dark"] .landing-card-quiet,
-        .landing-page[data-theme="dark"] .landing-dark-frame {
-          background: #1F1F23 !important;
-          border-color: rgba(255,255,255,0.16) !important;
-          box-shadow: none !important;
-        }
-        .landing-page[data-theme="dark"] .landing-card:hover,
-        .landing-page[data-theme="dark"] .landing-card-quiet:hover,
-        .landing-page[data-theme="dark"] .landing-dark-frame:hover {
-          background: #232327 !important;
-          border-color: rgba(66,132,255,0.62) !important;
-        }
-        .landing-page[data-theme="dark"] .landing-chip,
-        .landing-page[data-theme="dark"] .landing-social-button,
-        .landing-page[data-theme="dark"] .landing-language-button {
-          background: rgba(255,255,255,0.04) !important;
-          border-color: rgba(255,255,255,0.12) !important;
-          color: rgba(255,255,255,0.72) !important;
-        }
-        .landing-page[data-theme="dark"] .landing-chip:hover,
-        .landing-page[data-theme="dark"] .landing-social-button:hover,
-        .landing-page[data-theme="dark"] .landing-language-button:hover {
-          background: rgba(255,255,255,0.07) !important;
-          border-color: rgba(66,132,255,0.62) !important;
-          color: #F5F5F7 !important;
-        }
-        .landing-page[data-theme="dark"] .landing-grid,
-        .landing-page[data-theme="dark"] .landing-hero-effects,
-        .landing-page[data-theme="dark"] .landing-dark-orb {
-          display: none !important;
-        }
-        .landing-page[data-theme="dark"] .landing-section-soft,
-        .landing-page[data-theme="dark"] .landing-marquee,
-        .landing-page[data-theme="dark"] .landing-final-cta {
-          background: #141416 !important;
-        }
-        .landing-page[data-theme="dark"] .landing-hero-shell {
-          border-color: rgba(255,255,255,0.12) !important;
-          background: #141416 !important;
-          box-shadow: none !important;
-        }
-        .landing-page[data-theme="dark"] .landing-hero-kicker,
-        .landing-page[data-theme="dark"] .landing-hero-secondary,
-        .landing-page[data-theme="dark"] .landing-hero-stat,
-        .landing-page[data-theme="dark"] .landing-hero-bubble,
-        .landing-page[data-theme="dark"] .landing-hero-panel,
-        .landing-page[data-theme="dark"] .landing-hero-form,
-        .landing-page[data-theme="dark"] .landing-hero-quick,
-        .landing-page[data-theme="dark"] .landing-hero-pill {
-          border-color: rgba(255,255,255,0.12) !important;
-          background: rgba(255,255,255,0.04) !important;
-          color: rgba(255,255,255,0.72) !important;
-          box-shadow: none !important;
-        }
-        .landing-page[data-theme="dark"] .landing-hero-kicker:hover,
-        .landing-page[data-theme="dark"] .landing-hero-secondary:hover,
-        .landing-page[data-theme="dark"] .landing-hero-stat:hover,
-        .landing-page[data-theme="dark"] .landing-hero-bubble:hover,
-        .landing-page[data-theme="dark"] .landing-hero-panel:hover,
-        .landing-page[data-theme="dark"] .landing-hero-form:hover,
-        .landing-page[data-theme="dark"] .landing-hero-quick:hover,
-        .landing-page[data-theme="dark"] .landing-hero-pill:hover {
-          background: rgba(255,255,255,0.07) !important;
-          border-color: rgba(66,132,255,0.62) !important;
-        }
-        .landing-page[data-theme="dark"] .landing-hero-title,
-        .landing-page[data-theme="dark"] .landing-hero-stat strong,
-        .landing-page[data-theme="dark"] .landing-hero-input {
-          color: ${DARK_TEXT} !important;
-        }
-        .landing-page[data-theme="dark"] .landing-hero-copy,
-        .landing-page[data-theme="dark"] .landing-hero-bubble-copy {
-          color: ${DARK_MUTED} !important;
-        }
-        .landing-page[data-theme="dark"] .landing-hero-preview {
-          border-color: rgba(255,255,255,0.16) !important;
-          background: #1F1F23 !important;
-          box-shadow: none !important;
-        }
-        .landing-page[data-theme="dark"] .landing-hero-preview:hover {
-          border-color: rgba(66,132,255,0.62) !important;
-        }
-        .landing-page[data-theme="dark"] .landing-hero-input::placeholder {
-          color: rgba(255,255,255,0.38) !important;
-        }
-        .landing-page[data-theme="dark"] [class*="bg-blue-50"],
-        .landing-page[data-theme="dark"] [class*="bg-blue-500/"],
-        .landing-page[data-theme="dark"] [class*="bg-white/"] {
-          background: rgba(255,255,255,0.04) !important;
-        }
-        .landing-page[data-theme="dark"] [class*="border-blue-"] {
-          border-color: rgba(255,255,255,0.16) !important;
-        }
-        .landing-page[data-theme="dark"] .landing-dark-solid {
-          background: ${COBALT} !important;
-          color: #FFFFFF !important;
-          border-color: ${COBALT} !important;
-          background-image: none !important;
-        }
-        .landing-page[data-theme="dark"] .landing-dark-solid:hover {
-          background: ${COBALT_DEEP} !important;
-          border-color: ${COBALT_DEEP} !important;
-        }
-        .landing-page[data-theme="dark"] .landing-final-cta,
-        .landing-page[data-theme="dark"] .landing-preview-shell,
-        .landing-page[data-theme="dark"] .landing-preview-rail,
-        .landing-page[data-theme="dark"] .landing-preview-pane,
-        .landing-page[data-theme="dark"] .landing-preview-card,
-        .landing-page[data-theme="dark"] .landing-preview-input {
-          background: #1F1F23 !important;
-          border-color: rgba(255,255,255,0.16) !important;
-          color: #F5F5F7 !important;
-        }
-        .landing-page[data-theme="dark"] .landing-final-cta:hover,
-        .landing-page[data-theme="dark"] .landing-preview-shell:hover,
-        .landing-page[data-theme="dark"] .landing-preview-card:hover,
-        .landing-page[data-theme="dark"] .landing-preview-input:hover {
-          border-color: rgba(66,132,255,0.62) !important;
-        }
-        .landing-page[data-theme="dark"] .landing-final-label {
-          color: rgba(245,245,247,0.72) !important;
-        }
-      `}</style>
-
-      <header
-        className={cn(
-          "sticky top-0 z-40 transition-all duration-200",
-          scrolled
-            ? "border-b border-[var(--landing-line)] backdrop-blur-xl"
-            : "bg-transparent",
-        )}
-        style={{
-          background: scrolled
-            ? isDark
-              ? "rgba(18,18,20,0.84)"
-              : "rgba(244,246,251,0.82)"
-            : "transparent",
-        }}
-      >
-        <div className="landing-container">
-          <div className="flex min-h-[76px] items-center gap-3 py-3 sm:gap-4">
-            <Link href="/" className="flex min-w-0 items-center gap-3 no-underline">
-              <AlternusLogo size={30} radius={9} />
-              <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-                <span className="truncate text-sm font-black tracking-[-0.03em] text-[var(--landing-fg)] sm:text-[15px]">
-                  ALTERNUS
-                </span>
-                <span className="landing-chip hidden sm:inline-flex">Beta</span>
-              </div>
-            </Link>
-
-            <nav className="ml-4 hidden items-center gap-5 lg:flex">
-              {navItems.map((item) => (
-                <Link
-                  key={item.l}
-                  href={item.h}
-                  className="text-sm font-medium tracking-[-0.01em] text-[var(--landing-muted)] transition-colors hover:text-[var(--landing-fg)]"
-                >
-                  {item.l}
-                </Link>
-              ))}
-            </nav>
-
-            <div className="ml-auto flex items-center gap-2 sm:gap-3">
-              <button
-                onClick={() => setIsDark((value) => !value)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--landing-line)] bg-[var(--landing-surface)] text-[var(--landing-muted)] transition-all hover:border-[var(--landing-line-strong)] hover:text-[var(--landing-fg)]"
-                aria-label="Toggle theme"
+    <div className="flex flex-col">
+      {/* Hero Section - Horizontal Scroll Frame */}
+      <section className="pt-6 pb-8 md:py-16 bg-gradient-to-b from-stone-50 to-white">
+        <div className="container mx-auto px-4">
+          {/* Navigation Header */}
+          <div className="flex items-center justify-between mb-2 md:mb-4">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold">Exclusive Original Artworks</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={heroScrollLeft}
+                className="rounded-full h-10 w-10"
               >
-                {isDark ? (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="4" />
-                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-                  </svg>
-                ) : (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                  </svg>
-                )}
-              </button>
-
-              {isLoggedIn ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="hidden h-10 items-center gap-2 rounded-2xl border border-[var(--landing-line)] bg-[var(--landing-surface)] px-3 pr-4 text-sm font-semibold tracking-[-0.01em] text-[var(--landing-fg)] transition-all hover:border-[var(--landing-accent)] sm:inline-flex">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--landing-accent)] text-[11px] font-bold text-white">
-                        {(user?.name || user?.email || "U").charAt(0).toUpperCase()}
-                      </span>
-                      <span className="max-w-28 truncate">{user?.name || user?.email?.split("@")[0] || "Profile"}</span>
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-64">
-                    <div className="px-3 py-2 border-b">
-                      <p className="text-sm font-semibold text-foreground">{user?.name || user?.email?.split("@")[0]}</p>
-                      <p className="text-xs text-muted-foreground">{user?.email}</p>
-                    </div>
-                    <DropdownMenuItem asChild>
-                      <Link href="/account" className="flex items-center gap-2 cursor-pointer">
-                        Usage
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
-                        Settings
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/pricing" className="flex items-center gap-2 cursor-pointer">
-                        Billing
-                      </Link>
-                    </DropdownMenuItem>
-                    <div className="border-t mt-1 pt-1">
-                      <DropdownMenuItem asChild>
-                        <Link href="/dashboard" className="flex items-center gap-2 cursor-pointer">
-                          Dashboard
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/orders" className="flex items-center gap-2 cursor-pointer">
-                          Orders
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/favorites" className="flex items-center gap-2 cursor-pointer">
-                          Favorites
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/help" className="flex items-center gap-2 cursor-pointer">
-                          Help
-                        </Link>
-                      </DropdownMenuItem>
-                    </div>
-                    <div className="border-t mt-1 pt-1">
-                      <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })} className="cursor-pointer text-red-600">
-                        Sign out
-                      </DropdownMenuItem>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Link
-                  href="/login"
-                  className="hidden h-10 items-center rounded-2xl border border-[var(--landing-line)] px-4 text-sm font-semibold tracking-[-0.01em] text-[var(--landing-fg)] transition-all hover:border-[var(--landing-accent)] sm:inline-flex"
-                >
-                  Log in
-                </Link>
-              )}
-
-              <Link
-                href="/main"
-                className="landing-dark-solid inline-flex h-10 items-center gap-2 rounded-2xl bg-[var(--landing-accent)] px-4 text-sm font-bold tracking-[-0.01em] text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[var(--landing-accent-strong)] hover:shadow-xl hover:shadow-blue-500/25 sm:h-11 sm:px-5"
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={heroScrollRight}
+                className="rounded-full h-10 w-10"
               >
-                Launch Studio
-                <ArrowIcon className="h-3.5 w-3.5" />
-              </Link>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </Button>
             </div>
           </div>
 
-          <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-3 lg:hidden">
-            {navItems.map((item) => (
-              <Link key={item.l} href={item.h} className="landing-chip shrink-0">
-                {item.l}
-              </Link>
-            ))}
+          {/* Style Buttons */}
+          <div className="mb-5 md:mb-6">
+            <p className="text-sm text-gray-500 italic mb-2 md:mb-3">Browse by style</p>
+            <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory md:flex-wrap" style={{ scrollbarWidth: "thin" }}>
+              <button
+                onClick={() => router.push('/gallery?category=Baroque')}
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+              >
+                Baroque
+              </button>
+              <button
+                onClick={() => router.push('/gallery?category=Expressionism')}
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+              >
+                Expressionism
+              </button>
+              <button
+                onClick={() => router.push('/gallery?category=Impressionism')}
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+              >
+                Impressionism
+              </button>
+              <button
+                onClick={() => router.push('/gallery?category=Abstract')}
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+              >
+                Abstract
+              </button>
+              <button
+                onClick={() => router.push('/gallery?category=Photography')}
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+              >
+                Photography
+              </button>
+            </div>
+          </div>
+
+          {/* Horizontal Scroll Container */}
+          <div className="relative -mx-4 md:mx-0">
+            <div
+              ref={heroScrollRef}
+              className="flex gap-6 overflow-x-auto pb-0 md:pb-4 snap-x snap-mandatory px-4 md:px-0"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              {/* Main Hero Card */}
+              <div className="flex-shrink-0 w-[calc(100vw-32px)] md:w-[700px] lg:w-[900px] snap-start">
+                {/* Mobile Layout - Framed */}
+                <div className="md:hidden relative h-[424px] p-2">
+                  {/* Decorative Frame */}
+                  <div className="relative h-full rounded-[16px] border-[2px] border-amber-600/80 bg-gradient-to-br from-zinc-900 to-zinc-800 overflow-hidden shadow-[0_0_0_4px_rgba(120,53,15,0.3)]">
+                    {/* Background Image */}
+                    <div className="absolute inset-0">
+                      <Image
+                        src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200&q=80"
+                        alt="Featured Artwork"
+                        fill
+                        className="object-cover opacity-50"
+                        priority
+                      />
+                    </div>
+                    {/* Frame Inner Border */}
+                    <div className="absolute inset-1.5 border border-amber-500/30 rounded-[12px] pointer-events-none" />
+
+                    {/* Content Inside Frame */}
+                    <div className="relative z-10 h-full flex flex-col justify-between p-4">
+                      {/* Top Section - Badge */}
+                      <div className="inline-flex items-center gap-1.5 bg-amber-900/60 backdrop-blur-sm text-amber-100 px-2.5 py-1 rounded-full text-[10px] font-medium w-fit border border-amber-600/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                          <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                          <path d="M2 2l7.586 7.586" />
+                          <circle cx="11" cy="11" r="2" />
+                        </svg>
+                        Original Artworks
+                      </div>
+
+                      {/* Bottom Section - Content & Buttons */}
+                      <div>
+                        {/* Main Headline */}
+                        <h1 className="text-2xl font-bold text-white mb-1 leading-tight drop-shadow-lg">
+                          Where Art <span className="text-amber-200">Meets Soul</span>
+                        </h1>
+
+                        {/* Subheadline */}
+                        <p className="text-xs text-white/80 mb-3 drop-shadow">
+                          Discover unique paintings crafted with passion.
+                        </p>
+
+                        {/* CTA Buttons & Stats Row */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex gap-2">
+                            <Button asChild size="sm" className="h-8 px-3 text-xs bg-amber-600 text-white hover:bg-amber-500 border-0">
+                              <Link href="/signup">
+                                Try Cerevix
+                              </Link>
+                            </Button>
+                            <Button asChild size="sm" variant="outline" className="h-8 px-3 text-xs bg-white/10 text-white border border-white/30 hover:bg-white/20">
+                              <Link href="/gallery">
+                                Gallery
+                              </Link>
+                            </Button>
+                          </div>
+                          {/* Mobile Stats */}
+                          <div className="flex gap-2">
+                            <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg px-2 py-1">
+                              <p className="text-sm font-bold text-white">50+</p>
+                              <p className="text-white/60 text-[8px]">Works</p>
+                            </div>
+                            <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg px-2 py-1">
+                              <p className="text-sm font-bold text-white">100%</p>
+                              <p className="text-white/60 text-[8px]">Original</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Layout - Original */}
+                <div className="hidden md:block relative bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-[16px] overflow-hidden h-[450px]">
+                  {/* Background Image */}
+                  <div className="absolute inset-0">
+                    <Image
+                      src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200&q=80"
+                      alt="Featured Artwork"
+                      fill
+                      className="object-cover opacity-40"
+                      priority
+                    />
+                  </div>
+
+                  {/* Content */}
+                  <div className="relative z-10 h-full flex flex-col justify-center p-12">
+                    {/* Badge */}
+                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium mb-6 w-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                        <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                        <path d="M2 2l7.586 7.586" />
+                        <circle cx="11" cy="11" r="2" />
+                      </svg>
+                      Original Artworks
+                    </div>
+
+                    {/* Main Headline */}
+                    <h1 className="text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+                      Where Art<br />
+                      <span className="text-white">Meets Soul</span>
+                    </h1>
+
+                    {/* Subheadline */}
+                    <p className="text-lg text-white/70 mb-8 max-w-lg">
+                      Discover unique paintings crafted with passion. Each artwork tells
+                      a story waiting to become part of your world.
+                    </p>
+
+                    {/* CTA Buttons */}
+                    <div className="flex flex-wrap gap-4">
+                      <Button asChild size="lg" className="px-8 bg-white text-black hover:bg-white/90">
+                        <Link href="/signup">
+                          Try Cerevix
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                          </svg>
+                        </Link>
+                      </Button>
+                      <Button asChild size="lg" variant="outline" className="px-8 bg-white/20 text-white border border-white/30 hover:bg-white/30">
+                        <Link href="/gallery">
+                          Browse Gallery
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Stats - Bottom Right */}
+                  <div className="flex absolute bottom-6 right-6 gap-6">
+                    <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                      <p className="text-2xl font-bold text-white">50+</p>
+                      <p className="text-white/60 text-xs">Artworks</p>
+                    </div>
+                    <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                      <p className="text-2xl font-bold text-white">12</p>
+                      <p className="text-white/60 text-xs">Countries</p>
+                    </div>
+                    <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                      <p className="text-2xl font-bold text-white">100%</p>
+                      <p className="text-white/60 text-xs">Original</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* News Card 2 - New Collection */}
+              <div className="flex-shrink-0 w-[calc(100vw-32px)] md:w-[700px] lg:w-[900px] snap-start">
+                {/* Mobile Layout - Framed */}
+                <div className="md:hidden relative h-[424px] p-2">
+                  <div className="relative h-full rounded-[16px] border-[2px] border-emerald-600/80 bg-gradient-to-br from-emerald-900 to-emerald-800 overflow-hidden shadow-[0_0_0_4px_rgba(5,150,105,0.3)]">
+                    <div className="absolute inset-0">
+                      <Image
+                        src="https://images.unsplash.com/photo-1549289524-06cf8837ace5?w=1200&q=80"
+                        alt="New Collection"
+                        fill
+                        className="object-cover opacity-50"
+                      />
+                    </div>
+                    <div className="absolute inset-1.5 border border-emerald-500/30 rounded-[12px] pointer-events-none" />
+
+                    <div className="relative z-10 h-full flex flex-col justify-between p-4">
+                      {/* Top Section - Badge */}
+                      <div className="inline-flex items-center gap-1.5 bg-emerald-900/60 backdrop-blur-sm text-emerald-100 px-2.5 py-1 rounded-full text-[10px] font-medium w-fit border border-emerald-600/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                          <path d="m3.3 7 8.7 5 8.7-5" />
+                          <path d="M12 22V12" />
+                        </svg>
+                        New Collection
+                      </div>
+
+                      {/* Bottom Section - Content & Buttons */}
+                      <div>
+                        <h2 className="text-2xl font-bold text-white mb-1 leading-tight drop-shadow-lg">
+                          Spring 2026 <span className="text-emerald-200">Collection</span>
+                        </h2>
+                        <p className="text-xs text-white/80 mb-3 drop-shadow">
+                          Fresh perspectives inspired by the renewal of spring.
+                        </p>
+                        {/* CTA Buttons & Stats Row */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex gap-2">
+                            <Button asChild size="sm" className="h-8 px-3 text-xs bg-emerald-600 text-white hover:bg-emerald-500 border-0">
+                              <Link href="/gallery">
+                                Explore
+                              </Link>
+                            </Button>
+                            <Button asChild size="sm" variant="outline" className="h-8 px-3 text-xs bg-white/10 text-white border border-white/30 hover:bg-white/20">
+                              <Link href="/gallery?category=Abstract">
+                                Abstract
+                              </Link>
+                            </Button>
+                          </div>
+                          {/* Mobile Stats */}
+                          <div className="flex gap-2">
+                            <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg px-2 py-1">
+                              <p className="text-sm font-bold text-white">15+</p>
+                              <p className="text-white/60 text-[8px]">New</p>
+                            </div>
+                            <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg px-2 py-1">
+                              <p className="text-sm font-bold text-white">2026</p>
+                              <p className="text-white/60 text-[8px]">Season</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Layout - Original */}
+                <div className="hidden md:block relative bg-gradient-to-br from-emerald-900 to-emerald-800 rounded-[16px] overflow-hidden h-[450px]">
+                  <div className="absolute inset-0">
+                    <Image
+                      src="https://images.unsplash.com/photo-1549289524-06cf8837ace5?w=1200&q=80"
+                      alt="New Collection"
+                      fill
+                      className="object-cover opacity-40"
+                    />
+                  </div>
+                  <div className="relative z-10 h-full flex flex-col justify-center p-12">
+                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium mb-6 w-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                        <path d="m3.3 7 8.7 5 8.7-5" />
+                        <path d="M12 22V12" />
+                      </svg>
+                      New Collection
+                    </div>
+
+                    <h2 className="text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+                      Spring 2026<br />
+                      <span className="text-white">Collection</span>
+                    </h2>
+                    <p className="text-lg text-white/70 mb-8 max-w-lg">
+                      Explore our latest collection featuring vibrant colors and fresh perspectives inspired by the renewal of spring.
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      <Button asChild size="lg" className="px-8 bg-white text-black hover:bg-white/90">
+                        <Link href="/gallery">
+                          Explore Collection
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                          </svg>
+                        </Link>
+                      </Button>
+                      <Button asChild size="lg" variant="outline" className="px-8 bg-white/20 text-white border border-white/30 hover:bg-white/30">
+                        <Link href="/gallery?category=Abstract">
+                          View Abstract Art
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex absolute bottom-6 right-6 gap-6">
+                    <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                      <p className="text-2xl font-bold text-white">15+</p>
+                      <p className="text-white/60 text-xs">New Works</p>
+                    </div>
+                    <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                      <p className="text-2xl font-bold text-white">2026</p>
+                      <p className="text-white/60 text-xs">Season</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* News Card 3 - Limited Offer */}
+              <div className="flex-shrink-0 w-[calc(100vw-32px)] md:w-[700px] lg:w-[900px] snap-start">
+                {/* Mobile Layout - Framed */}
+                <div className="md:hidden relative h-[424px] p-2">
+                  <div className="relative h-full rounded-[16px] border-[2px] border-orange-600/80 bg-gradient-to-br from-amber-900 to-orange-800 overflow-hidden shadow-[0_0_0_4px_rgba(234,88,12,0.3)]">
+                    <div className="absolute inset-0">
+                      <Image
+                        src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=1200&q=80"
+                        alt="Worldwide Shipping"
+                        fill
+                        className="object-cover opacity-50"
+                      />
+                    </div>
+                    <div className="absolute inset-1.5 border border-orange-500/30 rounded-[12px] pointer-events-none" />
+
+                    <div className="relative z-10 h-full flex flex-col justify-between p-4">
+                      {/* Top Section - Badge */}
+                      <div className="inline-flex items-center gap-1.5 bg-orange-900/60 backdrop-blur-sm text-orange-100 px-2.5 py-1 rounded-full text-[10px] font-medium w-fit border border-orange-600/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M12 16v-4" />
+                          <path d="M12 8h.01" />
+                        </svg>
+                        Limited Time
+                      </div>
+
+                      {/* Bottom Section - Content & Buttons */}
+                      <div>
+                        <h2 className="text-2xl font-bold text-white mb-1 leading-tight drop-shadow-lg">
+                          Free Shipping <span className="text-orange-200">Worldwide</span>
+                        </h2>
+                        <p className="text-xs text-white/80 mb-3 drop-shadow">
+                          Complimentary shipping on all original artworks.
+                        </p>
+                        {/* CTA Buttons & Stats Row */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex gap-2">
+                            <Button asChild size="sm" className="h-8 px-3 text-xs bg-orange-600 text-white hover:bg-orange-500 border-0">
+                              <Link href="/gallery">
+                                Shop Now
+                              </Link>
+                            </Button>
+                            <Button asChild size="sm" variant="outline" className="h-8 px-3 text-xs bg-white/10 text-white border border-white/30 hover:bg-white/20">
+                              <Link href="/support">
+                                Learn More
+                              </Link>
+                            </Button>
+                          </div>
+                          {/* Mobile Stats */}
+                          <div className="flex gap-2">
+                            <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg px-2 py-1">
+                              <p className="text-sm font-bold text-white">€0</p>
+                              <p className="text-white/60 text-[8px]">Shipping</p>
+                            </div>
+                            <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg px-2 py-1">
+                              <p className="text-sm font-bold text-white">7</p>
+                              <p className="text-white/60 text-[8px]">Days Left</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Layout - Original */}
+                <div className="hidden md:block relative bg-gradient-to-br from-amber-900 to-orange-800 rounded-[16px] overflow-hidden h-[450px]">
+                  <div className="absolute inset-0">
+                    <Image
+                      src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=1200&q=80"
+                      alt="Worldwide Shipping"
+                      fill
+                      className="object-cover opacity-40"
+                    />
+                  </div>
+                  <div className="relative z-10 h-full flex flex-col justify-center p-12">
+                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium mb-6 w-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4" />
+                        <path d="M12 8h.01" />
+                      </svg>
+                      Limited Time Offer
+                    </div>
+
+                    <h2 className="text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+                      Free Shipping<br />
+                      <span className="text-white">Worldwide</span>
+                    </h2>
+                    <p className="text-lg text-white/70 mb-8 max-w-lg">
+                      For a limited time, enjoy complimentary worldwide shipping on all original artworks. Start your collection today.
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      <Button asChild size="lg" className="px-8 bg-white text-black hover:bg-white/90">
+                        <Link href="/gallery">
+                          Shop Now
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                          </svg>
+                        </Link>
+                      </Button>
+                      <Button asChild size="lg" variant="outline" className="px-8 bg-white/20 text-white border border-white/30 hover:bg-white/30">
+                        <Link href="/support">
+                          Learn More
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex absolute bottom-6 right-6 gap-6">
+                    <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                      <p className="text-2xl font-bold text-white">€0</p>
+                      <p className="text-white/60 text-xs">Shipping</p>
+                    </div>
+                    <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                      <p className="text-2xl font-bold text-white">7 Days</p>
+                      <p className="text-white/60 text-xs">Left</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* News Card 4 - Meet the Artist */}
+              <div className="flex-shrink-0 w-[calc(100vw-32px)] md:w-[700px] lg:w-[900px] snap-start">
+                {/* Mobile Layout - Framed */}
+                <div className="md:hidden relative h-[424px] p-2">
+                  <div className="relative h-full rounded-[16px] border-[2px] border-purple-600/80 bg-gradient-to-br from-purple-900 to-indigo-800 overflow-hidden shadow-[0_0_0_4px_rgba(147,51,234,0.3)]">
+                    <div className="absolute inset-0">
+                      <Image
+                        src="https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=1200&q=80"
+                        alt="Meet the Artist"
+                        fill
+                        className="object-cover opacity-50"
+                      />
+                    </div>
+                    <div className="absolute inset-1.5 border border-purple-500/30 rounded-[12px] pointer-events-none" />
+
+                    <div className="relative z-10 h-full flex flex-col justify-between p-4">
+                      {/* Top Section - Badge */}
+                      <div className="inline-flex items-center gap-1.5 bg-purple-900/60 backdrop-blur-sm text-purple-100 px-2.5 py-1 rounded-full text-[10px] font-medium w-fit border border-purple-600/30">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        Artist Spotlight
+                      </div>
+
+                      {/* Bottom Section - Content & Buttons */}
+                      <div>
+                        <h2 className="text-2xl font-bold text-white mb-1 leading-tight drop-shadow-lg">
+                          Meet <span className="text-purple-200">Lamiart</span>
+                        </h2>
+                        <p className="text-xs text-white/80 mb-3 drop-shadow">
+                          Discover the story behind the art.
+                        </p>
+                        {/* CTA Buttons & Stats Row */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex gap-2">
+                            <Button asChild size="sm" className="h-8 px-3 text-xs bg-purple-600 text-white hover:bg-purple-500 border-0">
+                              <Link href="/artist/1">
+                                Read Story
+                              </Link>
+                            </Button>
+                            <Button asChild size="sm" variant="outline" className="h-8 px-3 text-xs bg-white/10 text-white border border-white/30 hover:bg-white/20">
+                              <Link href="/gallery?artist=1">
+                                Artworks
+                              </Link>
+                            </Button>
+                          </div>
+                          {/* Mobile Stats */}
+                          <div className="flex gap-2">
+                            <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg px-2 py-1">
+                              <p className="text-sm font-bold text-white">10+</p>
+                              <p className="text-white/60 text-[8px]">Years</p>
+                            </div>
+                            <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg px-2 py-1">
+                              <p className="text-sm font-bold text-white">50+</p>
+                              <p className="text-white/60 text-[8px]">Works</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Desktop Layout - Original */}
+                <div className="hidden md:block relative bg-gradient-to-br from-purple-900 to-indigo-800 rounded-[16px] overflow-hidden h-[450px]">
+                  <div className="absolute inset-0">
+                    <Image
+                      src="https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=1200&q=80"
+                      alt="Meet the Artist"
+                      fill
+                      className="object-cover opacity-40"
+                    />
+                  </div>
+                  <div className="relative z-10 h-full flex flex-col justify-center p-12">
+                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium mb-6 w-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                      Artist Spotlight
+                    </div>
+
+                    <h2 className="text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+                      Meet<br />
+                      <span className="text-white">Lamiart</span>
+                    </h2>
+                    <p className="text-lg text-white/70 mb-8 max-w-lg">
+                      Discover the story behind the art. Learn about Lamiart&apos;s journey, inspiration, and creative process.
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      <Button asChild size="lg" className="px-8 bg-white text-black hover:bg-white/90">
+                        <Link href="/artist/1">
+                          Read Story
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                          </svg>
+                        </Link>
+                      </Button>
+                      <Button asChild size="lg" variant="outline" className="px-8 bg-white/20 text-white border border-white/30 hover:bg-white/30">
+                        <Link href="/gallery?artist=1">
+                          View Artworks
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex absolute bottom-6 right-6 gap-6">
+                    <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                      <p className="text-2xl font-bold text-white">10+</p>
+                      <p className="text-white/60 text-xs">Years</p>
+                    </div>
+                    <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3">
+                      <p className="text-2xl font-bold text-white">50+</p>
+                      <p className="text-white/60 text-xs">Artworks</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </header>
+      </section>
 
-      <main>
-        <section className="landing-section overflow-hidden pt-10 sm:pt-12">
-          <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="landing-grid alternus-grid-motion absolute inset-x-0 top-0 h-[82%] opacity-90 [mask-image:radial-gradient(ellipse_at_top,black_38%,transparent_84%)]" />
-            <div className="landing-dark-orb absolute right-[-12rem] top-[-8rem] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(66,132,255,0.24),transparent_68%)] blur-3xl" />
-            <div className="landing-dark-orb absolute left-[-8rem] top-[10rem] h-[18rem] w-[18rem] rounded-full bg-[radial-gradient(circle,rgba(125,169,255,0.18),transparent_68%)] blur-3xl" />
-          </div>
+      {/* Decorative Divider */}
+      <div className="flex items-center justify-center py-2">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-stone-300" />
+        <div className="w-1.5 h-1.5 rotate-45 bg-stone-300 mx-3" />
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-stone-300" />
+      </div>
 
-          <div className="landing-container relative">
-            <div className="landing-hero-shell relative overflow-hidden rounded-[2.6rem] border border-white/55 bg-[linear-gradient(135deg,rgba(238,246,255,0.98)_0%,rgba(219,235,255,0.96)_46%,rgba(198,222,255,0.94)_100%)] px-6 py-8 shadow-[0_40px_110px_rgba(66,132,255,0.24)] sm:px-9 sm:py-10 lg:px-12 lg:py-12">
-              <div className="landing-hero-effects pointer-events-none absolute inset-0">
-                <div className="absolute left-[-8%] top-[6%] h-[20rem] w-[20rem] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.78),transparent_66%)] blur-3xl" />
-                <div className="absolute right-[-6%] top-[8%] h-[16rem] w-[16rem] rounded-full bg-[radial-gradient(circle,rgba(66,132,255,0.36),transparent_70%)] blur-3xl" />
-                <div className="absolute bottom-[-8%] left-[42%] h-[18rem] w-[18rem] rounded-full bg-[radial-gradient(circle,rgba(46,105,226,0.25),transparent_72%)] blur-3xl" />
-                <div className="alternus-float-soft absolute right-[8%] top-[18%] h-16 w-16 rounded-[1.4rem] border border-white/60 bg-[linear-gradient(180deg,rgba(66,132,255,0.58),rgba(255,255,255,0.18))] shadow-[0_18px_44px_rgba(66,132,255,0.24)]" />
-                <div className="alternus-float-soft absolute bottom-[18%] right-[20%] h-10 w-10 rounded-[1rem] border border-white/60 bg-[linear-gradient(180deg,rgba(30,94,212,0.5),rgba(255,255,255,0.16))] shadow-[0_16px_34px_rgba(66,132,255,0.18)] [animation-delay:1.1s]" />
-              </div>
-
-              <div className="relative grid gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center">
-                <div className="max-w-[34rem]">
-                  <div className="landing-hero-kicker mb-5 inline-flex rounded-full border border-white/60 bg-white/55 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)] shadow-sm">
-                    Supercharge your AI workflows
-                  </div>
-
-                  <h1
-                    className="landing-hero-title max-w-[10ch] text-[clamp(3rem,6vw,5.1rem)] font-black leading-[0.92] tracking-[-0.06em] text-[#1F2B4D]"
-                    style={{ fontFamily: "var(--font-roboto-flex), var(--font-roboto), ui-sans-serif, system-ui, sans-serif" }}
-                  >
-                    The AI-powered creative workspace.
-                  </h1>
-
-                  <p className="landing-hero-copy mt-5 max-w-[31rem] text-[1rem] leading-8 text-[rgba(31,43,77,0.7)] sm:text-[1.04rem]">
-                    Website design, AutoCAD systems, coded sections, and Blender 3D work from one command layer.
-                    Alternus keeps the craft tools in place and moves repetitive design production to the agent.
-                  </p>
-
-                  <div className="mt-7 flex flex-wrap items-center gap-3">
-                    <Button
-                      asChild
-                      size="lg"
-                      className="landing-dark-solid h-12 rounded-2xl bg-[var(--landing-accent)] px-6 text-[15px] font-bold tracking-[-0.02em] text-white shadow-[0_18px_40px_rgba(66,132,255,0.24)] hover:bg-[var(--landing-accent-strong)]"
-                    >
-                      <Link href="/main">
-                        Get started
-                        <ArrowIcon className="h-3.5 w-3.5" />
-                      </Link>
-                    </Button>
-
-                    <Button
-                      asChild
-                      variant="outline"
-                      size="lg"
-                      className="landing-hero-secondary h-12 rounded-2xl border-white/70 bg-white/58 px-6 text-[15px] font-semibold tracking-[-0.02em] text-[#1F2B4D] shadow-sm hover:bg-white/80"
-                    >
-                      <Link href="#caps">Book a demo</Link>
-                    </Button>
-                  </div>
-
-                  <div className="mt-7 flex flex-wrap gap-2">
-                    {heroStats.map((stat) => (
-                      <div
-                        key={stat.label}
-                        className="landing-hero-stat rounded-full border border-white/60 bg-white/52 px-3.5 py-2 text-[12px] font-semibold tracking-[-0.01em] text-[#476089] shadow-sm"
-                      >
-                        <span className="font-black text-[#1F2B4D]">{stat.value}</span> {stat.label}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="relative mx-auto w-full max-w-[36rem] lg:mx-0">
-                  <div className="landing-hero-bubble absolute left-[14%] top-[29%] z-20 max-w-[18rem] rounded-[1.2rem] border border-white/65 bg-white/92 px-4 py-3 shadow-[0_24px_44px_rgba(42,103,255,0.14)] backdrop-blur-sm">
-                    <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
-                      {capabilities[activeCap].t}
-                    </div>
-                    <div className="landing-hero-bubble-copy text-[13px] leading-6 text-[#476089]">
-                      {capabilities[activeCap].d}
-                    </div>
-                  </div>
-
-                  <div className="landing-hero-preview relative rounded-[2rem] border border-white/60 bg-[linear-gradient(180deg,rgba(235,244,255,0.68),rgba(207,226,255,0.42))] p-4 pt-36 shadow-[0_30px_76px_rgba(66,132,255,0.2)] backdrop-blur-xl sm:p-5 sm:pt-40">
-                    <div className="landing-hero-panel rounded-[1.4rem] border border-white/65 bg-white/90 p-4 shadow-[0_20px_48px_rgba(42,103,255,0.13)]">
-                      <div className="mb-3 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-[rgba(31,43,77,0.08)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#1F2B4D]">
-                          GPT 4.5
-                        </span>
-                        <span className="rounded-full bg-[rgba(66,132,255,0.08)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
-                          Search
-                        </span>
-                      </div>
-
-                      <form
-                        onSubmit={(event) => {
-                          event.preventDefault();
-                          goToChat();
-                        }}
-                        className="space-y-4"
-                      >
-                        <div className="landing-hero-form rounded-[1.2rem] border border-[rgba(31,43,77,0.1)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(243,248,255,0.94))] px-4 py-4">
-                          <input
-                            value={prompt}
-                            onChange={(event) => setPrompt(event.target.value)}
-                            placeholder="Ask anything..."
-                            className="landing-hero-input w-full border-0 bg-transparent text-[15px] text-[#1F2B4D] outline-none placeholder:text-[rgba(71,96,137,0.54)]"
-                          />
-                        </div>
-
-                        <div className="grid gap-2 sm:grid-cols-2">
-                          {quickPrompts.slice(0, 2).map((item) => (
-                            <button
-                              key={item}
-                              type="button"
-                              onClick={() => goToChat(item)}
-                              className="landing-hero-quick rounded-[1rem] border border-[rgba(31,43,77,0.08)] bg-[rgba(255,255,255,0.82)] px-3 py-3 text-left text-[12.5px] leading-5 text-[#476089] transition-colors hover:bg-white"
-                            >
-                              {item}
-                            </button>
-                          ))}
-                        </div>
-
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex flex-wrap gap-2">
-                            {bridgeApps.slice(0, 3).map((app) => (
-                              <span
-                                key={app}
-                                className="landing-hero-pill rounded-full border border-[rgba(31,43,77,0.08)] bg-white px-2.5 py-1 text-[10px] font-semibold text-[#476089]"
-                              >
-                                {app}
-                              </span>
-                            ))}
-                          </div>
-
-                          <button
-                            type="submit"
-                            className="landing-dark-solid flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#4284FF_0%,#6EA4FF_100%)] text-white shadow-[0_12px_24px_rgba(66,132,255,0.28)]"
-                            aria-label="Run prompt"
-                          >
-                            <ArrowIcon className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      {/* Featured Works Section - Grid Layout */}
+      <section className="py-28 bg-gradient-to-b from-white via-stone-50/30 to-white">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-6">
+            <div>
+              <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">
+                Collection
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold">
+                {t("featuredWorks")}
+              </h2>
             </div>
-          </div>
-        </section>
-
-        <section className="landing-marquee overflow-hidden border-b border-[var(--landing-line)] bg-[var(--landing-accent)] py-5">
-          <div className="alternus-marquee-track flex w-max items-center gap-12 whitespace-nowrap">
-            {[...marquee, ...marquee, ...marquee].map((item, index) => (
-              <span
-                key={`${item}-${index}`}
-                className="inline-flex items-center gap-12 text-[19px] font-black tracking-[-0.03em] text-white sm:text-[22px]"
+            {visiblePaintings < artworks.length && (
+              <button
+                onClick={() => setVisiblePaintings(prev => Math.min(prev + 4, artworks.length))}
+                className="mt-4 md:mt-0 group inline-flex items-center gap-2 px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors"
               >
-                {item}
-                <span className="h-2.5 w-2.5 rounded-full bg-white" />
-              </span>
-            ))}
+                <span>See More</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-y-1 transition-transform">
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+            )}
           </div>
-        </section>
 
-        <section id="caps" className="landing-section">
-          <div className="landing-container">
-            <SectionHeading
-              label="Section 01 / Capabilities"
-              title={
-                <>
-                  Six crafts. <br />
-                  <span className="text-[var(--landing-muted)]">One agent.</span>
-                </>
-              }
-              copy="From the first storyboard to the final master, every discipline shares the same brief, the same media, and the same memory."
-            />
-
-            <div className="landing-card overflow-hidden">
-              <div className="hidden grid-cols-[96px_minmax(0,0.75fr)_minmax(0,1fr)_170px] gap-6 border-b border-[var(--landing-line)] bg-[var(--landing-surface-soft)] px-7 py-4 lg:grid">
-                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--landing-muted)]">
-                  No.
-                </span>
-                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--landing-muted)]">
-                  Craft
-                </span>
-                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--landing-muted)]">
-                  What the agent does
-                </span>
-                <span className="text-right text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--landing-muted)]">
-                  Output
-                </span>
-              </div>
-
-              <div className="divide-y divide-[var(--landing-line)]">
-                {capabilities.map((item) => (
-                  <div
-                    key={item.n}
-                    className="grid gap-4 px-5 py-6 transition-colors hover:bg-blue-50/40 sm:px-6 lg:grid-cols-[96px_minmax(0,0.75fr)_minmax(0,1fr)_170px] lg:gap-6 lg:px-7 lg:py-7"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="rounded-xl bg-blue-50 px-2.5 py-1 font-mono text-xs font-bold text-[var(--landing-accent)]">
-                        {item.n}
-                      </span>
-                    </div>
-
-                    <div className="space-y-2">
-                      <h3 className="landing-heading-md text-[var(--landing-fg)]">{item.t}</h3>
-                      <code className="inline-flex rounded-full border border-blue-100 bg-blue-50/80 px-3 py-1 font-mono text-xs text-[var(--landing-accent)]">
-                        {item.k}
-                      </code>
-                    </div>
-
-                    <p className="landing-copy">{item.d}</p>
-
-                    <div className="flex items-start lg:justify-end">
-                      <span className="rounded-full border border-[var(--landing-line)] bg-white/80 px-3 py-1.5 text-sm font-semibold text-[var(--landing-muted-strong)]">
-                        {item.output}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* Price Buttons */}
+          <div className="mb-8">
+            <p className="text-sm text-gray-500 italic mb-3">Shop by your budget</p>
+            <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory md:flex-wrap" style={{ scrollbarWidth: "thin" }}>
+              <button
+                onClick={() => router.push('/gallery?maxPrice=500')}
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+              >
+                Under €500
+              </button>
+              <button
+                onClick={() => router.push('/gallery?minPrice=1000&maxPrice=3000')}
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+              >
+                €1000 - €3000
+              </button>
+              <button
+                onClick={() => router.push('/gallery?minPrice=3000&maxPrice=5000')}
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+              >
+                €3000 - €5000
+              </button>
+              <button
+                onClick={() => router.push('/gallery?minPrice=5000&maxPrice=10000')}
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium rounded-full border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors snap-start"
+              >
+                €5000 - €10000
+              </button>
             </div>
           </div>
-        </section>
 
-        <section id="manifesto" className="landing-section landing-section-soft overflow-hidden">
-          <div className="pointer-events-none absolute left-[-10rem] top-[10rem] h-[22rem] w-[22rem] rounded-full bg-[radial-gradient(circle,rgba(66,132,255,0.18),transparent_70%)] blur-3xl" />
-          <div className="landing-container relative">
-            <SectionHeading
-              label="Section 02 / Manifesto"
-              title={
-                <>
-                  An AI that <span className="landing-emphasis">speaks your craft</span>{" "}
-                  - not just your calendar.
-                </>
-              }
-            />
-
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {pillars.map((pillar, index) => (
-                <div key={pillar.k} className="landing-card p-6 sm:p-7">
-                  <div className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--landing-muted)]">
-                    / 0{index + 1}
+          {/* Grid Container */}
+          {isLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-stone-200/60 overflow-hidden animate-pulse shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+                  <div className="aspect-[4/5] bg-gray-200" />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-200 rounded w-1/2" />
+                    <div className="h-5 bg-gray-200 rounded w-1/3" />
                   </div>
-                  <div className="mt-5 text-[2.2rem] font-black tracking-[-0.06em] text-[var(--landing-accent)]">
-                    {pillar.k}.
-                  </div>
-                  <p className="landing-copy mt-4">{pillar.v}</p>
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-
-        <section id="voices" className="landing-section">
-          <div className="landing-container">
-            <SectionHeading
-              label="Section 03 / Voices"
-              title={
-                <>
-                  People shipping with <span className="landing-emphasis">Alternus</span>
-                </>
-              }
-              copy="The system has to feel credible in AutoCAD, code, and Blender 3D, not just attractive in screenshots. These quotes are framed as product proof, not decoration."
-            />
-
-            <div className="grid gap-5 xl:grid-cols-3">
-              {quotes.map((quote) => (
-                <figure key={quote.by} className="landing-card flex h-full flex-col gap-8 p-6 sm:p-8">
-                  <div className="text-5xl font-black leading-none text-[var(--landing-accent)]">
-                    &ldquo;
-                  </div>
-                  <blockquote className="flex-1 text-[1.15rem] font-medium leading-[1.5] tracking-[-0.02em] text-[var(--landing-fg)]">
-                    {quote.q}
-                  </blockquote>
-                  <figcaption className="flex items-center gap-4 border-t border-[var(--landing-line)] pt-5">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--landing-accent)] text-sm font-black text-white">
-                      {quote.by
-                        .split(" ")
-                        .map((part) => part[0])
-                        .join("")}
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-[var(--landing-fg)]">{quote.by}</div>
-                      <div className="text-xs font-medium uppercase tracking-[0.14em] text-[var(--landing-muted)]">
-                        {quote.role}
+          ) : featuredPaintings.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredPaintings.map((painting) => (
+                <div
+                  key={painting.id}
+                  className="group bg-white rounded-2xl border border-stone-200/60 overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-shadow"
+                >
+                  <Link href={`/gallery/${painting.id}`}>
+                    <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+                      <Image
+                        src={painting.image}
+                        alt={painting.title}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      {/* Style Badge - Top Left */}
+                      <div className="absolute top-3 left-3 flex flex-col gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {painting.style}
+                        </Badge>
                       </div>
-                    </div>
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="landing-section">
-          <div className="landing-container">
-            <SectionHeading
-              label="Section 04 / Preview"
-              title={<>The workspace.</>}
-              copy="The landing page should feel close to the product. This preview keeps the editorial voice, but the UI is organized enough to read as real software."
-              action={
-                <Link href="/main" className="landing-link">
-                  Open it live
-                  <ArrowIcon className="h-3.5 w-3.5" />
-                </Link>
-              }
-            />
-
-            <div className="landing-card overflow-hidden p-3 sm:p-4">
-              <div className="landing-preview-shell overflow-hidden rounded-[1.35rem] border border-white/10 bg-[#161a24] shadow-[0_24px_60px_rgba(8,15,32,0.38)]">
-                <div className="flex items-center gap-2 border-b border-white/10 bg-white/5 px-4 py-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
-                  <div className="ml-4 rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-[11px] text-white/60">
-                    alternus.art/main
-                  </div>
-                  <div className="ml-auto hidden font-mono text-[11px] text-white/40 sm:block">
-                    agent:idle · opus-4.6
-                  </div>
-                </div>
-
-                <div className="grid gap-0 lg:grid-cols-[78px_240px_minmax(0,1fr)]">
-                  <div className="landing-preview-rail flex border-b border-white/10 px-3 py-3 lg:min-h-[560px] lg:flex-col lg:items-center lg:gap-3 lg:border-b-0 lg:border-r lg:px-0 lg:py-5">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--landing-accent)] text-sm font-black text-white">
-                      A
-                    </div>
-                    <div className="hidden h-8 w-px bg-white/10 lg:block" />
-                    {[
-                      "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z",
-                      "M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z",
-                      "M16 18l6-6-6-6M8 6l-6 6 6 6",
-                      "M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z",
-                    ].map((path, index) => (
-                      <div
-                        key={path}
-                        className={cn(
-                          "ml-2 flex h-10 w-10 items-center justify-center rounded-2xl lg:ml-0",
-                          index === 1
-                            ? "bg-blue-500/18 text-[var(--landing-accent)]"
-                            : "text-white/40",
-                        )}
+                      {/* Wishlist Button - Top Right */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (isInWishlist(painting.id)) {
+                            removeFromWishlist(painting.id);
+                          } else {
+                            addToWishlist({
+                              ...painting,
+                              artist: painting.artist?.displayName,
+                            });
+                          }
+                        }}
+                        className="absolute top-3 right-3 p-1.5 rounded-full bg-white/90 hover:bg-white shadow-lg transition-all hover:scale-110"
+                        aria-label={isInWishlist(painting.id) ? "Remove from wishlist" : "Add to wishlist"}
                       >
                         <svg
-                          width="18"
-                          height="18"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
                           viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
+                          fill={isInWishlist(painting.id) ? "red" : "none"}
+                          stroke={isInWishlist(painting.id) ? "red" : "currentColor"}
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <path d={path} />
+                          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
                         </svg>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="landing-preview-pane border-b border-white/10 p-4 lg:min-h-[560px] lg:border-b-0 lg:border-r lg:p-4">
-                    <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-white/45">
-                      Files
-                    </div>
-                    <div className="space-y-2">
-                      {workspaceFiles.map((item, index) => (
-                        <div
-                          key={item.name}
-                          className={cn(
-                            "flex items-center gap-3 rounded-2xl px-3 py-3 text-sm",
-                            index === 1
-                              ? "bg-blue-500/18 text-white"
-                              : "text-white/70 hover:bg-white/5",
-                          )}
-                        >
-                          <span className="text-white/35">▸</span>
-                          <span>{item.name}</span>
-                          {item.badge ? (
-                            <span className="ml-auto rounded-full bg-[var(--landing-accent)] px-2 py-0.5 text-[11px] font-bold text-white">
-                              {item.badge}
-                            </span>
-                          ) : null}
+                      </button>
+                      {/* Quick Add Button */}
+                      {painting.available && (
+                        <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            size="sm"
+                            className="w-full"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              addToCart({
+                                id: painting.id,
+                                title: painting.title,
+                                price: painting.price,
+                                image: painting.image,
+                                description: painting.description,
+                                dimensions: painting.dimensions,
+                                medium: painting.medium,
+                                year: painting.year,
+                                category: painting.category,
+                                style: painting.style,
+                                available: painting.available,
+                              });
+                            }}
+                          >
+                            {t("addToCart")}
+                          </Button>
                         </div>
-                      ))}
+                      )}
                     </div>
-                  </div>
-
-                  <div className="flex min-h-[360px] flex-col gap-5 p-5 sm:p-6 lg:min-h-[560px]">
-                    <div>
-                      <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/45">
-                        Agent
-                      </div>
-                      <div className="mt-2 text-2xl font-black tracking-[-0.04em] text-white">
-                        # invoices
-                      </div>
-                    </div>
-
-                    <div className="landing-preview-card rounded-[1.2rem] border border-blue-400/20 bg-blue-500/10 p-4">
-                      <div className="mb-3 flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--landing-accent)] text-[11px] font-black text-white">
-                          AI
-                        </div>
-                        <div className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--landing-accent)]">
-                          Alternus
-                        </div>
-                        <div className="ml-auto font-mono text-[11px] text-white/35">10:42</div>
-                      </div>
-                      <p className="text-sm leading-7 text-white/82">{workspaceLead}</p>
-                    </div>
-
-                    <div className="grid gap-3 sm:grid-cols-3">
-                      {workspaceDocs.map((doc, index) => (
-                        <div
-                          key={doc}
-                          className="landing-preview-card rounded-[1.15rem] border border-white/10 bg-white/5 p-3"
-                        >
-                          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl border border-blue-300/30 bg-blue-500/12 text-[10px] font-black text-[var(--landing-accent)]">
-                            PDF
-                          </div>
-                          <div className="text-sm font-semibold text-white">{doc}</div>
-                          <div className="mt-1 text-[11px] text-white/35">
-                            {[128, 84, 32][index]} KB
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="landing-preview-input mt-auto flex items-center gap-3 rounded-[1.2rem] border border-white/10 bg-white/5 px-4 py-3">
-                      <span className="font-mono text-sm font-bold text-[var(--landing-accent)]">$</span>
-                      <span className="flex-1 font-mono text-sm text-white/45">
-                        ask agent about these files...
-                      </span>
-                      <ArrowIcon className="h-3.5 w-3.5 text-[var(--landing-accent)]" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="faq" className="landing-section">
-          <div className="landing-container max-w-[1020px]">
-            <div className="mb-10">
-              <div className="landing-section-label">Section 05 / Questions</div>
-              <h2 className="landing-heading-lg mt-5">Frequently asked.</h2>
-            </div>
-
-            <div className="space-y-3">
-              {faq.map((item, index) => {
-                const open = openFaq === index;
-                return (
-                  <div key={item.q} className="landing-card overflow-hidden">
-                    <button
-                      onClick={() => setOpenFaq(open ? null : index)}
-                      className="flex w-full items-start justify-between gap-4 px-5 py-5 text-left sm:px-7 sm:py-6"
-                    >
-                      <div className="flex min-w-0 items-start gap-4 sm:gap-5">
-                        <span className="rounded-xl bg-blue-50 px-2.5 py-1 font-mono text-xs font-bold text-[var(--landing-accent)]">
-                          0{index + 1}
-                        </span>
-                        <div className="min-w-0">
-                          <div className="text-lg font-bold tracking-[-0.025em] text-[var(--landing-fg)] sm:text-[1.15rem]">
-                            {item.q}
-                          </div>
-                          {open ? (
-                            <p className="landing-copy mt-4 max-w-[48rem]">{item.a}</p>
-                          ) : null}
-                        </div>
-                      </div>
-                      <span
-                        className={cn(
-                          "mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--landing-line)] text-lg text-[var(--landing-accent)] transition-transform",
-                          open && "rotate-45",
-                        )}
-                      >
-                        +
-                      </span>
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section className="landing-section border-b-0 bg-transparent">
-          <div className="landing-container">
-            <div className="landing-final-cta mx-auto max-w-[980px] rounded-[2.6rem] border border-[var(--landing-line)] bg-[linear-gradient(180deg,#4B87FF_0%,#2E69E2_100%)] px-6 py-14 text-center shadow-[0_34px_90px_rgba(42,103,255,0.16)] sm:px-12 sm:py-20">
-              <div className="mx-auto max-w-[760px]">
-                <div className="landing-final-label mb-7 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-950/72">
-                  Section 06 / Begin
-                </div>
-                <h2 className="landing-heading-lg text-white sm:text-[clamp(3rem,6vw,5.2rem)]">
-                  Stop rebuilding. <br />
-                  <span className="italic">Start directing.</span>
-                </h2>
-                <p className="mx-auto mt-6 max-w-[34rem] text-base leading-8 text-white/84 sm:text-[1.02rem]">
-                  Alternus is free to try. Plug it into AutoCAD and Blender,
-                  then let the agent handle website design, code, and 3D production.
-                </p>
-                <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="landing-dark-solid h-12 rounded-2xl bg-white px-6 text-[15px] font-bold tracking-[-0.02em] text-[var(--landing-accent)] shadow-lg shadow-blue-950/20 hover:bg-white/95"
-                  >
-                    <Link href="/main">
-                      Launch Alternus OS
-                      <ArrowIcon className="h-3.5 w-3.5" />
+                  </Link>
+                  <div className="p-4">
+                    <Link href={`/gallery/${painting.id}`}>
+                      <h3 className="font-semibold text-gray-900 group-hover:text-gray-700 transition-colors">
+                        {painting.title}
+                      </h3>
                     </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="lg"
-                    className="h-12 rounded-2xl border-white/25 bg-transparent px-6 text-[15px] font-semibold tracking-[-0.02em] text-white hover:bg-white/10"
-                  >
-                    <Link href="/platform/overview">See the platform</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer className="border-t border-[var(--landing-line)] pb-10 pt-16">
-        <div className="landing-container">
-          <div className="grid gap-10 border-b border-[var(--landing-line)] pb-12 md:grid-cols-2 xl:grid-cols-4">
-            {footerColumns.map((column) => (
-              <div key={column.heading}>
-                <div className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--landing-muted)]">
-                  {column.heading}
-                </div>
-                <ul className="mt-5 space-y-3">
-                  {column.links.map((link) => (
-                    <li key={link.l}>
+                    {painting.artist && (
                       <Link
-                        href={link.h}
-                        className="inline-flex items-center gap-2 text-[15px] font-medium tracking-[-0.01em] text-[var(--landing-fg)] transition-colors hover:text-[var(--landing-accent)]"
+                        href={`/artists/${painting.artist.id}`}
+                        className="text-xs text-gray-400 hover:text-gray-600 transition-colors mt-0.5 inline-block"
                       >
-                        {link.l}
-                        {link.ext ? <ArrowIcon className="h-3.5 w-3.5 opacity-70" /> : null}
+                        by {painting.artist.displayName}
                       </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-6 pt-7 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-              {socials.map((social) => (
-                <Link
-                  key={social.l}
-                  href="#"
-                  aria-label={social.l}
-                  className="landing-social-button inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--landing-line)] bg-white/65 text-[var(--landing-muted)] transition-all hover:border-[var(--landing-accent)] hover:text-[var(--landing-accent)]"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                    <path d={social.d} />
-                  </svg>
-                </Link>
+                    )}
+                    <p className="text-sm text-gray-500 mt-1">{painting.medium}</p>
+                    <p className="text-sm text-gray-500">{painting.dimensions}</p>
+                    <div className="flex items-center justify-between mt-3">
+                      {painting.available ? (
+                        <>
+                          <p className="text-lg font-bold text-gray-900">
+                            {formatPrice(painting.price)}
+                          </p>
+                          <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
+                            {t("available")}
+                          </Badge>
+                        </>
+                      ) : (
+                        <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 text-xs font-semibold">
+                          SOLD
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
-
-            <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--landing-muted)]">
-              <div className="flex items-center gap-3">
-                <AlternusLogo size={20} radius={6} />
-                <span className="font-black tracking-[-0.02em] text-[var(--landing-fg)]">
-                  ALTERNUS
-                </span>
+          ) : (
+            <div className="text-center py-16">
+              <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                  <circle cx="9" cy="9" r="2" />
+                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                </svg>
               </div>
-              <span>© 2015-2026 · Built with Claude</span>
-              <Link href="/cookie-notice" className="landing-link !text-sm">
-                Manage cookies
-              </Link>
+              <h3 className="text-xl font-semibold mb-2">No artworks yet</h3>
+              <p className="text-muted-foreground mb-6">Check back soon for new artwork additions!</p>
+              <Button asChild>
+                <Link href="/gallery">Browse Gallery</Link>
+              </Button>
             </div>
+          )}
+        </div>
+      </section>
 
-            <button className="landing-language-button inline-flex h-10 items-center gap-2 self-start rounded-full border border-[var(--landing-line)] bg-white/70 px-4 text-sm font-medium text-[var(--landing-fg)] transition-all hover:border-[var(--landing-accent)]">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
+      {/* Ad Banner */}
+      <div className="container mx-auto px-4">
+        <AdBanner />
+      </div>
+
+      {/* Decorative Divider */}
+      <div className="flex items-center justify-center py-2">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-stone-300" />
+        <div className="w-1.5 h-1.5 rotate-45 bg-stone-300 mx-3" />
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-stone-300" />
+      </div>
+
+      {/* Favorite Artist Section - Horizontal Scroll */}
+      <section className="py-28 bg-stone-50/50 overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
+            <div>
+              <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">
+                Curated Selection
+              </p>
+              <h2 className="text-3xl md:text-4xl font-bold">
+                {t("favoriteArtist")}
+              </h2>
+              <p className="text-muted-foreground mt-2 max-w-md">
+                {t("favoriteArtistSubtitle")}
+              </p>
+            </div>
+            <div className="flex items-center gap-3 mt-4 md:mt-0">
+              <Link
+                href="/gallery"
+                className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors"
               >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20" />
-              </svg>
-              English
-              <span className="text-[var(--landing-muted)]">Albania</span>
-            </button>
+                See More
+              </Link>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={scrollLeft}
+                className="rounded-full h-10 w-10"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={scrollRight}
+                className="rounded-full h-10 w-10"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </Button>
+            </div>
+          </div>
+
+          {/* Horizontal Scroll Container */}
+          <div className="relative">
+            <div
+              ref={scrollContainerRef}
+              className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+            {artworks.map((painting) => (
+              <div
+                key={painting.id}
+                className="group flex-shrink-0 w-[200px] md:w-[260px] snap-start bg-white rounded-2xl border border-stone-200/60 overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-shadow"
+              >
+                <Link href={`/gallery/${painting.id}`}>
+                  <div className="relative aspect-[4/5] overflow-hidden bg-muted">
+                    <Image
+                      src={painting.image}
+                      alt={painting.title}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    {/* Style Badge - Top Left */}
+                    <div className="absolute top-3 left-3 flex flex-col gap-2">
+                      <Badge variant="secondary" className="text-xs">
+                        {painting.style}
+                      </Badge>
+                    </div>
+                    {/* Wishlist Button - Top Right */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (isInWishlist(painting.id)) {
+                          removeFromWishlist(painting.id);
+                        } else {
+                          addToWishlist({
+                            ...painting,
+                            artist: painting.artist?.displayName,
+                          });
+                        }
+                      }}
+                      className="absolute top-3 right-3 p-1.5 rounded-full bg-white/90 hover:bg-white shadow-lg transition-all hover:scale-110"
+                      aria-label={isInWishlist(painting.id) ? "Remove from wishlist" : "Add to wishlist"}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill={isInWishlist(painting.id) ? "red" : "none"}
+                        stroke={isInWishlist(painting.id) ? "red" : "currentColor"}
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                      </svg>
+                    </button>
+                    {/* Quick Add Button */}
+                    {painting.available && (
+                      <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          size="sm"
+                          className="w-full"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            addToCart({
+                              id: painting.id,
+                              title: painting.title,
+                              price: painting.price,
+                              image: painting.image,
+                              description: painting.description,
+                              dimensions: painting.dimensions,
+                              medium: painting.medium,
+                              year: painting.year,
+                              category: painting.category,
+                              style: painting.style,
+                              available: painting.available,
+                            });
+                          }}
+                        >
+                          {t("addToCart")}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+                <div className="p-4">
+                  <Link href={`/gallery/${painting.id}`}>
+                    <h3 className="font-semibold text-gray-900 group-hover:text-gray-700 transition-colors">
+                      {painting.title}
+                    </h3>
+                  </Link>
+                  {painting.artist && (
+                    <Link
+                      href={`/artists/${painting.artist.id}`}
+                      className="text-xs text-gray-400 hover:text-gray-600 transition-colors mt-0.5 inline-block"
+                    >
+                      by {painting.artist.displayName}
+                    </Link>
+                  )}
+                  <p className="text-sm text-gray-500 mt-1">{painting.medium}</p>
+                  <p className="text-sm text-gray-500">{painting.dimensions}</p>
+                  <div className="flex items-center justify-between mt-3">
+                    {painting.available ? (
+                      <>
+                        <p className="text-lg font-bold text-gray-900">
+                          {formatPrice(painting.price)}
+                        </p>
+                        <Badge variant="outline" className="text-green-600 border-green-600 text-xs">
+                          {t("available")}
+                        </Badge>
+                      </>
+                    ) : (
+                      <Badge className="bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 text-xs font-semibold">
+                        SOLD
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            </div>
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* Decorative Divider */}
+      <div className="flex items-center justify-center py-2">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-stone-300" />
+        <div className="w-1.5 h-1.5 rotate-45 bg-stone-300 mx-3" />
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-stone-300" />
+      </div>
+
+      {/* Why Shop at Alternus Platform Section */}
+      <section className="py-20 bg-gradient-to-b from-white to-stone-50/40">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-1">
+              Trust & Quality
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">
+              {t("whyShopTitle")}
+            </h2>
+            <p className="text-muted-foreground text-sm max-w-xl mx-auto">
+              {t("whyShopSubtitle")}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {/* Secure Shipping */}
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                  <polyline points="3.29 7 12 12 20.71 7" />
+                  <line x1="12" x2="12" y1="22" y2="12" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold mb-1">{t("secureShipping")}</h3>
+              <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
+                {t("secureShippingDesc")}
+              </p>
+            </div>
+
+            {/* 100% Authentic */}
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold mb-1">{t("authenticArt")}</h3>
+              <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
+                {t("authenticArtDesc")}
+              </p>
+            </div>
+
+            {/* 14-Day Returns */}
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" />
+                  <path d="M12 7v5l4 2" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold mb-1">{t("easyReturns")}</h3>
+              <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
+                {t("easyReturnsDesc")}
+              </p>
+            </div>
+
+            {/* Secure Payment */}
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                  <rect width="20" height="14" x="2" y="5" rx="2" />
+                  <line x1="2" x2="22" y1="10" y2="10" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold mb-1">{t("securePayment")}</h3>
+              <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
+                {t("securePaymentDesc")}
+              </p>
+            </div>
+
+            {/* Direct from Artist */}
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                  <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                  <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                  <path d="M2 2l7.586 7.586" />
+                  <circle cx="11" cy="11" r="2" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold mb-1">{t("directFromArtist")}</h3>
+              <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
+                {t("directFromArtistDesc")}
+              </p>
+            </div>
+
+            {/* Expert Support */}
+            <div className="bg-white rounded-2xl p-6 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow text-center">
+              <div className="w-10 h-10 bg-stone-100 rounded-lg flex items-center justify-center mb-3 mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                  <path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold mb-1">{t("expertSupport")}</h3>
+              <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
+                {t("expertSupportDesc")}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Decorative Divider */}
+      <div className="flex items-center justify-center py-2">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent to-stone-300" />
+        <div className="w-1.5 h-1.5 rotate-45 bg-stone-300 mx-3" />
+        <div className="h-px w-16 bg-gradient-to-l from-transparent to-stone-300" />
+      </div>
+
+      {/* Testimonials Section */}
+      <section className="py-28 bg-gradient-to-b from-stone-50/50 to-white overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground mb-2">
+              Testimonials
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              What Collectors Say
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Discover why art enthusiasts around the world choose Alternus Platform
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Testimonial 1 */}
+            <div className="bg-white rounded-2xl p-8 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow relative">
+              <div className="absolute -top-4 left-8">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-primary-foreground">
+                    <path d="M11.192 15.757c0-.88-.23-1.618-.69-2.217-.326-.412-.768-.683-1.327-.812-.55-.128-1.07-.137-1.54-.028-.16-.95.1-1.956.76-3.022.66-1.065 1.515-1.867 2.558-2.403L9.373 5c-.8.396-1.56.898-2.26 1.505-.71.607-1.34 1.305-1.9 2.094s-.98 1.68-1.25 2.69-.346 2.04-.217 3.1c.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l.002.003zm9.124 0c0-.88-.23-1.618-.69-2.217-.326-.42-.77-.692-1.327-.817-.56-.124-1.074-.13-1.54-.022-.16-.94.09-1.95.75-3.02.66-1.06 1.514-1.86 2.557-2.4L18.49 5c-.8.396-1.555.898-2.26 1.505-.708.607-1.34 1.305-1.894 2.094-.556.79-.97 1.68-1.24 2.69-.273 1-.345 2.04-.217 3.1.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l-.007.006z"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="pt-6">
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  &quot;The artwork I purchased exceeded all my expectations. The quality is outstanding
+                  and the customer service was impeccable from start to finish.&quot;
+                </p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                    SM
+                  </div>
+                  <div>
+                    <p className="font-semibold">Sarah Mitchell</p>
+                    <p className="text-sm text-muted-foreground">Art Collector, London</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 2 */}
+            <div className="bg-white rounded-2xl p-8 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow relative">
+              <div className="absolute -top-4 left-8">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-primary-foreground">
+                    <path d="M11.192 15.757c0-.88-.23-1.618-.69-2.217-.326-.412-.768-.683-1.327-.812-.55-.128-1.07-.137-1.54-.028-.16-.95.1-1.956.76-3.022.66-1.065 1.515-1.867 2.558-2.403L9.373 5c-.8.396-1.56.898-2.26 1.505-.71.607-1.34 1.305-1.9 2.094s-.98 1.68-1.25 2.69-.346 2.04-.217 3.1c.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l.002.003zm9.124 0c0-.88-.23-1.618-.69-2.217-.326-.42-.77-.692-1.327-.817-.56-.124-1.074-.13-1.54-.022-.16-.94.09-1.95.75-3.02.66-1.06 1.514-1.86 2.557-2.4L18.49 5c-.8.396-1.555.898-2.26 1.505-.708.607-1.34 1.305-1.894 2.094-.556.79-.97 1.68-1.24 2.69-.273 1-.345 2.04-.217 3.1.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l-.007.006z"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="pt-6">
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  &quot;Alternus Platform made buying art online feel personal and trustworthy.
+                  The piece arrived beautifully packaged and now sits proudly in my living room.&quot;
+                </p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-semibold">
+                    JK
+                  </div>
+                  <div>
+                    <p className="font-semibold">James Kowalski</p>
+                    <p className="text-sm text-muted-foreground">Interior Designer, New York</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 3 */}
+            <div className="bg-white rounded-2xl p-8 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-stone-100 transition-shadow relative">
+              <div className="absolute -top-4 left-8">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-primary-foreground">
+                    <path d="M11.192 15.757c0-.88-.23-1.618-.69-2.217-.326-.412-.768-.683-1.327-.812-.55-.128-1.07-.137-1.54-.028-.16-.95.1-1.956.76-3.022.66-1.065 1.515-1.867 2.558-2.403L9.373 5c-.8.396-1.56.898-2.26 1.505-.71.607-1.34 1.305-1.9 2.094s-.98 1.68-1.25 2.69-.346 2.04-.217 3.1c.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l.002.003zm9.124 0c0-.88-.23-1.618-.69-2.217-.326-.42-.77-.692-1.327-.817-.56-.124-1.074-.13-1.54-.022-.16-.94.09-1.95.75-3.02.66-1.06 1.514-1.86 2.557-2.4L18.49 5c-.8.396-1.555.898-2.26 1.505-.708.607-1.34 1.305-1.894 2.094-.556.79-.97 1.68-1.24 2.69-.273 1-.345 2.04-.217 3.1.168 1.4.62 2.52 1.356 3.35.735.84 1.652 1.26 2.748 1.26.965 0 1.766-.29 2.4-.878.628-.576.94-1.365.94-2.368l-.007.006z"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="pt-6">
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  &quot;As a first-time art buyer, I was nervous about investing. The Alternus Platform team
+                  guided me through the process and helped me find the perfect piece.&quot;
+                </p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-semibold">
+                    AR
+                  </div>
+                  <div>
+                    <p className="font-semibold">Ana Rodriguez</p>
+                    <p className="text-sm text-muted-foreground">Entrepreneur, Madrid</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Preview Section - Apple Accordion Style */}
+      <section className="py-32 md:py-40 bg-gradient-to-b from-white to-stone-50/30 overflow-hidden">
+        <div className="container mx-auto px-6 md:px-12">
+          <div className="max-w-7xl mx-auto">
+            {/* Header */}
+            <div className="mb-16">
+              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[0.95] text-gray-900 mb-6">
+                Art that
+                <span className="block">speaks.</span>
+              </h2>
+              <p className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-2xl">
+                A curated platform connecting exceptional artists with passionate collectors worldwide.
+              </p>
+            </div>
+
+            <AccordionSection />
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <TestimonialsSection />
+
+      {/* Ad Banner */}
+      <div className="container mx-auto px-4">
+        <AdBanner />
+      </div>
+
+      {/* Newsletter Section */}
+      <section className="py-24 bg-gradient-to-b from-white to-gray-50/80">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            {/* Header */}
+            <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-3">
+              Stay Updated
+            </p>
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-900 mb-3">
+              Join Our Newsletter
+            </h2>
+            <p className="text-gray-500 text-sm mb-10 max-w-md mx-auto">
+              Get notified about new artworks, exclusive offers, and artist stories.
+            </p>
+
+            {/* Modern Email Input */}
+            <div className="max-w-md mx-auto">
+              <form onSubmit={handleSubscribe}>
+                <div className={`flex items-center gap-3 p-1.5 bg-gray-100/80 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.04)] border transition-colors ${
+                  subscriptionStatus === "error" ? "border-red-300" : "border-gray-200/50"
+                }`}>
+                  <input
+                    type="email"
+                    placeholder="Enter your email address"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (subscriptionStatus === "error") {
+                        setSubscriptionStatus("idle");
+                      }
+                    }}
+                    disabled={isSubscribing}
+                    className="flex-1 px-5 py-2.5 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none disabled:opacity-50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSubscribing || subscriptionStatus === "success"}
+                    className="px-6 py-2.5 bg-white text-gray-700 text-sm font-medium rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.08)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.12)] hover:text-gray-900 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubscribing ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      </span>
+                    ) : subscriptionStatus === "success" ? (
+                      "Subscribed!"
+                    ) : (
+                      "Subscribe"
+                    )}
+                  </button>
+                </div>
+              </form>
+
+              {/* Status Messages */}
+              {subscriptionStatus === "success" && (
+                <div className="mt-4 flex items-center justify-center gap-2 text-green-600 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                  <p className="text-sm font-medium">Successfully subscribed! Check your email.</p>
+                </div>
+              )}
+
+              {subscriptionStatus === "error" && (
+                <div className="mt-4 flex items-center justify-center gap-2 text-red-600 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" x2="12" y1="8" y2="12" />
+                    <line x1="12" x2="12.01" y1="16" y2="16" />
+                  </svg>
+                  <p className="text-sm font-medium">Please enter a valid email address.</p>
+                </div>
+              )}
+
+              {subscriptionStatus === "idle" && (
+                <p className="text-[11px] text-gray-400 mt-4">
+                  No spam, unsubscribe anytime.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

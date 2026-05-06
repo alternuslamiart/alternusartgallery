@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
-import { AlternusPage, COBALT } from "@/components/alternus-shell";
+import { CerevixPage, COBALT } from "@/components/cerevix-shell";
 
 export default function About() {
   return (
-    <AlternusPage>
+    <CerevixPage>
       {(t) => (
         <>
           <section style={{ padding: "120px 0 80px" }}>
@@ -24,7 +24,7 @@ export default function About() {
                   <div style={{ fontSize: 11, letterSpacing: "0.2em", fontWeight: 700, color: t.muted, position: "sticky", top: 100 }}>§ ORIGIN</div>
                 </div>
                 <div className="md:col-span-8" style={{ fontSize: 18, lineHeight: 1.75, color: t.fg, fontWeight: 400 }}>
-                  <p>Alternus was started in 2024 by a small team who were tired of desktops that hadn&apos;t really changed since 1984. Windows. Menus. Files. Folders. A metaphor from an era before the modern agent even existed.</p>
+                  <p>Cerevix was started in 2024 by a small team who were tired of desktops that hadn&apos;t really changed since 1984. Windows. Menus. Files. Folders. A metaphor from an era before the modern agent even existed.</p>
                   <p style={{ marginTop: 24 }}>We started from a simpler question — <em style={{ color: COBALT, fontStyle: "italic" }}>what if the OS were an agent?</em> An operating system that listens, reads, writes, remembers — and that you can talk to in the same way you talk to a colleague.</p>
                 </div>
               </div>
@@ -36,7 +36,7 @@ export default function About() {
                   <div style={{ fontSize: 11, letterSpacing: "0.2em", fontWeight: 700, color: t.muted, position: "sticky", top: 100 }}>§ TODAY</div>
                 </div>
                 <div className="md:col-span-8" style={{ fontSize: 18, lineHeight: 1.75, color: t.fg }}>
-                  <p>Today Alternus is a browser-native OS used by over 10,000 people. It runs Claude Opus 4.6. It ships new features every week. It has one goal: make the computer work for you.</p>
+                  <p>Today Cerevix is a browser-native OS used by over 10,000 people. It runs Claude Opus 4.6. It ships new features every week. It has one goal: make the computer work for you.</p>
                 </div>
               </div>
 
@@ -56,6 +56,6 @@ export default function About() {
           </section>
         </>
       )}
-    </AlternusPage>
+    </CerevixPage>
   );
 }

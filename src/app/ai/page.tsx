@@ -131,12 +131,12 @@ export default function AIPage() {
           <div className="flex items-center gap-2.5">
             <div className="relative">
               <div className="w-8 h-8 rounded-full bg-coffee flex items-center justify-center overflow-hidden">
-                <Image src="/logo.png" alt="Alternus AI" width={24} height={24} className="object-cover" />
+                <Image src="/logo.png" alt="Cerevix AI" width={24} height={24} className="object-cover" />
               </div>
               <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-white" />
             </div>
             <div>
-              <h1 className="text-sm font-semibold text-stone-900">Alternus AI</h1>
+              <h1 className="text-sm font-semibold text-stone-900">Cerevix AI</h1>
               <p className="text-[10px] text-stone-400">Art Assistant & Image Creator</p>
             </div>
           </div>
@@ -151,13 +151,13 @@ export default function AIPage() {
           <div className="flex-1 flex flex-col items-center justify-center px-4 py-16">
             <div className="relative mb-6">
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-coffee to-stone-700 flex items-center justify-center shadow-lg">
-                <Image src="/logo.png" alt="Alternus AI" width={48} height={48} className="object-cover" />
+                <Image src="/logo.png" alt="Cerevix AI" width={48} height={48} className="object-cover" />
               </div>
               <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-3 border-white" />
             </div>
 
             <h2 className="text-2xl font-bold text-stone-900 mb-2">
-              Welcome to Alternus AI
+              Welcome to Cerevix AI
             </h2>
             <p className="text-stone-500 text-center max-w-md mb-10">
               Your personal art assistant. Ask about art history, styles, techniques, or create stunning AI-generated artwork.
@@ -227,7 +227,7 @@ export default function AIPage() {
                 </button>
               </div>
               <p className="text-[11px] text-stone-400 text-center mt-3">
-                Powered by Gemini via /api/ai-chat. Alternus AI can make mistakes.
+                Powered by Gemini via /api/ai-chat. Cerevix AI can make mistakes.
               </p>
             </div>
           </div>

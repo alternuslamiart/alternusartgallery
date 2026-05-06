@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Mail, ArrowLeft, Eye, EyeOff, Check, X, User, Lock, Globe, Phone } from "lucide-react";
-import { AlternusLogo } from "@/components/alternus-shell";
+import { CerevixLogo } from "@/components/cerevix-shell";
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -313,7 +313,7 @@ export default function SignUpPage() {
     e.preventDefault();
 
     if (!termsAccepted || !privacyAccepted) {
-      alert("Please accept Alternus Art Gallery policies to continue.");
+      alert("Please accept Cerevix Art Gallery policies to continue.");
       return;
     }
 
@@ -370,8 +370,8 @@ export default function SignUpPage() {
 
       <header className="relative z-10 flex items-center justify-between gap-4 px-6 pb-2 pt-6 sm:px-8">
         <Link href="/" className="flex items-center gap-3 text-[#1f1f1f] no-underline">
-          <AlternusLogo size={28} radius={8} />
-          <span className="text-[15px] font-extrabold tracking-[-0.02em]">ALTERNUS</span>
+          <CerevixLogo size={28} radius={8} />
+          <span className="text-[15px] font-extrabold tracking-[-0.02em]">Cerevix</span>
         </Link>
         <div className="flex items-center gap-3 text-sm text-slate-500">
           <span className="hidden sm:inline">Already have an account?</span>
@@ -393,7 +393,7 @@ export default function SignUpPage() {
               </h1>
               <p className="mx-auto mt-3.5 max-w-[22.5rem] text-[14.5px] leading-[1.6] text-slate-500">
                 {showVerification
-                  ? "Enter the 6-digit code we sent to continue into Alternus."
+                  ? "Enter the 6-digit code we sent to continue into Cerevix."
                   : "A cleaner account flow with one focused card, centered on the page."}
               </p>
             </div>
@@ -725,7 +725,7 @@ export default function SignUpPage() {
                         <Link href="/terms" className="font-medium text-slate-900 hover:underline">
                           Terms of Service
                         </Link>{" "}
-                        for using Alternus.
+                        for using Cerevix.
                       </label>
                     </div>
 
@@ -775,7 +775,7 @@ export default function SignUpPage() {
                 </div>
 
                 <p className="text-center text-[11px] leading-relaxed text-slate-400">
-                  By signing up, you agree to our terms and consent to receive account emails from Alternus.
+                  By signing up, you agree to our terms and consent to receive account emails from Cerevix.
                 </p>
               </div>
             )}

@@ -1,5 +1,5 @@
 "use client";
-import { AlternusPage, COBALT } from "@/components/alternus-shell";
+import { CerevixPage, COBALT } from "@/components/cerevix-shell";
 
 const principles = [
   { n: "01", t: "Intent over interface.",   d: "The user&apos;s goal matters. The buttons are an implementation detail. If the agent can do it, the user shouldn&apos;t have to." },
@@ -12,7 +12,7 @@ const principles = [
 
 export default function Manifesto() {
   return (
-    <AlternusPage>
+    <CerevixPage>
       {(t) => (
         <>
           <section style={{ padding: "120px 0 60px", borderBottom: `1px solid ${t.faint}` }}>
@@ -43,6 +43,6 @@ export default function Manifesto() {
           </section>
         </>
       )}
-    </AlternusPage>
+    </CerevixPage>
   );
 }

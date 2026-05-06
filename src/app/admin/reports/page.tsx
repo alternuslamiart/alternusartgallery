@@ -180,7 +180,7 @@ export default function ReportsPage() {
           <div class="page">
             <div class="header">
               <div>
-                <div class="logo">ALTERNUS</div>
+                <div class="logo">Cerevix</div>
                 <div class="logo-sub">ART GALLERY</div>
               </div>
               <div class="doc-info">
@@ -195,7 +195,7 @@ export default function ReportsPage() {
             <div class="section">
               <div class="section-title">1. Purpose & Scope</div>
               <div class="section-text">
-                This W-7 Policy Document establishes the comprehensive governance framework for Alternus Art Gallery (hereinafter "AAG" or "the Gallery"). It defines the terms, conditions, and operational standards governing all commercial activities between the Gallery, its represented artists, buyers, and affiliated third parties. This policy applies to all original artworks, prints, commissions, and digital art transactions facilitated through the Gallery's physical and digital platforms, including alternusart.com.
+                This W-7 Policy Document establishes the comprehensive governance framework for Cerevix Art Gallery (hereinafter "AAG" or "the Gallery"). It defines the terms, conditions, and operational standards governing all commercial activities between the Gallery, its represented artists, buyers, and affiliated third parties. This policy applies to all original artworks, prints, commissions, and digital art transactions facilitated through the Gallery's physical and digital platforms, including alternusart.com.
               </div>
             </div>
 
@@ -247,7 +247,7 @@ export default function ReportsPage() {
               <div class="signature-block">
                 <div class="sig-line"></div>
                 <div class="sig-label">Authorized Signature — Gallery Director</div>
-                <div style="font-size:9px;color:#999;margin-top:4px">Alternus Art Gallery</div>
+                <div style="font-size:9px;color:#999;margin-top:4px">Cerevix Art Gallery</div>
               </div>
               <div class="signature-block">
                 <div class="sig-line"></div>
@@ -256,7 +256,7 @@ export default function ReportsPage() {
             </div>
 
             <div class="page-footer">
-              <div>Alternus Art Gallery (AAG) — W-7 Policy Document — Confidential</div>
+              <div>Cerevix Art Gallery (AAG) — W-7 Policy Document — Confidential</div>
               <div>Page 1 of 2</div>
             </div>
           </div>
@@ -265,7 +265,7 @@ export default function ReportsPage() {
           <div class="page">
             <div class="header">
               <div>
-                <div class="logo">ALTERNUS</div>
+                <div class="logo">Cerevix</div>
                 <div class="logo-sub">ART GALLERY</div>
               </div>
               <div class="doc-info">
@@ -279,7 +279,7 @@ export default function ReportsPage() {
             <div class="section">
               <div class="section-title">Executive Summary</div>
               <div class="section-text">
-                This report provides a comprehensive overview of Alternus Art Gallery's financial performance for the fiscal year ${reportYear}. It includes key revenue metrics, commission analysis, artist performance rankings, and category-level sales distribution. All figures are reported in EUR (€) and reflect the Gallery's standard 40/60 commission model.
+                This report provides a comprehensive overview of Cerevix Art Gallery's financial performance for the fiscal year ${reportYear}. It includes key revenue metrics, commission analysis, artist performance rankings, and category-level sales distribution. All figures are reported in EUR (€) and reflect the Gallery's standard 40/60 commission model.
               </div>
             </div>
 
@@ -372,7 +372,7 @@ export default function ReportsPage() {
             </div>
 
             <div class="page-footer">
-              <div>Alternus Art Gallery (AAG) — Financial Report FY ${reportYear} — Internal Use Only</div>
+              <div>Cerevix Art Gallery (AAG) — Financial Report FY ${reportYear} — Internal Use Only</div>
               <div>Page 2 of 2</div>
             </div>
           </div>
@@ -506,7 +506,7 @@ export default function ReportsPage() {
                 <div class="corner corner-br"></div>
 
                 <div class="cert-header">
-                  <div class="cert-logo">ALTERNUS</div>
+                  <div class="cert-logo">Cerevix</div>
                   <div class="cert-logo-sub">ART GALLERY</div>
                   <div class="cert-divider"></div>
                   <div class="cert-title">Certificate of Authenticity</div>
@@ -522,7 +522,7 @@ export default function ReportsPage() {
                     </div>
                     <div class="cert-statement">
                       This document certifies that the artwork described below is an authentic,
-                      original work of art. Alternus Art Gallery guarantees the provenance,
+                      original work of art. Cerevix Art Gallery guarantees the provenance,
                       authenticity, and originality of this piece as represented by the artist
                       and verified through the Gallery's authentication process.
                     </div>
@@ -566,7 +566,7 @@ export default function ReportsPage() {
                   <div class="warranty">
                     <div class="warranty-title">Guarantee of Authenticity</div>
                     <div class="warranty-text">
-                      Alternus Art Gallery warrants that this artwork is an original creation by the named artist.
+                      Cerevix Art Gallery warrants that this artwork is an original creation by the named artist.
                       This certificate serves as a permanent record of authenticity and provenance. The Gallery has
                       conducted due diligence to verify the artwork's originality, condition, and attribution.
                       This certificate is non-transferable without the artwork and should be stored securely
@@ -586,7 +586,7 @@ export default function ReportsPage() {
                   <div class="sig-block">
                     <div class="sig-line"></div>
                     <div class="sig-name">Gallery Director</div>
-                    <div class="sig-role">Alternus Art Gallery</div>
+                    <div class="sig-role">Cerevix Art Gallery</div>
                   </div>
                   <div class="sig-block">
                     <div class="sig-line"></div>
