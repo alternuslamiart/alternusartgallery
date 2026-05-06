@@ -99,7 +99,7 @@ export function AlternusNav({ isDark, setIsDark, scrolled, fg, muted, faint }: R
         <Link href="/login" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }} className="hover:!border-[#4284FF]">
           Log in
         </Link>
-        <Link href="/account" aria-label="Account" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, fontSize: 12, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.02em" }}>AL</Link>
+        <Link href="/account" aria-label="Account profile" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, fontSize: 12, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.02em" }}>AL</Link>
         <Link href="/main" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
           Launch Studio <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
         </Link>
