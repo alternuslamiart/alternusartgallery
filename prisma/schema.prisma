@@ -326,19 +326,23 @@ model Review {
 }
 
 model Notification {
-  id        String    @id @default(uuid())
-  userId    String    @map("user_id")
-  type      String
-  title     String
-  message   String?
-  linkUrl   String?   @map("link_url")
-  isRead    Boolean   @default(false) @map("is_read")
-  readAt    DateTime? @map("read_at")
-  createdAt DateTime  @default(now()) @map("created_at")
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  workspaceId String?   @map("workspace_id")
+  type        String
+  title       String
+  message     String?
+  linkUrl     String?   @map("link_url")
+  actionUrl   String?   @map("action_url")
+  metadata    Json?
+  isRead      Boolean   @default(false) @map("is_read")
+  readAt      DateTime? @map("read_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([workspaceId])
   @@map("notifications")
 }
 
@@ -418,4 +422,729 @@ model OsFile {
   @@index([parentId])
   @@index([userId, path])
   @@map("os_files")
+}
+
+enum WorkspacePlan {
+  TRIAL
+  FREE
+  PRO
+  TEAM
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
+enum ProjectType {
+  DESIGN
+  CAD
+  CODE
+  BLENDER
+  MIXED
+  OTHER
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ARCHIVED
+  DELETED
+}
+
+enum PrototypeType {
+  WEBSITE
+  MOBILE_APP
+  DASHBOARD
+  LANDING_PAGE
+  DESIGN_SYSTEM
+}
+
+enum PrototypeQuality {
+  WIREFRAME
+  HIGH_FIDELITY
+}
+
+enum PrototypeStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum PrototypeVisibility {
+  PRIVATE
+  SHARED
+}
+
+enum DesignColorPreset {
+  SKY_PAPER_GRAPHITE
+  MINIMAL_MONO
+  WARM_EDITORIAL
+  ENTERPRISE_BLUE
+}
+
+enum DesignTypographyPreset {
+  CLEAN_UI_SCALE
+  EDITORIAL_SCALE
+  COMPACT_DASHBOARD
+}
+
+enum DesignSpacingPreset {
+  EIGHT_PX_RHYTHM
+  COMPACT
+  SPACIOUS
+}
+
+enum GenerationStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  CANCELED
+}
+
+enum StudioJobType {
+  CHAT
+  DESIGN_GENERATION
+  CODE_GENERATION
+  IMAGE_GENERATION
+  MODEL_GENERATION
+  EXPORT_GENERATION
+  CAD_GENERATION
+  BLENDER_GENERATION
+  PROMPT_RUN
+}
+
+enum AssistantConversationStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum AssistantMessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum CadDesignStatus {
+  DRAFT
+  QUEUED
+  GENERATING
+  READY
+  FAILED
+  ARCHIVED
+}
+
+enum CodeLanguage {
+  JAVASCRIPT
+  TYPESCRIPT
+  PYTHON
+  GO
+  RUST
+  HTML
+  CSS
+  OTHER
+}
+
+enum CodeProjectStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum BlenderProjectStatus {
+  DRAFT
+  QUEUED
+  GENERATING
+  READY
+  FAILED
+  ARCHIVED
+}
+
+enum AssetType {
+  IMAGE
+  VECTOR
+  MODEL
+  DOCUMENT
+  TEXTURE
+  REFERENCE
+  EXPORT
+  AUDIO
+  CODE
+  UNKNOWN
+}
+
+enum AssetStorageProvider {
+  LOCAL
+  S3
+  DATABASE
+  MEMORY
+}
+
+enum AssetStatus {
+  UPLOADED
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum PromptCategory {
+  DESIGN
+  IMAGE
+  VIDEO
+  CODE
+  CAD
+  BLENDER
+  MARKETING
+  SYSTEM
+  OTHER
+}
+
+enum PromptStatus {
+  DRAFT
+  SAVED
+  ARCHIVED
+}
+
+enum ExportSourceType {
+  PROTOTYPE
+  ASSET
+  CODE_PROJECT
+  CAD_DESIGN
+  BLENDER_PROJECT
+  PROMPT
+  MIXED
+}
+
+enum ExportFormat {
+  PNG
+  JPG
+  PDF
+  ZIP
+  JSON
+  GLB
+  OBJ
+  HTML
+  CODE_ZIP
+  OTHER
+}
+
+enum ExportStatus {
+  QUEUED
+  RUNNING
+  READY
+  FAILED
+  CANCELED
+}
+
+enum UserTheme {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+enum DefaultVisibility {
+  PRIVATE
+  SHARED
+}
+
+model Workspace {
+  id          String        @id @default(uuid())
+  ownerId     String        @map("owner_id")
+  name        String
+  plan        WorkspacePlan @default(TRIAL)
+  trialEndsAt DateTime?     @map("trial_ends_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@index([ownerId])
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String        @id @default(uuid())
+  workspaceId String        @map("workspace_id")
+  userId      String        @map("user_id")
+  role        WorkspaceRole @default(OWNER)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+  @@index([workspaceId])
+  @@map("workspace_members")
+}
+
+model SubscriptionState {
+  workspaceId String             @id @map("workspace_id")
+  plan        WorkspacePlan      @default(TRIAL)
+  status      SubscriptionStatus @default(TRIALING)
+  trialEndsAt DateTime?          @map("trial_ends_at")
+  usageLimits Json?              @map("usage_limits")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+
+  @@map("subscription_states")
+}
+
+model Project {
+  id           String        @id @default(uuid())
+  workspaceId  String        @map("workspace_id")
+  userId       String        @map("user_id")
+  name         String
+  description  String?
+  type         ProjectType   @default(OTHER)
+  status       ProjectStatus @default(ACTIVE)
+  coverAssetId String?       @map("cover_asset_id")
+  lastOpenedAt DateTime?     @map("last_opened_at")
+  deletedAt    DateTime?     @map("deleted_at")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([updatedAt])
+  @@index([deletedAt])
+  @@map("studio_projects")
+}
+
+model Prototype {
+  id               String              @id @default(uuid())
+  workspaceId      String              @map("workspace_id")
+  userId           String              @map("user_id")
+  projectId        String?             @map("project_id")
+  name             String
+  type             PrototypeType
+  quality          PrototypeQuality
+  status           PrototypeStatus     @default(DRAFT)
+  visibility       PrototypeVisibility @default(PRIVATE)
+  brief            String?             @db.Text
+  tags             Json?
+  thumbnailAssetId String?             @map("thumbnail_asset_id")
+  designSystemId   String?             @map("design_system_id")
+  lastOpenedAt     DateTime?           @map("last_opened_at")
+  deletedAt        DateTime?           @map("deleted_at")
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([projectId])
+  @@index([type])
+  @@index([quality])
+  @@index([status])
+  @@index([updatedAt])
+  @@index([deletedAt])
+  @@map("prototypes")
+}
+
+model DesignSystem {
+  id               String                 @id @default(uuid())
+  workspaceId      String                 @map("workspace_id")
+  userId           String                 @map("user_id")
+  projectId        String?                @map("project_id")
+  prototypeId      String?                @map("prototype_id")
+  name             String
+  colorPreset      DesignColorPreset      @default(SKY_PAPER_GRAPHITE) @map("color_preset")
+  typographyPreset DesignTypographyPreset @default(CLEAN_UI_SCALE) @map("typography_preset")
+  spacingPreset    DesignSpacingPreset    @default(EIGHT_PX_RHYTHM) @map("spacing_preset")
+  tokens           Json?
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([projectId])
+  @@index([prototypeId])
+  @@map("design_systems")
+}
+
+model AssistantConversation {
+  id            String                      @id @default(uuid())
+  workspaceId   String                      @map("workspace_id")
+  userId        String                      @map("user_id")
+  title         String
+  status        AssistantConversationStatus @default(ACTIVE)
+  lastMessageAt DateTime?                   @map("last_message_at")
+  createdAt     DateTime                    @default(now()) @map("created_at")
+  updatedAt     DateTime                    @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([status])
+  @@index([lastMessageAt])
+  @@map("assistant_conversations")
+}
+
+model AssistantMessage {
+  id             String               @id @default(uuid())
+  conversationId String               @map("conversation_id")
+  role           AssistantMessageRole
+  content        String               @db.Text
+  metadata       Json?
+  createdAt      DateTime             @default(now()) @map("created_at")
+
+  @@index([conversationId])
+  @@index([createdAt])
+  @@map("assistant_messages")
+}
+
+model AIProviderJob {
+  id          String           @id @default(uuid())
+  workspaceId String           @map("workspace_id")
+  userId      String           @map("user_id")
+  provider    String           @default("local_stub")
+  type        StudioJobType
+  status      GenerationStatus @default(QUEUED)
+  input       Json
+  output      Json?
+  error       String?
+  startedAt   DateTime?        @map("started_at")
+  completedAt DateTime?        @map("completed_at")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+  @@map("ai_provider_jobs")
+}
+
+model CadDesign {
+  id            String          @id @default(uuid())
+  workspaceId   String          @map("workspace_id")
+  userId        String          @map("user_id")
+  projectId     String?         @map("project_id")
+  name          String
+  description   String?
+  status        CadDesignStatus @default(DRAFT)
+  inputAssetIds Json?           @map("input_asset_ids")
+  outputAssetId String?         @map("output_asset_id")
+  settings      Json?
+  deletedAt     DateTime?       @map("deleted_at")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([projectId])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("cad_designs")
+}
+
+model CadJob {
+  id          String           @id @default(uuid())
+  workspaceId String           @map("workspace_id")
+  userId      String           @map("user_id")
+  cadDesignId String           @map("cad_design_id")
+  status      GenerationStatus @default(QUEUED)
+  input       Json
+  output      Json?
+  error       String?
+  startedAt   DateTime?        @map("started_at")
+  completedAt DateTime?        @map("completed_at")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([cadDesignId])
+  @@index([status])
+  @@map("cad_jobs")
+}
+
+model CodeProject {
+  id           String            @id @default(uuid())
+  workspaceId  String            @map("workspace_id")
+  userId       String            @map("user_id")
+  projectId    String?           @map("project_id")
+  name         String
+  description  String?
+  language     CodeLanguage      @default(TYPESCRIPT)
+  framework    String?
+  status       CodeProjectStatus @default(DRAFT)
+  files        Json?
+  lastOpenedAt DateTime?         @map("last_opened_at")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([projectId])
+  @@index([status])
+  @@index([updatedAt])
+  @@map("code_projects")
+}
+
+model CodeFile {
+  id            String       @id @default(uuid())
+  codeProjectId String       @map("code_project_id")
+  path          String
+  language      CodeLanguage @default(OTHER)
+  content       String       @db.Text
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  @@unique([codeProjectId, path])
+  @@index([codeProjectId])
+  @@map("code_files")
+}
+
+model CodeGenerationJob {
+  id            String           @id @default(uuid())
+  workspaceId   String           @map("workspace_id")
+  userId        String           @map("user_id")
+  codeProjectId String?          @map("code_project_id")
+  status        GenerationStatus @default(QUEUED)
+  prompt        String           @db.Text
+  input         Json?
+  output        Json?
+  error         String?
+  startedAt     DateTime?        @map("started_at")
+  completedAt   DateTime?        @map("completed_at")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([codeProjectId])
+  @@index([status])
+  @@map("code_generation_jobs")
+}
+
+model BlenderProject {
+  id            String               @id @default(uuid())
+  workspaceId   String               @map("workspace_id")
+  userId        String               @map("user_id")
+  projectId     String?              @map("project_id")
+  name          String
+  description   String?
+  status        BlenderProjectStatus @default(DRAFT)
+  inputAssetIds Json?                @map("input_asset_ids")
+  outputAssetId String?              @map("output_asset_id")
+  settings      Json?
+  deletedAt     DateTime?            @map("deleted_at")
+  createdAt     DateTime             @default(now()) @map("created_at")
+  updatedAt     DateTime             @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([projectId])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("blender_projects")
+}
+
+model BlenderJob {
+  id               String           @id @default(uuid())
+  workspaceId      String           @map("workspace_id")
+  userId           String           @map("user_id")
+  blenderProjectId String?          @map("blender_project_id")
+  status           GenerationStatus @default(QUEUED)
+  input            Json
+  output           Json?
+  error            String?
+  startedAt        DateTime?        @map("started_at")
+  completedAt      DateTime?        @map("completed_at")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([blenderProjectId])
+  @@index([status])
+  @@map("blender_jobs")
+}
+
+model Asset {
+  id               String               @id @default(uuid())
+  workspaceId      String               @map("workspace_id")
+  userId           String               @map("user_id")
+  projectId        String?              @map("project_id")
+  name             String
+  type             AssetType            @default(UNKNOWN)
+  filename         String
+  originalFilename String               @map("original_filename")
+  mimeType         String               @map("mime_type")
+  extension        String
+  sizeBytes        Int                  @map("size_bytes")
+  storageProvider  AssetStorageProvider @default(LOCAL) @map("storage_provider")
+  storageKey       String               @unique @map("storage_key")
+  publicUrl        String?              @map("public_url")
+  previewUrl       String?              @map("preview_url")
+  checksum         String?
+  status           AssetStatus          @default(READY)
+  tags             Json?
+  metadata         Json?
+  deletedAt        DateTime?            @map("deleted_at")
+  createdAt        DateTime             @default(now()) @map("created_at")
+  updatedAt        DateTime             @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([projectId])
+  @@index([type])
+  @@index([status])
+  @@index([updatedAt])
+  @@index([deletedAt])
+  @@map("assets")
+}
+
+model AssetFolder {
+  id          String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
+  userId      String   @map("user_id")
+  name        String
+  parentId    String?  @map("parent_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([parentId])
+  @@map("asset_folders")
+}
+
+model Prompt {
+  id          String         @id @default(uuid())
+  workspaceId String         @map("workspace_id")
+  userId      String         @map("user_id")
+  projectId   String?        @map("project_id")
+  title       String
+  content     String         @db.Text
+  category    PromptCategory @default(OTHER)
+  status      PromptStatus   @default(SAVED)
+  tags        Json?
+  variables   Json?
+  version     Int            @default(1)
+  lastUsedAt  DateTime?      @map("last_used_at")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([projectId])
+  @@index([category])
+  @@index([status])
+  @@index([updatedAt])
+  @@map("prompts")
+}
+
+model PromptRun {
+  id          String           @id @default(uuid())
+  workspaceId String           @map("workspace_id")
+  userId      String           @map("user_id")
+  promptId    String?          @map("prompt_id")
+  input       Json
+  output      Json?
+  provider    String?
+  status      GenerationStatus @default(QUEUED)
+  completedAt DateTime?        @map("completed_at")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([promptId])
+  @@index([status])
+  @@map("prompt_runs")
+}
+
+model StudioExport {
+  id          String           @id @default(uuid())
+  workspaceId String           @map("workspace_id")
+  userId      String           @map("user_id")
+  projectId   String?          @map("project_id")
+  sourceType  ExportSourceType @map("source_type")
+  sourceId    String?          @map("source_id")
+  name        String
+  format      ExportFormat
+  status      ExportStatus     @default(QUEUED)
+  assetId     String?          @map("asset_id")
+  error       String?
+  metadata    Json?
+  completedAt DateTime?        @map("completed_at")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([projectId])
+  @@index([sourceType])
+  @@index([status])
+  @@map("exports")
+}
+
+model UserSettings {
+  userId             String    @id @map("user_id")
+  theme              UserTheme @default(LIGHT)
+  accentColor        String    @default("#4A9BFF") @map("accent_color")
+  language           String    @default("en")
+  timezone           String    @default("UTC")
+  emailNotifications Boolean   @default(true) @map("email_notifications")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  @@map("user_settings")
+}
+
+model WorkspaceSettings {
+  workspaceId       String            @id @map("workspace_id")
+  defaultVisibility DefaultVisibility @default(PRIVATE) @map("default_visibility")
+  storageProvider   String            @default("local") @map("storage_provider")
+  aiProvider        String?           @map("ai_provider")
+  allowedAssetTypes Json?             @map("allowed_asset_types")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  @@map("workspace_settings")
+}
+
+model HelpArticle {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  title     String
+  category  String
+  content   String   @db.Text
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@index([published])
+  @@map("help_articles")
+}
+
+model ActivityLog {
+  id          String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
+  userId      String   @map("user_id")
+  action      String
+  entityType  String   @map("entity_type")
+  entityId    String?  @map("entity_id")
+  message     String
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([entityType])
+  @@index([entityId])
+  @@index([createdAt])
+  @@map("activity_logs")
 }
