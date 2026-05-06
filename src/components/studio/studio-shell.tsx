@@ -3911,142 +3911,309 @@ function SettingsPage() {
   const { theme, setTheme, toggleTheme } = useStudioTheme();
   const { openModal, showToast } = useStudioActions();
   const isDark = theme === "dark";
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    promptLab: true,
+    exports: true,
+    weekly: false,
+    billing: true,
+  });
+
+  const surfaceClass = isDark
+    ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_18px_42px_rgba(0,0,0,0.22)]"
+    : "border-[#E7EBF0] bg-white shadow-[0_18px_42px_rgba(31,43,77,0.055)]";
+  const mutedClass = isDark ? "text-[#A8B0BA]" : "text-[#6B7280]";
+  const headingClass = isDark ? "text-[#F4F6F8]" : "text-[#171717]";
+
+  const toggleNotification = (key: keyof typeof notificationPrefs) => {
+    setNotificationPrefs((current) => ({ ...current, [key]: !current[key] }));
+  };
 
   return (
-    <div>
-      <PageHeader
-        title="Settings"
-        subtitle="Manage profile, workspace, plan, appearance, and preferences."
-        action={
-          <button
-            onClick={toggleTheme}
-            className={`inline-flex h-9 items-center gap-2 rounded-xl border px-4 text-[12px] font-semibold ${isDark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#171717] shadow-sm hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
-          >
-            {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-            {isDark ? "Switch to light" : "Switch to dark"}
-          </button>
-        }
-      />
-
-      <div className="mb-4 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <SoftCard>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${isDark ? "bg-[#181B20] text-[#3BA7FF]" : "bg-[#EEF7FC] text-[#1DA1F2]"}`}>
-                {isDark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-              </div>
-              <h3 className={`text-[14px] font-semibold ${isDark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Appearance</h3>
-              <p className={`mt-2 max-w-md text-[11px] leading-5 ${isDark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
-                Choose a softer light workspace or a calm dark workspace. Your preference is saved on this browser.
-              </p>
-            </div>
-            <div className={`inline-flex rounded-2xl border p-1 ${isDark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5E7EB] bg-white"}`}>
-              <button
-                onClick={() => setTheme("light")}
-                className={[
-                  "inline-flex h-8 items-center gap-2 rounded-xl px-3 text-[11px] font-semibold transition-all",
-                  theme === "light" ? (isDark ? "bg-[rgba(59,167,255,0.14)] text-[#F4F6F8]" : "bg-[#DDEEFF] text-[#4A9BFF]") : (isDark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#6B7280] hover:bg-[#F4F8FB]"),
-                ].join(" ")}
-              >
-                <Sun className="h-3.5 w-3.5" />
-                Light
-              </button>
-              <button
-                onClick={() => setTheme("dark")}
-                className={[
-                  "inline-flex h-8 items-center gap-2 rounded-xl px-3 text-[11px] font-semibold transition-all",
-                  theme === "dark" ? (isDark ? "bg-[rgba(59,167,255,0.14)] text-[#F4F6F8]" : "bg-[#DDEEFF] text-[#4A9BFF]") : (isDark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#6B7280] hover:bg-[#F4F8FB]"),
-                ].join(" ")}
-              >
-                <Moon className="h-3.5 w-3.5" />
-                Dark
-              </button>
-            </div>
-          </div>
-        </SoftCard>
-        <SoftCard>
-          <h3 className={`text-[13px] font-semibold ${isDark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Alternus AI Trial</h3>
-          <p className={`mt-2 text-[11px] leading-5 ${isDark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>12 days left on the Personal workspace trial.</p>
-          <div className={`mt-4 h-2 overflow-hidden rounded-full ${isDark ? "bg-[#181B20]" : "bg-[#EEF7FC]"}`}>
-            <div className="h-full w-[58%] rounded-full bg-[#4A9BFF]" />
-          </div>
-          <button onClick={() => openModal("upgrade")} className={`mt-4 inline-flex h-9 items-center rounded-xl px-4 text-[12px] font-semibold text-white shadow-[0_12px_24px_rgba(74,155,255,0.22)] transition-all active:scale-[0.98] ${isDark ? "bg-[#3BA7FF] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}>
-            Upgrade plan
-          </button>
-        </SoftCard>
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <SoftCard>
-          <SettingCardHeader icon={UserRound} title="Profile settings" />
-          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Name, email, avatar, role, and account details placeholder.</p>
-          <SettingsRows rows={["Display name: Julie", "Email: personal workspace", "Profile photo placeholder"]} onRowClick={showToast} />
-        </SoftCard>
-        <SoftCard>
-          <SettingCardHeader icon={Shield} title="Workspace settings" />
-          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Personal workspace controls, members, permissions, and collaboration settings.</p>
-          <SettingsRows rows={["Workspace: Personal", "Member invites placeholder", "Default project: AI Assistant"]} onRowClick={showToast} />
-        </SoftCard>
-        <SoftCard>
-          <SettingCardHeader icon={CreditCard} title="Billing and plan" />
-          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Trial status, upgrade placeholder, invoices, and billing history.</p>
-          <SettingsRows rows={["Current plan: Trial", "Billing history placeholder", "Payment method placeholder"]} onRowClick={showToast} />
-        </SoftCard>
-        <SoftCard>
-          <SettingCardHeader icon={Bell} title="Notifications" />
-          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Control alerts for prompt lab updates, exports, and workspace changes.</p>
-          <SettingsRows rows={["Prompt Lab badge alerts", "Export completion alerts", "Weekly summary placeholder"]} onRowClick={showToast} />
-        </SoftCard>
-        <SoftCard>
-          <SettingCardHeader icon={KeyRound} title="Security" />
-          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Password, sessions, two-factor authentication, and trusted devices.</p>
-          <SettingsRows rows={["Password change placeholder", "Active sessions placeholder", "Two-factor authentication placeholder"]} onRowClick={showToast} />
-        </SoftCard>
-        <SoftCard>
-          <SettingCardHeader icon={Plug} title="Integrations" />
-          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Connect AutoCAD, Blender, code repositories, and export destinations.</p>
-          <SettingsRows rows={["AutoCAD connection placeholder", "Blender bridge placeholder", "Git provider placeholder"]} onRowClick={showToast} />
-        </SoftCard>
-        <SoftCard>
-          <SettingCardHeader icon={Database} title="Data and exports" />
-          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Manage workspace data, download history, retention, and import defaults.</p>
-          <SettingsRows rows={["Export archive placeholder", "Import defaults placeholder", "Data retention placeholder"]} onRowClick={showToast} />
-        </SoftCard>
-        <SoftCard>
-          <SettingCardHeader icon={Monitor} title="Display defaults" />
-          <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Sidebar behavior, compact preview, and dashboard density.</p>
-          <SettingsRows rows={["Sidebar collapse preference", "Preview mode placeholder", "Density: Comfortable"]} onRowClick={showToast} />
-        </SoftCard>
-      </div>
-    </div>
-  );
-}
-
-function SettingCardHeader({ icon: Icon, title }: { icon: LucideIcon; title: string }) {
-  const { theme } = useStudioTheme();
-  const dark = theme === "dark";
-  return (
-    <div className="flex items-center gap-3">
-      <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ? "bg-[#181B20] text-[#3BA7FF]" : "bg-[#EEF7FC] text-[#1DA1F2]"}`}>
-        <Icon className="h-4 w-4" />
-      </span>
-      <h3 className={`text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{title}</h3>
-    </div>
-  );
-}
-
-function SettingsRows({ rows, onRowClick }: { rows: string[]; onRowClick?: (message: string) => void }) {
-  const { theme } = useStudioTheme();
-  const dark = theme === "dark";
-  return (
-    <div className="mt-4 space-y-2">
-      {rows.map((row) => (
-        <button key={row} onClick={() => onRowClick?.(`${row} opened`)} className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left transition-all hover:border-[#CFE8F8] active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5E7EB] bg-white"}`}>
-          <span className={`text-[11px] font-medium ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>{row}</span>
-          <span className={`text-[10px] font-semibold ${dark ? "text-[#6F7782]" : "text-[#A1A7B0]"}`}>Soon</span>
+    <div className="mx-auto w-full max-w-[1180px] pb-8">
+      <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className={`text-[36px] font-semibold leading-tight tracking-[-0.04em] ${headingClass}`}>Settings</h1>
+          <p className={`mt-2 max-w-xl text-[13px] leading-6 ${mutedClass}`}>
+            Manage profile, workspace, plan, appearance, and preferences.
+          </p>
+        </div>
+        <button
+          onClick={toggleTheme}
+          className={`inline-flex h-11 items-center gap-3 rounded-2xl border px-4 text-[12px] font-semibold transition-all active:scale-[0.98] ${isDark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] shadow-[0_10px_24px_rgba(0,0,0,0.2)] hover:border-[rgba(125,211,252,0.28)]" : "border-[#E4E8EF] bg-white text-[#171717] shadow-[0_12px_26px_rgba(31,43,77,0.06)] hover:border-[#BFD8FF]"}`}
+        >
+          <span className={`flex h-6 w-10 items-center rounded-full p-0.5 transition-colors ${isDark ? "justify-end bg-[#4A9BFF]" : "justify-start bg-[#EAF2FF]"}`}>
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm">
+              {isDark ? <Moon className="h-3 w-3 text-[#4A9BFF]" /> : <Sun className="h-3 w-3 text-[#4A9BFF]" />}
+            </span>
+          </span>
+          {isDark ? "Switch to light" : "Switch to dark"}
         </button>
-      ))}
+      </div>
+
+      <div className="space-y-6">
+        <section className={`rounded-[22px] border p-6 ${surfaceClass}`}>
+          <SettingsSectionHeader icon={Monitor} title="Appearance" subtitle="Choose how Alternus AI Studio feels across your workspace." />
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <AppearanceModeCard active={theme === "light"} icon={Sun} label="Light" description="Clean white workspace with crisp contrast." preview="light" onClick={() => setTheme("light")} />
+            <AppearanceModeCard active={theme === "dark"} icon={Moon} label="Dark" description="Low-glare workspace for focused sessions." preview="dark" onClick={() => setTheme("dark")} />
+          </div>
+        </section>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <section className={`rounded-[22px] border p-6 ${surfaceClass}`}>
+            <SettingsSectionHeader icon={UserRound} title="Profile Settings" subtitle="Your visible account identity and role." />
+            <div className="mt-6 space-y-3">
+              <SettingsField label="Display name" value="Julie" onClick={() => showToast("Display name opened")} />
+              <SettingsField label="Email" value="personal workspace" onClick={() => showToast("Email opened")} />
+              <ProfilePhotoDropzone onClick={() => showToast("Profile photo upload opened")} />
+              <SettingsField label="Role" value="Workspace owner" onClick={() => showToast("Role opened")} />
+            </div>
+          </section>
+
+          <section className={`rounded-[22px] border p-6 ${surfaceClass}`}>
+            <SettingsSectionHeader icon={Shield} title="Workspace Settings" subtitle="Workspace defaults for projects and members." />
+            <div className="mt-6 space-y-3">
+              <SettingsField label="Workspace name" value="Personal" onClick={() => showToast("Workspace name opened")} />
+              <SettingsField label="Member invites" value="Invite by email" onClick={() => showToast("Member invites opened")} />
+              <SettingsField label="Default project" value="AI Assistant" onClick={() => showToast("Default project opened")} />
+            </div>
+          </section>
+        </div>
+
+        <section className={`overflow-hidden rounded-[22px] border ${surfaceClass}`}>
+          <div className="grid gap-0 lg:grid-cols-[1.25fr_0.75fr]">
+            <div className={`p-6 ${isDark ? "bg-[linear-gradient(135deg,rgba(59,167,255,0.16),rgba(139,92,246,0.1))]" : "bg-[linear-gradient(135deg,#F4FAFF,#F7F2FF)]"}`}>
+              <SettingsSectionHeader icon={CreditCard} title="Plan & Billing" subtitle="Trial status, current plan, billing history, and upgrades." />
+              <div className="mt-7 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className={`text-[12px] font-semibold uppercase tracking-[0.14em] ${isDark ? "text-[#7DD3FC]" : "text-[#4A5CFF]"}`}>Alternus AI Trial</p>
+                  <p className={`mt-3 text-[34px] font-semibold tracking-[-0.04em] ${headingClass}`}>12 days left</p>
+                  <p className={`mt-2 max-w-md text-[12px] leading-5 ${mutedClass}`}>Your Personal workspace trial is 58% complete. Upgrade any time to keep advanced studio tools active.</p>
+                </div>
+                <button
+                  onClick={() => openModal("upgrade")}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-[linear-gradient(135deg,#4A9BFF,#7C3AED)] px-5 text-[12px] font-semibold text-white shadow-[0_18px_34px_rgba(74,91,255,0.28)] transition-all hover:-translate-y-0.5 active:scale-[0.98]"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Upgrade plan
+                </button>
+              </div>
+              <div className={`mt-7 h-3 overflow-hidden rounded-full ${isDark ? "bg-[#181B20]" : "bg-white"}`}>
+                <div className="h-full w-[58%] rounded-full bg-[linear-gradient(90deg,#4A9BFF,#8B5CF6)]" />
+              </div>
+            </div>
+            <div className="grid gap-3 p-6">
+              <BillingMetric label="Current plan" value="Trial" />
+              <BillingMetric label="Billing history" value="No invoices yet" />
+              <BillingMetric label="Renewal" value="After trial" />
+            </div>
+          </div>
+        </section>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <section className={`rounded-[22px] border p-6 ${surfaceClass}`}>
+            <SettingsSectionHeader icon={Bell} title="Notifications" subtitle="Choose the alerts that matter to your workspace." />
+            <div className="mt-6 space-y-3">
+              <NotificationRow title="Prompt Lab badge alerts" description="Saved prompt updates and review requests." enabled={notificationPrefs.promptLab} onToggle={() => toggleNotification("promptLab")} />
+              <NotificationRow title="Export completion alerts" description="Finished renders, downloads, and archives." enabled={notificationPrefs.exports} onToggle={() => toggleNotification("exports")} />
+              <NotificationRow title="Weekly summary" description="A compact digest of workspace activity." enabled={notificationPrefs.weekly} onToggle={() => toggleNotification("weekly")} />
+              <NotificationRow title="Billing notices" description="Trial, plan, and payment updates." enabled={notificationPrefs.billing} onToggle={() => toggleNotification("billing")} />
+            </div>
+          </section>
+
+          <section className={`rounded-[22px] border p-6 ${surfaceClass}`}>
+            <SettingsSectionHeader icon={KeyRound} title="Security" subtitle="Account protection and trusted access." />
+            <div className="mt-6 space-y-3">
+              <SecurityRow title="Password" value="Last changed recently" onClick={() => showToast("Password settings opened")} />
+              <SecurityRow title="Active sessions" value="2 trusted devices" onClick={() => showToast("Active sessions opened")} />
+              <SecurityRow title="Two-factor authentication" value="Recommended" onClick={() => showToast("Two-factor authentication opened")} accent />
+            </div>
+          </section>
+        </div>
+
+        <section className={`rounded-[22px] border p-6 ${surfaceClass}`}>
+          <SettingsSectionHeader icon={Plug} title="Integrations" subtitle="Connected tools, design apps, and export destinations." />
+          <div className="mt-6 grid gap-3 md:grid-cols-3">
+            <IntegrationRow icon={PenLine} title="AutoCAD" status="Ready to connect" onClick={() => showToast("AutoCAD integration opened")} />
+            <IntegrationRow icon={Layers3} title="Blender" status="Bridge available" onClick={() => showToast("Blender integration opened")} />
+            <IntegrationRow icon={Code2} title="Git provider" status="Connect repository" onClick={() => showToast("Git provider opened")} />
+          </div>
+        </section>
+      </div>
     </div>
+  );
+}
+
+function SettingsSectionHeader({ icon: Icon, title, subtitle }: { icon: LucideIcon; title: string; subtitle: string }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  return (
+    <div className="flex items-start gap-4">
+      <span className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl ${dark ? "bg-[rgba(59,167,255,0.12)] text-[#7DD3FC]" : "bg-[#EEF7FF] text-[#1D9BF0]"}`}>
+        <Icon className="h-5 w-5" />
+      </span>
+      <div>
+        <h2 className={`text-[17px] font-semibold tracking-[-0.02em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{title}</h2>
+        <p className={`mt-1.5 max-w-xl text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{subtitle}</p>
+      </div>
+    </div>
+  );
+}
+
+function AppearanceModeCard({
+  active,
+  icon: Icon,
+  label,
+  description,
+  preview,
+  onClick,
+}: {
+  active: boolean;
+  icon: LucideIcon;
+  label: string;
+  description: string;
+  preview: "light" | "dark";
+  onClick: () => void;
+}) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  return (
+    <button
+      onClick={onClick}
+      className={`group rounded-[18px] border p-4 text-left transition-all active:scale-[0.99] ${active ? (dark ? "border-[#3BA7FF] bg-[rgba(59,167,255,0.1)]" : "border-[#9CCAFF] bg-[#F4FAFF] shadow-[0_14px_30px_rgba(74,155,255,0.1)]") : (dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] hover:border-[rgba(125,211,252,0.24)]" : "border-[#E8ECF2] bg-[#FCFDFE] hover:border-[#CFE8F8] hover:bg-white")}`}
+    >
+      <div className={`h-28 overflow-hidden rounded-[14px] border p-3 ${preview === "dark" ? "border-[#303843] bg-[#111318]" : "border-[#E5EAF0] bg-white"}`}>
+        <div className={`mb-3 h-2.5 w-20 rounded-full ${preview === "dark" ? "bg-[#333B46]" : "bg-[#E8EEF7]"}`} />
+        <div className="grid grid-cols-[0.65fr_1fr] gap-2">
+          <div className={`h-16 rounded-[10px] ${preview === "dark" ? "bg-[#1E232B]" : "bg-[#F3F7FB]"}`} />
+          <div className="space-y-2">
+            <div className={`h-4 rounded-full ${preview === "dark" ? "bg-[#27303B]" : "bg-[#E8EEF7]"}`} />
+            <div className={`h-4 w-3/4 rounded-full ${preview === "dark" ? "bg-[#27303B]" : "bg-[#E8EEF7]"}`} />
+            <div className={`h-6 rounded-[8px] ${preview === "dark" ? "bg-[#3BA7FF]" : "bg-[#4A9BFF]"}`} />
+          </div>
+        </div>
+      </div>
+      <div className="mt-4 flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${active ? "bg-[#4A9BFF] text-white" : (dark ? "bg-[#202832] text-[#7DD3FC]" : "bg-[#EEF7FF] text-[#1D9BF0]")}`}>
+            <Icon className="h-4 w-4" />
+          </span>
+          <span>
+            <span className={`block text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{label}</span>
+            <span className={`mt-1 block text-[11px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{description}</span>
+          </span>
+        </div>
+        {active && <CheckCircle2 className="mt-1 h-4 w-4 flex-shrink-0 text-[#4A9BFF]" />}
+      </div>
+    </button>
+  );
+}
+
+function SettingsField({ label, value, onClick }: { label: string; value: string; onClick: () => void }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  return (
+    <button
+      onClick={onClick}
+      className={`flex w-full items-center justify-between gap-4 rounded-2xl border px-4 py-3 text-left transition-all active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] hover:border-[rgba(125,211,252,0.24)]" : "border-[#E8ECF2] bg-[#FCFDFE] hover:border-[#CFE8F8] hover:bg-white"}`}
+    >
+      <span>
+        <span className={`block text-[11px] font-semibold uppercase tracking-[0.1em] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`}>{label}</span>
+        <span className={`mt-1 block text-[13px] font-medium ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{value}</span>
+      </span>
+      <span className={`text-[11px] font-semibold ${dark ? "text-[#6F7782]" : "text-[#A1A7B0]"}`}>Edit</span>
+    </button>
+  );
+}
+
+function ProfilePhotoDropzone({ onClick }: { onClick: () => void }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  return (
+    <button
+      onClick={onClick}
+      className={`flex w-full items-center gap-4 rounded-2xl border border-dashed px-4 py-4 text-left transition-all active:scale-[0.99] ${dark ? "border-[rgba(125,211,252,0.26)] bg-[#181B20] hover:bg-[rgba(59,167,255,0.08)]" : "border-[#BFD8FF] bg-[#F8FBFF] hover:bg-white"}`}
+    >
+      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#4A9BFF,#8B5CF6)] text-white shadow-[0_14px_24px_rgba(74,91,255,0.22)]">
+        <Upload className="h-5 w-5" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className={`block text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Profile photo upload area</span>
+        <span className={`mt-1 block text-[11px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>PNG, JPG, or WebP up to 4 MB.</span>
+      </span>
+      <span className={`hidden text-[11px] font-semibold sm:block ${dark ? "text-[#7DD3FC]" : "text-[#4A5CFF]"}`}>Upload</span>
+    </button>
+  );
+}
+
+function BillingMetric({ label, value }: { label: string; value: string }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  return (
+    <div className={`rounded-2xl border px-4 py-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E8ECF2] bg-[#FCFDFE]"}`}>
+      <p className={`text-[11px] font-semibold uppercase tracking-[0.1em] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`}>{label}</p>
+      <p className={`mt-1 text-[14px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{value}</p>
+    </div>
+  );
+}
+
+function NotificationRow({ title, description, enabled, onToggle }: { title: string; description: string; enabled: boolean; onToggle: () => void }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  return (
+    <div className={`flex items-center justify-between gap-4 rounded-2xl border px-4 py-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E8ECF2] bg-[#FCFDFE]"}`}>
+      <span className="min-w-0">
+        <span className={`block text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{title}</span>
+        <span className={`mt-1 block text-[11px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{description}</span>
+      </span>
+      <SettingsToggle enabled={enabled} onToggle={onToggle} label={title} />
+    </div>
+  );
+}
+
+function SettingsToggle({ enabled, onToggle, label }: { enabled: boolean; onToggle: () => void; label: string }) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-label={`${enabled ? "Disable" : "Enable"} ${label}`}
+      className={`flex h-7 w-12 flex-shrink-0 items-center rounded-full p-0.5 transition-colors ${enabled ? "justify-end bg-[linear-gradient(135deg,#4A9BFF,#8B5CF6)]" : "justify-start bg-[#D6DCE5]"}`}
+    >
+      <span className="h-6 w-6 rounded-full bg-white shadow-[0_3px_10px_rgba(15,23,42,0.18)]" />
+    </button>
+  );
+}
+
+function SecurityRow({ title, value, onClick, accent = false }: { title: string; value: string; onClick: () => void; accent?: boolean }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  return (
+    <button
+      onClick={onClick}
+      className={`flex w-full items-center justify-between gap-4 rounded-2xl border px-4 py-4 text-left transition-all active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] hover:border-[rgba(125,211,252,0.24)]" : "border-[#E8ECF2] bg-[#FCFDFE] hover:border-[#CFE8F8] hover:bg-white"}`}
+    >
+      <span>
+        <span className={`block text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{title}</span>
+        <span className={`mt-1 block text-[11px] ${accent ? "text-[#4A9BFF]" : (dark ? "text-[#A8B0BA]" : "text-[#6B7280]")}`}>{value}</span>
+      </span>
+      <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${accent ? "bg-[#EEF7FF] text-[#1D9BF0]" : (dark ? "bg-[#202832] text-[#A8B0BA]" : "bg-[#F2F5F8] text-[#6B7280]")}`}>Manage</span>
+    </button>
+  );
+}
+
+function IntegrationRow({ icon: Icon, title, status, onClick }: { icon: LucideIcon; title: string; status: string; onClick: () => void }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] hover:border-[rgba(125,211,252,0.24)]" : "border-[#E8ECF2] bg-[#FCFDFE] hover:border-[#CFE8F8] hover:bg-white hover:shadow-[0_16px_30px_rgba(31,43,77,0.07)]"}`}
+    >
+      <span className={`flex h-10 w-10 items-center justify-center rounded-2xl ${dark ? "bg-[rgba(59,167,255,0.12)] text-[#7DD3FC]" : "bg-[#EEF7FF] text-[#1D9BF0]"}`}>
+        <Icon className="h-[18px] w-[18px]" />
+      </span>
+      <span className={`mt-4 block text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{title}</span>
+      <span className={`mt-1 block text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{status}</span>
+    </button>
   );
 }
 
