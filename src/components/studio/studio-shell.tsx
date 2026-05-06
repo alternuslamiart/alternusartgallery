@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronLeft,
   Code2,
+  Copy,
   CreditCard,
   Database,
   Download,
@@ -32,9 +33,12 @@ import {
   Search,
   Send,
   Settings,
+  Share2,
   Shield,
   Sparkles,
   Sun,
+  ThumbsDown,
+  ThumbsUp,
   Upload,
   UserRound,
   X,
@@ -3289,6 +3293,7 @@ function AIAssistantPage() {
   const [actionsOpen, setActionsOpen] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isSending, setIsSending] = useState(false);
+  const [messageFeedback, setMessageFeedback] = useState<Record<string, "like" | "dislike">>({});
   const conversationEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -3304,6 +3309,7 @@ function AIAssistantPage() {
     setMessages([]);
     setInput("");
     setAttachments([]);
+    setMessageFeedback({});
     setActionsOpen(false);
     setIsSending(false);
   }, [temporaryChatId]);
@@ -3312,6 +3318,7 @@ function AIAssistantPage() {
     setMessages([]);
     setInput("");
     setAttachments([]);
+    setMessageFeedback({});
     setActionsOpen(false);
     setIsSending(false);
     endTemporaryChat();
@@ -3388,6 +3395,98 @@ function AIAssistantPage() {
           content: "I couldn't complete that request. Please check the AI configuration or try again.",
         },
       ]);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const copyAssistantMessage = async (content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      showToast("Response copied");
+    } catch {
+      showToast("Copy failed");
+    }
+  };
+
+  const shareAssistantMessage = async (content: string) => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Alternus AI response", text: content });
+        showToast("Response shared");
+        return;
+      }
+      await navigator.clipboard.writeText(content);
+      showToast("Share unavailable. Response copied");
+    } catch {
+      showToast("Share cancelled");
+    }
+  };
+
+  const downloadAssistantMessage = (message: { id: string; content: string }) => {
+    const blob = new Blob([message.content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `alternus-ai-response-${message.id}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    showToast("Response downloaded");
+  };
+
+  const regenerateAssistantMessage = async (messageId: string) => {
+    if (isSending) return;
+
+    const assistantIndex = messages.findIndex((message) => message.id === messageId);
+    const promptIndex = messages
+      .slice(0, assistantIndex)
+      .map((message, index) => ({ message, index }))
+      .reverse()
+      .find((item) => item.message.role === "user")?.index;
+
+    if (assistantIndex < 0 || promptIndex === undefined) {
+      showToast("No prompt found to regenerate");
+      return;
+    }
+
+    const promptMessage = messages[promptIndex];
+    const conversationHistory = messages.slice(0, promptIndex).map((message) => ({
+      role: message.role,
+      content: message.content,
+    }));
+
+    setIsSending(true);
+    try {
+      const response = await fetch("/api/ai-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: promptMessage.content,
+          conversationHistory,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error || "Failed to regenerate response");
+
+      const nextContent =
+        typeof data?.content === "string"
+          ? data.content
+          : typeof data?.answer === "string"
+            ? data.answer
+            : "No response received.";
+
+      setMessages((current) =>
+        current.map((message) =>
+          message.id === messageId ? { ...message, content: nextContent } : message,
+        ),
+      );
+      showToast("Response regenerated");
+    } catch (error) {
+      console.error("AI Assistant regenerate error:", error);
+      showToast("Regenerate failed");
     } finally {
       setIsSending(false);
     }
@@ -3594,18 +3693,89 @@ function AIAssistantPage() {
                   <Sparkles className="h-4 w-4 fill-current" />
                 </div>
               )}
-              <div
-                className={`max-w-[720px] rounded-[24px] px-4 py-3 text-[13px] leading-6 shadow-[0_10px_28px_rgba(31,43,77,0.04)] ${
-                  message.role === "user"
-                    ? dark
-                      ? "border border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]"
-                      : "border border-[#E5E7EB] bg-white text-[#171717]"
-                    : dark
-                      ? "text-[#F4F6F8]"
-                      : "text-[#171717]"
-                }`}
-              >
-                <p className="whitespace-pre-wrap">{message.content}</p>
+              <div className={`flex max-w-[720px] flex-col ${message.role === "user" ? "items-end" : "items-start"}`}>
+                <div
+                  className={`rounded-[24px] px-4 py-3 text-[13px] leading-6 shadow-[0_10px_28px_rgba(31,43,77,0.04)] ${
+                    message.role === "user"
+                      ? dark
+                        ? "border border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]"
+                        : "border border-[#E5E7EB] bg-white text-[#171717]"
+                      : dark
+                        ? "text-[#F4F6F8]"
+                        : "text-[#171717]"
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap">{message.content}</p>
+                </div>
+                {message.role === "assistant" && (
+                  <div className={`mt-2 flex items-center gap-1 rounded-full border px-1.5 py-1 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]/80 text-[#A8B0BA]" : "border-[#E5E7EB] bg-white/80 text-[#9CA3AF] shadow-sm"}`}>
+                    <button
+                      onClick={() => void copyAssistantMessage(message.content)}
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+                      aria-label="Copy response"
+                      title="Copy"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMessageFeedback((current) => {
+                          const next = { ...current };
+                          if (next[message.id] === "like") delete next[message.id];
+                          else next[message.id] = "like";
+                          return next;
+                        });
+                        showToast("Feedback saved");
+                      }}
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${messageFeedback[message.id] === "like" ? "bg-[#DDEEFF] text-[#1D9BF0]" : dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+                      aria-label="Like response"
+                      title="Like"
+                    >
+                      <ThumbsUp className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMessageFeedback((current) => {
+                          const next = { ...current };
+                          if (next[message.id] === "dislike") delete next[message.id];
+                          else next[message.id] = "dislike";
+                          return next;
+                        });
+                        showToast("Feedback saved");
+                      }}
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${messageFeedback[message.id] === "dislike" ? "bg-[#FFE8ED] text-[#D92D52]" : dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+                      aria-label="Dislike response"
+                      title="Dislike"
+                    >
+                      <ThumbsDown className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => void regenerateAssistantMessage(message.id)}
+                      disabled={isSending}
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+                      aria-label="Regenerate response"
+                      title="Regenerate"
+                    >
+                      <RefreshCw className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => void shareAssistantMessage(message.content)}
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+                      aria-label="Share response"
+                      title="Share"
+                    >
+                      <Share2 className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => downloadAssistantMessage(message)}
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+                      aria-label="Download response"
+                      title="Download"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
