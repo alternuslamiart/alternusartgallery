@@ -46,12 +46,29 @@ The first version returns a controlled Blender Python scene script generated fro
 
 The add-on can either run the returned script immediately or place it into Blender's Text editor by disabling `Run Script`.
 
+## Chat Modes
+
+`Create new scene` clears the current scene and builds a new generated setup.
+
+`Add to current scene` keeps the existing Blender scene, sends scene context to the API, and adds requested elements without deleting existing objects.
+
+Example add prompts:
+
+```text
+add three chairs
+add warm spotlights
+add a glass roof
+add plants near the walls
+add two sculptures in the center
+```
+
 ## Future Provider Boundary
 
 Replace `generateBlenderSceneScript()` in `src/lib/blender-chat.ts` with a real 3D provider or LLM planner when available. Keep the API response contract:
 
 ```json
 {
+  "mode": "new_scene",
   "title": "Scene title",
   "summary": "Short explanation",
   "script": "Blender Python script",

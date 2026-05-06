@@ -1,11 +1,18 @@
 export type BlenderChatResponse = {
   id: string;
   prompt: string;
+  mode: BlenderChatMode;
   title: string;
   summary: string;
   script: string;
   objects: string[];
   warnings: string[];
+};
+
+export type BlenderChatMode = "new_scene" | "add_to_scene";
+
+export type BlenderSceneContext = {
+  objectNames?: string[];
 };
 
 function cleanPrompt(prompt: string) {
@@ -18,6 +25,10 @@ function hasAny(value: string, words: string[]) {
 
 function escapePythonString(value: string) {
   return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\r?\n/g, "\\n");
+}
+
+function normalizeMode(mode: unknown): BlenderChatMode {
+  return mode === "add_to_scene" ? "add_to_scene" : "new_scene";
 }
 
 function inferScene(prompt: string) {
@@ -256,10 +267,155 @@ print(f"Alternus AI generated scene: {SCENE_TITLE} from prompt: {PROMPT}")
   return {
     id: `blender-scene-${Date.now()}`,
     prompt,
+    mode: "new_scene",
     title: scene.title,
     summary: `${scene.title} generated with ${scene.objects.join(", ")}.`,
     script,
     objects: scene.objects,
     warnings: ["Local template generator. Replace with a real 3D provider when configured."],
+  };
+}
+
+function inferAdditions(prompt: string) {
+  const lower = prompt.toLowerCase();
+  const additions: Array<"chair" | "table" | "plant" | "light" | "sculpture" | "artwork" | "window" | "roof"> = [];
+
+  if (hasAny(lower, ["chair", "chairs", "seat", "seating"])) additions.push("chair");
+  if (hasAny(lower, ["table", "desk", "coffee table"])) additions.push("table");
+  if (hasAny(lower, ["plant", "plants", "tree", "green"])) additions.push("plant");
+  if (hasAny(lower, ["light", "lights", "spotlight", "lamp", "warm"])) additions.push("light");
+  if (hasAny(lower, ["sculpture", "statue", "object", "art piece"])) additions.push("sculpture");
+  if (hasAny(lower, ["painting", "artwork", "frame", "poster"])) additions.push("artwork");
+  if (hasAny(lower, ["window", "glass", "view"])) additions.push("window");
+  if (hasAny(lower, ["roof", "ceiling", "skylight"])) additions.push("roof");
+
+  return additions.length ? additions : ["sculpture", "light"];
+}
+
+export function generateBlenderChatScript(
+  promptInput: string,
+  options: { mode?: unknown; sceneContext?: BlenderSceneContext } = {},
+): BlenderChatResponse {
+  const mode = normalizeMode(options.mode);
+  if (mode === "new_scene") return generateBlenderSceneScript(promptInput);
+
+  const prompt = cleanPrompt(promptInput);
+  const additions = inferAdditions(prompt);
+  const existingCount = options.sceneContext?.objectNames?.length ?? 0;
+  const safePrompt = escapePythonString(prompt || "Add details to the current scene");
+  const safeObjects = options.sceneContext?.objectNames?.slice(0, 20).map(escapePythonString) ?? [];
+  const safeExistingObjects = safeObjects.map((name) => `"${name}"`).join(", ");
+  const additionList = additions.map((item) => `"${item}"`).join(", ");
+
+  const script = `import bpy
+import math
+
+PROMPT = "${safePrompt}"
+EXISTING_OBJECTS = [${safeExistingObjects}]
+ADDITIONS = [${additionList}]
+
+def make_material(name, color, roughness=0.55):
+    material = bpy.data.materials.get(name) or bpy.data.materials.new(name)
+    material.use_nodes = True
+    bsdf = material.node_tree.nodes.get("Principled BSDF")
+    if bsdf:
+        bsdf.inputs["Base Color"].default_value = color
+        bsdf.inputs["Roughness"].default_value = roughness
+    return material
+
+def add_cube(name, location, scale, material):
+    bpy.ops.mesh.primitive_cube_add(size=1, location=location)
+    obj = bpy.context.object
+    obj.name = name
+    obj.scale = scale
+    obj.data.materials.append(material)
+    return obj
+
+def add_sphere(name, location, scale, material):
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=48, ring_count=24, location=location)
+    obj = bpy.context.object
+    obj.name = name
+    obj.scale = scale
+    obj.data.materials.append(material)
+    return obj
+
+def add_cylinder(name, location, radius, depth, material):
+    bpy.ops.mesh.primitive_cylinder_add(vertices=48, radius=radius, depth=depth, location=location)
+    obj = bpy.context.object
+    obj.name = name
+    obj.data.materials.append(material)
+    return obj
+
+def add_area_light(name, location, energy, size):
+    bpy.ops.object.light_add(type="AREA", location=location)
+    light = bpy.context.object
+    light.name = name
+    light.data.energy = energy
+    light.data.size = size
+    return light
+
+def next_position(index):
+    x_positions = [-1.8, -0.65, 0.65, 1.8]
+    x = x_positions[index % len(x_positions)]
+    y = -0.75 + (index // len(x_positions)) * 0.65
+    return x, y
+
+materials = {
+    "wood": make_material("AI Add Wood", (0.45, 0.28, 0.15, 1), 0.55),
+    "fabric": make_material("AI Add Fabric", (0.12, 0.38, 0.72, 1), 0.68),
+    "leaf": make_material("AI Add Leaf", (0.18, 0.42, 0.22, 1), 0.72),
+    "clay": make_material("AI Add Clay", (0.72, 0.35, 0.22, 1), 0.66),
+    "frame": make_material("AI Add Frame", (0.04, 0.04, 0.045, 1), 0.5),
+    "glass": make_material("AI Add Glass", (0.55, 0.75, 0.9, 0.65), 0.22),
+    "white": make_material("AI Add White", (0.9, 0.9, 0.86, 1), 0.6),
+}
+
+created = []
+slot = 0
+
+for addition in ADDITIONS:
+    x, y = next_position(slot)
+    slot += 1
+
+    if addition == "chair":
+        created.append(add_cube("AI Added Chair Seat", (x, y, 0.38), (0.32, 0.32, 0.12), materials["fabric"]))
+        created.append(add_cube("AI Added Chair Back", (x, y + 0.22, 0.68), (0.32, 0.08, 0.32), materials["fabric"]))
+        created.append(add_cube("AI Added Chair Legs", (x, y, 0.18), (0.26, 0.26, 0.16), materials["wood"]))
+    elif addition == "table":
+        created.append(add_cube("AI Added Table Top", (x, y, 0.5), (0.58, 0.38, 0.06), materials["wood"]))
+        created.append(add_cube("AI Added Table Base", (x, y, 0.26), (0.12, 0.12, 0.24), materials["wood"]))
+    elif addition == "plant":
+        created.append(add_cylinder("AI Added Plant Pot", (x, y, 0.28), 0.18, 0.32, materials["clay"]))
+        created.append(add_sphere("AI Added Plant Crown", (x, y, 0.72), (0.34, 0.34, 0.34), materials["leaf"]))
+    elif addition == "light":
+        created.append(add_area_light("AI Added Warm Area Light", (x, y - 0.6, 2.4), 280, 2.0))
+    elif addition == "sculpture":
+        created.append(add_cube("AI Added Sculpture Plinth", (x, y, 0.28), (0.32, 0.32, 0.28), materials["white"]))
+        created.append(add_sphere("AI Added Sculpture", (x, y, 0.72), (0.24, 0.18, 0.34), materials["clay"]))
+    elif addition == "artwork":
+        created.append(add_cube("AI Added Wall Artwork", (x, 1.92, 1.38), (0.5, 0.03, 0.34), materials["glass"]))
+        created.append(add_cube("AI Added Artwork Frame", (x, 1.9, 1.38), (0.56, 0.025, 0.4), materials["frame"]))
+    elif addition == "window":
+        created.append(add_cube("AI Added Window Glass", (x, 1.93, 1.48), (0.52, 0.03, 0.42), materials["glass"]))
+        created.append(add_cube("AI Added Window Frame", (x, 1.9, 1.48), (0.6, 0.025, 0.48), materials["frame"]))
+    elif addition == "roof":
+        created.append(add_cube("AI Added Ceiling Plane", (0, 0, 2.55), (2.6, 2.0, 0.05), materials["white"]))
+        created.append(add_cube("AI Added Skylight", (0, 0.05, 2.58), (0.85, 0.5, 0.035), materials["glass"]))
+
+for obj in created:
+    obj.select_set(True)
+
+print(f"Alternus AI added {len(created)} objects from prompt: {PROMPT}. Existing context objects: {len(EXISTING_OBJECTS)}")
+`;
+
+  return {
+    id: `blender-add-${Date.now()}`,
+    prompt,
+    mode: "add_to_scene",
+    title: "AI Scene Addition",
+    summary: `Added ${additions.join(", ")} to the current Blender scene using ${existingCount} existing context objects.`,
+    script,
+    objects: additions,
+    warnings: ["Add mode preserves the current scene and adds template geometry only."],
   };
 }

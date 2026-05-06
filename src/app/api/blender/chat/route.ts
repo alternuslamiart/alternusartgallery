@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateBlenderSceneScript } from "@/lib/blender-chat";
+import { generateBlenderChatScript } from "@/lib/blender-chat";
 import { apiError, mapUnknownError, ok, readJsonBody } from "@/lib/platform/api";
-import { asString, ValidationError } from "@/lib/platform/validation";
+import { asJsonObject, asString, ValidationError } from "@/lib/platform/validation";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +34,9 @@ export async function POST(request: NextRequest) {
 
     const body = await readJsonBody(request);
     const prompt = asString(body, "prompt", { required: true, max: 1200 });
-    const result = generateBlenderSceneScript(prompt);
+    const mode = asString(body, "mode", { max: 40 });
+    const sceneContext = asJsonObject(body, "sceneContext") ?? {};
+    const result = generateBlenderChatScript(prompt, { mode, sceneContext });
 
     return ok(
       {

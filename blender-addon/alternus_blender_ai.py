@@ -14,7 +14,7 @@ import urllib.error
 import urllib.request
 
 import bpy
-from bpy.props import BoolProperty, StringProperty
+from bpy.props import BoolProperty, EnumProperty, StringProperty
 
 
 DEFAULT_API_URL = "https://www.alternusart.com/api/blender/chat"
@@ -37,6 +37,14 @@ class AlternusBlenderAISettings(bpy.types.PropertyGroup):
         default="Create a modern gallery room with white walls, wooden floor, spotlights, and three sculptures",
         description="Describe the 3D scene to generate",
     )
+    mode: EnumProperty(
+        name="Mode",
+        default="new_scene",
+        items=(
+            ("new_scene", "Create new scene", "Clear the scene and generate a new 3D setup"),
+            ("add_to_scene", "Add to current scene", "Keep the current scene and add requested elements"),
+        ),
+    )
     status: StringProperty(
         name="Status",
         default="Ready",
@@ -58,8 +66,32 @@ def append_chat_line(context, text):
     settings.last_summary = f"{current}\n{text}".strip()[-1800:]
 
 
+def collect_scene_context():
+    objects = []
+    for obj in bpy.context.scene.objects:
+        if obj.type in {"MESH", "LIGHT", "CAMERA", "FONT"}:
+            objects.append(
+                {
+                    "name": obj.name,
+                    "type": obj.type,
+                    "location": [round(value, 3) for value in obj.location],
+                }
+            )
+    return {
+        "sceneName": bpy.context.scene.name,
+        "objectNames": [item["name"] for item in objects[:80]],
+        "objects": objects[:80],
+    }
+
+
 def call_alternus_api(settings):
-    payload = json.dumps({"prompt": settings.prompt}).encode("utf-8")
+    payload = json.dumps(
+        {
+            "prompt": settings.prompt,
+            "mode": settings.mode,
+            "sceneContext": collect_scene_context(),
+        }
+    ).encode("utf-8")
     request = urllib.request.Request(
         settings.api_url,
         data=payload,
@@ -98,6 +130,7 @@ class ALTERNUS_OT_generate_scene(bpy.types.Operator):
             result = call_alternus_api(settings)
             script = result.get("script")
             summary = result.get("summary", "Scene generated.")
+            mode = result.get("mode", settings.mode)
             if not script:
                 raise ValueError("API response did not include a script.")
 
@@ -107,7 +140,7 @@ class ALTERNUS_OT_generate_scene(bpy.types.Operator):
                     "bpy": bpy,
                 }
                 exec(script, namespace)
-                settings.status = "Scene generated in Blender."
+                settings.status = "Added to current scene." if mode == "add_to_scene" else "Scene generated in Blender."
             else:
                 text = bpy.data.texts.new("alternus_generated_scene.py")
                 text.write(script)
@@ -155,6 +188,7 @@ class ALTERNUS_PT_blender_ai_panel(bpy.types.Panel):
         layout.prop(settings, "api_url")
         layout.prop(settings, "api_token")
         layout.separator()
+        layout.prop(settings, "mode")
         layout.prop(settings, "prompt", text="Prompt")
         layout.prop(settings, "auto_execute")
 
