@@ -40,7 +40,20 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { ChangeEvent, ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type AssetType,
+  type DesignSystemSettings,
+  type PrototypeItem,
+  type PrototypeQuality,
+  type PrototypeType,
+  type StudioAsset,
+  assetRepository,
+  defaultDesignSystem,
+  detectAssetType,
+  formatFileSize,
+  prototypeRepository,
+} from "@/lib/studio-repositories";
 
 export type StudioRouteKey =
   | "studio-overview"
@@ -74,11 +87,6 @@ type GeneratedRecent = {
   output: string;
 };
 
-function isPaidStudioPlan() {
-  const plan = process.env.NEXT_PUBLIC_ALTERNUS_PLAN?.toLowerCase();
-  return plan === "pro" || plan === "team" || plan === "premium" || plan === "paid" || plan === "enterprise";
-}
-
 export const studioNavigation: NavItem[] = [
   { key: "ai-assistant", label: "AI Assistant", href: "/ai-assistant", icon: Sparkles },
   { key: "studio-overview", label: "Studio Overview", href: "/studio-overview", icon: Grid2X2 },
@@ -90,36 +98,6 @@ export const studioNavigation: NavItem[] = [
   { key: "prompt-lab", label: "Prompt Lab", href: "/prompt-lab", icon: FileText, badge: "2" },
   { key: "projects", label: "Projects", href: "/projects", icon: Folder },
   { key: "exports", label: "Exports", href: "/exports", icon: Upload },
-];
-
-const generatedRecents: GeneratedRecent[] = [
-  {
-    id: "recent-3d-environment",
-    title: "Create 3D Environment",
-    tool: "Blender 3D",
-    meta: "Generated scene",
-    time: "14m",
-    icon: Layers3,
-    output: "A light studio environment with soft grid floor, product lighting, and export-ready GLB scene setup.",
-  },
-  {
-    id: "recent-react-component",
-    title: "React Component Draft",
-    tool: "AI for Code",
-    meta: "Generated plan",
-    time: "22m",
-    icon: Code2,
-    output: "A reusable React component structure with responsive states, accessible controls, and clean Tailwind styling.",
-  },
-  {
-    id: "recent-floor-plan",
-    title: "Floor Plan Layer Setup",
-    tool: "AutoCAD",
-    meta: "CAD draft",
-    time: "31m",
-    icon: PenLine,
-    output: "A CAD floor-plan draft with wall, dimension, annotation, furniture, and export layers prepared.",
-  },
 ];
 
 const bottomNavigation = [
@@ -338,12 +316,29 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const [toast, setToast] = useState<string | null>(null);
   const [isTemporaryChat, setIsTemporaryChat] = useState(false);
   const [temporaryChatId, setTemporaryChatId] = useState<number | null>(null);
+  const [sidebarSearch, setSidebarSearch] = useState("");
   const workspaceRef = useRef<HTMLDivElement>(null);
   const sidebarNotificationRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
   const displayRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+  const sidebarSearchRef = useRef<HTMLInputElement>(null);
   const currentTitle = getRouteTitle(activeRoute);
+  const normalizedSidebarSearch = sidebarSearch.trim().toLowerCase();
+  const visibleMainNavigation = useMemo(
+    () =>
+      normalizedSidebarSearch
+        ? studioNavigation.filter((item) => item.label.toLowerCase().includes(normalizedSidebarSearch))
+        : studioNavigation,
+    [normalizedSidebarSearch],
+  );
+  const visibleBottomNavigation = useMemo(
+    () =>
+      normalizedSidebarSearch
+        ? bottomNavigation.filter((item) => item.label.toLowerCase().includes(normalizedSidebarSearch))
+        : bottomNavigation,
+    [normalizedSidebarSearch],
+  );
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("alternus-studio-theme");
@@ -414,18 +409,29 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         setActiveRecent(null);
         setActionsOpenSafe();
       }
+      if (event.key === "/" && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        const target = event.target as HTMLElement | null;
+        const isTyping =
+          target?.tagName === "INPUT" ||
+          target?.tagName === "TEXTAREA" ||
+          target?.getAttribute("contenteditable") === "true";
+        if (!isTyping && !isCollapsed) {
+          event.preventDefault();
+          sidebarSearchRef.current?.focus();
+        }
+      }
     }
 
     function setActionsOpenSafe() {
       setWorkspaceOpen(false);
       setNotificationsOpen(false);
-        setDisplayOpen(false);
-        setProfileOpen(false);
+      setDisplayOpen(false);
+      setProfileOpen(false);
     }
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [isCollapsed]);
 
   useEffect(() => {
     function onPointerDown(event: MouseEvent) {
@@ -518,17 +524,37 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
       </div>
 
       {!isCollapsed && (
-        <button onClick={() => setActiveModal("search")} className={`mb-5 flex h-10 w-full cursor-pointer items-center gap-2 rounded-2xl border px-3 text-left transition-all active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_22px_rgba(0,0,0,0.16)] hover:border-[rgba(59,167,255,0.24)]" : "border-white/80 bg-white/72 shadow-[0_8px_22px_rgba(31,43,77,0.04)] hover:border-[#CFE8F8]"}`} aria-label="Open search">
+        <div className={`mb-5 flex h-10 w-full items-center gap-2 rounded-2xl border px-3 transition-all ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_22px_rgba(0,0,0,0.16)] focus-within:border-[rgba(59,167,255,0.34)]" : "border-white/80 bg-white/72 shadow-[0_8px_22px_rgba(31,43,77,0.04)] focus-within:border-[#9BD2FF]"}`}>
           <Search className={`h-[13px] w-[13px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} />
-          <span className={`min-w-0 flex-1 text-[12px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`}>Search...</span>
+          <input
+            ref={sidebarSearchRef}
+            value={sidebarSearch}
+            onChange={(event) => setSidebarSearch(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                const firstResult = visibleMainNavigation[0] ?? visibleBottomNavigation[0];
+                if (firstResult) {
+                  router.push(firstResult.href);
+                  setSidebarSearch("");
+                  setIsMobileOpen(false);
+                }
+              }
+            }}
+            className={`min-w-0 flex-1 bg-transparent text-[12px] outline-none placeholder:text-[#A1A7B0] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}
+            placeholder="Search..."
+            aria-label="Search navigation"
+          />
           <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F3F6F8] text-[#9CA3AF]"}`}>/</span>
-        </button>
+        </div>
       )}
 
       <nav className="space-y-1">
-        {studioNavigation.map((item) => (
+        {visibleMainNavigation.map((item) => (
           <SidebarLink key={item.key} item={item} active={item.key === activeRoute} collapsed={isCollapsed} onNavigate={() => setIsMobileOpen(false)} />
         ))}
+        {!isCollapsed && normalizedSidebarSearch && visibleMainNavigation.length === 0 && visibleBottomNavigation.length === 0 && (
+          <p className={`px-2.5 py-2 text-[11px] ${dark ? "text-[#6F7782]" : "text-[#8A94A3]"}`}>No navigation matches.</p>
+        )}
       </nav>
 
       <div className={`mt-3 border-t pt-3 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-white/70"}`}>
@@ -552,7 +578,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           </div>
         )}
         <div className="space-y-1 pb-1">
-          {bottomNavigation.map((item) => (
+          {visibleBottomNavigation.map((item) => (
             <SidebarLink key={item.key} item={item} active={item.key === activeRoute} collapsed={isCollapsed} onNavigate={() => setIsMobileOpen(false)} />
           ))}
           <button
@@ -1673,76 +1699,136 @@ function AlternusDesignPage() {
   const { theme } = useStudioTheme();
   const { showToast } = useStudioActions();
   const dark = theme === "dark";
-  const [previewUnlocked, setPreviewUnlocked] = useState(false);
-  const isPaidPlan = isPaidStudioPlan() || previewUnlocked;
+  const [prototypes, setPrototypes] = useState<PrototypeItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [projectName, setProjectName] = useState("");
+  const [quality, setQuality] = useState<PrototypeQuality>("high-fidelity");
+  const [prototypeType, setPrototypeType] = useState<Exclude<PrototypeType, "design-system">>("website");
+  const [brief, setBrief] = useState("");
+  const [briefTags, setBriefTags] = useState<string[]>([]);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"Recent" | "Your designs" | "Design systems">("Recent");
+  const [selectedPrototype, setSelectedPrototype] = useState<PrototypeItem | null>(null);
+  const [designSystem, setDesignSystem] = useState<DesignSystemSettings>(defaultDesignSystem);
+  const [editingPreset, setEditingPreset] = useState<keyof DesignSystemSettings | null>(null);
+  const projectInputRef = useRef<HTMLInputElement>(null);
   const shell = dark
     ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_18px_42px_rgba(0,0,0,0.24)]"
     : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_18px_42px_rgba(31,43,77,0.06)]";
   const muted = dark ? "text-[#A8B0BA]" : "text-[#6B7280]";
   const strong = dark ? "text-[#F4F6F8]" : "text-[#171717]";
-  const prototypeModes: Array<{ label: string; icon: LucideIcon; desc: string }> = [
-    { label: "Wireframe", icon: Grid2X2, desc: "Fast layout" },
-    { label: "High fidelity", icon: PenLine, desc: "Visual polish" },
-    { label: "Website", icon: Monitor, desc: "Landing pages" },
-    { label: "Mobile app", icon: Layers3, desc: "iOS/Android" },
+  const qualityModes: Array<{ value: PrototypeQuality; label: string; icon: LucideIcon; desc: string }> = [
+    { value: "wireframe", label: "Wireframe", icon: Grid2X2, desc: "Fast layout" },
+    { value: "high-fidelity", label: "High fidelity", icon: PenLine, desc: "Visual polish" },
+  ];
+  const typeModes: Array<{ value: Exclude<PrototypeType, "design-system">; label: string; icon: LucideIcon; desc: string }> = [
+    { value: "website", label: "Website", icon: Monitor, desc: "Landing pages" },
+    { value: "mobile-app", label: "Mobile app", icon: Layers3, desc: "iOS/Android" },
   ];
 
-  if (!isPaidPlan) {
-    return (
-      <div>
-        <PageHeader
-          title="Alternus Design"
-          subtitle="Design website, app, and mobile prototypes in the same Alternus AI workspace."
-        />
-        <div className={`overflow-hidden rounded-[32px] border p-6 ${shell}`}>
-          <div className="grid gap-6 lg:grid-cols-[1fr_0.85fr] lg:items-center">
-            <div>
-              <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_18px_36px_rgba(29,161,242,0.24)]">
-                <CreditCard className="h-6 w-6" />
-              </div>
-              <p className={`mt-6 text-[11px] font-semibold uppercase tracking-[0.12em] ${muted}`}>Paid plan required</p>
-              <h3 className={`mt-2 max-w-xl text-[30px] font-semibold tracking-[-0.04em] ${strong}`}>Alternus Design is available only on paid plans.</h3>
-              <p className={`mt-3 max-w-2xl text-[13px] leading-6 ${muted}`}>
-                Free Plan users can use AI Assistant and the basic workspace. Website, app, and mobile prototype generation is reserved for Pro, Team, Premium, or Enterprise plans.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <button onClick={() => { setPreviewUnlocked(true); showToast("Alternus Design unlocked for this preview"); }} className="inline-flex h-10 items-center gap-2 rounded-2xl bg-[#4A9BFF] px-4 text-[12px] font-semibold text-white shadow-[0_14px_28px_rgba(74,155,255,0.22)] transition-all hover:bg-[#2D8FF0] active:scale-[0.98]">
-                  <CreditCard className="h-4 w-4" />
-                  Upgrade to Pro
-                </button>
-                <button onClick={() => showToast("Alternus Design unlocks after a paid plan is active")} className={`inline-flex h-10 items-center gap-2 rounded-2xl border px-4 text-[12px] font-semibold transition-all active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:text-[#F4F6F8]" : "border-[#E5EAF0] bg-white text-[#4B5563] hover:border-[#CFE8F8] hover:text-[#171717]"}`}>
-                  <KeyRound className="h-4 w-4" />
-                  Check access
-                </button>
-              </div>
-            </div>
-            <div className={`rounded-[28px] border p-4 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-white"}`}>
-              <p className={`text-[13px] font-semibold ${strong}`}>Locked features</p>
-              <div className="mt-4 grid gap-3">
-                {["Website prototype generation", "Mobile app screens", "High fidelity UI systems", "Design token exports"].map((feature) => (
-                  <div key={feature} className={`flex items-center gap-3 rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-[#FAFCFD]"}`}>
-                    <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-[#4A9BFF]" />
-                    <span className={`text-[12px] font-semibold ${strong}`}>{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    try {
+      setPrototypes(prototypeRepository.list());
+      setLoadError(null);
+    } catch {
+      setLoadError("Could not load prototypes from this browser.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const persistPrototypes = useCallback((nextPrototypes: PrototypeItem[]) => {
+    setPrototypes(nextPrototypes);
+    prototypeRepository.saveAll(nextPrototypes);
+  }, []);
+
+  const filteredPrototypes = useMemo(() => {
+    const sorted = [...prototypes].sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt));
+    if (activeTab === "Your designs") return sorted.filter((item) => item.origin === "user");
+    if (activeTab === "Design systems") return sorted.filter((item) => item.type === "design-system");
+    return sorted;
+  }, [activeTab, prototypes]);
+
+  const handleBriefChip = (chip: string) => {
+    setBriefTags((current) => (current.includes(chip) ? current.filter((item) => item !== chip) : [...current, chip]));
+    setBrief((current) => {
+      const line = chipToBriefLine(chip);
+      return current.includes(line) ? current : `${current.trim()}${current.trim() ? "\n" : ""}${line}`;
+    });
+  };
+
+  const createPrototype = (event: FormEvent) => {
+    event.preventDefault();
+    if (!projectName.trim()) {
+      setFormError("Project name is required.");
+      showToast("Add a project name before creating.");
+      projectInputRef.current?.focus();
+      return;
+    }
+
+    try {
+      const created = prototypeRepository.create({
+        name: projectName.trim(),
+        type: prototypeType,
+        quality,
+        brief: brief.trim(),
+        tags: briefTags,
+        designSystem,
+      });
+      persistPrototypes([created, ...prototypes]);
+      setProjectName("");
+      setBrief("");
+      setBriefTags([]);
+      setFormError(null);
+      setActiveTab("Recent");
+      setSelectedPrototype(created);
+      showToast(`${created.name} created`);
+    } catch {
+      setFormError("Prototype could not be saved in this browser.");
+      showToast("Prototype could not be saved.");
+    }
+  };
+
+  const updatePrototype = (updated: PrototypeItem) => {
+    const next = prototypes.map((item) => (item.id === updated.id ? { ...updated, updatedAt: new Date().toISOString() } : item));
+    persistPrototypes(next);
+    setSelectedPrototype(next.find((item) => item.id === updated.id) ?? null);
+  };
+
+  const deletePrototype = (prototypeId: string) => {
+    persistPrototypes(prototypes.filter((item) => item.id !== prototypeId));
+    setSelectedPrototype(null);
+    showToast("Prototype deleted");
+  };
+
+  const duplicatePrototype = (item: PrototypeItem) => {
+    const duplicate = prototypeRepository.duplicate(item);
+    persistPrototypes([duplicate, ...prototypes]);
+    setSelectedPrototype(duplicate);
+    showToast("Prototype duplicated");
+  };
+
+  const updateDesignSystem = (key: keyof DesignSystemSettings, value: string) => {
+    const next = { ...designSystem, [key]: value } as DesignSystemSettings;
+    setDesignSystem(next);
+    setEditingPreset(null);
+    if (selectedPrototype) {
+      updatePrototype({ ...selectedPrototype, designSystem: next });
+    }
+    showToast("Design system updated");
+  };
 
   return (
     <div>
       <PageHeader
         title="Alternus Design"
         subtitle="Design website, app, and mobile prototypes in the same Alternus AI workspace."
-        action={<PrimaryButton icon={Sparkles} onClick={() => showToast("New Alternus Design prototype created")}>Create prototype</PrimaryButton>}
+        action={<PrimaryButton icon={Sparkles} onClick={() => projectInputRef.current?.focus()}>Create prototype</PrimaryButton>}
       />
 
       <div className="grid gap-5 xl:grid-cols-[320px_1fr]">
-        <section className={`rounded-[28px] border p-4 ${shell}`}>
+        <form onSubmit={createPrototype} className={`rounded-[28px] border p-4 ${shell}`}>
           <div className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_14px_30px_rgba(29,161,242,0.24)]">
               <Monitor className="h-4 w-4" />
@@ -1754,28 +1840,52 @@ function AlternusDesignPage() {
           </div>
 
           <div className={`mt-5 rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-white"}`}>
-            <label className={`text-[11px] font-semibold ${strong}`}>Project name</label>
-            <input className={`mt-2 h-10 w-full rounded-xl border px-3 text-[12px] outline-none ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8] placeholder:text-[#6F7782]" : "border-[#E5E7EB] bg-[#FAFCFD] text-[#171717] placeholder:text-[#A1A7B0]"}`} placeholder="Marketplace mobile refresh" />
+            <label htmlFor="prototype-name" className={`text-[11px] font-semibold ${strong}`}>Project name</label>
+            <input
+              id="prototype-name"
+              ref={projectInputRef}
+              value={projectName}
+              onChange={(event) => {
+                setProjectName(event.target.value);
+                if (formError) setFormError(null);
+              }}
+              className={`mt-2 h-10 w-full rounded-xl border px-3 text-[12px] outline-none ${formError ? "border-[#FF3B6B]" : dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8] placeholder:text-[#6F7782]" : "border-[#E5E7EB] bg-[#FAFCFD] text-[#171717] placeholder:text-[#A1A7B0]"}`}
+              placeholder="Marketplace mobile refresh"
+              aria-invalid={Boolean(formError)}
+            />
+            {formError && <p className="mt-2 text-[10.5px] font-semibold text-[#FF3B6B]">{formError}</p>}
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-3">
-            {prototypeModes.map(({ label, icon: Icon, desc }, index) => (
-              <button key={label} onClick={() => showToast(`${label} mode selected`)} className={`group min-h-[108px] rounded-2xl border p-3 text-left transition-all hover:-translate-y-0.5 active:scale-[0.99] ${index === 1 ? "border-[#9BD2FF] bg-[#EEF7FF]" : dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] hover:border-[rgba(59,167,255,0.24)]" : "border-[#E5EAF0] bg-white hover:border-[#CFE8F8]"}`}>
-                <div className={`mb-3 flex h-10 items-center justify-center rounded-xl ${index === 1 ? "bg-white text-[#4A9BFF]" : dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F4F8FB] text-[#6B7280]"}`}>
+            {[...qualityModes, ...typeModes].map(({ label, icon: Icon, desc, value }) => {
+              const selected = value === quality || value === prototypeType;
+              return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => {
+                  if (value === "wireframe" || value === "high-fidelity") setQuality(value);
+                  else setPrototypeType(value as Exclude<PrototypeType, "design-system">);
+                }}
+                className={`group min-h-[108px] rounded-2xl border p-3 text-left transition-all hover:-translate-y-0.5 active:scale-[0.99] ${selected ? "border-[#9BD2FF] bg-[#EEF7FF]" : dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] hover:border-[rgba(59,167,255,0.24)]" : "border-[#E5EAF0] bg-white hover:border-[#CFE8F8]"}`}
+                aria-pressed={selected}
+              >
+                <div className={`mb-3 flex h-10 items-center justify-center rounded-xl ${selected ? "bg-white text-[#4A9BFF]" : dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F4F8FB] text-[#6B7280]"}`}>
                   <Icon className="h-4 w-4" />
                 </div>
-                <p className={`text-[12px] font-semibold ${index === 1 ? "text-[#171717]" : strong}`}>{label}</p>
-                <p className={`mt-1 text-[10px] ${index === 1 ? "text-[#4B5563]" : muted}`}>{desc}</p>
+                <p className={`text-[12px] font-semibold ${selected ? "text-[#171717]" : strong}`}>{label}</p>
+                <p className={`mt-1 text-[10px] ${selected ? "text-[#4B5563]" : muted}`}>{desc}</p>
               </button>
-            ))}
+            );
+            })}
           </div>
 
-          <button onClick={() => showToast("Alternus Design generation queued")} className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#4A9BFF] to-[#1DA1F2] text-[12px] font-semibold text-white shadow-[0_16px_34px_rgba(29,161,242,0.24)] transition-all hover:-translate-y-0.5 active:scale-[0.99]">
+          <button type="submit" className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#4A9BFF] to-[#1DA1F2] text-[12px] font-semibold text-white shadow-[0_16px_34px_rgba(29,161,242,0.24)] transition-all hover:-translate-y-0.5 active:scale-[0.99]">
             <Plus className="h-4 w-4" />
             Create
           </button>
           <p className={`mt-3 text-center text-[10px] ${muted}`}>Only you can see your prototype by default.</p>
-        </section>
+        </form>
 
         <section className="space-y-4">
           <div className={`rounded-[28px] border p-4 ${shell}`}>
@@ -1785,46 +1895,41 @@ function AlternusDesignPage() {
                 <p className={`mt-1 text-[11px] ${muted}`}>Recent prototypes and UI systems generated with Alternus AI.</p>
               </div>
               <div className={`flex rounded-2xl p-1 ${dark ? "bg-[#181B20]" : "bg-[#EEF3F7]"}`}>
-                {["Recent", "Your designs", "Design systems"].map((tab, index) => (
-                  <button key={tab} onClick={() => showToast(`${tab} selected`)} className={`rounded-xl px-3 py-1.5 text-[11px] font-semibold ${index === 0 ? "bg-white text-[#171717] shadow-sm" : muted}`}>
+                {(["Recent", "Your designs", "Design systems"] as const).map((tab) => (
+                  <button key={tab} onClick={() => setActiveTab(tab)} className={`rounded-xl px-3 py-1.5 text-[11px] font-semibold ${activeTab === tab ? "bg-white text-[#171717] shadow-sm" : muted}`}>
                     {tab}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="mt-5 grid gap-3 md:grid-cols-3">
-              {[
-                ["Gallery checkout redesign", "Website", "Today", "Checkout"],
-                ["Collector mobile app", "Mobile app", "Yesterday", "App"],
-                ["Artist dashboard system", "Design system", "2d ago", "System"],
-              ].map(([title, type, time, tag]) => (
-                <ClickableSoftCard key={title} className="overflow-hidden p-0" onClick={() => showToast(`${title} opened`)} ariaLabel={`Open ${title}`}>
-                  <div className="relative h-32 overflow-hidden rounded-t-2xl bg-gradient-to-br from-[#DDF2FF] via-[#F8FBFF] to-[#EAF7F2]">
-                    <div className="absolute left-4 top-4 h-16 w-24 rounded-2xl border border-white/80 bg-white/70 shadow-[0_10px_24px_rgba(31,43,77,0.08)]" />
-                    <div className="absolute bottom-4 right-4 h-20 w-28 rounded-2xl border border-white/80 bg-white/82 p-2 shadow-[0_12px_28px_rgba(31,43,77,0.10)]">
-                      <div className="h-2 w-14 rounded-full bg-[#4A9BFF]" />
-                      <div className="mt-2 h-2 w-20 rounded-full bg-[#D7E5EF]" />
-                      <div className="mt-2 h-8 rounded-xl bg-[#F7BFA3]" />
-                    </div>
-                    <span className="absolute right-3 top-3 rounded-full bg-white/82 px-2 py-1 text-[10px] font-semibold text-[#4A5563]">{tag}</span>
-                  </div>
-                  <div className="p-4">
-                    <p className={`text-[12px] font-semibold ${strong}`}>{title}</p>
-                    <p className={`mt-1 text-[10.5px] ${muted}`}>{type} - {time}</p>
-                  </div>
-                </ClickableSoftCard>
-              ))}
-            </div>
+            {isLoading && <StudioInlineState icon={RefreshCw} title="Loading prototypes" text="Reading saved design work from this browser." />}
+            {loadError && <StudioInlineState icon={AlertTriangle} title="Prototype error" text={loadError} />}
+            {!isLoading && !loadError && filteredPrototypes.length === 0 && (
+              <StudioInlineState icon={Monitor} title="No designs yet" text={activeTab === "Your designs" ? "Create a prototype and it will appear here." : "No items match this tab yet."} />
+            )}
+            {!isLoading && !loadError && filteredPrototypes.length > 0 && (
+              <div className="mt-5 grid gap-3 md:grid-cols-3">
+                {filteredPrototypes.map((prototype) => (
+                  <PrototypeCard key={prototype.id} prototype={prototype} onOpen={() => setSelectedPrototype(prototype)} />
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
             <div className={`rounded-[28px] border p-4 ${shell}`}>
-              <p className={`text-[13px] font-semibold ${strong}`}>Prototype brief</p>
-              <textarea className={`mt-3 min-h-[118px] w-full resize-none rounded-2xl border p-4 text-[13px] outline-none ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#6F7782]" : "border-[#E5EAF0] bg-white text-[#171717] placeholder:text-[#A1A7B0]"}`} placeholder="Describe the website, dashboard, mobile flow, or app screen you want Alternus Design to create..." />
+              <label htmlFor="prototype-brief" className={`text-[13px] font-semibold ${strong}`}>Prototype brief</label>
+              <textarea
+                id="prototype-brief"
+                value={brief}
+                onChange={(event) => setBrief(event.target.value)}
+                className={`mt-3 min-h-[118px] w-full resize-none rounded-2xl border p-4 text-[13px] outline-none ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#6F7782]" : "border-[#E5EAF0] bg-white text-[#171717] placeholder:text-[#A1A7B0]"}`}
+                placeholder="Describe the website, dashboard, mobile flow, or app screen you want Alternus Design to create..."
+              />
               <div className="mt-3 flex flex-wrap gap-2">
                 {["Responsive", "Design tokens", "Components", "Prototype flow"].map((chip) => (
-                  <button key={chip} onClick={() => showToast(`${chip} added to brief`)} className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA]" : "border-[#E5EAF0] bg-[#FAFCFD] text-[#4B5563]"}`}>{chip}</button>
+                  <button key={chip} type="button" onClick={() => handleBriefChip(chip)} className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold ${briefTags.includes(chip) ? "border-[#9BD2FF] bg-[#EEF7FF] text-[#171717]" : dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA]" : "border-[#E5EAF0] bg-[#FAFCFD] text-[#4B5563]"}`}>{chip}</button>
                 ))}
               </div>
             </div>
@@ -1833,23 +1938,251 @@ function AlternusDesignPage() {
               <p className={`text-[13px] font-semibold ${strong}`}>Design system</p>
               <div className="mt-4 space-y-3">
                 {[
-                  ["Color", "Sky, paper, graphite", "#4A9BFF"],
-                  ["Typography", "Clean UI scale", "#171717"],
-                  ["Spacing", "8px rhythm", "#CFE8F8"],
-                ].map(([label, desc, color]) => (
-                  <div key={label} className={`flex items-center gap-3 rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-white"}`}>
+                  ["Color", "colorPreset", designSystem.colorPreset, "#4A9BFF"],
+                  ["Typography", "typographyPreset", designSystem.typographyPreset, "#171717"],
+                  ["Spacing", "spacingPreset", designSystem.spacingPreset, "#CFE8F8"],
+                ].map(([label, key, desc, color]) => (
+                  <button key={label} type="button" onClick={() => setEditingPreset(key as keyof DesignSystemSettings)} className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition-all hover:border-[#CFE8F8] active:scale-[0.99] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-white"}`}>
                     <span className="h-9 w-9 rounded-xl" style={{ background: color }} />
-                    <span>
+                    <span className="min-w-0 flex-1">
                       <span className={`block text-[12px] font-semibold ${strong}`}>{label}</span>
                       <span className={`mt-0.5 block text-[10.5px] ${muted}`}>{desc}</span>
                     </span>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
           </div>
         </section>
       </div>
+      {editingPreset && (
+        <PresetEditor
+          presetKey={editingPreset}
+          value={designSystem[editingPreset]}
+          onSave={(value) => updateDesignSystem(editingPreset, value)}
+          onClose={() => setEditingPreset(null)}
+        />
+      )}
+      {selectedPrototype && (
+        <PrototypeDetailDrawer
+          prototype={selectedPrototype}
+          onClose={() => setSelectedPrototype(null)}
+          onUpdate={updatePrototype}
+          onDelete={() => deletePrototype(selectedPrototype.id)}
+          onDuplicate={() => duplicatePrototype(selectedPrototype)}
+          onOpen={() => showToast(`${selectedPrototype.name} opened`)}
+        />
+      )}
+    </div>
+  );
+}
+
+function chipToBriefLine(chip: string) {
+  const map: Record<string, string> = {
+    Responsive: "- Responsive layout across desktop, tablet, and mobile.",
+    "Design tokens": "- Tokenized color, type, and spacing decisions.",
+    Components: "- Reusable UI components for repeated product sections.",
+    "Prototype flow": "- Connected screens that show the primary user flow.",
+  };
+  return map[chip] ?? `- ${chip}`;
+}
+
+function prototypeTypeLabel(type: PrototypeType) {
+  if (type === "mobile-app") return "Mobile app";
+  if (type === "design-system") return "Design system";
+  return "Website";
+}
+
+function prototypeQualityLabel(quality: PrototypeQuality) {
+  return quality === "high-fidelity" ? "High fidelity" : "Wireframe";
+}
+
+function formatStudioDate(dateString: string) {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "Unknown date";
+  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(date);
+}
+
+function formatRelativeStudioDate(dateString: string) {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "Recently";
+  const diff = Date.now() - date.getTime();
+  const day = 1000 * 60 * 60 * 24;
+  if (diff < day) return "Today";
+  if (diff < day * 2) return "Yesterday";
+  return `${Math.max(2, Math.floor(diff / day))}d ago`;
+}
+
+function StudioInlineState({ icon: Icon, title, text }: { icon: LucideIcon; title: string; text: string }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  return (
+    <div className={`mt-5 rounded-2xl border border-dashed p-6 text-center ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#DCEBFA] bg-white"}`}>
+      <Icon className="mx-auto h-6 w-6 text-[#4A9BFF]" />
+      <p className={`mt-3 text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{title}</p>
+      <p className={`mt-2 text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{text}</p>
+    </div>
+  );
+}
+
+function PrototypeCard({ prototype, onOpen }: { prototype: PrototypeItem; onOpen: () => void }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  const strong = dark ? "text-[#F4F6F8]" : "text-[#171717]";
+  const muted = dark ? "text-[#A8B0BA]" : "text-[#6B7280]";
+  const tag = prototype.type === "design-system" ? "System" : prototype.type === "mobile-app" ? "App" : "Checkout";
+
+  return (
+    <ClickableSoftCard className="overflow-hidden p-0" onClick={onOpen} ariaLabel={`Open ${prototype.name}`}>
+      <div className="relative h-32 overflow-hidden rounded-t-2xl bg-gradient-to-br from-[#DDF2FF] via-[#F8FBFF] to-[#EAF7F2]">
+        <div className="absolute left-4 top-4 h-16 w-24 rounded-2xl border border-white/80 bg-white/70 shadow-[0_10px_24px_rgba(31,43,77,0.08)]" />
+        <div className="absolute bottom-4 right-4 h-20 w-28 rounded-2xl border border-white/80 bg-white/82 p-2 shadow-[0_12px_28px_rgba(31,43,77,0.10)]">
+          <div className="h-2 w-14 rounded-full bg-[#4A9BFF]" />
+          <div className="mt-2 h-2 w-20 rounded-full bg-[#D7E5EF]" />
+          <div className="mt-2 h-8 rounded-xl bg-[#F7BFA3]" />
+        </div>
+        <span className="absolute right-3 top-3 rounded-full bg-white/82 px-2 py-1 text-[10px] font-semibold text-[#4A5563]">{tag}</span>
+      </div>
+      <div className="p-4">
+        <p className={`text-[12px] font-semibold ${strong}`}>{prototype.name}</p>
+        <p className={`mt-1 text-[10.5px] ${muted}`}>{prototypeTypeLabel(prototype.type)} - {formatRelativeStudioDate(prototype.createdAt)}</p>
+      </div>
+    </ClickableSoftCard>
+  );
+}
+
+function PresetEditor({
+  presetKey,
+  value,
+  onSave,
+  onClose,
+}: {
+  presetKey: keyof DesignSystemSettings;
+  value: string;
+  onSave: (value: string) => void;
+  onClose: () => void;
+}) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  const [draft, setDraft] = useState(value);
+  const options: Record<keyof DesignSystemSettings, string[]> = {
+    colorPreset: ["Sky / Paper / Graphite", "Ocean / Paper / Ink", "Mono / Cloud / Graphite"],
+    typographyPreset: ["Clean UI scale", "Editorial scale", "Compact product scale"],
+    spacingPreset: ["8px rhythm", "6px compact rhythm", "12px spacious rhythm"],
+  };
+  const title = presetKey === "colorPreset" ? "Color preset" : presetKey === "typographyPreset" ? "Typography preset" : "Spacing preset";
+
+  return (
+    <div className={`fixed inset-0 z-50 flex items-center justify-center px-4 backdrop-blur-[2px] ${dark ? "bg-black/45" : "bg-[#1F2937]/20"}`} onMouseDown={onClose}>
+      <div className={`w-full max-w-sm rounded-3xl border p-5 shadow-[0_24px_70px_rgba(31,43,77,0.16)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5E7EB] bg-white"}`} onMouseDown={(event) => event.stopPropagation()}>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className={`text-[16px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{title}</h2>
+            <p className={`mt-2 text-[12px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Choose the default for new prototypes.</p>
+          </div>
+          <button onClick={onClose} className={`flex h-8 w-8 items-center justify-center rounded-xl ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#9CA3AF] hover:bg-[#F4F8FB]"}`} aria-label="Close preset editor">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <select value={draft} onChange={(event) => setDraft(event.target.value)} className={`mt-5 h-11 w-full rounded-2xl border px-3 text-[12px] outline-none ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8]" : "border-[#E5EAF0] bg-white text-[#171717]"}`}>
+          {options[presetKey].map((option) => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
+        <div className="mt-5 flex justify-end gap-2">
+          <button onClick={onClose} className={`rounded-xl border px-4 py-2 text-[12px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]" : "border-[#E5E7EB] bg-white text-[#4B5563]"}`}>Cancel</button>
+          <button onClick={() => onSave(draft)} className="rounded-xl bg-[#4A9BFF] px-4 py-2 text-[12px] font-semibold text-white shadow-[0_10px_22px_rgba(74,155,255,0.22)]">Save</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PrototypeDetailDrawer({
+  prototype,
+  onClose,
+  onUpdate,
+  onDelete,
+  onDuplicate,
+  onOpen,
+}: {
+  prototype: PrototypeItem;
+  onClose: () => void;
+  onUpdate: (prototype: PrototypeItem) => void;
+  onDelete: () => void;
+  onDuplicate: () => void;
+  onOpen: () => void;
+}) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  const [name, setName] = useState(prototype.name);
+
+  useEffect(() => {
+    setName(prototype.name);
+  }, [prototype.id, prototype.name]);
+
+  return (
+    <div className={`fixed inset-0 z-50 flex justify-end backdrop-blur-[2px] ${dark ? "bg-black/35" : "bg-[#1F2937]/20"}`} onMouseDown={onClose}>
+      <aside className={`h-full w-full max-w-md overflow-y-auto border-l p-5 shadow-[-24px_0_70px_rgba(31,43,77,0.14)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5E7EB] bg-white"}`} onMouseDown={(event) => event.stopPropagation()}>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className={`text-[17px] font-semibold tracking-[-0.02em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Prototype details</h2>
+            <p className={`mt-2 text-[12px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{prototype.status} - {prototype.visibility}</p>
+          </div>
+          <button onClick={onClose} className={`flex h-8 w-8 items-center justify-center rounded-xl ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#9CA3AF] hover:bg-[#F4F8FB]"}`} aria-label="Close prototype details">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="mt-5 space-y-4">
+          <div>
+            <label className={`text-[11px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Name</label>
+            <div className="mt-2 flex gap-2">
+              <input value={name} onChange={(event) => setName(event.target.value)} className={`h-10 min-w-0 flex-1 rounded-xl border px-3 text-[12px] outline-none ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8]" : "border-[#E5EAF0] bg-white text-[#171717]"}`} />
+              <button onClick={() => name.trim() && onUpdate({ ...prototype, name: name.trim() })} className="rounded-xl bg-[#4A9BFF] px-3 text-[11px] font-semibold text-white">Save</button>
+            </div>
+          </div>
+          <DetailRows
+            rows={[
+              ["Type", prototypeTypeLabel(prototype.type)],
+              ["Quality", prototypeQualityLabel(prototype.quality)],
+              ["Status", prototype.status],
+              ["Created", formatStudioDate(prototype.createdAt)],
+              ["Visibility", prototype.visibility],
+            ]}
+          />
+          <div className={`rounded-2xl border p-4 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-[#FCFDFE]"}`}>
+            <p className={`text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Brief</p>
+            <p className={`mt-2 whitespace-pre-wrap text-[12px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>{prototype.brief || "No brief saved."}</p>
+          </div>
+          <DetailRows
+            rows={[
+              ["Color", prototype.designSystem.colorPreset],
+              ["Typography", prototype.designSystem.typographyPreset],
+              ["Spacing", prototype.designSystem.spacingPreset],
+            ]}
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={onOpen} className="rounded-xl border border-[#E5EAF0] px-3 py-2 text-[11px] font-semibold text-[#4B5563]">Open</button>
+            <button onClick={onDuplicate} className="rounded-xl border border-[#E5EAF0] px-3 py-2 text-[11px] font-semibold text-[#4B5563]">Duplicate</button>
+            <button onClick={onDelete} className="col-span-2 rounded-xl border border-[#FFD7DF] px-3 py-2 text-[11px] font-semibold text-[#D92D52]">Delete</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+function DetailRows({ rows }: { rows: Array<[string, string]> }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  return (
+    <div className={`overflow-hidden rounded-2xl border ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#E5EAF0]"}`}>
+      {rows.map(([label, value]) => (
+        <div key={label} className={`flex items-center justify-between gap-3 border-b px-3 py-2 last:border-b-0 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#E5EAF0] bg-[#FCFDFE]"}`}>
+          <span className={`text-[10.5px] font-semibold ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{label}</span>
+          <span className={`text-right text-[11px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{value}</span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -1936,30 +2269,323 @@ function BlenderPage() {
 }
 
 function AssetLibraryPage() {
-  const { openDrawer, openModal, showToast } = useStudioActions();
+  const { showToast } = useStudioActions();
+  const [assets, setAssets] = useState<StudioAsset[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState<"all" | AssetType>("all");
+  const [sortMode, setSortMode] = useState<"recent" | "oldest" | "az" | "za" | "largest" | "smallest">("recent");
+  const [selectedAsset, setSelectedAsset] = useState<StudioAsset | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const maxFileSize = 25 * 1024 * 1024;
+
+  useEffect(() => {
+    setAssets(assetRepository.list());
+    setIsLoading(false);
+  }, []);
+
+  const persistAssets = useCallback((nextAssets: StudioAsset[]) => {
+    setAssets(nextAssets);
+    assetRepository.saveAll(nextAssets);
+  }, []);
+
+  const filteredAssets = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    return assets
+      .filter((asset) => {
+        const matchesType = typeFilter === "all" || asset.type === typeFilter;
+        const matchesQuery =
+          !normalizedQuery ||
+          [asset.name, asset.type, asset.filename, ...asset.tags].some((value) => value.toLowerCase().includes(normalizedQuery));
+        return matchesType && matchesQuery;
+      })
+      .sort((a, b) => {
+        if (sortMode === "oldest") return Date.parse(a.createdAt) - Date.parse(b.createdAt);
+        if (sortMode === "az") return a.name.localeCompare(b.name);
+        if (sortMode === "za") return b.name.localeCompare(a.name);
+        if (sortMode === "largest") return b.size - a.size;
+        if (sortMode === "smallest") return a.size - b.size;
+        return Date.parse(b.createdAt) - Date.parse(a.createdAt);
+      });
+  }, [assets, searchQuery, sortMode, typeFilter]);
+
+  const handleFiles = (fileList: FileList | File[]) => {
+    const files = Array.from(fileList);
+    const accepted: StudioAsset[] = [];
+    let error: string | null = null;
+
+    files.forEach((file) => {
+      if (file.size > maxFileSize) {
+        error = `${file.name} is larger than 25 MB.`;
+        return;
+      }
+      const detectedType = detectAssetType(file);
+      if (!detectedType) {
+        error = `${file.name} is not a supported asset type.`;
+        return;
+      }
+      const previewUrl = file.type.startsWith("image/") ? URL.createObjectURL(file) : URL.createObjectURL(file);
+      accepted.push(assetRepository.fromFile(file, detectedType, previewUrl));
+    });
+
+    if (accepted.length > 0) {
+      persistAssets([...accepted, ...assets]);
+      setUploadError(null);
+      showToast(`${accepted.length} asset${accepted.length > 1 ? "s" : ""} uploaded`);
+    }
+    if (error) {
+      setUploadError(error);
+      showToast(error);
+    }
+  };
+
+  const updateAsset = (updated: StudioAsset) => {
+    const next = assets.map((asset) => (asset.id === updated.id ? { ...updated, updatedAt: new Date().toISOString() } : asset));
+    persistAssets(next);
+    setSelectedAsset(next.find((asset) => asset.id === updated.id) ?? null);
+  };
+
+  const deleteAsset = (assetId: string) => {
+    persistAssets(assets.filter((asset) => asset.id !== assetId));
+    setSelectedAsset(null);
+    showToast("Asset deleted");
+  };
+
+  const resetFilters = () => {
+    setSearchQuery("");
+    setTypeFilter("all");
+    setSortMode("recent");
+  };
+  const showCategoryShortcuts = assets.length === 0 && !searchQuery && typeFilter === "all";
 
   return (
     <div>
-      <PageHeader title="Asset Library" subtitle="Search, filter, and upload creative assets." action={<PrimaryButton icon={Upload} onClick={() => openModal("asset-upload")}>Upload asset</PrimaryButton>} />
-      <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-[#EAECEF] bg-[#FCFDFE] p-3 sm:flex-row">
+      <PageHeader title="Asset Library" subtitle="Search, filter, and upload creative assets." action={<PrimaryButton icon={Upload} onClick={() => fileInputRef.current?.click()}>Upload asset</PrimaryButton>} />
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        className="hidden"
+        onChange={(event) => {
+          if (event.target.files) handleFiles(event.target.files);
+          event.target.value = "";
+        }}
+        aria-label="Upload assets"
+      />
+      <div
+        onDragOver={(event) => {
+          event.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={(event) => {
+          event.preventDefault();
+          setIsDragging(false);
+          handleFiles(event.dataTransfer.files);
+        }}
+        className={`mb-5 flex flex-col gap-3 rounded-2xl border p-3 sm:flex-row ${isDragging ? "border-[#9BD2FF] bg-[#EEF7FF]" : "border-[#EAECEF] bg-[#FCFDFE]"}`}
+      >
         <div className="flex h-10 flex-1 items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3">
           <Search className="h-4 w-4 text-[#9CA3AF]" />
-          <input className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]" placeholder="Search assets..." />
+          <input
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]"
+            placeholder="Search assets..."
+            aria-label="Search assets"
+          />
         </div>
-        <SecondaryButton onClick={() => showToast("All asset types selected")}>All types</SecondaryButton>
-        <SecondaryButton onClick={() => showToast("Recent assets selected")}>Recent</SecondaryButton>
+        <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as "all" | AssetType)} className="h-10 rounded-xl border border-[#E5E7EB] bg-white px-3 text-[12px] font-semibold text-[#4B5563] outline-none">
+          <option value="all">All types</option>
+          <option value="image">Images</option>
+          <option value="vector">Vectors</option>
+          <option value="model">Models</option>
+          <option value="document">Documents</option>
+          <option value="texture">Textures</option>
+          <option value="reference">References</option>
+          <option value="export">Exports</option>
+          <option value="audio">Audio</option>
+        </select>
+        <select value={sortMode} onChange={(event) => setSortMode(event.target.value as typeof sortMode)} className="h-10 rounded-xl border border-[#E5E7EB] bg-white px-3 text-[12px] font-semibold text-[#4B5563] outline-none">
+          <option value="recent">Recent first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="az">Name A-Z</option>
+          <option value="za">Name Z-A</option>
+          <option value="largest">Largest first</option>
+          <option value="smallest">Smallest first</option>
+        </select>
       </div>
-      <div className="grid gap-3 md:grid-cols-4">
-        {["Image", "Vector", "Model", "Document", "Texture", "Reference", "Export", "Audio"].map((name) => (
-          <ClickableSoftCard key={name} onClick={() => openDrawer("asset-preview")} ariaLabel={`Preview ${name} asset`}>
-            <div className="mb-3 flex h-20 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
-              <ImageIcon className="h-6 w-6" />
+      {uploadError && (
+        <div className="mb-4 rounded-2xl border border-[#FFD7DF] bg-[#FFF7F9] px-4 py-3 text-[12px] font-semibold text-[#D92D52]">{uploadError}</div>
+      )}
+      {isLoading && <StudioInlineState icon={RefreshCw} title="Loading assets" text="Reading saved asset metadata from this browser." />}
+      {!isLoading && showCategoryShortcuts && (
+        <div className="grid gap-3 md:grid-cols-4">
+          {assetTypeOptions.map((category) => {
+            const Icon = category.icon;
+            return (
+              <ClickableSoftCard key={category.type} onClick={() => setTypeFilter(category.type)} ariaLabel={`Filter ${category.label} assets`}>
+                <div className="mb-3 flex h-20 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
+                  <Icon className="h-6 w-6" />
+                </div>
+                <p className="text-[12px] font-semibold text-[#171717]">{category.label} asset</p>
+                <p className="mt-1 text-[10px] text-[#6B7280]">Upload or filter this category</p>
+              </ClickableSoftCard>
+            );
+          })}
+        </div>
+      )}
+      {!isLoading && !showCategoryShortcuts && filteredAssets.length === 0 && (
+        <StudioInlineState icon={Search} title="No assets found" text="No uploaded assets match the current search or filters." />
+      )}
+      {!isLoading && filteredAssets.length > 0 && (
+        <div className="grid gap-3 md:grid-cols-4">
+          {filteredAssets.map((asset) => (
+            <AssetCard key={asset.id} asset={asset} onOpen={() => setSelectedAsset(asset)} />
+          ))}
+        </div>
+      )}
+      {!isLoading && !showCategoryShortcuts && filteredAssets.length === 0 && (
+        <button onClick={resetFilters} className="mt-4 rounded-xl border border-[#E5E7EB] bg-white px-4 py-2 text-[12px] font-semibold text-[#4B5563] shadow-sm transition-all hover:border-[#CFE8F8]">Reset filters</button>
+      )}
+      {selectedAsset && (
+        <AssetDetailDrawer
+          asset={selectedAsset}
+          onClose={() => setSelectedAsset(null)}
+          onUpdate={updateAsset}
+          onDelete={() => deleteAsset(selectedAsset.id)}
+        />
+      )}
+    </div>
+  );
+}
+
+const assetTypeOptions: Array<{ type: AssetType; label: string; icon: LucideIcon }> = [
+  { type: "image", label: "Image", icon: ImageIcon },
+  { type: "vector", label: "Vector", icon: PenLine },
+  { type: "model", label: "Model", icon: Box },
+  { type: "document", label: "Document", icon: FileText },
+  { type: "texture", label: "Texture", icon: Layers3 },
+  { type: "reference", label: "Reference", icon: Paperclip },
+  { type: "export", label: "Export", icon: Upload },
+  { type: "audio", label: "Audio", icon: MessageCircle },
+];
+
+function assetTypeLabel(type: AssetType) {
+  return assetTypeOptions.find((option) => option.type === type)?.label ?? type;
+}
+
+function AssetCard({ asset, onOpen }: { asset: StudioAsset; onOpen: () => void }) {
+  const { theme } = useStudioTheme();
+  const dark = theme === "dark";
+  const Icon = assetTypeOptions.find((option) => option.type === asset.type)?.icon ?? FileText;
+  const isImagePreview = asset.type === "image" || asset.type === "vector";
+
+  return (
+    <ClickableSoftCard onClick={onOpen} ariaLabel={`Open ${asset.name}`}>
+      <div className="mb-3 flex h-24 items-center justify-center overflow-hidden rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
+        {isImagePreview && asset.previewUrl ? (
+          <img src={asset.previewUrl} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <Icon className="h-6 w-6" />
+        )}
+      </div>
+      <p className={`truncate text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{asset.name}</p>
+      <p className={`mt-1 text-[10px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{assetTypeLabel(asset.type)} - {formatFileSize(asset.size)}</p>
+    </ClickableSoftCard>
+  );
+}
+
+function AssetDetailDrawer({
+  asset,
+  onClose,
+  onUpdate,
+  onDelete,
+}: {
+  asset: StudioAsset;
+  onClose: () => void;
+  onUpdate: (asset: StudioAsset) => void;
+  onDelete: () => void;
+}) {
+  const { theme } = useStudioTheme();
+  const { showToast } = useStudioActions();
+  const dark = theme === "dark";
+  const [name, setName] = useState(asset.name);
+  const Icon = assetTypeOptions.find((option) => option.type === asset.type)?.icon ?? FileText;
+  const canOpen = Boolean(asset.previewUrl);
+
+  useEffect(() => {
+    setName(asset.name);
+  }, [asset.id, asset.name]);
+
+  const openAsset = () => {
+    if (!asset.previewUrl) {
+      showToast("This asset has metadata only in local storage.");
+      return;
+    }
+    window.open(asset.previewUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const copyAssetId = async () => {
+    try {
+      await navigator.clipboard.writeText(asset.id);
+      showToast("Asset id copied");
+    } catch {
+      showToast("Could not copy asset id");
+    }
+  };
+
+  return (
+    <div className={`fixed inset-0 z-50 flex justify-end backdrop-blur-[2px] ${dark ? "bg-black/35" : "bg-[#1F2937]/20"}`} onMouseDown={onClose}>
+      <aside className={`h-full w-full max-w-md overflow-y-auto border-l p-5 shadow-[-24px_0_70px_rgba(31,43,77,0.14)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5E7EB] bg-white"}`} onMouseDown={(event) => event.stopPropagation()}>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className={`text-[17px] font-semibold tracking-[-0.02em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Asset details</h2>
+            <p className={`mt-2 text-[12px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{assetTypeLabel(asset.type)} - {asset.status}</p>
+          </div>
+          <button onClick={onClose} className={`flex h-8 w-8 items-center justify-center rounded-xl ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#9CA3AF] hover:bg-[#F4F8FB]"}`} aria-label="Close asset details">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="mt-5 space-y-4">
+          <div className="flex h-44 items-center justify-center overflow-hidden rounded-3xl bg-[#EEF7FC] text-[#1DA1F2]">
+            {(asset.type === "image" || asset.type === "vector") && asset.previewUrl ? (
+              <img src={asset.previewUrl} alt="" className="h-full w-full object-contain" />
+            ) : (
+              <Icon className="h-10 w-10" />
+            )}
+          </div>
+          <div>
+            <label className={`text-[11px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Asset name</label>
+            <div className="mt-2 flex gap-2">
+              <input value={name} onChange={(event) => setName(event.target.value)} className={`h-10 min-w-0 flex-1 rounded-xl border px-3 text-[12px] outline-none ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8]" : "border-[#E5EAF0] bg-white text-[#171717]"}`} />
+              <button onClick={() => name.trim() && onUpdate({ ...asset, name: name.trim() })} className="rounded-xl bg-[#4A9BFF] px-3 text-[11px] font-semibold text-white">Save</button>
             </div>
-            <p className="text-[12px] font-semibold text-[#171717]">{name} asset</p>
-            <p className="mt-1 text-[10px] text-[#6B7280]">Placeholder</p>
-          </ClickableSoftCard>
-        ))}
-      </div>
+          </div>
+          <DetailRows
+            rows={[
+              ["File", asset.filename],
+              ["Type", assetTypeLabel(asset.type)],
+              ["Size", formatFileSize(asset.size)],
+              ["Uploaded", formatStudioDate(asset.createdAt)],
+              ["MIME", asset.mimeType],
+            ]}
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={openAsset} className="rounded-xl border border-[#E5EAF0] px-3 py-2 text-[11px] font-semibold text-[#4B5563]">{canOpen ? "Open" : "Preview unavailable"}</button>
+            {asset.previewUrl ? (
+              <a href={asset.previewUrl} download={asset.filename} className="rounded-xl border border-[#E5EAF0] px-3 py-2 text-center text-[11px] font-semibold text-[#4B5563]">Download</a>
+            ) : (
+              <button onClick={() => showToast("Binary file is not persisted without backend storage")} className="rounded-xl border border-[#E5EAF0] px-3 py-2 text-[11px] font-semibold text-[#4B5563]">Download</button>
+            )}
+            <button onClick={copyAssetId} className="rounded-xl border border-[#E5EAF0] px-3 py-2 text-[11px] font-semibold text-[#4B5563]">Copy id</button>
+            <button onClick={onDelete} className="rounded-xl border border-[#FFD7DF] px-3 py-2 text-[11px] font-semibold text-[#D92D52]">Delete</button>
+          </div>
+        </div>
+      </aside>
     </div>
   );
 }
