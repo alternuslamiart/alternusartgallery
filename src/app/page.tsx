@@ -326,7 +326,7 @@ function Footer() {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen overflow-hidden bg-[#0f0f11] font-sans text-zinc-100">
+    <div className="min-h-screen overflow-hidden bg-[#0f0f11] font-roboto text-zinc-100">
       <SiteHeader />
       <main>
         <Hero />
