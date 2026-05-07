@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   Bot,
@@ -10,11 +13,13 @@ import {
   ImageIcon,
   Link2,
   Mic,
+  Moon,
   Paperclip,
   Play,
   Send,
   Settings,
   Sparkles,
+  Sun,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -107,6 +112,26 @@ const footerHref: Record<string, string> = {
   Pricing: "/pricing",
 };
 
+const HOME_THEME_KEY = "cerevix_home_theme";
+
+function useHomeTheme() {
+  const [isLight, setIsLight] = useState(false);
+
+  useEffect(() => {
+    setIsLight(window.localStorage.getItem(HOME_THEME_KEY) === "light");
+  }, []);
+
+  const toggleTheme = () => {
+    setIsLight((current) => {
+      const next = !current;
+      window.localStorage.setItem(HOME_THEME_KEY, next ? "light" : "dark");
+      return next;
+    });
+  };
+
+  return [isLight, toggleTheme] as const;
+}
+
 function CerevixMark({ className = "h-8 w-8" }: { className?: string }) {
   return (
     <span
@@ -120,28 +145,40 @@ function CerevixMark({ className = "h-8 w-8" }: { className?: string }) {
   );
 }
 
-function Brand({ compact = false }: { compact?: boolean }) {
+function Brand({ compact = false, isLight = false }: { compact?: boolean; isLight?: boolean }) {
   return (
     <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Cerevix home">
       <CerevixMark className={compact ? "h-5 w-5" : "h-8 w-8"} />
-      <span className={compact ? "text-xs font-semibold text-white" : "text-[1.35rem] font-semibold tracking-[-0.03em] text-white"}>
+      <span
+        className={
+          compact
+            ? `text-xs font-semibold ${isLight ? "text-[#101114]" : "text-white"}`
+            : `text-[1.35rem] font-semibold tracking-[-0.03em] ${isLight ? "text-[#101114]" : "text-white"}`
+        }
+      >
         Cerevix
       </span>
     </Link>
   );
 }
 
-function SiteHeader() {
+function SiteHeader({ isLight }: { isLight: boolean }) {
   return (
-    <header className="relative z-20 border-b border-white/[0.06] bg-white/[0.05] backdrop-blur-xl">
+    <header
+      className={`relative z-20 border-b backdrop-blur-xl ${
+        isLight ? "border-black/[0.06] bg-white/[0.55]" : "border-white/[0.06] bg-white/[0.05]"
+      }`}
+    >
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
-        <Brand />
+        <Brand isLight={isLight} />
         <nav className="hidden items-center gap-9 md:flex" aria-label="Primary navigation">
           {navItems.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
+              className={`text-xs font-medium transition-colors ${
+                isLight ? "text-zinc-600 hover:text-[#101114]" : "text-zinc-400 hover:text-white"
+              }`}
             >
               {item.label}
             </Link>
@@ -255,16 +292,32 @@ function DashboardPreview() {
   );
 }
 
-function Hero() {
+function Hero({ isLight }: { isLight: boolean }) {
   return (
     <section className="relative overflow-hidden pb-12 pt-8 sm:pb-16 lg:pb-20">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[720px] bg-[radial-gradient(ellipse_at_top,rgba(6,143,255,0.19),rgba(15,15,17,0)_58%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-[310px] h-[520px] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.09),rgba(15,15,17,0)_62%)]" />
+      <div
+        className={`pointer-events-none absolute inset-x-0 top-0 h-[720px] ${
+          isLight
+            ? "bg-[radial-gradient(ellipse_at_top,rgba(6,143,255,0.13),rgba(246,248,251,0)_58%)]"
+            : "bg-[radial-gradient(ellipse_at_top,rgba(6,143,255,0.19),rgba(15,15,17,0)_58%)]"
+        }`}
+      />
+      <div
+        className={`pointer-events-none absolute inset-x-0 top-[310px] h-[520px] ${
+          isLight
+            ? "bg-[radial-gradient(ellipse_at_center,rgba(6,143,255,0.08),rgba(246,248,251,0)_62%)]"
+            : "bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.09),rgba(15,15,17,0)_62%)]"
+        }`}
+      />
       <div className="relative mx-auto max-w-5xl px-5 text-center sm:px-8">
-        <h1 className="mx-auto max-w-4xl text-balance text-[clamp(3rem,8vw,6.6rem)] font-semibold leading-[0.92] tracking-[-0.07em] text-zinc-100">
+        <h1
+          className={`mx-auto max-w-4xl text-balance text-[clamp(3rem,8vw,6.6rem)] font-semibold leading-[0.92] tracking-[-0.07em] ${
+            isLight ? "text-[#101114]" : "text-zinc-100"
+          }`}
+        >
           Build faster with an AI platform studio.
         </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-balance text-base leading-7 text-zinc-400 sm:text-lg">
+        <p className={`mx-auto mt-6 max-w-2xl text-balance text-base leading-7 sm:text-lg ${isLight ? "text-zinc-600" : "text-zinc-400"}`}>
           Create workflows, generate assets, automate tools, and coordinate AI agents across code, 3D, and design environments.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -277,7 +330,11 @@ function Hero() {
           <Button
             asChild
             variant="outline"
-            className="h-11 rounded-full border-white/18 bg-white/[0.03] px-6 text-xs font-semibold text-zinc-100 shadow-none transition-colors hover:border-white/30 hover:bg-white/[0.07] hover:text-white"
+            className={`h-11 rounded-full px-6 text-xs font-semibold shadow-none transition-colors ${
+              isLight
+                ? "border-black/12 bg-white/70 text-[#101114] hover:border-[#068fff]/35 hover:bg-white hover:text-[#068fff]"
+                : "border-white/18 bg-white/[0.03] text-zinc-100 hover:border-white/30 hover:bg-white/[0.07] hover:text-white"
+            }`}
           >
             <Link href="/main">Explore Studio</Link>
           </Button>
@@ -288,23 +345,29 @@ function Hero() {
   );
 }
 
-function Footer() {
+function Footer({ isLight, toggleTheme }: { isLight: boolean; toggleTheme: () => void }) {
   return (
-    <footer className="relative border-t border-white/[0.08] bg-[#111113] px-5 py-8 sm:px-8 lg:px-10">
+    <footer
+      className={`relative border-t px-5 py-8 sm:px-8 lg:px-10 ${
+        isLight ? "border-black/[0.08] bg-[#f8fafc]" : "border-white/[0.08] bg-[#111113]"
+      }`}
+    >
       <div className="mx-auto max-w-5xl">
         <div className="grid gap-10 py-6 sm:grid-cols-2 lg:grid-cols-[1.2fr_repeat(4,1fr)]">
           <div>
-            <Brand compact />
+            <Brand compact isLight={isLight} />
           </div>
           {footerColumns.map((column) => (
             <nav key={column.title} aria-label={`${column.title} footer links`}>
-              <h2 className="text-xs font-semibold text-white">{column.title}</h2>
+              <h2 className={`text-xs font-semibold ${isLight ? "text-[#101114]" : "text-white"}`}>{column.title}</h2>
               <ul className="mt-5 space-y-3">
                 {column.links.map((link) => (
                   <li key={link}>
                     <Link
                       href={footerHref[link] ?? "#"}
-                      className="text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-200"
+                      className={`text-xs font-medium transition-colors ${
+                        isLight ? "text-zinc-600 hover:text-[#068fff]" : "text-zinc-500 hover:text-zinc-200"
+                      }`}
                     >
                       {link}
                     </Link>
@@ -314,12 +377,37 @@ function Footer() {
             </nav>
           ))}
         </div>
-        <div className="mt-8 flex flex-col gap-4 border-t border-white/[0.08] pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-zinc-500">Cerevix · Copyright &copy;2026</p>
-          <button className="inline-flex h-9 w-fit items-center gap-2 rounded-full border border-white/16 bg-transparent px-4 text-xs font-medium text-zinc-300 transition-colors hover:border-[#068fff]/50 hover:text-white">
-            <Globe2 className="h-3.5 w-3.5" />
-            English
-          </button>
+        <div
+          className={`mt-8 flex flex-col gap-4 border-t pt-6 sm:flex-row sm:items-center sm:justify-between ${
+            isLight ? "border-black/[0.08]" : "border-white/[0.08]"
+          }`}
+        >
+          <p className={`text-xs ${isLight ? "text-zinc-600" : "text-zinc-500"}`}>Cerevix · Copyright &copy;2026</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className={`inline-flex h-9 w-fit items-center gap-2 rounded-full border px-4 text-xs font-medium transition-colors ${
+                isLight
+                  ? "border-black/12 bg-white text-[#101114] hover:border-[#068fff]/45 hover:text-[#068fff]"
+                  : "border-white/16 bg-transparent text-zinc-300 hover:border-[#068fff]/50 hover:text-white"
+              }`}
+              aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
+            >
+              {isLight ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
+              {isLight ? "Dark" : "Light"}
+            </button>
+            <button
+              className={`inline-flex h-9 w-fit items-center gap-2 rounded-full border px-4 text-xs font-medium transition-colors ${
+                isLight
+                  ? "border-black/12 bg-white text-[#101114] hover:border-[#068fff]/45 hover:text-[#068fff]"
+                  : "border-white/16 bg-transparent text-zinc-300 hover:border-[#068fff]/50 hover:text-white"
+              }`}
+            >
+              <Globe2 className="h-3.5 w-3.5" />
+              English
+            </button>
+          </div>
         </div>
       </div>
     </footer>
@@ -327,13 +415,15 @@ function Footer() {
 }
 
 export default function HomePage() {
+  const [isLight, toggleTheme] = useHomeTheme();
+
   return (
-    <div className="min-h-screen overflow-hidden bg-[#0f0f11] font-roboto text-zinc-100">
-      <SiteHeader />
+    <div className={`min-h-screen overflow-hidden font-roboto transition-colors ${isLight ? "bg-[#f6f8fb] text-[#101114]" : "bg-[#0f0f11] text-zinc-100"}`}>
+      <SiteHeader isLight={isLight} />
       <main>
-        <Hero />
+        <Hero isLight={isLight} />
       </main>
-      <Footer />
+      <Footer isLight={isLight} toggleTheme={toggleTheme} />
     </div>
   );
 }
