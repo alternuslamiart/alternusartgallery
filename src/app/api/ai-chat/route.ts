@@ -26,8 +26,16 @@ type RequestBody = {
 type AIProvider = "openai" | "gemini" | "local";
 type RemoteAIProvider = Exclude<AIProvider, "local">;
 
+function getFirstEnvValue(names: string[]) {
+  for (const name of names) {
+    const value = process.env[name]?.trim();
+    if (value) return value;
+  }
+  return undefined;
+}
+
 function getGeminiApiKey() {
-  return process.env.GEMINI_API_KEY?.trim();
+  return getFirstEnvValue(["GEMINI_API_KEY", "GOOGLE_GENERATIVE_AI_API_KEY", "GOOGLE_API_KEY"]);
 }
 
 function getGeminiModel() {
@@ -45,8 +53,12 @@ function getOpenAIModel() {
 function getPreferredProvider(): AIProvider {
   const configuredProvider = process.env.AI_PROVIDER?.trim().toLowerCase();
 
-  if (configuredProvider === "openai" || configuredProvider === "gemini") {
-    return configuredProvider;
+  if (configuredProvider === "openai" && getOpenAIApiKey()) {
+    return "openai";
+  }
+
+  if (configuredProvider === "gemini" && getGeminiApiKey()) {
+    return "gemini";
   }
 
   if (getGeminiApiKey()) return "gemini";
@@ -58,6 +70,19 @@ function getFallbackProvider(provider: AIProvider): RemoteAIProvider | null {
   if (provider === "openai" && getGeminiApiKey()) return "gemini";
   if (provider === "gemini" && getOpenAIApiKey()) return "openai";
   return null;
+}
+
+function getProviderAttempts(provider: AIProvider): RemoteAIProvider[] {
+  if (provider === "local") return [];
+
+  const attempts: RemoteAIProvider[] = [provider];
+  const fallbackProvider = getFallbackProvider(provider);
+
+  if (fallbackProvider && !attempts.includes(fallbackProvider)) {
+    attempts.push(fallbackProvider);
+  }
+
+  return attempts;
 }
 
 function normalizeHistory(value: unknown): ChatMessage[] {
@@ -247,25 +272,32 @@ export async function POST(request: NextRequest) {
     const provider = getPreferredProvider();
 
     if (provider === "openai" || provider === "gemini") {
-      try {
-        const answer = await askProvider(provider, message, history);
-        return NextResponse.json({ content: answer, answer, provider });
-      } catch (primaryError) {
-        const fallbackProvider = getFallbackProvider(provider);
+      const providerAttempts = getProviderAttempts(provider);
+      let failedProvider: RemoteAIProvider | undefined;
 
-        if (!fallbackProvider) {
-          throw primaryError;
+      for (const providerAttempt of providerAttempts) {
+        try {
+          const answer = await askProvider(providerAttempt, message, history);
+          return NextResponse.json({
+            content: answer,
+            answer,
+            provider: providerAttempt,
+            fallbackFrom: providerAttempt === provider ? undefined : provider,
+          });
+        } catch (providerError) {
+          failedProvider = providerAttempt;
+          console.warn(`AI provider ${providerAttempt} failed.`, providerError);
         }
-
-        console.warn(`AI provider ${provider} failed. Falling back to ${fallbackProvider}.`, primaryError);
-        const answer = await askProvider(fallbackProvider, message, history);
-        return NextResponse.json({
-          content: answer,
-          answer,
-          provider: fallbackProvider,
-          fallbackFrom: provider,
-        });
       }
+
+      const fallback = getAIResponse(message);
+      return NextResponse.json({
+        content: fallback.content,
+        answer: fallback.content,
+        suggestedQuestions: fallback.suggestedQuestions,
+        provider: "local",
+        fallbackFrom: failedProvider ?? provider,
+      });
     }
 
     const fallback = getAIResponse(message);
