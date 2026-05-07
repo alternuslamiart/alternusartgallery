@@ -7,7 +7,6 @@ import {
   ArrowRight,
   Github,
   Linkedin,
-  LogIn,
   Moon,
   ShieldCheck,
   Sparkles,
@@ -79,16 +78,11 @@ function Header({ isDark, setIsDark }: { isDark: boolean; setIsDark: (value: boo
           </button>
           <Button
             asChild
-            variant="outline"
-            className={`h-10 rounded-full px-4 text-[12px] font-bold shadow-none ${
-              isDark
-                ? "border-white/10 bg-white/[0.055] text-white hover:bg-white/[0.09] hover:text-white"
-                : "border-[#DCE3EE] bg-white text-[#171717] hover:border-[#4284FF]/40 hover:bg-white hover:text-[#4284FF]"
-            }`}
+            className="h-10 rounded-full bg-[#4284FF] px-4 text-[12px] font-black text-white shadow-[0_14px_30px_rgba(66,132,255,0.28)] hover:bg-[#3273F2]"
           >
-            <Link href="/login">
-              <LogIn className="h-4 w-4" />
-              Login
+            <Link href="/signup">
+              Try Cerevix
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>
