@@ -1,17 +1,18 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { ArrowRight, Lock, Mail } from "lucide-react";
+import { ArrowRight, Lock, Mail, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const STUDIO_HOME = "/ai-assistant";
+const AUTH_THEME_KEY = "cerevix_auth_theme";
 
 type OAuthProvider = "google" | "github" | "discord";
 
@@ -62,11 +63,29 @@ function CerevixMark() {
   );
 }
 
+function useAuthTheme() {
+  const [isLight, setIsLight] = useState(false);
+
+  useEffect(() => {
+    setIsLight(window.localStorage.getItem(AUTH_THEME_KEY) === "light");
+  }, []);
+
+  const toggleTheme = () => {
+    setIsLight((current) => {
+      const next = !current;
+      window.localStorage.setItem(AUTH_THEME_KEY, next ? "light" : "dark");
+      return next;
+    });
+  };
+
+  return [isLight, toggleTheme] as const;
+}
+
 function Brand() {
   return (
     <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Cerevix home">
       <CerevixMark />
-      <span className="text-[1.35rem] font-semibold tracking-[-0.03em] text-white">Cerevix</span>
+      <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Cerevix</span>
     </Link>
   );
 }
@@ -74,6 +93,7 @@ function Brand() {
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isLight, toggleTheme] = useAuthTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -106,21 +126,31 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#0f0f11] font-roboto text-zinc-100">
-      <div className="pointer-events-none fixed inset-x-0 top-0 h-[520px] bg-[radial-gradient(ellipse_at_top,rgba(6,143,255,0.18),rgba(15,15,17,0)_62%)]" />
+    <div className={`auth-page ${isLight ? "auth-light" : "auth-dark"}`}>
+      <div className="auth-glow pointer-events-none fixed inset-x-0 top-0 h-[520px]" />
       <header className="relative z-10 mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
         <Brand />
-        <Link href="/signup" className="text-xs font-semibold text-zinc-400 transition-colors hover:text-white">
-          Create account
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="auth-theme-toggle inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors"
+            aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
+          >
+            {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+          </button>
+          <Link href="/signup" className="auth-top-link text-xs font-semibold transition-colors">
+            Create account
+          </Link>
+        </div>
       </header>
 
       <main className="relative z-10 flex min-h-[calc(100vh-80px)] items-center justify-center px-5 pb-16 pt-8">
-        <Card className="w-full max-w-md rounded-[24px] border border-white/[0.12] bg-[#151618]/92 text-white shadow-none backdrop-blur-xl">
+        <Card className="auth-card w-full max-w-md rounded-[24px] border shadow-none backdrop-blur-xl">
           <CardHeader className="space-y-3 p-7 text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Cerevix workspace</p>
-            <h1 className="text-4xl font-semibold tracking-[-0.05em]">Sign in</h1>
-            <p className="mx-auto max-w-xs text-sm leading-6 text-zinc-400">
+            <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">Sign in</h1>
+            <p className="auth-copy mx-auto max-w-xs text-sm leading-6">
               Open your AI platform studio for code, 3D, and technical workflows.
             </p>
           </CardHeader>
@@ -132,7 +162,7 @@ export default function LoginPage() {
                   type="button"
                   variant="outline"
                   onClick={() => handleOAuthSignIn(provider.id)}
-                  className="h-11 rounded-[10px] border-white/12 bg-white/[0.04] text-sm font-semibold text-zinc-100 shadow-none hover:border-[#068fff]/45 hover:bg-white/[0.07] hover:text-white"
+                  className="auth-social-button h-11 rounded-[10px] text-sm font-semibold shadow-none"
                 >
                   {provider.icon}
                   {provider.label}
@@ -141,18 +171,18 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="h-px flex-1 bg-white/[0.09]" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">or email</span>
-              <div className="h-px flex-1 bg-white/[0.09]" />
+              <div className="auth-divider-line h-px flex-1" />
+              <span className="auth-divider-label text-[10px] font-semibold uppercase tracking-[0.18em]">or email</span>
+              <div className="auth-divider-line h-px flex-1" />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="email" className="auth-label text-xs font-medium">
                   Email
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                  <Mail className="auth-input-icon absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
                   <Input
                     id="email"
                     type="email"
@@ -161,22 +191,22 @@ export default function LoginPage() {
                     placeholder="you@company.com"
                     autoComplete="email"
                     required
-                    className="h-11 rounded-[10px] border-white/10 bg-black/20 pl-9 text-sm text-white shadow-none placeholder:text-zinc-600 focus-visible:ring-[#068fff]"
+                    className="auth-input h-11 rounded-[10px] pl-9 text-sm shadow-none focus-visible:ring-[#068fff]"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-xs font-medium text-zinc-300">
+                  <Label htmlFor="password" className="auth-label text-xs font-medium">
                     Password
                   </Label>
-                  <Link href="/reset-password" className="text-xs font-medium text-[#8fccff] hover:text-white">
+                  <Link href="/reset-password" className="auth-accent-link text-xs font-medium">
                     Forgot?
                   </Link>
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                  <Lock className="auth-input-icon absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
                   <Input
                     id="password"
                     type="password"
@@ -185,7 +215,7 @@ export default function LoginPage() {
                     placeholder="Enter your password"
                     autoComplete="current-password"
                     required
-                    className="h-11 rounded-[10px] border-white/10 bg-black/20 pl-9 text-sm text-white shadow-none placeholder:text-zinc-600 focus-visible:ring-[#068fff]"
+                    className="auth-input h-11 rounded-[10px] pl-9 text-sm shadow-none focus-visible:ring-[#068fff]"
                   />
                 </div>
               </div>
@@ -206,9 +236,9 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <p className="text-center text-xs text-zinc-500">
+            <p className="auth-footer-copy text-center text-xs">
               New to Cerevix?{" "}
-              <Link href="/signup" className="font-semibold text-zinc-200 hover:text-white">
+              <Link href="/signup" className="auth-footer-link font-semibold">
                 Create an account
               </Link>
             </p>
