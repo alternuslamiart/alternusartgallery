@@ -133,28 +133,30 @@ function Brand({ compact = false }: { compact?: boolean }) {
 
 function SiteHeader() {
   return (
-    <header className="relative z-20 mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
-      <Brand />
-      <nav className="hidden items-center gap-9 md:flex" aria-label="Primary navigation">
-        {navItems.map((item) => (
-          <Link
-            key={item.label}
-            href={item.href}
-            className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
-          >
-            {item.label}
+    <header className="relative z-20 border-b border-white/[0.06] bg-white/[0.05] backdrop-blur-xl">
+      <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
+        <Brand />
+        <nav className="hidden items-center gap-9 md:flex" aria-label="Primary navigation">
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <Button
+          asChild
+          className="h-10 rounded-full bg-[#068fff] px-5 text-xs font-semibold text-white shadow-none transition-colors hover:bg-[#1b9dff]"
+        >
+          <Link href="/signup">
+            Try Cerevix
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
-        ))}
-      </nav>
-      <Button
-        asChild
-        className="h-10 rounded-full bg-[#068fff] px-5 text-xs font-semibold text-white shadow-none transition-colors hover:bg-[#1b9dff]"
-      >
-        <Link href="/signup">
-          Try Cerevix
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-      </Button>
+        </Button>
+      </div>
     </header>
   );
 }
