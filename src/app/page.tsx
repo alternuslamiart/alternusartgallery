@@ -1,79 +1,19 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  BarChart3,
   Bot,
-  ChevronRight,
-  Globe2,
   Github,
   Linkedin,
   Menu,
   MessageCircle,
-  MousePointer2,
   Send,
   ShieldCheck,
   Sparkles,
   Twitter,
-  Workflow,
-  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
 const navLinks = ["Usecases", "Become a partner", "Pricing", "My chatbots", "Account"];
-
-const features = [
-  {
-    icon: MessageCircle,
-    title: "24/7 automated support",
-    description: "Resolve common questions instantly with fast, accurate replies trained on your business content.",
-  },
-  {
-    icon: MousePointer2,
-    title: "Lead capture and qualification",
-    description: "Collect intent, company details, and contact information before a visitor ever leaves your site.",
-  },
-  {
-    icon: Bot,
-    title: "Website-trained AI answers",
-    description: "Turn your pages, docs, policies, and product data into an always-on assistant for visitors.",
-  },
-  {
-    icon: Globe2,
-    title: "Multilingual conversations",
-    description: "Support global customers with calm, natural responses across languages and time zones.",
-  },
-  {
-    icon: BarChart3,
-    title: "Conversation insights",
-    description: "Understand recurring questions, high-value leads, and support gaps from one clean dashboard.",
-  },
-  {
-    icon: Workflow,
-    title: "Workflow integrations",
-    description: "Route qualified conversations into the tools your sales and support teams already use.",
-  },
-];
-
-const processSteps = [
-  {
-    step: "01",
-    title: "Connect your website or data",
-    description: "Add your site, help center, product pages, PDFs, or internal content in minutes.",
-  },
-  {
-    step: "02",
-    title: "Train your AI assistant",
-    description: "Cerevix structures your knowledge and prepares safe, brand-aligned responses.",
-  },
-  {
-    step: "03",
-    title: "Convert visitors into leads",
-    description: "Launch a polished chat assistant that answers questions and captures qualified demand.",
-  },
-];
-
-const trustedLogos = ["Northstar", "Apex Cloud", "Signal Desk", "Blue Ridge", "Orbit Labs"];
 
 function CerevixLogo() {
   return (
@@ -307,181 +247,75 @@ function Hero() {
   );
 }
 
-function FeaturesSection() {
-  return (
-    <section className="bg-[#1B1B1B] px-4 py-24 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#4284FF]">Features</p>
-          <h2 className="mt-3 text-4xl font-black tracking-[-0.045em] text-[#F4F4F1] sm:text-5xl">
-            Built for support, sales, and growth teams.
-          </h2>
-          <p className="mt-4 text-sm leading-6 text-[#C1C2BF]">
-            Cerevix gives visitors clear answers and gives your team cleaner data, better context, and fewer repetitive tickets.
-          </p>
-        </div>
-
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => {
-            const Icon = feature.icon;
-            return (
-              <Card key={feature.title} className="rounded-[1.5rem] border-[#333333] bg-[#262626] text-[#C1C2BF] shadow-none transition-transform hover:-translate-y-1">
-                <CardContent className="p-6">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#4284FF]/14 text-[#4284FF]">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="mt-5 text-lg font-black tracking-[-0.03em] text-[#F4F4F1]">{feature.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-[#C1C2BF]">{feature.description}</p>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function HowItWorksSection() {
-  return (
-    <section className="bg-[#262626] px-4 py-24 sm:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
-        <div>
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#4284FF]">How it works</p>
-          <h2 className="mt-3 text-4xl font-black tracking-[-0.045em] text-[#F4F4F1] sm:text-5xl">
-            Launch a trained AI assistant without slowing down your team.
-          </h2>
-          <p className="mt-5 text-sm leading-7 text-[#C1C2BF]">
-            From content ingestion to live conversations, Cerevix keeps the setup simple and the customer experience polished.
-          </p>
-          <Button asChild className="mt-7 h-11 rounded-full bg-[#4284FF] px-6 text-[13px] font-bold text-white hover:bg-[#3273F2]">
-            <Link href="/signup">
-              Start setup <ChevronRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-        <div className="grid gap-4">
-          {processSteps.map((item) => (
-            <div key={item.step} className="flex gap-5 rounded-[1.5rem] border border-[#333333] bg-[#1B1B1B] p-5 shadow-none">
-              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#4284FF] text-sm font-black text-white">
-                {item.step}
-              </div>
-              <div>
-                <h3 className="text-lg font-black tracking-[-0.03em] text-[#F4F4F1]">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-[#C1C2BF]">{item.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function TrustedSection() {
-  return (
-    <section className="bg-[#1B1B1B] px-4 py-20 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl rounded-[2rem] border border-[#333333] bg-[#262626] p-8 shadow-none">
-        <p className="text-center text-[12px] font-black uppercase tracking-[0.2em] text-[#C1C2BF]/55">Trusted by modern businesses</p>
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {trustedLogos.map((logo) => (
-            <div key={logo} className="flex h-16 items-center justify-center rounded-2xl border border-[#333333] bg-[#1B1B1B] text-sm font-black tracking-[-0.02em] text-[#C1C2BF]">
-              {logo}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CTASection() {
-  return (
-    <section className="bg-[#1B1B1B] px-4 py-24 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl overflow-hidden rounded-[2.2rem] border border-[#4284FF]/32 bg-[#262626] px-6 py-14 text-center shadow-none sm:px-12">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#4284FF]/16 text-[#4284FF] ring-1 ring-[#4284FF]/24">
-          <Zap className="h-6 w-6" />
-        </div>
-        <h2 className="mx-auto mt-6 max-w-3xl text-balance text-4xl font-black tracking-[-0.05em] text-[#F4F4F1] sm:text-6xl">
-          Start automating support with Cerevix.
-        </h2>
-        <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-[#C1C2BF]">
-          Give every visitor an instant, helpful answer while your team focuses on the conversations that need a human touch.
-        </p>
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button asChild className="h-11 rounded-full bg-[#4284FF] px-6 text-[13px] font-black text-white hover:bg-[#3273F2]">
-            <Link href="/signup">Try Cerevix</Link>
-          </Button>
-          <Button asChild variant="outline" className="h-11 rounded-full border-[#333333] bg-[#1B1B1B] px-6 text-[13px] font-bold text-[#C1C2BF] hover:border-[#4284FF] hover:bg-[#1B1B1B] hover:text-[#4284FF]">
-            <Link href="/contact">Book a Demo</Link>
-          </Button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function Footer() {
   const columns = [
     {
-      title: "Product",
-      links: ["Features", "Pricing", "Integrations", "Usecases"],
+      title: "Platform",
+      links: ["Overview", "Bridges", "Agent SDK", "API Reference", "Changelog", "Status"],
+    },
+    {
+      title: "Creative",
+      links: ["Launch Studio", "Edit", "Media library", "FX & 3D", "Boards", "Voice & sound"],
     },
     {
       title: "Company",
-      links: ["About", "Become a partner", "Contact", "Blog"],
+      links: ["About", "Manifesto", "Careers", "Press Kit", "Contact"],
     },
     {
       title: "Legal",
-      links: ["Privacy Policy", "Terms of Service", "Cookies"],
+      links: ["Privacy Policy", "Terms of Use", "Cookie Notice", "Security", "Pricing"],
     },
+  ];
+  const socials = [
+    { label: "X", icon: Twitter },
+    { label: "GitHub", icon: Github },
+    { label: "LinkedIn", icon: Linkedin },
+    { label: "YouTube", icon: MessageCircle },
+    { label: "RSS", icon: Send },
   ];
 
   return (
-    <footer className="border-t border-[#333333] bg-[#262626] px-4 py-14 sm:px-6 lg:px-8">
+    <footer className="border-t border-[#333333] bg-[#262626] px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <div className="grid gap-10 lg:grid-cols-[1.25fr_2fr]">
-          <div>
-            <CerevixLogo />
-            <p className="mt-4 max-w-sm text-sm leading-6 text-[#C1C2BF]">
-              Cerevix helps businesses automate support, capture leads, and answer website visitors with trained AI assistants.
-            </p>
-            <div className="mt-5 flex items-center gap-3 text-[#C1C2BF]/70">
-              <Link href="#" aria-label="Cerevix on X" className="rounded-full border border-[#333333] bg-[#1B1B1B] p-2 hover:text-[#4284FF]">
-                <Twitter className="h-4 w-4" />
-              </Link>
-              <Link href="#" aria-label="Cerevix on LinkedIn" className="rounded-full border border-[#333333] bg-[#1B1B1B] p-2 hover:text-[#4284FF]">
-                <Linkedin className="h-4 w-4" />
-              </Link>
-              <Link href="#" aria-label="Cerevix on GitHub" className="rounded-full border border-[#333333] bg-[#1B1B1B] p-2 hover:text-[#4284FF]">
-                <Github className="h-4 w-4" />
-              </Link>
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-4 md:gap-12">
+          {columns.map((column) => (
+            <div key={column.title}>
+              <h3 className="text-[11px] font-medium tracking-[-0.005em] text-[#C1C2BF]/62">{column.title}</h3>
+              <ul className="mt-7 space-y-5">
+                {column.links.map((link) => (
+                  <li key={link}>
+                    <Link href="#" className="text-[14.5px] font-medium tracking-[-0.005em] text-[#C1C2BF] hover:text-[#4284FF]">
+                      {link}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-          <div className="grid gap-8 sm:grid-cols-3">
-            {columns.map((column) => (
-              <div key={column.title}>
-                <h3 className="text-[12px] font-black uppercase tracking-[0.16em] text-[#F4F4F1]">{column.title}</h3>
-                <ul className="mt-4 space-y-3">
-                  {column.links.map((link) => (
-                    <li key={link}>
-                      <Link href="#" className="text-sm font-medium text-[#C1C2BF] hover:text-[#4284FF]">
-                        {link}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-[#333333] pt-6 text-sm text-[#C1C2BF]/70 sm:flex-row sm:items-center sm:justify-between">
-          <p>&copy; 2026 Cerevix. All rights reserved.</p>
-          <div className="flex flex-wrap items-center gap-4">
-            <Link href="/privacy" className="hover:text-[#4284FF]">Privacy</Link>
-            <Link href="/terms" className="hover:text-[#4284FF]">Terms</Link>
-            <Link href="/cookie-notice" className="hover:text-[#4284FF]">Cookies</Link>
+        <div className="mt-20 flex flex-col gap-6 border-t border-[#333333] pt-7 text-[11.5px] text-[#C1C2BF]/70 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4">
+            {socials.map(({ label, icon: Icon }) => (
+              <Link key={label} href="#" aria-label={label} className="text-[#C1C2BF]/62 hover:text-[#4284FF]">
+                <Icon className="h-4 w-4" />
+              </Link>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center gap-2 font-extrabold text-[#F4F4F1]">
+              <span className="flex h-[18px] w-[18px] items-center justify-center rounded-[5px] bg-[#4284FF] text-white">
+                <Sparkles className="h-3 w-3 fill-white" />
+              </span>
+              Cerevix
+            </span>
+            <span>&copy; 2026</span>
+            <Link href="/cookie-notice" className="border-b border-dashed border-[#C1C2BF]/30 pb-0.5 hover:text-[#4284FF]">
+              Manage Cookies
+            </Link>
+          </div>
+          <div className="inline-flex h-9 items-center gap-2 self-start rounded-full border border-[#333333] bg-[#1B1B1B] px-4 font-medium text-[#C1C2BF] md:self-auto">
+            English <span className="text-[#C1C2BF]/55">Albania</span>
           </div>
         </div>
       </div>
@@ -495,10 +329,6 @@ export default function HomePage() {
       <Header />
       <main>
         <Hero />
-        <FeaturesSection />
-        <HowItWorksSection />
-        <TrustedSection />
-        <CTASection />
       </main>
       <Footer />
     </div>
