@@ -24,6 +24,7 @@ type RequestBody = {
 };
 
 type AIProvider = "openai" | "gemini" | "local";
+type RemoteAIProvider = Exclude<AIProvider, "local">;
 
 function getGeminiApiKey() {
   return process.env.GEMINI_API_KEY?.trim();
@@ -51,6 +52,12 @@ function getPreferredProvider(): AIProvider {
   if (getGeminiApiKey()) return "gemini";
   if (getOpenAIApiKey()) return "openai";
   return "local";
+}
+
+function getFallbackProvider(provider: AIProvider): RemoteAIProvider | null {
+  if (provider === "openai" && getGeminiApiKey()) return "gemini";
+  if (provider === "gemini" && getOpenAIApiKey()) return "openai";
+  return null;
 }
 
 function normalizeHistory(value: unknown): ChatMessage[] {
@@ -200,6 +207,10 @@ async function askOpenAI(message: string, history: ChatMessage[]) {
   return answer;
 }
 
+async function askProvider(provider: RemoteAIProvider, message: string, history: ChatMessage[]) {
+  return provider === "openai" ? askOpenAI(message, history) : askGemini(message, history);
+}
+
 export async function GET() {
   const provider = getPreferredProvider();
 
@@ -235,14 +246,26 @@ export async function POST(request: NextRequest) {
     const history = normalizeHistory(body.history ?? body.conversationHistory);
     const provider = getPreferredProvider();
 
-    if (provider === "openai") {
-      const answer = await askOpenAI(message, history);
-      return NextResponse.json({ content: answer, answer, provider });
-    }
+    if (provider === "openai" || provider === "gemini") {
+      try {
+        const answer = await askProvider(provider, message, history);
+        return NextResponse.json({ content: answer, answer, provider });
+      } catch (primaryError) {
+        const fallbackProvider = getFallbackProvider(provider);
 
-    if (provider === "gemini") {
-      const answer = await askGemini(message, history);
-      return NextResponse.json({ content: answer, answer, provider });
+        if (!fallbackProvider) {
+          throw primaryError;
+        }
+
+        console.warn(`AI provider ${provider} failed. Falling back to ${fallbackProvider}.`, primaryError);
+        const answer = await askProvider(fallbackProvider, message, history);
+        return NextResponse.json({
+          content: answer,
+          answer,
+          provider: fallbackProvider,
+          fallbackFrom: provider,
+        });
+      }
     }
 
     const fallback = getAIResponse(message);
