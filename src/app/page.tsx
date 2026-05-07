@@ -164,7 +164,7 @@ function Brand({ compact = false, isLight = false }: { compact?: boolean; isLigh
 
 function SiteHeader({ isLight }: { isLight: boolean }) {
   return (
-    <header className="relative z-20">
+    <header className="absolute inset-x-0 top-0 z-20">
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
         <Brand isLight={isLight} />
         <nav className="hidden items-center gap-9 md:flex" aria-label="Primary navigation">
@@ -290,7 +290,7 @@ function DashboardPreview() {
 
 function Hero({ isLight }: { isLight: boolean }) {
   return (
-    <section className="relative overflow-hidden pb-12 pt-8 sm:pb-16 lg:pb-20">
+    <section className="relative overflow-hidden pb-12 pt-28 sm:pb-16 lg:pb-20">
       <div
         className={`pointer-events-none absolute inset-x-0 top-0 h-[720px] ${
           isLight
