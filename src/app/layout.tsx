@@ -56,10 +56,11 @@ export const metadata: Metadata = {
   publisher: "Cerevix AI",
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "any" },
       { url: "/cerevix-ai-favicon.png", sizes: "512x512", type: "image/png" },
       { url: "/cerevix-ai-favicon.svg", type: "image/svg+xml" },
     ],
-    shortcut: "/cerevix-ai-favicon.png",
+    shortcut: "/favicon.ico",
     apple: "/cerevix-ai-favicon.png",
   },
   openGraph: {
