@@ -164,11 +164,7 @@ function Brand({ compact = false, isLight = false }: { compact?: boolean; isLigh
 
 function SiteHeader({ isLight }: { isLight: boolean }) {
   return (
-    <header
-      className={`relative z-20 border-b backdrop-blur-xl ${
-        isLight ? "border-black/[0.06] bg-white/[0.55]" : "border-white/[0.06] bg-white/[0.05]"
-      }`}
-    >
+    <header className="relative z-20">
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
         <Brand isLight={isLight} />
         <nav className="hidden items-center gap-9 md:flex" aria-label="Primary navigation">
@@ -325,7 +321,7 @@ function Hero({ isLight }: { isLight: boolean }) {
             asChild
             className="h-11 rounded-full bg-[#068fff] px-6 text-xs font-semibold text-white shadow-none transition-colors hover:bg-[#1b9dff]"
           >
-            <Link href="/signup">Try Cerevix</Link>
+            <Link href="/pricing">Upgrade</Link>
           </Button>
           <Button
             asChild
