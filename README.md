@@ -149,17 +149,21 @@ These are used by the email helper in `src/lib/email.ts`.
 ### AI and Workspace
 
 ```env
+AI_PROVIDER=gemini
 OPENAI_API_KEY=
 OPENAI_MODEL=gpt-4o-mini
 ANTHROPIC_API_KEY=
 GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.0-flash
 OS_DEMO_USER_ID=
 ```
 
-- `OPENAI_API_KEY` is used by `src/app/api/ai-chat/route.ts` when present
+- `AI_PROVIDER` is optional and can be `gemini` or `openai`; when omitted, the AI chat route uses Gemini first and OpenAI second
+- `OPENAI_API_KEY` is used by `src/app/api/ai-chat/route.ts` when OpenAI is selected or Gemini is not configured
 - `OPENAI_MODEL` is optional and defaults to `gpt-4o-mini`
-- `ANTHROPIC_API_KEY` remains supported as a fallback for `src/app/api/ai-chat/route.ts` and is used by `src/app/api/os/ai/route.ts`
-- `GEMINI_API_KEY` is used by `src/app/api/ai-chat/test/route.ts` and the Python desktop utility
+- `ANTHROPIC_API_KEY` is used by `src/app/api/os/ai/route.ts`
+- `GEMINI_API_KEY` is used by `src/app/api/ai-chat/route.ts`, `src/app/api/ai-chat/test/route.ts`, and the Python desktop utility
+- `GEMINI_MODEL` is optional and defaults to `gemini-2.0-flash`
 - `OS_DEMO_USER_ID` is an optional fallback for OS file routes when no authenticated session is available
 
 ### Optional CEO Password Script
@@ -266,8 +270,8 @@ Check that `NEXT_PUBLIC_PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_ID`, and `PAYPAL_CLIEN
 Check the relevant keys:
 
 - `OPENAI_API_KEY` for the main AI chat route
-- `ANTHROPIC_API_KEY` for the main AI chat and OS AI endpoints
-- `GEMINI_API_KEY` for the AI test route
+- `GEMINI_API_KEY` for the main AI chat and AI test routes
+- `ANTHROPIC_API_KEY` for the OS AI endpoint
 
 ### Admin login is unavailable
 

@@ -13,13 +13,11 @@ import {
   Code2,
   Copy,
   CreditCard,
-  Database,
   Download,
   FileText,
   Folder,
   Grid2X2,
   ImageIcon,
-  KeyRound,
   Layers3,
   MessageCircle,
   Monitor,
@@ -3316,6 +3314,7 @@ function AIAssistantPage() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [messageFeedback, setMessageFeedback] = useState<Record<string, "like" | "dislike">>({});
+  const [aiProviderLabel, setAiProviderLabel] = useState("Checking AI provider");
   const conversationEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -3335,6 +3334,39 @@ function AIAssistantPage() {
     setActionsOpen(false);
     setIsSending(false);
   }, [temporaryChatId]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadAIStatus = async () => {
+      try {
+        const response = await fetch("/api/ai-chat", { cache: "no-store" });
+        const data = (await response.json()) as { provider?: string; model?: string; configured?: boolean };
+        if (!isMounted) return;
+
+        const providerName =
+          data.provider === "openai"
+            ? "OpenAI"
+            : data.provider === "gemini"
+              ? "Gemini"
+              : "local fallback";
+        const modelName = typeof data.model === "string" && data.model ? ` (${data.model})` : "";
+        setAiProviderLabel(
+          data.configured
+            ? `Connected to ${providerName}${modelName} via /api/ai-chat`
+            : "Using local fallback via /api/ai-chat. Add OPENAI_API_KEY or GEMINI_API_KEY for live AI.",
+        );
+      } catch {
+        if (isMounted) setAiProviderLabel("AI provider status unavailable");
+      }
+    };
+
+    void loadAIStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const closeTemporaryChat = () => {
     setMessages([]);
@@ -3414,7 +3446,7 @@ function AIAssistantPage() {
         {
           id: `assistant-error-${Date.now()}`,
           role: "assistant",
-          content: "I couldn't complete that request. Please check the AI configuration or try again.",
+          content: error instanceof Error ? error.message : "I couldn't complete that request. Please try again.",
         },
       ]);
     } finally {
@@ -3824,7 +3856,7 @@ function AIAssistantPage() {
           )}
           <div ref={conversationEndRef} />
           <div className={`text-center text-[11px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`}>
-            Connected to Gemini via `/api/ai-chat`
+            {aiProviderLabel}
           </div>
         </div>
       </div>
