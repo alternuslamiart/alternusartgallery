@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Box, Gamepad2 } from "lucide-react";
 import { CerevixPage, COBALT } from "@/components/cerevix-shell";
 
 const bridges = [
@@ -23,6 +24,21 @@ const bridges = [
       "Drive website hero scenes, 3D assets, geometry nodes, materials, lighting, and render queues through a signed Blender add-on.",
     verbs: ["build scene", "geometry nodes", "materials", "render assets"],
     install: "Cerevix.ai/bridges/blender.zip",
+  },
+];
+
+const upcomingEngines = [
+  {
+    app: "Unreal Engine",
+    Icon: Box,
+    description: "Create, prototype, and assist with next-generation 3D experiences powered by Cerevix AI.",
+    tags: ["real-time 3D", "prototyping", "worldbuilding"],
+  },
+  {
+    app: "Unity",
+    Icon: Gamepad2,
+    description: "Build smarter interactive apps, games, simulations, and real-time experiences with AI-assisted workflows.",
+    tags: ["interactive apps", "games", "simulation"],
   },
 ];
 
@@ -105,6 +121,142 @@ export default function Bridges() {
                       </Link>
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section style={{ padding: "84px 0", borderTop: `1px solid ${t.faint}`, background: t.isDark ? "#1B1B1B" : t.bg }}>
+            <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
+              <div style={{ maxWidth: 720, marginBottom: 34 }}>
+                <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 18 }}>
+                  ROADMAP / GAME ENGINES
+                </div>
+                <h2 style={{ fontSize: "clamp(34px,5vw,64px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.96, margin: 0, fontStretch: "86%" }}>
+                  Game Engine Workflows - Coming Soon
+                </h2>
+                <p style={{ marginTop: 18, fontSize: 15.5, color: t.muted, maxWidth: 680, lineHeight: 1.65 }}>
+                  Cerevix AI is preparing support for advanced real-time creation workflows across Unreal Engine and Unity.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {upcomingEngines.map(({ app, Icon, description, tags }) => (
+                  <article
+                    key={app}
+                    style={{
+                      position: "relative",
+                      overflow: "hidden",
+                      minHeight: 286,
+                      padding: "30px 30px 26px",
+                      border: `1px solid ${t.isDark ? "rgba(66,132,255,0.22)" : "rgba(66,132,255,0.18)"}`,
+                      borderRadius: 18,
+                      background: t.isDark
+                        ? "linear-gradient(135deg,#262626 0%,#1B1B1B 58%,rgba(66,132,255,0.13) 100%)"
+                        : "linear-gradient(135deg,#ffffff 0%,#F4F6FB 58%,rgba(66,132,255,0.12) 100%)",
+                      boxShadow: t.isDark ? "0 18px 54px rgba(0,0,0,0.24)" : "0 18px 54px rgba(30,64,175,0.08)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        right: -70,
+                        top: -80,
+                        width: 230,
+                        height: 230,
+                        borderRadius: "50%",
+                        background: `radial-gradient(closest-side,${COBALT}25,transparent 72%)`,
+                        pointerEvents: "none",
+                      }}
+                    />
+                    <div style={{ position: "relative", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 18 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                        <div
+                          style={{
+                            width: 48,
+                            height: 48,
+                            borderRadius: 14,
+                            background: `${COBALT}16`,
+                            border: `1px solid ${COBALT}30`,
+                            color: COBALT,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Icon size={22} strokeWidth={1.9} />
+                        </div>
+                        <div>
+                          <h3 style={{ fontSize: 24, fontWeight: 900, letterSpacing: "-0.03em", margin: 0 }}>{app}</h3>
+                          <p style={{ margin: "4px 0 0", fontSize: 11, color: t.muted, fontFamily: "var(--font-geist-mono),monospace" }}>
+                            planned platform capability
+                          </p>
+                        </div>
+                      </div>
+                      <span
+                        style={{
+                          flexShrink: 0,
+                          fontSize: 9,
+                          fontWeight: 800,
+                          letterSpacing: "0.08em",
+                          color: COBALT,
+                          background: `${COBALT}14`,
+                          border: `1px solid ${COBALT}22`,
+                          padding: "5px 8px",
+                          borderRadius: 999,
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Coming Soon
+                      </span>
+                    </div>
+
+                    <p style={{ position: "relative", margin: "26px 0 0", maxWidth: 560, fontSize: 14.5, color: t.muted, lineHeight: 1.65 }}>
+                      {description}
+                    </p>
+
+                    <div style={{ position: "relative", display: "flex", flexWrap: "wrap", gap: 7, marginTop: 22 }}>
+                      {tags.map((tag) => (
+                        <span
+                          key={tag}
+                          style={{
+                            fontSize: 10.5,
+                            fontWeight: 700,
+                            color: t.muted,
+                            background: t.isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.72)",
+                            border: `1px solid ${t.faint}`,
+                            padding: "5px 10px",
+                            borderRadius: 999,
+                            letterSpacing: "0.02em",
+                          }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div style={{ position: "relative", marginTop: 28, paddingTop: 18, borderTop: `1px solid ${t.faint}` }}>
+                      <button
+                        type="button"
+                        disabled
+                        aria-disabled="true"
+                        style={{
+                          height: 40,
+                          padding: "0 16px",
+                          borderRadius: 10,
+                          border: `1px solid ${t.faint}`,
+                          background: t.isDark ? "rgba(255,255,255,0.04)" : "rgba(5,8,15,0.035)",
+                          color: t.muted,
+                          fontSize: 12.5,
+                          fontWeight: 800,
+                          cursor: "not-allowed",
+                          opacity: 0.78,
+                        }}
+                      >
+                        Coming Soon
+                      </button>
+                    </div>
+                  </article>
                 ))}
               </div>
             </div>
