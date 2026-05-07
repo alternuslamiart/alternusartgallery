@@ -1,110 +1,210 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  BarChart3,
   Bot,
+  CheckCircle2,
+  Database,
   Github,
+  Globe2,
+  Layers3,
   Linkedin,
   Menu,
   MessageCircle,
+  MousePointer2,
   Send,
   ShieldCheck,
   Sparkles,
   Twitter,
+  Workflow,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const navLinks = ["Usecases", "Become a partner", "Pricing", "My chatbots", "Account"];
+const navLinks = [
+  { label: "Use cases", href: "#use-cases" },
+  { label: "Features", href: "#features" },
+  { label: "How it works", href: "#how-it-works" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Account", href: "/account" },
+];
+
+const features = [
+  {
+    icon: MessageCircle,
+    title: "24/7 AI support",
+    description: "Resolve repetitive customer questions instantly with grounded answers trained on your business content.",
+  },
+  {
+    icon: Database,
+    title: "Website-trained responses",
+    description: "Turn pages, docs, policies, and product data into a reliable assistant for every visitor.",
+  },
+  {
+    icon: MousePointer2,
+    title: "Lead capture",
+    description: "Qualify intent, collect contact details, and route high-value conversations before visitors leave.",
+  },
+  {
+    icon: Globe2,
+    title: "Multilingual conversations",
+    description: "Support customers across markets with clear responses that feel natural and brand-safe.",
+  },
+  {
+    icon: BarChart3,
+    title: "Visitor insights",
+    description: "See recurring questions, missed content, conversion signals, and support demand from one dashboard.",
+  },
+  {
+    icon: Workflow,
+    title: "Smart workflows",
+    description: "Prepare handoffs, summarize conversations, and keep sales and support teams aligned.",
+  },
+];
+
+const steps = [
+  {
+    label: "01",
+    title: "Connect your website",
+    description: "Import your website, help center, PDFs, product pages, and support content.",
+  },
+  {
+    label: "02",
+    title: "Train Cerevix AI",
+    description: "Cerevix structures your knowledge and prepares source-aware, brand-aligned responses.",
+  },
+  {
+    label: "03",
+    title: "Convert visitors",
+    description: "Answer questions, capture qualified leads, and surface insights for your team.",
+  },
+];
+
+const useCases = ["SaaS support", "Agencies", "Ecommerce", "B2B sales", "Service businesses"];
+
+const footerColumns = [
+  { title: "Product", links: ["Features", "Use cases", "Pricing", "Integrations"] },
+  { title: "Company", links: ["About", "Contact", "Partners", "Blog"] },
+  { title: "Legal", links: ["Privacy Policy", "Terms of Use", "Cookie Notice", "Security"] },
+];
 
 function CerevixLogo() {
   return (
-    <Link href="/" className="flex items-center gap-2" aria-label="Cerevix home">
-      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#4284FF] text-white">
-        <Sparkles className="h-4 w-4 fill-white" />
+    <Link href="/" className="group flex items-center gap-2.5" aria-label="Cerevix AI home">
+      <span className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[#4284FF] text-white shadow-[0_16px_34px_rgba(66,132,255,0.28)]">
+        <span className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.32),transparent_48%)]" />
+        <Sparkles className="relative h-4 w-4 fill-white" />
       </span>
-      <span className="text-[15px] font-black tracking-[-0.02em] text-[#F4F4F1]">Cerevix</span>
+      <span className="text-[15px] font-black tracking-[-0.02em] text-[#F4F4F1]">Cerevix AI</span>
     </Link>
+  );
+}
+
+function GlassShell({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div
+      className={`border border-white/10 bg-white/[0.055] shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl ${className}`}
+    >
+      {children}
+    </div>
   );
 }
 
 function Header() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-[#262626] bg-[#1B1B1B]/86 backdrop-blur-2xl">
-      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5">
+      <GlassShell className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between rounded-[1.35rem] px-4 sm:px-5 lg:px-6">
         <CerevixLogo />
         <nav className="hidden items-center gap-7 md:flex" aria-label="Primary navigation">
           {navLinks.map((link) => (
             <Link
-              key={link}
-              href={link === "Pricing" ? "/pricing" : "#"}
-              className="text-[12px] font-semibold text-[#C1C2BF]/72 transition-colors hover:text-[#4284FF]"
+              key={link.label}
+              href={link.href}
+              className="text-[12px] font-semibold text-[#C1C2BF]/72 transition-colors hover:text-white"
             >
-              {link}
+              {link.label}
             </Link>
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Button asChild className="h-9 rounded-full bg-[#4284FF] px-4 text-[12px] font-bold text-white shadow-none hover:bg-[#3273F2]">
+          <Button
+            asChild
+            className="h-10 rounded-full bg-[#4284FF] px-5 text-[12px] font-black text-white shadow-[0_18px_36px_rgba(66,132,255,0.30)] hover:bg-[#3273F2]"
+          >
             <Link href="/signup">Try Cerevix</Link>
           </Button>
-          <Button variant="ghost" size="icon" className="text-[#C1C2BF] hover:bg-[#262626] hover:text-[#4284FF] md:hidden" aria-label="Open navigation">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full text-[#C1C2BF] hover:bg-white/10 hover:text-white md:hidden"
+            aria-label="Open navigation"
+          >
             <Menu className="h-4 w-4" />
           </Button>
         </div>
-      </div>
+      </GlassShell>
     </header>
   );
 }
 
 function HeroBadge() {
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-[#262626] bg-[#262626] px-3 py-1.5 text-[11px] font-bold text-[#C1C2BF]">
-      <span className="h-1.5 w-1.5 rounded-full bg-[#4284FF]" />
-      Custom ChatGPT trained on your website data
+    <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.065] px-3.5 py-2 text-[11px] font-bold text-[#C1C2BF] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl">
+      <span className="h-1.5 w-1.5 rounded-full bg-[#4284FF] shadow-[0_0_16px_rgba(66,132,255,0.85)]" />
+      Website-trained AI support and lead capture
     </div>
   );
 }
 
 function DashboardMockup() {
-  const sidebar = ["Inbox", "Live chats", "Knowledge", "Leads", "Settings"];
+  const sidebar = ["Inbox", "Live chats", "Knowledge", "Leads", "Insights"];
   const conversations = [
-    { name: "Mila", text: "Can you explain the enterprise plan?", active: true },
-    { name: "Arben", text: "Do you support Albanian and English?", active: false },
-    { name: "Nora", text: "I want pricing for my team.", active: false },
+    { name: "Mila", text: "Can you explain the enterprise plan?", score: "92", active: true },
+    { name: "Arben", text: "Do you support Albanian and English?", score: "78", active: false },
+    { name: "Nora", text: "I want pricing for my team.", score: "84", active: false },
+  ];
+  const metrics = [
+    ["Qualified", "38"],
+    ["Resolved", "91%"],
+    ["Avg reply", "1.4s"],
   ];
 
   return (
-    <div className="relative mx-auto mt-16 w-full max-w-4xl px-3 sm:px-6">
-      <div className="absolute -left-10 top-16 hidden h-44 w-44 rounded-full bg-[#4284FF]/18 blur-3xl md:block" />
-      <div className="absolute -right-8 bottom-2 hidden h-52 w-52 rounded-full bg-[#4284FF]/12 blur-3xl md:block" />
+    <div className="relative mx-auto mt-16 w-full max-w-6xl">
+      <div className="absolute -left-10 top-12 hidden h-72 w-72 rounded-full bg-[#4284FF]/18 blur-3xl lg:block" />
+      <div className="absolute -right-8 bottom-10 hidden h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl lg:block" />
 
-      <div className="relative overflow-hidden rounded-[2rem] border border-[#333333] bg-[#262626]/84 p-3 shadow-none backdrop-blur-xl">
-        <div className="rounded-[1.45rem] border border-[#333333] bg-[#1B1B1B]">
-          <div className="flex items-center justify-between border-b border-[#333333] px-4 py-3">
+      <GlassShell className="relative overflow-hidden rounded-[2.15rem] p-2.5 sm:p-3">
+        <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent" />
+        <div className="overflow-hidden rounded-[1.65rem] border border-white/10 bg-[#111111]/82">
+          <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.035] px-4 py-3">
             <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-red-300" />
-              <span className="h-2.5 w-2.5 rounded-full bg-yellow-300" />
-              <span className="h-2.5 w-2.5 rounded-full bg-green-300" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#FF7A7A]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#F7CF5B]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#66DBA2]" />
             </div>
-            <div className="hidden items-center gap-2 rounded-full bg-[#262626] px-3 py-1 text-[10px] font-bold text-[#C1C2BF]/72 sm:flex">
+            <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.055] px-3 py-1.5 text-[10px] font-bold text-[#C1C2BF] sm:flex">
               <ShieldCheck className="h-3 w-3 text-[#4284FF]" />
               AI assistant online
             </div>
           </div>
 
-          <div className="grid min-h-[390px] grid-cols-1 md:grid-cols-[160px_1fr_190px]">
-            <aside className="hidden border-r border-[#333333] bg-[#262626] p-4 md:block">
-              <div className="mb-5 flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#4284FF] text-white">
-                  <Sparkles className="h-3.5 w-3.5 fill-white" />
+          <div className="grid min-h-[430px] grid-cols-1 lg:grid-cols-[178px_1fr_230px]">
+            <aside className="hidden border-r border-white/10 bg-white/[0.035] p-4 lg:block">
+              <div className="mb-6 flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#4284FF] text-white shadow-[0_12px_28px_rgba(66,132,255,0.24)]">
+                  <Sparkles className="h-4 w-4 fill-white" />
                 </div>
-                <span className="text-[12px] font-black text-[#F4F4F1]">Cerevix</span>
+                <span className="text-[12px] font-black text-white">Cerevix</span>
               </div>
               <div className="space-y-1.5">
                 {sidebar.map((item, index) => (
                   <div
                     key={item}
-                    className={`rounded-xl px-3 py-2 text-[11px] font-semibold ${
-                      index === 1 ? "bg-[#4284FF] text-white" : "text-[#C1C2BF]/68"
+                    className={`rounded-xl px-3 py-2.5 text-[11px] font-semibold transition-colors ${
+                      index === 1
+                        ? "bg-[#4284FF] text-white shadow-[0_12px_26px_rgba(66,132,255,0.28)]"
+                        : "text-[#C1C2BF]/68 hover:bg-white/[0.055]"
                     }`}
                   >
                     {item}
@@ -114,84 +214,97 @@ function DashboardMockup() {
             </aside>
 
             <section className="p-4 sm:p-5">
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4284FF]">Support inbox</p>
-                  <h3 className="mt-1 text-lg font-black tracking-[-0.03em] text-[#F4F4F1]">Website visitors</h3>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#4284FF]">Support inbox</p>
+                  <h3 className="mt-1 text-xl font-black tracking-[-0.04em] text-white">Website visitors</h3>
                 </div>
-                <div className="rounded-full bg-[#4284FF]/14 px-3 py-1 text-[11px] font-bold text-[#4284FF]">12 live now</div>
+                <div className="rounded-full border border-[#4284FF]/25 bg-[#4284FF]/12 px-3 py-1.5 text-[11px] font-bold text-[#8DB5FF]">
+                  12 live now
+                </div>
               </div>
 
-              <div className="grid gap-3 lg:grid-cols-[0.8fr_1.2fr]">
-                <div className="space-y-2">
+              <div className="grid gap-3 xl:grid-cols-[0.82fr_1.18fr]">
+                <div className="space-y-2.5">
                   {conversations.map((item) => (
                     <div
                       key={item.name}
-                      className={`rounded-2xl border p-3 ${
-                        item.active ? "border-[#4284FF]/50 bg-[#4284FF]/12" : "border-[#333333] bg-[#262626]"
+                      className={`rounded-2xl border p-3.5 transition-all ${
+                        item.active
+                          ? "border-[#4284FF]/45 bg-[#4284FF]/12 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                          : "border-white/10 bg-white/[0.045]"
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[12px] font-bold text-[#F4F4F1]">{item.name}</span>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-[12px] font-bold text-white">{item.name}</span>
                         <span className="text-[10px] font-semibold text-[#C1C2BF]/55">2m</span>
                       </div>
-                      <p className="mt-1 line-clamp-2 text-[11px] leading-4 text-[#C1C2BF]/70">{item.text}</p>
+                      <p className="mt-1.5 line-clamp-2 text-[11px] leading-4 text-[#C1C2BF]/72">{item.text}</p>
+                      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/8">
+                        <div className="h-full rounded-full bg-[#4284FF]" style={{ width: `${item.score}%` }} />
+                      </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="rounded-3xl border border-[#333333] bg-[#262626] p-3">
-                  <div className="flex items-center gap-2 border-b border-[#333333] pb-3">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#4284FF] text-[11px] font-black text-white">
+                <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.055] p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                  <div className="flex items-center gap-3 border-b border-white/10 pb-3.5">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#4284FF,#77C8FF)] text-[11px] font-black text-white">
                       M
                     </span>
                     <div>
-                      <p className="text-[12px] font-bold text-[#F4F4F1]">Mila from Berlin</p>
-                      <p className="text-[10px] font-semibold text-[#C1C2BF]/55">Lead score 92</p>
+                      <p className="text-[12px] font-bold text-white">Mila from Berlin</p>
+                      <p className="text-[10px] font-semibold text-[#C1C2BF]/55">Lead score 92 - Pricing page</p>
                     </div>
                   </div>
                   <div className="space-y-3 py-4">
-                    <div className="max-w-[82%] rounded-2xl bg-[#1B1B1B] px-3 py-2 text-[11px] leading-5 text-[#C1C2BF]">
+                    <div className="max-w-[82%] rounded-2xl border border-white/10 bg-[#0F0F0F]/86 px-3 py-2.5 text-[11px] leading-5 text-[#C1C2BF]">
                       How does Cerevix learn our support docs?
                     </div>
-                    <div className="ml-auto max-w-[86%] rounded-2xl bg-[#4284FF] px-3 py-2 text-[11px] leading-5 text-white">
-                      Upload your website, help center, or files. Cerevix turns them into grounded answers with source-aware response rules.
+                    <div className="ml-auto max-w-[88%] rounded-2xl bg-[#4284FF] px-3 py-2.5 text-[11px] leading-5 text-white shadow-[0_16px_34px_rgba(66,132,255,0.22)]">
+                      Upload your website, help center, or files. Cerevix creates grounded answers with source-aware response rules.
                     </div>
-                    <div className="max-w-[78%] rounded-2xl bg-[#1B1B1B] px-3 py-2 text-[11px] leading-5 text-[#C1C2BF]">
+                    <div className="max-w-[76%] rounded-2xl border border-white/10 bg-[#0F0F0F]/86 px-3 py-2.5 text-[11px] leading-5 text-[#C1C2BF]">
                       Great. Can I book a demo?
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 rounded-full border border-[#333333] bg-[#1B1B1B] px-3 py-2">
-                    <span className="flex-1 text-[11px] text-[#C1C2BF]/55">Ask Cerevix to reply...</span>
+                  <div className="flex items-center gap-2 rounded-full border border-white/10 bg-[#0F0F0F]/90 px-3 py-2.5">
+                    <span className="min-w-0 flex-1 truncate text-[11px] text-[#C1C2BF]/55">Ask Cerevix to reply...</span>
                     <Send className="h-3.5 w-3.5 text-[#4284FF]" />
                   </div>
                 </div>
               </div>
             </section>
 
-            <aside className="hidden border-l border-[#333333] bg-[#262626] p-4 md:block">
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#C1C2BF]/55">Visitor summary</p>
+            <aside className="hidden border-l border-white/10 bg-white/[0.035] p-4 lg:block">
+              <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#C1C2BF]/52">Visitor summary</p>
               <div className="mt-4 space-y-3">
                 {[
                   ["Intent", "Enterprise trial"],
                   ["Language", "English"],
                   ["Source", "Pricing page"],
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-2xl border border-[#333333] bg-[#1B1B1B] px-3 py-2">
-                    <p className="text-[10px] font-semibold text-[#C1C2BF]/55">{label}</p>
-                    <p className="mt-1 text-[12px] font-bold text-[#F4F4F1]">{value}</p>
+                  <div key={label} className="rounded-2xl border border-white/10 bg-[#0F0F0F]/70 px-3 py-2.5">
+                    <p className="text-[10px] font-semibold text-[#C1C2BF]/50">{label}</p>
+                    <p className="mt-1 text-[12px] font-bold text-white">{value}</p>
                   </div>
                 ))}
               </div>
-              <Button className="mt-5 h-9 w-full rounded-full bg-[#4284FF] text-[11px] font-bold text-white hover:bg-[#3273F2]">
+              <div className="mt-4 grid grid-cols-1 gap-2">
+                {metrics.map(([label, value]) => (
+                  <div key={label} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.045] px-3 py-2">
+                    <span className="text-[10px] font-semibold text-[#C1C2BF]/58">{label}</span>
+                    <span className="text-[12px] font-black text-white">{value}</span>
+                  </div>
+                ))}
+              </div>
+              <Button className="mt-5 h-10 w-full rounded-full bg-[#4284FF] text-[11px] font-black text-white hover:bg-[#3273F2]">
                 Create lead
               </Button>
             </aside>
           </div>
         </div>
-      </div>
-
-      <div className="pointer-events-none absolute left-1/2 top-[54%] -z-10 h-[360px] w-[780px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(circle_at_center,rgba(66,132,255,0.18),rgba(66,132,255,0.08)_42%,transparent_70%)]" />
+      </GlassShell>
 
       <FloatingChatWidget />
     </div>
@@ -200,44 +313,46 @@ function DashboardMockup() {
 
 function FloatingChatWidget() {
   return (
-    <div className="absolute -bottom-8 right-2 z-20 hidden w-[330px] items-center gap-3 rounded-full border border-[#333333] bg-[#262626] px-3 py-2.5 shadow-none backdrop-blur-xl sm:flex lg:right-0">
-      <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#4284FF] text-white">
+    <GlassShell className="absolute -bottom-7 left-1/2 z-20 hidden w-[min(520px,calc(100%-32px))] -translate-x-1/2 items-center gap-3 rounded-full px-3 py-2.5 sm:flex">
+      <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#4284FF] text-white shadow-[0_14px_28px_rgba(66,132,255,0.26)]">
         <Bot className="h-4 w-4" />
       </span>
-      <span className="min-w-0 flex-1 truncate text-[12px] font-medium text-[#C1C2BF]">How can we help you today?</span>
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#4284FF]/14 text-[#4284FF]">
-        <Send className="h-3.5 w-3.5" />
+      <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-[#C1C2BF]">Ask Cerevix AI how it can qualify leads...</span>
+      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#4284FF]/15 text-[#77A8FF]">
+        <Send className="h-4 w-4" />
       </span>
-    </div>
+    </GlassShell>
   );
 }
 
 function Hero() {
   return (
-    <section className="relative overflow-hidden bg-[#1B1B1B] px-4 pb-28 pt-32 sm:px-6 lg:px-8">
-      <div className="absolute left-1/2 top-10 h-72 w-72 -translate-x-1/2 rounded-full bg-[#4284FF]/16 blur-3xl" />
-      <div className="absolute inset-x-0 bottom-0 h-[360px] overflow-hidden">
-        <div className="absolute left-1/2 top-20 h-[520px] w-[980px] -translate-x-1/2 rounded-[50%] border border-[#262626] bg-[linear-gradient(135deg,rgba(66,132,255,0.14),rgba(38,38,38,0.10))]" />
-        <div className="absolute left-[58%] top-8 h-[430px] w-[650px] -translate-x-1/2 rotate-[-12deg] rounded-[48%] border border-[#262626] bg-[linear-gradient(135deg,rgba(66,132,255,0.10),rgba(38,38,38,0.06))]" />
-      </div>
-
+    <section className="relative overflow-hidden px-4 pb-28 pt-32 sm:px-6 lg:px-8">
+      <div className="absolute left-1/2 top-6 h-[560px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(66,132,255,0.20),rgba(66,132,255,0.08)_36%,transparent_68%)] blur-2xl" />
+      <div className="absolute right-[-12%] top-28 h-80 w-80 rounded-full bg-cyan-300/8 blur-3xl" />
       <div className="relative mx-auto max-w-5xl text-center">
         <HeroBadge />
-        <h1 className="mx-auto mt-5 max-w-4xl text-balance text-[clamp(2.5rem,7vw,5.65rem)] font-black leading-[0.91] tracking-[-0.065em] text-[#F4F4F1]">
-          Your 24/7 AI Support Assistant
-          <span className="block">that helps you grow your business.</span>
+        <h1 className="mx-auto mt-6 max-w-4xl text-balance text-[clamp(2.8rem,7vw,6.2rem)] font-black leading-[0.88] tracking-[-0.068em] text-white">
+          AI customer support that turns visitors into revenue.
         </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-balance text-sm leading-6 text-[#C1C2BF] sm:text-base sm:leading-7">
-          Cerevix is an AI-powered chatbot that handles lead generation and customer support for your business, reducing support workload while delivering fast, personalized replies.
+        <p className="mx-auto mt-6 max-w-2xl text-balance text-[15px] leading-7 text-[#C1C2BF] sm:text-base sm:leading-8">
+          Cerevix AI answers customer questions, captures qualified leads, and learns from your website knowledge so your team can move faster without losing the human touch.
         </p>
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button asChild className="h-11 rounded-full bg-[#4284FF] px-6 text-[13px] font-bold text-white shadow-none hover:bg-[#3273F2]">
+        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Button
+            asChild
+            className="h-12 rounded-full bg-[#4284FF] px-7 text-[13px] font-black text-white shadow-[0_22px_46px_rgba(66,132,255,0.34)] hover:bg-[#3273F2]"
+          >
             <Link href="/signup">
               Try Cerevix <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
-          <Button asChild variant="outline" className="h-11 rounded-full border-[#333333] bg-[#262626] px-6 text-[13px] font-bold text-[#C1C2BF] shadow-none hover:border-[#4284FF] hover:bg-[#262626] hover:text-[#4284FF]">
-            <Link href="/pricing">View pricing</Link>
+          <Button
+            asChild
+            variant="outline"
+            className="h-12 rounded-full border-white/10 bg-white/[0.055] px-7 text-[13px] font-bold text-[#C1C2BF] shadow-none backdrop-blur-xl hover:bg-white/[0.09] hover:text-white"
+          >
+            <Link href="#how-it-works">See how it works</Link>
           </Button>
         </div>
       </div>
@@ -247,75 +362,192 @@ function Hero() {
   );
 }
 
+function FeaturesSection() {
+  return (
+    <section id="features" className="relative px-4 py-24 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div className="max-w-2xl">
+            <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#4284FF]">Features</p>
+            <h2 className="mt-3 text-4xl font-black tracking-[-0.055em] text-white sm:text-5xl">Built for modern support and growth teams.</h2>
+          </div>
+          <p className="max-w-md text-sm leading-6 text-[#C1C2BF]">
+            A polished AI front desk for answering questions, understanding demand, and helping visitors take the next step.
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature) => {
+            const Icon = feature.icon;
+            return (
+              <GlassShell
+                key={feature.title}
+                className="group rounded-[1.5rem] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#4284FF]/35 hover:bg-white/[0.075]"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#4284FF]/18 bg-[#4284FF]/12 text-[#7EAEFF] transition-colors group-hover:bg-[#4284FF] group-hover:text-white">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-5 text-lg font-black tracking-[-0.03em] text-white">{feature.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-[#C1C2BF]">{feature.description}</p>
+              </GlassShell>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HowItWorksSection() {
+  return (
+    <section id="how-it-works" className="relative px-4 py-24 sm:px-6 lg:px-8">
+      <div className="absolute left-0 top-20 h-80 w-80 rounded-full bg-[#4284FF]/10 blur-3xl" />
+      <div className="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+        <div>
+          <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#4284FF]">How it works</p>
+          <h2 className="mt-3 text-4xl font-black tracking-[-0.055em] text-white sm:text-5xl">Launch a trained assistant without a heavy setup cycle.</h2>
+          <p className="mt-5 max-w-xl text-sm leading-7 text-[#C1C2BF]">
+            Cerevix keeps the setup simple: connect content, train the assistant, and start converting conversations into qualified opportunities.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-2">
+            {useCases.map((useCase) => (
+              <span key={useCase} className="rounded-full border border-white/10 bg-white/[0.055] px-3 py-1.5 text-[11px] font-bold text-[#C1C2BF]">
+                {useCase}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid gap-4">
+          {steps.map((step) => (
+            <GlassShell key={step.label} className="rounded-[1.5rem] p-5">
+              <div className="flex gap-5">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#4284FF] text-sm font-black text-white shadow-[0_14px_30px_rgba(66,132,255,0.28)]">
+                  {step.label}
+                </div>
+                <div>
+                  <h3 className="text-lg font-black tracking-[-0.03em] text-white">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#C1C2BF]">{step.description}</p>
+                </div>
+              </div>
+            </GlassShell>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WhySection() {
+  return (
+    <section className="px-4 py-24 sm:px-6 lg:px-8">
+      <GlassShell className="mx-auto grid max-w-7xl gap-8 overflow-hidden rounded-[2rem] p-6 sm:p-8 lg:grid-cols-[0.9fr_1.1fr] lg:p-10">
+        <div>
+          <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#4284FF]">Why Cerevix AI</p>
+          <h2 className="mt-3 text-4xl font-black tracking-[-0.055em] text-white sm:text-5xl">Support automation that still feels premium.</h2>
+          <p className="mt-5 text-sm leading-7 text-[#C1C2BF]">
+            The experience is designed for high-trust customer interactions: clear answers, measured tone, visible context, and clean handoffs.
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {[
+            ["Source-aware answers", "Ground responses in your own business knowledge."],
+            ["Lead intelligence", "Spot intent, urgency, and conversion signals."],
+            ["Human handoff ready", "Summaries keep your team in control."],
+            ["Premium visitor UX", "Fast, polished chat that feels native to your brand."],
+          ].map(([title, description]) => (
+            <div key={title} className="rounded-2xl border border-white/10 bg-[#0F0F0F]/62 p-4">
+              <CheckCircle2 className="h-4 w-4 text-[#4284FF]" />
+              <h3 className="mt-4 text-sm font-black text-white">{title}</h3>
+              <p className="mt-2 text-[12px] leading-5 text-[#C1C2BF]">{description}</p>
+            </div>
+          ))}
+        </div>
+      </GlassShell>
+    </section>
+  );
+}
+
+function CTASection() {
+  return (
+    <section className="px-4 py-24 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-[#4284FF]/25 bg-[linear-gradient(135deg,rgba(66,132,255,0.22),rgba(255,255,255,0.06)_48%,rgba(15,15,15,0.92))] px-6 py-14 text-center shadow-[0_30px_90px_rgba(0,0,0,0.34)] backdrop-blur-2xl sm:px-12">
+        <div className="absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-[#4284FF]/24 blur-3xl" />
+        <div className="relative mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-white">
+          <Zap className="h-6 w-6" />
+        </div>
+        <h2 className="relative mx-auto mt-6 max-w-3xl text-balance text-4xl font-black tracking-[-0.055em] text-white sm:text-6xl">
+          Make every website visit feel handled.
+        </h2>
+        <p className="relative mx-auto mt-5 max-w-2xl text-sm leading-7 text-[#D9DBD6]">
+          Start with instant answers, lead capture, and clear handoffs for the conversations that need your team.
+        </p>
+        <div className="relative mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Button asChild className="h-12 rounded-full bg-white px-7 text-[13px] font-black text-[#1B1B1B] hover:bg-[#EDEFEB]">
+            <Link href="/signup">Try Cerevix</Link>
+          </Button>
+          <Button asChild variant="outline" className="h-12 rounded-full border-white/16 bg-white/8 px-7 text-[13px] font-bold text-white shadow-none hover:bg-white/12 hover:text-white">
+            <Link href="/contact">Book a Demo</Link>
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Footer() {
-  const columns = [
-    {
-      title: "Platform",
-      links: ["Overview", "Bridges", "Agent SDK", "API Reference", "Changelog", "Status"],
-    },
-    {
-      title: "Creative",
-      links: ["Launch Studio", "Edit", "Media library", "FX & 3D", "Boards", "Voice & sound"],
-    },
-    {
-      title: "Company",
-      links: ["About", "Manifesto", "Careers", "Press Kit", "Contact"],
-    },
-    {
-      title: "Legal",
-      links: ["Privacy Policy", "Terms of Use", "Cookie Notice", "Security", "Pricing"],
-    },
-  ];
   const socials = [
     { label: "X", icon: Twitter },
     { label: "GitHub", icon: Github },
     { label: "LinkedIn", icon: Linkedin },
-    { label: "YouTube", icon: MessageCircle },
-    { label: "RSS", icon: Send },
+    { label: "Layers", icon: Layers3 },
   ];
 
   return (
-    <footer className="border-t border-[#333333] bg-[#262626] px-4 py-20 sm:px-6 lg:px-8">
+    <footer className="border-t border-white/10 px-4 py-16 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-4 md:gap-12">
-          {columns.map((column) => (
-            <div key={column.title}>
-              <h3 className="text-[11px] font-medium tracking-[-0.005em] text-[#C1C2BF]/62">{column.title}</h3>
-              <ul className="mt-7 space-y-5">
-                {column.links.map((link) => (
-                  <li key={link}>
-                    <Link href="#" className="text-[14.5px] font-medium tracking-[-0.005em] text-[#C1C2BF] hover:text-[#4284FF]">
-                      {link}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+        <div className="grid gap-10 lg:grid-cols-[1.15fr_2fr]">
+          <div>
+            <CerevixLogo />
+            <p className="mt-4 max-w-sm text-sm leading-6 text-[#C1C2BF]">
+              Cerevix AI helps businesses automate support, capture leads, and answer visitors with trained AI assistants.
+            </p>
+            <div className="mt-6 flex items-center gap-3">
+              {socials.map(({ label, icon: Icon }) => (
+                <Link
+                  key={label}
+                  href="#"
+                  aria-label={label}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.055] text-[#C1C2BF] transition-colors hover:border-[#4284FF]/40 hover:text-[#4284FF]"
+                >
+                  <Icon className="h-4 w-4" />
+                </Link>
+              ))}
             </div>
-          ))}
-        </div>
-
-        <div className="mt-20 flex flex-col gap-6 border-t border-[#333333] pt-7 text-[11.5px] text-[#C1C2BF]/70 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-4">
-            {socials.map(({ label, icon: Icon }) => (
-              <Link key={label} href="#" aria-label={label} className="text-[#C1C2BF]/62 hover:text-[#4284FF]">
-                <Icon className="h-4 w-4" />
-              </Link>
+          </div>
+          <div className="grid gap-8 sm:grid-cols-3">
+            {footerColumns.map((column) => (
+              <div key={column.title}>
+                <h3 className="text-[11px] font-black uppercase tracking-[0.16em] text-white">{column.title}</h3>
+                <ul className="mt-4 space-y-3">
+                  {column.links.map((link) => (
+                    <li key={link}>
+                      <Link href="#" className="text-sm font-medium text-[#C1C2BF] transition-colors hover:text-[#4284FF]">
+                        {link}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 font-extrabold text-[#F4F4F1]">
-              <span className="flex h-[18px] w-[18px] items-center justify-center rounded-[5px] bg-[#4284FF] text-white">
-                <Sparkles className="h-3 w-3 fill-white" />
-              </span>
-              Cerevix
-            </span>
-            <span>&copy; 2026</span>
-            <Link href="/cookie-notice" className="border-b border-dashed border-[#C1C2BF]/30 pb-0.5 hover:text-[#4284FF]">
-              Manage Cookies
-            </Link>
-          </div>
-          <div className="inline-flex h-9 items-center gap-2 self-start rounded-full border border-[#333333] bg-[#1B1B1B] px-4 font-medium text-[#C1C2BF] md:self-auto">
-            English <span className="text-[#C1C2BF]/55">Albania</span>
+        </div>
+        <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-[#C1C2BF]/70 sm:flex-row sm:items-center sm:justify-between">
+          <p>&copy; 2026 Cerevix AI. All rights reserved.</p>
+          <div className="flex flex-wrap items-center gap-4">
+            <Link href="/privacy" className="hover:text-[#4284FF]">Privacy</Link>
+            <Link href="/terms" className="hover:text-[#4284FF]">Terms</Link>
+            <Link href="/cookie-notice" className="hover:text-[#4284FF]">Cookies</Link>
           </div>
         </div>
       </div>
@@ -325,12 +557,20 @@ function Footer() {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[#1B1B1B] font-sans text-[#C1C2BF]">
-      <Header />
-      <main>
-        <Hero />
-      </main>
-      <Footer />
+    <div className="min-h-screen overflow-hidden bg-[#090A0D] font-sans text-[#C1C2BF]">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(66,132,255,0.14),transparent_34%),linear-gradient(180deg,#111318_0%,#090A0D_42%,#0D0D10_100%)]" />
+      <div className="pointer-events-none fixed inset-0 opacity-[0.22] [background-image:linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:80px_80px]" />
+      <div className="relative">
+        <Header />
+        <main>
+          <Hero />
+          <FeaturesSection />
+          <HowItWorksSection />
+          <WhySection />
+          <CTASection />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }
