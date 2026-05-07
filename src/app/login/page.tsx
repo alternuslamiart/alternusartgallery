@@ -1,442 +1,219 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import type { FormEvent } from "react";
 import { useState } from "react";
-import {
-  CerevixLogo,
-  DARK_BG,
-  DARK_BORDER_SOFT,
-  DARK_MUTED,
-  DARK_SURFACE_SOFT,
-  DARK_TEXT,
-  useCerevixMode,
-} from "@/components/cerevix-shell";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { ArrowRight, Lock, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-const COBALT = "#4284FF";
-const INK = "#1F1F1F";
-const PAPER = "#F4F6FB";
+const STUDIO_HOME = "/ai-assistant";
 
-const socialProviders = [
+type OAuthProvider = "google" | "github" | "discord";
+
+const socialProviders: Array<{
+  id: OAuthProvider;
+  label: string;
+  icon: JSX.Element;
+}> = [
   {
     id: "google",
     label: "Continue with Google",
-    icon: "M21.35 11.1h-9.2v2.96h5.28c-.23 1.23-1.54 3.6-5.28 3.6-3.18 0-5.78-2.63-5.78-5.87s2.6-5.87 5.78-5.87c1.8 0 3.02.77 3.72 1.43l2.54-2.44C16.46 3.55 14.5 2.7 12.15 2.7 6.96 2.7 2.77 6.9 2.77 12.1s4.19 9.4 9.38 9.4c5.41 0 9-3.8 9-9.14 0-.62-.07-1.08-.15-1.26z",
+    icon: (
+      <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+      </svg>
+    ),
   },
   {
     id: "github",
     label: "Continue with GitHub",
-    icon: "M12 2a10 10 0 00-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.12-1.47-1.12-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.1.39-2 1.03-2.7-.1-.26-.45-1.29.1-2.68 0 0 .84-.27 2.75 1.03a9.57 9.57 0 015 0c1.91-1.3 2.75-1.03 2.75-1.03.55 1.39.2 2.42.1 2.68.64.7 1.03 1.6 1.03 2.7 0 3.85-2.34 4.7-4.57 4.94.36.31.68.92.68 1.86v2.76c0 .27.18.58.69.48A10 10 0 0012 2z",
+    icon: (
+      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.49 0-.24-.01-1.04-.01-1.89-2.78.62-3.37-1.22-3.37-1.22-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.56 2.34 1.11 2.91.85.09-.67.35-1.11.64-1.37-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.04 1.03-2.76-.1-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.05A9.35 9.35 0 0 1 12 6.95c.85 0 1.71.12 2.51.35 1.9-1.33 2.74-1.05 2.74-1.05.55 1.41.2 2.46.1 2.72.64.72 1.03 1.64 1.03 2.76 0 3.95-2.34 4.82-4.57 5.08.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.8 0 .27.18.59.69.49A10.08 10.08 0 0 0 22 12.26C22 6.58 17.52 2 12 2Z" />
+      </svg>
+    ),
   },
   {
-    id: "sso",
-    label: "Continue with SSO",
-    icon: "M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z",
+    id: "discord",
+    label: "Continue with Discord",
+    icon: (
+      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M20.32 4.37A19.79 19.79 0 0 0 16.55 3c-.16.29-.35.68-.48.99a18.27 18.27 0 0 0-8.14 0c-.13-.31-.32-.7-.48-.99a19.74 19.74 0 0 0-3.77 1.37C1.29 7.96.61 11.46.93 14.9a19.9 19.9 0 0 0 6 3.05c.48-.65.91-1.34 1.28-2.07-.71-.27-1.4-.6-2.05-1 .17-.13.34-.26.5-.4 3.92 1.82 8.17 1.82 12.04 0 .17.14.33.27.5.4-.65.4-1.34.73-2.05 1 .37.73.8 1.42 1.28 2.07a19.9 19.9 0 0 0 6-3.05c.39-4-.67-7.47-3.11-10.53ZM8.68 12.78c-1.18 0-2.15-1.1-2.15-2.44s.95-2.44 2.15-2.44c1.2 0 2.17 1.1 2.15 2.44 0 1.34-.95 2.44-2.15 2.44Zm6.64 0c-1.18 0-2.15-1.1-2.15-2.44s.95-2.44 2.15-2.44c1.2 0 2.17 1.1 2.15 2.44 0 1.34-.95 2.44-2.15 2.44Z" />
+      </svg>
+    ),
   },
 ];
 
-export default function Login() {
+function CerevixMark() {
+  return (
+    <span className="relative inline-flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#068fff]" aria-hidden="true">
+      <span className="absolute inset-[4px] rounded-full border-[3px] border-[#071014] border-r-white/0 border-t-white/0" />
+      <span className="absolute right-[6px] top-[5px] h-2 w-2 rounded-full bg-[#071014]" />
+      <span className="absolute left-[7px] top-[7px] h-2.5 w-2.5 rounded-full bg-[#071014]" />
+    </span>
+  );
+}
+
+function Brand() {
+  return (
+    <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Cerevix home">
+      <CerevixMark />
+      <span className="text-[1.35rem] font-semibold tracking-[-0.03em] text-white">Cerevix</span>
+    </Link>
+  );
+}
+
+export default function LoginPage() {
   const router = useRouter();
-  const [isDark, setIsDark] = useCerevixMode();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
-  const [pw, setPw] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const callbackUrl = searchParams.get("callbackUrl") || STUDIO_HOME;
 
-  const bg = isDark ? DARK_BG : PAPER;
-  const fg = isDark ? DARK_TEXT : INK;
-  const muted = isDark ? DARK_MUTED : "rgba(15,23,42,0.58)";
-  const faint = isDark ? DARK_BORDER_SOFT : "rgba(15,23,42,0.1)";
-  const line = isDark ? "rgba(255,255,255,0.08)" : "rgba(66,132,255,0.1)";
-  const surface = isDark ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.86)";
-  const card = isDark ? "rgba(31,31,35,0.98)" : "rgba(255,255,255,0.94)";
-  const field = isDark ? "rgba(255,255,255,0.035)" : "rgba(245,247,252,0.92)";
-  const softShadow = isDark ? "0 18px 48px rgba(0,0,0,0.18)" : "0 24px 60px rgba(66,132,255,0.12)";
-  const cardShadow = isDark ? "0 24px 72px rgba(0,0,0,0.22)" : "0 30px 90px rgba(66,132,255,0.15)";
-  const ctaShadow = isDark ? "0 18px 36px rgba(66,132,255,0.18)" : "0 18px 34px rgba(66,132,255,0.24)";
+  const handleOAuthSignIn = (provider: OAuthProvider) => {
+    signIn(provider, { callbackUrl: STUDIO_HOME });
+  };
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErr(null);
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      if (!email || !pw) {
-        setErr("Email and password are required.");
-        return;
-      }
-      router.push("/main");
-    }, 600);
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+
+    setIsSubmitting(false);
+
+    if (result?.error) {
+      setError("Email or password is incorrect.");
+      return;
+    }
+
+    router.replace(callbackUrl);
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: bg,
-        color: fg,
-        fontFamily:
-          "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      <style>{`
-        @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .6; transform: scale(.92); } }
-        .login-grid {
-          background-image:
-            linear-gradient(rgba(66,132,255,0.06) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(66,132,255,0.06) 1px, transparent 1px);
-          background-size: 64px 64px;
-        }
-        .login-pulse { animation: pulse 2s ease-in-out infinite; }
-      `}</style>
-
-      <div
-        className="login-grid"
-        style={{
-          position: "absolute",
-          inset: 0,
-          opacity: isDark ? 0.18 : 1,
-          maskImage: "radial-gradient(circle at center, black 32%, transparent 88%)",
-          WebkitMaskImage: "radial-gradient(circle at center, black 32%, transparent 88%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-          style={{
-            position: "absolute",
-            inset: "auto auto 10% 8%",
-            width: 320,
-            height: 320,
-            borderRadius: "50%",
-            background: isDark
-              ? "radial-gradient(circle, rgba(66,132,255,0.08), transparent 70%)"
-              : "radial-gradient(circle, rgba(66,132,255,0.16), transparent 72%)",
-            filter: "blur(30px)",
-            pointerEvents: "none",
-          }}
-        />
-      <div
-          style={{
-            position: "absolute",
-            inset: "8% 8% auto auto",
-            width: 280,
-            height: 280,
-            borderRadius: "50%",
-            background: isDark
-              ? "radial-gradient(circle, rgba(113,157,255,0.06), transparent 70%)"
-              : "radial-gradient(circle, rgba(113,157,255,0.16), transparent 72%)",
-            filter: "blur(26px)",
-            pointerEvents: "none",
-          }}
-        />
-
-      <header
-        style={{
-          position: "relative",
-          zIndex: 1,
-          padding: "24px 28px 0",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
-        }}
-      >
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <CerevixLogo size={28} radius={8} />
-          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg }}>Cerevix</span>
+    <div className="min-h-screen overflow-hidden bg-[#0f0f11] font-roboto text-zinc-100">
+      <div className="pointer-events-none fixed inset-x-0 top-0 h-[520px] bg-[radial-gradient(ellipse_at_top,rgba(6,143,255,0.18),rgba(15,15,17,0)_62%)]" />
+      <header className="relative z-10 mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
+        <Brand />
+        <Link href="/signup" className="text-xs font-semibold text-zinc-400 transition-colors hover:text-white">
+          Create account
         </Link>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Link href="/signup" style={{ fontSize: 13, fontWeight: 700, color: COBALT, textDecoration: "none" }}>
-            Create account
-          </Link>
-          <button
-            onClick={() => setIsDark((value) => !value)}
-            style={{
-              width: 38,
-              height: 38,
-              border: `1px solid ${faint}`,
-              background: isDark ? DARK_SURFACE_SOFT : surface,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: muted,
-              borderRadius: 12,
-              backdropFilter: "blur(18px)",
-            }}
-            aria-label="Toggle theme"
-          >
-            {isDark ? (
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="4" />
-                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-              </svg>
-            ) : (
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-              </svg>
-            )}
-          </button>
-        </div>
       </header>
 
-      <main
-        style={{
-          position: "relative",
-          zIndex: 1,
-          minHeight: "calc(100vh - 76px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "28px 20px 48px",
-        }}
-      >
-        <div style={{ width: "100%", maxWidth: 1120, position: "relative" }}>
-          <div
-              className="hidden xl:block"
-              style={{
-                position: "absolute",
-                left: 0,
-                top: "50%",
-                transform: "translateY(-50%)",
-                width: 260,
-                border: `1px solid ${line}`,
-                borderRadius: 28,
-                background: surface,
-                padding: 22,
-                backdropFilter: "blur(18px)",
-                boxShadow: softShadow,
-              }}
-          >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-              <span style={{ fontSize: 10, letterSpacing: "0.18em", fontWeight: 700, color: muted }}>LIVE STATUS</span>
-              <span className="login-pulse" style={{ width: 9, height: 9, borderRadius: "50%", background: "#22C55E" }} />
-            </div>
-            <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.02 }}>
-              Claude Opus 4.6
-            </div>
-            <p style={{ marginTop: 10, marginBottom: 0, fontSize: 13.5, lineHeight: 1.6, color: muted }}>
-              Mail, files, prompts and context are where you left them.
+      <main className="relative z-10 flex min-h-[calc(100vh-80px)] items-center justify-center px-5 pb-16 pt-8">
+        <Card className="w-full max-w-md rounded-[24px] border border-white/[0.12] bg-[#151618]/92 text-white shadow-none backdrop-blur-xl">
+          <CardHeader className="space-y-3 p-7 text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Cerevix workspace</p>
+            <h1 className="text-4xl font-semibold tracking-[-0.05em]">Sign in</h1>
+            <p className="mx-auto max-w-xs text-sm leading-6 text-zinc-400">
+              Open your AI platform studio for code, 3D, and technical workflows.
             </p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginTop: 18 }}>
-              {[
-                ["200ms", "Latency"],
-                ["99.9%", "Uptime"],
-                ["10k+", "Users"],
-              ].map(([value, label]) => (
-                <div key={label} style={{ borderTop: `1px solid ${faint}`, paddingTop: 10 }}>
-                  <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em" }}>{value}</div>
-                  <div style={{ fontSize: 9, color: muted, letterSpacing: "0.14em", marginTop: 3 }}>
-                    {label.toUpperCase()}
-                  </div>
-                </div>
+          </CardHeader>
+          <CardContent className="space-y-5 p-7 pt-0">
+            <div className="grid gap-2.5">
+              {socialProviders.map((provider) => (
+                <Button
+                  key={provider.id}
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleOAuthSignIn(provider.id)}
+                  className="h-11 rounded-[10px] border-white/12 bg-white/[0.04] text-sm font-semibold text-zinc-100 shadow-none hover:border-[#068fff]/45 hover:bg-white/[0.07] hover:text-white"
+                >
+                  {provider.icon}
+                  {provider.label}
+                </Button>
               ))}
             </div>
-          </div>
 
-          <div style={{ margin: "0 auto", width: "100%", maxWidth: 520 }}>
-            <div
-              style={{
-                border: `1px solid ${line}`,
-                borderRadius: 32,
-                background: card,
-                backdropFilter: "blur(20px)",
-                boxShadow: cardShadow,
-                padding: 32,
-              }}
-            >
-              <div style={{ marginBottom: 26, textAlign: "center" }}>
-                <div style={{ fontSize: 11, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 14 }}>
-                  LOGIN / WORKSPACE
-                </div>
-                <h1
-                  style={{
-                    fontSize: "clamp(34px,4vw,48px)",
-                    fontWeight: 900,
-                    letterSpacing: "-0.045em",
-                    lineHeight: 0.92,
-                    margin: 0,
-                  }}
-                >
-                  Sign in to Cerevix.
-                </h1>
-                <p style={{ margin: "14px auto 0", maxWidth: 360, fontSize: 14.5, lineHeight: 1.6, color: muted }}>
-                  Centered, quieter, and ready to get you back into the workspace.
-                </p>
-              </div>
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-white/[0.09]" />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">or email</span>
+              <div className="h-px flex-1 bg-white/[0.09]" />
+            </div>
 
-              <div style={{ display: "grid", gap: 10 }}>
-                {socialProviders.map((provider) => (
-                  <button
-                    key={provider.id}
-                    onClick={() => router.push("/main")}
-                    style={{
-                      height: 50,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 12,
-                      background: surface,
-                      border: `1px solid ${faint}`,
-                      borderRadius: 16,
-                      cursor: "pointer",
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: fg,
-                      letterSpacing: "-0.01em",
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <path d={provider.icon} />
-                    </svg>
-                    {provider.label}
-                  </button>
-                ))}
-              </div>
-
-              <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "24px 0 18px" }}>
-                <div style={{ flex: 1, height: 1, background: faint }} />
-                <span style={{ fontSize: 10.5, color: muted, letterSpacing: "0.16em", fontWeight: 700 }}>OR WITH EMAIL</span>
-                <div style={{ flex: 1, height: 1, background: faint }} />
-              </div>
-
-              <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                <label style={{ display: "grid", gap: 8 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: muted }}>WORK EMAIL</span>
-                  <input
-                    required
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-xs font-medium text-zinc-300">
+                  Email
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                  <Input
+                    id="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@work.com"
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="you@company.com"
                     autoComplete="email"
-                    style={{
-                      height: 54,
-                      borderRadius: 16,
-                      border: `1px solid ${faint}`,
-                      background: field,
-                      padding: "0 16px",
-                      outline: "none",
-                      color: fg,
-                      fontSize: 15,
-                    }}
-                  />
-                </label>
-
-                <label style={{ display: "grid", gap: 8 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: muted }}>PASSWORD</span>
-                  <input
                     required
-                    type="password"
-                    value={pw}
-                    onChange={(e) => setPw(e.target.value)}
-                    placeholder="Enter your password"
-                    autoComplete="current-password"
-                    style={{
-                      height: 54,
-                      borderRadius: 16,
-                      border: `1px solid ${faint}`,
-                      background: field,
-                      padding: "0 16px",
-                      outline: "none",
-                      color: fg,
-                      fontSize: 15,
-                    }}
+                    className="h-11 rounded-[10px] border-white/10 bg-black/20 pl-9 text-sm text-white shadow-none placeholder:text-zinc-600 focus-visible:ring-[#068fff]"
                   />
-                </label>
+                </div>
+              </div>
 
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginTop: 2 }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                    <input type="checkbox" style={{ width: 14, height: 14, accentColor: COBALT }} />
-                    <span style={{ fontSize: 12.5, color: muted }}>Keep me signed in</span>
-                  </label>
-                  <Link href="/reset-password" style={{ fontSize: 12.5, color: COBALT, textDecoration: "none", fontWeight: 700 }}>
-                    Forgot password?
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-xs font-medium text-zinc-300">
+                    Password
+                  </Label>
+                  <Link href="/reset-password" className="text-xs font-medium text-[#8fccff] hover:text-white">
+                    Forgot?
                   </Link>
                 </div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                    required
+                    className="h-11 rounded-[10px] border-white/10 bg-black/20 pl-9 text-sm text-white shadow-none placeholder:text-zinc-600 focus-visible:ring-[#068fff]"
+                  />
+                </div>
+              </div>
 
-                {err ? (
-                  <div
-                    style={{
-                      padding: "12px 14px",
-                      fontSize: 12.5,
-                      color: "#DC2626",
-                      background: isDark ? "rgba(248,113,113,0.10)" : "rgba(248,113,113,0.08)",
-                      border: "1px solid rgba(248,113,113,0.22)",
-                      borderRadius: 14,
-                    }}
-                  >
-                    {err}
-                  </div>
-                ) : null}
+              {error ? (
+                <p className="rounded-[10px] border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+                  {error}
+                </p>
+              ) : null}
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                    style={{
-                      marginTop: 6,
-                      height: 54,
-                      background: "linear-gradient(135deg, #4284FF 0%, #2F6CF1 100%)",
-                      color: "#FFF",
-                    fontSize: 14,
-                    fontWeight: 800,
-                    letterSpacing: "-0.01em",
-                    border: "none",
-                      borderRadius: 16,
-                      cursor: loading ? "not-allowed" : "pointer",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      opacity: loading ? 0.72 : 1,
-                      boxShadow: ctaShadow,
-                    }}
-                  >
-                  {loading ? "Signing in..." : "Sign in"}
-                </button>
-              </form>
-
-              <div
-                style={{
-                  marginTop: 24,
-                  paddingTop: 18,
-                  borderTop: `1px solid ${faint}`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 16,
-                  flexWrap: "wrap",
-                  fontSize: 12.5,
-                  color: muted,
-                }}
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="h-11 w-full rounded-[10px] bg-[#068fff] text-sm font-semibold text-white shadow-none hover:bg-[#1b9dff]"
               >
-                <span>
-                  Need an account?{" "}
-                  <Link href="/signup" style={{ color: COBALT, fontWeight: 700, textDecoration: "none" }}>
-                    Sign up free
-                  </Link>
-                </span>
-                <Link href="/contact" style={{ color: muted, textDecoration: "none" }}>
-                  Having trouble?
-                </Link>
-              </div>
+                {isSubmitting ? "Signing in..." : "Sign in to Studio"}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </form>
 
-              <div style={{ marginTop: 16, fontSize: 11, color: muted, lineHeight: 1.6, textAlign: "center" }}>
-                By continuing, you agree to our{" "}
-                <Link href="/terms" style={{ color: muted, textDecoration: "underline" }}>
-                  Terms
-                </Link>{" "}
-                and{" "}
-                <Link href="/privacy" style={{ color: muted, textDecoration: "underline" }}>
-                  Privacy Policy
-                </Link>
-                .
-              </div>
-            </div>
-          </div>
-        </div>
+            <p className="text-center text-xs text-zinc-500">
+              New to Cerevix?{" "}
+              <Link href="/signup" className="font-semibold text-zinc-200 hover:text-white">
+                Create an account
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
