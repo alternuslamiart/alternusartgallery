@@ -118,22 +118,22 @@ export default function RootLayout({
           __html: `
             html[data-cerevix-theme="dark"],
             .dark {
-              --background: 240 5% 8%;
-              --foreground: 240 11% 96%;
-              --card: 240 6% 13%;
-              --card-foreground: 240 11% 96%;
-              --popover: 240 6% 13%;
-              --popover-foreground: 240 11% 96%;
+              --background: 0 0% 11%;
+              --foreground: 80 2% 75%;
+              --card: 0 0% 15%;
+              --card-foreground: 80 2% 75%;
+              --popover: 0 0% 15%;
+              --popover-foreground: 80 2% 75%;
               --primary: 218 100% 63%;
               --primary-foreground: 0 0% 100%;
-              --secondary: 240 5% 15%;
-              --secondary-foreground: 240 11% 96%;
-              --muted: 240 5% 15%;
-              --muted-foreground: 240 5% 70%;
-              --accent: 240 5% 15%;
-              --accent-foreground: 240 11% 96%;
-              --border: 240 5% 25%;
-              --input: 240 5% 25%;
+              --secondary: 0 0% 15%;
+              --secondary-foreground: 80 2% 75%;
+              --muted: 0 0% 15%;
+              --muted-foreground: 80 2% 75%;
+              --accent: 0 0% 15%;
+              --accent-foreground: 80 2% 75%;
+              --border: 0 0% 20%;
+              --input: 0 0% 20%;
               --ring: 218 100% 63%;
             }
             html[data-cerevix-theme="dark"] *,
