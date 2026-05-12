@@ -797,7 +797,8 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
           <section
             className={[
-              "min-h-0 flex-1 overflow-auto rounded-3xl",
+              "min-h-0 flex-1 rounded-3xl",
+              activeRoute === "ai-assistant" ? "overflow-hidden flex flex-col" : "overflow-auto",
               activeRoute === "code-builder" ? "px-4 py-4" : "px-8 py-8",
               dark
                 ? "border border-[rgba(255,255,255,0.08)] bg-[#17191D] shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
@@ -805,7 +806,13 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
               activeRoute === "ai-assistant" ? "max-sm:px-4 max-sm:py-0" : "",
             ].join(" ")}
           >
-            <div className={activeRoute === "code-builder" ? "w-full" : "mx-auto w-full max-w-[1180px]"}>
+            <div className={
+              activeRoute === "ai-assistant"
+                ? "mx-auto flex min-h-0 w-full max-w-[1180px] flex-1 flex-col"
+                : activeRoute === "code-builder"
+                  ? "w-full"
+                  : "mx-auto w-full max-w-[1180px]"
+            }>
               {children}
             </div>
           </section>
@@ -4173,9 +4180,9 @@ function AIAssistantPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-[900px] flex-col justify-end">
-      <div className="flex flex-1 flex-col justify-end pb-6">
-        <div className="mb-8 flex flex-1 flex-col justify-end gap-5">
+    <div className="mx-auto flex h-full w-full max-w-[900px] flex-col">
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="flex min-h-full flex-col justify-end gap-5 pb-4">
           {temporaryChatNotice}
           {messages.map((message) => (
             <div key={message.id} className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -4287,7 +4294,9 @@ function AIAssistantPage() {
         </div>
       </div>
 
-      {composer}
+      <div className="pb-6 pt-3">
+        {composer}
+      </div>
     </div>
   );
 }
