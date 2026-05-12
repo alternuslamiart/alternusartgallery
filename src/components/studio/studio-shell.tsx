@@ -3422,11 +3422,11 @@ const workflowStarters: StarterCard[] = [
 function StarterPanel({
   mode,
   dark,
-  onSelect,
+  onOpen,
 }: {
   mode: "agent" | "workflow";
   dark: boolean;
-  onSelect: (prompt: string) => void;
+  onOpen: (card: StarterCard) => void;
 }) {
   const cards = mode === "agent" ? agentStarters : workflowStarters;
   const heading = mode === "agent" ? "Start building from scratch" : "Start a new workflow";
@@ -3444,7 +3444,7 @@ function StarterPanel({
             <button
               key={card.title}
               type="button"
-              onClick={() => onSelect(card.prompt)}
+              onClick={() => onOpen(card)}
               className={`group flex flex-col rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${cardBase}`}
             >
               <span className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${card.gradient} ${card.iconColor}`}>
@@ -3464,6 +3464,238 @@ function StarterPanel({
   );
 }
 
+function CardDetailView({
+  card,
+  dark,
+  onBack,
+  onLaunch,
+}: {
+  card: StarterCard;
+  dark: boolean;
+  onBack: () => void;
+  onLaunch: (prompt: string) => void;
+}) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [trigger, setTrigger] = useState<"manual" | "scheduled" | "event">("manual");
+  const [schedule, setSchedule] = useState("daily");
+  const [capabilities, setCapabilities] = useState<string[]>([]);
+  const [target, setTarget] = useState("");
+  const [runMode, setRunMode] = useState<"interactive" | "headless">("interactive");
+  const [sourceApp, setSourceApp] = useState("");
+  const [destApp, setDestApp] = useState("");
+
+  const Icon = card.icon;
+
+  const buildPrompt = () => {
+    switch (card.title) {
+      case "Create workflow":
+        return `Help me create a workflow named "${name || "My Workflow"}" that ${description || "automates a business process"}. Trigger type: ${trigger}.`;
+      case "Create autonomous agent":
+        return `Build an autonomous agent named "${name || "My Agent"}" to ${description || "handle tasks automatically"}. Capabilities: ${capabilities.length ? capabilities.join(", ") : "general purpose"}.`;
+      case "Computer-using agent":
+        return `Set up a computer-using agent to control "${target || "a web app"}". Task: ${description || "perform automated actions"}. Run mode: ${runMode}.`;
+      case "Blank workflow":
+        return `Design a blank workflow named "${name || "My Workflow"}"${description ? ` for: ${description}` : ""}. I will define each step myself.`;
+      case "Scheduled run":
+        return `Create a scheduled workflow named "${name || "My Schedule"}" that runs ${schedule} and performs: ${description || "a recurring task"}.`;
+      case "Connect apps":
+        return `Connect ${sourceApp || "App A"} to ${destApp || "App B"} and transfer or sync: ${description || "relevant data between them"}.`;
+      default:
+        return `${card.prompt} ${description}`.trim();
+    }
+  };
+
+  const containerClass = dark
+    ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_18px_42px_rgba(0,0,0,0.22)]"
+    : "border-[#E5E7EB] bg-white shadow-[0_18px_42px_rgba(31,43,77,0.06)]";
+  const labelClass = `mb-1.5 block text-[11px] font-semibold ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`;
+  const inputClass = `h-10 w-full rounded-xl border px-3 text-[12px] outline-none transition-colors ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#4B5563] focus:border-[#3BA7FF]" : "border-[#E5EAF0] bg-[#FAFBFC] text-[#171717] placeholder:text-[#A1A7B0] focus:border-[#4A9BFF]"}`;
+  const textareaClass = `w-full resize-none rounded-xl border px-3 py-2.5 text-[12px] outline-none transition-colors ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#4B5563] focus:border-[#3BA7FF]" : "border-[#E5EAF0] bg-[#FAFBFC] text-[#171717] placeholder:text-[#A1A7B0] focus:border-[#4A9BFF]"}`;
+  const chipBase = (active: boolean) =>
+    `h-7 rounded-full px-3 text-[11px] font-medium transition-all ${active ? "bg-[#1D9BF0] text-white shadow-[0_4px_12px_rgba(29,155,240,0.28)]" : dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:text-[#F4F6F8]" : "border border-[#E5EAF0] bg-[#FAFBFC] text-[#4B5563] hover:border-[#CFE8F8]"}`;
+
+  const renderFields = () => {
+    switch (card.title) {
+      case "Create workflow":
+        return (
+          <>
+            <div>
+              <label className={labelClass}>Workflow name</label>
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="My Workflow" className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>What should this workflow do?</label>
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe what this workflow automates..." rows={3} className={textareaClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Trigger type</label>
+              <div className="flex gap-2">
+                {(["manual", "scheduled", "event"] as const).map((t) => (
+                  <button key={t} type="button" onClick={() => setTrigger(t)} className={chipBase(trigger === t)}>
+                    {t.charAt(0).toUpperCase() + t.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        );
+
+      case "Create autonomous agent":
+        return (
+          <>
+            <div>
+              <label className={labelClass}>Agent name</label>
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="My Agent" className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>What goal should this agent accomplish?</label>
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the agent's goal and tasks..." rows={3} className={textareaClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Capabilities</label>
+              <div className="flex flex-wrap gap-2">
+                {["Web browsing", "Code execution", "File management", "API calls", "Email"].map((cap) => {
+                  const active = capabilities.includes(cap);
+                  return (
+                    <button key={cap} type="button" onClick={() => setCapabilities((prev) => active ? prev.filter((c) => c !== cap) : [...prev, cap])} className={chipBase(active)}>
+                      {cap}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        );
+
+      case "Computer-using agent":
+        return (
+          <>
+            <div>
+              <label className={labelClass}>Target app or URL</label>
+              <input value={target} onChange={(e) => setTarget(e.target.value)} placeholder="https://example.com or app name" className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Task description</label>
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe what the agent should do on this app..." rows={3} className={textareaClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Run mode</label>
+              <div className="flex gap-2">
+                {(["interactive", "headless"] as const).map((m) => (
+                  <button key={m} type="button" onClick={() => setRunMode(m)} className={chipBase(runMode === m)}>
+                    {m.charAt(0).toUpperCase() + m.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        );
+
+      case "Blank workflow":
+        return (
+          <>
+            <div>
+              <label className={labelClass}>Workflow name</label>
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="My Workflow" className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Description (optional)</label>
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What will this workflow do?" rows={3} className={textareaClass} />
+            </div>
+          </>
+        );
+
+      case "Scheduled run":
+        return (
+          <>
+            <div>
+              <label className={labelClass}>Workflow name</label>
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="My Schedule" className={inputClass} />
+            </div>
+            <div>
+              <label className={labelClass}>Run frequency</label>
+              <div className="flex flex-wrap gap-2">
+                {["Hourly", "Daily", "Weekly", "Monthly", "Custom"].map((s) => (
+                  <button key={s} type="button" onClick={() => setSchedule(s.toLowerCase())} className={chipBase(schedule === s.toLowerCase())}>
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className={labelClass}>What should run?</label>
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the task to run on schedule..." rows={3} className={textareaClass} />
+            </div>
+          </>
+        );
+
+      case "Connect apps":
+        return (
+          <>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelClass}>Source app</label>
+                <input value={sourceApp} onChange={(e) => setSourceApp(e.target.value)} placeholder="e.g. Slack, Gmail" className={inputClass} />
+              </div>
+              <div>
+                <label className={labelClass}>Destination app</label>
+                <input value={destApp} onChange={(e) => setDestApp(e.target.value)} placeholder="e.g. Notion, Sheets" className={inputClass} />
+              </div>
+            </div>
+            <div>
+              <label className={labelClass}>What data should move?</label>
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe what data to sync or transform..." rows={3} className={textareaClass} />
+            </div>
+          </>
+        );
+
+      default:
+        return (
+          <div>
+            <label className={labelClass}>Describe your goal</label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What do you want to accomplish?" rows={4} className={textareaClass} />
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="w-full">
+      <button
+        type="button"
+        onClick={onBack}
+        className={`mb-4 inline-flex items-center gap-1.5 text-[11px] font-medium transition-colors ${dark ? "text-[#A8B0BA] hover:text-[#F4F6F8]" : "text-[#6B7280] hover:text-[#171717]"}`}
+      >
+        <ChevronLeft className="h-3.5 w-3.5" />
+        Back
+      </button>
+      <div className={`w-full rounded-3xl border p-5 ${containerClass}`}>
+        <div className="mb-5 flex items-center gap-3">
+          <span className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${card.gradient} ${card.iconColor}`}>
+            <Icon className="h-5 w-5" />
+          </span>
+          <div>
+            <p className={`text-[14px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{card.title}</p>
+            <p className={`text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{card.description}</p>
+          </div>
+        </div>
+        <div className="flex flex-col gap-4">
+          {renderFields()}
+          <button
+            type="button"
+            onClick={() => onLaunch(buildPrompt())}
+            className="mt-1 flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-[#1D9BF0] text-[12px] font-semibold text-white shadow-[0_8px_20px_rgba(29,155,240,0.28)] transition-all hover:bg-[#1A8CD8] active:scale-[0.98]"
+          >
+            <Sparkles className="h-3.5 w-3.5 fill-current" />
+            Launch with AI
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AIAssistantPage() {
   const router = useRouter();
   const { theme } = useStudioTheme();
@@ -3472,6 +3704,7 @@ function AIAssistantPage() {
   const [messages, setMessages] = useState<Array<{ id: string; role: "user" | "assistant"; content: string }>>([]);
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<"agent" | "workflow">("agent");
+  const [selectedCard, setSelectedCard] = useState<StarterCard | null>(null);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isSending, setIsSending] = useState(false);
@@ -3554,13 +3787,13 @@ function AIAssistantPage() {
     event.target.value = "";
   };
 
-  const sendPrompt = async () => {
-    if (!input.trim()) {
+  const sendPrompt = async (promptOverride?: string) => {
+    const prompt = (promptOverride !== undefined ? promptOverride : input).trim();
+    if (!prompt) {
       showToast("Write a prompt before sending");
       return;
     }
 
-    const prompt = input.trim();
     const conversationHistory = messages.map((message) => ({
       role: message.role,
       content: message.content,
@@ -3570,7 +3803,7 @@ function AIAssistantPage() {
       ...current,
       { id: `user-${Date.now()}`, role: "user", content: prompt },
     ]);
-    setInput("");
+    if (promptOverride === undefined) setInput("");
     setIsSending(true);
 
     try {
@@ -3836,6 +4069,24 @@ function AIAssistantPage() {
     </div>
   ) : null;
 
+  if (!hasConversation && selectedCard) {
+    return (
+      <div className="flex min-h-full items-center justify-center py-8 max-sm:items-start max-sm:py-4">
+        <div className="w-full max-w-[620px]">
+          <CardDetailView
+            card={selectedCard}
+            dark={dark}
+            onBack={() => setSelectedCard(null)}
+            onLaunch={(p) => {
+              setSelectedCard(null);
+              void sendPrompt(p);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (!hasConversation) {
     const mobileSuggestions: { title: string; icon: LucideIcon; href?: string }[] = [
       { title: "AI for Code", icon: Code2, href: toolWorkspaces.code.href },
@@ -3865,11 +4116,11 @@ function AIAssistantPage() {
           {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
 
           <div className="mt-7 flex w-full justify-center">
-            <ModeToggle mode={mode} onChange={setMode} dark={dark} />
+            <ModeToggle mode={mode} onChange={(next) => { setMode(next); setSelectedCard(null); }} dark={dark} />
           </div>
 
           <div className="mt-5 hidden w-full sm:block">
-            <StarterPanel mode={mode} dark={dark} onSelect={(value) => setInput(value)} />
+            <StarterPanel mode={mode} dark={dark} onOpen={(card) => setSelectedCard(card)} />
           </div>
 
           <div className="mt-5 hidden w-full sm:block">{composer}</div>
