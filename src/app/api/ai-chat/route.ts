@@ -217,7 +217,13 @@ async function askOpenAI(message: string, history: ChatMessage[]) {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`OpenAI request failed with ${response.status}: ${errorText}`);
+    let parsedMessage: string | undefined;
+    try {
+      const parsed = JSON.parse(errorText) as { error?: { message?: string; code?: string } };
+      parsedMessage = parsed?.error?.message;
+    } catch {}
+    const reason = parsedMessage || errorText.slice(0, 200);
+    throw new Error(`OpenAI ${response.status}: ${reason}`);
   }
 
   const data = (await response.json()) as {

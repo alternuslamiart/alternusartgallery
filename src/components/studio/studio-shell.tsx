@@ -3596,13 +3596,19 @@ function AIAssistantPage() {
             : "No response received.";
 
       const isFallback = data?.provider === "local" && data?.fallbackFrom;
+      const providerErrorRaw = typeof data?.providerError === "string" ? data.providerError : "";
+      const providerErrorShort = providerErrorRaw
+        .replace(/\s+/g, " ")
+        .replace(/https?:\/\/\S+/g, "")
+        .trim()
+        .slice(0, 160);
       const finalContent = isFallback
-        ? `${answerText}\n\n⚠️ Fallback: ${String(data.fallbackFrom).toUpperCase()} request failed${data?.providerError ? ` — ${data.providerError}` : ""}. Replying with local placeholder.`
+        ? `${answerText}\n\n⚠️ ${String(data.fallbackFrom).toUpperCase()} API failed${providerErrorShort ? `: ${providerErrorShort}` : ""}. Using local placeholder.`
         : answerText;
 
       if (isFallback) {
         setAiProviderLabel(
-          `Fallback active. ${String(data.fallbackFrom).toUpperCase()} call failed${data?.providerError ? `: ${data.providerError}` : ""}.`,
+          `${String(data.fallbackFrom).toUpperCase()} fallback active${providerErrorShort ? `: ${providerErrorShort}` : ""}`,
         );
       }
 
