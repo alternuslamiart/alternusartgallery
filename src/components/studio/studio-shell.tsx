@@ -6,10 +6,12 @@ import { signOut } from "next-auth/react";
 import {
   AlertTriangle,
   Bell,
+  Bot,
   Box,
   CheckCircle2,
   ChevronDown,
   ChevronLeft,
+  CircleSlash,
   Code2,
   Copy,
   CreditCard,
@@ -22,6 +24,7 @@ import {
   MessageCircle,
   Monitor,
   Moon,
+  Network,
   Paperclip,
   PanelLeft,
   PenLine,
@@ -40,6 +43,7 @@ import {
   ThumbsUp,
   Upload,
   UserRound,
+  Workflow,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -3303,6 +3307,163 @@ function AssetDetailDrawer({
   );
 }
 
+function ModeToggle({
+  mode,
+  onChange,
+  dark,
+}: {
+  mode: "agent" | "workflow";
+  onChange: (next: "agent" | "workflow") => void;
+  dark: boolean;
+}) {
+  const containerClass = dark
+    ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_10px_24px_rgba(0,0,0,0.22)]"
+    : "border-[#E5E7EB] bg-white shadow-[0_10px_24px_rgba(31,43,77,0.06)]";
+  const inactiveClass = dark
+    ? "text-[#A8B0BA] hover:text-[#F4F6F8]"
+    : "text-[#4B5563] hover:text-[#171717]";
+  return (
+    <div className={`inline-flex items-center gap-1 rounded-full border p-1 ${containerClass}`} role="tablist" aria-label="Build mode">
+      <button
+        type="button"
+        role="tab"
+        aria-selected={mode === "agent"}
+        onClick={() => onChange("agent")}
+        className={`inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-[12px] font-semibold transition-all active:scale-[0.98] ${
+          mode === "agent"
+            ? "bg-[#1D9BF0] text-white shadow-[0_8px_20px_rgba(29,155,240,0.32)]"
+            : inactiveClass
+        }`}
+      >
+        <CircleSlash className="h-3.5 w-3.5" />
+        Agent
+      </button>
+      <button
+        type="button"
+        role="tab"
+        aria-selected={mode === "workflow"}
+        onClick={() => onChange("workflow")}
+        className={`inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-[12px] font-semibold transition-all active:scale-[0.98] ${
+          mode === "workflow"
+            ? "bg-[#1D9BF0] text-white shadow-[0_8px_20px_rgba(29,155,240,0.32)]"
+            : inactiveClass
+        }`}
+      >
+        <Network className="h-3.5 w-3.5" />
+        Workflow
+      </button>
+    </div>
+  );
+}
+
+type StarterCard = {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  gradient: string;
+  iconColor: string;
+  prompt: string;
+};
+
+const agentStarters: StarterCard[] = [
+  {
+    title: "Create workflow",
+    description: "Powerful automations speed up your processes with ease and security in mind.",
+    icon: Workflow,
+    gradient: "from-[#FDE68A] via-[#FBA4C8] to-[#A855F7]",
+    iconColor: "text-[#7C3AED]",
+    prompt: "Help me create a workflow that ",
+  },
+  {
+    title: "Create autonomous agent",
+    description: "Intelligent agent that can handle basic requests and approvals.",
+    icon: Bot,
+    gradient: "from-[#67E8F9] via-[#818CF8] to-[#C084FC]",
+    iconColor: "text-[#6366F1]",
+    prompt: "Build an autonomous agent that ",
+  },
+  {
+    title: "Computer-using agent",
+    description: "Let agents accomplish even more across apps and websites.",
+    icon: Monitor,
+    gradient: "from-[#A7F3D0] via-[#86EFAC] to-[#A855F7]",
+    iconColor: "text-[#10B981]",
+    prompt: "Set up a computer-using agent that ",
+  },
+];
+
+const workflowStarters: StarterCard[] = [
+  {
+    title: "Blank workflow",
+    description: "Start from scratch and design every step of your automation.",
+    icon: Workflow,
+    gradient: "from-[#BAE6FD] via-[#7DD3FC] to-[#38BDF8]",
+    iconColor: "text-[#0284C7]",
+    prompt: "Design a blank workflow that ",
+  },
+  {
+    title: "Scheduled run",
+    description: "Trigger workflows on a cron-style schedule with built-in retries.",
+    icon: RefreshCw,
+    gradient: "from-[#FDE68A] via-[#FCA5A5] to-[#F472B6]",
+    iconColor: "text-[#DB2777]",
+    prompt: "Create a scheduled workflow that ",
+  },
+  {
+    title: "Connect apps",
+    description: "Move data between tools with secure connectors and approvals.",
+    icon: Plug,
+    gradient: "from-[#C7D2FE] via-[#A5B4FC] to-[#6366F1]",
+    iconColor: "text-[#4338CA]",
+    prompt: "Connect two apps with a workflow that ",
+  },
+];
+
+function StarterPanel({
+  mode,
+  dark,
+  onSelect,
+}: {
+  mode: "agent" | "workflow";
+  dark: boolean;
+  onSelect: (prompt: string) => void;
+}) {
+  const cards = mode === "agent" ? agentStarters : workflowStarters;
+  const heading = mode === "agent" ? "Start building from scratch" : "Start a new workflow";
+  const cardBase = dark
+    ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_10px_24px_rgba(0,0,0,0.22)] hover:border-[rgba(59,167,255,0.24)] hover:bg-[#23262C] hover:shadow-[0_16px_34px_rgba(0,0,0,0.28)]"
+    : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_10px_24px_rgba(31,43,77,0.035)] hover:border-[#CFE8F8] hover:bg-white hover:shadow-[0_16px_34px_rgba(31,43,77,0.08)]";
+
+  return (
+    <div className="w-full text-left">
+      <p className={`mb-3 text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{heading}</p>
+      <div className="grid w-full gap-3 sm:grid-cols-3">
+        {cards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <button
+              key={card.title}
+              type="button"
+              onClick={() => onSelect(card.prompt)}
+              className={`group flex flex-col rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${cardBase}`}
+            >
+              <span className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${card.gradient} ${card.iconColor}`}>
+                <Icon className="h-5 w-5" />
+              </span>
+              <span className={`text-[12.5px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
+                {card.title}
+              </span>
+              <span className={`mt-1.5 text-[11px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
+                {card.description}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function AIAssistantPage() {
   const router = useRouter();
   const { theme } = useStudioTheme();
@@ -3310,6 +3471,7 @@ function AIAssistantPage() {
   const dark = theme === "dark";
   const [messages, setMessages] = useState<Array<{ id: string; role: "user" | "assistant"; content: string }>>([]);
   const [input, setInput] = useState("");
+  const [mode, setMode] = useState<"agent" | "workflow">("agent");
   const [actionsOpen, setActionsOpen] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isSending, setIsSending] = useState(false);
@@ -3656,11 +3818,6 @@ function AIAssistantPage() {
   ) : null;
 
   if (!hasConversation) {
-    const suggestions = [
-      toolWorkspaces.code,
-      toolWorkspaces.blender,
-      toolWorkspaces.autocad,
-    ];
     const mobileSuggestions: { title: string; icon: LucideIcon; href?: string }[] = [
       { title: "AI for Code", icon: Code2, href: toolWorkspaces.code.href },
       { title: "Blender 3D", icon: Layers3, href: toolWorkspaces.blender.href },
@@ -3688,16 +3845,15 @@ function AIAssistantPage() {
 
           {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
 
-          <div className="mt-7 hidden w-full sm:block">{composer}</div>
-
-          <div className="mt-4 hidden w-full gap-3 sm:grid sm:grid-cols-3">
-            {suggestions.map((card) => (
-              <Link key={card.title} href={card.href} className={`cursor-pointer rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_10px_24px_rgba(0,0,0,0.22)] hover:border-[rgba(59,167,255,0.24)] hover:bg-[#23262C] hover:shadow-[0_16px_34px_rgba(0,0,0,0.28)]" : "border-[#EAECEF] bg-[#FCFDFE] shadow-[0_10px_24px_rgba(31,43,77,0.035)] hover:border-[#CFE8F8] hover:bg-white hover:shadow-[0_16px_34px_rgba(31,43,77,0.08)]"}`}>
-                <p className={`text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{card.title}</p>
-                <p className={`mt-2 text-[10.5px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>{card.description}</p>
-              </Link>
-            ))}
+          <div className="mt-7 flex w-full justify-center">
+            <ModeToggle mode={mode} onChange={setMode} dark={dark} />
           </div>
+
+          <div className="mt-5 hidden w-full sm:block">
+            <StarterPanel mode={mode} dark={dark} onSelect={(value) => setInput(value)} />
+          </div>
+
+          <div className="mt-5 hidden w-full sm:block">{composer}</div>
           <div className="mt-4 hidden flex-wrap justify-center gap-2 max-sm:flex">
             {mobileSuggestions.map((item) => {
               const Icon = item.icon;
