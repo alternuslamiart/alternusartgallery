@@ -3914,8 +3914,10 @@ function AIAssistantPage() {
         onClose={() => setWireframeOpen(false)}
       />
     </div>
-  ) : (
-    <div className={`sticky top-0 z-20 mb-3 flex justify-end py-1 ${wireframeBackdrop}`}>
+  ) : null;
+
+  const showWireframeChip = !wireframeOpen ? (
+    <div className="mt-3 flex justify-center">
       <button
         type="button"
         onClick={() => {
@@ -3928,7 +3930,7 @@ function AIAssistantPage() {
         Show wireframe
       </button>
     </div>
-  );
+  ) : null;
 
   const temporaryChatNotice = isTemporaryChat ? (
     <div className={`w-full rounded-2xl border px-4 py-3 text-left ${dark ? "border-[rgba(59,167,255,0.24)] bg-[rgba(59,167,255,0.09)]" : "border-[#BFE2FF] bg-[#F2F9FF]"}`}>
@@ -3991,7 +3993,10 @@ function AIAssistantPage() {
             <StarterPanel mode={mode} dark={dark} onSelect={(value) => setInput(value)} />
           </div>
 
-          <div className="mt-5 hidden w-full sm:block">{composer}</div>
+          <div className="mt-5 hidden w-full sm:block">
+            {composer}
+            <div className="hidden sm:block">{showWireframeChip}</div>
+          </div>
           <div className="mt-4 hidden flex-wrap justify-center gap-2 max-sm:flex">
             {mobileSuggestions.map((item) => {
               const Icon = item.icon;
@@ -4034,6 +4039,7 @@ function AIAssistantPage() {
               </div>
             </div>
             {composer}
+            {showWireframeChip}
           </div>
         </div>
         </div>
@@ -4159,6 +4165,7 @@ function AIAssistantPage() {
       </div>
 
       {composer}
+      {showWireframeChip}
       </div>
     </div>
   );
