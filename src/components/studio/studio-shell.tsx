@@ -3588,17 +3588,30 @@ function AIAssistantPage() {
         throw new Error(data?.error || "Failed to get response");
       }
 
+      const answerText =
+        typeof data?.content === "string"
+          ? data.content
+          : typeof data?.answer === "string"
+            ? data.answer
+            : "No response received.";
+
+      const isFallback = data?.provider === "local" && data?.fallbackFrom;
+      const finalContent = isFallback
+        ? `${answerText}\n\n⚠️ Fallback: ${String(data.fallbackFrom).toUpperCase()} request failed${data?.providerError ? ` — ${data.providerError}` : ""}. Replying with local placeholder.`
+        : answerText;
+
+      if (isFallback) {
+        setAiProviderLabel(
+          `Fallback active. ${String(data.fallbackFrom).toUpperCase()} call failed${data?.providerError ? `: ${data.providerError}` : ""}.`,
+        );
+      }
+
       setMessages((current) => [
         ...current,
         {
           id: `assistant-${Date.now()}`,
           role: "assistant",
-          content:
-            typeof data?.content === "string"
-              ? data.content
-              : typeof data?.answer === "string"
-                ? data.answer
-                : "No response received.",
+          content: finalContent,
         },
       ]);
     } catch (error) {

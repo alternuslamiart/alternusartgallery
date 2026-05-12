@@ -274,6 +274,7 @@ export async function POST(request: NextRequest) {
     if (provider === "openai" || provider === "gemini") {
       const providerAttempts = getProviderAttempts(provider);
       let failedProvider: RemoteAIProvider | undefined;
+      let lastProviderError: string | undefined;
 
       for (const providerAttempt of providerAttempts) {
         try {
@@ -286,6 +287,7 @@ export async function POST(request: NextRequest) {
           });
         } catch (providerError) {
           failedProvider = providerAttempt;
+          lastProviderError = providerError instanceof Error ? providerError.message : String(providerError);
           console.warn(`AI provider ${providerAttempt} failed.`, providerError);
         }
       }
@@ -297,6 +299,7 @@ export async function POST(request: NextRequest) {
         suggestedQuestions: fallback.suggestedQuestions,
         provider: "local",
         fallbackFrom: failedProvider ?? provider,
+        providerError: lastProviderError,
       });
     }
 
