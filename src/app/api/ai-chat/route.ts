@@ -9,7 +9,7 @@ const DEFAULT_GEMINI_MODEL = "gemini-2.0-flash";
 const MAX_HISTORY_MESSAGES = 16;
 const OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions";
 
-const SYSTEM_PROMPT = `You are Cerevix AI Assistant. Answer clearly, directly, and helpfully. For coding, design, business, and product questions, give practical, structured answers. Do not claim to perform actions you cannot perform. If the user asks for implementation guidance, provide concrete steps. Keep replies concise and respond in the user's language when clear.`;
+const SYSTEM_PROMPT = `You are Cerevix AI Assistant. Answer clearly, thoroughly, and helpfully. For coding, design, business, and product questions, give complete, practical, well-structured answers with examples, step-by-step instructions, and code blocks where useful. Match the depth of the answer to the complexity of the question — short questions get short answers, but never truncate an explanation that needs detail. Respond in the user's language when clear.`;
 
 type ChatRole = "user" | "assistant";
 type ChatMessage = {
@@ -181,7 +181,7 @@ async function askGemini(message: string, history: ChatMessage[]) {
     history: toGeminiHistory(history),
     generationConfig: {
       temperature: 0.7,
-      maxOutputTokens: 1024,
+      maxOutputTokens: 4096,
     },
   });
 
@@ -211,7 +211,7 @@ async function askOpenAI(message: string, history: ChatMessage[]) {
       model: getOpenAIModel(),
       messages: toOpenAIMessages(history, message),
       temperature: 0.7,
-      max_tokens: 1024,
+      max_tokens: 4096,
     }),
   });
 
