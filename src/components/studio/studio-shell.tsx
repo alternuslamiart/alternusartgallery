@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronLeft,
+  ChevronUp,
   CircleSlash,
   Code2,
   Copy,
@@ -3307,6 +3308,110 @@ function AssetDetailDrawer({
   );
 }
 
+function WireframePreview({
+  dark,
+  collapsed,
+  onToggle,
+  onClose,
+}: {
+  dark: boolean;
+  collapsed: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+}) {
+  const frame = dark
+    ? "border-[rgba(255,255,255,0.10)] bg-[#1A1D22] shadow-[0_18px_42px_rgba(0,0,0,0.32)]"
+    : "border-[#E5EAF0] bg-white shadow-[0_18px_42px_rgba(31,43,77,0.08)]";
+  const subtle = dark ? "text-[#A8B0BA]" : "text-[#6B7280]";
+  const block = dark ? "bg-[rgba(255,255,255,0.06)]" : "bg-[#EEF2F7]";
+  const blockSoft = dark ? "bg-[rgba(255,255,255,0.04)]" : "bg-[#F4F7FB]";
+  const accent = "bg-[#1D9BF0]";
+  const bubble = dark ? "bg-[rgba(255,255,255,0.08)]" : "bg-[#F1F5FA]";
+  const dotBorder = dark ? "border-[rgba(255,255,255,0.10)]" : "border-[#E5EAF0]";
+
+  return (
+    <div className={`mx-auto w-full max-w-[1180px] rounded-2xl border ${frame}`}>
+      <div className={`flex items-center justify-between border-b px-4 py-2.5 ${dotBorder}`}>
+        <div className="flex items-center gap-2">
+          <span className="flex h-2 w-2 rounded-full bg-[#FF5F57]" />
+          <span className="flex h-2 w-2 rounded-full bg-[#FEBC2E]" />
+          <span className="flex h-2 w-2 rounded-full bg-[#28C840]" />
+          <span className={`ml-2 text-[10.5px] font-semibold uppercase tracking-[0.18em] ${subtle}`}>Wireframe · AI Assistant</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-label={collapsed ? "Expand wireframe" : "Collapse wireframe"}
+            className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#6B7280] hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+          >
+            {collapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close wireframe"
+            className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#6B7280] hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+      {!collapsed && (
+        <div className="p-3">
+          <div className={`grid h-[180px] grid-cols-[64px_minmax(0,1fr)] gap-3 overflow-hidden rounded-xl border ${dotBorder} ${dark ? "bg-[#15171B]" : "bg-[#FAFCFE]"}`}>
+            <div className="flex flex-col gap-2 p-2">
+              <div className={`h-3 rounded-md ${block}`} />
+              <div className={`h-2 rounded-md ${blockSoft}`} />
+              <div className={`h-2 rounded-md ${accent} opacity-80`} />
+              <div className={`h-2 rounded-md ${blockSoft}`} />
+              <div className={`h-2 rounded-md ${blockSoft}`} />
+              <div className={`h-2 rounded-md ${blockSoft}`} />
+              <div className={`h-2 rounded-md ${blockSoft}`} />
+              <div className={`h-2 rounded-md ${blockSoft}`} />
+              <div className="mt-auto flex flex-col gap-1.5">
+                <div className={`h-2 rounded-md ${blockSoft}`} />
+                <div className={`h-2 rounded-md ${blockSoft}`} />
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 p-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <div className={`h-2 w-2 rounded-full ${block}`} />
+                  <div className={`h-2 w-2 rounded-full ${block}`} />
+                  <div className={`h-2 w-2 rounded-full ${block}`} />
+                  <div className={`ml-1 h-2 w-16 rounded-md ${block}`} />
+                </div>
+                <div className={`h-4 w-4 rounded-full ${accent} opacity-90`} />
+              </div>
+              <div className="mt-1 flex flex-1 flex-col gap-1.5">
+                <div className="flex justify-end">
+                  <div className={`h-3.5 w-20 rounded-full ${bubble}`} />
+                </div>
+                <div className="flex items-start gap-1.5">
+                  <div className={`h-3 w-3 rounded-full ${accent}`} />
+                  <div className={`h-3.5 w-44 rounded-2xl ${bubble}`} />
+                </div>
+                <div className="flex justify-end">
+                  <div className={`h-3.5 w-16 rounded-full ${bubble}`} />
+                </div>
+                <div className="flex items-start gap-1.5">
+                  <div className={`h-3 w-3 rounded-full ${accent}`} />
+                  <div className={`h-3.5 w-36 rounded-2xl ${bubble}`} />
+                </div>
+              </div>
+              <div className={`mt-auto flex items-center gap-2 rounded-xl border ${dotBorder} ${dark ? "bg-[#181B20]" : "bg-white"} px-2 py-1.5`}>
+                <div className={`h-2 flex-1 rounded-md ${blockSoft}`} />
+                <div className={`h-5 w-5 rounded-full ${accent}`} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ModeToggle({
   mode,
   onChange,
@@ -3473,6 +3578,8 @@ function AIAssistantPage() {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<"agent" | "workflow">("agent");
   const [actionsOpen, setActionsOpen] = useState(false);
+  const [wireframeOpen, setWireframeOpen] = useState(true);
+  const [wireframeCollapsed, setWireframeCollapsed] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [messageFeedback, setMessageFeedback] = useState<Record<string, "like" | "dislike">>({});
@@ -3794,6 +3901,35 @@ function AIAssistantPage() {
     </div>
   );
 
+  const wireframeBackdrop = dark
+    ? "bg-[#17191D]/95 backdrop-blur supports-[backdrop-filter]:bg-[#17191D]/85"
+    : "bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75";
+
+  const wireframeFrame = wireframeOpen ? (
+    <div className={`sticky top-0 z-20 mb-4 pb-2 pt-1 ${wireframeBackdrop}`}>
+      <WireframePreview
+        dark={dark}
+        collapsed={wireframeCollapsed}
+        onToggle={() => setWireframeCollapsed((value) => !value)}
+        onClose={() => setWireframeOpen(false)}
+      />
+    </div>
+  ) : (
+    <div className={`sticky top-0 z-20 mb-3 flex justify-end py-1 ${wireframeBackdrop}`}>
+      <button
+        type="button"
+        onClick={() => {
+          setWireframeOpen(true);
+          setWireframeCollapsed(false);
+        }}
+        className={`inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm hover:text-[#171717]"}`}
+      >
+        <Grid2X2 className="h-3 w-3" />
+        Show wireframe
+      </button>
+    </div>
+  );
+
   const temporaryChatNotice = isTemporaryChat ? (
     <div className={`w-full rounded-2xl border px-4 py-3 text-left ${dark ? "border-[rgba(59,167,255,0.24)] bg-[rgba(59,167,255,0.09)]" : "border-[#BFE2FF] bg-[#F2F9FF]"}`}>
       <div className="flex items-start gap-3">
@@ -3828,7 +3964,9 @@ function AIAssistantPage() {
     ];
 
     return (
-      <div className="flex min-h-full items-center justify-center py-8 max-sm:items-stretch max-sm:justify-start max-sm:py-0">
+      <div className="flex min-h-full flex-col">
+        {wireframeFrame}
+        <div className="flex flex-1 items-center justify-center py-4 max-sm:items-stretch max-sm:justify-start max-sm:py-0">
         <div className="flex w-full max-w-[620px] flex-col items-center text-center max-sm:min-h-full max-sm:max-w-none max-sm:pb-3">
           <div className="hidden h-12 w-full items-center justify-center sm:hidden max-sm:flex">
             <button className={`absolute left-1 flex h-9 w-9 items-center justify-center rounded-full ${dark ? "text-[#F4F6F8] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#171717] hover:bg-[#F4F8FB]"}`} aria-label="Back">
@@ -3898,12 +4036,15 @@ function AIAssistantPage() {
             {composer}
           </div>
         </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-[900px] flex-col justify-end">
+    <div className="flex min-h-full flex-col">
+      {wireframeFrame}
+      <div className="mx-auto flex min-h-full w-full max-w-[900px] flex-1 flex-col justify-end">
       <div className="flex flex-1 flex-col justify-end pb-6">
         <div className="mb-8 flex flex-1 flex-col justify-end gap-5">
           {temporaryChatNotice}
@@ -4018,6 +4159,7 @@ function AIAssistantPage() {
       </div>
 
       {composer}
+      </div>
     </div>
   );
 }
