@@ -3430,7 +3430,7 @@ function StarterPanel({
   return (
     <div className="w-full text-left">
       <p className={`mb-3 text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{heading}</p>
-      <div className="grid w-full gap-3 sm:grid-cols-3">
+      <div className="grid w-full gap-5 lg:grid-cols-3">
         {cards.map((card) => {
           const Icon = card.icon;
           return (
@@ -3438,16 +3438,18 @@ function StarterPanel({
               key={card.title}
               type="button"
               onClick={() => onOpen(card)}
-              className={`group flex flex-col rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${cardBase}`}
+              className={`group flex min-h-[106px] items-center gap-4 rounded-[14px] border p-3 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${cardBase}`}
             >
-              <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#DDEEFF] text-[#1D9BF0] transition-colors group-hover:bg-[#1D9BF0] group-hover:text-white">
-                <Icon className="h-5 w-5" />
+              <span className={`flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-[8px] transition-colors ${dark ? "bg-[rgba(59,167,255,0.18)] text-[#7DD3FC] group-hover:bg-[#1D9BF0] group-hover:text-white" : "bg-[#DDE3FF] text-[#1D9BF0] group-hover:bg-[#1D9BF0] group-hover:text-white"}`}>
+                <Icon className="h-6 w-6" />
               </span>
-              <span className={`text-[12.5px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
-                {card.title}
-              </span>
-              <span className={`mt-1.5 text-[11px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
-                {card.description}
+              <span className="min-w-0 flex-1">
+                <span className={`block truncate text-[22px] font-semibold leading-[1.05] tracking-[-0.03em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
+                  {card.title}
+                </span>
+                <span className={`mt-2 block text-[12px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#30343A]"}`}>
+                  {card.description}
+                </span>
               </span>
             </button>
           );
@@ -4092,7 +4094,7 @@ function AIAssistantPage() {
 
     return (
       <div className="flex min-h-full items-center justify-center py-8 max-sm:items-stretch max-sm:justify-start max-sm:py-0">
-        <div className="flex w-full max-w-[620px] flex-col items-center text-center max-sm:min-h-full max-sm:max-w-none max-sm:pb-3">
+        <div className="flex w-full max-w-[1164px] flex-col items-center text-center max-sm:min-h-full max-sm:max-w-none max-sm:pb-3">
           <div className="hidden h-12 w-full items-center justify-center sm:hidden max-sm:flex">
             <button className={`absolute left-1 flex h-9 w-9 items-center justify-center rounded-full ${dark ? "text-[#F4F6F8] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#171717] hover:bg-[#F4F8FB]"}`} aria-label="Back">
               <ChevronLeft className="h-5 w-5" />
@@ -4113,7 +4115,7 @@ function AIAssistantPage() {
             <StarterPanel mode={mode} dark={dark} onOpen={(card) => setSelectedCard(card)} />
           </div>
 
-          <div className="mt-5 hidden w-full sm:block">{composer}</div>
+          <div className="mt-5 hidden w-full max-w-[620px] sm:block">{composer}</div>
           <div className="mt-4 hidden flex-wrap justify-center gap-2 max-sm:flex">
             {mobileSuggestions.map((item) => {
               const Icon = item.icon;
