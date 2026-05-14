@@ -3430,7 +3430,7 @@ function StarterPanel({
   return (
     <div className="w-full text-left">
       <p className={`mb-3 text-[13px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>{heading}</p>
-      <div className="grid w-full gap-5 lg:grid-cols-3">
+      <div className="grid w-full gap-3 sm:grid-cols-3">
         {cards.map((card) => {
           const Icon = card.icon;
           return (
@@ -3438,16 +3438,16 @@ function StarterPanel({
               key={card.title}
               type="button"
               onClick={() => onOpen(card)}
-              className={`group flex min-h-[106px] items-center gap-4 rounded-[14px] border p-3 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${cardBase}`}
+              className={`group flex min-h-[88px] items-center gap-3 rounded-[14px] border p-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${cardBase}`}
             >
-              <span className={`flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-[8px] transition-colors ${dark ? "bg-[rgba(59,167,255,0.18)] text-[#7DD3FC] group-hover:bg-[#1D9BF0] group-hover:text-white" : "bg-[#DDE3FF] text-[#1D9BF0] group-hover:bg-[#1D9BF0] group-hover:text-white"}`}>
-                <Icon className="h-6 w-6" />
+              <span className={`flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-[8px] transition-colors ${dark ? "bg-[rgba(59,167,255,0.18)] text-[#7DD3FC] group-hover:bg-[#1D9BF0] group-hover:text-white" : "bg-[#DDE3FF] text-[#1D9BF0] group-hover:bg-[#1D9BF0] group-hover:text-white"}`}>
+                <Icon className="h-5 w-5" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className={`block truncate text-[22px] font-semibold leading-[1.05] tracking-[-0.03em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
+                <span className={`block truncate text-[14px] font-semibold leading-[1.12] tracking-[-0.02em] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
                   {card.title}
                 </span>
-                <span className={`mt-2 block text-[12px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#30343A]"}`}>
+                <span className={`mt-1.5 block text-[10.5px] leading-3.5 ${dark ? "text-[#A8B0BA]" : "text-[#30343A]"}`}>
                   {card.description}
                 </span>
               </span>
@@ -4111,7 +4111,7 @@ function AIAssistantPage() {
             <ModeToggle mode={mode} onChange={(next) => { setMode(next); setSelectedCard(null); }} dark={dark} />
           </div>
 
-          <div className="mt-5 hidden w-full sm:block">
+          <div className="mt-5 hidden w-full max-w-[620px] sm:block">
             <StarterPanel mode={mode} dark={dark} onOpen={(card) => setSelectedCard(card)} />
           </div>
 
