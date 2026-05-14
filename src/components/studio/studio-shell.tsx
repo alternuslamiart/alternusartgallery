@@ -1186,7 +1186,7 @@ function SidebarLink({
         color: active ? (dark ? "#F4F6F8" : "#171717") : undefined,
       }}
     >
-      <Icon className={`h-[13px] w-[13px] flex-shrink-0 ${dark ? "group-hover:text-[#F4F6F8]" : "group-hover:text-[#4A9BFF]"} ${active ? "text-[#3BA7FF]" : dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`} />
+      <Icon className={`h-[13px] w-[13px] flex-shrink-0 ${dark ? "group-hover:text-[#F4F6F8]" : "text-[#4A9BFF] group-hover:text-[#1D9BF0]"} ${active ? "text-[#3BA7FF]" : dark ? "text-[#A8B0BA]" : "text-[#4A9BFF]"}`} />
       {!collapsed && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
       {!collapsed && item.badge && (
         <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF3B6B] px-1 text-[10px] font-bold text-white">{item.badge}</span>
@@ -3440,7 +3440,7 @@ function StarterPanel({
               onClick={() => onOpen(card)}
               className={`group flex flex-col rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${cardBase}`}
             >
-              <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#1D9BF0] text-white">
+              <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#DDEEFF] text-[#1D9BF0] transition-colors group-hover:bg-[#1D9BF0] group-hover:text-white">
                 <Icon className="h-5 w-5" />
               </span>
               <span className={`text-[12.5px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
@@ -3665,7 +3665,7 @@ function CardDetailView({
       </button>
       <div className={`w-full rounded-3xl border p-5 ${containerClass}`}>
         <div className="mb-5 flex items-center gap-3">
-          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#1D9BF0] text-white">
+          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#DDEEFF] text-[#1D9BF0]">
             <Icon className="h-5 w-5" />
           </span>
           <div>
@@ -4030,7 +4030,7 @@ function AIAssistantPage() {
             onClick={() => void sendPrompt()}
             disabled={isSending}
             aria-label="Send prompt"
-            className={`ml-auto flex h-9 w-9 items-center justify-center rounded-full text-white shadow-[0_12px_24px_rgba(74,155,255,0.28)] transition-colors disabled:opacity-70 ${dark ? "bg-[#3BA7FF] hover:bg-[#2D8FF0]" : "bg-[#4A9BFF] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
+            className={`ml-auto flex h-9 w-9 items-center justify-center rounded-full transition-colors disabled:opacity-70 ${dark ? "bg-[#3BA7FF] text-white shadow-[0_12px_24px_rgba(74,155,255,0.28)] hover:bg-[#2D8FF0]" : "bg-[#F4F8FB] text-[#9CA3AF] hover:bg-[#4A9BFF] hover:text-white"}`}
           >
             {isSending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </button>
@@ -4100,9 +4100,6 @@ function AIAssistantPage() {
             <p className={`text-[13px] font-medium ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Lumen AI Assistant</p>
           </div>
 
-          <div className="mb-5 flex h-[62px] w-[62px] items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_16px_38px_rgba(29,161,242,0.32)] max-sm:mt-24 max-sm:h-[54px] max-sm:w-[54px]">
-            <Sparkles className="h-7 w-7 fill-current max-sm:h-6 max-sm:w-6" />
-          </div>
           <h2 className={`text-[28px] font-semibold tracking-[-0.03em] max-sm:text-[17px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Cerevix AI Assistant</h2>
           <p className={`mt-3 text-[12px] leading-5 max-sm:mt-1 max-sm:text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Build workflows, generate assets, automate tasks, and coordinate AI tools from one Cerevix AI workspace.</p>
 
