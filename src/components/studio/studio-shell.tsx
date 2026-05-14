@@ -593,9 +593,9 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           <button
             onClick={() => setSignOutOpen(true)}
             className={[
-              "group flex h-8 w-full items-center rounded-xl px-2.5 text-left text-[12px] font-medium transition-all",
+              "group flex h-8 items-center rounded-xl text-left text-[12px] font-medium transition-all",
               dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#4B5563] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
-              isCollapsed ? "justify-center" : "gap-2",
+              isCollapsed ? "mx-auto w-8 justify-center px-0" : "w-full gap-2 px-2.5",
             ].join(" ")}
           >
             <Upload className={`h-[13px] w-[13px] rotate-90 ${dark ? "text-[#6F7782] group-hover:text-[#F4F6F8]" : "text-[#6B7280] group-hover:text-[#4A9BFF]"}`} />
@@ -1175,9 +1175,9 @@ function SidebarLink({
       onClick={onNavigate}
       title={collapsed ? item.label : undefined}
       className={[
-        "group flex h-8 w-full items-center rounded-xl px-2.5 text-left text-[12px] font-medium transition-all",
+        "group flex h-8 items-center rounded-xl text-left text-[12px] font-medium transition-all",
         dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
-        collapsed ? "justify-center" : "gap-2",
+        collapsed ? "mx-auto w-8 justify-center px-0" : "w-full gap-2 px-2.5",
       ].join(" ")}
       style={{
         background: active ? (dark ? "rgba(59,167,255,0.14)" : "#FFFFFF") : undefined,
