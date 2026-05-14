@@ -199,31 +199,75 @@ function SiteHeader({ isLight }: { isLight: boolean }) {
   );
 }
 
-function DashboardPreview() {
+function DashboardPreview({ isLight }: { isLight: boolean }) {
+  const preview = isLight
+    ? {
+        shell: "bg-white text-[#101114] shadow-[0_26px_70px_rgba(31,43,77,0.08)]",
+        topbar: "bg-[#f8fbff]",
+        sidebar: "bg-[#eef6fb]",
+        sidebarPanel: "bg-white/72",
+        sidebarItem: "text-[#6b7280]",
+        sidebarActive: "bg-[#dceeff] text-[#101114]",
+        workspace: "bg-[#f7fbff]",
+        header: "bg-[#f8fbff]",
+        iconButton: "bg-white text-[#5b6573]",
+        initials: "bg-[#edf6ff] text-[#101114]",
+        card: "bg-white",
+        panel: "bg-white",
+        input: "bg-[#f4f8fb]",
+        inputControls: "bg-white",
+        title: "text-[#101114]",
+        body: "text-[#5b6573]",
+        muted: "text-[#8792a0]",
+        subtle: "text-[#9aa5b1]",
+        dot: "bg-[#a7b0ba]",
+      }
+    : {
+        shell: "bg-[#101113] text-white",
+        topbar: "bg-[#121315]",
+        sidebar: "bg-[#0b0c0e]",
+        sidebarPanel: "bg-[#101113]",
+        sidebarItem: "text-zinc-500",
+        sidebarActive: "bg-[#071824] text-white",
+        workspace: "bg-[#141518]",
+        header: "bg-[#15161a]",
+        iconButton: "bg-[#202126] text-zinc-300",
+        initials: "bg-[#1b1c20] text-zinc-100",
+        card: "bg-[#111215]",
+        panel: "bg-[#17181b]",
+        input: "bg-[#0f1012]",
+        inputControls: "bg-[#141518]",
+        title: "text-white",
+        body: "text-zinc-400",
+        muted: "text-zinc-500",
+        subtle: "text-zinc-600",
+        dot: "bg-zinc-700",
+      };
+
   return (
     <div className="mx-auto mt-16 w-full max-w-6xl overflow-x-auto px-4 pb-3 sm:px-6 lg:mt-20">
-      <div className="relative mx-auto min-w-[940px] overflow-hidden rounded-[14px] bg-[#101113] text-white">
-        <div className="flex h-11 items-center justify-between bg-[#121315] px-5">
+      <div className={`relative mx-auto min-w-[940px] overflow-hidden rounded-[14px] ${preview.shell}`}>
+        <div className={`flex h-11 items-center justify-between px-5 ${preview.topbar}`}>
           <div className="flex items-center gap-3">
             <span className="h-2 w-2 rounded-full bg-[#068fff]" />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-zinc-400">Studio command layer</span>
+            <span className={`text-[10px] font-semibold uppercase tracking-[0.28em] ${preview.muted}`}>Studio command layer</span>
           </div>
-          <div className="flex items-center gap-4 text-[10px] uppercase tracking-[0.24em] text-zinc-500">
+          <div className={`flex items-center gap-4 text-[10px] uppercase tracking-[0.24em] ${preview.muted}`}>
             <span>Live</span>
-            <span className="h-1 w-1 rounded-full bg-zinc-700" />
+            <span className={`h-1 w-1 rounded-full ${preview.dot}`} />
             <span>Build 26.05</span>
           </div>
         </div>
 
         <div className="grid min-h-[500px] grid-cols-[210px_1fr]">
-          <aside className="flex flex-col bg-[#0b0c0e] p-5">
-            <Brand compact />
+          <aside className={`flex flex-col p-5 ${preview.sidebar}`}>
+            <Brand compact isLight={isLight} />
             <nav className="mt-6 flex flex-1 flex-col gap-1" aria-label="Dashboard preview navigation">
               {sidebarItems.map(({ label, icon: Icon, active }) => (
                 <div
                   key={label}
                   className={`flex h-9 items-center justify-between rounded-[6px] px-3 text-[11px] transition-colors ${
-                    active ? "bg-[#071824] text-white" : "text-zinc-500"
+                    active ? preview.sidebarActive : preview.sidebarItem
                   }`}
                 >
                   <span className="flex items-center gap-2">
@@ -234,29 +278,29 @@ function DashboardPreview() {
                 </div>
               ))}
             </nav>
-            <div className="mt-8 bg-[#101113] p-3">
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-zinc-600">
+            <div className={`mt-8 p-3 ${preview.sidebarPanel}`}>
+              <div className={`flex items-center justify-between text-[10px] uppercase tracking-[0.22em] ${preview.subtle}`}>
                 <span>System</span>
                 <span>Online</span>
               </div>
-              <div className="mt-3 flex items-center gap-2 rounded-[6px] bg-[#17181b] px-3 py-2 text-[11px] text-zinc-300">
+              <div className={`mt-3 flex items-center gap-2 rounded-[6px] px-3 py-2 text-[11px] ${preview.iconButton}`}>
                 <Settings className="h-4 w-4" />
                 Settings
               </div>
             </div>
           </aside>
 
-          <section className="relative flex flex-col bg-[#141518]">
-            <header className="relative flex h-16 items-center justify-between bg-[#15161a] px-8">
+          <section className={`relative flex flex-col ${preview.workspace}`}>
+            <header className={`relative flex h-16 items-center justify-between px-8 ${preview.header}`}>
               <div>
-                <p className="text-xs font-semibold text-zinc-200">Welcome, Mike</p>
-                <p className="mt-1 text-[10px] uppercase tracking-[0.22em] text-zinc-600">Workspace ready</p>
+                <p className={`text-xs font-semibold ${preview.title}`}>Welcome, Mike</p>
+                <p className={`mt-1 text-[10px] uppercase tracking-[0.22em] ${preview.subtle}`}>Workspace ready</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-[6px] bg-[#202126] text-zinc-300">
+                <span className={`inline-flex h-8 w-8 items-center justify-center rounded-[6px] ${preview.iconButton}`}>
                   <Bot className="h-3.5 w-3.5" />
                 </span>
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-[6px] bg-[#1b1c20] text-xs font-semibold text-zinc-100">
+                <span className={`inline-flex h-8 w-8 items-center justify-center rounded-[6px] text-xs font-semibold ${preview.initials}`}>
                   B
                 </span>
               </div>
@@ -266,34 +310,34 @@ function DashboardPreview() {
               <div className="flex flex-col">
                 <div className="grid grid-cols-3 gap-3">
                   {telemetryItems.map((item) => (
-                    <div key={item.label} className="rounded-[8px] bg-[#111215] p-4">
-                      <p className="text-[10px] uppercase tracking-[0.22em] text-zinc-600">{item.label}</p>
-                      <p className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-white">{item.value}</p>
+                    <div key={item.label} className={`rounded-[8px] p-4 ${preview.card}`}>
+                      <p className={`text-[10px] uppercase tracking-[0.22em] ${preview.subtle}`}>{item.label}</p>
+                      <p className={`mt-3 text-2xl font-semibold tracking-[-0.04em] ${preview.title}`}>{item.value}</p>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-5 flex flex-1 flex-col justify-center rounded-[10px] bg-[#17181b] p-7">
+                <div className={`mt-5 flex flex-1 flex-col justify-center rounded-[10px] p-7 ${preview.panel}`}>
                   <Badge className="mb-5 w-fit rounded-[6px] border-0 bg-[#071824] px-3 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-[#8fccff] shadow-none hover:bg-[#071824]">
                     Platform Studio
                   </Badge>
-                  <h2 className="max-w-xl text-3xl font-semibold tracking-[-0.05em] text-white">
+                  <h2 className={`max-w-xl text-3xl font-semibold tracking-[-0.05em] ${preview.title}`}>
                     Cerevix AI Assistant
                   </h2>
-                  <p className="mt-3 max-w-lg text-sm leading-6 text-zinc-400">
+                  <p className={`mt-3 max-w-lg text-sm leading-6 ${preview.body}`}>
                     Build workflows, generate assets, automate tasks, and coordinate AI tools from one Cerevix AI workspace.
                   </p>
 
-                  <div className="mt-8 rounded-[8px] bg-[#0f1012] p-3">
+                  <div className={`mt-8 rounded-[8px] p-3 ${preview.input}`}>
                     <Input
                       readOnly
                       aria-label="Ask Cerevix anything"
                       value=""
                       placeholder="Ask Cerevix anything..."
-                      className="h-11 border-0 bg-transparent px-1 text-xs text-zinc-100 shadow-none placeholder:text-zinc-500 focus-visible:ring-0"
+                      className={`h-11 border-0 bg-transparent px-1 text-xs shadow-none placeholder:text-zinc-500 focus-visible:ring-0 ${isLight ? "text-[#101114] placeholder:text-[#8f9aa7]" : "text-zinc-100"}`}
                     />
-                    <div className="mt-4 flex items-center justify-between bg-[#141518] px-3 py-3">
-                      <div className="flex items-center gap-3 text-zinc-500">
+                    <div className={`mt-4 flex items-center justify-between px-3 py-3 ${preview.inputControls}`}>
+                      <div className={`flex items-center gap-3 ${preview.muted}`}>
                         <Paperclip className="h-3.5 w-3.5" />
                         <Link2 className="h-3.5 w-3.5" />
                         <Mic className="h-3.5 w-3.5" />
@@ -313,14 +357,14 @@ function DashboardPreview() {
                 {featureCards.map(({ title, copy, icon: Icon }) => (
                   <div
                     key={title}
-                    className="rounded-[8px] bg-[#111215] p-4 text-white transition-colors hover:bg-[#141820]"
+                    className={`rounded-[8px] p-4 transition-colors ${preview.card} ${isLight ? "hover:bg-[#f8fbff]" : "hover:bg-[#141820]"}`}
                   >
                     <div className="mb-4 flex items-center justify-between">
                       <Icon className="h-4 w-4 text-[#068fff]" />
-                      <span className="h-1.5 w-1.5 rounded-full bg-zinc-700" />
+                      <span className={`h-1.5 w-1.5 rounded-full ${preview.dot}`} />
                     </div>
-                    <h3 className="text-xs font-semibold tracking-[-0.02em] text-zinc-100">{title}</h3>
-                    <p className="mt-2 text-[10.5px] leading-4 text-zinc-500">{copy}</p>
+                    <h3 className={`text-xs font-semibold tracking-[-0.02em] ${preview.title}`}>{title}</h3>
+                    <p className={`mt-2 text-[10.5px] leading-4 ${preview.muted}`}>{copy}</p>
                   </div>
                 ))}
               </div>
@@ -366,7 +410,7 @@ function Hero({ isLight }: { isLight: boolean }) {
           </Button>
         </div>
       </div>
-      <DashboardPreview />
+      <DashboardPreview isLight={isLight} />
     </section>
   );
 }
