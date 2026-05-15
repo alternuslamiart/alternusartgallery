@@ -3683,7 +3683,7 @@ function CardDetailView({
 
 function AIAssistantPage() {
   const { theme } = useStudioTheme();
-  const { showToast, isTemporaryChat, temporaryChatId, startTemporaryChat, endTemporaryChat } = useStudioActions();
+  const { showToast, isTemporaryChat, temporaryChatId, endTemporaryChat } = useStudioActions();
   const dark = theme === "dark";
   const [messages, setMessages] = useState<Array<{ id: string; role: "user" | "assistant"; content: string }>>([]);
   const [input, setInput] = useState("");
@@ -3948,13 +3948,9 @@ function AIAssistantPage() {
 
   const composer = (
     <div className="w-full">
-      <div className={`w-full overflow-hidden rounded-[4px] border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5E7EB] bg-white shadow-[0_14px_34px_rgba(31,43,77,0.06)]"}`}>
+      <div className={`w-full overflow-hidden rounded-2xl border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5E7EB] bg-white shadow-[0_14px_34px_rgba(31,43,77,0.06)]"}`}>
         <div className={`flex h-7 items-center px-4 text-[10px] font-semibold ${dark ? "bg-[#181B20] text-[#A8B0BA]" : "bg-[#E5E5E5] text-[#3D3D3D]"}`}>
           <span>Use our faster AI on Pro Plan</span>
-          <span className="mx-2">-</span>
-          <button type="button" onClick={startTemporaryChat} className={dark ? "text-[#7DD3FC]" : "text-[#171717]"}>
-            Temporary chat
-          </button>
         </div>
         <div className="relative flex min-h-[108px] flex-col px-4 pb-3 pt-3">
           <textarea
