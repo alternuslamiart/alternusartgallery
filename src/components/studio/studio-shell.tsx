@@ -3683,7 +3683,7 @@ function CardDetailView({
 
 function AIAssistantPage() {
   const { theme } = useStudioTheme();
-  const { showToast, isTemporaryChat, temporaryChatId, endTemporaryChat } = useStudioActions();
+  const { openModal, showToast, isTemporaryChat, temporaryChatId, endTemporaryChat } = useStudioActions();
   const dark = theme === "dark";
   const [messages, setMessages] = useState<Array<{ id: string; role: "user" | "assistant"; content: string }>>([]);
   const [input, setInput] = useState("");
@@ -3948,11 +3948,18 @@ function AIAssistantPage() {
 
   const composer = (
     <div className="w-full">
-      <div className={`w-full overflow-hidden rounded-2xl border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5E7EB] bg-white shadow-[0_14px_34px_rgba(31,43,77,0.06)]"}`}>
-        <div className={`flex h-7 items-center px-4 text-[10px] font-semibold ${dark ? "bg-[#181B20] text-[#A8B0BA]" : "bg-[#E5E5E5] text-[#3D3D3D]"}`}>
+      <div className={`mb-4 flex h-[54px] items-center justify-between rounded-2xl px-8 text-[13px] font-semibold ${dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F3F3F3] text-[#9A9A9A]"}`}>
           <span>Use our faster AI on Pro Plan</span>
-        </div>
-        <div className="relative flex min-h-[108px] flex-col px-4 pb-3 pt-3">
+        <button
+          type="button"
+          onClick={() => openModal("upgrade")}
+          className={`h-10 rounded-xl border px-6 text-[13px] font-bold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8]" : "border-[#E1E1E1] bg-[#F7F7F7] text-[#3E3E3E]"}`}
+        >
+          Upgrade Now
+        </button>
+      </div>
+      <div className={`w-full overflow-hidden rounded-2xl border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#DCDCDC] bg-white shadow-[0_14px_34px_rgba(31,43,77,0.05)]"}`}>
+        <div className="relative flex min-h-[166px] flex-col px-8 pb-4 pt-6">
           <textarea
             value={input}
             onChange={(event) => setInput(event.target.value)}
@@ -3962,9 +3969,9 @@ function AIAssistantPage() {
                 void sendPrompt();
               }
             }}
-            placeholder="Ask me anything..."
+            placeholder="What do you want me to help you with?"
             rows={2}
-            className={`min-h-[44px] min-w-0 flex-1 resize-none bg-transparent text-[12px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#8D949E]"}`}
+            className={`min-h-[70px] min-w-0 flex-1 resize-none bg-transparent text-[14px] font-semibold leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#C7C7C7]"}`}
             style={{ color: dark ? "#F4F6F8" : "#171717", letterSpacing: 0 }}
           />
           {attachments.length > 0 && (
@@ -3984,48 +3991,46 @@ function AIAssistantPage() {
             </div>
           )}
           <div className={`mt-auto flex items-center gap-2 pt-2 max-sm:flex-wrap ${dark ? "text-[#A8B0BA]" : "text-[#4B463E]"}`}>
-            <button onClick={() => fileInputRef.current?.click()} className={`flex h-8 w-8 items-center justify-center rounded-full ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#111827] hover:bg-[#F3F4F6]"}`} aria-label="Attach file">
+            <button onClick={() => fileInputRef.current?.click()} className={`flex h-11 w-11 items-center justify-center rounded-2xl ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "bg-[#F0F0F0] text-[#8E8E8E] hover:bg-[#E8E8E8]"}`} aria-label="Attach file">
               <Paperclip className="h-4 w-4" />
             </button>
             <button
               type="button"
-              className={`inline-flex h-8 items-center gap-2 rounded-full border px-3 text-[11px] font-semibold transition-colors ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#DDE3EA] hover:border-[rgba(59,167,255,0.28)]" : "border-[#E5E7EB] bg-white text-[#30343A] hover:border-[#D1D5DB]"}`}
+              className={`inline-flex h-10 items-center gap-2 rounded-xl border px-4 text-[13px] font-semibold transition-colors ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#DDE3EA] hover:border-[rgba(59,167,255,0.28)]" : "border-[#D8D8D8] bg-white text-[#A1A1A1] hover:border-[#CACACA]"}`}
             >
-              <span className="flex h-4 w-4 items-center justify-center rounded-full border border-current text-[8px]">AI</span>
-              Claude 3.5 sonnet
-              <ChevronDown className="h-3 w-3" />
+              Codex Plus 5.5
             </button>
             <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
             <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
             <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
             <button
               type="button"
-              className={`ml-auto flex h-8 w-8 items-center justify-center rounded-full border ${dark ? "border-[rgba(255,255,255,0.08)] text-[#DDE3EA] hover:bg-[rgba(255,255,255,0.06)]" : "border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-[#F3F4F6]"}`}
+              className={`ml-auto flex h-11 w-11 items-center justify-center rounded-2xl ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[rgba(255,255,255,0.06)]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E8E8E8]"}`}
               aria-label="Voice input"
             >
-              <Mic className="h-3.5 w-3.5" />
+              <Mic className="h-5 w-5" />
             </button>
             <button
               onClick={() => void sendPrompt()}
               disabled={isSending}
               aria-label="Send prompt"
-              className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors disabled:opacity-70 ${dark ? "bg-[#3BA7FF] text-white hover:bg-[#2D8FF0]" : "bg-[#9CA3AF] text-white hover:bg-[#6B7280]"}`}
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1292E8] text-white transition-colors hover:bg-[#0F83D2] disabled:opacity-70"
             >
-              {isSending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4 -rotate-45" />}
+              {isSending ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
             </button>
           </div>
         </div>
       </div>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-3">
         {assistantChips.map((item) => {
           const Icon = item.icon;
           return (
               <button
                 key={item.label}
                 type="button"
-              className={`inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8] hover:border-[rgba(59,167,255,0.28)]" : "border-[#E5E7EB] bg-white text-[#171717] shadow-[0_6px_14px_rgba(31,43,77,0.04)] hover:border-[#D1D5DB]"}`}
+              className={`inline-flex h-10 min-w-[128px] items-center justify-center gap-2 rounded-2xl border px-4 text-[13px] font-bold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.28)]" : "border-[#DCDCDC] bg-white text-[#AAAAAA] shadow-[0_6px_14px_rgba(31,43,77,0.03)] hover:border-[#D1D5DB]"}`}
               >
-              <Icon className="h-3 w-3" />
+              <Icon className="h-4 w-4" />
                 {item.label}
               </button>
           );
@@ -4060,7 +4065,7 @@ function AIAssistantPage() {
   if (!hasConversation) {
     return (
       <div className={`flex min-h-full items-center justify-center px-0 py-2 ${dark ? "bg-transparent" : "bg-white"}`}>
-        <div className="flex w-full max-w-[620px] -translate-y-8 flex-col max-sm:translate-y-0">
+        <div className="flex w-full max-w-[700px] -translate-y-8 flex-col max-sm:translate-y-0">
           <div className="flex flex-col items-center text-center">
             <h2 className={`text-[28px] font-medium leading-tight tracking-[0] max-sm:text-[23px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
               Good Morning, Toby
