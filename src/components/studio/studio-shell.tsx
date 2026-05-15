@@ -22,6 +22,7 @@ import {
   ImageIcon,
   Layers3,
   MessageCircle,
+  Mic,
   Monitor,
   Moon,
   Network,
@@ -3676,7 +3677,7 @@ function CardDetailView({
 
 function AIAssistantPage() {
   const { theme } = useStudioTheme();
-  const { openModal, showToast, isTemporaryChat, temporaryChatId, endTemporaryChat } = useStudioActions();
+  const { showToast, isTemporaryChat, temporaryChatId, startTemporaryChat, endTemporaryChat } = useStudioActions();
   const dark = theme === "dark";
   const [messages, setMessages] = useState<Array<{ id: string; role: "user" | "assistant"; content: string }>>([]);
   const [input, setInput] = useState("");
@@ -3941,12 +3942,12 @@ function AIAssistantPage() {
 
   const composer = (
     <div className="w-full">
-      <div className={`w-full overflow-hidden rounded-[8px] border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5E7EB] bg-white shadow-[0_14px_34px_rgba(31,43,77,0.06)]"}`}>
+      <div className={`w-full overflow-hidden rounded-[4px] border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5E7EB] bg-white shadow-[0_14px_34px_rgba(31,43,77,0.06)]"}`}>
         <div className={`flex h-7 items-center px-4 text-[10px] font-semibold ${dark ? "bg-[#181B20] text-[#A8B0BA]" : "bg-[#E5E5E5] text-[#3D3D3D]"}`}>
           <span>Use our faster AI on Pro Plan</span>
           <span className="mx-2">-</span>
-          <button type="button" onClick={() => openModal("upgrade")} className={dark ? "text-[#7DD3FC]" : "text-[#171717]"}>
-            Upgrade
+          <button type="button" onClick={startTemporaryChat} className={dark ? "text-[#7DD3FC]" : "text-[#171717]"}>
+            Temporary chat
           </button>
         </div>
         <div className="relative flex min-h-[108px] flex-col px-4 pb-3 pt-3">
@@ -4000,7 +4001,7 @@ function AIAssistantPage() {
               className={`ml-auto flex h-8 w-8 items-center justify-center rounded-full border ${dark ? "border-[rgba(255,255,255,0.08)] text-[#DDE3EA] hover:bg-[rgba(255,255,255,0.06)]" : "border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-[#F3F4F6]"}`}
               aria-label="Voice input"
             >
-              <MessageCircle className="h-3.5 w-3.5" />
+              <Mic className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={() => void sendPrompt()}
