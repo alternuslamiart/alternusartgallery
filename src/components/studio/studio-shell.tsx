@@ -282,6 +282,8 @@ const StudioActionContext = createContext<{
   showToast: (message: string) => void;
   isTemporaryChat: boolean;
   temporaryChatId: number | null;
+  newChatId: number | null;
+  startNewChat: () => void;
   startTemporaryChat: () => void;
   endTemporaryChat: () => void;
 } | null>(null);
@@ -330,6 +332,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const [toast, setToast] = useState<string | null>(null);
   const [isTemporaryChat, setIsTemporaryChat] = useState(false);
   const [temporaryChatId, setTemporaryChatId] = useState<number | null>(null);
+  const [newChatId, setNewChatId] = useState<number | null>(null);
   const [sidebarSearch, setSidebarSearch] = useState("");
   const workspaceRef = useRef<HTMLDivElement>(null);
   const sidebarNotificationRef = useRef<HTMLDivElement>(null);
@@ -378,6 +381,21 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
     window.setTimeout(() => setToast(null), 2600);
   }, []);
 
+  const startNewChat = useCallback(() => {
+    setActiveModal(null);
+    setActiveDrawer(null);
+    setActiveRecent(null);
+    setWorkspaceOpen(false);
+    setNotificationsOpen(false);
+    setDisplayOpen(false);
+    setIsTemporaryChat(false);
+    setTemporaryChatId(null);
+    setNewChatId(Date.now());
+    setIsMobileOpen(false);
+    router.push("/ai-assistant");
+    showToast("New chat started");
+  }, [router, showToast]);
+
   const startTemporaryChat = useCallback(() => {
     setActiveModal(null);
     setActiveDrawer(null);
@@ -407,10 +425,12 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
       showToast,
       isTemporaryChat,
       temporaryChatId,
+      newChatId,
+      startNewChat,
       startTemporaryChat,
       endTemporaryChat,
     }),
-    [endTemporaryChat, isTemporaryChat, showToast, startTemporaryChat, temporaryChatId],
+    [endTemporaryChat, isTemporaryChat, newChatId, showToast, startNewChat, startTemporaryChat, temporaryChatId],
   );
 
   useEffect(() => {
@@ -558,7 +578,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
             <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F3F6F8] text-[#9CA3AF]"}`}>/</span>
           </div>
           <button
-            onClick={startTemporaryChat}
+            onClick={startNewChat}
             className="mb-4 flex h-9 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#38BDF8] to-[#1DA1F2] text-[11px] font-semibold text-white shadow-[0_10px_24px_rgba(29,161,242,0.24)] transition-all hover:from-[#2FB2EE] hover:to-[#168ED8] active:scale-[0.98]"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -583,15 +603,19 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
       <div className="mt-auto">
         {!isCollapsed && (
-          <button
-            onClick={() => setActiveModal("upgrade")}
-            className={`mb-5 flex h-10 w-full items-center gap-3 rounded-full px-3 text-[12px] font-bold transition-all active:scale-[0.98] ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8] shadow-[0_12px_30px_rgba(0,0,0,0.24)] hover:border-[rgba(59,167,255,0.24)]" : "border border-white/80 bg-white text-[#171717] shadow-[0_12px_30px_rgba(31,43,77,0.08)] hover:border-[#CFE8F8]"}`}
-          >
-            <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#1DA1F2] text-white shadow-[0_8px_18px_rgba(29,161,242,0.22)]">
-              <Sparkles className="h-4 w-4 fill-current" />
-            </span>
-            Upgrade Now
-          </button>
+          <div className={`mb-5 rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.12)] bg-[#1D2026] text-[#F4F6F8] shadow-[0_14px_36px_rgba(0,0,0,0.28)]" : "border-[#D6DEE7] bg-[#EAF2F7] text-[#171717] shadow-[0_14px_36px_rgba(31,43,77,0.11)]"}`}>
+            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white shadow-[0_10px_22px_rgba(29,161,242,0.24)]">
+              <Sparkles className="h-[15px] w-[15px] fill-current" />
+            </div>
+            <p className="text-[12px] font-bold">Free Plan</p>
+            <p className={`mt-1 text-[10px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#596575]"}`}>There are 12 days left before your free plan ends.</p>
+            <button
+              onClick={() => setActiveModal("upgrade")}
+              className={`mt-3 h-8 rounded-lg border px-3 text-[10px] font-semibold ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328] text-[#F4F6F8] hover:border-[rgba(59,167,255,0.24)]" : "border-[#D1D9E2] bg-white text-[#171717] shadow-sm hover:border-[#B8C7D6]"}`}
+            >
+              Upgrade Now
+            </button>
+          </div>
         )}
         <div className="space-y-1 pb-1">
           {visibleBottomNavigation.map((item) => (
@@ -3683,7 +3707,7 @@ function CardDetailView({
 
 function AIAssistantPage() {
   const { theme } = useStudioTheme();
-  const { openModal, showToast, isTemporaryChat, temporaryChatId, endTemporaryChat } = useStudioActions();
+  const { openModal, showToast, isTemporaryChat, temporaryChatId, newChatId, endTemporaryChat } = useStudioActions();
   const dark = theme === "dark";
   const [messages, setMessages] = useState<Array<{ id: string; role: "user" | "assistant"; content: string }>>([]);
   const [input, setInput] = useState("");
@@ -3709,6 +3733,15 @@ function AIAssistantPage() {
     setMessageFeedback({});
     setIsSending(false);
   }, [temporaryChatId]);
+
+  useEffect(() => {
+    if (!newChatId) return;
+    setMessages([]);
+    setInput("");
+    setAttachments([]);
+    setMessageFeedback({});
+    setIsSending(false);
+  }, [newChatId]);
 
   useEffect(() => {
     let isMounted = true;
