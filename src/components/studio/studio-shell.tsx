@@ -492,7 +492,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const sidebar = (
     <aside
       className={[
-        "flex h-full flex-shrink-0 flex-col py-3 transition-all duration-200 ease-out",
+        "flex h-full flex-shrink-0 flex-col rounded-none py-3 transition-all duration-200 ease-out",
         dark
           ? "border-r border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,#181A1F_0%,#14161A_100%)]"
           : "border-r border-white/70 bg-[linear-gradient(180deg,#EAF3F8_0%,#F6FAFC_100%)]",
@@ -774,16 +774,16 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         }
       `}</style>
       <div className="flex h-full">
-        {activeRoute !== "ai-assistant" && <div className="hidden lg:block">{sidebar}</div>}
+        <div className="hidden lg:block">{sidebar}</div>
         {isMobileOpen && (
           <div className="fixed inset-0 z-40 lg:hidden">
             <button className={`absolute inset-0 ${dark ? "bg-black/40 backdrop-blur-[2px]" : "bg-[#1F2937]/20 backdrop-blur-[2px]"}`} onClick={() => setIsMobileOpen(false)} aria-label="Close sidebar" />
-            <div className="relative h-full w-[230px] shadow-[18px_0_50px_rgba(31,43,77,0.16)]">{sidebar}</div>
+            <div className="relative h-full w-[230px] rounded-none shadow-[18px_0_50px_rgba(31,43,77,0.16)]">{sidebar}</div>
           </div>
         )}
 
-        <main className={`flex min-w-0 flex-1 flex-col ${activeRoute === "ai-assistant" ? "p-0" : "p-3"}`}>
-          <header className={`mb-3 h-8 items-center justify-between px-1 ${activeRoute === "ai-assistant" ? "hidden" : "flex"}`}>
+        <main className="flex min-w-0 flex-1 flex-col p-3">
+          <header className="mb-3 flex h-8 items-center justify-between px-1">
             <div className="flex min-w-0 items-center gap-3">
               <div className={`relative flex items-center gap-2 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
                 <div ref={notificationRef} className="relative">
@@ -828,7 +828,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
           <section
             className={[
-              activeRoute === "ai-assistant" ? "min-h-0 flex-1 rounded-none" : "min-h-0 flex-1 rounded-3xl",
+              activeRoute === "ai-assistant" ? "min-h-0 flex-1 rounded-[12px]" : "min-h-0 flex-1 rounded-3xl",
               activeRoute === "ai-assistant" ? "overflow-hidden flex flex-col" : "overflow-auto",
               activeRoute === "ai-assistant" ? "p-0" : activeRoute === "code-builder" ? "px-4 py-4" : "px-8 py-8",
               dark
@@ -3706,28 +3706,6 @@ function CardDetailView({
 }
 
 function AIAssistantPage() {
-  const slideIndicators = Array.from({ length: 10 });
-
-  return (
-    <div className="h-full w-full bg-white">
-      <div className="relative h-full w-full overflow-hidden rounded-[18px] border border-[#E5E5E5] bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-        <div className="absolute inset-x-0 top-0 z-20 h-px bg-[#E5E5E5]" />
-        <div className="absolute inset-x-0 bottom-0 z-20 h-px bg-[#E5E5E5]" />
-
-        <aside className="absolute inset-y-0 left-0 w-[18%] min-w-[260px] max-w-[300px] border-r border-[#E5E5E5] bg-[#E5E5E5] shadow-[inset_-1px_0_0_rgba(255,255,255,0.35)]" />
-
-        <section className="absolute inset-y-0 left-[18%] right-0 bg-white max-[1440px]:left-[260px]">
-          <div className="absolute inset-0 shadow-[inset_0_1px_0_rgba(229,229,229,0.45),inset_0_-1px_0_rgba(229,229,229,0.45)]" />
-          <div className="absolute right-5 top-1/2 flex -translate-y-1/2 flex-col gap-[10px]">
-            {slideIndicators.map((_, index) => (
-              <span key={index} className="h-[5px] w-[12px] rounded-full bg-[#D6D6D6]" />
-            ))}
-          </div>
-        </section>
-      </div>
-    </div>
-  );
-
   const { theme } = useStudioTheme();
   const { openModal, showToast, isTemporaryChat, temporaryChatId, newChatId, endTemporaryChat } = useStudioActions();
   const dark = theme === "dark";
@@ -4119,8 +4097,8 @@ function AIAssistantPage() {
 
   if (!hasConversation) {
     return (
-      <div className={`flex min-h-full items-center justify-center px-0 py-2 ${dark ? "bg-transparent" : "bg-white"}`}>
-        <div className="flex w-full max-w-[700px] -translate-y-8 flex-col max-sm:translate-y-0">
+      <div className={`flex min-h-full items-start justify-center px-0 pb-2 pt-[138px] max-xl:pt-[108px] max-sm:pt-8 ${dark ? "bg-transparent" : "bg-white"}`}>
+        <div className="flex w-full max-w-[700px] flex-col">
           <div className="flex flex-col items-center text-center">
             <h2 className={`text-[28px] font-medium leading-tight tracking-[0] max-sm:text-[23px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
               Good Morning, Toby
