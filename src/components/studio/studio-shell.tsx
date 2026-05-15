@@ -803,7 +803,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
               dark
                 ? "border border-[rgba(255,255,255,0.08)] bg-[#17191D] shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
                 : "border border-[#E8EEF2] bg-white shadow-[0_24px_60px_rgba(31,43,77,0.06)]",
-              activeRoute === "ai-assistant" ? (dark ? "max-sm:px-4 max-sm:py-0" : "border-transparent bg-[#FBF7EE] shadow-none max-sm:px-4 max-sm:py-0") : "",
+              activeRoute === "ai-assistant" ? (dark ? "max-sm:px-4 max-sm:py-0" : "border-transparent bg-white shadow-none max-sm:px-4 max-sm:py-0") : "",
             ].join(" ")}
           >
             <div className={
@@ -4056,8 +4056,8 @@ function AIAssistantPage() {
 
   if (!hasConversation) {
     return (
-      <div className={`flex min-h-full justify-center px-0 py-2 ${dark ? "bg-transparent" : "bg-[#FBF7EE]"}`}>
-        <div className="flex w-full max-w-[620px] flex-col">
+      <div className={`flex min-h-full items-center justify-center px-0 py-2 ${dark ? "bg-transparent" : "bg-white"}`}>
+        <div className="flex w-full max-w-[620px] -translate-y-8 flex-col max-sm:translate-y-0">
           <div className="flex flex-col items-center text-center">
             <h2 className={`text-[28px] font-medium leading-tight tracking-[0] max-sm:text-[23px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
               Good Morning, Toby
