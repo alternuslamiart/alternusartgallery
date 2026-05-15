@@ -743,7 +743,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         }
       `}</style>
       <div className="flex h-full">
-        {activeRoute !== "ai-assistant" && <div className="hidden lg:block">{sidebar}</div>}
+        <div className="hidden lg:block">{sidebar}</div>
         {isMobileOpen && (
           <div className="fixed inset-0 z-40 lg:hidden">
             <button className={`absolute inset-0 ${dark ? "bg-black/40 backdrop-blur-[2px]" : "bg-[#1F2937]/20 backdrop-blur-[2px]"}`} onClick={() => setIsMobileOpen(false)} aria-label="Close sidebar" />
@@ -752,7 +752,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         )}
 
         <main className="flex min-w-0 flex-1 flex-col p-3">
-          <header className={`mb-3 h-8 items-center justify-between px-1 ${activeRoute === "ai-assistant" ? "hidden" : "flex"}`}>
+          <header className={`mb-3 flex h-8 items-center justify-between px-1 ${activeRoute === "ai-assistant" ? "max-sm:hidden" : ""}`}>
             <div className="flex min-w-0 items-center gap-3">
               <div className={`relative flex items-center gap-2 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
                 <div ref={notificationRef} className="relative">
@@ -799,11 +799,11 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
             className={[
               "min-h-0 flex-1 rounded-3xl",
               activeRoute === "ai-assistant" ? "overflow-hidden flex flex-col" : "overflow-auto",
-              activeRoute === "ai-assistant" ? "p-0" : activeRoute === "code-builder" ? "px-4 py-4" : "px-8 py-8",
+              activeRoute === "code-builder" ? "px-4 py-4" : "px-8 py-8",
               dark
                 ? "border border-[rgba(255,255,255,0.08)] bg-[#17191D] shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
                 : "border border-[#E8EEF2] bg-white shadow-[0_24px_60px_rgba(31,43,77,0.06)]",
-              activeRoute === "ai-assistant" ? (dark ? "border-transparent shadow-none" : "border-transparent bg-white shadow-none") : "",
+              activeRoute === "ai-assistant" ? (dark ? "max-sm:px-4 max-sm:py-0" : "border-transparent bg-[#FBF7EE] shadow-none max-sm:px-4 max-sm:py-0") : "",
             ].join(" ")}
           >
             <div className={
@@ -3688,6 +3688,7 @@ function AIAssistantPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
+  const hasConversation = messages.length > 0;
 
   useEffect(() => {
     conversationEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -3931,53 +3932,25 @@ function AIAssistantPage() {
     }
   };
 
-  const demoMessages: Array<{ id: string; role: "user" | "assistant"; content: string }> = [
-    {
-      id: "demo-user",
-      role: "user",
-      content: "Create a chatbot gpt using python language what will be step for that",
-    },
-    {
-      id: "demo-assistant",
-      role: "assistant",
-      content:
-        "Sure, I can help you get started with creating a chatbot using GPT in Python.\nHere are the basic steps you'll need to follow:\n\n1. Install the required libraries: You'll need to install the transformers library from Hugging Face to use GPT. You can install it using pip.\n\n2. Load the pre-trained model: GPT comes in several sizes and versions, so you'll need to choose the one that fits your needs. You can load a pre-trained GPT model. This loads the 1.3B parameter version of GPT-Neo, which is a powerful and relatively recent model.\n\n3. Create a chatbot loop: You'll need to create a loop that takes user input, generates a response using the GPT model, and outputs it to the user. This loop will keep running until the user exits the program or the loop is interrupted.\n\n4. Add some personality to the chatbot: While GPT can generate text, it doesn't have any inherent personality or style. You can make your chatbot more interesting by adding custom prompts or responses that reflect your desired personality.",
-    },
-  ];
-  const visibleMessages = messages.length ? messages : demoMessages;
-  const conversationItems = [
-    "Create HTML Game...",
-    "Apply To Leave For Emergency",
-    "What is UI UX Design?",
-    "Create UI System",
-    "What is UX Audit",
-    "Create Prompt...",
-    "Create 3D Environment",
-    "AutoCAD design for building",
+  const assistantChips = [
+    { label: "Summary", icon: CircleSlash },
+    { label: "Code", icon: Code2 },
+    { label: "Design", icon: PenLine },
+    { label: "Research", icon: Network },
   ];
 
   const composer = (
-    <div className={`relative w-full border-t px-8 pb-5 pt-8 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#111318]" : "border-[#EDF0F2] bg-white"}`}>
-      <div className="pointer-events-none absolute left-[18%] top-0 flex items-center gap-3 text-[26px] font-medium text-[#EF4444]">
-        <span>Submit line</span>
-        <span className="h-px w-28 origin-left rotate-[10deg] bg-[#EF4444]" />
-      </div>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          void sendPrompt();
-        }}
-        className={`mx-auto flex h-14 w-full max-w-[900px] items-center gap-3 rounded-full border px-3 shadow-[0_8px_24px_rgba(15,23,42,0.08)] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#1B1E24]" : "border-[#E2E6EA] bg-white"}`}
-      >
-        <button
-          type="button"
-          onClick={() => openModal("upload-file")}
-          className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${dark ? "bg-[#272B33] text-[#C7D0DC]" : "bg-[#F1F3F5] text-[#9AA2AD]"}`}
-          aria-label="Attach file"
-        >
-          <Plus className="h-5 w-5" />
-        </button>
-        <textarea
+    <div className="w-full">
+      <div className={`w-full overflow-hidden rounded-[8px] border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5E7EB] bg-white shadow-[0_14px_34px_rgba(31,43,77,0.06)]"}`}>
+        <div className={`flex h-7 items-center px-4 text-[10px] font-semibold ${dark ? "bg-[#181B20] text-[#A8B0BA]" : "bg-[#E5E5E5] text-[#3D3D3D]"}`}>
+          <span>Use our faster AI on Pro Plan</span>
+          <span className="mx-2">-</span>
+          <button type="button" onClick={() => openModal("upgrade")} className={dark ? "text-[#7DD3FC]" : "text-[#171717]"}>
+            Upgrade
+          </button>
+        </div>
+        <div className="relative flex min-h-[108px] flex-col px-4 pb-3 pt-3">
+          <textarea
             value={input}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={(event) => {
@@ -3986,39 +3959,75 @@ function AIAssistantPage() {
                 void sendPrompt();
               }
             }}
-            placeholder="Ask anything..."
-            rows={1}
-            className={`mt-4 min-h-[26px] min-w-0 flex-1 resize-none bg-transparent text-[13px] font-semibold leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#747C89]" : "text-[#22262C] placeholder:text-[#A3AAB3]"}`}
+            placeholder="Ask me anything..."
+            rows={2}
+            className={`min-h-[44px] min-w-0 flex-1 resize-none bg-transparent text-[12px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#8D949E]"}`}
             style={{ color: dark ? "#F4F6F8" : "#171717", letterSpacing: 0 }}
           />
-        {attachments.length > 0 && (
-          <div className="absolute bottom-[86px] left-8 flex max-w-[700px] flex-wrap gap-2">
-            {attachments.map((attachment) => (
-              <span key={attachment.id} className={`inline-flex max-w-full items-center gap-2 rounded-full border px-2.5 py-1 text-[10px] font-medium ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]" : "border-[#E5E7EB] bg-[#F8FAFC] text-[#4B5563]"}`}>
-                <span className="truncate">{attachment.name}</span>
-                <button
-                  onClick={() => setAttachments((current) => current.filter((item) => item.id !== attachment.id))}
-                  className={`rounded-full ${dark ? "text-[#6F7782] hover:text-[#F4F6F8]" : "text-[#9CA3AF] hover:text-[#171717]"}`}
-                  aria-label={`Remove ${attachment.name}`}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
+          {attachments.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {attachments.map((attachment) => (
+                <span key={attachment.id} className={`inline-flex max-w-full items-center gap-2 rounded-full border px-2.5 py-1 text-[10px] font-medium ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]" : "border-[#E5E7EB] bg-[#F8FAFC] text-[#4B5563]"}`}>
+                  <span className="truncate">{attachment.name}</span>
+                  <button
+                    onClick={() => setAttachments((current) => current.filter((item) => item.id !== attachment.id))}
+                    className={`rounded-full ${dark ? "text-[#6F7782] hover:text-[#F4F6F8]" : "text-[#9CA3AF] hover:text-[#171717]"}`}
+                    aria-label={`Remove ${attachment.name}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className={`mt-auto flex items-center gap-2 pt-2 max-sm:flex-wrap ${dark ? "text-[#A8B0BA]" : "text-[#4B463E]"}`}>
+            <button onClick={() => fileInputRef.current?.click()} className={`flex h-8 w-8 items-center justify-center rounded-full ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#111827] hover:bg-[#F3F4F6]"}`} aria-label="Attach file">
+              <Paperclip className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              className={`inline-flex h-8 items-center gap-2 rounded-full border px-3 text-[11px] font-semibold transition-colors ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#DDE3EA] hover:border-[rgba(59,167,255,0.28)]" : "border-[#E5E7EB] bg-white text-[#30343A] hover:border-[#D1D5DB]"}`}
+            >
+              <span className="flex h-4 w-4 items-center justify-center rounded-full border border-current text-[8px]">AI</span>
+              Claude 3.5 sonnet
+              <ChevronDown className="h-3 w-3" />
+            </button>
+            <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
+            <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
+            <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
+            <button
+              type="button"
+              className={`ml-auto flex h-8 w-8 items-center justify-center rounded-full border ${dark ? "border-[rgba(255,255,255,0.08)] text-[#DDE3EA] hover:bg-[rgba(255,255,255,0.06)]" : "border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-[#F3F4F6]"}`}
+              aria-label="Voice input"
+            >
+              <MessageCircle className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => void sendPrompt()}
+              disabled={isSending}
+              aria-label="Send prompt"
+              className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors disabled:opacity-70 ${dark ? "bg-[#3BA7FF] text-white hover:bg-[#2D8FF0]" : "bg-[#9CA3AF] text-white hover:bg-[#6B7280]"}`}
+            >
+              {isSending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4 -rotate-45" />}
+            </button>
           </div>
-        )}
-        <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
-        <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
-        <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
-        <button
-          type="submit"
-          disabled={isSending}
-          aria-label="Send prompt"
-          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-[#1299EA] text-white shadow-[0_10px_22px_rgba(18,153,234,0.34)] transition-colors hover:bg-[#0E83CC] disabled:opacity-70"
-        >
-          {isSending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-5 w-5" />}
-        </button>
-      </form>
+        </div>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {assistantChips.map((item) => {
+          const Icon = item.icon;
+          return (
+              <button
+                key={item.label}
+                type="button"
+              className={`inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-[11px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8] hover:border-[rgba(59,167,255,0.28)]" : "border-[#E5E7EB] bg-white text-[#171717] shadow-[0_6px_14px_rgba(31,43,77,0.04)] hover:border-[#D1D5DB]"}`}
+              >
+              <Icon className="h-3 w-3" />
+                {item.label}
+              </button>
+          );
+        })}
+      </div>
     </div>
   );
 
@@ -4045,91 +4054,66 @@ function AIAssistantPage() {
     </div>
   ) : null;
 
-  return (
-    <div className={`relative flex h-full min-h-[760px] overflow-hidden rounded-[22px] border font-sans ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#111318]" : "border-[#EEF0F3] bg-white"}`}>
-      <aside className={`relative flex w-[248px] flex-shrink-0 flex-col px-4 py-5 ${dark ? "bg-[#171A20]" : "bg-[#F3F4F6]"}`}>
-        <div className="mb-5 flex items-center gap-2">
-          <h1 className={`text-[21px] font-bold tracking-[-0.03em] ${dark ? "text-white" : "text-[#1E232B]"}`}>Softray</h1>
-          <button className={`ml-auto flex h-8 w-8 items-center justify-center rounded-full ${dark ? "bg-[#222731] text-[#AAB2C0]" : "bg-white text-[#8C94A0]"}`} aria-label="Search">
-            <Search className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="relative mb-5 border-2 border-[#EF4444] p-2">
-          <span className="pointer-events-none absolute -top-9 left-14 text-[31px] font-medium text-[#EF4444]">Submit</span>
-          <button onClick={() => { setMessages([]); setInput(""); showToast("New chat started"); }} className="flex h-10 w-full items-center justify-center gap-2 rounded-[10px] bg-[#128FE3] text-[13px] font-bold text-white shadow-[0_10px_22px_rgba(18,143,227,0.22)]">
-            <span className="flex h-5 w-5 items-center justify-center rounded-md border border-white/50">
-              <Plus className="h-3.5 w-3.5" />
-            </span>
-            New chat
-          </button>
-        </div>
-        <nav className="space-y-2">
-          {["Build Environment", "Build Website", "New Projects"].map((item) => (
-            <button key={item} className={`h-10 w-full rounded-xl px-4 text-left text-[13px] font-bold ${dark ? "text-[#B9C1CC] hover:bg-[#20242D]" : "text-[#666D76] hover:bg-white"}`}>
-              {item}
-            </button>
-          ))}
-        </nav>
-        <div className="mt-16 flex items-center justify-between px-2">
-          <span className={`text-[10px] font-semibold ${dark ? "text-[#7B8491]" : "text-[#8E96A1]"}`}>Your conversations</span>
-          <button className="text-[10px] font-bold text-[#1299EA]">Clear All</button>
-        </div>
-        <div className="mt-3 space-y-1">
-          {conversationItems.map((item, index) => (
-            <button key={item} className={`group flex h-10 w-full items-center rounded-xl px-3 text-left text-[13px] font-bold ${index === 0 ? (dark ? "bg-[#20242D] text-white" : "bg-white text-[#626A74] shadow-sm") : dark ? "text-[#AEB7C4] hover:bg-[#20242D]" : "text-[#626A74] hover:bg-white"}`}>
-              <span className={`truncate ${index === 1 ? "text-[#1299EA]" : ""}`}>{item}</span>
-              {index === 0 && <span className={`ml-auto rounded-full px-2 py-1 text-[12px] ${dark ? "bg-[#2A303B]" : "bg-[#EEF0F2]"}`}>...</span>}
-            </button>
-          ))}
-        </div>
-        <div className="relative mt-auto border-2 border-[#EF4444] p-2">
-          <span className="pointer-events-none absolute -top-11 left-12 text-[27px] font-medium text-[#EF4444]">Submit</span>
-          <span className="pointer-events-none absolute -top-4 left-[112px] h-9 w-px bg-[#EF4444]" />
-          <button className="flex h-11 w-full items-center gap-3 rounded-xl bg-white px-3 text-[13px] font-bold text-[#1E232B] shadow-sm">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1299EA] text-white">
-              <Sparkles className="h-4 w-4 fill-current" />
-            </span>
-            Upgrade Now
-          </button>
-        </div>
-        <button className={`mt-20 flex items-center gap-2 px-3 text-[13px] font-bold ${dark ? "text-[#D1D7E0]" : "text-[#313741]"}`}>
-          <Settings className="h-4 w-4" />
-          Settings
-        </button>
-      </aside>
+  if (!hasConversation) {
+    return (
+      <div className={`flex min-h-full justify-center px-0 py-2 ${dark ? "bg-transparent" : "bg-[#FBF7EE]"}`}>
+        <div className="flex w-full max-w-[620px] flex-col">
+          <div className="flex flex-col items-center text-center">
+            <h2 className={`text-[28px] font-medium leading-tight tracking-[0] max-sm:text-[23px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
+              Good Morning, Toby
+            </h2>
+            <p className={`mt-1 text-[25px] font-medium leading-tight tracking-[0] max-sm:text-[20px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
+              How Can I <span className="text-[#A78BFA]">Assist You Today?</span>
+            </p>
+          </div>
 
-      <main className="relative flex min-w-0 flex-1 flex-col bg-white">
-        <div className="absolute left-1/2 top-0 h-7 w-40 -translate-x-1/2 rounded-b-2xl bg-black" />
-        <button className="absolute right-72 top-12 z-10 flex h-8 w-8 items-center justify-center border-2 border-[#EF4444] text-[#9AA2AD]" aria-label="Submit">
-          <span className="pointer-events-none absolute -top-12 text-[29px] font-medium text-[#EF4444]">Submit</span>
-          <Send className="h-4 w-4" />
-        </button>
-        <div className="absolute right-0 top-[368px] z-10 border-2 border-[#EF4444] px-5 py-8">
-          <span className="pointer-events-none absolute -left-[73px] -top-[50px] text-[29px] font-medium text-[#EF4444]">Submit</span>
-          <span className="pointer-events-none absolute -left-[21px] top-5 h-px w-8 -rotate-[145deg] bg-[#EF4444]" />
-          <div className="space-y-3">
-            {Array.from({ length: 8 }).map((_, index) => (
-              <span key={index} className="block h-1.5 w-3 rounded-full bg-[#D8DADD]" />
-            ))}
+          {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
+
+          <div className="mt-7 w-full">{composer}</div>
+
+          <div className={`mt-5 text-center text-[10px] ${dark ? "text-[#6F7782]" : "text-[#B4A99A]"}`}>
+            {aiProviderLabel}
           </div>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-10 pb-4 pt-16">
-          <div className="mx-auto max-w-[720px]">
-            {temporaryChatNotice && <div className="mb-6">{temporaryChatNotice}</div>}
-            {visibleMessages.map((message) => (
-              <div key={message.id} className="mb-6 flex gap-5">
-                <div className={`mt-1 h-7 w-7 flex-shrink-0 rounded-lg ${message.role === "user" ? "bg-[#EFF1F3]" : "bg-transparent"}`} />
-                <div className={`min-w-0 flex-1 text-[13px] font-bold leading-[1.42] ${dark ? "text-[#1E232B]" : "text-[#1E232B]"}`}>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto flex h-full w-full max-w-[900px] flex-col">
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="flex min-h-full flex-col justify-end gap-5 pb-4">
+          {temporaryChatNotice}
+          {messages.map((message) => (
+            <div key={message.id} className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+              {message.role === "assistant" && (
+                <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white shadow-[0_12px_26px_rgba(29,161,242,0.28)]">
+                  <Sparkles className="h-4 w-4 fill-current" />
+                </div>
+              )}
+              <div className={`flex max-w-[720px] flex-col ${message.role === "user" ? "items-end" : "items-start"}`}>
+                <div
+                  className={`rounded-[24px] px-4 py-3 text-[13px] leading-6 shadow-[0_10px_28px_rgba(31,43,77,0.04)] ${
+                    message.role === "user"
+                      ? dark
+                        ? "border border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]"
+                        : "border border-[#E5E7EB] bg-white text-[#171717]"
+                      : dark
+                        ? "text-[#F4F6F8]"
+                        : "text-[#171717]"
+                  }`}
+                >
                   <p className="whitespace-pre-wrap">{message.content}</p>
-                  {message.role === "assistant" && (
-                    <div className="mt-4 inline-flex items-center gap-1 rounded-full border border-[#E3E7EB] bg-white px-2 py-1 text-[#99A1AB] shadow-sm">
+                </div>
+                {message.role === "assistant" && (
+                  <div className={`mt-2 flex items-center gap-1 rounded-full border px-1.5 py-1 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]/80 text-[#A8B0BA]" : "border-[#E5E7EB] bg-white/80 text-[#9CA3AF] shadow-sm"}`}>
                     <button
                       onClick={() => void copyAssistantMessage(message.content)}
-                        className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-[#F2F4F6]"
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
                       aria-label="Copy response"
                       title="Copy"
                     >
-                        <Copy className="h-3 w-3" />
+                      <Copy className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => {
@@ -4141,11 +4125,11 @@ function AIAssistantPage() {
                         });
                         showToast("Feedback saved");
                       }}
-                        className={`flex h-5 w-5 items-center justify-center rounded-full ${messageFeedback[message.id] === "like" ? "bg-[#E6F3FE] text-[#1299EA]" : "hover:bg-[#F2F4F6]"}`}
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${messageFeedback[message.id] === "like" ? "bg-[#DDEEFF] text-[#1D9BF0]" : dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
                       aria-label="Like response"
                       title="Like"
                     >
-                        <ThumbsUp className="h-3 w-3" />
+                      <ThumbsUp className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => {
@@ -4157,36 +4141,36 @@ function AIAssistantPage() {
                         });
                         showToast("Feedback saved");
                       }}
-                        className={`flex h-5 w-5 items-center justify-center rounded-full ${messageFeedback[message.id] === "dislike" ? "bg-[#FFE8ED] text-[#D92D52]" : "hover:bg-[#F2F4F6]"}`}
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${messageFeedback[message.id] === "dislike" ? "bg-[#FFE8ED] text-[#D92D52]" : dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
                       aria-label="Dislike response"
                       title="Dislike"
                     >
-                        <ThumbsDown className="h-3 w-3" />
+                      <ThumbsDown className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => void regenerateAssistantMessage(message.id)}
                       disabled={isSending}
-                        className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-[#F2F4F6] disabled:opacity-45"
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
                       aria-label="Regenerate response"
                       title="Regenerate"
                     >
-                        <RefreshCw className="h-3 w-3" />
+                      <RefreshCw className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => void shareAssistantMessage(message.content)}
-                        className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-[#F2F4F6]"
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
                       aria-label="Share response"
                       title="Share"
                     >
-                        <Share2 className="h-3 w-3" />
+                      <Share2 className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => downloadAssistantMessage(message)}
-                        className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-[#F2F4F6]"
+                      className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
                       aria-label="Download response"
                       title="Download"
                     >
-                        <Download className="h-3 w-3" />
+                      <Download className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 )}
@@ -4204,13 +4188,15 @@ function AIAssistantPage() {
             </div>
           )}
           <div ref={conversationEndRef} />
-            <div className="text-center text-[10px] text-[#A8AFB8]">
+          <div className={`text-center text-[11px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`}>
             {aiProviderLabel}
           </div>
         </div>
       </div>
+
+      <div className="pb-6 pt-3">
         {composer}
-      </main>
+      </div>
     </div>
   );
 }
