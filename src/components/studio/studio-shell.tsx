@@ -534,28 +534,38 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
       </div>
 
       {!isCollapsed && (
-        <div className={`mb-5 flex h-10 w-full items-center gap-2 rounded-2xl border px-3 transition-all ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_22px_rgba(0,0,0,0.16)] focus-within:border-[rgba(59,167,255,0.34)]" : "border-white/80 bg-white/72 shadow-[0_8px_22px_rgba(31,43,77,0.04)] focus-within:border-[#9BD2FF]"}`}>
-          <Search className={`h-[13px] w-[13px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} />
-          <input
-            ref={sidebarSearchRef}
-            value={sidebarSearch}
-            onChange={(event) => setSidebarSearch(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                const firstResult = visibleMainNavigation[0] ?? visibleBottomNavigation[0];
-                if (firstResult) {
-                  router.push(firstResult.href);
-                  setSidebarSearch("");
-                  setIsMobileOpen(false);
+        <>
+          <div className={`mb-3 flex h-10 w-full items-center gap-2 rounded-2xl border px-3 transition-all ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_22px_rgba(0,0,0,0.16)] focus-within:border-[rgba(59,167,255,0.34)]" : "border-white/80 bg-white/72 shadow-[0_8px_22px_rgba(31,43,77,0.04)] focus-within:border-[#9BD2FF]"}`}>
+            <Search className={`h-[13px] w-[13px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} />
+            <input
+              ref={sidebarSearchRef}
+              value={sidebarSearch}
+              onChange={(event) => setSidebarSearch(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  const firstResult = visibleMainNavigation[0] ?? visibleBottomNavigation[0];
+                  if (firstResult) {
+                    router.push(firstResult.href);
+                    setSidebarSearch("");
+                    setIsMobileOpen(false);
+                  }
                 }
-              }
-            }}
-            className={`min-w-0 flex-1 bg-transparent text-[12px] outline-none placeholder:text-[#A1A7B0] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}
-            placeholder="Search..."
-            aria-label="Search navigation"
-          />
-          <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F3F6F8] text-[#9CA3AF]"}`}>/</span>
-        </div>
+              }}
+              className={`min-w-0 flex-1 bg-transparent text-[12px] outline-none placeholder:text-[#A1A7B0] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}
+              placeholder="Search..."
+              aria-label="Search navigation"
+            />
+            <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F3F6F8] text-[#9CA3AF]"}`}>/</span>
+          </div>
+          <button
+            onClick={startTemporaryChat}
+            className="mb-4 flex h-9 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#38BDF8] to-[#1DA1F2] text-[11px] font-semibold text-white shadow-[0_10px_24px_rgba(29,161,242,0.24)] transition-all hover:from-[#2FB2EE] hover:to-[#168ED8] active:scale-[0.98]"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            New Chat
+            <Sparkles className="h-3.5 w-3.5 fill-current" />
+          </button>
+        </>
       )}
 
       <nav className="space-y-1">
@@ -573,19 +583,15 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
       <div className="mt-auto">
         {!isCollapsed && (
-          <div className={`mb-5 rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#17191D] shadow-[0_14px_36px_rgba(0,0,0,0.22)]" : "border-white/80 bg-white/72 shadow-[0_14px_36px_rgba(31,43,77,0.07)]"}`}>
-            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white shadow-[0_10px_22px_rgba(29,161,242,0.24)]">
-              <Sparkles className="h-[15px] w-[15px] fill-current" />
-            </div>
-            <p className={`text-[12px] font-bold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Cerevix AI Trial</p>
-            <p className={`mt-1 text-[10px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>There are 12 days left for you to enjoy the various features.</p>
-            <button
-              onClick={() => setActiveModal("upgrade")}
-              className={`mt-3 rounded-lg border px-3 py-1.5 text-[10px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:border-[rgba(59,167,255,0.24)]" : "border-[#E5E7EB] bg-white text-[#171717] shadow-sm hover:border-[#CFE8F8]"}`}
-            >
-              Upgrade to Pro
-            </button>
-          </div>
+          <button
+            onClick={() => setActiveModal("upgrade")}
+            className={`mb-5 flex h-10 w-full items-center gap-3 rounded-full px-3 text-[12px] font-bold transition-all active:scale-[0.98] ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8] shadow-[0_12px_30px_rgba(0,0,0,0.24)] hover:border-[rgba(59,167,255,0.24)]" : "border border-white/80 bg-white text-[#171717] shadow-[0_12px_30px_rgba(31,43,77,0.08)] hover:border-[#CFE8F8]"}`}
+          >
+            <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#1DA1F2] text-white shadow-[0_8px_18px_rgba(29,161,242,0.22)]">
+              <Sparkles className="h-4 w-4 fill-current" />
+            </span>
+            Upgrade Now
+          </button>
         )}
         <div className="space-y-1 pb-1">
           {visibleBottomNavigation.map((item) => (
