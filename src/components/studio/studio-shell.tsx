@@ -803,7 +803,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
               dark
                 ? "border border-[rgba(255,255,255,0.08)] bg-[#17191D] shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
                 : "border border-[#E8EEF2] bg-white shadow-[0_24px_60px_rgba(31,43,77,0.06)]",
-              activeRoute === "ai-assistant" ? "max-sm:px-4 max-sm:py-0" : "",
+              activeRoute === "ai-assistant" ? (dark ? "max-sm:px-4 max-sm:py-0" : "border-transparent bg-[#FBF7EE] shadow-none max-sm:px-4 max-sm:py-0") : "",
             ].join(" ")}
           >
             <div className={
@@ -1218,26 +1218,6 @@ function DropdownButton({ icon: Icon, label, onClick, muted }: { icon: LucideIco
       <span>{label}</span>
       {muted && <span className={`ml-auto text-[10px] ${dark ? "text-[#6F7782]" : "text-[#A1A7B0]"}`}>Soon</span>}
     </button>
-  );
-}
-
-function VoiceSpeakIcon() {
-  return (
-    <svg className="h-[15px] w-[15px]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <rect x="8.4" y="3.2" width="7.2" height="11.2" rx="3.6" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M5.8 10.6v.9a6.2 6.2 0 0 0 12.4 0v-.9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M12 17.7v2.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M9.3 20.8h5.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M18.1 7.2c1.1.8 1.8 2 1.8 3.4s-.7 2.6-1.8 3.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" opacity="0.72">
-        <animate attributeName="opacity" values="0.35;0.95;0.35" dur="1.6s" repeatCount="indefinite" />
-      </path>
-      <path d="M20.4 4.9a8 8 0 0 1 0 11.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" opacity="0.46">
-        <animate attributeName="opacity" values="0.18;0.8;0.18" dur="1.6s" begin="0.18s" repeatCount="indefinite" />
-      </path>
-      <path d="M5.9 7.2c-1.1.8-1.8 2-1.8 3.4s.7 2.6 1.8 3.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" opacity="0.72">
-        <animate attributeName="opacity" values="0.35;0.95;0.35" dur="1.6s" begin="0.08s" repeatCount="indefinite" />
-      </path>
-    </svg>
   );
 }
 
@@ -3314,6 +3294,7 @@ function AssetDetailDrawer({
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ModeToggle({
   mode,
   onChange,
@@ -3412,6 +3393,7 @@ const workflowStarters: StarterCard[] = [
   },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function StarterPanel({
   mode,
   dark,
@@ -3459,6 +3441,7 @@ function StarterPanel({
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function CardDetailView({
   card,
   dark,
@@ -3692,14 +3675,11 @@ function CardDetailView({
 }
 
 function AIAssistantPage() {
-  const router = useRouter();
   const { theme } = useStudioTheme();
   const { openModal, showToast, isTemporaryChat, temporaryChatId, endTemporaryChat } = useStudioActions();
   const dark = theme === "dark";
   const [messages, setMessages] = useState<Array<{ id: string; role: "user" | "assistant"; content: string }>>([]);
   const [input, setInput] = useState("");
-  const [mode, setMode] = useState<"agent" | "workflow">("agent");
-  const [selectedCard, setSelectedCard] = useState<StarterCard | null>(null);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isSending, setIsSending] = useState(false);
@@ -3955,22 +3935,40 @@ function AIAssistantPage() {
     }
   };
 
+  const exploreCards = [
+    {
+      title: "Responsive Web",
+      description: "Learn more about creating websites that work beautifully on any device.",
+      icon: Grid2X2,
+    },
+    {
+      title: "CSS Frameworks",
+      description: "Explore different frameworks to speed up your web development workflow.",
+      icon: Grid2X2,
+    },
+    {
+      title: "Web Accessibility",
+      description: "Delve into making websites more accessible to a wider audience.",
+      icon: Shield,
+    },
+  ];
+
   const composer = (
-    <div className={`w-full overflow-visible rounded-3xl border text-left max-sm:rounded-[1.35rem] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_18px_42px_rgba(0,0,0,0.22)] max-sm:shadow-[0_12px_30px_rgba(0,0,0,0.26)]" : "border-[#E5E7EB] bg-white shadow-[0_18px_42px_rgba(31,43,77,0.06)] max-sm:shadow-[0_12px_30px_rgba(31,43,77,0.08)]"}`}>
-      <div className="relative flex min-h-[150px] flex-col px-5 py-4 max-sm:min-h-[112px] max-sm:px-4 max-sm:py-3">
-        <div className="flex items-start gap-2">
-          <Sparkles className="mt-0.5 h-[13px] w-[13px] fill-[#1DA1F2] text-[#1DA1F2]" />
-          <input
+    <div className={`w-full overflow-visible rounded-[8px] border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5DED3] bg-[#FFFCF5]"}`}>
+      <div className="relative flex min-h-[118px] flex-col px-3 py-3">
+        <div className="flex items-start">
+          <textarea
             value={input}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={(event) => {
-              if (event.key === "Enter") {
+              if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
                 void sendPrompt();
               }
             }}
-            placeholder="Ask Cerevix AI Assistant..."
-            className={`min-w-0 flex-1 bg-transparent text-[13px] outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#A1A7B0]"}`}
+            placeholder="What can i do for you?"
+            rows={2}
+            className={`min-h-[56px] min-w-0 flex-1 resize-none bg-transparent text-[12px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#9A948B]"}`}
             style={{ color: dark ? "#F4F6F8" : "#171717", letterSpacing: 0 }}
           />
         </div>
@@ -3990,10 +3988,10 @@ function AIAssistantPage() {
             ))}
           </div>
         )}
-        <div className={`mt-auto flex items-center gap-3 pt-5 max-sm:gap-1.5 max-sm:pt-3 ${dark ? "text-[#A8B0BA]" : "text-[#A1A7B0]"}`}>
+        <div className={`mt-auto flex items-center gap-2 pt-2 max-sm:flex-wrap ${dark ? "text-[#A8B0BA]" : "text-[#4B463E]"}`}>
           <div className="relative">
-            <button onClick={() => setActionsOpen((value) => !value)} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Open assistant actions">
-              <Plus className="h-[13px] w-[13px]" />
+            <button onClick={() => setActionsOpen((value) => !value)} className={`flex h-6 w-6 items-center justify-center rounded-full border ${dark ? "border-[rgba(255,255,255,0.12)] text-[#F4F6F8] hover:bg-[rgba(255,255,255,0.06)]" : "border-[#E8D8CC] bg-[#FFF7EF] text-[#D16C4C] hover:bg-[#FFEDE1]"}`} aria-label="Open assistant actions">
+              <Paperclip className="h-[13px] w-[13px]" />
             </button>
             {actionsOpen && (
               <DropdownPanel className="bottom-9 left-0 w-44">
@@ -4005,36 +4003,43 @@ function AIAssistantPage() {
               </DropdownPanel>
             )}
           </div>
-          <button
-            onClick={() => {
-              router.push("/workspace/voice");
-              showToast("Voice Speak opened");
-            }}
-            className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(59,167,255,0.14)] hover:text-[#7DD3FC]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
-            aria-label="Open Voice Speak"
-            title="Voice Speak"
-          >
-            <VoiceSpeakIcon />
-          </button>
-          <button onClick={() => openModal("upload-file")} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach file">
-            <Paperclip className="h-[13px] w-[13px]" />
-          </button>
-          <button onClick={() => openModal("upload-image")} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach image">
-            <ImageIcon className="h-[13px] w-[13px]" />
-          </button>
-          <button onClick={() => openModal("upload-document")} className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`} aria-label="Attach document">
-            <FileText className="h-[13px] w-[13px]" />
-          </button>
+          {[
+            { label: "Reasoning", icon: Bot },
+            { label: "Deep research", icon: Network },
+            { label: "Image generation", icon: ImageIcon },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.label}
+                type="button"
+                className={`inline-flex h-6 items-center gap-1 rounded-md border px-2 text-[8.5px] font-semibold transition-colors ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#DDE3EA] hover:border-[rgba(59,167,255,0.28)]" : "border-[#ECE4DA] bg-[#FFFDF8] text-[#39362F] hover:border-[#D9C8BA]"}`}
+              >
+                <Icon className="h-3 w-3" />
+                {item.label}
+              </button>
+            );
+          })}
           <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
           <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
           <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
           <button
+            type="button"
+            className={`ml-auto inline-flex h-6 items-center gap-1 rounded-md px-2 text-[9px] font-medium ${dark ? "text-[#DDE3EA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#4B463E] hover:bg-[#F6EFE5]"}`}
+          >
+            <span className="flex h-3 w-3 items-center justify-center rounded-[3px] bg-[#19C37D] text-white">
+              <Sparkles className="h-2 w-2 fill-current" />
+            </span>
+            ChatGPT 5.1
+            <ChevronDown className="h-3 w-3" />
+          </button>
+          <button
             onClick={() => void sendPrompt()}
             disabled={isSending}
             aria-label="Send prompt"
-            className={`ml-auto flex h-9 w-9 items-center justify-center rounded-full transition-colors disabled:opacity-70 ${dark ? "bg-[#3BA7FF] text-white shadow-[0_12px_24px_rgba(74,155,255,0.28)] hover:bg-[#2D8FF0]" : "bg-[#F4F8FB] text-[#9CA3AF] hover:bg-[#4A9BFF] hover:text-white"}`}
+            className={`flex h-6 w-6 items-center justify-center rounded-[8px] transition-colors disabled:opacity-70 ${dark ? "bg-[#3BA7FF] text-white hover:bg-[#2D8FF0]" : "bg-[#D86D4A] text-white hover:bg-[#C45D3C]"}`}
           >
-            {isSending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {isSending ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
           </button>
         </div>
       </div>
@@ -4064,100 +4069,56 @@ function AIAssistantPage() {
     </div>
   ) : null;
 
-  if (!hasConversation && selectedCard) {
-    return (
-      <div className="flex min-h-full items-center justify-center py-8 max-sm:items-start max-sm:py-4">
-        <div className="w-full max-w-[620px]">
-          <CardDetailView
-            card={selectedCard}
-            dark={dark}
-            onBack={() => setSelectedCard(null)}
-            onLaunch={(p) => {
-              setSelectedCard(null);
-              void sendPrompt(p);
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
-
   if (!hasConversation) {
-    const mobileSuggestions: { title: string; icon: LucideIcon; href?: string }[] = [
-      { title: "AI for Code", icon: Code2, href: toolWorkspaces.code.href },
-      { title: "Blender 3D", icon: Layers3, href: toolWorkspaces.blender.href },
-      { title: "AutoCAD", icon: PenLine, href: toolWorkspaces.autocad.href },
-      { title: "Research", icon: FileText },
-      { title: "Saving", icon: RefreshCw },
-      { title: "Overspend", icon: AlertTriangle },
-    ];
-
     return (
-      <div className="flex min-h-full items-center justify-center py-8 max-sm:items-stretch max-sm:justify-start max-sm:py-0">
-        <div className="flex w-full max-w-[1164px] flex-col items-center text-center max-sm:min-h-full max-sm:max-w-none max-sm:pb-3">
-          <div className="hidden h-12 w-full items-center justify-center sm:hidden max-sm:flex">
-            <button className={`absolute left-1 flex h-9 w-9 items-center justify-center rounded-full ${dark ? "text-[#F4F6F8] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#171717] hover:bg-[#F4F8FB]"}`} aria-label="Back">
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <p className={`text-[13px] font-medium ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Lumen AI Assistant</p>
+      <div className={`flex min-h-full justify-center px-0 py-2 ${dark ? "bg-transparent" : "bg-[#FBF7EE]"}`}>
+        <div className="flex w-full max-w-[620px] flex-col">
+          <div className="flex flex-col items-center text-center">
+            <h2 className="text-[31px] font-bold leading-none tracking-[0] max-sm:text-[27px]">
+              <span className="bg-gradient-to-r from-[#0D8ED8] via-[#078FB5] to-[#00856F] bg-clip-text text-transparent">Hello john</span>
+            </h2>
+            <p className={`mt-1 text-[23px] font-bold leading-tight tracking-[0] max-sm:text-[19px] ${dark ? "text-[#F4F6F8]" : "text-[#383328]"}`}>
+              How can I assist you today?
+            </p>
           </div>
-
-          <h2 className={`text-[28px] font-semibold tracking-[-0.03em] max-sm:text-[17px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Cerevix AI Assistant</h2>
-          <p className={`mt-3 text-[12px] leading-5 max-sm:mt-1 max-sm:text-[11px] ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Build workflows, generate assets, automate tasks, and coordinate AI tools from one Cerevix AI workspace.</p>
 
           {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
 
-          <div className="mt-7 flex w-full justify-center">
-            <ModeToggle mode={mode} onChange={(next) => { setMode(next); setSelectedCard(null); }} dark={dark} />
-          </div>
+          <div className="mt-7 w-full">{composer}</div>
 
-          <div className="mt-5 hidden w-full max-w-[620px] sm:block">
-            <StarterPanel mode={mode} dark={dark} onOpen={(card) => setSelectedCard(card)} />
-          </div>
-
-          <div className="mt-5 hidden w-full max-w-[620px] sm:block">{composer}</div>
-          <div className="mt-4 hidden flex-wrap justify-center gap-2 max-sm:flex">
-            {mobileSuggestions.map((item) => {
-              const Icon = item.icon;
-              const className = `inline-flex h-7 items-center gap-1.5 rounded-full border px-3 text-[10.5px] font-medium shadow-[0_8px_20px_rgba(31,43,77,0.04)] transition-all active:scale-[0.98] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]" : "border-[#E5E7EB] bg-white text-[#171717]"}`;
-              const content = (
-                <>
-                  <Icon className={`h-3 w-3 ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`} />
-                  {item.title}
-                </>
-              );
-              if (item.href) {
-                return (
-                  <Link key={item.title} href={item.href} className={className}>
-                    {content}
-                  </Link>
-                );
-              }
-              return (
-                <button key={item.title} className={className}>
-                  {content}
-                </button>
-              );
-            })}
-          </div>
-
-          <button className={`mt-4 self-start text-[11px] font-medium max-sm:hidden ${dark ? "text-[#A8B0BA] hover:text-[#F4F6F8]" : "text-[#6B7280] hover:text-[#171717]"}`}>
-            <span className="inline-flex items-center gap-1">
-              Refresh prompts <RefreshCw className="h-[11px] w-[11px]" />
-            </span>
-          </button>
-
-          <div className="mt-auto hidden w-full pt-4 max-sm:block">
-            <div className={`mb-2 flex items-start gap-2 rounded-2xl border px-3 py-2 text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] shadow-[0_10px_24px_rgba(0,0,0,0.22)]" : "border-[#E8EEF2] bg-[#FCFDFE] shadow-[0_10px_24px_rgba(31,43,77,0.04)]"}`}>
-              <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white">
-                <Sparkles className="h-3.5 w-3.5 fill-current" />
-              </div>
-              <div className="min-w-0">
-                <p className={`text-[10.5px] font-medium ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Connected to the live Cerevix assistant</p>
-                <p className={`mt-0.5 text-[9.5px] leading-3 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>Your prompts are sent to the same API used by the web chat.</p>
-              </div>
+          <div className="mt-10 w-full">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className={`text-[13px] font-bold tracking-[0] ${dark ? "text-[#F4F6F8]" : "text-[#4A453A]"}`}>Explore new ideas</h3>
+              <button
+                type="button"
+                className={`inline-flex items-center gap-1 text-[10px] font-medium ${dark ? "text-[#A8B0BA] hover:text-[#F4F6F8]" : "text-[#D7A28F] hover:text-[#C46D50]"}`}
+              >
+                Show all
+                <ChevronDown className="h-3 w-3 -rotate-90" />
+              </button>
             </div>
-            {composer}
+            <div className="grid gap-2 md:grid-cols-3">
+              {exploreCards.map((card) => {
+                const Icon = card.icon;
+                return (
+                  <button
+                    key={card.title}
+                    type="button"
+                    onClick={() => void sendPrompt(card.title)}
+                    className={`min-h-[110px] rounded-[8px] border p-3 text-left transition-colors ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] hover:border-[rgba(59,167,255,0.28)]" : "border-[#E7DFD2] bg-[#FFFCF5] hover:border-[#D9C8BA]"}`}
+                  >
+                    <span className={`mb-3 flex h-5 w-5 items-center justify-center rounded-[5px] border ${dark ? "border-[rgba(255,255,255,0.1)] text-[#F0A181]" : "border-[#F0DDD2] text-[#D36E4F]"}`}>
+                      <Icon className="h-3 w-3" />
+                    </span>
+                    <span className={`block text-[11px] font-bold ${dark ? "text-[#F4F6F8]" : "text-[#403B32]"}`}>{card.title}</span>
+                    <span className={`mt-2 block text-[10px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#817B70]"}`}>{card.description}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className={`mt-5 text-center text-[10px] ${dark ? "text-[#6F7782]" : "text-[#B4A99A]"}`}>
+              {aiProviderLabel}
+            </div>
           </div>
         </div>
       </div>
