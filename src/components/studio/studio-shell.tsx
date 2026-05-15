@@ -774,7 +774,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         }
       `}</style>
       <div className="flex h-full">
-        <div className="hidden lg:block">{sidebar}</div>
+        {activeRoute !== "ai-assistant" && <div className="hidden lg:block">{sidebar}</div>}
         {isMobileOpen && (
           <div className="fixed inset-0 z-40 lg:hidden">
             <button className={`absolute inset-0 ${dark ? "bg-black/40 backdrop-blur-[2px]" : "bg-[#1F2937]/20 backdrop-blur-[2px]"}`} onClick={() => setIsMobileOpen(false)} aria-label="Close sidebar" />
@@ -782,8 +782,8 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           </div>
         )}
 
-        <main className="flex min-w-0 flex-1 flex-col p-3">
-          <header className={`mb-3 flex h-8 items-center justify-between px-1 ${activeRoute === "ai-assistant" ? "max-sm:hidden" : ""}`}>
+        <main className={`flex min-w-0 flex-1 flex-col ${activeRoute === "ai-assistant" ? "p-0" : "p-3"}`}>
+          <header className={`mb-3 h-8 items-center justify-between px-1 ${activeRoute === "ai-assistant" ? "hidden" : "flex"}`}>
             <div className="flex min-w-0 items-center gap-3">
               <div className={`relative flex items-center gap-2 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`}>
                 <div ref={notificationRef} className="relative">
@@ -828,18 +828,18 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
           <section
             className={[
-              "min-h-0 flex-1 rounded-3xl",
+              activeRoute === "ai-assistant" ? "min-h-0 flex-1 rounded-none" : "min-h-0 flex-1 rounded-3xl",
               activeRoute === "ai-assistant" ? "overflow-hidden flex flex-col" : "overflow-auto",
-              activeRoute === "code-builder" ? "px-4 py-4" : "px-8 py-8",
+              activeRoute === "ai-assistant" ? "p-0" : activeRoute === "code-builder" ? "px-4 py-4" : "px-8 py-8",
               dark
                 ? "border border-[rgba(255,255,255,0.08)] bg-[#17191D] shadow-[0_24px_60px_rgba(0,0,0,0.22)]"
                 : "border border-[#E8EEF2] bg-white shadow-[0_24px_60px_rgba(31,43,77,0.06)]",
-              activeRoute === "ai-assistant" ? (dark ? "max-sm:px-4 max-sm:py-0" : "border-transparent bg-white shadow-none max-sm:px-4 max-sm:py-0") : "",
+              activeRoute === "ai-assistant" ? "border-transparent bg-white shadow-none" : "",
             ].join(" ")}
           >
             <div className={
               activeRoute === "ai-assistant"
-                ? "mx-auto flex min-h-0 w-full max-w-[1180px] flex-1 flex-col"
+                ? "flex min-h-0 w-full flex-1 flex-col"
                 : activeRoute === "code-builder"
                   ? "w-full"
                   : "mx-auto w-full max-w-[1180px]"
@@ -3706,6 +3706,28 @@ function CardDetailView({
 }
 
 function AIAssistantPage() {
+  const slideIndicators = Array.from({ length: 10 });
+
+  return (
+    <div className="h-full w-full bg-white">
+      <div className="relative h-full w-full overflow-hidden rounded-[18px] border border-[#E5E5E5] bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+        <div className="absolute inset-x-0 top-0 z-20 h-px bg-[#E5E5E5]" />
+        <div className="absolute inset-x-0 bottom-0 z-20 h-px bg-[#E5E5E5]" />
+
+        <aside className="absolute inset-y-0 left-0 w-[18%] min-w-[260px] max-w-[300px] border-r border-[#E5E5E5] bg-[#E5E5E5] shadow-[inset_-1px_0_0_rgba(255,255,255,0.35)]" />
+
+        <section className="absolute inset-y-0 left-[18%] right-0 bg-white max-[1440px]:left-[260px]">
+          <div className="absolute inset-0 shadow-[inset_0_1px_0_rgba(229,229,229,0.45),inset_0_-1px_0_rgba(229,229,229,0.45)]" />
+          <div className="absolute right-5 top-1/2 flex -translate-y-1/2 flex-col gap-[10px]">
+            {slideIndicators.map((_, index) => (
+              <span key={index} className="h-[5px] w-[12px] rounded-full bg-[#D6D6D6]" />
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+
   const { theme } = useStudioTheme();
   const { openModal, showToast, isTemporaryChat, temporaryChatId, newChatId, endTemporaryChat } = useStudioActions();
   const dark = theme === "dark";
