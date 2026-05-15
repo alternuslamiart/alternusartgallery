@@ -504,38 +504,38 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         {isCollapsed ? (
           <button
             onClick={toggleMenu}
-            className={`mx-auto flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "text-[#A8B0BA] hover:bg-white/6 hover:text-[#F4F6F8]" : "text-[#6B7280] hover:bg-white/70 hover:text-[#171717]"}`}
+            className={`group mx-auto flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "text-[#A8B0BA] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]" : "text-[#6B7280] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
             aria-label="Expand sidebar"
           >
-            <PanelLeft className="h-[14px] w-[14px]" />
+            <PanelLeft className="h-[14px] w-[14px]" strokeWidth={2.25} />
           </button>
         ) : (
           <>
             <button
               onClick={() => setWorkspaceOpen((value) => !value)}
-              className={`flex min-w-0 flex-1 items-center gap-2 rounded-xl px-1.5 py-1 text-[13px] font-semibold ${dark ? "text-[#F4F6F8] hover:bg-white/6" : "text-[#1F2937] hover:bg-white/60"}`}
+              className={`group flex min-w-0 flex-1 items-center gap-2 rounded-xl px-1.5 py-1 text-[13px] font-semibold transition-colors ${dark ? "text-[#F4F6F8] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]" : "text-[#1F2937] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
               aria-expanded={workspaceOpen}
             >
               <span className="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white">
-                <Shield className="h-[11px] w-[11px]" />
+                <Shield className="h-[11px] w-[11px]" strokeWidth={2.25} />
               </span>
               <span className="truncate">Personal</span>
-              <ChevronDown className={`h-3 w-3 ${dark ? "text-[#A8B0BA]" : "text-[#6B7280]"}`} />
+              <ChevronDown className={`h-3 w-3 ${dark ? "text-[#A8B0BA] group-hover:text-[#6EA4FF]" : "text-[#6B7280] group-hover:text-[#4A9BFF]"}`} strokeWidth={2.25} />
             </button>
             <button
               onClick={startTemporaryChat}
-              className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg ${isTemporaryChat ? (dark ? "bg-[rgba(59,167,255,0.14)] text-[#3BA7FF]" : "bg-[#DDEEFF] text-[#4A9BFF]") : (dark ? "text-[#A8B0BA] hover:bg-white/6 hover:text-[#F4F6F8]" : "text-[#6B7280] hover:bg-white/70 hover:text-[#171717]")}`}
+              className={`group flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg ${isTemporaryChat ? (dark ? "bg-[rgba(59,167,255,0.14)] text-[#3BA7FF]" : "bg-[#DDEEFF] text-[#4A9BFF]") : (dark ? "text-[#A8B0BA] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]" : "text-[#6B7280] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]")}`}
               aria-label="Temporary Chat"
               title="Start temporary chat"
             >
-              <MessageCircle className="h-[14px] w-[14px]" />
+              <MessageCircle className="h-[14px] w-[14px]" strokeWidth={2.25} />
             </button>
             <button
               onClick={toggleMenu}
-              className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "text-[#A8B0BA] hover:bg-white/6 hover:text-[#F4F6F8]" : "text-[#6B7280] hover:bg-white/70 hover:text-[#171717]"}`}
+              className={`group flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "text-[#A8B0BA] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]" : "text-[#6B7280] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
               aria-label="Collapse sidebar"
             >
-              <PanelLeft className="h-[14px] w-[14px]" />
+              <PanelLeft className="h-[14px] w-[14px]" strokeWidth={2.25} />
             </button>
           </>
         )}
@@ -556,7 +556,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
       {!isCollapsed && (
         <>
           <div className={`mb-3 flex h-10 w-full items-center gap-2 rounded-2xl border px-3 transition-all ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_22px_rgba(0,0,0,0.16)] focus-within:border-[rgba(59,167,255,0.34)]" : "border-white/80 bg-white/72 shadow-[0_8px_22px_rgba(31,43,77,0.04)] focus-within:border-[#9BD2FF]"}`}>
-            <Search className={`h-[13px] w-[13px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} />
+            <Search className={`h-[13px] w-[13px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} strokeWidth={2.25} />
             <input
               ref={sidebarSearchRef}
               value={sidebarSearch}
@@ -581,9 +581,9 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
             onClick={startNewChat}
             className="mb-4 flex h-9 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#38BDF8] to-[#1DA1F2] text-[11px] font-semibold text-white shadow-[0_10px_24px_rgba(29,161,242,0.24)] transition-all hover:from-[#2FB2EE] hover:to-[#168ED8] active:scale-[0.98]"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-3.5 w-3.5" strokeWidth={2.25} />
             New Chat
-            <Sparkles className="h-3.5 w-3.5 fill-current" />
+            <Sparkles className="h-3.5 w-3.5" strokeWidth={2.25} />
           </button>
         </>
       )}
@@ -605,7 +605,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         {!isCollapsed && (
           <div className={`mb-5 rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.12)] bg-[#1D2026] text-[#F4F6F8] shadow-[0_14px_36px_rgba(0,0,0,0.28)]" : "border-[#D6DEE7] bg-[#EAF2F7] text-[#171717] shadow-[0_14px_36px_rgba(31,43,77,0.11)]"}`}>
             <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white shadow-[0_10px_22px_rgba(29,161,242,0.24)]">
-              <Sparkles className="h-[15px] w-[15px] fill-current" />
+              <Sparkles className="h-[15px] w-[15px]" strokeWidth={2.25} />
             </div>
             <p className="text-[12px] font-bold">Free Plan</p>
             <p className={`mt-1 text-[10px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#596575]"}`}>There are 12 days left before your free plan ends.</p>
@@ -625,11 +625,11 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
             onClick={() => setSignOutOpen(true)}
             className={[
               "group flex h-8 items-center rounded-xl text-left text-[12px] font-medium transition-all",
-              dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#4B5563] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
+              dark ? "text-[#A8B0BA] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]" : "text-[#4B5563] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
               isCollapsed ? "mx-auto w-8 justify-center px-0" : "w-full gap-2 px-2.5",
             ].join(" ")}
           >
-            <Upload className={`h-[13px] w-[13px] rotate-90 ${dark ? "text-[#6F7782] group-hover:text-[#F4F6F8]" : "text-[#6B7280] group-hover:text-[#4A9BFF]"}`} />
+            <Upload className={`h-[13px] w-[13px] rotate-90 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#6B7280] group-hover:text-[#4A9BFF]"}`} strokeWidth={2.25} />
             {!isCollapsed && <span>Sign Out</span>}
           </button>
         </div>
@@ -773,6 +773,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           color: #ffffff !important;
         }
       `}</style>
+      <div className={`pointer-events-none absolute inset-x-0 top-0 z-30 h-px ${dark ? "bg-[rgba(255,255,255,0.1)]" : "bg-[#DCE6EC]"}`} />
       <div className="flex h-full">
         <div className="hidden lg:block">{sidebar}</div>
         {isMobileOpen && (
@@ -789,28 +790,28 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
                 <div ref={notificationRef} className="relative">
                   <button
                     onClick={() => setActiveDrawer("notifications")}
-                    className={`relative flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white/70 shadow-sm hover:bg-white"}`}
+                    className={`group relative flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]" : "bg-white/70 text-[#6B7280] shadow-sm hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
                     aria-label="Notifications"
                   >
-                    <Bell className="h-[13px] w-[13px]" />
+                    <Bell className="h-[13px] w-[13px]" strokeWidth={2.25} />
                     <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#FF3B6B]" />
                   </button>
                   {notificationsOpen && <NotificationsDropdown align="left" />}
                 </div>
                 <button
                   onClick={() => setActiveModal("quick-settings")}
-                  className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white/70 shadow-sm hover:bg-white"}`}
+                  className={`group flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]" : "bg-white/70 text-[#6B7280] shadow-sm hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
                   aria-label="Open settings"
                 >
-                  <Settings className="h-[13px] w-[13px]" />
+                  <Settings className="h-[13px] w-[13px]" strokeWidth={2.25} />
                 </button>
                 <div ref={displayRef} className="relative">
                   <button
                     onClick={() => setDisplayOpen((value) => !value)}
-                    className={`flex h-7 w-7 items-center justify-center rounded-lg ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white/70 shadow-sm hover:bg-white"}`}
+                    className={`group flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]" : "bg-white/70 text-[#6B7280] shadow-sm hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
                     aria-label="Display preview"
                   >
-                    <Monitor className="h-[13px] w-[13px]" />
+                    <Monitor className="h-[13px] w-[13px]" strokeWidth={2.25} />
                   </button>
                   {displayOpen && <DisplayDropdown />}
                 </div>
@@ -819,7 +820,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
             </div>
             <Link
               href="/account"
-              className={`flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-bold tracking-[-0.02em] ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#7DD3FC] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(255,255,255,0.06)]" : "bg-white text-[#4284FF] shadow-sm hover:bg-[#FAFCFD]"}`}
+              className={`flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-bold tracking-[-0.02em] transition-colors ${dark ? "border border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#7DD3FC] shadow-[0_8px_18px_rgba(0,0,0,0.18)] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]" : "bg-white text-[#4284FF] shadow-sm hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
               aria-label="Open account profile"
             >
               AL
@@ -1206,18 +1207,18 @@ function SidebarLink({
       onClick={onNavigate}
       title={collapsed ? item.label : undefined}
       className={[
-        "group flex h-8 items-center rounded-xl text-left text-[12px] font-medium transition-all",
-        dark ? "hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
+        "group flex h-8 items-center rounded-xl border border-transparent text-left text-[12px] font-medium transition-all",
+        dark ? "hover:border-[rgba(66,132,255,0.18)] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]" : "hover:border-[#CFE8F8] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
         collapsed ? "mx-auto w-8 justify-center px-0" : "w-full gap-2 px-2.5",
       ].join(" ")}
       style={{
         background: active ? (dark ? "rgba(59,167,255,0.14)" : "#FFFFFF") : undefined,
-        border: active ? (dark ? "1px solid rgba(59,167,255,0.18)" : "1px solid rgba(229,231,235,0.95)") : undefined,
+        borderColor: active ? (dark ? "rgba(59,167,255,0.18)" : "rgba(229,231,235,0.95)") : undefined,
         boxShadow: active ? (dark ? "0 10px 24px rgba(0,0,0,0.22)" : "0 8px 18px rgba(31,43,77,0.06)") : undefined,
         color: active ? (dark ? "#F4F6F8" : "#171717") : undefined,
       }}
     >
-      <Icon className={`h-[13px] w-[13px] flex-shrink-0 ${dark ? "group-hover:text-[#F4F6F8]" : "text-[#4A9BFF] group-hover:text-[#1D9BF0]"} ${active ? "text-[#3BA7FF]" : dark ? "text-[#A8B0BA]" : "text-[#4A9BFF]"}`} />
+      <Icon className={`h-[13px] w-[13px] flex-shrink-0 ${dark ? "group-hover:text-[#6EA4FF]" : "text-[#4A9BFF] group-hover:text-[#4A9BFF]"} ${active ? "text-[#3BA7FF]" : dark ? "text-[#A8B0BA]" : "text-[#4A9BFF]"}`} strokeWidth={2.25} />
       {!collapsed && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
       {!collapsed && item.badge && (
         <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF3B6B] px-1 text-[10px] font-bold text-white">{item.badge}</span>
@@ -1243,9 +1244,9 @@ function DropdownButton({ icon: Icon, label, onClick, muted }: { icon: LucideIco
   return (
     <button
       onClick={() => (onClick ? onClick() : showToast(`${label} is ready to configure`))}
-      className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-[12px] font-medium ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)]" : "text-[#4B5563] hover:bg-[#F4F8FB]"}`}
+      className={`group flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-[12px] font-medium transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]" : "text-[#4B5563] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]"}`}
     >
-      <Icon className={`h-3.5 w-3.5 ${dark ? "text-[#6F7782]" : "text-[#6B7280]"}`} />
+      <Icon className={`h-3.5 w-3.5 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#6B7280] group-hover:text-[#4A9BFF]"}`} strokeWidth={2.25} />
       <span>{label}</span>
       {muted && <span className={`ml-auto text-[10px] ${dark ? "text-[#6F7782]" : "text-[#A1A7B0]"}`}>Soon</span>}
     </button>
