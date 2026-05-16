@@ -6,6 +6,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 import { CookieModal } from "@/components/cookie-modal";
 import { LayoutShell } from "@/components/layout-shell";
+import { SignInPopup } from "@/components/signin-popup";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -237,6 +238,7 @@ export default function RootLayout({
         <Providers>
           <LayoutShell>{children}</LayoutShell>
           <CookieModal />
+          <SignInPopup />
         </Providers>
       </body>
     </html>
