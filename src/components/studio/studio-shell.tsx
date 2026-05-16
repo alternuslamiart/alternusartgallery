@@ -498,7 +498,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  ?"border-r border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,#181A1F_0%,#14161A_100%)]"
  :"border-r border-white/70 bg-[linear-gradient(180deg,#EAF3F8_0%,#F6FAFC_100%)]",
  isCollapsed ?"w-[60px]":"w-[230px]",
- ].join("")}
+ ].join(" ")}
  >
  <div className={isCollapsed ?"flex min-h-0 flex-1 flex-col px-2":"flex min-h-0 flex-1 flex-col px-3"}>
  <div ref={workspaceRef} className="relative mb-4 flex items-center justify-between">
