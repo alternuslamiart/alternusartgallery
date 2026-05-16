@@ -590,15 +590,11 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
       <div className="mt-auto">
         {!isCollapsed && (
-          <div className={`mb-5 rounded-2xl border p-3 ${dark ? "border-[rgba(255,255,255,0.12)] bg-[#1D2026] text-[#F4F6F8] shadow-[0_14px_36px_rgba(0,0,0,0.28)]" : "border-[#D6DEE7] bg-[#EAF2F7] text-[#171717] shadow-[0_14px_36px_rgba(31,43,77,0.11)]"}`}>
-            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#38BDF8] to-[#1DA1F2] text-white shadow-[0_10px_22px_rgba(29,161,242,0.24)]">
-              <Sparkles className="h-[15px] w-[15px]" strokeWidth={2.25} />
-            </div>
-            <p className="text-[12px] font-bold">Free Plan</p>
-            <p className={`mt-1 text-[10px] leading-4 ${dark ? "text-[#A8B0BA]" : "text-[#596575]"}`}>There are 12 days left before your free plan ends.</p>
+          <div className="mb-4 flex justify-center">
             <button
               onClick={() => setActiveModal("upgrade")}
-              className={`mt-3 h-8 rounded-lg border px-3 text-[10px] font-semibold ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328] text-[#F4F6F8] hover:border-[rgba(59,167,255,0.24)]" : "border-[#D1D9E2] bg-white text-[#171717] shadow-sm hover:border-[#B8C7D6]"}`}
+              style={{ height: 46, width: 148 }}
+              className={`rounded-xl text-[12px] font-semibold transition-colors ${dark ? "bg-[#1D2026] text-[#F4F6F8] border border-[rgba(255,255,255,0.1)] hover:border-[rgba(59,167,255,0.24)]" : "bg-[#EAF2F7] text-[#171717] border border-[#D6DEE7] hover:border-[#B8C7D6]"}`}
             >
               Upgrade Now
             </button>
