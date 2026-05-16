@@ -3717,15 +3717,26 @@ function AIAssistantPage() {
   const [isSending, setIsSending] = useState(false);
   const [messageFeedback, setMessageFeedback] = useState<Record<string, "like" | "dislike">>({});
   const [aiProviderLabel, setAiProviderLabel] = useState("Checking AI provider");
+  const [aiChatCount, setAiChatCount] = useState<number>(0);
+  const [planNoticeDismissed, setPlanNoticeDismissed] = useState<boolean>(false);
   const conversationEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
   const hasConversation = messages.length > 0;
+  const showPlanEndingNotice = aiChatCount >= 3 && !planNoticeDismissed;
 
   useEffect(() => {
     conversationEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, isSending]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = Number(window.localStorage.getItem("cerevix-ai-chat-count") || "0");
+    if (Number.isFinite(stored) && stored > 0) setAiChatCount(stored);
+    const dismissed = window.localStorage.getItem("cerevix-ai-plan-notice-dismissed");
+    if (dismissed === "1") setPlanNoticeDismissed(true);
+  }, []);
 
   useEffect(() => {
     if (!temporaryChatId) return;
@@ -3867,6 +3878,13 @@ function AIAssistantPage() {
           content: finalContent,
         },
       ]);
+      setAiChatCount((current) => {
+        const next = current + 1;
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("cerevix-ai-chat-count", String(next));
+        }
+        return next;
+      });
     } catch (error) {
       console.error("AI Assistant error:", error);
       setMessages((current) => [
@@ -3981,18 +3999,47 @@ function AIAssistantPage() {
     { label: "Research", icon: Network },
   ];
 
+  const dismissPlanNotice = () => {
+    setPlanNoticeDismissed(true);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("cerevix-ai-plan-notice-dismissed", "1");
+    }
+  };
+
   const composer = (
-    <div className="w-full">
-      <div className={`mb-4 flex h-[54px] items-center justify-between rounded-2xl px-8 text-[13px] font-semibold ${dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F3F3F3] text-[#9A9A9A]"}`}>
-          <span>Use our faster AI on Pro Plan</span>
-        <button
-          type="button"
-          onClick={() => openModal("upgrade")}
-          className={`h-10 rounded-xl border px-6 text-[13px] font-bold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8]" : "border-[#E1E1E1] bg-[#F7F7F7] text-[#3E3E3E]"}`}
-        >
-          Upgrade Now
-        </button>
-      </div>
+    <div className="group/composer w-full">
+      {showPlanEndingNotice && (
+        <div className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-6 py-3 text-[12px] ${dark ? "border-[rgba(255,170,0,0.32)] bg-[rgba(255,170,0,0.08)] text-[#F4F6F8]" : "border-[#FCD7A1] bg-[#FFF8EC] text-[#171717]"}`}>
+          <div className="flex items-start gap-3">
+            <div className={`mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl ${dark ? "bg-[rgba(255,170,0,0.16)] text-[#FFB454]" : "bg-[#FFEBC9] text-[#B7791F]"}`}>
+              <AlertTriangle className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold">Your free plan is wrapping up</p>
+              <p className={`mt-0.5 text-[11px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>
+                You have used Cerevix AI {aiChatCount} {aiChatCount === 1 ? "time" : "times"} on your free trial. Upgrade to keep your chats, attachments, and Voice Speak going without interruption.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => openModal("upgrade")}
+              className="inline-flex h-9 items-center rounded-xl bg-[#1292E8] px-4 text-[12px] font-semibold text-white shadow-[0_8px_18px_rgba(18,146,232,0.32)] transition-colors hover:bg-[#0F83D2]"
+            >
+              Upgrade Now
+            </button>
+            <button
+              type="button"
+              onClick={dismissPlanNotice}
+              aria-label="Dismiss free plan notice"
+              className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#9CA3AF] hover:bg-white hover:text-[#171717]"}`}
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
       <div className={`w-full overflow-hidden rounded-2xl border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#DCDCDC] bg-white shadow-[0_14px_34px_rgba(31,43,77,0.05)]"}`}>
         <div className="relative flex min-h-[166px] flex-col px-8 pb-4 pt-6">
           <textarea
@@ -4026,7 +4073,7 @@ function AIAssistantPage() {
             </div>
           )}
           <div className={`mt-auto flex items-center gap-2 pt-2 max-sm:flex-wrap ${dark ? "text-[#A8B0BA]" : "text-[#4B463E]"}`}>
-            <button onClick={() => fileInputRef.current?.click()} className={`flex h-11 w-11 items-center justify-center rounded-2xl ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "bg-[#F0F0F0] text-[#8E8E8E] hover:bg-[#E8E8E8]"}`} aria-label="Attach file">
+            <button onClick={() => fileInputRef.current?.click()} className={`flex h-11 w-11 items-center justify-center rounded-2xl opacity-0 transition-opacity duration-200 focus:opacity-100 group-hover/composer:opacity-100 group-focus-within/composer:opacity-100 ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "bg-[#F0F0F0] text-[#8E8E8E] hover:bg-[#E8E8E8]"}`} aria-label="Attach file">
               <Paperclip className="h-4 w-4" />
             </button>
             <button
@@ -4040,7 +4087,7 @@ function AIAssistantPage() {
             <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
             <button
               type="button"
-              className={`ml-auto flex h-11 w-11 items-center justify-center rounded-2xl ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[rgba(255,255,255,0.06)]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E8E8E8]"}`}
+              className={`ml-auto flex h-11 w-11 items-center justify-center rounded-2xl opacity-0 transition-opacity duration-200 focus:opacity-100 group-hover/composer:opacity-100 group-focus-within/composer:opacity-100 ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[rgba(255,255,255,0.06)]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E8E8E8]"}`}
               aria-label="Voice input"
             >
               <Mic className="h-5 w-5" />
@@ -4106,7 +4153,7 @@ function AIAssistantPage() {
               Good Morning, Toby
             </h2>
             <p className={`mt-1 text-[25px] font-medium leading-tight tracking-[0] max-sm:text-[20px] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>
-              How Can I <span className="text-[#A78BFA]">Assist You Today?</span>
+              How Can I <span className="text-[#1DA1F2]">Assist You Today?</span>
             </p>
           </div>
 
@@ -4124,7 +4171,14 @@ function AIAssistantPage() {
 
   return (
     <div className="mx-auto flex h-full w-full max-w-[900px] flex-col">
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div
+        className="min-h-0 flex-1 overflow-y-auto"
+        role="log"
+        aria-label="AI assistant conversation"
+        aria-live="polite"
+        aria-relevant="additions"
+        aria-busy={isSending}
+      >
         <div className="flex min-h-full flex-col justify-end gap-5 pb-4">
           {temporaryChatNotice}
           {messages.map((message) => (
@@ -4136,7 +4190,7 @@ function AIAssistantPage() {
               )}
               <div className={`flex max-w-[720px] flex-col ${message.role === "user" ? "items-end" : "items-start"}`}>
                 <div
-                  className={`rounded-[24px] px-4 py-3 text-[13px] leading-6 shadow-[0_10px_28px_rgba(31,43,77,0.04)] ${
+                  className={`break-words rounded-[24px] px-4 py-3 text-[13px] leading-6 shadow-[0_10px_28px_rgba(31,43,77,0.04)] ${
                     message.role === "user"
                       ? dark
                         ? "border border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]"
