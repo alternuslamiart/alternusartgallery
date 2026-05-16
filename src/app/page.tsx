@@ -6,13 +6,12 @@ import {
   ArrowRight,
   CheckCircle2,
   Layers3,
-  Moon,
   ShieldCheck,
   Sparkles,
-  Sun,
   Workflow,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CerevixFooter } from "@/components/cerevix-shell";
 
 const navItems = [
   { label: "Platform", href: "/platform/overview" },
@@ -50,47 +49,6 @@ const workflowSteps = [
   "Cedium creates a structured plan with assets and next actions.",
   "Launch the output in Studio, refine, and ship.",
 ];
-
-const footerColumns = [
-  {
-    title: "Platform",
-    links: ["Overview", "Studio", "Agent SDK", "API Reference", "Changelog", "Status"],
-  },
-  {
-    title: "Workspace",
-    links: ["Launch Studio", "Design", "Asset Library", "3D Tools", "Voice"],
-  },
-  {
-    title: "Company",
-    links: ["About", "Careers", "Press", "Contact"],
-  },
-  {
-    title: "Legal",
-    links: ["Privacy", "Terms", "Cookie Notice", "Security"],
-  },
-];
-
-const footerHref: Record<string, string> = {
-  Overview: "/platform/overview",
-  Studio: "/main",
-  "Agent SDK": "/platform/agent-sdk",
-  "API Reference": "/platform/api",
-  Changelog: "/platform/changelog",
-  Status: "/platform/status",
-  "Launch Studio": "/main",
-  Design: "/autocad-design",
-  "Asset Library": "/asset-library",
-  "3D Tools": "/blender-3d",
-  Voice: "/workspace/voice",
-  About: "/about",
-  Careers: "/careers",
-  Press: "/press",
-  Contact: "/contact",
-  Privacy: "/privacy",
-  Terms: "/terms",
-  "Cookie Notice": "/cookie-notice",
-  Security: "/security",
-};
 
 const HOME_THEME_KEY = "cedium_home_theme";
 
@@ -395,61 +353,8 @@ function Cta({ isLight }: { isLight: boolean }) {
   );
 }
 
-function Footer({ isLight, toggleTheme }: { isLight: boolean; toggleTheme: () => void }) {
-  return (
-    <footer className={`border-t px-5 py-10 sm:px-8 lg:px-10 ${isLight ? "border-[#DCEAF5] bg-white" : "border-white/10 bg-[#101113]"}`}>
-      <div className="mx-auto max-w-7xl">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.3fr_repeat(4,1fr)]">
-          <div>
-            <Brand compact isLight={isLight} />
-            <p className={`mt-4 max-w-xs text-sm leading-6 ${isLight ? "text-[#475569]" : "text-zinc-400"}`}>
-              Clean AI workspace for production teams, creators, and builders.
-            </p>
-          </div>
-          {footerColumns.map((column) => (
-            <nav key={column.title} aria-label={`${column.title} footer links`}>
-              <h2 className={`text-sm font-semibold ${isLight ? "text-[#0F172A]" : "text-white"}`}>{column.title}</h2>
-              <ul className="mt-4 space-y-3">
-                {column.links.map((link) => (
-                  <li key={link}>
-                    <Link
-                      href={footerHref[link] ?? "#"}
-                      className={`text-sm transition-colors ${
-                        isLight ? "text-[#475569] hover:text-[#0284C7]" : "text-zinc-400 hover:text-white"
-                      }`}
-                    >
-                      {link}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          ))}
-        </div>
-
-        <div className="mt-10 flex flex-col gap-4 border-t border-[#DCEAF5] pt-6 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
-          <p className={`text-sm ${isLight ? "text-[#475569]" : "text-zinc-500"}`}>Cedium. Copyright &copy;2026</p>
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className={`inline-flex h-10 w-fit items-center gap-2 rounded-[8px] border px-4 text-sm font-medium transition-colors ${
-              isLight
-                ? "border-[#DCEAF5] bg-[#F8FCFF] text-[#0F172A] hover:text-[#0284C7]"
-                : "border-white/10 bg-white/5 text-zinc-300 hover:text-white"
-            }`}
-            aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
-          >
-            {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-            {isLight ? "Dark" : "Light"}
-          </button>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
 export default function HomePage() {
-  const [isLight, toggleTheme] = useHomeTheme();
+  const [isLight] = useHomeTheme();
 
   return (
     <div className={`${isLight ? "" : "dark"}`}>
@@ -461,7 +366,12 @@ export default function HomePage() {
           <WorkflowSection isLight={isLight} />
           <Cta isLight={isLight} />
         </main>
-        <Footer isLight={isLight} toggleTheme={toggleTheme} />
+        <CerevixFooter
+          isDark={!isLight}
+          fg={isLight ? "#0F172A" : "#C1C2BF"}
+          muted={isLight ? "rgba(5,8,15,0.62)" : "rgba(193,194,191,0.72)"}
+          faint={isLight ? "rgba(5,8,15,0.1)" : "rgba(255,255,255,0.16)"}
+        />
       </div>
     </div>
   );

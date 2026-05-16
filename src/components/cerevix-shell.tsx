@@ -108,7 +108,7 @@ export function CerevixNav({ isDark, setIsDark, scrolled, fg, muted, faint }: Re
   );
 }
 
-export function CerevixFooter({ isDark, fg, muted, faint }: ReturnType<typeof useCerevixTheme>) {
+export function CerevixFooter({ isDark, fg, muted, faint }: Pick<ReturnType<typeof useCerevixTheme>, "isDark" | "fg" | "muted" | "faint">) {
   const cols = [
     { heading: "Platform", links: [
       { l: "Overview", h: "/platform/overview", ext: false },
@@ -181,9 +181,9 @@ export function CerevixFooter({ isDark, fg, muted, faint }: ReturnType<typeof us
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <CerevixLogo size={18} radius={5} />
-              <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>Cerevix</span>
+              <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>Cedium</span>
             </div>
-            <span style={{ fontSize: 11.5, color: muted }}>© 2015–2026 · Built with Claude</span>
+            <span style={{ fontSize: 11.5, color: muted }}>Copyright &copy;2026</span>
             <Link href="/cookie-notice" style={{ fontSize: 11.5, color: muted, textDecoration: "none", borderBottom: `1px dashed ${faint}`, paddingBottom: 1 }}>Manage Cookies</Link>
           </div>
           <button style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 14px", border: `1px solid ${faint}`, background: "transparent", color: fg, fontSize: 12.5, fontWeight: 500, cursor: "pointer", borderRadius: 999 }} className="hover:!border-[#4284FF]">
