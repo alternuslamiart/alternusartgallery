@@ -3971,72 +3971,89 @@ function AIAssistantPage() {
 
  const compactComposer = (
  <div className="w-full">
- {attachments.length > 0 && (
- <div className="mb-2 flex flex-wrap gap-2 px-2">
+ {attachments.length > 0 ? (
+ /* Expanded card when attachment exists */
+ <div className={`w-full overflow-hidden rounded-2xl border ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#D9D9D9] bg-white"}`}>
+ <div className="min-h-[120px] p-4">
+ {/* Thumbnails */}
+ <div className="mb-3 flex flex-wrap gap-2">
  {attachments.map((attachment) => (
- <span key={attachment.id} className={`inline-flex max-w-full items-center gap-2 rounded-full border px-2.5 py-1 text-[10px] font-medium ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]":"border-[#E5E7EB] bg-white text-[#4B5563]"}`}>
- <span className="truncate">{attachment.name}</span>
+ <div key={attachment.id} className="relative">
+ <div className={`h-[80px] w-[80px] rounded-xl border flex items-center justify-center ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20]" : "border-[#E5E7EB] bg-[#F3F4F6]"}`}>
+ {attachment.type === "image" ? (
+ <ImageIcon className={`h-7 w-7 ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} />
+ ) : (
+ <FileText className={`h-7 w-7 ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} />
+ )}
+ </div>
  <button
  onClick={() => setAttachments((current) => current.filter((item) => item.id !== attachment.id))}
- className={`rounded-full ${dark ?"text-[#6F7782] hover:text-[#F4F6F8]":"text-[#9CA3AF] hover:text-[#171717]"}`}
+ className={`absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${dark ? "border-[rgba(255,255,255,0.15)] bg-[#202328] text-[#A8B0BA] hover:text-[#F4F6F8]" : "border-[#D1D5DB] bg-white text-[#6B7280] hover:text-[#111827]"}`}
  aria-label={`Remove ${attachment.name}`}
  >
- <X className="h-3 w-3"/>
+ <X className="h-3 w-3" />
  </button>
- </span>
+ </div>
  ))}
  </div>
- )}
- <div className={`flex min-h-[58px] w-full items-center gap-2 rounded-[24px] border px-2.5 py-2 ${dark ?"border-[rgba(255,255,255,0.1)] bg-[#202328]":"border-[#D9D9D9] bg-white"}`}>
- <button
- type="button"
- onClick={() => fileInputRef.current?.click()}
- className={`flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ?"bg-[#181B20] text-[#DDE3EA] hover:bg-[#252A31]":"bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E7E7E7]"}`}
- aria-label="Attach file"
- title="Attach file"
- >
- <Plus className="h-5 w-5"strokeWidth={1.8} />
+ {/* Textarea */}
+ <textarea
+ value={input}
+ onChange={(event) => setInput(event.target.value)}
+ onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendPrompt(); } }}
+ aria-label="Message Cedium"
+ rows={2}
+ placeholder="Add a message..."
+ className={`w-full resize-none bg-transparent text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#171717] placeholder:text-[#A1A1A1]"}`}
+ style={{ letterSpacing: 0 }}
+ />
+ </div>
+ {/* Bottom toolbar */}
+ <div className={`flex items-center gap-2 border-t px-4 py-3 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#F3F4F6]"}`}>
+ <button type="button" onClick={() => fileInputRef.current?.click()} className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[#252A31]" : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"}`} aria-label="Attach file">
+ <Paperclip className="h-4 w-4" />
+ </button>
+ <button type="button" onClick={() => setModelMenuOpen((o) => !o)} className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[12px] font-semibold transition-colors ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20] text-[#DDE3EA]" : "border-[#D8D8D8] bg-white text-[#6B7280]"}`}>
+ {selectedModel}
+ </button>
+ <div className="flex-1" />
+ <button type="button" className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[#252A31]" : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"}`} aria-label="Voice input">
+ <Mic className="h-4 w-4" strokeWidth={2} />
+ </button>
+ <button onClick={() => void sendPrompt()} disabled={isSending} aria-label="Send prompt" className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[14px] bg-[#1292E8] text-white transition-all hover:bg-[#0F83D2] disabled:opacity-60">
+ {isSending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <CornerDownLeft className="h-4 w-4" strokeWidth={2} />}
+ </button>
+ </div>
+ <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
+ <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
+ <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
+ </div>
+ ) : (
+ /* Compact bar when no attachment */
+ <div className={`flex min-h-[58px] w-full items-center gap-2 rounded-[24px] border px-2.5 py-2 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#D9D9D9] bg-white"}`}>
+ <button type="button" onClick={() => fileInputRef.current?.click()} className={`flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E7E7E7]"}`} aria-label="Attach file" title="Attach file">
+ <Plus className="h-5 w-5" strokeWidth={1.8} />
  </button>
  <textarea
  value={input}
  onChange={(event) => setInput(event.target.value)}
- onKeyDown={(event) => {
- if (event.key ==="Enter"&& !event.shiftKey) {
- event.preventDefault();
- void sendPrompt();
- }
- }}
+ onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendPrompt(); } }}
  aria-label="Message Cedium"
  rows={1}
- className={`min-h-[32px] flex-1 resize-none bg-transparent px-2 py-1.5 text-[14px] leading-5 outline-none ${dark ?"text-[#F4F6F8] placeholder:text-[#6F7782]":"text-[#171717] placeholder:text-[#A1A1A1]"}`}
+ className={`min-h-[32px] flex-1 resize-none bg-transparent px-2 py-1.5 text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#171717] placeholder:text-[#A1A1A1]"}`}
  style={{ letterSpacing: 0 }}
  />
- <button
- type="button"
- className={`flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ?"bg-[#181B20] text-[#F4F6F8] hover:bg-[#252A31]":"bg-[#F0F0F0] text-[#171717] hover:bg-[#E7E7E7]"}`}
- aria-label="Voice input"
- title="Voice input"
- >
- <Mic className="h-5 w-5"strokeWidth={2} />
+ <button type="button" className={`flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#F4F6F8] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#171717] hover:bg-[#E7E7E7]"}`} aria-label="Voice input" title="Voice input">
+ <Mic className="h-5 w-5" strokeWidth={2} />
  </button>
- <button
- onClick={() => void sendPrompt()}
- disabled={isSending || (!input.trim() && false)}
- aria-label="Send prompt"
- className="flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] bg-[#1292E8] text-white transition-all hover:bg-[#0F83D2] disabled:cursor-not-allowed disabled:opacity-60"
- >
- {isSending ? (
- <RefreshCw className="h-5 w-5 animate-spin"/>
- ) : input.trim() ? (
- <CornerDownLeft className="h-5 w-5"strokeWidth={2} />
- ) : (
- <AudioLines className="h-5 w-5"strokeWidth={2} />
- )}
+ <button onClick={() => void sendPrompt()} disabled={isSending || (!input.trim() && false)} aria-label="Send prompt" className="flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] bg-[#1292E8] text-white transition-all hover:bg-[#0F83D2] disabled:cursor-not-allowed disabled:opacity-60">
+ {isSending ? <RefreshCw className="h-5 w-5 animate-spin" /> : input.trim() ? <CornerDownLeft className="h-5 w-5" strokeWidth={2} /> : <AudioLines className="h-5 w-5" strokeWidth={2} />}
  </button>
- <input ref={fileInputRef} type="file"multiple className="hidden"onChange={(event) => onFiles(event,"file")} />
- <input ref={imageInputRef} type="file"multiple accept="image/*"className="hidden"onChange={(event) => onFiles(event,"image")} />
- <input ref={documentInputRef} type="file"multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"className="hidden"onChange={(event) => onFiles(event,"document")} />
+ <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
+ <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
+ <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
  </div>
+ )}
  {/* Model selector */}
  <div className="relative mt-2 flex justify-start">
  {modelMenuOpen && (
