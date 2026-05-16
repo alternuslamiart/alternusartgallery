@@ -3704,6 +3704,7 @@ function AIAssistantPage() {
   const [aiProviderLabel, setAiProviderLabel] = useState("Checking AI provider");
   const [aiChatCount, setAiChatCount] = useState<number>(0);
   const [planNoticeDismissed, setPlanNoticeDismissed] = useState<boolean>(false);
+  const [assistantMode, setAssistantMode] = useState<"agent" | "workflow">("agent");
   const conversationEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -3992,7 +3993,7 @@ function AIAssistantPage() {
   };
 
   const composer = (
-    <div className="group/composer w-full">
+    <div className="w-full">
       {showPlanEndingNotice && (
         <div className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-6 py-3 text-[12px] ${dark ? "border-[rgba(255,170,0,0.32)] bg-[rgba(255,170,0,0.08)] text-[#F4F6F8]" : "border-[#FCD7A1] bg-[#FFF8EC] text-[#171717]"}`}>
           <div className="flex items-start gap-3">
@@ -4025,7 +4026,26 @@ function AIAssistantPage() {
           </div>
         </div>
       )}
-      <div className={`w-full overflow-hidden rounded-2xl border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#DCDCDC] bg-white shadow-[0_14px_34px_rgba(31,43,77,0.05)]"}`}>
+      <div className={`relative w-full overflow-hidden rounded-2xl border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#DCDCDC] bg-white shadow-[0_14px_34px_rgba(31,43,77,0.05)]"}`}>
+        <div className="pointer-events-none absolute right-3 top-3 z-10 flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className={`pointer-events-auto flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.16)] hover:text-[#7DD3FC]" : "bg-[#F4F6F8] text-[#9CA3AF] hover:bg-[#DDEEFF] hover:text-[#1D9BF0]"}`}
+            aria-label="Attach file"
+            title="Attach file"
+          >
+            <Paperclip className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            className={`pointer-events-auto flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.16)] hover:text-[#7DD3FC]" : "bg-[#F4F6F8] text-[#9CA3AF] hover:bg-[#DDEEFF] hover:text-[#1D9BF0]"}`}
+            aria-label="Voice input"
+            title="Voice input"
+          >
+            <Mic className="h-4 w-4" />
+          </button>
+        </div>
         <div className="relative flex min-h-[166px] flex-col px-8 pb-4 pt-6">
           <textarea
             value={input}
@@ -4038,7 +4058,7 @@ function AIAssistantPage() {
             }}
             placeholder="What do you want me to help you with?"
             rows={2}
-            className={`min-h-[70px] min-w-0 flex-1 resize-none bg-transparent text-[14px] font-semibold leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#C7C7C7]"}`}
+            className={`min-h-[70px] min-w-0 flex-1 resize-none bg-transparent pr-24 text-[14px] font-semibold leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#C7C7C7]"}`}
             style={{ color: dark ? "#F4F6F8" : "#171717", letterSpacing: 0 }}
           />
           {attachments.length > 0 && (
@@ -4058,9 +4078,6 @@ function AIAssistantPage() {
             </div>
           )}
           <div className={`mt-auto flex items-center gap-2 pt-2 max-sm:flex-wrap ${dark ? "text-[#A8B0BA]" : "text-[#4B463E]"}`}>
-            <button onClick={() => fileInputRef.current?.click()} className={`flex h-11 w-11 items-center justify-center rounded-2xl opacity-0 transition-opacity duration-200 focus:opacity-100 group-hover/composer:opacity-100 group-focus-within/composer:opacity-100 ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "bg-[#F0F0F0] text-[#8E8E8E] hover:bg-[#E8E8E8]"}`} aria-label="Attach file">
-              <Paperclip className="h-4 w-4" />
-            </button>
             <button
               type="button"
               className={`inline-flex h-10 items-center gap-2 rounded-xl border px-4 text-[13px] font-semibold transition-colors ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#DDE3EA] hover:border-[rgba(59,167,255,0.28)]" : "border-[#D8D8D8] bg-white text-[#A1A1A1] hover:border-[#CACACA]"}`}
@@ -4071,17 +4088,10 @@ function AIAssistantPage() {
             <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
             <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
             <button
-              type="button"
-              className={`ml-auto flex h-11 w-11 items-center justify-center rounded-2xl opacity-0 transition-opacity duration-200 focus:opacity-100 group-hover/composer:opacity-100 group-focus-within/composer:opacity-100 ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[rgba(255,255,255,0.06)]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E8E8E8]"}`}
-              aria-label="Voice input"
-            >
-              <Mic className="h-5 w-5" />
-            </button>
-            <button
               onClick={() => void sendPrompt()}
               disabled={isSending}
               aria-label="Send prompt"
-              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1292E8] text-white transition-colors hover:bg-[#0F83D2] disabled:opacity-70"
+              className="ml-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1292E8] text-white transition-colors hover:bg-[#0F83D2] disabled:opacity-70"
             >
               {isSending ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
             </button>
@@ -4138,7 +4148,36 @@ function AIAssistantPage() {
 
           {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
 
-          <div className="mt-7 w-full">{composer}</div>
+          <div className="mt-7 flex w-full justify-center">
+            <div
+              className={`inline-flex items-center gap-1 rounded-full border p-1 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_10px_24px_rgba(0,0,0,0.22)]" : "border-[#E5E7EB] bg-white shadow-[0_10px_24px_rgba(31,43,77,0.06)]"}`}
+              role="tablist"
+              aria-label="Assistant mode"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={assistantMode === "agent"}
+                onClick={() => setAssistantMode("agent")}
+                className={`inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-[12px] font-semibold transition-all active:scale-[0.98] ${assistantMode === "agent" ? "bg-[#1D9BF0] text-white shadow-[0_8px_20px_rgba(29,155,240,0.32)]" : dark ? "text-[#A8B0BA] hover:text-[#F4F6F8]" : "text-[#4B5563] hover:text-[#171717]"}`}
+              >
+                <Bot className="h-3.5 w-3.5" strokeWidth={2.25} />
+                Agent
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={assistantMode === "workflow"}
+                onClick={() => setAssistantMode("workflow")}
+                className={`inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-[12px] font-semibold transition-all active:scale-[0.98] ${assistantMode === "workflow" ? "bg-[#1D9BF0] text-white shadow-[0_8px_20px_rgba(29,155,240,0.32)]" : dark ? "text-[#A8B0BA] hover:text-[#F4F6F8]" : "text-[#4B5563] hover:text-[#171717]"}`}
+              >
+                <Workflow className="h-3.5 w-3.5" strokeWidth={2.25} />
+                Workflow
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 w-full">{composer}</div>
 
           <div className={`mt-5 text-center text-[10px] ${dark ? "text-[#6F7782]" : "text-[#B4A99A]"}`}>
             {aiProviderLabel}
