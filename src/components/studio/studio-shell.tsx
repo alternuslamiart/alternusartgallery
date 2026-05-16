@@ -589,17 +589,6 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
       </div>
 
       <div className="mt-auto">
-        {!isCollapsed && (
-          <div className="mb-4 flex justify-center">
-            <button
-              onClick={() => setActiveModal("upgrade")}
-              style={{ height: 46, width: 148 }}
-              className={`rounded-xl text-[12px] font-semibold transition-colors ${dark ? "bg-[#1D2026] text-[#F4F6F8] border border-[rgba(255,255,255,0.1)] hover:border-[rgba(59,167,255,0.24)]" : "bg-[#EAF2F7] text-[#171717] border border-[#D6DEE7] hover:border-[#B8C7D6]"}`}
-            >
-              Upgrade Now
-            </button>
-          </div>
-        )}
         <div className="space-y-1 pb-1">
           {visibleBottomNavigation.map((item) => (
             <SidebarLink key={item.key} item={item} active={item.key === activeRoute} collapsed={isCollapsed} onNavigate={() => setIsMobileOpen(false)} />
