@@ -4045,22 +4045,16 @@ function AIAssistantPage() {
  </button>
  {attachMenuOpen && (
  <div className={`absolute top-[calc(100%+10px)] left-0 z-50 w-[240px] overflow-hidden rounded-2xl border py-1 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328] shadow-[0_16px_40px_rgba(0,0,0,0.36)]" : "border-[#E5E7EB] bg-white shadow-[0_16px_40px_rgba(0,0,0,0.12)]"}`}>
- <div className="mx-2 mb-1">
- <button type="button" onClick={() => { fileInputRef.current?.click(); setAttachMenuOpen(false); }} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] font-semibold transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}>
- <Paperclip className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} strokeWidth={2} />
- Add photo &amp; files
- </button>
- </div>
- <div className={`my-1 h-px ${dark ? "bg-[rgba(255,255,255,0.06)]" : "bg-[#F0F0F0]"}`} />
  <div className="mx-2 space-y-0.5 py-1">
  {[
+ { label: "Add photo & files", icon: Paperclip, arrow: false },
  { label: "Recent files", icon: Clock, arrow: true },
  { label: "Create image", icon: ImageIcon, arrow: false },
  { label: "Deep research", icon: Search, arrow: false },
  { label: "Connections & sources", icon: Globe, arrow: true },
  { label: "More...", icon: MoreHorizontal, arrow: false },
  ].map(({ label, icon: Icon, arrow }) => (
- <button key={label} type="button" onClick={() => setAttachMenuOpen(false)} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}>
+ <button key={label} type="button" onClick={() => { if (label === "Add photo & files") fileInputRef.current?.click(); setAttachMenuOpen(false); }} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}>
  <Icon className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} strokeWidth={2} />
  <span className="flex-1">{label}</span>
  {arrow && <ChevronRight className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} strokeWidth={2} />}
