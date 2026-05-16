@@ -752,7 +752,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  {isMobileOpen && (
  <div className="fixed inset-0 z-40 lg:hidden">
  <button className={`absolute inset-0 ${dark ?"bg-black/40 backdrop-blur-[2px]":"bg-[#1F2937]/20 backdrop-blur-[2px]"}`} onClick={() => setIsMobileOpen(false)} aria-label="Close sidebar"/>
- <div className="relative h-full w-[230px] rounded-none">{sidebar}</div>
+ <div className="relative h-full w-[230px] rounded-none shadow-[18px_0_50px_rgba(31,43,77,0.16)]">{sidebar}</div>
  </div>
  )}
 
@@ -927,7 +927,7 @@ function StudioDrawer({ drawer, onClose }: { drawer: StudioDrawerKey; onClose: (
  return (
  <div className={`fixed inset-0 z-50 flex justify-end backdrop-blur-[2px] ${dark ?"bg-black/35":"bg-[#1F2937]/20"}`} onMouseDown={onClose}>
  <aside
- className={`h-full w-full max-w-md border-l p-5 transition-all ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5E7EB] bg-white"}`}
+ className={`h-full w-full max-w-md border-l p-5 transition-all shadow-[-24px_0_70px_rgba(31,43,77,0.14)] ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5E7EB] bg-white"}`}
  onMouseDown={(event) => event.stopPropagation()}
  >
  <div className="flex items-start justify-between gap-4">
@@ -992,7 +992,7 @@ function RecentOutputDrawer({ recent, onClose }: { recent: GeneratedRecent; onCl
  return (
  <div className={`fixed inset-0 z-50 flex justify-end backdrop-blur-[2px] ${dark ?"bg-black/35":"bg-[#1F2937]/20"}`} onMouseDown={onClose}>
  <aside
- className={`h-full w-full max-w-md border-l p-5 transition-all ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5E7EB] bg-white"}`}
+ className={`h-full w-full max-w-md border-l p-5 transition-all shadow-[-24px_0_70px_rgba(31,43,77,0.14)] ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5E7EB] bg-white"}`}
  onMouseDown={(event) => event.stopPropagation()}
  >
  <div className="flex items-start justify-between gap-4">
@@ -2123,7 +2123,7 @@ function PrototypeDetailDrawer({
 
  return (
  <div className={`fixed inset-0 z-50 flex justify-end backdrop-blur-[2px] ${dark ?"bg-black/35":"bg-[#1F2937]/20"}`} onMouseDown={onClose}>
- <aside className={`h-full w-full max-w-md overflow-y-auto border-l p-5 ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5E7EB] bg-white"}`} onMouseDown={(event) => event.stopPropagation()}>
+ <aside className={`h-full w-full max-w-md overflow-y-auto border-l p-5 shadow-[-24px_0_70px_rgba(31,43,77,0.14)] ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5E7EB] bg-white"}`} onMouseDown={(event) => event.stopPropagation()}>
  <div className="flex items-start justify-between gap-4">
  <div>
  <h2 className={`text-[17px] font-semibold tracking-[-0.02em] ${dark ?"text-[#F4F6F8]":"text-[#171717]"}`}>Prototype details</h2>
@@ -3248,7 +3248,7 @@ function AssetDetailDrawer({
 
  return (
  <div className={`fixed inset-0 z-50 flex justify-end backdrop-blur-[2px] ${dark ?"bg-black/35":"bg-[#1F2937]/20"}`} onMouseDown={onClose}>
- <aside className={`h-full w-full max-w-md overflow-y-auto border-l p-5 ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5E7EB] bg-white"}`} onMouseDown={(event) => event.stopPropagation()}>
+ <aside className={`h-full w-full max-w-md overflow-y-auto border-l p-5 shadow-[-24px_0_70px_rgba(31,43,77,0.14)] ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5E7EB] bg-white"}`} onMouseDown={(event) => event.stopPropagation()}>
  <div className="flex items-start justify-between gap-4">
  <div>
  <h2 className={`text-[17px] font-semibold tracking-[-0.02em] ${dark ?"text-[#F4F6F8]":"text-[#171717]"}`}>Asset details</h2>
