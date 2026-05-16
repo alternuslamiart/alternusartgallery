@@ -3312,7 +3312,6 @@ function AssetDetailDrawer({
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ModeToggle({
   mode,
   onChange,
@@ -3411,7 +3410,6 @@ const workflowStarters: StarterCard[] = [
   },
 ];
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function StarterPanel({
   mode,
   dark,
@@ -4031,7 +4029,7 @@ function AIAssistantPage() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className={`pointer-events-auto flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.16)] hover:text-[#7DD3FC]" : "bg-[#F4F6F8] text-[#9CA3AF] hover:bg-[#DDEEFF] hover:text-[#1D9BF0]"}`}
+            className={`pointer-events-auto flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.36)] hover:bg-[rgba(59,167,255,0.16)] hover:text-[#7DD3FC]" : "border-[#E5E7EB] bg-white text-[#6B7280] shadow-sm hover:border-[#9BD2FF] hover:bg-[#DDEEFF] hover:text-[#1D9BF0]"}`}
             aria-label="Attach file"
             title="Attach file"
           >
@@ -4039,7 +4037,7 @@ function AIAssistantPage() {
           </button>
           <button
             type="button"
-            className={`pointer-events-auto flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.16)] hover:text-[#7DD3FC]" : "bg-[#F4F6F8] text-[#9CA3AF] hover:bg-[#DDEEFF] hover:text-[#1D9BF0]"}`}
+            className={`pointer-events-auto flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.36)] hover:bg-[rgba(59,167,255,0.16)] hover:text-[#7DD3FC]" : "border-[#E5E7EB] bg-white text-[#6B7280] shadow-sm hover:border-[#9BD2FF] hover:bg-[#DDEEFF] hover:text-[#1D9BF0]"}`}
             aria-label="Voice input"
             title="Voice input"
           >
@@ -4149,32 +4147,15 @@ function AIAssistantPage() {
           {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
 
           <div className="mt-7 flex w-full justify-center">
-            <div
-              className={`inline-flex items-center gap-1 rounded-full border p-1 ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_10px_24px_rgba(0,0,0,0.22)]" : "border-[#E5E7EB] bg-white shadow-[0_10px_24px_rgba(31,43,77,0.06)]"}`}
-              role="tablist"
-              aria-label="Assistant mode"
-            >
-              <button
-                type="button"
-                role="tab"
-                aria-selected={assistantMode === "agent"}
-                onClick={() => setAssistantMode("agent")}
-                className={`inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-[12px] font-semibold transition-all active:scale-[0.98] ${assistantMode === "agent" ? "bg-[#1D9BF0] text-white shadow-[0_8px_20px_rgba(29,155,240,0.32)]" : dark ? "text-[#A8B0BA] hover:text-[#F4F6F8]" : "text-[#4B5563] hover:text-[#171717]"}`}
-              >
-                <Bot className="h-3.5 w-3.5" strokeWidth={2.25} />
-                Agent
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={assistantMode === "workflow"}
-                onClick={() => setAssistantMode("workflow")}
-                className={`inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-[12px] font-semibold transition-all active:scale-[0.98] ${assistantMode === "workflow" ? "bg-[#1D9BF0] text-white shadow-[0_8px_20px_rgba(29,155,240,0.32)]" : dark ? "text-[#A8B0BA] hover:text-[#F4F6F8]" : "text-[#4B5563] hover:text-[#171717]"}`}
-              >
-                <Workflow className="h-3.5 w-3.5" strokeWidth={2.25} />
-                Workflow
-              </button>
-            </div>
+            <ModeToggle mode={assistantMode} onChange={setAssistantMode} dark={dark} />
+          </div>
+
+          <div className="mt-5 w-full">
+            <StarterPanel
+              mode={assistantMode}
+              dark={dark}
+              onOpen={(card) => setInput(card.prompt)}
+            />
           </div>
 
           <div className="mt-4 w-full">{composer}</div>
