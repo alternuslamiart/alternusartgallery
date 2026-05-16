@@ -4024,9 +4024,6 @@ function AIAssistantPage() {
  <button type="button" onClick={() => fileInputRef.current?.click()} className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[#252A31]" : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"}`} aria-label="Attach file">
  <Paperclip className="h-4 w-4" />
  </button>
- <button type="button" onClick={() => setModelMenuOpen((o) => !o)} className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[12px] font-semibold transition-colors ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20] text-[#DDE3EA]" : "border-[#D8D8D8] bg-white text-[#6B7280]"}`}>
- {selectedModel}
- </button>
  <div className="flex-1" />
  <button type="button" className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[#252A31]" : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"}`} aria-label="Voice input">
  <Mic className="h-4 w-4" strokeWidth={2} />
@@ -4089,32 +4086,6 @@ function AIAssistantPage() {
  <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
  </div>
  )}
- {/* Model selector */}
- <div className="relative mt-2 flex justify-start">
- {modelMenuOpen && (
- <div className={`absolute bottom-full left-0 mb-2 min-w-[200px] overflow-hidden rounded-2xl border py-1.5 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#E5E7EB] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.10)]"}`}>
- {["Claude Sonnet 4.5","Codex Pro 5.5","Codex Plus 5.5"].map((m) => (
- <button
- key={m}
- type="button"
- onClick={() => { setSelectedModel(m); setModelMenuOpen(false); }}
- className={`flex w-full items-center px-4 py-2.5 text-left text-[13px] font-medium transition-colors ${selectedModel === m ? (dark ? "bg-[rgba(255,255,255,0.07)] text-[#F4F6F8]" : "bg-[#F3F4F6] text-[#111827]") : (dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.05)]" : "text-[#374151] hover:bg-[#F9FAFB]")}`}
- >
- {m}
- </button>
- ))}
- </div>
- )}
- <button
- type="button"
- onMouseDown={(e) => e.stopPropagation()}
- onClick={() => setModelMenuOpen((o) => !o)}
- className={`inline-flex h-9 items-center gap-2 rounded-xl border px-3.5 text-[12px] font-semibold transition-colors ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#DDE3EA] hover:border-[rgba(59,167,255,0.28)]" : "border-[#D8D8D8] bg-white text-[#A1A1A1] hover:border-[#CACACA]"}`}
- >
- <Sparkles className="h-3.5 w-3.5 text-[#1292E8]" strokeWidth={2} />
- {selectedModel}
- </button>
- </div>
  </div>
  );
 
