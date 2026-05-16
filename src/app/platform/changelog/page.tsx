@@ -1,5 +1,5 @@
-﻿"use client";
-import { CediumPage, COBALT } from "@/components/Cedium-shell";
+"use client";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
 const log = [
   { d: "2026-04-22", v: "0.9.4", k: "feat", t: "AutoCAD and Blender agent goes public", b: "Website design, responsive code, and Blender 3D production are available in all workspaces." },

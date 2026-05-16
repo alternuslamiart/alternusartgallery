@@ -1,5 +1,5 @@
-﻿"use client";
-import { CediumPage, COBALT } from "@/components/Cedium-shell";
+"use client";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
 const sections = [
   { id: "overview",  t: "Overview",         b: "Cedium treats your data as yours. We process it only to deliver the product, we do not sell it, and we do not train shared models on it." },

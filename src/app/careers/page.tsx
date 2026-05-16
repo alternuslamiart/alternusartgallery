@@ -1,5 +1,5 @@
-﻿"use client";
-import { CediumPage, COBALT } from "@/components/Cedium-shell";
+"use client";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
 const roles = [
   { t: "Staff Product Engineer — Agent",    loc: "Remote · EU", team: "Engineering" },

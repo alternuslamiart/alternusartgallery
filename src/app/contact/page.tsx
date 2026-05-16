@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 import { useState } from "react";
-import { CediumPage, COBALT } from "@/components/Cedium-shell";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
 export default function Contact() {
   const [sent, setSent] = useState(false);

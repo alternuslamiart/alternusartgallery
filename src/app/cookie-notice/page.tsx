@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 import { useState } from "react";
-import { CediumPage, COBALT } from "@/components/Cedium-shell";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
 const categories = [
   { k: "essential", t: "Essential",   d: "Keep you signed in, remember your workspace, and secure the session.", required: true,  count: 3 },

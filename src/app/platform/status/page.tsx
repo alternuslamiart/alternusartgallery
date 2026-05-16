@@ -1,5 +1,5 @@
-﻿"use client";
-import { CediumPage, COBALT } from "@/components/Cedium-shell";
+"use client";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
 const services = [
   { n: "Agent runtime", u: "100.00%", s: "operational" },

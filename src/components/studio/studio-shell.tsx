@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -73,7 +73,7 @@ import {
 
 export type StudioRouteKey =
   | "studio-overview"
-  | "Cedium-design"
+  | "cedium-design"
   | "autocad-design"
   | "code-builder"
   | "blender-3d"
@@ -106,7 +106,7 @@ type GeneratedRecent = {
 export const studioNavigation: NavItem[] = [
   { key: "ai-assistant", label: "AI Assistant", href: "/ai-assistant", icon: Sparkles },
   { key: "studio-overview", label: "Studio Overview", href: "/studio-overview", icon: Grid2X2 },
-  { key: "Cedium-design", label: "Cedium Design", href: "/Cedium-design", icon: Monitor },
+  { key: "cedium-design", label: "Cedium Design", href: "/cedium-design", icon: Monitor },
   { key: "autocad-design", label: "AutoCAD Design", href: "/autocad-design", icon: PenLine },
   { key: "code-builder", label: "Code Builder", href: "/code-builder", icon: Code2 },
   { key: "blender-3d", label: "Blender 3D", href: "/blender-3d", icon: Layers3 },
@@ -124,7 +124,7 @@ const bottomNavigation = [
 const routeByPath: Record<string, StudioRouteKey> = {
   "/main": "studio-overview",
   "/studio-overview": "studio-overview",
-  "/Cedium-design": "Cedium-design",
+  "/cedium-design": "cedium-design",
   "/autocad-design": "autocad-design",
   "/code-builder": "code-builder",
   "/blender-3d": "blender-3d",
@@ -1288,7 +1288,7 @@ function StudioContent({ route, assistantTool }: { route: StudioRouteKey; assist
   switch (route) {
     case "studio-overview":
       return <OverviewPage />;
-    case "Cedium-design":
+    case "cedium-design":
       return <CediumDesignPage />;
     case "autocad-design":
       return <AutoCADPage />;

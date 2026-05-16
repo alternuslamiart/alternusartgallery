@@ -1,5 +1,5 @@
-﻿"use client";
-import { CediumPage, COBALT } from "@/components/Cedium-shell";
+"use client";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
 const principles = [
   { n: "01", t: "Intent over interface.",   d: "The user&apos;s goal matters. The buttons are an implementation detail. If the agent can do it, the user shouldn&apos;t have to." },

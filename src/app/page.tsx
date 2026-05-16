@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -11,7 +11,7 @@ import {
   Workflow,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CediumFooter } from "@/components/Cedium-shell";
+import { CediumFooter } from "@/components/cedium-shell";
 
 const navItems = [
   { label: "Platform", href: "/platform/overview" },

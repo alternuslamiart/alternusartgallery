@@ -1,5 +1,5 @@
-﻿"use client";
-import { CediumPage, COBALT } from "@/components/Cedium-shell";
+"use client";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
 const install = `npm install @Cedium/agent`;
 const example = `import { Agent } from "@Cedium/agent";

@@ -1,4 +1,4 @@
-﻿export type PrototypeQuality = "wireframe" | "high-fidelity";
+export type PrototypeQuality = "wireframe" | "high-fidelity";
 export type PrototypeType = "website" | "mobile-app" | "design-system";
 export type PrototypeStatus = "Draft" | "Ready" | "Archived";
 export type PrototypeVisibility = "private" | "workspace";
@@ -50,7 +50,7 @@ export type StudioAsset = {
   status: "Ready";
 };
 
-const PROTOTYPES_KEY = "Cedium-design-prototypes";
+const PROTOTYPES_KEY = "cedium-design-prototypes";
 const ASSETS_KEY = "Cedium-asset-library";
 
 export const defaultDesignSystem: DesignSystemSettings = {

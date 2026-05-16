@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -12,7 +12,7 @@ import {
   DARK_SURFACE_SOFT,
   DARK_TEXT,
   useCediumMode,
-} from "@/components/Cedium-shell";
+} from "@/components/cedium-shell";
 
 const COBALT = "#4284FF";
 const INK = "#1F1F1F";

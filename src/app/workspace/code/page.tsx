@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 import Link from "next/link";
-import { CediumPage, COBALT } from "@/components/Cedium-shell";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
 const snippet = [
   { n: 1,  t: `import { Agent } from "@Cedium/agent";`, k: "kw" },

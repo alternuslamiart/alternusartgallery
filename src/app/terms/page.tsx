@@ -1,5 +1,5 @@
-﻿"use client";
-import { CediumPage, COBALT } from "@/components/Cedium-shell";
+"use client";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
 const clauses = [
   { t: "Acceptance",       b: "By creating an Cedium workspace, you agree to these terms. If you don't, don't use the service." },

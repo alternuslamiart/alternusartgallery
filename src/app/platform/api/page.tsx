@@ -1,5 +1,5 @@
-﻿"use client";
-import { CediumPage, COBALT } from "@/components/Cedium-shell";
+"use client";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
 const endpoints = [
   { m: "POST", p: "/v1/agents", d: "Create an agent with a model and tool set." },

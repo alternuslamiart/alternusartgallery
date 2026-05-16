@@ -1,5 +1,5 @@
-﻿"use client";
-import { CediumPage, COBALT } from "@/components/Cedium-shell";
+"use client";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
 const press = [
   { by: "TechCrunch",   t: "Cedium raises seed to build the agent-native OS",      d: "Apr 2026" },
