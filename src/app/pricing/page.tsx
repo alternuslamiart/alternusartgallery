@@ -122,6 +122,13 @@ const faq = [
 export default function Pricing() {
   const [yearly, setYearly] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [checkoutTier, setCheckoutTier] = useState<(typeof tiers)[number] | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState("");
+
+  const openCheckout = (tier: (typeof tiers)[number]) => {
+    setCheckoutTier(tier);
+    setPaymentStatus("");
+  };
 
   return (
     <CerevixPage>
@@ -262,26 +269,52 @@ export default function Pricing() {
                         /mo{yearly && tier.pm > 0 ? ", billed yearly" : ""}
                       </span>
                     </div>
-                    <Link
-                      href="/main"
-                      style={{
-                        marginTop: 24,
-                        height: 46,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        background: tier.featured ? COBALT : "transparent",
-                        color: tier.featured ? "#fff" : t.fg,
-                        fontSize: 14,
-                        fontWeight: 700,
-                        borderRadius: 8,
-                        border: `1px solid ${tier.featured ? COBALT : t.faint}`,
-                        textDecoration: "none",
-                        transition: "all 0.15s",
-                      }}
-                    >
-                      {tier.cta}
-                    </Link>
+                    {tier.n === "Free" ? (
+                      <Link
+                        href="/main"
+                        style={{
+                          marginTop: 24,
+                          height: 46,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: "transparent",
+                          color: t.fg,
+                          fontSize: 14,
+                          fontWeight: 700,
+                          borderRadius: 8,
+                          border: `1px solid ${t.faint}`,
+                          textDecoration: "none",
+                          transition: "all 0.15s",
+                        }}
+                      >
+                        {tier.cta}
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openCheckout(tier)}
+                        style={{
+                          marginTop: 24,
+                          height: 46,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: tier.featured ? COBALT : "transparent",
+                          color: tier.featured ? "#fff" : t.fg,
+                          fontSize: 14,
+                          fontWeight: 700,
+                          borderRadius: 8,
+                          border: `1px solid ${tier.featured ? COBALT : t.faint}`,
+                          transition: "all 0.15s",
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                          width: "100%",
+                        }}
+                      >
+                        {tier.cta}
+                      </button>
+                    )}
                     <div style={{ marginTop: 28, height: 1, background: t.faint }} />
                     <ul style={{ marginTop: 24, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 12, flex: 1 }}>
                       {tier.feat.map((f) => (
@@ -447,6 +480,189 @@ export default function Pricing() {
               </div>
             </div>
           </section>
+
+          {checkoutTier ? (
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={`${checkoutTier.n} payment frame`}
+              onClick={() => setCheckoutTier(null)}
+              style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 80,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 24,
+                background: "rgba(15,23,42,0.42)",
+                backdropFilter: "blur(12px)",
+              }}
+            >
+              <div
+                onClick={(event) => event.stopPropagation()}
+                style={{
+                  width: "min(940px, 100%)",
+                  maxHeight: "calc(100vh - 48px)",
+                  overflowY: "auto",
+                  borderRadius: 28,
+                  border: `1px solid ${t.faint}`,
+                  background: t.raised,
+                  boxShadow: "0 34px 120px rgba(15,23,42,0.28)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 18,
+                    padding: "22px 24px",
+                    borderBottom: `1px solid ${t.faint}`,
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.18em", color: COBALT, textTransform: "uppercase" }}>
+                      Secure checkout
+                    </div>
+                    <h2 style={{ margin: "6px 0 0", fontSize: 24, fontWeight: 900, letterSpacing: "-0.03em", color: t.fg }}>
+                      {checkoutTier.n === "Team" ? "Start Team trial" : "Upgrade to Pro"}
+                    </h2>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setCheckoutTier(null)}
+                    aria-label="Close payment frame"
+                    style={{
+                      height: 40,
+                      width: 40,
+                      borderRadius: 999,
+                      border: `1px solid ${t.faint}`,
+                      background: t.surface,
+                      color: t.fg,
+                      cursor: "pointer",
+                      fontSize: 22,
+                      lineHeight: 1,
+                    }}
+                  >
+                    x
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-0 md:grid-cols-[0.9fr_1.1fr]">
+                  <aside style={{ padding: 26, borderRight: `1px solid ${t.faint}`, background: t.surface }}>
+                    <div style={{ border: `1px solid ${t.faint}`, borderRadius: 20, padding: 22, background: t.raised }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", gap: 16 }}>
+                        <div>
+                          <div style={{ fontSize: 22, fontWeight: 900, letterSpacing: "-0.03em", color: t.fg }}>{checkoutTier.n}</div>
+                          <p style={{ margin: "8px 0 0", fontSize: 13, color: t.muted, lineHeight: 1.55 }}>{checkoutTier.d}</p>
+                        </div>
+                        <span style={{ borderRadius: 999, padding: "6px 10px", background: `${COBALT}18`, color: COBALT, fontSize: 11, fontWeight: 800 }}>
+                          {yearly ? "Yearly" : "Monthly"}
+                        </span>
+                      </div>
+                      <div style={{ marginTop: 28, display: "flex", alignItems: "baseline", gap: 5 }}>
+                        <span style={{ fontSize: 16, fontWeight: 800, color: t.muted }}>$</span>
+                        <span style={{ fontSize: 56, fontWeight: 900, letterSpacing: "-0.05em", color: t.fg }}>
+                          {yearly ? checkoutTier.py : checkoutTier.pm}
+                        </span>
+                        <span style={{ fontSize: 13, color: t.muted }}>/mo</span>
+                      </div>
+                      <div style={{ marginTop: 18, height: 1, background: t.faint }} />
+                      <ul style={{ margin: "18px 0 0", padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
+                        {checkoutTier.feat.slice(0, 4).map((feature) => (
+                          <li key={feature} style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 13, color: t.fg }}>
+                            <span style={{ height: 7, width: 7, borderRadius: "50%", background: COBALT, flexShrink: 0 }} />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <p style={{ margin: "18px 0 0", fontSize: 12, color: t.muted, lineHeight: 1.6 }}>
+                      {checkoutTier.n === "Team"
+                        ? "Team trial starts after payment method verification. You can cancel before billing begins."
+                        : "Your Pro access starts immediately after checkout confirmation."}
+                    </p>
+                  </aside>
+
+                  <form
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      setPaymentStatus("Payment frame submitted. Connect Stripe or another gateway to process live charges.");
+                    }}
+                    style={{ padding: 26 }}
+                  >
+                    <div style={{ display: "grid", gap: 14 }}>
+                      <label style={{ display: "grid", gap: 8, fontSize: 12, fontWeight: 800, color: t.fg }}>
+                        Email
+                        <input
+                          required
+                          type="email"
+                          placeholder="you@company.com"
+                          style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: t.surface, color: t.fg, padding: "0 14px", outline: "none" }}
+                        />
+                      </label>
+                      <label style={{ display: "grid", gap: 8, fontSize: 12, fontWeight: 800, color: t.fg }}>
+                        Card number
+                        <input
+                          required
+                          inputMode="numeric"
+                          placeholder="4242 4242 4242 4242"
+                          style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: t.surface, color: t.fg, padding: "0 14px", outline: "none" }}
+                        />
+                      </label>
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <label style={{ display: "grid", gap: 8, fontSize: 12, fontWeight: 800, color: t.fg }}>
+                          Expiry
+                          <input
+                            required
+                            placeholder="MM / YY"
+                            style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: t.surface, color: t.fg, padding: "0 14px", outline: "none" }}
+                          />
+                        </label>
+                        <label style={{ display: "grid", gap: 8, fontSize: 12, fontWeight: 800, color: t.fg }}>
+                          CVC
+                          <input
+                            required
+                            inputMode="numeric"
+                            placeholder="123"
+                            style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: t.surface, color: t.fg, padding: "0 14px", outline: "none" }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      style={{
+                        marginTop: 20,
+                        width: "100%",
+                        height: 50,
+                        border: "none",
+                        borderRadius: 14,
+                        background: COBALT,
+                        color: "#fff",
+                        fontSize: 14,
+                        fontWeight: 900,
+                        cursor: "pointer",
+                        boxShadow: `0 18px 36px ${COBALT}30`,
+                      }}
+                    >
+                      {checkoutTier.n === "Team" ? "Start trial with payment method" : "Continue payment"}
+                    </button>
+                    {paymentStatus ? (
+                      <div style={{ marginTop: 14, borderRadius: 12, background: `${COBALT}12`, color: COBALT, padding: "12px 14px", fontSize: 12, fontWeight: 700, lineHeight: 1.5 }}>
+                        {paymentStatus}
+                      </div>
+                    ) : null}
+                    <p style={{ margin: "14px 0 0", fontSize: 11.5, color: t.muted, lineHeight: 1.6 }}>
+                      Demo checkout frame. Live charging requires connecting a billing provider endpoint.
+                    </p>
+                  </form>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </>
       )}
     </CerevixPage>
