@@ -4073,25 +4073,6 @@ function AIAssistantPage() {
         </div>
       )}
       <div className={`relative w-full overflow-hidden rounded-2xl border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#DCDCDC] bg-white shadow-[0_14px_34px_rgba(31,43,77,0.05)]"}`}>
-        <div className="pointer-events-none absolute right-3 top-3 z-10 flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className={`pointer-events-auto flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.36)] hover:bg-[rgba(59,167,255,0.16)] hover:text-[#7DD3FC]" : "border-[#E5E7EB] bg-white text-[#6B7280] shadow-sm hover:border-[#9BD2FF] hover:bg-[#DDEEFF] hover:text-[#1D9BF0]"}`}
-            aria-label="Attach file"
-            title="Attach file"
-          >
-            <Paperclip className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            className={`pointer-events-auto flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.36)] hover:bg-[rgba(59,167,255,0.16)] hover:text-[#7DD3FC]" : "border-[#E5E7EB] bg-white text-[#6B7280] shadow-sm hover:border-[#9BD2FF] hover:bg-[#DDEEFF] hover:text-[#1D9BF0]"}`}
-            aria-label="Voice input"
-            title="Voice input"
-          >
-            <Mic className="h-4 w-4" />
-          </button>
-        </div>
         <div className="relative flex min-h-[166px] flex-col px-8 pb-4 pt-6">
           <textarea
             value={input}
@@ -4104,7 +4085,7 @@ function AIAssistantPage() {
             }}
             placeholder="What do you want me to help you with?"
             rows={2}
-            className={`min-h-[70px] min-w-0 flex-1 resize-none bg-transparent pr-24 text-[14px] font-semibold leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#C7C7C7]"}`}
+            className={`min-h-[70px] min-w-0 flex-1 resize-none bg-transparent text-[14px] font-semibold leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#C7C7C7]"}`}
             style={{ color: dark ? "#F4F6F8" : "#171717", letterSpacing: 0 }}
           />
           {attachments.length > 0 && (
@@ -4130,14 +4111,31 @@ function AIAssistantPage() {
             >
               Codex Plus 5.5
             </button>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.36)] hover:text-[#7DD3FC]" : "border-[#E5E7EB] bg-white text-[#6B7280] shadow-sm hover:border-[#9BD2FF] hover:text-[#1D9BF0]"}`}
+              aria-label="Attach file"
+              title="Attach file"
+            >
+              <Paperclip className="h-4 w-4" />
+            </button>
             <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
             <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
             <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
             <button
+              type="button"
+              className={`ml-auto flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.36)] hover:text-[#7DD3FC]" : "border-[#E5E7EB] bg-white text-[#6B7280] shadow-sm hover:border-[#9BD2FF] hover:text-[#1D9BF0]"}`}
+              aria-label="Voice input"
+              title="Voice input"
+            >
+              <Mic className="h-4 w-4" />
+            </button>
+            <button
               onClick={() => void sendPrompt()}
               disabled={isSending}
               aria-label="Send prompt"
-              className="ml-auto flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1292E8] text-white transition-colors hover:bg-[#0F83D2] disabled:opacity-70"
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1292E8] text-white transition-colors hover:bg-[#0F83D2] disabled:opacity-70"
             >
               {isSending ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
             </button>
