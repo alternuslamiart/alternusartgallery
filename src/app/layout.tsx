@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Roboto, Roboto_Flex } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/components/providers";
@@ -17,13 +18,15 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-const roboto = localFont({
-  src: "./fonts/GeistVF.woff",
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
   variable: "--font-roboto",
+  display: "swap",
 });
 
-const robotoFlex = localFont({
-  src: "./fonts/GeistVF.woff",
+const robotoFlex = Roboto_Flex({
+  subsets: ["latin"],
   variable: "--font-roboto-flex",
   display: "swap",
 });

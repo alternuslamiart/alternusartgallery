@@ -82,6 +82,8 @@ const config: Config = {
   			sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
   			serif: ['var(--font-playfair)', 'Georgia', 'serif'],
   			mono: ['var(--font-geist-mono)', 'monospace'],
+  			roboto: ['var(--font-roboto)', 'sans-serif'],
+  			'roboto-flex': ['var(--font-roboto-flex)', 'sans-serif'],
   		},
   		letterSpacing: {
   			gallery: '0.25em',
