@@ -3985,7 +3985,7 @@ function AIAssistantPage() {
  ))}
  </div>
  )}
- <div className={`flex min-h-[58px] items-center gap-2 rounded-[24px] border px-2.5 py-2 mx-6 ${dark ?"border-[rgba(255,255,255,0.1)] bg-[#202328]":"border-[#D9D9D9] bg-white"}`} style={{ width:"calc(100% - 48px)"}}>
+ <div className={`flex min-h-[58px] w-full items-center gap-2 rounded-[24px] border px-2.5 py-2 ${dark ?"border-[rgba(255,255,255,0.1)] bg-[#202328]":"border-[#D9D9D9] bg-white"}`}>
  <button
  type="button"
  onClick={() => fileInputRef.current?.click()}
@@ -4256,7 +4256,7 @@ function AIAssistantPage() {
  </div>
  </div>
 
- <div className="pb-7 pt-3">
+ <div className="pb-7 pt-3 px-6">
  {composer}
  </div>
  </div>
