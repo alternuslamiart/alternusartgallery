@@ -4038,125 +4038,41 @@ function AIAssistantPage() {
     </div>
   );
 
-  const composer = hasConversation ? compactComposer : (
-    <div className="w-full">
-      {showPlanEndingNotice && (
-        <div className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-6 py-3 text-[12px] ${dark ? "border-[rgba(255,170,0,0.32)] bg-[rgba(255,170,0,0.08)] text-[#F4F6F8]" : "border-[#FCD7A1] bg-[#FFF8EC] text-[#171717]"}`}>
-          <div className="flex items-start gap-3">
-            <div className={`mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl ${dark ? "bg-[rgba(255,170,0,0.16)] text-[#FFB454]" : "bg-[#FFEBC9] text-[#B7791F]"}`}>
-              <AlertTriangle className="h-4 w-4" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[13px] font-semibold">Your free plan is wrapping up</p>
-              <p className={`mt-0.5 text-[11px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>
-                You have used Cedium AI {aiChatCount} {aiChatCount === 1 ? "time" : "times"} on your free trial. Upgrade to keep your chats, attachments, and Voice Speak going without interruption.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => openModal("upgrade")}
-              className="inline-flex h-9 items-center rounded-xl bg-[#1292E8] px-4 text-[12px] font-semibold text-white shadow-[0_8px_18px_rgba(18,146,232,0.32)] transition-colors hover:bg-[#0F83D2]"
-            >
-              Upgrade Now
-            </button>
-            <button
-              type="button"
-              onClick={dismissPlanNotice}
-              aria-label="Dismiss free plan notice"
-              className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#9CA3AF] hover:bg-white hover:text-[#171717]"}`}
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
+  const composer = compactComposer;
+
+  const planNotice = showPlanEndingNotice ? (
+    <div className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-6 py-3 text-[12px] ${dark ? "border-[rgba(255,170,0,0.32)] bg-[rgba(255,170,0,0.08)] text-[#F4F6F8]" : "border-[#FCD7A1] bg-[#FFF8EC] text-[#171717]"}`}>
+      <div className="flex items-start gap-3">
+        <div className={`mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl ${dark ? "bg-[rgba(255,170,0,0.16)] text-[#FFB454]" : "bg-[#FFEBC9] text-[#B7791F]"}`}>
+          <AlertTriangle className="h-4 w-4" />
         </div>
-      )}
-      <div className={`relative w-full overflow-hidden rounded-2xl border text-left ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#DCDCDC] bg-white shadow-[0_14px_34px_rgba(31,43,77,0.05)]"}`}>
-        <div className="relative flex min-h-[166px] flex-col px-8 pb-4 pt-6">
-          <textarea
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                void sendPrompt();
-              }
-            }}
-            placeholder="What do you want me to help you with?"
-            rows={2}
-            className={`min-h-[70px] min-w-0 flex-1 resize-none bg-transparent text-[14px] font-semibold leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "placeholder:text-[#C7C7C7]"}`}
-            style={{ color: dark ? "#F4F6F8" : "#171717", letterSpacing: 0 }}
-          />
-          {attachments.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-2">
-              {attachments.map((attachment) => (
-                <span key={attachment.id} className={`inline-flex max-w-full items-center gap-2 rounded-full border px-2.5 py-1 text-[10px] font-medium ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]" : "border-[#E5E7EB] bg-[#F8FAFC] text-[#4B5563]"}`}>
-                  <span className="truncate">{attachment.name}</span>
-                  <button
-                    onClick={() => setAttachments((current) => current.filter((item) => item.id !== attachment.id))}
-                    className={`rounded-full ${dark ? "text-[#6F7782] hover:text-[#F4F6F8]" : "text-[#9CA3AF] hover:text-[#171717]"}`}
-                    aria-label={`Remove ${attachment.name}`}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-          <div className={`mt-auto flex items-center gap-2 pt-2 max-sm:flex-wrap ${dark ? "text-[#A8B0BA]" : "text-[#4B463E]"}`}>
-            <button
-              type="button"
-              className={`inline-flex h-10 items-center gap-2 rounded-xl border px-4 text-[13px] font-semibold transition-colors ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#DDE3EA] hover:border-[rgba(59,167,255,0.28)]" : "border-[#D8D8D8] bg-white text-[#A1A1A1] hover:border-[#CACACA]"}`}
-            >
-              Codex Plus 5.5
-            </button>
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.36)] hover:text-[#7DD3FC]" : "border-[#E5E7EB] bg-white text-[#6B7280] shadow-sm hover:border-[#9BD2FF] hover:text-[#1D9BF0]"}`}
-              aria-label="Attach file"
-              title="Attach file"
-            >
-              <Paperclip className="h-4 w-4" />
-            </button>
-            <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
-            <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
-            <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
-            <button
-              type="button"
-              className={`ml-auto flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.36)] hover:text-[#7DD3FC]" : "border-[#E5E7EB] bg-white text-[#6B7280] shadow-sm hover:border-[#9BD2FF] hover:text-[#1D9BF0]"}`}
-              aria-label="Voice input"
-              title="Voice input"
-            >
-              <Mic className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => void sendPrompt()}
-              disabled={isSending}
-              aria-label="Send prompt"
-              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#1292E8] text-white transition-colors hover:bg-[#0F83D2] disabled:opacity-70"
-            >
-              {isSending ? <RefreshCw className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-            </button>
-          </div>
+        <div className="min-w-0">
+          <p className="text-[13px] font-semibold">Your free plan is wrapping up</p>
+          <p className={`mt-0.5 text-[11px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>
+            You have used Cedium AI {aiChatCount} {aiChatCount === 1 ? "time" : "times"} on your free trial. Upgrade to keep your chats, attachments, and Voice Speak going without interruption.
+          </p>
         </div>
       </div>
-      <div className="mt-4 flex flex-wrap gap-3">
-        {assistantChips.map((item) => {
-          const Icon = item.icon;
-          return (
-              <button
-                key={item.label}
-                type="button"
-              className={`inline-flex h-10 min-w-[128px] items-center justify-center gap-2 rounded-2xl border px-4 text-[13px] font-bold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.28)]" : "border-[#DCDCDC] bg-white text-[#AAAAAA] shadow-[0_6px_14px_rgba(31,43,77,0.03)] hover:border-[#D1D5DB]"}`}
-              >
-              <Icon className="h-4 w-4" />
-                {item.label}
-              </button>
-          );
-        })}
+      <div className="flex items-center gap-2">
+        <button type="button" onClick={() => openModal("upgrade")} className="inline-flex h-9 items-center rounded-xl bg-[#1292E8] px-4 text-[12px] font-semibold text-white shadow-[0_8px_18px_rgba(18,146,232,0.32)] transition-colors hover:bg-[#0F83D2]">Upgrade Now</button>
+        <button type="button" onClick={dismissPlanNotice} aria-label="Dismiss free plan notice" className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#9CA3AF] hover:bg-white hover:text-[#171717]"}`}>
+          <X className="h-4 w-4" />
+        </button>
       </div>
+    </div>
+  ) : null;
+
+  const chipsRow = (
+    <div className="mt-4 flex flex-wrap gap-3">
+      {assistantChips.map((item) => {
+        const Icon = item.icon;
+        return (
+          <button key={item.label} type="button" className={`inline-flex h-10 min-w-[128px] items-center justify-center gap-2 rounded-2xl border px-4 text-[13px] font-bold ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.28)]" : "border-[#DCDCDC] bg-white text-[#AAAAAA] shadow-[0_6px_14px_rgba(31,43,77,0.03)] hover:border-[#D1D5DB]"}`}>
+            <Icon className="h-4 w-4" />
+            {item.label}
+          </button>
+        );
+      })}
     </div>
   );
 
@@ -4204,7 +4120,11 @@ function AIAssistantPage() {
             />
           </div>
 
-          <div className="mt-4 w-full">{composer}</div>
+          <div className="mt-4 w-full">
+            {planNotice}
+            {composer}
+            {chipsRow}
+          </div>
 
           <div className={`mt-5 text-center text-[10px] ${dark ? "text-[#6F7782]" : "text-[#B4A99A]"}`}>
             {aiProviderLabel}
