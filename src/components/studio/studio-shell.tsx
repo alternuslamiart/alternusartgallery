@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   AlertTriangle,
+  AudioLines,
   Bell,
   Bot,
   Box,
@@ -13,6 +14,7 @@ import {
   ChevronLeft,
   CircleSlash,
   Code2,
+  CornerDownLeft,
   Copy,
   CreditCard,
   Download,
@@ -3983,15 +3985,15 @@ function AIAssistantPage() {
           ))}
         </div>
       )}
-      <div className={`flex min-h-[82px] w-full items-center gap-3 rounded-[30px] border px-3 py-3 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#D9D9D9] bg-white shadow-[0_12px_30px_rgba(31,43,77,0.05)]"}`}>
+      <div className={`flex min-h-[58px] w-full items-center gap-2 rounded-[24px] border px-2.5 py-2 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#D9D9D9] bg-white shadow-[0_12px_30px_rgba(31,43,77,0.05)]"}`}>
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className={`flex h-[58px] w-[58px] flex-shrink-0 items-center justify-center rounded-[20px] transition-colors ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E7E7E7]"}`}
+          className={`flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E7E7E7]"}`}
           aria-label="Attach file"
           title="Attach file"
         >
-          <Plus className="h-6 w-6" strokeWidth={1.8} />
+          <Plus className="h-5 w-5" strokeWidth={1.8} />
         </button>
         <textarea
           value={input}
@@ -4004,24 +4006,30 @@ function AIAssistantPage() {
           }}
           aria-label="Message Cedium"
           rows={1}
-          className={`min-h-[42px] flex-1 resize-none bg-transparent px-2 py-3 text-[15px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#171717] placeholder:text-[#A1A1A1]"}`}
+          className={`min-h-[32px] flex-1 resize-none bg-transparent px-2 py-1.5 text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#171717] placeholder:text-[#A1A1A1]"}`}
           style={{ letterSpacing: 0 }}
         />
         <button
           type="button"
-          className={`flex h-[58px] w-[58px] flex-shrink-0 items-center justify-center rounded-[20px] transition-colors ${dark ? "bg-[#181B20] text-[#F4F6F8] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#171717] hover:bg-[#E7E7E7]"}`}
+          className={`flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#F4F6F8] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#171717] hover:bg-[#E7E7E7]"}`}
           aria-label="Voice input"
           title="Voice input"
         >
-          <Mic className="h-6 w-6" strokeWidth={2} />
+          <Mic className="h-5 w-5" strokeWidth={2} />
         </button>
         <button
           onClick={() => void sendPrompt()}
-          disabled={isSending || !input.trim()}
+          disabled={isSending || (!input.trim() && false)}
           aria-label="Send prompt"
-          className="flex h-[58px] w-[58px] flex-shrink-0 items-center justify-center rounded-[20px] bg-[#1292E8] text-white transition-colors hover:bg-[#0F83D2] disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] bg-[#1292E8] text-white transition-all hover:bg-[#0F83D2] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isSending ? <RefreshCw className="h-6 w-6 animate-spin" /> : <Send className="h-6 w-6" />}
+          {isSending ? (
+            <RefreshCw className="h-5 w-5 animate-spin" />
+          ) : input.trim() ? (
+            <CornerDownLeft className="h-5 w-5" strokeWidth={2} />
+          ) : (
+            <AudioLines className="h-5 w-5" strokeWidth={2} />
+          )}
         </button>
         <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
         <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
