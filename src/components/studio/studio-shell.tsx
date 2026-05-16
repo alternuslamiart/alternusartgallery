@@ -14,6 +14,7 @@ import {
  ChevronLeft,
  ChevronRight,
  CircleSlash,
+ Clock,
  Code2,
  CornerDownLeft,
  Copy,
@@ -22,6 +23,7 @@ import {
  FileText,
  Folder,
  Ghost,
+ Globe,
  Grid2X2,
  ImageIcon,
  Layers3,
@@ -29,6 +31,7 @@ import {
  Mic,
  Monitor,
  Moon,
+ MoreHorizontal,
  Network,
  Paperclip,
  PanelLeft,
@@ -4051,14 +4054,15 @@ function AIAssistantPage() {
  </button>
  <div className={`my-1 h-px ${dark ? "bg-[rgba(255,255,255,0.06)]" : "bg-[#F0F0F0]"}`} />
  {[
- { label: "Recent files", arrow: true },
- { label: "Create image", arrow: false },
- { label: "Deep research", arrow: false },
- { label: "Connections & sources", arrow: true },
- { label: "More...", arrow: false },
- ].map(({ label, arrow }) => (
- <button key={label} type="button" onClick={() => setAttachMenuOpen(false)} className={`flex w-full items-center justify-between px-4 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.05)]" : "text-[#374151] hover:bg-[#F9FAFB]"}`}>
- <span>{label}</span>
+ { label: "Recent files", icon: Clock, arrow: true },
+ { label: "Create image", icon: ImageIcon, arrow: false },
+ { label: "Deep research", icon: Search, arrow: false },
+ { label: "Connections & sources", icon: Globe, arrow: true },
+ { label: "More...", icon: MoreHorizontal, arrow: false },
+ ].map(({ label, icon: Icon, arrow }) => (
+ <button key={label} type="button" onClick={() => setAttachMenuOpen(false)} className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.05)]" : "text-[#374151] hover:bg-[#F9FAFB]"}`}>
+ <Icon className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} strokeWidth={2} />
+ <span className="flex-1">{label}</span>
  {arrow && <ChevronRight className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} strokeWidth={2} />}
  </button>
  ))}
