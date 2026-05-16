@@ -18,6 +18,7 @@ import {
   Download,
   FileText,
   Folder,
+  Ghost,
   Grid2X2,
   ImageIcon,
   Layers3,
@@ -759,8 +760,6 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           color: #ffffff !important;
         }
       `}</style>
-      <div className={`pointer-events-none absolute inset-x-0 top-0 z-30 h-[2px] ${dark ? "bg-[rgba(255,255,255,0.14)]" : "bg-[#D6E1E8]"}`} />
-      <div className={`pointer-events-none absolute inset-x-0 top-[56px] z-30 h-px ${dark ? "bg-[rgba(255,255,255,0.12)]" : "bg-[#D6E1E8]"}`} />
       <div className="flex h-full">
         <div className="hidden lg:block">{sidebar}</div>
         {isMobileOpen && (
@@ -4108,21 +4107,15 @@ function AIAssistantPage() {
   );
 
   const temporaryChatNotice = isTemporaryChat ? (
-    <div className={`w-full rounded-2xl border px-4 py-3 text-left ${dark ? "border-[rgba(59,167,255,0.24)] bg-[rgba(59,167,255,0.09)]" : "border-[#BFE2FF] bg-[#F2F9FF]"}`}>
-      <div className="flex items-start gap-3">
-        <div className={`mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl ${dark ? "bg-[rgba(59,167,255,0.16)] text-[#7DD3FC]" : "bg-[#DDEEFF] text-[#1D9BF0]"}`}>
-          <MessageCircle className="h-4 w-4" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className={`text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Temporary chat</p>
-            <span className={`rounded-full px-2 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.08em] ${dark ? "bg-[rgba(255,255,255,0.08)] text-[#A8B0BA]" : "bg-white text-[#6B7280]"}`}>Not saved</span>
-          </div>
-          <p className={`mt-1 text-[11px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>This conversation stays only in this session and starts without previous context.</p>
-        </div>
+    <div className="flex w-full justify-center">
+      <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]" : "border-[#E5EAF0] bg-[#F6F8FB] text-[#4B5563]"}`}>
+        <Ghost className={`h-3.5 w-3.5 ${dark ? "text-[#7DD3FC]" : "text-[#1D9BF0]"}`} strokeWidth={2} />
+        <span className={`font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}>Temporary chat</span>
+        <span className="hidden sm:inline">— this conversation won&apos;t be saved.</span>
         <button
+          type="button"
           onClick={closeTemporaryChat}
-          className={`flex h-7 flex-shrink-0 items-center rounded-lg px-2.5 text-[10.5px] font-semibold ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]" : "text-[#4B5563] hover:bg-white hover:text-[#171717]"}`}
+          className={`ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold transition-colors ${dark ? "bg-[rgba(255,255,255,0.06)] text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.1)] hover:text-[#F4F6F8]" : "bg-white text-[#4B5563] shadow-sm hover:text-[#171717]"}`}
         >
           End
         </button>
