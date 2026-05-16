@@ -3423,7 +3423,7 @@ function StarterPanel({
               onClick={() => onOpen(card)}
               className={`group flex min-h-[88px] items-start gap-3 rounded-[14px] border p-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] ${cardBase}`}
             >
-              <span className={`flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-[8px] transition-colors ${dark ? "bg-[rgba(59,167,255,0.18)] text-[#7DD3FC] group-hover:bg-[#1D9BF0] group-hover:text-white" : "bg-[#D0E8F5] text-[#1D9BF0] group-hover:bg-[#1D9BF0] group-hover:text-white"}`}>
+              <span className={`flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-[8px] transition-colors ${dark ? "bg-[rgba(59,167,255,0.18)] text-[#7DD3FC] group-hover:bg-[#1D9BF0] group-hover:text-white" : "bg-[#E8F4FB] text-[#1D9BF0] group-hover:bg-[#1D9BF0] group-hover:text-white"}`}>
                 <Icon className="h-5 w-5" />
               </span>
               <span className="min-w-0 flex-1">
