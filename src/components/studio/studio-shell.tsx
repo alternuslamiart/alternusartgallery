@@ -3708,6 +3708,8 @@ function AIAssistantPage() {
  const fileInputRef = useRef<HTMLInputElement>(null);
  const imageInputRef = useRef<HTMLInputElement>(null);
  const documentInputRef = useRef<HTMLInputElement>(null);
+ const allFilesRef = useRef<HTMLInputElement>(null);
+ const textareaRef = useRef<HTMLTextAreaElement>(null);
  const hasConversation = messages.length > 0;
  const showPlanEndingNotice = aiChatCount >= 3 && !planNoticeDismissed;
 
@@ -3793,8 +3795,21 @@ function AIAssistantPage() {
  kind,
  })),
  ]);
- if (files.length) showToast(`${files.length} ${kind} attachment${files.length > 1 ?"s":""} added`);
- event.target.value ="";
+ if (files.length) showToast(`${files.length} attachment${files.length > 1 ? "s" : ""} added`);
+ event.target.value = "";
+ };
+
+ const onAllFiles = (event: ChangeEvent<HTMLInputElement>) => {
+ const files = Array.from(event.target.files ?? []);
+ setAttachments((current) => [
+ ...current,
+ ...files.map((file) => {
+ const kind: Attachment["kind"] = file.type.startsWith("image/") ? "image" : "document";
+ return { id: `${kind}-${file.name}-${file.lastModified}-${Math.random().toString(36).slice(2)}`, name: file.name, kind };
+ }),
+ ]);
+ if (files.length) showToast(`${files.length} attachment${files.length > 1 ? "s" : ""} added`);
+ event.target.value = "";
  };
 
  const sendPrompt = async (promptOverride?: string) => {
@@ -4048,12 +4063,12 @@ function AIAssistantPage() {
  <div className={`absolute top-[calc(100%+10px)] left-0 z-50 w-[240px] overflow-hidden rounded-2xl border py-1 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328] shadow-[0_16px_40px_rgba(0,0,0,0.36)]" : "border-[#E5E7EB] bg-white shadow-[0_16px_40px_rgba(0,0,0,0.12)]"}`}>
  <div className="mx-2 space-y-0.5 py-1">
  {[
- { label: "Add photo & files", icon: Paperclip, arrow: false, action: () => { fileInputRef.current?.click(); } },
+ { label: "Add photo & files", icon: Paperclip, arrow: false, action: () => { allFilesRef.current?.click(); } },
  { label: "Recent files", icon: Clock, arrow: true, action: () => { router.push("/workspace/files"); } },
- { label: "Create image", icon: ImageIcon, arrow: false, action: () => { setInput("Create an image: "); } },
- { label: "Deep research", icon: Search, arrow: false, action: () => { setInput("Deep research: "); } },
+ { label: "Create image", icon: ImageIcon, arrow: false, action: () => { imageInputRef.current?.click(); } },
+ { label: "Deep research", icon: Search, arrow: false, action: () => { setInput("Deep research on: "); setTimeout(() => { textareaRef.current?.focus(); }, 50); } },
  { label: "Connections & sources", icon: Globe, arrow: true, action: () => { showToast("Connections & sources coming soon"); } },
- { label: "More...", icon: MoreHorizontal, arrow: false, action: () => { showToast("More features coming soon"); } },
+ { label: "More...", icon: MoreHorizontal, arrow: false, action: () => { showToast("More options coming soon"); } },
  ].map(({ label, icon: Icon, arrow, action }) => (
  <button key={label} type="button" onClick={() => { action(); setAttachMenuOpen(false); }} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}>
  <Icon className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} strokeWidth={2} />
@@ -4066,6 +4081,7 @@ function AIAssistantPage() {
  )}
  </div>
  <textarea
+ ref={textareaRef}
  value={input}
  onChange={(event) => setInput(event.target.value)}
  onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendPrompt(); } }}
@@ -4083,6 +4099,7 @@ function AIAssistantPage() {
  <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
  <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
  <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
+ <input ref={allFilesRef} type="file" multiple accept="image/*,.pdf,.doc,.docx,.txt,.md,application/pdf,text/plain" className="hidden" onChange={onAllFiles} />
  </div>
  )}
  </div>
