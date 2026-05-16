@@ -333,14 +333,12 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   const [isTemporaryChat, setIsTemporaryChat] = useState(false);
   const [temporaryChatId, setTemporaryChatId] = useState<number | null>(null);
   const [newChatId, setNewChatId] = useState<number | null>(null);
-  const [sidebarSearch, setSidebarSearch] = useState("");
   const workspaceRef = useRef<HTMLDivElement>(null);
   const sidebarNotificationRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
   const displayRef = useRef<HTMLDivElement>(null);
-  const sidebarSearchRef = useRef<HTMLInputElement>(null);
   const currentTitle = getRouteTitle(activeRoute);
-  const normalizedSidebarSearch = sidebarSearch.trim().toLowerCase();
+  const normalizedSidebarSearch = "";
   const visibleMainNavigation = useMemo(
     () =>
       normalizedSidebarSearch
@@ -447,9 +445,9 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
           target?.tagName === "INPUT" ||
           target?.tagName === "TEXTAREA" ||
           target?.getAttribute("contenteditable") === "true";
-        if (!isTyping && !isCollapsed) {
+        if (!isTyping) {
           event.preventDefault();
-          sidebarSearchRef.current?.focus();
+          setActiveModal("search");
         }
       }
     }
@@ -555,31 +553,19 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
       {!isCollapsed && (
         <>
-          <div className={`mb-3 flex h-10 w-full items-center gap-2 rounded-2xl border px-3 transition-all ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_22px_rgba(0,0,0,0.16)] focus-within:border-[rgba(59,167,255,0.34)]" : "border-white/80 bg-white/72 shadow-[0_8px_22px_rgba(31,43,77,0.04)] focus-within:border-[#9BD2FF]"}`}>
+          <button
+            type="button"
+            onClick={() => setActiveModal("search")}
+            className={`mb-3 flex h-10 w-full items-center gap-2 rounded-2xl border px-3 text-left transition-all ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] shadow-[0_8px_22px_rgba(0,0,0,0.16)] hover:border-[rgba(59,167,255,0.34)]" : "border-white/80 bg-white/72 shadow-[0_8px_22px_rgba(31,43,77,0.04)] hover:border-[#9BD2FF]"}`}
+            aria-label="Open search"
+          >
             <Search className={`h-[13px] w-[13px] ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} strokeWidth={2.25} />
-            <input
-              ref={sidebarSearchRef}
-              value={sidebarSearch}
-              onChange={(event) => setSidebarSearch(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  const firstResult = visibleMainNavigation[0] ?? visibleBottomNavigation[0];
-                  if (firstResult) {
-                    router.push(firstResult.href);
-                    setSidebarSearch("");
-                    setIsMobileOpen(false);
-                  }
-                }
-              }}
-              className={`min-w-0 flex-1 bg-transparent text-[12px] outline-none placeholder:text-[#A1A7B0] ${dark ? "text-[#F4F6F8]" : "text-[#171717]"}`}
-              placeholder="Search..."
-              aria-label="Search navigation"
-            />
+            <span className={`min-w-0 flex-1 truncate text-[12px] ${dark ? "text-[#6F7782]" : "text-[#A1A7B0]"}`}>Search...</span>
             <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#F3F6F8] text-[#9CA3AF]"}`}>/</span>
-          </div>
+          </button>
           <button
             onClick={startNewChat}
-            className="mb-4 flex h-9 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#38BDF8] to-[#1DA1F2] text-[11px] font-semibold text-white shadow-[0_10px_24px_rgba(29,161,242,0.24)] transition-all hover:from-[#2FB2EE] hover:to-[#168ED8] active:scale-[0.98]"
+            className="mb-4 flex h-10 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#38BDF8] to-[#1DA1F2] text-[11px] font-semibold text-white shadow-[0_10px_24px_rgba(29,161,242,0.24)] transition-all hover:from-[#2FB2EE] hover:to-[#168ED8] active:scale-[0.98]"
           >
             <Plus className="h-3.5 w-3.5" strokeWidth={2.25} />
             New Chat
@@ -597,7 +583,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
         )}
       </nav>
 
-      <div className={`mt-3 border-t pt-3 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-white/70"}`}>
+      <div className="mt-3 pt-3">
         {!isCollapsed && <p className={`mb-2 px-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${dark ? "text-[#6F7782]" : "text-[#8A94A3]"}`}>Recents</p>}
       </div>
 
