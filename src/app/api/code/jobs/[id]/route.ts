@@ -5,15 +5,15 @@ import { apiError, isApiResponse, mapUnknownError, ok, parseId, requirePlatformC
 export const dynamic = "force-dynamic";
 
 export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const context = await requirePlatformContext();
-    if (isApiResponse(context)) return context;
-    const id = parseId(params);
-    if (!id) return apiError("VALIDATION_ERROR", "Invalid code job id.", 400);
-    const job = await prisma.codeGenerationJob.findFirst({ where: { id, workspaceId: context.workspaceId } });
-    if (!job) return apiError("NOT_FOUND", "Code job not found.", 404);
-    return ok({ job });
-  } catch (error) {
-    return mapUnknownError(error);
-  }
+ try {
+ const context = await requirePlatformContext();
+ if (isApiResponse(context)) return context;
+ const id = parseId(params);
+ if (!id) return apiError("VALIDATION_ERROR", "Invalid code job id.", 400);
+ const job = await prisma.codeGenerationJob.findFirst({ where: { id, workspaceId: context.workspaceId } });
+ if (!job) return apiError("NOT_FOUND", "Code job not found.", 404);
+ return ok({ job });
+ } catch (error) {
+ return mapUnknownError(error);
+ }
 }

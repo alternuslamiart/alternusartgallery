@@ -1,5 +1,5 @@
 import { StudioRoutePage } from "@/components/studio/studio-shell";
 
 export default function HelpCenterPage() {
-  return <StudioRoutePage route="help-center" />;
+ return <StudioRoutePage route="help-center" />;
 }

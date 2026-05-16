@@ -13,344 +13,344 @@ const SYSTEM_PROMPT = `You are Cedium AI Assistant. Answer clearly, thoroughly, 
 
 type ChatRole = "user" | "assistant";
 type ChatMessage = {
-  role: ChatRole;
-  content: string;
+ role: ChatRole;
+ content: string;
 };
 
 type RequestBody = {
-  message?: unknown;
-  history?: unknown;
-  conversationHistory?: unknown;
+ message?: unknown;
+ history?: unknown;
+ conversationHistory?: unknown;
 };
 
 type AIProvider = "openai" | "gemini" | "local";
 type RemoteAIProvider = Exclude<AIProvider, "local">;
 
 function getFirstEnvValue(names: string[]) {
-  for (const name of names) {
-    const value = process.env[name]?.trim();
-    if (value) return value;
-  }
-  return undefined;
+ for (const name of names) {
+ const value = process.env[name]?.trim();
+ if (value) return value;
+ }
+ return undefined;
 }
 
 function getGeminiApiKey() {
-  return getFirstEnvValue(["GEMINI_API_KEY", "GOOGLE_GENERATIVE_AI_API_KEY", "GOOGLE_API_KEY"]);
+ return getFirstEnvValue(["GEMINI_API_KEY", "GOOGLE_GENERATIVE_AI_API_KEY", "GOOGLE_API_KEY"]);
 }
 
 function getGeminiModel() {
-  return process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL;
+ return process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL;
 }
 
 function getOpenAIApiKey() {
-  return process.env.OPENAI_API_KEY?.trim();
+ return process.env.OPENAI_API_KEY?.trim();
 }
 
 function getOpenAIModel() {
-  return process.env.OPENAI_MODEL?.trim() || DEFAULT_OPENAI_MODEL;
+ return process.env.OPENAI_MODEL?.trim() || DEFAULT_OPENAI_MODEL;
 }
 
 function getPreferredProvider(): AIProvider {
-  const configuredProvider = process.env.AI_PROVIDER?.trim().toLowerCase();
+ const configuredProvider = process.env.AI_PROVIDER?.trim().toLowerCase();
 
-  if (configuredProvider === "openai" && getOpenAIApiKey()) {
-    return "openai";
-  }
+ if (configuredProvider === "openai" && getOpenAIApiKey()) {
+ return "openai";
+ }
 
-  if (configuredProvider === "gemini" && getGeminiApiKey()) {
-    return "gemini";
-  }
+ if (configuredProvider === "gemini" && getGeminiApiKey()) {
+ return "gemini";
+ }
 
-  if (getGeminiApiKey()) return "gemini";
-  if (getOpenAIApiKey()) return "openai";
-  return "local";
+ if (getGeminiApiKey()) return "gemini";
+ if (getOpenAIApiKey()) return "openai";
+ return "local";
 }
 
 function getFallbackProvider(provider: AIProvider): RemoteAIProvider | null {
-  if (provider === "openai" && getGeminiApiKey()) return "gemini";
-  if (provider === "gemini" && getOpenAIApiKey()) return "openai";
-  return null;
+ if (provider === "openai" && getGeminiApiKey()) return "gemini";
+ if (provider === "gemini" && getOpenAIApiKey()) return "openai";
+ return null;
 }
 
 function getProviderAttempts(provider: AIProvider): RemoteAIProvider[] {
-  if (provider === "local") return [];
+ if (provider === "local") return [];
 
-  const attempts: RemoteAIProvider[] = [provider];
-  const fallbackProvider = getFallbackProvider(provider);
+ const attempts: RemoteAIProvider[] = [provider];
+ const fallbackProvider = getFallbackProvider(provider);
 
-  if (fallbackProvider && !attempts.includes(fallbackProvider)) {
-    attempts.push(fallbackProvider);
-  }
+ if (fallbackProvider && !attempts.includes(fallbackProvider)) {
+ attempts.push(fallbackProvider);
+ }
 
-  return attempts;
+ return attempts;
 }
 
 function normalizeHistory(value: unknown): ChatMessage[] {
-  if (!Array.isArray(value)) return [];
+ if (!Array.isArray(value)) return [];
 
-  const messages = value
-    .map((item): ChatMessage | null => {
-      if (!item || typeof item !== "object") return null;
+ const messages = value
+ .map((item): ChatMessage | null => {
+ if (!item || typeof item !== "object") return null;
 
-      const record = item as Record<string, unknown>;
-      const content = typeof record.content === "string" ? record.content.trim() : "";
-      if (!content) return null;
+ const record = item as Record<string, unknown>;
+ const content = typeof record.content === "string" ? record.content.trim() : "";
+ if (!content) return null;
 
-      return {
-        role: record.role === "assistant" ? "assistant" : "user",
-        content,
-      };
-    })
-    .filter((item): item is ChatMessage => Boolean(item))
-    .slice(-MAX_HISTORY_MESSAGES);
+ return {
+ role: record.role === "assistant" ? "assistant" : "user",
+ content,
+ };
+ })
+ .filter((item): item is ChatMessage => Boolean(item))
+ .slice(-MAX_HISTORY_MESSAGES);
 
-  const normalized: ChatMessage[] = [];
-  for (const message of messages) {
-    if (normalized.length === 0 && message.role === "assistant") continue;
+ const normalized: ChatMessage[] = [];
+ for (const message of messages) {
+ if (normalized.length === 0 && message.role === "assistant") continue;
 
-    const previous = normalized[normalized.length - 1];
-    if (previous?.role === message.role) {
-      previous.content = `${previous.content}\n\n${message.content}`;
-    } else {
-      normalized.push({ ...message });
-    }
-  }
+ const previous = normalized[normalized.length - 1];
+ if (previous?.role === message.role) {
+ previous.content = `${previous.content}\n\n${message.content}`;
+ } else {
+ normalized.push({ ...message });
+ }
+ }
 
-  return normalized;
+ return normalized;
 }
 
 function toGeminiHistory(messages: ChatMessage[]) {
-  return messages.map((message) => ({
-    role: message.role === "assistant" ? "model" : "user",
-    parts: [{ text: message.content }],
-  }));
+ return messages.map((message) => ({
+ role: message.role === "assistant" ? "model" : "user",
+ parts: [{ text: message.content }],
+ }));
 }
 
 function toOpenAIMessages(history: ChatMessage[], message: string) {
-  return [
-    { role: "system", content: SYSTEM_PROMPT },
-    ...history.map((item) => ({
-      role: item.role,
-      content: item.content,
-    })),
-    { role: "user", content: message },
-  ];
+ return [
+ { role: "system", content: SYSTEM_PROMPT },
+ ...history.map((item) => ({
+ role: item.role,
+ content: item.content,
+ })),
+ { role: "user", content: message },
+ ];
 }
 
 function getProviderError(error: unknown, provider: "openai" | "gemini") {
-  const message = error instanceof Error ? error.message : String(error);
-  const lower = message.toLowerCase();
-  const name = provider === "openai" ? "OpenAI" : "Gemini";
+ const message = error instanceof Error ? error.message : String(error);
+ const lower = message.toLowerCase();
+ const name = provider === "openai" ? "OpenAI" : "Gemini";
 
-  if (lower.includes("quota") || lower.includes("rate") || lower.includes("429")) {
-    return {
-      status: 429,
-      error: `${name} quota or rate limit reached. Please try again later.`,
-      code: `${provider.toUpperCase()}_RATE_LIMIT`,
-    };
-  }
+ if (lower.includes("quota") || lower.includes("rate") || lower.includes("429")) {
+ return {
+ status: 429,
+ error: `${name} quota or rate limit reached. Please try again later.`,
+ code: `${provider.toUpperCase()}_RATE_LIMIT`,
+ };
+ }
 
-  if (lower.includes("api key") || lower.includes("permission") || lower.includes("unauthorized")) {
-    return {
-      status: 500,
-      error: `${name} API request failed. Check the server AI configuration.`,
-      code: `${provider.toUpperCase()}_CONFIGURATION_ERROR`,
-    };
-  }
+ if (lower.includes("api key") || lower.includes("permission") || lower.includes("unauthorized")) {
+ return {
+ status: 500,
+ error: `${name} API request failed. Check the server AI configuration.`,
+ code: `${provider.toUpperCase()}_CONFIGURATION_ERROR`,
+ };
+ }
 
-  return {
-    status: 502,
-    error: `${name} API request failed. Please try again.`,
-    code: `${provider.toUpperCase()}_REQUEST_FAILED`,
-  };
+ return {
+ status: 502,
+ error: `${name} API request failed. Please try again.`,
+ code: `${provider.toUpperCase()}_REQUEST_FAILED`,
+ };
 }
 
 async function askGemini(message: string, history: ChatMessage[]) {
-  const apiKey = getGeminiApiKey();
-  if (!apiKey) {
-    throw new Error("Missing Gemini API key. Set GEMINI_API_KEY in the environment.");
-  }
+ const apiKey = getGeminiApiKey();
+ if (!apiKey) {
+ throw new Error("Missing Gemini API key. Set GEMINI_API_KEY in the environment.");
+ }
 
-  const client = new GoogleGenerativeAI(apiKey);
-  const modelName = getGeminiModel();
-  const model = client.getGenerativeModel({
-    model: modelName,
-    systemInstruction: SYSTEM_PROMPT,
-  });
+ const client = new GoogleGenerativeAI(apiKey);
+ const modelName = getGeminiModel();
+ const model = client.getGenerativeModel({
+ model: modelName,
+ systemInstruction: SYSTEM_PROMPT,
+ });
 
-  const chat = model.startChat({
-    history: toGeminiHistory(history),
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 4096,
-    },
-  });
+ const chat = model.startChat({
+ history: toGeminiHistory(history),
+ generationConfig: {
+ temperature: 0.7,
+ maxOutputTokens: 4096,
+ },
+ });
 
-  let result;
-  try {
-    result = await chat.sendMessage(message);
-  } catch (sendError) {
-    const reason = sendError instanceof Error ? sendError.message : String(sendError);
-    throw new Error(`Gemini API request failed (model ${modelName}): ${reason}`);
-  }
+ let result;
+ try {
+ result = await chat.sendMessage(message);
+ } catch (sendError) {
+ const reason = sendError instanceof Error ? sendError.message : String(sendError);
+ throw new Error(`Gemini API request failed (model ${modelName}): ${reason}`);
+ }
 
-  const blockReason = result.response.promptFeedback?.blockReason;
-  if (blockReason) {
-    throw new Error(`Gemini blocked the prompt (${blockReason}).`);
-  }
+ const blockReason = result.response.promptFeedback?.blockReason;
+ if (blockReason) {
+ throw new Error(`Gemini blocked the prompt (${blockReason}).`);
+ }
 
-  const finishReason = result.response.candidates?.[0]?.finishReason;
-  if (finishReason && finishReason !== "STOP" && finishReason !== "MAX_TOKENS") {
-    throw new Error(`Gemini stopped early (${finishReason}).`);
-  }
+ const finishReason = result.response.candidates?.[0]?.finishReason;
+ if (finishReason && finishReason !== "STOP" && finishReason !== "MAX_TOKENS") {
+ throw new Error(`Gemini stopped early (${finishReason}).`);
+ }
 
-  let answer: string | undefined;
-  try {
-    answer = result.response.text()?.trim();
-  } catch (textError) {
-    const reason = textError instanceof Error ? textError.message : String(textError);
-    throw new Error(`Gemini returned no readable text: ${reason}`);
-  }
+ let answer: string | undefined;
+ try {
+ answer = result.response.text()?.trim();
+ } catch (textError) {
+ const reason = textError instanceof Error ? textError.message : String(textError);
+ throw new Error(`Gemini returned no readable text: ${reason}`);
+ }
 
-  if (!answer) {
-    throw new Error(`Gemini returned an empty response (model ${modelName}).`);
-  }
+ if (!answer) {
+ throw new Error(`Gemini returned an empty response (model ${modelName}).`);
+ }
 
-  return answer;
+ return answer;
 }
 
 async function askOpenAI(message: string, history: ChatMessage[]) {
-  const apiKey = getOpenAIApiKey();
-  if (!apiKey) {
-    throw new Error("Missing OpenAI API key.");
-  }
+ const apiKey = getOpenAIApiKey();
+ if (!apiKey) {
+ throw new Error("Missing OpenAI API key.");
+ }
 
-  const response = await fetch(OPENAI_CHAT_COMPLETIONS_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: getOpenAIModel(),
-      messages: toOpenAIMessages(history, message),
-      temperature: 0.7,
-      max_tokens: 4096,
-    }),
-  });
+ const response = await fetch(OPENAI_CHAT_COMPLETIONS_URL, {
+ method: "POST",
+ headers: {
+ Authorization: `Bearer ${apiKey}`,
+ "Content-Type": "application/json",
+ },
+ body: JSON.stringify({
+ model: getOpenAIModel(),
+ messages: toOpenAIMessages(history, message),
+ temperature: 0.7,
+ max_tokens: 4096,
+ }),
+ });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    let parsedMessage: string | undefined;
-    try {
-      const parsed = JSON.parse(errorText) as { error?: { message?: string; code?: string } };
-      parsedMessage = parsed?.error?.message;
-    } catch {}
-    const reason = parsedMessage || errorText.slice(0, 200);
-    throw new Error(`OpenAI ${response.status}: ${reason}`);
-  }
+ if (!response.ok) {
+ const errorText = await response.text();
+ let parsedMessage: string | undefined;
+ try {
+ const parsed = JSON.parse(errorText) as { error?: { message?: string; code?: string } };
+ parsedMessage = parsed?.error?.message;
+ } catch {}
+ const reason = parsedMessage || errorText.slice(0, 200);
+ throw new Error(`OpenAI ${response.status}: ${reason}`);
+ }
 
-  const data = (await response.json()) as {
-    choices?: Array<{ message?: { content?: string } }>;
-  };
-  const answer = data.choices?.[0]?.message?.content?.trim();
+ const data = (await response.json()) as {
+ choices?: Array<{ message?: { content?: string } }>;
+ };
+ const answer = data.choices?.[0]?.message?.content?.trim();
 
-  if (!answer) {
-    throw new Error("Invalid OpenAI response.");
-  }
+ if (!answer) {
+ throw new Error("Invalid OpenAI response.");
+ }
 
-  return answer;
+ return answer;
 }
 
 async function askProvider(provider: RemoteAIProvider, message: string, history: ChatMessage[]) {
-  return provider === "openai" ? askOpenAI(message, history) : askGemini(message, history);
+ return provider === "openai" ? askOpenAI(message, history) : askGemini(message, history);
 }
 
 export async function GET() {
-  const provider = getPreferredProvider();
+ const provider = getPreferredProvider();
 
-  return NextResponse.json({
-    ok: true,
-    provider,
-    model:
-      provider === "openai"
-        ? getOpenAIModel()
-        : provider === "gemini"
-          ? getGeminiModel()
-          : "local-fallback",
-    configured: Boolean(getGeminiApiKey() || getOpenAIApiKey()),
-    providers: {
-      gemini: Boolean(getGeminiApiKey()),
-      openai: Boolean(getOpenAIApiKey()),
-    },
-  });
+ return NextResponse.json({
+ ok: true,
+ provider,
+ model:
+ provider === "openai"
+ ? getOpenAIModel()
+ : provider === "gemini"
+ ? getGeminiModel()
+ : "local-fallback",
+ configured: Boolean(getGeminiApiKey() || getOpenAIApiKey()),
+ providers: {
+ gemini: Boolean(getGeminiApiKey()),
+ openai: Boolean(getOpenAIApiKey()),
+ },
+ });
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = (await request.json()) as RequestBody;
-    const message = typeof body.message === "string" ? body.message.trim() : "";
+ try {
+ const body = (await request.json()) as RequestBody;
+ const message = typeof body.message === "string" ? body.message.trim() : "";
 
-    if (!message) {
-      return NextResponse.json(
-        { error: "Message is required.", code: "EMPTY_MESSAGE" },
-        { status: 400 },
-      );
-    }
+ if (!message) {
+ return NextResponse.json(
+ { error: "Message is required.", code: "EMPTY_MESSAGE" },
+ { status: 400 },
+ );
+ }
 
-    const history = normalizeHistory(body.history ?? body.conversationHistory);
-    const provider = getPreferredProvider();
+ const history = normalizeHistory(body.history ?? body.conversationHistory);
+ const provider = getPreferredProvider();
 
-    if (provider === "openai" || provider === "gemini") {
-      const providerAttempts = getProviderAttempts(provider);
-      const providerErrors: Array<{ provider: RemoteAIProvider; message: string }> = [];
+ if (provider === "openai" || provider === "gemini") {
+ const providerAttempts = getProviderAttempts(provider);
+ const providerErrors: Array<{ provider: RemoteAIProvider; message: string }> = [];
 
-      for (const providerAttempt of providerAttempts) {
-        try {
-          const answer = await askProvider(providerAttempt, message, history);
-          return NextResponse.json({
-            content: answer,
-            answer,
-            provider: providerAttempt,
-            fallbackFrom: providerAttempt === provider ? undefined : provider,
-          });
-        } catch (providerError) {
-          const errorMessage = providerError instanceof Error ? providerError.message : String(providerError);
-          providerErrors.push({ provider: providerAttempt, message: errorMessage });
-          console.warn(`AI provider ${providerAttempt} failed.`, providerError);
-        }
-      }
+ for (const providerAttempt of providerAttempts) {
+ try {
+ const answer = await askProvider(providerAttempt, message, history);
+ return NextResponse.json({
+ content: answer,
+ answer,
+ provider: providerAttempt,
+ fallbackFrom: providerAttempt === provider ? undefined : provider,
+ });
+ } catch (providerError) {
+ const errorMessage = providerError instanceof Error ? providerError.message : String(providerError);
+ providerErrors.push({ provider: providerAttempt, message: errorMessage });
+ console.warn(`AI provider ${providerAttempt} failed.`, providerError);
+ }
+ }
 
-      const primaryError = providerErrors.find((entry) => entry.provider === provider);
-      const surfacedError = primaryError ?? providerErrors[providerErrors.length - 1];
-      const fallback = getAIResponse(message);
-      return NextResponse.json({
-        content: fallback.content,
-        answer: fallback.content,
-        suggestedQuestions: fallback.suggestedQuestions,
-        provider: "local",
-        fallbackFrom: surfacedError?.provider ?? provider,
-        providerError: surfacedError?.message,
-        providerErrors: providerErrors.map((entry) => ({ provider: entry.provider, message: entry.message })),
-      });
-    }
+ const primaryError = providerErrors.find((entry) => entry.provider === provider);
+ const surfacedError = primaryError ?? providerErrors[providerErrors.length - 1];
+ const fallback = getAIResponse(message);
+ return NextResponse.json({
+ content: fallback.content,
+ answer: fallback.content,
+ suggestedQuestions: fallback.suggestedQuestions,
+ provider: "local",
+ fallbackFrom: surfacedError?.provider ?? provider,
+ providerError: surfacedError?.message,
+ providerErrors: providerErrors.map((entry) => ({ provider: entry.provider, message: entry.message })),
+ });
+ }
 
-    const fallback = getAIResponse(message);
-    return NextResponse.json({
-      content: fallback.content,
-      answer: fallback.content,
-      suggestedQuestions: fallback.suggestedQuestions,
-      provider,
-    });
-  } catch (error) {
-    const provider = getPreferredProvider();
-    const remoteProvider = provider === "openai" ? "openai" : "gemini";
-    const providerError = getProviderError(error, remoteProvider);
-    console.error("AI chat error:", error);
+ const fallback = getAIResponse(message);
+ return NextResponse.json({
+ content: fallback.content,
+ answer: fallback.content,
+ suggestedQuestions: fallback.suggestedQuestions,
+ provider,
+ });
+ } catch (error) {
+ const provider = getPreferredProvider();
+ const remoteProvider = provider === "openai" ? "openai" : "gemini";
+ const providerError = getProviderError(error, remoteProvider);
+ console.error("AI chat error:", error);
 
-    return NextResponse.json(
-      { error: providerError.error, code: providerError.code, provider },
-      { status: providerError.status },
-    );
-  }
+ return NextResponse.json(
+ { error: providerError.error, code: providerError.code, provider },
+ { status: providerError.status },
+ );
+ }
 }

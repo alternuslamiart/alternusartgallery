@@ -10,67 +10,67 @@ const typographyPresets = ["CLEAN_UI_SCALE", "EDITORIAL_SCALE", "COMPACT_DASHBOA
 const spacingPresets = ["EIGHT_PX_RHYTHM", "COMPACT", "SPACIOUS"] as const;
 
 export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const context = await requirePlatformContext();
-    if (isApiResponse(context)) return context;
-    const id = parseId(params);
-    if (!id) return apiError("VALIDATION_ERROR", "Invalid design system id.", 400);
-    const designSystem = await prisma.designSystem.findFirst({ where: { id, workspaceId: context.workspaceId } });
-    if (!designSystem) return apiError("NOT_FOUND", "Design system not found.", 404);
-    return ok({ designSystem });
-  } catch (error) {
-    return mapUnknownError(error);
-  }
+ try {
+ const context = await requirePlatformContext();
+ if (isApiResponse(context)) return context;
+ const id = parseId(params);
+ if (!id) return apiError("VALIDATION_ERROR", "Invalid design system id.", 400);
+ const designSystem = await prisma.designSystem.findFirst({ where: { id, workspaceId: context.workspaceId } });
+ if (!designSystem) return apiError("NOT_FOUND", "Design system not found.", 404);
+ return ok({ designSystem });
+ } catch (error) {
+ return mapUnknownError(error);
+ }
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const context = await requirePlatformContext();
-    if (isApiResponse(context)) return context;
-    const id = parseId(params);
-    if (!id) return apiError("VALIDATION_ERROR", "Invalid design system id.", 400);
-    const existing = await prisma.designSystem.findFirst({ where: { id, workspaceId: context.workspaceId } });
-    if (!existing) return apiError("NOT_FOUND", "Design system not found.", 404);
+ try {
+ const context = await requirePlatformContext();
+ if (isApiResponse(context)) return context;
+ const id = parseId(params);
+ if (!id) return apiError("VALIDATION_ERROR", "Invalid design system id.", 400);
+ const existing = await prisma.designSystem.findFirst({ where: { id, workspaceId: context.workspaceId } });
+ if (!existing) return apiError("NOT_FOUND", "Design system not found.", 404);
 
-    const body = await readJsonBody(request);
-    const designSystem = await prisma.designSystem.update({
-      where: { id },
-      data: {
-        name: asString(body, "name", { max: 120 }),
-        colorPreset: asEnum(body, "colorPreset", colorPresets),
-        typographyPreset: asEnum(body, "typographyPreset", typographyPresets),
-        spacingPreset: asEnum(body, "spacingPreset", spacingPresets),
-        tokens: asJsonObject(body, "tokens"),
-      },
-    });
+ const body = await readJsonBody(request);
+ const designSystem = await prisma.designSystem.update({
+ where: { id },
+ data: {
+ name: asString(body, "name", { max: 120 }),
+ colorPreset: asEnum(body, "colorPreset", colorPresets),
+ typographyPreset: asEnum(body, "typographyPreset", typographyPresets),
+ spacingPreset: asEnum(body, "spacingPreset", spacingPresets),
+ tokens: asJsonObject(body, "tokens"),
+ },
+ });
 
-    await logActivity({
-      workspaceId: context.workspaceId,
-      userId: context.userId,
-      action: "design_system.updated",
-      entityType: "design_system",
-      entityId: designSystem.id,
-      message: `Design system "${designSystem.name}" updated.`,
-    });
+ await logActivity({
+ workspaceId: context.workspaceId,
+ userId: context.userId,
+ action: "design_system.updated",
+ entityType: "design_system",
+ entityId: designSystem.id,
+ message: `Design system "${designSystem.name}" updated.`,
+ });
 
-    return ok({ designSystem });
-  } catch (error) {
-    if (error instanceof ValidationError) return apiError("VALIDATION_ERROR", error.message, 400, error.details);
-    return mapUnknownError(error);
-  }
+ return ok({ designSystem });
+ } catch (error) {
+ if (error instanceof ValidationError) return apiError("VALIDATION_ERROR", error.message, 400, error.details);
+ return mapUnknownError(error);
+ }
 }
 
 export async function DELETE(_request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const context = await requirePlatformContext();
-    if (isApiResponse(context)) return context;
-    const id = parseId(params);
-    if (!id) return apiError("VALIDATION_ERROR", "Invalid design system id.", 400);
-    const existing = await prisma.designSystem.findFirst({ where: { id, workspaceId: context.workspaceId } });
-    if (!existing) return apiError("NOT_FOUND", "Design system not found.", 404);
-    await prisma.designSystem.delete({ where: { id } });
-    return ok({ success: true });
-  } catch (error) {
-    return mapUnknownError(error);
-  }
+ try {
+ const context = await requirePlatformContext();
+ if (isApiResponse(context)) return context;
+ const id = parseId(params);
+ if (!id) return apiError("VALIDATION_ERROR", "Invalid design system id.", 400);
+ const existing = await prisma.designSystem.findFirst({ where: { id, workspaceId: context.workspaceId } });
+ if (!existing) return apiError("NOT_FOUND", "Design system not found.", 404);
+ await prisma.designSystem.delete({ where: { id } });
+ return ok({ success: true });
+ } catch (error) {
+ return mapUnknownError(error);
+ }
 }

@@ -4,17 +4,17 @@ import { isApiResponse, mapUnknownError, ok, requirePlatformContext } from "@/li
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  try {
-    const context = await requirePlatformContext();
-    if (isApiResponse(context)) return context;
+ try {
+ const context = await requirePlatformContext();
+ if (isApiResponse(context)) return context;
 
-    const [userSettings, workspaceSettings] = await Promise.all([
-      prisma.userSettings.findUnique({ where: { userId: context.userId } }),
-      prisma.workspaceSettings.findUnique({ where: { workspaceId: context.workspaceId } }),
-    ]);
+ const [userSettings, workspaceSettings] = await Promise.all([
+ prisma.userSettings.findUnique({ where: { userId: context.userId } }),
+ prisma.workspaceSettings.findUnique({ where: { workspaceId: context.workspaceId } }),
+ ]);
 
-    return ok({ userSettings, workspaceSettings });
-  } catch (error) {
-    return mapUnknownError(error);
-  }
+ return ok({ userSettings, workspaceSettings });
+ } catch (error) {
+ return mapUnknownError(error);
+ }
 }

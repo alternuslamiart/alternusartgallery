@@ -1,20 +1,20 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  return {
-    rules: [
-      {
-        userAgent: '*',
-        allow: '/',
-        disallow: [
-          '/admin/',
-          '/api/',
-          '/checkout/',
-          '/settings/',
-          '/orders/',
-        ],
-      },
-    ],
-    sitemap: 'https://www.alternusart.com/sitemap.xml',
-  };
+ return {
+ rules: [
+ {
+ userAgent: '*',
+ allow: '/',
+ disallow: [
+ '/admin/',
+ '/api/',
+ '/checkout/',
+ '/settings/',
+ '/orders/',
+ ],
+ },
+ ],
+ sitemap: 'https://www.alternusart.com/sitemap.xml',
+ };
 }

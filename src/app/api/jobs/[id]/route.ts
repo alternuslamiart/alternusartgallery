@@ -5,16 +5,16 @@ import { apiError, isApiResponse, mapUnknownError, ok, parseId, requirePlatformC
 export const dynamic = "force-dynamic";
 
 export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const context = await requirePlatformContext();
-    if (isApiResponse(context)) return context;
-    const id = parseId(params);
-    if (!id) return apiError("VALIDATION_ERROR", "Invalid job id.", 400);
+ try {
+ const context = await requirePlatformContext();
+ if (isApiResponse(context)) return context;
+ const id = parseId(params);
+ if (!id) return apiError("VALIDATION_ERROR", "Invalid job id.", 400);
 
-    const job = await prisma.aIProviderJob.findFirst({ where: { id, workspaceId: context.workspaceId } });
-    if (!job) return apiError("NOT_FOUND", "Job not found.", 404);
-    return ok({ job });
-  } catch (error) {
-    return mapUnknownError(error);
-  }
+ const job = await prisma.aIProviderJob.findFirst({ where: { id, workspaceId: context.workspaceId } });
+ if (!job) return apiError("NOT_FOUND", "Job not found.", 404);
+ return ok({ job });
+ } catch (error) {
+ return mapUnknownError(error);
+ }
 }
