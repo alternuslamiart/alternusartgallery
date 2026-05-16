@@ -106,7 +106,7 @@ type GeneratedRecent = {
 export const studioNavigation: NavItem[] = [
   { key: "ai-assistant", label: "AI Assistant", href: "/ai-assistant", icon: Sparkles },
   { key: "studio-overview", label: "Studio Overview", href: "/studio-overview", icon: Grid2X2 },
-  { key: "cerevix-design", label: "Cerevix Design", href: "/cerevix-design", icon: Monitor },
+  { key: "cerevix-design", label: "Cedium Design", href: "/cerevix-design", icon: Monitor },
   { key: "autocad-design", label: "AutoCAD Design", href: "/autocad-design", icon: PenLine },
   { key: "code-builder", label: "Code Builder", href: "/code-builder", icon: Code2 },
   { key: "blender-3d", label: "Blender 3D", href: "/blender-3d", icon: Layers3 },
@@ -356,14 +356,14 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
   );
 
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem("Cerevix-studio-theme");
+    const savedTheme = window.localStorage.getItem("Cedium-studio-theme");
     if (savedTheme === "light" || savedTheme === "dark") {
       setTheme(savedTheme);
     }
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem("Cerevix-studio-theme", theme);
+    window.localStorage.setItem("Cedium-studio-theme", theme);
   }, [theme]);
 
   const themeValue = useMemo(
@@ -1289,7 +1289,7 @@ function StudioContent({ route, assistantTool }: { route: StudioRouteKey; assist
     case "studio-overview":
       return <OverviewPage />;
     case "cerevix-design":
-      return <CerevixDesignPage />;
+      return <CediumDesignPage />;
     case "autocad-design":
       return <AutoCADPage />;
     case "code-builder":
@@ -1708,7 +1708,7 @@ function OverviewPage() {
   );
 }
 
-function CerevixDesignPage() {
+function CediumDesignPage() {
   const { theme } = useStudioTheme();
   const { showToast } = useStudioActions();
   const dark = theme === "dark";
@@ -1835,8 +1835,8 @@ function CerevixDesignPage() {
   return (
     <div>
       <PageHeader
-        title="Cerevix Design"
-        subtitle="Design website, app, and mobile prototypes in the same Cerevix AI workspace."
+        title="Cedium Design"
+        subtitle="Design website, app, and mobile prototypes in the same Cedium AI workspace."
         action={<PrimaryButton icon={Sparkles} onClick={() => projectInputRef.current?.focus()}>Create prototype</PrimaryButton>}
       />
 
@@ -1905,7 +1905,7 @@ function CerevixDesignPage() {
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className={`text-[13px] font-semibold ${strong}`}>Designs</p>
-                <p className={`mt-1 text-[11px] ${muted}`}>Recent prototypes and UI systems generated with Cerevix AI.</p>
+                <p className={`mt-1 text-[11px] ${muted}`}>Recent prototypes and UI systems generated with Cedium AI.</p>
               </div>
               <div className={`flex rounded-2xl p-1 ${dark ? "bg-[#181B20]" : "bg-[#EEF3F7]"}`}>
                 {(["Recent", "Your designs", "Design systems"] as const).map((tab) => (
@@ -1938,7 +1938,7 @@ function CerevixDesignPage() {
                 value={brief}
                 onChange={(event) => setBrief(event.target.value)}
                 className={`mt-3 min-h-[118px] w-full resize-none rounded-2xl border p-4 text-[13px] outline-none ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#6F7782]" : "border-[#E5EAF0] bg-white text-[#171717] placeholder:text-[#A1A7B0]"}`}
-                placeholder="Describe the website, dashboard, mobile flow, or app screen you want Cerevix Design to create..."
+                placeholder="Describe the website, dashboard, mobile flow, or app screen you want Cedium Design to create..."
               />
               <div className="mt-3 flex flex-wrap gap-2">
                 {["Responsive", "Design tokens", "Components", "Prototype flow"].map((chip) => (
@@ -3838,20 +3838,10 @@ function AIAssistantPage() {
             : "No response received.";
 
       const isFallback = data?.provider === "local" && data?.fallbackFrom;
-      const providerErrorRaw = typeof data?.providerError === "string" ? data.providerError : "";
-      const providerErrorShort = providerErrorRaw
-        .replace(/\s+/g, " ")
-        .replace(/https?:\/\/\S+/g, "")
-        .trim()
-        .slice(0, 160);
-      const finalContent = isFallback
-        ? `${answerText}\n\n⚠️ ${String(data.fallbackFrom).toUpperCase()} API failed${providerErrorShort ? `: ${providerErrorShort}` : ""}. Using local placeholder.`
-        : answerText;
+      const finalContent = answerText;
 
       if (isFallback) {
-        setAiProviderLabel(
-          `${String(data.fallbackFrom).toUpperCase()} fallback active${providerErrorShort ? `: ${providerErrorShort}` : ""}`,
-        );
+        setAiProviderLabel(`${String(data.fallbackFrom).toUpperCase()} fallback active. Using local assistant.`);
       }
 
       setMessages((current) => [
@@ -3896,7 +3886,7 @@ function AIAssistantPage() {
   const shareAssistantMessage = async (content: string) => {
     try {
       if (navigator.share) {
-        await navigator.share({ title: "Cerevix AI response", text: content });
+        await navigator.share({ title: "Cedium AI response", text: content });
         showToast("Response shared");
         return;
       }
@@ -3912,7 +3902,7 @@ function AIAssistantPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `Cerevix-ai-response-${message.id}.txt`;
+    link.download = `Cedium-ai-response-${message.id}.txt`;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -3990,7 +3980,72 @@ function AIAssistantPage() {
     }
   };
 
-  const composer = (
+  const compactComposer = (
+    <div className="w-full">
+      {attachments.length > 0 && (
+        <div className="mb-2 flex flex-wrap gap-2 px-2">
+          {attachments.map((attachment) => (
+            <span key={attachment.id} className={`inline-flex max-w-full items-center gap-2 rounded-full border px-2.5 py-1 text-[10px] font-medium ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]" : "border-[#E5E7EB] bg-white text-[#4B5563] shadow-sm"}`}>
+              <span className="truncate">{attachment.name}</span>
+              <button
+                onClick={() => setAttachments((current) => current.filter((item) => item.id !== attachment.id))}
+                className={`rounded-full ${dark ? "text-[#6F7782] hover:text-[#F4F6F8]" : "text-[#9CA3AF] hover:text-[#171717]"}`}
+                aria-label={`Remove ${attachment.name}`}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      <div className={`flex min-h-[82px] w-full items-center gap-3 rounded-[30px] border px-3 py-3 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#D9D9D9] bg-white shadow-[0_12px_30px_rgba(31,43,77,0.05)]"}`}>
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className={`flex h-[58px] w-[58px] flex-shrink-0 items-center justify-center rounded-[20px] transition-colors ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E7E7E7]"}`}
+          aria-label="Attach file"
+          title="Attach file"
+        >
+          <Plus className="h-6 w-6" strokeWidth={1.8} />
+        </button>
+        <textarea
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              void sendPrompt();
+            }
+          }}
+          aria-label="Message Cedium"
+          rows={1}
+          className={`min-h-[42px] flex-1 resize-none bg-transparent px-2 py-3 text-[15px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#171717] placeholder:text-[#A1A1A1]"}`}
+          style={{ letterSpacing: 0 }}
+        />
+        <button
+          type="button"
+          className={`flex h-[58px] w-[58px] flex-shrink-0 items-center justify-center rounded-[20px] transition-colors ${dark ? "bg-[#181B20] text-[#F4F6F8] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#171717] hover:bg-[#E7E7E7]"}`}
+          aria-label="Voice input"
+          title="Voice input"
+        >
+          <Mic className="h-6 w-6" strokeWidth={2} />
+        </button>
+        <button
+          onClick={() => void sendPrompt()}
+          disabled={isSending || !input.trim()}
+          aria-label="Send prompt"
+          className="flex h-[58px] w-[58px] flex-shrink-0 items-center justify-center rounded-[20px] bg-[#1292E8] text-white transition-colors hover:bg-[#0F83D2] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isSending ? <RefreshCw className="h-6 w-6 animate-spin" /> : <Send className="h-6 w-6" />}
+        </button>
+        <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
+        <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
+        <input ref={documentInputRef} type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="hidden" onChange={(event) => onFiles(event, "document")} />
+      </div>
+    </div>
+  );
+
+  const composer = hasConversation ? compactComposer : (
     <div className="w-full">
       {showPlanEndingNotice && (
         <div className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-6 py-3 text-[12px] ${dark ? "border-[rgba(255,170,0,0.32)] bg-[rgba(255,170,0,0.08)] text-[#F4F6F8]" : "border-[#FCD7A1] bg-[#FFF8EC] text-[#171717]"}`}>
@@ -4001,7 +4056,7 @@ function AIAssistantPage() {
             <div className="min-w-0">
               <p className="text-[13px] font-semibold">Your free plan is wrapping up</p>
               <p className={`mt-0.5 text-[11px] leading-5 ${dark ? "text-[#A8B0BA]" : "text-[#4B5563]"}`}>
-                You have used Cerevix AI {aiChatCount} {aiChatCount === 1 ? "time" : "times"} on your free trial. Upgrade to keep your chats, attachments, and Voice Speak going without interruption.
+                You have used Cedium AI {aiChatCount} {aiChatCount === 1 ? "time" : "times"} on your free trial. Upgrade to keep your chats, attachments, and Voice Speak going without interruption.
               </p>
             </div>
           </div>
@@ -4169,7 +4224,7 @@ function AIAssistantPage() {
   }
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-[900px] flex-col">
+    <div className="mx-auto flex h-full w-full max-w-[1080px] flex-col px-4">
       <div
         className="min-h-0 flex-1 overflow-y-auto"
         role="log"
@@ -4178,7 +4233,7 @@ function AIAssistantPage() {
         aria-relevant="additions"
         aria-busy={isSending}
       >
-        <div className="flex min-h-full flex-col justify-end gap-5 pb-4">
+        <div className="flex min-h-full flex-col justify-start gap-5 pb-4 pt-8">
           {temporaryChatNotice}
           {messages.map((message) => (
             <div key={message.id} className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -4290,7 +4345,7 @@ function AIAssistantPage() {
         </div>
       </div>
 
-      <div className="pb-6 pt-3">
+      <div className="pb-7 pt-3">
         {composer}
       </div>
     </div>
@@ -4329,7 +4384,7 @@ function ProjectsPage() {
     <div>
       <PageHeader title="Projects" subtitle="Manage studio projects and production status." action={<PrimaryButton icon={Plus} onClick={() => openModal("project-create")}>New project</PrimaryButton>} />
       <div className="grid gap-3 md:grid-cols-3">
-        {["Cerevix command center", "Automation workflow", "3D product system"].map((name) => (
+        {["Cedium command center", "Automation workflow", "3D product system"].map((name) => (
           <ClickableSoftCard key={name} className="min-h-[150px]" onClick={() => openDrawer("project-detail")} ariaLabel={`Open ${name} project`}>
             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
               <Folder className="h-5 w-5" />
@@ -4414,7 +4469,7 @@ function SettingsPage() {
             <VoiceSettingRow />
             <GeneralSettingRow
               label="Separate Voice"
-              description="Keep Cerevix Voice in a separate full screen, without real time transcripts and visuals."
+              description="Keep Cedium Voice in a separate full screen, without real time transcripts and visuals."
               control={<SettingsSwitch enabled={false} label="Separate Voice" />}
             />
           </div>

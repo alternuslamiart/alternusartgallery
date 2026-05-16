@@ -5,7 +5,7 @@ interface AIResponse {
 
 const STUDIO_TOPICS = {
   en: {
-    studio: `**Cerevix AI Studio**
+    studio: `**Cedium AI Studio**
 
 I can help you with:
 - AutoCAD design prompts
@@ -38,7 +38,7 @@ Tell me what you want to build and I will help you structure it.`,
 - a 3D hero brief`,
   },
   sq: {
-    studio: `**Cerevix AI Studio**
+    studio: `**Cedium AI Studio**
 
 Mund t'ju ndihmoj me:
 - Prompte per AutoCAD Design
@@ -90,8 +90,8 @@ export function getAIResponse(message: string): AIResponse {
     return {
       content:
         lang === "sq"
-          ? "Përshëndetje. Jam Cerevix AI Studio. Më thuaj çfarë po ndërton dhe do të të ndihmoj ta kthesh në strukturë, layout ose kod."
-          : "Hello. I am Cerevix AI Studio. Tell me what you are building and I will help turn it into structure, layout, or code.",
+          ? "Përshëndetje. Jam Cedium AI Studio. Më thuaj çfarë po ndërton dhe do të të ndihmoj ta kthesh në strukturë, layout ose kod."
+          : "Hello. I am Cedium AI Studio. Tell me what you are building and I will help turn it into structure, layout, or code.",
       suggestedQuestions:
         lang === "sq"
           ? ["Nderto nje homepage", "Propozo nje dashboard", "Bëj një mobile flow"]
@@ -161,12 +161,12 @@ export function getAIResponse(message: string): AIResponse {
 }
 
 export const WELCOME_MESSAGE = {
-  en: `Welcome to Cerevix AI Studio.
+  en: `Welcome to Cedium AI Studio.
 
 I can help you design website and app screens, plan AutoCAD layouts, generate React and Tailwind code, and prepare Blender 3D briefs.
 
 Ask me for a homepage, dashboard, mobile flow, component system, or 3D scene.`,
-  sq: `Mirësevini në Cerevix AI Studio.
+  sq: `Mirësevini në Cedium AI Studio.
 
 Mund t'ju ndihmoj të dizajnoni ekranet e website dhe app, të planifikoni layout AutoCAD, të gjeneroni kod React dhe Tailwind, dhe të përgatisni brief për Blender 3D.
 
