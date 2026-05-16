@@ -4,16 +4,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
-  Bot,
-  Box,
   CheckCircle2,
-  Code2,
-  DraftingCompass,
-  Gamepad2,
-  ImageIcon,
   Layers3,
   Moon,
-  Send,
   ShieldCheck,
   Sparkles,
   Sun,
@@ -27,15 +20,6 @@ const navItems = [
   { label: "Pricing", href: "/pricing" },
   { label: "Status", href: "/platform/status" },
   { label: "Contact", href: "/contact" },
-];
-
-const sidebarItems = [
-  { label: "Assistant", icon: Bot, active: true },
-  { label: "Design", icon: ImageIcon },
-  { label: "Code", icon: Code2 },
-  { label: "3D", icon: Box },
-  { label: "CAD", icon: DraftingCompass },
-  { label: "Engines", icon: Gamepad2 },
 ];
 
 const featureCards = [
@@ -191,10 +175,8 @@ function ProductPreview({ isLight }: { isLight: boolean }) {
   const t = isLight
     ? {
         shell: "border-[#DCEAF5] bg-white text-[#0F172A] shadow-[0_34px_100px_rgba(14,165,233,0.13)]",
-        top: "border-[#DCEAF5] bg-[#FBFDFF]",
-        sidebar: "border-[#DCEAF5] bg-[#F8FCFF]",
+        canvas: "border-[#DCEAF5] bg-[#F8FCFF]",
         surface: "border-[#DCEAF5] bg-white",
-        panel: "border-[#DCEAF5] bg-[#F8FCFF]",
         text: "text-[#0F172A]",
         muted: "text-[#475569]",
         faint: "text-[#94A3B8]",
@@ -202,10 +184,8 @@ function ProductPreview({ isLight }: { isLight: boolean }) {
       }
     : {
         shell: "border-white/10 bg-[#111827] text-white",
-        top: "border-white/10 bg-[#0F172A]",
-        sidebar: "border-white/10 bg-[#0B1120]",
+        canvas: "border-white/10 bg-[#0B1120]",
         surface: "border-white/10 bg-[#111827]",
-        panel: "border-white/10 bg-[#0F172A]",
         text: "text-white",
         muted: "text-slate-300",
         faint: "text-slate-500",
@@ -213,106 +193,58 @@ function ProductPreview({ isLight }: { isLight: boolean }) {
       };
 
   return (
-    <div className={`w-full overflow-hidden rounded-[24px] border ${t.shell}`}>
-      <div className={`relative flex h-14 items-center justify-between border-b px-4 sm:px-5 ${t.top}`}>
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#facc15]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#22c55e]" />
+    <div className={`w-full rounded-[28px] border p-4 sm:p-5 ${t.shell}`}>
+      <div className={`rounded-[24px] border p-6 sm:p-8 ${t.canvas}`}>
+        <div className="grid min-h-[470px] gap-6 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+          <div className={`rounded-[22px] border p-6 sm:p-7 ${t.surface}`}>
+            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${t.chip}`}>Cedium intelligence layer</span>
+            <h2 className={`mt-6 max-w-md text-3xl font-semibold leading-tight sm:text-4xl ${t.text}`}>
+              One brief becomes a complete production direction.
+            </h2>
+            <p className={`mt-4 max-w-md text-sm leading-6 ${t.muted}`}>
+              Cedium turns an idea into structured strategy, interface direction, and the next focused build steps.
+            </p>
+
+            <div className="mt-8 space-y-4">
+              {["Define outcome", "Shape interface", "Prepare launch"].map((item, index) => (
+                <div key={item} className="flex items-center gap-4">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-[#E0F2FE] text-sm font-semibold text-[#0284C7]">
+                    {index + 1}
+                  </span>
+                  <div>
+                    <p className={`text-sm font-semibold ${t.text}`}>{item}</p>
+                    <p className={`mt-0.5 text-xs ${t.faint}`}>Clear, reviewed, ready</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-5">
+            <div className={`rounded-[22px] border p-6 ${t.surface}`}>
+              <p className={`text-xs font-semibold uppercase ${t.faint}`}>Launch readiness</p>
+              <div className="mt-6 flex items-end justify-between">
+                <p className={`text-5xl font-semibold ${t.text}`}>92%</p>
+                <p className={`pb-1 text-sm ${t.muted}`}>aligned</p>
+              </div>
+              <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-[#E0F2FE] dark:bg-white/10">
+                <div className="h-full w-[92%] rounded-full bg-[#38BDF8]" />
+              </div>
+            </div>
+
+            <div className={`rounded-[22px] border p-6 ${t.surface}`}>
+              <p className={`text-xs font-semibold uppercase ${t.faint}`}>Generated output</p>
+              <div className="mt-5 space-y-3">
+                {["Premium hero direction", "Sky-blue visual system", "Implementation checklist"].map((item) => (
+                  <div key={item} className="flex items-center gap-3">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#38BDF8]" />
+                    <span className={`text-sm font-medium ${t.text}`}>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-        <span className={`hidden text-xs font-medium tracking-wide sm:inline ${t.muted}`}>cedium.com/studio</span>
-        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${t.chip}`}>Live workspace</span>
-      </div>
-
-      <div className="grid min-h-[500px] grid-cols-1 lg:grid-cols-[190px_1fr]">
-        <aside className={`hidden border-r p-5 lg:block ${t.sidebar}`}>
-          <Brand compact isLight={isLight} />
-          <nav className="mt-9 space-y-2" aria-label="Product preview navigation">
-            {sidebarItems.slice(0, 4).map(({ label, icon: Icon, active }) => (
-              <div
-                key={label}
-                className={`flex h-10 items-center gap-3 rounded-[10px] px-3 text-sm transition-colors ${
-                  active ? "bg-[#E0F2FE] text-[#0369A1] shadow-[inset_0_0_0_1px_rgba(56,189,248,0.14)]" : t.muted
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {label}
-              </div>
-            ))}
-          </nav>
-          <div className={`mt-10 rounded-[14px] border p-4 ${t.surface}`}>
-            <p className={`text-xs font-semibold uppercase ${t.faint}`}>Workspace</p>
-            <p className={`mt-3 text-2xl font-semibold ${t.text}`}>99.9%</p>
-            <p className={`mt-1 text-xs ${t.muted}`}>ready state</p>
-          </div>
-        </aside>
-
-        <section className="p-5 sm:p-7">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-            <div>
-              <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${t.chip}`}>Production brief</span>
-              <h2 className={`mt-5 max-w-lg text-3xl font-semibold leading-tight sm:text-4xl ${t.text}`}>
-                Shape the whole workflow before work begins.
-              </h2>
-            </div>
-            <div className={`rounded-[14px] border px-4 py-3 text-right ${t.surface}`}>
-              <p className={`text-xs ${t.faint}`}>Active tools</p>
-              <p className={`mt-1 text-2xl font-semibold ${t.text}`}>12</p>
-            </div>
-          </div>
-
-          <div className="mt-7 grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
-            <div className={`rounded-[20px] border p-5 sm:p-6 ${t.panel}`}>
-              <div className={`rounded-[16px] border bg-white p-4 shadow-[0_12px_34px_rgba(15,23,42,0.04)] dark:bg-[#111827] ${isLight ? "border-[#DCEAF5]" : "border-white/10"}`}>
-                <p className={`text-xs font-semibold uppercase ${t.faint}`}>Prompt</p>
-                <div className="mt-3 flex items-center justify-between gap-4">
-                  <p className={`text-sm leading-6 ${t.muted}`}>Create a polished SaaS homepage, product flow, and launch checklist.</p>
-                  <Button size="icon" className="h-10 w-10 shrink-0 rounded-[12px] bg-[#38BDF8] text-white shadow-[0_12px_26px_rgba(56,189,248,0.25)] hover:bg-[#0EA5E9]">
-                    <Send className="h-4 w-4" />
-                    <span className="sr-only">Send</span>
-                  </Button>
-                </div>
-              </div>
-
-              <div className="mt-6 space-y-3">
-                {["Strategy mapped", "Interface direction set", "Implementation path ready"].map((item) => (
-                  <div key={item} className={`flex items-center justify-between rounded-[14px] border bg-white px-4 py-3 dark:bg-[#111827] ${isLight ? "border-[#DCEAF5]" : "border-white/10"}`}>
-                    <div className="flex items-center gap-3">
-                      <span className="h-2.5 w-2.5 rounded-full bg-[#38BDF8]" />
-                      <span className={`text-sm font-medium ${t.text}`}>{item}</span>
-                    </div>
-                    <span className={`text-xs ${t.faint}`}>Done</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className={`rounded-[20px] border p-5 ${t.surface}`}>
-              <p className={`text-xs font-semibold uppercase ${t.faint}`}>Launch quality</p>
-              <div className="mt-6">
-                <div className="flex items-end justify-between">
-                  <p className={`text-4xl font-semibold ${t.text}`}>86%</p>
-                  <p className={`text-xs ${t.muted}`}>ready</p>
-                </div>
-                <div className="mt-5 h-2 overflow-hidden rounded-full bg-[#E0F2FE] dark:bg-white/10">
-                  <div className="h-full w-[86%] rounded-full bg-[#38BDF8]" />
-                </div>
-              </div>
-
-              <div className="mt-8 space-y-5">
-                {[
-                  ["Visual system", "Clean sky-blue direction"],
-                  ["Next step", "Product preview polish"],
-                ].map(([label, value]) => (
-                  <div key={label}>
-                    <p className={`text-xs ${t.faint}`}>{label}</p>
-                    <p className={`mt-1 text-sm font-medium leading-6 ${t.text}`}>{value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
     </div>
   );
