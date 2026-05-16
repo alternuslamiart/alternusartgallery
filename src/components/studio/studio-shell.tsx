@@ -3980,7 +3980,7 @@ function AIAssistantPage() {
  {attachments.map((attachment) => (
  <div key={attachment.id} className="relative">
  <div className={`h-[80px] w-[80px] rounded-xl border flex items-center justify-center ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20]" : "border-[#E5E7EB] bg-[#F3F4F6]"}`}>
- {attachment.type === "image" ? (
+ {attachment.kind === "image" ? (
  <ImageIcon className={`h-7 w-7 ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} />
  ) : (
  <FileText className={`h-7 w-7 ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} />
