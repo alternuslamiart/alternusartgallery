@@ -40,7 +40,7 @@ export default function Files() {
  {/* Folder grid */}
  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
  {folders.map((f) => (
- <div key={f.n} style={{ padding: "24px 22px", border: `1px solid ${t.faint}`, borderRadius: 12, background: t.raised, cursor: "pointer", transition: "transform 0.2s,border-color 0.2s" }} className="hover:border-[#4284FF]/50 
+ <div key={f.n} style={{ padding: "24px 22px", border: `1px solid ${t.faint}`, borderRadius: 12, background: t.raised, cursor: "pointer", transition: "transform 0.2s,border-color 0.2s" }} className="hover:border-[#4284FF]/50">
  <div style={{ width: 40, height: 40, borderRadius: 10, background: `${COBALT}18`, border: `1px solid ${COBALT}44`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={COBALT} strokeWidth="2"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
  </div>
