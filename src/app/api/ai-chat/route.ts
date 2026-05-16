@@ -168,12 +168,13 @@ function getProviderError(error: unknown, provider: "openai" | "gemini") {
 async function askGemini(message: string, history: ChatMessage[]) {
   const apiKey = getGeminiApiKey();
   if (!apiKey) {
-    throw new Error("Missing Gemini API key.");
+    throw new Error("Missing Gemini API key. Set GEMINI_API_KEY in the environment.");
   }
 
   const client = new GoogleGenerativeAI(apiKey);
+  const modelName = getGeminiModel();
   const model = client.getGenerativeModel({
-    model: getGeminiModel(),
+    model: modelName,
     systemInstruction: SYSTEM_PROMPT,
   });
 
@@ -185,11 +186,34 @@ async function askGemini(message: string, history: ChatMessage[]) {
     },
   });
 
-  const result = await chat.sendMessage(message);
-  const answer = result.response.text()?.trim();
+  let result;
+  try {
+    result = await chat.sendMessage(message);
+  } catch (sendError) {
+    const reason = sendError instanceof Error ? sendError.message : String(sendError);
+    throw new Error(`Gemini API request failed (model ${modelName}): ${reason}`);
+  }
+
+  const blockReason = result.response.promptFeedback?.blockReason;
+  if (blockReason) {
+    throw new Error(`Gemini blocked the prompt (${blockReason}).`);
+  }
+
+  const finishReason = result.response.candidates?.[0]?.finishReason;
+  if (finishReason && finishReason !== "STOP" && finishReason !== "MAX_TOKENS") {
+    throw new Error(`Gemini stopped early (${finishReason}).`);
+  }
+
+  let answer: string | undefined;
+  try {
+    answer = result.response.text()?.trim();
+  } catch (textError) {
+    const reason = textError instanceof Error ? textError.message : String(textError);
+    throw new Error(`Gemini returned no readable text: ${reason}`);
+  }
 
   if (!answer) {
-    throw new Error("Invalid Gemini response.");
+    throw new Error(`Gemini returned an empty response (model ${modelName}).`);
   }
 
   return answer;
@@ -279,8 +303,7 @@ export async function POST(request: NextRequest) {
 
     if (provider === "openai" || provider === "gemini") {
       const providerAttempts = getProviderAttempts(provider);
-      let failedProvider: RemoteAIProvider | undefined;
-      let lastProviderError: string | undefined;
+      const providerErrors: Array<{ provider: RemoteAIProvider; message: string }> = [];
 
       for (const providerAttempt of providerAttempts) {
         try {
@@ -292,20 +315,23 @@ export async function POST(request: NextRequest) {
             fallbackFrom: providerAttempt === provider ? undefined : provider,
           });
         } catch (providerError) {
-          failedProvider = providerAttempt;
-          lastProviderError = providerError instanceof Error ? providerError.message : String(providerError);
+          const errorMessage = providerError instanceof Error ? providerError.message : String(providerError);
+          providerErrors.push({ provider: providerAttempt, message: errorMessage });
           console.warn(`AI provider ${providerAttempt} failed.`, providerError);
         }
       }
 
+      const primaryError = providerErrors.find((entry) => entry.provider === provider);
+      const surfacedError = primaryError ?? providerErrors[providerErrors.length - 1];
       const fallback = getAIResponse(message);
       return NextResponse.json({
         content: fallback.content,
         answer: fallback.content,
         suggestedQuestions: fallback.suggestedQuestions,
         provider: "local",
-        fallbackFrom: failedProvider ?? provider,
-        providerError: lastProviderError,
+        fallbackFrom: surfacedError?.provider ?? provider,
+        providerError: surfacedError?.message,
+        providerErrors: providerErrors.map((entry) => ({ provider: entry.provider, message: entry.message })),
       });
     }
 
