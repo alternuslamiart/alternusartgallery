@@ -4058,7 +4058,7 @@ function AIAssistantPage() {
  <div className="relative mt-2 flex justify-start">
  {modelMenuOpen && (
  <div className={`absolute bottom-full left-0 mb-2 min-w-[200px] overflow-hidden rounded-2xl border py-1.5 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#E5E7EB] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.10)]"}`}>
- {["Claude Sonnet 4.5","Codex Pro 5.5","Claude Opus 5.7","Codex Plus 5.5"].map((m) => (
+ {["Claude Sonnet 4.5","Codex Pro 5.5","Codex Plus 5.5"].map((m) => (
  <button
  key={m}
  type="button"
