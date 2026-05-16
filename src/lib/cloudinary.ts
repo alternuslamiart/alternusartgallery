@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary'
+﻿import { v2 as cloudinary } from 'cloudinary'
 
 // Configure Cloudinary
 cloudinary.config({
@@ -12,11 +12,11 @@ export { cloudinary }
 // Upload image to Cloudinary
 export async function uploadImage(
   file: string, // base64 or URL
-  folder: string = 'cerevix-assets'
+  folder: string = 'Cedium-assets'
 ): Promise<{ url: string; publicId: string }> {
   try {
     const result = await cloudinary.uploader.upload(file, {
-      folder: `Cerevix/${folder}`,
+      folder: `Cedium/${folder}`,
       resource_type: 'image',
       transformation: [
         { quality: 'auto:best' },

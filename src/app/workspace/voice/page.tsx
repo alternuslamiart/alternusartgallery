@@ -1,12 +1,12 @@
-"use client";
+﻿"use client";
 import Link from "next/link";
-import { CerevixPage, COBALT } from "@/components/cerevix-shell";
+import { CediumPage, COBALT } from "@/components/Cedium-shell";
 
 export default function Voice() {
   const bars = [5, 12, 8, 18, 22, 14, 28, 36, 22, 14, 9, 16, 24, 32, 40, 28, 20, 14, 8, 6, 12, 20, 30, 36, 44, 34, 22, 14, 10, 6];
 
   return (
-    <CerevixPage>
+    <CediumPage>
       {(t) => (
         <section style={{ padding: "0 0 120px" }}>
           {/* Voice hero with waveform */}
@@ -53,6 +53,6 @@ export default function Voice() {
           <style>{`@keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.5 } }`}</style>
         </section>
       )}
-    </CerevixPage>
+    </CediumPage>
   );
 }

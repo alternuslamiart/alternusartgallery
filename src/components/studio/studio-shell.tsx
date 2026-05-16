@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -73,7 +73,7 @@ import {
 
 export type StudioRouteKey =
   | "studio-overview"
-  | "cerevix-design"
+  | "Cedium-design"
   | "autocad-design"
   | "code-builder"
   | "blender-3d"
@@ -106,7 +106,7 @@ type GeneratedRecent = {
 export const studioNavigation: NavItem[] = [
   { key: "ai-assistant", label: "AI Assistant", href: "/ai-assistant", icon: Sparkles },
   { key: "studio-overview", label: "Studio Overview", href: "/studio-overview", icon: Grid2X2 },
-  { key: "cerevix-design", label: "Cedium Design", href: "/cerevix-design", icon: Monitor },
+  { key: "Cedium-design", label: "Cedium Design", href: "/Cedium-design", icon: Monitor },
   { key: "autocad-design", label: "AutoCAD Design", href: "/autocad-design", icon: PenLine },
   { key: "code-builder", label: "Code Builder", href: "/code-builder", icon: Code2 },
   { key: "blender-3d", label: "Blender 3D", href: "/blender-3d", icon: Layers3 },
@@ -124,7 +124,7 @@ const bottomNavigation = [
 const routeByPath: Record<string, StudioRouteKey> = {
   "/main": "studio-overview",
   "/studio-overview": "studio-overview",
-  "/cerevix-design": "cerevix-design",
+  "/Cedium-design": "Cedium-design",
   "/autocad-design": "autocad-design",
   "/code-builder": "code-builder",
   "/blender-3d": "blender-3d",
@@ -1288,7 +1288,7 @@ function StudioContent({ route, assistantTool }: { route: StudioRouteKey; assist
   switch (route) {
     case "studio-overview":
       return <OverviewPage />;
-    case "cerevix-design":
+    case "Cedium-design":
       return <CediumDesignPage />;
     case "autocad-design":
       return <AutoCADPage />;
@@ -3716,9 +3716,9 @@ function AIAssistantPage() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const stored = Number(window.localStorage.getItem("cerevix-ai-chat-count") || "0");
+    const stored = Number(window.localStorage.getItem("Cedium-ai-chat-count") || "0");
     if (Number.isFinite(stored) && stored > 0) setAiChatCount(stored);
-    const dismissed = window.localStorage.getItem("cerevix-ai-plan-notice-dismissed");
+    const dismissed = window.localStorage.getItem("Cedium-ai-plan-notice-dismissed");
     if (dismissed === "1") setPlanNoticeDismissed(true);
   }, []);
 
@@ -3855,7 +3855,7 @@ function AIAssistantPage() {
       setAiChatCount((current) => {
         const next = current + 1;
         if (typeof window !== "undefined") {
-          window.localStorage.setItem("cerevix-ai-chat-count", String(next));
+          window.localStorage.setItem("Cedium-ai-chat-count", String(next));
         }
         return next;
       });
@@ -3976,7 +3976,7 @@ function AIAssistantPage() {
   const dismissPlanNotice = () => {
     setPlanNoticeDismissed(true);
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("cerevix-ai-plan-notice-dismissed", "1");
+      window.localStorage.setItem("Cedium-ai-plan-notice-dismissed", "1");
     }
   };
 

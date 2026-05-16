@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+﻿import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { uploadImage } from '@/lib/cloudinary'
 
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { image, folder = 'cerevix-assets' } = body
+    const { image, folder = 'Cedium-assets' } = body
 
     if (!image) {
       return NextResponse.json(

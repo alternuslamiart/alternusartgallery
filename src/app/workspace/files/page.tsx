@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 import Link from "next/link";
-import { CerevixPage, COBALT } from "@/components/cerevix-shell";
+import { CediumPage, COBALT } from "@/components/Cedium-shell";
 
 const folders = [
   { n: "Invoices",  c: 12, d: "2h ago" },
@@ -13,7 +13,7 @@ const folders = [
 
 export default function Files() {
   return (
-    <CerevixPage>
+    <CediumPage>
       {(t) => (
         <>
           <section style={{ padding: "80px 0 40px" }}>
@@ -59,6 +59,6 @@ export default function Files() {
           </section>
         </>
       )}
-    </CerevixPage>
+    </CediumPage>
   );
 }

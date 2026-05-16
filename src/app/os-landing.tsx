@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -104,7 +104,7 @@ const appsAll = [
 // ━━━━ Pricing tiers ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const tiers = [
   {
-    name: "Cerevix ART",
+    name: "Cedium ART",
     price: "$59.99",
     period: "",
     desc: "Essential desktop experience",
@@ -113,10 +113,10 @@ const tiers = [
     cta: "Get ART",
   },
   {
-    name: "Cerevix Ultra",
+    name: "Cedium Ultra",
     price: "$79.99",
     period: "",
-    desc: "The complete Cerevix experience",
+    desc: "The complete Cedium experience",
     features: ["Everything in ART", "Unlimited AI assistant", "Cloud sync & backup", "Priority support", "Custom themes", "Early access to new features"],
     highlighted: true,
     cta: "Get Ultra",
@@ -189,7 +189,7 @@ export default function OSLandingPage() {
         className="fixed top-0 left-0 right-0 z-50 px-6 h-14 flex items-center justify-between"
       >
         <Link href="/" className="flex items-center gap-2 no-underline">
-          <span style={{ color: t.text }} className="text-sm font-bold tracking-widest">Cerevix</span>
+          <span style={{ color: t.text }} className="text-sm font-bold tracking-widest">Cedium</span>
           <span style={{ color: t.textMuted }} className="text-sm font-light tracking-widest">OS</span>
         </Link>
 
@@ -269,7 +269,7 @@ export default function OSLandingPage() {
               letterSpacing: "-0.02em",
             }}
           >
-            Cerevix
+            Cedium
           </span>
           <sup style={{ color: t.textMuted, fontSize: "0.25em", verticalAlign: "super", position: "relative", top: "-0.6em" }}>&copy;</sup>
         </h1>
@@ -286,7 +286,7 @@ export default function OSLandingPage() {
             onMouseEnter={e => (e.currentTarget.style.background = t.accentHover)}
             onMouseLeave={e => (e.currentTarget.style.background = t.accent)}
           >
-            Try Cerevix OS <I d={ic.arrowRight} s={14} />
+            Try Cedium OS <I d={ic.arrowRight} s={14} />
           </Link>
           <a
             href="#pricing"
@@ -321,7 +321,7 @@ export default function OSLandingPage() {
                 {/* Taskbar */}
                 <div className="flex items-center justify-between px-4 h-7" style={{ background: t.surface, borderBottom: `1px solid ${t.border}` }}>
                   <div className="flex items-center gap-3">
-                    <span style={{ color: t.text }} className="text-[9px] font-bold tracking-widest">Cerevix</span>
+                    <span style={{ color: t.text }} className="text-[9px] font-bold tracking-widest">Cedium</span>
                     <span style={{ color: t.textMuted }} className="text-[9px] font-light tracking-wider">OS</span>
                   </div>
                   <span style={{ color: t.textMuted }} className="text-[9px] font-mono">02:22 - Apr 3</span>
@@ -348,7 +348,7 @@ export default function OSLandingPage() {
                       <div className="rounded h-3 mb-1.5" style={{ background: t.cardAlt, width: "75%" }} />
                       <div className="flex gap-1.5 mb-2">
                         <div className="rounded h-2 px-1" style={{ background: t.accentSoft, width: "20%" }}>
-                          <span style={{ color: t.accentText }} className="text-[6px]">Cerevix</span>
+                          <span style={{ color: t.accentText }} className="text-[6px]">Cedium</span>
                         </div>
                         <div className="rounded h-2" style={{ background: t.cardAlt, width: "14%" }} />
                         <div className="rounded h-2" style={{ background: t.cardAlt, width: "14%" }} />
@@ -392,7 +392,7 @@ export default function OSLandingPage() {
                       </div>
                     </div>
                     <div className="px-2 py-1 font-mono text-[7px] leading-relaxed">
-                      <div><span style={{ color: t.textMuted }}>1</span> <span style={{ color: t.textSec }}>{"// Cerevix Code Editor"}</span></div>
+                      <div><span style={{ color: t.textMuted }}>1</span> <span style={{ color: t.textSec }}>{"// Cedium Code Editor"}</span></div>
                       <div><span style={{ color: t.textMuted }}>2</span></div>
                       <div><span style={{ color: t.textMuted }}>3</span> <span style={{ color: t.purple }}>function</span> <span style={{ color: t.accentText }}>greet</span><span style={{ color: t.textSec }}>(name) {"{"}</span></div>
                       <div><span style={{ color: t.textMuted }}>4</span>   <span style={{ color: t.purple }}>return</span> <span style={{ color: t.success }}>{"`Hello, ${name}!`"}</span></div>
@@ -650,7 +650,7 @@ export default function OSLandingPage() {
       {/* ── Pricing ── */}
       <Section id="pricing" className="px-6 py-24 max-w-5xl mx-auto">
         <p style={{ color: t.accent }} className="text-xs tracking-[0.2em] uppercase text-center mb-3">Pricing</p>
-        <h2 style={{ color: t.text }} className="text-3xl md:text-4xl font-bold text-center mb-4">Get Cerevix OS</h2>
+        <h2 style={{ color: t.text }} className="text-3xl md:text-4xl font-bold text-center mb-4">Get Cedium OS</h2>
         <p style={{ color: t.textSec }} className="text-center max-w-lg mx-auto mb-14">
           Choose the edition that fits your needs.
         </p>
@@ -715,7 +715,7 @@ export default function OSLandingPage() {
       {/* ── CTA ── */}
       <Section className="px-6 py-24 text-center">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to try Cerevix OS?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to try Cedium OS?</h2>
           <p style={{ color: t.textSec }} className="mb-8">
             No download required. Launch the full desktop experience in your browser right now.
           </p>
@@ -726,7 +726,7 @@ export default function OSLandingPage() {
             onMouseEnter={e => (e.currentTarget.style.background = t.accentHover)}
             onMouseLeave={e => (e.currentTarget.style.background = t.accent)}
           >
-            Launch Cerevix OS <I d={ic.arrowRight} s={14} />
+            Launch Cedium OS <I d={ic.arrowRight} s={14} />
           </Link>
         </div>
       </Section>
@@ -739,7 +739,7 @@ export default function OSLandingPage() {
           </div>
           <h3 className="text-xl font-semibold mb-2">Need Help?</h3>
           <p style={{ color: t.textSec }} className="text-sm mb-6 max-w-md mx-auto">
-            Our support team is here to help you get the most out of Cerevix OS. Browse docs, join the community, or contact us directly.
+            Our support team is here to help you get the most out of Cedium OS. Browse docs, join the community, or contact us directly.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="#" className="px-5 py-2.5 rounded-lg text-sm font-medium no-underline" style={{ background: t.accent, color: "#fff" }}>
@@ -759,7 +759,7 @@ export default function OSLandingPage() {
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-3">
-                <span style={{ color: t.text }} className="text-sm font-bold tracking-widest">Cerevix</span>
+                <span style={{ color: t.text }} className="text-sm font-bold tracking-widest">Cedium</span>
                 <span style={{ color: t.textMuted }} className="text-sm font-light tracking-widest">OS</span>
               </div>
               <p style={{ color: t.textMuted }} className="text-xs leading-relaxed mb-3">
@@ -813,9 +813,9 @@ export default function OSLandingPage() {
               <h4 style={{ color: t.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Operating System</h4>
               <div className="flex flex-col gap-2">
                 {[
-                  { label: "Try Cerevix OS", href: "/main" },
-                  { label: "Cerevix ART", href: "#pricing" },
-                  { label: "Cerevix Ultra", href: "#pricing" },
+                  { label: "Try Cedium OS", href: "/main" },
+                  { label: "Cedium ART", href: "#pricing" },
+                  { label: "Cedium Ultra", href: "#pricing" },
                   { label: "System Requirements", href: "#" },
                   { label: "Release Notes", href: "#" },
                   { label: "What's New", href: "#" },
@@ -870,7 +870,7 @@ export default function OSLandingPage() {
               <h4 style={{ color: t.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Company</h4>
               <div className="flex flex-col gap-2">
                 {[
-                  { label: "About Cerevix", href: "/about" },
+                  { label: "About Cedium", href: "/about" },
                   { label: "Contact", href: "/contact" },
                   { label: "Terms of Service", href: "/terms" },
                   { label: "Privacy Policy", href: "/privacy" },
@@ -888,10 +888,10 @@ export default function OSLandingPage() {
           {/* Bottom bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6" style={{ borderTop: `1px solid ${t.border}` }}>
             <span style={{ color: t.textMuted }} className="text-xs">
-              &copy; {new Date().getFullYear()} Cerevix. All rights reserved.
+              &copy; {new Date().getFullYear()} Cedium. All rights reserved.
             </span>
             <div className="flex items-center gap-4">
-              <span style={{ color: t.textMuted }} className="text-xs">Cerevix ART &middot; Cerevix Ultra &middot; Cerevix OS v1.0</span>
+              <span style={{ color: t.textMuted }} className="text-xs">Cedium ART &middot; Cedium Ultra &middot; Cedium OS v1.0</span>
             </div>
           </div>
         </div>

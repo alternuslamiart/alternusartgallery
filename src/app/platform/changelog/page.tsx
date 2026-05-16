@@ -1,11 +1,11 @@
-"use client";
-import { CerevixPage, COBALT } from "@/components/cerevix-shell";
+﻿"use client";
+import { CediumPage, COBALT } from "@/components/Cedium-shell";
 
 const log = [
   { d: "2026-04-22", v: "0.9.4", k: "feat", t: "AutoCAD and Blender agent goes public", b: "Website design, responsive code, and Blender 3D production are available in all workspaces." },
   { d: "2026-04-14", v: "0.9.3", k: "fix", t: "File search re-ranking", b: "Semantic FS search now cold-starts ~40% faster and de-duplicates near-identical matches." },
   { d: "2026-04-02", v: "0.9.2", k: "feat", t: "Code Studio multi-repo", b: "Open up to 8 repositories in a single Code Studio window with shared agent context." },
-  { d: "2026-03-18", v: "0.9.1", k: "feat", t: "Agent SDK (beta)", b: "Embed the Cerevix agent into any TypeScript app. npm i @Cerevix/agent." },
+  { d: "2026-03-18", v: "0.9.1", k: "feat", t: "Agent SDK (beta)", b: "Embed the Cedium agent into any TypeScript app. npm i @Cedium/agent." },
   { d: "2026-03-01", v: "0.9.0", k: "feat", t: "AutoCAD and Blender workflow upgrade", b: "Default agent upgraded for website design, coding, and Blender 3D workflows." },
   { d: "2026-02-11", v: "0.8.7", k: "fix", t: "OOBE skip for returning users", b: "We no longer replay the setup flow on every visit — restored from profile cookie." },
 ];
@@ -14,7 +14,7 @@ const tagColor: Record<string, string> = { feat: COBALT, fix: "#F59E0B", chore: 
 
 export default function Changelog() {
   return (
-    <CerevixPage>
+    <CediumPage>
       {(t) => (
         <>
           <section style={{ padding: "80px 0 40px", borderBottom: `1px solid ${t.faint}` }}>
@@ -51,6 +51,6 @@ export default function Changelog() {
           </section>
         </>
       )}
-    </CerevixPage>
+    </CediumPage>
   );
 }

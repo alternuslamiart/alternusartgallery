@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -435,7 +435,7 @@ export default function ChangePasswordPage() {
               </li>
               <li className="flex gap-2">
                 <span className="text-blue-600">•</span>
-                <span>Use a unique password for your Cerevix account</span>
+                <span>Use a unique password for your Cedium account</span>
               </li>
               <li className="flex gap-2">
                 <span className="text-blue-600">•</span>

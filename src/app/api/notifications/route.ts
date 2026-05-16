@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { apiError, isApiResponse, mapUnknownError, requirePlatformContext } from "@/lib/platform/api";
@@ -34,7 +34,7 @@ async function getPublicStudioNotifications(limit: number) {
     {
       id: "studio-welcome",
       type: "workspace_update",
-      title: "Cerevix Studio is ready",
+      title: "Cedium Studio is ready",
       message: "Open the studio to generate assets, run prompts, and coordinate AI tools.",
       linkUrl: "/main",
       actionUrl: "/main",

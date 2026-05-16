@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 
 // In-memory chat storage (will reset on server restart)
 // In production, use a database like the existing Prisma setup
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       chatId,
       text,
       sender,
-      senderName: senderName || (sender === 'support' ? 'Cerevix CEO' : 'Visitor'),
+      senderName: senderName || (sender === 'support' ? 'Cedium CEO' : 'Visitor'),
       senderEmail,
       timestamp: new Date().toISOString(),
       read: false,

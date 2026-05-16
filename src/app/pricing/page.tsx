@@ -1,15 +1,15 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
-import { CerevixPage, COBALT } from "@/components/cerevix-shell";
+import { CediumPage, COBALT } from "@/components/Cedium-shell";
 
 const tiers = [
   {
     n: "Free",
     pm: 0,
     py: 0,
-    d: "For trying Cerevix and running a single workspace.",
+    d: "For trying Cedium and running a single workspace.",
     cta: "Start free",
     feat: [
       "1 personal workspace",
@@ -23,7 +23,7 @@ const tiers = [
     n: "Pro",
     pm: 24,
     py: 19,
-    d: "For individuals who live in Cerevix every day.",
+    d: "For individuals who live in Cedium every day.",
     cta: "Upgrade to Pro",
     featured: true,
     feat: [
@@ -115,7 +115,7 @@ const faq = [
   },
   {
     q: "Do you offer student discounts?",
-    a: "Yes. Pro is free for verified students. Email hello@Cerevix.ai from a .edu address for a code.",
+    a: "Yes. Pro is free for verified students. Email hello@Cedium.ai from a .edu address for a code.",
   },
 ];
 
@@ -131,7 +131,7 @@ export default function Pricing() {
   };
 
   return (
-    <CerevixPage>
+    <CediumPage>
       {(t) => (
         <>
           <section style={{ padding: "120px 0 60px", position: "relative", overflow: "hidden" }}>
@@ -393,7 +393,7 @@ export default function Pricing() {
                 <div>
                   <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 14 }}>ENTERPRISE</div>
                   <h2 style={{ fontSize: "clamp(32px,5vw,52px)", fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1, margin: 0, marginBottom: 16, fontStretch: "88%" }}>
-                    Running Cerevix at scale?
+                    Running Cedium at scale?
                   </h2>
                   <p style={{ fontSize: 15.5, color: t.muted, lineHeight: 1.6, margin: 0, maxWidth: 480 }}>
                     Custom knowledge volume, dedicated throughput, SOC 2 artifacts on request, and a named account engineer.
@@ -412,7 +412,7 @@ export default function Pricing() {
                     <Link href="/contact" style={{ height: 46, padding: "0 22px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
                       Talk to sales →
                     </Link>
-                    <a href="mailto:sales@Cerevix.ai" style={{ height: 46, padding: "0 22px", background: "transparent", color: t.fg, fontSize: 14, fontWeight: 700, borderRadius: 8, border: `1px solid ${t.faint}`, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+                    <a href="mailto:sales@Cedium.ai" style={{ height: 46, padding: "0 22px", background: "transparent", color: t.fg, fontSize: 14, fontWeight: 700, borderRadius: 8, border: `1px solid ${t.faint}`, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
                       Email sales@
                     </a>
                   </div>
@@ -465,11 +465,11 @@ export default function Pricing() {
                       <span style={{ fontStyle: "italic" }}>Upgrade when it pays for itself.</span>
                     </h2>
                     <p style={{ margin: "26px auto 0", maxWidth: 560, fontSize: 18, lineHeight: 1.7, color: "rgba(255,255,255,0.84)" }}>
-                      Cerevix is free to try. Move into paid plans only when the workflow starts returning real value.
+                      Cedium is free to try. Move into paid plans only when the workflow starts returning real value.
                     </p>
                     <div style={{ marginTop: 36, display: "inline-flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
                       <Link href="/main" style={{ height: 48, padding: "0 24px", background: "#fff", color: COBALT, fontSize: 15, fontWeight: 800, borderRadius: 18, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10, boxShadow: "0 16px 28px rgba(18,46,120,0.18)" }}>
-                        Launch Cerevix OS <span style={{ fontSize: 13 }}>↗</span>
+                        Launch Cedium OS <span style={{ fontSize: 13 }}>↗</span>
                       </Link>
                       <Link href="/contact" style={{ height: 48, padding: "0 24px", background: "transparent", color: "#fff", fontSize: 15, fontWeight: 700, borderRadius: 18, textDecoration: "none", display: "inline-flex", alignItems: "center", border: "1px solid rgba(255,255,255,0.28)" }}>
                         Talk to sales
@@ -665,6 +665,6 @@ export default function Pricing() {
           ) : null}
         </>
       )}
-    </CerevixPage>
+    </CediumPage>
   );
 }

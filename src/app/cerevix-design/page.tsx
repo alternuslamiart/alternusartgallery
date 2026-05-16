@@ -1,5 +1,5 @@
-import { StudioRoutePage } from "@/components/studio/studio-shell";
+﻿import { StudioRoutePage } from "@/components/studio/studio-shell";
 
-export default function CerevixDesignRoutePage() {
-  return <StudioRoutePage route="cerevix-design" />;
+export default function CediumDesignRoutePage() {
+  return <StudioRoutePage route="Cedium-design" />;
 }

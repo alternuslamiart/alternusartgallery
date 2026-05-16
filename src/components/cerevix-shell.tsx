@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useState } from "react";
@@ -14,13 +14,13 @@ export const DARK_BORDER = "rgba(255,255,255,0.16)";
 export const DARK_BORDER_SOFT = "rgba(255,255,255,0.10)";
 export const DARK_MUTED = "rgba(193,194,191,0.72)";
 export const DARK_TEXT = "#C1C2BF";
-const THEME_KEY = "cerevix_theme";
+const THEME_KEY = "Cedium_theme";
 
 /**
- * AI-branded Cerevix mark. A cobalt rounded tile with a 4-point sparkle
+ * AI-branded Cedium mark. A cobalt rounded tile with a 4-point sparkle
  * plus one smaller satellite spark — the universal 'AI' glyph.
  */
-export function CerevixLogo({ size = 28, radius = 8 }: { size?: number; radius?: number }) {
+export function CediumLogo({ size = 28, radius = 8 }: { size?: number; radius?: number }) {
   const spark = size * 0.64;
   return (
     <div style={{ width: size, height: size, background: COBALT, borderRadius: radius, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, position: "relative" }}>
@@ -34,21 +34,21 @@ export function CerevixLogo({ size = 28, radius = 8 }: { size?: number; radius?:
   );
 }
 
-export function useCerevixMode() {
+export function useCediumMode() {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(THEME_KEY);
     const next = saved ? saved === "dark" : false;
     setIsDark(next);
-    document.documentElement.dataset.cerevixTheme = next ? "dark" : "light";
+    document.documentElement.dataset.CediumTheme = next ? "dark" : "light";
   }, []);
 
   const setMode: Dispatch<SetStateAction<boolean>> = useCallback((next) => {
     setIsDark((current) => {
       const value = typeof next === "function" ? next(current) : next;
       window.localStorage.setItem(THEME_KEY, value ? "dark" : "light");
-      document.documentElement.dataset.cerevixTheme = value ? "dark" : "light";
+      document.documentElement.dataset.CediumTheme = value ? "dark" : "light";
       return value;
     });
   }, []);
@@ -56,8 +56,8 @@ export function useCerevixMode() {
   return [isDark, setMode] as const;
 }
 
-export function useCerevixTheme() {
-  const [isDark, setIsDark] = useCerevixMode();
+export function useCediumTheme() {
+  const [isDark, setIsDark] = useCediumMode();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -76,13 +76,13 @@ export function useCerevixTheme() {
   return { isDark, setIsDark, scrolled, bg, fg, muted, faint, surface, raised };
 }
 
-export function CerevixNav({ isDark, setIsDark, scrolled, fg, muted, faint }: ReturnType<typeof useCerevixTheme>) {
+export function CediumNav({ isDark, setIsDark, scrolled, fg, muted, faint }: ReturnType<typeof useCediumTheme>) {
   return (
     <header style={{ position: "sticky", top: 0, zIndex: 40, width: "100%", transition: "all 0.25s", backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", WebkitBackdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", background: scrolled ? (isDark ? "rgba(18,18,20,0.84)" : "rgba(244,246,251,0.82)") : "transparent", borderBottom: `1px solid ${scrolled ? faint : "transparent"}` }}>
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", height: 64, display: "flex", alignItems: "center", gap: 32 }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <CerevixLogo size={28} radius={8} />
-          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>Cerevix</span>
+          <CediumLogo size={28} radius={8} />
+          <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>Cedium</span>
         </Link>
         <nav className="hidden md:flex" style={{ alignItems: "center", gap: 24 }}>
           {[{ l: "Platform", h: "/platform/overview" }, { l: "Bridges", h: "/platform/bridges" }, { l: "Company", h: "/about" }, { l: "Pricing", h: "/pricing" }].map((i) => (
@@ -108,7 +108,7 @@ export function CerevixNav({ isDark, setIsDark, scrolled, fg, muted, faint }: Re
   );
 }
 
-export function CerevixFooter({ isDark, fg, muted, faint }: Pick<ReturnType<typeof useCerevixTheme>, "isDark" | "fg" | "muted" | "faint">) {
+export function CediumFooter({ isDark, fg, muted, faint }: Pick<ReturnType<typeof useCediumTheme>, "isDark" | "fg" | "muted" | "faint">) {
   const cols = [
     { heading: "Platform", links: [
       { l: "Overview", h: "/platform/overview", ext: false },
@@ -180,7 +180,7 @@ export function CerevixFooter({ isDark, fg, muted, faint }: Pick<ReturnType<type
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <CerevixLogo size={18} radius={5} />
+              <CediumLogo size={18} radius={5} />
               <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>Cedium</span>
             </div>
             <span style={{ fontSize: 11.5, color: muted }}>Copyright &copy;2026</span>
@@ -198,15 +198,15 @@ export function CerevixFooter({ isDark, fg, muted, faint }: Pick<ReturnType<type
   );
 }
 
-export type CerevixTheme = ReturnType<typeof useCerevixTheme>;
+export type CediumTheme = ReturnType<typeof useCediumTheme>;
 
-export function CerevixPage({ children }: { children: ReactNode | ((t: CerevixTheme) => ReactNode) }) {
-  const theme = useCerevixTheme();
+export function CediumPage({ children }: { children: ReactNode | ((t: CediumTheme) => ReactNode) }) {
+  const theme = useCediumTheme();
   return (
     <div style={{ minHeight: "100vh", background: theme.bg, color: theme.fg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", transition: "background 0.3s,color 0.3s", overflowX: "hidden" }}>
-      <CerevixNav {...theme} />
+      <CediumNav {...theme} />
       {typeof children === "function" ? children(theme) : children}
-      <CerevixFooter {...theme} />
+      <CediumFooter {...theme} />
     </div>
   );
 }

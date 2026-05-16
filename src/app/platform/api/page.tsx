@@ -1,5 +1,5 @@
-"use client";
-import { CerevixPage, COBALT } from "@/components/cerevix-shell";
+﻿"use client";
+import { CediumPage, COBALT } from "@/components/Cedium-shell";
 
 const endpoints = [
   { m: "POST", p: "/v1/agents", d: "Create an agent with a model and tool set." },
@@ -21,7 +21,7 @@ const methodColor: Record<string, string> = {
 
 export default function APIPage() {
   return (
-    <CerevixPage>
+    <CediumPage>
       {(t) => (
         <>
           <section style={{ padding: "80px 0 40px", borderBottom: `1px solid ${t.faint}` }}>
@@ -35,7 +35,7 @@ export default function APIPage() {
               </p>
               <div style={{ marginTop: 28, display: "inline-flex", alignItems: "center", gap: 10, padding: "6px 12px", border: `1px solid ${t.faint}`, borderRadius: 8, fontFamily: "var(--font-geist-mono),monospace", fontSize: 12, color: t.fg }}>
                 <span style={{ color: COBALT, fontWeight: 700 }}>BASE</span>
-                https://api.Cerevix.ai/v1
+                https://api.Cedium.ai/v1
               </div>
             </div>
           </section>
@@ -58,6 +58,6 @@ export default function APIPage() {
           </section>
         </>
       )}
-    </CerevixPage>
+    </CediumPage>
   );
 }

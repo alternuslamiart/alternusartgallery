@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -11,7 +11,7 @@ import {
   Workflow,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CerevixFooter } from "@/components/cerevix-shell";
+import { CediumFooter } from "@/components/Cedium-shell";
 
 const navItems = [
   { label: "Platform", href: "/platform/overview" },
@@ -366,7 +366,7 @@ export default function HomePage() {
           <WorkflowSection isLight={isLight} />
           <Cta isLight={isLight} />
         </main>
-        <CerevixFooter
+        <CediumFooter
           isDark={!isLight}
           fg={isLight ? "#0F172A" : "#C1C2BF"}
           muted={isLight ? "rgba(5,8,15,0.62)" : "rgba(193,194,191,0.72)"}

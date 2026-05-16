@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -119,7 +119,7 @@ export default function ResetPasswordPage() {
         {/* Logo/Header */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-bold tracking-[0.15em] mb-2">Cerevix</h1>
+            <h1 className="text-3xl font-bold tracking-[0.15em] mb-2">Cedium</h1>
             <p className="text-sm text-muted-foreground tracking-[0.2em]">ART GALLERY</p>
           </Link>
         </div>

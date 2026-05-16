@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
-import { CerevixPage, COBALT } from "@/components/cerevix-shell";
+import { CediumPage, COBALT } from "@/components/Cedium-shell";
 
 const categories = [
   { k: "essential", t: "Essential",   d: "Keep you signed in, remember your workspace, and secure the session.", required: true,  count: 3 },
@@ -12,7 +12,7 @@ const categories = [
 export default function CookieNotice() {
   const [prefs, setPrefs] = useState<Record<string, boolean>>({ essential: true, agent: true, analytics: false, ads: false });
   return (
-    <CerevixPage>
+    <CediumPage>
       {(t) => (
         <section style={{ padding: "100px 0 120px" }}>
           <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 32px" }}>
@@ -49,6 +49,6 @@ export default function CookieNotice() {
           </div>
         </section>
       )}
-    </CerevixPage>
+    </CediumPage>
   );
 }

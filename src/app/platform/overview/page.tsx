@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 import Link from "next/link";
-import { CerevixPage, COBALT } from "@/components/cerevix-shell";
+import { CediumPage, COBALT } from "@/components/Cedium-shell";
 
 export default function PlatformOverview() {
   return (
-    <CerevixPage>
+    <CediumPage>
       {(t) => (
         <>
           <section style={{ padding: "96px 0 64px", borderBottom: `1px solid ${t.faint}` }}>
@@ -14,7 +14,7 @@ export default function PlatformOverview() {
                 One platform.<br/><span style={{ color: COBALT, fontStyle: "italic" }}>Every surface.</span>
               </h1>
               <p style={{ marginTop: 32, fontSize: 18, color: t.muted, maxWidth: 640, lineHeight: 1.55 }}>
-                Cerevix is a browser-native OS with a shared agent workflow for AutoCAD website design, coding, and Blender 3D production.
+                Cedium is a browser-native OS with a shared agent workflow for AutoCAD website design, coding, and Blender 3D production.
               </p>
             </div>
           </section>
@@ -42,6 +42,6 @@ export default function PlatformOverview() {
           </section>
         </>
       )}
-    </CerevixPage>
+    </CediumPage>
   );
 }

@@ -1,10 +1,10 @@
-"use client";
-import { CerevixPage, COBALT } from "@/components/cerevix-shell";
+﻿"use client";
+import { CediumPage, COBALT } from "@/components/Cedium-shell";
 
 const press = [
-  { by: "TechCrunch",   t: "Cerevix raises seed to build the agent-native OS",      d: "Apr 2026" },
+  { by: "TechCrunch",   t: "Cedium raises seed to build the agent-native OS",      d: "Apr 2026" },
   { by: "The Verge",    t: "I replaced my desktop with a browser tab and it worked", d: "Mar 2026" },
-  { by: "Hacker News",  t: "Show HN: Cerevix OS — an OS that runs on Claude",        d: "Feb 2026" },
+  { by: "Hacker News",  t: "Show HN: Cedium OS — an OS that runs on Claude",        d: "Feb 2026" },
   { by: "Wired",        t: "The return of the command line — but this time it talks back", d: "Jan 2026" },
 ];
 
@@ -12,7 +12,7 @@ const mentioned = ["TechCrunch", "The Verge", "Wired", "Hacker News", "Ars Techn
 
 export default function Press() {
   return (
-    <CerevixPage>
+    <CediumPage>
       {(t) => (
         <>
           <section style={{ padding: "120px 0 60px", borderBottom: `1px solid ${t.faint}` }}>
@@ -56,7 +56,7 @@ export default function Press() {
                   <div style={{ fontSize: 14, color: t.muted }}>Download logos, screenshots, and brand assets.</div>
                 </div>
                 <div style={{ display: "flex", gap: 12 }}>
-                  <a href="mailto:press@Cerevix.ai" style={{ height: 44, padding: "0 20px", background: COBALT, color: "#fff", fontSize: 13.5, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>Email press@</a>
+                  <a href="mailto:press@Cedium.ai" style={{ height: 44, padding: "0 20px", background: COBALT, color: "#fff", fontSize: 13.5, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>Email press@</a>
                   <a href="#" style={{ height: 44, padding: "0 20px", background: "transparent", color: t.fg, fontSize: 13.5, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", border: `1px solid ${t.faint}` }}>Brand kit .zip</a>
                 </div>
               </div>
@@ -64,6 +64,6 @@ export default function Press() {
           </section>
         </>
       )}
-    </CerevixPage>
+    </CediumPage>
   );
 }

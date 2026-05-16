@@ -1,6 +1,6 @@
-# Cerevix Art Gallery
+﻿# Cedium Art Gallery
 
-Cerevix Art Gallery is a Next.js 14 application for an online art marketplace. The codebase includes public storefront pages, customer accounts, artist application flows, checkout and order handling, admin tooling, image uploads, email utilities, AI chat endpoints, and a browser-based "Cerevix OS" workspace.
+Cedium Art Gallery is a Next.js 14 application for an online art marketplace. The codebase includes public storefront pages, customer accounts, artist application flows, checkout and order handling, admin tooling, image uploads, email utilities, AI chat endpoints, and a browser-based "Cedium OS" workspace.
 
 This repository also contains a separate Python desktop utility in `altrenus-business-manager/`.
 
