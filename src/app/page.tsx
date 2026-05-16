@@ -10,12 +10,9 @@ import {
   Code2,
   DraftingCompass,
   Gamepad2,
-  Globe2,
   ImageIcon,
   Layers3,
   Moon,
-  Paperclip,
-  Play,
   Send,
   ShieldCheck,
   Sparkles,
@@ -23,7 +20,6 @@ import {
   Workflow,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 const navItems = [
   { label: "Platform", href: "/platform/overview" },
@@ -63,12 +59,6 @@ const featureCards = [
     copy: "Keep workspaces readable with roles, activity, project history, and clear operational status.",
     icon: ShieldCheck,
   },
-];
-
-const metrics = [
-  { label: "Workspace uptime", value: "99.9%" },
-  { label: "AI tools", value: "12" },
-  { label: "Live tasks", value: "48" },
 ];
 
 const workflowSteps = [
@@ -200,15 +190,14 @@ function SiteHeader({ isLight }: { isLight: boolean }) {
 function ProductPreview({ isLight }: { isLight: boolean }) {
   const t = isLight
     ? {
-        shell: "border-[#DCEAF5] bg-white/90 text-[#0F172A] shadow-[0_32px_90px_rgba(14,165,233,0.14)]",
-        top: "border-[#DCEAF5] bg-[#F8FCFF]",
-        sidebar: "border-[#DCEAF5] bg-[#F7FBFF]",
+        shell: "border-[#DCEAF5] bg-white text-[#0F172A] shadow-[0_34px_100px_rgba(14,165,233,0.13)]",
+        top: "border-[#DCEAF5] bg-[#FBFDFF]",
+        sidebar: "border-[#DCEAF5] bg-[#F8FCFF]",
         surface: "border-[#DCEAF5] bg-white",
-        panel: "border-[#DCEAF5] bg-white/90",
-        softPanel: "border-[#DCEAF5] bg-[#F8FCFF]",
+        panel: "border-[#DCEAF5] bg-[#F8FCFF]",
         text: "text-[#0F172A]",
         muted: "text-[#475569]",
-        faint: "text-slate-400",
+        faint: "text-[#94A3B8]",
         chip: "bg-[#E0F2FE] text-[#0369A1]",
       }
     : {
@@ -217,7 +206,6 @@ function ProductPreview({ isLight }: { isLight: boolean }) {
         sidebar: "border-white/10 bg-[#0B1120]",
         surface: "border-white/10 bg-[#111827]",
         panel: "border-white/10 bg-[#0F172A]",
-        softPanel: "border-white/10 bg-[#0B1120]",
         text: "text-white",
         muted: "text-slate-300",
         faint: "text-slate-500",
@@ -225,7 +213,7 @@ function ProductPreview({ isLight }: { isLight: boolean }) {
       };
 
   return (
-    <div className={`relative w-full overflow-hidden rounded-[22px] border backdrop-blur ${t.shell}`}>
+    <div className={`w-full overflow-hidden rounded-[24px] border ${t.shell}`}>
       <div className={`relative flex h-14 items-center justify-between border-b px-4 sm:px-5 ${t.top}`}>
         <div className="flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]" />
@@ -236,11 +224,11 @@ function ProductPreview({ isLight }: { isLight: boolean }) {
         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${t.chip}`}>Live workspace</span>
       </div>
 
-      <div className="relative grid min-h-[510px] grid-cols-1 lg:grid-cols-[210px_1fr]">
+      <div className="grid min-h-[500px] grid-cols-1 lg:grid-cols-[190px_1fr]">
         <aside className={`hidden border-r p-5 lg:block ${t.sidebar}`}>
           <Brand compact isLight={isLight} />
-          <nav className="mt-8 space-y-1.5" aria-label="Product preview navigation">
-            {sidebarItems.map(({ label, icon: Icon, active }) => (
+          <nav className="mt-9 space-y-2" aria-label="Product preview navigation">
+            {sidebarItems.slice(0, 4).map(({ label, icon: Icon, active }) => (
               <div
                 key={label}
                 className={`flex h-10 items-center gap-3 rounded-[10px] px-3 text-sm transition-colors ${
@@ -252,84 +240,75 @@ function ProductPreview({ isLight }: { isLight: boolean }) {
               </div>
             ))}
           </nav>
+          <div className={`mt-10 rounded-[14px] border p-4 ${t.surface}`}>
+            <p className={`text-xs font-semibold uppercase ${t.faint}`}>Workspace</p>
+            <p className={`mt-3 text-2xl font-semibold ${t.text}`}>99.9%</p>
+            <p className={`mt-1 text-xs ${t.muted}`}>ready state</p>
+          </div>
         </aside>
 
-        <section className="p-4 sm:p-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            {metrics.map((metric) => (
-              <div key={metric.label} className={`rounded-[16px] border p-4 ${t.panel}`}>
-                <p className={`text-xs font-medium ${t.muted}`}>{metric.label}</p>
-                <p className={`mt-3 text-3xl font-semibold ${t.text}`}>{metric.value}</p>
-              </div>
-            ))}
+        <section className="p-5 sm:p-7">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+            <div>
+              <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${t.chip}`}>Production brief</span>
+              <h2 className={`mt-5 max-w-lg text-3xl font-semibold leading-tight sm:text-4xl ${t.text}`}>
+                Shape the whole workflow before work begins.
+              </h2>
+            </div>
+            <div className={`rounded-[14px] border px-4 py-3 text-right ${t.surface}`}>
+              <p className={`text-xs ${t.faint}`}>Active tools</p>
+              <p className={`mt-1 text-2xl font-semibold ${t.text}`}>12</p>
+            </div>
           </div>
 
-          <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-            <div className={`rounded-[18px] border p-5 sm:p-6 ${t.softPanel}`}>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${t.chip}`}>AI command</span>
-                <span className={`text-xs ${t.muted}`}>Workspace context connected</span>
-              </div>
-              <h2 className={`mt-7 max-w-lg text-3xl font-semibold leading-tight sm:text-4xl ${t.text}`}>
-                Plan, generate, and refine every build from one calm workspace.
-              </h2>
-              <p className={`mt-4 max-w-xl text-sm leading-6 ${t.muted}`}>
-                Requirements, generated assets, implementation notes, and review state stay visible while Cedium works through the project.
-              </p>
-
-              <div className="mt-8 grid gap-3">
-                {["Product brief parsed", "Design system generated", "Preview ready for review"].map((item, index) => (
-                  <div key={item} className={`flex items-center gap-3 rounded-[12px] border px-3 py-2.5 ${t.surface}`}>
-                    <span className="flex h-7 w-7 items-center justify-center rounded-[9px] bg-[#E0F2FE] text-xs font-semibold text-[#0284C7]">
-                      {index + 1}
-                    </span>
-                    <span className={`text-sm font-medium ${t.text}`}>{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className={`mt-5 overflow-hidden rounded-[16px] border ${t.surface}`}>
-                <Input
-                  readOnly
-                  aria-label="Ask Cedium"
-                  value=""
-                  placeholder="Ask Cedium to create a clean landing page..."
-                  className={`h-12 border-0 bg-transparent px-4 text-sm shadow-none focus-visible:ring-0 ${
-                    isLight ? "text-[#0F172A] placeholder:text-slate-400" : "text-white placeholder:text-slate-500"
-                  }`}
-                />
-                <div className="flex items-center justify-between border-t border-[#DCEAF5] px-4 py-3 dark:border-white/10">
-                  <div className={`flex items-center gap-3 ${t.muted}`}>
-                    <Paperclip className="h-4 w-4" />
-                    <Globe2 className="h-4 w-4" />
-                    <ImageIcon className="h-4 w-4" />
-                    <Play className="h-4 w-4" />
-                  </div>
-                  <Button size="icon" className="h-9 w-9 rounded-[10px] bg-[#38BDF8] text-white shadow-[0_12px_28px_rgba(56,189,248,0.26)] hover:bg-[#0EA5E9]">
+          <div className="mt-7 grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
+            <div className={`rounded-[20px] border p-5 sm:p-6 ${t.panel}`}>
+              <div className={`rounded-[16px] border bg-white p-4 shadow-[0_12px_34px_rgba(15,23,42,0.04)] dark:bg-[#111827] ${isLight ? "border-[#DCEAF5]" : "border-white/10"}`}>
+                <p className={`text-xs font-semibold uppercase ${t.faint}`}>Prompt</p>
+                <div className="mt-3 flex items-center justify-between gap-4">
+                  <p className={`text-sm leading-6 ${t.muted}`}>Create a polished SaaS homepage, product flow, and launch checklist.</p>
+                  <Button size="icon" className="h-10 w-10 shrink-0 rounded-[12px] bg-[#38BDF8] text-white shadow-[0_12px_26px_rgba(56,189,248,0.25)] hover:bg-[#0EA5E9]">
                     <Send className="h-4 w-4" />
                     <span className="sr-only">Send</span>
                   </Button>
                 </div>
               </div>
+
+              <div className="mt-6 space-y-3">
+                {["Strategy mapped", "Interface direction set", "Implementation path ready"].map((item) => (
+                  <div key={item} className={`flex items-center justify-between rounded-[14px] border bg-white px-4 py-3 dark:bg-[#111827] ${isLight ? "border-[#DCEAF5]" : "border-white/10"}`}>
+                    <div className="flex items-center gap-3">
+                      <span className="h-2.5 w-2.5 rounded-full bg-[#38BDF8]" />
+                      <span className={`text-sm font-medium ${t.text}`}>{item}</span>
+                    </div>
+                    <span className={`text-xs ${t.faint}`}>Done</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="grid gap-4">
-              {featureCards.slice(0, 2).map(({ title, copy, icon: Icon }) => (
-                <div key={title} className={`rounded-[16px] border p-5 ${t.panel}`}>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[#E0F2FE] text-[#0284C7]">
-                    <Icon className="h-5 w-5" />
+            <div className={`rounded-[20px] border p-5 ${t.surface}`}>
+              <p className={`text-xs font-semibold uppercase ${t.faint}`}>Launch quality</p>
+              <div className="mt-6">
+                <div className="flex items-end justify-between">
+                  <p className={`text-4xl font-semibold ${t.text}`}>86%</p>
+                  <p className={`text-xs ${t.muted}`}>ready</p>
+                </div>
+                <div className="mt-5 h-2 overflow-hidden rounded-full bg-[#E0F2FE] dark:bg-white/10">
+                  <div className="h-full w-[86%] rounded-full bg-[#38BDF8]" />
+                </div>
+              </div>
+
+              <div className="mt-8 space-y-5">
+                {[
+                  ["Visual system", "Clean sky-blue direction"],
+                  ["Next step", "Product preview polish"],
+                ].map(([label, value]) => (
+                  <div key={label}>
+                    <p className={`text-xs ${t.faint}`}>{label}</p>
+                    <p className={`mt-1 text-sm font-medium leading-6 ${t.text}`}>{value}</p>
                   </div>
-                  <h3 className={`mt-6 text-base font-semibold ${t.text}`}>{title}</h3>
-                  <p className={`mt-3 text-sm leading-6 ${t.muted}`}>{copy}</p>
-                </div>
-              ))}
-              <div className={`rounded-[16px] border p-5 ${t.softPanel}`}>
-                <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${t.faint}`}>Current task</p>
-                <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
-                  <div className="h-full w-4/5 rounded-full bg-[#38BDF8]" />
-                </div>
-                <p className={`mt-4 text-sm font-medium ${t.text}`}>Landing page polish is 80% complete</p>
-                <p className={`mt-2 text-xs leading-5 ${t.muted}`}>Copy, layout, preview, and implementation notes are synced.</p>
+                ))}
               </div>
             </div>
           </div>
