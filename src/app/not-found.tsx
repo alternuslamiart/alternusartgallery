@@ -10,7 +10,7 @@ export default function NotFound() {
         </div>
         <h1 className="text-2xl font-semibold tracking-[-0.02em]">Workspace not found</h1>
         <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#6B7280]">
-          This route is no longer part of the Cerevix AI platform surface.
+          This route is no longer part of the Cedium platform surface.
         </p>
         <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button asChild>

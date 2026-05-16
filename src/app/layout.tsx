@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Roboto, Roboto_Flex } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/components/providers";
@@ -18,27 +17,26 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["400", "500", "700", "900"],
+const roboto = localFont({
+  src: "./fonts/GeistVF.woff",
   variable: "--font-roboto",
 });
 
-const robotoFlex = Roboto_Flex({
-  subsets: ["latin"],
+const robotoFlex = localFont({
+  src: "./fonts/GeistVF.woff",
   variable: "--font-roboto-flex",
   display: "swap",
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.alternusart.com"),
-  applicationName: "Cerevix AI",
+  applicationName: "Cedium",
   title: {
-    default: "Cerevix AI | Creative AI Workspace",
-    template: "%s | Cerevix AI",
+    default: "Cedium | AI Production Workspace",
+    template: "%s | Cedium",
   },
   description:
-    "Cerevix AI is a creative AI workspace for AutoCAD website design, coding agents, and Blender 3D production workflows.",
+    "Cedium is a clean AI production workspace for design, code, 3D, CAD, and automation workflows.",
   keywords: [
     "AI studio",
     "creative AI",
@@ -48,43 +46,42 @@ export const metadata: Metadata = {
     "Blender 3D AI",
     "code agent",
     "AI workspace",
-    "Cerevix AI",
+    "Cedium",
     "creative operating system",
   ],
-  authors: [{ name: "Cerevix AI" }],
-  creator: "Cerevix AI",
-  publisher: "Cerevix AI",
+  authors: [{ name: "Cedium" }],
+  creator: "Cedium",
+  publisher: "Cedium",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
-      { url: "/cerevix-ai-favicon.png", sizes: "512x512", type: "image/png" },
-      { url: "/cerevix-ai-favicon.svg", type: "image/svg+xml" },
+      { url: "/logo.png", sizes: "512x512", type: "image/png" },
     ],
     shortcut: "/favicon.ico",
-    apple: "/cerevix-ai-favicon.png",
+    apple: "/logo.png",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://www.alternusart.com",
-    siteName: "Cerevix AI",
-    title: "Cerevix AI | Creative AI Workspace",
+    siteName: "Cedium",
+    title: "Cedium | AI Production Workspace",
     description:
-      "Creative AI workspace for AutoCAD website design, coding agents, and Blender 3D production.",
+      "Clean AI production workspace for design, code, 3D, CAD, and automation workflows.",
     images: [
       {
         url: "/logo.png",
         width: 512,
         height: 512,
-        alt: "Cerevix AI",
+        alt: "Cedium",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cerevix AI | Creative AI Workspace",
+    title: "Cedium | AI Production Workspace",
     description:
-      "Creative AI workspace for AutoCAD website design and Blender 3D. Cerevix turns prompts into real production work.",
+      "Clean AI production workspace for design, code, 3D, CAD, and automation workflows.",
     images: ["/logo.png"],
   },
   robots: {
@@ -114,10 +111,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <style
-        id="cerevix-dark-flat"
+        id="cedium-dark-flat"
         dangerouslySetInnerHTML={{
           __html: `
-            html[data-cerevix-theme="dark"],
+            html[data-cedium-theme="dark"],
             .dark {
               --background: 0 0% 11%;
               --foreground: 80 2% 75%;
@@ -137,9 +134,9 @@ export default function RootLayout({
               --input: 0 0% 20%;
               --ring: 218 100% 63%;
             }
-            html[data-cerevix-theme="dark"] *,
-            html[data-cerevix-theme="dark"] *::before,
-            html[data-cerevix-theme="dark"] *::after,
+            html[data-cedium-theme="dark"] *,
+            html[data-cedium-theme="dark"] *::before,
+            html[data-cedium-theme="dark"] *::after,
             .dark *,
             .dark *::before,
             .dark *::after {
@@ -178,8 +175,8 @@ export default function RootLayout({
             "@context": "https://schema.org",
             "@type": "Organization",
             "@id": "https://www.alternusart.com/#organization",
-            "name": "Cerevix AI",
-            "alternateName": "Cerevix",
+            "name": "Cedium",
+            "alternateName": "Cedium AI",
             "url": "https://www.alternusart.com",
             "logo": {
               "@type": "ImageObject",
@@ -188,7 +185,7 @@ export default function RootLayout({
               "height": 512
             },
             "image": "https://www.alternusart.com/logo.png",
-            "description": "Creative AI workspace for AutoCAD website design, coding agents, and Blender 3D production workflows.",
+            "description": "Clean AI production workspace for design, code, 3D, CAD, and automation workflows.",
             "email": "contact@alternusart.com",
             "foundingDate": "2024",
             "sameAs": [
@@ -215,8 +212,8 @@ export default function RootLayout({
             "@type": "WebSite",
             "@id": "https://www.alternusart.com/#website",
             "url": "https://www.alternusart.com",
-            "name": "Cerevix AI",
-            "description": "Creative AI workspace for AutoCAD website design, coding agents, and Blender 3D production workflows",
+            "name": "Cedium",
+            "description": "Clean AI production workspace for design, code, 3D, CAD, and automation workflows",
             "publisher": {
               "@id": "https://www.alternusart.com/#organization"
             },
