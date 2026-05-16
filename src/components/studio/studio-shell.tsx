@@ -12,6 +12,7 @@ import {
  CheckCircle2,
  ChevronDown,
  ChevronLeft,
+ ChevronRight,
  CircleSlash,
  Code2,
  CornerDownLeft,
@@ -3692,7 +3693,14 @@ function AIAssistantPage() {
  const [assistantMode, setAssistantMode] = useState<"agent"|"workflow">("agent");
  const [selectedModel, setSelectedModel] = useState("Codex Plus 5.5");
  const [modelMenuOpen, setModelMenuOpen] = useState(false);
+ const [attachMenuOpen, setAttachMenuOpen] = useState(false);
  const conversationEndRef = useRef<HTMLDivElement>(null);
+
+ useEffect(() => {
+ function onDown() { setModelMenuOpen(false); setAttachMenuOpen(false); }
+ document.addEventListener("mousedown", onDown);
+ return () => document.removeEventListener("mousedown", onDown);
+ }, []);
  const fileInputRef = useRef<HTMLInputElement>(null);
  const imageInputRef = useRef<HTMLInputElement>(null);
  const documentInputRef = useRef<HTMLInputElement>(null);
@@ -4031,9 +4039,32 @@ function AIAssistantPage() {
  ) : (
  /* Compact bar when no attachment */
  <div className={`flex min-h-[58px] w-full items-center gap-2 rounded-[24px] border px-2.5 py-2 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#D9D9D9] bg-white"}`}>
- <button type="button" onClick={() => fileInputRef.current?.click()} className={`flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E7E7E7]"}`} aria-label="Attach file" title="Attach file">
+ <div className="relative flex-shrink-0">
+ <button type="button" onMouseDown={(e) => e.stopPropagation()} onClick={() => setAttachMenuOpen((o) => !o)} className={`flex h-[40px] w-[40px] items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E7E7E7]"}`} aria-label="Attach file" title="Attach file">
  <Plus className="h-5 w-5" strokeWidth={1.8} />
  </button>
+ {attachMenuOpen && (
+ <div className={`absolute bottom-[calc(100%+10px)] left-0 z-50 w-[240px] overflow-hidden rounded-2xl border py-1 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328] shadow-[0_16px_40px_rgba(0,0,0,0.36)]" : "border-[#E5E7EB] bg-white shadow-[0_16px_40px_rgba(0,0,0,0.12)]"}`}>
+ <button type="button" onClick={() => { fileInputRef.current?.click(); setAttachMenuOpen(false); }} className={`flex w-full items-center gap-3 px-4 py-3 text-left text-[13px] font-semibold ${dark ? "bg-[rgba(255,255,255,0.05)] text-[#F4F6F8]" : "bg-[#F3F4F6] text-[#111827]"}`}>
+ <Paperclip className="h-4 w-4 flex-shrink-0" strokeWidth={2} />
+ Add photo &amp; files
+ </button>
+ <div className={`my-1 h-px ${dark ? "bg-[rgba(255,255,255,0.06)]" : "bg-[#F0F0F0]"}`} />
+ {[
+ { label: "Recent files", arrow: true },
+ { label: "Create image", arrow: false },
+ { label: "Deep research", arrow: false },
+ { label: "Connections & sources", arrow: true },
+ { label: "More...", arrow: false },
+ ].map(({ label, arrow }) => (
+ <button key={label} type="button" onClick={() => setAttachMenuOpen(false)} className={`flex w-full items-center justify-between px-4 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.05)]" : "text-[#374151] hover:bg-[#F9FAFB]"}`}>
+ <span>{label}</span>
+ {arrow && <ChevronRight className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} strokeWidth={2} />}
+ </button>
+ ))}
+ </div>
+ )}
+ </div>
  <textarea
  value={input}
  onChange={(event) => setInput(event.target.value)}
@@ -4072,6 +4103,7 @@ function AIAssistantPage() {
  )}
  <button
  type="button"
+ onMouseDown={(e) => e.stopPropagation()}
  onClick={() => setModelMenuOpen((o) => !o)}
  className={`inline-flex h-9 items-center gap-2 rounded-xl border px-3.5 text-[12px] font-semibold transition-colors ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#DDE3EA] hover:border-[rgba(59,167,255,0.28)]" : "border-[#D8D8D8] bg-white text-[#A1A1A1] hover:border-[#CACACA]"}`}
  >
