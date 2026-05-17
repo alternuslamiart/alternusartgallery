@@ -518,7 +518,7 @@ export default function Pricing() {
  alignItems: "center",
  justifyContent: "space-between",
  gap: 18,
- padding: "28px clamp(112px, 14vw, 168px) 28px 28px",
+ padding: "24px 84px 24px 28px",
  borderBottom: `1px solid ${t.faint}`,
  }}
  >
@@ -536,27 +536,28 @@ export default function Pricing() {
  aria-label="Close payment frame"
  style={{
  position: "absolute",
- top: 28,
- right: 28,
- height: "clamp(68px, 8vw, 112px)",
- width: "clamp(68px, 8vw, 112px)",
- borderRadius: "clamp(24px, 3.5vw, 44px)",
- border: "1px solid rgba(15,23,42,0.04)",
- background: t.isDark ? "rgba(255,255,255,0.08)" : "#EEEEEE",
+ top: 20,
+ right: 20,
+ height: 44,
+ width: 44,
+ borderRadius: 14,
+ border: `1px solid ${t.faint}`,
+ background: t.isDark ? "rgba(255,255,255,0.08)" : "#F8FAFC",
  color: t.fg,
  cursor: "pointer",
- boxShadow: t.isDark ? "inset 0 1px 0 rgba(255,255,255,0.08)" : "inset 0 1px 0 rgba(255,255,255,0.7)",
+ boxShadow: t.isDark ? "inset 0 1px 0 rgba(255,255,255,0.08)" : "0 8px 18px rgba(15,23,42,0.06)",
  display: "flex",
  alignItems: "center",
  justifyContent: "center",
+ transition: "background 0.18s ease, transform 0.18s ease",
  }}
  >
  <span
  aria-hidden="true"
  style={{
  position: "absolute",
- width: "46%",
- height: 6,
+ width: "42%",
+ height: 2,
  borderRadius: 999,
  background: t.fg,
  transform: "rotate(45deg)",
@@ -566,8 +567,8 @@ export default function Pricing() {
  aria-hidden="true"
  style={{
  position: "absolute",
- width: "46%",
- height: 6,
+ width: "42%",
+ height: 2,
  borderRadius: 999,
  background: t.fg,
  transform: "rotate(-45deg)",
