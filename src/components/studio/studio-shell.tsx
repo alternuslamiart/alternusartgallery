@@ -3456,6 +3456,193 @@ function StarterPanel({
  );
 }
 
+function StarterPlaygroundView({
+ card,
+ dark,
+ onBack,
+ onRun,
+}: {
+ card: StarterCard;
+ dark: boolean;
+ onBack: () => void;
+ onRun: () => void;
+}) {
+ const Icon = card.icon;
+ const panels = [
+ {
+ label:"Base task",
+ model:"Claude 4.5 Sonnet",
+ accent: dark ?"bg-[#7DD3FC]":"bg-[#94A3B8]",
+ output:"Summary",
+ score:"< $0.001",
+ latency:"1.1s",
+ },
+ {
+ label:"Comparison task",
+ model:"GPT-5",
+ accent:"bg-[#8B5CF6]",
+ output:"Structured plan",
+ score:"$0.001",
+ latency:"1.8s",
+ },
+ {
+ label:"Comparison task",
+ model:"Gemini 2.5 Pro",
+ accent:"bg-[#4F7BFF]",
+ output:"Launch checklist",
+ score:"$0.001",
+ latency:"1.8s",
+ },
+ ];
+ const taskPrompt = `You are a Cedium production analyst. Your task is to review the request and provide a concise plan for: ${card.title}.`;
+ const textClass = dark ?"text-[#F4F6F8]":"text-[#111827]";
+ const mutedClass = dark ?"text-[#A8B0BA]":"text-[#667085]";
+ const panelClass = dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5EAF0] bg-white";
+ const softClass = dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20]":"border-[#EDF1F5] bg-[#F8FAFC]";
+
+ return (
+ <div className={`flex min-h-full w-full justify-center px-4 py-5 ${dark ?"bg-transparent":"bg-[#F6F8FB]"}`}>
+ <div className="w-full max-w-[1180px]">
+ <div className={`mb-3 flex flex-wrap items-center justify-between gap-3 text-[12px] ${mutedClass}`}>
+ <div className="flex items-center gap-2">
+ <button
+ type="button"
+ onClick={onBack}
+ className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 font-semibold transition-colors ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] hover:bg-[#202328]":"border-[#DDE5EE] bg-white text-[#344054] hover:bg-[#F8FAFC]"}`}
+ >
+ <ChevronLeft className="h-3.5 w-3.5"/>
+ Back
+ </button>
+ <span>Acme</span>
+ <ChevronRight className="h-3 w-3"/>
+ <span>AI Studio</span>
+ <ChevronRight className="h-3 w-3"/>
+ <span className={textClass}>Playgrounds</span>
+ </div>
+ <div className="flex items-center gap-2">
+ <span>Diff</span>
+ <span className={`h-4 w-8 rounded-full ${dark ?"bg-[#2B3037]":"bg-[#E5E7EB]"}`}>
+ <span className="block h-4 w-4 rounded-full bg-white shadow-sm"/>
+ </span>
+ <button type="button" className={`inline-flex h-8 items-center gap-1.5 rounded-xl px-3 font-semibold transition-colors ${dark ?"hover:bg-[#202328]":"hover:bg-white"}`}>
+ <Plus className="h-3.5 w-3.5"/>
+ Experiments
+ </button>
+ <button
+ type="button"
+ onClick={onRun}
+ className="inline-flex h-8 items-center gap-1.5 rounded-xl bg-[#1D9BF0] px-3 font-semibold text-white transition-colors hover:bg-[#1A8CD8]"
+ >
+ <Play className="h-3.5 w-3.5 fill-current"/>
+ Run
+ </button>
+ </div>
+ </div>
+
+ <div className={`overflow-hidden rounded-[18px] border shadow-[0_18px_60px_rgba(31,43,77,0.08)] ${panelClass}`}>
+ <div className={`flex items-center justify-between border-b px-4 py-3 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E5EAF0]"}`}>
+ <div className="flex items-center gap-3">
+ <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ?"bg-[rgba(59,167,255,0.18)] text-[#7DD3FC]":"bg-[#E8F4FB] text-[#1D9BF0]"}`}>
+ <Icon className="h-[18px] w-[18px]"/>
+ </span>
+ <div>
+ <h2 className={`text-[15px] font-semibold ${textClass}`}>{card.shortTitle ?? card.title} Playground</h2>
+ <p className={`text-[11px] ${mutedClass}`}>Compare prompt behavior before launching in chat.</p>
+ </div>
+ </div>
+ <button type="button" className={`hidden h-8 rounded-xl border px-3 text-[12px] font-semibold sm:inline-flex sm:items-center ${dark ?"border-[rgba(255,255,255,0.08)] text-[#A8B0BA] hover:text-[#F4F6F8]":"border-[#DDE5EE] text-[#344054] hover:bg-[#F8FAFC]"}`}>
+ Save version
+ </button>
+ </div>
+
+ <div className="grid gap-1 p-2 lg:grid-cols-3">
+ {panels.map((panel) => (
+ <article key={panel.model} className={`rounded-[14px] border ${softClass}`}>
+ <div className={`flex items-center justify-between border-b px-3 py-2.5 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E5EAF0]"}`}>
+ <div className="flex items-center gap-2">
+ <span className={`h-2.5 w-2.5 rounded-full ${panel.accent}`}/>
+ <span className={`text-[11px] font-semibold ${panel.label ==="Base task" ? mutedClass :"text-[#7C3AED]"}`}>{panel.label}</span>
+ </div>
+ <button type="button" aria-label={`Options for ${panel.model}`} className={`rounded-lg p-1 ${dark ?"text-[#A8B0BA] hover:bg-[#202328]":"text-[#98A2B3] hover:bg-white"}`}>
+ <MoreHorizontal className="h-4 w-4"/>
+ </button>
+ </div>
+ <div className="flex items-center justify-between border-b border-inherit px-3 py-2">
+ <div className={`flex items-center gap-2 text-[12px] font-semibold ${textClass}`}>
+ <Icon className="h-3.5 w-3.5 text-[#1D9BF0]"/>
+ {panel.model}
+ </div>
+ <div className={`flex items-center gap-2 text-[11px] ${mutedClass}`}>
+ Params
+ <ChevronDown className="h-3.5 w-3.5"/>
+ </div>
+ </div>
+ <div className="min-h-[166px] px-4 py-3">
+ <div className={`mb-2 flex items-center gap-1 text-[11px] font-medium ${mutedClass}`}>
+ System
+ <ChevronDown className="h-3 w-3"/>
+ </div>
+ <p className={`text-[12px] leading-5 ${dark ?"text-[#D8DEE6]":"text-[#344054]"}`}>{taskPrompt}</p>
+ <div className={`mt-3 rounded-xl border px-3 py-2 text-[11px] leading-5 ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#111317] text-[#A8B0BA]":"border-[#E5EAF0] bg-white text-[#667085]"}`}>
+ For each result include a short summary, intent classification, and one practical next step.
+ </div>
+ </div>
+ <div className={`flex items-center justify-between border-t px-3 py-2 text-[11px] ${dark ?"border-[rgba(255,255,255,0.08)] text-[#A8B0BA]":"border-[#E5EAF0] text-[#667085]"}`}>
+ <span>Save prompt</span>
+ <span>Draft</span>
+ </div>
+ </article>
+ ))}
+ </div>
+
+ <div className={`flex flex-wrap items-center justify-between gap-3 border-y px-3 py-2 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E5EAF0]"}`}>
+ <div className="flex flex-wrap gap-2">
+ {["All rows","Filter","Fields","Grid","Group","Height"].map((item) => (
+ <button key={item} type="button" className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]":"border-[#DDE5EE] bg-white text-[#344054]"}`}>
+ {item}
+ </button>
+ ))}
+ </div>
+ <button type="button" className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]":"border-[#DDE5EE] bg-white text-[#344054]"}`}>
+ <Plus className="h-3.5 w-3.5"/>
+ Row
+ </button>
+ </div>
+
+ <div className="overflow-x-auto">
+ <div className="min-w-[900px]">
+ <div className={`grid grid-cols-[46px_1.35fr_repeat(3,1fr)] border-b text-[11px] font-semibold ${dark ?"border-[rgba(255,255,255,0.08)] text-[#A8B0BA]":"border-[#E5EAF0] text-[#667085]"}`}>
+ {["","Input","CustomerSupport","Claude 4.5 Sonnet","GPT-5","Gemini 2.5 Pro"].map((item) => (
+ <div key={item ||"index"} className="px-3 py-2">{item}</div>
+ ))}
+ </div>
+ <div className={`grid grid-cols-[46px_1.35fr_repeat(3,1fr)] text-[12px] ${dark ?"text-[#D8DEE6]":"text-[#344054]"}`}>
+ <div className="px-3 py-4">1</div>
+ <div className="px-3 py-4">My subscription was charged twice this month. Can you help me get a refund?</div>
+ <div className="px-3 py-4">
+ <span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${dark ?"bg-[#202328] text-[#A8B0BA]":"bg-[#EEF2F7] text-[#475467]"}`}>Output</span>
+ <p className={`mt-3 text-lg font-semibold ${textClass}`}>Summary</p>
+ </div>
+ {panels.map((panel) => (
+ <div key={panel.output} className="px-3 py-4">
+ <div className={`flex items-center gap-3 text-[10px] ${mutedClass}`}>
+ <span>Just now</span>
+ <span>{panel.latency}</span>
+ <span>{panel.score}</span>
+ </div>
+ <p className={`mt-3 text-lg font-semibold ${textClass}`}>{panel.output}</p>
+ <p className={`mt-2 text-[11px] leading-5 ${mutedClass}`}>Clear intent, practical next step, and ready-to-use structure.</p>
+ </div>
+ ))}
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ );
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function CardDetailView({
  card,
@@ -3703,6 +3890,7 @@ function AIAssistantPage() {
  const [aiChatCount, setAiChatCount] = useState<number>(0);
  const [planNoticeDismissed, setPlanNoticeDismissed] = useState<boolean>(false);
  const [assistantMode, setAssistantMode] = useState<"agent"|"workflow">("agent");
+ const [activePlaygroundCard, setActivePlaygroundCard] = useState<StarterCard | null>(null);
  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
  const conversationEndRef = useRef<HTMLDivElement>(null);
 
@@ -4167,6 +4355,17 @@ function AIAssistantPage() {
  ) : null;
 
  if (!hasConversation) {
+ if (activePlaygroundCard) {
+ return (
+ <StarterPlaygroundView
+ card={activePlaygroundCard}
+ dark={dark}
+ onBack={() => setActivePlaygroundCard(null)}
+ onRun={() => void sendPrompt(activePlaygroundCard.prompt)}
+ />
+ );
+ }
+
  return (
  <div className={`flex min-h-full items-start justify-center px-0 pb-2 pt-[138px] max-xl:pt-[108px] max-sm:pt-8 ${dark ?"bg-transparent":"bg-white"}`}>
  <div className="flex w-full max-w-[700px] flex-col">
@@ -4189,7 +4388,7 @@ function AIAssistantPage() {
  <StarterPanel
  mode={assistantMode}
  dark={dark}
- onOpen={(card) => setInput(card.prompt)}
+ onOpen={(card) => setActivePlaygroundCard(card)}
  />
  </div>
 
