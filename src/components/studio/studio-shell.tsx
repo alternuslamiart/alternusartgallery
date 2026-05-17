@@ -3355,6 +3355,8 @@ function ModeToggle({
 type StarterCard = {
  title: string;
  description: string;
+ shortTitle?: string;
+ shortDescription?: string;
  icon: LucideIcon;
  prompt: string;
 };
@@ -3363,18 +3365,24 @@ const agentStarters: StarterCard[] = [
  {
  title:"Create workflow",
  description:"Powerful automations speed up your processes with ease and security in mind.",
+ shortTitle:"Workflow",
+ shortDescription:"Automate tasks securely.",
  icon: Workflow,
  prompt:"Help me create a workflow that",
  },
  {
  title:"Create autonomous agent",
  description:"Intelligent agent that can handle basic requests and approvals.",
+ shortTitle:"Autonomous agent",
+ shortDescription:"Handle requests and approvals.",
  icon: Bot,
  prompt:"Build an autonomous agent that",
  },
  {
  title:"Computer-using agent",
  description:"Let agents accomplish even more across apps and websites.",
+ shortTitle:"Computer agent",
+ shortDescription:"Use apps and websites.",
  icon: Monitor,
  prompt:"Set up a computer-using agent that",
  },
@@ -3427,17 +3435,17 @@ function StarterPanel({
  key={card.title}
  type="button"
  onClick={() => onOpen(card)}
- className={`group flex min-h-[88px] items-start gap-3 rounded-[14px] border p-2.5 text-left transition-all duration-200 ${cardBase}`}
+ className={`group flex min-h-[72px] items-start gap-2.5 rounded-[12px] border p-2 text-left transition-all duration-200 ${cardBase}`}
  >
- <span className={`flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-[8px] transition-colors ${dark ?"bg-[rgba(59,167,255,0.18)] text-[#7DD3FC] group-hover:bg-[#1D9BF0] group-hover:text-white":"bg-[#E8F4FB] text-[#1D9BF0] group-hover:bg-[#1D9BF0] group-hover:text-white"}`}>
- <Icon className="h-5 w-5"/>
+ <span className={`flex h-[44px] w-[44px] flex-shrink-0 items-center justify-center rounded-[7px] transition-colors ${dark ?"bg-[rgba(59,167,255,0.18)] text-[#7DD3FC] group-hover:bg-[#1D9BF0] group-hover:text-white":"bg-[#E8F4FB] text-[#1D9BF0] group-hover:bg-[#1D9BF0] group-hover:text-white"}`}>
+ <Icon className="h-[18px] w-[18px]"/>
  </span>
  <span className="min-w-0 flex-1">
- <span className={`block truncate text-[14px] font-semibold leading-[1.12] tracking-[-0.02em] ${dark ?"text-[#F4F6F8]":"text-[#171717]"}`}>
- {card.title}
+ <span className={`block truncate text-[13px] font-semibold leading-[1.12] ${dark ?"text-[#F4F6F8]":"text-[#171717]"}`}>
+ {card.shortTitle ?? card.title}
  </span>
- <span className={`mt-1.5 block text-[10.5px] leading-3.5 ${dark ?"text-[#A8B0BA]":"text-[#30343A]"}`}>
- {card.description}
+ <span className={`mt-1 block text-[10px] leading-3 ${dark ?"text-[#A8B0BA]":"text-[#30343A]"}`}>
+ {card.shortDescription ?? card.description}
  </span>
  </span>
  </button>
@@ -3695,13 +3703,11 @@ function AIAssistantPage() {
  const [aiChatCount, setAiChatCount] = useState<number>(0);
  const [planNoticeDismissed, setPlanNoticeDismissed] = useState<boolean>(false);
  const [assistantMode, setAssistantMode] = useState<"agent"|"workflow">("agent");
- const [selectedModel, setSelectedModel] = useState("Codex Plus 5.5");
- const [modelMenuOpen, setModelMenuOpen] = useState(false);
  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
  const conversationEndRef = useRef<HTMLDivElement>(null);
 
  useEffect(() => {
- function onDown() { setModelMenuOpen(false); setAttachMenuOpen(false); }
+ function onDown() { setAttachMenuOpen(false); }
  document.addEventListener("mousedown", onDown);
  return () => document.removeEventListener("mousedown", onDown);
  }, []);
