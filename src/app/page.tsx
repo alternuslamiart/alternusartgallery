@@ -8,6 +8,7 @@ import {
  Layers3,
  ShieldCheck,
  Sparkles,
+ UsersRound,
  Workflow,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -249,6 +250,20 @@ function Hero({ isLight }: { isLight: boolean }) {
  }`}
  >
  <Link href="/pricing">View pricing</Link>
+ </Button>
+ <Button
+ asChild
+ variant="outline"
+ className={`h-11 rounded-[10px] px-5 text-sm font-semibold shadow-none ${
+ isLight
+ ? "border-[#DCEAF5] bg-white/80 text-[#0F172A] hover:bg-[#F0F9FF]"
+ : "border-white/10 bg-white/5 text-white hover:bg-white/10"
+ }`}
+ >
+ <Link href="/community">
+ <UsersRound className="h-4 w-4" />
+ AI Community
+ </Link>
  </Button>
  </div>
  </div>
