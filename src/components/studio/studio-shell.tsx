@@ -202,6 +202,8 @@ type StudioModalKey =
  |"prompt-editor"
  |"project-create"
  |"asset-upload"
+ |"voice-dictation"
+ |"voice-speak"
  |"support";
 type StudioDrawerKey ="profile"|"notifications"|"asset-preview"|"project-detail"|"help-preview";
 
@@ -989,6 +991,8 @@ function StudioModal({ modal, onClose }: { modal: StudioModalKey; onClose: () =>
  {modal ==="upload-file"&& <UploadFrame kind="file"/>}
  {modal ==="upload-image"&& <UploadFrame kind="image"/>}
  {modal ==="upload-document"&& <UploadFrame kind="document"/>}
+ {modal ==="voice-dictation"&& <VoiceFrame mode="dictation"/>}
+ {modal ==="voice-speak"&& <VoiceFrame mode="speak"/>}
  {modal ==="support"&& <SimpleForm placeholder="How can support help?"extra="Send a short support request. The team will follow up in your workspace."/>}
 
  <div className="mt-6 flex justify-end gap-2">
@@ -1131,6 +1135,8 @@ function getModalContent(modal: StudioModalKey) {
 "prompt-editor": { title:"Create prompt", description:"Save a reusable prompt template for future workflows.", action:"Save prompt", success:"Prompt saved"},
 "project-create": { title:"Create project", description:"Create a project container for generated outputs and assets.", action:"Create project", success:"Project created"},
 "asset-upload": { title:"Upload asset", description:"Add images, 3D models, CAD files, documents, or generated outputs.", action:"Upload asset", success:"Asset uploaded"},
+"voice-dictation": { title:"Voice dictation", description:"Speak directly into the composer and turn speech into a clean prompt draft.", action:"Start dictation", success:"Voice dictation ready"},
+"voice-speak": { title:"Voice Speak", description:"Open a focused voice frame for hands-free conversation with Cedium.", action:"Start voice", success:"Voice Speak ready"},
  support: { title:"Contact support", description:"Send a short support request from your workspace.", action:"Send request", success:"Support request sent"},
  };
  return map[modal];
@@ -1165,6 +1171,65 @@ function UploadFrame({ kind }: { kind:"file"|"image"|"document"|"asset"}) {
  <p className="mt-2 text-[12px] text-[#6B7280]">{label}</p>
  <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#EEF7FC]">
  <div className="h-full w-[18%] rounded-full bg-[#4A9BFF]"/>
+ </div>
+ </div>
+ );
+}
+
+function VoiceFrame({ mode }: { mode:"dictation"|"speak" }) {
+ const bars = mode ==="dictation"
+ ? [12, 28, 18, 34, 46, 24, 40, 58, 32, 20, 36, 52, 26, 18]
+ : [18, 36, 54, 28, 62, 42, 74, 48, 68, 34, 56, 30, 44, 22];
+ const isDictation = mode ==="dictation";
+
+ return (
+ <div className="mt-5 overflow-hidden rounded-3xl border border-[#DCEBFA] bg-[linear-gradient(180deg,#F8FCFF_0%,#FFFFFF_100%)]">
+ <div className="p-5">
+ <div className="flex items-center justify-between gap-4">
+ <div className="flex items-center gap-3">
+ <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8F4FB] text-[#1D9BF0]">
+ {isDictation ? <Mic className="h-5 w-5"/> : <AudioLines className="h-5 w-5"/>}
+ </span>
+ <div>
+ <p className="text-[13px] font-semibold text-[#171717]">{isDictation ? "Composer microphone" : "Live voice session"}</p>
+ <p className="mt-1 text-[11px] text-[#6B7280]">{isDictation ? "Records your instruction as editable text." : "Starts a spoken assistant frame."}</p>
+ </div>
+ </div>
+ <span className="inline-flex items-center gap-2 rounded-full bg-[#E8F4FB] px-3 py-1 text-[11px] font-semibold text-[#1D9BF0]">
+ <span className="h-2 w-2 rounded-full bg-[#1D9BF0]"/>
+ Ready
+ </span>
+ </div>
+
+ <div className="mt-6 flex h-24 items-center justify-center gap-1.5 rounded-3xl border border-[#E5EAF0] bg-white">
+ {bars.map((height, index) => (
+ <span
+ key={`${height}-${index}`}
+ className="w-1.5 rounded-full bg-[#1D9BF0]"
+ style={{ height: `${height}%`, opacity: 0.35 + ((index % 5) * 0.12) }}
+ />
+ ))}
+ </div>
+
+ <div className="mt-4 grid gap-3 sm:grid-cols-3">
+ {(isDictation
+ ? [
+ { label:"Language", value:"Auto detect" },
+ { label:"Output", value:"Prompt draft" },
+ { label:"Privacy", value:"No storage" },
+ ]
+ : [
+ { label:"Mode", value:"Conversation" },
+ { label:"Interruptions", value:"Enabled" },
+ { label:"Transcript", value:"Workspace only" },
+ ]
+ ).map((item) => (
+ <div key={item.label} className="rounded-2xl border border-[#E5EAF0] bg-[#FCFDFE] p-3">
+ <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#8A94A3]">{item.label}</p>
+ <p className="mt-1 text-[12px] font-semibold text-[#171717]">{item.value}</p>
+ </div>
+ ))}
+ </div>
  </div>
  </div>
  );
@@ -4439,7 +4504,7 @@ function AIAssistantPage() {
  <Paperclip className="h-4 w-4" />
  </button>
  <div className="flex-1" />
- <button type="button" className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[#252A31]" : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"}`} aria-label="Voice input">
+ <button type="button" onClick={() => openModal("voice-dictation")} className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[#252A31]" : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"}`} aria-label="Voice input">
  <Mic className="h-4 w-4" strokeWidth={2} />
  </button>
  <button onClick={() => void sendPrompt()} disabled={isSending} aria-label="Send prompt" className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[14px] bg-[#1292E8] text-white transition-all hover:bg-[#0F83D2] disabled:opacity-60">
@@ -4523,10 +4588,10 @@ function AIAssistantPage() {
  className={`min-h-[32px] flex-1 resize-none bg-transparent px-2 py-1.5 text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#171717] placeholder:text-[#A1A1A1]"}`}
  style={{ letterSpacing: 0 }}
  />
- <button type="button" className={`flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#F4F6F8] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#171717] hover:bg-[#E7E7E7]"}`} aria-label="Voice input" title="Voice input">
+ <button type="button" onClick={() => openModal("voice-dictation")} className={`flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#F4F6F8] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#171717] hover:bg-[#E7E7E7]"}`} aria-label="Voice input" title="Voice input">
  <Mic className="h-5 w-5" strokeWidth={2} />
  </button>
- <button onClick={() => void sendPrompt()} disabled={isSending || (!input.trim() && false)} aria-label="Send prompt" className="flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] bg-[#1292E8] text-white transition-all hover:bg-[#0F83D2] disabled:cursor-not-allowed disabled:opacity-60">
+ <button onClick={() => input.trim() ? void sendPrompt() : openModal("voice-speak")} disabled={isSending} aria-label={input.trim() ? "Send prompt" : "Open Voice Speak"} className="flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] bg-[#1292E8] text-white transition-all hover:bg-[#0F83D2] disabled:cursor-not-allowed disabled:opacity-60">
  {isSending ? <RefreshCw className="h-5 w-5 animate-spin" /> : input.trim() ? <CornerDownLeft className="h-5 w-5" strokeWidth={2} /> : <AudioLines className="h-5 w-5" strokeWidth={2} />}
  </button>
  <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
