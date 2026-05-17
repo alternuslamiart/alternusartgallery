@@ -234,48 +234,88 @@ function Hero({ isLight }: { isLight: boolean }) {
  A refined AI studio for design, code, 3D, and automation. Plan the work, generate the output, and keep every project moving from one calm workspace.
  </p>
  <div
- className={`mt-8 w-full max-w-[620px] rounded-[22px] border p-2.5 shadow-[0_24px_70px_rgba(56,189,248,0.12)] backdrop-blur-xl ${
+ className={`mt-9 w-full max-w-[680px] rounded-[30px] border p-3 shadow-[0_30px_90px_rgba(56,189,248,0.16)] backdrop-blur-2xl ${
  isLight
- ? "border-white/80 bg-white/58"
+ ? "border-white/85 bg-white/52"
  : "border-white/10 bg-white/5"
  }`}
  >
- <div className="flex flex-col gap-2.5 sm:flex-row">
- <Button asChild className="h-12 rounded-[16px] bg-[#38BDF8] px-5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(56,189,248,0.28)] hover:bg-[#0EA5E9]">
- <Link href="/main">
- Launch Cedium
- <ArrowRight className="h-4 w-4" />
- </Link>
- </Button>
- <Button
- asChild
- variant="outline"
- className={`h-12 rounded-[16px] px-5 text-sm font-semibold shadow-none backdrop-blur ${
- isLight
- ? "border-[#DCEAF5] bg-white/72 text-[#0F172A] hover:bg-white"
- : "border-white/10 bg-white/5 text-white hover:bg-white/10"
- }`}
+ <div className="grid gap-3 sm:grid-cols-[1.2fr_0.8fr]">
+ <Link
+ href="/main"
+ className="group relative overflow-hidden rounded-[24px] bg-[#0F172A] p-5 text-white shadow-[0_22px_48px_rgba(15,23,42,0.18)] transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8]"
  >
- <Link href="/pricing">View pricing</Link>
- </Button>
- <Button
- asChild
- variant="outline"
- className={`h-12 rounded-[16px] px-5 text-sm font-semibold shadow-none backdrop-blur ${
- isLight
- ? "border-[#DCEAF5] bg-white/72 text-[#0F172A] hover:bg-white"
- : "border-white/10 bg-white/5 text-white hover:bg-white/10"
- }`}
- >
- <Link href="/community">
- <UsersRound className="h-4 w-4" />
- AI Community
- </Link>
- </Button>
+ <span className="absolute right-0 top-0 h-32 w-32 translate-x-10 -translate-y-10 rounded-full bg-[#38BDF8]/35 blur-2xl" />
+ <span className="relative inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-sky-100">
+ <Sparkles className="h-3.5 w-3.5" />
+ Start here
+ </span>
+ <div className="relative mt-8 flex items-end justify-between gap-5">
+ <div>
+ <p className="text-2xl font-semibold tracking-[-0.02em]">Launch Studio</p>
+ <p className="mt-2 max-w-xs text-sm leading-6 text-slate-300">
+ Open the AI workspace for chat, projects, assets, code, and production tasks.
+ </p>
  </div>
- <div className={`mt-2 flex flex-wrap items-center gap-2 px-2 pb-1 text-[11px] font-medium ${isLight ? "text-[#64748B]" : "text-zinc-400"}`}>
+ <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#38BDF8] text-white transition-transform group-hover:translate-x-0.5">
+ <ArrowRight className="h-5 w-5" />
+ </span>
+ </div>
+ </Link>
+
+ <div className="grid gap-3">
+ <Link
+ href="/community"
+ className={`group rounded-[22px] border p-4 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] ${
+ isLight
+ ? "border-[#DCEAF5] bg-white/76 text-[#0F172A] hover:bg-white"
+ : "border-white/10 bg-white/5 text-white hover:bg-white/10"
+ }`}
+ >
+ <div className="flex items-center justify-between gap-3">
+ <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#E0F2FE] text-[#0284C7]">
+ <UsersRound className="h-4 w-4" />
+ </span>
+ <ArrowRight className="h-4 w-4 text-[#38BDF8] transition-transform group-hover:translate-x-0.5" />
+ </div>
+ <p className="mt-4 text-sm font-semibold">AI Community</p>
+ <p className={`mt-1 text-xs leading-5 ${isLight ? "text-[#64748B]" : "text-zinc-400"}`}>
+ Publish, remix, and get feedback.
+ </p>
+ </Link>
+
+ <Link
+ href="/pricing"
+ className={`group rounded-[22px] border p-4 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] ${
+ isLight
+ ? "border-[#DCEAF5] bg-white/76 text-[#0F172A] hover:bg-white"
+ : "border-white/10 bg-white/5 text-white hover:bg-white/10"
+ }`}
+ >
+ <div className="flex items-center justify-between gap-3">
+ <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#E0F2FE] text-[#0284C7]">
+ <ShieldCheck className="h-4 w-4" />
+ </span>
+ <ArrowRight className="h-4 w-4 text-[#38BDF8] transition-transform group-hover:translate-x-0.5" />
+ </div>
+ <p className="mt-4 text-sm font-semibold">Plans & access</p>
+ <p className={`mt-1 text-xs leading-5 ${isLight ? "text-[#64748B]" : "text-zinc-400"}`}>
+ Compare usage and workspace limits.
+ </p>
+ </Link>
+ </div>
+ </div>
+ <div className={`mt-3 grid gap-2 rounded-[20px] border px-4 py-3 text-[11px] font-semibold sm:grid-cols-3 ${
+ isLight
+ ? "border-[#DCEAF5] bg-white/58 text-[#64748B]"
+ : "border-white/10 bg-white/5 text-zinc-400"
+ }`}>
+ {["Chat to project", "Community feedback", "Production workflow"].map((item) => (
+ <div key={item} className="flex items-center gap-2">
  <span className="h-1.5 w-1.5 rounded-full bg-[#38BDF8]" />
- Start from chat, projects, community feedback, or production workflows.
+ {item}
+ </div>
+ ))}
  </div>
  </div>
  </div>
