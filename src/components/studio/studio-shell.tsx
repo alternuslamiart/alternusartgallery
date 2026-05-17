@@ -556,8 +556,8 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  className={[
 "flex h-full flex-shrink-0 flex-col rounded-none py-3 transition-all duration-200 ease-out",
  dark
- ?"border-r border-[rgba(255,255,255,0.08)] bg-[linear-gradient(180deg,#181A1F_0%,#14161A_100%)]"
- :"border-r border-white/70 bg-[linear-gradient(180deg,#EAF3F8_0%,#F6FAFC_100%)]",
+ ?"border-r border-t border-b border-[rgba(255,255,255,0.08)] bg-[#181A1F]"
+ :"border-r border-t border-b border-[rgba(164,196,214,0.45)] bg-[#EAF3F8]",
  isCollapsed ?"w-[60px]":"w-[230px]",
  ].join(" ")}
  >
@@ -727,7 +727,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  color: #f4f6f8 !important;
  }
  .studio-shell-dark aside {
- background: linear-gradient(180deg, #181a1f 0%, #14161a 100%) !important;
+ background: #181a1f !important;
  border-color: rgba(255, 255, 255, 0.08) !important;
  }
  .studio-shell-dark section {
@@ -3695,186 +3695,560 @@ function StarterPlaygroundView({
  card,
  dark,
  onBack,
- onRun,
 }: {
  card: StarterCard;
  dark: boolean;
  onBack: () => void;
  onRun: () => void;
 }) {
+ const { showToast } = useStudioActions();
  const Icon = card.icon;
+
  const panels = [
- {
- label:"Base task",
- model:"Claude 4.5 Sonnet",
- accent: dark ?"bg-[#7DD3FC]":"bg-[#94A3B8]",
- output:"Summary",
- score:"< $0.001",
- latency:"1.1s",
- },
- {
- label:"Comparison task",
- model:"GPT-5",
- accent:"bg-[#8B5CF6]",
- output:"Structured plan",
- score:"$0.001",
- latency:"1.8s",
- },
- {
- label:"Comparison task",
- model:"Gemini 2.5 Pro",
- accent:"bg-[#4F7BFF]",
- output:"Launch checklist",
- score:"$0.001",
- latency:"1.8s",
- },
+ { label: "Base task", model: "Claude 4.5 Sonnet", accent: dark ? "bg-[#7DD3FC]" : "bg-[#94A3B8]", output: "Summary", score: "< $0.001", latency: "1.1s" },
+ { label: "Comparison task", model: "GPT-5", accent: "bg-[#8B5CF6]", output: "Structured plan", score: "$0.001", latency: "1.8s" },
+ { label: "Comparison task", model: "Gemini 2.5 Pro", accent: "bg-[#4F7BFF]", output: "Launch checklist", score: "$0.001", latency: "1.8s" },
  ];
+
  const taskPrompt = `You are a Cedium production analyst. Your task is to review the request and provide a concise plan for: ${card.title}.`;
- const textClass = dark ?"text-[#F4F6F8]":"text-[#111827]";
- const mutedClass = dark ?"text-[#A8B0BA]":"text-[#667085]";
- const panelClass = dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5EAF0] bg-white";
- const softClass = dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20]":"border-[#EDF1F5] bg-[#F8FAFC]";
+ const textClass = dark ? "text-[#F4F6F8]" : "text-[#111827]";
+ const mutedClass = dark ? "text-[#A8B0BA]" : "text-[#667085]";
+ const panelClass = dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-white";
+ const softClass = dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20]" : "border-[#EDF1F5] bg-[#F8FAFC]";
+ const btnBase = dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:bg-[#202328]" : "border-[#DDE5EE] bg-white text-[#344054] hover:bg-[#F8FAFC]";
+ const dividerClass = dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#E5EAF0]";
+
+ // ── Top-bar state ──────────────────────────────────────────
+ const [diffEnabled, setDiffEnabled] = useState(false);
+ const [experimentsOpen, setExperimentsOpen] = useState(false);
+ const [isRunning, setIsRunning] = useState(false);
+ const [versionSaved, setVersionSaved] = useState(false);
+
+ // ── Per-card state ─────────────────────────────────────────
+ const [activeParamsMenu, setActiveParamsMenu] = useState<string | null>(null);
+ const [activeCardMenu, setActiveCardMenu] = useState<string | null>(null);
+ const [savedPrompts, setSavedPrompts] = useState<Set<string>>(new Set());
+ const [cardPrompts, setCardPrompts] = useState<Record<string, string>>({
+  "Claude 4.5 Sonnet": "For each result include a short summary, intent classification, and one practical next step.",
+  "GPT-5": "For each result include a short summary, intent classification, and one practical next step.",
+  "Gemini 2.5 Pro": "For each result include a short summary, intent classification, and one practical next step.",
+ });
+ const [cardParams, setCardParams] = useState<Record<string, { temperature: number; maxTokens: number }>>({
+  "Claude 4.5 Sonnet": { temperature: 0.7, maxTokens: 1024 },
+  "GPT-5": { temperature: 0.7, maxTokens: 1024 },
+  "Gemini 2.5 Pro": { temperature: 0.7, maxTokens: 1024 },
+ });
+
+ // ── Table state ────────────────────────────────────────────
+ const [tableRows, setTableRows] = useState([
+  { id: 1, input: "My subscription was charged twice this month. Can you help me get a refund?" },
+ ]);
+ const [nextRowId, setNextRowId] = useState(2);
+ const allColumns = ["Input", "CustomerSupport", "Claude 4.5 Sonnet", "GPT-5", "Gemini 2.5 Pro"];
+ const [visibleColumns, setVisibleColumns] = useState<Set<string>>(new Set(allColumns));
+ const [rowHeight, setRowHeight] = useState<"compact" | "comfortable" | "expanded">("comfortable");
+ const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+ const [filterOpen, setFilterOpen] = useState(false);
+ const [fieldsOpen, setFieldsOpen] = useState(false);
+ const [groupOpen, setGroupOpen] = useState(false);
+ const [filterText, setFilterText] = useState("");
+
+ // ── Dropdown refs for click-outside ───────────────────────
+ const experimentsRef = useRef<HTMLDivElement>(null);
+ const filterRef = useRef<HTMLDivElement>(null);
+ const fieldsRef = useRef<HTMLDivElement>(null);
+ const groupRef = useRef<HTMLDivElement>(null);
+
+ useEffect(() => {
+  function onDown(e: MouseEvent) {
+   const t = e.target as Node;
+   if (experimentsRef.current && !experimentsRef.current.contains(t)) setExperimentsOpen(false);
+   if (filterRef.current && !filterRef.current.contains(t)) setFilterOpen(false);
+   if (fieldsRef.current && !fieldsRef.current.contains(t)) setFieldsOpen(false);
+   if (groupRef.current && !groupRef.current.contains(t)) setGroupOpen(false);
+  }
+  document.addEventListener("mousedown", onDown);
+  return () => document.removeEventListener("mousedown", onDown);
+ }, []);
+
+ // ── Handlers ───────────────────────────────────────────────
+ const handleRun = async () => {
+  if (isRunning) return;
+  setIsRunning(true);
+  await new Promise<void>((resolve) => setTimeout(resolve, 1800));
+  setIsRunning(false);
+  showToast("Run complete");
+ };
+
+ const handleSaveVersion = () => {
+  setVersionSaved(true);
+  showToast("Version saved");
+  setTimeout(() => setVersionSaved(false), 2500);
+ };
+
+ const handleSavePrompt = (model: string) => {
+  setSavedPrompts((prev) => new Set(Array.from(prev).concat(model)));
+  showToast("Prompt saved");
+  setTimeout(() => setSavedPrompts((prev) => { const next = new Set(prev); next.delete(model); return next; }), 2500);
+ };
+
+ const addRow = () => {
+  setTableRows((rows) => [...rows, { id: nextRowId, input: "" }]);
+  setNextRowId((n) => n + 1);
+ };
+
+ const cycleRowHeight = () => {
+  setRowHeight((h) => h === "compact" ? "comfortable" : h === "comfortable" ? "expanded" : "compact");
+ };
+
+ const rowPy = rowHeight === "compact" ? "py-2" : rowHeight === "comfortable" ? "py-4" : "py-6";
+ const promptRows = rowHeight === "compact" ? 1 : rowHeight === "comfortable" ? 2 : 4;
+ const nonInputVisible = allColumns.filter((c) => c !== "Input" && visibleColumns.has(c));
+ const gridCols = `46px 1.35fr ${nonInputVisible.map(() => "1fr").join(" ")}`;
+ const filteredRows = filterText
+  ? tableRows.filter((r) => r.input.toLowerCase().includes(filterText.toLowerCase()))
+  : tableRows;
 
  return (
- <div className={`flex min-h-full w-full justify-center px-4 py-5 ${dark ?"bg-transparent":"bg-[#F6F8FB]"}`}>
- <div className="w-full max-w-[1180px]">
- <div className={`mb-3 flex flex-wrap items-center justify-between gap-3 text-[12px] ${mutedClass}`}>
- <div className="flex items-center gap-2">
- <button
- type="button"
- onClick={onBack}
- className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 font-semibold transition-colors ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] hover:bg-[#202328]":"border-[#DDE5EE] bg-white text-[#344054] hover:bg-[#F8FAFC]"}`}
- >
- <ChevronLeft className="h-3.5 w-3.5"/>
- Back
- </button>
- <span>Acme</span>
- <ChevronRight className="h-3 w-3"/>
- <span>AI Studio</span>
- <ChevronRight className="h-3 w-3"/>
- <span className={textClass}>Playgrounds</span>
- </div>
- <div className="flex items-center gap-2">
- <span>Diff</span>
- <span className={`h-4 w-8 rounded-full ${dark ?"bg-[#2B3037]":"bg-[#E5E7EB]"}`}>
- <span className="block h-4 w-4 rounded-full bg-white shadow-sm"/>
- </span>
- <button type="button" className={`inline-flex h-8 items-center gap-1.5 rounded-xl px-3 font-semibold transition-colors ${dark ?"hover:bg-[#202328]":"hover:bg-white"}`}>
- <Plus className="h-3.5 w-3.5"/>
- Experiments
- </button>
- <button
- type="button"
- onClick={onRun}
- className="inline-flex h-8 items-center gap-1.5 rounded-xl bg-[#1D9BF0] px-3 font-semibold text-white transition-colors hover:bg-[#1A8CD8]"
- >
- <Play className="h-3.5 w-3.5 fill-current"/>
- Run
- </button>
- </div>
- </div>
+  // scroll container — fixes cut-off content
+  <div className="h-full overflow-y-auto">
+   <div className={`flex min-h-full w-full justify-center px-4 py-5 ${dark ? "bg-transparent" : "bg-[#F6F8FB]"}`}>
+    <div className="w-full max-w-[1180px] pb-10">
 
- <div className={`overflow-hidden rounded-[18px] border shadow-[0_18px_60px_rgba(31,43,77,0.08)] ${panelClass}`}>
- <div className={`flex items-center justify-between border-b px-4 py-3 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E5EAF0]"}`}>
- <div className="flex items-center gap-3">
- <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ?"bg-[rgba(59,167,255,0.18)] text-[#7DD3FC]":"bg-[#E8F4FB] text-[#1D9BF0]"}`}>
- <Icon className="h-[18px] w-[18px]"/>
- </span>
- <div>
- <h2 className={`text-[15px] font-semibold ${textClass}`}>{card.shortTitle ?? card.title} Playground</h2>
- <p className={`text-[11px] ${mutedClass}`}>Compare prompt behavior before launching in chat.</p>
- </div>
- </div>
- <button type="button" className={`hidden h-8 rounded-xl border px-3 text-[12px] font-semibold sm:inline-flex sm:items-center ${dark ?"border-[rgba(255,255,255,0.08)] text-[#A8B0BA] hover:text-[#F4F6F8]":"border-[#DDE5EE] text-[#344054] hover:bg-[#F8FAFC]"}`}>
- Save version
- </button>
- </div>
+     {/* ── Breadcrumb & top controls ── */}
+     <div className={`mb-3 flex flex-wrap items-center justify-between gap-3 text-[12px] ${mutedClass}`}>
+      <div className="flex items-center gap-2">
+       <button
+        type="button"
+        onClick={onBack}
+        className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 font-semibold transition-colors ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] hover:bg-[#202328]" : "border-[#DDE5EE] bg-white text-[#344054] hover:bg-[#F8FAFC]"}`}
+       >
+        <ChevronLeft className="h-3.5 w-3.5" />
+        Back
+       </button>
+       <Link href="/studio-overview" className="hover:underline">Acme</Link>
+       <ChevronRight className="h-3 w-3" />
+       <Link href="/studio-overview" className="hover:underline">AI Studio</Link>
+       <ChevronRight className="h-3 w-3" />
+       <span className={textClass}>Playgrounds</span>
+      </div>
 
- <div className="grid gap-1 p-2 lg:grid-cols-3">
- {panels.map((panel) => (
- <article key={panel.model} className={`rounded-[14px] border ${softClass}`}>
- <div className={`flex items-center justify-between border-b px-3 py-2.5 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E5EAF0]"}`}>
- <div className="flex items-center gap-2">
- <span className={`h-2.5 w-2.5 rounded-full ${panel.accent}`}/>
- <span className={`text-[11px] font-semibold ${panel.label ==="Base task" ? mutedClass :"text-[#7C3AED]"}`}>{panel.label}</span>
- </div>
- <button type="button" aria-label={`Options for ${panel.model}`} className={`rounded-lg p-1 ${dark ?"text-[#A8B0BA] hover:bg-[#202328]":"text-[#98A2B3] hover:bg-white"}`}>
- <MoreHorizontal className="h-4 w-4"/>
- </button>
- </div>
- <div className="flex items-center justify-between border-b border-inherit px-3 py-2">
- <div className={`flex items-center gap-2 text-[12px] font-semibold ${textClass}`}>
- <Icon className="h-3.5 w-3.5 text-[#1D9BF0]"/>
- {panel.model}
- </div>
- <div className={`flex items-center gap-2 text-[11px] ${mutedClass}`}>
- Params
- <ChevronDown className="h-3.5 w-3.5"/>
- </div>
- </div>
- <div className="min-h-[166px] px-4 py-3">
- <div className={`mb-2 flex items-center gap-1 text-[11px] font-medium ${mutedClass}`}>
- System
- <ChevronDown className="h-3 w-3"/>
- </div>
- <p className={`text-[12px] leading-5 ${dark ?"text-[#D8DEE6]":"text-[#344054]"}`}>{taskPrompt}</p>
- <div className={`mt-3 rounded-xl border px-3 py-2 text-[11px] leading-5 ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#111317] text-[#A8B0BA]":"border-[#E5EAF0] bg-white text-[#667085]"}`}>
- For each result include a short summary, intent classification, and one practical next step.
- </div>
- </div>
- <div className={`flex items-center justify-between border-t px-3 py-2 text-[11px] ${dark ?"border-[rgba(255,255,255,0.08)] text-[#A8B0BA]":"border-[#E5EAF0] text-[#667085]"}`}>
- <span>Save prompt</span>
- <span>Draft</span>
- </div>
- </article>
- ))}
- </div>
+      <div className="flex items-center gap-2">
+       <span>Diff</span>
+       {/* Diff toggle */}
+       <button
+        type="button"
+        role="switch"
+        aria-checked={diffEnabled}
+        onClick={() => setDiffEnabled((v) => !v)}
+        className={`relative h-5 w-9 flex-shrink-0 rounded-full transition-colors ${diffEnabled ? "bg-[#1D9BF0]" : dark ? "bg-[#2B3037]" : "bg-[#E5E7EB]"}`}
+       >
+        <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${diffEnabled ? "translate-x-4" : "translate-x-0.5"}`} />
+       </button>
 
- <div className={`flex flex-wrap items-center justify-between gap-3 border-y px-3 py-2 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E5EAF0]"}`}>
- <div className="flex flex-wrap gap-2">
- {["All rows","Filter","Fields","Grid","Group","Height"].map((item) => (
- <button key={item} type="button" className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]":"border-[#DDE5EE] bg-white text-[#344054]"}`}>
- {item}
- </button>
- ))}
- </div>
- <button type="button" className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]":"border-[#DDE5EE] bg-white text-[#344054]"}`}>
- <Plus className="h-3.5 w-3.5"/>
- Row
- </button>
- </div>
+       {/* Experiments */}
+       <div ref={experimentsRef} className="relative">
+        <button
+         type="button"
+         onClick={() => setExperimentsOpen((v) => !v)}
+         className={`inline-flex h-8 items-center gap-1.5 rounded-xl px-3 font-semibold transition-colors ${dark ? "hover:bg-[#202328]" : "hover:bg-white"}`}
+        >
+         <Plus className="h-3.5 w-3.5" />
+         Experiments
+        </button>
+        {experimentsOpen && (
+         <div className={`absolute right-0 top-10 z-20 w-56 rounded-xl border p-4 shadow-lg ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-white"}`}>
+          <p className={`text-[12px] font-semibold ${textClass}`}>No experiments yet</p>
+          <p className={`mt-1 text-[11px] leading-5 ${mutedClass}`}>Run a playground comparison to create one.</p>
+         </div>
+        )}
+       </div>
 
- <div className="overflow-x-auto">
- <div className="min-w-[900px]">
- <div className={`grid grid-cols-[46px_1.35fr_repeat(3,1fr)] border-b text-[11px] font-semibold ${dark ?"border-[rgba(255,255,255,0.08)] text-[#A8B0BA]":"border-[#E5EAF0] text-[#667085]"}`}>
- {["","Input","CustomerSupport","Claude 4.5 Sonnet","GPT-5","Gemini 2.5 Pro"].map((item) => (
- <div key={item ||"index"} className="px-3 py-2">{item}</div>
- ))}
- </div>
- <div className={`grid grid-cols-[46px_1.35fr_repeat(3,1fr)] text-[12px] ${dark ?"text-[#D8DEE6]":"text-[#344054]"}`}>
- <div className="px-3 py-4">1</div>
- <div className="px-3 py-4">My subscription was charged twice this month. Can you help me get a refund?</div>
- <div className="px-3 py-4">
- <span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${dark ?"bg-[#202328] text-[#A8B0BA]":"bg-[#EEF2F7] text-[#475467]"}`}>Output</span>
- <p className={`mt-3 text-lg font-semibold ${textClass}`}>Summary</p>
- </div>
- {panels.map((panel) => (
- <div key={panel.output} className="px-3 py-4">
- <div className={`flex items-center gap-3 text-[10px] ${mutedClass}`}>
- <span>Just now</span>
- <span>{panel.latency}</span>
- <span>{panel.score}</span>
- </div>
- <p className={`mt-3 text-lg font-semibold ${textClass}`}>{panel.output}</p>
- <p className={`mt-2 text-[11px] leading-5 ${mutedClass}`}>Clear intent, practical next step, and ready-to-use structure.</p>
- </div>
- ))}
- </div>
- </div>
- </div>
- </div>
- </div>
- </div>
+       {/* Run */}
+       <button
+        type="button"
+        onClick={() => void handleRun()}
+        disabled={isRunning}
+        className={`inline-flex h-8 items-center gap-1.5 rounded-xl px-3 font-semibold text-white transition-colors ${isRunning ? "cursor-not-allowed bg-[#1D9BF0]/70" : "bg-[#1D9BF0] hover:bg-[#1A8CD8]"}`}
+       >
+        {isRunning ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5 fill-current" />}
+        {isRunning ? "Running…" : "Run"}
+       </button>
+      </div>
+     </div>
+
+     {/* ── Main panel ── */}
+     <div className={`overflow-hidden rounded-[18px] border shadow-[0_18px_60px_rgba(31,43,77,0.08)] ${panelClass}`}>
+
+      {/* Panel header */}
+      <div className={`flex items-center justify-between border-b px-4 py-3 ${dividerClass}`}>
+       <div className="flex items-center gap-3">
+        <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ? "bg-[rgba(59,167,255,0.18)] text-[#7DD3FC]" : "bg-[#E8F4FB] text-[#1D9BF0]"}`}>
+         <Icon className="h-[18px] w-[18px]" />
+        </span>
+        <div>
+         <h2 className={`text-[15px] font-semibold ${textClass}`}>{card.shortTitle ?? card.title} Playground</h2>
+         <p className={`text-[11px] ${mutedClass}`}>Compare prompt behavior before launching in chat.</p>
+        </div>
+       </div>
+       <button
+        type="button"
+        onClick={handleSaveVersion}
+        className={`hidden h-8 items-center gap-1.5 rounded-xl border px-3 text-[12px] font-semibold transition-colors sm:inline-flex ${versionSaved ? (dark ? "border-[rgba(255,255,255,0.08)] text-[#34D399]" : "border-[#D1FAE5] text-[#059669]") : (dark ? "border-[rgba(255,255,255,0.08)] text-[#A8B0BA] hover:text-[#F4F6F8]" : "border-[#DDE5EE] text-[#344054] hover:bg-[#F8FAFC]")}`}
+       >
+        {versionSaved && <CheckCircle2 className="h-3.5 w-3.5" />}
+        {versionSaved ? "Saved" : "Save version"}
+       </button>
+      </div>
+
+      {/* ── Model cards ── */}
+      <div className="grid gap-1 p-2 lg:grid-cols-3">
+       {panels.map((panel) => {
+        const isParamsOpen = activeParamsMenu === panel.model;
+        const isMenuOpen = activeCardMenu === panel.model;
+        const promptSaved = savedPrompts.has(panel.model);
+        const params = cardParams[panel.model] ?? { temperature: 0.7, maxTokens: 1024 };
+        const promptText = cardPrompts[panel.model] ?? "";
+        const diffHighlight = diffEnabled && panel.label !== "Base task";
+
+        return (
+         <article
+          key={panel.model}
+          className={`relative rounded-[14px] border ${softClass} ${diffHighlight ? (dark ? "ring-1 ring-[#3BA7FF]/30" : "ring-1 ring-[#1D9BF0]/20") : ""}`}
+         >
+          {/* Card header */}
+          <div className={`flex items-center justify-between border-b px-3 py-2.5 ${dividerClass}`}>
+           <div className="flex items-center gap-2">
+            <span className={`h-2.5 w-2.5 rounded-full ${panel.accent}`} />
+            <span className={`text-[11px] font-semibold ${panel.label === "Base task" ? mutedClass : "text-[#7C3AED]"}`}>{panel.label}</span>
+           </div>
+           <div className="relative">
+            <button
+             type="button"
+             aria-label={`Options for ${panel.model}`}
+             onClick={() => setActiveCardMenu(isMenuOpen ? null : panel.model)}
+             className={`rounded-lg p-1 transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[#202328]" : "text-[#98A2B3] hover:bg-white"}`}
+            >
+             <MoreHorizontal className="h-4 w-4" />
+            </button>
+            {isMenuOpen && (
+             <div className={`absolute right-0 top-8 z-20 w-44 overflow-hidden rounded-xl border shadow-lg ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-white"}`}>
+              {[
+               { label: "Duplicate task", fn: () => { showToast("Task duplicated"); setActiveCardMenu(null); } },
+               { label: "Rename task", fn: () => { showToast("Rename not available yet"); setActiveCardMenu(null); } },
+               { label: "Clear prompt", fn: () => { setCardPrompts((p) => ({ ...p, [panel.model]: "" })); setActiveCardMenu(null); showToast("Prompt cleared"); } },
+               { label: "Remove task", fn: () => { showToast("Cannot remove base task"); setActiveCardMenu(null); } },
+              ].map((item) => (
+               <button
+                key={item.label}
+                type="button"
+                onClick={item.fn}
+                className={`w-full px-3 py-2 text-left text-[12px] transition-colors ${dark ? "text-[#D8DEE6] hover:bg-[#181B20]" : "text-[#344054] hover:bg-[#F8FAFC]"}`}
+               >
+                {item.label}
+               </button>
+              ))}
+             </div>
+            )}
+           </div>
+          </div>
+
+          {/* Model row */}
+          <div className={`flex items-center justify-between border-b px-3 py-2 ${dividerClass}`}>
+           <div className={`flex items-center gap-2 text-[12px] font-semibold ${textClass}`}>
+            <Icon className="h-3.5 w-3.5 text-[#1D9BF0]" />
+            {panel.model}
+           </div>
+           <div className="relative">
+            <button
+             type="button"
+             onClick={() => setActiveParamsMenu(isParamsOpen ? null : panel.model)}
+             className={`flex items-center gap-1.5 text-[11px] transition-colors ${mutedClass} hover:${textClass}`}
+            >
+             Params
+             <ChevronDown className="h-3.5 w-3.5" />
+            </button>
+            {isParamsOpen && (
+             <div className={`absolute right-0 top-8 z-20 w-52 rounded-xl border p-3 shadow-lg ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-white"}`}>
+              <p className={`mb-3 text-[11px] font-semibold ${textClass}`}>Parameters</p>
+              <div className="space-y-3">
+               <div>
+                <label className={`block text-[10px] font-medium ${mutedClass}`}>Temperature: {params.temperature.toFixed(1)}</label>
+                <input type="range" min="0" max="1" step="0.1" value={params.temperature}
+                 onChange={(e) => setCardParams((p) => ({ ...p, [panel.model]: { ...params, temperature: parseFloat(e.target.value) } }))}
+                 className="mt-1 w-full accent-[#1D9BF0]" />
+               </div>
+               <div>
+                <label className={`block text-[10px] font-medium ${mutedClass}`}>Max tokens: {params.maxTokens}</label>
+                <input type="range" min="256" max="4096" step="256" value={params.maxTokens}
+                 onChange={(e) => setCardParams((p) => ({ ...p, [panel.model]: { ...params, maxTokens: parseInt(e.target.value) } }))}
+                 className="mt-1 w-full accent-[#1D9BF0]" />
+               </div>
+              </div>
+              <button
+               type="button"
+               onClick={() => setActiveParamsMenu(null)}
+               className={`mt-3 w-full rounded-lg py-1.5 text-[11px] font-semibold transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:text-[#F4F6F8]" : "bg-[#F8FAFC] text-[#344054] hover:bg-[#EDF1F5]"}`}
+              >
+               Done
+              </button>
+             </div>
+            )}
+           </div>
+          </div>
+
+          {/* System prompt + editable user prompt */}
+          <div className="min-h-[166px] px-4 py-3">
+           <div className={`mb-2 flex items-center gap-1 text-[11px] font-medium ${mutedClass}`}>
+            System <ChevronDown className="h-3 w-3" />
+           </div>
+           <p className={`text-[12px] leading-5 ${dark ? "text-[#D8DEE6]" : "text-[#344054]"}`}>{taskPrompt}</p>
+           <textarea
+            value={promptText}
+            onChange={(e) => setCardPrompts((p) => ({ ...p, [panel.model]: e.target.value }))}
+            placeholder="Enter your prompt…"
+            rows={3}
+            className={`mt-3 w-full resize-none rounded-xl border bg-transparent px-3 py-2 text-[11px] leading-5 outline-none ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#111317] text-[#A8B0BA] placeholder:text-[#6F7782]" : "border-[#E5EAF0] bg-white text-[#667085] placeholder:text-[#B0BAC6]"}`}
+           />
+          </div>
+
+          {/* Save prompt footer */}
+          <div className={`flex items-center justify-between border-t px-3 py-2 text-[11px] ${dividerClass} ${dark ? "text-[#A8B0BA]" : "text-[#667085]"}`}>
+           <button
+            type="button"
+            onClick={() => handleSavePrompt(panel.model)}
+            className={`flex items-center gap-1 transition-colors ${promptSaved ? (dark ? "text-[#34D399]" : "text-[#059669]") : "hover:underline"}`}
+           >
+            {promptSaved && <CheckCircle2 className="h-3 w-3" />}
+            {promptSaved ? "Prompt saved" : "Save prompt"}
+           </button>
+           <span>{promptText ? "Draft" : "Empty"}</span>
+          </div>
+         </article>
+        );
+       })}
+      </div>
+
+      {/* ── Table toolbar ── */}
+      <div className={`flex flex-wrap items-center justify-between gap-3 border-y px-3 py-2 ${dividerClass}`}>
+       <div className="flex flex-wrap items-center gap-2">
+
+        <button
+         type="button"
+         onClick={() => { setFilterText(""); setViewMode("table"); }}
+         className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold transition-colors ${btnBase}`}
+        >
+         All rows
+        </button>
+
+        <div ref={filterRef} className="relative">
+         <button
+          type="button"
+          onClick={() => setFilterOpen((v) => !v)}
+          className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold transition-colors ${filterText ? (dark ? "border-[#3BA7FF]/40 bg-[#3BA7FF]/10 text-[#7DD3FC]" : "border-[#1D9BF0]/30 bg-[#E8F4FB] text-[#1D9BF0]") : btnBase}`}
+         >
+          Filter
+         </button>
+         {filterOpen && (
+          <div className={`absolute left-0 top-10 z-20 w-56 rounded-xl border p-3 shadow-lg ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-white"}`}>
+           <p className={`mb-2 text-[11px] font-semibold ${textClass}`}>Filter rows</p>
+           <input
+            type="text"
+            placeholder="Input contains…"
+            value={filterText}
+            onChange={(e) => setFilterText(e.target.value)}
+            className={`w-full rounded-lg border px-2.5 py-1.5 text-[11px] outline-none ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#D8DEE6] placeholder:text-[#A8B0BA]" : "border-[#E5EAF0] bg-[#F8FAFC] text-[#344054] placeholder:text-[#98A2B3]"}`}
+           />
+           {filterText && (
+            <button type="button" onClick={() => setFilterText("")} className={`mt-2 text-[10px] hover:underline ${mutedClass}`}>
+             Clear filter
+            </button>
+           )}
+          </div>
+         )}
+        </div>
+
+        <div ref={fieldsRef} className="relative">
+         <button
+          type="button"
+          onClick={() => setFieldsOpen((v) => !v)}
+          className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold transition-colors ${btnBase}`}
+         >
+          Fields
+         </button>
+         {fieldsOpen && (
+          <div className={`absolute left-0 top-10 z-20 w-52 rounded-xl border p-3 shadow-lg ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-white"}`}>
+           <p className={`mb-2 text-[11px] font-semibold ${textClass}`}>Visible columns</p>
+           <div className="space-y-0.5">
+            {allColumns.map((col) => (
+             <label key={col} className={`flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-[11px] transition-colors ${dark ? "text-[#D8DEE6] hover:bg-[#181B20]" : "text-[#344054] hover:bg-[#F8FAFC]"}`}>
+              <input
+               type="checkbox"
+               checked={visibleColumns.has(col)}
+               disabled={col === "Input"}
+               onChange={() => {
+                if (col === "Input") return;
+                setVisibleColumns((prev) => {
+                 const next = new Set(prev);
+                 if (next.has(col)) next.delete(col); else next.add(col);
+                 return next;
+                });
+               }}
+               className="accent-[#1D9BF0]"
+              />
+              {col}
+             </label>
+            ))}
+           </div>
+          </div>
+         )}
+        </div>
+
+        <button
+         type="button"
+         onClick={() => setViewMode((v) => v === "table" ? "grid" : "table")}
+         className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold transition-colors ${viewMode === "grid" ? (dark ? "border-[#3BA7FF]/40 bg-[#3BA7FF]/10 text-[#7DD3FC]" : "border-[#1D9BF0]/30 bg-[#E8F4FB] text-[#1D9BF0]") : btnBase}`}
+        >
+         <Grid2X2 className="h-3.5 w-3.5" />
+         Grid
+        </button>
+
+        <div ref={groupRef} className="relative">
+         <button
+          type="button"
+          onClick={() => setGroupOpen((v) => !v)}
+          className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold transition-colors ${btnBase}`}
+         >
+          Group
+         </button>
+         {groupOpen && (
+          <div className={`absolute left-0 top-10 z-20 w-40 rounded-xl border p-1.5 shadow-lg ${dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-white"}`}>
+           {["None", "Model", "Status", "Task"].map((g) => (
+            <button
+             key={g}
+             type="button"
+             onClick={() => { showToast(`Grouped by ${g}`); setGroupOpen(false); }}
+             className={`w-full rounded-lg px-3 py-1.5 text-left text-[11px] transition-colors ${dark ? "text-[#D8DEE6] hover:bg-[#181B20]" : "text-[#344054] hover:bg-[#F8FAFC]"}`}
+            >
+             {g}
+            </button>
+           ))}
+          </div>
+         )}
+        </div>
+
+        <button
+         type="button"
+         onClick={cycleRowHeight}
+         className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold transition-colors ${btnBase}`}
+        >
+         Height: {rowHeight}
+        </button>
+       </div>
+
+       <button
+        type="button"
+        onClick={addRow}
+        className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold transition-colors ${btnBase}`}
+       >
+        <Plus className="h-3.5 w-3.5" />
+        Row
+       </button>
+      </div>
+
+      {/* ── Table / Grid ── */}
+      {viewMode === "table" ? (
+       <div className="overflow-x-auto">
+        <div style={{ minWidth: "900px" }}>
+         {/* Header */}
+         <div
+          className={`grid border-b text-[11px] font-semibold ${dark ? "border-[rgba(255,255,255,0.08)] text-[#A8B0BA]" : "border-[#E5EAF0] text-[#667085]"}`}
+          style={{ gridTemplateColumns: gridCols }}
+         >
+          <div className="px-3 py-2" />
+          <div className="px-3 py-2">Input</div>
+          {nonInputVisible.map((col) => <div key={col} className="px-3 py-2">{col}</div>)}
+         </div>
+         {/* Rows */}
+         {filteredRows.map((row) => (
+          <div
+           key={row.id}
+           className={`grid border-b text-[12px] last:border-b-0 ${dark ? "border-[rgba(255,255,255,0.06)] text-[#D8DEE6]" : "border-[#EDF1F5] text-[#344054]"}`}
+           style={{ gridTemplateColumns: gridCols }}
+          >
+           <div className={`px-3 ${rowPy} text-[11px] ${mutedClass}`}>{row.id}</div>
+           <div className={`px-3 ${rowPy}`}>
+            <textarea
+             value={row.input}
+             onChange={(e) => setTableRows((rows) => rows.map((r) => r.id === row.id ? { ...r, input: e.target.value } : r))}
+             placeholder="Enter input…"
+             rows={promptRows}
+             className={`w-full resize-none rounded bg-transparent text-[12px] leading-5 outline-none ${dark ? "placeholder:text-[#6F7782]" : "placeholder:text-[#B0BAC6]"}`}
+            />
+           </div>
+           {visibleColumns.has("CustomerSupport") && (
+            <div className={`px-3 ${rowPy}`}>
+             <span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${dark ? "bg-[#202328] text-[#A8B0BA]" : "bg-[#EEF2F7] text-[#475467]"}`}>Output</span>
+             <p className={`mt-3 text-lg font-semibold ${textClass}`}>Summary</p>
+            </div>
+           )}
+           {panels.filter((p) => visibleColumns.has(p.model)).map((panel) => (
+            <div key={panel.model} className={`group relative px-3 ${rowPy}`}>
+             {isRunning ? (
+              <div className={`flex items-center gap-2 text-[11px] ${mutedClass}`}>
+               <RefreshCw className="h-3 w-3 animate-spin" /> Running…
+              </div>
+             ) : (
+              <>
+               <div className={`flex items-center gap-3 text-[10px] ${mutedClass}`}>
+                <span>Just now</span>
+                <span>{panel.latency}</span>
+                <span>{panel.score}</span>
+               </div>
+               <p className={`mt-3 text-lg font-semibold ${textClass}`}>{panel.output}</p>
+               <p className={`mt-2 text-[11px] leading-5 ${mutedClass}`}>Clear intent, practical next step, and ready-to-use structure.</p>
+               <button
+                type="button"
+                onClick={() => { void navigator.clipboard.writeText(panel.output); showToast("Copied"); }}
+                aria-label="Copy output"
+                className={`absolute right-2 top-2 hidden rounded-lg p-1 group-hover:flex ${dark ? "text-[#A8B0BA] hover:bg-[#202328]" : "text-[#98A2B3] hover:bg-[#EDF1F5]"}`}
+               >
+                <Copy className="h-3.5 w-3.5" />
+               </button>
+              </>
+             )}
+            </div>
+           ))}
+          </div>
+         ))}
+         {filteredRows.length === 0 && (
+          <div className={`px-3 py-8 text-center text-[12px] ${mutedClass}`}>No rows match the current filter.</div>
+         )}
+        </div>
+       </div>
+      ) : (
+       /* Grid view */
+       <div className="grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredRows.map((row) => (
+         <div key={row.id} className={`rounded-[14px] border p-3 ${softClass}`}>
+          <p className={`mb-2 text-[11px] font-semibold ${mutedClass}`}>#{row.id} Input</p>
+          <p className={`text-[12px] leading-5 ${dark ? "text-[#D8DEE6]" : "text-[#344054]"}`}>{row.input || <span className={mutedClass}>Empty</span>}</p>
+          <div className={`mt-3 border-t pt-3 ${dividerClass}`}>
+           {panels.map((panel) => (
+            <div key={panel.model} className="mt-2 first:mt-0">
+             <p className={`text-[10px] font-semibold ${mutedClass}`}>{panel.model}</p>
+             {isRunning ? <p className={`text-[11px] ${mutedClass}`}><RefreshCw className="mr-1 inline h-3 w-3 animate-spin" />Running…</p> : <p className={`text-[12px] font-semibold ${textClass}`}>{panel.output}</p>}
+            </div>
+           ))}
+          </div>
+         </div>
+        ))}
+       </div>
+      )}
+     </div>
+    </div>
+   </div>
+  </div>
  );
 }
 
