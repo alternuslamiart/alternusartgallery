@@ -851,7 +851,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  </div>
  )}
 
- <main className="flex min-w-0 flex-1 flex-col p-[6px] pl-0">
+ <main className={`flex min-w-0 flex-1 flex-col p-[6px] pl-0 ${dark ? "bg-[#181A1F]" : "bg-[#EAF3F8]"}`}>
  <div className={`studio-main-frame flex min-h-0 flex-1 flex-col overflow-hidden rounded-[8px] border ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#17191D]":"border-[#DDE7EE] bg-white"}`}>
  <header className={`flex h-11 items-center justify-between border-b px-3 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E8EEF2]"}`}>
  <div className="flex min-w-0 items-center gap-3">
