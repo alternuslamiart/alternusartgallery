@@ -133,18 +133,18 @@ function SiteHeader({ isLight }: { isLight: boolean }) {
 function ProductPreview({ isLight }: { isLight: boolean }) {
  const t = isLight
  ? {
- shell: "border-[#DCEAF5] bg-white text-[#0F172A] ",
- canvas: "border-[#DCEAF5] bg-[#F8FCFF]",
- surface: "border-[#DCEAF5] bg-white",
+ shell: "border-[#CFE4F4] bg-white/62 text-[#0F172A] shadow-[0_28px_80px_rgba(56,189,248,0.10)] backdrop-blur-xl",
+ canvas: "border-white/70 bg-white/42 backdrop-blur-xl",
+ surface: "border-[#DCEAF5] bg-white/76 backdrop-blur",
  text: "text-[#0F172A]",
  muted: "text-[#475569]",
  faint: "text-[#94A3B8]",
  chip: "bg-[#E0F2FE] text-[#0369A1]",
  }
  : {
- shell: "border-white/10 bg-[#111827] text-white",
- canvas: "border-white/10 bg-[#0B1120]",
- surface: "border-white/10 bg-[#111827]",
+ shell: "border-white/10 bg-white/5 text-white backdrop-blur-xl",
+ canvas: "border-white/10 bg-white/5 backdrop-blur-xl",
+ surface: "border-white/10 bg-white/6 backdrop-blur",
  text: "text-white",
  muted: "text-slate-300",
  faint: "text-slate-500",
@@ -216,8 +216,8 @@ function Hero({ isLight }: { isLight: boolean }) {
  <div className="relative grid gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
  <div>
  <div
- className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold ${
- isLight ? "border-[#DCEAF5] bg-white/80 text-[#0369A1]" : "border-white/10 bg-white/5 text-sky-200"
+ className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold shadow-sm backdrop-blur-xl ${
+ isLight ? "border-white/70 bg-white/64 text-[#0369A1]" : "border-white/10 bg-white/5 text-sky-200"
  }`}
  >
  <Sparkles className="h-3.5 w-3.5" />
@@ -233,8 +233,15 @@ function Hero({ isLight }: { isLight: boolean }) {
  <p className={`mt-6 max-w-2xl text-base leading-7 sm:text-lg ${isLight ? "text-[#475569]" : "text-zinc-400"}`}>
  A refined AI studio for design, code, 3D, and automation. Plan the work, generate the output, and keep every project moving from one calm workspace.
  </p>
- <div className="mt-8 flex flex-col gap-3 sm:flex-row">
- <Button asChild className="h-11 rounded-[10px] bg-[#38BDF8] px-5 text-sm font-semibold text-white hover:bg-[#0EA5E9]">
+ <div
+ className={`mt-8 w-full max-w-[620px] rounded-[22px] border p-2.5 shadow-[0_24px_70px_rgba(56,189,248,0.12)] backdrop-blur-xl ${
+ isLight
+ ? "border-white/80 bg-white/58"
+ : "border-white/10 bg-white/5"
+ }`}
+ >
+ <div className="flex flex-col gap-2.5 sm:flex-row">
+ <Button asChild className="h-12 rounded-[16px] bg-[#38BDF8] px-5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(56,189,248,0.28)] hover:bg-[#0EA5E9]">
  <Link href="/main">
  Launch Cedium
  <ArrowRight className="h-4 w-4" />
@@ -243,9 +250,9 @@ function Hero({ isLight }: { isLight: boolean }) {
  <Button
  asChild
  variant="outline"
- className={`h-11 rounded-[10px] px-5 text-sm font-semibold shadow-none ${
+ className={`h-12 rounded-[16px] px-5 text-sm font-semibold shadow-none backdrop-blur ${
  isLight
- ? "border-[#DCEAF5] bg-white/80 text-[#0F172A] hover:bg-[#F0F9FF]"
+ ? "border-[#DCEAF5] bg-white/72 text-[#0F172A] hover:bg-white"
  : "border-white/10 bg-white/5 text-white hover:bg-white/10"
  }`}
  >
@@ -254,9 +261,9 @@ function Hero({ isLight }: { isLight: boolean }) {
  <Button
  asChild
  variant="outline"
- className={`h-11 rounded-[10px] px-5 text-sm font-semibold shadow-none ${
+ className={`h-12 rounded-[16px] px-5 text-sm font-semibold shadow-none backdrop-blur ${
  isLight
- ? "border-[#DCEAF5] bg-white/80 text-[#0F172A] hover:bg-[#F0F9FF]"
+ ? "border-[#DCEAF5] bg-white/72 text-[#0F172A] hover:bg-white"
  : "border-white/10 bg-white/5 text-white hover:bg-white/10"
  }`}
  >
@@ -265,6 +272,11 @@ function Hero({ isLight }: { isLight: boolean }) {
  AI Community
  </Link>
  </Button>
+ </div>
+ <div className={`mt-2 flex flex-wrap items-center gap-2 px-2 pb-1 text-[11px] font-medium ${isLight ? "text-[#64748B]" : "text-zinc-400"}`}>
+ <span className="h-1.5 w-1.5 rounded-full bg-[#38BDF8]" />
+ Start from chat, projects, community feedback, or production workflows.
+ </div>
  </div>
  </div>
 
