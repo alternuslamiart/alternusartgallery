@@ -842,7 +842,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  </div>
  )}
 
- <main className="flex min-w-0 flex-1 flex-col p-3">
+ <main className="flex min-w-0 flex-1 flex-col py-3 pl-0 pr-3">
  <header className="mb-3 flex h-8 items-center justify-between px-1">
  <div className="flex min-w-0 items-center gap-3">
  <div className={`relative flex items-center gap-2 ${dark ?"text-[#A8B0BA]":"text-[#6B7280]"}`}>
