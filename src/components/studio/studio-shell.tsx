@@ -4446,10 +4446,10 @@ function AIAssistantPage() {
  };
 
  const assistantChips = [
- { label:"Summary", icon: CircleSlash },
- { label:"Code", icon: Code2 },
- { label:"Design", icon: PenLine },
- { label:"Research", icon: Network },
+ { label:"Summary", icon: CircleSlash, prompt:"Summarize this clearly with key points and next actions: " },
+ { label:"Code", icon: Code2, prompt:"Help me write, debug, or review code for: " },
+ { label:"Design", icon: PenLine, prompt:"Create a clean design direction for: " },
+ { label:"Research", icon: Network, prompt:"Research this topic and return sources, risks, and next steps: " },
  ];
 
  const dismissPlanNotice = () => {
@@ -4632,7 +4632,15 @@ function AIAssistantPage() {
  {assistantChips.map((item) => {
  const Icon = item.icon;
  return (
- <button key={item.label} type="button"className={`inline-flex h-10 min-w-[128px] items-center justify-center gap-2 rounded-2xl border px-4 text-[13px] font-bold ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.28)]":"border-[#DCDCDC] bg-white text-[#AAAAAA] hover:border-[#D1D5DB]"}`}>
+ <button
+ key={item.label}
+ type="button"
+ onClick={() => {
+ applyPromptTemplate(item.prompt);
+ showToast(`${item.label} prompt ready`);
+ }}
+ className={`inline-flex h-10 min-w-[128px] items-center justify-center gap-2 rounded-2xl border px-4 text-[13px] font-bold transition-all ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.28)] hover:text-[#F4F6F8]":"border-[#DCDCDC] bg-white text-[#7A7F87] hover:border-[#CFE8F8] hover:text-[#1D9BF0]"}`}
+ >
  <Icon className="h-4 w-4"/>
  {item.label}
  </button>
