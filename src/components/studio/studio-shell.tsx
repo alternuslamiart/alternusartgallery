@@ -49,6 +49,7 @@ import {
  Sun,
  ThumbsDown,
  ThumbsUp,
+ Trash2,
  Upload,
  UserRound,
  Workflow,
@@ -125,6 +126,36 @@ export const studioNavigation: NavItem[] = [
 const bottomNavigation = [
  { key:"settings"as const, label:"Settings", href:"/settings", icon: Settings },
  { key:"help-center"as const, label:"Help Center", href:"/help-center", icon: AlertTriangle },
+];
+
+const sidebarRecentItems: GeneratedRecent[] = [
+ {
+ id:"recent-workflow-brief",
+ title:"Workflow brief",
+ tool:"AI Assistant",
+ meta:"Prompt plan",
+ time:"Today",
+ icon: Workflow,
+ output:"A saved workflow brief with trigger logic, required inputs, approval steps, and production notes.",
+ },
+ {
+ id:"recent-landing-page",
+ title:"SaaS landing page",
+ tool:"Code Builder",
+ meta:"React page",
+ time:"Yesterday",
+ icon: Code2,
+ output:"A recent landing page generation with hero copy, pricing structure, component notes, and responsive layout direction.",
+ },
+ {
+ id:"recent-game-scene",
+ title:"Cyberpunk city scene",
+ tool:"Blender 3D",
+ meta:"Environment concept",
+ time:"2 days ago",
+ icon: Layers3,
+ output:"A saved game environment concept with lighting direction, modular asset list, NPC route notes, and optimization checklist.",
+ },
 ];
 
 const routeByPath: Record<string, StudioRouteKey> = {
@@ -336,6 +367,8 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  const [activeModal, setActiveModal] = useState<StudioModalKey | null>(null);
  const [activeDrawer, setActiveDrawer] = useState<StudioDrawerKey | null>(null);
  const [activeRecent, setActiveRecent] = useState<GeneratedRecent | null>(null);
+ const [recentItems, setRecentItems] = useState<GeneratedRecent[]>(sidebarRecentItems);
+ const [recentMenuId, setRecentMenuId] = useState<string | null>(null);
  const [toast, setToast] = useState<string | null>(null);
  const [isTemporaryChat, setIsTemporaryChat] = useState(false);
  const [temporaryChatId, setTemporaryChatId] = useState<number | null>(null);
@@ -419,6 +452,28 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  setIsTemporaryChat(false);
  setTemporaryChatId(null);
  showToast("Temporary chat ended");
+ }, [showToast]);
+
+ const shareRecent = useCallback(async (recent: GeneratedRecent) => {
+ const text = `${recent.title}\n${recent.output}`;
+ try {
+ if (navigator.share) {
+ await navigator.share({ title: recent.title, text });
+ showToast("Recent item shared");
+ return;
+ }
+ await navigator.clipboard.writeText(text);
+ showToast("Recent item copied");
+ } catch {
+ showToast("Share cancelled");
+ }
+ }, [showToast]);
+
+ const deleteRecent = useCallback((recentId: string) => {
+ setRecentItems((items) => items.filter((item) => item.id !== recentId));
+ setRecentMenuId(null);
+ setActiveRecent((current) => (current?.id === recentId ? null : current));
+ showToast("Recent item deleted");
  }, [showToast]);
 
  const actionValue = useMemo(
@@ -592,6 +647,31 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
  <div className="mt-3 pt-3">
  {!isCollapsed && <p className={`mb-2 px-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${dark ?"text-[#6F7782]":"text-[#8A94A3]"}`}>Recents</p>}
+ {!isCollapsed && (
+ <div className="space-y-1">
+ {recentItems.map((recent) => (
+ <RecentSidebarItem
+ key={recent.id}
+ recent={recent}
+ active={activeRecent?.id === recent.id}
+ menuOpen={recentMenuId === recent.id}
+ onOpen={() => {
+ setRecentMenuId(null);
+ setActiveRecent(recent);
+ }}
+ onMenuToggle={() => setRecentMenuId((current) => (current === recent.id ? null : recent.id))}
+ onShare={() => {
+ setRecentMenuId(null);
+ void shareRecent(recent);
+ }}
+ onDelete={() => deleteRecent(recent.id)}
+ />
+ ))}
+ {recentItems.length === 0 && (
+ <p className={`px-2.5 py-2 text-[11px] ${dark ?"text-[#6F7782]":"text-[#8A94A3]"}`}>No recents yet.</p>
+ )}
+ </div>
+ )}
  </div>
 
  <div className="mt-auto">
@@ -1201,6 +1281,87 @@ function SidebarLink({
  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF3B6B] px-1 text-[10px] font-bold text-white">{item.badge}</span>
  )}
  </Link>
+ );
+}
+
+function RecentSidebarItem({
+ recent,
+ active,
+ menuOpen,
+ onOpen,
+ onMenuToggle,
+ onShare,
+ onDelete,
+}: {
+ recent: GeneratedRecent;
+ active: boolean;
+ menuOpen: boolean;
+ onOpen: () => void;
+ onMenuToggle: () => void;
+ onShare: () => void;
+ onDelete: () => void;
+}) {
+ const { theme } = useStudioTheme();
+ const dark = theme ==="dark";
+
+ return (
+ <div className="group relative">
+ <button
+ type="button"
+ onClick={onOpen}
+ title={recent.title}
+ className={[
+ "flex h-8 w-full items-center rounded-xl border border-transparent pr-8 text-left text-[12px] font-medium transition-all",
+ dark ?"text-[#A8B0BA] hover:border-[rgba(66,132,255,0.24)] hover:bg-[rgba(66,132,255,0.2)] hover:text-[#6EA4FF]":"text-[#4B5563] hover:border-[#B7DDF4] hover:bg-[#CFE8F8] hover:text-[#1D9BF0]",
+ ].join(" ")}
+ style={{
+ background: active ? (dark ?"rgba(59,167,255,0.14)":"#FFFFFF") : undefined,
+ borderColor: active ? (dark ?"rgba(59,167,255,0.18)":"rgba(229,231,235,0.95)") : undefined,
+ boxShadow: active ? (dark ?"0 10px 24px rgba(0,0,0,0.22)":"0 8px 18px rgba(31,43,77,0.06)") : undefined,
+ color: active ? (dark ?"#F4F6F8":"#171717") : undefined,
+ }}
+ >
+ <span className="min-w-0 flex-1 truncate px-2.5">{recent.title}</span>
+ </button>
+ <button
+ type="button"
+ onClick={(event) => {
+ event.stopPropagation();
+ onMenuToggle();
+ }}
+ aria-label={`Open actions for ${recent.title}`}
+ className={[
+ "absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-lg opacity-0 transition-all group-hover:opacity-100",
+ menuOpen ? "opacity-100" : "",
+ dark ?"text-[#A8B0BA] hover:bg-[#181B20] hover:text-[#F4F6F8]":"text-[#64748B] hover:bg-white hover:text-[#1D9BF0]",
+ ].join(" ")}
+ >
+ <MoreHorizontal className="h-3.5 w-3.5"/>
+ </button>
+ {menuOpen && (
+ <div
+ className={`absolute right-0 top-8 z-50 w-36 rounded-2xl border p-1.5 shadow-[0_16px_40px_rgba(31,43,77,0.14)] ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E8EEF2] bg-white"}`}
+ onClick={(event) => event.stopPropagation()}
+ >
+ <button
+ type="button"
+ onClick={onShare}
+ className={`flex h-8 w-full items-center gap-2 rounded-xl px-2.5 text-left text-[12px] font-semibold transition-colors ${dark ?"text-[#A8B0BA] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]":"text-[#4B5563] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}
+ >
+ <Share2 className="h-3.5 w-3.5"/>
+ Share
+ </button>
+ <button
+ type="button"
+ onClick={onDelete}
+ className={`flex h-8 w-full items-center gap-2 rounded-xl px-2.5 text-left text-[12px] font-semibold transition-colors ${dark ?"text-[#FCA5A5] hover:bg-[rgba(239,68,68,0.12)]":"text-[#D92D52] hover:bg-[#FFF1F3]"}`}
+ >
+ <Trash2 className="h-3.5 w-3.5"/>
+ Delete
+ </button>
+ </div>
+ )}
+ </div>
  );
 }
 
