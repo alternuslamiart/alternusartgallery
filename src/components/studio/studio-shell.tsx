@@ -557,7 +557,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 "flex h-full flex-shrink-0 flex-col rounded-none py-3 transition-all duration-200 ease-out",
  dark
  ?"border-r border-t border-b border-[rgba(255,255,255,0.08)] bg-[#181A1F]"
- :"border-r border-t border-b border-white/70 bg-[#EAF3F8]",
+ :"border-r border-t border-b border-[#C5D9E8] bg-[#EAF3F8]",
  isCollapsed ?"w-[60px]":"w-[230px]",
  ].join(" ")}
  >
