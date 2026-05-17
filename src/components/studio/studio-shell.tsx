@@ -684,12 +684,12 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  <button
  onClick={() => setSignOutOpen(true)}
  className={[
-"group flex h-8 items-center rounded-xl text-left text-[12px] font-medium transition-all",
- dark ?"text-[#A8B0BA] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]":"text-[#4B5563] hover:bg-[#DDEEFF] hover:text-[#4A9BFF]",
+"group flex h-8 items-center rounded-xl border border-transparent text-left text-[12px] font-medium transition-all",
+ dark ?"text-[#A8B0BA] hover:border-[rgba(66,132,255,0.24)] hover:bg-[rgba(66,132,255,0.2)] hover:text-[#6EA4FF]":"text-[#4B5563] hover:border-[#B7DDF4] hover:bg-[#CFE8F8] hover:text-[#1D9BF0]",
  isCollapsed ?"mx-auto w-8 justify-center px-0":"w-full gap-2 px-2.5",
  ].join("")}
  >
- <Upload className={`h-[13px] w-[13px] rotate-90 ${dark ?"text-[#6F7782] group-hover:text-[#6EA4FF]":"text-[#6B7280] group-hover:text-[#4A9BFF]"}`} strokeWidth={2.25} />
+ <Upload className={`h-[13px] w-[13px] rotate-90 ${dark ?"text-[#6F7782] group-hover:text-[#6EA4FF]":"text-[#64748B] group-hover:text-[#1D9BF0]"}`} strokeWidth={2.25} />
  {!isCollapsed && <span>Sign Out</span>}
  </button>
  </div>
@@ -4688,7 +4688,7 @@ function AIAssistantPage() {
  <ModeToggle mode={assistantMode} onChange={setAssistantMode} dark={dark} />
  </div>
 
- <div className="mt-5 w-full">
+ <div className="mt-4 w-full">
  <StarterPanel
  mode={assistantMode}
  dark={dark}
@@ -4696,7 +4696,7 @@ function AIAssistantPage() {
  />
  </div>
 
- <div className="mt-4 w-full">
+ <div className="mt-3 w-full">
  {planNotice}
  {composer}
  {chipsRow}
