@@ -130,130 +130,31 @@ function SiteHeader({ isLight }: { isLight: boolean }) {
  );
 }
 
-function ProductPreview({ isLight }: { isLight: boolean }) {
- const t = isLight
- ? {
- shell: "border-[#CFE4F4] bg-white/62 text-[#0F172A] shadow-[0_28px_80px_rgba(56,189,248,0.10)] backdrop-blur-xl",
- canvas: "border-white/70 bg-white/42 backdrop-blur-xl",
- surface: "border-[#DCEAF5] bg-white/76 backdrop-blur",
- text: "text-[#0F172A]",
- muted: "text-[#475569]",
- faint: "text-[#94A3B8]",
- chip: "bg-[#E0F2FE] text-[#0369A1]",
- }
- : {
- shell: "border-white/10 bg-white/5 text-white backdrop-blur-xl",
- canvas: "border-white/10 bg-white/5 backdrop-blur-xl",
- surface: "border-white/10 bg-white/6 backdrop-blur",
- text: "text-white",
- muted: "text-slate-300",
- faint: "text-slate-500",
- chip: "bg-sky-400/10 text-sky-200",
- };
-
+function HeroActionPanel({ isLight }: { isLight: boolean }) {
  return (
- <div className={`w-full rounded-[28px] border p-4 sm:p-5 ${t.shell}`}>
- <div className={`rounded-[24px] border p-6 sm:p-8 ${t.canvas}`}>
- <div className="grid min-h-[470px] gap-6 lg:grid-cols-[1fr_0.9fr] lg:items-center">
- <div className={`rounded-[22px] border p-6 sm:p-7 ${t.surface}`}>
- <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${t.chip}`}>Cedium intelligence layer</span>
- <h2 className={`mt-6 max-w-md text-3xl font-semibold leading-tight sm:text-4xl ${t.text}`}>
- One brief becomes a complete production direction.
- </h2>
- <p className={`mt-4 max-w-md text-sm leading-6 ${t.muted}`}>
- Cedium turns an idea into structured strategy, interface direction, and the next focused build steps.
- </p>
-
- <div className="mt-8 space-y-4">
- {["Define outcome", "Shape interface", "Prepare launch"].map((item, index) => (
- <div key={item} className="flex items-center gap-4">
- <span className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-[#E0F2FE] text-sm font-semibold text-[#0284C7]">
- {index + 1}
- </span>
- <div>
- <p className={`text-sm font-semibold ${t.text}`}>{item}</p>
- <p className={`mt-0.5 text-xs ${t.faint}`}>Clear, reviewed, ready</p>
- </div>
- </div>
- ))}
- </div>
- </div>
-
- <div className="space-y-5">
- <div className={`rounded-[22px] border p-6 ${t.surface}`}>
- <p className={`text-xs font-semibold uppercase ${t.faint}`}>Launch readiness</p>
- <div className="mt-6 flex items-end justify-between">
- <p className={`text-5xl font-semibold ${t.text}`}>92%</p>
- <p className={`pb-1 text-sm ${t.muted}`}>aligned</p>
- </div>
- <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-[#E0F2FE] dark:bg-white/10">
- <div className="h-full w-[92%] rounded-full bg-[#38BDF8]" />
- </div>
- </div>
-
- <div className={`rounded-[22px] border p-6 ${t.surface}`}>
- <p className={`text-xs font-semibold uppercase ${t.faint}`}>Generated output</p>
- <div className="mt-5 space-y-3">
- {["Premium hero direction", "Sky-blue visual system", "Implementation checklist"].map((item) => (
- <div key={item} className="flex items-center gap-3">
- <span className="h-2.5 w-2.5 rounded-full bg-[#38BDF8]" />
- <span className={`text-sm font-medium ${t.text}`}>{item}</span>
- </div>
- ))}
- </div>
- </div>
- </div>
- </div>
- </div>
- </div>
- );
-}
-
-function Hero({ isLight }: { isLight: boolean }) {
- return (
- <section className="relative overflow-hidden px-5 pb-20 pt-[4.5rem] sm:px-8 lg:px-10">
- <div className="mx-auto max-w-7xl">
- <div className="relative grid gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
- <div>
  <div
- className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold shadow-sm backdrop-blur-xl ${
- isLight ? "border-white/70 bg-white/64 text-[#0369A1]" : "border-white/10 bg-white/5 text-sky-200"
- }`}
- >
- <Sparkles className="h-3.5 w-3.5" />
- Premium AI workspace
- </div>
- <h1
- className={`mt-6 max-w-3xl text-balance text-5xl font-semibold leading-[1.02] sm:text-6xl lg:text-7xl ${
- isLight ? "text-[#0F172A]" : "text-white"
- }`}
- >
- Cedium turns ideas into polished production workflows.
- </h1>
- <p className={`mt-6 max-w-2xl text-base leading-7 sm:text-lg ${isLight ? "text-[#475569]" : "text-zinc-400"}`}>
- A refined AI studio for design, code, 3D, and automation. Plan the work, generate the output, and keep every project moving from one calm workspace.
- </p>
- <div
- className={`mt-9 w-full max-w-[680px] rounded-[30px] border p-3 shadow-[0_30px_90px_rgba(56,189,248,0.16)] backdrop-blur-2xl ${
+ className={`w-full rounded-[34px] border p-3 shadow-[0_34px_100px_rgba(56,189,248,0.16)] backdrop-blur-2xl sm:p-4 ${
  isLight
- ? "border-white/85 bg-white/52"
+ ? "border-white/85 bg-white/54"
  : "border-white/10 bg-white/5"
  }`}
  >
- <div className="grid gap-3 sm:grid-cols-[1.2fr_0.8fr]">
+ <div className="grid gap-3 sm:grid-cols-[1.18fr_0.82fr]">
  <Link
  href="/main"
- className="group relative overflow-hidden rounded-[24px] bg-[#0F172A] p-5 text-white shadow-[0_22px_48px_rgba(15,23,42,0.18)] transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8]"
+ className="group relative min-h-[330px] overflow-hidden rounded-[26px] bg-[#0F172A] p-6 text-white shadow-[0_24px_52px_rgba(15,23,42,0.18)] transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] sm:min-h-[360px]"
  >
- <span className="absolute right-0 top-0 h-32 w-32 translate-x-10 -translate-y-10 rounded-full bg-[#38BDF8]/35 blur-2xl" />
+ <span className="absolute right-0 top-0 h-36 w-36 translate-x-10 -translate-y-10 rounded-full bg-[#38BDF8]/35 blur-2xl" />
+ <span className="absolute bottom-0 left-0 h-40 w-40 -translate-x-12 translate-y-12 rounded-full bg-[#2563EB]/28 blur-3xl" />
  <span className="relative inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-sky-100">
  <Sparkles className="h-3.5 w-3.5" />
  Start here
  </span>
- <div className="relative mt-8 flex items-end justify-between gap-5">
+ <div className="relative flex h-full flex-col justify-end pt-16">
+ <div className="flex items-end justify-between gap-5">
  <div>
- <p className="text-2xl font-semibold tracking-[-0.02em]">Launch Studio</p>
- <p className="mt-2 max-w-xs text-sm leading-6 text-slate-300">
+ <p className="text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">Launch Studio</p>
+ <p className="mt-3 max-w-xs text-sm leading-6 text-slate-300">
  Open the AI workspace for chat, projects, assets, code, and production tasks.
  </p>
  </div>
@@ -261,53 +162,54 @@ function Hero({ isLight }: { isLight: boolean }) {
  <ArrowRight className="h-5 w-5" />
  </span>
  </div>
+ </div>
  </Link>
 
  <div className="grid gap-3">
  <Link
  href="/community"
- className={`group rounded-[22px] border p-4 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] ${
+ className={`group rounded-[24px] border p-5 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] ${
  isLight
- ? "border-[#DCEAF5] bg-white/76 text-[#0F172A] hover:bg-white"
+ ? "border-[#DCEAF5] bg-white/78 text-[#0F172A] hover:bg-white"
  : "border-white/10 bg-white/5 text-white hover:bg-white/10"
  }`}
  >
  <div className="flex items-center justify-between gap-3">
- <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#E0F2FE] text-[#0284C7]">
- <UsersRound className="h-4 w-4" />
+ <span className="flex h-11 w-11 items-center justify-center rounded-[15px] bg-[#E0F2FE] text-[#0284C7]">
+ <UsersRound className="h-[18px] w-[18px]" />
  </span>
  <ArrowRight className="h-4 w-4 text-[#38BDF8] transition-transform group-hover:translate-x-0.5" />
  </div>
- <p className="mt-4 text-sm font-semibold">AI Community</p>
- <p className={`mt-1 text-xs leading-5 ${isLight ? "text-[#64748B]" : "text-zinc-400"}`}>
+ <p className="mt-6 text-sm font-semibold">AI Community</p>
+ <p className={`mt-2 text-xs leading-5 ${isLight ? "text-[#64748B]" : "text-zinc-400"}`}>
  Publish, remix, and get feedback.
  </p>
  </Link>
 
  <Link
  href="/pricing"
- className={`group rounded-[22px] border p-4 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] ${
+ className={`group rounded-[24px] border p-5 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] ${
  isLight
- ? "border-[#DCEAF5] bg-white/76 text-[#0F172A] hover:bg-white"
+ ? "border-[#DCEAF5] bg-white/78 text-[#0F172A] hover:bg-white"
  : "border-white/10 bg-white/5 text-white hover:bg-white/10"
  }`}
  >
  <div className="flex items-center justify-between gap-3">
- <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#E0F2FE] text-[#0284C7]">
- <ShieldCheck className="h-4 w-4" />
+ <span className="flex h-11 w-11 items-center justify-center rounded-[15px] bg-[#E0F2FE] text-[#0284C7]">
+ <ShieldCheck className="h-[18px] w-[18px]" />
  </span>
  <ArrowRight className="h-4 w-4 text-[#38BDF8] transition-transform group-hover:translate-x-0.5" />
  </div>
- <p className="mt-4 text-sm font-semibold">Plans & access</p>
- <p className={`mt-1 text-xs leading-5 ${isLight ? "text-[#64748B]" : "text-zinc-400"}`}>
+ <p className="mt-6 text-sm font-semibold">Plans & access</p>
+ <p className={`mt-2 text-xs leading-5 ${isLight ? "text-[#64748B]" : "text-zinc-400"}`}>
  Compare usage and workspace limits.
  </p>
  </Link>
  </div>
  </div>
- <div className={`mt-3 grid gap-2 rounded-[20px] border px-4 py-3 text-[11px] font-semibold sm:grid-cols-3 ${
+ <div className={`mt-3 grid gap-2 rounded-[22px] border px-4 py-3 text-[11px] font-semibold sm:grid-cols-3 ${
  isLight
- ? "border-[#DCEAF5] bg-white/58 text-[#64748B]"
+ ? "border-[#DCEAF5] bg-white/60 text-[#64748B]"
  : "border-white/10 bg-white/5 text-zinc-400"
  }`}>
  {["Chat to project", "Community feedback", "Production workflow"].map((item) => (
@@ -318,9 +220,35 @@ function Hero({ isLight }: { isLight: boolean }) {
  ))}
  </div>
  </div>
- </div>
+ );
+}
 
- <ProductPreview isLight={isLight} />
+function Hero({ isLight }: { isLight: boolean }) {
+ return (
+ <section className="relative overflow-hidden px-5 pb-20 pt-[4.5rem] sm:px-8 lg:px-10">
+ <div className="mx-auto max-w-7xl">
+ <div className="relative grid gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+ <div>
+ <div
+ className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold shadow-sm backdrop-blur-xl ${
+ isLight ? "border-white/70 bg-white/64 text-[#0369A1]" : "border-white/10 bg-white/5 text-sky-200"
+ }`}
+ >
+ <Sparkles className="h-3.5 w-3.5" />
+ Premium AI workspace
+ </div>
+ <h1
+ className={`mt-6 max-w-2xl text-balance text-5xl font-semibold leading-[1.02] sm:text-6xl ${
+ isLight ? "text-[#0F172A]" : "text-white"
+ }`}
+ >
+ Build polished work from one AI workspace.
+ </h1>
+ <p className={`mt-6 max-w-xl text-base leading-7 ${isLight ? "text-[#475569]" : "text-zinc-400"}`}>
+ A refined AI studio for design, code, 3D, and automation, built to move projects from idea to production in one calm workspace.
+ </p>
+ </div>
+ <HeroActionPanel isLight={isLight} />
  </div>
  </div>
  </section>
