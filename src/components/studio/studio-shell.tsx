@@ -832,6 +832,15 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  .studio-shell-dark [class*="text-white"] {
  color: #ffffff !important;
  }
+ .studio-shell-dark .studio-main-frame {
+ background: #17191d !important;
+ border-color: rgba(255, 255, 255, 0.08) !important;
+ }
+ .studio-shell-dark section.studio-content-surface {
+ background: transparent !important;
+ border-color: transparent !important;
+ box-shadow: none !important;
+ }
  `}</style>
  <div className="flex h-full">
  <div className="hidden lg:block">{sidebar}</div>
@@ -842,8 +851,9 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  </div>
  )}
 
- <main className="flex min-w-0 flex-1 flex-col py-3 pl-0 pr-3">
- <header className="mb-3 flex h-8 items-center justify-between px-1">
+ <main className="flex min-w-0 flex-1 flex-col p-[6px] pl-0">
+ <div className={`studio-main-frame flex min-h-0 flex-1 flex-col overflow-hidden rounded-[8px] border ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#17191D]":"border-[#DDE7EE] bg-white"}`}>
+ <header className={`flex h-11 items-center justify-between border-b px-3 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E8EEF2]"}`}>
  <div className="flex min-w-0 items-center gap-3">
  <div className={`relative flex items-center gap-2 ${dark ?"text-[#A8B0BA]":"text-[#6B7280]"}`}>
  <div ref={notificationRef} className="relative">
@@ -888,13 +898,11 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
  <section
  className={[
- activeRoute ==="ai-assistant"?"min-h-0 flex-1 rounded-[18px]":"min-h-0 flex-1 rounded-3xl",
+ "studio-content-surface",
+ activeRoute ==="ai-assistant"?"min-h-0 flex-1":"min-h-0 flex-1",
  activeRoute ==="ai-assistant"?"overflow-hidden flex flex-col":"overflow-auto",
  activeRoute ==="ai-assistant"?"p-0": activeRoute ==="code-builder"?"px-4 py-4":"px-8 py-8",
- dark
- ?"border border-[rgba(255,255,255,0.08)] bg-[#17191D]"
- :"border border-[#E8EEF2] bg-white",
- activeRoute ==="ai-assistant"?(dark ?"border-[rgba(255,255,255,0.08)] bg-[#17191D] shadow-none":"border-[#DDE7EE] bg-white shadow-none"):"",
+ dark ?"bg-transparent":"bg-transparent",
  ].join("")}
  >
  <div className={
@@ -907,6 +915,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  {children}
  </div>
  </section>
+ </div>
  </main>
  </div>
 
