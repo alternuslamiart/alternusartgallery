@@ -509,6 +509,7 @@ export default function Pricing() {
  border: `1px solid ${t.faint}`,
  background: t.raised,
  boxShadow: "0 34px 120px rgba(15,23,42,0.28)",
+ position: "relative",
  }}
  >
  <div
@@ -517,7 +518,7 @@ export default function Pricing() {
  alignItems: "center",
  justifyContent: "space-between",
  gap: 18,
- padding: "22px 24px",
+ padding: "28px clamp(112px, 14vw, 168px) 28px 28px",
  borderBottom: `1px solid ${t.faint}`,
  }}
  >
@@ -534,18 +535,44 @@ export default function Pricing() {
  onClick={() => setCheckoutTier(null)}
  aria-label="Close payment frame"
  style={{
- height: 40,
- width: 40,
- borderRadius: 999,
- border: `1px solid ${t.faint}`,
- background: t.surface,
+ position: "absolute",
+ top: 28,
+ right: 28,
+ height: "clamp(68px, 8vw, 112px)",
+ width: "clamp(68px, 8vw, 112px)",
+ borderRadius: "clamp(24px, 3.5vw, 44px)",
+ border: "1px solid rgba(15,23,42,0.04)",
+ background: t.isDark ? "rgba(255,255,255,0.08)" : "#EEEEEE",
  color: t.fg,
  cursor: "pointer",
- fontSize: 22,
- lineHeight: 1,
+ boxShadow: t.isDark ? "inset 0 1px 0 rgba(255,255,255,0.08)" : "inset 0 1px 0 rgba(255,255,255,0.7)",
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
  }}
  >
- x
+ <span
+ aria-hidden="true"
+ style={{
+ position: "absolute",
+ width: "46%",
+ height: 6,
+ borderRadius: 999,
+ background: t.fg,
+ transform: "rotate(45deg)",
+ }}
+ />
+ <span
+ aria-hidden="true"
+ style={{
+ position: "absolute",
+ width: "46%",
+ height: 6,
+ borderRadius: 999,
+ background: t.fg,
+ transform: "rotate(-45deg)",
+ }}
+ />
  </button>
  </div>
 
