@@ -556,8 +556,8 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  className={[
 "flex h-full flex-shrink-0 flex-col rounded-none py-3 transition-all duration-200 ease-out",
  dark
- ?"border-r border-t border-b border-[rgba(255,255,255,0.08)] bg-[#181A1F]"
- :"border-r border-t border-b border-[#C5D9E8] bg-[#EAF3F8]",
+ ?"bg-[#181A1F]"
+ :"bg-[#EAF3F8]",
  isCollapsed ?"w-[60px]":"w-[230px]",
  ].join(" ")}
  >
@@ -728,7 +728,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  }
  .studio-shell-dark aside {
  background: #181a1f !important;
- border-color: rgba(255, 255, 255, 0.08) !important;
+ border: none !important;
  }
  .studio-shell-dark section {
  background: #17191d !important;
