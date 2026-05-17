@@ -1,25 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
 import {
- ArrowRight,
- BadgeCheck,
- Bot,
+ Bell,
+ Bookmark,
+ ChevronDown,
  Code2,
  FileCode2,
  Gamepad2,
  GitFork,
  Globe2,
- History,
+ Home,
  Layers3,
+ MessageCircle,
  MessageSquareText,
- Rocket,
+ Plus,
+ Search,
  Sparkles,
- Store,
+ Star,
  ThumbsUp,
  Wand2,
  Workflow,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
  title: "AI Community",
@@ -28,485 +30,384 @@ export const metadata: Metadata = {
 };
 
 const spaces = [
- {
- title: "Showcase",
- description: "Publish finished creations: websites, app concepts, game scenes, prompt workflows, and asset packs.",
- activity: "320 creations",
- icon: Sparkles,
- },
- {
- title: "Feedback",
- description: "Ask for useful critique on UI, code structure, environment design, prompts, and product direction.",
- activity: "118 active reviews",
- icon: MessageSquareText,
- },
- {
- title: "Prompts & Workflows",
- description: "Share repeatable AI processes for research, content, automation, coding, and daily work.",
- activity: "246 workflows",
- icon: Workflow,
- },
- {
- title: "Code & Apps",
- description: "Discuss AI-assisted apps, agents, backend structure, debugging, architecture, and implementation.",
- activity: "174 projects",
- icon: Code2,
- },
- {
- title: "Game Environments",
- description: "Post maps, worlds, scenes, asset plans, biomes, lighting studies, and level design experiments.",
- activity: "89 worlds",
- icon: Gamepad2,
- },
+ { name: "showcase", label: "Showcase", count: "320 creations", icon: Sparkles },
+ { name: "feedback", label: "Feedback", count: "118 reviews", icon: MessageSquareText },
+ { name: "prompts-workflows", label: "Prompts & Workflows", count: "246 workflows", icon: Workflow },
+ { name: "code-apps", label: "Code & Apps", count: "174 projects", icon: Code2 },
+ { name: "game-environments", label: "Game Environments", count: "89 worlds", icon: Gamepad2 },
 ];
 
-const creations = [
+const feedPosts = [
  {
- title: "Cyberpunk City Environment",
- type: "Game Environment",
+ title: "Built a cyberpunk city environment with AI",
+ space: "showcase",
  author: "Dren Gashi",
+ time: "18 min ago",
+ type: "Game Environment",
  description:
- "A dense neon city block with street markets, rain lighting, modular buildings, and NPC route notes.",
+ "Dense neon city block with rain lighting, modular buildings, market props, NPC route notes, and optimization checklist.",
  stack: ["Blender", "AI prompts", "Unreal plan"],
- stats: { comments: 18, likes: 142, saves: 36, forks: 11 },
- notes: "Prompt chain includes mood references, asset list, lighting passes, and optimization notes.",
- version: "v3 night lighting",
+ notes: "Prompt chain includes mood references, asset list, lighting passes, and version notes.",
+ comments: 18,
+ likes: 142,
+ saves: 36,
+ forks: 11,
  icon: Gamepad2,
- },
- {
- title: "SaaS Launch Page Kit",
- type: "Website Template",
- author: "Elira Morina",
- description:
- "A polished React landing page direction with sections, conversion copy, feature cards, and pricing layout.",
- stack: ["Next.js", "Tailwind", "Copy workflow"],
- stats: { comments: 24, likes: 210, saves: 58, forks: 19 },
- notes: "Generation notes cover hero variants, CTA tests, component hierarchy, and responsive decisions.",
- version: "v2 pricing pass",
- icon: Globe2,
- },
- {
- title: "Rust API Starter Review",
- type: "Code Structure",
- author: "Arben Krasniqi",
- description:
- "A backend folder structure asking for security feedback, endpoint naming, and performance risks.",
- stack: ["Rust", "Postgres", "API design"],
- stats: { comments: 31, likes: 96, saves: 22, forks: 7 },
- notes: "Includes route map, auth questions, database notes, and AI review output.",
- version: "v1 review draft",
- icon: FileCode2,
- },
-];
-
-const feedItems = [
- {
- title: "Built a medieval game environment with AI",
- label: "Showcase",
- detail: "Includes biome notes, asset list, lighting pass, and a fork request for a night version.",
- icon: Gamepad2,
+ accent: "from-[#312E81] via-[#6D28D9] to-[#38BDF8]",
  },
  {
  title: "Generated a React landing page for SaaS",
- label: "Website",
- detail: "Looking for feedback on section order, hero copy, pricing cards, and mobile spacing.",
+ space: "feedback",
+ author: "Elira Morina",
+ time: "42 min ago",
+ type: "Website Template",
+ description:
+ "Looking for critique on hero copy, section order, pricing cards, mobile rhythm, and CTA hierarchy.",
+ stack: ["Next.js", "Tailwind", "Copy workflow"],
+ notes: "Generation notes cover three hero variants, conversion copy, and responsive component decisions.",
+ comments: 24,
+ likes: 210,
+ saves: 58,
+ forks: 19,
  icon: Globe2,
+ accent: "from-[#0F766E] via-[#0284C7] to-[#7DD3FC]",
  },
  {
- title: "Fork this prompt and make it better",
- label: "Prompt Workflow",
- detail: "A repeatable prompt chain for app UI, product requirements, and frontend screens.",
- icon: GitFork,
- },
- {
- title: "Can someone improve this backend structure?",
- label: "Code Review",
- detail: "Requesting architecture comments, security notes, database feedback, and refactor ideas.",
- icon: Code2,
+ title: "Can someone improve this Rust backend structure?",
+ space: "code-apps",
+ author: "Arben Krasniqi",
+ time: "1 hr ago",
+ type: "Code Structure",
+ description:
+ "API starter asking for security feedback, endpoint naming, database structure, and performance risks.",
+ stack: ["Rust", "Postgres", "API design"],
+ notes: "Includes route map, auth questions, schema notes, and AI review output.",
+ comments: 31,
+ likes: 96,
+ saves: 22,
+ forks: 7,
+ icon: FileCode2,
+ accent: "from-[#1E293B] via-[#334155] to-[#38BDF8]",
  },
 ];
 
-const aiProjectHelp = [
+const aiReviewCards = [
  {
- title: "App ideas",
- items: ["Feature breakdown", "MVP scope", "Database structure", "Frontend screens", "Backend endpoints"],
- icon: Rocket,
+ title: "App idea",
+ body: "AI can generate feature breakdown, MVP scope, database structure, frontend screens, backend endpoints, risks, and improvements.",
+ icon: Layers3,
  },
  {
- title: "Game environments",
- items: ["Lighting improvements", "Biome details", "Asset list", "Quest ideas", "Optimization notes"],
+ title: "Game environment",
+ body: "AI can suggest lighting, biome details, asset lists, quest ideas, level design issues, and optimization notes.",
  icon: Gamepad2,
  },
  {
- title: "Code projects",
- items: ["Review", "Refactor suggestions", "Security notes", "Architecture comments", "Performance risks"],
+ title: "Code project",
+ body: "AI can review architecture, refactors, security notes, performance risks, and implementation tradeoffs.",
  icon: Code2,
  },
 ];
 
 const remixChain = [
- "User A creates a medieval game environment.",
- "User B forks it and builds a night version.",
- "User C adds an NPC village and quest structure.",
- "User D turns the chain into a Unity asset plan.",
+ "Medieval environment",
+ "Night lighting fork",
+ "NPC village version",
+ "Unity asset plan",
 ];
 
-const reputationActions = [
- "Project was forked",
- "Comment marked helpful",
- "Prompt reused by others",
- "Quality feedback given",
- "Project template published",
- "Contribution added to a project chain",
+const reputation = [
+ "Project forked",
+ "Helpful comment",
+ "Prompt reused",
+ "Quality feedback",
+ "Template published",
+ "Project-chain contribution",
 ];
 
-const marketplaceItems = [
- "AI-generated environment packs",
+const marketplaceLater = [
+ "Environment packs",
  "Website templates",
  "App starter kits",
  "Prompt packs",
  "Code boilerplates",
- "Game asset concepts",
  "Premium workflows",
- "Creator services",
 ];
 
-function SectionHeading({
- eyebrow,
- title,
- description,
+function IconTile({
+ icon: Icon,
+ active = false,
+ label,
 }: {
- eyebrow: string;
- title: string;
- description: string;
+ icon: LucideIcon;
+ active?: boolean;
+ label: string;
 }) {
  return (
- <div className="max-w-3xl">
- <p className="text-sm font-semibold text-[#0284C7]">{eyebrow}</p>
- <h2 className="mt-3 text-3xl font-semibold leading-tight text-[#0F172A] sm:text-4xl">
- {title}
- </h2>
- <p className="mt-4 text-sm leading-6 text-[#475569] sm:text-base">
- {description}
- </p>
- </div>
+ <button
+ type="button"
+ aria-label={label}
+ className={`flex h-12 w-12 items-center justify-center rounded-[16px] border transition ${
+ active
+ ? "border-[#38BDF8] bg-[#38BDF8] text-white shadow-sm"
+ : "border-[#DCEAF5] bg-white text-[#64748B] hover:border-[#B7DDF6] hover:text-[#0284C7]"
+ }`}
+ >
+ <Icon className="h-5 w-5" />
+ </button>
  );
 }
 
-function PreviewPanel({ icon: Icon, title }: { icon: typeof Sparkles; title: string }) {
+function Stat({ label, value }: { label: string; value: string }) {
  return (
- <div className="overflow-hidden rounded-[18px] border border-[#DCEAF5] bg-[#F8FCFF]">
- <div className="flex items-center gap-2 border-b border-[#DCEAF5] bg-white px-3 py-2">
- <span className="h-2.5 w-2.5 rounded-full bg-[#38BDF8]" />
- <span className="h-2.5 w-2.5 rounded-full bg-[#DCEAF5]" />
- <span className="h-2.5 w-2.5 rounded-full bg-[#DCEAF5]" />
- <span className="ml-2 text-[10px] font-semibold text-[#94A3B8]">project preview</span>
- </div>
- <div className="p-4">
- <div className="flex h-32 items-center justify-center rounded-[14px] border border-[#DCEAF5] bg-white">
- <div className="text-center">
- <Icon className="mx-auto h-7 w-7 text-[#0284C7]" />
- <p className="mt-3 text-xs font-semibold text-[#475569]">{title}</p>
- </div>
- </div>
- </div>
+ <div>
+ <p className="text-sm font-semibold text-[#0F172A]">{value}</p>
+ <p className="mt-0.5 text-[11px] text-[#64748B]">{label}</p>
  </div>
  );
 }
 
 export default function CommunityPage() {
  return (
- <main className="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#F8FCFF_0%,#FFFFFF_44%,#F6FBFF_100%)] font-roboto text-[#0F172A]">
- <section className="px-5 pb-12 pt-12 sm:px-8 sm:pt-16 lg:px-10">
- <div className="mx-auto max-w-7xl">
- <div className="rounded-[28px] border border-[#DCEAF5] bg-white/80 p-6 shadow-sm backdrop-blur sm:p-8 lg:p-10">
- <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
- <div>
- <Link
- href="/"
- className="inline-flex items-center gap-2 rounded-full border border-[#DCEAF5] bg-white/80 px-3.5 py-1.5 text-xs font-semibold text-[#0369A1] transition-colors hover:bg-[#F0F9FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8]"
- >
- <ArrowRight className="h-3.5 w-3.5 rotate-180" />
- Back to Cedium
+ <main className="min-h-screen bg-[#EEF3F7] font-roboto text-[#111827]">
+ <header className="sticky top-0 z-30 border-b border-[#D8E2EA] bg-white/92 backdrop-blur-xl">
+ <div className="mx-auto flex h-14 max-w-[1440px] items-center gap-3 px-3 sm:px-4">
+ <Link href="/" className="inline-flex items-center gap-2 rounded-[12px] px-2 py-1.5 text-sm font-semibold text-[#0F172A] hover:bg-[#F1F5F9]">
+ <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#38BDF8] text-white">
+ <Sparkles className="h-4 w-4 fill-current" />
+ </span>
+ Cedium
  </Link>
- <h1 className="mt-6 max-w-3xl text-balance text-5xl font-semibold leading-[1.02] text-[#0F172A] sm:text-6xl">
- AI Community
- </h1>
- <p className="mt-6 max-w-2xl text-base leading-7 text-[#475569] sm:text-lg">
- A creation-first AI community where every post is connected to a project, asset, prompt, code structure, environment, website, or app idea.
- </p>
- <div className="mt-8 flex flex-col gap-3 sm:flex-row">
- <Button asChild className="h-11 rounded-[10px] bg-[#38BDF8] px-5 text-sm font-semibold text-white hover:bg-[#0EA5E9]">
- <a href="#creations">
- Publish a Creation
- <ArrowRight className="h-4 w-4" />
- </a>
- </Button>
- <Button
- asChild
- variant="outline"
- className="h-11 rounded-[10px] border-[#DCEAF5] bg-white/80 px-5 text-sm font-semibold text-[#0F172A] shadow-none hover:bg-[#F0F9FF]"
- >
- <a href="#feed">Explore Feed</a>
- </Button>
+ <div className="hidden h-9 min-w-0 flex-1 items-center gap-2 rounded-full bg-[#EEF3F7] px-4 text-sm text-[#64748B] md:flex">
+ <Search className="h-4 w-4" />
+ Search projects, prompts, code, environments
  </div>
+ <Link href="/main" className="hidden h-9 items-center gap-2 rounded-full border border-[#DCEAF5] bg-white px-4 text-sm font-semibold text-[#0F172A] hover:bg-[#F0F9FF] sm:inline-flex">
+ Open Studio
+ </Link>
+ <button type="button" className="inline-flex h-9 items-center gap-2 rounded-full bg-[#38BDF8] px-4 text-sm font-semibold text-white hover:bg-[#0EA5E9]">
+ <Plus className="h-4 w-4" />
+ Create
+ </button>
+ <button type="button" aria-label="Notifications" className="flex h-9 w-9 items-center justify-center rounded-full border border-[#DCEAF5] bg-white text-[#64748B] hover:bg-[#F0F9FF]">
+ <Bell className="h-4 w-4" />
+ </button>
  </div>
+ </header>
 
- <div className="rounded-[24px] border border-[#DCEAF5] bg-[#F8FCFF] p-5">
- <div className="grid gap-4 sm:grid-cols-2">
- {[
- { label: "Project posts", value: "920", icon: Layers3 },
- { label: "Forks/remixes", value: "310", icon: GitFork },
- { label: "Helpful reviews", value: "1.8k", icon: BadgeCheck },
- { label: "Prompt workflows", value: "246", icon: Workflow },
- ].map(({ label, value, icon: Icon }) => (
- <div key={label} className="rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
- <Icon className="h-5 w-5 text-[#0284C7]" />
- <p className="mt-6 text-3xl font-semibold text-[#0F172A]">{value}</p>
- <p className="mt-1 text-sm text-[#64748B]">{label}</p>
+ <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-4 px-3 py-4 sm:px-4 lg:grid-cols-[72px_230px_minmax(0,1fr)_310px]">
+ <aside className="hidden lg:flex lg:flex-col lg:items-center lg:gap-3">
+ <IconTile icon={Home} label="Home" />
+ <IconTile icon={Sparkles} active label="AI Community" />
+ <IconTile icon={Gamepad2} label="Game environments" />
+ <IconTile icon={Code2} label="Code and apps" />
+ <IconTile icon={Workflow} label="Workflows" />
+ <IconTile icon={Plus} label="Create new space" />
+ </aside>
+
+ <aside className="hidden overflow-hidden rounded-[20px] border border-[#DCEAF5] bg-[#101114] text-white shadow-sm lg:block">
+ <div className="bg-gradient-to-br from-[#7C3AED] via-[#38BDF8] to-[#F0F9FF] p-4">
+ <div className="flex items-center justify-between">
+ <div>
+ <p className="text-sm font-semibold">AI Creation Hub</p>
+ <p className="mt-1 text-xs text-white/75">Projects, remixes, feedback</p>
  </div>
+ <ChevronDown className="h-4 w-4" />
+ </div>
+ </div>
+ <div className="p-3">
+ <div className="mb-4 rounded-[14px] bg-white/6 p-3">
+ <p className="text-xs font-semibold text-white">Creation loop</p>
+ <p className="mt-2 text-[11px] leading-5 text-white/62">
+ AI tool to project to preview to publish to feedback to remix.
+ </p>
+ </div>
+ <div className="space-y-1">
+ <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-wide text-white/45">Spaces</p>
+ {spaces.map(({ name, label, count, icon: Icon }) => (
+ <button key={name} type="button" className="group flex w-full items-center gap-2 rounded-[10px] px-2 py-2 text-left text-sm text-white/72 hover:bg-white/8 hover:text-white">
+ <Icon className="h-4 w-4 text-white/35 group-hover:text-[#7DD3FC]" />
+ <span className="min-w-0 flex-1 truncate">{label}</span>
+ <span className="text-[10px] text-white/35">{count.split(" ")[0]}</span>
+ </button>
  ))}
  </div>
  </div>
- </div>
- </div>
- </div>
- </section>
+ </aside>
 
- <section id="spaces" className="px-5 py-12 sm:px-8 sm:py-16 lg:px-10">
- <div className="mx-auto max-w-7xl">
- <SectionHeading
- eyebrow="Spaces"
- title="Keep the community focused around creation."
- description="Start with a few active spaces instead of a large empty forum. Each space is tied to work people can publish, review, fork, or improve."
- />
- <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
- {spaces.map(({ title, description, activity, icon: Icon }) => (
- <article
- key={title}
- className="rounded-[18px] border border-[#DCEAF5] bg-white p-6 shadow-sm transition hover:border-[#B7DDF6] hover:shadow-md"
- >
- <div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[#E0F2FE] text-[#0284C7]">
- <Icon className="h-5 w-5" />
+ <section className="min-w-0">
+ <div className="overflow-hidden rounded-[20px] border border-[#DCEAF5] bg-white shadow-sm">
+ <div className="h-28 bg-gradient-to-br from-[#111827] via-[#1D4ED8] to-[#38BDF8]" />
+ <div className="px-5 pb-5">
+ <div className="-mt-9 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+ <div className="flex items-end gap-4">
+ <div className="flex h-20 w-20 items-center justify-center rounded-[22px] border-4 border-white bg-[#38BDF8] text-white shadow-sm">
+ <Wand2 className="h-9 w-9" />
  </div>
- <h3 className="mt-6 text-base font-semibold text-[#0F172A]">{title}</h3>
+ <div className="pb-1">
+ <h1 className="text-2xl font-semibold tracking-[-0.01em] text-[#0F172A]">AI Community</h1>
+ <p className="mt-1 text-sm text-[#64748B]">Creation-first space for AI projects, prompts, code, worlds, and remixes.</p>
+ </div>
+ </div>
+ <div className="flex gap-2">
+ <button type="button" className="h-10 rounded-full border border-[#DCEAF5] bg-white px-4 text-sm font-semibold text-[#0F172A] hover:bg-[#F0F9FF]">
+ Explore
+ </button>
+ <button type="button" className="h-10 rounded-full bg-[#38BDF8] px-4 text-sm font-semibold text-white hover:bg-[#0EA5E9]">
+ Join
+ </button>
+ </div>
+ </div>
+ <div className="mt-5 grid grid-cols-2 gap-4 border-t border-[#EEF3F7] pt-4 sm:grid-cols-4">
+ <Stat label="Projects" value="920" />
+ <Stat label="Forks" value="310" />
+ <Stat label="Reviews" value="1.8k" />
+ <Stat label="Workflows" value="246" />
+ </div>
+ <div className="mt-5 flex gap-6 border-t border-[#EEF3F7] pt-4 text-sm font-semibold text-[#64748B]">
+ <a href="#feed" className="text-[#0284C7]">Overview</a>
+ <a href="#feed" className="hover:text-[#0284C7]">Posts</a>
+ <a href="#remix" className="hover:text-[#0284C7]">Remix chains</a>
+ <a href="#ai-review" className="hover:text-[#0284C7]">AI Review</a>
+ </div>
+ </div>
+ </div>
+
+ <div className="mt-4 rounded-[18px] border border-[#DCEAF5] bg-white p-4 shadow-sm">
+ <div className="flex gap-3">
+ <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#E0F2FE] text-sm font-semibold text-[#0369A1]">AL</div>
+ <button type="button" className="flex min-h-10 flex-1 items-center rounded-full border border-[#DCEAF5] bg-[#F8FCFF] px-4 text-left text-sm text-[#64748B] hover:bg-[#F0F9FF]">
+ Share a project, prompt workflow, code snippet, app idea, or game environment
+ </button>
+ </div>
+ <div className="mt-3 flex flex-wrap gap-2 pl-0 sm:pl-13">
+ {["Project", "Preview", "Prompt history", "Ask feedback", "Fork request"].map((item) => (
+ <button key={item} type="button" className="rounded-full border border-[#DCEAF5] bg-white px-3 py-1.5 text-xs font-semibold text-[#475569] hover:bg-[#F0F9FF]">
+ {item}
+ </button>
+ ))}
+ </div>
+ </div>
+
+ <div id="feed" className="mt-4 space-y-4">
+ {feedPosts.map(({ title, space, author, time, type, description, stack, notes, comments, likes, saves, forks, icon: Icon, accent }) => (
+ <article key={title} className="overflow-hidden rounded-[18px] border border-[#DCEAF5] bg-white shadow-sm">
+ <div className="grid gap-0 md:grid-cols-[220px_minmax(0,1fr)]">
+ <div className={`flex min-h-[190px] items-center justify-center bg-gradient-to-br ${accent} p-5 text-white`}>
+ <div className="text-center">
+ <Icon className="mx-auto h-10 w-10" />
+ <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-white/75">{type}</p>
+ </div>
+ </div>
+ <div className="p-5">
+ <div className="flex flex-wrap items-center gap-2 text-xs text-[#64748B]">
+ <span className="font-semibold text-[#0284C7]">#{space}</span>
+ <span>Posted by {author}</span>
+ <span>{time}</span>
+ </div>
+ <h2 className="mt-3 text-xl font-semibold tracking-[-0.01em] text-[#0F172A]">{title}</h2>
  <p className="mt-3 text-sm leading-6 text-[#475569]">{description}</p>
- <p className="mt-5 inline-flex rounded-full bg-[#F0F9FF] px-3 py-1 text-xs font-semibold text-[#0369A1]">
- {activity}
- </p>
+ <div className="mt-4 flex flex-wrap gap-2">
+ {stack.map((item) => (
+ <span key={item} className="rounded-full bg-[#F1F5F9] px-3 py-1 text-xs font-semibold text-[#475569]">
+ {item}
+ </span>
+ ))}
+ </div>
+ <div className="mt-4 rounded-[14px] border border-[#DCEAF5] bg-[#F8FCFF] p-3 text-xs leading-5 text-[#64748B]">
+ <span className="font-semibold text-[#0F172A]">Generation notes:</span> {notes}
+ </div>
+ <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold text-[#64748B]">
+ <button type="button" className="inline-flex items-center gap-1.5 rounded-full bg-[#F1F5F9] px-3 py-1.5 hover:bg-[#E0F2FE] hover:text-[#0369A1]"><MessageCircle className="h-3.5 w-3.5" />{comments}</button>
+ <button type="button" className="inline-flex items-center gap-1.5 rounded-full bg-[#F1F5F9] px-3 py-1.5 hover:bg-[#E0F2FE] hover:text-[#0369A1]"><ThumbsUp className="h-3.5 w-3.5" />{likes}</button>
+ <button type="button" className="inline-flex items-center gap-1.5 rounded-full bg-[#F1F5F9] px-3 py-1.5 hover:bg-[#E0F2FE] hover:text-[#0369A1]"><Bookmark className="h-3.5 w-3.5" />{saves}</button>
+ <button type="button" className="inline-flex items-center gap-1.5 rounded-full bg-[#38BDF8] px-3 py-1.5 text-white hover:bg-[#0EA5E9]"><GitFork className="h-3.5 w-3.5" />Fork {forks}</button>
+ </div>
+ </div>
+ </div>
  </article>
  ))}
  </div>
+
+ <div id="remix" className="mt-4 rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
+ <div className="flex items-center justify-between gap-4">
+ <div>
+ <p className="text-sm font-semibold text-[#0284C7]">Remix / Fork system</p>
+ <h2 className="mt-2 text-xl font-semibold text-[#0F172A]">Every useful creation can become a project chain.</h2>
+ </div>
+ <GitFork className="hidden h-6 w-6 text-[#0284C7] sm:block" />
+ </div>
+ <div className="mt-5 grid gap-3 sm:grid-cols-4">
+ {remixChain.map((item, index) => (
+ <div key={item} className="rounded-[14px] border border-[#DCEAF5] bg-[#F8FCFF] p-4">
+ <span className="flex h-7 w-7 items-center justify-center rounded-[9px] bg-[#38BDF8] text-xs font-semibold text-white">{index + 1}</span>
+ <p className="mt-4 text-sm font-semibold text-[#0F172A]">{item}</p>
+ </div>
+ ))}
+ </div>
  </div>
  </section>
 
- <section id="creations" className="px-5 py-12 sm:px-8 sm:py-16 lg:px-10">
- <div className="mx-auto max-w-7xl">
- <SectionHeading
- eyebrow="Projects / Creations"
- title="Better than ordinary posts: every item is a reusable project."
- description="Each creation can include title, description, preview, tech stack, prompt history, files, comments, likes, saves, forks, and version history."
- />
- <div className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-3">
- {creations.map(({ title, type, author, description, stack, stats, notes, version, icon: Icon }) => (
- <article key={title} className="flex flex-col rounded-[22px] border border-[#DCEAF5] bg-white p-5 shadow-sm transition hover:border-[#B7DDF6] hover:shadow-md">
- <PreviewPanel icon={Icon} title={type} />
- <div className="mt-5 flex items-start justify-between gap-4">
+ <aside className="space-y-4 lg:sticky lg:top-[72px] lg:self-start">
+ <section className="rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
+ <div className="flex items-start justify-between">
  <div>
- <p className="text-xs font-semibold text-[#0284C7]">{type}</p>
- <h3 className="mt-2 text-lg font-semibold leading-tight text-[#0F172A]">{title}</h3>
- <p className="mt-1 text-xs text-[#64748B]">by {author}</p>
+ <h2 className="text-base font-semibold text-[#0F172A]">AI Creation Hub</h2>
+ <p className="mt-1 text-xs text-[#64748B]">u/ai_creation_hub</p>
  </div>
- <span className="rounded-full bg-[#F1F5F9] px-2.5 py-1 text-[10px] font-semibold text-[#475569]">
- {version}
- </span>
+ <button type="button" aria-label="Community options" className="rounded-full p-2 text-[#64748B] hover:bg-[#F1F5F9]">
+ <ChevronDown className="h-4 w-4" />
+ </button>
  </div>
- <p className="mt-4 text-sm leading-6 text-[#475569]">{description}</p>
+ <div className="mt-5 grid grid-cols-3 gap-3 border-y border-[#EEF3F7] py-4">
+ <Stat label="Members" value="3,868" />
+ <Stat label="Online" value="355" />
+ <Stat label="Created" value="2026" />
+ </div>
+ <button type="button" className="mt-4 h-10 w-full rounded-full bg-[#38BDF8] text-sm font-semibold text-white hover:bg-[#0EA5E9]">
+ Join Community
+ </button>
+ </section>
+
+ <section id="ai-review" className="rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
+ <h2 className="text-sm font-semibold uppercase tracking-wide text-[#64748B]">AI inside projects</h2>
+ <div className="mt-4 space-y-3">
+ {aiReviewCards.map(({ title, body, icon: Icon }) => (
+ <div key={title} className="rounded-[14px] border border-[#DCEAF5] bg-[#F8FCFF] p-3">
+ <div className="flex items-center gap-2 text-sm font-semibold text-[#0F172A]">
+ <Icon className="h-4 w-4 text-[#0284C7]" />
+ {title}
+ </div>
+ <p className="mt-2 text-xs leading-5 text-[#64748B]">{body}</p>
+ </div>
+ ))}
+ </div>
+ </section>
+
+ <section className="rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
+ <h2 className="text-sm font-semibold uppercase tracking-wide text-[#64748B]">Reputation</h2>
+ <div className="mt-4 space-y-2">
+ {reputation.map((item) => (
+ <div key={item} className="flex items-center gap-2 rounded-[12px] bg-[#F8FCFF] px-3 py-2 text-xs font-semibold text-[#475569]">
+ <Star className="h-3.5 w-3.5 text-[#0284C7]" />
+ {item}
+ </div>
+ ))}
+ </div>
+ </section>
+
+ <section className="rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
+ <h2 className="text-sm font-semibold uppercase tracking-wide text-[#64748B]">Marketplace later</h2>
  <div className="mt-4 flex flex-wrap gap-2">
- {stack.map((item) => (
+ {marketplaceLater.map((item) => (
  <span key={item} className="rounded-full bg-[#F0F9FF] px-3 py-1 text-xs font-semibold text-[#0369A1]">
  {item}
  </span>
  ))}
  </div>
- <div className="mt-5 rounded-[14px] border border-[#DCEAF5] bg-[#F8FCFF] p-4">
- <div className="flex items-center gap-2 text-xs font-semibold text-[#0F172A]">
- <History className="h-3.5 w-3.5 text-[#0284C7]" />
- Prompt history / generation notes
- </div>
- <p className="mt-2 text-xs leading-5 text-[#64748B]">{notes}</p>
- </div>
- <div className="mt-5 grid grid-cols-4 gap-2 text-center text-xs text-[#64748B]">
- <span>{stats.comments} comments</span>
- <span>{stats.likes} likes</span>
- <span>{stats.saves} saves</span>
- <span>{stats.forks} forks</span>
- </div>
- <div className="mt-auto flex gap-2 pt-5">
- <Button
- type="button"
- variant="outline"
- className="h-10 flex-1 rounded-[10px] border-[#DCEAF5] bg-white text-sm font-semibold text-[#0F172A] shadow-none hover:bg-[#F0F9FF]"
- >
- View Project
- </Button>
- <Button type="button" className="h-10 flex-1 rounded-[10px] bg-[#38BDF8] text-sm font-semibold text-white hover:bg-[#0EA5E9]">
- <GitFork className="h-4 w-4" />
- Fork / Remix
- </Button>
- </div>
- </article>
- ))}
- </div>
- </div>
  </section>
-
- <section id="feed" className="px-5 py-12 sm:px-8 sm:py-16 lg:px-10">
- <div className="mx-auto max-w-7xl">
- <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr]">
- <SectionHeading
- eyebrow="Creation feed"
- title="The feed is not just text. It is a stream of useful work."
- description="People publish projects, ask for feedback, share AI workflows, request code reviews, and invite others to fork better versions."
- />
- <div className="grid gap-4">
- {feedItems.map(({ title, label, detail, icon: Icon }) => (
- <article key={title} className="rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
- <div className="flex items-start gap-4">
- <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#E0F2FE] text-[#0284C7]">
- <Icon className="h-5 w-5" />
+ </aside>
  </div>
- <div className="min-w-0">
- <p className="text-xs font-semibold text-[#0284C7]">{label}</p>
- <h3 className="mt-1 text-base font-semibold text-[#0F172A]">{title}</h3>
- <p className="mt-2 text-sm leading-6 text-[#475569]">{detail}</p>
- </div>
- </div>
- </article>
- ))}
- </div>
- </div>
- </div>
- </section>
-
- <section className="px-5 py-12 sm:px-8 sm:py-16 lg:px-10">
- <div className="mx-auto max-w-7xl">
- <div className="rounded-[24px] border border-[#DCEAF5] bg-white/80 p-6 shadow-sm sm:p-8">
- <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
- <SectionHeading
- eyebrow="Remix / Fork system"
- title="Make every useful creation easier to improve."
- description="The strongest loop is project publishing followed by feedback, forked variations, version chains, and practical reuse."
- />
- <div className="grid gap-3">
- {remixChain.map((step, index) => (
- <div key={step} className="flex gap-4 rounded-[14px] border border-[#DCEAF5] bg-[#F8FCFF] p-4">
- <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-[#38BDF8] text-sm font-semibold text-white">
- {index + 1}
- </span>
- <p className="text-sm leading-6 text-[#334155]">{step}</p>
- </div>
- ))}
- </div>
- </div>
- </div>
- </div>
- </section>
-
- <section className="px-5 py-12 sm:px-8 sm:py-16 lg:px-10">
- <div className="mx-auto max-w-7xl">
- <SectionHeading
- eyebrow="AI inside every project"
- title="The community becomes more valuable when AI reviews the work."
- description="AI is not a separate chatbot tab. It sits inside projects and helps creators improve app ideas, game environments, code, prompts, and product systems."
- />
- <div className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-3">
- {aiProjectHelp.map(({ title, items, icon: Icon }) => (
- <article key={title} className="rounded-[18px] border border-[#DCEAF5] bg-white p-6 shadow-sm">
- <div className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[#E0F2FE] text-[#0284C7]">
- <Icon className="h-5 w-5" />
- </div>
- <h3 className="mt-6 text-base font-semibold text-[#0F172A]">{title}</h3>
- <div className="mt-4 space-y-3">
- {items.map((item) => (
- <div key={item} className="flex items-center gap-3 text-sm text-[#475569]">
- <Bot className="h-4 w-4 text-[#0284C7]" />
- {item}
- </div>
- ))}
- </div>
- </article>
- ))}
- </div>
- </div>
- </section>
-
- <section className="px-5 py-12 sm:px-8 sm:py-16 lg:px-10">
- <div className="mx-auto grid max-w-7xl gap-5 lg:grid-cols-[1fr_1fr]">
- <div className="rounded-[24px] border border-[#DCEAF5] bg-white p-6 shadow-sm sm:p-8">
- <SectionHeading
- eyebrow="Reputation"
- title="Reward contribution, not noise."
- description="Reputation should come from helpful activity: forks, useful comments, reused prompts, templates, and meaningful project-chain contributions."
- />
- <div className="mt-8 grid gap-3 sm:grid-cols-2">
- {reputationActions.map((action) => (
- <div key={action} className="flex items-center gap-3 rounded-[14px] border border-[#DCEAF5] bg-[#F8FCFF] p-3 text-sm font-medium text-[#334155]">
- <ThumbsUp className="h-4 w-4 text-[#0284C7]" />
- {action}
- </div>
- ))}
- </div>
- </div>
-
- <div className="rounded-[24px] border border-[#DCEAF5] bg-white p-6 shadow-sm sm:p-8">
- <SectionHeading
- eyebrow="Marketplace later"
- title="Monetize after the creation loop is active."
- description="Marketplace should come after people are already publishing, remixing, and trusting creator quality."
- />
- <div className="mt-8 flex flex-wrap gap-2">
- {marketplaceItems.map((item) => (
- <span key={item} className="inline-flex items-center gap-2 rounded-full bg-[#F0F9FF] px-3 py-1.5 text-xs font-semibold text-[#0369A1]">
- <Store className="h-3.5 w-3.5" />
- {item}
- </span>
- ))}
- </div>
- </div>
- </div>
- </section>
-
- <section className="px-5 py-12 pb-20 sm:px-8 sm:py-16 lg:px-10">
- <div className="mx-auto max-w-7xl">
- <div className="rounded-[24px] border border-[#DCEAF5] bg-white/80 p-6 text-center shadow-sm sm:p-8">
- <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[14px] bg-[#E0F2FE] text-[#0284C7]">
- <Wand2 className="h-6 w-6" />
- </div>
- <h2 className="mx-auto mt-5 max-w-3xl text-3xl font-semibold leading-tight text-[#0F172A] sm:text-4xl">
- AI tool to project creation to preview to publish to feedback to remix to reputation to marketplace.
- </h2>
- <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-[#475569] sm:text-base">
- This is the product loop: not a Discord clone, but a practical AI creation community where work improves through collaboration.
- </p>
- <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
- <Button asChild className="h-11 rounded-[10px] bg-[#38BDF8] px-5 text-sm font-semibold text-white hover:bg-[#0EA5E9]">
- <Link href="/main">
- Start Creating
- <ArrowRight className="h-4 w-4" />
- </Link>
- </Button>
- <Button
- asChild
- variant="outline"
- className="h-11 rounded-[10px] border-[#DCEAF5] bg-white/80 px-5 text-sm font-semibold text-[#0F172A] shadow-none hover:bg-[#F0F9FF]"
- >
- <a href="#creations">View Creation Model</a>
- </Button>
- </div>
- </div>
- </div>
- </section>
  </main>
  );
 }
