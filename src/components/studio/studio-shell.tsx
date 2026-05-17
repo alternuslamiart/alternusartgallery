@@ -806,13 +806,13 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
  <section
  className={[
- activeRoute ==="ai-assistant"?"min-h-0 flex-1 rounded-[12px]":"min-h-0 flex-1 rounded-3xl",
+ activeRoute ==="ai-assistant"?"min-h-0 flex-1 rounded-[18px]":"min-h-0 flex-1 rounded-3xl",
  activeRoute ==="ai-assistant"?"overflow-hidden flex flex-col":"overflow-auto",
  activeRoute ==="ai-assistant"?"p-0": activeRoute ==="code-builder"?"px-4 py-4":"px-8 py-8",
  dark
  ?"border border-[rgba(255,255,255,0.08)] bg-[#17191D]"
  :"border border-[#E8EEF2] bg-white",
- activeRoute ==="ai-assistant"?"border-transparent bg-white shadow-none":"",
+ activeRoute ==="ai-assistant"?(dark ?"border-[rgba(255,255,255,0.08)] bg-[#17191D] shadow-none":"border-[#DDE7EE] bg-white shadow-none"):"",
  ].join("")}
  >
  <div className={
