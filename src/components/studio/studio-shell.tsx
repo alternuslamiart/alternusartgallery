@@ -3892,10 +3892,17 @@ function AIAssistantPage() {
  const [assistantMode, setAssistantMode] = useState<"agent"|"workflow">("agent");
  const [activePlaygroundCard, setActivePlaygroundCard] = useState<StarterCard | null>(null);
  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
+ const [attachMenuView, setAttachMenuView] = useState<"main"|"recent"|"connections"|"more">("main");
+ const attachMenuRef = useRef<HTMLDivElement>(null);
  const conversationEndRef = useRef<HTMLDivElement>(null);
 
  useEffect(() => {
- function onDown() { setAttachMenuOpen(false); }
+ function onDown(event: MouseEvent) {
+ const target = event.target as Node | null;
+ if (target && attachMenuRef.current?.contains(target)) return;
+ setAttachMenuOpen(false);
+ setAttachMenuView("main");
+ }
  document.addEventListener("mousedown", onDown);
  return () => document.removeEventListener("mousedown", onDown);
  }, []);
@@ -4005,6 +4012,42 @@ function AIAssistantPage() {
  if (files.length) showToast(`${files.length} attachment${files.length > 1 ? "s" : ""} added`);
  event.target.value = "";
  };
+
+ const closeAttachMenu = () => {
+ setAttachMenuOpen(false);
+ setAttachMenuView("main");
+ };
+
+ const focusComposer = () => {
+ window.setTimeout(() => textareaRef.current?.focus(), 50);
+ };
+
+ const applyPromptTemplate = (template: string) => {
+ setInput(template);
+ closeAttachMenu();
+ focusComposer();
+ };
+
+ const attachVirtualFile = (name: string, kind: Attachment["kind"] = "document") => {
+ setAttachments((current) => [
+ ...current,
+ { id: `recent-${name}-${Date.now()}`, name, kind },
+ ]);
+ closeAttachMenu();
+ showToast(`${name} attached`);
+ };
+
+ const recentFiles = [
+ { name:"Project brief.pdf", meta:"Updated today", kind:"document" as const },
+ { name:"Landing copy.md", meta:"Recent workspace note", kind:"document" as const },
+ { name:"UI reference.png", meta:"Image asset", kind:"image" as const },
+ ];
+
+ const sourceOptions = [
+ { name:"Workspace knowledge", prompt:"Use my workspace knowledge as source for: " },
+ { name:"Project files", prompt:"Use attached project files as source for: " },
+ { name:"Web research", prompt:"Research current web sources about: " },
+ ];
 
  const sendPrompt = async (promptOverride?: string) => {
  const prompt = (promptOverride !== undefined ? promptOverride : input).trim();
@@ -4249,25 +4292,60 @@ function AIAssistantPage() {
  ) : (
  /* Compact bar when no attachment */
  <div className={`flex min-h-[58px] w-full items-center gap-2 rounded-[24px] border px-2.5 py-2 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#D9D9D9] bg-white"}`}>
- <div className="relative flex-shrink-0">
- <button type="button" onMouseDown={(e) => e.stopPropagation()} onClick={() => setAttachMenuOpen((o) => !o)} className={`flex h-[40px] w-[40px] items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E7E7E7]"}`} aria-label="Attach file" title="Attach file">
+ <div ref={attachMenuRef} className="relative flex-shrink-0">
+ <button type="button" onClick={() => { setAttachMenuOpen((open) => !open); setAttachMenuView("main"); }} className={`flex h-[40px] w-[40px] items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E7E7E7]"}`} aria-label="Attach file" title="Attach file">
  <Plus className="h-5 w-5" strokeWidth={1.8} />
  </button>
  {attachMenuOpen && (
- <div className={`absolute top-[calc(100%+10px)] left-0 z-50 w-[240px] overflow-hidden rounded-2xl border py-1 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328] shadow-[0_16px_40px_rgba(0,0,0,0.36)]" : "border-[#E5E7EB] bg-white shadow-[0_16px_40px_rgba(0,0,0,0.12)]"}`}>
+ <div className={`absolute top-[calc(100%+10px)] left-0 z-50 w-[252px] overflow-hidden rounded-2xl border py-1 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328] shadow-[0_16px_40px_rgba(0,0,0,0.36)]" : "border-[#E5E7EB] bg-white shadow-[0_16px_40px_rgba(0,0,0,0.12)]"}`}>
+ {attachMenuView !== "main" ? (
+ <div className={`flex items-center gap-2 border-b px-3 py-2 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#EEF2F7]"}`}>
+ <button type="button" onClick={() => setAttachMenuView("main")} className={`flex h-8 w-8 items-center justify-center rounded-xl ${dark ? "text-[#A8B0BA] hover:bg-[#181B20] hover:text-[#F4F6F8]" : "text-[#667085] hover:bg-[#F8FAFC] hover:text-[#111827]"}`} aria-label="Back to attach menu">
+ <ChevronLeft className="h-4 w-4"/>
+ </button>
+ <span className={`text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#111827]"}`}>
+ {attachMenuView === "recent" ? "Recent files" : attachMenuView === "connections" ? "Connections & sources" : "More options"}
+ </span>
+ </div>
+ ) : null}
  <div className="mx-2 space-y-0.5 py-1">
- {[
- { label: "Add photo & files", icon: Paperclip, arrow: false, action: () => { allFilesRef.current?.click(); } },
- { label: "Recent files", icon: Clock, arrow: true, action: () => { router.push("/workspace/files"); } },
- { label: "Create image", icon: ImageIcon, arrow: false, action: () => { imageInputRef.current?.click(); } },
- { label: "Deep research", icon: Search, arrow: false, action: () => { setInput("Deep research on: "); setTimeout(() => { textareaRef.current?.focus(); }, 50); } },
- { label: "Connections & sources", icon: Globe, arrow: true, action: () => { showToast("Connections & sources coming soon"); } },
- { label: "More...", icon: MoreHorizontal, arrow: false, action: () => { showToast("More options coming soon"); } },
+ {attachMenuView === "main" && [
+ { label: "Add photo & files", icon: Paperclip, arrow: false, action: () => { allFilesRef.current?.click(); closeAttachMenu(); } },
+ { label: "Recent files", icon: Clock, arrow: true, action: () => setAttachMenuView("recent") },
+ { label: "Create image", icon: ImageIcon, arrow: false, action: () => applyPromptTemplate("Create an image of: ") },
+ { label: "Deep research", icon: Search, arrow: false, action: () => applyPromptTemplate("Deep research on: ") },
+ { label: "Connections & sources", icon: Globe, arrow: true, action: () => setAttachMenuView("connections") },
+ { label: "More...", icon: MoreHorizontal, arrow: true, action: () => setAttachMenuView("more") },
  ].map(({ label, icon: Icon, arrow, action }) => (
- <button key={label} type="button" onClick={() => { action(); setAttachMenuOpen(false); }} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}>
+ <button key={label} type="button" onClick={action} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}>
  <Icon className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} strokeWidth={2} />
  <span className="flex-1">{label}</span>
  {arrow && <ChevronRight className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} strokeWidth={2} />}
+ </button>
+ ))}
+ {attachMenuView === "recent" && recentFiles.map((file) => (
+ <button key={file.name} type="button" onClick={() => attachVirtualFile(file.name, file.kind)} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${dark ? "hover:bg-[rgba(59,167,255,0.12)]" : "hover:bg-[#EEF7FF]"}`}>
+ <FileText className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} />
+ <span className="min-w-0 flex-1">
+ <span className={`block truncate text-[13px] font-medium ${dark ? "text-[#DDE3EA]" : "text-[#374151]"}`}>{file.name}</span>
+ <span className={`mt-0.5 block text-[11px] ${dark ? "text-[#6F7782]" : "text-[#98A2B3]"}`}>{file.meta}</span>
+ </span>
+ </button>
+ ))}
+ {attachMenuView === "connections" && sourceOptions.map((source) => (
+ <button key={source.name} type="button" onClick={() => applyPromptTemplate(source.prompt)} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}>
+ <Globe className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} />
+ <span className="flex-1">{source.name}</span>
+ </button>
+ ))}
+ {attachMenuView === "more" && [
+ { label: "Upload document", icon: FileText, action: () => { documentInputRef.current?.click(); closeAttachMenu(); } },
+ { label: "Add image only", icon: ImageIcon, action: () => { imageInputRef.current?.click(); closeAttachMenu(); } },
+ { label: "Open files workspace", icon: Folder, action: () => { closeAttachMenu(); router.push("/workspace/files"); } },
+ ].map(({ label, icon: Icon, action }) => (
+ <button key={label} type="button" onClick={action} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}>
+ <Icon className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} />
+ <span className="flex-1">{label}</span>
  </button>
  ))}
  </div>
