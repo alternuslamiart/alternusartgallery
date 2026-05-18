@@ -3683,7 +3683,7 @@ function StarterPanel({
  key={card.title}
  type="button"
  onClick={() => onOpen(card)}
- className={`group flex min-h-[72px] items-start gap-2.5 rounded-[12px] border p-2 text-left transition-all duration-200 ${cardBase}`}
+ className={`group flex min-h-[60px] items-start gap-2.5 rounded-[12px] border px-2 py-1.5 text-left transition-all duration-200 ${cardBase}`}
  >
  <span className={`flex h-[44px] w-[44px] flex-shrink-0 items-center justify-center rounded-[7px] transition-colors ${dark ?"bg-[rgba(59,167,255,0.18)] text-[#7DD3FC] group-hover:bg-[#4284FF] group-hover:text-white":"bg-[#E8F4FB] text-[#4284FF] group-hover:bg-[#4284FF] group-hover:text-white"}`}>
  <Icon className="h-[18px] w-[18px]"/>
