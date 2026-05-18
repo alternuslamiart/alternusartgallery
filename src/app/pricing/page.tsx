@@ -4,13 +4,25 @@ import { useState } from "react";
 import Link from "next/link";
 import { CediumPage, COBALT } from "@/components/cedium-shell";
 
-const tiers = [
+type PricingTier = {
+ n: string;
+ pm: number;
+ py: number;
+ yearlyUnit?: "/mo" | "/yr";
+ yearlyNote?: string;
+ d: string;
+ cta: string;
+ featured?: boolean;
+ feat: string[];
+};
+
+const tiers: PricingTier[] = [
  {
- n: "Free",
- pm: 0,
- py: 0,
- d: "For trying Cedium and running a single workspace.",
- cta: "Start free",
+ n: "Basic Plan",
+ pm: 10,
+ py: 5,
+ d: "For starting with Cedium and running a single workspace.",
+ cta: "Start Basic",
  feat: [
  "1 personal workspace",
  "Claude Haiku agent",
@@ -50,44 +62,73 @@ const tiers = [
  "Slack-channel support",
  ],
  },
+ {
+ n: "Studio",
+ pm: 100,
+ py: 120,
+ yearlyUnit: "/yr",
+ yearlyNote: "billed yearly",
+ d: "For game and movie creators building with code and Unity.",
+ cta: "Upgrade to Studio",
+ feat: [
+ "5x / 20x code capacity",
+ "Unity for games",
+ "Movie pipeline support",
+ "Game + film asset workflows",
+ "Build and prototype tools",
+ "Priority studio support",
+ ],
+ },
 ];
+
+const getBillingUnit = (tier: PricingTier, yearly: boolean) => (yearly && tier.yearlyUnit ? tier.yearlyUnit : "/mo");
+
+const getBillingNote = (tier: PricingTier, yearly: boolean) => {
+ if (!yearly || tier.pm === 0) {
+ return "";
+ }
+
+ return tier.yearlyNote ?? "billed yearly";
+};
 
 const compare = [
  {
  cat: "Agent",
  rows: [
- { f: "Default model", v: ["Claude Haiku", "Claude Opus 4.6", "Claude Opus 4.6"] },
- { f: "Monthly agent runs", v: ["200", "Unlimited", "Unlimited"] },
- { f: "Parallel tool calls", v: ["-", "Yes", "Yes"] },
- { f: "Long-running background jobs", v: ["-", "Yes", "Yes"] },
+ { f: "Default model", v: ["Claude Haiku", "Claude Opus 4.6", "Claude Opus 4.6", "Claude Opus 4.6 + Unity"] },
+ { f: "Monthly agent runs", v: ["200", "Unlimited", "Unlimited", "Unlimited"] },
+ { f: "Parallel tool calls", v: ["-", "Yes", "Yes", "Yes"] },
+ { f: "Long-running background jobs", v: ["-", "Yes", "Yes", "Yes"] },
+ { f: "Code capacity", v: ["1x", "1x", "Team scale", "5x / 20x"] },
  ],
  },
  {
  cat: "Workspace",
  rows: [
- { f: "Workspaces", v: ["1", "Unlimited", "Unlimited"] },
- { f: "Knowledge layer", v: ["5 GB", "100 GB", "500 GB"] },
- { f: "Voice mode", v: ["-", "Yes", "Yes"] },
- { f: "Code Studio", v: ["Read-only", "Yes", "Yes"] },
- { f: "Shared knowledge across members", v: ["-", "-", "Yes"] },
+ { f: "Workspaces", v: ["1", "Unlimited", "Unlimited", "Unlimited"] },
+ { f: "Knowledge layer", v: ["5 GB", "100 GB", "500 GB", "1 TB"] },
+ { f: "Voice mode", v: ["-", "Yes", "Yes", "Yes"] },
+ { f: "Code Studio", v: ["Read-only", "Yes", "Yes", "5x / 20x"] },
+ { f: "Unity game and movie tools", v: ["-", "-", "-", "Yes"] },
+ { f: "Shared knowledge across members", v: ["-", "-", "Yes", "Yes"] },
  ],
  },
  {
  cat: "Admin & security",
  rows: [
- { f: "SSO / SCIM", v: ["-", "-", "Yes"] },
- { f: "Audit logs", v: ["7 days", "30 days", "1 year · export"] },
- { f: "Role-based permissions", v: ["-", "-", "Yes"] },
- { f: "SOC 2 Type II report", v: ["-", "On request", "Included"] },
+ { f: "SSO / SCIM", v: ["-", "-", "Yes", "Optional"] },
+ { f: "Audit logs", v: ["7 days", "30 days", "1 year · export", "1 year · export"] },
+ { f: "Role-based permissions", v: ["-", "-", "Yes", "Yes"] },
+ { f: "SOC 2 Type II report", v: ["-", "On request", "Included", "Included"] },
  ],
  },
  {
  cat: "Support",
  rows: [
- { f: "Community forum", v: ["Yes", "Yes", "Yes"] },
- { f: "Email support", v: ["-", "Priority", "Priority"] },
- { f: "Shared Slack channel", v: ["-", "-", "Yes"] },
- { f: "SLA", v: ["-", "-", "99.9% uptime"] },
+ { f: "Community forum", v: ["Yes", "Yes", "Yes", "Yes"] },
+ { f: "Email support", v: ["-", "Priority", "Priority", "Priority"] },
+ { f: "Shared Slack channel", v: ["-", "-", "Yes", "Yes"] },
+ { f: "SLA", v: ["-", "-", "99.9% uptime", "99.9% uptime"] },
  ],
  },
 ];
@@ -99,7 +140,7 @@ const faq = [
  },
  {
  q: "Do you offer annual billing?",
- a: "Yes. Yearly plans are 20% cheaper than monthly. Toggle above the pricing cards to see yearly prices.",
+ a: "Yes. Toggle above the pricing cards to see yearly prices and annual billing details.",
  },
  {
  q: "What about taxes and VAT?",
@@ -107,7 +148,7 @@ const faq = [
  },
  {
  q: "What counts as an agent run?",
- a: "One goal to one run, even if the agent chains multiple tool calls to finish it. Free plans get 200 runs per month; Pro and Team are unlimited.",
+ a: "One goal to one run, even if the agent chains multiple tool calls to finish it. Basic Plan gets 200 runs per month; Pro, Team, and Studio are unlimited.",
  },
  {
  q: "Can I switch plans mid-cycle?",
@@ -122,10 +163,10 @@ const faq = [
 export default function Pricing() {
  const [yearly, setYearly] = useState(true);
  const [openFaq, setOpenFaq] = useState<number | null>(0);
- const [checkoutTier, setCheckoutTier] = useState<(typeof tiers)[number] | null>(null);
+ const [checkoutTier, setCheckoutTier] = useState<PricingTier | null>(null);
  const [paymentStatus, setPaymentStatus] = useState("");
 
- const openCheckout = (tier: (typeof tiers)[number]) => {
+ const openCheckout = (tier: PricingTier) => {
  setCheckoutTier(tier);
  setPaymentStatus("");
  };
@@ -168,7 +209,7 @@ export default function Pricing() {
  <span style={{ color: COBALT, fontStyle: "italic" }}>Not the seats.</span>
  </h1>
  <p style={{ margin: "28px auto 0", fontSize: 18, color: t.muted, maxWidth: 620, lineHeight: 1.55 }}>
- One workspace, one agent, one bill. Start free, scale when you&apos;re ready. No hidden tiers, no per-API-call surprises.
+ One workspace, one agent, one bill. Start with Basic, scale when you&apos;re ready. No hidden tiers, no per-API-call surprises.
  </p>
 
  <div
@@ -214,7 +255,7 @@ export default function Pricing() {
  letterSpacing: "0.04em",
  }}
  >
- -20%
+ SAVE
  </span>
  ) : null}
  </button>
@@ -224,8 +265,8 @@ export default function Pricing() {
  </section>
 
  <section style={{ padding: "40px 0 100px" }}>
- <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 32px" }}>
- <div className="grid grid-cols-1 items-stretch gap-5 md:grid-cols-3">
+ <div style={{ maxWidth: 1360, margin: "0 auto", padding: "0 32px" }}>
+ <div className="grid grid-cols-1 items-stretch gap-5 md:grid-cols-2 xl:grid-cols-4">
  {tiers.map((tier) => (
  <div
  key={tier.n}
@@ -266,10 +307,11 @@ export default function Pricing() {
  {yearly ? tier.py : tier.pm}
  </span>
  <span style={{ fontSize: 14, color: t.muted, marginLeft: 4 }}>
- /mo{yearly && tier.pm > 0 ? ", billed yearly" : ""}
+ {getBillingUnit(tier, yearly)}
+ {getBillingNote(tier, yearly) ? `, ${getBillingNote(tier, yearly)}` : ""}
  </span>
  </div>
- {tier.n === "Free" ? (
+ {tier.pm === 0 ? (
  <Link
  href="/main"
  style={{
@@ -349,13 +391,14 @@ export default function Pricing() {
  </p>
  </div>
 
- <div style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden", background: t.raised }}>
- <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", padding: "18px 28px", borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
+ <div style={{ overflowX: "auto" }}>
+ <div style={{ minWidth: 900, border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden", background: t.raised }}>
+ <div style={{ display: "grid", gridTemplateColumns: `2fr repeat(${tiers.length}, 1fr)`, padding: "18px 28px", borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
  <span style={{ fontSize: 11, fontWeight: 700, color: t.muted, letterSpacing: "0.1em", textTransform: "uppercase" }}>Feature</span>
  {tiers.map((tier) => (
  <div key={tier.n} style={{ textAlign: "center" }}>
  <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.01em", color: tier.featured ? COBALT : t.fg }}>{tier.n}</div>
- <div style={{ fontSize: 11, color: t.muted, marginTop: 2 }}>${yearly ? tier.py : tier.pm}/mo</div>
+ <div style={{ fontSize: 11, color: t.muted, marginTop: 2 }}>${yearly ? tier.py : tier.pm}{getBillingUnit(tier, yearly)}</div>
  </div>
  ))}
  </div>
@@ -366,7 +409,7 @@ export default function Pricing() {
  {section.cat}
  </div>
  {section.rows.map((row, i) => (
- <div key={row.f} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", alignItems: "center", padding: "16px 28px", borderTop: i > 0 ? `1px solid ${t.faint}` : "none" }}>
+ <div key={row.f} style={{ display: "grid", gridTemplateColumns: `2fr repeat(${tiers.length}, 1fr)`, alignItems: "center", padding: "16px 28px", borderTop: i > 0 ? `1px solid ${t.faint}` : "none" }}>
  <span style={{ fontSize: 13.5, color: t.fg, fontWeight: 500 }}>{row.f}</span>
  {row.v.map((val, j) => (
  <div key={j} style={{ textAlign: "center", fontSize: 13, color: val === "Yes" ? COBALT : val === "-" ? t.muted : t.fg, fontWeight: val === "Yes" ? 700 : 500 }}>
@@ -383,6 +426,7 @@ export default function Pricing() {
  ))}
  </div>
  ))}
+ </div>
  </div>
  </div>
  </section>
@@ -460,12 +504,12 @@ export default function Pricing() {
  Section 06 / Begin
  </div>
  <h2 style={{ fontSize: "clamp(44px,7vw,92px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.9, color: "#fff", margin: 0, fontStretch: "84%" }}>
- Start free.
+ Start with Basic.
  <br />
  <span style={{ fontStyle: "italic" }}>Upgrade when it pays for itself.</span>
  </h2>
  <p style={{ margin: "26px auto 0", maxWidth: 560, fontSize: 18, lineHeight: 1.7, color: "rgba(255,255,255,0.84)" }}>
- Cedium is free to try. Move into paid plans only when the workflow starts returning real value.
+ Cedium starts with Basic. Move into larger plans only when the workflow starts returning real value.
  </p>
  <div style={{ marginTop: 36, display: "inline-flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
  <Link href="/main" style={{ height: 48, padding: "0 24px", background: "#fff", color: COBALT, fontSize: 15, fontWeight: 800, borderRadius: 18, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10, boxShadow: "0 16px 28px rgba(18,46,120,0.18)" }}>
@@ -527,7 +571,7 @@ export default function Pricing() {
  Secure checkout
  </div>
  <h2 style={{ margin: "6px 0 0", fontSize: 24, fontWeight: 900, letterSpacing: "-0.03em", color: t.fg }}>
- {checkoutTier.n === "Team" ? "Start Team trial" : "Upgrade to Pro"}
+ {checkoutTier.cta}
  </h2>
  </div>
  <button
@@ -594,7 +638,10 @@ export default function Pricing() {
  <span style={{ fontSize: 56, fontWeight: 900, letterSpacing: "-0.05em", color: t.fg }}>
  {yearly ? checkoutTier.py : checkoutTier.pm}
  </span>
- <span style={{ fontSize: 13, color: t.muted }}>/mo</span>
+ <span style={{ fontSize: 13, color: t.muted }}>
+ {getBillingUnit(checkoutTier, yearly)}
+ {getBillingNote(checkoutTier, yearly) ? `, ${getBillingNote(checkoutTier, yearly)}` : ""}
+ </span>
  </div>
  <div style={{ marginTop: 18, height: 1, background: t.faint }} />
  <ul style={{ margin: "18px 0 0", padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
@@ -609,7 +656,7 @@ export default function Pricing() {
  <p style={{ margin: "18px 0 0", fontSize: 12, color: t.muted, lineHeight: 1.6 }}>
  {checkoutTier.n === "Team"
  ? "Team trial starts after payment method verification. You can cancel before billing begins."
- : "Your Pro access starts immediately after checkout confirmation."}
+ : `Your ${checkoutTier.n} access starts immediately after checkout confirmation.`}
  </p>
  </aside>
 
