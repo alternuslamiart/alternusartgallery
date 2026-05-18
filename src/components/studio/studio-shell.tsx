@@ -414,6 +414,10 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  if (savedTheme ==="light"|| savedTheme ==="dark") {
  setTheme(savedTheme);
  }
+ const savedDensity = window.localStorage.getItem("Cedium-studio-density");
+ if (savedDensity ==="compact"|| savedDensity ==="comfortable") {
+ document.documentElement.dataset.studioDensity = savedDensity;
+ }
  }, []);
 
  useEffect(() => {
@@ -490,6 +494,13 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  setActiveRecent((current) => (current?.id === recentId ? null : current));
  showToast("Recent item deleted");
  }, [showToast]);
+
+ const openRecentWorkspace = useCallback((recent: GeneratedRecent) => {
+ setRecentMenuId(null);
+ setActiveRecent(null);
+ setIsMobileOpen(false);
+ router.push(getWorkspaceHrefForRecent(recent));
+ }, [router]);
 
  const actionValue = useMemo(
  () => ({
@@ -679,6 +690,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  setRecentMenuId(null);
  void shareRecent(recent);
  }}
+ onOpenWorkspace={() => openRecentWorkspace(recent)}
  onDelete={() => deleteRecent(recent.id)}
  />
  ))}
@@ -970,7 +982,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
 
 function StudioModal({ modal, onClose }: { modal: StudioModalKey; onClose: () => void }) {
  const { theme, toggleTheme } = useStudioTheme();
- const { showToast } = useStudioActions();
+ const { showToast, openDrawer } = useStudioActions();
  const dark = theme ==="dark";
  const content = getModalContent(modal);
 
@@ -995,11 +1007,11 @@ function StudioModal({ modal, onClose }: { modal: StudioModalKey; onClose: () =>
  </button>
  </div>
 
- {modal ==="search"&& <SearchFrame />}
+ {modal ==="search"&& <SearchFrame onClose={onClose} />}
  {modal ==="quick-settings"&& (
  <div className="mt-5 space-y-3">
  <ModalRow icon={theme ==="dark"? Moon : Sun} title={`${theme ==="dark"?"Dark":"Light"} mode`} desc="Toggle the workspace appearance."action="Toggle"onClick={toggleTheme} />
- <ModalRow icon={Bell} title="Notifications"desc="Review workspace notification preferences."action="Open"onClick={() => showToast("Notification settings opened")} />
+ <ModalRow icon={Bell} title="Notifications"desc="Review workspace notification preferences."action="Open"onClick={() => { onClose(); openDrawer("notifications"); }} />
  <ModalRow icon={UserRound} title="Account settings"desc="Manage your profile and plan."action="Settings"href="/settings"/>
  <ModalRow icon={Shield} title="Workspace settings"desc="Manage the Personal workspace."action="Manage"href="/settings"/>
  </div>
@@ -1030,7 +1042,7 @@ function StudioModal({ modal, onClose }: { modal: StudioModalKey; onClose: () =>
 
 function StudioDrawer({ drawer, onClose }: { drawer: StudioDrawerKey; onClose: () => void }) {
  const { theme } = useStudioTheme();
- const { showToast } = useStudioActions();
+ const { showToast, openModal } = useStudioActions();
  const dark = theme ==="dark";
  const title = drawer ==="profile"?"Profile": drawer ==="notifications"?"Notifications": drawer ==="asset-preview"?"Asset details": drawer ==="project-detail"?"Project details":"Help article";
 
@@ -1065,8 +1077,8 @@ function StudioDrawer({ drawer, onClose }: { drawer: StudioDrawerKey; onClose: (
  </div>
  <DrawerAction icon={Settings} label="Account settings"href="/settings"/>
  <DrawerAction icon={CreditCard} label="Billing and plan"href="/settings"/>
- <DrawerAction icon={RefreshCw} label="Switch workspace"onClick={() => showToast("Workspace switcher opened")} />
- <DrawerAction icon={Upload} label="Sign out"onClick={() => showToast("Use the sidebar Sign Out confirmation")} />
+ <DrawerAction icon={RefreshCw} label="Switch workspace"onClick={() => { onClose(); openModal("workspace-switch"); }} />
+ <DrawerAction icon={Upload} label="Sign out"onClick={() => signOut({ callbackUrl:"/login"})} />
  </div>
  )}
 
@@ -1164,21 +1176,61 @@ function getModalContent(modal: StudioModalKey) {
  return map[modal];
 }
 
-function SearchFrame() {
+function SearchFrame({ onClose }: { onClose: () => void }) {
+ const [query, setQuery] = useState("");
+ const searchTargets = [
+ ...studioNavigation.map((item) => ({ title: item.label, desc: "Open studio workspace", href: item.href, icon: item.icon })),
+ ...bottomNavigation.map((item) => ({ title: item.label, desc: "Open workspace settings area", href: item.href, icon: item.icon })),
+ { title:"AI for Code", desc:"Open guided code assistant", href:"/ai-assistant/tools/code", icon: Code2 },
+ { title:"AI for Blender", desc:"Open guided 3D assistant", href:"/ai-assistant/tools/blender", icon: Layers3 },
+ { title:"AI for AutoCAD", desc:"Open guided CAD assistant", href:"/ai-assistant/tools/autocad", icon: PenLine },
+ { title:"Workspace Files", desc:"Open file workspace", href:"/workspace/files", icon: Folder },
+ ];
+ const normalizedQuery = query.trim().toLowerCase();
+ const results = normalizedQuery
+ ? searchTargets.filter((item) => `${item.title} ${item.desc}`.toLowerCase().includes(normalizedQuery)).slice(0, 6)
+ : searchTargets.slice(0, 6);
+
  return (
  <div className="mt-5 space-y-4">
  <div className="flex h-11 items-center gap-2 rounded-2xl border border-[#E5EAF0] bg-[#FCFDFE] px-4">
  <Search className="h-4 w-4 text-[#9CA3AF]"/>
- <input autoFocus className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]"placeholder="Search projects, prompts, assets, exports, and help..."/>
+ <input
+ autoFocus
+ value={query}
+ onChange={(event) => setQuery(event.target.value)}
+ className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]"
+ placeholder="Search projects, prompts, assets, exports, and help..."
+ />
  <span className="rounded-md bg-[#F3F6F8] px-1.5 py-0.5 text-[10px] font-semibold text-[#9CA3AF]">Enter</span>
  </div>
- <div className="grid gap-3 sm:grid-cols-2">
- {["Recent searches","Suggested actions","Projects","Assets"].map((title) => (
- <div key={title} className="rounded-2xl border border-[#E5E7EB] bg-[#FCFDFE] p-3">
- <p className="text-[12px] font-semibold text-[#171717]">{title}</p>
- <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">No results yet. Start typing to preview matches.</p>
+ <div className="grid gap-2">
+ {results.map((item) => {
+ const Icon = item.icon;
+ return (
+ <Link
+ key={`${item.title}-${item.href}`}
+ href={item.href}
+ onClick={onClose}
+ className="flex items-center gap-3 rounded-2xl border border-[#E5E7EB] bg-[#FCFDFE] p-3 transition-all hover:border-[#BBD4FF] hover:bg-[#F8FBFF]"
+ >
+ <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EAF2FF] text-[#4284FF]">
+ <Icon className="h-4 w-4"/>
+ </span>
+ <span className="min-w-0 flex-1">
+ <span className="block text-[12px] font-semibold text-[#171717]">{item.title}</span>
+ <span className="mt-1 block text-[10.5px] leading-4 text-[#6B7280]">{item.desc}</span>
+ </span>
+ <ChevronRight className="h-4 w-4 text-[#9CA3AF]"/>
+ </Link>
+ );
+ })}
+ {results.length === 0 && (
+ <div className="rounded-2xl border border-dashed border-[#E5E7EB] bg-[#FCFDFE] p-4 text-center">
+ <p className="text-[12px] font-semibold text-[#171717]">No matches</p>
+ <p className="mt-1 text-[11px] text-[#6B7280]">Try searching for assistant, code, project, asset, export, or settings.</p>
  </div>
- ))}
+ )}
  </div>
  </div>
  );
@@ -1378,6 +1430,7 @@ function RecentSidebarItem({
  onOpen,
  onMenuToggle,
  onShare,
+ onOpenWorkspace,
  onDelete,
 }: {
  recent: GeneratedRecent;
@@ -1386,6 +1439,7 @@ function RecentSidebarItem({
  onOpen: () => void;
  onMenuToggle: () => void;
  onShare: () => void;
+ onOpenWorkspace: () => void;
  onDelete: () => void;
 }) {
  const { theme } = useStudioTheme();
@@ -1430,6 +1484,14 @@ function RecentSidebarItem({
  className={`absolute right-0 top-8 z-50 w-36 rounded-2xl border p-1.5 shadow-[0_16px_40px_rgba(31,43,77,0.14)] ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E8EEF2] bg-white"}`}
  onClick={(event) => event.stopPropagation()}
  >
+ <button
+ type="button"
+ onClick={onOpenWorkspace}
+ className={`flex h-8 w-full items-center gap-2 rounded-xl px-2.5 text-left text-[12px] font-semibold transition-colors ${dark ?"text-[#A8B0BA] hover:bg-[rgba(66,132,255,0.14)] hover:text-[#6EA4FF]":"text-[#4B5563] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}
+ >
+ <ChevronRight className="h-3.5 w-3.5"/>
+ Open
+ </button>
  <button
  type="button"
  onClick={onShare}
@@ -1502,12 +1564,19 @@ function NotificationsDropdown({ align ="right"}: { align?:"left"|"right"}) {
 }
 
 function DisplayDropdown() {
- const { theme } = useStudioTheme();
+ const { theme, toggleTheme } = useStudioTheme();
  const { showToast } = useStudioActions();
  const dark = theme ==="dark";
  const enterFullscreen = () => {
  document.documentElement.requestFullscreen?.();
  showToast("Fullscreen requested");
+ };
+ const toggleDensity = () => {
+ const current = document.documentElement.dataset.studioDensity;
+ const next = current ==="compact"?"comfortable":"compact";
+ document.documentElement.dataset.studioDensity = next;
+ window.localStorage.setItem("Cedium-studio-density", next);
+ showToast(`${next ==="compact"?"Compact":"Comfortable"} density applied`);
  };
 
  return (
@@ -1517,8 +1586,8 @@ function DisplayDropdown() {
  <p className={`mt-1 text-[11px] ${dark ?"text-[#A8B0BA]":"text-[#6B7280]"}`}>Layout and preview controls</p>
  </div>
  <DropdownButton icon={Monitor} label="Preview workspace"onClick={enterFullscreen} />
- <DropdownButton icon={Grid2X2} label="Compact density"onClick={() => showToast("Compact density applied")} />
- <DropdownButton icon={CheckCircle2} label={`${theme ==="dark"?"Dark":"Light"} mode active`} />
+ <DropdownButton icon={Grid2X2} label="Toggle density"onClick={toggleDensity} />
+ <DropdownButton icon={theme ==="dark"? Sun : Moon} label={`Switch to ${theme ==="dark"?"light":"dark"} mode`} onClick={toggleTheme} />
  </DropdownPanel>
  );
 }
@@ -5308,8 +5377,8 @@ function AIAssistantPage() {
 
  const assistantChips = [
  { label:"Summary", icon: CircleSlash, prompt:"Summarize this clearly with key points and next actions: " },
- { label:"Code", icon: Code2, prompt:"Help me write, debug, or review code for: " },
- { label:"Design", icon: PenLine, prompt:"Create a clean design direction for: " },
+ { label:"Code", icon: Code2, prompt:"Help me write, debug, or review code for: ", href:"/ai-assistant/tools/code" },
+ { label:"Design", icon: PenLine, prompt:"Create a clean design direction for: ", href:"/cedium-design" },
  { label:"Research", icon: Network, prompt:"Research this topic and return sources, risks, and next steps: " },
  ];
 
@@ -5399,7 +5468,7 @@ function AIAssistantPage() {
  {attachMenuView === "main" && [
  { label: "Add photo & files", icon: Paperclip, arrow: false, action: () => { allFilesRef.current?.click(); closeAttachMenu(); } },
  { label: "Recent files", icon: Clock, arrow: true, action: () => setAttachMenuView("recent") },
- { label: "Create image", icon: ImageIcon, arrow: false, action: () => applyPromptTemplate("Create an image of: ") },
+ { label: "Create image", icon: ImageIcon, arrow: false, action: () => { closeAttachMenu(); router.push("/cedium-design"); } },
  { label: "Deep research", icon: Search, arrow: false, action: () => applyPromptTemplate("Deep research on: ") },
  { label: "Connections & sources", icon: Globe, arrow: true, action: () => setAttachMenuView("connections") },
  { label: "More...", icon: MoreHorizontal, arrow: true, action: () => setAttachMenuView("more") },
@@ -5429,6 +5498,8 @@ function AIAssistantPage() {
  { label: "Upload document", icon: FileText, action: () => { documentInputRef.current?.click(); closeAttachMenu(); } },
  { label: "Add image only", icon: ImageIcon, action: () => { imageInputRef.current?.click(); closeAttachMenu(); } },
  { label: "Open files workspace", icon: Folder, action: () => { closeAttachMenu(); router.push("/workspace/files"); } },
+ { label: "Open asset library", icon: ImageIcon, action: () => { closeAttachMenu(); router.push("/asset-library"); } },
+ { label: "Open Prompt Lab", icon: FileText, action: () => { closeAttachMenu(); router.push("/prompt-lab"); } },
  ].map(({ label, icon: Icon, action }) => (
  <button key={label} type="button" onClick={action} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#4284FF]"}`}>
  <Icon className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#4284FF]"}`} />
@@ -5498,6 +5569,10 @@ function AIAssistantPage() {
  key={item.label}
  type="button"
  onClick={() => {
+ if ("href" in item && item.href) {
+ router.push(item.href);
+ return;
+ }
  applyPromptTemplate(item.prompt);
  showToast(`${item.label} prompt ready`);
  }}
@@ -5938,4 +6013,15 @@ function getRouteTitle(route: StudioRouteKey) {
  [...studioNavigation, ...bottomNavigation].find((item) => item.key === route)?.label ??
 "AI Assistant"
  );
+}
+
+function getWorkspaceHrefForRecent(recent: GeneratedRecent) {
+ const tool = recent.tool.toLowerCase();
+ if (tool.includes("code")) return"/code-builder";
+ if (tool.includes("blender")|| tool.includes("3d")) return"/blender-3d";
+ if (tool.includes("autocad")|| tool.includes("cad")) return"/autocad-design";
+ if (tool.includes("asset")) return"/asset-library";
+ if (tool.includes("prompt")) return"/prompt-lab";
+ if (tool.includes("export")) return"/exports";
+ return"/ai-assistant";
 }
