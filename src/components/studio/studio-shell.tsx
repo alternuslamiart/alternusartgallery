@@ -2617,24 +2617,175 @@ function DetailRows({ rows }: { rows: Array<[string, string]> }) {
 }
 
 function AutoCADPage() {
+ const router = useRouter();
+ const { theme } = useStudioTheme();
  const { openModal, showToast } = useStudioActions();
+ const dark = theme ==="dark";
+ const text = dark ?"text-[#F4F6F8]":"text-[#1F1F1F]";
+ const muted = dark ?"text-[#A8B0BA]":"text-[#657184]";
+ const line = dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E5EAF0]";
+ const soft = dark ?"bg-[#181B20]":"bg-white";
+ const panel = dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5EAF0] bg-[#FCFDFE]";
+ const drawings = [
+ { name:"Floor plan study", type:"DWG plan", status:"Review", updated:"12 min ago", progress:84 },
+ { name:"Workspace elevation", type:"DXF elevation", status:"Drafting", updated:"38 min ago", progress:62 },
+ { name:"System detail", type:"PDF reference", status:"Ready", updated:"1h ago", progress:100 },
+ ];
+ const standards = [
+ ["Units","Millimeters"],
+ ["Layer set","Architecture"],
+ ["Line weight","ISO 128"],
+ ["Export","DWG + PDF"],
+ ];
+ const draftingTools = [
+ { label:"Floor plan", desc:"Rooms, doors, dimensions.", icon: Grid2X2 },
+ { label:"Elevation", desc:"Facade and section lines.", icon: Monitor },
+ { label:"Layer cleanup", desc:"Normalize names and weights.", icon: Layers3 },
+ { label:"DXF audit", desc:"Find missing references.", icon: FileText },
+ ];
 
  return (
+ <div className="font-roboto">
+ <PageHeader
+ title="AutoCAD Design"
+ subtitle="Draft, review, clean, and export technical drawing packages from one CAD workspace."
+ action={
+ <div className="flex flex-wrap items-center gap-2">
+ <SecondaryButton icon={Sparkles} onClick={() => router.push("/ai-assistant/tools/autocad")}>AI draft</SecondaryButton>
+ <PrimaryButton icon={Upload} onClick={() => openModal("upload-file")}>Import AutoCAD file</PrimaryButton>
+ </div>
+ }
+ />
+
+ <div className={`mb-5 overflow-hidden rounded-2xl border ${panel}`}>
+ <div className="grid gap-0 xl:grid-cols-[1.2fr_0.8fr]">
+ <div className={`relative min-h-[330px] overflow-hidden p-5 xl:border-r ${line}`}>
+ <div
+ className={`absolute inset-0 opacity-80 ${dark ?"bg-[#181B20]":"bg-[#F8FBFF]"}`}
+ style={{
+ backgroundImage: `linear-gradient(${dark ?"rgba(255,255,255,0.06)":"#DDEBFA"} 1px, transparent 1px), linear-gradient(90deg, ${dark ?"rgba(255,255,255,0.06)":"#DDEBFA"} 1px, transparent 1px)`,
+ backgroundSize:"28px 28px",
+ }}
+ />
+ <div className="relative z-10 flex h-full min-h-[290px] flex-col justify-between">
+ <div className="flex flex-wrap items-start justify-between gap-3">
  <div>
- <PageHeader title="AutoCAD Design"subtitle="Create CAD drawings, technical plans, and export-ready drafting files."action={<PrimaryButton icon={Upload} onClick={() => openModal("upload-file")}>Import AutoCAD file</PrimaryButton>} />
- <button onClick={() => openModal("upload-file")} className="mb-5 flex min-h-[150px] w-full flex-col items-center justify-center rounded-2xl border border-dashed border-[#EAECEF] bg-[#FCFDFE] p-4 text-center transition-all hover:border-[#CFE8F8]">
- <PenLine className="h-8 w-8 text-[#1DA1F2]"/>
- <p className="mt-3 text-[13px] font-semibold text-[#171717]">Upload or import an AutoCAD file</p>
- <p className="mt-1 text-[11px] text-[#6B7280]">Drop a DWG, DXF, PDF, or technical reference file here.</p>
+ <span className="inline-flex items-center gap-2 rounded-full border border-[#CFE1FF] bg-[#EFF6FF] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-[#4284FF]">
+ <PenLine className="h-3.5 w-3.5"/>
+ CAD workspace
+ </span>
+ <h3 className={`mt-4 max-w-xl text-[34px] font-semibold leading-[0.98] tracking-[-0.045em] ${text}`}>AutoCAD Design for production drawings.</h3>
+ <p className={`mt-3 max-w-lg text-[12px] leading-5 ${muted}`}>Import references, generate structured drafts, audit layers, and prepare export-ready DWG, DXF, and PDF packages.</p>
+ </div>
+ <button onClick={() => openModal("upload-file")} className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#4284FF] px-4 text-[12px] font-semibold text-white transition-colors hover:bg-[#376FE0]">
+ <Upload className="h-4 w-4"/>
+ Upload file
  </button>
- <h3 className="mb-3 text-[13px] font-semibold text-[#171717]">Recent drawings</h3>
- <div className="grid gap-3 md:grid-cols-3">
- {["Floor plan study","Workspace elevation","System detail"].map((name) => (
- <ClickableSoftCard key={name} className="min-h-[130px]"onClick={() => showToast(`${name} drawing opened`)} ariaLabel={`Open ${name}`}>
- <div className="mb-4 h-16 rounded-xl bg-[#EEF7FC]"/>
- <p className="text-[12px] font-semibold text-[#171717]">{name}</p>
- <p className="mt-1 text-[10px] text-[#6B7280]">No generated preview yet.</p>
- </ClickableSoftCard>
+ </div>
+
+ <div className="relative mt-8 h-[150px] rounded-2xl border border-[#BBD4FF] bg-white/75 shadow-[0_18px_40px_rgba(66,132,255,0.12)]">
+ <div className="absolute left-[8%] top-[18%] h-[58%] w-[30%] rounded-sm border-2 border-[#4284FF] bg-[#EFF6FF]/70"/>
+ <div className="absolute left-[42%] top-[18%] h-[28%] w-[34%] rounded-sm border-2 border-[#4284FF] bg-white/60"/>
+ <div className="absolute left-[42%] top-[52%] h-[24%] w-[20%] rounded-sm border-2 border-[#4284FF] bg-white/60"/>
+ <div className="absolute bottom-[18%] right-[10%] h-px w-[26%] bg-[#4284FF]"/>
+ <div className="absolute bottom-[17%] right-[35%] h-3 w-px bg-[#4284FF]"/>
+ <div className="absolute bottom-[17%] right-[10%] h-3 w-px bg-[#4284FF]"/>
+ <span className="absolute bottom-[24%] right-[18%] text-[10px] font-semibold text-[#4284FF]">12.40m</span>
+ </div>
+ </div>
+ </div>
+
+ <div className="p-5">
+ <div className="flex items-center justify-between gap-3">
+ <div>
+ <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${muted}`}>Drawing setup</p>
+ <h4 className={`mt-2 text-[15px] font-semibold ${text}`}>Active standards</h4>
+ </div>
+ <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAF2FF] text-[#4284FF]">
+ <Shield className="h-4 w-4"/>
+ </span>
+ </div>
+ <div className="mt-5 grid gap-2">
+ {standards.map(([label, value]) => (
+ <div key={label} className={`flex items-center justify-between rounded-2xl border px-3 py-3 ${line} ${soft}`}>
+ <span className={`text-[11px] font-semibold ${muted}`}>{label}</span>
+ <span className={`text-[12px] font-semibold ${text}`}>{value}</span>
+ </div>
+ ))}
+ </div>
+ <div className="mt-4 grid gap-2 sm:grid-cols-2">
+ <SecondaryButton icon={Layers3} onClick={() => showToast("Layer standards opened")}>Layers</SecondaryButton>
+ <SecondaryButton icon={Download} onClick={() => showToast("Export package prepared")}>Export</SecondaryButton>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <div className="grid gap-4 xl:grid-cols-[0.8fr_1.2fr]">
+ <SoftCard>
+ <div className="flex items-center justify-between gap-3">
+ <div>
+ <h3 className={`text-[14px] font-semibold ${text}`}>Drafting tools</h3>
+ <p className={`mt-1 text-[11px] ${muted}`}>Start common CAD workflows quickly.</p>
+ </div>
+ <button onClick={() => router.push("/ai-assistant/tools/autocad")} className="text-[11px] font-semibold text-[#4284FF]">Open AI</button>
+ </div>
+ <div className="mt-4 grid gap-2">
+ {draftingTools.map(({ label, desc, icon: Icon }) => (
+ <button key={label} onClick={() => showToast(`${label} workflow prepared`)} className={`flex items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all ${line} ${soft} ${dark ?"hover:border-[rgba(66,132,255,0.4)]":"hover:border-[#BBD4FF] hover:bg-[#F8FBFF]"}`}>
+ <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAF2FF] text-[#4284FF]">
+ <Icon className="h-4 w-4"/>
+ </span>
+ <span>
+ <span className={`block text-[12px] font-semibold ${text}`}>{label}</span>
+ <span className={`mt-0.5 block text-[10px] ${muted}`}>{desc}</span>
+ </span>
+ </button>
+ ))}
+ </div>
+ </SoftCard>
+
+ <SoftCard className="p-0">
+ <div className={`flex flex-wrap items-center justify-between gap-3 border-b p-4 ${line}`}>
+ <div>
+ <h3 className={`text-[14px] font-semibold ${text}`}>Recent drawings</h3>
+ <p className={`mt-1 text-[11px] ${muted}`}>Files and generated drafts currently in review.</p>
+ </div>
+ <SecondaryButton icon={RefreshCw} onClick={() => showToast("Drawings refreshed")}>Refresh</SecondaryButton>
+ </div>
+ <div className="divide-y divide-[#E5EAF0] dark:divide-[rgba(255,255,255,0.08)]">
+ {drawings.map((drawing) => (
+ <button key={drawing.name} onClick={() => showToast(`${drawing.name} drawing opened`)} className={`grid w-full gap-3 px-4 py-3 text-left transition-all md:grid-cols-[1.1fr_0.55fr_0.5fr_0.8fr] md:items-center ${dark ?"hover:bg-[#181B20]":"hover:bg-white"}`}>
+ <div>
+ <p className={`text-[13px] font-semibold ${text}`}>{drawing.name}</p>
+ <p className={`mt-1 text-[11px] ${muted}`}>{drawing.type} - {drawing.updated}</p>
+ </div>
+ <span className="w-fit rounded-full border border-[#CFE1FF] bg-[#EFF6FF] px-2.5 py-1 text-[10px] font-semibold text-[#4284FF]">{drawing.status}</span>
+ <p className={`text-[11px] font-semibold ${muted}`}>{drawing.progress}%</p>
+ <div>
+ <div className={`h-2 overflow-hidden rounded-full ${dark ?"bg-[#2A3038]":"bg-[#E8EEF7]"}`}>
+ <div className="h-full rounded-full bg-[#4284FF]" style={{ width: `${drawing.progress}%` }}/>
+ </div>
+ </div>
+ </button>
+ ))}
+ </div>
+ </SoftCard>
+ </div>
+
+ <div className="mt-5 grid gap-3 md:grid-cols-3">
+ {[
+ { label:"Import reference", desc:"DWG, DXF, PDF, image, or survey notes.", icon: Upload, action: () => openModal("upload-file") },
+ { label:"Generate plan", desc:"Describe rooms, dimensions, and layer rules.", icon: Sparkles, action: () => router.push("/ai-assistant/tools/autocad") },
+ { label:"Audit package", desc:"Check missing layers, line weights, and exports.", icon: CheckCircle2, action: () => showToast("CAD audit started") },
+ ].map(({ label, desc, icon: Icon, action }) => (
+ <button key={label} onClick={action} className={`rounded-2xl border p-4 text-left transition-all ${panel} ${dark ?"hover:border-[rgba(66,132,255,0.4)]":"hover:border-[#BBD4FF] hover:bg-white hover:shadow-[0_16px_34px_rgba(31,43,77,0.08)]"}`}>
+ <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAF2FF] text-[#4284FF]">
+ <Icon className="h-4 w-4"/>
+ </span>
+ <p className={`mt-4 text-[13px] font-semibold ${text}`}>{label}</p>
+ <p className={`mt-2 text-[11px] leading-5 ${muted}`}>{desc}</p>
+ </button>
  ))}
  </div>
  </div>
