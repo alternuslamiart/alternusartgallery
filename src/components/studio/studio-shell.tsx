@@ -128,6 +128,19 @@ const bottomNavigation = [
  { key:"help-center"as const, label:"Help Center", href:"/help-center", icon: AlertTriangle },
 ];
 
+const assistantRailSections = [
+ { id: "assistant-overview", label: "Overview" },
+ { id: "assistant-greeting", label: "Greeting" },
+ { id: "assistant-mode", label: "Mode" },
+ { id: "assistant-starters", label: "Starters" },
+ { id: "assistant-workflows", label: "Workflows" },
+ { id: "assistant-summary", label: "Summary" },
+ { id: "assistant-code", label: "Code" },
+ { id: "assistant-design", label: "Design" },
+ { id: "assistant-composer", label: "Composer" },
+ { id: "assistant-provider", label: "Provider" },
+];
+
 const sidebarRecentItems: GeneratedRecent[] = [
  {
  id:"recent-workflow-brief",
@@ -4485,6 +4498,54 @@ function CardDetailView({
  );
 }
 
+function AssistantScrollRail({ dark }: { dark: boolean }) {
+ const scrollToSection = (id: string) => {
+ const target = document.getElementById(id);
+ target?.scrollIntoView({ behavior: "smooth", block: "center" });
+ };
+
+ return (
+ <nav
+ aria-label="AI Assistant sections"
+ className="pointer-events-none fixed right-4 top-1/2 z-30 hidden -translate-y-1/2 xl:block"
+ >
+ <div
+ className={`pointer-events-auto flex h-[168px] w-4 flex-col items-center justify-center gap-3 rounded-full ${
+ dark ? "bg-[#181B20]/80" : "bg-white/[0.82]"
+ }`}
+ >
+ {assistantRailSections.map((section) => (
+ <button
+ key={section.id}
+ type="button"
+ onClick={() => scrollToSection(section.id)}
+ className="group relative flex h-1.5 w-4 items-center justify-center rounded-full outline-none"
+ aria-label={`Scroll to ${section.label}`}
+ title={section.label}
+ >
+ <span
+ className={`block h-1.5 w-4 rounded-full transition-colors ${
+ dark
+ ? "bg-[rgba(255,255,255,0.22)] group-hover:bg-[#6EA4FF] group-focus-visible:bg-[#6EA4FF]"
+ : "bg-[#D9D9D9] group-hover:bg-[#1D9BF0] group-focus-visible:bg-[#1D9BF0]"
+ }`}
+ />
+ <span
+ className={`pointer-events-none absolute right-6 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-lg px-2 py-1 text-[11px] font-semibold opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 ${
+ dark
+ ? "border border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]"
+ : "border border-[#E5E7EB] bg-white text-[#171717]"
+ }`}
+ >
+ {section.label}
+ </span>
+ </button>
+ ))}
+ </div>
+ </nav>
+ );
+}
+
 function AIAssistantPage() {
  const { theme } = useStudioTheme();
  const { openModal, showToast, isTemporaryChat, temporaryChatId, newChatId, endTemporaryChat } = useStudioActions();
@@ -4843,7 +4904,7 @@ function AIAssistantPage() {
  };
 
  const compactComposer = (
- <div className="w-full">
+ <div id="assistant-composer" className="w-full">
  {attachments.length > 0 ? (
  /* Expanded card when attachment exists */
  <div className={`w-full overflow-hidden rounded-2xl border ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#D9D9D9] bg-white"}`}>
@@ -5016,6 +5077,7 @@ function AIAssistantPage() {
  const Icon = item.icon;
  return (
  <button
+ id={["Summary","Code","Design"].includes(item.label) ? `assistant-${item.label.toLowerCase()}` : undefined}
  key={item.label}
  type="button"
  onClick={() => {
@@ -5052,19 +5114,26 @@ function AIAssistantPage() {
  if (!hasConversation) {
  if (activePlaygroundCard) {
  return (
+ <>
+ <AssistantScrollRail dark={dark} />
+ <div id="assistant-overview">
  <StarterPlaygroundView
  card={activePlaygroundCard}
  dark={dark}
  onBack={() => setActivePlaygroundCard(null)}
  onRun={() => void sendPrompt(activePlaygroundCard.prompt)}
  />
+ </div>
+ </>
  );
  }
 
  return (
- <div className={`flex min-h-full items-start justify-center px-0 pb-2 pt-[138px] max-xl:pt-[108px] max-sm:pt-8 ${dark ?"bg-transparent":"bg-white"}`}>
+ <>
+ <AssistantScrollRail dark={dark} />
+ <div id="assistant-overview" className={`flex min-h-full items-start justify-center px-0 pb-2 pt-[138px] max-xl:pt-[108px] max-sm:pt-8 ${dark ?"bg-transparent":"bg-white"}`}>
  <div className="flex w-full max-w-[700px] flex-col">
- <div className="flex flex-col items-center text-center">
+ <div id="assistant-greeting" className="flex flex-col items-center text-center">
  <h2 className={`text-[28px] font-medium leading-tight tracking-[0] max-sm:text-[23px] ${dark ?"text-[#F4F6F8]":"text-[#171717]"}`}>
  Good Morning, Toby
  </h2>
@@ -5075,16 +5144,18 @@ function AIAssistantPage() {
 
  {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
 
- <div className="mt-7 flex w-full justify-center">
+ <div id="assistant-mode" className="mt-7 flex w-full justify-center">
  <ModeToggle mode={assistantMode} onChange={setAssistantMode} dark={dark} />
  </div>
 
- <div className="mt-4 w-full">
+ <div id="assistant-starters" className="mt-4 w-full">
+ <div id="assistant-workflows">
  <StarterPanel
  mode={assistantMode}
  dark={dark}
  onOpen={(card) => setActivePlaygroundCard(card)}
  />
+ </div>
  </div>
 
  <div className="mt-3 w-full">
@@ -5093,17 +5164,21 @@ function AIAssistantPage() {
  {chipsRow}
  </div>
 
- <div className={`mt-5 text-center text-[10px] ${dark ?"text-[#6F7782]":"text-[#B4A99A]"}`}>
+ <div id="assistant-provider" className={`mt-5 text-center text-[10px] ${dark ?"text-[#6F7782]":"text-[#B4A99A]"}`}>
  {aiProviderLabel}
  </div>
  </div>
  </div>
+ </>
  );
  }
 
  return (
- <div className="mx-auto flex h-full w-full max-w-[1080px] flex-col px-4">
+ <>
+ <AssistantScrollRail dark={dark} />
+ <div id="assistant-overview" className="mx-auto flex h-full w-full max-w-[1080px] flex-col px-4">
  <div
+ id="assistant-greeting"
  className="min-h-0 flex-1 overflow-y-auto"
  role="log"
  aria-label="AI assistant conversation"
@@ -5217,7 +5292,7 @@ function AIAssistantPage() {
  </div>
  )}
  <div ref={conversationEndRef} />
- <div className={`text-center text-[11px] ${dark ?"text-[#6F7782]":"text-[#9CA3AF]"}`}>
+ <div id="assistant-provider" className={`text-center text-[11px] ${dark ?"text-[#6F7782]":"text-[#9CA3AF]"}`}>
  {aiProviderLabel}
  </div>
  </div>
@@ -5227,6 +5302,7 @@ function AIAssistantPage() {
  {composer}
  </div>
  </div>
+ </>
  );
 }
 
