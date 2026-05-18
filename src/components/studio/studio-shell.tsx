@@ -2793,13 +2793,36 @@ function AutoCADPage() {
 }
 
 function CodeBuilderPage() {
+ const router = useRouter();
+ const { theme } = useStudioTheme();
  const { openModal, showToast } = useStudioActions();
+ const dark = theme ==="dark";
+ const text = dark ?"text-[#F4F6F8]":"text-[#1F1F1F]";
+ const muted = dark ?"text-[#A8B0BA]":"text-[#657184]";
+ const line = dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E5EAF0]";
+ const soft = dark ?"bg-[#181B20]":"bg-white";
+ const panel = dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5EAF0] bg-[#FCFDFE]";
  const [phase, setPhase] = useState<CodeBuilderPhase>("idle");
  const [prompt, setPrompt] = useState("");
  const [plan, setPlan] = useState<CodeBuilderPlan | null>(null);
  const [activeLayerId, setActiveLayerId] = useState<CodeBuilderLayer["id"]>("hero");
  const [errorMessage, setErrorMessage] = useState<string | null>(null);
  const promptRef = useRef<HTMLTextAreaElement>(null);
+ const promptTemplates = [
+ "SaaS landing page with hero, pricing, testimonials, and clean conversion sections.",
+ "Portfolio site with project grid, case study detail, contact CTA, and dark header.",
+ "Product launch page with feature comparison, FAQ, newsletter capture, and footer.",
+ ];
+ const outputSteps = [
+ { label:"Plan summary", desc:"Pages, sections, and conversion goal." },
+ { label:"Code layers", desc:"Components, layout, CSS, and route map." },
+ { label:"Live preview", desc:"Editable preview canvas and file workspace." },
+ ];
+ const codeChecks = [
+ { label:"Responsive", value:"Ready" },
+ { label:"Components", value:"Layered" },
+ { label:"Export", value:"Next.js" },
+ ];
 
  const generatePlan = async (event?: FormEvent) => {
  event?.preventDefault();
@@ -2867,20 +2890,40 @@ function CodeBuilderPage() {
  }
 
  return (
- <div className="flex w-full flex-col gap-5 pb-2">
- <PageHeader title="Code Builder"subtitle="Describe a website and generate a plan-ready builder workspace."/>
- <form onSubmit={generatePlan} className="overflow-hidden rounded-[8px] border border-[#E1E6EA] bg-[#FCFDFE]">
- <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_320px]">
- <div className="border-b border-[#E8EEF2] p-5 lg:border-b-0 lg:border-r">
- <div className="mb-4 flex items-center gap-3">
- <span className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-[#EEF7FC] text-[#1DA1F2]">
- <Code2 className="h-4 w-4"/>
- </span>
+ <div className="flex w-full flex-col gap-5 pb-2 font-roboto">
+ <PageHeader
+ title="Code Builder"
+ subtitle="Turn a website brief into a clean plan, component layers, preview, and export-ready code."
+ action={
+ <div className="flex flex-wrap items-center gap-2">
+ <SecondaryButton icon={Folder} onClick={() => openModal("project-create")}>Open project</SecondaryButton>
+ <PrimaryButton icon={Sparkles} onClick={() => router.push("/ai-assistant/tools/code")}>AI code task</PrimaryButton>
+ </div>
+ }
+ />
+
+ <div className={`overflow-hidden rounded-2xl border ${panel}`}>
+ <div className="grid gap-0 xl:grid-cols-[minmax(0,1.35fr)_360px]">
+ <form onSubmit={generatePlan} className={`border-b p-5 xl:border-b-0 xl:border-r ${line}`}>
+ <div className="flex flex-wrap items-start justify-between gap-4">
  <div>
- <label htmlFor="code-builder-prompt"className="text-[13px] font-semibold text-[#171717]">Project prompt</label>
- <p className="mt-1 text-[11px] text-[#6B7280]">This creates the first website plan, layers, and preview canvas.</p>
+ <span className="inline-flex items-center gap-2 rounded-full border border-[#CFE1FF] bg-[#EFF6FF] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-[#4284FF]">
+ <Code2 className="h-3.5 w-3.5"/>
+ Builder workspace
+ </span>
+ <h3 className={`mt-4 max-w-2xl text-[34px] font-semibold leading-[0.98] tracking-[-0.045em] ${text}`}>Clean code starts with a clear build plan.</h3>
+ <p className={`mt-3 max-w-2xl text-[12px] leading-5 ${muted}`}>Describe the site, then generate a structured workspace with sections, files, layers, and a live preview surface.</p>
+ </div>
+ <div className={`rounded-2xl border px-4 py-3 ${line} ${soft}`}>
+ <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${muted}`}>Mode</p>
+ <p className={`mt-2 text-[13px] font-semibold ${text}`}>Next.js builder</p>
+ <p className="mt-1 text-[10px] font-semibold text-[#4284FF]">Plan-first output</p>
  </div>
  </div>
+
+ <div className="mt-6">
+ <label htmlFor="code-builder-prompt"className={`text-[13px] font-semibold ${text}`}>Project prompt</label>
+ <p className={`mt-1 text-[11px] ${muted}`}>Include audience, sections, style, conversion goal, and any required pages.</p>
  <textarea
  ref={promptRef}
  id="code-builder-prompt"
@@ -2890,8 +2933,8 @@ function CodeBuilderPage() {
  if (phase ==="error") setErrorMessage(null);
  }}
  disabled={phase ==="generatingPlan"}
- className="min-h-[170px] w-full resize-none rounded-[8px] border border-[#E5EAF0] bg-white p-4 text-[13px] leading-6 text-[#171717] outline-none transition-colors placeholder:text-[#A1A7B0] focus:border-[#9BD2FF] disabled:cursor-not-allowed disabled:opacity-60"
- placeholder="Describe the website you want to build. Example: a modern SaaS landing page for a design automation platform with pricing, testimonials, and a strong CTA."
+ className={`mt-3 min-h-[210px] w-full resize-none rounded-2xl border p-4 text-[13px] leading-6 outline-none transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#6F7782] focus:border-[rgba(66,132,255,0.5)]":"border-[#DDE6F0] bg-white text-[#1F1F1F] placeholder:text-[#9BA5B3] focus:border-[#9FC1FF]"}`}
+ placeholder="Example: build a polished SaaS landing page for an AI design platform with hero, feature grid, pricing, testimonials, FAQ, and a footer. Use a calm professional UI and strong conversion CTA."
  />
  {errorMessage && (
  <p className="mt-3 flex items-center gap-2 text-[11px] font-medium text-[#B42318]">
@@ -2899,37 +2942,83 @@ function CodeBuilderPage() {
  {errorMessage}
  </p>
  )}
+ </div>
+
  <div className="mt-4 flex flex-wrap items-center gap-2">
  <button
  type="submit"
  disabled={!prompt.trim() || phase ==="generatingPlan"}
- className="inline-flex h-9 items-center gap-2 rounded-[8px] bg-[#4A9BFF] px-4 text-[12px] font-semibold text-white transition-all hover:bg-[#2D8FF0] disabled:cursor-not-allowed disabled:opacity-50"
+ className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#4284FF] px-4 text-[12px] font-semibold text-white transition-all hover:bg-[#376FE0] disabled:cursor-not-allowed disabled:opacity-50"
  >
  {phase ==="generatingPlan"? <RefreshCw className="h-3.5 w-3.5 animate-spin"/> : <Code2 className="h-3.5 w-3.5"/>}
- {phase ==="generatingPlan"?"Generating plan...":"Generate plan"}
+ {phase ==="generatingPlan"?"Generating plan...":"Generate clean plan"}
  </button>
  <button
  type="button"
  onClick={() => openModal("project-create")}
- className="inline-flex h-9 items-center gap-2 rounded-[8px] border border-[#E5E7EB] bg-white px-3 text-[12px] font-semibold text-[#4B5563] transition-all hover:border-[#CFE8F8] hover:text-[#171717]"
+ className={`inline-flex h-10 items-center gap-2 rounded-xl border px-3 text-[12px] font-semibold transition-all ${line} ${soft} ${dark ?"text-[#A8B0BA] hover:text-[#F4F6F8]":"text-[#4B5563] hover:border-[#BBD4FF] hover:text-[#1F1F1F]"}`}
  >
  <Folder className="h-3.5 w-3.5"/>
  Open recent project
  </button>
  </div>
+
+ <div className="mt-5 grid gap-2 md:grid-cols-3">
+ {promptTemplates.map((template, index) => (
+ <button
+ key={template}
+ type="button"
+ onClick={() => {
+ setPrompt(template);
+ promptRef.current?.focus();
+ }}
+ disabled={phase ==="generatingPlan"}
+ className={`rounded-2xl border p-3 text-left transition-all disabled:cursor-not-allowed disabled:opacity-50 ${line} ${soft} ${dark ?"hover:border-[rgba(66,132,255,0.4)]":"hover:border-[#BBD4FF] hover:bg-[#F8FBFF]"}`}
+ >
+ <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#EAF2FF] text-[#4284FF]">
+ {index + 1}
+ </span>
+ <span className={`mt-3 block text-[11px] leading-5 ${muted}`}>{template}</span>
+ </button>
+ ))}
  </div>
- <div className="bg-[#F7FAFC] p-5">
- <p className="text-[12px] font-semibold text-[#171717]">Builder output</p>
- <div className="mt-4 space-y-3">
- {["Plan summary","Code layers","Live preview"].map((item, index) => (
- <div key={item} className="flex items-center gap-3 rounded-[8px] border border-[#E5EAF0] bg-white px-3 py-3">
- <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold ${phase ==="generatingPlan"&& index === 0 ?"bg-[#4A9BFF] text-white":"bg-[#EEF7FC] text-[#1DA1F2]"}`}>
+ </form>
+
+ <aside className={`p-5 ${dark ?"bg-[#181B20]":"bg-[#F7FAFC]"}`}>
+ <div className="flex items-center justify-between gap-3">
+ <div>
+ <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${muted}`}>Builder output</p>
+ <h3 className={`mt-2 text-[15px] font-semibold ${text}`}>Generated workspace</h3>
+ </div>
+ <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAF2FF] text-[#4284FF]">
+ <Workflow className="h-4 w-4"/>
+ </span>
+ </div>
+ <div className="mt-5 space-y-3">
+ {outputSteps.map((item, index) => (
+ <div key={item.label} className={`rounded-2xl border p-3 ${line} ${soft}`}>
+ <div className="flex items-start gap-3">
+ <span className={`flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold ${phase ==="generatingPlan"&& index === 0 ?"bg-[#4284FF] text-white":"bg-[#EAF2FF] text-[#4284FF]"}`}>
  {phase ==="generatingPlan"&& index === 0 ? <RefreshCw className="h-3 w-3 animate-spin"/> : index + 1}
  </span>
- <span className="text-[12px] font-medium text-[#4B5563]">{item}</span>
+ <div>
+ <p className={`text-[12px] font-semibold ${text}`}>{item.label}</p>
+ <p className={`mt-1 text-[10.5px] leading-4 ${muted}`}>{item.desc}</p>
+ </div>
+ </div>
  </div>
  ))}
  </div>
+
+ <div className="mt-5 grid gap-2">
+ {codeChecks.map((check) => (
+ <div key={check.label} className={`flex items-center justify-between rounded-2xl border px-3 py-3 ${line} ${soft}`}>
+ <span className={`text-[11px] font-semibold ${muted}`}>{check.label}</span>
+ <span className="text-[11px] font-semibold text-[#4284FF]">{check.value}</span>
+ </div>
+ ))}
+ </div>
+
  <button
  type="button"
  onClick={() => {
@@ -2937,14 +3026,14 @@ function CodeBuilderPage() {
  promptRef.current?.focus();
  }}
  disabled={phase ==="generatingPlan"}
- className="mt-5 inline-flex h-9 items-center gap-2 rounded-[8px] border border-[#E5E7EB] bg-white px-3 text-[11px] font-semibold text-[#4B5563] transition-all hover:border-[#CFE8F8] hover:text-[#171717] disabled:cursor-not-allowed disabled:opacity-50"
+ className={`mt-5 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border px-3 text-[11px] font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 ${line} ${soft} ${dark ?"text-[#A8B0BA] hover:text-[#F4F6F8]":"text-[#4B5563] hover:border-[#BBD4FF] hover:text-[#1F1F1F]"}`}
  >
- <Sparkles className="h-3.5 w-3.5 text-[#4A9BFF]"/>
+ <Sparkles className="h-3.5 w-3.5 text-[#4284FF]"/>
  Use website template prompt
  </button>
+ </aside>
  </div>
  </div>
- </form>
  </div>
  );
 }
