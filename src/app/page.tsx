@@ -11,7 +11,7 @@ const surfaces = [
  title: "Studio workspace",
  description: "Chat, project context, files, assets, and checkpoints stay in one readable production surface.",
  Icon: Layers3,
- href: "/main",
+ href: "/ai-assistant",
  cta: "Launch Studio",
  },
  {
@@ -136,7 +136,7 @@ export default function HomePage() {
  One calm AI workspace for design, code, 3D, CAD, assets, and automation. Start with a brief, keep context, and move projects toward production without changing tools.
  </p>
  <div style={{ marginTop: 36, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", color: t.fg }}>
- <ActionLink href="/main">
+ <ActionLink href="/ai-assistant">
  Launch Studio <ArrowRight size={15} />
  </ActionLink>
  <ActionLink href="/platform/overview" variant="secondary">
