@@ -3565,7 +3565,7 @@ function ModeToggle({
  :"border-[#E5E7EB] bg-white";
  const inactiveClass = dark
  ?"text-[#A8B0BA] hover:text-[#F4F6F8]"
- :"text-[#4B5563] hover:text-[#171717]";
+ :"text-[#4B5563] hover:text-[#1F1F1F]";
  return (
  <div className={`inline-flex items-center gap-1 rounded-full border p-1 ${containerClass}`} role="tablist"aria-label="Build mode">
  <button
@@ -3575,7 +3575,7 @@ function ModeToggle({
  onClick={() => onChange("agent")}
  className={`inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-[12px] font-semibold transition-all ${
  mode ==="agent"
- ?"bg-[#1D9BF0] text-white"
+ ?"bg-[#4284FF] text-white"
  : inactiveClass
  }`}
  >
@@ -3589,7 +3589,7 @@ function ModeToggle({
  onClick={() => onChange("workflow")}
  className={`inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-[12px] font-semibold transition-all ${
  mode ==="workflow"
- ?"bg-[#1D9BF0] text-white"
+ ?"bg-[#4284FF] text-white"
  : inactiveClass
  }`}
  >
@@ -3674,7 +3674,7 @@ function StarterPanel({
 
  return (
  <div className="w-full text-left">
- <p className={`mb-3 text-[13px] font-semibold ${dark ?"text-[#F4F6F8]":"text-[#171717]"}`}>{heading}</p>
+ <p className={`mb-3 text-[13px] font-semibold ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>{heading}</p>
  <div className="grid w-full gap-3 sm:grid-cols-3">
  {cards.map((card) => {
  const Icon = card.icon;
@@ -3685,11 +3685,11 @@ function StarterPanel({
  onClick={() => onOpen(card)}
  className={`group flex min-h-[72px] items-start gap-2.5 rounded-[12px] border p-2 text-left transition-all duration-200 ${cardBase}`}
  >
- <span className={`flex h-[44px] w-[44px] flex-shrink-0 items-center justify-center rounded-[7px] transition-colors ${dark ?"bg-[rgba(59,167,255,0.18)] text-[#7DD3FC] group-hover:bg-[#1D9BF0] group-hover:text-white":"bg-[#E8F4FB] text-[#1D9BF0] group-hover:bg-[#1D9BF0] group-hover:text-white"}`}>
+ <span className={`flex h-[44px] w-[44px] flex-shrink-0 items-center justify-center rounded-[7px] transition-colors ${dark ?"bg-[rgba(59,167,255,0.18)] text-[#7DD3FC] group-hover:bg-[#4284FF] group-hover:text-white":"bg-[#E8F4FB] text-[#4284FF] group-hover:bg-[#4284FF] group-hover:text-white"}`}>
  <Icon className="h-[18px] w-[18px]"/>
  </span>
  <span className="min-w-0 flex-1">
- <span className={`block truncate text-[13px] font-semibold leading-[1.12] ${dark ?"text-[#F4F6F8]":"text-[#171717]"}`}>
+ <span className={`block truncate text-[13px] font-semibold leading-[1.12] ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>
  {card.shortTitle ?? card.title}
  </span>
  <span className={`mt-1 block text-[10px] leading-3 ${dark ?"text-[#A8B0BA]":"text-[#30343A]"}`}>
@@ -3854,7 +3854,7 @@ function StarterPlaygroundView({
         role="switch"
         aria-checked={diffEnabled}
         onClick={() => setDiffEnabled((v) => !v)}
-        className={`relative h-5 w-9 flex-shrink-0 rounded-full transition-colors ${diffEnabled ? "bg-[#1D9BF0]" : dark ? "bg-[#2B3037]" : "bg-[#E5E7EB]"}`}
+        className={`relative h-5 w-9 flex-shrink-0 rounded-full transition-colors ${diffEnabled ? "bg-[#4284FF]" : dark ? "bg-[#2B3037]" : "bg-[#E5E7EB]"}`}
        >
         <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${diffEnabled ? "translate-x-4" : "translate-x-0.5"}`} />
        </button>
@@ -3882,7 +3882,7 @@ function StarterPlaygroundView({
         type="button"
         onClick={() => void handleRun()}
         disabled={isRunning}
-        className={`inline-flex h-8 items-center gap-1.5 rounded-xl px-3 font-semibold text-white transition-colors ${isRunning ? "cursor-not-allowed bg-[#1D9BF0]/70" : "bg-[#1D9BF0] hover:bg-[#1A8CD8]"}`}
+        className={`inline-flex h-8 items-center gap-1.5 rounded-xl px-3 font-semibold text-white transition-colors ${isRunning ? "cursor-not-allowed bg-[#4284FF]/70" : "bg-[#4284FF] hover:bg-[#376FE0]"}`}
        >
         {isRunning ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5 fill-current" />}
         {isRunning ? "Running…" : "Run"}
@@ -3896,7 +3896,7 @@ function StarterPlaygroundView({
       {/* Panel header */}
       <div className={`flex items-center justify-between border-b px-4 py-3 ${dividerClass}`}>
        <div className="flex items-center gap-3">
-        <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ? "bg-[rgba(59,167,255,0.18)] text-[#7DD3FC]" : "bg-[#E8F4FB] text-[#1D9BF0]"}`}>
+        <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ? "bg-[rgba(59,167,255,0.18)] text-[#7DD3FC]" : "bg-[#E8F4FB] text-[#4284FF]"}`}>
          <Icon className="h-[18px] w-[18px]" />
         </span>
         <div>
@@ -3927,7 +3927,7 @@ function StarterPlaygroundView({
         return (
          <article
           key={panel.model}
-          className={`relative rounded-[14px] border ${softClass} ${diffHighlight ? (dark ? "ring-1 ring-[#3BA7FF]/30" : "ring-1 ring-[#1D9BF0]/20") : ""}`}
+          className={`relative rounded-[14px] border ${softClass} ${diffHighlight ? (dark ? "ring-1 ring-[#3BA7FF]/30" : "ring-1 ring-[#4284FF]/20") : ""}`}
          >
           {/* Card header */}
           <div className={`flex items-center justify-between border-b px-3 py-2.5 ${dividerClass}`}>
@@ -3969,7 +3969,7 @@ function StarterPlaygroundView({
           {/* Model row */}
           <div className={`flex items-center justify-between border-b px-3 py-2 ${dividerClass}`}>
            <div className={`flex items-center gap-2 text-[12px] font-semibold ${textClass}`}>
-            <Icon className="h-3.5 w-3.5 text-[#1D9BF0]" />
+            <Icon className="h-3.5 w-3.5 text-[#4284FF]" />
             {panel.model}
            </div>
            <div className="relative">
@@ -3989,13 +3989,13 @@ function StarterPlaygroundView({
                 <label className={`block text-[10px] font-medium ${mutedClass}`}>Temperature: {params.temperature.toFixed(1)}</label>
                 <input type="range" min="0" max="1" step="0.1" value={params.temperature}
                  onChange={(e) => setCardParams((p) => ({ ...p, [panel.model]: { ...params, temperature: parseFloat(e.target.value) } }))}
-                 className="mt-1 w-full accent-[#1D9BF0]" />
+                 className="mt-1 w-full accent-[#4284FF]" />
                </div>
                <div>
                 <label className={`block text-[10px] font-medium ${mutedClass}`}>Max tokens: {params.maxTokens}</label>
                 <input type="range" min="256" max="4096" step="256" value={params.maxTokens}
                  onChange={(e) => setCardParams((p) => ({ ...p, [panel.model]: { ...params, maxTokens: parseInt(e.target.value) } }))}
-                 className="mt-1 w-full accent-[#1D9BF0]" />
+                 className="mt-1 w-full accent-[#4284FF]" />
                </div>
               </div>
               <button
@@ -4058,7 +4058,7 @@ function StarterPlaygroundView({
          <button
           type="button"
           onClick={() => setFilterOpen((v) => !v)}
-          className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold transition-colors ${filterText ? (dark ? "border-[#3BA7FF]/40 bg-[#3BA7FF]/10 text-[#7DD3FC]" : "border-[#1D9BF0]/30 bg-[#E8F4FB] text-[#1D9BF0]") : btnBase}`}
+          className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold transition-colors ${filterText ? (dark ? "border-[#3BA7FF]/40 bg-[#3BA7FF]/10 text-[#7DD3FC]" : "border-[#4284FF]/30 bg-[#E8F4FB] text-[#4284FF]") : btnBase}`}
          >
           Filter
          </button>
@@ -4107,7 +4107,7 @@ function StarterPlaygroundView({
                  return next;
                 });
                }}
-               className="accent-[#1D9BF0]"
+               className="accent-[#4284FF]"
               />
               {col}
              </label>
@@ -4120,7 +4120,7 @@ function StarterPlaygroundView({
         <button
          type="button"
          onClick={() => setViewMode((v) => v === "table" ? "grid" : "table")}
-         className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold transition-colors ${viewMode === "grid" ? (dark ? "border-[#3BA7FF]/40 bg-[#3BA7FF]/10 text-[#7DD3FC]" : "border-[#1D9BF0]/30 bg-[#E8F4FB] text-[#1D9BF0]") : btnBase}`}
+         className={`inline-flex h-8 items-center gap-1.5 rounded-xl border px-3 text-[11px] font-semibold transition-colors ${viewMode === "grid" ? (dark ? "border-[#3BA7FF]/40 bg-[#3BA7FF]/10 text-[#7DD3FC]" : "border-[#4284FF]/30 bg-[#E8F4FB] text-[#4284FF]") : btnBase}`}
         >
          <Grid2X2 className="h-3.5 w-3.5" />
          Grid
@@ -4312,10 +4312,10 @@ function CardDetailView({
  ?"border-[rgba(255,255,255,0.08)] bg-[#202328]"
  :"border-[#E5E7EB] bg-white";
  const labelClass = `mb-1.5 block text-[11px] font-semibold ${dark ?"text-[#A8B0BA]":"text-[#4B5563]"}`;
- const inputClass = `h-10 w-full rounded-xl border px-3 text-[12px] outline-none transition-colors ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#4B5563] focus:border-[#3BA7FF]":"border-[#E5EAF0] bg-[#FAFBFC] text-[#171717] placeholder:text-[#A1A7B0] focus:border-[#4A9BFF]"}`;
- const textareaClass = `w-full resize-none rounded-xl border px-3 py-2.5 text-[12px] outline-none transition-colors ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#4B5563] focus:border-[#3BA7FF]":"border-[#E5EAF0] bg-[#FAFBFC] text-[#171717] placeholder:text-[#A1A7B0] focus:border-[#4A9BFF]"}`;
+ const inputClass = `h-10 w-full rounded-xl border px-3 text-[12px] outline-none transition-colors ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#4B5563] focus:border-[#3BA7FF]":"border-[#E5EAF0] bg-[#FAFBFC] text-[#1F1F1F] placeholder:text-[#A1A7B0] focus:border-[#4284FF]"}`;
+ const textareaClass = `w-full resize-none rounded-xl border px-3 py-2.5 text-[12px] outline-none transition-colors ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#4B5563] focus:border-[#3BA7FF]":"border-[#E5EAF0] bg-[#FAFBFC] text-[#1F1F1F] placeholder:text-[#A1A7B0] focus:border-[#4284FF]"}`;
  const chipBase = (active: boolean) =>
- `h-7 rounded-full px-3 text-[11px] font-medium transition-all ${active ?"bg-[#1D9BF0] text-white": dark ?"border border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:text-[#F4F6F8]":"border border-[#E5EAF0] bg-[#FAFBFC] text-[#4B5563] hover:border-[#CFE8F8]"}`;
+ `h-7 rounded-full px-3 text-[11px] font-medium transition-all ${active ?"bg-[#4284FF] text-white": dark ?"border border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA] hover:text-[#F4F6F8]":"border border-[#E5EAF0] bg-[#FAFBFC] text-[#4B5563] hover:border-[#CFE8F8]"}`;
 
  const renderFields = () => {
  switch (card.title) {
@@ -4467,18 +4467,18 @@ function CardDetailView({
  <button
  type="button"
  onClick={onBack}
- className={`mb-4 inline-flex items-center gap-1.5 text-[11px] font-medium transition-colors ${dark ?"text-[#A8B0BA] hover:text-[#F4F6F8]":"text-[#6B7280] hover:text-[#171717]"}`}
+ className={`mb-4 inline-flex items-center gap-1.5 text-[11px] font-medium transition-colors ${dark ?"text-[#A8B0BA] hover:text-[#F4F6F8]":"text-[#6B7280] hover:text-[#1F1F1F]"}`}
  >
  <ChevronLeft className="h-3.5 w-3.5"/>
  Back
  </button>
  <div className={`w-full rounded-3xl border p-5 ${containerClass}`}>
  <div className="mb-5 flex items-center gap-3">
- <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#DDEEFF] text-[#1D9BF0]">
+ <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#DDEEFF] text-[#4284FF]">
  <Icon className="h-5 w-5"/>
  </span>
  <div>
- <p className={`text-[14px] font-semibold ${dark ?"text-[#F4F6F8]":"text-[#171717]"}`}>{card.title}</p>
+ <p className={`text-[14px] font-semibold ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>{card.title}</p>
  <p className={`text-[11px] ${dark ?"text-[#A8B0BA]":"text-[#6B7280]"}`}>{card.description}</p>
  </div>
  </div>
@@ -4487,7 +4487,7 @@ function CardDetailView({
  <button
  type="button"
  onClick={() => onLaunch(buildPrompt())}
- className="mt-1 flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-[#1D9BF0] text-[12px] font-semibold text-white transition-all hover:bg-[#1A8CD8]"
+ className="mt-1 flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-[#4284FF] text-[12px] font-semibold text-white transition-all hover:bg-[#376FE0]"
  >
  <Sparkles className="h-3.5 w-3.5 fill-current"/>
  Launch with AI
@@ -4527,14 +4527,14 @@ function AssistantScrollRail({ dark }: { dark: boolean }) {
  className={`block h-1.5 w-4 rounded-full transition-colors ${
  dark
  ? "bg-[rgba(255,255,255,0.22)] group-hover:bg-[#6EA4FF] group-focus-visible:bg-[#6EA4FF]"
- : "bg-[#D9D9D9] group-hover:bg-[#1D9BF0] group-focus-visible:bg-[#1D9BF0]"
+ : "bg-[#D9D9D9] group-hover:bg-[#4284FF] group-focus-visible:bg-[#4284FF]"
  }`}
  />
  <span
  className={`pointer-events-none absolute right-6 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-lg px-2 py-1 text-[11px] font-semibold opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 ${
  dark
  ? "border border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]"
- : "border border-[#E5E7EB] bg-white text-[#171717]"
+ : "border border-[#E5E7EB] bg-white text-[#1F1F1F]"
  }`}
  >
  {section.label}
@@ -4938,7 +4938,7 @@ function AIAssistantPage() {
  aria-label="Message Cedium"
  rows={2}
  placeholder="Add a message..."
- className={`w-full resize-none bg-transparent text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#171717] placeholder:text-[#A1A1A1]"}`}
+ className={`w-full resize-none bg-transparent text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#1F1F1F] placeholder:text-[#A1A1A1]"}`}
  style={{ letterSpacing: 0 }}
  />
  </div>
@@ -4951,7 +4951,7 @@ function AIAssistantPage() {
  <button type="button" onClick={() => openModal("voice-dictation")} className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[#252A31]" : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"}`} aria-label="Voice input">
  <Mic className="h-4 w-4" strokeWidth={2} />
  </button>
- <button onClick={() => void sendPrompt()} disabled={isSending} aria-label="Send prompt" className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[14px] bg-[#1292E8] text-white transition-all hover:bg-[#0F83D2] disabled:opacity-60">
+ <button onClick={() => void sendPrompt()} disabled={isSending} aria-label="Send prompt" className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[14px] bg-[#4284FF] text-white transition-all hover:bg-[#376FE0] disabled:opacity-60">
  {isSending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <CornerDownLeft className="h-4 w-4" strokeWidth={2} />}
  </button>
  </div>
@@ -4987,15 +4987,15 @@ function AIAssistantPage() {
  { label: "Connections & sources", icon: Globe, arrow: true, action: () => setAttachMenuView("connections") },
  { label: "More...", icon: MoreHorizontal, arrow: true, action: () => setAttachMenuView("more") },
  ].map(({ label, icon: Icon, arrow, action }) => (
- <button key={label} type="button" onClick={action} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}>
- <Icon className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} strokeWidth={2} />
+ <button key={label} type="button" onClick={action} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#4284FF]"}`}>
+ <Icon className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#4284FF]"}`} strokeWidth={2} />
  <span className="flex-1">{label}</span>
- {arrow && <ChevronRight className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} strokeWidth={2} />}
+ {arrow && <ChevronRight className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#4284FF]"}`} strokeWidth={2} />}
  </button>
  ))}
  {attachMenuView === "recent" && recentFiles.map((file) => (
  <button key={file.name} type="button" onClick={() => attachVirtualFile(file.name, file.kind)} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${dark ? "hover:bg-[rgba(59,167,255,0.12)]" : "hover:bg-[#EEF7FF]"}`}>
- <FileText className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} />
+ <FileText className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#4284FF]"}`} />
  <span className="min-w-0 flex-1">
  <span className={`block truncate text-[13px] font-medium ${dark ? "text-[#DDE3EA]" : "text-[#374151]"}`}>{file.name}</span>
  <span className={`mt-0.5 block text-[11px] ${dark ? "text-[#6F7782]" : "text-[#98A2B3]"}`}>{file.meta}</span>
@@ -5003,8 +5003,8 @@ function AIAssistantPage() {
  </button>
  ))}
  {attachMenuView === "connections" && sourceOptions.map((source) => (
- <button key={source.name} type="button" onClick={() => applyPromptTemplate(source.prompt)} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}>
- <Globe className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} />
+ <button key={source.name} type="button" onClick={() => applyPromptTemplate(source.prompt)} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#4284FF]"}`}>
+ <Globe className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#4284FF]"}`} />
  <span className="flex-1">{source.name}</span>
  </button>
  ))}
@@ -5013,8 +5013,8 @@ function AIAssistantPage() {
  { label: "Add image only", icon: ImageIcon, action: () => { imageInputRef.current?.click(); closeAttachMenu(); } },
  { label: "Open files workspace", icon: Folder, action: () => { closeAttachMenu(); router.push("/workspace/files"); } },
  ].map(({ label, icon: Icon, action }) => (
- <button key={label} type="button" onClick={action} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#1D9BF0]"}`}>
- <Icon className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#1D9BF0]"}`} />
+ <button key={label} type="button" onClick={action} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#4284FF]"}`}>
+ <Icon className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#4284FF]"}`} />
  <span className="flex-1">{label}</span>
  </button>
  ))}
@@ -5029,13 +5029,13 @@ function AIAssistantPage() {
  onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendPrompt(); } }}
  aria-label="Message Cedium"
  rows={1}
- className={`min-h-[32px] flex-1 resize-none bg-transparent px-2 py-1.5 text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#171717] placeholder:text-[#A1A1A1]"}`}
+ className={`min-h-[32px] flex-1 resize-none bg-transparent px-2 py-1.5 text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#1F1F1F] placeholder:text-[#A1A1A1]"}`}
  style={{ letterSpacing: 0 }}
  />
- <button type="button" onClick={() => openModal("voice-dictation")} className={`flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#F4F6F8] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#171717] hover:bg-[#E7E7E7]"}`} aria-label="Voice input" title="Voice input">
+ <button type="button" onClick={() => openModal("voice-dictation")} className={`flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#F4F6F8] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#1F1F1F] hover:bg-[#E7E7E7]"}`} aria-label="Voice input" title="Voice input">
  <Mic className="h-5 w-5" strokeWidth={2} />
  </button>
- <button onClick={() => input.trim() ? void sendPrompt() : openModal("voice-speak")} disabled={isSending} aria-label={input.trim() ? "Send prompt" : "Open Voice Speak"} className="flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] bg-[#1292E8] text-white transition-all hover:bg-[#0F83D2] disabled:cursor-not-allowed disabled:opacity-60">
+ <button onClick={() => input.trim() ? void sendPrompt() : openModal("voice-speak")} disabled={isSending} aria-label={input.trim() ? "Send prompt" : "Open Voice Speak"} className="flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] bg-[#4284FF] text-white transition-all hover:bg-[#376FE0] disabled:cursor-not-allowed disabled:opacity-60">
  {isSending ? <RefreshCw className="h-5 w-5 animate-spin" /> : input.trim() ? <CornerDownLeft className="h-5 w-5" strokeWidth={2} /> : <AudioLines className="h-5 w-5" strokeWidth={2} />}
  </button>
  <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
@@ -5050,7 +5050,7 @@ function AIAssistantPage() {
  const composer = compactComposer;
 
  const planNotice = showPlanEndingNotice ? (
- <div className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-6 py-3 text-[12px] ${dark ?"border-[rgba(255,170,0,0.32)] bg-[rgba(255,170,0,0.08)] text-[#F4F6F8]":"border-[#FCD7A1] bg-[#FFF8EC] text-[#171717]"}`}>
+ <div className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-6 py-3 text-[12px] ${dark ?"border-[rgba(255,170,0,0.32)] bg-[rgba(255,170,0,0.08)] text-[#F4F6F8]":"border-[#FCD7A1] bg-[#FFF8EC] text-[#1F1F1F]"}`}>
  <div className="flex items-start gap-3">
  <div className={`mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl ${dark ?"bg-[rgba(255,170,0,0.16)] text-[#FFB454]":"bg-[#FFEBC9] text-[#B7791F]"}`}>
  <AlertTriangle className="h-4 w-4"/>
@@ -5063,8 +5063,8 @@ function AIAssistantPage() {
  </div>
  </div>
  <div className="flex items-center gap-2">
- <button type="button"onClick={() => openModal("upgrade")} className="inline-flex h-9 items-center rounded-xl bg-[#1292E8] px-4 text-[12px] font-semibold text-white transition-colors hover:bg-[#0F83D2]">Upgrade Now</button>
- <button type="button"onClick={dismissPlanNotice} aria-label="Dismiss free plan notice"className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ?"text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"text-[#9CA3AF] hover:bg-white hover:text-[#171717]"}`}>
+ <button type="button"onClick={() => openModal("upgrade")} className="inline-flex h-9 items-center rounded-xl bg-[#4284FF] px-4 text-[12px] font-semibold text-white transition-colors hover:bg-[#376FE0]">Upgrade Now</button>
+ <button type="button"onClick={dismissPlanNotice} aria-label="Dismiss free plan notice"className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ?"text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"text-[#9CA3AF] hover:bg-white hover:text-[#1F1F1F]"}`}>
  <X className="h-4 w-4"/>
  </button>
  </div>
@@ -5084,7 +5084,7 @@ function AIAssistantPage() {
  applyPromptTemplate(item.prompt);
  showToast(`${item.label} prompt ready`);
  }}
- className={`inline-flex h-10 min-w-[128px] items-center justify-center gap-2 rounded-2xl border px-4 text-[13px] font-bold transition-all ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.28)] hover:text-[#F4F6F8]":"border-[#DCDCDC] bg-white text-[#7A7F87] hover:border-[#CFE8F8] hover:text-[#1D9BF0]"}`}
+ className={`inline-flex h-10 min-w-[128px] items-center justify-center gap-2 rounded-2xl border px-4 text-[13px] font-bold transition-all ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.28)] hover:text-[#F4F6F8]":"border-[#DCDCDC] bg-white text-[#7A7F87] hover:border-[#CFE8F8] hover:text-[#4284FF]"}`}
  >
  <Icon className="h-4 w-4"/>
  {item.label}
@@ -5097,13 +5097,13 @@ function AIAssistantPage() {
  const temporaryChatNotice = isTemporaryChat ? (
  <div className="flex w-full justify-center">
  <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]":"border-[#E5EAF0] bg-[#F6F8FB] text-[#4B5563]"}`}>
- <Ghost className={`h-3.5 w-3.5 ${dark ?"text-[#7DD3FC]":"text-[#1D9BF0]"}`} strokeWidth={2} />
- <span className={`font-semibold ${dark ?"text-[#F4F6F8]":"text-[#171717]"}`}>Temporary chat</span>
+ <Ghost className={`h-3.5 w-3.5 ${dark ?"text-[#7DD3FC]":"text-[#4284FF]"}`} strokeWidth={2} />
+ <span className={`font-semibold ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>Temporary chat</span>
  <span className="hidden sm:inline">— this conversation won&apos;t be saved.</span>
  <button
  type="button"
  onClick={closeTemporaryChat}
- className={`ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold transition-colors ${dark ?"bg-[rgba(255,255,255,0.06)] text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.1)] hover:text-[#F4F6F8]":"bg-white text-[#4B5563] hover:text-[#171717]"}`}
+ className={`ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold transition-colors ${dark ?"bg-[rgba(255,255,255,0.06)] text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.1)] hover:text-[#F4F6F8]":"bg-white text-[#4B5563] hover:text-[#1F1F1F]"}`}
  >
  End
  </button>
@@ -5116,7 +5116,7 @@ function AIAssistantPage() {
  return (
  <>
  <AssistantScrollRail dark={dark} />
- <div id="assistant-overview">
+ <div id="assistant-overview" className="font-roboto">
  <StarterPlaygroundView
  card={activePlaygroundCard}
  dark={dark}
@@ -5131,14 +5131,14 @@ function AIAssistantPage() {
  return (
  <>
  <AssistantScrollRail dark={dark} />
- <div id="assistant-overview" className={`flex min-h-full items-start justify-center px-0 pb-2 pt-[138px] max-xl:pt-[108px] max-sm:pt-8 ${dark ?"bg-transparent":"bg-white"}`}>
+ <div id="assistant-overview" className={`flex min-h-full items-start justify-center px-0 pb-2 pt-[138px] font-roboto max-xl:pt-[108px] max-sm:pt-8 ${dark ?"bg-transparent":"bg-white text-[#1F1F1F]"}`}>
  <div className="flex w-full max-w-[700px] flex-col">
  <div id="assistant-greeting" className="flex flex-col items-center text-center">
- <h2 className={`text-[28px] font-medium leading-tight tracking-[0] max-sm:text-[23px] ${dark ?"text-[#F4F6F8]":"text-[#171717]"}`}>
+ <h2 className={`text-[28px] font-medium leading-tight tracking-[0] max-sm:text-[23px] ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>
  Good Morning, Toby
  </h2>
- <p className={`mt-1 text-[25px] font-medium leading-tight tracking-[0] max-sm:text-[20px] ${dark ?"text-[#F4F6F8]":"text-[#171717]"}`}>
- How Can I <span className="text-[#1DA1F2]">Assist You Today?</span>
+ <p className={`mt-1 text-[25px] font-medium leading-tight tracking-[0] max-sm:text-[20px] ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>
+ How Can I <span className="text-[#4284FF]">Assist You Today?</span>
  </p>
  </div>
 
@@ -5176,7 +5176,7 @@ function AIAssistantPage() {
  return (
  <>
  <AssistantScrollRail dark={dark} />
- <div id="assistant-overview" className="mx-auto flex h-full w-full max-w-[1080px] flex-col px-4">
+ <div id="assistant-overview" className="mx-auto flex h-full w-full max-w-[1080px] flex-col px-4 font-roboto">
  <div
  id="assistant-greeting"
  className="min-h-0 flex-1 overflow-y-auto"
@@ -5191,7 +5191,7 @@ function AIAssistantPage() {
  {messages.map((message) => (
  <div key={message.id} className={`flex gap-3 ${message.role ==="user"?"justify-end":"justify-start"}`}>
  {message.role ==="assistant"&& (
- <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white">
+ <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#4284FF] text-white">
  <Sparkles className="h-4 w-4 fill-current"/>
  </div>
  )}
@@ -5201,10 +5201,10 @@ function AIAssistantPage() {
  message.role ==="user"
  ? dark
  ?"border border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]"
- :"border border-[#E5E7EB] bg-white text-[#171717]"
+ :"border border-[#E5E7EB] bg-white text-[#1F1F1F]"
  : dark
  ?"text-[#F4F6F8]"
- :"text-[#171717]"
+ :"text-[#1F1F1F]"
  }`}
  >
  <p className="whitespace-pre-wrap">{message.content}</p>
@@ -5213,7 +5213,7 @@ function AIAssistantPage() {
  <div className={`mt-2 flex items-center gap-1 rounded-full border px-1.5 py-1 ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20]/80 text-[#A8B0BA]":"border-[#E5E7EB] bg-white/80 text-[#9CA3AF]"}`}>
  <button
  onClick={() => void copyAssistantMessage(message.content)}
- className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+ className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#1F1F1F]"}`}
  aria-label="Copy response"
  title="Copy"
  >
@@ -5229,7 +5229,7 @@ function AIAssistantPage() {
  });
  showToast("Feedback saved");
  }}
- className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${messageFeedback[message.id] ==="like"?"bg-[#DDEEFF] text-[#1D9BF0]": dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+ className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${messageFeedback[message.id] ==="like"?"bg-[#DDEEFF] text-[#4284FF]": dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#1F1F1F]"}`}
  aria-label="Like response"
  title="Like"
  >
@@ -5245,7 +5245,7 @@ function AIAssistantPage() {
  });
  showToast("Feedback saved");
  }}
- className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${messageFeedback[message.id] ==="dislike"?"bg-[#FFE8ED] text-[#D92D52]": dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+ className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${messageFeedback[message.id] ==="dislike"?"bg-[#FFE8ED] text-[#D92D52]": dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#1F1F1F]"}`}
  aria-label="Dislike response"
  title="Dislike"
  >
@@ -5254,7 +5254,7 @@ function AIAssistantPage() {
  <button
  onClick={() => void regenerateAssistantMessage(message.id)}
  disabled={isSending}
- className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+ className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#1F1F1F]"}`}
  aria-label="Regenerate response"
  title="Regenerate"
  >
@@ -5262,7 +5262,7 @@ function AIAssistantPage() {
  </button>
  <button
  onClick={() => void shareAssistantMessage(message.content)}
- className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+ className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#1F1F1F]"}`}
  aria-label="Share response"
  title="Share"
  >
@@ -5270,7 +5270,7 @@ function AIAssistantPage() {
  </button>
  <button
  onClick={() => downloadAssistantMessage(message)}
- className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#171717]"}`}
+ className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#1F1F1F]"}`}
  aria-label="Download response"
  title="Download"
  >
@@ -5283,7 +5283,7 @@ function AIAssistantPage() {
  ))}
  {isSending && (
  <div className="flex gap-3">
- <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#1D9BF0] text-white">
+ <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#4284FF] text-white">
  <RefreshCw className="h-4 w-4 animate-spin"/>
  </div>
  <div className={`rounded-[24px] px-4 py-3 text-[13px] ${dark ?"text-[#A8B0BA]":"text-[#6B7280]"}`}>
