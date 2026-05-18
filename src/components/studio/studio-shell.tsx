@@ -1903,43 +1903,220 @@ function ToolPreviewPlaceholder({ config, activeTab, hasOutput, prompt }: { conf
 
 function OverviewPage() {
  const router = useRouter();
- const { openModal, showToast } = useStudioActions();
+ const { theme } = useStudioTheme();
+ const { openModal, openDrawer, showToast } = useStudioActions();
+ const dark = theme ==="dark";
+ const text = dark ?"text-[#F4F6F8]":"text-[#1F1F1F]";
+ const muted = dark ?"text-[#A8B0BA]":"text-[#657184]";
+ const line = dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E5EAF0]";
+ const soft = dark ?"bg-[#181B20]":"bg-white";
+ const panel = dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5EAF0] bg-[#FCFDFE]";
+ const stats = [
+ { label:"Live projects", value:"12", meta:"+3 this week", icon: Folder, trend:"72% active" },
+ { label:"Design files", value:"48", meta:"6 updated today", icon: Layers3, trend:"18 reviewed" },
+ { label:"Builds", value:"19", meta:"4 ready", icon: Code2, trend:"3 in QA" },
+ { label:"Exports", value:"27", meta:"9 delivered", icon: Download, trend:"100% synced" },
+ ];
+ const pipeline = [
+ { name:"AutoCAD homepage concept", type:"Design", owner:"AI Assistant", status:"Review", progress:78 },
+ { name:"Cedium landing route", type:"Code", owner:"Code Builder", status:"Building", progress:64 },
+ { name:"Product hero scene", type:"3D", owner:"Blender 3D", status:"Ready", progress:92 },
+ ];
+ const modules = [
+ { label:"AI Assistant", desc:"Start directed workspace tasks.", icon: Sparkles, action: () => router.push("/ai-assistant") },
+ { label:"Cedium Design", desc:"Create layouts and prototypes.", icon: Monitor, action: () => router.push("/cedium-design") },
+ { label:"AutoCAD Design", desc:"Draft plans and technical files.", icon: PenLine, action: () => router.push("/autocad-design") },
+ { label:"Code Builder", desc:"Prepare routes and components.", icon: Code2, action: () => router.push("/code-builder") },
+ ];
+ const activity = [
+ { label:"Homepage concept updated", time:"2m ago", tone:"bg-[#4284FF]" },
+ { label:"Prompt Lab checklist saved", time:"18m ago", tone:"bg-[#23B26D]" },
+ { label:"Blender material preview queued", time:"42m ago", tone:"bg-[#F59E0B]" },
+ { label:"Export package delivered", time:"1h ago", tone:"bg-[#8B5CF6]" },
+ ];
+ const systemHealth = [
+ ["Workspace sync","Online","99.9%"],
+ ["Agent queue","4 active","2 waiting"],
+ ["Storage","64 GB used","128 GB plan"],
+ ];
 
  return (
+ <div className="font-roboto">
+ <PageHeader
+ title="Studio Overview"
+ subtitle="Command center for projects, agent work, design files, builds, and exports."
+ action={
+ <div className="flex flex-wrap items-center gap-2">
+ <SecondaryButton icon={Upload} onClick={() => openModal("asset-upload")}>Import asset</SecondaryButton>
+ <PrimaryButton icon={Sparkles} onClick={() => router.push("/ai-assistant")}>Start AI task</PrimaryButton>
+ </div>
+ }
+ />
+
+ <div className={`mb-5 overflow-hidden rounded-2xl border ${panel}`}>
+ <div className="grid gap-0 lg:grid-cols-[1.25fr_0.75fr]">
+ <div className={`p-5 lg:border-r ${line}`}>
+ <div className="flex flex-wrap items-start justify-between gap-4">
  <div>
- <PageHeader title="Studio Overview"subtitle="Overview of workspace activity."/>
- <div className="grid gap-3 md:grid-cols-4">
- {[
- ["Active projects","12","+3 this week"],
- ["Design files","48","6 updated today"],
- ["Builds","19","4 ready"],
- ["Exports","27","9 delivered"],
- ].map(([label, value, meta]) => (
- <SoftCard key={label}>
- <p className="text-[11px] font-medium text-[#6B7280]">{label}</p>
- <p className="mt-3 text-[26px] font-semibold tracking-[-0.03em] text-[#171717]">{value}</p>
- <p className="mt-1 text-[10px] text-[#8A94A3]">{meta}</p>
- </SoftCard>
+ <span className="inline-flex items-center gap-2 rounded-full border border-[#CFE1FF] bg-[#EFF6FF] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-[#4284FF]">
+ <span className="h-1.5 w-1.5 rounded-full bg-[#4284FF]"/>
+ Live workspace
+ </span>
+ <h3 className={`mt-4 max-w-2xl text-[34px] font-semibold leading-[0.98] tracking-[-0.045em] ${text}`}>Studio Overview for active production.</h3>
+ <p className={`mt-3 max-w-xl text-[12px] leading-5 ${muted}`}>Track what is open, where agents are working, and which outputs need review before delivery.</p>
+ </div>
+ <div className={`rounded-2xl border px-4 py-3 ${line} ${soft}`}>
+ <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${muted}`}>Today</p>
+ <p className={`mt-2 text-[24px] font-semibold tracking-[-0.04em] ${text}`}>8 tasks</p>
+ <p className="mt-1 text-[10px] font-semibold text-[#4284FF]">5 on schedule</p>
+ </div>
+ </div>
+ <div className="mt-6 grid gap-3 sm:grid-cols-3">
+ {systemHealth.map(([label, value, meta]) => (
+ <div key={label} className={`rounded-2xl border px-4 py-3 ${line} ${soft}`}>
+ <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${muted}`}>{label}</p>
+ <p className={`mt-2 text-[13px] font-semibold ${text}`}>{value}</p>
+ <p className={`mt-1 text-[11px] ${muted}`}>{meta}</p>
+ </div>
  ))}
  </div>
- <div className="mt-5 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
- <SoftCard>
- <h3 className="text-[13px] font-semibold text-[#171717]">Recent activity</h3>
- <div className="mt-4 space-y-3">
- {["AutoCAD homepage concept updated","Code Builder prepared landing route","Blender material preview generated"].map((item) => (
- <button key={item} onClick={() => showToast(`${item} opened`)} className="flex w-full items-center gap-3 rounded-xl bg-white px-3 py-2 text-left transition-all hover:bg-[#F8FAFC]">
- <span className="h-2 w-2 rounded-full bg-[#1DA1F2]"/>
- <span className="text-[12px] text-[#4B5563]">{item}</span>
+ </div>
+ <div className="p-5">
+ <div className="flex items-center justify-between">
+ <div>
+ <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${muted}`}>Agent status</p>
+ <h4 className={`mt-2 text-[15px] font-semibold ${text}`}>Production queue</h4>
+ </div>
+ <button onClick={() => showToast("Queue refreshed")} className={`flex h-9 w-9 items-center justify-center rounded-xl border transition-all ${line} ${soft} ${dark ?"text-[#A8B0BA] hover:text-[#F4F6F8]":"text-[#657184] hover:text-[#1F1F1F]"}`} aria-label="Refresh queue">
+ <RefreshCw className="h-4 w-4"/>
+ </button>
+ </div>
+ <div className="mt-5 space-y-3">
+ {["Brief parsed","Assets mapped","Build checks","Export handoff"].map((step, index) => (
+ <div key={step} className="flex items-center gap-3">
+ <div className={`flex h-8 w-8 items-center justify-center rounded-xl ${index < 3 ?"bg-[#EAF2FF] text-[#4284FF]":"bg-[#F3F4F6] text-[#8A94A3]"}`}>
+ {index < 3 ? <CheckCircle2 className="h-4 w-4"/> : <Clock className="h-4 w-4"/>}
+ </div>
+ <div className="min-w-0 flex-1">
+ <p className={`text-[12px] font-semibold ${text}`}>{step}</p>
+ <div className={`mt-1 h-1.5 overflow-hidden rounded-full ${dark ?"bg-[#2A3038]":"bg-[#E8EEF7]"}`}>
+ <div className="h-full rounded-full bg-[#4284FF]" style={{ width: `${index < 3 ? 100 : 45}%` }}/>
+ </div>
+ </div>
+ </div>
+ ))}
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <div className="grid gap-3 md:grid-cols-4">
+ {stats.map(({ label, value, meta, icon: Icon, trend }) => (
+ <button key={label} onClick={() => showToast(`${label} opened`)} className={`rounded-2xl border p-4 text-left transition-all ${panel} ${dark ?"hover:border-[rgba(66,132,255,0.4)]":"hover:border-[#BBD4FF] hover:bg-white hover:shadow-[0_16px_34px_rgba(31,43,77,0.08)]"}`}>
+ <div className="flex items-start justify-between gap-3">
+ <div>
+ <p className={`text-[11px] font-medium ${muted}`}>{label}</p>
+ <p className={`mt-3 text-[28px] font-semibold tracking-[-0.04em] ${text}`}>{value}</p>
+ </div>
+ <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAF2FF] text-[#4284FF]">
+ <Icon className="h-4 w-4"/>
+ </span>
+ </div>
+ <div className="mt-3 flex items-center justify-between gap-2">
+ <p className={`text-[10px] ${muted}`}>{meta}</p>
+ <p className="text-[10px] font-semibold text-[#4284FF]">{trend}</p>
+ </div>
+ </button>
+ ))}
+ </div>
+
+ <div className="mt-5 grid gap-4 xl:grid-cols-[1.35fr_0.65fr]">
+ <SoftCard className="p-0">
+ <div className={`flex flex-wrap items-center justify-between gap-3 border-b p-4 ${line}`}>
+ <div>
+ <h3 className={`text-[14px] font-semibold ${text}`}>Production pipeline</h3>
+ <p className={`mt-1 text-[11px] ${muted}`}>Open work across design, code, and 3D.</p>
+ </div>
+ <SecondaryButton icon={Folder} onClick={() => router.push("/projects")}>View projects</SecondaryButton>
+ </div>
+ <div className="divide-y divide-[#E5EAF0] dark:divide-[rgba(255,255,255,0.08)]">
+ {pipeline.map((item) => (
+ <button key={item.name} onClick={() => openDrawer("project-detail")} className={`grid w-full gap-3 px-4 py-3 text-left transition-all md:grid-cols-[1.25fr_0.7fr_0.7fr_0.9fr] md:items-center ${dark ?"hover:bg-[#181B20]":"hover:bg-white"}`}>
+ <div>
+ <p className={`text-[13px] font-semibold ${text}`}>{item.name}</p>
+ <p className={`mt-1 text-[11px] ${muted}`}>{item.type}</p>
+ </div>
+ <p className={`text-[12px] ${muted}`}>{item.owner}</p>
+ <span className="w-fit rounded-full border border-[#CFE1FF] bg-[#EFF6FF] px-2.5 py-1 text-[10px] font-semibold text-[#4284FF]">{item.status}</span>
+ <div className="min-w-0">
+ <div className={`h-2 overflow-hidden rounded-full ${dark ?"bg-[#2A3038]":"bg-[#E8EEF7]"}`}>
+ <div className="h-full rounded-full bg-[#4284FF]" style={{ width: `${item.progress}%` }}/>
+ </div>
+ <p className={`mt-1 text-right text-[10px] ${muted}`}>{item.progress}%</p>
+ </div>
  </button>
  ))}
  </div>
  </SoftCard>
+
  <SoftCard>
- <h3 className="text-[13px] font-semibold text-[#171717]">Quick actions</h3>
+ <div className="flex items-center justify-between">
+ <div>
+ <h3 className={`text-[14px] font-semibold ${text}`}>Quick launch</h3>
+ <p className={`mt-1 text-[11px] ${muted}`}>Jump into the right studio.</p>
+ </div>
+ <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EAF2FF] text-[#4284FF]">
+ <Workflow className="h-4 w-4"/>
+ </span>
+ </div>
  <div className="mt-4 grid gap-2">
+ {modules.map(({ label, desc, icon: Icon, action }) => (
+ <button key={label} onClick={action} className={`flex items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all ${line} ${soft} ${dark ?"hover:border-[rgba(66,132,255,0.4)]":"hover:border-[#BBD4FF] hover:bg-[#F8FBFF]"}`}>
+ <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAF2FF] text-[#4284FF]">
+ <Icon className="h-4 w-4"/>
+ </span>
+ <span className="min-w-0">
+ <span className={`block text-[12px] font-semibold ${text}`}>{label}</span>
+ <span className={`mt-0.5 block text-[10px] ${muted}`}>{desc}</span>
+ </span>
+ </button>
+ ))}
+ </div>
+ </SoftCard>
+ </div>
+
+ <div className="mt-5 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+ <SoftCard>
+ <div className="flex items-center justify-between">
+ <h3 className={`text-[14px] font-semibold ${text}`}>Recent activity</h3>
+ <button onClick={() => showToast("Activity feed opened")} className="text-[11px] font-semibold text-[#4284FF]">View all</button>
+ </div>
+ <div className="mt-4 space-y-3">
+ {activity.map((item) => (
+ <button key={item.label} onClick={() => showToast(`${item.label} opened`)} className={`flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition-all ${line} ${soft} ${dark ?"hover:border-[rgba(66,132,255,0.4)]":"hover:border-[#BBD4FF] hover:bg-[#F8FBFF]"}`}>
+ <span className={`h-2.5 w-2.5 rounded-full ${item.tone}`}/>
+ <span className="min-w-0 flex-1">
+ <span className={`block truncate text-[12px] font-medium ${text}`}>{item.label}</span>
+ <span className={`mt-0.5 block text-[10px] ${muted}`}>{item.time}</span>
+ </span>
+ </button>
+ ))}
+ </div>
+ </SoftCard>
+
+ <SoftCard>
+ <div className="flex flex-wrap items-center justify-between gap-3">
+ <div>
+ <h3 className={`text-[14px] font-semibold ${text}`}>Workspace actions</h3>
+ <p className={`mt-1 text-[11px] ${muted}`}>Create, import, review, or export without leaving overview.</p>
+ </div>
+ <Shield className="h-4 w-4 text-[#4284FF]"/>
+ </div>
+ <div className="mt-4 grid gap-2 sm:grid-cols-2">
  <SecondaryButton icon={Plus} onClick={() => openModal("project-create")}>New project</SecondaryButton>
  <SecondaryButton icon={Upload} onClick={() => openModal("asset-upload")}>Import asset</SecondaryButton>
- <SecondaryButton icon={Sparkles} onClick={() => router.push("/ai-assistant")}>Start AI task</SecondaryButton>
+ <SecondaryButton icon={FileText} onClick={() => router.push("/prompt-lab")}>Prompt Lab</SecondaryButton>
+ <SecondaryButton icon={Download} onClick={() => router.push("/exports")}>Exports</SecondaryButton>
  </div>
  </SoftCard>
  </div>
