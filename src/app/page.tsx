@@ -1,373 +1,385 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import {
- ArrowRight,
- CheckCircle2,
- Layers3,
- ShieldCheck,
- Sparkles,
- UsersRound,
- Workflow,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { CediumFooter } from "@/components/cedium-shell";
+import type { ReactNode } from "react";
+import { ArrowRight, Code2, Cuboid, Layers3, ShieldCheck, Sparkles, Workflow } from "lucide-react";
+import { CediumPage, COBALT } from "@/components/cedium-shell";
 
-const navItems = [
- { label: "Platform", href: "/platform/overview" },
- { label: "Studio", href: "/main" },
- { label: "Pricing", href: "/pricing" },
- { label: "Status", href: "/platform/status" },
- { label: "Contact", href: "/contact" },
-];
-
-const featureCards = [
+const surfaces = [
  {
- title: "One studio for every build",
- copy: "Plan pages, generate code, shape assets, and keep creative workflows in one focused surface.",
- icon: Layers3,
+ n: "01",
+ title: "Studio workspace",
+ description: "Chat, project context, files, assets, and checkpoints stay in one readable production surface.",
+ Icon: Layers3,
+ href: "/main",
+ cta: "Launch Studio",
  },
  {
- title: "Agent-ready production",
- copy: "Turn prompts into tasks with context, files, assets, previews, and checkpoints that stay organized.",
- icon: Workflow,
+ n: "02",
+ title: "Agent-ready code",
+ description: "Turn prompts, page structure, design notes, and implementation tasks into focused code workflows.",
+ Icon: Code2,
+ href: "/workspace/code",
+ cta: "Open Code",
  },
  {
- title: "Design, code, and 3D",
- copy: "Move from web layout to Blender concepts, CAD support, and implementation without changing tools.",
- icon: Sparkles,
- },
- {
- title: "Clean team control",
- copy: "Keep workspaces readable with roles, activity, project history, and clear operational status.",
- icon: ShieldCheck,
+ n: "03",
+ title: "3D and CAD flow",
+ description: "Move from AutoCAD website layouts to Blender scenes, product visuals, and render-ready assets.",
+ Icon: Cuboid,
+ href: "/platform/bridges",
+ cta: "View Bridges",
  },
 ];
 
-const workflowSteps = [
- "Describe the product, page, scene, or workflow.",
- "Cedium creates a structured plan with assets and next actions.",
- "Launch the output in Studio, refine, and ship.",
+const metrics = [
+ { label: "One workspace", value: "01", detail: "for design, code, assets, and production memory" },
+ { label: "Agent surfaces", value: "06", detail: "studio, mail, files, code, knowledge, voice" },
+ { label: "Production paths", value: "3D", detail: "website builds, CAD support, and Blender output" },
 ];
 
-const HOME_THEME_KEY = "cedium_home_theme";
+const workflow = [
+ {
+ title: "Start with the brief",
+ copy: "Describe the page, product, CAD frame, 3D scene, or operational workflow.",
+ },
+ {
+ title: "Shape the work",
+ copy: "Cedium keeps context, assets, decisions, and next actions organized across the build.",
+ },
+ {
+ title: "Ship from Studio",
+ copy: "Move into code, files, community feedback, pricing, or project status without losing state.",
+ },
+];
 
-function useHomeTheme() {
- const [isLight, setIsLight] = useState(true);
+const controls = [
+ { title: "Clean access", copy: "Roles, workspace limits, account state, and plan gates remain visible." },
+ { title: "Project memory", copy: "Files, prompts, exports, and activity stay tied to the work instead of scattered tabs." },
+ { title: "Readable status", copy: "Production flow, platform health, and support links are easy to find." },
+ { title: "Security posture", copy: "Security, privacy, terms, and cookie controls live in the same system shell." },
+];
 
- useEffect(() => {
- setIsLight(window.localStorage.getItem(HOME_THEME_KEY) !== "dark");
- }, []);
-
- const toggleTheme = () => {
- setIsLight((current) => {
- const next = !current;
- window.localStorage.setItem(HOME_THEME_KEY, next ? "light" : "dark");
- return next;
- });
- };
-
- return [isLight, toggleTheme] as const;
-}
-
-function CediumMark({ className = "h-8 w-8" }: { className?: string }) {
+function ActionLink({
+ href,
+ children,
+ variant = "primary",
+}: {
+ href: string;
+ children: ReactNode;
+ variant?: "primary" | "secondary";
+}) {
  return (
- <span
- className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-[8px] bg-[#38BDF8] ${className}`}
- aria-hidden="true"
- >
- <span className="absolute inset-[5px] rounded-[5px] border border-white/55" />
- <span className="absolute h-2/5 w-2/5 rounded-full bg-white" />
- <span className="absolute bottom-[6px] right-[6px] h-1.5 w-1.5 rounded-full bg-white" />
- </span>
- );
-}
-
-function Brand({ compact = false, isLight = true }: { compact?: boolean; isLight?: boolean }) {
- return (
- <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Cedium home">
- <CediumMark className={compact ? "h-6 w-6" : "h-8 w-8"} />
- <span
- className={
- compact
- ? `text-sm font-semibold ${isLight ? "text-[#0F172A]" : "text-white"}`
- : `text-[1.35rem] font-semibold ${isLight ? "text-[#0F172A]" : "text-white"}`
- }
- >
- Cedium
- </span>
- </Link>
- );
-}
-
-function SiteHeader({ isLight }: { isLight: boolean }) {
- return (
- <header className="sticky top-0 z-30 border-b border-black/5 bg-white/78 backdrop-blur-xl dark:border-white/10 dark:bg-[#101113]/78">
- <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
- <Brand isLight={isLight} />
- <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation">
- {navItems.map((item) => (
  <Link
- key={item.label}
- href={item.href}
- className={`text-sm font-medium transition-colors ${
- isLight ? "text-slate-600 hover:text-[#0284C7]" : "text-zinc-400 hover:text-white"
- }`}
+ href={href}
+ style={{
+ height: 46,
+ padding: "0 20px",
+ borderRadius: 8,
+ display: "inline-flex",
+ alignItems: "center",
+ justifyContent: "center",
+ gap: 9,
+ textDecoration: "none",
+ fontSize: 14,
+ fontWeight: 800,
+ letterSpacing: "-0.01em",
+ background: variant === "primary" ? COBALT : "transparent",
+ color: variant === "primary" ? "#fff" : "inherit",
+ border: variant === "primary" ? `1px solid ${COBALT}` : "1px solid currentColor",
+ }}
  >
- {item.label}
+ {children}
  </Link>
- ))}
- </nav>
- <Button asChild className="h-10 rounded-[8px] bg-[#38BDF8] px-4 text-sm font-semibold text-white hover:bg-[#0EA5E9]">
- <Link href="/main">
- Open Studio
- <ArrowRight className="h-4 w-4" />
- </Link>
- </Button>
- </div>
- </header>
  );
 }
 
-function HeroActionPanel({ isLight }: { isLight: boolean }) {
+export default function HomePage() {
  return (
+ <CediumPage>
+ {(t) => (
+ <>
+ <section style={{ padding: "112px 0 72px", position: "relative", overflow: "hidden" }}>
  <div
- className={`w-full rounded-[34px] border p-3 shadow-[0_34px_100px_rgba(56,189,248,0.16)] backdrop-blur-2xl sm:p-4 ${
- isLight
- ? "border-white/85 bg-white/54"
- : "border-white/10 bg-white/5"
- }`}
- >
- <div className="grid gap-3 sm:grid-cols-[1.18fr_0.82fr]">
- <Link
- href="/main"
- className="group relative min-h-[330px] overflow-hidden rounded-[26px] bg-[#0F172A] p-6 text-white shadow-[0_24px_52px_rgba(15,23,42,0.18)] transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] sm:min-h-[360px]"
- >
- <span className="absolute right-0 top-0 h-36 w-36 translate-x-10 -translate-y-10 rounded-full bg-[#38BDF8]/35 blur-2xl" />
- <span className="absolute bottom-0 left-0 h-40 w-40 -translate-x-12 translate-y-12 rounded-full bg-[#2563EB]/28 blur-3xl" />
- <span className="relative inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-sky-100">
- <Sparkles className="h-3.5 w-3.5" />
- Start here
- </span>
- <div className="relative flex h-full flex-col justify-end pt-16">
- <div className="flex items-end justify-between gap-5">
- <div>
- <p className="text-2xl font-semibold tracking-[-0.02em] sm:text-3xl">Launch Studio</p>
- <p className="mt-3 max-w-xs text-sm leading-6 text-slate-300">
- Open the AI workspace for chat, projects, assets, code, and production tasks.
- </p>
- </div>
- <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#38BDF8] text-white transition-transform group-hover:translate-x-0.5">
- <ArrowRight className="h-5 w-5" />
- </span>
- </div>
- </div>
- </Link>
-
- <div className="grid gap-3">
- <Link
- href="/community"
- className={`group rounded-[24px] border p-5 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] ${
- isLight
- ? "border-[#DCEAF5] bg-white/78 text-[#0F172A] hover:bg-white"
- : "border-white/10 bg-white/5 text-white hover:bg-white/10"
- }`}
- >
- <div className="flex items-center justify-between gap-3">
- <span className="flex h-11 w-11 items-center justify-center rounded-[15px] bg-[#E0F2FE] text-[#0284C7]">
- <UsersRound className="h-[18px] w-[18px]" />
- </span>
- <ArrowRight className="h-4 w-4 text-[#38BDF8] transition-transform group-hover:translate-x-0.5" />
- </div>
- <p className="mt-6 text-sm font-semibold">AI Community</p>
- <p className={`mt-2 text-xs leading-5 ${isLight ? "text-[#64748B]" : "text-zinc-400"}`}>
- Publish, remix, and get feedback.
- </p>
- </Link>
-
- <Link
- href="/pricing"
- className={`group rounded-[24px] border p-5 transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] ${
- isLight
- ? "border-[#DCEAF5] bg-white/78 text-[#0F172A] hover:bg-white"
- : "border-white/10 bg-white/5 text-white hover:bg-white/10"
- }`}
- >
- <div className="flex items-center justify-between gap-3">
- <span className="flex h-11 w-11 items-center justify-center rounded-[15px] bg-[#E0F2FE] text-[#0284C7]">
- <ShieldCheck className="h-[18px] w-[18px]" />
- </span>
- <ArrowRight className="h-4 w-4 text-[#38BDF8] transition-transform group-hover:translate-x-0.5" />
- </div>
- <p className="mt-6 text-sm font-semibold">Plans & access</p>
- <p className={`mt-2 text-xs leading-5 ${isLight ? "text-[#64748B]" : "text-zinc-400"}`}>
- Compare usage and workspace limits.
- </p>
- </Link>
- </div>
- </div>
- <div className={`mt-3 grid gap-2 rounded-[22px] border px-4 py-3 text-[11px] font-semibold sm:grid-cols-3 ${
- isLight
- ? "border-[#DCEAF5] bg-white/60 text-[#64748B]"
- : "border-white/10 bg-white/5 text-zinc-400"
- }`}>
- {["Chat to project", "Community feedback", "Production workflow"].map((item) => (
- <div key={item} className="flex items-center gap-2">
- <span className="h-1.5 w-1.5 rounded-full bg-[#38BDF8]" />
- {item}
- </div>
- ))}
- </div>
- </div>
- );
-}
-
-function Hero({ isLight }: { isLight: boolean }) {
- return (
- <section className="relative overflow-hidden px-5 pb-20 pt-[4.5rem] sm:px-8 lg:px-10">
- <div className="mx-auto max-w-7xl">
- <div className="relative grid gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
- <div>
- <div
- className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold shadow-sm backdrop-blur-xl ${
- isLight ? "border-white/70 bg-white/64 text-[#0369A1]" : "border-white/10 bg-white/5 text-sky-200"
- }`}
- >
- <Sparkles className="h-3.5 w-3.5" />
- Premium AI workspace
+ style={{
+ position: "absolute",
+ left: "50%",
+ top: "-26%",
+ transform: "translateX(-50%)",
+ width: 960,
+ height: 660,
+ borderRadius: "50%",
+ background: `radial-gradient(closest-side,${COBALT}24,transparent 72%)`,
+ filter: "blur(38px)",
+ pointerEvents: "none",
+ }}
+ />
+ <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 32px", textAlign: "center", position: "relative" }}>
+ <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 22 }}>
+ AI PRODUCTION / v2.2
  </div>
  <h1
- className={`mt-6 max-w-2xl text-balance text-5xl font-semibold leading-[1.02] sm:text-6xl ${
- isLight ? "text-[#0F172A]" : "text-white"
- }`}
+ style={{
+ margin: 0,
+ fontSize: "clamp(56px,10vw,132px)",
+ fontWeight: 900,
+ letterSpacing: "-0.055em",
+ lineHeight: 0.88,
+ fontStretch: "82%",
+ }}
  >
- Build polished work from one AI workspace.
+ Build the work.
+ <br />
+ <span style={{ color: COBALT, fontStyle: "italic" }}>Not the tabs.</span>
  </h1>
- <p className={`mt-6 max-w-xl text-base leading-7 ${isLight ? "text-[#475569]" : "text-zinc-400"}`}>
- A refined AI studio for design, code, 3D, and automation, built to move projects from idea to production in one calm workspace.
+ <p style={{ margin: "30px auto 0", maxWidth: 690, fontSize: 18, color: t.muted, lineHeight: 1.62 }}>
+ One calm AI workspace for design, code, 3D, CAD, assets, and automation. Start with a brief, keep context, and move projects toward production without changing tools.
  </p>
+ <div style={{ marginTop: 36, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", color: t.fg }}>
+ <ActionLink href="/main">
+ Launch Studio <ArrowRight size={15} />
+ </ActionLink>
+ <ActionLink href="/platform/overview" variant="secondary">
+ Explore Platform
+ </ActionLink>
  </div>
- <HeroActionPanel isLight={isLight} />
+ <div
+ style={{
+ margin: "44px auto 0",
+ display: "inline-flex",
+ gap: 8,
+ flexWrap: "wrap",
+ justifyContent: "center",
+ color: t.muted,
+ }}
+ >
+ {["Design systems", "Code agent", "Blender 3D", "AutoCAD bridge", "Project memory"].map((item) => (
+ <span
+ key={item}
+ style={{
+ fontSize: 11,
+ fontWeight: 800,
+ letterSpacing: "0.08em",
+ textTransform: "uppercase",
+ padding: "7px 11px",
+ borderRadius: 999,
+ border: `1px solid ${t.faint}`,
+ background: t.raised,
+ }}
+ >
+ {item}
+ </span>
+ ))}
  </div>
  </div>
  </section>
- );
-}
 
-function Features({ isLight }: { isLight: boolean }) {
- return (
- <section className="px-5 py-16 sm:px-8 lg:px-10">
- <div className="mx-auto max-w-7xl">
- <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
- <div>
- <p className="text-sm font-semibold text-[#0284C7]">What Cedium does</p>
- <h2 className={`mt-3 max-w-2xl text-3xl font-semibold leading-tight sm:text-5xl ${isLight ? "text-[#0F172A]" : "text-white"}`}>
- A quieter way to run AI-assisted production.
- </h2>
- </div>
- <p className={`max-w-md text-sm leading-6 ${isLight ? "text-[#475569]" : "text-zinc-400"}`}>
- Built for people who need useful outputs, clear project state, and a workspace that stays readable.
- </p>
- </div>
-
- <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
- {featureCards.map(({ title, copy, icon: Icon }) => (
+ <section style={{ padding: "42px 0 92px" }}>
+ <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 32px" }}>
+ <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+ {metrics.map((metric) => (
  <article
- key={title}
- className={`rounded-[12px] border p-5 ${
- isLight ? "border-[#DCEAF5] bg-white " : "border-white/10 bg-[#151719]"
- }`}
+ key={metric.label}
+ style={{
+ padding: 28,
+ border: `1px solid ${t.faint}`,
+ borderRadius: 12,
+ background: t.raised,
+ minHeight: 210,
+ display: "flex",
+ flexDirection: "column",
+ justifyContent: "space-between",
+ }}
  >
- <Icon className="h-5 w-5 text-[#0284C7]" />
- <h3 className={`mt-8 text-base font-semibold ${isLight ? "text-[#0F172A]" : "text-white"}`}>{title}</h3>
- <p className={`mt-3 text-sm leading-6 ${isLight ? "text-[#475569]" : "text-zinc-400"}`}>{copy}</p>
+ <div style={{ fontSize: 11, color: t.muted, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>{metric.label}</div>
+ <div>
+ <div style={{ fontSize: 76, fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 0.9, color: COBALT, fontStretch: "82%" }}>
+ {metric.value}
+ </div>
+ <p style={{ margin: "16px 0 0", fontSize: 14, color: t.muted, lineHeight: 1.55 }}>{metric.detail}</p>
+ </div>
  </article>
  ))}
  </div>
  </div>
  </section>
- );
-}
 
-function WorkflowSection({ isLight }: { isLight: boolean }) {
- return (
- <section className="px-5 py-16 sm:px-8 lg:px-10">
- <div
- className={`mx-auto grid max-w-7xl gap-8 rounded-[14px] border p-6 sm:p-8 lg:grid-cols-[0.8fr_1.2fr] ${
- isLight ? "border-[#DCEAF5] bg-white " : "border-white/10 bg-[#151719]"
- }`}
- >
+ <section style={{ padding: "94px 0", borderTop: `1px solid ${t.faint}`, borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
+ <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
+ <div style={{ display: "flex", alignItems: "end", justifyContent: "space-between", gap: 24, flexWrap: "wrap", marginBottom: 42 }}>
  <div>
- <p className="text-sm font-semibold text-[#0284C7]">How it works</p>
- <h2 className={`mt-3 text-3xl font-semibold leading-tight sm:text-4xl ${isLight ? "text-[#0F172A]" : "text-white"}`}>
- From brief to usable output without losing context.
+ <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 18 }}>
+ WHAT CEDIUM DOES
+ </div>
+ <h2 style={{ fontSize: "clamp(38px,6vw,72px)", fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 0.94, margin: 0, fontStretch: "84%" }}>
+ A quieter way to run<br />
+ <span style={{ color: COBALT, fontStyle: "italic" }}>AI-assisted production.</span>
  </h2>
  </div>
- <div className="grid gap-3">
- {workflowSteps.map((step, index) => (
- <div
- key={step}
- className={`flex gap-4 rounded-[10px] border p-4 ${
- isLight ? "border-[#DCEAF5] bg-[#F8FCFF]" : "border-white/10 bg-[#101214]"
- }`}
+ <p style={{ margin: 0, maxWidth: 410, color: t.muted, fontSize: 15, lineHeight: 1.65 }}>
+ Built for useful outputs, clear project state, and a workspace that stays readable while the work gets more complex.
+ </p>
+ </div>
+
+ <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+ {surfaces.map(({ n, title, description, Icon, href, cta }) => (
+ <Link
+ key={title}
+ href={href}
+ style={{
+ position: "relative",
+ minHeight: 310,
+ padding: 30,
+ border: `1px solid ${t.faint}`,
+ borderRadius: 12,
+ background: t.raised,
+ color: t.fg,
+ textDecoration: "none",
+ overflow: "hidden",
+ }}
+ className="group"
  >
- <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] bg-[#38BDF8] text-sm font-semibold text-white">
- {index + 1}
+ <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 18 }}>
+ <div
+ style={{
+ width: 46,
+ height: 46,
+ borderRadius: 10,
+ background: `${COBALT}16`,
+ border: `1px solid ${COBALT}34`,
+ color: COBALT,
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ }}
+ >
+ <Icon size={21} strokeWidth={1.9} />
+ </div>
+ <span style={{ fontSize: 12, fontFamily: "var(--font-geist-mono),monospace", fontWeight: 800, color: COBALT }}>/ {n}</span>
+ </div>
+ <div style={{ position: "absolute", left: 30, right: 30, bottom: 28 }}>
+ <h3 style={{ fontSize: 27, fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1.02, margin: 0 }}>{title}</h3>
+ <p style={{ margin: "14px 0 24px", fontSize: 14, color: t.muted, lineHeight: 1.62 }}>{description}</p>
+ <span style={{ display: "inline-flex", alignItems: "center", gap: 8, color: COBALT, fontSize: 13, fontWeight: 800 }}>
+ {cta} <ArrowRight size={14} />
  </span>
- <p className={`text-sm leading-6 ${isLight ? "text-[#334155]" : "text-zinc-300"}`}>{step}</p>
+ </div>
+ </Link>
+ ))}
+ </div>
+ </div>
+ </section>
+
+ <section style={{ padding: "96px 0" }}>
+ <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
+ <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 20 }}>
+ HOW IT WORKS
+ </div>
+ <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr]" style={{ alignItems: "start" }}>
+ <div>
+ <h2 style={{ fontSize: "clamp(36px,5vw,64px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.96, margin: 0, fontStretch: "86%" }}>
+ From idea to output without losing context.
+ </h2>
+ <p style={{ marginTop: 22, fontSize: 15.5, color: t.muted, maxWidth: 480, lineHeight: 1.65 }}>
+ Keep the goal, source files, generated assets, and review path tied to the same workspace from first prompt to final output.
+ </p>
+ </div>
+ <div style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden", background: t.raised }}>
+ {workflow.map((item, index) => (
+ <div
+ key={item.title}
+ style={{
+ padding: "30px 32px",
+ borderTop: index > 0 ? `1px solid ${t.faint}` : "none",
+ display: "grid",
+ gridTemplateColumns: "48px 1fr",
+ gap: 22,
+ }}
+ >
+ <div style={{ fontSize: 12, color: COBALT, fontFamily: "var(--font-geist-mono),monospace", fontWeight: 800 }}>
+ 0{index + 1}
+ </div>
+ <div>
+ <h3 style={{ margin: 0, fontSize: 21, fontWeight: 900, letterSpacing: "-0.025em" }}>{item.title}</h3>
+ <p style={{ margin: "9px 0 0", fontSize: 14, color: t.muted, lineHeight: 1.6 }}>{item.copy}</p>
+ </div>
+ </div>
+ ))}
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <section style={{ padding: "96px 0", borderTop: `1px solid ${t.faint}`, background: t.surface }}>
+ <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
+ <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22 }}>
+ <div
+ style={{
+ width: 42,
+ height: 42,
+ borderRadius: 10,
+ background: `${COBALT}16`,
+ border: `1px solid ${COBALT}34`,
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ color: COBALT,
+ }}
+ >
+ <ShieldCheck size={20} />
+ </div>
+ <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT }}>WORKSPACE CONTROL</div>
+ </div>
+ <h2 style={{ fontSize: "clamp(36px,5vw,62px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.96, margin: 0, marginBottom: 42, fontStretch: "86%" }}>
+ Useful production, clear state,<br />
+ <span style={{ color: COBALT, fontStyle: "italic" }}>less interface noise.</span>
+ </h2>
+ <div className="grid grid-cols-1 gap-0 md:grid-cols-2" style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden" }}>
+ {controls.map((item, index) => (
+ <div
+ key={item.title}
+ style={{
+ padding: "30px 32px",
+ borderTop: index >= 2 ? `1px solid ${t.faint}` : "none",
+ borderLeft: index % 2 === 1 ? `1px solid ${t.faint}` : "none",
+ background: t.raised,
+ }}
+ >
+ <div style={{ fontSize: 11, color: COBALT, fontFamily: "var(--font-geist-mono),monospace", fontWeight: 800, marginBottom: 12 }}>
+ / {String(index + 1).padStart(2, "0")}
+ </div>
+ <h3 style={{ fontSize: 20, fontWeight: 900, letterSpacing: "-0.025em", margin: "0 0 9px" }}>{item.title}</h3>
+ <p style={{ fontSize: 13.5, color: t.muted, lineHeight: 1.62, margin: 0 }}>{item.copy}</p>
  </div>
  ))}
  </div>
  </div>
  </section>
- );
-}
 
-function Cta({ isLight }: { isLight: boolean }) {
- return (
- <section className="px-5 py-16 sm:px-8 lg:px-10">
- <div className="mx-auto max-w-5xl text-center">
- <div className="mx-auto flex w-fit items-center gap-2 rounded-full bg-[#E0F2FE] px-3 py-1 text-xs font-semibold text-[#0369A1]">
- <CheckCircle2 className="h-3.5 w-3.5" />
- Ready for focused work
+ <section style={{ padding: "108px 0" }}>
+ <div style={{ maxWidth: 980, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
+ <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, color: COBALT, fontWeight: 900, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 20 }}>
+ <Sparkles size={15} /> Begin
  </div>
- <h2 className={`mx-auto mt-5 max-w-3xl text-3xl font-semibold leading-tight sm:text-5xl ${isLight ? "text-[#0F172A]" : "text-white"}`}>
- Build the next page, project, or product workflow in Cedium.
+ <h2 style={{ fontSize: "clamp(44px,7vw,88px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.9, margin: 0, fontStretch: "84%" }}>
+ Start in Studio.<br />
+ <span style={{ color: COBALT, fontStyle: "italic" }}>Keep the work moving.</span>
  </h2>
- <div className="mt-8 flex justify-center">
- <Button asChild className="h-11 rounded-[10px] bg-[#38BDF8] px-5 text-sm font-semibold text-white hover:bg-[#0EA5E9]">
- <Link href="/main">
- Start building
- <ArrowRight className="h-4 w-4" />
- </Link>
- </Button>
+ <p style={{ margin: "26px auto 0", maxWidth: 610, color: t.muted, fontSize: 16, lineHeight: 1.65 }}>
+ Open the AI workspace, compare plans, or review the platform before moving a project into production.
+ </p>
+ <div style={{ marginTop: 36, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", color: t.fg }}>
+ <ActionLink href="/main">
+ Open Studio <Workflow size={15} />
+ </ActionLink>
+ <ActionLink href="/pricing" variant="secondary">
+ See Pricing
+ </ActionLink>
  </div>
  </div>
  </section>
- );
-}
-
-export default function HomePage() {
- const [isLight] = useHomeTheme();
-
- return (
- <div className={`${isLight ? "" : "dark"}`}>
- <div className={`min-h-screen overflow-hidden font-roboto transition-colors ${isLight ? "bg-[linear-gradient(180deg,#F8FCFF_0%,#FFFFFF_42%,#F6FBFF_100%)] text-[#0F172A]" : "bg-[#101113] text-zinc-100"}`}>
- <SiteHeader isLight={isLight} />
- <main>
- <Hero isLight={isLight} />
- <Features isLight={isLight} />
- <WorkflowSection isLight={isLight} />
- <Cta isLight={isLight} />
- </main>
- <CediumFooter
- isDark={!isLight}
- fg={isLight ? "#0F172A" : "#C1C2BF"}
- muted={isLight ? "rgba(5,8,15,0.62)" : "rgba(193,194,191,0.72)"}
- faint={isLight ? "rgba(5,8,15,0.1)" : "rgba(255,255,255,0.16)"}
- />
- </div>
- </div>
+ </>
+ )}
+ </CediumPage>
  );
 }
