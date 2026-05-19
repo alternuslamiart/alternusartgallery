@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import {
  getGeminiApiKey,
  getGeminiModel,
+ getGroqBaseUrl,
  getGroqApiKey,
  getGroqModel,
  getOpenAIApiKey,
@@ -78,7 +79,7 @@ async function testOpenAI() {
 }
 
 async function testGroq() {
- const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+ const response = await fetch(`${getGroqBaseUrl()}/chat/completions`, {
  method: 'POST',
  headers: {
  Authorization: `Bearer ${getGroqApiKey()}`,
@@ -111,6 +112,7 @@ export async function GET() {
  gemini_model: getGeminiModel(),
  groq_key_set: getGroqApiKey() ? 'Yes' : 'No',
  groq_model: getGroqModel(),
+ groq_base_url: getGroqBaseUrl(),
  openai_key_set: getOpenAIApiKey() ? 'Yes' : 'No',
  openai_model: getOpenAIModel(),
  };

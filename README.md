@@ -156,17 +156,19 @@ ANTHROPIC_API_KEY=
 GEMINI_API_KEY=
 GEMINI_MODEL=gemini-3-flash-preview
 GROQ_API_KEY=
+GROQ_BASE_URL=https://api.groq.com/openai/v1
 GROQ_MODEL=llama-3.1-8b-instant
 OS_DEMO_USER_ID=
 ```
 
-- `AI_PROVIDER` is optional and can be `gemini`, `groq`, or `openai`; when omitted, the AI chat route tries Gemini, Groq, then OpenAI
+- `AI_PROVIDER` is optional and can be `gemini`, `groq`, or `openai`; `AI_CHAT_PROVIDER` is also accepted for compatibility. When omitted, the AI chat route tries Gemini, Groq, then OpenAI
 - `OPENAI_API_KEY` is used by `src/app/api/ai-chat/route.ts` when OpenAI is selected or Gemini is not configured
 - `OPENAI_MODEL` is optional and defaults to `gpt-4o-mini`
 - `ANTHROPIC_API_KEY` is used by `src/app/api/os/ai/route.ts`
 - `GEMINI_API_KEY` is used by `src/app/api/ai-chat/route.ts`, `src/app/api/ai-chat/test/route.ts`, and the Python desktop utility
 - `GEMINI_MODEL` is optional and defaults to `gemini-3-flash-preview`
 - `GROQ_API_KEY` is used by `src/app/api/ai-chat/route.ts` and `src/app/api/ai-chat/test/route.ts`
+- `GROQ_BASE_URL` is optional and defaults to `https://api.groq.com/openai/v1`
 - `GROQ_MODEL` is optional and defaults to `llama-3.1-8b-instant`
 - `OS_DEMO_USER_ID` is an optional fallback for OS file routes when no authenticated session is available
 

@@ -4,6 +4,7 @@ import {
  DEFAULT_GEMINI_MODEL,
  DEFAULT_GROQ_MODEL,
  DEFAULT_OPENAI_MODEL,
+ getConfiguredAIProvider,
  getSafeAIErrorMessage,
 } from "@/lib/ai-provider-config";
 
@@ -11,7 +12,6 @@ export const dynamic = "force-dynamic";
 
 const MAX_HISTORY_MESSAGES = 16;
 const GEMINI_GENERATE_CONTENT_URL = "https://generativelanguage.googleapis.com/v1beta/models";
-const GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions";
 const OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions";
 
 const SYSTEM_PROMPT = `You are Cedium AI Assistant. Answer clearly, thoroughly, and helpfully. For coding, design, business, and product questions, give complete, practical, well-structured answers with examples, step-by-step instructions, and code blocks where useful. Match the depth of the answer to the complexity of the question — short questions get short answers, but never truncate an explanation that needs detail. Respond in the user's language when clear.`;
@@ -64,6 +64,11 @@ function getGroqModel() {
  return process.env.GROQ_MODEL?.trim() || DEFAULT_GROQ_MODEL;
 }
 
+function getGroqChatCompletionsUrl() {
+ const baseUrl = (process.env.GROQ_BASE_URL?.trim() || "https://api.groq.com/openai/v1").replace(/\/+$/, "");
+ return `${baseUrl}/chat/completions`;
+}
+
 function hasProviderKey(provider: RemoteAIProvider) {
  if (provider === "gemini") return Boolean(getGeminiApiKey());
  if (provider === "groq") return Boolean(getGroqApiKey());
@@ -71,7 +76,7 @@ function hasProviderKey(provider: RemoteAIProvider) {
 }
 
 function getPreferredProvider(): AIProvider {
- const configuredProvider = process.env.AI_PROVIDER?.trim().toLowerCase();
+ const configuredProvider = getConfiguredAIProvider();
 
  if (configuredProvider === "openai" && getOpenAIApiKey()) {
  return "openai";
@@ -173,7 +178,14 @@ function getProviderError(error: unknown, provider: RemoteAIProvider) {
  };
  }
 
- if (lower.includes("api key") || lower.includes("permission") || lower.includes("unauthorized")) {
+ if (
+ lower.includes("api key") ||
+ lower.includes("invalid_api_key") ||
+ lower.includes("permission") ||
+ lower.includes("unauthorized") ||
+ lower.includes("401") ||
+ lower.includes("403")
+ ) {
  return {
  status: 500,
  error: `${name} API request failed. Check the server AI configuration.`,
@@ -329,7 +341,7 @@ async function askOpenAI(message: string, history: ChatMessage[]) {
 async function askGroq(message: string, history: ChatMessage[]) {
  return askOpenAICompatible({
  apiKey: getGroqApiKey(),
- endpoint: GROQ_CHAT_COMPLETIONS_URL,
+ endpoint: getGroqChatCompletionsUrl(),
  history,
  message,
  modelName: getGroqModel(),
@@ -345,10 +357,14 @@ async function askProvider(provider: RemoteAIProvider, message: string, history:
 
 export async function GET() {
  const provider = getPreferredProvider();
+ const configuredProvider = getConfiguredAIProvider();
+ const configuredProviderReady = configuredProvider ? hasProviderKey(configuredProvider) : undefined;
 
  return NextResponse.json({
  ok: true,
  provider,
+ configuredProvider,
+ configuredProviderReady,
  model:
  provider === "openai"
  ? getOpenAIModel()
@@ -363,6 +379,7 @@ export async function GET() {
  groq: Boolean(getGroqApiKey()),
  openai: Boolean(getOpenAIApiKey()),
  },
+ groqBaseUrl: process.env.GROQ_BASE_URL?.trim() || "https://api.groq.com/openai/v1",
  });
 }
 

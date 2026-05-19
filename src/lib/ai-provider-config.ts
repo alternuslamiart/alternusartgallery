@@ -10,6 +10,12 @@ const SECRET_PATTERNS = [
 
 export type AIProvider = "gemini" | "groq" | "openai";
 
+export function getConfiguredAIProvider() {
+ const provider = (process.env.AI_PROVIDER || process.env.AI_CHAT_PROVIDER || "").trim().toLowerCase();
+ if (provider === "openai" || provider === "gemini" || provider === "groq") return provider;
+ return null;
+}
+
 export function getGeminiApiKey() {
  return process.env.GEMINI_API_KEY?.trim() || "";
 }
@@ -34,10 +40,12 @@ export function getGroqModel() {
  return process.env.GROQ_MODEL?.trim() || DEFAULT_GROQ_MODEL;
 }
 
+export function getGroqBaseUrl() {
+ return (process.env.GROQ_BASE_URL?.trim() || "https://api.groq.com/openai/v1").replace(/\/+$/, "");
+}
+
 export function getPreferredAIProvider(): AIProvider | null {
- const provider = process.env.AI_CHAT_PROVIDER?.trim().toLowerCase();
- if (provider === "openai" || provider === "gemini" || provider === "groq") return provider;
- return null;
+ return getConfiguredAIProvider();
 }
 
 export function getSafeAIErrorMessage(error: unknown) {
