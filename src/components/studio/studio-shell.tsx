@@ -7,7 +7,6 @@ import {
  AlertTriangle,
  AudioLines,
  Bell,
- Bot,
  Box,
  CheckCircle2,
  ChevronDown,
@@ -22,6 +21,7 @@ import {
  Download,
  FileText,
  Folder,
+ Gamepad2,
  Ghost,
  Globe,
  Grid2X2,
@@ -4093,6 +4093,7 @@ type StarterCard = {
  shortDescription?: string;
  icon: LucideIcon;
  prompt: string;
+ href?: string;
 };
 
 type StarterVisual = {
@@ -4133,32 +4134,87 @@ const starterVisuals: StarterVisual[] = [
  wave: "bg-[#9A3412]",
  meta: "Browser",
  },
+ {
+ preview: "from-[#0F172A] via-[#2563EB] to-[#93C5FD]",
+ strip: "from-[#38BDF8] via-[#2563EB] to-[#1E40AF]",
+ marker: "bg-[#38BDF8]",
+ glow: "bg-[rgba(147,197,253,0.9)]",
+ orb: "bg-[rgba(255,255,255,0.66)]",
+ wave: "bg-[#1E3A8A]",
+ meta: "Code",
+ },
+ {
+ preview: "from-[#064E3B] via-[#16A34A] to-[#BEF264]",
+ strip: "from-[#22C55E] via-[#84CC16] to-[#FACC15]",
+ marker: "bg-[#84CC16]",
+ glow: "bg-[rgba(236,252,203,0.92)]",
+ orb: "bg-[rgba(255,255,255,0.74)]",
+ wave: "bg-[#14532D]",
+ meta: "Engine",
+ },
+ {
+ preview: "from-[#7F1D1D] via-[#EF4444] to-[#FED7AA]",
+ strip: "from-[#EF4444] via-[#F97316] to-[#FDBA74]",
+ marker: "bg-[#EF4444]",
+ glow: "bg-[rgba(254,215,170,0.9)]",
+ orb: "bg-[rgba(255,255,255,0.76)]",
+ wave: "bg-[#7F1D1D]",
+ meta: "CAD",
+ },
 ];
 
 const agentStarters: StarterCard[] = [
  {
- title:"Create workflow",
- description:"Powerful automations speed up your processes with ease and security in mind.",
+ title:"AI Code",
+ description:"Generate, debug, refactor, and review full-stack code.",
+ shortTitle:"Code",
+ shortDescription:"Build, debug, and review code.",
+ icon: Code2,
+ prompt:"Help me write, debug, or review code for",
+ href:"/ai-assistant/tools/code",
+ },
+ {
+ title:"Unity / Unreal Engine",
+ description:"Plan gameplay, levels, mechanics, NPCs, assets, and optimization.",
+ shortTitle:"Unity / Unreal",
+ shortDescription:"Design games and real-time scenes.",
+ icon: Gamepad2,
+ prompt:"Help me plan a Unity or Unreal Engine project with gameplay, levels, assets, and optimization for",
+ },
+ {
+ title:"AutoCAD AI",
+ description:"Draft CAD layouts, dimensions, layers, rooms, and technical plans.",
+ shortTitle:"AutoCAD",
+ shortDescription:"Draft layouts and layer plans.",
+ icon: PenLine,
+ prompt:"Help me create an AutoCAD plan with dimensions, rooms, layers, and notes for",
+ href:"/ai-assistant/tools/autocad",
+ },
+ {
+ title:"Blender 3D",
+ description:"Create scene briefs, materials, lighting, camera, and render plans.",
+ shortTitle:"Blender 3D",
+ shortDescription:"Plan scenes and 3D renders.",
+ icon: Layers3,
+ prompt:"Help me prepare a Blender 3D scene brief for",
+ href:"/ai-assistant/tools/blender",
+ },
+ {
+ title:"Cedium Design",
+ description:"Shape UI screens, web layouts, prototypes, and design systems.",
+ shortTitle:"Design",
+ shortDescription:"Create layouts and prototypes.",
+ icon: Monitor,
+ prompt:"Create a clean design direction, layout, and component plan for",
+ href:"/cedium-design",
+ },
+ {
+ title:"Workflow Automation",
+ description:"Build secure workflow automations, approvals, and repeatable tasks.",
  shortTitle:"Workflow",
  shortDescription:"Automate tasks securely.",
  icon: Workflow,
- prompt:"Help me create a workflow that",
- },
- {
- title:"Create autonomous agent",
- description:"Intelligent agent that can handle basic requests and approvals.",
- shortTitle:"Autonomous agent",
- shortDescription:"Handle requests and approvals.",
- icon: Bot,
- prompt:"Build an autonomous agent that",
- },
- {
- title:"Computer-using agent",
- description:"Let agents accomplish even more across apps and websites.",
- shortTitle:"Computer agent",
- shortDescription:"Use apps and websites.",
- icon: Monitor,
- prompt:"Set up a computer-using agent that",
+ prompt:"Help me create a workflow that automates",
  },
 ];
 
@@ -4204,8 +4260,8 @@ function StarterPanel({
  return (
  <div className="w-full text-left">
  <p className={`mb-3 text-[13px] font-semibold ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>{heading}</p>
- <div className={`relative w-full overflow-visible px-1 pb-3 pt-1 ${deckGlow}`}>
- <div className="grid w-full grid-cols-3 items-stretch gap-3 max-sm:grid-cols-1">
+ <div className={`relative w-full overflow-hidden px-1 pb-3 pt-1 ${deckGlow}`}>
+ <div className="flex w-full snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-3 [scrollbar-width:thin]">
  {cards.map((card, index) => {
  const Icon = card.icon;
  const visual = starterVisuals[index % starterVisuals.length];
@@ -4215,10 +4271,10 @@ function StarterPanel({
  type="button"
  onClick={() => onOpen(card)}
  aria-label={card.title}
- className={`group relative flex min-h-[132px] flex-col overflow-hidden rounded-[8px] border text-left transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4284FF] focus-visible:ring-offset-2 max-sm:min-h-[124px] ${cardBase}`}
+ className={`group relative flex min-h-[164px] w-[236px] flex-none snap-start flex-col overflow-hidden rounded-[8px] border text-left transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4284FF] focus-visible:ring-offset-2 max-sm:w-[220px] ${cardBase}`}
  >
  <span className={`pointer-events-none absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b ${visual.strip}`} />
- <span className={`relative block h-[70px] overflow-hidden bg-gradient-to-br ${visual.preview}`}>
+ <span className={`relative block h-[92px] overflow-hidden bg-gradient-to-br ${visual.preview}`}>
  <span className={`absolute right-5 top-4 h-9 w-9 rounded-full blur-[1px] ${visual.glow}`} />
  <span className={`absolute right-8 top-2 h-4 w-4 rounded-full ${visual.orb}`} />
  <span className={`absolute -bottom-4 left-4 h-16 w-[115px] -rotate-6 rounded-[50%] opacity-80 ${visual.wave}`} />
@@ -4229,7 +4285,7 @@ function StarterPanel({
  {visual.meta}
  </span>
  </span>
- <span className="flex min-w-0 flex-1 items-start gap-2 px-3 pb-2.5 pt-2.5">
+ <span className="flex min-w-0 flex-1 items-start gap-2 px-3 pb-3 pt-3">
  <span className={`mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-[7px] transition-colors ${dark ?"bg-[#E8F4FB] text-[#4284FF] group-hover:bg-[#4284FF] group-hover:text-white":"bg-[#F1F6FF] text-[#4284FF] group-hover:bg-[#4284FF] group-hover:text-white"}`}>
  <Icon className="h-[15px] w-[15px]"/>
  </span>
@@ -4237,7 +4293,7 @@ function StarterPanel({
  <span className="block truncate text-[12px] font-bold leading-[1.12] text-[#101828]">
  {card.shortTitle ?? card.title}
  </span>
- <span className="mt-1 block text-[9px] leading-[1.25] text-[#475467]">
+ <span className="mt-1.5 block text-[9.5px] leading-[1.3] text-[#475467]">
  {card.shortDescription ?? card.description}
  </span>
  </span>
@@ -5675,7 +5731,13 @@ function AIAssistantPage() {
  <StarterPanel
  mode={assistantMode}
  dark={dark}
- onOpen={(card) => setActivePlaygroundCard(card)}
+ onOpen={(card) => {
+ if (card.href) {
+ router.push(card.href);
+ return;
+ }
+ setActivePlaygroundCard(card);
+ }}
  />
  </div>
  </div>
