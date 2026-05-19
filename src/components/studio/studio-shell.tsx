@@ -361,16 +361,15 @@ export function StudioRoutePage({ route, assistantTool }: StudioPageProps) {
  const pathname = usePathname();
  const activeTool = assistantTool ?? assistantToolByPath[pathname];
  const activeRoute = route ?? routeByPath[pathname] ??"ai-assistant";
- const assistantHome = activeRoute ==="ai-assistant"&& !activeTool;
 
  return (
- <StudioShell activeRoute={activeRoute} assistantHome={assistantHome}>
+ <StudioShell activeRoute={activeRoute}>
  <StudioContent route={activeRoute} assistantTool={activeTool} />
  </StudioShell>
  );
 }
 
-function StudioShell({ activeRoute, assistantHome = false, children }: { activeRoute: StudioRouteKey; assistantHome?: boolean; children: ReactNode }) {
+function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; children: ReactNode }) {
  const router = useRouter();
  const [theme, setTheme] = useState<StudioTheme>("light");
  const dark = theme ==="dark";
@@ -727,7 +726,7 @@ function StudioShell({ activeRoute, assistantHome = false, children }: { activeR
  return (
  <StudioThemeContext.Provider value={themeValue}>
  <StudioActionContext.Provider value={actionValue}>
- <div className={`fixed inset-0 overflow-hidden font-sans ${assistantHome ? dark ?"bg-[#0F1013] text-[#F4F6F8] studio-shell-dark":"bg-white text-[#171717]" : dark ?"bg-[#0F1013] text-[#F4F6F8] studio-shell-dark":"bg-[#F6FAFC] text-[#171717]"}`}>
+ <div className={`fixed inset-0 overflow-hidden font-sans ${dark ?"bg-[#0F1013] text-[#F4F6F8] studio-shell-dark":"bg-[#F6FAFC] text-[#171717]"}`}>
  <style jsx global>{`
  .studio-shell-dark button,
  .studio-shell-dark a,
@@ -869,17 +868,17 @@ function StudioShell({ activeRoute, assistantHome = false, children }: { activeR
  }
  `}</style>
  <div className="flex h-full">
- <div className={assistantHome ?"hidden":"hidden lg:block"}>{sidebar}</div>
- {!assistantHome && isMobileOpen && (
+ <div className="hidden lg:block">{sidebar}</div>
+ {isMobileOpen && (
  <div className="fixed inset-0 z-40 lg:hidden">
  <button className={`absolute inset-0 ${dark ?"bg-black/40 backdrop-blur-[2px]":"bg-[#1F2937]/20 backdrop-blur-[2px]"}`} onClick={() => setIsMobileOpen(false)} aria-label="Close sidebar"/>
  <div className="relative h-full w-[230px] rounded-none shadow-[18px_0_50px_rgba(31,43,77,0.16)]">{sidebar}</div>
  </div>
  )}
 
- <main className={`flex min-w-0 flex-1 flex-col ${assistantHome ? dark ?"bg-[#0F1013] p-0":"bg-white p-0" : `p-[6px] pl-0 ${dark ? "bg-[#181A1F]" : "bg-[#EAF3F8]"}`}`}>
- <div className={`studio-main-frame flex min-h-0 flex-1 flex-col overflow-hidden ${assistantHome ? dark ?"rounded-none border-0 bg-[#0F1013]":"rounded-none border-0 bg-white" : dark ?"rounded-[8px] border border-[rgba(255,255,255,0.08)] bg-[#17191D]":"rounded-[8px] border border-[#DDE7EE] bg-white"}`}>
- {!assistantHome && <header className={`flex h-11 items-center justify-between border-b px-3 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E8EEF2]"}`}>
+ <main className={`flex min-w-0 flex-1 flex-col p-[6px] pl-0 ${dark ? "bg-[#181A1F]" : "bg-[#EAF3F8]"}`}>
+ <div className={`studio-main-frame flex min-h-0 flex-1 flex-col overflow-hidden rounded-[8px] border ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#17191D]":"border-[#DDE7EE] bg-white"}`}>
+ <header className={`flex h-11 items-center justify-between border-b px-3 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E8EEF2]"}`}>
  <div className="flex min-w-0 items-center gap-3">
  <div className={`relative flex items-center gap-2 ${dark ?"text-[#A8B0BA]":"text-[#6B7280]"}`}>
  <div ref={notificationRef} className="relative">
@@ -920,7 +919,7 @@ function StudioShell({ activeRoute, assistantHome = false, children }: { activeR
  >
  AL
  </Link>
- </header>}
+ </header>
 
  <section
  className={[
@@ -5705,6 +5704,7 @@ function AIAssistantPage() {
  if (activePlaygroundCard) {
  return (
  <>
+ <AssistantScrollRail dark={dark} />
  <div id="assistant-overview" className="font-roboto">
  <StarterPlaygroundView
  card={activePlaygroundCard}
@@ -5719,6 +5719,7 @@ function AIAssistantPage() {
 
  return (
  <>
+ <AssistantScrollRail dark={dark} />
  <div id="assistant-overview" className={`flex min-h-full items-start justify-center px-6 pb-6 pt-7 font-roboto max-sm:px-4 max-sm:pt-6 ${dark ?"bg-[#0F1013]":"bg-white text-[#1F1F1F]"}`}>
  <div className="flex w-full max-w-[684px] flex-col">
  <div id="assistant-greeting" className="flex flex-col items-center text-center">
@@ -5764,6 +5765,7 @@ function AIAssistantPage() {
 
  return (
  <>
+ <AssistantScrollRail dark={dark} />
  <div id="assistant-overview" className="mx-auto flex h-full w-full max-w-[1080px] flex-col px-4 font-roboto">
  <div
  id="assistant-greeting"
