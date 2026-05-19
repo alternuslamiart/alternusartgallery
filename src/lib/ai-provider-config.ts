@@ -1,12 +1,14 @@
 export const DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview";
+export const DEFAULT_GROQ_MODEL = "llama-3.1-8b-instant";
 export const DEFAULT_OPENAI_MODEL = "gpt-4o-mini";
 
 const SECRET_PATTERNS = [
  /sk-[A-Za-z0-9_*.-]+/g,
+ /gsk_[A-Za-z0-9_-]+/g,
  /AIza[0-9A-Za-z_-]+/g,
 ];
 
-export type AIProvider = "gemini" | "openai";
+export type AIProvider = "gemini" | "groq" | "openai";
 
 export function getGeminiApiKey() {
  return process.env.GEMINI_API_KEY?.trim() || "";
@@ -24,9 +26,17 @@ export function getOpenAIModel() {
  return process.env.OPENAI_MODEL?.trim() || DEFAULT_OPENAI_MODEL;
 }
 
+export function getGroqApiKey() {
+ return process.env.GROQ_API_KEY?.trim() || "";
+}
+
+export function getGroqModel() {
+ return process.env.GROQ_MODEL?.trim() || DEFAULT_GROQ_MODEL;
+}
+
 export function getPreferredAIProvider(): AIProvider | null {
  const provider = process.env.AI_CHAT_PROVIDER?.trim().toLowerCase();
- if (provider === "openai" || provider === "gemini") return provider;
+ if (provider === "openai" || provider === "gemini" || provider === "groq") return provider;
  return null;
 }
 

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import {
  getGeminiApiKey,
  getGeminiModel,
+ getGroqApiKey,
+ getGroqModel,
  getOpenAIApiKey,
  getOpenAIModel,
  getSafeAIErrorMessage,
@@ -75,6 +77,30 @@ async function testOpenAI() {
  return text ? 'WORKING' : 'No response';
 }
 
+async function testGroq() {
+ const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+ method: 'POST',
+ headers: {
+ Authorization: `Bearer ${getGroqApiKey()}`,
+ 'Content-Type': 'application/json',
+ },
+ body: JSON.stringify({
+ model: getGroqModel(),
+ messages: [{ role: 'user', content: 'Say "ok"' }],
+ max_tokens: 16,
+ }),
+ });
+
+ if (!response.ok) {
+ const errorText = await response.text();
+ return `FAILED: ${response.status} - ${getSafeAIErrorMessage(errorText).slice(0, 200)}`;
+ }
+
+ const data = (await response.json()) as OpenAIResponse;
+ const text = data.choices?.[0]?.message?.content;
+ return text ? 'WORKING' : 'No response';
+}
+
 export async function GET() {
  if (process.env.NODE_ENV === 'production' && process.env.AI_DIAGNOSTICS_ENABLED !== 'true') {
  return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -83,6 +109,8 @@ export async function GET() {
  const results: Record<string, string> = {
  gemini_key_set: getGeminiApiKey() ? 'Yes' : 'No',
  gemini_model: getGeminiModel(),
+ groq_key_set: getGroqApiKey() ? 'Yes' : 'No',
+ groq_model: getGroqModel(),
  openai_key_set: getOpenAIApiKey() ? 'Yes' : 'No',
  openai_model: getOpenAIModel(),
  };
@@ -92,6 +120,14 @@ export async function GET() {
  results.gemini_test = await testGemini();
  } catch (e: unknown) {
  results.gemini_test = `FAILED: ${getSafeAIErrorMessage(e)}`;
+ }
+ }
+
+ if (getGroqApiKey()) {
+ try {
+ results.groq_test = await testGroq();
+ } catch (e: unknown) {
+ results.groq_test = `FAILED: ${getSafeAIErrorMessage(e)}`;
  }
  }
 

@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAIResponse } from "@/lib/ai-assistant";
-import { DEFAULT_GEMINI_MODEL, DEFAULT_OPENAI_MODEL, getSafeAIErrorMessage } from "@/lib/ai-provider-config";
+import {
+ DEFAULT_GEMINI_MODEL,
+ DEFAULT_GROQ_MODEL,
+ DEFAULT_OPENAI_MODEL,
+ getSafeAIErrorMessage,
+} from "@/lib/ai-provider-config";
 
 export const dynamic = "force-dynamic";
 
 const MAX_HISTORY_MESSAGES = 16;
 const GEMINI_GENERATE_CONTENT_URL = "https://generativelanguage.googleapis.com/v1beta/models";
+const GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions";
 const OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions";
 
 const SYSTEM_PROMPT = `You are Cedium AI Assistant. Answer clearly, thoroughly, and helpfully. For coding, design, business, and product questions, give complete, practical, well-structured answers with examples, step-by-step instructions, and code blocks where useful. Match the depth of the answer to the complexity of the question — short questions get short answers, but never truncate an explanation that needs detail. Respond in the user's language when clear.`;
@@ -22,8 +28,9 @@ type RequestBody = {
  conversationHistory?: unknown;
 };
 
-type AIProvider = "openai" | "gemini" | "local";
+type AIProvider = "openai" | "gemini" | "groq" | "local";
 type RemoteAIProvider = Exclude<AIProvider, "local">;
+const PROVIDER_PRIORITY: RemoteAIProvider[] = ["gemini", "groq", "openai"];
 
 function getFirstEnvValue(names: string[]) {
  for (const name of names) {
@@ -49,6 +56,20 @@ function getOpenAIModel() {
  return process.env.OPENAI_MODEL?.trim() || DEFAULT_OPENAI_MODEL;
 }
 
+function getGroqApiKey() {
+ return process.env.GROQ_API_KEY?.trim();
+}
+
+function getGroqModel() {
+ return process.env.GROQ_MODEL?.trim() || DEFAULT_GROQ_MODEL;
+}
+
+function hasProviderKey(provider: RemoteAIProvider) {
+ if (provider === "gemini") return Boolean(getGeminiApiKey());
+ if (provider === "groq") return Boolean(getGroqApiKey());
+ return Boolean(getOpenAIApiKey());
+}
+
 function getPreferredProvider(): AIProvider {
  const configuredProvider = process.env.AI_PROVIDER?.trim().toLowerCase();
 
@@ -60,25 +81,21 @@ function getPreferredProvider(): AIProvider {
  return "gemini";
  }
 
- if (getGeminiApiKey()) return "gemini";
- if (getOpenAIApiKey()) return "openai";
- return "local";
-}
+ if (configuredProvider === "groq" && getGroqApiKey()) {
+ return "groq";
+ }
 
-function getFallbackProvider(provider: AIProvider): RemoteAIProvider | null {
- if (provider === "openai" && getGeminiApiKey()) return "gemini";
- if (provider === "gemini" && getOpenAIApiKey()) return "openai";
- return null;
+ return PROVIDER_PRIORITY.find(hasProviderKey) ?? "local";
 }
 
 function getProviderAttempts(provider: AIProvider): RemoteAIProvider[] {
  if (provider === "local") return [];
 
  const attempts: RemoteAIProvider[] = [provider];
- const fallbackProvider = getFallbackProvider(provider);
-
- if (fallbackProvider && !attempts.includes(fallbackProvider)) {
+ for (const fallbackProvider of PROVIDER_PRIORITY) {
+ if (fallbackProvider !== provider && hasProviderKey(fallbackProvider)) {
  attempts.push(fallbackProvider);
+ }
  }
 
  return attempts;
@@ -143,10 +160,10 @@ function toOpenAIMessages(history: ChatMessage[], message: string) {
  ];
 }
 
-function getProviderError(error: unknown, provider: "openai" | "gemini") {
+function getProviderError(error: unknown, provider: RemoteAIProvider) {
  const message = getSafeAIErrorMessage(error);
  const lower = message.toLowerCase();
- const name = provider === "openai" ? "OpenAI" : "Gemini";
+ const name = provider === "openai" ? "OpenAI" : provider === "groq" ? "Groq" : "Gemini";
 
  if (lower.includes("quota") || lower.includes("rate") || lower.includes("429")) {
  return {
@@ -242,20 +259,33 @@ async function askGemini(message: string, history: ChatMessage[]) {
  return answer;
 }
 
-async function askOpenAI(message: string, history: ChatMessage[]) {
- const apiKey = getOpenAIApiKey();
+async function askOpenAICompatible({
+ apiKey,
+ endpoint,
+ history,
+ message,
+ modelName,
+ providerName,
+}: {
+ apiKey: string | undefined;
+ endpoint: string;
+ history: ChatMessage[];
+ message: string;
+ modelName: string;
+ providerName: "OpenAI" | "Groq";
+}) {
  if (!apiKey) {
- throw new Error("Missing OpenAI API key.");
+ throw new Error(`Missing ${providerName} API key.`);
  }
 
- const response = await fetch(OPENAI_CHAT_COMPLETIONS_URL, {
+ const response = await fetch(endpoint, {
  method: "POST",
  headers: {
  Authorization: `Bearer ${apiKey}`,
  "Content-Type": "application/json",
  },
  body: JSON.stringify({
- model: getOpenAIModel(),
+ model: modelName,
  messages: toOpenAIMessages(history, message),
  temperature: 0.7,
  max_tokens: 4096,
@@ -270,7 +300,7 @@ async function askOpenAI(message: string, history: ChatMessage[]) {
  parsedMessage = parsed?.error?.message;
  } catch {}
  const reason = parsedMessage || errorText.slice(0, 200);
- throw new Error(`OpenAI ${response.status}: ${reason}`);
+ throw new Error(`${providerName} ${response.status}: ${reason}`);
  }
 
  const data = (await response.json()) as {
@@ -279,14 +309,38 @@ async function askOpenAI(message: string, history: ChatMessage[]) {
  const answer = data.choices?.[0]?.message?.content?.trim();
 
  if (!answer) {
- throw new Error("Invalid OpenAI response.");
+ throw new Error(`Invalid ${providerName} response.`);
  }
 
  return answer;
 }
 
+async function askOpenAI(message: string, history: ChatMessage[]) {
+ return askOpenAICompatible({
+ apiKey: getOpenAIApiKey(),
+ endpoint: OPENAI_CHAT_COMPLETIONS_URL,
+ history,
+ message,
+ modelName: getOpenAIModel(),
+ providerName: "OpenAI",
+ });
+}
+
+async function askGroq(message: string, history: ChatMessage[]) {
+ return askOpenAICompatible({
+ apiKey: getGroqApiKey(),
+ endpoint: GROQ_CHAT_COMPLETIONS_URL,
+ history,
+ message,
+ modelName: getGroqModel(),
+ providerName: "Groq",
+ });
+}
+
 async function askProvider(provider: RemoteAIProvider, message: string, history: ChatMessage[]) {
- return provider === "openai" ? askOpenAI(message, history) : askGemini(message, history);
+ if (provider === "openai") return askOpenAI(message, history);
+ if (provider === "groq") return askGroq(message, history);
+ return askGemini(message, history);
 }
 
 export async function GET() {
@@ -298,12 +352,15 @@ export async function GET() {
  model:
  provider === "openai"
  ? getOpenAIModel()
+ : provider === "groq"
+ ? getGroqModel()
  : provider === "gemini"
  ? getGeminiModel()
  : "local-fallback",
- configured: Boolean(getGeminiApiKey() || getOpenAIApiKey()),
+ configured: Boolean(getGeminiApiKey() || getGroqApiKey() || getOpenAIApiKey()),
  providers: {
  gemini: Boolean(getGeminiApiKey()),
+ groq: Boolean(getGroqApiKey()),
  openai: Boolean(getOpenAIApiKey()),
  },
  });
@@ -324,7 +381,7 @@ export async function POST(request: NextRequest) {
  const history = normalizeHistory(body.history ?? body.conversationHistory);
  const provider = getPreferredProvider();
 
- if (provider === "openai" || provider === "gemini") {
+ if (provider === "openai" || provider === "gemini" || provider === "groq") {
  const providerAttempts = getProviderAttempts(provider);
  const providerErrors: Array<{ provider: RemoteAIProvider; message: string }> = [];
 
@@ -367,7 +424,7 @@ export async function POST(request: NextRequest) {
  });
  } catch (error) {
  const provider = getPreferredProvider();
- const remoteProvider = provider === "openai" ? "openai" : "gemini";
+ const remoteProvider: RemoteAIProvider = provider === "openai" || provider === "groq" ? provider : "gemini";
  const providerError = getProviderError(error, remoteProvider);
  console.error("AI chat error:", error);
 

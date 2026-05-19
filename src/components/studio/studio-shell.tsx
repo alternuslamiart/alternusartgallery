@@ -5174,6 +5174,8 @@ function AIAssistantPage() {
  const providerName =
  data.provider ==="openai"
  ?"OpenAI"
+ : data.provider ==="groq"
+ ?"Groq"
  : data.provider ==="gemini"
  ?"Gemini"
  :"local fallback";
@@ -5181,7 +5183,7 @@ function AIAssistantPage() {
  setAiProviderLabel(
  data.configured
  ? `Connected to ${providerName}${modelName} via /api/ai-chat`
- :"Using local fallback via /api/ai-chat. Add OPENAI_API_KEY or GEMINI_API_KEY for live AI.",
+ :"Using local fallback via /api/ai-chat. Add GEMINI_API_KEY, GROQ_API_KEY, or OPENAI_API_KEY for live AI.",
  );
  } catch {
  if (isMounted) setAiProviderLabel("AI provider status unavailable");
