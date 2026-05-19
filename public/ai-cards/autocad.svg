@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" role="img" aria-label="AutoCAD preview">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7f1d1d"/>
+      <stop offset="0.58" stop-color="#ef4444"/>
+      <stop offset="1" stop-color="#fed7aa"/>
+    </linearGradient>
+    <pattern id="grid" width="16" height="16" patternUnits="userSpaceOnUse">
+      <path d="M16 0H0V16" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.22"/>
+    </pattern>
+  </defs>
+  <rect width="320" height="140" fill="url(#bg)"/>
+  <rect width="320" height="140" fill="url(#grid)" opacity="0.58"/>
+  <path d="M58 107 H151 V80 H197 V41 H258 V107 H58 Z" fill="#ffffff" opacity="0.16"/>
+  <path d="M58 107 H151 V80 H197 V41 H258 V107 H58 Z" fill="none" stroke="#ffffff" stroke-width="6" stroke-linejoin="round" opacity="0.86"/>
+  <path d="M88 107 V66 H151 M197 80 H232 V107" fill="none" stroke="#fed7aa" stroke-width="4" stroke-linejoin="round" opacity="0.92"/>
+  <path d="M54 31 H119 M54 48 H91 M226 28 H269" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.48"/>
+  <circle cx="255" cy="78" r="23" fill="#ffffff" opacity="0.17"/>
+  <circle cx="255" cy="78" r="10" fill="#ffffff" opacity="0.36"/>
+</svg>

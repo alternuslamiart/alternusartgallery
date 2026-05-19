@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" role="img" aria-label="AI code preview">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="0.56" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#93c5fd"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+  </defs>
+  <rect width="320" height="140" fill="url(#bg)"/>
+  <circle cx="256" cy="72" r="29" fill="#93c5fd" filter="url(#glow)" opacity="0.55"/>
+  <rect x="48" y="34" width="169" height="87" rx="13" fill="#07111f" opacity="0.78"/>
+  <rect x="62" y="48" width="58" height="8" rx="4" fill="#38bdf8" opacity="0.9"/>
+  <rect x="132" y="48" width="47" height="8" rx="4" fill="#ffffff" opacity="0.28"/>
+  <path d="M85 81 L68 94 L85 107" fill="none" stroke="#dbeafe" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M180 81 L197 94 L180 107" fill="none" stroke="#dbeafe" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M143 77 L122 110" stroke="#7dd3fc" stroke-width="8" stroke-linecap="round"/>
+  <rect x="228" y="39" width="44" height="9" rx="4.5" fill="#ffffff" opacity="0.34"/>
+  <rect x="228" y="57" width="66" height="9" rx="4.5" fill="#ffffff" opacity="0.22"/>
+  <rect x="228" y="75" width="50" height="9" rx="4.5" fill="#ffffff" opacity="0.3"/>
+</svg>

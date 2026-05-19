@@ -4097,68 +4097,54 @@ type StarterCard = {
 };
 
 type StarterVisual = {
+ image: string;
  preview: string;
  strip: string;
  marker: string;
- glow: string;
- orb: string;
- wave: string;
  meta: string;
 };
 
 const starterVisuals: StarterVisual[] = [
  {
+ image: "/ai-cards/workflow.svg",
  preview: "from-[#0B6F82] via-[#55A8D8] to-[#EAF7FE]",
  strip: "from-[#19B7A5] via-[#2B8CFF] to-[#BDB4FF]",
  marker: "bg-[#22C55E]",
- glow: "bg-[rgba(250,204,21,0.82)]",
- orb: "bg-[rgba(255,255,255,0.9)]",
- wave: "bg-[#0F172A]",
  meta: "Planning",
  },
  {
+ image: "/ai-cards/agent.svg",
  preview: "from-[#3B2AAE] via-[#F64F9E] to-[#FFB35C]",
  strip: "from-[#3758FF] via-[#DE3BFF] to-[#FF8A3D]",
  marker: "bg-[#7C3AED]",
- glow: "bg-[rgba(255,239,138,0.95)]",
- orb: "bg-[rgba(255,255,255,0.58)]",
- wave: "bg-[#581C87]",
  meta: "Agent",
  },
  {
+ image: "/ai-cards/browser.svg",
  preview: "from-[#F8C6B6] via-[#F5E2D8] to-[#F9A979]",
  strip: "from-[#F97316] via-[#FB7185] to-[#FCD34D]",
  marker: "bg-[#F97316]",
- glow: "bg-[rgba(255,255,255,0.86)]",
- orb: "bg-[rgba(255,255,255,0.74)]",
- wave: "bg-[#9A3412]",
  meta: "Browser",
  },
  {
+ image: "/ai-cards/code.svg",
  preview: "from-[#0F172A] via-[#2563EB] to-[#93C5FD]",
  strip: "from-[#38BDF8] via-[#2563EB] to-[#1E40AF]",
  marker: "bg-[#38BDF8]",
- glow: "bg-[rgba(147,197,253,0.9)]",
- orb: "bg-[rgba(255,255,255,0.66)]",
- wave: "bg-[#1E3A8A]",
  meta: "Code",
  },
  {
+ image: "/ai-cards/engine.svg",
  preview: "from-[#064E3B] via-[#16A34A] to-[#BEF264]",
  strip: "from-[#22C55E] via-[#84CC16] to-[#FACC15]",
  marker: "bg-[#84CC16]",
- glow: "bg-[rgba(236,252,203,0.92)]",
- orb: "bg-[rgba(255,255,255,0.74)]",
- wave: "bg-[#14532D]",
  meta: "Engine",
  },
  {
+ image: "/ai-cards/autocad.svg",
  preview: "from-[#7F1D1D] via-[#EF4444] to-[#FED7AA]",
  strip: "from-[#EF4444] via-[#F97316] to-[#FDBA74]",
  marker: "bg-[#EF4444]",
- glow: "bg-[rgba(254,215,170,0.9)]",
- orb: "bg-[rgba(255,255,255,0.76)]",
- wave: "bg-[#7F1D1D]",
  meta: "CAD",
  },
 ];
@@ -4250,6 +4236,13 @@ function StarterPanel({
 }) {
  const cards = mode ==="agent"? agentStarters : workflowStarters;
  const heading = mode ==="agent"?"Start building from scratch":"Start a new workflow";
+ const [carouselIndex, setCarouselIndex] = useState(0);
+ const visibleCount = Math.min(3, cards.length);
+ const showCarouselControls = cards.length > visibleCount;
+ const visibleCards = Array.from({ length: visibleCount }, (_, offset) => {
+ const index = (carouselIndex + offset) % cards.length;
+ return { card: cards[index], index, offset };
+ });
  const cardBase = dark
  ?"border-[rgba(255,255,255,0.12)] bg-[#F8FAFC] shadow-[0_18px_34px_rgba(0,0,0,0.3)] hover:border-[rgba(125,211,252,0.45)] hover:shadow-[0_22px_42px_rgba(0,0,0,0.4)]"
  :"border-[#E3E8EF] bg-white shadow-[0_14px_28px_rgba(15,23,42,0.08)] hover:border-[#B9D8FF] hover:shadow-[0_22px_42px_rgba(31,43,77,0.14)]";
@@ -4257,29 +4250,49 @@ function StarterPanel({
  ?"bg-[radial-gradient(circle_at_50%_0%,rgba(66,132,255,0.18),rgba(24,27,32,0)_60%)]"
  :"bg-[radial-gradient(circle_at_50%_0%,rgba(66,132,255,0.12),rgba(255,255,255,0)_58%)]";
 
+ useEffect(() => {
+ setCarouselIndex(0);
+ }, [mode]);
+
+ const goToPreviousStarter = () => {
+ setCarouselIndex((current) => (current - 1 + cards.length) % cards.length);
+ };
+
+ const goToNextStarter = () => {
+ setCarouselIndex((current) => (current + 1) % cards.length);
+ };
+
  return (
  <div className="w-full text-left">
  <p className={`mb-3 text-[13px] font-semibold ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>{heading}</p>
- <div className={`relative w-full overflow-hidden px-1 pb-3 pt-1 ${deckGlow}`}>
- <div className="flex w-full snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-3 [scrollbar-width:thin]">
- {cards.map((card, index) => {
+ <div className={`relative w-full overflow-hidden px-8 pb-4 pt-1 max-sm:px-9 ${deckGlow}`}>
+ {showCarouselControls && (
+ <button
+ type="button"
+ onClick={goToPreviousStarter}
+ aria-label="Previous AI platform function"
+ className={`absolute left-0 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border transition-colors ${dark ?"border-[rgba(255,255,255,0.1)] bg-[#202328] text-[#DDE3EA] hover:bg-[#252A31]":"border-[#D9E2EE] bg-white text-[#475467] shadow-[0_10px_24px_rgba(15,23,42,0.1)] hover:border-[#B9D8FF] hover:text-[#4284FF]"}`}
+ >
+ <ChevronLeft className="h-4 w-4" />
+ </button>
+ )}
+ <div className="grid w-full grid-cols-3 items-center gap-3 max-sm:grid-cols-1">
+ {visibleCards.map(({ card, index, offset }) => {
  const Icon = card.icon;
  const visual = starterVisuals[index % starterVisuals.length];
+ const isCenterCard = offset === 1 && visibleCards.length === 3;
  return (
  <button
- key={card.title}
+ key={`${carouselIndex}-${card.title}`}
  type="button"
  onClick={() => onOpen(card)}
  aria-label={card.title}
- className={`group relative flex min-h-[164px] w-[236px] flex-none snap-start flex-col overflow-hidden rounded-[8px] border text-left transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4284FF] focus-visible:ring-offset-2 max-sm:w-[220px] ${cardBase}`}
+ className={`group relative flex w-full flex-col overflow-hidden rounded-[8px] border text-left transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4284FF] focus-visible:ring-offset-2 ${isCenterCard ?"min-h-[190px]":"min-h-[170px]"} ${cardBase}`}
  >
  <span className={`pointer-events-none absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b ${visual.strip}`} />
- <span className={`relative block h-[92px] overflow-hidden bg-gradient-to-br ${visual.preview}`}>
- <span className={`absolute right-5 top-4 h-9 w-9 rounded-full blur-[1px] ${visual.glow}`} />
- <span className={`absolute right-8 top-2 h-4 w-4 rounded-full ${visual.orb}`} />
- <span className={`absolute -bottom-4 left-4 h-16 w-[115px] -rotate-6 rounded-[50%] opacity-80 ${visual.wave}`} />
- <span className="absolute bottom-4 left-8 h-7 w-[86px] -rotate-6 rounded-[50%] bg-white/[0.45] blur-[1px]" />
- <span className="absolute bottom-5 left-7 h-5 w-[74px] -rotate-6 rounded-[50%] bg-white/75" />
+ <span className={`relative block overflow-hidden bg-gradient-to-br ${isCenterCard ?"h-[112px]":"h-[96px]"} ${visual.preview}`}>
+ <span className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${visual.image})` }} />
+ <span className="absolute inset-0 bg-gradient-to-r from-black/[0.08] via-transparent to-white/[0.12]" />
  <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/[0.78] px-2 py-0.5 text-[7px] font-bold uppercase tracking-[0] text-[#1F2937] shadow-[0_4px_12px_rgba(15,23,42,0.12)]">
  <span className={`h-1.5 w-1.5 rounded-full ${visual.marker}`} />
  {visual.meta}
@@ -4303,6 +4316,16 @@ function StarterPanel({
  );
  })}
  </div>
+ {showCarouselControls && (
+ <button
+ type="button"
+ onClick={goToNextStarter}
+ aria-label="Next AI platform function"
+ className={`absolute right-0 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border transition-colors ${dark ?"border-[rgba(255,255,255,0.1)] bg-[#202328] text-[#DDE3EA] hover:bg-[#252A31]":"border-[#D9E2EE] bg-white text-[#475467] shadow-[0_10px_24px_rgba(15,23,42,0.1)] hover:border-[#B9D8FF] hover:text-[#4284FF]"}`}
+ >
+ <ChevronRight className="h-4 w-4" />
+ </button>
+ )}
  </div>
  </div>
  );
