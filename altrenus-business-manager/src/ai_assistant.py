@@ -17,7 +17,8 @@ SUCCESS = "#22C55E"
 DANGER  = "#EF4444"
 MUTED   = "#6B7280"
 
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={key}"
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3-flash-preview")
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
 
 SYSTEM_PROMPT = """Ti je Alternus Business AI, asistenti i dedikuar për menaxhimin e biznesit shqiptar.
 
@@ -67,7 +68,7 @@ class AIAssistantFrame(ctk.CTkFrame):
         header.pack(fill="x", padx=20, pady=(20, 0))
         ctk.CTkLabel(header, text="🤖 Asistenti AI i Biznesit",
                      font=("Segoe UI", 22, "bold")).pack(side="left")
-        ctk.CTkLabel(header, text="Gemini 2.0 Flash · Falas",
+        ctk.CTkLabel(header, text=f"{GEMINI_MODEL} · Falas",
                      font=("Segoe UI", 11), text_color=SUCCESS).pack(side="right", padx=4)
 
         # API Key setup bar
@@ -200,16 +201,18 @@ class AIAssistantFrame(ctk.CTkFrame):
             ctx = ""
 
         payload = {
-            "system_instruction": {"parts": [{"text": SYSTEM_PROMPT + ctx}]},
+            "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT + ctx}]},
             "contents": self._history[-16:],
             "generationConfig": {"temperature": 0.7, "maxOutputTokens": 1024},
         }
 
         try:
             data   = json.dumps(payload).encode("utf-8")
-            url    = GEMINI_URL.format(key=self._api_key)
-            req    = urllib.request.Request(url, data=data,
-                                             headers={"Content-Type": "application/json"})
+            req    = urllib.request.Request(GEMINI_URL, data=data,
+                                             headers={
+                                                 "Content-Type": "application/json",
+                                                 "x-goog-api-key": self._api_key,
+                                             })
             with urllib.request.urlopen(req, timeout=30) as resp:
                 result = json.loads(resp.read().decode("utf-8"))
             text = result["candidates"][0]["content"]["parts"][0]["text"]

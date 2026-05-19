@@ -1,12 +1,11 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import { getAIResponse } from "@/lib/ai-assistant";
+import { DEFAULT_GEMINI_MODEL, DEFAULT_OPENAI_MODEL, getSafeAIErrorMessage } from "@/lib/ai-provider-config";
 
 export const dynamic = "force-dynamic";
 
-const DEFAULT_OPENAI_MODEL = "gpt-4o-mini";
-const DEFAULT_GEMINI_MODEL = "gemini-2.0-flash";
 const MAX_HISTORY_MESSAGES = 16;
+const GEMINI_GENERATE_CONTENT_URL = "https://generativelanguage.googleapis.com/v1beta/models";
 const OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions";
 
 const SYSTEM_PROMPT = `You are Cedium AI Assistant. Answer clearly, thoroughly, and helpfully. For coding, design, business, and product questions, give complete, practical, well-structured answers with examples, step-by-step instructions, and code blocks where useful. Match the depth of the answer to the complexity of the question — short questions get short answers, but never truncate an explanation that needs detail. Respond in the user's language when clear.`;
@@ -126,6 +125,13 @@ function toGeminiHistory(messages: ChatMessage[]) {
  }));
 }
 
+function toGeminiContents(history: ChatMessage[], message: string) {
+ return [
+ ...toGeminiHistory(history),
+ { role: "user", parts: [{ text: message }] },
+ ];
+}
+
 function toOpenAIMessages(history: ChatMessage[], message: string) {
  return [
  { role: "system", content: SYSTEM_PROMPT },
@@ -138,7 +144,7 @@ function toOpenAIMessages(history: ChatMessage[], message: string) {
 }
 
 function getProviderError(error: unknown, provider: "openai" | "gemini") {
- const message = error instanceof Error ? error.message : String(error);
+ const message = getSafeAIErrorMessage(error);
  const lower = message.toLowerCase();
  const name = provider === "openai" ? "OpenAI" : "Gemini";
 
@@ -171,46 +177,63 @@ async function askGemini(message: string, history: ChatMessage[]) {
  throw new Error("Missing Gemini API key. Set GEMINI_API_KEY in the environment.");
  }
 
- const client = new GoogleGenerativeAI(apiKey);
  const modelName = getGeminiModel();
- const model = client.getGenerativeModel({
- model: modelName,
- systemInstruction: SYSTEM_PROMPT,
- });
-
- const chat = model.startChat({
- history: toGeminiHistory(history),
+ let response: Response;
+ try {
+ response = await fetch(`${GEMINI_GENERATE_CONTENT_URL}/${encodeURIComponent(modelName)}:generateContent`, {
+ method: "POST",
+ headers: {
+ "Content-Type": "application/json",
+ "x-goog-api-key": apiKey,
+ },
+ body: JSON.stringify({
+ systemInstruction: {
+ parts: [{ text: SYSTEM_PROMPT }],
+ },
+ contents: toGeminiContents(history, message),
  generationConfig: {
  temperature: 0.7,
  maxOutputTokens: 4096,
  },
+ }),
  });
-
- let result;
- try {
- result = await chat.sendMessage(message);
  } catch (sendError) {
  const reason = sendError instanceof Error ? sendError.message : String(sendError);
  throw new Error(`Gemini API request failed (model ${modelName}): ${reason}`);
  }
 
- const blockReason = result.response.promptFeedback?.blockReason;
+ if (!response.ok) {
+ const errorText = await response.text();
+ throw new Error(`Gemini ${response.status} (model ${modelName}): ${errorText.slice(0, 500)}`);
+ }
+
+ const data = (await response.json()) as {
+ candidates?: Array<{
+ content?: {
+ parts?: Array<{ text?: string }>;
+ };
+ finishReason?: string;
+ }>;
+ promptFeedback?: {
+ blockReason?: string;
+ };
+ };
+
+ const blockReason = data.promptFeedback?.blockReason;
  if (blockReason) {
  throw new Error(`Gemini blocked the prompt (${blockReason}).`);
  }
 
- const finishReason = result.response.candidates?.[0]?.finishReason;
+ const finishReason = data.candidates?.[0]?.finishReason;
  if (finishReason && finishReason !== "STOP" && finishReason !== "MAX_TOKENS") {
  throw new Error(`Gemini stopped early (${finishReason}).`);
  }
 
- let answer: string | undefined;
- try {
- answer = result.response.text()?.trim();
- } catch (textError) {
- const reason = textError instanceof Error ? textError.message : String(textError);
- throw new Error(`Gemini returned no readable text: ${reason}`);
- }
+ const answer = data.candidates?.[0]?.content?.parts
+ ?.map((part) => part.text)
+ .filter((part): part is string => Boolean(part))
+ .join("")
+ .trim();
 
  if (!answer) {
  throw new Error(`Gemini returned an empty response (model ${modelName}).`);
@@ -315,7 +338,7 @@ export async function POST(request: NextRequest) {
  fallbackFrom: providerAttempt === provider ? undefined : provider,
  });
  } catch (providerError) {
- const errorMessage = providerError instanceof Error ? providerError.message : String(providerError);
+ const errorMessage = getSafeAIErrorMessage(providerError);
  providerErrors.push({ provider: providerAttempt, message: errorMessage });
  console.warn(`AI provider ${providerAttempt} failed.`, providerError);
  }

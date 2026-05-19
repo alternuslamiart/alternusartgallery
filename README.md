@@ -154,7 +154,7 @@ OPENAI_API_KEY=
 OPENAI_MODEL=gpt-4o-mini
 ANTHROPIC_API_KEY=
 GEMINI_API_KEY=
-GEMINI_MODEL=gemini-2.0-flash
+GEMINI_MODEL=gemini-3-flash-preview
 OS_DEMO_USER_ID=
 ```
 
@@ -163,7 +163,7 @@ OS_DEMO_USER_ID=
 - `OPENAI_MODEL` is optional and defaults to `gpt-4o-mini`
 - `ANTHROPIC_API_KEY` is used by `src/app/api/os/ai/route.ts`
 - `GEMINI_API_KEY` is used by `src/app/api/ai-chat/route.ts`, `src/app/api/ai-chat/test/route.ts`, and the Python desktop utility
-- `GEMINI_MODEL` is optional and defaults to `gemini-2.0-flash`
+- `GEMINI_MODEL` is optional and defaults to `gemini-3-flash-preview`
 - `OS_DEMO_USER_ID` is an optional fallback for OS file routes when no authenticated session is available
 
 ### Optional CEO Password Script
