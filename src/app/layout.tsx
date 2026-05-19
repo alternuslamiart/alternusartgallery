@@ -58,10 +58,10 @@ export const metadata: Metadata = {
  publisher: "Cedium",
  icons: {
  icon: [
- { url: "/favicon.ico", sizes: "any" },
+ { url: "/favicon.svg", type: "image/svg+xml" },
  { url: "/logo.png", sizes: "512x512", type: "image/png" },
  ],
- shortcut: "/favicon.ico",
+ shortcut: "/favicon.svg",
  apple: "/logo.png",
  },
  openGraph: {
