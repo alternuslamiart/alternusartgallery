@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 280" role="img" aria-label="AI code assistant card">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4d7dc"/>
+      <stop offset="1" stop-color="#f4f5f7"/>
+    </linearGradient>
+    <radialGradient id="head" cx="45%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.58" stop-color="#e9edf2"/>
+      <stop offset="1" stop-color="#b6bdc8"/>
+    </radialGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#718096" flood-opacity="0.28"/>
+    </filter>
+    <filter id="blueGlow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+  </defs>
+  <rect width="320" height="280" fill="url(#bg)"/>
+  <ellipse cx="150" cy="225" rx="86" ry="17" fill="#b5bdc8" opacity="0.28"/>
+  <g filter="url(#softShadow)">
+    <path d="M138 133c-28 10-48 39-47 72 2 45 34 67 76 67 43 0 73-23 75-68 1-36-19-63-50-72-12 15-40 16-54 1z" fill="#eef1f5"/>
+    <circle cx="164" cy="91" r="56" fill="url(#head)"/>
+    <rect x="111" y="87" width="106" height="27" rx="13.5" fill="#eef6ff"/>
+    <rect x="124" y="92" width="80" height="17" rx="8.5" fill="#0e79d6"/>
+    <circle cx="145" cy="101" r="4" fill="#7fe6ff" filter="url(#blueGlow)"/>
+    <circle cx="184" cy="101" r="4" fill="#7fe6ff" filter="url(#blueGlow)"/>
+    <path d="M109 149c-17 6-28 18-36 34" fill="none" stroke="#dfe5ec" stroke-width="17" stroke-linecap="round"/>
+    <path d="M222 151c19 8 31 22 37 42" fill="none" stroke="#dfe5ec" stroke-width="17" stroke-linecap="round"/>
+    <circle cx="164" cy="171" r="19" fill="#1498e8"/>
+    <text x="164" y="176" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#fff">AI</text>
+    <line x1="164" y1="35" x2="164" y2="18" stroke="#7b8796" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="164" cy="15" r="6" fill="#0b92df"/>
+  </g>
+  <g filter="url(#softShadow)">
+    <path d="M45 225h122l22-63H67z" fill="#0a7dcc"/>
+    <path d="M67 162h122l-22 63H45z" fill="#1597e5"/>
+    <path d="M41 226h138l-13 13H53z" fill="#0a5f99"/>
+  </g>
+</svg>

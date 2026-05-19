@@ -361,15 +361,16 @@ export function StudioRoutePage({ route, assistantTool }: StudioPageProps) {
  const pathname = usePathname();
  const activeTool = assistantTool ?? assistantToolByPath[pathname];
  const activeRoute = route ?? routeByPath[pathname] ??"ai-assistant";
+ const assistantHome = activeRoute ==="ai-assistant"&& !activeTool;
 
  return (
- <StudioShell activeRoute={activeRoute}>
+ <StudioShell activeRoute={activeRoute} assistantHome={assistantHome}>
  <StudioContent route={activeRoute} assistantTool={activeTool} />
  </StudioShell>
  );
 }
 
-function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; children: ReactNode }) {
+function StudioShell({ activeRoute, assistantHome = false, children }: { activeRoute: StudioRouteKey; assistantHome?: boolean; children: ReactNode }) {
  const router = useRouter();
  const [theme, setTheme] = useState<StudioTheme>("light");
  const dark = theme ==="dark";
@@ -726,7 +727,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  return (
  <StudioThemeContext.Provider value={themeValue}>
  <StudioActionContext.Provider value={actionValue}>
- <div className={`fixed inset-0 overflow-hidden font-sans ${dark ?"bg-[#0F1013] text-[#F4F6F8] studio-shell-dark":"bg-[#F6FAFC] text-[#171717]"}`}>
+ <div className={`fixed inset-0 overflow-hidden font-sans ${assistantHome ? dark ?"bg-[#0F1013] text-[#F4F6F8] studio-shell-dark":"bg-white text-[#171717]" : dark ?"bg-[#0F1013] text-[#F4F6F8] studio-shell-dark":"bg-[#F6FAFC] text-[#171717]"}`}>
  <style jsx global>{`
  .studio-shell-dark button,
  .studio-shell-dark a,
@@ -868,17 +869,17 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  }
  `}</style>
  <div className="flex h-full">
- <div className="hidden lg:block">{sidebar}</div>
- {isMobileOpen && (
+ <div className={assistantHome ?"hidden":"hidden lg:block"}>{sidebar}</div>
+ {!assistantHome && isMobileOpen && (
  <div className="fixed inset-0 z-40 lg:hidden">
  <button className={`absolute inset-0 ${dark ?"bg-black/40 backdrop-blur-[2px]":"bg-[#1F2937]/20 backdrop-blur-[2px]"}`} onClick={() => setIsMobileOpen(false)} aria-label="Close sidebar"/>
  <div className="relative h-full w-[230px] rounded-none shadow-[18px_0_50px_rgba(31,43,77,0.16)]">{sidebar}</div>
  </div>
  )}
 
- <main className={`flex min-w-0 flex-1 flex-col p-[6px] pl-0 ${dark ? "bg-[#181A1F]" : "bg-[#EAF3F8]"}`}>
- <div className={`studio-main-frame flex min-h-0 flex-1 flex-col overflow-hidden rounded-[8px] border ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#17191D]":"border-[#DDE7EE] bg-white"}`}>
- <header className={`flex h-11 items-center justify-between border-b px-3 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E8EEF2]"}`}>
+ <main className={`flex min-w-0 flex-1 flex-col ${assistantHome ? dark ?"bg-[#0F1013] p-0":"bg-white p-0" : `p-[6px] pl-0 ${dark ? "bg-[#181A1F]" : "bg-[#EAF3F8]"}`}`}>
+ <div className={`studio-main-frame flex min-h-0 flex-1 flex-col overflow-hidden ${assistantHome ? dark ?"rounded-none border-0 bg-[#0F1013]":"rounded-none border-0 bg-white" : dark ?"rounded-[8px] border border-[rgba(255,255,255,0.08)] bg-[#17191D]":"rounded-[8px] border border-[#DDE7EE] bg-white"}`}>
+ {!assistantHome && <header className={`flex h-11 items-center justify-between border-b px-3 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E8EEF2]"}`}>
  <div className="flex min-w-0 items-center gap-3">
  <div className={`relative flex items-center gap-2 ${dark ?"text-[#A8B0BA]":"text-[#6B7280]"}`}>
  <div ref={notificationRef} className="relative">
@@ -919,7 +920,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  >
  AL
  </Link>
- </header>
+ </header>}
 
  <section
  className={[
@@ -928,7 +929,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  activeRoute ==="ai-assistant"?"overflow-hidden flex flex-col":"overflow-auto",
  activeRoute ==="ai-assistant"?"p-0": activeRoute ==="code-builder"?"px-4 py-4":"px-8 py-8",
  dark ?"bg-transparent":"bg-transparent",
- ].join("")}
+ ].join(" ")}
  >
  <div className={
  activeRoute ==="ai-assistant"
@@ -4053,19 +4054,19 @@ function ModeToggle({
  ?"text-[#A8B0BA] hover:text-[#F4F6F8]"
  :"text-[#4B5563] hover:text-[#1F1F1F]";
  return (
- <div className={`inline-flex items-center gap-1 rounded-full border p-1 ${containerClass}`} role="tablist"aria-label="Build mode">
+ <div className={`inline-flex items-center gap-1 rounded-full border p-[2px] shadow-[0_8px_18px_rgba(15,23,42,0.05)] ${containerClass}`} role="tablist"aria-label="Build mode">
  <button
  type="button"
  role="tab"
  aria-selected={mode ==="agent"}
  onClick={() => onChange("agent")}
- className={`inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-[12px] font-semibold transition-all ${
+ className={`inline-flex h-7 items-center gap-1.5 rounded-full px-5 text-[10px] font-semibold transition-all ${
  mode ==="agent"
  ?"bg-[#4284FF] text-white"
  : inactiveClass
  }`}
  >
- <CircleSlash className="h-3.5 w-3.5"/>
+ <CircleSlash className="h-3 w-3"/>
  Agent
  </button>
  <button
@@ -4073,13 +4074,13 @@ function ModeToggle({
  role="tab"
  aria-selected={mode ==="workflow"}
  onClick={() => onChange("workflow")}
- className={`inline-flex h-8 items-center gap-1.5 rounded-full px-4 text-[12px] font-semibold transition-all ${
+ className={`inline-flex h-7 items-center gap-1.5 rounded-full px-5 text-[10px] font-semibold transition-all ${
  mode ==="workflow"
  ?"bg-[#4284FF] text-white"
  : inactiveClass
  }`}
  >
- <Network className="h-3.5 w-3.5"/>
+ <Network className="h-3 w-3"/>
  Workflow
  </button>
  </div>
@@ -4106,22 +4107,22 @@ type StarterVisual = {
 
 const starterVisuals: StarterVisual[] = [
  {
- image: "/ai-cards/workflow.svg",
- preview: "from-[#0B6F82] via-[#55A8D8] to-[#EAF7FE]",
+ image: "/ai-cards/chat-code.svg",
+ preview: "from-[#D4D7DC] via-[#EEF1F5] to-[#FFFFFF]",
  strip: "from-[#19B7A5] via-[#2B8CFF] to-[#BDB4FF]",
  marker: "bg-[#22C55E]",
  meta: "Planning",
  },
  {
- image: "/ai-cards/agent.svg",
- preview: "from-[#3B2AAE] via-[#F64F9E] to-[#FFB35C]",
+ image: "/ai-cards/chat-unity.svg",
+ preview: "from-[#073963] via-[#0C82B5] to-[#B8F0FF]",
  strip: "from-[#3758FF] via-[#DE3BFF] to-[#FF8A3D]",
  marker: "bg-[#7C3AED]",
  meta: "Agent",
  },
  {
- image: "/ai-cards/browser.svg",
- preview: "from-[#F8C6B6] via-[#F5E2D8] to-[#F9A979]",
+ image: "/ai-cards/chat-architecture.svg",
+ preview: "from-[#DFF8FB] via-[#B6EEF0] to-[#8EE0E4]",
  strip: "from-[#F97316] via-[#FB7185] to-[#FCD34D]",
  marker: "bg-[#F97316]",
  meta: "Browser",
@@ -4168,12 +4169,12 @@ const agentStarters: StarterCard[] = [
  prompt:"Help me plan a Unity or Unreal Engine project with gameplay, levels, assets, and optimization for",
  },
  {
- title:"AutoCAD AI",
- description:"Draft CAD layouts, dimensions, layers, rooms, and technical plans.",
- shortTitle:"AutoCAD",
- shortDescription:"Draft layouts and layer plans.",
- icon: PenLine,
- prompt:"Help me create an AutoCAD plan with dimensions, rooms, layers, and notes for",
+ title:"Architecture",
+ description:"Draft architectural layouts, dimensions, rooms, and technical plans.",
+ shortTitle:"Architecture",
+ shortDescription:"Plan spaces, layouts, and drawings.",
+ icon: Network,
+ prompt:"Help me create an architectural plan with dimensions, rooms, layers, and notes for",
  href:"/ai-assistant/tools/autocad",
  },
  {
@@ -4235,7 +4236,6 @@ function StarterPanel({
  onOpen: (card: StarterCard) => void;
 }) {
  const cards = mode ==="agent"? agentStarters : workflowStarters;
- const heading = mode ==="agent"?"Start building from scratch":"Start a new workflow";
  const [carouselIndex, setCarouselIndex] = useState(0);
  const visibleCount = Math.min(3, cards.length);
  const showCarouselControls = cards.length > visibleCount;
@@ -4244,11 +4244,8 @@ function StarterPanel({
  return { card: cards[index], index, offset };
  });
  const cardBase = dark
- ?"border-[rgba(255,255,255,0.12)] bg-[#F8FAFC] shadow-[0_18px_34px_rgba(0,0,0,0.3)] hover:border-[rgba(125,211,252,0.45)] hover:shadow-[0_22px_42px_rgba(0,0,0,0.4)]"
- :"border-[#E3E8EF] bg-white shadow-[0_14px_28px_rgba(15,23,42,0.08)] hover:border-[#B9D8FF] hover:shadow-[0_22px_42px_rgba(31,43,77,0.14)]";
- const deckGlow = dark
- ?"bg-[radial-gradient(circle_at_50%_0%,rgba(66,132,255,0.18),rgba(24,27,32,0)_60%)]"
- :"bg-[radial-gradient(circle_at_50%_0%,rgba(66,132,255,0.12),rgba(255,255,255,0)_58%)]";
+ ?"border-[rgba(255,255,255,0.1)] bg-[#202328] shadow-[0_18px_42px_rgba(0,0,0,0.34)]"
+ :"border-[#E1E5EA] bg-white shadow-[0_10px_24px_rgba(15,23,42,0.08)]";
 
  useEffect(() => {
  setCarouselIndex(0);
@@ -4264,19 +4261,18 @@ function StarterPanel({
 
  return (
  <div className="w-full text-left">
- <p className={`mb-3 text-[13px] font-semibold ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>{heading}</p>
- <div className={`relative w-full overflow-hidden px-8 pb-4 pt-1 max-sm:px-9 ${deckGlow}`}>
+ <div className="relative w-full overflow-visible px-0 pb-0 pt-0 max-sm:px-8">
  {showCarouselControls && (
  <button
  type="button"
  onClick={goToPreviousStarter}
  aria-label="Previous AI platform function"
- className={`absolute left-0 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border transition-colors ${dark ?"border-[rgba(255,255,255,0.1)] bg-[#202328] text-[#DDE3EA] hover:bg-[#252A31]":"border-[#D9E2EE] bg-white text-[#475467] shadow-[0_10px_24px_rgba(15,23,42,0.1)] hover:border-[#B9D8FF] hover:text-[#4284FF]"}`}
+ className={`absolute -left-4 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border transition-colors max-sm:left-0 ${dark ?"border-[rgba(255,255,255,0.1)] bg-[#202328] text-[#DDE3EA] hover:bg-[#252A31]":"border-[#E5E7EB] bg-white text-[#475467] shadow-[0_10px_24px_rgba(15,23,42,0.12)] hover:border-[#B9D8FF] hover:text-[#4284FF]"}`}
  >
  <ChevronLeft className="h-4 w-4" />
  </button>
  )}
- <div className="grid w-full grid-cols-3 items-center gap-3 max-sm:grid-cols-1">
+ <div className="grid w-full grid-cols-3 items-center gap-4 max-sm:grid-cols-1">
  {visibleCards.map(({ card, index, offset }) => {
  const Icon = card.icon;
  const visual = starterVisuals[index % starterVisuals.length];
@@ -4287,30 +4283,23 @@ function StarterPanel({
  type="button"
  onClick={() => onOpen(card)}
  aria-label={card.title}
- className={`group relative flex w-full flex-col overflow-hidden rounded-[8px] border text-left transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4284FF] focus-visible:ring-offset-2 ${isCenterCard ?"min-h-[190px]":"min-h-[170px]"} ${cardBase}`}
+ className={`group relative flex h-[280px] w-full flex-col overflow-hidden rounded-[8px] border text-left transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4284FF] focus-visible:ring-offset-2 max-sm:h-[250px] ${isCenterCard ?"scale-[1.01]":"scale-100"} ${cardBase}`}
  >
- <span className={`pointer-events-none absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b ${visual.strip}`} />
- <span className={`relative block overflow-hidden bg-gradient-to-br ${isCenterCard ?"h-[112px]":"h-[96px]"} ${visual.preview}`}>
+ <span className={`absolute inset-0 bg-gradient-to-br ${visual.preview}`} />
  <span className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${visual.image})` }} />
- <span className="absolute inset-0 bg-gradient-to-r from-black/[0.08] via-transparent to-white/[0.12]" />
- <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/[0.78] px-2 py-0.5 text-[7px] font-bold uppercase tracking-[0] text-[#1F2937] shadow-[0_4px_12px_rgba(15,23,42,0.12)]">
- <span className={`h-1.5 w-1.5 rounded-full ${visual.marker}`} />
- {visual.meta}
- </span>
- </span>
- <span className="flex min-w-0 flex-1 items-start gap-2 px-3 pb-3 pt-3">
- <span className={`mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-[7px] transition-colors ${dark ?"bg-[#E8F4FB] text-[#4284FF] group-hover:bg-[#4284FF] group-hover:text-white":"bg-[#F1F6FF] text-[#4284FF] group-hover:bg-[#4284FF] group-hover:text-white"}`}>
- <Icon className="h-[15px] w-[15px]"/>
+ <span className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/[0.06]" />
+ <span className={`absolute inset-x-[5px] bottom-[5px] flex h-[82px] items-center gap-3 rounded-[7px] px-5 shadow-[0_10px_24px_rgba(15,23,42,0.12)] ${dark ?"bg-[#F8FAFC]":"bg-white"}`}>
+ <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center text-[#4284FF]">
+ <Icon className="h-[22px] w-[22px]" strokeWidth={1.9}/>
  </span>
  <span className="min-w-0 flex-1">
- <span className="block truncate text-[12px] font-bold leading-[1.12] text-[#101828]">
+ <span className="block truncate text-[12px] font-bold leading-[1.12] text-[#111827]">
  {card.shortTitle ?? card.title}
  </span>
- <span className="mt-1.5 block text-[9.5px] leading-[1.3] text-[#475467]">
+ <span className="mt-2 block max-w-[132px] text-[9px] leading-[1.25] text-[#111827]">
  {card.shortDescription ?? card.description}
  </span>
  </span>
- <ChevronRight className="mt-1 h-3.5 w-3.5 flex-shrink-0 text-[#98A2B3] transition-transform group-hover:translate-x-0.5 group-hover:text-[#4284FF]" />
  </span>
  </button>
  );
@@ -4321,7 +4310,7 @@ function StarterPanel({
  type="button"
  onClick={goToNextStarter}
  aria-label="Next AI platform function"
- className={`absolute right-0 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border transition-colors ${dark ?"border-[rgba(255,255,255,0.1)] bg-[#202328] text-[#DDE3EA] hover:bg-[#252A31]":"border-[#D9E2EE] bg-white text-[#475467] shadow-[0_10px_24px_rgba(15,23,42,0.1)] hover:border-[#B9D8FF] hover:text-[#4284FF]"}`}
+ className={`absolute -right-4 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border transition-colors max-sm:right-0 ${dark ?"border-[rgba(255,255,255,0.1)] bg-[#202328] text-[#DDE3EA] hover:bg-[#252A31]":"border-[#E5E7EB] bg-white text-[#475467] shadow-[0_10px_24px_rgba(15,23,42,0.12)] hover:border-[#B9D8FF] hover:text-[#4284FF]"}`}
  >
  <ChevronRight className="h-4 w-4" />
  </button>
@@ -5209,7 +5198,7 @@ function AIAssistantPage() {
  const allFilesRef = useRef<HTMLInputElement>(null);
  const textareaRef = useRef<HTMLTextAreaElement>(null);
  const hasConversation = messages.length > 0;
- const showPlanEndingNotice = aiChatCount >= 3 && !planNoticeDismissed;
+ const showPlanEndingNotice = hasConversation && aiChatCount >= 3 && !planNoticeDismissed;
 
  useEffect(() => {
  conversationEndRef.current?.scrollIntoView({ behavior:"smooth", block:"end"});
@@ -5583,10 +5572,10 @@ function AIAssistantPage() {
  </div>
  ) : (
  /* Compact bar when no attachment */
- <div className={`flex min-h-[58px] w-full items-center gap-2 rounded-[24px] border px-2.5 py-2 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#D9D9D9] bg-white"}`}>
+ <div className={`flex min-h-[45px] w-full items-center gap-2 rounded-[18px] border px-1.5 py-1.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#D9D9D9] bg-white"}`}>
  <div ref={attachMenuRef} className="relative flex-shrink-0">
- <button type="button" onClick={() => { setAttachMenuOpen((open) => !open); setAttachMenuView("main"); }} className={`flex h-[40px] w-[40px] items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E7E7E7]"}`} aria-label="Attach file" title="Attach file">
- <Plus className="h-5 w-5" strokeWidth={1.8} />
+ <button type="button" onClick={() => { setAttachMenuOpen((open) => !open); setAttachMenuView("main"); }} className={`flex h-8 w-8 items-center justify-center rounded-[12px] transition-colors ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E7E7E7]"}`} aria-label="Attach file" title="Attach file">
+ <Plus className="h-4 w-4" strokeWidth={1.8} />
  </button>
  {attachMenuOpen && (
  <div className={`absolute top-[calc(100%+10px)] left-0 z-50 w-[252px] overflow-hidden rounded-2xl border py-1 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328] shadow-[0_16px_40px_rgba(0,0,0,0.36)]" : "border-[#E5E7EB] bg-white shadow-[0_16px_40px_rgba(0,0,0,0.12)]"}`}>
@@ -5653,14 +5642,14 @@ function AIAssistantPage() {
  onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendPrompt(); } }}
  aria-label="Message Cedium"
  rows={1}
- className={`min-h-[32px] flex-1 resize-none bg-transparent px-2 py-1.5 text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#1F1F1F] placeholder:text-[#A1A1A1]"}`}
+ className={`min-h-[28px] flex-1 resize-none bg-transparent px-2 py-1 text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#1F1F1F] placeholder:text-[#A1A1A1]"}`}
  style={{ letterSpacing: 0 }}
  />
- <button type="button" onClick={() => openModal("voice-dictation")} className={`flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#F4F6F8] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#1F1F1F] hover:bg-[#E7E7E7]"}`} aria-label="Voice input" title="Voice input">
- <Mic className="h-5 w-5" strokeWidth={2} />
+ <button type="button" onClick={() => openModal("voice-dictation")} className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[12px] transition-colors ${dark ? "bg-[#181B20] text-[#F4F6F8] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#1F1F1F] hover:bg-[#E7E7E7]"}`} aria-label="Voice input" title="Voice input">
+ <Mic className="h-4 w-4" strokeWidth={2} />
  </button>
- <button onClick={() => input.trim() ? void sendPrompt() : openModal("voice-speak")} disabled={isSending} aria-label={input.trim() ? "Send prompt" : "Open Voice Speak"} className="flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[14px] bg-[#4284FF] text-white transition-all hover:bg-[#376FE0] disabled:cursor-not-allowed disabled:opacity-60">
- {isSending ? <RefreshCw className="h-5 w-5 animate-spin" /> : input.trim() ? <CornerDownLeft className="h-5 w-5" strokeWidth={2} /> : <AudioLines className="h-5 w-5" strokeWidth={2} />}
+ <button onClick={() => input.trim() ? void sendPrompt() : openModal("voice-speak")} disabled={isSending} aria-label={input.trim() ? "Send prompt" : "Open Voice Speak"} className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[12px] bg-[#178CE8] text-white transition-all hover:bg-[#0F77C9] disabled:cursor-not-allowed disabled:opacity-60">
+ {isSending ? <RefreshCw className="h-4 w-4 animate-spin" /> : input.trim() ? <CornerDownLeft className="h-4 w-4" strokeWidth={2} /> : <Sparkles className="h-4 w-4" strokeWidth={2} />}
  </button>
  <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
  <input ref={imageInputRef} type="file" multiple accept="image/*" className="hidden" onChange={(event) => onFiles(event, "image")} />
@@ -5716,7 +5705,6 @@ function AIAssistantPage() {
  if (activePlaygroundCard) {
  return (
  <>
- <AssistantScrollRail dark={dark} />
  <div id="assistant-overview" className="font-roboto">
  <StarterPlaygroundView
  card={activePlaygroundCard}
@@ -5731,25 +5719,24 @@ function AIAssistantPage() {
 
  return (
  <>
- <AssistantScrollRail dark={dark} />
- <div id="assistant-overview" className={`flex min-h-full items-start justify-center px-0 pb-2 pt-[138px] font-roboto max-xl:pt-[108px] max-sm:pt-8 ${dark ?"bg-transparent":"bg-white text-[#1F1F1F]"}`}>
- <div className="flex w-full max-w-[700px] flex-col">
+ <div id="assistant-overview" className={`flex min-h-full items-start justify-center px-6 pb-6 pt-7 font-roboto max-sm:px-4 max-sm:pt-6 ${dark ?"bg-[#0F1013]":"bg-white text-[#1F1F1F]"}`}>
+ <div className="flex w-full max-w-[684px] flex-col">
  <div id="assistant-greeting" className="flex flex-col items-center text-center">
- <h2 className={`text-[28px] font-medium leading-tight tracking-[0] max-sm:text-[23px] ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>
+ <h2 className={`text-[21px] font-semibold leading-tight tracking-[0] max-sm:text-[20px] ${dark ?"text-[#F4F6F8]":"text-[#080808]"}`}>
  Good Morning, Toby
  </h2>
- <p className={`mt-1 text-[25px] font-medium leading-tight tracking-[0] max-sm:text-[20px] ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>
+ <p className={`mt-1 text-[21px] font-semibold leading-tight tracking-[0] max-sm:text-[20px] ${dark ?"text-[#F4F6F8]":"text-[#080808]"}`}>
  How Can I <span className="text-[#4284FF]">Assist You Today?</span>
  </p>
  </div>
 
  {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
 
- <div id="assistant-mode" className="mt-7 flex w-full justify-center">
+ <div id="assistant-mode" className="mt-5 flex w-full justify-center">
  <ModeToggle mode={assistantMode} onChange={setAssistantMode} dark={dark} />
  </div>
 
- <div id="assistant-starters" className="mt-4 w-full">
+ <div id="assistant-starters" className="mt-[26px] w-full">
  <div id="assistant-workflows">
  <StarterPanel
  mode={assistantMode}
@@ -5765,13 +5752,9 @@ function AIAssistantPage() {
  </div>
  </div>
 
- <div className="mt-3 w-full">
+ <div className="mt-12 w-full">
  {planNotice}
  {composer}
- </div>
-
- <div id="assistant-provider" className={`mt-5 text-center text-[10px] ${dark ?"text-[#6F7782]":"text-[#B4A99A]"}`}>
- {aiProviderLabel}
  </div>
  </div>
  </div>
@@ -5781,7 +5764,6 @@ function AIAssistantPage() {
 
  return (
  <>
- <AssistantScrollRail dark={dark} />
  <div id="assistant-overview" className="mx-auto flex h-full w-full max-w-[1080px] flex-col px-4 font-roboto">
  <div
  id="assistant-greeting"

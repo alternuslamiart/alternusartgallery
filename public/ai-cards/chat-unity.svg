@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 280" role="img" aria-label="Game engine neural card">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#073963"/>
+      <stop offset="0.52" stop-color="#0c82b5"/>
+      <stop offset="1" stop-color="#b8f0ff"/>
+    </linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+  </defs>
+  <rect width="320" height="280" fill="url(#bg)"/>
+  <g opacity="0.9" fill="none" stroke-linecap="round">
+    <path d="M-20 218C45 167 38 101 109 80c84-25 94 55 231-14" stroke="#86e8ff" stroke-width="5" opacity="0.55"/>
+    <path d="M-15 244C61 203 63 125 138 107c90-22 112 41 214-17" stroke="#f5fbff" stroke-width="3" opacity="0.78"/>
+    <path d="M-12 188C58 134 83 59 164 50c76-9 102 35 181-12" stroke="#0be3ff" stroke-width="3" opacity="0.48"/>
+    <path d="M31 283C99 208 127 161 208 145c47-9 77-34 134-75" stroke="#d9f8ff" stroke-width="4" opacity="0.62"/>
+    <path d="M20 25C81 97 120 127 193 116c57-9 90 11 144 50" stroke="#7bdcff" stroke-width="3" opacity="0.5"/>
+    <path d="M-24 128C42 93 67 55 119 46c75-14 130 36 221-13" stroke="#ffffff" stroke-width="2" opacity="0.46"/>
+  </g>
+  <g filter="url(#glow)">
+    <circle cx="65" cy="72" r="5" fill="#ffffff"/>
+    <circle cx="105" cy="139" r="7" fill="#fff4b5"/>
+    <circle cx="153" cy="52" r="6" fill="#ffffff"/>
+    <circle cx="193" cy="178" r="9" fill="#fff8d5"/>
+    <circle cx="236" cy="85" r="7" fill="#ffffff"/>
+    <circle cx="270" cy="134" r="8" fill="#ffe9a6"/>
+    <circle cx="302" cy="55" r="5" fill="#ffffff"/>
+  </g>
+  <g opacity="0.35" fill="none" stroke="#ffffff" stroke-width="1.5">
+    <path d="M84 251l63-104 58 72 83-149"/>
+    <path d="M23 174l94-71 64 27 92-98"/>
+    <path d="M44 52l74 89 62-73 94 96"/>
+  </g>
+</svg>
