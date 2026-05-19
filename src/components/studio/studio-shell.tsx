@@ -4096,7 +4096,6 @@ type StarterCard = {
 };
 
 type StarterVisual = {
- tilt: string;
  preview: string;
  strip: string;
  marker: string;
@@ -4108,7 +4107,6 @@ type StarterVisual = {
 
 const starterVisuals: StarterVisual[] = [
  {
- tilt: "-rotate-[7deg] translate-y-2",
  preview: "from-[#0B6F82] via-[#55A8D8] to-[#EAF7FE]",
  strip: "from-[#19B7A5] via-[#2B8CFF] to-[#BDB4FF]",
  marker: "bg-[#22C55E]",
@@ -4118,7 +4116,6 @@ const starterVisuals: StarterVisual[] = [
  meta: "Planning",
  },
  {
- tilt: "rotate-[4deg] -translate-y-1",
  preview: "from-[#3B2AAE] via-[#F64F9E] to-[#FFB35C]",
  strip: "from-[#3758FF] via-[#DE3BFF] to-[#FF8A3D]",
  marker: "bg-[#7C3AED]",
@@ -4128,7 +4125,6 @@ const starterVisuals: StarterVisual[] = [
  meta: "Agent",
  },
  {
- tilt: "rotate-[8deg] translate-y-1",
  preview: "from-[#F8C6B6] via-[#F5E2D8] to-[#F9A979]",
  strip: "from-[#F97316] via-[#FB7185] to-[#FCD34D]",
  marker: "bg-[#F97316]",
@@ -4208,8 +4204,8 @@ function StarterPanel({
  return (
  <div className="w-full text-left">
  <p className={`mb-3 text-[13px] font-semibold ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>{heading}</p>
- <div className={`relative w-full overflow-visible px-7 pb-4 pt-1 max-sm:px-0 ${deckGlow}`}>
- <div className="grid min-h-[150px] w-full grid-cols-3 items-end gap-1.5 max-sm:min-h-0 max-sm:grid-cols-1 max-sm:gap-3">
+ <div className={`relative w-full overflow-visible px-1 pb-3 pt-1 ${deckGlow}`}>
+ <div className="grid w-full grid-cols-3 items-stretch gap-3 max-sm:grid-cols-1">
  {cards.map((card, index) => {
  const Icon = card.icon;
  const visual = starterVisuals[index % starterVisuals.length];
@@ -4219,7 +4215,7 @@ function StarterPanel({
  type="button"
  onClick={() => onOpen(card)}
  aria-label={card.title}
- className={`group relative flex min-h-[132px] origin-center flex-col overflow-hidden rounded-[12px] border text-left transition-all duration-300 hover:-translate-y-2 hover:rotate-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4284FF] focus-visible:ring-offset-2 max-sm:min-h-[124px] max-sm:translate-y-0 max-sm:rotate-0 ${visual.tilt} ${cardBase}`}
+ className={`group relative flex min-h-[132px] flex-col overflow-hidden rounded-[8px] border text-left transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4284FF] focus-visible:ring-offset-2 max-sm:min-h-[124px] ${cardBase}`}
  >
  <span className={`pointer-events-none absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b ${visual.strip}`} />
  <span className={`relative block h-[70px] overflow-hidden bg-gradient-to-br ${visual.preview}`}>
@@ -5441,13 +5437,6 @@ function AIAssistantPage() {
  }
  };
 
- const assistantChips = [
- { label:"Summary", icon: CircleSlash, prompt:"Summarize this clearly with key points and next actions: " },
- { label:"Code", icon: Code2, prompt:"Help me write, debug, or review code for: ", href:"/ai-assistant/tools/code" },
- { label:"Design", icon: PenLine, prompt:"Create a clean design direction for: ", href:"/cedium-design" },
- { label:"Research", icon: Network, prompt:"Research this topic and return sources, risks, and next steps: " },
- ];
-
  const dismissPlanNotice = () => {
  setPlanNoticeDismissed(true);
  if (typeof window !=="undefined") {
@@ -5625,33 +5614,6 @@ function AIAssistantPage() {
  </div>
  ) : null;
 
- const chipsRow = (
- <div className="mt-4 flex flex-wrap gap-3">
- {assistantChips.map((item) => {
- const Icon = item.icon;
- return (
- <button
- id={["Summary","Code","Design"].includes(item.label) ? `assistant-${item.label.toLowerCase()}` : undefined}
- key={item.label}
- type="button"
- onClick={() => {
- if ("href" in item && item.href) {
- router.push(item.href);
- return;
- }
- applyPromptTemplate(item.prompt);
- showToast(`${item.label} prompt ready`);
- }}
- className={`inline-flex h-10 min-w-[128px] items-center justify-center gap-2 rounded-2xl border px-4 text-[13px] font-bold transition-all ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA] hover:border-[rgba(59,167,255,0.28)] hover:text-[#F4F6F8]":"border-[#DCDCDC] bg-white text-[#7A7F87] hover:border-[#CFE8F8] hover:text-[#4284FF]"}`}
- >
- <Icon className="h-4 w-4"/>
- {item.label}
- </button>
- );
- })}
- </div>
- );
-
  const temporaryChatNotice = isTemporaryChat ? (
  <div className="flex w-full justify-center">
  <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]":"border-[#E5EAF0] bg-[#F6F8FB] text-[#4B5563]"}`}>
@@ -5719,7 +5681,6 @@ function AIAssistantPage() {
  <div className="mt-3 w-full">
  {planNotice}
  {composer}
- {chipsRow}
  </div>
 
  <div id="assistant-provider" className={`mt-5 text-center text-[10px] ${dark ?"text-[#6F7782]":"text-[#B4A99A]"}`}>
