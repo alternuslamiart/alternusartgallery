@@ -4095,6 +4095,50 @@ type StarterCard = {
  prompt: string;
 };
 
+type StarterVisual = {
+ tilt: string;
+ preview: string;
+ strip: string;
+ marker: string;
+ glow: string;
+ orb: string;
+ wave: string;
+ meta: string;
+};
+
+const starterVisuals: StarterVisual[] = [
+ {
+ tilt: "-rotate-[7deg] translate-y-2",
+ preview: "from-[#0B6F82] via-[#55A8D8] to-[#EAF7FE]",
+ strip: "from-[#19B7A5] via-[#2B8CFF] to-[#BDB4FF]",
+ marker: "bg-[#22C55E]",
+ glow: "bg-[rgba(250,204,21,0.82)]",
+ orb: "bg-[rgba(255,255,255,0.9)]",
+ wave: "bg-[#0F172A]",
+ meta: "Planning",
+ },
+ {
+ tilt: "rotate-[4deg] -translate-y-1",
+ preview: "from-[#3B2AAE] via-[#F64F9E] to-[#FFB35C]",
+ strip: "from-[#3758FF] via-[#DE3BFF] to-[#FF8A3D]",
+ marker: "bg-[#7C3AED]",
+ glow: "bg-[rgba(255,239,138,0.95)]",
+ orb: "bg-[rgba(255,255,255,0.58)]",
+ wave: "bg-[#581C87]",
+ meta: "Agent",
+ },
+ {
+ tilt: "rotate-[8deg] translate-y-1",
+ preview: "from-[#F8C6B6] via-[#F5E2D8] to-[#F9A979]",
+ strip: "from-[#F97316] via-[#FB7185] to-[#FCD34D]",
+ marker: "bg-[#F97316]",
+ glow: "bg-[rgba(255,255,255,0.86)]",
+ orb: "bg-[rgba(255,255,255,0.74)]",
+ wave: "bg-[#9A3412]",
+ meta: "Browser",
+ },
+];
+
 const agentStarters: StarterCard[] = [
  {
  title:"Create workflow",
@@ -4155,36 +4199,58 @@ function StarterPanel({
  const cards = mode ==="agent"? agentStarters : workflowStarters;
  const heading = mode ==="agent"?"Start building from scratch":"Start a new workflow";
  const cardBase = dark
- ?"border-[rgba(255,255,255,0.08)] bg-[#202328] hover:border-[rgba(59,167,255,0.24)] hover:bg-[#23262C] hover:shadow-[0_16px_34px_rgba(0,0,0,0.28)]"
- :"border-[#EAECEF] bg-[#FCFDFE] hover:border-[#CFE8F8] hover:bg-white hover:shadow-[0_16px_34px_rgba(31,43,77,0.08)]";
+ ?"border-[rgba(255,255,255,0.12)] bg-[#F8FAFC] shadow-[0_18px_34px_rgba(0,0,0,0.3)] hover:border-[rgba(125,211,252,0.45)] hover:shadow-[0_22px_42px_rgba(0,0,0,0.4)]"
+ :"border-[#E3E8EF] bg-white shadow-[0_14px_28px_rgba(15,23,42,0.08)] hover:border-[#B9D8FF] hover:shadow-[0_22px_42px_rgba(31,43,77,0.14)]";
+ const deckGlow = dark
+ ?"bg-[radial-gradient(circle_at_50%_0%,rgba(66,132,255,0.18),rgba(24,27,32,0)_60%)]"
+ :"bg-[radial-gradient(circle_at_50%_0%,rgba(66,132,255,0.12),rgba(255,255,255,0)_58%)]";
 
  return (
  <div className="w-full text-left">
  <p className={`mb-3 text-[13px] font-semibold ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>{heading}</p>
- <div className="grid w-full gap-3 sm:grid-cols-3">
- {cards.map((card) => {
+ <div className={`relative w-full overflow-visible px-7 pb-4 pt-1 max-sm:px-0 ${deckGlow}`}>
+ <div className="grid min-h-[150px] w-full grid-cols-3 items-end gap-1.5 max-sm:min-h-0 max-sm:grid-cols-1 max-sm:gap-3">
+ {cards.map((card, index) => {
  const Icon = card.icon;
+ const visual = starterVisuals[index % starterVisuals.length];
  return (
  <button
  key={card.title}
  type="button"
  onClick={() => onOpen(card)}
- className={`group flex min-h-[60px] items-start gap-2.5 rounded-[12px] border px-2 py-1.5 text-left transition-all duration-200 ${cardBase}`}
+ aria-label={card.title}
+ className={`group relative flex min-h-[132px] origin-center flex-col overflow-hidden rounded-[12px] border text-left transition-all duration-300 hover:-translate-y-2 hover:rotate-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4284FF] focus-visible:ring-offset-2 max-sm:min-h-[124px] max-sm:translate-y-0 max-sm:rotate-0 ${visual.tilt} ${cardBase}`}
  >
- <span className={`flex h-[44px] w-[44px] flex-shrink-0 items-center justify-center rounded-[7px] transition-colors ${dark ?"bg-[rgba(59,167,255,0.18)] text-[#7DD3FC] group-hover:bg-[#4284FF] group-hover:text-white":"bg-[#E8F4FB] text-[#4284FF] group-hover:bg-[#4284FF] group-hover:text-white"}`}>
- <Icon className="h-[18px] w-[18px]"/>
+ <span className={`pointer-events-none absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b ${visual.strip}`} />
+ <span className={`relative block h-[70px] overflow-hidden bg-gradient-to-br ${visual.preview}`}>
+ <span className={`absolute right-5 top-4 h-9 w-9 rounded-full blur-[1px] ${visual.glow}`} />
+ <span className={`absolute right-8 top-2 h-4 w-4 rounded-full ${visual.orb}`} />
+ <span className={`absolute -bottom-4 left-4 h-16 w-[115px] -rotate-6 rounded-[50%] opacity-80 ${visual.wave}`} />
+ <span className="absolute bottom-4 left-8 h-7 w-[86px] -rotate-6 rounded-[50%] bg-white/[0.45] blur-[1px]" />
+ <span className="absolute bottom-5 left-7 h-5 w-[74px] -rotate-6 rounded-[50%] bg-white/75" />
+ <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/[0.78] px-2 py-0.5 text-[7px] font-bold uppercase tracking-[0] text-[#1F2937] shadow-[0_4px_12px_rgba(15,23,42,0.12)]">
+ <span className={`h-1.5 w-1.5 rounded-full ${visual.marker}`} />
+ {visual.meta}
+ </span>
+ </span>
+ <span className="flex min-w-0 flex-1 items-start gap-2 px-3 pb-2.5 pt-2.5">
+ <span className={`mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-[7px] transition-colors ${dark ?"bg-[#E8F4FB] text-[#4284FF] group-hover:bg-[#4284FF] group-hover:text-white":"bg-[#F1F6FF] text-[#4284FF] group-hover:bg-[#4284FF] group-hover:text-white"}`}>
+ <Icon className="h-[15px] w-[15px]"/>
  </span>
  <span className="min-w-0 flex-1">
- <span className={`block truncate text-[13px] font-semibold leading-[1.12] ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>
+ <span className="block truncate text-[12px] font-bold leading-[1.12] text-[#101828]">
  {card.shortTitle ?? card.title}
  </span>
- <span className={`mt-1 block text-[10px] leading-3 ${dark ?"text-[#A8B0BA]":"text-[#30343A]"}`}>
+ <span className="mt-1 block text-[9px] leading-[1.25] text-[#475467]">
  {card.shortDescription ?? card.description}
  </span>
+ </span>
+ <ChevronRight className="mt-1 h-3.5 w-3.5 flex-shrink-0 text-[#98A2B3] transition-transform group-hover:translate-x-0.5 group-hover:text-[#4284FF]" />
  </span>
  </button>
  );
  })}
+ </div>
  </div>
  </div>
  );
