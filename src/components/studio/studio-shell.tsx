@@ -5720,7 +5720,7 @@ function AIAssistantPage() {
  return (
  <>
  <AssistantScrollRail dark={dark} />
- <div id="assistant-overview" className={`flex min-h-full items-start justify-center px-6 pb-6 pt-7 font-roboto max-sm:px-4 max-sm:pt-6 ${dark ?"bg-[#0F1013]":"bg-white text-[#1F1F1F]"}`}>
+ <div id="assistant-overview" className={`flex min-h-full items-center justify-center px-6 py-6 font-roboto max-sm:items-start max-sm:px-4 max-sm:pt-6 ${dark ?"bg-[#0F1013]":"bg-white text-[#1F1F1F]"}`}>
  <div className="flex w-full max-w-[684px] flex-col">
  <div id="assistant-greeting" className="flex flex-col items-center text-center">
  <h2 className={`text-[21px] font-semibold leading-tight tracking-[0] max-sm:text-[20px] ${dark ?"text-[#F4F6F8]":"text-[#080808]"}`}>
