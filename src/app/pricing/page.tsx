@@ -64,8 +64,8 @@ const tiers: PricingTier[] = [
  },
  {
  n: "Studio",
- pm: 100,
- py: 120,
+ pm: 120,
+ py: 100,
  yearlyUnit: "/yr",
  yearlyNote: "billed yearly",
  d: "For game and movie creators building with code and Unity.",
