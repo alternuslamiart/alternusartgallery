@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAIResponse } from "@/lib/ai-assistant";
 import {
- DEFAULT_GEMINI_MODEL,
  DEFAULT_GROQ_MODEL,
  DEFAULT_OPENAI_MODEL,
  getConfiguredAIProvider,
+ getGeminiApiKey,
+ getGeminiModel,
  getSafeAIErrorMessage,
 } from "@/lib/ai-provider-config";
 
@@ -31,22 +32,6 @@ type RequestBody = {
 type AIProvider = "openai" | "gemini" | "groq" | "local";
 type RemoteAIProvider = Exclude<AIProvider, "local">;
 const PROVIDER_PRIORITY: RemoteAIProvider[] = ["gemini", "groq", "openai"];
-
-function getFirstEnvValue(names: string[]) {
- for (const name of names) {
- const value = process.env[name]?.trim();
- if (value) return value;
- }
- return undefined;
-}
-
-function getGeminiApiKey() {
- return getFirstEnvValue(["GEMINI_API_KEY", "GOOGLE_GENERATIVE_AI_API_KEY", "GOOGLE_API_KEY"]);
-}
-
-function getGeminiModel() {
- return process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL;
-}
 
 function getOpenAIApiKey() {
  return process.env.OPENAI_API_KEY?.trim();
@@ -216,12 +201,12 @@ async function askGemini(message: string, history: ChatMessage[]) {
  "x-goog-api-key": apiKey,
  },
  body: JSON.stringify({
- systemInstruction: {
+ system_instruction: {
  parts: [{ text: SYSTEM_PROMPT }],
  },
  contents: toGeminiContents(history, message),
  generationConfig: {
- temperature: 0.7,
+ temperature: 1,
  maxOutputTokens: 4096,
  },
  }),

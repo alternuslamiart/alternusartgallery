@@ -154,7 +154,7 @@ OPENAI_API_KEY=
 OPENAI_MODEL=gpt-4o-mini
 ANTHROPIC_API_KEY=
 GEMINI_API_KEY=
-GEMINI_MODEL=gemini-3-flash-preview
+GEMINI_MODEL=gemini-3.5-flash
 GROQ_API_KEY=
 GROQ_BASE_URL=https://api.groq.com/openai/v1
 GROQ_MODEL=llama-3.1-8b-instant
@@ -165,8 +165,8 @@ OS_DEMO_USER_ID=
 - `OPENAI_API_KEY` is used by `src/app/api/ai-chat/route.ts` when OpenAI is selected or Gemini is not configured
 - `OPENAI_MODEL` is optional and defaults to `gpt-4o-mini`
 - `ANTHROPIC_API_KEY` is used by `src/app/api/os/ai/route.ts`
-- `GEMINI_API_KEY` is used by `src/app/api/ai-chat/route.ts`, `src/app/api/ai-chat/test/route.ts`, and the Python desktop utility
-- `GEMINI_MODEL` is optional and defaults to `gemini-3-flash-preview`
+- `GEMINI_API_KEY` is used by `src/app/api/ai-chat/route.ts`, `src/app/api/ai-chat/test/route.ts`, and the Python desktop utility. `GOOGLE_GENERATIVE_AI_API_KEY` and `GOOGLE_API_KEY` are also accepted by the web AI routes
+- `GEMINI_MODEL` is optional and defaults to `gemini-3.5-flash`
 - `GROQ_API_KEY` is used by `src/app/api/ai-chat/route.ts` and `src/app/api/ai-chat/test/route.ts`
 - `GROQ_BASE_URL` is optional and defaults to `https://api.groq.com/openai/v1`
 - `GROQ_MODEL` is optional and defaults to `llama-3.1-8b-instant`

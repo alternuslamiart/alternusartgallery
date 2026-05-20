@@ -30,7 +30,7 @@ type OpenAIResponse = {
 
 async function testGemini() {
  const response = await fetch(
- `https://generativelanguage.googleapis.com/v1beta/models/${getGeminiModel()}:generateContent`,
+ `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(getGeminiModel())}:generateContent`,
  {
  method: 'POST',
  headers: {

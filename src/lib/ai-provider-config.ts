@@ -1,4 +1,4 @@
-export const DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview";
+export const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash";
 export const DEFAULT_GROQ_MODEL = "llama-3.1-8b-instant";
 export const DEFAULT_OPENAI_MODEL = "gpt-4o-mini";
 
@@ -17,7 +17,12 @@ export function getConfiguredAIProvider() {
 }
 
 export function getGeminiApiKey() {
- return process.env.GEMINI_API_KEY?.trim() || "";
+ return (
+ process.env.GEMINI_API_KEY?.trim() ||
+ process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() ||
+ process.env.GOOGLE_API_KEY?.trim() ||
+ ""
+ );
 }
 
 export function getGeminiModel() {
