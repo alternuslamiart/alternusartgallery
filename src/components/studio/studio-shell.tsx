@@ -5139,6 +5139,8 @@ function AIAssistantPage() {
  const [aiChatCount, setAiChatCount] = useState<number>(0);
  const [planNoticeDismissed, setPlanNoticeDismissed] = useState<boolean>(false);
  const [assistantMode, setAssistantMode] = useState<"agent"|"workflow">("agent");
+ const [selectedDesignTool, setSelectedDesignTool] = useState("Frame");
+ const [inspectorTab, setInspectorTab] = useState<"Design"|"Prototype">("Design");
  const [activePlaygroundCard, setActivePlaygroundCard] = useState<StarterCard | null>(null);
  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
  const [attachMenuView, setAttachMenuView] = useState<"main"|"recent"|"connections"|"more">("main");
@@ -5689,130 +5691,174 @@ function AIAssistantPage() {
 
  return (
  <>
- <div id="assistant-overview" className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#191919] font-roboto text-[#E6E8EA]">
- <div className="flex h-8 flex-shrink-0 items-center gap-3 border-b border-[#2A2A2A] bg-[#111111] px-2 text-[11px] text-[#C9CDD2]">
- <div className="flex items-center gap-3">
- {["File","Edit","Render","Window","Help"].map((item) => (
- <button key={item} type="button" className="rounded-[4px] px-1.5 py-1 hover:bg-[#2C2C2A] hover:text-white">{item}</button>
+ <div id="assistant-overview" className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#2B2B2B] font-roboto text-[#F4F7FA]">
+ <div className="flex h-9 flex-shrink-0 items-center border-b border-[#3A3A3A] bg-[#303030] text-[11px] text-[#D3D1C7]">
+ <div className="flex h-full w-[298px] flex-shrink-0 items-center border-r border-[#3A3A3A] px-3">
+ <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#0A0E14] text-[8px] font-bold text-[#B5D4F4]">CF</span>
+ <span className="ml-2 font-semibold text-white">Coreforge AI</span>
+ <ChevronDown className="ml-1 h-3 w-3 text-[#B4B2A9]" />
+ </div>
+ <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden px-3">
+ {["File","Edit","View","Object","Vector","Text","Arrange","Plugins"].map((item) => (
+ <button key={item} type="button" className="rounded-[4px] px-2 py-1 hover:bg-[#3A3A3A] hover:text-white">{item}</button>
  ))}
  </div>
- <div className="h-4 w-px bg-[#343434]" />
- <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
- {["Layout","Modeling","Scripting","Rendering","Simulation","CAD"].map((item, index) => (
- <button key={item} type="button" className={`rounded-[4px] px-3 py-1 ${index === 0 ?"bg-[#303030] text-white":"text-[#9DA3AA] hover:bg-[#262626] hover:text-white"}`}>{item}</button>
- ))}
+ <div className="flex h-full items-center gap-2 border-l border-[#3A3A3A] px-3">
+ <button type="button" onClick={() => openModal("voice-speak")} className="flex h-7 w-7 items-center justify-center rounded-[4px] text-[#D3D1C7] hover:bg-[#3A3A3A] hover:text-white" aria-label="Preview">
+ <Play className="h-4 w-4" />
+ </button>
+ <button type="button" onClick={() => showToast("Share panel opened")} className="h-7 rounded-[4px] bg-[#185FA5] px-3 text-[11px] font-semibold text-white hover:bg-[#378ADD]">Share</button>
  </div>
- <span className="hidden rounded-[4px] bg-[#202328] px-2 py-1 text-[#B5D4F4] sm:inline">Coreforge Workspace</span>
  </div>
 
  <div className="flex min-h-0 flex-1">
- <aside className="hidden w-11 flex-shrink-0 flex-col items-center gap-2 border-r border-[#2A2A2A] bg-[#202020] py-2 md:flex">
- {[Sparkles, CircleSlash, Box, PenLine, Code2, Layers3, Network, Upload].map((Icon, index) => (
- <button key={index} type="button" className={`flex h-8 w-8 items-center justify-center rounded-[4px] border ${index === 0 ?"border-[#378ADD] bg-[#185FA5] text-white":"border-[#303030] bg-[#282828] text-[#B4B2A9] hover:border-[#5F5E5A] hover:text-white"}`} aria-label={`Tool ${index + 1}`}>
- <Icon className="h-4 w-4" strokeWidth={2} />
+ <aside className="hidden w-[298px] flex-shrink-0 border-r border-[#3A3A3A] bg-[#2C2C2A] md:flex">
+ <div className="flex w-14 flex-shrink-0 flex-col items-center border-r border-[#3A3A3A] py-3">
+ {[
+ ["File", FileText],
+ ["Assets", ImageIcon],
+ ["Variables", Settings],
+ ["Comments", MessageCircle],
+ ].map(([label, Icon], index) => (
+ <button key={label as string} type="button" className={`mb-3 flex h-10 w-10 flex-col items-center justify-center rounded-[6px] text-[8px] ${index === 0 ?"bg-[#185FA5] text-white":"text-[#D3D1C7] hover:bg-[#3A3A3A] hover:text-white"}`} aria-label={label as string}>
+ <Icon className="mb-0.5 h-4 w-4" />
+ <span>{label as string}</span>
  </button>
  ))}
- </aside>
-
- <main className="relative min-w-0 flex-1 overflow-hidden bg-[#383838]">
- <div className="absolute inset-0" style={{ backgroundImage:"linear-gradient(rgba(255,255,255,0.075) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.075) 1px, transparent 1px)", backgroundSize:"38px 38px" }} />
- <div className="absolute left-[-10%] top-1/2 h-px w-[130%] -rotate-[18deg] bg-[#CF3348]/80" />
- <div className="absolute left-[42%] top-[-20%] h-[140%] w-px rotate-[34deg] bg-[#65B82E]/80" />
- <div className="absolute left-4 top-3 z-10 rounded-[4px] bg-black/24 px-3 py-2 text-[12px] leading-5 text-white">
- <p className="font-semibold">User Perspective</p>
- <p className="text-[#D3D1C7]">(1) Coreforge / Mechanical AI Workspace</p>
  </div>
- <div className="absolute right-4 top-3 z-10 flex items-center gap-1 rounded-[4px] bg-[#202020]/92 p-1">
- {["X","Y","Z"].map((axis) => (
- <span key={axis} className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${axis ==="X"?"bg-[#CF3348]": axis ==="Y"?"bg-[#65B82E]":"bg-[#378ADD]"} text-white`}>{axis}</span>
+ <div className="min-w-0 flex-1 overflow-y-auto">
+ <div className="border-b border-[#3A3A3A] p-3">
+ <div className="flex items-center justify-between">
+ <div>
+ <p className="text-[13px] font-semibold text-white">Soft AI</p>
+ <p className="mt-1 text-[11px] text-[#B4B2A9]">Drafts <span className="rounded-[4px] bg-[#185FA5] px-1.5 py-0.5 text-[9px] text-white">Free</span></p>
+ </div>
+ <PanelLeft className="h-4 w-4 text-[#B4B2A9]" />
+ </div>
+ </div>
+ <div className="border-b border-[#3A3A3A] p-3">
+ <div className="mb-3 flex items-center justify-between">
+ <p className="text-[11px] font-semibold text-white">Pages</p>
+ <div className="flex items-center gap-2 text-[#D3D1C7]">
+ <Search className="h-3.5 w-3.5" />
+ <Plus className="h-3.5 w-3.5" />
+ </div>
+ </div>
+ <button type="button" className="h-8 w-full rounded-[5px] bg-[#3A3A3A] px-2 text-left text-[11px] font-semibold text-white">AI Assistant</button>
+ </div>
+ <div className="p-3">
+ <div className="mb-3 flex items-center justify-between">
+ <p className="text-[11px] font-semibold text-white">Layers</p>
+ <MoreHorizontal className="h-4 w-4 text-[#B4B2A9]" />
+ </div>
+ {[
+ { label:"Group 20", icon: Grid2X2, indent: 0 },
+ { label:"MacBook Pro 16 - 2", icon: Monitor, indent: 0 },
+ { label:"Ask everything...", icon: FileText, indent: 1 },
+ { label:"Workflow", icon: Workflow, indent: 2 },
+ { label:"Good Morning, Coreforge", icon: Sparkles, indent: 2 },
+ { label:"Design", icon: PenLine, indent: 2 },
+ { label:"Game Engineering", icon: Box, indent: 2 },
+ { label:"Code Building", icon: Code2, indent: 2 },
+ { label:"AI prompt dock", icon: MessageCircle, indent: 1 },
+ ].map(({ label, icon: Icon, indent }) => (
+ <button key={label} type="button" className="flex h-8 w-full items-center gap-2 rounded-[4px] px-2 text-left text-[11px] text-[#D3D1C7] hover:bg-[#3A3A3A] hover:text-white">
+ <span style={{ width: `${indent * 14}px` }} />
+ <Icon className="h-3.5 w-3.5 flex-shrink-0 text-[#B5D4F4]" />
+ <span className="min-w-0 flex-1 truncate">{label}</span>
+ </button>
  ))}
  </div>
+ </div>
+ </aside>
 
- <div className="absolute left-[18%] top-[18%] h-24 w-36 -rotate-[18deg] border border-black/70">
- <div className="absolute left-5 top-4 h-12 w-20 skew-x-[-18deg] border border-black/70 bg-black/10" />
- <div className="absolute right-4 top-2 h-9 w-14 bg-black" style={{ clipPath:"polygon(0 100%, 70% 0, 100% 100%)" }} />
+ <main className="relative min-w-0 flex-1 overflow-hidden bg-[#2B2B2B]">
+ <div className="absolute left-0 top-0 z-10 h-7 w-full border-b border-[#454545] bg-[#2B2B2B]">
+ <div className="ml-4 flex h-full items-center gap-[76px] text-[9px] text-[#8A94A3]">
+ {["-2000","-1500","-1000","-500","0","500","1000","1500","2000","2500","3000","3500","4000"].map((tick) => <span key={tick}>{tick}</span>)}
  </div>
- <div className="absolute left-1/2 top-[42%] h-28 w-28 -translate-x-1/2 -translate-y-1/2 rotate-[-18deg] border-2 border-[#F59E0B] bg-[#B88961] shadow-[18px_18px_0_0_rgba(147,91,37,0.9)]">
- <div className="absolute inset-0 bg-gradient-to-br from-white/28 via-transparent to-black/18" />
- <div className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#F4F7FA] bg-[#CF3348]" />
  </div>
-
- <div id="assistant-greeting" className="absolute bottom-[92px] left-1/2 z-10 w-[min(720px,calc(100%-32px))] -translate-x-1/2">
- {temporaryChatNotice && <div className="mb-3">{temporaryChatNotice}</div>}
- <div className="mb-3 rounded-[8px] border border-[#2C2C2A] bg-[#111111]/86 p-4 shadow-[0_18px_42px_rgba(0,0,0,0.34)] backdrop-blur">
- <div className="flex flex-wrap items-start justify-between gap-3">
- <div className="min-w-0">
- <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#B5D4F4]">AI Assistant</p>
- <h2 className="mt-2 text-[30px] font-semibold leading-none tracking-[0] text-white sm:text-[42px]">Build machinery in a 3D viewport.</h2>
- <p className="mt-3 max-w-xl text-[13px] leading-5 text-[#D3D1C7]">Engines, vehicles, industrial machinery, CNC, CAD scripts, hydraulics, transmissions, and simulation workflows.</p>
+ <div className="absolute left-0 top-7 z-10 h-full w-7 border-r border-[#454545] bg-[#2B2B2B]">
+ <div className="flex origin-top-left translate-x-2 rotate-90 gap-[86px] whitespace-nowrap text-[9px] text-[#8A94A3]">
+ {["2500","3000","3500","4000","4500","5000","5500","6000","6500","7000"].map((tick) => <span key={tick}>{tick}</span>)}
  </div>
- <div id="assistant-mode" className="w-full sm:w-auto">
+ </div>
+ <div className="absolute inset-0" style={{ backgroundImage:"radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px)", backgroundSize:"28px 28px", backgroundPosition:"28px 28px" }} />
+ <div className="absolute left-[26%] top-[18%] h-[280px] w-[402px] rounded-[12px] border border-[#454545] bg-[#1F1F1F]/58 shadow-[0_18px_60px_rgba(0,0,0,0.26)]">
+ <div className="flex h-8 items-center justify-between border-b border-[#454545] px-3">
+ <span className="text-[11px] font-semibold text-white">Coreforge AI frame</span>
+ <span className="text-[10px] text-[#B4B2A9]">402 x 874</span>
+ </div>
+ <div className="p-4">
+ <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#B5D4F4]">Ask everything</p>
+ <h2 className="mt-3 text-[30px] font-semibold leading-none tracking-[0] text-white">Design engines, machinery, CAD and code.</h2>
+ <p className="mt-3 text-[12px] leading-5 text-[#D3D1C7]">Build AI-assisted mechanical workflows directly from a Figma-like canvas.</p>
+ <div id="assistant-mode" className="mt-4">
  <ModeToggle mode={assistantMode} onChange={setAssistantMode} dark={dark} />
  </div>
  </div>
  </div>
- <div className="w-full">{composer}</div>
+ <div id="assistant-greeting" className="absolute bottom-20 left-1/2 z-20 w-[min(680px,calc(100%-32px))] -translate-x-1/2">
+ {temporaryChatNotice && <div className="mb-3">{temporaryChatNotice}</div>}
+ {planNotice}
+ {composer}
  </div>
-
- <div className="absolute inset-x-0 bottom-0 flex h-9 items-center gap-2 border-t border-[#2A2A2A] bg-[#202020] px-3 text-[11px] text-[#B4B2A9]">
- <Play className="h-3.5 w-3.5 text-[#B5D4F4]" />
- <span className="rounded-[4px] bg-[#303030] px-3 py-1 text-white">Frame 1</span>
- <div className="h-1 flex-1 rounded-full bg-[#303030]">
- <div className="h-full w-[18%] rounded-full bg-[#378ADD]" />
- </div>
- <span>End 250</span>
- </div>
- </main>
-
- <aside className="hidden w-[318px] flex-shrink-0 flex-col border-l border-[#2A2A2A] bg-[#202020] xl:flex">
- <div className="border-b border-[#2A2A2A] p-3">
- <div className="mb-2 flex items-center justify-between">
- <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#B5D4F4]">Scene Collection</p>
- <Search className="h-3.5 w-3.5 text-[#B4B2A9]" />
- </div>
+ <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1 rounded-[10px] border border-[#454545] bg-[#3A3A3A]/94 p-2 shadow-[0_14px_34px_rgba(0,0,0,0.34)]">
  {[
- ["Camera","Viewport target"],
- ["Cube","Engine block concept"],
- ["Light","Studio key light"],
- ].map(([name, meta], index) => (
- <button key={name} type="button" className={`mb-1 flex w-full items-center gap-2 rounded-[4px] px-2 py-1.5 text-left ${index === 1 ?"bg-[#303030] text-white":"text-[#C9CDD2] hover:bg-[#282828]"}`}>
- <Box className={`h-3.5 w-3.5 ${index === 1 ?"text-[#F59E0B]":"text-[#8A94A3]"}`} />
- <span className="min-w-0 flex-1">
- <span className="block truncate text-[12px] font-semibold">{name}</span>
- <span className="block truncate text-[10px] text-[#8A94A3]">{meta}</span>
- </span>
+ ["Pointer", Sparkles],
+ ["Frame", Grid2X2],
+ ["Shape", Box],
+ ["Pen", PenLine],
+ ["Text", FileText],
+ ["Comment", MessageCircle],
+ ["Code", Code2],
+ ].map(([label, Icon]) => (
+ <button key={label as string} type="button" onClick={() => setSelectedDesignTool(label as string)} className={`flex h-8 min-w-8 items-center justify-center rounded-[6px] px-2 text-[10px] font-semibold ${selectedDesignTool === label ?"bg-[#185FA5] text-white":"text-[#F4F7FA] hover:bg-[#4A4A4A]"}`} title={label as string} aria-label={label as string}>
+ <Icon className="h-4 w-4" />
  </button>
  ))}
  </div>
- <div className="min-h-0 flex-1 overflow-y-auto p-3">
- <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#B5D4F4]">Properties</p>
- <div className="space-y-2">
- {["Transform","Relations","Collections","Motion Paths","Shading","AI Constraints"].map((section, index) => (
- <div key={section} className="rounded-[4px] border border-[#343434] bg-[#2A2A2A]">
- <div className="flex items-center gap-2 border-b border-[#343434] px-2 py-1.5 text-[11px] font-semibold text-[#E6E8EA]">
+ </main>
+
+ <aside className="hidden w-60 flex-shrink-0 flex-col border-l border-[#3A3A3A] bg-[#2C2C2A] xl:flex">
+ <div className="border-b border-[#3A3A3A] p-3">
+ <div className="flex gap-1">
+ {(["Design","Prototype"] as const).map((tab) => (
+ <button key={tab} type="button" onClick={() => setInspectorTab(tab)} className={`h-7 rounded-[5px] px-3 text-[11px] font-semibold ${inspectorTab === tab ?"bg-[#3A3A3A] text-white":"text-[#B4B2A9] hover:text-white"}`}>{tab}</button>
+ ))}
+ </div>
+ </div>
+ <div className="min-h-0 flex-1 overflow-y-auto">
+ <div className="border-b border-[#3A3A3A] p-4">
+ <p className="mb-4 text-[11px] font-semibold text-white">Frame</p>
+ <div className="space-y-3">
+ {[
+ ["Phone", "iPhone 17", "402 x 874"],
+ ["Tablet", "iPad Pro", "1024 x 1366"],
+ ["Desktop", "MacBook Pro", "1512 x 982"],
+ ["Presentation", "16:9", "1920 x 1080"],
+ ["Social media", "Post", "1080 x 1350"],
+ ].map(([group, name, size]) => (
+ <div key={group}>
+ <div className="mb-2 flex items-center gap-1 text-[11px] font-semibold text-[#D3D1C7]">
  <ChevronRight className="h-3 w-3" />
- {section}
+ {group}
  </div>
- {index === 0 && (
- <div className="space-y-1.5 p-2">
- {["Location X","Location Y","Location Z","Scale X","Scale Y","Scale Z"].map((field, fieldIndex) => (
- <div key={field} className="grid grid-cols-[78px_1fr] items-center gap-2 text-[10px] text-[#C9CDD2]">
- <span>{field}</span>
- <span className="rounded-[3px] bg-[#3A3A3A] px-2 py-1 text-right text-[#F4F7FA]">{fieldIndex < 3 ?"0 m":"1.000"}</span>
+ <button type="button" className="grid w-full grid-cols-[1fr_auto] rounded-[4px] px-2 py-1.5 text-left text-[11px] text-[#B4B2A9] hover:bg-[#3A3A3A] hover:text-white">
+ <span>{name}</span>
+ <span>{size}</span>
+ </button>
  </div>
  ))}
  </div>
- )}
  </div>
- ))}
- </div>
- <div id="assistant-starters" className="mt-3">
- <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#B5D4F4]">AI Operations</p>
+ <div id="assistant-starters" className="p-4">
+ <p className="mb-3 text-[11px] font-semibold text-white">AI Operations</p>
  <div id="assistant-workflows" className="space-y-1.5">
  {agentStarters.slice(0, 5).map((card) => {
  const Icon = card.icon;
  return (
- <button key={card.title} type="button" onClick={() => card.href ? router.push(card.href) : setActivePlaygroundCard(card)} className="flex w-full items-center gap-2 rounded-[4px] border border-[#343434] bg-[#282828] px-2 py-2 text-left text-[#D3D1C7] hover:border-[#378ADD] hover:text-white">
+ <button key={card.title} type="button" onClick={() => card.href ? router.push(card.href) : setActivePlaygroundCard(card)} className="flex w-full items-center gap-2 rounded-[5px] border border-[#3A3A3A] bg-[#303030] px-2 py-2 text-left text-[#D3D1C7] hover:border-[#378ADD] hover:text-white">
  <Icon className="h-3.5 w-3.5 flex-shrink-0 text-[#B5D4F4]" />
  <span className="min-w-0 flex-1 truncate text-[11px] font-semibold">{card.title}</span>
  </button>
