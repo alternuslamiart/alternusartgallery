@@ -5703,6 +5703,9 @@ function AIAssistantPage() {
  <button key={item} type="button" className="rounded-[4px] px-2 py-1 hover:bg-[#3A3A3A] hover:text-white">{item}</button>
  ))}
  </div>
+ <div id="assistant-mode" className="hidden flex-shrink-0 items-center px-3 md:flex">
+ <ModeToggle mode={assistantMode} onChange={setAssistantMode} dark={dark} />
+ </div>
  <div className="flex h-full items-center gap-2 border-l border-[#3A3A3A] px-3">
  <button type="button" onClick={() => openModal("voice-speak")} className="flex h-7 w-7 items-center justify-center rounded-[4px] text-[#D3D1C7] hover:bg-[#3A3A3A] hover:text-white" aria-label="Preview">
  <Play className="h-4 w-4" />
@@ -5789,19 +5792,11 @@ function AIAssistantPage() {
  <span className="text-[11px] font-semibold text-white">Coreforge AI frame</span>
  <span className="text-[10px] text-[#B4B2A9]">402 x 874</span>
  </div>
- <div className="p-4">
- <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#B5D4F4]">Ask everything</p>
- <h2 className="mt-3 text-[30px] font-semibold leading-none tracking-[0] text-white">Design engines, machinery, CAD and code.</h2>
- <p className="mt-3 text-[12px] leading-5 text-[#D3D1C7]">Build AI-assisted mechanical workflows directly from a Figma-like canvas.</p>
- <div id="assistant-mode" className="mt-4">
+ <div className="flex h-[calc(100%-2rem)] items-center justify-center p-4">
+ <div className="md:hidden">
  <ModeToggle mode={assistantMode} onChange={setAssistantMode} dark={dark} />
  </div>
  </div>
- </div>
- <div id="assistant-greeting" className="absolute bottom-20 left-1/2 z-20 w-[min(680px,calc(100%-32px))] -translate-x-1/2">
- {temporaryChatNotice && <div className="mb-3">{temporaryChatNotice}</div>}
- {planNotice}
- {composer}
  </div>
  <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1 rounded-[10px] border border-[#454545] bg-[#3A3A3A]/94 p-2 shadow-[0_14px_34px_rgba(0,0,0,0.34)]">
  {[
@@ -5850,6 +5845,13 @@ function AIAssistantPage() {
  </button>
  </div>
  ))}
+ </div>
+ </div>
+ <div className="border-b border-[#3A3A3A] p-4">
+ <div id="assistant-greeting">
+ {temporaryChatNotice && <div className="mb-3">{temporaryChatNotice}</div>}
+ {planNotice}
+ {composer}
  </div>
  </div>
  <div id="assistant-starters" className="p-4">
