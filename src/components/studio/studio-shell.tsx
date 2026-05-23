@@ -592,7 +592,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  className={`group mx-auto flex h-7 w-7 items-center justify-center rounded-lg ${dark ?"text-[#A8B0BA] hover:bg-[rgba(66,132,255,0.2)] hover:text-[#6EA4FF]":"text-[#64748B] hover:bg-[#CFE8F8] hover:text-[#1D9BF0]"}`}
  aria-label="Expand sidebar"
  >
- <PanelLeft className="h-[14px] w-[14px]"strokeWidth={2.25} />
+ <PanelLeft className="h-[14px] w-[14px]" strokeWidth={2.25} />
  </button>
  ) : (
  <>
@@ -620,7 +620,7 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  className={`group flex h-7 w-7 items-center justify-center rounded-lg ${dark ?"text-[#A8B0BA] hover:bg-[rgba(66,132,255,0.2)] hover:text-[#6EA4FF]":"text-[#64748B] hover:bg-[#CFE8F8] hover:text-[#1D9BF0]"}`}
  aria-label="Collapse sidebar"
  >
- <PanelLeft className="h-[14px] w-[14px]"strokeWidth={2.25} />
+ <PanelLeft className="h-[14px] w-[14px]" strokeWidth={2.25} />
  </button>
  </>
  )}
@@ -875,11 +875,19 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  </div>
  )}
 
- <main className={`flex min-w-0 flex-1 flex-col p-[6px] pl-0 ${dark ? "bg-[#181A1F]" : "bg-[#EAF3F8]"}`}>
- <div className={`studio-main-frame flex min-h-0 flex-1 flex-col overflow-hidden rounded-[8px] border ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#17191D]":"border-[#DDE7EE] bg-white"}`}>
- <header className={`flex h-11 items-center justify-between border-b px-3 ${dark ?"border-[rgba(255,255,255,0.08)]":"border-[#E8EEF2]"}`}>
+ <main className={`flex min-w-0 flex-1 flex-col p-[6px] pl-0 ${dark ? "bg-[#0A0E14]" : "bg-[#F4F7FA]"}`}>
+ <div className={`studio-main-frame flex min-h-0 flex-1 flex-col overflow-hidden rounded-[8px] border ${dark ?"border-[rgba(181,212,244,0.12)] bg-[#0A0E14]":"border-[#D3D1C7] bg-[#F4F7FA]"}`}>
+ <header className={`flex h-11 items-center justify-between border-b px-3 ${dark ?"border-[rgba(181,212,244,0.12)] bg-[#2C2C2A]":"border-[#D3D1C7] bg-[#FFFFFF]"}`}>
  <div className="flex min-w-0 items-center gap-3">
  <div className={`relative flex items-center gap-2 ${dark ?"text-[#A8B0BA]":"text-[#6B7280]"}`}>
+ <button
+ onClick={toggleMenu}
+ className={`group flex h-7 w-7 items-center justify-center rounded-lg border transition-colors ${dark ?"border-[rgba(181,212,244,0.14)] bg-[#0A0E14] text-[#B5D4F4] hover:border-[#378ADD] hover:bg-[#185FA5]/20 hover:text-[#E6F1FB]":"border-[#D3D1C7] bg-[#F4F7FA] text-[#5F5E5A] hover:border-[#378ADD] hover:bg-[#E6F1FB] hover:text-[#185FA5]"}`}
+ aria-label={isCollapsed ? "Open sidebar" : "Toggle sidebar"}
+ title={isCollapsed ? "Open sidebar" : "Toggle sidebar"}
+ >
+ <PanelLeft className="h-[14px] w-[14px]" strokeWidth={2.25} />
+ </button>
  <div ref={notificationRef} className="relative">
  <button
  onClick={() => setActiveDrawer("notifications")}
@@ -4236,85 +4244,47 @@ function StarterPanel({
  onOpen: (card: StarterCard) => void;
 }) {
  const cards = mode ==="agent"? agentStarters : workflowStarters;
- const [carouselIndex, setCarouselIndex] = useState(0);
- const visibleCount = Math.min(3, cards.length);
- const showCarouselControls = cards.length > visibleCount;
- const visibleCards = Array.from({ length: visibleCount }, (_, offset) => {
- const index = (carouselIndex + offset) % cards.length;
- return { card: cards[index], index, offset };
- });
  const cardBase = dark
- ?"border-[rgba(255,255,255,0.1)] bg-[#202328] shadow-[0_18px_42px_rgba(0,0,0,0.34)]"
- :"border-[#E1E5EA] bg-white shadow-[0_10px_24px_rgba(15,23,42,0.08)]";
-
- useEffect(() => {
- setCarouselIndex(0);
- }, [mode]);
-
- const goToPreviousStarter = () => {
- setCarouselIndex((current) => (current - 1 + cards.length) % cards.length);
- };
-
- const goToNextStarter = () => {
- setCarouselIndex((current) => (current + 1) % cards.length);
- };
+ ?"border-[rgba(181,212,244,0.14)] bg-[#2C2C2A] text-[#F4F7FA] hover:border-[#378ADD] hover:bg-[#313330]"
+ :"border-[#D3D1C7] bg-white text-[#0A0E14] hover:border-[#378ADD] hover:bg-[#F8FBFE]";
 
  return (
  <div className="w-full text-left">
- <div className="relative w-full overflow-visible px-0 pb-0 pt-0 max-sm:px-8">
- {showCarouselControls && (
- <button
- type="button"
- onClick={goToPreviousStarter}
- aria-label="Previous AI platform function"
- className={`absolute -left-4 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border transition-colors max-sm:left-0 ${dark ?"border-[rgba(255,255,255,0.1)] bg-[#202328] text-[#DDE3EA] hover:bg-[#252A31]":"border-[#E5E7EB] bg-white text-[#475467] shadow-[0_10px_24px_rgba(15,23,42,0.12)] hover:border-[#B9D8FF] hover:text-[#4284FF]"}`}
- >
- <ChevronLeft className="h-4 w-4" />
- </button>
- )}
- <div className="grid w-full grid-cols-3 items-center gap-4 max-sm:grid-cols-1">
- {visibleCards.map(({ card, index, offset }) => {
+ <div className="grid w-full grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+ {cards.map((card, index) => {
  const Icon = card.icon;
  const visual = starterVisuals[index % starterVisuals.length];
- const isCenterCard = offset === 1 && visibleCards.length === 3;
  return (
  <button
- key={`${carouselIndex}-${card.title}`}
+ key={card.title}
  type="button"
  onClick={() => onOpen(card)}
  aria-label={card.title}
- className={`group relative flex h-[280px] w-full flex-col overflow-hidden rounded-[8px] border text-left transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4284FF] focus-visible:ring-offset-2 max-sm:h-[250px] ${isCenterCard ?"scale-[1.01]":"scale-100"} ${cardBase}`}
+ className={`group relative flex min-h-[148px] w-full flex-col overflow-hidden rounded-[8px] border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#378ADD] ${cardBase}`}
  >
- <span className={`absolute inset-0 bg-gradient-to-br ${visual.preview}`} />
- <span className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${visual.image})` }} />
- <span className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/[0.06]" />
- <span className={`absolute inset-x-[5px] bottom-[5px] flex h-[82px] items-center gap-3 rounded-[7px] px-5 shadow-[0_10px_24px_rgba(15,23,42,0.12)] ${dark ?"bg-[#F8FAFC]":"bg-white"}`}>
- <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center text-[#4284FF]">
- <Icon className="h-[22px] w-[22px]" strokeWidth={1.9}/>
+ <span className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${visual.strip}`} />
+ <span className="flex items-start justify-between gap-3">
+ <span className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[8px] border ${dark ?"border-[rgba(181,212,244,0.18)] bg-[#0A0E14] text-[#B5D4F4]":"border-[#D3D1C7] bg-[#E6F1FB] text-[#185FA5]"}`}>
+ <Icon className="h-[20px] w-[20px]" strokeWidth={1.9}/>
  </span>
- <span className="min-w-0 flex-1">
- <span className="block truncate text-[12px] font-bold leading-[1.12] text-[#111827]">
+ <span className={`rounded-full px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] ${dark ?"bg-[#0A0E14] text-[#B5D4F4]":"bg-[#E6F1FB] text-[#185FA5]"}`}>
+ {visual.meta}
+ </span>
+ </span>
+ <span className="mt-5 min-w-0">
+ <span className={`block text-[12px] font-bold uppercase leading-[1.15] tracking-[0.12em] ${dark ?"text-[#B5D4F4]":"text-[#185FA5]"}`}>
  {card.shortTitle ?? card.title}
  </span>
- <span className="mt-2 block max-w-[132px] text-[9px] leading-[1.25] text-[#111827]">
- {card.shortDescription ?? card.description}
+ <span className={`mt-2 block text-[18px] font-semibold leading-[1.08] tracking-[0] ${dark ?"text-[#F4F7FA]":"text-[#0A0E14]"}`}>
+ {card.title}
  </span>
+ <span className={`mt-2 block max-w-[260px] text-[12px] leading-5 ${dark ?"text-[#D3D1C7]":"text-[#5F5E5A]"}`}>
+ {card.shortDescription ?? card.description}
  </span>
  </span>
  </button>
  );
  })}
- </div>
- {showCarouselControls && (
- <button
- type="button"
- onClick={goToNextStarter}
- aria-label="Next AI platform function"
- className={`absolute -right-4 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border transition-colors max-sm:right-0 ${dark ?"border-[rgba(255,255,255,0.1)] bg-[#202328] text-[#DDE3EA] hover:bg-[#252A31]":"border-[#E5E7EB] bg-white text-[#475467] shadow-[0_10px_24px_rgba(15,23,42,0.12)] hover:border-[#B9D8FF] hover:text-[#4284FF]"}`}
- >
- <ChevronRight className="h-4 w-4" />
- </button>
- )}
  </div>
  </div>
  );
@@ -5518,13 +5488,13 @@ function AIAssistantPage() {
  <div id="assistant-composer" className="w-full">
  {attachments.length > 0 ? (
  /* Expanded card when attachment exists */
- <div className={`w-full overflow-hidden rounded-2xl border ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#D9D9D9] bg-white"}`}>
+ <div className={`w-full overflow-hidden rounded-[8px] border shadow-[0_18px_48px_rgba(10,14,20,0.12)] ${dark ? "border-[rgba(181,212,244,0.16)] bg-[#2C2C2A]" : "border-[#D3D1C7] bg-white"}`}>
  <div className="min-h-[120px] p-4">
  {/* Thumbnails */}
  <div className="mb-3 flex flex-wrap gap-2">
  {attachments.map((attachment) => (
  <div key={attachment.id} className="relative">
- <div className={`h-[80px] w-[80px] rounded-xl border flex items-center justify-center ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#181B20]" : "border-[#E5E7EB] bg-[#F3F4F6]"}`}>
+ <div className={`h-[80px] w-[80px] rounded-[8px] border flex items-center justify-center ${dark ? "border-[rgba(181,212,244,0.14)] bg-[#0A0E14]" : "border-[#D3D1C7] bg-[#E6F1FB]"}`}>
  {attachment.kind === "image" ? (
  <ImageIcon className={`h-7 w-7 ${dark ? "text-[#6F7782]" : "text-[#9CA3AF]"}`} />
  ) : (
@@ -5533,7 +5503,7 @@ function AIAssistantPage() {
  </div>
  <button
  onClick={() => setAttachments((current) => current.filter((item) => item.id !== attachment.id))}
- className={`absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${dark ? "border-[rgba(255,255,255,0.15)] bg-[#202328] text-[#A8B0BA] hover:text-[#F4F6F8]" : "border-[#D1D5DB] bg-white text-[#6B7280] hover:text-[#111827]"}`}
+ className={`absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] ${dark ? "border-[rgba(181,212,244,0.16)] bg-[#2C2C2A] text-[#B5D4F4] hover:text-[#F4F7FA]" : "border-[#D3D1C7] bg-white text-[#5F5E5A] hover:text-[#0A0E14]"}`}
  aria-label={`Remove ${attachment.name}`}
  >
  <X className="h-3 w-3" />
@@ -5549,20 +5519,20 @@ function AIAssistantPage() {
  aria-label="Message Coreforge"
  rows={2}
  placeholder="Add a message..."
- className={`w-full resize-none bg-transparent text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#1F1F1F] placeholder:text-[#A1A1A1]"}`}
+ className={`w-full resize-none bg-transparent text-[14px] leading-5 outline-none ${dark ? "text-[#F4F7FA] placeholder:text-[#B4B2A9]" : "text-[#0A0E14] placeholder:text-[#5F5E5A]"}`}
  style={{ letterSpacing: 0 }}
  />
  </div>
  {/* Bottom toolbar */}
- <div className={`flex items-center gap-2 border-t px-4 py-3 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#F3F4F6]"}`}>
- <button type="button" onClick={() => fileInputRef.current?.click()} className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[#252A31]" : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"}`} aria-label="Attach file">
+ <div className={`flex items-center gap-2 border-t px-4 py-3 ${dark ? "border-[rgba(181,212,244,0.12)]" : "border-[#D3D1C7]"}`}>
+ <button type="button" onClick={() => fileInputRef.current?.click()} className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[8px] transition-colors ${dark ? "bg-[#0A0E14] text-[#B5D4F4] hover:bg-[#185FA5]" : "bg-[#E6F1FB] text-[#185FA5] hover:bg-[#B5D4F4]"}`} aria-label="Attach file">
  <Paperclip className="h-4 w-4" />
  </button>
  <div className="flex-1" />
- <button type="button" onClick={() => openModal("voice-dictation")} className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[14px] transition-colors ${dark ? "bg-[#181B20] text-[#A8B0BA] hover:bg-[#252A31]" : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"}`} aria-label="Voice input">
+ <button type="button" onClick={() => openModal("voice-dictation")} className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[8px] transition-colors ${dark ? "bg-[#0A0E14] text-[#B5D4F4] hover:bg-[#185FA5]" : "bg-[#E6F1FB] text-[#185FA5] hover:bg-[#B5D4F4]"}`} aria-label="Voice input">
  <Mic className="h-4 w-4" strokeWidth={2} />
  </button>
- <button onClick={() => void sendPrompt()} disabled={isSending} aria-label="Send prompt" className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[14px] bg-[#4284FF] text-white transition-all hover:bg-[#376FE0] disabled:opacity-60">
+ <button onClick={() => void sendPrompt()} disabled={isSending} aria-label="Send prompt" className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[8px] bg-[#185FA5] text-white transition-all hover:bg-[#378ADD] disabled:opacity-60">
  {isSending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <CornerDownLeft className="h-4 w-4" strokeWidth={2} />}
  </button>
  </div>
@@ -5572,19 +5542,19 @@ function AIAssistantPage() {
  </div>
  ) : (
  /* Compact bar when no attachment */
- <div className={`flex min-h-[45px] w-full items-center gap-2 rounded-[18px] border px-1.5 py-1.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328]" : "border-[#D9D9D9] bg-white"}`}>
+ <div className={`flex min-h-[46px] w-full items-center gap-2 rounded-[8px] border px-1.5 py-1.5 shadow-[0_18px_48px_rgba(10,14,20,0.10)] ${dark ? "border-[rgba(181,212,244,0.16)] bg-[#2C2C2A]" : "border-[#D3D1C7] bg-white"}`}>
  <div ref={attachMenuRef} className="relative flex-shrink-0">
- <button type="button" onClick={() => { setAttachMenuOpen((open) => !open); setAttachMenuView("main"); }} className={`flex h-8 w-8 items-center justify-center rounded-[12px] transition-colors ${dark ? "bg-[#181B20] text-[#DDE3EA] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#4B5563] hover:bg-[#E7E7E7]"}`} aria-label="Attach file" title="Attach file">
+ <button type="button" onClick={() => { setAttachMenuOpen((open) => !open); setAttachMenuView("main"); }} className={`flex h-8 w-8 items-center justify-center rounded-[8px] transition-colors ${dark ? "bg-[#0A0E14] text-[#B5D4F4] hover:bg-[#185FA5]" : "bg-[#E6F1FB] text-[#185FA5] hover:bg-[#B5D4F4]"}`} aria-label="Attach file" title="Attach file">
  <Plus className="h-4 w-4" strokeWidth={1.8} />
  </button>
  {attachMenuOpen && (
- <div className={`absolute top-[calc(100%+10px)] left-0 z-50 w-[252px] overflow-hidden rounded-2xl border py-1 ${dark ? "border-[rgba(255,255,255,0.1)] bg-[#202328] shadow-[0_16px_40px_rgba(0,0,0,0.36)]" : "border-[#E5E7EB] bg-white shadow-[0_16px_40px_rgba(0,0,0,0.12)]"}`}>
+ <div className={`absolute top-[calc(100%+10px)] left-0 z-50 w-[252px] overflow-hidden rounded-[8px] border py-1 ${dark ? "border-[rgba(181,212,244,0.16)] bg-[#2C2C2A] shadow-[0_16px_40px_rgba(0,0,0,0.36)]" : "border-[#D3D1C7] bg-white shadow-[0_16px_40px_rgba(10,14,20,0.12)]"}`}>
  {attachMenuView !== "main" ? (
- <div className={`flex items-center gap-2 border-b px-3 py-2 ${dark ? "border-[rgba(255,255,255,0.08)]" : "border-[#EEF2F7]"}`}>
- <button type="button" onClick={() => setAttachMenuView("main")} className={`flex h-8 w-8 items-center justify-center rounded-xl ${dark ? "text-[#A8B0BA] hover:bg-[#181B20] hover:text-[#F4F6F8]" : "text-[#667085] hover:bg-[#F8FAFC] hover:text-[#111827]"}`} aria-label="Back to attach menu">
+ <div className={`flex items-center gap-2 border-b px-3 py-2 ${dark ? "border-[rgba(181,212,244,0.12)]" : "border-[#D3D1C7]"}`}>
+ <button type="button" onClick={() => setAttachMenuView("main")} className={`flex h-8 w-8 items-center justify-center rounded-[8px] ${dark ? "text-[#B5D4F4] hover:bg-[#0A0E14] hover:text-[#F4F7FA]" : "text-[#5F5E5A] hover:bg-[#E6F1FB] hover:text-[#185FA5]"}`} aria-label="Back to attach menu">
  <ChevronLeft className="h-4 w-4"/>
  </button>
- <span className={`text-[12px] font-semibold ${dark ? "text-[#F4F6F8]" : "text-[#111827]"}`}>
+ <span className={`text-[12px] font-semibold ${dark ? "text-[#F4F7FA]" : "text-[#0A0E14]"}`}>
  {attachMenuView === "recent" ? "Recent files" : attachMenuView === "connections" ? "Connections & sources" : "More options"}
  </span>
  </div>
@@ -5598,24 +5568,24 @@ function AIAssistantPage() {
  { label: "Connections & sources", icon: Globe, arrow: true, action: () => setAttachMenuView("connections") },
  { label: "More...", icon: MoreHorizontal, arrow: true, action: () => setAttachMenuView("more") },
  ].map(({ label, icon: Icon, arrow, action }) => (
- <button key={label} type="button" onClick={action} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#4284FF]"}`}>
- <Icon className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#4284FF]"}`} strokeWidth={2} />
+ <button key={label} type="button" onClick={action} className={`group flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#B4B2A9] hover:bg-[#0A0E14] hover:text-[#B5D4F4]" : "text-[#5F5E5A] hover:bg-[#E6F1FB] hover:text-[#185FA5]"}`}>
+ <Icon className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#B5D4F4]" : "text-[#185FA5]"}`} strokeWidth={2} />
  <span className="flex-1">{label}</span>
- {arrow && <ChevronRight className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#4284FF]"}`} strokeWidth={2} />}
+ {arrow && <ChevronRight className={`h-4 w-4 flex-shrink-0 transition-colors ${dark ? "text-[#B5D4F4]" : "text-[#185FA5]"}`} strokeWidth={2} />}
  </button>
  ))}
  {attachMenuView === "recent" && recentFiles.map((file) => (
- <button key={file.name} type="button" onClick={() => attachVirtualFile(file.name, file.kind)} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${dark ? "hover:bg-[rgba(59,167,255,0.12)]" : "hover:bg-[#EEF7FF]"}`}>
- <FileText className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#4284FF]"}`} />
+ <button key={file.name} type="button" onClick={() => attachVirtualFile(file.name, file.kind)} className={`group flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 text-left transition-colors ${dark ? "hover:bg-[#0A0E14]" : "hover:bg-[#E6F1FB]"}`}>
+ <FileText className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#B5D4F4]" : "text-[#185FA5]"}`} />
  <span className="min-w-0 flex-1">
- <span className={`block truncate text-[13px] font-medium ${dark ? "text-[#DDE3EA]" : "text-[#374151]"}`}>{file.name}</span>
- <span className={`mt-0.5 block text-[11px] ${dark ? "text-[#6F7782]" : "text-[#98A2B3]"}`}>{file.meta}</span>
+ <span className={`block truncate text-[13px] font-medium ${dark ? "text-[#F4F7FA]" : "text-[#0A0E14]"}`}>{file.name}</span>
+ <span className={`mt-0.5 block text-[11px] ${dark ? "text-[#B4B2A9]" : "text-[#5F5E5A]"}`}>{file.meta}</span>
  </span>
  </button>
  ))}
  {attachMenuView === "connections" && sourceOptions.map((source) => (
- <button key={source.name} type="button" onClick={() => applyPromptTemplate(source.prompt)} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#4284FF]"}`}>
- <Globe className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#4284FF]"}`} />
+ <button key={source.name} type="button" onClick={() => applyPromptTemplate(source.prompt)} className={`group flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#B4B2A9] hover:bg-[#0A0E14] hover:text-[#B5D4F4]" : "text-[#5F5E5A] hover:bg-[#E6F1FB] hover:text-[#185FA5]"}`}>
+ <Globe className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#B5D4F4]" : "text-[#185FA5]"}`} />
  <span className="flex-1">{source.name}</span>
  </button>
  ))}
@@ -5626,8 +5596,8 @@ function AIAssistantPage() {
  { label: "Open asset library", icon: ImageIcon, action: () => { closeAttachMenu(); router.push("/asset-library"); } },
  { label: "Open Prompt Lab", icon: FileText, action: () => { closeAttachMenu(); router.push("/prompt-lab"); } },
  ].map(({ label, icon: Icon, action }) => (
- <button key={label} type="button" onClick={action} className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#A8B0BA] hover:bg-[rgba(59,167,255,0.12)] hover:text-[#6EA4FF]" : "text-[#374151] hover:bg-[#EEF7FF] hover:text-[#4284FF]"}`}>
- <Icon className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#6F7782] group-hover:text-[#6EA4FF]" : "text-[#9CA3AF] group-hover:text-[#4284FF]"}`} />
+ <button key={label} type="button" onClick={action} className={`group flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 text-left text-[13px] transition-colors ${dark ? "text-[#B4B2A9] hover:bg-[#0A0E14] hover:text-[#B5D4F4]" : "text-[#5F5E5A] hover:bg-[#E6F1FB] hover:text-[#185FA5]"}`}>
+ <Icon className={`h-4 w-4 flex-shrink-0 ${dark ? "text-[#B5D4F4]" : "text-[#185FA5]"}`} />
  <span className="flex-1">{label}</span>
  </button>
  ))}
@@ -5642,13 +5612,13 @@ function AIAssistantPage() {
  onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendPrompt(); } }}
  aria-label="Message Coreforge"
  rows={1}
- className={`min-h-[28px] flex-1 resize-none bg-transparent px-2 py-1 text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#1F1F1F] placeholder:text-[#A1A1A1]"}`}
+ className={`min-h-[28px] flex-1 resize-none bg-transparent px-2 py-1 text-[14px] leading-5 outline-none ${dark ? "text-[#F4F7FA] placeholder:text-[#B4B2A9]" : "text-[#0A0E14] placeholder:text-[#5F5E5A]"}`}
  style={{ letterSpacing: 0 }}
  />
- <button type="button" onClick={() => openModal("voice-dictation")} className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[12px] transition-colors ${dark ? "bg-[#181B20] text-[#F4F6F8] hover:bg-[#252A31]" : "bg-[#F0F0F0] text-[#1F1F1F] hover:bg-[#E7E7E7]"}`} aria-label="Voice input" title="Voice input">
+ <button type="button" onClick={() => openModal("voice-dictation")} className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[8px] transition-colors ${dark ? "bg-[#0A0E14] text-[#B5D4F4] hover:bg-[#185FA5]" : "bg-[#E6F1FB] text-[#185FA5] hover:bg-[#B5D4F4]"}`} aria-label="Voice input" title="Voice input">
  <Mic className="h-4 w-4" strokeWidth={2} />
  </button>
- <button onClick={() => input.trim() ? void sendPrompt() : openModal("voice-speak")} disabled={isSending} aria-label={input.trim() ? "Send prompt" : "Open Voice Speak"} className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[12px] bg-[#178CE8] text-white transition-all hover:bg-[#0F77C9] disabled:cursor-not-allowed disabled:opacity-60">
+ <button onClick={() => input.trim() ? void sendPrompt() : openModal("voice-speak")} disabled={isSending} aria-label={input.trim() ? "Send prompt" : "Open Voice Speak"} className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[8px] bg-[#185FA5] text-white transition-all hover:bg-[#378ADD] disabled:cursor-not-allowed disabled:opacity-60">
  {isSending ? <RefreshCw className="h-4 w-4 animate-spin" /> : input.trim() ? <CornerDownLeft className="h-4 w-4" strokeWidth={2} /> : <Sparkles className="h-4 w-4" strokeWidth={2} />}
  </button>
  <input ref={fileInputRef} type="file" multiple className="hidden" onChange={(event) => onFiles(event, "file")} />
@@ -5663,7 +5633,7 @@ function AIAssistantPage() {
  const composer = compactComposer;
 
  const planNotice = showPlanEndingNotice ? (
- <div className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-6 py-3 text-[12px] ${dark ?"border-[rgba(255,170,0,0.32)] bg-[rgba(255,170,0,0.08)] text-[#F4F6F8]":"border-[#FCD7A1] bg-[#FFF8EC] text-[#1F1F1F]"}`}>
+ <div className={`mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[8px] border px-4 py-3 text-[12px] ${dark ?"border-[rgba(181,212,244,0.14)] bg-[#0A0E14] text-[#F4F7FA]":"border-[#D3D1C7] bg-[#E6F1FB] text-[#0A0E14]"}`}>
  <div className="flex items-start gap-3">
  <div className={`mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl ${dark ?"bg-[rgba(255,170,0,0.16)] text-[#FFB454]":"bg-[#FFEBC9] text-[#B7791F]"}`}>
  <AlertTriangle className="h-4 w-4"/>
@@ -5676,8 +5646,8 @@ function AIAssistantPage() {
  </div>
  </div>
  <div className="flex items-center gap-2">
- <button type="button"onClick={() => openModal("upgrade")} className="inline-flex h-9 items-center rounded-xl bg-[#4284FF] px-4 text-[12px] font-semibold text-white transition-colors hover:bg-[#376FE0]">Upgrade Now</button>
- <button type="button"onClick={dismissPlanNotice} aria-label="Dismiss free plan notice"className={`flex h-9 w-9 items-center justify-center rounded-xl ${dark ?"text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"text-[#9CA3AF] hover:bg-white hover:text-[#1F1F1F]"}`}>
+ <button type="button" onClick={() => openModal("upgrade")} className="inline-flex h-9 items-center rounded-[8px] bg-[#185FA5] px-4 text-[12px] font-semibold text-white transition-colors hover:bg-[#378ADD]">Upgrade Now</button>
+ <button type="button" onClick={dismissPlanNotice} aria-label="Dismiss free plan notice" className={`flex h-9 w-9 items-center justify-center rounded-[8px] ${dark ?"text-[#B5D4F4] hover:bg-[#2C2C2A] hover:text-[#F4F7FA]":"text-[#5F5E5A] hover:bg-white hover:text-[#0A0E14]"}`}>
  <X className="h-4 w-4"/>
  </button>
  </div>
@@ -5686,14 +5656,14 @@ function AIAssistantPage() {
 
  const temporaryChatNotice = isTemporaryChat ? (
  <div className="flex w-full justify-center">
- <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#A8B0BA]":"border-[#E5EAF0] bg-[#F6F8FB] text-[#4B5563]"}`}>
- <Ghost className={`h-3.5 w-3.5 ${dark ?"text-[#7DD3FC]":"text-[#4284FF]"}`} strokeWidth={2} />
- <span className={`font-semibold ${dark ?"text-[#F4F6F8]":"text-[#1F1F1F]"}`}>Temporary chat</span>
+ <div className={`inline-flex items-center gap-2 rounded-[8px] border px-3 py-1.5 text-[12px] ${dark ?"border-[rgba(181,212,244,0.14)] bg-[#2C2C2A] text-[#B4B2A9]":"border-[#D3D1C7] bg-white text-[#5F5E5A]"}`}>
+ <Ghost className={`h-3.5 w-3.5 ${dark ?"text-[#B5D4F4]":"text-[#185FA5]"}`} strokeWidth={2} />
+ <span className={`font-semibold ${dark ?"text-[#F4F7FA]":"text-[#0A0E14]"}`}>Temporary chat</span>
  <span className="hidden sm:inline">— this conversation won&apos;t be saved.</span>
  <button
  type="button"
  onClick={closeTemporaryChat}
- className={`ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold transition-colors ${dark ?"bg-[rgba(255,255,255,0.06)] text-[#A8B0BA] hover:bg-[rgba(255,255,255,0.1)] hover:text-[#F4F6F8]":"bg-white text-[#4B5563] hover:text-[#1F1F1F]"}`}
+ className={`ml-1 inline-flex items-center rounded-[6px] px-2 py-0.5 text-[11px] font-semibold transition-colors ${dark ?"bg-[#0A0E14] text-[#B5D4F4] hover:bg-[#185FA5] hover:text-white":"bg-[#E6F1FB] text-[#185FA5] hover:bg-[#B5D4F4]"}`}
  >
  End
  </button>
@@ -5720,25 +5690,98 @@ function AIAssistantPage() {
 
  return (
  <>
- <AssistantScrollRail dark={dark} />
- <div id="assistant-overview" className={`flex min-h-full items-center justify-center px-6 py-6 font-roboto max-sm:items-start max-sm:px-4 max-sm:pt-6 ${dark ?"bg-[#0F1013]":"bg-white text-[#1F1F1F]"}`}>
- <div className="flex w-full max-w-[684px] flex-col">
- <div id="assistant-greeting" className="flex flex-col items-center text-center">
- <h2 className={`text-[21px] font-semibold leading-tight tracking-[0] max-sm:text-[20px] ${dark ?"text-[#F4F6F8]":"text-[#080808]"}`}>
- Good Morning, Toby
+ <div id="assistant-overview" className={`min-h-full overflow-y-auto font-roboto ${dark ?"bg-[#0A0E14] text-[#F4F7FA]":"bg-[#F4F7FA] text-[#0A0E14]"}`}>
+ <div className="mx-auto flex w-full max-w-[1180px] flex-col px-4 py-5 sm:px-6 lg:px-8">
+ <div className={`mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[8px] border px-3 py-2 ${dark ?"border-[rgba(181,212,244,0.12)] bg-[#2C2C2A]":"border-[#D3D1C7] bg-white"}`}>
+ <div className="flex min-w-0 items-center gap-3">
+ <span className={`flex h-8 w-8 items-center justify-center rounded-[8px] ${dark ?"bg-[#185FA5] text-white":"bg-[#E6F1FB] text-[#185FA5]"}`}>
+ <Sparkles className="h-4 w-4" strokeWidth={2.2}/>
+ </span>
+ <div className="min-w-0">
+ <p className={`truncate text-[13px] font-semibold ${dark ?"text-[#F4F7FA]":"text-[#0A0E14]"}`}>Coreforge AI Assistant</p>
+ <p className={`truncate text-[11px] ${dark ?"text-[#B4B2A9]":"text-[#5F5E5A]"}`}>3D machinery, CAD studios, CNC/CAM, engines, vehicles</p>
+ </div>
+ </div>
+ <div className="flex items-center gap-2">
+ {["Design","CAD","CNC","API"].map((label) => (
+ <span key={label} className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${dark ?"border-[rgba(181,212,244,0.14)] bg-[#0A0E14] text-[#B5D4F4]":"border-[#D3D1C7] bg-[#F4F7FA] text-[#5F5E5A]"}`}>{label}</span>
+ ))}
+ </div>
+ </div>
+
+ <div className="grid gap-5 lg:grid-cols-[1fr_380px]">
+ <section id="assistant-greeting" className={`rounded-[8px] border p-5 sm:p-7 ${dark ?"border-[rgba(181,212,244,0.12)] bg-[#2C2C2A]":"border-[#D3D1C7] bg-white"}`}>
+ <div className="flex flex-wrap items-start justify-between gap-4">
+ <div>
+ <p className={`text-[10px] font-semibold uppercase tracking-[0.24em] ${dark ?"text-[#B5D4F4]":"text-[#185FA5]"}`}>Mechanical intelligence</p>
+ <h2 className={`mt-4 max-w-2xl text-[38px] font-semibold leading-[0.95] tracking-[0] sm:text-[56px] ${dark ?"text-[#F4F7FA]":"text-[#0A0E14]"}`}>
+ Build precise 3D machinery with AI.
  </h2>
- <p className={`mt-1 text-[21px] font-semibold leading-tight tracking-[0] max-sm:text-[20px] ${dark ?"text-[#F4F6F8]":"text-[#080808]"}`}>
- How Can I <span className="text-[#4284FF]">Assist You Today?</span>
+ <p className={`mt-4 max-w-xl text-[14px] leading-6 ${dark ?"text-[#D3D1C7]":"text-[#5F5E5A]"}`}>
+ Ask for engines, transmissions, hydraulics, pneumatic systems, automotive parts, aerospace layouts, CNC toolpaths, CAD scripts, and API automation.
  </p>
+ </div>
+ <div className={`hidden min-w-[136px] rounded-[8px] border p-3 text-right sm:block ${dark ?"border-[rgba(181,212,244,0.12)] bg-[#0A0E14]":"border-[#D3D1C7] bg-[#F4F7FA]"}`}>
+ <p className={`text-[10px] uppercase tracking-[0.18em] ${dark ?"text-[#B4B2A9]":"text-[#5F5E5A]"}`}>Mode</p>
+ <p className={`mt-1 text-[20px] font-semibold ${dark ?"text-[#B5D4F4]":"text-[#185FA5]"}`}>Forge</p>
+ </div>
  </div>
 
  {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
 
- <div id="assistant-mode" className="mt-5 flex w-full justify-center">
+ <div id="assistant-mode" className="mt-6 flex w-full">
  <ModeToggle mode={assistantMode} onChange={setAssistantMode} dark={dark} />
  </div>
 
- <div id="assistant-starters" className="mt-[26px] w-full">
+ <div className="mt-8 w-full">
+ {planNotice}
+ {composer}
+ </div>
+ </section>
+
+ <aside className={`relative min-h-[360px] overflow-hidden rounded-[8px] border ${dark ?"border-[rgba(181,212,244,0.12)] bg-[#2C2C2A]":"border-[#D3D1C7] bg-white"}`}>
+ <div
+ className="absolute inset-0 opacity-70"
+ style={{
+ backgroundImage: `linear-gradient(${dark ?"rgba(181,212,244,0.12)":"#D3D1C7"} 1px, transparent 1px), linear-gradient(90deg, ${dark ?"rgba(181,212,244,0.12)":"#D3D1C7"} 1px, transparent 1px)`,
+ backgroundSize:"26px 26px",
+ }}
+ />
+ <div className="relative z-10 flex h-full flex-col justify-between p-5">
+ <div>
+ <p className={`text-[10px] font-semibold uppercase tracking-[0.22em] ${dark ?"text-[#B5D4F4]":"text-[#185FA5]"}`}>Viewport</p>
+ <div className="mt-6 space-y-3">
+ {[
+ ["Engine assembly","72 parts","Ready"],
+ ["CNC toolpath","G-code","Draft"],
+ ["CAD studio","NX / FreeCAD","Linked"],
+ ].map(([name, meta, status]) => (
+ <div key={name} className={`rounded-[8px] border p-3 ${dark ?"border-[rgba(181,212,244,0.14)] bg-[#0A0E14]/82":"border-[#D3D1C7] bg-[#F4F7FA]/90"}`}>
+ <div className="flex items-center justify-between gap-3">
+ <p className={`truncate text-[12px] font-semibold ${dark ?"text-[#F4F7FA]":"text-[#0A0E14]"}`}>{name}</p>
+ <span className={`rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase ${dark ?"bg-[#185FA5] text-white":"bg-[#E6F1FB] text-[#185FA5]"}`}>{status}</span>
+ </div>
+ <p className={`mt-1 text-[11px] ${dark ?"text-[#B4B2A9]":"text-[#5F5E5A]"}`}>{meta}</p>
+ </div>
+ ))}
+ </div>
+ </div>
+ <div className={`rounded-[8px] border p-3 ${dark ?"border-[rgba(181,212,244,0.14)] bg-[#0A0E14]/82":"border-[#D3D1C7] bg-[#F4F7FA]/90"}`}>
+ <div className="flex items-center justify-between">
+ <span className={`text-[10px] uppercase tracking-[0.16em] ${dark ?"text-[#B4B2A9]":"text-[#5F5E5A]"}`}>Palette</span>
+ <span className={`text-[10px] font-semibold ${dark ?"text-[#B5D4F4]":"text-[#185FA5]"}`}>Forge / Sky / Steel</span>
+ </div>
+ <div className="mt-3 grid grid-cols-5 gap-2">
+ {["#0A0E14","#185FA5","#378ADD","#B5D4F4","#F4F7FA"].map((color) => (
+ <span key={color} className="h-7 rounded-[6px] border border-white/10" style={{ backgroundColor: color }} />
+ ))}
+ </div>
+ </div>
+ </div>
+ </aside>
+ </div>
+
+ <div id="assistant-starters" className="mt-5 w-full">
  <div id="assistant-workflows">
  <StarterPanel
  mode={assistantMode}
@@ -5753,11 +5796,6 @@ function AIAssistantPage() {
  />
  </div>
  </div>
-
- <div className="mt-12 w-full">
- {planNotice}
- {composer}
- </div>
  </div>
  </div>
  </>
@@ -5766,8 +5804,8 @@ function AIAssistantPage() {
 
  return (
  <>
- <AssistantScrollRail dark={dark} />
- <div id="assistant-overview" className="mx-auto flex h-full w-full max-w-[1080px] flex-col px-4 font-roboto">
+ <div id="assistant-overview" className={`flex h-full w-full flex-col font-roboto ${dark ?"bg-[#0A0E14] text-[#F4F7FA]":"bg-[#F4F7FA] text-[#0A0E14]"}`}>
+ <div className="mx-auto flex h-full w-full max-w-[1120px] flex-col px-4">
  <div
  id="assistant-greeting"
  className="min-h-0 flex-1 overflow-y-auto"
@@ -5782,29 +5820,29 @@ function AIAssistantPage() {
  {messages.map((message) => (
  <div key={message.id} className={`flex gap-3 ${message.role ==="user"?"justify-end":"justify-start"}`}>
  {message.role ==="assistant"&& (
- <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#4284FF] text-white">
+ <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[8px] bg-[#185FA5] text-white">
  <Sparkles className="h-4 w-4 fill-current"/>
  </div>
  )}
  <div className={`flex max-w-[720px] flex-col ${message.role ==="user"?"items-end":"items-start"}`}>
  <div
- className={`break-words rounded-[24px] px-4 py-3 text-[13px] leading-6 ${
+ className={`break-words rounded-[8px] border px-4 py-3 text-[13px] leading-6 shadow-[0_10px_30px_rgba(10,14,20,0.08)] ${
  message.role ==="user"
  ? dark
- ?"border border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#F4F6F8]"
- :"border border-[#E5E7EB] bg-white text-[#1F1F1F]"
+ ?"border-[rgba(181,212,244,0.14)] bg-[#2C2C2A] text-[#F4F7FA]"
+ :"border-[#D3D1C7] bg-white text-[#0A0E14]"
  : dark
- ?"text-[#F4F6F8]"
- :"text-[#1F1F1F]"
+ ?"border-[rgba(181,212,244,0.10)] bg-[#0A0E14] text-[#F4F7FA]"
+ :"border-[#D3D1C7] bg-[#F4F7FA] text-[#0A0E14]"
  }`}
  >
  <p className="whitespace-pre-wrap">{message.content}</p>
  </div>
  {message.role ==="assistant"&& (
- <div className={`mt-2 flex items-center gap-1 rounded-full border px-1.5 py-1 ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20]/80 text-[#A8B0BA]":"border-[#E5E7EB] bg-white/80 text-[#9CA3AF]"}`}>
+ <div className={`mt-2 flex items-center gap-1 rounded-[8px] border px-1.5 py-1 ${dark ?"border-[rgba(181,212,244,0.12)] bg-[#2C2C2A] text-[#B5D4F4]":"border-[#D3D1C7] bg-white text-[#5F5E5A]"}`}>
  <button
  onClick={() => void copyAssistantMessage(message.content)}
- className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#1F1F1F]"}`}
+ className={`flex h-7 w-7 items-center justify-center rounded-[6px] transition-colors ${dark ?"hover:bg-[#0A0E14] hover:text-[#F4F7FA]":"hover:bg-[#E6F1FB] hover:text-[#185FA5]"}`}
  aria-label="Copy response"
  title="Copy"
  >
@@ -5820,7 +5858,7 @@ function AIAssistantPage() {
  });
  showToast("Feedback saved");
  }}
- className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${messageFeedback[message.id] ==="like"?"bg-[#DDEEFF] text-[#4284FF]": dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#1F1F1F]"}`}
+ className={`flex h-7 w-7 items-center justify-center rounded-[6px] transition-colors ${messageFeedback[message.id] ==="like"?"bg-[#E6F1FB] text-[#185FA5]": dark ?"hover:bg-[#0A0E14] hover:text-[#F4F7FA]":"hover:bg-[#E6F1FB] hover:text-[#185FA5]"}`}
  aria-label="Like response"
  title="Like"
  >
@@ -5836,7 +5874,7 @@ function AIAssistantPage() {
  });
  showToast("Feedback saved");
  }}
- className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${messageFeedback[message.id] ==="dislike"?"bg-[#FFE8ED] text-[#D92D52]": dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#1F1F1F]"}`}
+ className={`flex h-7 w-7 items-center justify-center rounded-[6px] transition-colors ${messageFeedback[message.id] ==="dislike"?"bg-[#E6F1FB] text-[#185FA5]": dark ?"hover:bg-[#0A0E14] hover:text-[#F4F7FA]":"hover:bg-[#E6F1FB] hover:text-[#185FA5]"}`}
  aria-label="Dislike response"
  title="Dislike"
  >
@@ -5845,7 +5883,7 @@ function AIAssistantPage() {
  <button
  onClick={() => void regenerateAssistantMessage(message.id)}
  disabled={isSending}
- className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#1F1F1F]"}`}
+ className={`flex h-7 w-7 items-center justify-center rounded-[6px] transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${dark ?"hover:bg-[#0A0E14] hover:text-[#F4F7FA]":"hover:bg-[#E6F1FB] hover:text-[#185FA5]"}`}
  aria-label="Regenerate response"
  title="Regenerate"
  >
@@ -5853,7 +5891,7 @@ function AIAssistantPage() {
  </button>
  <button
  onClick={() => void shareAssistantMessage(message.content)}
- className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#1F1F1F]"}`}
+ className={`flex h-7 w-7 items-center justify-center rounded-[6px] transition-colors ${dark ?"hover:bg-[#0A0E14] hover:text-[#F4F7FA]":"hover:bg-[#E6F1FB] hover:text-[#185FA5]"}`}
  aria-label="Share response"
  title="Share"
  >
@@ -5861,7 +5899,7 @@ function AIAssistantPage() {
  </button>
  <button
  onClick={() => downloadAssistantMessage(message)}
- className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${dark ?"hover:bg-[rgba(255,255,255,0.06)] hover:text-[#F4F6F8]":"hover:bg-[#F4F8FB] hover:text-[#1F1F1F]"}`}
+ className={`flex h-7 w-7 items-center justify-center rounded-[6px] transition-colors ${dark ?"hover:bg-[#0A0E14] hover:text-[#F4F7FA]":"hover:bg-[#E6F1FB] hover:text-[#185FA5]"}`}
  aria-label="Download response"
  title="Download"
  >
@@ -5874,23 +5912,24 @@ function AIAssistantPage() {
  ))}
  {isSending && (
  <div className="flex gap-3">
- <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#7DD3FC] via-[#38BDF8] to-[#4284FF] text-white">
+ <div className="mt-1 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[8px] bg-[#185FA5] text-white">
  <RefreshCw className="h-4 w-4 animate-spin"/>
  </div>
- <div className={`rounded-[24px] px-4 py-3 text-[13px] ${dark ?"text-[#A8B0BA]":"text-[#6B7280]"}`}>
+ <div className={`rounded-[8px] border px-4 py-3 text-[13px] ${dark ?"border-[rgba(181,212,244,0.10)] bg-[#2C2C2A] text-[#D3D1C7]":"border-[#D3D1C7] bg-white text-[#5F5E5A]"}`}>
  Thinking...
  </div>
  </div>
  )}
  <div ref={conversationEndRef} />
- <div id="assistant-provider" className={`text-center text-[11px] ${dark ?"text-[#6F7782]":"text-[#9CA3AF]"}`}>
+ <div id="assistant-provider" className={`text-center text-[11px] ${dark ?"text-[#B4B2A9]":"text-[#5F5E5A]"}`}>
  {aiProviderLabel}
  </div>
  </div>
  </div>
 
- <div className="pb-7 pt-3 px-6">
+ <div className="px-2 pb-7 pt-3 sm:px-6">
  {composer}
+ </div>
  </div>
  </div>
  </>
