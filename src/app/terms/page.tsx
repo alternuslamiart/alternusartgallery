@@ -1,13 +1,13 @@
 "use client";
-import { CediumPage, COBALT } from "@/components/cedium-shell";
+import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const clauses = [
- { t: "Acceptance", b: "By creating an Cedium workspace, you agree to these terms. If you don't, don't use the service." },
+ { t: "Acceptance", b: "By creating an Coreforge workspace, you agree to these terms. If you don't, don't use the service." },
  { t: "Your account", b: "You're responsible for securing your credentials. One workspace per person unless you're on an Enterprise plan." },
- { t: "Acceptable use", b: "Don't use Cedium to harm others, break laws, or generate harmful content. We reserve the right to terminate workspaces that do." },
- { t: "Your content", b: "You retain full ownership of everything you put into Cedium. We need a minimal license to display it back to you — nothing more." },
+ { t: "Acceptable use", b: "Don't use Coreforge to harm others, break laws, or generate harmful content. We reserve the right to terminate workspaces that do." },
+ { t: "Your content", b: "You retain full ownership of everything you put into Coreforge. We need a minimal license to display it back to you — nothing more." },
  { t: "Agent behavior", b: "The agent is powerful but not infallible. High-risk actions (sending mail, deleting files, paying invoices) always require your confirmation." },
- { t: "Availability", b: "We target 99.9% uptime. When we don't meet it, we credit you. Check status.Cedium.ai for the live picture." },
+ { t: "Availability", b: "We target 99.9% uptime. When we don't meet it, we credit you. Check status.Coreforge.ai for the live picture." },
  { t: "Pricing & billing",b: "Prices in USD. We bill monthly in advance. Cancel anytime — you keep the rest of the period." },
  { t: "Liability", b: "Our aggregate liability is capped at the fees you paid in the preceding 12 months. Some jurisdictions may not allow this; those carve-outs apply." },
  { t: "Changes", b: "If we materially change these terms, we email every workspace owner 30 days before they take effect." },
@@ -15,7 +15,7 @@ const clauses = [
 
 export default function Terms() {
  return (
- <CediumPage>
+ <CoreforgePage>
  {(t) => (
  <section style={{ padding: "100px 0 120px" }}>
  <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 32px" }}>
@@ -39,6 +39,6 @@ export default function Terms() {
  </div>
  </section>
  )}
- </CediumPage>
+ </CoreforgePage>
  );
 }

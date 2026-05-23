@@ -51,7 +51,7 @@ export type StudioAsset = {
 };
 
 const PROTOTYPES_KEY = "cedium-design-prototypes";
-const ASSETS_KEY = "Cedium-asset-library";
+const ASSETS_KEY = "Coreforge-asset-library";
 
 export const defaultDesignSystem: DesignSystemSettings = {
  colorPreset: "Sky / Paper / Graphite",

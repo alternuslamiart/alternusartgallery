@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
  }
 
  const body = await request.json()
- const { image, folder = 'Cedium-assets' } = body
+ const { image, folder = 'Coreforge-assets' } = body
 
  if (!image) {
  return NextResponse.json(

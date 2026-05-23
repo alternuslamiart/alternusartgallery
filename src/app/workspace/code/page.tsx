@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
-import { CediumPage, COBALT } from "@/components/cedium-shell";
+import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const snippet = [
- { n: 1, t: `import { Agent } from "@Cedium/agent";`, k: "kw" },
+ { n: 1, t: `import { Agent } from "@Coreforge/agent";`, k: "kw" },
  { n: 2, t: `` },
  { n: 3, t: `// Agent has read every file in this repo.` , k: "c" },
  { n: 4, t: `const review = await Agent.review({` },
@@ -16,7 +16,7 @@ const snippet = [
 
 export default function CodeStudio() {
  return (
- <CediumPage>
+ <CoreforgePage>
  {(t) => (
  <section style={{ padding: "80px 0 120px" }}>
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
@@ -70,6 +70,6 @@ export default function CodeStudio() {
  </div>
  </section>
  )}
- </CediumPage>
+ </CoreforgePage>
  );
 }

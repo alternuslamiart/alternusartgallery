@@ -8,7 +8,7 @@ import { X } from "lucide-react";
 const POPUP_KEY = "cedium_signin_popup_dismissed";
 const STUDIO_HOME = "/ai-assistant";
 
-function CediumMark() {
+function CoreforgeMark() {
  return (
  <span className="relative inline-flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-[9px] bg-[#38BDF8] " aria-hidden="true">
  <span className="absolute inset-[4px] rounded-[4px] border border-white/55" />
@@ -62,7 +62,7 @@ export function SignInPopup() {
  <div className="px-5 pb-4 pt-5">
  {/* Logo */}
  <div className="mb-3 flex justify-center">
- <CediumMark />
+ <CoreforgeMark />
  </div>
 
  {/* Heading */}

@@ -34,28 +34,28 @@ const robotoFlex = Roboto_Flex({
 
 export const metadata: Metadata = {
  metadataBase: new URL("https://www.alternusart.com"),
- applicationName: "Cedium",
+ applicationName: "Coreforge",
  title: {
- default: "Cedium | AI Production Workspace",
- template: "%s | Cedium",
+ default: "Coreforge Website | 3D Machinery Design",
+ template: "%s | Coreforge",
  },
  description:
- "Cedium is a clean AI production workspace for design, code, 3D, CAD, and automation workflows.",
+ "Coreforge is an AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.",
  keywords: [
- "AI studio",
- "creative AI",
- "AutoCAD AI",
- "website design AI",
- "Blender AI",
- "Blender 3D AI",
- "code agent",
- "AI workspace",
- "Cedium",
- "creative operating system",
+ "3D machinery design",
+ "engine 3D design",
+ "industrial machinery CAD",
+ "automotive 3D design",
+ "motorcycle 3D design",
+ "CNC CAM AI",
+ "CAD studio integration",
+ "AI code assistant",
+ "Coreforge",
+ "mechanical engineering AI",
  ],
- authors: [{ name: "Cedium" }],
- creator: "Cedium",
- publisher: "Cedium",
+ authors: [{ name: "Coreforge" }],
+ creator: "Coreforge",
+ publisher: "Coreforge",
  icons: {
  icon: [
  { url: "/favicon.svg", type: "image/svg+xml" },
@@ -68,24 +68,24 @@ export const metadata: Metadata = {
  type: "website",
  locale: "en_US",
  url: "https://www.alternusart.com",
- siteName: "Cedium",
- title: "Cedium | AI Production Workspace",
+ siteName: "Coreforge",
+ title: "Coreforge Website | 3D Machinery Design",
  description:
- "Clean AI production workspace for design, code, 3D, CAD, and automation workflows.",
+ "AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.",
  images: [
  {
  url: "/logo.png",
  width: 512,
  height: 512,
- alt: "Cedium",
+ alt: "Coreforge",
  },
  ],
  },
  twitter: {
  card: "summary_large_image",
- title: "Cedium | AI Production Workspace",
+ title: "Coreforge Website | 3D Machinery Design",
  description:
- "Clean AI production workspace for design, code, 3D, CAD, and automation workflows.",
+ "AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.",
  images: ["/logo.png"],
  },
  robots: {
@@ -179,8 +179,8 @@ export default function RootLayout({
  "@context": "https://schema.org",
  "@type": "Organization",
  "@id": "https://www.alternusart.com/#organization",
- "name": "Cedium",
- "alternateName": "Cedium AI",
+ "name": "Coreforge",
+ "alternateName": "Coreforge Website",
  "url": "https://www.alternusart.com",
  "logo": {
  "@type": "ImageObject",
@@ -189,7 +189,7 @@ export default function RootLayout({
  "height": 512
  },
  "image": "https://www.alternusart.com/logo.png",
- "description": "Clean AI production workspace for design, code, 3D, CAD, and automation workflows.",
+ "description": "AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.",
  "email": "contact@alternusart.com",
  "foundingDate": "2024",
  "sameAs": [
@@ -198,11 +198,13 @@ export default function RootLayout({
  ],
  "areaServed": "Worldwide",
  "knowsAbout": [
- "Creative AI",
- "AutoCAD Website Design",
- "Website Coding Agents",
- "Blender 3D Workflows",
- "AI-Powered Production"
+ "3D Machinery Design",
+ "Engines and Industrial Machinery",
+ "Automotive and Motorcycles",
+ "Aerospace and Drones",
+ "CNC and Machining",
+ "CAD Studio Integration",
+ "AI Code Assistant"
  ]
  })
  }}
@@ -216,8 +218,8 @@ export default function RootLayout({
  "@type": "WebSite",
  "@id": "https://www.alternusart.com/#website",
  "url": "https://www.alternusart.com",
- "name": "Cedium",
- "description": "Clean AI production workspace for design, code, 3D, CAD, and automation workflows",
+ "name": "Coreforge",
+ "description": "AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation",
  "publisher": {
  "@id": "https://www.alternusart.com/#organization"
  },

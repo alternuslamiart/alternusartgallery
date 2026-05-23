@@ -1,5 +1,5 @@
 "use client";
-import { CediumPage, COBALT } from "@/components/cedium-shell";
+import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const services = [
  { n: "Agent runtime", u: "100.00%", s: "operational" },
@@ -16,7 +16,7 @@ const dotColor = { operational: "#22C55E", degraded: "#F59E0B", down: "#EF4444" 
 export default function Status() {
  const allGood = services.every((s) => s.s === "operational");
  return (
- <CediumPage>
+ <CoreforgePage>
  {(t) => (
  <>
  <section style={{ padding: "80px 0 40px" }}>
@@ -56,6 +56,6 @@ export default function Status() {
  </section>
  </>
  )}
- </CediumPage>
+ </CoreforgePage>
  );
 }

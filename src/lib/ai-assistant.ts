@@ -5,75 +5,77 @@ interface AIResponse {
 
 const STUDIO_TOPICS = {
  en: {
- studio: `**Cedium AI Studio**
+ studio: `**Coreforge AI Studio**
 
 I can help you with:
-- AutoCAD design prompts
-- Website and app UI planning
-- React and Tailwind code generation
-- Blender 3D scene briefs
-- Design system setup
-- Workspace and file organization
+- 3D Machinery Engines & Industrial Machinery
+- Automotive & Motorcycles
+- Aerospace & Drones
+- CNC & Machining
+- 3D Studio Integration
+- AI Code Assistant for FEA/CFD, CAD scripting, automation, and APIs
 
-Tell me what you want to build and I will help you structure it.`,
+Tell me what machine, vehicle, part, or workflow you want to build and I will help you structure it.`,
  tools: `**Available Tools**
 
-- **AutoCAD Design** - plan layouts, components, and responsive screens
-- **Code Builder** - turn a design direction into React and UI code
-- **Blender 3D** - define scenes, lighting, materials, and renders
-- **Asset Library** - organize images, files, and references
-- **Prompt Lab** - iterate on prompts and variants`,
+- **3D Machinery Engines & Industrial Machinery** - engines, transmissions, hydraulic and pneumatic systems
+- **Automotive & Motorcycles** - body, chassis, suspension, braking systems, cars, trucks, motorcycles, and EVs
+- **Aerospace & Drones** - aerodynamics, wing structures, fuselage modeling, and avionics layout
+- **CNC & Machining** - G-code, toolpath optimization, milling, and turning workflows
+- **3D Studio Integration** - SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD, and more
+- **AI Code Assistant** - FEA/CFD simulations, CAD scripts, parametric automation, and API integrations`,
  workflow: `**Typical Workflow**
 
-1. Describe the product or screen
-2. Pick the target output: web, app, mobile, or 3D
-3. Define layout, tone, and key components
-4. Generate the first draft
-5. Refine spacing, states, and responsive behavior`,
- help: `If you want, I can draft:
-- a homepage layout
-- a dashboard screen
-- a mobile app flow
-- a component system
-- a 3D hero brief`,
+1. Describe the machine, vehicle system, aerospace part, or CNC task
+2. Pick the target output: CAD model, assembly plan, CAM workflow, simulation code, or API automation
+3. Define constraints, materials, dimensions, tolerances, and target CAD studio
+4. Generate the first engineering plan
+5. Refine parts, scripts, exports, and production notes`,
+ help: `I can draft:
+- an engine assembly plan
+- an automotive chassis brief
+- a drone fuselage workflow
+- a CNC toolpath prompt
+- a CAD automation script`,
  },
  sq: {
- studio: `**Cedium AI Studio**
+ studio: `**Coreforge AI Studio**
 
 Mund t'ju ndihmoj me:
-- Prompte per AutoCAD Design
-- Planifikim UI per website dhe app
-- Gjenerim kodi React dhe Tailwind
-- Brief per skena 3D ne Blender
-- Konfigurim te design system
-- Organizim te workspace dhe file-ve
+- 3D Machinery Engines & Industrial Machinery
+- Automotive & Motorcycles
+- Aerospace & Drones
+- CNC & Machining
+- 3D Studio Integration
+- AI Code Assistant per FEA/CFD, CAD scripting, automation dhe API
 
-Më thuaj çfarë do të ndërtosh dhe do ta strukturoj.`,
+Me thuaj cfare makinerie, automjeti, pjese ose workflow do te ndertosh dhe do ta strukturoj.`,
  tools: `**Mjetet e Disponueshme**
 
-- **AutoCAD Design** - layout, komponentë dhe screen-e responsive
-- **Code Builder** - kthen drejtimin e dizajnit në kod UI
-- **Blender 3D** - skena, drita, materiale dhe render
-- **Asset Library** - organizim i file-ve dhe referencave
-- **Prompt Lab** - iterim prompts dhe variante`,
+- **3D Machinery Engines & Industrial Machinery** - motorre, transmisione, sisteme hidraulike dhe pneumatike
+- **Automotive & Motorcycles** - body, chassis, suspension, braking systems, makina, kamione, motore dhe EV
+- **Aerospace & Drones** - aerodinamike, krahe, fuselage modeling dhe avionics layout
+- **CNC & Machining** - G-code, toolpath optimization, milling dhe turning
+- **3D Studio Integration** - SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD dhe me shume
+- **AI Code Assistant** - FEA/CFD simulations, CAD scripts, parametric automation dhe API integrations`,
  workflow: `**Workflow Tipik**
 
-1. Përshkruaj produktin ose ekranin
-2. Zgjidh output-in: web, app, mobile ose 3D
-3. Përcakto layout, tonin dhe komponentët kryesorë
-4. Gjenero draftin e parë
-5. Rafino spacing, states dhe responsive behavior`,
- help: `Nëse dëshiron, mund të përgatis:
-- homepage
-- dashboard
-- mobile app flow
-- component system
-- 3D hero brief`,
+1. Pershkruaj makinerine, sistemin e automjetit, pjesen aerospace ose detyren CNC
+2. Zgjidh output-in: CAD model, assembly plan, CAM workflow, simulation code ose API automation
+3. Percakto constraints, materiale, dimensione, toleranca dhe CAD studio
+4. Gjenero planin e pare engineering
+5. Rafino pjeset, scripts, exports dhe production notes`,
+ help: `Mund te pergatis:
+- engine assembly plan
+- automotive chassis brief
+- drone fuselage workflow
+- CNC toolpath prompt
+- CAD automation script`,
  },
 } as const;
 
 function detectLanguage(message: string): "en" | "sq" {
- return /[ëç]/i.test(message) || /\b(mund|do|treg|ndihm|shkruaj|dizajn|faqe|aplikacion)\b/i.test(message)
+ return /\b(mund|do|treg|ndihm|shkruaj|dizajn|faqe|aplikacion|makineri|motor)\b/i.test(message)
  ? "sq"
  : "en";
 }
@@ -90,12 +92,12 @@ export function getAIResponse(message: string): AIResponse {
  return {
  content:
  lang === "sq"
- ? "Përshëndetje. Jam Cedium AI Studio. Më thuaj çfarë po ndërton dhe do të të ndihmoj ta kthesh në strukturë, layout ose kod."
- : "Hello. I am Cedium AI Studio. Tell me what you are building and I will help turn it into structure, layout, or code.",
+ ? "Pershendetje. Jam Coreforge AI Studio. Me thuaj cfare makinerie, motori, automjeti, pjese CNC, drone ose CAD workflow po nderton dhe do ta kthej ne plan engineering."
+ : "Hello. I am Coreforge AI Studio. Tell me what machinery, engine, vehicle, CNC part, drone, or CAD workflow you are building and I will turn it into an engineering plan.",
  suggestedQuestions:
  lang === "sq"
- ? ["Nderto nje homepage", "Propozo nje dashboard", "Bëj një mobile flow"]
- : ["Build a homepage", "Propose a dashboard", "Make a mobile flow"],
+ ? ["Nderto nje engine assembly", "Propozo nje chassis design", "Pergatit nje CNC workflow"]
+ : ["Build an engine assembly", "Propose a chassis design", "Prepare a CNC workflow"],
  };
  }
 
@@ -103,8 +105,8 @@ export function getAIResponse(message: string): AIResponse {
  return {
  content:
  lang === "sq"
- ? "Në rregull. Nëse do, mund të vazhdojmë me layout, komponentë ose prompt tjetër."
- : "Understood. If you want, we can continue with layout, components, or another prompt.",
+ ? "Ne rregull. Mund te vazhdojme me mechanical design, automotive systems, CNC/CAM, CAD studio integration ose code/API automation."
+ : "Understood. We can continue with mechanical design, automotive systems, CNC/CAM, CAD studio integration, or code/API automation.",
  };
  }
 
@@ -113,32 +115,41 @@ export function getAIResponse(message: string): AIResponse {
  content: `${STUDIO_TOPICS[lang].studio}\n\n${STUDIO_TOPICS[lang].tools}\n\n${STUDIO_TOPICS[lang].workflow}`,
  suggestedQuestions:
  lang === "sq"
- ? ["Si ndërtoj një dashboard?", "Si e organizoj një design system?", "Më bëj një brief për Blender"]
- : ["How do I build a dashboard?", "How do I organize a design system?", "Make a Blender brief"],
+ ? ["Si ndertoj engine assembly?", "Si planifikoj CNC toolpaths?", "Me bej nje workflow per SolidWorks"]
+ : ["How do I build an engine assembly?", "How do I plan CNC toolpaths?", "Make a SolidWorks workflow"],
  };
  }
 
- if (/\b(acad|autocad|layout|wireframe|design system|component|responsive|screen|faqe|website|app|mobile)\b/i.test(lower)) {
+ if (/\b(cnc|cam|g-code|gcode|milling|turning|toolpath)\b/i.test(lower)) {
  return {
  content: `${STUDIO_TOPICS[lang].workflow}\n\n${STUDIO_TOPICS[lang].help}`,
  };
  }
 
- if (/\b(blender|3d|scene|render|lighting|material|model)\b/i.test(lower)) {
+ if (/\b(3d|engine|transmission|hydraulic|pneumatic|machinery|industrial|model|assembly|motor)\b/i.test(lower)) {
  return {
  content:
  lang === "sq"
- ? "Për Blender 3D mund të përgatis brief për scene, lighting, camera, materials dhe render states. Përshkruaj objektin, stilin dhe ambientin."
- : "For Blender 3D I can prepare a brief for scene setup, lighting, camera, materials, and render states. Describe the object, style, and environment.",
+ ? "Per 3D Machinery mund te pergatis nje plan per engines, transmissions, hydraulic dhe pneumatic systems, me assemblies, constraints, materiale dhe target CAD studio."
+ : "For 3D Machinery I can prepare a plan for engines, transmissions, hydraulic and pneumatic systems, with assemblies, constraints, materials, and target CAD studio.",
  };
  }
 
- if (/\b(code|react|tailwind|component|ui|frontend)\b/i.test(lower)) {
+ if (/\b(car|truck|motorcycle|automotive|chassis|suspension|brake|braking|ev)\b/i.test(lower)) {
  return {
  content:
  lang === "sq"
- ? "Mund ta kthej drejtimin në strukturë komponentësh, layout responsive dhe kod UI. Më jep ekranin ose flow-n që do të ndërtojmë."
- : "I can turn the direction into component structure, responsive layout, and UI code. Give me the screen or flow you want to build.",
+ ? "Per Automotive & Motorcycles mund te strukturoj body, chassis, suspension, braking systems, cars, trucks, motorcycles dhe EV components."
+ : "For Automotive & Motorcycles I can structure body, chassis, suspension, braking systems, cars, trucks, motorcycles, and EV components.",
+ };
+ }
+
+ if (/\b(code|api|script|simulation|fea|cfd|automation|parametric)\b/i.test(lower)) {
+ return {
+ content:
+ lang === "sq"
+ ? "AI Code Assistant mund te gjeneroje FEA/CFD simulation helpers, CAD scripts, parametric automation dhe API integrations. Me jep CAD studio, input/output dhe constraints."
+ : "AI Code Assistant can generate FEA/CFD simulation helpers, CAD scripts, parametric automation, and API integrations. Give me the CAD studio, inputs/outputs, and constraints.",
  };
  }
 
@@ -146,44 +157,44 @@ export function getAIResponse(message: string): AIResponse {
  content:
  lang === "sq"
  ? randomChoice([
- "Më jep një ekran, flow, ose objektiv dhe do ta kthej në strukturë të qartë për Studio.",
- "Mund të ndihmoj me AutoCAD, code, Blender, ose organizim workspace.",
+ "Me jep nje makineri, motor, automjet, drone, CNC task ose CAD studio dhe do ta kthej ne strukture engineering.",
+ "Mund te ndihmoj me 3D Machinery, Automotive, Aerospace, CNC/CAM, 3D Studio Integration ose AI Code Assistant.",
  ])
  : randomChoice([
- "Give me a screen, flow, or target and I will turn it into a clear Studio structure.",
- "I can help with AutoCAD, code, Blender, or workspace organization.",
+ "Give me a machine, engine, vehicle, drone, CNC task, or CAD studio and I will turn it into an engineering structure.",
+ "I can help with 3D Machinery, Automotive, Aerospace, CNC/CAM, 3D Studio Integration, or AI Code Assistant.",
  ]),
  suggestedQuestions:
  lang === "sq"
- ? ["Krijo një landing page", "Bëj një dashboard layout", "Përgatit një brief 3D"]
- : ["Create a landing page", "Build a dashboard layout", "Prepare a 3D brief"],
+ ? ["Krijo engine assembly", "Bej automotive chassis", "Pergatit CNC toolpath"]
+ : ["Create an engine assembly", "Build an automotive chassis", "Prepare a CNC toolpath"],
  };
 }
 
 export const WELCOME_MESSAGE = {
- en: `Welcome to Cedium AI Studio.
+ en: `Welcome to Coreforge AI Studio.
 
-I can help you design website and app screens, plan AutoCAD layouts, generate React and Tailwind code, and prepare Blender 3D briefs.
+I can help you design 3D machinery, engines, transmissions, hydraulic and pneumatic systems, automotive and motorcycle parts, aerospace and drone structures, CNC/CAM workflows, CAD studio integrations, and engineering code/API automation.
 
-Ask me for a homepage, dashboard, mobile flow, component system, or 3D scene.`,
- sq: `Mirësevini në Cedium AI Studio.
+Ask me for an engine assembly, chassis system, drone fuselage, CNC toolpath, CAD studio workflow, or FEA/CFD code helper.`,
+ sq: `Miresevini ne Coreforge AI Studio.
 
-Mund t'ju ndihmoj të dizajnoni ekranet e website dhe app, të planifikoni layout AutoCAD, të gjeneroni kod React dhe Tailwind, dhe të përgatisni brief për Blender 3D.
+Mund t'ju ndihmoj te dizajnoni 3D machinery, engines, transmissions, hydraulic dhe pneumatic systems, automotive dhe motorcycle parts, aerospace dhe drone structures, CNC/CAM workflows, CAD studio integrations dhe engineering code/API automation.
 
-Kërkoni një homepage, dashboard, mobile flow, component system, ose skenë 3D.`,
+Kerkoni engine assembly, chassis system, drone fuselage, CNC toolpath, CAD studio workflow ose FEA/CFD code helper.`,
 };
 
 export const SUGGESTED_QUESTIONS = {
  en: [
- "Build a dashboard layout",
- "Create a homepage wireframe",
- "Prepare a Blender 3D brief",
- "Generate a component system",
+ "Create an engine assembly",
+ "Build an automotive chassis",
+ "Prepare a CNC toolpath",
+ "Generate a CAD automation script",
  ],
  sq: [
- "Bëj një dashboard layout",
- "Krijo një wireframe për homepage",
- "Përgatit një brief Blender 3D",
- "Gjenero një component system",
+ "Krijo engine assembly",
+ "Bej automotive chassis",
+ "Pergatit CNC toolpath",
+ "Gjenero CAD automation script",
  ],
 };

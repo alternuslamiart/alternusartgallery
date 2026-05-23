@@ -45,50 +45,47 @@ function titleCase(value: string) {
 
 function inferWebsiteType(prompt: string) {
  const lower = prompt.toLowerCase();
- if (/(shop|store|ecommerce|commerce|product catalog)/.test(lower)) return "E-commerce storefront";
- if (/(portfolio|designer|photographer|creative director)/.test(lower)) return "Creative portfolio";
- if (/(agency|studio|branding|marketing)/.test(lower)) return "Agency website";
- if (/(saas|software|platform|dashboard|app)/.test(lower)) return "SaaS landing page";
- if (/(restaurant|cafe|bar|hotel|hospitality)/.test(lower)) return "Hospitality website";
- if (/(course|school|education|academy|training)/.test(lower)) return "Education landing page";
- return "Marketing website";
+ if (/(fea|finite|stress|simulation)/.test(lower)) return "FEA simulation helper";
+ if (/(cfd|flow|aero|aerodynamic|fluid)/.test(lower)) return "CFD automation";
+ if (/(cnc|cam|g-code|gcode|toolpath|milling|turning)/.test(lower)) return "CNC / CAM automation";
+ if (/(api|integration|endpoint|webhook)/.test(lower)) return "CAD API integration";
+ if (/(parametric|macro|script|cad)/.test(lower)) return "CAD scripting workflow";
+ return "Engineering automation";
 }
 
 function inferDesignDirection(prompt: string) {
  const lower = prompt.toLowerCase();
- if (lower.includes("minimal")) return "Minimal, airy layout with strong spacing and quiet typography.";
- if (lower.includes("bold")) return "Bold product layout with high contrast sections and confident CTAs.";
- if (lower.includes("premium")) return "Premium SaaS presentation with soft contrast and crisp spacing.";
- if (lower.includes("playful")) return "Friendly, approachable layout with rounded cards and lighter rhythm.";
- if (lower.includes("dark")) return "Dark canvas with crisp surfaces and a high-contrast product feel.";
- return "Neutral product-grade layout with layered sections and focused conversion flow.";
+ if (lower.includes("minimal")) return "Minimal engineering script with clear inputs, outputs, and comments.";
+ if (lower.includes("bold")) return "Direct automation plan with explicit constraints and validation steps.";
+ if (lower.includes("premium")) return "Production-grade automation with metadata, exports, and review notes.";
+ if (lower.includes("dark")) return "Simulation-first workflow with strict units, checks, and logged outputs.";
+ return "Neutral engineering workflow with structured steps and clear production handoff.";
 }
 
 function inferPages(prompt: string, websiteType: string) {
  const lower = `${prompt} ${websiteType}`.toLowerCase();
- if (/(e-commerce|storefront|store|shop)/.test(lower)) return ["Home", "Collections", "Product", "About", "Contact"];
- if (/(saas|landing page|platform|software|dashboard)/.test(lower)) return ["Home", "Pricing", "Features", "Docs", "Contact"];
- if (/(portfolio|creative|agency)/.test(lower)) return ["Home", "Work", "About", "Services", "Contact"];
- if (/(hospitality|restaurant|cafe|hotel)/.test(lower)) return ["Home", "Menu", "Reservations", "Gallery", "Contact"];
- return ["Home", "About", "Services", "Contact"];
+ if (/(cnc|cam|g-code|gcode|toolpath)/.test(lower)) return ["Inputs", "Toolpath", "Machine Setup", "Validation", "Export"];
+ if (/(fea|cfd|simulation)/.test(lower)) return ["Inputs", "Mesh", "Boundary Conditions", "Solver", "Results"];
+ if (/(api|integration|endpoint)/.test(lower)) return ["Schema", "Routes", "Auth", "Payloads", "Tests"];
+ return ["Inputs", "Parameters", "Automation", "Validation", "Export"];
 }
 
 function inferNotes(prompt: string, websiteType: string) {
  const lower = `${prompt} ${websiteType}`.toLowerCase();
  const notes = [
- "Keep the hero section compact and conversion-focused.",
- "Use a restrained neutral palette with one clear action color.",
- "Make the preview feel like a production canvas, not a chat screen.",
+ "Keep units, inputs, outputs, and constraints explicit.",
+ "Use deterministic parameter names and clear validation steps.",
+ "Make the preview read like an engineering production plan.",
  ];
 
- if (/(e-commerce|store|shop)/.test(lower)) {
- notes.push("Surface product cards and a strong buy-now path.");
- } else if (/(saas|platform|software)/.test(lower)) {
- notes.push("Lead with feature clarity and a pricing comparison block.");
- } else if (/(portfolio|creative|agency)/.test(lower)) {
- notes.push("Make the work samples visually prominent and easy to scan.");
+ if (/(cnc|cam|g-code|gcode|toolpath)/.test(lower)) {
+ notes.push("Include feed, speed, tool, operation, and post-processor assumptions.");
+ } else if (/(fea|cfd|simulation)/.test(lower)) {
+ notes.push("Define mesh, boundary conditions, solver settings, and result checks.");
+ } else if (/(api|integration|endpoint)/.test(lower)) {
+ notes.push("Define payload schemas, authentication, retries, and test fixtures.");
  } else {
- notes.push("Bias the layout toward trust signals and a visible CTA.");
+ notes.push("Bias the workflow toward reusable CAD parameters and export-ready outputs.");
  }
 
  return notes.slice(0, 4);
@@ -96,34 +93,34 @@ function inferNotes(prompt: string, websiteType: string) {
 
 function buildLayers(websiteType: string): CodeBuilderLayer[] {
  const commonLayers: CodeBuilderLayer[] = [
- { id: "header", label: "Header", description: "Logo, navigation, and primary action.", canvasLabel: "Navbar" },
- { id: "hero", label: "Hero Section", description: "Headline, support copy, and CTA.", canvasLabel: "Hero" },
- { id: "features", label: "Features Section", description: "Core benefits and proof points.", canvasLabel: "Feature cards" },
- { id: "testimonials", label: "Testimonials", description: "Social proof and trust signals.", canvasLabel: "Testimonials" },
- { id: "cta", label: "CTA Area", description: "Conversion prompt and final action.", canvasLabel: "CTA" },
- { id: "footer", label: "Footer", description: "Utility links and closing details.", canvasLabel: "Footer" },
+ { id: "header", label: "Input Schema", description: "Parameters, units, source files, and required fields.", canvasLabel: "Inputs" },
+ { id: "hero", label: "Automation Core", description: "Main CAD, simulation, CAM, or API logic.", canvasLabel: "Core" },
+ { id: "features", label: "Validation", description: "Geometry checks, solver checks, and output guards.", canvasLabel: "Checks" },
+ { id: "testimonials", label: "Review Notes", description: "Assumptions, risks, and engineering review items.", canvasLabel: "Review" },
+ { id: "cta", label: "Export Step", description: "Generated files, formats, and handoff instructions.", canvasLabel: "Export" },
+ { id: "footer", label: "Documentation", description: "Usage notes and repeatable workflow details.", canvasLabel: "Docs" },
  ];
 
- if (/(e-commerce|store|shop)/.test(websiteType.toLowerCase())) {
+ if (/(cnc|cam)/.test(websiteType.toLowerCase())) {
  return [
  commonLayers[0],
  commonLayers[1],
- { id: "features", label: "Product Highlights", description: "Core capabilities, modules, and conversion points.", canvasLabel: "Product cards" },
- { id: "pricing", label: "Offers Section", description: "Bundles, offers, or price anchors.", canvasLabel: "Offers" },
+ { id: "features", label: "Toolpath Logic", description: "Operations, tooling, feeds, speeds, and path checks.", canvasLabel: "Toolpaths" },
+ { id: "pricing", label: "Machine Setup", description: "Workholding, coordinate system, and post-processor notes.", canvasLabel: "Machine" },
  commonLayers[3],
  commonLayers[4],
  commonLayers[5],
  ];
  }
 
- if (/(saas|landing page|platform|software)/.test(websiteType.toLowerCase())) {
+ if (/(fea|cfd|simulation)/.test(websiteType.toLowerCase())) {
  return [
  commonLayers[0],
  commonLayers[1],
  commonLayers[2],
- { id: "pricing", label: "Pricing Section", description: "Plans, comparison, and upgrade path.", canvasLabel: "Pricing table" },
+ { id: "pricing", label: "Solver Setup", description: "Solver options, convergence checks, and run settings.", canvasLabel: "Solver" },
  commonLayers[3],
- { id: "faq", label: "FAQ Section", description: "Common questions and objections.", canvasLabel: "FAQ" },
+ { id: "faq", label: "Result Checks", description: "Post-processing, plots, tolerances, and quality gates.", canvasLabel: "Results" },
  commonLayers[5],
  ];
  }
@@ -133,7 +130,7 @@ function buildLayers(websiteType: string): CodeBuilderLayer[] {
 
 function projectNameFromPrompt(prompt: string) {
  const normalized = normalizePrompt(prompt);
- if (!normalized) return "Website Building Template";
+ if (!normalized) return "Engineering Automation Template";
 
  const forMatch = normalized.match(/\bfor\s+([^.,;:!?]+)(?:[.,;:!?]|$)/i);
  if (forMatch?.[1]) {
@@ -144,7 +141,7 @@ function projectNameFromPrompt(prompt: string) {
  const firstSegment = normalized.split(/[.,;:!?]/)[0]?.trim() ?? "";
  const firstWords = firstSegment.split(/\s+/).slice(0, 5).join(" ");
  const candidate = titleCase(firstWords);
- return candidate || "Website Building Template";
+ return candidate || "Engineering Automation Template";
 }
 
 export function generateWebsitePlanFromPrompt(prompt: string): CodeBuilderPlan {
@@ -161,7 +158,7 @@ export function generateWebsitePlanFromPrompt(prompt: string): CodeBuilderPlan {
  websiteType,
  designDirection,
  pages,
- summary: `A ${websiteType.toLowerCase()} with a clean builder canvas, strong section hierarchy, and a focused conversion path.`,
+ summary: `A ${websiteType.toLowerCase()} with clear inputs, automation layers, validation steps, and export-ready outputs.`,
  notes: inferNotes(cleanPrompt, websiteType),
  layers,
  source: "local_stub",
@@ -218,7 +215,7 @@ export function normalizeCodeBuilderPlan(value: unknown, prompt: string): CodeBu
  websiteType,
  designDirection: typeof value.designDirection === "string" ? value.designDirection : inferDesignDirection(prompt),
  pages: isStringArray(value.pages) && value.pages.length ? value.pages : inferPages(prompt, websiteType),
- summary: typeof value.summary === "string" ? value.summary : `A ${websiteType.toLowerCase()} with a clean builder canvas, strong section hierarchy, and a focused conversion path.`,
+ summary: typeof value.summary === "string" ? value.summary : `A ${websiteType.toLowerCase()} with clear inputs, automation layers, validation steps, and export-ready outputs.`,
  notes: isStringArray(value.notes) && value.notes.length ? value.notes : inferNotes(prompt, websiteType),
  layers,
  source,

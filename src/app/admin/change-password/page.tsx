@@ -435,7 +435,7 @@ export default function ChangePasswordPage() {
  </li>
  <li className="flex gap-2">
  <span className="text-blue-600">•</span>
- <span>Use a unique password for your Cedium account</span>
+ <span>Use a unique password for your Coreforge account</span>
  </li>
  <li className="flex gap-2">
  <span className="text-blue-600">•</span>

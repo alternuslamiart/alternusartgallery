@@ -1,5 +1,5 @@
 "use client";
-import { CediumPage, COBALT } from "@/components/cedium-shell";
+import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const certs = [
  { n: "SOC 2 Type II", s: "Audited" },
@@ -16,12 +16,12 @@ const controls = [
  { t: "Audit logs", d: "Every action, every agent query, every admin change — immutable, exportable." },
  { t: "Incident response", d: "Published runbook. 24/7 on-call. Status page updated in under 5 minutes." },
  { t: "Penetration testing", d: "Quarterly third-party pentests. Reports available under NDA on request." },
- { t: "Responsible disclosure", d: "security@Cedium.ai · 7-day SLA for triage · bounty program for valid reports." },
+ { t: "Responsible disclosure", d: "security@Coreforge.ai · 7-day SLA for triage · bounty program for valid reports." },
 ];
 
 export default function Security() {
  return (
- <CediumPage>
+ <CoreforgePage>
  {(t) => (
  <>
  <section style={{ padding: "120px 0 60px", position: "relative", overflow: "hidden" }}>
@@ -32,7 +32,7 @@ export default function Security() {
  Built for the<br/><span style={{ color: COBALT, fontStyle: "italic" }}>paranoid.</span>
  </h1>
  <p style={{ marginTop: 28, fontSize: 17, color: t.muted, maxWidth: 600, lineHeight: 1.6 }}>
- Cedium handles your mail, your files, your code — so security is the foundation, not a bolt-on. Here&apos;s how we keep it.
+ Coreforge handles your mail, your files, your code — so security is the foundation, not a bolt-on. Here&apos;s how we keep it.
  </p>
  </div>
  </section>
@@ -72,6 +72,6 @@ export default function Security() {
  </section>
  </>
  )}
- </CediumPage>
+ </CoreforgePage>
  );
 }

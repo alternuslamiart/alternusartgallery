@@ -34,7 +34,7 @@ async function getPublicStudioNotifications(limit: number) {
  {
  id: "studio-welcome",
  type: "workspace_update",
- title: "Cedium Studio is ready",
+ title: "Coreforge Studio is ready",
  message: "Open the studio to generate assets, run prompts, and coordinate AI tools.",
  linkUrl: "/main",
  actionUrl: "/main",

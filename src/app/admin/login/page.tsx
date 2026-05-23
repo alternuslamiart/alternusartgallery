@@ -57,7 +57,7 @@ export default function AdminLogin() {
  <div className="text-center mb-8">
  <div className="inline-flex flex-col mb-6">
  <span className="text-4xl font-bold tracking-[0.2em] leading-tight text-foreground">
- Cedium
+ Coreforge
  </span>
  <span className="text-xs text-muted-foreground tracking-[0.3em] uppercase mt-1">
  Admin Panel
@@ -178,7 +178,7 @@ export default function AdminLogin() {
 
  {/* Footer */}
  <p className="text-center text-muted-foreground text-xs mt-6">
- © 2024 Cedium AI. All rights reserved.
+ © 2024 Coreforge AI. All rights reserved.
  </p>
  </div>
  </div>

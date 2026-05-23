@@ -20,7 +20,7 @@ const helpArticles = [
  title: "Creating prototypes",
  category: "Design",
  order: 3,
- content: "Create a prototype record from Cedium Design by adding a name, type, quality, brief, tags, and design system settings.",
+ content: "Create a prototype record from Coreforge Design by adding a name, type, quality, brief, tags, and design system settings.",
  },
  {
  slug: "using-prompt-lab",

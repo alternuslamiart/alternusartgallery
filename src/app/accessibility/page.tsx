@@ -9,13 +9,13 @@ export default function AccessibilityPage() {
  <div className="border-b border-[#E5E7EB] bg-[#0B1120] text-white">
  <div className="container mx-auto px-4 text-center">
  <p className="mb-3 pt-16 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300 sm:pt-20 sm:text-sm">
- Cedium AI
+ Coreforge AI
  </p>
  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
  Accessibility
  </h1>
  <p className="mx-auto max-w-2xl pb-16 text-base text-slate-300 sm:pb-20 sm:text-lg">
- We build Cedium AI so teams can operate an AI workspace with clear navigation, readable interfaces, and inclusive product flows.
+ We build Coreforge AI so teams can operate an AI workspace with clear navigation, readable interfaces, and inclusive product flows.
  </p>
  </div>
  </div>
@@ -34,7 +34,7 @@ export default function AccessibilityPage() {
  <div>
  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Our Commitment</h2>
  <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
- Cedium AI is dedicated to ensuring that our website, studio, and digital experiences are accessible to all users, including those with disabilities. We strive to meet or exceed the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards.
+ Coreforge AI is dedicated to ensuring that our website, studio, and digital experiences are accessible to all users, including those with disabilities. We strive to meet or exceed the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards.
  </p>
  </div>
  </div>
@@ -141,7 +141,7 @@ export default function AccessibilityPage() {
  <section className="bg-gray-50 rounded-2xl p-6 sm:p-8">
  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">Feedback & Assistance</h2>
  <p className="text-gray-600 leading-relaxed mb-6">
- If you experience any difficulty accessing any part of our website or studio, or if you have suggestions for improvement, we want to hear from you. Your feedback helps us make Cedium AI accessible to everyone.
+ If you experience any difficulty accessing any part of our website or studio, or if you have suggestions for improvement, we want to hear from you. Your feedback helps us make Coreforge AI accessible to everyone.
  </p>
  <Link
  href="/help-center"

@@ -21,7 +21,6 @@ import {
  Download,
  FileText,
  Folder,
- Gamepad2,
  Ghost,
  Globe,
  Grid2X2,
@@ -113,10 +112,10 @@ type GeneratedRecent = {
 export const studioNavigation: NavItem[] = [
  { key:"ai-assistant", label:"AI Assistant", href:"/ai-assistant", icon: Sparkles },
  { key:"studio-overview", label:"Studio Overview", href:"/studio-overview", icon: Grid2X2 },
- { key:"cedium-design", label:"Cedium Design", href:"/cedium-design", icon: Monitor },
- { key:"autocad-design", label:"AutoCAD Design", href:"/autocad-design", icon: PenLine },
- { key:"code-builder", label:"Code Builder", href:"/code-builder", icon: Code2 },
- { key:"blender-3d", label:"Blender 3D", href:"/blender-3d", icon: Layers3 },
+ { key:"cedium-design", label:"3D Machinery", href:"/cedium-design", icon: Monitor },
+ { key:"autocad-design", label:"Automotive & Motorcycles", href:"/autocad-design", icon: PenLine },
+ { key:"code-builder", label:"AI Code Assistant", href:"/code-builder", icon: Code2 },
+ { key:"blender-3d", label:"3D Studio Integration", href:"/blender-3d", icon: Layers3 },
  { key:"asset-library", label:"Asset Library", href:"/asset-library", icon: ImageIcon },
  { key:"prompt-lab", label:"Prompt Lab", href:"/prompt-lab", icon: FileText, badge:"2"},
  { key:"projects", label:"Projects", href:"/projects", icon: Folder },
@@ -153,21 +152,21 @@ const sidebarRecentItems: GeneratedRecent[] = [
  },
  {
  id:"recent-landing-page",
- title:"SaaS landing page",
- tool:"Code Builder",
- meta:"React page",
+ title:"Engine automation script",
+ tool:"AI Code Assistant",
+ meta:"CAD API",
  time:"Yesterday",
  icon: Code2,
- output:"A recent landing page generation with hero copy, pricing structure, component notes, and responsive layout direction.",
+ output:"A recent CAD scripting plan with parametric controls, API notes, and simulation helper steps.",
  },
  {
  id:"recent-game-scene",
- title:"Cyberpunk city scene",
- tool:"Blender 3D",
- meta:"Environment concept",
+ title:"Industrial engine assembly",
+ tool:"3D Studio Integration",
+ meta:"Mechanical concept",
  time:"2 days ago",
  icon: Layers3,
- output:"A saved game environment concept with lighting direction, modular asset list, NPC route notes, and optimization checklist.",
+ output:"A saved mechanical assembly concept with part hierarchy, materials, constraints, and export checklist.",
  },
 ];
 
@@ -250,22 +249,22 @@ const toolWorkspaces: Record<AssistantToolKey, ToolWorkspaceConfig> = {
  code: {
  key:"code",
  href:"/ai-assistant/tools/code",
- title:"AI for Code",
- description:"Build websites, apps, and digital tools with guided AI coding support.",
+ title:"AI Code Assistant",
+ description:"Generate FEA/CFD simulation code, CAD scripting, parametric automation, and API integrations.",
  icon: Code2,
- placeholder:"Describe the app, component, bug, or feature you want to build...",
+ placeholder:"Describe the simulation, CAD script, parametric rule, API integration, or automation you want to build...",
  actionLabel:"Generate",
  quickActions: [
- { title:"Create React Component", desc:"Draft a reusable UI component.", icon: Code2 },
- { title:"Build Landing Page", desc:"Plan a polished conversion page.", icon: Monitor },
- { title:"Fix Code Issue", desc:"Debug errors or broken behavior.", icon: AlertTriangle },
+ { title:"FEA Script", desc:"Draft finite-element setup helpers.", icon: Code2 },
+ { title:"CFD Automation", desc:"Prepare flow simulation scripting.", icon: Monitor },
+ { title:"Fix CAD Macro", desc:"Debug CAD automation issues.", icon: AlertTriangle },
  { title:"Generate API Endpoint", desc:"Create route logic and payloads.", icon: Plug },
- { title:"Explain Existing Code", desc:"Understand files and patterns.", icon: FileText },
- { title:"Convert Design to Code", desc:"Translate UI into components.", icon: PenLine },
+ { title:"Explain Existing Code", desc:"Understand scripts and integration patterns.", icon: FileText },
+ { title:"Parametric Model Code", desc:"Translate design rules into automation.", icon: PenLine },
  ],
  selectors: [
- { label:"Project type", options: ["Website","Web App","API","Component","Bug Fix"] },
- { label:"Tech stack", options: ["React","Next.js","Vue","Node.js","Go","Rust"] },
+ { label:"Project type", options: ["FEA","CFD","CAD Script","API","Automation"] },
+ { label:"Tech stack", options: ["Python","JavaScript","TypeScript","C#","Go","Rust"] },
  ],
  previewTabs: ["Plan","Code","Preview"],
  previewType:"code",
@@ -274,50 +273,50 @@ const toolWorkspaces: Record<AssistantToolKey, ToolWorkspaceConfig> = {
  blender: {
  key:"blender",
  href:"/ai-assistant/tools/blender",
- title:"Blender 3D",
- description:"Create 3D models, scenes, and visual assets from text prompts.",
+ title:"3D Studio Integration",
+ description:"Create mechanical assets across SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD, and more.",
  icon: Layers3,
- placeholder:"Describe the 3D object, scene, material, or animation you want to create...",
+ placeholder:"Describe the machine part, assembly, CAD studio, material, constraint, or export workflow you want to create...",
  actionLabel:"Create",
  quickActions: [
- { title:"Create 3D Model", desc:"Generate a focused object brief.", icon: Box },
- { title:"Generate Product Scene", desc:"Stage products with lighting.", icon: Grid2X2 },
- { title:"Design Character", desc:"Shape a stylized character.", icon: Sparkles },
- { title:"Create Materials", desc:"Define textures and surfaces.", icon: ImageIcon },
- { title:"Lighting Setup", desc:"Prepare mood and render lighting.", icon: Monitor },
+ { title:"Engine Assembly", desc:"Generate a focused mechanical brief.", icon: Box },
+ { title:"Transmission Model", desc:"Stage parts and constraints.", icon: Grid2X2 },
+ { title:"Industrial Machinery", desc:"Shape machine systems and modules.", icon: Sparkles },
+ { title:"Material Setup", desc:"Define metals, finishes, and surfaces.", icon: ImageIcon },
+ { title:"CAD Studio Setup", desc:"Prepare studio-specific workflow notes.", icon: Monitor },
  { title:"Export Asset", desc:"Package assets for delivery.", icon: Download },
  ],
  selectors: [
- { label:"Asset type", options: ["Object","Scene","Character","Product","Environment"] },
- { label:"Style", options: ["Realistic","Low-poly","Stylized","Isometric","Game-ready"] },
+ { label:"Asset type", options: ["Engine","Transmission","Hydraulics","Machinery","Vehicle"] },
+ { label:"CAD studio", options: ["SolidWorks","Fusion 360","CATIA","Rhino 3D","NX","FreeCAD"] },
  { label:"Output format", options: ["BLEND","FBX","OBJ","GLB"] },
  ],
  previewType:"blender",
- emptyState:"Your 3D preview or generated asset will appear here.",
+ emptyState:"Your mechanical 3D preview or generated asset will appear here.",
  },
  autocad: {
  key:"autocad",
  href:"/ai-assistant/tools/autocad",
- title:"AutoCAD",
- description:"Create CAD drawings, technical layouts, and clean drafting plans with guided AI support.",
+ title:"Automotive & Motorcycles",
+ description:"Design body, chassis, suspension, braking systems, cars, trucks, motorcycles, and electric vehicles.",
  icon: PenLine,
- placeholder:"Describe the CAD drawing, dimensions, layers, or technical plan you want to create...",
+ placeholder:"Describe the vehicle body, chassis, suspension, braking system, motorcycle, truck, or EV component you want to create...",
  actionLabel:"Draft",
  quickActions: [
- { title:"Create CAD Drawing", desc:"Start a clean technical drawing.", icon: PenLine },
- { title:"Floor Plan Layout", desc:"Draft rooms, walls, and dimensions.", icon: Grid2X2 },
- { title:"Layer Setup", desc:"Organize geometry and annotations.", icon: Layers3 },
- { title:"Dimension Plan", desc:"Prepare measurements and units.", icon: Monitor },
- { title:"DXF Cleanup", desc:"Review imported CAD structure.", icon: FileText },
- { title:"Export DWG/DXF", desc:"Package drawings for delivery.", icon: Upload },
+ { title:"Car Body Model", desc:"Start a clean body design plan.", icon: PenLine },
+ { title:"Chassis Layout", desc:"Draft frame geometry and dimensions.", icon: Grid2X2 },
+ { title:"Suspension Setup", desc:"Organize suspension geometry.", icon: Layers3 },
+ { title:"Brake System", desc:"Prepare measurements and clearances.", icon: Monitor },
+ { title:"Motorcycle Frame", desc:"Review imported CAD structure.", icon: FileText },
+ { title:"Export CAD Files", desc:"Package drawings for delivery.", icon: Upload },
  ],
  selectors: [
- { label:"Drawing type", options: ["Floor Plan","Elevation","Section","Site Plan","Detail"] },
+ { label:"System type", options: ["Body","Chassis","Suspension","Braking","EV System"] },
  { label:"Units", options: ["Millimeters","Centimeters","Meters","Inches","Feet"] },
- { label:"Layer options", options: ["Standard","Architecture","Mechanical","Electrical","Custom"] },
+ { label:"Layer options", options: ["Standard","Mechanical","Electrical","Hydraulic","Custom"] },
  ],
  previewType:"autocad",
- emptyState:"Your CAD drawing preview will appear here.",
+ emptyState:"Your automotive CAD preview will appear here.",
  },
 };
 
@@ -410,18 +409,18 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  );
 
  useEffect(() => {
- const savedTheme = window.localStorage.getItem("Cedium-studio-theme");
+ const savedTheme = window.localStorage.getItem("Coreforge-studio-theme");
  if (savedTheme ==="light"|| savedTheme ==="dark") {
  setTheme(savedTheme);
  }
- const savedDensity = window.localStorage.getItem("Cedium-studio-density");
+ const savedDensity = window.localStorage.getItem("Coreforge-studio-density");
  if (savedDensity ==="compact"|| savedDensity ==="comfortable") {
  document.documentElement.dataset.studioDensity = savedDensity;
  }
  }, []);
 
  useEffect(() => {
- window.localStorage.setItem("Cedium-studio-theme", theme);
+ window.localStorage.setItem("Coreforge-studio-theme", theme);
  }, [theme]);
 
  const themeValue = useMemo(
@@ -1170,7 +1169,7 @@ function getModalContent(modal: StudioModalKey) {
 "project-create": { title:"Create project", description:"Create a project container for generated outputs and assets.", action:"Create project", success:"Project created"},
 "asset-upload": { title:"Upload asset", description:"Add images, 3D models, CAD files, documents, or generated outputs.", action:"Upload asset", success:"Asset uploaded"},
 "voice-dictation": { title:"Voice dictation", description:"Speak directly into the composer and turn speech into a clean prompt draft.", action:"Start dictation", success:"Voice dictation ready"},
-"voice-speak": { title:"Voice Speak", description:"Open a focused voice frame for hands-free conversation with Cedium.", action:"Start voice", success:"Voice Speak ready"},
+"voice-speak": { title:"Voice Speak", description:"Open a focused voice frame for hands-free conversation with Coreforge.", action:"Start voice", success:"Voice Speak ready"},
  support: { title:"Contact support", description:"Send a short support request from your workspace.", action:"Send request", success:"Support request sent"},
  };
  return map[modal];
@@ -1181,9 +1180,9 @@ function SearchFrame({ onClose }: { onClose: () => void }) {
  const searchTargets = [
  ...studioNavigation.map((item) => ({ title: item.label, desc: "Open studio workspace", href: item.href, icon: item.icon })),
  ...bottomNavigation.map((item) => ({ title: item.label, desc: "Open workspace settings area", href: item.href, icon: item.icon })),
- { title:"AI for Code", desc:"Open guided code assistant", href:"/ai-assistant/tools/code", icon: Code2 },
- { title:"AI for Blender", desc:"Open guided 3D assistant", href:"/ai-assistant/tools/blender", icon: Layers3 },
- { title:"AI for AutoCAD", desc:"Open guided CAD assistant", href:"/ai-assistant/tools/autocad", icon: PenLine },
+ { title:"AI Code Assistant", desc:"Open guided engineering code assistant", href:"/ai-assistant/tools/code", icon: Code2 },
+ { title:"3D Studio Integration", desc:"Open guided mechanical 3D assistant", href:"/ai-assistant/tools/blender", icon: Layers3 },
+ { title:"Automotive & Motorcycles", desc:"Open guided vehicle CAD assistant", href:"/ai-assistant/tools/autocad", icon: PenLine },
  { title:"Workspace Files", desc:"Open file workspace", href:"/workspace/files", icon: Folder },
  ];
  const normalizedQuery = query.trim().toLowerCase();
@@ -1575,7 +1574,7 @@ function DisplayDropdown() {
  const current = document.documentElement.dataset.studioDensity;
  const next = current ==="compact"?"comfortable":"compact";
  document.documentElement.dataset.studioDensity = next;
- window.localStorage.setItem("Cedium-studio-density", next);
+ window.localStorage.setItem("Coreforge-studio-density", next);
  showToast(`${next ==="compact"?"Compact":"Comfortable"} density applied`);
  };
 
@@ -1597,7 +1596,7 @@ function StudioContent({ route, assistantTool }: { route: StudioRouteKey; assist
  case"studio-overview":
  return <OverviewPage />;
  case"cedium-design":
- return <CediumDesignPage />;
+ return <CoreforgeDesignPage />;
  case"autocad-design":
  return <AutoCADPage />;
  case"code-builder":
@@ -1987,20 +1986,20 @@ function OverviewPage() {
  { label:"Exports", value:"27", meta:"9 delivered", icon: Download, trend:"100% synced" },
  ];
  const pipeline = [
- { name:"AutoCAD homepage concept", type:"Design", owner:"AI Assistant", status:"Review", progress:78 },
- { name:"Cedium landing route", type:"Code", owner:"Code Builder", status:"Building", progress:64 },
- { name:"Product hero scene", type:"3D", owner:"Blender 3D", status:"Ready", progress:92 },
+ { name:"Engine housing concept", type:"3D", owner:"AI Assistant", status:"Review", progress:78 },
+ { name:"FEA helper script", type:"Code", owner:"AI Code Assistant", status:"Building", progress:64 },
+ { name:"Industrial machinery assembly", type:"3D", owner:"3D Studio Integration", status:"Ready", progress:92 },
  ];
  const modules = [
  { label:"AI Assistant", desc:"Start directed workspace tasks.", icon: Sparkles, action: () => router.push("/ai-assistant") },
- { label:"Cedium Design", desc:"Create layouts and prototypes.", icon: Monitor, action: () => router.push("/cedium-design") },
- { label:"AutoCAD Design", desc:"Draft plans and technical files.", icon: PenLine, action: () => router.push("/autocad-design") },
- { label:"Code Builder", desc:"Prepare routes and components.", icon: Code2, action: () => router.push("/code-builder") },
+ { label:"3D Machinery", desc:"Design engines and industrial systems.", icon: Monitor, action: () => router.push("/cedium-design") },
+ { label:"Automotive & Motorcycles", desc:"Draft vehicle systems and parts.", icon: PenLine, action: () => router.push("/autocad-design") },
+ { label:"AI Code Assistant", desc:"Prepare scripts and API automation.", icon: Code2, action: () => router.push("/code-builder") },
  ];
  const activity = [
  { label:"Homepage concept updated", time:"2m ago", tone:"bg-[#4284FF]" },
  { label:"Prompt Lab checklist saved", time:"18m ago", tone:"bg-[#23B26D]" },
- { label:"Blender material preview queued", time:"42m ago", tone:"bg-[#F59E0B]" },
+ { label:"Engine material preview queued", time:"42m ago", tone:"bg-[#F59E0B]" },
  { label:"Export package delivered", time:"1h ago", tone:"bg-[#8B5CF6]" },
  ];
  const systemHealth = [
@@ -2193,7 +2192,7 @@ function OverviewPage() {
  );
 }
 
-function CediumDesignPage() {
+function CoreforgeDesignPage() {
  const { theme } = useStudioTheme();
  const { showToast } = useStudioActions();
  const dark = theme ==="dark";
@@ -2320,9 +2319,9 @@ function CediumDesignPage() {
  return (
  <div>
  <PageHeader
- title="Cedium Design"
- subtitle="Design website, app, and mobile prototypes in the same Cedium AI workspace."
- action={<PrimaryButton icon={Sparkles} onClick={() => projectInputRef.current?.focus()}>Create prototype</PrimaryButton>}
+ title="3D Machinery"
+ subtitle="Design engines, transmissions, hydraulic and pneumatic systems, and industrial machinery in the Coreforge workspace."
+ action={<PrimaryButton icon={Sparkles} onClick={() => projectInputRef.current?.focus()}>Create machinery plan</PrimaryButton>}
  />
 
  <div className="grid gap-5 xl:grid-cols-[320px_1fr]">
@@ -2332,8 +2331,8 @@ function CediumDesignPage() {
  <Monitor className="h-4 w-4"/>
  </div>
  <div>
- <p className={`text-[13px] font-semibold ${strong}`}>New prototype</p>
- <p className={`text-[11px] ${muted}`}>Website, app, mobile UI</p>
+ <p className={`text-[13px] font-semibold ${strong}`}>New machinery plan</p>
+ <p className={`text-[11px] ${muted}`}>Engines, hydraulics, industrial CAD</p>
  </div>
  </div>
 
@@ -2389,8 +2388,8 @@ function CediumDesignPage() {
  <div className={`rounded-[28px] border p-4 ${shell}`}>
  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
  <div>
- <p className={`text-[13px] font-semibold ${strong}`}>Designs</p>
- <p className={`mt-1 text-[11px] ${muted}`}>Recent prototypes and UI systems generated with Cedium AI.</p>
+ <p className={`text-[13px] font-semibold ${strong}`}>Machinery plans</p>
+ <p className={`mt-1 text-[11px] ${muted}`}>Recent mechanical systems generated with Coreforge AI.</p>
  </div>
  <div className={`flex rounded-2xl p-1 ${dark ?"bg-[#181B20]":"bg-[#EEF3F7]"}`}>
  {(["Recent","Your designs","Design systems"] as const).map((tab) => (
@@ -2417,23 +2416,23 @@ function CediumDesignPage() {
 
  <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
  <div className={`rounded-[28px] border p-4 ${shell}`}>
- <label htmlFor="prototype-brief"className={`text-[13px] font-semibold ${strong}`}>Prototype brief</label>
+ <label htmlFor="prototype-brief"className={`text-[13px] font-semibold ${strong}`}>Machinery brief</label>
  <textarea
  id="prototype-brief"
  value={brief}
  onChange={(event) => setBrief(event.target.value)}
  className={`mt-3 min-h-[118px] w-full resize-none rounded-2xl border p-4 text-[13px] outline-none ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#6F7782]":"border-[#E5EAF0] bg-white text-[#171717] placeholder:text-[#A1A7B0]"}`}
- placeholder="Describe the website, dashboard, mobile flow, or app screen you want Cedium Design to create..."
+ placeholder="Describe the engine, transmission, hydraulic system, pneumatic system, or industrial machine you want Coreforge to create..."
  />
  <div className="mt-3 flex flex-wrap gap-2">
- {["Responsive","Design tokens","Components","Prototype flow"].map((chip) => (
+ {["Engine assembly","Hydraulics","Pneumatics","Industrial machine"].map((chip) => (
  <button key={chip} type="button"onClick={() => handleBriefChip(chip)} className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold ${briefTags.includes(chip) ?"border-[#9BD2FF] bg-[#EEF7FF] text-[#171717]": dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA]":"border-[#E5EAF0] bg-[#FAFCFD] text-[#4B5563]"}`}>{chip}</button>
  ))}
  </div>
  </div>
 
  <div className={`rounded-[28px] border p-4 ${shell}`}>
- <p className={`text-[13px] font-semibold ${strong}`}>Design system</p>
+ <p className={`text-[13px] font-semibold ${strong}`}>Engineering system</p>
  <div className="mt-4 space-y-3">
  {[
  ["Color","colorPreset", designSystem.colorPreset,"#4A9BFF"],
@@ -2696,32 +2695,32 @@ function AutoCADPage() {
  const soft = dark ?"bg-[#181B20]":"bg-white";
  const panel = dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328]":"border-[#E5EAF0] bg-[#FCFDFE]";
  const drawings = [
- { name:"Floor plan study", type:"DWG plan", status:"Review", updated:"12 min ago", progress:84 },
- { name:"Workspace elevation", type:"DXF elevation", status:"Drafting", updated:"38 min ago", progress:62 },
- { name:"System detail", type:"PDF reference", status:"Ready", updated:"1h ago", progress:100 },
+ { name:"Chassis study", type:"3D CAD", status:"Review", updated:"12 min ago", progress:84 },
+ { name:"Suspension layout", type:"DXF layout", status:"Drafting", updated:"38 min ago", progress:62 },
+ { name:"Brake system detail", type:"PDF reference", status:"Ready", updated:"1h ago", progress:100 },
  ];
  const standards = [
  ["Units","Millimeters"],
- ["Layer set","Architecture"],
+ ["Layer set","Mechanical"],
  ["Line weight","ISO 128"],
  ["Export","DWG + PDF"],
  ];
  const draftingTools = [
- { label:"Floor plan", desc:"Rooms, doors, dimensions.", icon: Grid2X2 },
- { label:"Elevation", desc:"Facade and section lines.", icon: Monitor },
- { label:"Layer cleanup", desc:"Normalize names and weights.", icon: Layers3 },
- { label:"DXF audit", desc:"Find missing references.", icon: FileText },
+ { label:"Chassis", desc:"Frame and mounting points.", icon: Grid2X2 },
+ { label:"Body", desc:"Panels and section lines.", icon: Monitor },
+ { label:"Suspension", desc:"Normalize geometry and weights.", icon: Layers3 },
+ { label:"CAD audit", desc:"Find missing references.", icon: FileText },
  ];
 
  return (
  <div className="font-roboto">
  <PageHeader
- title="AutoCAD Design"
- subtitle="Draft, review, clean, and export technical drawing packages from one CAD workspace."
+ title="Automotive & Motorcycles"
+ subtitle="Design body, chassis, suspension, braking systems, cars, trucks, motorcycles, and electric vehicles."
  action={
  <div className="flex flex-wrap items-center gap-2">
- <SecondaryButton icon={Sparkles} onClick={() => router.push("/ai-assistant/tools/autocad")}>AI draft</SecondaryButton>
- <PrimaryButton icon={Upload} onClick={() => openModal("upload-file")}>Import AutoCAD file</PrimaryButton>
+ <SecondaryButton icon={Sparkles} onClick={() => router.push("/ai-assistant/tools/autocad")}>AI vehicle draft</SecondaryButton>
+ <PrimaryButton icon={Upload} onClick={() => openModal("upload-file")}>Import CAD file</PrimaryButton>
  </div>
  }
  />
@@ -2741,10 +2740,10 @@ function AutoCADPage() {
  <div>
  <span className="inline-flex items-center gap-2 rounded-full border border-[#CFE1FF] bg-[#EFF6FF] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-[#4284FF]">
  <PenLine className="h-3.5 w-3.5"/>
- CAD workspace
+ Vehicle CAD workspace
  </span>
- <h3 className={`mt-4 max-w-xl text-[34px] font-semibold leading-[0.98] tracking-[-0.045em] ${text}`}>AutoCAD Design for production drawings.</h3>
- <p className={`mt-3 max-w-lg text-[12px] leading-5 ${muted}`}>Import references, generate structured drafts, audit layers, and prepare export-ready DWG, DXF, and PDF packages.</p>
+ <h3 className={`mt-4 max-w-xl text-[34px] font-semibold leading-[0.98] tracking-[-0.045em] ${text}`}>Automotive and motorcycle systems for production CAD.</h3>
+ <p className={`mt-3 max-w-lg text-[12px] leading-5 ${muted}`}>Import references, generate structured body, chassis, suspension, and braking drafts, then prepare export-ready CAD packages.</p>
  </div>
  <button onClick={() => openModal("upload-file")} className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#4284FF] px-4 text-[12px] font-semibold text-white transition-colors hover:bg-[#376FE0]">
  <Upload className="h-4 w-4"/>
@@ -2898,7 +2897,7 @@ function CodeBuilderPage() {
  const cleanPrompt = prompt.trim();
  if (!cleanPrompt) {
  setPhase("error");
- setErrorMessage("Write a website prompt before generating a plan.");
+ setErrorMessage("Write an engineering prompt before generating a plan.");
  promptRef.current?.focus();
  return;
  }
@@ -2919,7 +2918,7 @@ function CodeBuilderPage() {
  headers: {"Content-Type":"application/json"},
  body: JSON.stringify({
  prompt: cleanPrompt,
- input: { workflow:"website_builder_plan"},
+ input: { workflow:"engineering_code_plan"},
  }),
  });
  const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
@@ -2961,8 +2960,8 @@ function CodeBuilderPage() {
  return (
  <div className="flex w-full flex-col gap-5 pb-2 font-roboto">
  <PageHeader
- title="Code Builder"
- subtitle="Turn a website brief into a clean plan, component layers, preview, and export-ready code."
+ title="AI Code Assistant"
+ subtitle="Generate FEA/CFD simulation helpers, CAD scripts, parametric automation, and API integrations."
  action={
  <div className="flex flex-wrap items-center gap-2">
  <SecondaryButton icon={Folder} onClick={() => openModal("project-create")}>Open project</SecondaryButton>
@@ -2978,21 +2977,21 @@ function CodeBuilderPage() {
  <div>
  <span className="inline-flex items-center gap-2 rounded-full border border-[#CFE1FF] bg-[#EFF6FF] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-[#4284FF]">
  <Code2 className="h-3.5 w-3.5"/>
- Builder workspace
+ Code / API workspace
  </span>
- <h3 className={`mt-4 max-w-2xl text-[34px] font-semibold leading-[0.98] tracking-[-0.045em] ${text}`}>Clean code starts with a clear build plan.</h3>
- <p className={`mt-3 max-w-2xl text-[12px] leading-5 ${muted}`}>Describe the site, then generate a structured workspace with sections, files, layers, and a live preview surface.</p>
+ <h3 className={`mt-4 max-w-2xl text-[34px] font-semibold leading-[0.98] tracking-[-0.045em] ${text}`}>Engineering code starts with a clear automation plan.</h3>
+ <p className={`mt-3 max-w-2xl text-[12px] leading-5 ${muted}`}>Describe the simulation, CAD script, parametric rule, or API workflow, then generate a structured plan with files, logic, inputs, and outputs.</p>
  </div>
  <div className={`rounded-2xl border px-4 py-3 ${line} ${soft}`}>
  <p className={`text-[10px] font-semibold uppercase tracking-[0.18em] ${muted}`}>Mode</p>
- <p className={`mt-2 text-[13px] font-semibold ${text}`}>Next.js builder</p>
+ <p className={`mt-2 text-[13px] font-semibold ${text}`}>Engineering code</p>
  <p className="mt-1 text-[10px] font-semibold text-[#4284FF]">Plan-first output</p>
  </div>
  </div>
 
  <div className="mt-6">
- <label htmlFor="code-builder-prompt"className={`text-[13px] font-semibold ${text}`}>Project prompt</label>
- <p className={`mt-1 text-[11px] ${muted}`}>Include audience, sections, style, conversion goal, and any required pages.</p>
+ <label htmlFor="code-builder-prompt"className={`text-[13px] font-semibold ${text}`}>Engineering prompt</label>
+ <p className={`mt-1 text-[11px] ${muted}`}>Include CAD studio, input geometry, units, constraints, simulation target, API output, and export format.</p>
  <textarea
  ref={promptRef}
  id="code-builder-prompt"
@@ -3003,7 +3002,7 @@ function CodeBuilderPage() {
  }}
  disabled={phase ==="generatingPlan"}
  className={`mt-3 min-h-[210px] w-full resize-none rounded-2xl border p-4 text-[13px] leading-6 outline-none transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#6F7782] focus:border-[rgba(66,132,255,0.5)]":"border-[#DDE6F0] bg-white text-[#1F1F1F] placeholder:text-[#9BA5B3] focus:border-[#9FC1FF]"}`}
- placeholder="Example: build a polished SaaS landing page for an AI design platform with hero, feature grid, pricing, testimonials, FAQ, and a footer. Use a calm professional UI and strong conversion CTA."
+ placeholder="Example: generate a Python CAD automation script for a transmission housing with parametric bolt patterns, material metadata, FEA-ready constraints, and STEP export."
  />
  {errorMessage && (
  <p className="mt-3 flex items-center gap-2 text-[11px] font-medium text-[#B42318]">
@@ -3091,14 +3090,14 @@ function CodeBuilderPage() {
  <button
  type="button"
  onClick={() => {
- setPrompt("Modern website building template with a strong hero, feature cards, pricing, testimonials, and a clean footer.");
+ setPrompt("Engineering automation template for a parametric engine housing script with CAD inputs, validation checks, and STEP export.");
  promptRef.current?.focus();
  }}
  disabled={phase ==="generatingPlan"}
  className={`mt-5 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border px-3 text-[11px] font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 ${line} ${soft} ${dark ?"text-[#A8B0BA] hover:text-[#F4F6F8]":"text-[#4B5563] hover:border-[#BBD4FF] hover:text-[#1F1F1F]"}`}
  >
  <Sparkles className="h-3.5 w-3.5 text-[#4284FF]"/>
- Use website template prompt
+ Use engineering template prompt
  </button>
  </aside>
  </div>
@@ -3185,7 +3184,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
  ${plan.websiteType}
  </p>
  <h1 className="mx-auto mt-4 max-w-3xl text-5xl font-semibold leading-tight text-black">
- Website Building Template
+ Engineering Automation Template
  </h1>
  <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-black/70">
  ${plan.designDirection}
@@ -3336,7 +3335,7 @@ function BuilderHeader({ plan, onRegenerate, onSave, onExport }: { plan: CodeBui
  </span>
  <div className="min-w-0">
  <div className="flex min-w-0 flex-wrap items-center gap-2">
- <h2 className="truncate text-[15px] font-semibold text-[#171717]">{plan.projectName ||"Website Building Template"}</h2>
+ <h2 className="truncate text-[15px] font-semibold text-[#171717]">{plan.projectName ||"Engineering Automation Template"}</h2>
  <span className="inline-flex h-6 items-center gap-1 rounded-full border border-[#BFE6D1] bg-[#EEFDF4] px-2 text-[10px] font-semibold text-[#087443]">
  <CheckCircle2 className="h-3 w-3"/>
  Plan generated
@@ -3604,7 +3603,7 @@ function PreviewHero({ plan, active }: { plan: CodeBuilderPlan; active: boolean 
  return (
  <section className={previewSectionClass(active,"bg-[#727272] px-7 py-16 text-center")}>
  <p className="mx-auto max-w-md text-[11px] font-semibold uppercase tracking-[0.14em] text-white/70">{plan.websiteType}</p>
- <h1 className="mx-auto mt-3 max-w-xl text-[34px] font-semibold leading-tight text-black">Website Building Template</h1>
+ <h1 className="mx-auto mt-3 max-w-xl text-[34px] font-semibold leading-tight text-black">Engineering Automation Template</h1>
  <p className="mx-auto mt-4 max-w-lg text-[13px] leading-6 text-black/70">{plan.designDirection}</p>
  <div className="mt-7 flex justify-center gap-2">
  <span className="rounded-[8px] bg-black px-4 py-2 text-[12px] font-semibold text-white">Launch preview</span>
@@ -3671,7 +3670,7 @@ function PreviewCta({ active }: { active: boolean }) {
  return (
  <section className={previewSectionClass(active,"bg-[#D9D9D9] px-7 py-10 text-center")}>
  <h3 className="text-[24px] font-semibold text-[#171717]">CTA Area</h3>
- <p className="mx-auto mt-3 max-w-md text-[12px] leading-5 text-[#4B5563]">Final conversion section generated from the website plan.</p>
+ <p className="mx-auto mt-3 max-w-md text-[12px] leading-5 text-[#4B5563]">Final export section generated from the engineering plan.</p>
  </section>
  );
 }
@@ -3690,21 +3689,21 @@ function BlenderPage() {
 
  return (
  <div>
- <PageHeader title="Blender 3D"subtitle="Generate, import, and organize 3D production assets."action={<PrimaryButton icon={Box} onClick={() => showToast("New Blender task prepared")}>New 3D task</PrimaryButton>} />
+ <PageHeader title="3D Studio Integration"subtitle="Work with SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD, and more."action={<PrimaryButton icon={Box} onClick={() => showToast("New CAD studio task prepared")}>New 3D task</PrimaryButton>} />
  <div className="grid gap-4 lg:grid-cols-2">
  <button onClick={() => openModal("asset-upload")} className="flex min-h-[180px] flex-col items-center justify-center rounded-2xl border border-dashed border-[#EAECEF] bg-[#FCFDFE] p-4 text-center transition-all hover:border-[#CFE8F8]">
  <Layers3 className="h-8 w-8 text-[#1DA1F2]"/>
- <p className="mt-3 text-[13px] font-semibold text-[#171717]">Upload asset or model</p>
- <p className="mt-1 text-[11px] text-[#6B7280]">OBJ, FBX, GLB, and blend files can be staged here.</p>
+ <p className="mt-3 text-[13px] font-semibold text-[#171717]">Upload CAD asset or model</p>
+ <p className="mt-1 text-[11px] text-[#6B7280]">STEP, OBJ, FBX, GLB, and CAD references can be staged here.</p>
  </button>
  <SoftCard>
  <label className="text-[12px] font-semibold text-[#171717]">Generation prompt</label>
- <textarea className="mt-3 min-h-[116px] w-full resize-none rounded-2xl border border-[#E5E7EB] bg-white p-4 text-[13px] outline-none placeholder:text-[#A1A7B0]"placeholder="Describe the model, material, lighting, or scene..."/>
- <PrimaryButton icon={Sparkles} onClick={() => showToast("Blender generation prepared")}>Prepare generation</PrimaryButton>
+ <textarea className="mt-3 min-h-[116px] w-full resize-none rounded-2xl border border-[#E5E7EB] bg-white p-4 text-[13px] outline-none placeholder:text-[#A1A7B0]"placeholder="Describe the CAD studio, assembly, material, constraint, or export workflow..."/>
+ <PrimaryButton icon={Sparkles} onClick={() => showToast("CAD studio generation prepared")}>Prepare generation</PrimaryButton>
  </SoftCard>
  </div>
  <div className="mt-5 grid gap-3 md:grid-cols-4">
- {["Material study","Product scene","Workspace lab","Character base"].map((name) => (
+ {["Material study","Engine assembly","CAD studio workflow","Industrial machine"].map((name) => (
  <ClickableSoftCard key={name} className="min-h-[120px]"onClick={() => showToast(`${name} asset opened`)} ariaLabel={`Open ${name}`}>
  <div className="mb-3 h-14 rounded-xl bg-[#EEF7FC]"/>
  <p className="text-[12px] font-semibold text-[#171717]">{name}</p>
@@ -4110,28 +4109,28 @@ const starterVisuals: StarterVisual[] = [
  preview: "from-[#D4D7DC] via-[#EEF1F5] to-[#FFFFFF]",
  strip: "from-[#19B7A5] via-[#2B8CFF] to-[#BDB4FF]",
  marker: "bg-[#22C55E]",
- meta: "Planning",
+ meta: "Mechanical",
  },
  {
  image: "/ai-cards/chat-unity.svg",
  preview: "from-[#073963] via-[#0C82B5] to-[#B8F0FF]",
  strip: "from-[#3758FF] via-[#DE3BFF] to-[#FF8A3D]",
  marker: "bg-[#7C3AED]",
- meta: "Agent",
+ meta: "Auto",
  },
  {
  image: "/ai-cards/chat-architecture.svg",
  preview: "from-[#DFF8FB] via-[#B6EEF0] to-[#8EE0E4]",
  strip: "from-[#F97316] via-[#FB7185] to-[#FCD34D]",
  marker: "bg-[#F97316]",
- meta: "Browser",
+ meta: "Aero",
  },
  {
  image: "/ai-cards/code.svg",
  preview: "from-[#0F172A] via-[#2563EB] to-[#93C5FD]",
  strip: "from-[#38BDF8] via-[#2563EB] to-[#1E40AF]",
  marker: "bg-[#38BDF8]",
- meta: "Code",
+ meta: "CNC",
  },
  {
  image: "/ai-cards/engine.svg",
@@ -4151,56 +4150,58 @@ const starterVisuals: StarterVisual[] = [
 
 const agentStarters: StarterCard[] = [
  {
- title:"AI Code",
- description:"Generate, debug, refactor, and review full-stack code.",
- shortTitle:"Code",
- shortDescription:"Build, debug, and review code.",
- icon: Code2,
- prompt:"Help me write, debug, or review code for",
- href:"/ai-assistant/tools/code",
- },
- {
- title:"Unity / Unreal Engine",
- description:"Plan gameplay, levels, mechanics, NPCs, assets, and optimization.",
- shortTitle:"Unity / Unreal",
- shortDescription:"Design games and real-time scenes.",
- icon: Gamepad2,
- prompt:"Help me plan a Unity or Unreal Engine project with gameplay, levels, assets, and optimization for",
- },
- {
- title:"Architecture",
- description:"Draft architectural layouts, dimensions, rooms, and technical plans.",
- shortTitle:"Architecture",
- shortDescription:"Plan spaces, layouts, and drawings.",
- icon: Network,
- prompt:"Help me create an architectural plan with dimensions, rooms, layers, and notes for",
- href:"/ai-assistant/tools/autocad",
- },
- {
- title:"Blender 3D",
- description:"Create scene briefs, materials, lighting, camera, and render plans.",
- shortTitle:"Blender 3D",
- shortDescription:"Plan scenes and 3D renders.",
- icon: Layers3,
- prompt:"Help me prepare a Blender 3D scene brief for",
+ title:"3D Machinery Engines & Industrial Machinery",
+ description:"3D design of engines, transmissions, hydraulic and pneumatic systems across all major CAD studios.",
+ shortTitle:"MECHANICAL ENG.",
+ shortDescription:"Engines, transmissions, hydraulics, pneumatics.",
+ icon: Box,
+ prompt:"Help me design 3D machinery, engines, transmissions, hydraulic and pneumatic systems for",
  href:"/ai-assistant/tools/blender",
  },
  {
- title:"Cedium Design",
- description:"Shape UI screens, web layouts, prototypes, and design systems.",
- shortTitle:"Design",
- shortDescription:"Create layouts and prototypes.",
+ title:"Automotive & Motorcycles",
+ description:"Body, chassis, suspension, braking systems - cars, trucks, motorcycles and electric vehicles.",
+ shortTitle:"AUTOMOTIVE",
+ shortDescription:"Cars, trucks, motorcycles, EV systems.",
+ icon: PenLine,
+ prompt:"Help me design automotive or motorcycle 3D systems for",
+ href:"/ai-assistant/tools/autocad",
+ },
+ {
+ title:"Aerospace & Drones",
+ description:"Aerodynamics, wing structures, fuselage modeling, and avionics system layout.",
+ shortTitle:"AEROSPACE",
+ shortDescription:"Drones, wings, fuselage, avionics layout.",
+ icon: Network,
+ prompt:"Help me design aerospace or drone 3D systems for",
+ href:"/ai-assistant/tools/autocad",
+ },
+ {
+ title:"CNC & Machining",
+ description:"AI-assisted G-code generation, toolpath optimization, milling and turning for all CNC workflows.",
+ shortTitle:"CNC / CAM",
+ shortDescription:"G-code, toolpaths, milling, turning.",
+ icon: Grid2X2,
+ prompt:"Help me prepare CNC, CAM, G-code, or toolpath planning for",
+ href:"/ai-assistant/tools/blender",
+ },
+ {
+ title:"3D Studio Integration",
+ description:"Works with SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD and more.",
+ shortTitle:"ALL CAD STUDIOS",
+ shortDescription:"SolidWorks, Fusion, CATIA, Rhino, NX.",
  icon: Monitor,
- prompt:"Create a clean design direction, layout, and component plan for",
+ prompt:"Help me connect and plan a CAD studio workflow for",
  href:"/cedium-design",
  },
  {
- title:"Workflow Automation",
- description:"Build secure workflow automations, approvals, and repeatable tasks.",
- shortTitle:"Workflow",
- shortDescription:"Automate tasks securely.",
- icon: Workflow,
- prompt:"Help me create a workflow that automates",
+ title:"AI Code Assistant",
+ description:"Code generation for FEA/CFD simulations, CAD scripting, parametric automation and API integrations.",
+ shortTitle:"CODE / API",
+ shortDescription:"FEA, CFD, CAD scripts, APIs.",
+ icon: Code2,
+ prompt:"Help me generate engineering code, CAD scripting, parametric automation, or API integration for",
+ href:"/ai-assistant/tools/code",
  },
 ];
 
@@ -4338,7 +4339,7 @@ function StarterPlaygroundView({
  { label: "Comparison task", model: "Gemini 2.5 Pro", accent: "bg-[#4F7BFF]", output: "Launch checklist", score: "$0.001", latency: "1.8s" },
  ];
 
- const taskPrompt = `You are a Cedium production analyst. Your task is to review the request and provide a concise plan for: ${card.title}.`;
+ const taskPrompt = `You are a Coreforge engineering analyst. Your task is to review the request and provide a concise plan for: ${card.title}.`;
  const textClass = dark ? "text-[#F4F6F8]" : "text-[#111827]";
  const mutedClass = dark ? "text-[#A8B0BA]" : "text-[#667085]";
  const panelClass = dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-white";
@@ -5205,9 +5206,9 @@ function AIAssistantPage() {
 
  useEffect(() => {
  if (typeof window ==="undefined") return;
- const stored = Number(window.localStorage.getItem("Cedium-ai-chat-count") ||"0");
+ const stored = Number(window.localStorage.getItem("Coreforge-ai-chat-count") ||"0");
  if (Number.isFinite(stored) && stored > 0) setAiChatCount(stored);
- const dismissed = window.localStorage.getItem("Cedium-ai-plan-notice-dismissed");
+ const dismissed = window.localStorage.getItem("Coreforge-ai-plan-notice-dismissed");
  if (dismissed ==="1") setPlanNoticeDismissed(true);
  }, []);
 
@@ -5395,7 +5396,7 @@ function AIAssistantPage() {
  setAiChatCount((current) => {
  const next = current + 1;
  if (typeof window !=="undefined") {
- window.localStorage.setItem("Cedium-ai-chat-count", String(next));
+ window.localStorage.setItem("Coreforge-ai-chat-count", String(next));
  }
  return next;
  });
@@ -5426,7 +5427,7 @@ function AIAssistantPage() {
  const shareAssistantMessage = async (content: string) => {
  try {
  if (navigator.share) {
- await navigator.share({ title:"Cedium AI response", text: content });
+ await navigator.share({ title:"Coreforge AI response", text: content });
  showToast("Response shared");
  return;
  }
@@ -5442,7 +5443,7 @@ function AIAssistantPage() {
  const url = URL.createObjectURL(blob);
  const link = document.createElement("a");
  link.href = url;
- link.download = `Cedium-ai-response-${message.id}.txt`;
+ link.download = `coreforge-ai-response-${message.id}.txt`;
  document.body.appendChild(link);
  link.click();
  link.remove();
@@ -5509,7 +5510,7 @@ function AIAssistantPage() {
  const dismissPlanNotice = () => {
  setPlanNoticeDismissed(true);
  if (typeof window !=="undefined") {
- window.localStorage.setItem("Cedium-ai-plan-notice-dismissed","1");
+ window.localStorage.setItem("Coreforge-ai-plan-notice-dismissed","1");
  }
  };
 
@@ -5545,7 +5546,7 @@ function AIAssistantPage() {
  value={input}
  onChange={(event) => setInput(event.target.value)}
  onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendPrompt(); } }}
- aria-label="Message Cedium"
+ aria-label="Message Coreforge"
  rows={2}
  placeholder="Add a message..."
  className={`w-full resize-none bg-transparent text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#1F1F1F] placeholder:text-[#A1A1A1]"}`}
@@ -5639,7 +5640,7 @@ function AIAssistantPage() {
  value={input}
  onChange={(event) => setInput(event.target.value)}
  onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendPrompt(); } }}
- aria-label="Message Cedium"
+ aria-label="Message Coreforge"
  rows={1}
  className={`min-h-[28px] flex-1 resize-none bg-transparent px-2 py-1 text-[14px] leading-5 outline-none ${dark ? "text-[#F4F6F8] placeholder:text-[#6F7782]" : "text-[#1F1F1F] placeholder:text-[#A1A1A1]"}`}
  style={{ letterSpacing: 0 }}
@@ -5670,7 +5671,7 @@ function AIAssistantPage() {
  <div className="min-w-0">
  <p className="text-[13px] font-semibold">Your free plan is wrapping up</p>
  <p className={`mt-0.5 text-[11px] leading-5 ${dark ?"text-[#A8B0BA]":"text-[#4B5563]"}`}>
- You have used Cedium AI {aiChatCount} {aiChatCount === 1 ?"time":"times"} on your free trial. Upgrade to keep your chats, attachments, and Voice Speak going without interruption.
+ You have used Coreforge AI {aiChatCount} {aiChatCount === 1 ?"time":"times"} on your free trial. Upgrade to keep your chats, attachments, and Voice Speak going without interruption.
  </p>
  </div>
  </div>
@@ -5910,7 +5911,7 @@ function PromptLabPage() {
  ))}
  </div>
  <div className="grid gap-3 md:grid-cols-3">
- {["Website audit","Component builder","Scene generator","Copy polish","Budget planner","Asset namer"].map((name) => (
+ {["Engine assembly","CAD script","CNC toolpath","Vehicle chassis","Drone fuselage","Asset namer"].map((name) => (
  <ClickableSoftCard key={name} onClick={() => openModal("prompt-editor")} ariaLabel={`Edit ${name} prompt`}>
  <p className="text-[12px] font-semibold text-[#171717]">{name}</p>
  <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">Prompt card placeholder for testing and reuse.</p>
@@ -5928,7 +5929,7 @@ function ProjectsPage() {
  <div>
  <PageHeader title="Projects"subtitle="Manage studio projects and production status."action={<PrimaryButton icon={Plus} onClick={() => openModal("project-create")}>New project</PrimaryButton>} />
  <div className="grid gap-3 md:grid-cols-3">
- {["Cedium command center","Automation workflow","3D product system"].map((name) => (
+ {["Coreforge command center","CNC automation workflow","3D machinery system"].map((name) => (
  <ClickableSoftCard key={name} className="min-h-[150px]"onClick={() => openDrawer("project-detail")} ariaLabel={`Open ${name} project`}>
  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
  <Folder className="h-5 w-5"/>
@@ -6013,7 +6014,7 @@ function SettingsPage() {
  <VoiceSettingRow />
  <GeneralSettingRow
  label="Separate Voice"
- description="Keep Cedium Voice in a separate full screen, without real time transcripts and visuals."
+ description="Keep Coreforge Voice in a separate full screen, without real time transcripts and visuals."
  control={<SettingsSwitch enabled={false} label="Separate Voice"/>}
  />
  </div>

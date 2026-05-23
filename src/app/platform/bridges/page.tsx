@@ -1,50 +1,50 @@
 "use client";
 
 import Link from "next/link";
-import { Box, Gamepad2 } from "lucide-react";
-import { CediumPage, COBALT } from "@/components/cedium-shell";
+import { Box } from "lucide-react";
+import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const bridges = [
  {
- app: "AutoCAD",
- slug: "autocad",
+ app: "3D Machinery",
+ slug: "machinery",
  v: "Latest",
- kind: "Design bridge",
+ kind: "Mechanical CAD",
  blurb:
- "Plan website screens, design systems, components, variants, and responsive states with the coding agent ready beside the design.",
- verbs: ["build frames", "sync tokens", "create components", "prepare code"],
- install: "AutoCAD Community plugin",
+ "3D design of engines, transmissions, hydraulic and pneumatic systems across all major CAD studios.",
+ verbs: ["engines", "transmissions", "hydraulics", "pneumatics"],
+ install: "Coreforge machinery workspace",
  },
  {
- app: "Blender",
- slug: "blender",
- v: "4.0+",
- kind: "Python add-on",
+ app: "3D Studio Integration",
+ slug: "cad-studios",
+ v: "All CAD",
+ kind: "Studio workflow",
  blurb:
- "Drive website hero scenes, 3D assets, geometry nodes, materials, lighting, and render queues through a signed Blender add-on.",
- verbs: ["build scene", "geometry nodes", "materials", "render assets"],
- install: "Cedium.ai/bridges/blender.zip",
+ "Works with SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD and more.",
+ verbs: ["SolidWorks", "Fusion 360", "CATIA", "FreeCAD"],
+ install: "Coreforge CAD studio workflow",
  },
 ];
 
 const upcomingEngines = [
  {
- app: "Unreal Engine",
+ app: "Automotive & Motorcycles",
  Icon: Box,
- description: "Create, prototype, and assist with next-generation 3D experiences powered by Cedium AI.",
- tags: ["real-time 3D", "prototyping", "worldbuilding"],
+ description: "Design body, chassis, suspension, braking systems, cars, trucks, motorcycles and electric vehicles.",
+ tags: ["body", "chassis", "suspension"],
  },
  {
- app: "Unity",
- Icon: Gamepad2,
- description: "Build smarter interactive apps, games, simulations, and real-time experiences with AI-assisted workflows.",
- tags: ["interactive apps", "games", "simulation"],
+ app: "Aerospace & Drones",
+ Icon: Box,
+ description: "Plan aerodynamics, wing structures, fuselage modeling, and avionics system layout.",
+ tags: ["aerodynamics", "wings", "avionics"],
  },
 ];
 
 export default function Bridges() {
  return (
- <CediumPage>
+ <CoreforgePage>
  {(t) => (
  <>
  <section style={{ padding: "120px 0 60px", position: "relative", overflow: "hidden" }}>
@@ -63,14 +63,14 @@ export default function Bridges() {
  />
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", position: "relative" }}>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 22 }}>
- PLATFORM / BRIDGES
+ PLATFORM / CAD STUDIOS
  </div>
  <h1 style={{ fontSize: "clamp(48px,8vw,128px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.88, margin: 0, fontStretch: "82%", maxWidth: 1100 }}>
- Design in <span style={{ color: COBALT, fontStyle: "italic" }}>AutoCAD</span>.<br />
- Build in Blender.
+ Design <span style={{ color: COBALT, fontStyle: "italic" }}>machines</span>.<br />
+ Build industrial 3D.
  </h1>
  <p style={{ marginTop: 32, fontSize: 18, color: t.muted, maxWidth: 640, lineHeight: 1.55 }}>
- Cedium connects the coding agent with AutoCAD for website design systems and Blender for 3D scenes, product visuals, and render-ready assets.
+ Coreforge connects 3D machinery, automotive systems, aerospace and drones, CNC/CAM, all major CAD studios, and AI code/API automation.
  </p>
  </div>
  </section>
@@ -130,13 +130,13 @@ export default function Bridges() {
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
  <div style={{ maxWidth: 720, marginBottom: 34 }}>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 18 }}>
- ROADMAP / GAME ENGINES
+ ROADMAP / ENGINEERING SYSTEMS
  </div>
  <h2 style={{ fontSize: "clamp(34px,5vw,64px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.96, margin: 0, fontStretch: "86%" }}>
- Game Engine Workflows - Coming Soon
+ Vehicle and Aerospace Workflows
  </h2>
  <p style={{ marginTop: 18, fontSize: 15.5, color: t.muted, maxWidth: 680, lineHeight: 1.65 }}>
- Cedium AI is preparing support for advanced real-time creation workflows across Unreal Engine and Unity.
+ Coreforge supports advanced mechanical creation workflows across automotive, motorcycles, aerospace, drones, CNC, and CAD studios.
  </p>
  </div>
 
@@ -268,22 +268,22 @@ export default function Bridges() {
  HOW IT CONNECTS
  </div>
  <h2 style={{ fontSize: "clamp(32px,5vw,56px)", fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1, margin: 0, marginBottom: 48, fontStretch: "88%" }}>
- AutoCAD for website design. Blender for 3D.
+ 3D machinery, CNC, and CAD studios in one flow.
  </h2>
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-0" style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden" }}>
  {[
  {
  n: "01",
- title: "AutoCAD to code",
- d: "The agent reads website structure, components, tokens, and layout intent from AutoCAD, then prepares responsive code sections.",
- tags: ["AutoCAD", "Code", "Website"],
+ title: "CNC & Machining",
+ d: "AI-assisted G-code generation, toolpath optimization, milling and turning for all CNC workflows.",
+ tags: ["CNC", "CAM", "G-code"],
  },
  {
  n: "02",
- title: "Blender to website",
- d: "The agent builds Blender scenes, materials, lighting, and render assets that can be used in hero sections and product pages.",
- tags: ["Blender", "3D", "Render"],
+ title: "AI Code Assistant",
+ d: "Code generation for FEA/CFD simulations, CAD scripting, parametric automation and API integrations.",
+ tags: ["FEA", "CFD", "API"],
  },
  ].map((step, i) => (
  <div key={step.n} style={{ padding: "40px 36px", background: t.raised, borderLeft: i === 1 ? `1px solid ${t.faint}` : "none" }}>
@@ -305,17 +305,17 @@ export default function Bridges() {
  <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E" }} />
  <span style={{ fontSize: 11, color: t.muted, fontFamily: "var(--font-geist-mono),monospace", letterSpacing: "0.06em" }}>
- Cedium.autocad.code - v0.9.4
+ Coreforge.cad.api - v1.0
  </span>
  </div>
  <pre style={{ margin: 0, fontSize: 12.5, fontFamily: "var(--font-geist-mono),monospace", lineHeight: 1.7, color: t.fg }}>
- <span style={{ color: COBALT }}>&gt;</span> Cedium.autocad.code({"{"}
- {"\n"} goal: <span style={{ color: "#22C55E" }}>&quot;build a clean responsive pricing section&quot;</span>,
- {"\n"} frame: <span style={{ color: "#22C55E" }}>&quot;Website / Pricing&quot;</span>,
- {"\n"} output: <span style={{ color: "#22C55E" }}>&quot;React + Tailwind&quot;</span>,
+ <span style={{ color: COBALT }}>&gt;</span> Coreforge.cad.api({"{"}
+ {"\n"} goal: <span style={{ color: "#22C55E" }}>&quot;generate transmission housing automation&quot;</span>,
+ {"\n"} studio: <span style={{ color: "#22C55E" }}>&quot;SolidWorks / Fusion 360&quot;</span>,
+ {"\n"} output: <span style={{ color: "#22C55E" }}>&quot;Python CAD script + STEP export&quot;</span>,
  {"\n"}
  {"}"}){"\n"}
- <span style={{ color: t.muted }}>{"// read AutoCAD frame - mapped tokens - wrote responsive code - 200ms"}</span>
+ <span style={{ color: t.muted }}>{"// read CAD constraints - mapped parameters - wrote automation plan - 200ms"}</span>
  </pre>
  </div>
  </div>
@@ -324,12 +324,12 @@ export default function Bridges() {
  <section style={{ padding: "96px 0", borderTop: `1px solid ${t.faint}` }}>
  <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
  <h2 style={{ fontSize: "clamp(40px,6vw,80px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.95, margin: 0, fontStretch: "86%" }}>
- AutoCAD and Blender.<br />
+ Machinery, CNC, and CAD.<br />
  <span style={{ color: COBALT, fontStyle: "italic" }}>One agent.</span>
  </h2>
  <div style={{ marginTop: 40, display: "inline-flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
  <Link href="/main" style={{ height: 48, padding: "0 22px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
- Launch Cedium OS
+ Launch Coreforge
  </Link>
  <Link href="/platform/agent-sdk" style={{ height: 48, padding: "0 22px", background: "transparent", color: t.fg, fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", border: `1px solid ${t.faint}` }}>
  Build the bridge
@@ -339,6 +339,6 @@ export default function Bridges() {
  </section>
  </>
  )}
- </CediumPage>
+ </CoreforgePage>
  );
 }

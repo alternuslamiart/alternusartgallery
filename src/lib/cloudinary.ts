@@ -12,11 +12,11 @@ export { cloudinary }
 // Upload image to Cloudinary
 export async function uploadImage(
  file: string, // base64 or URL
- folder: string = 'Cedium-assets'
+ folder: string = 'Coreforge-assets'
 ): Promise<{ url: string; publicId: string }> {
  try {
  const result = await cloudinary.uploader.upload(file, {
- folder: `Cedium/${folder}`,
+ folder: `Coreforge/${folder}`,
  resource_type: 'image',
  transformation: [
  { quality: 'auto:best' },

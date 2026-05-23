@@ -3,61 +3,61 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowRight, Code2, Cuboid, Layers3, ShieldCheck, Sparkles, Workflow } from "lucide-react";
-import { CediumPage, COBALT } from "@/components/cedium-shell";
+import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const surfaces = [
  {
  n: "01",
- title: "Studio workspace",
- description: "Chat, project context, files, assets, and checkpoints stay in one readable production surface.",
+ title: "3D Machinery",
+ description: "Engine, transmission, hydraulic, pneumatic, and industrial machinery design in one focused production surface.",
  Icon: Layers3,
  href: "/ai-assistant",
  cta: "Launch Studio",
  },
  {
  n: "02",
- title: "Agent-ready code",
- description: "Turn prompts, page structure, design notes, and implementation tasks into focused code workflows.",
+ title: "AI Code Assistant",
+ description: "Generate CAD scripts, simulation helpers, parametric automation, and API integrations for engineering workflows.",
  Icon: Code2,
  href: "/workspace/code",
- cta: "Open Code",
+ cta: "Open Assistant",
  },
  {
  n: "03",
- title: "3D and CAD flow",
- description: "Move from AutoCAD website layouts to Blender scenes, product visuals, and render-ready assets.",
+ title: "CAD Studio Flow",
+ description: "Work across SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD, and connected 3D studios.",
  Icon: Cuboid,
  href: "/platform/bridges",
- cta: "View Bridges",
+ cta: "View Studios",
  },
 ];
 
 const metrics = [
- { label: "One workspace", value: "01", detail: "for design, code, assets, and production memory" },
- { label: "Agent surfaces", value: "06", detail: "studio, mail, files, code, knowledge, voice" },
- { label: "Production paths", value: "3D", detail: "website builds, CAD support, and Blender output" },
+ { label: "Core focus", value: "3D", detail: "machinery, engines, vehicles, and industrial systems" },
+ { label: "Engineering tracks", value: "06", detail: "mechanical, automotive, aerospace, CNC, CAD studio, and code/API" },
+ { label: "CAD coverage", value: "All", detail: "major CAD studios, CAM tools, and parametric automation" },
 ];
 
 const workflow = [
  {
- title: "Start with the brief",
- copy: "Describe the page, product, CAD frame, 3D scene, or operational workflow.",
+ title: "Start with the machine brief",
+ copy: "Describe the engine, vehicle part, CNC workflow, drone frame, hydraulic system, or industrial assembly.",
  },
  {
- title: "Shape the work",
- copy: "Cedium keeps context, assets, decisions, and next actions organized across the build.",
+ title: "Shape the engineering plan",
+ copy: "Coreforge keeps CAD context, constraints, assemblies, materials, and next actions organized across the build.",
  },
  {
- title: "Ship from Studio",
- copy: "Move into code, files, community feedback, pricing, or project status without losing state.",
+ title: "Move into production",
+ copy: "Continue into CAD scripting, FEA/CFD support, CAM planning, exports, and project status without losing context.",
  },
 ];
 
 const controls = [
- { title: "Clean access", copy: "Roles, workspace limits, account state, and plan gates remain visible." },
- { title: "Project memory", copy: "Files, prompts, exports, and activity stay tied to the work instead of scattered tabs." },
- { title: "Readable status", copy: "Production flow, platform health, and support links are easy to find." },
- { title: "Security posture", copy: "Security, privacy, terms, and cookie controls live in the same system shell." },
+ { title: "Mechanical scope", copy: "Engines, transmissions, hydraulic and pneumatic systems stay organized by assemblies and constraints." },
+ { title: "Vehicle systems", copy: "Body, chassis, suspension, braking, motorcycle, truck, and EV work stays tied to the same project." },
+ { title: "Industrial output", copy: "CNC, CAM, G-code, toolpaths, milling, turning, and export tasks remain easy to track." },
+ { title: "Studio coverage", copy: "SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD, and code/API work fit the same flow." },
 ];
 
 function ActionLink({
@@ -96,7 +96,7 @@ function ActionLink({
 
 export default function HomePage() {
  return (
- <CediumPage>
+ <CoreforgePage>
  {(t) => (
  <>
  <section style={{ padding: "112px 0 72px", position: "relative", overflow: "hidden" }}>
@@ -116,7 +116,7 @@ export default function HomePage() {
  />
  <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 32px", textAlign: "center", position: "relative" }}>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 22 }}>
- AI PRODUCTION / v2.2
+ COREFORGE WEBSITE / 3D MACHINERY
  </div>
  <h1
  style={{
@@ -128,12 +128,12 @@ export default function HomePage() {
  fontStretch: "82%",
  }}
  >
- Build the work.
+ Build 3D machinery.
  <br />
- <span style={{ color: COBALT, fontStyle: "italic" }}>Not the tabs.</span>
+ <span style={{ color: COBALT, fontStyle: "italic" }}>Engines to industry.</span>
  </h1>
  <p style={{ margin: "30px auto 0", maxWidth: 690, fontSize: 18, color: t.muted, lineHeight: 1.62 }}>
- One calm AI workspace for design, code, 3D, CAD, assets, and automation. Start with a brief, keep context, and move projects toward production without changing tools.
+ Coreforge is an AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.
  </p>
  <div style={{ marginTop: 36, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", color: t.fg }}>
  <ActionLink href="/ai-assistant">
@@ -153,7 +153,7 @@ export default function HomePage() {
  color: t.muted,
  }}
  >
- {["Design systems", "Code agent", "Blender 3D", "AutoCAD bridge", "Project memory"].map((item) => (
+ {["3D machinery", "Engines", "Automotive", "CNC / CAM", "All CAD studios"].map((item) => (
  <span
  key={item}
  style={{
@@ -209,15 +209,15 @@ export default function HomePage() {
  <div style={{ display: "flex", alignItems: "end", justifyContent: "space-between", gap: 24, flexWrap: "wrap", marginBottom: 42 }}>
  <div>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 18 }}>
- WHAT CEDIUM DOES
+ WHAT COREFORGE DOES
  </div>
  <h2 style={{ fontSize: "clamp(38px,6vw,72px)", fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 0.94, margin: 0, fontStretch: "84%" }}>
- A quieter way to run<br />
- <span style={{ color: COBALT, fontStyle: "italic" }}>AI-assisted production.</span>
+ 3D engineering for<br />
+ <span style={{ color: COBALT, fontStyle: "italic" }}>machines and vehicles.</span>
  </h2>
  </div>
  <p style={{ margin: 0, maxWidth: 410, color: t.muted, fontSize: 15, lineHeight: 1.65 }}>
- Built for useful outputs, clear project state, and a workspace that stays readable while the work gets more complex.
+ Built for mechanical engineering, automotive and motorcycle design, aerospace parts, CNC/CAM workflows, CAD studio integration, and code/API automation.
  </p>
  </div>
 
@@ -278,10 +278,10 @@ export default function HomePage() {
  <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr]" style={{ alignItems: "start" }}>
  <div>
  <h2 style={{ fontSize: "clamp(36px,5vw,64px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.96, margin: 0, fontStretch: "86%" }}>
- From idea to output without losing context.
+ From concept to engineered output.
  </h2>
  <p style={{ marginTop: 22, fontSize: 15.5, color: t.muted, maxWidth: 480, lineHeight: 1.65 }}>
- Keep the goal, source files, generated assets, and review path tied to the same workspace from first prompt to final output.
+ Keep design goals, CAD files, assemblies, generated assets, and review paths tied to the same workspace from first prompt to final output.
  </p>
  </div>
  <div style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden", background: t.raised }}>
@@ -331,8 +331,8 @@ export default function HomePage() {
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT }}>WORKSPACE CONTROL</div>
  </div>
  <h2 style={{ fontSize: "clamp(36px,5vw,62px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.96, margin: 0, marginBottom: 42, fontStretch: "86%" }}>
- Useful production, clear state,<br />
- <span style={{ color: COBALT, fontStyle: "italic" }}>less interface noise.</span>
+ Mechanical production, clear state,<br />
+ <span style={{ color: COBALT, fontStyle: "italic" }}>better engineering flow.</span>
  </h2>
  <div className="grid grid-cols-1 gap-0 md:grid-cols-2" style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden" }}>
  {controls.map((item, index) => (
@@ -362,11 +362,11 @@ export default function HomePage() {
  <Sparkles size={15} /> Begin
  </div>
  <h2 style={{ fontSize: "clamp(44px,7vw,88px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.9, margin: 0, fontStretch: "84%" }}>
- Start in Studio.<br />
- <span style={{ color: COBALT, fontStyle: "italic" }}>Keep the work moving.</span>
+ Start in Coreforge.<br />
+ <span style={{ color: COBALT, fontStyle: "italic" }}>Keep machines moving.</span>
  </h2>
  <p style={{ margin: "26px auto 0", maxWidth: 610, color: t.muted, fontSize: 16, lineHeight: 1.65 }}>
- Open the AI workspace, compare plans, or review the platform before moving a project into production.
+ Open the engineering workspace, compare CAD plans, or review CNC, automotive, aerospace, and machinery workflows before production.
  </p>
  <div style={{ marginTop: 36, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", color: t.fg }}>
  <ActionLink href="/main">
@@ -380,6 +380,6 @@ export default function HomePage() {
  </section>
  </>
  )}
- </CediumPage>
+ </CoreforgePage>
  );
 }

@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const STUDIO_HOME = "/ai-assistant";
-const AUTH_THEME_KEY = "Cedium_auth_theme";
+const AUTH_THEME_KEY = "Coreforge_auth_theme";
 
 type OAuthProvider = "google" | "github" | "discord";
 
@@ -53,7 +53,7 @@ const socialProviders: Array<{
  },
 ];
 
-function CediumMark() {
+function CoreforgeMark() {
  return (
  <span className="relative inline-flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#068fff]" aria-hidden="true">
  <span className="absolute inset-[4px] rounded-full border-[3px] border-[#071014] border-r-white/0 border-t-white/0" />
@@ -83,9 +83,9 @@ function useAuthTheme() {
 
 function Brand() {
  return (
- <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Cedium home">
- <CediumMark />
- <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Cedium</span>
+ <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Coreforge home">
+ <CoreforgeMark />
+ <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Coreforge</span>
  </Link>
  );
 }
@@ -148,10 +148,10 @@ export default function LoginPage() {
  <main className="relative z-10 flex min-h-[calc(100vh-80px)] items-center justify-center px-5 pb-16 pt-8">
  <Card className="auth-card w-full max-w-md rounded-[24px] border shadow-none backdrop-blur-xl">
  <CardHeader className="space-y-3 p-7 text-center">
- <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Cedium workspace</p>
+ <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Coreforge workspace</p>
  <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">Sign in</h1>
  <p className="auth-copy mx-auto max-w-xs text-sm leading-6">
- Open your AI platform studio for code, 3D, and technical workflows.
+ Open your AI workspace for 3D machinery, CAD studios, CNC, and engineering code workflows.
  </p>
  </CardHeader>
  <CardContent className="space-y-5 p-7 pt-0">
@@ -237,7 +237,7 @@ export default function LoginPage() {
  </form>
 
  <p className="auth-footer-copy text-center text-xs">
- New to Cedium?{" "}
+ New to Coreforge?{" "}
  <Link href="/signup" className="auth-footer-link font-semibold">
  Create an account
  </Link>
