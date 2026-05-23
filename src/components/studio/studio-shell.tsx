@@ -111,13 +111,6 @@ type GeneratedRecent = {
 
 export const studioNavigation: NavItem[] = [
  { key:"ai-assistant", label:"AI Assistant", href:"/ai-assistant", icon: Sparkles },
- { key:"studio-overview", label:"Studio Overview", href:"/studio-overview", icon: Grid2X2 },
- { key:"cedium-design", label:"3D Machinery", href:"/cedium-design", icon: Monitor },
- { key:"autocad-design", label:"Automotive & Motorcycles", href:"/autocad-design", icon: PenLine },
- { key:"code-builder", label:"AI Code Assistant", href:"/code-builder", icon: Code2 },
- { key:"blender-3d", label:"3D Studio Integration", href:"/blender-3d", icon: Layers3 },
- { key:"asset-library", label:"Asset Library", href:"/asset-library", icon: ImageIcon },
- { key:"prompt-lab", label:"Prompt Lab", href:"/prompt-lab", icon: FileText, badge:"2"},
  { key:"projects", label:"Projects", href:"/projects", icon: Folder },
  { key:"exports", label:"Exports", href:"/exports", icon: Upload },
 ];
@@ -5133,10 +5126,10 @@ function AssistantScrollRail({ dark }: { dark: boolean }) {
 }
 
 function AIAssistantPage() {
- const { theme } = useStudioTheme();
+ const { theme, setTheme } = useStudioTheme();
  const { openModal, showToast, isTemporaryChat, temporaryChatId, newChatId, endTemporaryChat } = useStudioActions();
  const router = useRouter();
- const dark = theme ==="dark";
+ const dark = true;
  const [messages, setMessages] = useState<Array<{ id: string; role:"user"|"assistant"; content: string }>>([]);
  const [input, setInput] = useState("");
  const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -5169,6 +5162,12 @@ function AIAssistantPage() {
  const textareaRef = useRef<HTMLTextAreaElement>(null);
  const hasConversation = messages.length > 0;
  const showPlanEndingNotice = hasConversation && aiChatCount >= 3 && !planNoticeDismissed;
+
+ useEffect(() => {
+ if (theme !=="dark") {
+ setTheme("dark");
+ }
+ }, [theme, setTheme]);
 
  useEffect(() => {
  conversationEndRef.current?.scrollIntoView({ behavior:"smooth", block:"end"});
@@ -5690,112 +5689,139 @@ function AIAssistantPage() {
 
  return (
  <>
- <div id="assistant-overview" className={`min-h-full overflow-y-auto font-roboto ${dark ?"bg-[#0A0E14] text-[#F4F7FA]":"bg-[#F4F7FA] text-[#0A0E14]"}`}>
- <div className="mx-auto flex w-full max-w-[1180px] flex-col px-4 py-5 sm:px-6 lg:px-8">
- <div className={`mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[8px] border px-3 py-2 ${dark ?"border-[rgba(181,212,244,0.12)] bg-[#2C2C2A]":"border-[#D3D1C7] bg-white"}`}>
- <div className="flex min-w-0 items-center gap-3">
- <span className={`flex h-8 w-8 items-center justify-center rounded-[8px] ${dark ?"bg-[#185FA5] text-white":"bg-[#E6F1FB] text-[#185FA5]"}`}>
- <Sparkles className="h-4 w-4" strokeWidth={2.2}/>
- </span>
- <div className="min-w-0">
- <p className={`truncate text-[13px] font-semibold ${dark ?"text-[#F4F7FA]":"text-[#0A0E14]"}`}>Coreforge AI Assistant</p>
- <p className={`truncate text-[11px] ${dark ?"text-[#B4B2A9]":"text-[#5F5E5A]"}`}>3D machinery, CAD studios, CNC/CAM, engines, vehicles</p>
- </div>
- </div>
- <div className="flex items-center gap-2">
- {["Design","CAD","CNC","API"].map((label) => (
- <span key={label} className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${dark ?"border-[rgba(181,212,244,0.14)] bg-[#0A0E14] text-[#B5D4F4]":"border-[#D3D1C7] bg-[#F4F7FA] text-[#5F5E5A]"}`}>{label}</span>
+ <div id="assistant-overview" className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#191919] font-roboto text-[#E6E8EA]">
+ <div className="flex h-8 flex-shrink-0 items-center gap-3 border-b border-[#2A2A2A] bg-[#111111] px-2 text-[11px] text-[#C9CDD2]">
+ <div className="flex items-center gap-3">
+ {["File","Edit","Render","Window","Help"].map((item) => (
+ <button key={item} type="button" className="rounded-[4px] px-1.5 py-1 hover:bg-[#2C2C2A] hover:text-white">{item}</button>
  ))}
  </div>
+ <div className="h-4 w-px bg-[#343434]" />
+ <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
+ {["Layout","Modeling","Scripting","Rendering","Simulation","CAD"].map((item, index) => (
+ <button key={item} type="button" className={`rounded-[4px] px-3 py-1 ${index === 0 ?"bg-[#303030] text-white":"text-[#9DA3AA] hover:bg-[#262626] hover:text-white"}`}>{item}</button>
+ ))}
+ </div>
+ <span className="hidden rounded-[4px] bg-[#202328] px-2 py-1 text-[#B5D4F4] sm:inline">Coreforge Workspace</span>
  </div>
 
- <div className="grid gap-5 lg:grid-cols-[1fr_380px]">
- <section id="assistant-greeting" className={`rounded-[8px] border p-5 sm:p-7 ${dark ?"border-[rgba(181,212,244,0.12)] bg-[#2C2C2A]":"border-[#D3D1C7] bg-white"}`}>
- <div className="flex flex-wrap items-start justify-between gap-4">
- <div>
- <p className={`text-[10px] font-semibold uppercase tracking-[0.24em] ${dark ?"text-[#B5D4F4]":"text-[#185FA5]"}`}>Mechanical intelligence</p>
- <h2 className={`mt-4 max-w-2xl text-[38px] font-semibold leading-[0.95] tracking-[0] sm:text-[56px] ${dark ?"text-[#F4F7FA]":"text-[#0A0E14]"}`}>
- Build precise 3D machinery with AI.
- </h2>
- <p className={`mt-4 max-w-xl text-[14px] leading-6 ${dark ?"text-[#D3D1C7]":"text-[#5F5E5A]"}`}>
- Ask for engines, transmissions, hydraulics, pneumatic systems, automotive parts, aerospace layouts, CNC toolpaths, CAD scripts, and API automation.
- </p>
+ <div className="flex min-h-0 flex-1">
+ <aside className="hidden w-11 flex-shrink-0 flex-col items-center gap-2 border-r border-[#2A2A2A] bg-[#202020] py-2 md:flex">
+ {[Sparkles, CircleSlash, Box, PenLine, Code2, Layers3, Network, Upload].map((Icon, index) => (
+ <button key={index} type="button" className={`flex h-8 w-8 items-center justify-center rounded-[4px] border ${index === 0 ?"border-[#378ADD] bg-[#185FA5] text-white":"border-[#303030] bg-[#282828] text-[#B4B2A9] hover:border-[#5F5E5A] hover:text-white"}`} aria-label={`Tool ${index + 1}`}>
+ <Icon className="h-4 w-4" strokeWidth={2} />
+ </button>
+ ))}
+ </aside>
+
+ <main className="relative min-w-0 flex-1 overflow-hidden bg-[#383838]">
+ <div className="absolute inset-0" style={{ backgroundImage:"linear-gradient(rgba(255,255,255,0.075) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.075) 1px, transparent 1px)", backgroundSize:"38px 38px" }} />
+ <div className="absolute left-[-10%] top-1/2 h-px w-[130%] -rotate-[18deg] bg-[#CF3348]/80" />
+ <div className="absolute left-[42%] top-[-20%] h-[140%] w-px rotate-[34deg] bg-[#65B82E]/80" />
+ <div className="absolute left-4 top-3 z-10 rounded-[4px] bg-black/24 px-3 py-2 text-[12px] leading-5 text-white">
+ <p className="font-semibold">User Perspective</p>
+ <p className="text-[#D3D1C7]">(1) Coreforge / Mechanical AI Workspace</p>
  </div>
- <div className={`hidden min-w-[136px] rounded-[8px] border p-3 text-right sm:block ${dark ?"border-[rgba(181,212,244,0.12)] bg-[#0A0E14]":"border-[#D3D1C7] bg-[#F4F7FA]"}`}>
- <p className={`text-[10px] uppercase tracking-[0.18em] ${dark ?"text-[#B4B2A9]":"text-[#5F5E5A]"}`}>Mode</p>
- <p className={`mt-1 text-[20px] font-semibold ${dark ?"text-[#B5D4F4]":"text-[#185FA5]"}`}>Forge</p>
- </div>
+ <div className="absolute right-4 top-3 z-10 flex items-center gap-1 rounded-[4px] bg-[#202020]/92 p-1">
+ {["X","Y","Z"].map((axis) => (
+ <span key={axis} className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${axis ==="X"?"bg-[#CF3348]": axis ==="Y"?"bg-[#65B82E]":"bg-[#378ADD]"} text-white`}>{axis}</span>
+ ))}
  </div>
 
- {temporaryChatNotice && <div className="mt-5 w-full">{temporaryChatNotice}</div>}
+ <div className="absolute left-[18%] top-[18%] h-24 w-36 -rotate-[18deg] border border-black/70">
+ <div className="absolute left-5 top-4 h-12 w-20 skew-x-[-18deg] border border-black/70 bg-black/10" />
+ <div className="absolute right-4 top-2 h-9 w-14 bg-black" style={{ clipPath:"polygon(0 100%, 70% 0, 100% 100%)" }} />
+ </div>
+ <div className="absolute left-1/2 top-[42%] h-28 w-28 -translate-x-1/2 -translate-y-1/2 rotate-[-18deg] border-2 border-[#F59E0B] bg-[#B88961] shadow-[18px_18px_0_0_rgba(147,91,37,0.9)]">
+ <div className="absolute inset-0 bg-gradient-to-br from-white/28 via-transparent to-black/18" />
+ <div className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#F4F7FA] bg-[#CF3348]" />
+ </div>
 
- <div id="assistant-mode" className="mt-6 flex w-full">
+ <div id="assistant-greeting" className="absolute bottom-[92px] left-1/2 z-10 w-[min(720px,calc(100%-32px))] -translate-x-1/2">
+ {temporaryChatNotice && <div className="mb-3">{temporaryChatNotice}</div>}
+ <div className="mb-3 rounded-[8px] border border-[#2C2C2A] bg-[#111111]/86 p-4 shadow-[0_18px_42px_rgba(0,0,0,0.34)] backdrop-blur">
+ <div className="flex flex-wrap items-start justify-between gap-3">
+ <div className="min-w-0">
+ <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#B5D4F4]">AI Assistant</p>
+ <h2 className="mt-2 text-[30px] font-semibold leading-none tracking-[0] text-white sm:text-[42px]">Build machinery in a 3D viewport.</h2>
+ <p className="mt-3 max-w-xl text-[13px] leading-5 text-[#D3D1C7]">Engines, vehicles, industrial machinery, CNC, CAD scripts, hydraulics, transmissions, and simulation workflows.</p>
+ </div>
+ <div id="assistant-mode" className="w-full sm:w-auto">
  <ModeToggle mode={assistantMode} onChange={setAssistantMode} dark={dark} />
  </div>
-
- <div className="mt-8 w-full">
- {planNotice}
- {composer}
  </div>
- </section>
+ </div>
+ <div className="w-full">{composer}</div>
+ </div>
 
- <aside className={`relative min-h-[360px] overflow-hidden rounded-[8px] border ${dark ?"border-[rgba(181,212,244,0.12)] bg-[#2C2C2A]":"border-[#D3D1C7] bg-white"}`}>
- <div
- className="absolute inset-0 opacity-70"
- style={{
- backgroundImage: `linear-gradient(${dark ?"rgba(181,212,244,0.12)":"#D3D1C7"} 1px, transparent 1px), linear-gradient(90deg, ${dark ?"rgba(181,212,244,0.12)":"#D3D1C7"} 1px, transparent 1px)`,
- backgroundSize:"26px 26px",
- }}
- />
- <div className="relative z-10 flex h-full flex-col justify-between p-5">
- <div>
- <p className={`text-[10px] font-semibold uppercase tracking-[0.22em] ${dark ?"text-[#B5D4F4]":"text-[#185FA5]"}`}>Viewport</p>
- <div className="mt-6 space-y-3">
+ <div className="absolute inset-x-0 bottom-0 flex h-9 items-center gap-2 border-t border-[#2A2A2A] bg-[#202020] px-3 text-[11px] text-[#B4B2A9]">
+ <Play className="h-3.5 w-3.5 text-[#B5D4F4]" />
+ <span className="rounded-[4px] bg-[#303030] px-3 py-1 text-white">Frame 1</span>
+ <div className="h-1 flex-1 rounded-full bg-[#303030]">
+ <div className="h-full w-[18%] rounded-full bg-[#378ADD]" />
+ </div>
+ <span>End 250</span>
+ </div>
+ </main>
+
+ <aside className="hidden w-[318px] flex-shrink-0 flex-col border-l border-[#2A2A2A] bg-[#202020] xl:flex">
+ <div className="border-b border-[#2A2A2A] p-3">
+ <div className="mb-2 flex items-center justify-between">
+ <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#B5D4F4]">Scene Collection</p>
+ <Search className="h-3.5 w-3.5 text-[#B4B2A9]" />
+ </div>
  {[
- ["Engine assembly","72 parts","Ready"],
- ["CNC toolpath","G-code","Draft"],
- ["CAD studio","NX / FreeCAD","Linked"],
- ].map(([name, meta, status]) => (
- <div key={name} className={`rounded-[8px] border p-3 ${dark ?"border-[rgba(181,212,244,0.14)] bg-[#0A0E14]/82":"border-[#D3D1C7] bg-[#F4F7FA]/90"}`}>
- <div className="flex items-center justify-between gap-3">
- <p className={`truncate text-[12px] font-semibold ${dark ?"text-[#F4F7FA]":"text-[#0A0E14]"}`}>{name}</p>
- <span className={`rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase ${dark ?"bg-[#185FA5] text-white":"bg-[#E6F1FB] text-[#185FA5]"}`}>{status}</span>
+ ["Camera","Viewport target"],
+ ["Cube","Engine block concept"],
+ ["Light","Studio key light"],
+ ].map(([name, meta], index) => (
+ <button key={name} type="button" className={`mb-1 flex w-full items-center gap-2 rounded-[4px] px-2 py-1.5 text-left ${index === 1 ?"bg-[#303030] text-white":"text-[#C9CDD2] hover:bg-[#282828]"}`}>
+ <Box className={`h-3.5 w-3.5 ${index === 1 ?"text-[#F59E0B]":"text-[#8A94A3]"}`} />
+ <span className="min-w-0 flex-1">
+ <span className="block truncate text-[12px] font-semibold">{name}</span>
+ <span className="block truncate text-[10px] text-[#8A94A3]">{meta}</span>
+ </span>
+ </button>
+ ))}
  </div>
- <p className={`mt-1 text-[11px] ${dark ?"text-[#B4B2A9]":"text-[#5F5E5A]"}`}>{meta}</p>
+ <div className="min-h-0 flex-1 overflow-y-auto p-3">
+ <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#B5D4F4]">Properties</p>
+ <div className="space-y-2">
+ {["Transform","Relations","Collections","Motion Paths","Shading","AI Constraints"].map((section, index) => (
+ <div key={section} className="rounded-[4px] border border-[#343434] bg-[#2A2A2A]">
+ <div className="flex items-center gap-2 border-b border-[#343434] px-2 py-1.5 text-[11px] font-semibold text-[#E6E8EA]">
+ <ChevronRight className="h-3 w-3" />
+ {section}
+ </div>
+ {index === 0 && (
+ <div className="space-y-1.5 p-2">
+ {["Location X","Location Y","Location Z","Scale X","Scale Y","Scale Z"].map((field, fieldIndex) => (
+ <div key={field} className="grid grid-cols-[78px_1fr] items-center gap-2 text-[10px] text-[#C9CDD2]">
+ <span>{field}</span>
+ <span className="rounded-[3px] bg-[#3A3A3A] px-2 py-1 text-right text-[#F4F7FA]">{fieldIndex < 3 ?"0 m":"1.000"}</span>
  </div>
  ))}
  </div>
+ )}
  </div>
- <div className={`rounded-[8px] border p-3 ${dark ?"border-[rgba(181,212,244,0.14)] bg-[#0A0E14]/82":"border-[#D3D1C7] bg-[#F4F7FA]/90"}`}>
- <div className="flex items-center justify-between">
- <span className={`text-[10px] uppercase tracking-[0.16em] ${dark ?"text-[#B4B2A9]":"text-[#5F5E5A]"}`}>Palette</span>
- <span className={`text-[10px] font-semibold ${dark ?"text-[#B5D4F4]":"text-[#185FA5]"}`}>Forge / Sky / Steel</span>
- </div>
- <div className="mt-3 grid grid-cols-5 gap-2">
- {["#0A0E14","#185FA5","#378ADD","#B5D4F4","#F4F7FA"].map((color) => (
- <span key={color} className="h-7 rounded-[6px] border border-white/10" style={{ backgroundColor: color }} />
  ))}
+ </div>
+ <div id="assistant-starters" className="mt-3">
+ <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#B5D4F4]">AI Operations</p>
+ <div id="assistant-workflows" className="space-y-1.5">
+ {agentStarters.slice(0, 5).map((card) => {
+ const Icon = card.icon;
+ return (
+ <button key={card.title} type="button" onClick={() => card.href ? router.push(card.href) : setActivePlaygroundCard(card)} className="flex w-full items-center gap-2 rounded-[4px] border border-[#343434] bg-[#282828] px-2 py-2 text-left text-[#D3D1C7] hover:border-[#378ADD] hover:text-white">
+ <Icon className="h-3.5 w-3.5 flex-shrink-0 text-[#B5D4F4]" />
+ <span className="min-w-0 flex-1 truncate text-[11px] font-semibold">{card.title}</span>
+ </button>
+ );
+ })}
  </div>
  </div>
  </div>
  </aside>
- </div>
-
- <div id="assistant-starters" className="mt-5 w-full">
- <div id="assistant-workflows">
- <StarterPanel
- mode={assistantMode}
- dark={dark}
- onOpen={(card) => {
- if (card.href) {
- router.push(card.href);
- return;
- }
- setActivePlaygroundCard(card);
- }}
- />
- </div>
- </div>
  </div>
  </div>
  </>
