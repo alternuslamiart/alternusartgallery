@@ -128,12 +128,12 @@ export default function HomePage() {
  fontStretch: "82%",
  }}
  >
- Build 3D machinery.
+ AI for engineering.
  <br />
- <span style={{ color: COBALT, fontStyle: "italic" }}>Engines to industry.</span>
+ <span style={{ color: COBALT, fontStyle: "italic" }}>3D, CAD & automation.</span>
  </h1>
  <p style={{ margin: "30px auto 0", maxWidth: 690, fontSize: 18, color: t.muted, lineHeight: 1.62 }}>
- Coreforge is an AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.
+ One AI workspace for machinery, engines, vehicles, CNC, industrial CAD, and engineering code automation.
  </p>
  <div style={{ marginTop: 36, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", color: t.fg }}>
  <ActionLink href="/ai-assistant">
