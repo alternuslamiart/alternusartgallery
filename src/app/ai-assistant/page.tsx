@@ -1,5 +1,5 @@
-import { StudioRoutePage } from "@/components/studio/studio-shell";
+import { CrystalAssistantPage } from "@/components/crystal-assistant-page";
 
 export default function AIAssistantPage() {
- return <StudioRoutePage route="ai-assistant" />;
+ return <CrystalAssistantPage />;
 }
