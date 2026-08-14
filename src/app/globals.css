@@ -2,6 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
+.crystal-studio {
+  --crystal-left-width: 300px;
+  --crystal-right-width: 318px;
+  grid-template-columns: var(--crystal-left-width) minmax(0, 1fr) var(--crystal-right-width);
+  grid-template-rows: 64px minmax(0, 1fr) 40px;
+  font-family: Inter, var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.crystal-studio > header { grid-column: 1 / -1; }
+.crystal-left-panel { grid-column: 1; grid-row: 2; }
+.crystal-studio > section { grid-column: 2; grid-row: 2; }
+.crystal-right-panel { grid-column: 3; grid-row: 2; }
+.crystal-studio > footer { grid-row: 3; }
+.crystal-studio.crystal-left-closed { --crystal-left-width: 0px; }
+.crystal-studio.crystal-right-closed { --crystal-right-width: 0px; }
+
+.crystal-grid {
+  background-image:
+    linear-gradient(rgba(71, 71, 71, .72) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(71, 71, 71, .72) 1px, transparent 1px);
+  background-size: 68px 68px;
+  background-position: center center;
+}
+
+.crystal-object { transition: filter 180ms ease; transform-origin: center; }
+.crystal-object:hover { filter: brightness(1.12); }
+.crystal-model-shape {
+  clip-path: polygon(14% 29%, 43% 8%, 83% 20%, 97% 60%, 72% 91%, 26% 88%, 3% 59%);
+  border-radius: 35% 42% 38% 34%;
+  box-shadow: inset -25px -24px 35px rgba(0,0,0,.35), inset 15px 12px 24px rgba(255,255,255,.17), 0 28px 50px rgba(0,0,0,.38);
+}
+.crystal-mini-model { clip-path: polygon(20% 20%, 75% 8%, 94% 45%, 73% 88%, 18% 78%, 4% 42%); }
+.crystal-alt-theme { filter: saturate(.88) hue-rotate(16deg); }
+
+@media (max-width: 1400px) {
+  .crystal-studio { --crystal-left-width: 258px; --crystal-right-width: 286px; }
+}
+
+@media (max-width: 1023px) {
+  .crystal-studio { grid-template-columns: minmax(0, 1fr); }
+  .crystal-left-panel, .crystal-right-panel { position: absolute; z-index: 40; top: 64px; bottom: 40px; width: min(318px, 88vw); box-shadow: 0 10px 35px rgba(0,0,0,.45); }
+  .crystal-left-panel { left: 0; }
+  .crystal-right-panel { right: 0; }
+  .crystal-studio > section { grid-column: 1; }
+}
+
+@media (max-width: 700px) {
+  .crystal-studio { grid-template-rows: 54px minmax(0, 1fr) 42px; }
+  .crystal-studio > header { height: 54px; padding-inline: 62px 10px; }
+  .crystal-studio > header nav, .crystal-studio > header > div { display: none; }
+  .crystal-studio > header button { margin-left: auto; height: 36px; width: 104px; }
+  .crystal-left-panel, .crystal-right-panel { top: 54px; bottom: 42px; }
+}
+
 @layer utilities {
  .text-balance {
  text-wrap: balance;
