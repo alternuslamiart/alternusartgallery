@@ -1,5 +1,5 @@
 import type { MaterialName, StudioAsset, StudioTool } from "./types";
-import { Box, Brush, Crosshair, Cuboid, Focus, MousePointer2, Move3d, Orbit, Rotate3d, Scaling, Wrench } from "lucide-react";
+import { Box, Brush, CirclePlay, Crosshair, Cuboid, Focus, MousePointer2, Move3d, Rotate3d, Scaling, Wrench } from "lucide-react";
 
 export const materials: MaterialName[] = ["Titanium", "Aluminum", "Steel", "Carbon Fiber", "Plastic", "Glass", "Rubber"];
 
@@ -11,7 +11,7 @@ export const initialAssets: StudioAsset[] = [
 ];
 
 export const modelingTools: Array<{ id: StudioTool; label: string; icon: typeof Box }> = [
-  { id: "orbit", label: "Orbit view", icon: Orbit },
+  { id: "orbit", label: "Orbit view", icon: CirclePlay },
   { id: "focus", label: "Focus selection", icon: Focus },
   { id: "move", label: "Move object", icon: Move3d },
   { id: "rotate", label: "Rotate object", icon: Rotate3d },
