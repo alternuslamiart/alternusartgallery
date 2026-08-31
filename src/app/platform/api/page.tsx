@@ -35,7 +35,7 @@ export default function APIPage() {
  </p>
  <div style={{ marginTop: 28, display: "inline-flex", alignItems: "center", gap: 10, padding: "6px 12px", border: `1px solid ${t.faint}`, borderRadius: 8, fontFamily: "var(--font-geist-mono),monospace", fontSize: 12, color: t.fg }}>
  <span style={{ color: COBALT, fontWeight: 700 }}>BASE</span>
- https://api.Coreforge.ai/v1
+ https://api.alternusart.com/crystal/v1
  </div>
  </div>
  </section>

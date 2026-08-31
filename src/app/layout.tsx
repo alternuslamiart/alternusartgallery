@@ -34,13 +34,13 @@ const robotoFlex = Roboto_Flex({
 
 export const metadata: Metadata = {
  metadataBase: new URL("https://www.alternusart.com"),
- applicationName: "Coreforge",
+ applicationName: "Crystal Studio",
  title: {
- default: "Coreforge Website | 3D Machinery Design",
- template: "%s | Coreforge",
+ default: "Crystal Studio | AI Engineering and 3D CAD",
+ template: "%s | Crystal Studio",
  },
  description:
- "Coreforge is an AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.",
+ "Crystal Studio is an AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.",
  keywords: [
  "3D machinery design",
  "engine 3D design",
@@ -50,12 +50,12 @@ export const metadata: Metadata = {
  "CNC CAM AI",
  "CAD studio integration",
  "AI code assistant",
- "Coreforge",
+ "Crystal Studio",
  "mechanical engineering AI",
  ],
- authors: [{ name: "Coreforge" }],
- creator: "Coreforge",
- publisher: "Coreforge",
+ authors: [{ name: "Crystal Studio" }],
+ creator: "Crystal Studio",
+ publisher: "Crystal Studio",
  icons: {
  icon: [
  { url: "/favicon.svg", type: "image/svg+xml" },
@@ -68,8 +68,8 @@ export const metadata: Metadata = {
  type: "website",
  locale: "en_US",
  url: "https://www.alternusart.com",
- siteName: "Coreforge",
- title: "Coreforge Website | 3D Machinery Design",
+ siteName: "Crystal Studio",
+ title: "Crystal Studio | AI Engineering and 3D CAD",
  description:
  "AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.",
  images: [
@@ -77,13 +77,13 @@ export const metadata: Metadata = {
  url: "/logo.png",
  width: 512,
  height: 512,
- alt: "Coreforge",
+ alt: "Crystal Studio",
  },
  ],
  },
  twitter: {
  card: "summary_large_image",
- title: "Coreforge Website | 3D Machinery Design",
+ title: "Crystal Studio | AI Engineering and 3D CAD",
  description:
  "AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.",
  images: ["/logo.png"],
@@ -179,8 +179,8 @@ export default function RootLayout({
  "@context": "https://schema.org",
  "@type": "Organization",
  "@id": "https://www.alternusart.com/#organization",
- "name": "Coreforge",
- "alternateName": "Coreforge Website",
+ "name": "Crystal Studio",
+ "alternateName": "Crystal Studio AI Engineering",
  "url": "https://www.alternusart.com",
  "logo": {
  "@type": "ImageObject",
@@ -218,7 +218,7 @@ export default function RootLayout({
  "@type": "WebSite",
  "@id": "https://www.alternusart.com/#website",
  "url": "https://www.alternusart.com",
- "name": "Coreforge",
+ "name": "Crystal Studio",
  "description": "AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation",
  "publisher": {
  "@id": "https://www.alternusart.com/#organization"

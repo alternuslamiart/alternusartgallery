@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowRight, Code2, Cuboid, Layers3, ShieldCheck, Sparkles, Workflow } from "lucide-react";
+import { ArrowRight, Code2, Cuboid, Download, Gauge, HardDrive, Layers3, ShieldCheck, Sparkles, Workflow } from "lucide-react";
 import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const surfaces = [
@@ -45,7 +45,7 @@ const workflow = [
  },
  {
  title: "Shape the engineering plan",
- copy: "Coreforge keeps CAD context, constraints, assemblies, materials, and next actions organized across the build.",
+ copy: "Crystal Studio keeps CAD context, constraints, assemblies, materials, and next actions organized across the build.",
  },
  {
  title: "Move into production",
@@ -116,7 +116,7 @@ export default function HomePage() {
  />
  <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 32px", textAlign: "center", position: "relative" }}>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 22 }}>
- COREFORGE WEBSITE / 3D MACHINERY
+ CRYSTAL STUDIO / AI ENGINEERING
  </div>
  <h1
  style={{
@@ -209,7 +209,7 @@ export default function HomePage() {
  <div style={{ display: "flex", alignItems: "end", justifyContent: "space-between", gap: 24, flexWrap: "wrap", marginBottom: 42 }}>
  <div>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 18 }}>
- WHAT COREFORGE DOES
+ WHAT CRYSTAL STUDIO DOES
  </div>
  <h2 style={{ fontSize: "clamp(38px,6vw,72px)", fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 0.94, margin: 0, fontStretch: "84%" }}>
  3D engineering for<br />
@@ -356,13 +356,47 @@ export default function HomePage() {
  </div>
  </section>
 
+ <section style={{ padding: "100px 0", borderTop: `1px solid ${t.faint}`, background: t.surface }}>
+ <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 32px" }}>
+ <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 56, alignItems: "center" }}>
+ <div>
+ <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 18 }}>DESKTOP EDITION / PROFESSIONAL WORKFLOW</div>
+ <h2 style={{ margin: 0, fontSize: "clamp(42px,6vw,76px)", lineHeight: 0.94, letterSpacing: "-0.045em", fontWeight: 900 }}>
+ Take Crystal Studio<br /><span style={{ color: COBALT, fontStyle: "italic" }}>beyond the browser.</span>
+ </h2>
+ <p style={{ margin: "24px 0 0", maxWidth: 620, color: t.muted, fontSize: 17, lineHeight: 1.65 }}>
+ The website provides AI-only model generation and concept exploration. Crystal Studio Desktop adds advanced local project workflows, larger files, offline processing, automation tools, and deeper CAD handoff controls.
+ </p>
+ <p style={{ margin: "16px 0 0", maxWidth: 620, color: t.muted, fontSize: 13, lineHeight: 1.6 }}>
+ Professional engineering decisions and production-ready outputs must be reviewed and approved by a licensed engineer.
+ </p>
+ <div style={{ marginTop: 30, display: "flex", gap: 12, flexWrap: "wrap", color: t.fg }}>
+ <ActionLink href="/download">Download App <Download size={15} /></ActionLink>
+ <ActionLink href="/pricing" variant="secondary">View all plans</ActionLink>
+ </div>
+ </div>
+ <div style={{ border: `1px solid ${t.faint}`, borderRadius: 24, background: t.raised, padding: 28 }}>
+ <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 24, paddingBottom: 24, borderBottom: `1px solid ${t.faint}` }}>
+ <div><div style={{ fontSize: 12, color: t.muted }}>Crystal Studio Desktop</div><div style={{ marginTop: 8, fontSize: 26, fontWeight: 900 }}>Professional License</div></div>
+ <div style={{ textAlign: "right" }}><div style={{ fontSize: 42, lineHeight: 1, fontWeight: 900, color: COBALT }}>$79</div><div style={{ marginTop: 5, fontSize: 11, color: t.muted }}>one-time</div></div>
+ </div>
+ <div style={{ display: "grid", gap: 16, paddingTop: 24 }}>
+ {[{ Icon: Gauge, title: "Advanced desktop engine", description: "Local processing, larger projects, and extended modeling workflows." }, { Icon: HardDrive, title: "Offline project control", description: "Keep project files and engineering references on your workstation." }, { Icon: ShieldCheck, title: "Professional review required", description: "Outputs remain subject to licensed-engineer validation and applicable standards." }].map(({ Icon, title, description }) => (
+ <div key={title} style={{ display: "flex", gap: 14 }}><span style={{ width: 38, height: 38, borderRadius: 10, display: "grid", placeItems: "center", color: COBALT, background: `${COBALT}14` }}><Icon size={18} /></span><div><div style={{ fontSize: 14, fontWeight: 800 }}>{title}</div><div style={{ marginTop: 4, fontSize: 12.5, lineHeight: 1.5, color: t.muted }}>{description}</div></div></div>
+ ))}
+ </div>
+ </div>
+ </div>
+ </div>
+ </section>
+
  <section style={{ padding: "108px 0" }}>
  <div style={{ maxWidth: 980, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, color: COBALT, fontWeight: 900, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 20 }}>
  <Sparkles size={15} /> Begin
  </div>
  <h2 style={{ fontSize: "clamp(44px,7vw,88px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.9, margin: 0, fontStretch: "84%" }}>
- Start in Coreforge.<br />
+ Start in Crystal Studio.<br />
  <span style={{ color: COBALT, fontStyle: "italic" }}>Keep machines moving.</span>
  </h2>
  <p style={{ margin: "26px auto 0", maxWidth: 610, color: t.muted, fontSize: 16, lineHeight: 1.65 }}>

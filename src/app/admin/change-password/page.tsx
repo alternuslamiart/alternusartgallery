@@ -435,7 +435,7 @@ export default function ChangePasswordPage() {
  </li>
  <li className="flex gap-2">
  <span className="text-blue-600">•</span>
- <span>Use a unique password for your Coreforge account</span>
+ <span>Use a unique password for your Crystal Studio account</span>
  </li>
  <li className="flex gap-2">
  <span className="text-blue-600">•</span>

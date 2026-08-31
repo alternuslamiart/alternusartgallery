@@ -289,7 +289,7 @@ export default function CommunityPage() {
  <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#38BDF8] text-white">
  <Sparkles className="h-4 w-4 fill-current" />
  </span>
- Coreforge
+ Crystal Studio
  </Link>
  <label className="hidden h-9 min-w-0 flex-1 items-center gap-2 rounded-full bg-[#EEF3F7] px-4 text-sm text-[#64748B] md:flex">
  <Search className="h-4 w-4" />

@@ -2,13 +2,14 @@
 import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const sections = [
- { id: "overview", t: "Overview", b: "Coreforge treats your data as yours. We process it only to deliver the product, we do not sell it, and we do not train shared models on it." },
+ { id: "overview", t: "Overview", b: "Crystal Studio treats your data as yours. We process it only to deliver the product, we do not sell it, and we do not train shared models on it." },
  { id: "what", t: "What we collect", b: "Account information (email, workspace name), workspace content that you explicitly store (files, mail, notes), and operational telemetry for reliability." },
  { id: "how", t: "How we use it", b: "To run your workspace, answer your agent queries, send you essential notifications, and detect abuse. That is the complete list." },
  { id: "training", t: "Model training", b: "We do not train any model on your workspace content. The Claude agent reads your data at query time only, over encrypted channels." },
  { id: "storage", t: "Storage", b: "Data is encrypted at rest (AES-256) and in transit (TLS 1.3). Workspaces are isolated per-tenant with row-level access controls." },
  { id: "rights", t: "Your rights", b: "You can export everything at any time, delete your workspace in one action, and request a report of every query the agent ran on your behalf." },
- { id: "contact", t: "Contact", b: "privacy@Coreforge.ai — we respond within 72 hours, every time." },
+ { id: "desktop", t: "Desktop application", b: "Crystal Studio Desktop can keep project files and local processing data on your workstation. Features that call cloud AI services transmit only the information required to complete the requested operation." },
+ { id: "contact", t: "Contact", b: "Use the contact page for privacy requests. We aim to respond within 72 hours." },
 ];
 
 export default function Privacy() {

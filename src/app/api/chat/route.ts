@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
  chatId,
  text,
  sender,
- senderName: senderName || (sender === 'support' ? 'Coreforge CEO' : 'Visitor'),
+ senderName: senderName || (sender === 'support' ? 'Crystal Studio Support' : 'Visitor'),
  senderEmail,
  timestamp: new Date().toISOString(),
  read: false,

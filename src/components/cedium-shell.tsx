@@ -82,7 +82,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", height: 64, display: "flex", alignItems: "center", gap: 32 }}>
  <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
  <CoreforgeLogo size={28} radius={8} />
- <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>Coreforge</span>
+ <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>Crystal Studio</span>
  </Link>
  <nav className="hidden md:flex" style={{ alignItems: "center", gap: 24 }}>
  {[{ l: "Platform", h: "/platform/overview" }, { l: "CAD Studios", h: "/platform/bridges" }, { l: "Company", h: "/about" }, { l: "Pricing", h: "/pricing" }].map((i) => (
@@ -100,6 +100,9 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  Log in
  </Link>
  <Link href="/account" aria-label="Account profile" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, fontSize: 12, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.02em" }}>AL</Link>
+ <Link href="/download" className="hidden sm:inline-flex" style={{ alignItems: "center", height: 36, padding: "0 15px", color: fg, fontSize: 13, fontWeight: 700, textDecoration: "none", border: `1px solid ${faint}`, borderRadius: 8 }}>
+ Download App
+ </Link>
  <Link href="/ai-assistant" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
  Launch Studio <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
  </Link>
@@ -120,6 +123,7 @@ export function CoreforgeFooter({ isDark, fg, muted, faint }: Pick<ReturnType<ty
  ]},
  { heading: "Engineering", links: [
  { l: "Launch Studio", h: "/ai-assistant", ext: true },
+ { l: "Download Desktop App", h: "/download", ext: false },
  { l: "3D Machinery", h: "/workspace/files", ext: false },
  { l: "Automotive", h: "/workspace/code", ext: false },
  { l: "CNC / CAM", h: "/workspace/knowledge", ext: false },
@@ -181,7 +185,7 @@ export function CoreforgeFooter({ isDark, fg, muted, faint }: Pick<ReturnType<ty
  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
  <CoreforgeLogo size={18} radius={5} />
- <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>Coreforge</span>
+ <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>Crystal Studio</span>
  </div>
  <span style={{ fontSize: 11.5, color: muted }}>Copyright &copy;2026</span>
  <Link href="/cookie-notice" style={{ fontSize: 11.5, color: muted, textDecoration: "none", borderBottom: `1px dashed ${faint}`, paddingBottom: 1 }}>Manage Cookies</Link>

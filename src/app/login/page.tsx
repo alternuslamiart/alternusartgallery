@@ -83,9 +83,9 @@ function useAuthTheme() {
 
 function Brand() {
  return (
- <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Coreforge home">
+ <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Crystal Studio home">
  <CoreforgeMark />
- <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Coreforge</span>
+ <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Crystal Studio</span>
  </Link>
  );
 }
@@ -148,7 +148,7 @@ export default function LoginPage() {
  <main className="relative z-10 flex min-h-[calc(100vh-80px)] items-center justify-center px-5 pb-16 pt-8">
  <Card className="auth-card w-full max-w-md rounded-[24px] border shadow-none backdrop-blur-xl">
  <CardHeader className="space-y-3 p-7 text-center">
- <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Coreforge workspace</p>
+ <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Crystal Studio workspace</p>
  <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">Sign in</h1>
  <p className="auth-copy mx-auto max-w-xs text-sm leading-6">
  Open your AI workspace for 3D machinery, CAD studios, CNC, and engineering code workflows.
@@ -237,7 +237,7 @@ export default function LoginPage() {
  </form>
 
  <p className="auth-footer-copy text-center text-xs">
- New to Coreforge?{" "}
+ New to Crystal Studio?{" "}
  <Link href="/signup" className="auth-footer-link font-semibold">
  Create an account
  </Link>

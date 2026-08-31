@@ -46,7 +46,7 @@ export default function Careers() {
  <div style={{ marginTop: 64, padding: "40px 36px", border: `1px solid ${t.faint}`, borderRadius: 12, background: t.surface }}>
  <h2 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.025em", margin: 0, marginBottom: 20 }}>Don&apos;t see your role?</h2>
  <p style={{ fontSize: 15, color: t.muted, lineHeight: 1.6, margin: 0, maxWidth: 580 }}>
- If you&apos;re exceptional and passionate about agents, send us your work at <a href="mailto:hiring@Coreforge.ai" style={{ color: COBALT }}>hiring@Coreforge.ai</a>. We always make room for exceptional people.
+ If you&apos;re exceptional and passionate about AI engineering, send us your work at <a href="mailto:contact@alternusart.com" style={{ color: COBALT }}>contact@alternusart.com</a>. We always make room for exceptional people.
  </p>
  </div>
  </div>

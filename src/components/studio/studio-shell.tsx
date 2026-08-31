@@ -1170,7 +1170,7 @@ function getModalContent(modal: StudioModalKey) {
 "project-create": { title:"Create project", description:"Create a project container for generated outputs and assets.", action:"Create project", success:"Project created"},
 "asset-upload": { title:"Upload asset", description:"Add images, 3D models, CAD files, documents, or generated outputs.", action:"Upload asset", success:"Asset uploaded"},
 "voice-dictation": { title:"Voice dictation", description:"Speak directly into the composer and turn speech into a clean prompt draft.", action:"Start dictation", success:"Voice dictation ready"},
-"voice-speak": { title:"Voice Speak", description:"Open a focused voice frame for hands-free conversation with Coreforge.", action:"Start voice", success:"Voice Speak ready"},
+"voice-speak": { title:"Voice Speak", description:"Open a focused voice frame for hands-free conversation with Crystal Studio.", action:"Start voice", success:"Voice Speak ready"},
  support: { title:"Contact support", description:"Send a short support request from your workspace.", action:"Send request", success:"Support request sent"},
  };
  return map[modal];
@@ -2321,7 +2321,7 @@ function CoreforgeDesignPage() {
  <div>
  <PageHeader
  title="3D Machinery"
- subtitle="Design engines, transmissions, hydraulic and pneumatic systems, and industrial machinery in the Coreforge workspace."
+ subtitle="Design engines, transmissions, hydraulic and pneumatic systems, and industrial machinery in the Crystal Studio workspace."
  action={<PrimaryButton icon={Sparkles} onClick={() => projectInputRef.current?.focus()}>Create machinery plan</PrimaryButton>}
  />
 
@@ -2390,7 +2390,7 @@ function CoreforgeDesignPage() {
  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
  <div>
  <p className={`text-[13px] font-semibold ${strong}`}>Machinery plans</p>
- <p className={`mt-1 text-[11px] ${muted}`}>Recent mechanical systems generated with Coreforge AI.</p>
+ <p className={`mt-1 text-[11px] ${muted}`}>Recent mechanical systems generated with Crystal Studio AI.</p>
  </div>
  <div className={`flex rounded-2xl p-1 ${dark ?"bg-[#181B20]":"bg-[#EEF3F7]"}`}>
  {(["Recent","Your designs","Design systems"] as const).map((tab) => (
@@ -2423,7 +2423,7 @@ function CoreforgeDesignPage() {
  value={brief}
  onChange={(event) => setBrief(event.target.value)}
  className={`mt-3 min-h-[118px] w-full resize-none rounded-2xl border p-4 text-[13px] outline-none ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#6F7782]":"border-[#E5EAF0] bg-white text-[#171717] placeholder:text-[#A1A7B0]"}`}
- placeholder="Describe the engine, transmission, hydraulic system, pneumatic system, or industrial machine you want Coreforge to create..."
+ placeholder="Describe the engine, transmission, hydraulic system, pneumatic system, or industrial machine you want Crystal Studio to create..."
  />
  <div className="mt-3 flex flex-wrap gap-2">
  {["Engine assembly","Hydraulics","Pneumatics","Industrial machine"].map((chip) => (
@@ -4302,7 +4302,7 @@ function StarterPlaygroundView({
  { label: "Comparison task", model: "Gemini 2.5 Pro", accent: "bg-[#4F7BFF]", output: "Launch checklist", score: "$0.001", latency: "1.8s" },
  ];
 
- const taskPrompt = `You are a Coreforge engineering analyst. Your task is to review the request and provide a concise plan for: ${card.title}.`;
+ const taskPrompt = `You are a Crystal Studio engineering analyst. Review the request and provide a concise plan for: ${card.title}. Professional outputs require independent verification by a licensed engineer.`;
  const textClass = dark ? "text-[#F4F6F8]" : "text-[#111827]";
  const mutedClass = dark ? "text-[#A8B0BA]" : "text-[#667085]";
  const panelClass = dark ? "border-[rgba(255,255,255,0.08)] bg-[#202328]" : "border-[#E5EAF0] bg-white";
@@ -5398,7 +5398,7 @@ function AIAssistantPage() {
  const shareAssistantMessage = async (content: string) => {
  try {
  if (navigator.share) {
- await navigator.share({ title:"Coreforge AI response", text: content });
+ await navigator.share({ title:"Crystal Studio AI response", text: content });
  showToast("Response shared");
  return;
  }
@@ -5414,7 +5414,7 @@ function AIAssistantPage() {
  const url = URL.createObjectURL(blob);
  const link = document.createElement("a");
  link.href = url;
- link.download = `coreforge-ai-response-${message.id}.txt`;
+ link.download = `crystal-studio-ai-response-${message.id}.txt`;
  document.body.appendChild(link);
  link.click();
  link.remove();
@@ -5517,7 +5517,7 @@ function AIAssistantPage() {
  value={input}
  onChange={(event) => setInput(event.target.value)}
  onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendPrompt(); } }}
- aria-label="Message Coreforge"
+ aria-label="Message Crystal Studio"
  rows={2}
  placeholder="Add a message..."
  className={`w-full resize-none bg-transparent text-[14px] leading-5 outline-none ${dark ? "text-[#F4F7FA] placeholder:text-[#B4B2A9]" : "text-[#0A0E14] placeholder:text-[#5F5E5A]"}`}
@@ -5611,7 +5611,7 @@ function AIAssistantPage() {
  value={input}
  onChange={(event) => setInput(event.target.value)}
  onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendPrompt(); } }}
- aria-label="Message Coreforge"
+ aria-label="Message Crystal Studio"
  rows={1}
  className={`min-h-[28px] flex-1 resize-none bg-transparent px-2 py-1 text-[14px] leading-5 outline-none ${dark ? "text-[#F4F7FA] placeholder:text-[#B4B2A9]" : "text-[#0A0E14] placeholder:text-[#5F5E5A]"}`}
  style={{ letterSpacing: 0 }}
@@ -5642,7 +5642,7 @@ function AIAssistantPage() {
  <div className="min-w-0">
  <p className="text-[13px] font-semibold">Your free plan is wrapping up</p>
  <p className={`mt-0.5 text-[11px] leading-5 ${dark ?"text-[#A8B0BA]":"text-[#4B5563]"}`}>
- You have used Coreforge AI {aiChatCount} {aiChatCount === 1 ?"time":"times"} on your free trial. Upgrade to keep your chats, attachments, and Voice Speak going without interruption.
+ You have used Crystal Studio AI {aiChatCount} {aiChatCount === 1 ?"time":"times"} on your free trial. Upgrade to keep your chats, attachments, and Voice Speak going without interruption.
  </p>
  </div>
  </div>
@@ -5695,7 +5695,7 @@ function AIAssistantPage() {
  <div className="flex h-9 flex-shrink-0 items-center border-b border-[#3A3A3A] bg-[#303030] text-[11px] text-[#D3D1C7]">
  <div className="flex h-full w-[298px] flex-shrink-0 items-center border-r border-[#3A3A3A] px-3">
  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#0A0E14] text-[8px] font-bold text-[#B5D4F4]">CF</span>
- <span className="ml-2 font-semibold text-white">Coreforge AI</span>
+ <span className="ml-2 font-semibold text-white">Crystal Studio AI</span>
  <ChevronDown className="ml-1 h-3 w-3 text-[#B4B2A9]" />
  </div>
  <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden px-3">
@@ -5759,7 +5759,7 @@ function AIAssistantPage() {
  { label:"MacBook Pro 16 - 2", icon: Monitor, indent: 0 },
  { label:"Ask everything...", icon: FileText, indent: 1 },
  { label:"Workflow", icon: Workflow, indent: 2 },
- { label:"Good Morning, Coreforge", icon: Sparkles, indent: 2 },
+ { label:"Good Morning, Crystal Studio", icon: Sparkles, indent: 2 },
  { label:"Design", icon: PenLine, indent: 2 },
  { label:"Game Engineering", icon: Box, indent: 2 },
  { label:"Code Building", icon: Code2, indent: 2 },
@@ -5789,7 +5789,7 @@ function AIAssistantPage() {
  <div className="absolute inset-0" style={{ backgroundImage:"radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px)", backgroundSize:"28px 28px", backgroundPosition:"28px 28px" }} />
  <div className="absolute left-[26%] top-[18%] h-[280px] w-[402px] rounded-[12px] border border-[#454545] bg-[#1F1F1F]/58 shadow-[0_18px_60px_rgba(0,0,0,0.26)]">
  <div className="flex h-8 items-center justify-between border-b border-[#454545] px-3">
- <span className="text-[11px] font-semibold text-white">Coreforge AI frame</span>
+ <span className="text-[11px] font-semibold text-white">Crystal Studio AI frame</span>
  <span className="text-[10px] text-[#B4B2A9]">402 x 874</span>
  </div>
  <div className="flex h-[calc(100%-2rem)] items-center justify-center p-4">
@@ -6042,7 +6042,7 @@ function ProjectsPage() {
  <div>
  <PageHeader title="Projects"subtitle="Manage studio projects and production status."action={<PrimaryButton icon={Plus} onClick={() => openModal("project-create")}>New project</PrimaryButton>} />
  <div className="grid gap-3 md:grid-cols-3">
- {["Coreforge command center","CNC automation workflow","3D machinery system"].map((name) => (
+ {["Crystal Studio command center","CNC automation workflow","3D machinery system"].map((name) => (
  <ClickableSoftCard key={name} className="min-h-[150px]"onClick={() => openDrawer("project-detail")} ariaLabel={`Open ${name} project`}>
  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF7FC] text-[#1DA1F2]">
  <Folder className="h-5 w-5"/>
@@ -6127,7 +6127,7 @@ function SettingsPage() {
  <VoiceSettingRow />
  <GeneralSettingRow
  label="Separate Voice"
- description="Keep Coreforge Voice in a separate full screen, without real time transcripts and visuals."
+ description="Keep Crystal Studio Voice in a separate full screen, without real time transcripts and visuals."
  control={<SettingsSwitch enabled={false} label="Separate Voice"/>}
  />
  </div>

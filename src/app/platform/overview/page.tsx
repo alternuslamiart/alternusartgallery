@@ -14,7 +14,7 @@ export default function PlatformOverview() {
  One platform.<br/><span style={{ color: COBALT, fontStyle: "italic" }}>Every machine.</span>
  </h1>
  <p style={{ marginTop: 32, fontSize: 18, color: t.muted, maxWidth: 640, lineHeight: 1.55 }}>
- Coreforge is an AI engineering workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.
+ Crystal Studio is an AI engineering workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation. The browser experience focuses on AI generation; the desktop application adds advanced local workflows and CAD handoff tools.
  </p>
  </div>
  </section>

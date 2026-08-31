@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const snippet = [
- { n: 1, t: `import { Agent } from "@Coreforge/agent";`, k: "kw" },
+ { n: 1, t: `import { Agent } from "@crystal-studio/agent";`, k: "kw" },
  { n: 2, t: `` },
  { n: 3, t: `// Agent has read every file in this repo.` , k: "c" },
  { n: 4, t: `const review = await Agent.review({` },

@@ -21,10 +21,10 @@ export default function Contact() {
  </p>
  <div style={{ marginTop: 40, display: "flex", flexDirection: "column", gap: 0, border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden" }}>
  {[
- { l: "General", e: "hello@Coreforge.ai" },
- { l: "Sales", e: "sales@Coreforge.ai" },
- { l: "Security", e: "security@Coreforge.ai" },
- { l: "Press", e: "press@Coreforge.ai" },
+ { l: "General", e: "contact@alternusart.com" },
+ { l: "Sales", e: "sales@alternusart.com" },
+ { l: "Security", e: "security@alternusart.com" },
+ { l: "Press", e: "press@alternusart.com" },
  ].map((c, i, a) => (
  <a key={c.l} href={`mailto:${c.e}`} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderTop: i > 0 ? `1px solid ${t.faint}` : "none", textDecoration: "none", color: t.fg }}>
  <span style={{ fontSize: 13, fontWeight: 700, color: t.muted, letterSpacing: "0.08em", textTransform: "uppercase" }}>{c.l}</span>

@@ -1,8 +1,8 @@
 "use client";
 import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
-const install = `npm install @Coreforge/agent`;
-const example = `import { Agent } from "@Coreforge/agent";
+const install = `npm install @crystal-studio/agent`;
+const example = `import { Agent } from "@crystal-studio/agent";
 
 const agent = new Agent({ model: "claude-opus-4-6" });
 
@@ -18,12 +18,12 @@ export default function AgentSDK() {
  <>
  <section style={{ padding: "80px 0 40px" }}>
  <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
- <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 20 }}>/ @Coreforge/agent</div>
+ <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 20 }}>/ @crystal-studio/agent</div>
  <h1 style={{ fontSize: "clamp(40px,6vw,80px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.95, margin: 0, fontStretch: "88%" }}>
  Three lines<br/>to a working agent.
  </h1>
  <p style={{ marginTop: 28, fontSize: 17, color: t.muted, maxWidth: 560, lineHeight: 1.55 }}>
- The same runtime that powers Coreforge OS — shipped as a typed TypeScript SDK. Bring your own tools, your own memory, your own UI.
+ The same runtime that powers Crystal Studio — shipped as a typed TypeScript SDK. Bring your own tools, your own memory, and your own UI.
  </p>
  </div>
  </section>

@@ -13,7 +13,7 @@ const bridges = [
  blurb:
  "3D design of engines, transmissions, hydraulic and pneumatic systems across all major CAD studios.",
  verbs: ["engines", "transmissions", "hydraulics", "pneumatics"],
- install: "Coreforge machinery workspace",
+ install: "Crystal Studio machinery workspace",
  },
  {
  app: "3D Studio Integration",
@@ -23,7 +23,7 @@ const bridges = [
  blurb:
  "Works with SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD and more.",
  verbs: ["SolidWorks", "Fusion 360", "CATIA", "FreeCAD"],
- install: "Coreforge CAD studio workflow",
+ install: "Crystal Studio CAD workflow",
  },
 ];
 
@@ -70,7 +70,7 @@ export default function Bridges() {
  Build industrial 3D.
  </h1>
  <p style={{ marginTop: 32, fontSize: 18, color: t.muted, maxWidth: 640, lineHeight: 1.55 }}>
- Coreforge connects 3D machinery, automotive systems, aerospace and drones, CNC/CAM, all major CAD studios, and AI code/API automation.
+ Crystal Studio connects 3D machinery, automotive systems, aerospace and drones, CNC/CAM, major CAD studios, and AI code/API automation.
  </p>
  </div>
  </section>
@@ -136,7 +136,7 @@ export default function Bridges() {
  Vehicle and Aerospace Workflows
  </h2>
  <p style={{ marginTop: 18, fontSize: 15.5, color: t.muted, maxWidth: 680, lineHeight: 1.65 }}>
- Coreforge supports advanced mechanical creation workflows across automotive, motorcycles, aerospace, drones, CNC, and CAD studios.
+ Crystal Studio supports advanced mechanical creation workflows across automotive, motorcycles, aerospace, drones, CNC, and CAD studios.
  </p>
  </div>
 
@@ -305,11 +305,11 @@ export default function Bridges() {
  <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E" }} />
  <span style={{ fontSize: 11, color: t.muted, fontFamily: "var(--font-geist-mono),monospace", letterSpacing: "0.06em" }}>
- Coreforge.cad.api - v1.0
+ CrystalStudio.cad.api - v1.0
  </span>
  </div>
  <pre style={{ margin: 0, fontSize: 12.5, fontFamily: "var(--font-geist-mono),monospace", lineHeight: 1.7, color: t.fg }}>
- <span style={{ color: COBALT }}>&gt;</span> Coreforge.cad.api({"{"}
+ <span style={{ color: COBALT }}>&gt;</span> CrystalStudio.cad.api({"{"}
  {"\n"} goal: <span style={{ color: "#22C55E" }}>&quot;generate transmission housing automation&quot;</span>,
  {"\n"} studio: <span style={{ color: "#22C55E" }}>&quot;SolidWorks / Fusion 360&quot;</span>,
  {"\n"} output: <span style={{ color: "#22C55E" }}>&quot;Python CAD script + STEP export&quot;</span>,
@@ -329,7 +329,7 @@ export default function Bridges() {
  </h2>
  <div style={{ marginTop: 40, display: "inline-flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
  <Link href="/main" style={{ height: 48, padding: "0 22px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
- Launch Coreforge
+ Launch Crystal Studio
  </Link>
  <Link href="/platform/agent-sdk" style={{ height: 48, padding: "0 22px", background: "transparent", color: t.fg, fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", border: `1px solid ${t.faint}` }}>
  Build the bridge
