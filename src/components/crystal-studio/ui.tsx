@@ -5,7 +5,7 @@ import type { SelectHTMLAttributes } from "react";
 
 export function IconButton({ icon: Icon, label, active, onClick, className = "" }: { icon: LucideIcon; label: string; active?: boolean; onClick?: () => void; className?: string }) {
   return (
-    <button type="button" aria-label={label} title={label} onClick={onClick} className={`grid h-9 w-9 shrink-0 place-items-center rounded-[9px] border transition ${active ? "border-[#1687f7] bg-[#1687f7] text-white" : "border-transparent bg-transparent text-zinc-200 hover:bg-[#343434]"} ${className}`}>
+    <button type="button" aria-label={label} title={label} onClick={onClick} className={`grid h-9 w-9 shrink-0 place-items-center rounded-[9px] border transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#4A90D9] ${active ? "border-[#4A90D9] bg-[#1687f7] text-white shadow-[0_0_0_3px_rgba(74,144,217,.35),0_4px_12px_rgba(74,144,217,.25)]" : "border-transparent bg-transparent text-zinc-200 hover:bg-[#343434] active:border-[#4A90D9] active:shadow-[0_0_0_3px_rgba(74,144,217,.25)]"} ${className}`}>
       <Icon size={18} strokeWidth={2} />
     </button>
   );
