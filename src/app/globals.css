@@ -624,6 +624,7 @@
  .crystal-first-card, .crystal-feature-showcase { padding: 12px; align-items: stretch; }
  .crystal-first-card > div:first-child, .crystal-feature-copy { padding: 40px 32px; }
  .crystal-first-image, .crystal-feature-visual { height: auto; min-height: 390px; align-self: stretch; transform: none; }
+ .crystal-feature-showcase.reverse { margin-top: 72px; }
 }
 
 /* Homepage motion and interaction layer: restrained, responsive and consistent. */
