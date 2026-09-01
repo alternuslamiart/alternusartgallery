@@ -3,6 +3,7 @@
 import { Archive, ChevronDown, Gem, Globe2, Home, Menu, PanelLeftOpen, Plus, Search, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { generateModel } from "@/services/ai";
+import Link from "next/link";
 import { initialAssets } from "./data";
 import { LeftSidebar } from "./LeftSidebar";
 import { RightPanel } from "./RightPanel";
@@ -46,6 +47,7 @@ export function CrystalStudio() {
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [alternateTheme, setAlternateTheme] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const uploadUrl = useRef<string | null>(null);
   const selectedAsset = useMemo(() => assets.find((asset) => asset.id === selectedAssetId), [assets, selectedAssetId]);
 
@@ -101,8 +103,8 @@ export function CrystalStudio() {
     <div className={`crystal-studio crystal-studio-enter fixed inset-0 z-[90] grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
       <header className="col-span-full flex h-16 items-center border-b border-[#303030] bg-[#202020] px-7">
         <div className="flex items-center gap-3"><Gem size={26} className="text-zinc-600" fill="currentColor"/><b className="text-[16px]">Crystal</b><button aria-label="Back to projects" onClick={() => setDashboard(true)} className="ml-6 text-zinc-200"><Home size={17}/></button></div>
-        <nav aria-label="Application menu" className="ml-7 flex items-center gap-8 text-[12px] text-zinc-300">{["File", "Edit", "Tools", "Help", "View"].map((item) => <button key={item} className="hover:text-white">{item}</button>)}</nav>
-        <div className="ml-auto flex items-center gap-3"><button className="flex h-10 items-center gap-2 rounded-[12px] border border-zinc-400 px-3 text-[11px]">Starter <Zap size={17}/>200</button><button className="flex h-10 w-[124px] items-center justify-center gap-2 rounded-[11px] bg-[#1687f7] text-[12px] font-semibold text-white hover:bg-[#2d9bff]"><Zap size={19} fill="currentColor" />Go Pro</button></div>
+        <nav aria-label="Application menu" className="relative ml-7 flex items-center gap-8 text-[12px] text-zinc-300">{["File", "Edit", "Tools", "Help", "View"].map((item) => <button key={item} onClick={() => setOpenMenu(openMenu === item ? null : item)} className={`transition hover:text-white ${openMenu === item ? "text-white" : ""}`}>{item}</button>)}{openMenu && <div className="absolute left-0 top-8 z-50 w-44 rounded-xl border border-white/10 bg-[#272727] p-1.5 shadow-2xl"><div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{openMenu}</div>{(openMenu === "File" ? ["New project", "Import asset", "Export scene"] : openMenu === "Edit" ? ["Undo", "Redo", "Preferences"] : openMenu === "Tools" ? ["Measure", "Transform", "Material tools"] : openMenu === "Help" ? ["Studio guide", "Keyboard shortcuts", "Contact support"] : ["Perspective view", "Orthographic view", "Reset view"]).map(action => <button key={action} onClick={() => setOpenMenu(null)} className="block w-full rounded-lg px-3 py-2 text-left text-[11px] text-zinc-200 hover:bg-[#3a3a3a]">{action}</button>)}</div>}</nav>
+        <div className="ml-auto flex items-center gap-3"><button className="flex h-10 items-center gap-2 rounded-[12px] border border-zinc-400 px-3 text-[11px]">Starter <Zap size={17}/>200</button><Link href="/pricing" className="flex h-10 w-[124px] items-center justify-center gap-2 rounded-[11px] bg-[#1687f7] text-[12px] font-semibold text-white hover:bg-[#2d9bff]"><Zap size={19} fill="currentColor" />Go Pro</Link></div>
       </header>
 
       {!leftOpen && !rightOpen && <button aria-label="Show studio panels" onClick={() => { setLeftOpen(true); setRightOpen(true); }} className="absolute left-4 top-[76px] z-30 grid h-11 w-11 place-items-center rounded-[12px] border border-white/10 bg-[#252525] text-[#1687f7] shadow-xl"><PanelLeftOpen size={20} /></button>}
