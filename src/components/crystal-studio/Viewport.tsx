@@ -7,7 +7,7 @@ import type { StudioAsset, StudioTool, Transform } from "./types";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 
-type Camera = { targetX: number; targetZ: number; distance: number; yaw: number; pitch: number };
+type Camera = { targetX: number; targetZ: number; distance: number; yaw: number; pitch: number; orthographic: boolean };
 
 function PerspectiveGrid({ camera }: { camera: Camera }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -24,7 +24,7 @@ function PerspectiveGrid({ camera }: { camera: Camera }) {
       const f = { x: camera.targetX - eye.x, y: -eye.y, z: camera.targetZ - eye.z }; const fl = Math.hypot(f.x, f.y, f.z); f.x/=fl; f.y/=fl; f.z/=fl;
       const r = { x: -f.z, y: 0, z: f.x }; const rl = Math.hypot(r.x, r.z); r.x/=rl; r.z/=rl;
       const u = { x: r.z*f.y, y: f.z*r.x-r.z*f.x, z: -r.x*f.y }; const focal = Math.min(bounds.width, bounds.height) * 1.05;
-      const project = (x:number,z:number) => { const px=x-eye.x, py=-eye.y, pz=z-eye.z; const depth=px*f.x+py*f.y+pz*f.z; if(depth<.12)return null; return { x:bounds.width/2+(px*r.x+pz*r.z)*focal/depth, y:bounds.height*.52-(px*u.x+py*u.y+pz*u.z)*focal/depth, depth }; };
+      const project = (x:number,z:number) => { const px=x-eye.x, py=-eye.y, pz=z-eye.z; const depth=px*f.x+py*f.y+pz*f.z; if(depth<.12)return null; const scale=camera.orthographic ? focal/camera.distance : focal/depth; return { x:bounds.width/2+(px*r.x+pz*r.z)*scale, y:bounds.height*.52-(px*u.x+py*u.y+pz*u.z)*scale, depth }; };
       const line = (a:{x:number,z:number},b:{x:number,z:number},color:string,width=1) => { const p1=project(a.x,a.z),p2=project(b.x,b.z); if(!p1||!p2)return; ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke(); };
       for(let i=-40;i<=40;i++){ const major=i%5===0; line({x:i,z:-40},{x:i,z:40},major?"rgba(120,124,130,.31)":"rgba(108,112,118,.18)"); line({x:-40,z:i},{x:40,z:i},major?"rgba(120,124,130,.31)":"rgba(108,112,118,.18)"); }
       line({x:-40,z:0},{x:40,z:0},"rgba(224,75,75,.9)",1.35); line({x:0,z:-40},{x:0,z:40},"rgba(30,139,255,.95)",1.35);
@@ -62,7 +62,7 @@ export function Viewport(props: Props) {
   const [viewportMode, setViewportMode] = useState<"solid" | "wireframe" | "xray">("solid");
   const [openPanel, setOpenPanel] = useState<"brush" | "tools" | null>(null);
   const [notice, setNotice] = useState("Orbit: drag the model to inspect it");
-  const [camera, setCamera] = useState<Camera>({ targetX: 0, targetZ: 0, distance: 18, yaw: 0, pitch: .72 });
+  const [camera, setCamera] = useState<Camera>({ targetX: 0, targetZ: 0, distance: 18, yaw: 0, pitch: .72, orthographic: false });
   const cameraDrag = useRef<{ x: number; y: number; camera: typeof camera } | null>(null);
   const [workspaceMode, setWorkspaceMode] = useState<"Animate" | "Modeling" | "Images">("Modeling");
   const [activeView, setActiveView] = useState("Perspective");
@@ -70,15 +70,16 @@ export function Viewport(props: Props) {
   useEffect(() => {
     if (!props.selectedAsset) return;
     props.onTransformChange({ x: 0, y: 0, rotation: 0, scale: 1 });
-    setCamera({ targetX: 0, targetZ: 0, distance: 18, yaw: .72, pitch: .62 });
+    setCamera({ targetX: 0, targetZ: 0, distance: 18, yaw: .72, pitch: .62, orthographic: false });
     setActiveView("Perspective");
   // Center and frame every selected asset in the scene.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.selectedAsset?.id]);
 
   const setView = (view: string) => {
-    const views: Record<string, Pick<Camera, "yaw" | "pitch">> = { Perspective: { yaw: .72, pitch: .62 }, Top: { yaw: 0, pitch: 1.52 }, Bottom: { yaw: 0, pitch: -.72 }, Front: { yaw: Math.PI, pitch: .02 }, Back: { yaw: 0, pitch: .02 }, Left: { yaw: Math.PI / 2, pitch: .02 }, Right: { yaw: -Math.PI / 2, pitch: .02 }, Iso: { yaw: .78, pitch: .62 } };
-    setCamera((value) => ({ ...value, ...views[view], targetX: 0, targetZ: 0, distance: 18 })); setActiveView(view);
+    const views: Record<string, Pick<Camera, "yaw" | "pitch" | "orthographic">> = { Perspective: { yaw: .72, pitch: .62, orthographic: false }, Top: { yaw: 0, pitch: 1.52, orthographic: true }, Bottom: { yaw: 0, pitch: -.72, orthographic: true }, Front: { yaw: Math.PI, pitch: .02, orthographic: true }, Back: { yaw: 0, pitch: .02, orthographic: true }, Left: { yaw: Math.PI / 2, pitch: .02, orthographic: true }, Right: { yaw: -Math.PI / 2, pitch: .02, orthographic: true }, Iso: { yaw: .78, pitch: .62, orthographic: false } };
+    const from = camera; const to: Camera = { ...camera, ...views[view], targetX: 0, targetZ: 0, distance: 18 }; const started = performance.now();
+    const animate = (now: number) => { const p=Math.min(1,(now-started)/260); const ease=1-Math.pow(1-p,3); setCamera({ targetX:from.targetX+(to.targetX-from.targetX)*ease, targetZ:from.targetZ+(to.targetZ-from.targetZ)*ease, distance:from.distance+(to.distance-from.distance)*ease, yaw:from.yaw+(to.yaw-from.yaw)*ease, pitch:from.pitch+(to.pitch-from.pitch)*ease, orthographic:p<1?from.orthographic:to.orthographic }); if(p<1)requestAnimationFrame(animate); }; requestAnimationFrame(animate); setActiveView(view);
   };
   const beginDrag = (event: React.PointerEvent) => {
     drag.current = { x: event.clientX, y: event.clientY, transform: props.transform };
@@ -125,7 +126,7 @@ export function Viewport(props: Props) {
     <section
       className="relative min-h-0 overflow-hidden bg-[#292929]"
       onPointerDown={(event) => { if (event.button === 1 || event.button === 2) { event.preventDefault(); cameraDrag.current = { x: event.clientX, y: event.clientY, camera }; event.currentTarget.setPointerCapture(event.pointerId); } }}
-      onPointerMove={(event) => { moveDrag(event); if (cameraDrag.current) { const dx = event.clientX - cameraDrag.current.x; const dy = event.clientY - cameraDrag.current.y; const base=cameraDrag.current.camera; if(event.buttons===4) setCamera({ ...base, targetX:base.targetX-dx*.018, targetZ:base.targetZ+dy*.018 }); else setCamera({ ...base, yaw:base.yaw-dx*.006, pitch:Math.max(.18,Math.min(1.42,base.pitch+dy*.005)) }); } }}
+      onPointerMove={(event) => { moveDrag(event); if (cameraDrag.current) { const dx = event.clientX - cameraDrag.current.x; const dy = event.clientY - cameraDrag.current.y; const base=cameraDrag.current.camera; if(event.buttons===4) setCamera({ ...base, targetX:base.targetX-dx*.018, targetZ:base.targetZ+dy*.018 }); else setCamera({ ...base, yaw:base.yaw-dx*.006, pitch:Math.max(.18,Math.min(1.42,base.pitch+dy*.005)), orthographic:false }); } }}
       onPointerUp={() => { drag.current = null; cameraDrag.current = null; }}
       onContextMenu={(event) => event.preventDefault()}
       onWheel={(event) => { event.preventDefault(); setCamera((value) => ({ ...value, distance: Math.max(4, Math.min(60, value.distance * Math.exp(event.deltaY * .0012))) })); }}
@@ -142,7 +143,7 @@ export function Viewport(props: Props) {
       <div className="absolute right-7 top-5 z-30 grid w-[92px] grid-cols-3 gap-1 rounded-[14px] border border-white/10 bg-[#232323]/95 p-2 shadow-2xl backdrop-blur" aria-label="View cube navigation">
         {[["Iso","↖"],["Top","TOP"],["Iso","↗"],["Left","LEFT"],["Perspective","●"],["Right","RIGHT"],["Iso","↙"],["Bottom","BOT"],["Iso","↘"],["Front","FRONT"],["Back","BACK"]].map(([view,label], index)=><button key={`${view}-${index}`} onClick={()=>setView(view)} className={`min-h-5 rounded text-[7px] font-bold transition ${activeView===view?"bg-[#1687f7] text-white shadow-[0_0_12px_rgba(22,135,247,.55)]":"bg-[#373737] text-zinc-300 hover:bg-[#4a4a4a]"}`}>{label}</button>)}
       </div>
-      <div className="absolute right-6 top-[104px] z-20 grid gap-2">{[{icon:Lightbulb,label:"Lighting"},{icon:Globe2,label:"World"},{icon:Camera,label:"Camera"},{icon:Grid3X3,label:"Assets"},{icon:CircleHelp,label:"Help"}].map(({icon:Icon,label})=><button key={label} aria-label={label} className="grid h-10 w-10 place-items-center rounded-[10px] bg-[#252525]/95 text-zinc-100 shadow-lg backdrop-blur hover:bg-[#353535]"><Icon size={20}/></button>)}</div>
+      <div className="absolute right-6 top-[104px] z-20 grid gap-2">{[{icon:Lightbulb,label:"Lighting"},{icon:Globe2,label:"World"},{icon:Camera,label:"Reset view"},{icon:Grid3X3,label:"Assets"},{icon:CircleHelp,label:"Help"}].map(({icon:Icon,label})=><button key={label} aria-label={label} onClick={label==="Reset view"?()=>setView("Perspective"):undefined} className="grid h-10 w-10 place-items-center rounded-[10px] bg-[#252525]/95 text-zinc-100 shadow-lg backdrop-blur hover:bg-[#353535]"><Icon size={20}/></button>)}</div>
 
       {props.selectedAsset && (
         <button
