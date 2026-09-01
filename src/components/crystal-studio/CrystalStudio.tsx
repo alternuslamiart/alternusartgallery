@@ -21,7 +21,9 @@ function downloadFile(name: string, content: string, type = "text/plain") {
 }
 
 export function CrystalStudio() {
-  const [dashboard, setDashboard] = useState(true);
+  // Opening /crystal should enter the modeling workspace immediately. The
+  // project dashboard remains available from the Home control in the top bar.
+  const [dashboard, setDashboard] = useState(false);
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
