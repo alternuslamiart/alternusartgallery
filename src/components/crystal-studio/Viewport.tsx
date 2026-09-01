@@ -5,6 +5,7 @@ import { modelingTools } from "./data";
 import { IconButton } from "./ui";
 import type { StudioAsset, StudioTool, Transform } from "./types";
 import { useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 
 type Camera = { targetX: number; targetZ: number; distance: number; yaw: number; pitch: number };
 
@@ -64,6 +65,21 @@ export function Viewport(props: Props) {
   const [camera, setCamera] = useState<Camera>({ targetX: 0, targetZ: 0, distance: 18, yaw: 0, pitch: .72 });
   const cameraDrag = useRef<{ x: number; y: number; camera: typeof camera } | null>(null);
   const [workspaceMode, setWorkspaceMode] = useState<"Animate" | "Modeling" | "Images">("Modeling");
+  const [activeView, setActiveView] = useState("Perspective");
+
+  useEffect(() => {
+    if (!props.selectedAsset) return;
+    props.onTransformChange({ x: 0, y: 0, rotation: 0, scale: 1 });
+    setCamera({ targetX: 0, targetZ: 0, distance: 18, yaw: .72, pitch: .62 });
+    setActiveView("Perspective");
+  // Center and frame every selected asset in the scene.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.selectedAsset?.id]);
+
+  const setView = (view: string) => {
+    const views: Record<string, Pick<Camera, "yaw" | "pitch">> = { Perspective: { yaw: .72, pitch: .62 }, Top: { yaw: 0, pitch: 1.52 }, Bottom: { yaw: 0, pitch: -.72 }, Front: { yaw: Math.PI, pitch: .02 }, Back: { yaw: 0, pitch: .02 }, Left: { yaw: Math.PI / 2, pitch: .02 }, Right: { yaw: -Math.PI / 2, pitch: .02 }, Iso: { yaw: .78, pitch: .62 } };
+    setCamera((value) => ({ ...value, ...views[view], targetX: 0, targetZ: 0, distance: 18 })); setActiveView(view);
+  };
   const beginDrag = (event: React.PointerEvent) => {
     drag.current = { x: event.clientX, y: event.clientY, transform: props.transform };
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -123,12 +139,8 @@ export function Viewport(props: Props) {
       <PerspectiveGrid camera={camera} />
       <div className="absolute left-1/2 top-2 flex -translate-x-1/2 rounded-full bg-[#202020]/90 p-1 shadow-xl backdrop-blur-md">{(["Animate","Modeling","Images"] as const).map((mode)=><button key={mode} onClick={()=>setWorkspaceMode(mode)} className={`rounded-full px-5 py-2 text-[11px] transition-all duration-300 ${workspaceMode===mode?"bg-[#414141] text-white shadow-inner":"text-zinc-500 hover:text-zinc-200"}`}>{mode}</button>)}</div>
 
-      <div className="absolute right-8 top-16 h-20 w-20" aria-label="XYZ orientation gizmo">
-        <span className="absolute left-[36px] top-[29px] h-3 w-3 rounded-full bg-[#1687f7]" />
-        <span className="absolute left-[39px] top-0 h-6 w-2 rounded-full bg-[#ff6b61]" />
-        <span className="absolute left-[39px] top-[45px] h-6 w-2 rounded-full bg-[#ff6b61]" />
-        <span className="absolute left-2 top-[31px] h-2 w-6 rounded-full bg-[#83f462]" />
-        <span className="absolute right-0 top-[31px] h-2 w-6 rounded-full bg-[#83f462]" />
+      <div className="absolute right-7 top-5 z-30 grid w-[92px] grid-cols-3 gap-1 rounded-[14px] border border-white/10 bg-[#232323]/95 p-2 shadow-2xl backdrop-blur" aria-label="View cube navigation">
+        {[["Iso","↖"],["Top","TOP"],["Iso","↗"],["Left","LEFT"],["Perspective","●"],["Right","RIGHT"],["Iso","↙"],["Bottom","BOT"],["Iso","↘"],["Front","FRONT"],["Back","BACK"]].map(([view,label], index)=><button key={`${view}-${index}`} onClick={()=>setView(view)} className={`min-h-5 rounded text-[7px] font-bold transition ${activeView===view?"bg-[#1687f7] text-white shadow-[0_0_12px_rgba(22,135,247,.55)]":"bg-[#373737] text-zinc-300 hover:bg-[#4a4a4a]"}`}>{label}</button>)}
       </div>
       <div className="absolute right-6 top-[104px] z-20 grid gap-2">{[{icon:Lightbulb,label:"Lighting"},{icon:Globe2,label:"World"},{icon:Camera,label:"Camera"},{icon:Grid3X3,label:"Assets"},{icon:CircleHelp,label:"Help"}].map(({icon:Icon,label})=><button key={label} aria-label={label} className="grid h-10 w-10 place-items-center rounded-[10px] bg-[#252525]/95 text-zinc-100 shadow-lg backdrop-blur hover:bg-[#353535]"><Icon size={20}/></button>)}</div>
 
@@ -141,7 +153,7 @@ export function Viewport(props: Props) {
           className={`crystal-object absolute left-1/2 top-[43%] h-[150px] w-[190px] cursor-grab active:cursor-grabbing ${objectSelected ? "crystal-object-selected" : ""}`}
           style={{ transform: `translate(calc(-50% + ${props.transform.x}px), calc(-50% + ${props.transform.y}px)) rotate(${props.transform.rotation}deg) scale(${props.transform.scale})` }}
         >
-          <span className={`crystal-model-shape crystal-shape-${shape} crystal-view-${viewportMode} block h-full w-full`} style={{ backgroundColor: props.color }} />
+          <span className={`crystal-asset-cube crystal-view-${viewportMode} block h-full w-full ${objectSelected ? "crystal-asset-active" : ""}`} style={{ "--asset-color": props.color } as CSSProperties}><i className="crystal-cube-front"/><i className="crystal-cube-right"/><i className="crystal-cube-top"/></span>
           <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/45 px-3 py-1 text-[11px] text-zinc-200">{props.selectedAsset.name}</span>
         </button>
       )}
