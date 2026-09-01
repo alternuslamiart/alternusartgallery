@@ -9,7 +9,7 @@ import type { CSSProperties } from "react";
 
 type Camera = { targetX: number; targetZ: number; elevation: number; distance: number; yaw: number; pitch: number; orthographic: boolean };
 
-function PerspectiveGrid({ camera, asset, color }: { camera: Camera; asset?: StudioAsset; color: string }) {
+function PerspectiveGrid({ camera, asset, color, transform }: { camera: Camera; asset?: StudioAsset; color: string; transform: Transform }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -30,12 +30,13 @@ function PerspectiveGrid({ camera, asset, color }: { camera: Camera; asset?: Stu
       line({x:-40,z:0},{x:40,z:0},"rgba(224,75,75,.9)",1.35); line({x:0,z:-40},{x:0,z:40},"rgba(30,139,255,.95)",1.35);
       if (`${asset?.name ?? ""} ${asset?.prompt ?? ""}`.toLowerCase().includes("desk")) {
         const shade = ["#9a9a9a", "#5f646a", "#c0c3c8"];
-        const box = (cx:number,cy:number,cz:number,w:number,h:number,d:number, tint?:string) => { const v=[[cx-w/2,cy-h/2,cz-d/2],[cx+w/2,cy-h/2,cz-d/2],[cx+w/2,cy+h/2,cz-d/2],[cx-w/2,cy+h/2,cz-d/2],[cx-w/2,cy-h/2,cz+d/2],[cx+w/2,cy-h/2,cz+d/2],[cx+w/2,cy+h/2,cz+d/2],[cx-w/2,cy+h/2,cz+d/2]].map(p=>project(p[0],p[1],p[2])); const faces=[[0,1,2,3],[1,5,6,2],[3,2,6,7],[4,0,3,7],[5,4,7,6]]; faces.map(face=>({face,depth:face.reduce((n,i)=>n+(v[i]?.depth||0),0)/4})).sort((a,b)=>b.depth-a.depth).forEach(({face},i)=>{const p=face.map(i=>v[i]);if(p.some(x=>!x))return;ctx.beginPath();ctx.moveTo(p[0]!.x,p[0]!.y);p.slice(1).forEach(x=>ctx.lineTo(x!.x,x!.y));ctx.closePath();ctx.fillStyle=tint||shade[i%shade.length];ctx.fill();ctx.strokeStyle="rgba(232,239,246,.45)";ctx.stroke();}); };
+        const offsetX = transform.x / 42, offsetZ = transform.y / 42;
+        const box = (cx:number,cy:number,cz:number,w:number,h:number,d:number, tint?:string) => { const v=[[cx-w/2,cy-h/2,cz-d/2],[cx+w/2,cy-h/2,cz-d/2],[cx+w/2,cy+h/2,cz-d/2],[cx-w/2,cy+h/2,cz-d/2],[cx-w/2,cy-h/2,cz+d/2],[cx+w/2,cy-h/2,cz+d/2],[cx+w/2,cy+h/2,cz+d/2],[cx-w/2,cy+h/2,cz+d/2]].map(p=>project(p[0]+offsetX,p[1],p[2]+offsetZ)); const faces=[[0,1,2,3],[1,5,6,2],[3,2,6,7],[4,0,3,7],[5,4,7,6]]; faces.map(face=>({face,depth:face.reduce((n,i)=>n+(v[i]?.depth||0),0)/4})).sort((a,b)=>b.depth-a.depth).forEach(({face},i)=>{const p=face.map(i=>v[i]);if(p.some(x=>!x))return;ctx.beginPath();ctx.moveTo(p[0]!.x,p[0]!.y);p.slice(1).forEach(x=>ctx.lineTo(x!.x,x!.y));ctx.closePath();ctx.fillStyle=tint||shade[i%shade.length];ctx.fill();ctx.strokeStyle="rgba(232,239,246,.45)";ctx.stroke();}); };
         box(0,2.55,0,7.2,.38,3.4,"#6f4e34"); [-2.9,2.9].forEach(x=>[-1.25,1.25].forEach(z=>box(x,1.25,z,.34,2.45,.34,"#565c63"))); box(-1.55,1.55,.15,2.1,1.8,2.5,"#4d5359"); box(-1.55,1.8,-1.12,1.8,.5,.08,"#727980"); box(-1.55,1.22,-1.12,1.8,.5,.08,"#727980");
       }
     };
     draw(); const observer = new ResizeObserver(draw); observer.observe(canvas); return () => observer.disconnect();
-  }, [camera]);
+  }, [camera, asset, color, transform]);
   return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-label="Interactive 3D perspective grid" />;
 }
 
@@ -135,7 +136,7 @@ export function Viewport(props: Props) {
   return (
     <section
       className="relative min-h-0 overflow-hidden bg-[#292929]"
-      onPointerDown={(event) => { if (event.button === 1 || event.button === 2) { event.preventDefault(); cameraDrag.current = { x: event.clientX, y: event.clientY, camera }; event.currentTarget.setPointerCapture(event.pointerId); } }}
+      onPointerDown={(event) => { if (event.button === 0 && props.selectedAsset && ["move", "rotate", "scale"].includes(props.activeTool)) { beginDrag(event); return; } if (event.button === 1 || event.button === 2) { event.preventDefault(); cameraDrag.current = { x: event.clientX, y: event.clientY, camera }; event.currentTarget.setPointerCapture(event.pointerId); } }}
       onPointerMove={(event) => { moveDrag(event); if (cameraDrag.current) { const dx = event.clientX - cameraDrag.current.x; const dy = event.clientY - cameraDrag.current.y; const base=cameraDrag.current.camera; if(event.buttons===4 && event.shiftKey) setCamera({ ...base, elevation:Math.max(-48,Math.min(48,base.elevation-dy*.05)), targetX:base.targetX-dx*.018, orthographic:false }); else if(event.buttons===4) setCamera({ ...base, targetX:base.targetX-dx*.018, targetZ:base.targetZ+dy*.018 }); else setCamera({ ...base, yaw:base.yaw-dx*.006, pitch:Math.max(.12,Math.min(1.42,base.pitch+dy*.005)), orthographic:false }); } }}
       onPointerUp={() => { drag.current = null; cameraDrag.current = null; }}
       onContextMenu={(event) => event.preventDefault()}
@@ -147,7 +148,7 @@ export function Viewport(props: Props) {
         if (assetId) props.onAssetDrop(assetId);
       }}
     >
-      <PerspectiveGrid camera={camera} asset={props.selectedAsset} color={props.color} />
+      <PerspectiveGrid camera={camera} asset={props.selectedAsset} color={props.color} transform={props.transform} />
       <div className="pointer-events-none absolute bottom-5 left-5 rounded-md bg-black/25 px-2 py-1 text-[10px] text-zinc-400">Wheel: zoom · Middle drag: pan · Shift + middle drag: move above / below grid</div>
       <div className="absolute left-1/2 top-2 flex -translate-x-1/2 rounded-full bg-[#202020]/90 p-1 shadow-xl backdrop-blur-md">{(["Animate","Modeling","Images"] as const).map((mode)=><button key={mode} onClick={()=>{ setWorkspaceMode(mode); setChatOpen(true); }} className={`rounded-full px-5 py-2 text-[11px] transition-all duration-300 ${workspaceMode===mode?"bg-[#414141] text-white shadow-inner":"text-zinc-500 hover:text-zinc-200"}`}>{mode}</button>)}</div>
       {workspaceMode !== "Modeling" && <div className="absolute left-1/2 top-[58px] z-20 w-[310px] -translate-x-1/2 rounded-[14px] border border-white/10 bg-[#232323]/95 p-3 shadow-2xl backdrop-blur-md">{workspaceMode === "Animate" ? <><div className="flex items-center justify-between"><b className="text-[11px]">Animation controls</b><span className="rounded-full bg-[#1687f7]/20 px-2 py-1 text-[9px] text-[#71b4ff]">24 FPS</span></div><p className="mt-2 text-[10px] leading-4 text-zinc-400">Create keyframes and preview the selected asset motion.</p><div className="mt-3 flex gap-2"><button className="rounded-lg bg-[#1687f7] px-3 py-2 text-[10px] font-semibold">Add keyframe</button><button className="rounded-lg bg-[#363636] px-3 py-2 text-[10px]">Auto orbit</button></div></> : <><div className="flex items-center justify-between"><b className="text-[11px]">Image reference</b><span className="text-[9px] text-zinc-500">AI guided</span></div><p className="mt-2 text-[10px] leading-4 text-zinc-400">Attach an image to guide material, form and surface generation.</p><button onClick={() => attachmentInput.current?.click()} className="mt-3 rounded-lg bg-[#363636] px-3 py-2 text-[10px] text-zinc-100">Add image reference</button></>}</div>}
@@ -193,8 +194,9 @@ export function Viewport(props: Props) {
       {openPanel === "tools" && <div className="absolute bottom-[204px] left-1/2 z-20 grid w-[360px] -translate-x-1/2 grid-cols-4 gap-2 rounded-xl border border-[#333] bg-[#202020] p-2 shadow-xl">{(["x", "y", "rotation", "scale"] as const).map((field) => <label key={field} className="rounded-lg bg-[#303030] px-2 py-1 text-[9px] uppercase text-zinc-400">{field}<input aria-label={field} type="number" step={field === "scale" ? .1 : 1} value={props.transform[field]} onChange={(event) => props.onTransformChange({ ...props.transform, [field]: Number(event.target.value) })} className="mt-0.5 w-full bg-transparent text-[12px] normal-case text-white outline-none" /></label>)}</div>}
 
       <div className="crystal-modeling-tools absolute bottom-[18px] left-1/2 flex h-[56px] w-[488px] max-w-[calc(100%_-_32px)] -translate-x-1/2 items-center justify-between rounded-[14px] border border-[#292929] bg-[#202020] px-2 shadow-[0_8px_24px_rgba(0,0,0,.3)]">
-        <IconButton icon={Sparkles} label={chatOpen ? "Hide AI chat" : "Show AI chat"} active={chatOpen} onClick={() => setChatOpen((value) => !value)} />
-        {modelingTools.map((tool) => <IconButton key={tool.id} icon={tool.icon} label={tool.label} active={props.activeTool === tool.id} onClick={() => selectTool(tool.id)} />)}
+        {modelingTools.slice(0, 5).map((tool) => <IconButton key={tool.id} icon={tool.icon} label={tool.label} active={props.activeTool === tool.id} onClick={() => selectTool(tool.id)} />)}
+        <IconButton icon={Sparkles} label={chatOpen ? "Hide AI chat" : "Show AI chat"} onClick={() => setChatOpen((value) => !value)} />
+        {modelingTools.slice(5).map((tool) => <IconButton key={tool.id} icon={tool.icon} label={tool.label} active={props.activeTool === tool.id} onClick={() => selectTool(tool.id)} />)}
       </div>
       <div aria-live="polite" className="sr-only">{notice}</div>
     </section>
