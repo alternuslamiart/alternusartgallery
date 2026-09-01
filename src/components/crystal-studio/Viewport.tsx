@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronDown, Link2, LoaderCircle, Paperclip, Send, X } from "lucide-react";
+import { Camera, Check, ChevronDown, CircleHelp, Globe2, Grid3X3, Lightbulb, Link2, LoaderCircle, Paperclip, Send, X } from "lucide-react";
 import { modelingTools } from "./data";
 import { IconButton } from "./ui";
 import type { StudioAsset, StudioTool, Transform } from "./types";
@@ -55,7 +55,7 @@ export function Viewport(props: Props) {
   const drag = useRef<{ x: number; y: number; transform: Transform } | null>(null);
   const attachmentInput = useRef<HTMLInputElement | null>(null);
   const [attachmentName, setAttachmentName] = useState<string | null>(null);
-  const [selectedModel, setSelectedModel] = useState("GPT-High");
+  const [selectedModel, setSelectedModel] = useState("Precision Mode");
   const [objectSelected, setObjectSelected] = useState(true);
   const [shape, setShape] = useState<"organic" | "cube" | "sphere">("organic");
   const [viewportMode, setViewportMode] = useState<"solid" | "wireframe" | "xray">("solid");
@@ -130,6 +130,7 @@ export function Viewport(props: Props) {
         <span className="absolute left-2 top-[31px] h-2 w-6 rounded-full bg-[#83f462]" />
         <span className="absolute right-0 top-[31px] h-2 w-6 rounded-full bg-[#83f462]" />
       </div>
+      <div className="absolute right-6 top-[104px] z-20 grid gap-2">{[{icon:Lightbulb,label:"Lighting"},{icon:Globe2,label:"World"},{icon:Camera,label:"Camera"},{icon:Grid3X3,label:"Assets"},{icon:CircleHelp,label:"Help"}].map(({icon:Icon,label})=><button key={label} aria-label={label} className="grid h-10 w-10 place-items-center rounded-[10px] bg-[#252525]/95 text-zinc-100 shadow-lg backdrop-blur hover:bg-[#353535]"><Icon size={20}/></button>)}</div>
 
       {props.selectedAsset && (
         <button
@@ -145,15 +146,15 @@ export function Viewport(props: Props) {
         </button>
       )}
 
-      <div className="absolute bottom-[80px] left-1/2 w-[488px] max-w-[calc(100%_-_32px)] -translate-x-1/2 rounded-[14px] border border-[#252525] bg-[#202020] px-2 pb-2 pt-1 shadow-[0_10px_30px_rgba(0,0,0,.35)]">
-        <textarea aria-label="AI model prompt" value={props.prompt} onChange={(event) => props.onPromptChange(event.target.value)} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") props.onGenerate(); }} placeholder="Create script or 3D Model" className="h-[68px] w-full resize-none bg-transparent px-2 py-3 text-[12px] text-zinc-100 outline-none placeholder:text-zinc-400" />
+      <div className="absolute bottom-[80px] left-1/2 w-[488px] max-w-[calc(100%_-_32px)] -translate-x-1/2 rounded-[14px] border border-[#1687f7] bg-[#202020]/95 px-2 pb-2 pt-1 shadow-[0_10px_34px_rgba(0,0,0,.45),0_0_22px_rgba(22,135,247,.14)] backdrop-blur-md">
+        <textarea aria-label="AI model prompt" value={props.prompt} onChange={(event) => props.onPromptChange(event.target.value)} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") props.onGenerate(); }} placeholder="What do you want to create?" className="h-[68px] w-full resize-none bg-transparent px-2 py-3 text-[11px] text-zinc-100 outline-none placeholder:text-zinc-500" />
         {props.error && <div className="mb-2 flex items-center justify-between rounded-md bg-red-950/70 px-3 py-1.5 text-[11px] text-red-200"><span>{props.error}</span><button aria-label="Dismiss error" onClick={props.onClearError}><X size={14} /></button></div>}
         {props.loading && <div className="mb-2 h-1 overflow-hidden rounded-full bg-zinc-700"><div className="h-full bg-[#1687f7] transition-all" style={{ width: `${props.progress}%` }} /></div>}
         <div className="flex h-10 items-center gap-2">
           <input ref={attachmentInput} aria-label="Attach prompt reference" type="file" accept="image/*,.obj,.stl,.step,.glb,.gltf" className="sr-only" onChange={(event) => setAttachmentName(event.target.files?.[0]?.name ?? null)} />
           <IconButton icon={attachmentName ? Paperclip : Link2} label={attachmentName ? `Attached: ${attachmentName}` : "Attach reference"} onClick={() => attachmentInput.current?.click()} className="bg-[#303030]" />
           <label className="relative flex h-9 items-center rounded-[9px] bg-[#303030] text-[12px] text-zinc-100">
-            <select aria-label="AI model" value={selectedModel} onChange={(event) => { setSelectedModel(event.target.value); setNotice(`${event.target.value} selected`); }} className="h-full appearance-none bg-transparent pl-4 pr-9 outline-none"><option className="bg-[#303030]">GPT-High</option><option className="bg-[#303030]">GPT-Fast</option><option className="bg-[#303030]">CAD-Specialist</option></select>
+            <select aria-label="AI model" value={selectedModel} onChange={(event) => { setSelectedModel(event.target.value); setNotice(`${event.target.value} selected`); }} className="h-full appearance-none bg-transparent pl-4 pr-9 outline-none"><option className="bg-[#303030]">Precision Mode</option><option className="bg-[#303030]">Fast Concept</option><option className="bg-[#303030]">CAD Specialist</option></select>
             <ChevronDown size={15} className="pointer-events-none absolute right-3 text-zinc-300" />
           </label>
           {attachmentName && <button type="button" aria-label="Remove attachment" onClick={() => { setAttachmentName(null); if (attachmentInput.current) attachmentInput.current.value = ""; }} className="max-w-32 truncate rounded-full bg-[#303030] px-3 py-1.5 text-[10px] text-zinc-300">{attachmentName}</button>}

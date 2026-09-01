@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, ChevronDown, Globe2, Home, Menu, PanelLeftOpen, PanelRightOpen, Plus, Search, Trash2, Zap } from "lucide-react";
+import { Archive, ChevronDown, Gem, Globe2, Home, Menu, PanelLeftOpen, PanelRightOpen, Plus, Search, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { generateModel } from "@/services/ai";
 import { initialAssets } from "./data";
@@ -35,11 +35,11 @@ export function CrystalStudio() {
   const [error, setError] = useState<string | null>(null);
   const [assets, setAssets] = useState<StudioAsset[]>(initialAssets);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
-  const [resolution, setResolution] = useState("1920x1080");
-  const [frameRate, setFrameRate] = useState("30 fps");
-  const [color, setColor] = useState("#b47272");
+  const [resolution, setResolution] = useState("3840x2160");
+  const [frameRate, setFrameRate] = useState("60 fps");
+  const [color, setColor] = useState("#4A90D9");
   const [opacity, setOpacity] = useState(100);
-  const [renderSettings, setRenderSettings] = useState<RenderSettings>({ resolution: "1920x1080", sampleCount: 512, exposure: 40.5 });
+  const [renderSettings, setRenderSettings] = useState<RenderSettings>({ resolution: "2560x1440", sampleCount: 256, exposure: 1.2 });
   const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, rotation: -8, scale: 1 });
   const [start, setStart] = useState(1);
   const [end, setEnd] = useState(240);
@@ -100,9 +100,9 @@ export function CrystalStudio() {
   return (
     <div className={`crystal-studio crystal-studio-enter fixed inset-0 z-[90] grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
       <header className="col-span-full flex h-16 items-center border-b border-[#303030] bg-[#202020] px-7">
-        <button onClick={() => setDashboard(true)} className="flex items-center gap-3"><Home size={18} /><span className="text-[16px] font-semibold">Crystal</span></button>
-        <nav aria-label="Application menu" className="ml-16 flex items-center gap-9 text-[12px] text-zinc-300">{["File", "Edit", "Agent", "Help", "Layout"].map((item) => <button key={item} className="hover:text-white">{item}</button>)}</nav>
-        <button className="ml-auto flex h-10 w-[124px] items-center justify-center gap-2 rounded-[11px] bg-[#1687f7] text-[12px] font-semibold text-white hover:bg-[#2d9bff]"><Zap size={19} fill="currentColor" />Upgrade</button>
+        <div className="flex items-center gap-3"><Gem size={26} className="text-zinc-600" fill="currentColor"/><b className="text-[16px]">Crystal</b><button aria-label="Back to projects" onClick={() => setDashboard(true)} className="ml-6 text-zinc-200"><Home size={17}/></button></div>
+        <nav aria-label="Application menu" className="ml-7 flex items-center gap-8 text-[12px] text-zinc-300">{["File", "Edit", "Tools", "Help", "View"].map((item) => <button key={item} className="hover:text-white">{item}</button>)}</nav>
+        <div className="ml-auto flex items-center gap-3"><button className="flex h-10 items-center gap-2 rounded-[12px] border border-zinc-400 px-3 text-[11px]">Starter <Zap size={17}/>200</button><button className="flex h-10 w-[124px] items-center justify-center gap-2 rounded-[11px] bg-[#1687f7] text-[12px] font-semibold text-white hover:bg-[#2d9bff]"><Zap size={19} fill="currentColor" />Go Pro</button></div>
       </header>
 
       {!leftOpen && <button aria-label="Open left panel" onClick={() => setLeftOpen(true)} className="absolute left-3 top-[76px] z-30 grid h-10 w-10 place-items-center rounded-lg bg-[#1687f7]"><PanelLeftOpen size={19} /></button>}
