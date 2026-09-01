@@ -52,6 +52,7 @@ export function CrystalStudio() {
   const [mobileProfile, setMobileProfile] = useState(false);
   const [mobilePricing, setMobilePricing] = useState(false);
   const [pricingPlan, setPricingPlan] = useState("Basic");
+  const [mobileSplash, setMobileSplash] = useState(true);
   const uploadUrl = useRef<string | null>(null);
   const selectedAsset = useMemo(() => assets.find((asset) => asset.id === selectedAssetId), [assets, selectedAssetId]);
 
@@ -66,7 +67,13 @@ export function CrystalStudio() {
 
   useEffect(() => () => { if (uploadUrl.current) URL.revokeObjectURL(uploadUrl.current); }, []);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => setMobileSplash(false), 1100);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   if (dashboard) return <div className="crystal-dashboard">
+    {mobileSplash && <div className="crystal-mobile-splash"><img src="/logo.png" alt="Crystal" /></div>}
     <header><div className="crystal-dashboard-brand"><img src="/logo.png" alt="Crystal" className="crystal-brand-logo"/><b>Crystal</b></div><div className="crystal-window-controls">•••　—　×　□</div></header>
     <aside><button className="crystal-team"><span>B</span> My Team <ChevronDown size={17}/></button><label className="crystal-search"><Search size={16}/><input placeholder="Search" /></label><strong>Project</strong><nav><button className="active"><span>▦</span>All Projects</button><button><Globe2 size={16}/>Community</button><button><Archive size={16}/>Archive...</button><button onClick={() => setDashboard(false)}><Plus size={16}/>Project</button></nav><footer><span>▢　 Invite your team</span><button>Copy link</button></footer></aside>
     <main><div className="crystal-dashboard-title"><div><h1>♦ Crystal</h1><b>Recent</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => setDashboard(false)}>New Project　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago"},{title:"Architecture Sketch",time:"Viewed 3mo ago"}].map((project) => <button key={project.title} onClick={() => setDashboard(false)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
@@ -105,6 +112,7 @@ export function CrystalStudio() {
 
   return (
     <div className={`crystal-studio crystal-studio-enter fixed inset-0 z-[90] grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
+      {mobileSplash && <div className="crystal-mobile-splash"><img src="/logo.png" alt="Crystal" /></div>}
       <header className="col-span-full flex h-16 items-center border-b border-[#303030] bg-[#202020] px-7">
         <div className="flex items-center gap-3"><img src="/logo.png" alt="Crystal" className="crystal-brand-logo"/><b className="text-[16px]">Crystal</b><button aria-label="Back to projects" onClick={() => setDashboard(true)} className="ml-6 text-zinc-200"><Home size={17}/></button></div>
         <nav aria-label="Application menu" className="relative ml-7 flex items-center gap-8 text-[12px] text-zinc-300">{["File", "Edit", "Tools", "Help", "View"].map((item) => <button key={item} onClick={() => setOpenMenu(openMenu === item ? null : item)} className={`transition hover:text-white ${openMenu === item ? "text-white" : ""}`}>{item}</button>)}{openMenu && <div className="absolute left-0 top-8 z-50 w-44 rounded-xl border border-white/10 bg-[#272727] p-1.5 shadow-2xl"><div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{openMenu}</div>{(openMenu === "File" ? ["New project", "Import asset", "Export scene"] : openMenu === "Edit" ? ["Undo", "Redo", "Preferences"] : openMenu === "Tools" ? ["Measure", "Transform", "Material tools"] : openMenu === "Help" ? ["Studio guide", "Keyboard shortcuts", "Contact support"] : ["Perspective view", "Orthographic view", "Reset view"]).map(action => <button key={action} onClick={() => setOpenMenu(null)} className="block w-full rounded-lg px-3 py-2 text-left text-[11px] text-zinc-200 hover:bg-[#3a3a3a]">{action}</button>)}</div>}</nav>
