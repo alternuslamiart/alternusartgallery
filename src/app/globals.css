@@ -602,9 +602,9 @@
 
 /* Keep a refined 12px image inset on the desktop marketing feature frames. */
 @media (min-width: 701px) {
- .crystal-first-card, .crystal-feature-showcase { padding: 12px; }
+ .crystal-first-card, .crystal-feature-showcase { padding: 12px; align-items: stretch; }
  .crystal-first-card > div:first-child, .crystal-feature-copy { padding: 40px 32px; }
- .crystal-first-image, .crystal-feature-visual { height: auto; min-height: 390px; align-self: stretch; transform: translateY(9px); }
+ .crystal-first-image, .crystal-feature-visual { height: auto; min-height: 390px; align-self: stretch; transform: none; }
 }
 
 /* Homepage motion and interaction layer: restrained, responsive and consistent. */
