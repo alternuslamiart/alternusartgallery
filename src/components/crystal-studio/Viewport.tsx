@@ -72,7 +72,7 @@ export function Viewport(props: Props) {
   // Keep the normal working perspective above the construction plane.  The
   // explicit Bottom control is still available, but normal orbiting cannot
   // accidentally leave the model looking at the underside of the grid.
-  const [camera, setCamera] = useState<Camera>({ targetX: 0, targetZ: 0, elevation: 0, distance: 22, yaw: .72, pitch: .52, orthographic: false });
+  const [camera, setCamera] = useState<Camera>({ targetX: 0, targetZ: 0, elevation: 0, distance: 14, yaw: .72, pitch: .52, orthographic: false });
   const cameraDrag = useRef<{ x: number; y: number; camera: typeof camera } | null>(null);
   const [workspaceMode, setWorkspaceMode] = useState<"Animate" | "Modeling" | "Images">("Modeling");
   const [activeView, setActiveView] = useState("Perspective");
@@ -81,7 +81,7 @@ export function Viewport(props: Props) {
   useEffect(() => {
     if (!props.selectedAsset) return;
     props.onTransformChange({ x: 0, y: 0, rotation: 0, scale: 1 });
-    setCamera({ targetX: 0, targetZ: 0, elevation: 0, distance: 22, yaw: .72, pitch: .52, orthographic: false });
+    setCamera({ targetX: 0, targetZ: 0, elevation: 0, distance: 14, yaw: .72, pitch: .52, orthographic: false });
     setActiveView("Perspective");
   // Center and frame every selected asset in the scene.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -89,7 +89,7 @@ export function Viewport(props: Props) {
 
   const setView = (view: string) => {
     const views: Record<string, Pick<Camera, "yaw" | "pitch" | "orthographic">> = { Perspective: { yaw: .72, pitch: .52, orthographic: false }, Top: { yaw: 0, pitch: 1.52, orthographic: true }, Bottom: { yaw: 0, pitch: -.72, orthographic: true }, Front: { yaw: Math.PI, pitch: .02, orthographic: true }, Back: { yaw: 0, pitch: .02, orthographic: true }, Left: { yaw: Math.PI / 2, pitch: .02, orthographic: true }, Right: { yaw: -Math.PI / 2, pitch: .02, orthographic: true }, Iso: { yaw: .78, pitch: .55, orthographic: false } };
-    const from = camera; const to: Camera = { ...camera, ...views[view], targetX: 0, targetZ: 0, elevation: 0, distance: 22 }; const started = performance.now();
+    const from = camera; const to: Camera = { ...camera, ...views[view], targetX: 0, targetZ: 0, elevation: 0, distance: 14 }; const started = performance.now();
     const animate = (now: number) => { const p=Math.min(1,(now-started)/260); const ease=1-Math.pow(1-p,3); setCamera({ targetX:from.targetX+(to.targetX-from.targetX)*ease, targetZ:from.targetZ+(to.targetZ-from.targetZ)*ease, elevation:from.elevation+(to.elevation-from.elevation)*ease, distance:from.distance+(to.distance-from.distance)*ease, yaw:from.yaw+(to.yaw-from.yaw)*ease, pitch:from.pitch+(to.pitch-from.pitch)*ease, orthographic:p<1?from.orthographic:to.orthographic }); if(p<1)requestAnimationFrame(animate); }; requestAnimationFrame(animate); setActiveView(view);
   };
   const beginDrag = (event: React.PointerEvent) => {
