@@ -604,4 +604,5 @@
 @media (min-width: 701px) {
  .crystal-first-card, .crystal-feature-showcase { padding: 12px; }
  .crystal-first-card > div:first-child, .crystal-feature-copy { padding: 40px 32px; }
+ .crystal-first-image, .crystal-feature-visual { height: auto; min-height: 390px; align-self: stretch; }
 }
