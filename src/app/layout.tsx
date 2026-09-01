@@ -58,11 +58,10 @@ export const metadata: Metadata = {
  publisher: "Crystal Studio",
  icons: {
  icon: [
- { url: "/favicon.svg", type: "image/svg+xml" },
- { url: "/logo.png", sizes: "512x512", type: "image/png" },
+ { url: "/favicon.jpeg", sizes: "512x512", type: "image/jpeg" },
  ],
- shortcut: "/favicon.svg",
- apple: "/logo.png",
+ shortcut: "/favicon.jpeg",
+ apple: "/favicon.jpeg",
  },
  openGraph: {
  type: "website",
