@@ -55,6 +55,7 @@ type Props = {
   onClearError: () => void;
   onAssetDrop: (id: string) => void;
   onColorChange: (value: string) => void;
+  onOpenPricing: () => void;
 };
 
 export function Viewport(props: Props) {
@@ -172,7 +173,7 @@ export function Viewport(props: Props) {
       )}
 
       <div className={`${chatOpen ? "" : "hidden"} absolute bottom-[80px] left-1/2 w-[488px] max-w-[calc(100%_-_32px)] -translate-x-1/2 rounded-[14px] border border-[#1687f7] bg-[#202020]/95 px-2 pb-2 pt-1 shadow-[0_10px_34px_rgba(0,0,0,.45),0_0_22px_rgba(22,135,247,.14)] backdrop-blur-md`}>
-        {workspaceMode === "Images" && <div className="crystal-mobile-upgrade"><Zap size={18} fill="currentColor"/><b>Try Crystal Pro</b><button>Pay Now</button></div>}
+        {workspaceMode === "Images" && <div className="crystal-mobile-upgrade"><Zap size={18} fill="currentColor"/><b>Try Crystal Pro</b><button onClick={props.onOpenPricing}>Pay Now</button></div>}
         <textarea aria-label="AI model prompt" value={props.prompt} onChange={(event) => props.onPromptChange(event.target.value)} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") props.onGenerate(); }} placeholder="What do you want to create?" className="h-[68px] w-full resize-none bg-transparent px-2 py-3 text-[11px] text-zinc-100 outline-none placeholder:text-zinc-500" />
         {props.error && <div className="mb-2 flex items-center justify-between rounded-md bg-red-950/70 px-3 py-1.5 text-[11px] text-red-200"><span>{props.error}</span><button aria-label="Dismiss error" onClick={props.onClearError}><X size={14} /></button></div>}
         {props.loading && <div className="mb-2 h-1 overflow-hidden rounded-full bg-zinc-700"><div className="h-full bg-[#1687f7] transition-all" style={{ width: `${props.progress}%` }} /></div>}
