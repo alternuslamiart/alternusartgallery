@@ -78,13 +78,13 @@ export function useCoreforgeTheme() {
 
 export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: ReturnType<typeof useCoreforgeTheme>) {
  return (
- <header style={{ position: "sticky", top: 0, zIndex: 40, width: "100%", transition: "all 0.25s", backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", WebkitBackdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none", background: scrolled ? (isDark ? "rgba(18,18,20,0.84)" : "rgba(244,246,251,0.82)") : "transparent", borderBottom: `1px solid ${scrolled ? faint : "transparent"}` }}>
- <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", height: 64, display: "flex", alignItems: "center", gap: 32 }}>
+ <header className="crystal-glass-nav-shell">
+ <div className="crystal-glass-nav" style={{ color: fg, borderColor: faint, background: isDark ? "rgba(28,28,30,.72)" : "rgba(255,255,255,.72)" }}>
  <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
  <CoreforgeLogo size={28} radius={8} />
- <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>Crystal Studio</span>
+ <span className="crystal-glass-brand" style={{ color: fg }}>Crystal Studio</span>
  </Link>
- <nav className="hidden md:flex" style={{ alignItems: "center", gap: 24 }}>
+ <nav className="hidden md:flex crystal-glass-links" style={{ alignItems: "center", gap: 12 }}>
  {[{ l: "Platform", h: "/platform/overview" }, { l: "CAD Studios", h: "/platform/bridges" }, { l: "Company", h: "/about" }, { l: "Pricing", h: "/pricing" }].map((i) => (
  <Link key={i.l} href={i.h} style={{ fontSize: 13, color: muted, fontWeight: 500, textDecoration: "none", letterSpacing: "-0.01em" }}>{i.l}</Link>
  ))}
