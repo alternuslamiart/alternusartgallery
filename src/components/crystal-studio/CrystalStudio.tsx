@@ -34,7 +34,7 @@ export function CrystalStudio() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [assets, setAssets] = useState<StudioAsset[]>(initialAssets);
-  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>("industrial-desk");
   const [resolution, setResolution] = useState("3840x2160");
   const [frameRate, setFrameRate] = useState("60 fps");
   const [color, setColor] = useState("#4A90D9");

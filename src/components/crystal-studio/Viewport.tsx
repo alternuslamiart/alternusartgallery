@@ -9,7 +9,7 @@ import type { CSSProperties } from "react";
 
 type Camera = { targetX: number; targetZ: number; elevation: number; distance: number; yaw: number; pitch: number; orthographic: boolean };
 
-function PerspectiveGrid({ camera }: { camera: Camera }) {
+function PerspectiveGrid({ camera, asset, color }: { camera: Camera; asset?: StudioAsset; color: string }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -24,10 +24,15 @@ function PerspectiveGrid({ camera }: { camera: Camera }) {
       const f = { x: camera.targetX - eye.x, y: -eye.y, z: camera.targetZ - eye.z }; const fl = Math.hypot(f.x, f.y, f.z); f.x/=fl; f.y/=fl; f.z/=fl;
       const r = { x: -f.z, y: 0, z: f.x }; const rl = Math.hypot(r.x, r.z); r.x/=rl; r.z/=rl;
       const u = { x: r.z*f.y, y: f.z*r.x-r.z*f.x, z: -r.x*f.y }; const focal = Math.min(bounds.width, bounds.height) * 1.05;
-      const project = (x:number,z:number) => { const px=x-eye.x, py=-eye.y, pz=z-eye.z; const depth=px*f.x+py*f.y+pz*f.z; if(depth<.12)return null; const scale=camera.orthographic ? focal/camera.distance : focal/depth; return { x:bounds.width/2+(px*r.x+pz*r.z)*scale, y:bounds.height*.52-(px*u.x+py*u.y+pz*u.z)*scale, depth }; };
-      const line = (a:{x:number,z:number},b:{x:number,z:number},color:string,width=1) => { const p1=project(a.x,a.z),p2=project(b.x,b.z); if(!p1||!p2)return; ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke(); };
+      const project = (x:number,y:number,z:number) => { const px=x-eye.x, py=y-eye.y, pz=z-eye.z; const depth=px*f.x+py*f.y+pz*f.z; if(depth<.12)return null; const scale=camera.orthographic ? focal/camera.distance : focal/depth; return { x:bounds.width/2+(px*r.x+pz*r.z)*scale, y:bounds.height*.52-(px*u.x+py*u.y+pz*u.z)*scale, depth }; };
+      const line = (a:{x:number,z:number},b:{x:number,z:number},color:string,width=1) => { const p1=project(a.x,0,a.z),p2=project(b.x,0,b.z); if(!p1||!p2)return; ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke(); };
       for(let i=-40;i<=40;i++){ const major=i%5===0; line({x:i,z:-40},{x:i,z:40},major?"rgba(120,124,130,.31)":"rgba(108,112,118,.18)"); line({x:-40,z:i},{x:40,z:i},major?"rgba(120,124,130,.31)":"rgba(108,112,118,.18)"); }
       line({x:-40,z:0},{x:40,z:0},"rgba(224,75,75,.9)",1.35); line({x:0,z:-40},{x:0,z:40},"rgba(30,139,255,.95)",1.35);
+      if (`${asset?.name ?? ""} ${asset?.prompt ?? ""}`.toLowerCase().includes("desk")) {
+        const shade = ["#9a9a9a", "#5f646a", "#c0c3c8"];
+        const box = (cx:number,cy:number,cz:number,w:number,h:number,d:number, tint?:string) => { const v=[[cx-w/2,cy-h/2,cz-d/2],[cx+w/2,cy-h/2,cz-d/2],[cx+w/2,cy+h/2,cz-d/2],[cx-w/2,cy+h/2,cz-d/2],[cx-w/2,cy-h/2,cz+d/2],[cx+w/2,cy-h/2,cz+d/2],[cx+w/2,cy+h/2,cz+d/2],[cx-w/2,cy+h/2,cz+d/2]].map(p=>project(p[0],p[1],p[2])); const faces=[[0,1,2,3],[1,5,6,2],[3,2,6,7],[4,0,3,7],[5,4,7,6]]; faces.map(face=>({face,depth:face.reduce((n,i)=>n+(v[i]?.depth||0),0)/4})).sort((a,b)=>b.depth-a.depth).forEach(({face},i)=>{const p=face.map(i=>v[i]);if(p.some(x=>!x))return;ctx.beginPath();ctx.moveTo(p[0]!.x,p[0]!.y);p.slice(1).forEach(x=>ctx.lineTo(x!.x,x!.y));ctx.closePath();ctx.fillStyle=tint||shade[i%shade.length];ctx.fill();ctx.strokeStyle="rgba(232,239,246,.45)";ctx.stroke();}); };
+        box(0,2.55,0,7.2,.38,3.4,"#6f4e34"); [-2.9,2.9].forEach(x=>[-1.25,1.25].forEach(z=>box(x,1.25,z,.34,2.45,.34,"#565c63"))); box(-1.55,1.55,.15,2.1,1.8,2.5,"#4d5359"); box(-1.55,1.8,-1.12,1.8,.5,.08,"#727980"); box(-1.55,1.22,-1.12,1.8,.5,.08,"#727980");
+      }
     };
     draw(); const observer = new ResizeObserver(draw); observer.observe(canvas); return () => observer.disconnect();
   }, [camera]);
@@ -138,7 +143,7 @@ export function Viewport(props: Props) {
         if (assetId) props.onAssetDrop(assetId);
       }}
     >
-      <PerspectiveGrid camera={camera} />
+      <PerspectiveGrid camera={camera} asset={props.selectedAsset} color={props.color} />
       <div className="pointer-events-none absolute bottom-5 left-5 rounded-md bg-black/25 px-2 py-1 text-[10px] text-zinc-400">Wheel: zoom · Middle drag: pan · Shift + middle drag: move above / below grid</div>
       <div className="absolute left-1/2 top-2 flex -translate-x-1/2 rounded-full bg-[#202020]/90 p-1 shadow-xl backdrop-blur-md">{(["Animate","Modeling","Images"] as const).map((mode)=><button key={mode} onClick={()=>setWorkspaceMode(mode)} className={`rounded-full px-5 py-2 text-[11px] transition-all duration-300 ${workspaceMode===mode?"bg-[#414141] text-white shadow-inner":"text-zinc-500 hover:text-zinc-200"}`}>{mode}</button>)}</div>
 
@@ -147,7 +152,7 @@ export function Viewport(props: Props) {
       </div>
       <div className="absolute right-6 top-[104px] z-20 grid gap-2">{[{icon:Lightbulb,label:"Lighting"},{icon:Globe2,label:"World"},{icon:Camera,label:"Reset view"},{icon:Grid3X3,label:"Assets"},{icon:CircleHelp,label:"Help"}].map(({icon:Icon,label})=><button key={label} aria-label={label} onClick={label==="Reset view"?()=>setView("Perspective"):undefined} className="grid h-10 w-10 place-items-center rounded-[10px] bg-[#252525]/95 text-zinc-100 shadow-lg backdrop-blur hover:bg-[#353535]"><Icon size={20}/></button>)}</div>
 
-      {props.selectedAsset && (
+      {props.selectedAsset && !`${props.selectedAsset.name} ${props.selectedAsset.prompt}`.toLowerCase().includes("desk") && (
         <button
           type="button"
           aria-label={`Manipulate ${props.selectedAsset.name}`}
