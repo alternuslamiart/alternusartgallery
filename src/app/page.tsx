@@ -12,7 +12,7 @@ const surfaces = [
  title: "3D Machinery",
  description: "Engine, transmission, hydraulic, pneumatic, and industrial machinery design in one focused production surface.",
  Icon: Layers3,
- href: "/ai-assistant",
+ href: "/crystal",
  cta: "Launch Studio",
  },
  {
@@ -97,7 +97,7 @@ function ActionLink({
 }
 
 function FeatureShowcase({ title, copy, image, reverse = false }: { title: string; copy: string; image: string; reverse?: boolean }) {
- return <section className={`crystal-feature-showcase${reverse ? " reverse" : ""}`}><div className="crystal-feature-visual"><Image src={image} alt={title} fill sizes="(max-width: 700px) 100vw, 55vw" /></div><div className="crystal-feature-copy"><h2>{title}</h2><p>{copy}</p><ActionLink href="/ai-assistant">Explore <ArrowRight size={15} /></ActionLink></div></section>;
+ return <section className={`crystal-feature-showcase${reverse ? " reverse" : ""}`}><div className="crystal-feature-visual"><Image src={image} alt={title} fill sizes="(max-width: 700px) 100vw, 55vw" /></div><div className="crystal-feature-copy"><h2>{title}</h2><p>{copy}</p><ActionLink href="/crystal">Explore <ArrowRight size={15} /></ActionLink></div></section>;
 }
 
 export default function HomePage() {
@@ -107,7 +107,7 @@ export default function HomePage() {
  <>
  <section className="crystal-first-sector">
  <p>One AI workspace for machinery, engines, vehicles, CNC, industrial CAD, and engineering code automation.</p>
- <div className="crystal-first-card"><div><h1>Turn Ideas Into Reality</h1><p>We transform complex ideas into intelligent 3D designs, automated systems, and precision-engineered solutions. From concept to CAD, Crystal Studio combines AI, engineering, and advanced visualization to turn ambitious ideas into real-world innovation.</p><div><ActionLink href="/ai-assistant">Launch Studio <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">Download App</ActionLink></div></div><div className="crystal-first-image"><Image src="/Section/architectresectionone.png" alt="Futuristic architectural concept" fill priority sizes="(max-width: 700px) 100vw, 55vw" /></div></div>
+ <div className="crystal-first-card"><div><h1>Turn Ideas Into Reality</h1><p>We transform complex ideas into intelligent 3D designs, automated systems, and precision-engineered solutions. From concept to CAD, Crystal Studio combines AI, engineering, and advanced visualization to turn ambitious ideas into real-world innovation.</p><div><ActionLink href="/crystal">Launch Studio <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">Download App</ActionLink></div></div><div className="crystal-first-image"><Image src="/Section/architectresectionone.png" alt="Futuristic architectural concept" fill priority sizes="(max-width: 700px) 100vw, 55vw" /></div></div>
  <div className="crystal-first-chips">{["3D machinery", "Engines", "Automotive", "CAD", "All CAD studios"].map((item) => <span key={item}>{item}</span>)}</div>
  </section>
 

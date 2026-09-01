@@ -598,3 +598,10 @@
 /* Shared raster mark supplied for the Crystal application chrome. */
 .crystal-brand-logo { width: 27px; height: 27px; object-fit: contain; filter: invert(1) brightness(1.55); opacity: .88; }
 .crystal-brand-logo-mobile { width: 40px; height: 40px; }
+.crystal-site-logo { width: 28px; height: 28px; object-fit: contain; filter: invert(1) brightness(1.55); opacity: .9; }
+
+/* Keep a refined 12px image inset on the desktop marketing feature frames. */
+@media (min-width: 701px) {
+ .crystal-first-card, .crystal-feature-showcase { padding: 12px; }
+ .crystal-first-card > div:first-child, .crystal-feature-copy { padding: 40px 32px; }
+}

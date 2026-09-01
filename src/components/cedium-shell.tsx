@@ -81,8 +81,8 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  <header className="crystal-glass-nav-shell">
  <div className="crystal-glass-nav" style={{ color: fg, borderColor: faint, background: isDark ? "rgba(28,28,30,.72)" : "rgba(255,255,255,.72)" }}>
  <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
- <CoreforgeLogo size={28} radius={8} />
- <span className="crystal-glass-brand" style={{ color: fg }}>Crystal Studio</span>
+ <img src="/logo.png" alt="Crystal" className="crystal-site-logo" />
+ <span className="crystal-glass-brand" style={{ color: fg }}>Crystal</span>
  </Link>
  <nav className="hidden md:flex crystal-glass-links" style={{ alignItems: "center", gap: 12 }}>
  {[{ l: "Platform", h: "/platform/overview" }, { l: "CAD Studios", h: "/platform/bridges" }, { l: "Company", h: "/about" }, { l: "Pricing", h: "/pricing" }].map((i) => (
@@ -103,7 +103,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  <Link href="/download" className="hidden sm:inline-flex" style={{ alignItems: "center", height: 36, padding: "0 15px", color: fg, fontSize: 13, fontWeight: 700, textDecoration: "none", border: `1px solid ${faint}`, borderRadius: 8 }}>
  Download App
  </Link>
- <Link href="/ai-assistant" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
+ <Link href="/crystal" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
  Launch Studio <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
  </Link>
  </div>
@@ -122,7 +122,7 @@ export function CoreforgeFooter({ isDark, fg, muted, faint }: Pick<ReturnType<ty
  { l: "Status", h: "/platform/status", ext: false },
  ]},
  { heading: "Engineering", links: [
- { l: "Launch Studio", h: "/ai-assistant", ext: true },
+ { l: "Launch Studio", h: "/crystal", ext: true },
  { l: "Download Desktop App", h: "/download", ext: false },
  { l: "3D Machinery", h: "/workspace/files", ext: false },
  { l: "Automotive", h: "/workspace/code", ext: false },
