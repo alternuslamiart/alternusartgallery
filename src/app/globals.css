@@ -82,7 +82,8 @@
   .crystal-studio > section > .absolute.left-1\/2.top-2 button { padding: 11px 20px; font-size: 12px; }
   .crystal-studio > section > .absolute.right-9, .crystal-studio > section > .absolute.right-6, .crystal-studio > section > .pointer-events-none { display: none; }
   .crystal-studio > section .crystal-object { top: 46%; transform-origin: center; }
-  .crystal-studio > section > .absolute.bottom-\[80px\] { bottom: 20px; width: calc(100% - 46px); max-width: none; padding: 10px 14px; border-color: rgba(38,117,255,.24); border-radius: 29px; background: #292929; box-shadow: 0 0 36px rgba(49,93,255,.2); }
+  .crystal-studio > section > .absolute.bottom-\[80px\] { bottom: 20px; width: calc(100% - 40px); max-width: none; padding: 10px 14px; border-color: rgba(38,117,255,.24); border-radius: 29px; background: #292929; box-shadow: 0 0 36px rgba(49,93,255,.2); }
+  .crystal-modeling-tools { display: none !important; }
   .crystal-studio > section > .absolute.bottom-\[80px\] textarea { height: 58px; padding: 13px 0 6px; font-size: 15px; }
   .crystal-studio > section > .absolute.bottom-\[80px\] > .flex { height: 48px; justify-content: space-between; }
   .crystal-studio > section > .absolute.bottom-\[80px\] .h-9 { height: 42px; border-radius: 999px; }
