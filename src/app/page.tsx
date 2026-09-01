@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { ArrowRight, Code2, Cuboid, Download, Gauge, HardDrive, Layers3, ShieldCheck, Sparkles, Workflow } from "lucide-react";
 import { CoreforgePage, COBALT } from "@/components/cedium-shell";
@@ -97,10 +98,16 @@ function ActionLink({
 }
 
 function FeatureShowcase({ title, copy, image, reverse = false }: { title: string; copy: string; image: string; reverse?: boolean }) {
- return <section className={`crystal-feature-showcase${reverse ? " reverse" : ""}`}><div className="crystal-feature-visual"><Image src={image} alt={title} fill sizes="(max-width: 700px) 100vw, 55vw" /></div><div className="crystal-feature-copy"><h2>{title}</h2><p>{copy}</p><ActionLink href="/crystal">Explore <ArrowRight size={15} /></ActionLink></div></section>;
+ return <section data-crystal-reveal className={`crystal-feature-showcase${reverse ? " reverse" : ""}`}><div className="crystal-feature-visual"><Image src={image} alt={title} fill sizes="(max-width: 700px) 100vw, 55vw" /></div><div className="crystal-feature-copy"><h2>{title}</h2><p>{copy}</p><ActionLink href="/crystal">Explore <ArrowRight size={15} /></ActionLink></div></section>;
 }
 
 export default function HomePage() {
+ useEffect(() => {
+  const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-crystal-reveal]"));
+  const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("crystal-revealed"); observer.unobserve(entry.target); } }), { threshold: 0.14, rootMargin: "0px 0px -40px" });
+  elements.forEach((element) => observer.observe(element));
+  return () => observer.disconnect();
+ }, []);
  return (
  <CoreforgePage>
  {(t) => (
@@ -111,7 +118,7 @@ export default function HomePage() {
  <div className="crystal-first-chips">{["3D machinery", "Engines", "Automotive", "CAD", "All CAD studios"].map((item) => <span key={item}>{item}</span>)}</div>
  </section>
 
- <section style={{ padding: "42px 0 92px" }}>
+ <section data-crystal-reveal style={{ padding: "42px 0 92px" }}>
  <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 32px" }}>
  <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
  {metrics.map((metric) => (
@@ -143,7 +150,7 @@ export default function HomePage() {
 
  <FeatureShowcase title="VR Headset VR Goggles" image="/Section/section1.png" copy="Explore immersive engineering concepts through detailed technical drawings, 3D visualization, specifications, and precision-focused design documentation." />
 
- <section style={{ padding: "94px 0", borderTop: `1px solid ${t.faint}`, borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
+ <section data-crystal-reveal style={{ padding: "94px 0", borderTop: `1px solid ${t.faint}`, borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
  <div style={{ display: "flex", alignItems: "end", justifyContent: "space-between", gap: 24, flexWrap: "wrap", marginBottom: 42 }}>
  <div>
@@ -176,7 +183,7 @@ export default function HomePage() {
  textDecoration: "none",
  overflow: "hidden",
  }}
- className="group"
+ className="group crystal-home-surface"
  >
  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 18 }}>
  <div
@@ -211,7 +218,7 @@ export default function HomePage() {
 
  <FeatureShowcase reverse title="Build Robot Humanoid" image="/Section/section0.jpg" copy="Develop intelligent humanoid systems with a workspace for robotic mechanisms, digital prototyping, precision assemblies, and advanced engineering context." />
 
- <section style={{ padding: "96px 0" }}>
+ <section data-crystal-reveal style={{ padding: "96px 0" }}>
  <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 20 }}>
  HOW IT WORKS

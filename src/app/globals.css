@@ -617,3 +617,11 @@
 .crystal-surface:hover, .crystal-process article:hover { transform: translateY(-4px); border-color: rgba(66,132,255,.55); box-shadow: 0 17px 36px rgba(0,0,0,.22), 0 0 25px rgba(45,104,231,.13); }
 @media (prefers-reduced-motion: no-preference) { .crystal-first-card, .crystal-feature-showcase, .crystal-surface, .crystal-process article { animation: crystal-smart-enter 650ms cubic-bezier(.2,.8,.2,1) both; } }
 @keyframes crystal-smart-enter { from { opacity:0; transform:translateY(18px) scale(.985); } to { opacity:1; transform:translateY(0) scale(1); } }
+
+/* Scroll-driven Smart Animate reveal, with blue responsive surfaces. */
+[data-crystal-reveal] { opacity: 0; transform: translateY(34px) scale(.985); transition: opacity 700ms cubic-bezier(.2,.8,.2,1), transform 700ms cubic-bezier(.2,.8,.2,1); }
+[data-crystal-reveal].crystal-revealed { opacity: 1; transform: translateY(0) scale(1); }
+.crystal-home-surface { transition: transform 320ms cubic-bezier(.2,.8,.2,1), box-shadow 320ms ease, border-color 250ms ease, background-color 250ms ease; }
+.crystal-home-surface:hover { transform: translateY(-7px); border-color: rgba(66,132,255,.85) !important; background: linear-gradient(145deg, rgba(44,67,116,.42), rgba(37,37,37,.98)) !important; box-shadow: 0 20px 38px rgba(0,0,0,.3), 0 0 28px rgba(47,110,255,.22); }
+.crystal-home-surface:hover span, .crystal-home-surface:hover h3 { color: #84adff !important; }
+@media (prefers-reduced-motion: reduce) { [data-crystal-reveal] { opacity: 1; transform: none; transition: none; } }
