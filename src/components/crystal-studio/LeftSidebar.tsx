@@ -13,7 +13,8 @@ function Toggle({ label, initial = false }: { label: string; initial?: boolean }
 }
 
 export function LeftSidebar(props: Props) {
-  return <aside className="crystal-left-panel flex min-h-0 flex-col overflow-y-auto border-r border-[#3a3a3a] bg-[#202020] px-2 pb-3 pt-3 scrollbar-hide">
+  return <aside className="crystal-left-panel flex min-h-0 flex-col overflow-hidden border-r border-[#3a3a3a] bg-[#202020] px-2 pb-2 pt-3">
+    <div className="crystal-left-scroll min-h-0 flex-1 overflow-y-auto scrollbar-hide">
     <div className="flex items-center justify-between px-3 pb-3"><h1 className="text-[16px] font-semibold text-zinc-300">Scene Builder</h1><button aria-label="Collapse left panel" onClick={props.onCollapse} className="grid h-9 w-9 place-items-center rounded-[10px] bg-[#1687f7] text-white"><PanelLeftClose size={18}/></button></div>
     <div className="flex h-12 items-center gap-3 rounded-[14px] bg-[#2c2c2c] px-2"><span className="grid h-9 w-9 place-items-center rounded-[9px] bg-[#1687f7]"><Layers3 size={20}/></span><b className="flex-1 text-[12px]">Renderer</b><ChevronDown size={16} className="text-zinc-400"/></div>
 
@@ -28,9 +29,10 @@ export function LeftSidebar(props: Props) {
     <h3 className="px-3 pb-2 pt-5 text-[11px] font-semibold">Topology</h3><div className="mx-1 grid grid-cols-3 gap-1 rounded-[12px] bg-[#292929] p-1">{["Auto","Low Poly","Topology"].map(x=><button key={x} className="h-7 rounded-lg bg-[#414141] text-[9px] text-zinc-200">{x}</button>)}</div>
     <h3 className="px-3 pb-2 pt-4 text-[11px] font-semibold">Texture</h3><div className="mx-1 grid grid-cols-3 gap-1 rounded-[12px] bg-[#292929] p-1">{["None","Standard","PBR"].map(x=><button key={x} className="h-7 rounded-lg bg-[#414141] text-[9px] text-zinc-200">{x}</button>)}</div>
     <h2 className="px-4 pb-2 pt-5 text-[14px] font-semibold text-zinc-400">Advanced</h2><div className="mx-1 rounded-[14px] bg-[#292929] py-1"><Toggle label="Separate Parts"/><Toggle label="Image Enhancement"/><Toggle label="Code Execution" initial/></div>
+    </div>
 
-    <div className="mt-3 px-2 text-[10px] leading-4 text-zinc-400">Pro workspace: unlimited renders,<br/>industrial-grade mesh export</div>
-    <div className="mx-1 mt-3 rounded-[14px] bg-[#292929] p-2"><div className="mb-2 flex justify-center gap-4 text-[12px] font-semibold"><span>1 min</span><span className="flex items-center gap-1"><Zap size={17} fill="white"/>50</span></div><button className="flex h-9 w-full items-center justify-between rounded-[11px] bg-gradient-to-r from-[#1698f7] to-[#0754ff] px-12 text-[12px] font-semibold">Render Queue <span>50</span></button></div>
-    <div className="mt-auto flex h-12 items-center rounded-[12px] bg-[#292929] px-2"><span className="grid h-8 w-8 place-items-center rounded-[8px] bg-[#1687f7] text-xs font-semibold">B</span><button className="ml-auto flex items-center gap-2 px-3 text-[11px] text-zinc-300"><LogOut size={19}/>Sign Out</button></div>
+    <div className="crystal-left-footer shrink-0"><div className="mt-2 px-2 text-[10px] leading-4 text-zinc-400">Pro workspace: unlimited renders,<br/>industrial-grade mesh export</div>
+    <div className="mx-1 mt-2 rounded-[14px] bg-[#292929] p-2"><div className="mb-2 flex justify-center gap-4 text-[12px] font-semibold"><span>1 min</span><span className="flex items-center gap-1"><Zap size={17} fill="white"/>50</span></div><button className="flex h-9 w-full items-center justify-between rounded-[11px] bg-gradient-to-r from-[#1698f7] to-[#0754ff] px-12 text-[12px] font-semibold">Render Queue <span>50</span></button></div>
+    <div className="mt-2 flex h-12 items-center rounded-[12px] bg-[#292929] px-2"><span className="grid h-8 w-8 place-items-center rounded-[8px] bg-[#1687f7] text-xs font-semibold">B</span><button className="ml-auto flex items-center gap-2 px-3 text-[11px] text-zinc-300"><LogOut size={19}/>Sign Out</button></div></div>
   </aside>;
 }

@@ -16,7 +16,7 @@
 .crystal-right-panel { grid-column: 3; grid-row: 2; }
 .crystal-studio > footer { grid-row: 3; }
 .crystal-studio > footer { position: relative; }
-@media (min-width: 701px) {.crystal-studio{column-gap:8px;padding-inline:6px}.crystal-studio>header{margin-inline:-6px}.crystal-left-panel,.crystal-right-panel,.crystal-studio>section{margin-block:8px;border:1px solid #353535!important;border-radius:20px;box-shadow:0 14px 28px rgba(0,0,0,.22);overflow:hidden}.crystal-left-panel{margin-left:2px}.crystal-right-panel{margin-right:2px}.crystal-studio>section{background:#292929}.crystal-studio>footer{margin-inline:-6px}}
+@media (min-width: 701px) {.crystal-studio{column-gap:4px;padding-inline:3px}.crystal-studio>header{margin-inline:-3px}.crystal-left-panel,.crystal-right-panel,.crystal-studio>section{margin-block:4px;border:1px solid #353535!important;border-radius:20px;box-shadow:0 14px 28px rgba(0,0,0,.22);overflow:hidden}.crystal-left-panel{margin-left:1px}.crystal-right-panel{margin-right:1px}.crystal-studio>section{background:#292929}.crystal-studio>footer{margin-inline:-3px}}
 .crystal-studio.crystal-left-closed { --crystal-left-width: 0px; }
 .crystal-studio.crystal-right-closed { --crystal-right-width: 0px; }
 
