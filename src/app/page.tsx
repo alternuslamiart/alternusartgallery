@@ -73,6 +73,7 @@ function ActionLink({
  return (
  <Link
  href={href}
+ className={`crystal-action-link ${variant === "secondary" ? "crystal-action-link-secondary" : ""}`}
  style={{
  height: 46,
  padding: "0 20px",
@@ -106,7 +107,7 @@ export default function HomePage() {
  <>
  <section className="crystal-first-sector">
  <p>One AI workspace for machinery, engines, vehicles, CNC, industrial CAD, and engineering code automation.</p>
- <div className="crystal-first-card"><div><h1>Turn Ideas Into Reality</h1><p>We transform complex ideas into intelligent 3D designs, automated systems, and precision-engineered solutions. From concept to CAD, Crystal Studio combines AI, engineering, and advanced visualization to turn ambitious ideas into real-world innovation.</p><div><ActionLink href="/ai-assistant">Launch Studio <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">Download App</ActionLink></div></div><div className="crystal-first-image"><Image src="/roomart.jpg" alt="Futuristic architectural concept" fill priority sizes="(max-width: 700px) 100vw, 55vw" /></div></div>
+ <div className="crystal-first-card"><div><h1>Turn Ideas Into Reality</h1><p>We transform complex ideas into intelligent 3D designs, automated systems, and precision-engineered solutions. From concept to CAD, Crystal Studio combines AI, engineering, and advanced visualization to turn ambitious ideas into real-world innovation.</p><div><ActionLink href="/ai-assistant">Launch Studio <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">Download App</ActionLink></div></div><div className="crystal-first-image"><Image src="/Section/architectresectionone.png" alt="Futuristic architectural concept" fill priority sizes="(max-width: 700px) 100vw, 55vw" /></div></div>
  <div className="crystal-first-chips">{["3D machinery", "Engines", "Automotive", "CAD", "All CAD studios"].map((item) => <span key={item}>{item}</span>)}</div>
  </section>
 
@@ -140,7 +141,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <FeatureShowcase title="VR Headset VR Goggles" image="/wallpapers/OSwp2.png" copy="Explore immersive engineering concepts through detailed technical drawings, 3D visualization, specifications, and precision-focused design documentation." />
+ <FeatureShowcase title="VR Headset VR Goggles" image="/Section/section1.png" copy="Explore immersive engineering concepts through detailed technical drawings, 3D visualization, specifications, and precision-focused design documentation." />
 
  <section style={{ padding: "94px 0", borderTop: `1px solid ${t.faint}`, borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
@@ -208,7 +209,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <FeatureShowcase reverse title="Build Robot Humanoid" image="/wallpapers/OSwp5.png" copy="Develop intelligent humanoid systems with a workspace for robotic mechanisms, digital prototyping, precision assemblies, and advanced engineering context." />
+ <FeatureShowcase reverse title="Build Robot Humanoid" image="/Section/section0.jpg" copy="Develop intelligent humanoid systems with a workspace for robotic mechanisms, digital prototyping, precision assemblies, and advanced engineering context." />
 
  <section style={{ padding: "96px 0" }}>
  <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
