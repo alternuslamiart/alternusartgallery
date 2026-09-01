@@ -34,6 +34,8 @@ export function Viewport(props: Props) {
   const [viewportMode, setViewportMode] = useState<"solid" | "wireframe" | "xray">("solid");
   const [openPanel, setOpenPanel] = useState<"brush" | "tools" | null>(null);
   const [notice, setNotice] = useState("Orbit: drag the model to inspect it");
+  const [camera, setCamera] = useState({ x: 0, y: 0, zoom: 1, pitch: 0 });
+  const cameraDrag = useRef<{ x: number; y: number; camera: typeof camera } | null>(null);
   const beginDrag = (event: React.PointerEvent) => {
     drag.current = { x: event.clientX, y: event.clientY, transform: props.transform };
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -78,8 +80,11 @@ export function Viewport(props: Props) {
   return (
     <section
       className="relative min-h-0 overflow-hidden bg-[#292929]"
-      onPointerMove={moveDrag}
-      onPointerUp={() => { drag.current = null; }}
+      onPointerDown={(event) => { if (event.button === 1 || event.button === 2) { event.preventDefault(); cameraDrag.current = { x: event.clientX, y: event.clientY, camera }; event.currentTarget.setPointerCapture(event.pointerId); } }}
+      onPointerMove={(event) => { moveDrag(event); if (cameraDrag.current) { const dx = event.clientX - cameraDrag.current.x; const dy = event.clientY - cameraDrag.current.y; setCamera({ ...cameraDrag.current.camera, x: cameraDrag.current.camera.x + dx, y: cameraDrag.current.camera.y + dy, pitch: Math.max(-28, Math.min(28, cameraDrag.current.camera.pitch + dy * .08)) }); } }}
+      onPointerUp={() => { drag.current = null; cameraDrag.current = null; }}
+      onContextMenu={(event) => event.preventDefault()}
+      onWheel={(event) => { event.preventDefault(); setCamera((value) => ({ ...value, zoom: Math.max(.45, Math.min(2.5, value.zoom - event.deltaY * .001)) })); }}
       onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => {
         event.preventDefault();
@@ -87,9 +92,9 @@ export function Viewport(props: Props) {
         if (assetId) props.onAssetDrop(assetId);
       }}
     >
-      <div className="crystal-grid absolute inset-0" />
-      <div className="absolute left-0 right-0 top-1/2 h-px bg-[#d95757]/75" />
-      <div className="absolute bottom-0 left-1/2 top-0 w-px bg-[#1687f7]/75" />
+      <div className="crystal-grid absolute inset-[-35%] origin-center transition-transform duration-75" style={{ transform: `translate(${camera.x}px, ${camera.y}px) scale(${camera.zoom}) rotateX(${camera.pitch}deg)` }} />
+      <div className="absolute left-0 right-0 top-1/2 h-px bg-[#d95757]/75" style={{ transform: `translateY(${camera.y}px)` }} />
+      <div className="absolute bottom-0 left-1/2 top-0 w-px bg-[#1687f7]/75" style={{ transform: `translateX(${camera.x}px)` }} />
 
       <div className="absolute right-8 top-16 h-20 w-20" aria-label="XYZ orientation gizmo">
         <span className="absolute left-[36px] top-[29px] h-3 w-3 rounded-full bg-[#1687f7]" />

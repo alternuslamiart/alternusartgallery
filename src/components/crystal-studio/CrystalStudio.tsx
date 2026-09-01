@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Menu, PanelLeftOpen, PanelRightOpen, Zap } from "lucide-react";
+import { Archive, ChevronDown, Globe2, Home, Menu, PanelLeftOpen, PanelRightOpen, Plus, Search, Trash2, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { generateModel } from "@/services/ai";
 import { initialAssets } from "./data";
@@ -20,6 +20,7 @@ function downloadFile(name: string, content: string, type = "text/plain") {
 }
 
 export function CrystalStudio() {
+  const [dashboard, setDashboard] = useState(true);
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -47,6 +48,12 @@ export function CrystalStudio() {
   const [alternateTheme, setAlternateTheme] = useState(false);
   const uploadUrl = useRef<string | null>(null);
   const selectedAsset = useMemo(() => assets.find((asset) => asset.id === selectedAssetId), [assets, selectedAssetId]);
+
+  if (dashboard) return <div className="crystal-dashboard">
+    <header><div className="crystal-dashboard-brand"><Home size={17}/><b>Crystal</b></div><div className="crystal-window-controls">•••　—　×　□</div></header>
+    <aside><button className="crystal-team"><span>B</span> My Team <ChevronDown size={17}/></button><label className="crystal-search"><Search size={16}/><input placeholder="Search" /></label><strong>Project</strong><nav><button className="active"><span>▦</span>All Projects</button><button><Globe2 size={16}/>Community</button><button><Archive size={16}/>Archive...</button><button onClick={() => setDashboard(false)}><Plus size={16}/>Project</button></nav><footer><span>▢　 Invite your team</span><button>Copy link</button></footer></aside>
+    <main><div className="crystal-dashboard-title"><div><h1>♦ Crystal</h1><b>Recent</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => setDashboard(false)}>New Project　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago"},{title:"Architecture Sketch",time:"Viewed 3mo ago"}].map((project) => <button key={project.title} onClick={() => setDashboard(false)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
+  </div>;
 
   useEffect(() => {
     if (!playing) return;
