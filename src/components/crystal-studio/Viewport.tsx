@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Check, ChevronDown, CircleHelp, Globe2, Grid3X3, Lightbulb, Link2, LoaderCircle, Paperclip, Send, X } from "lucide-react";
+import { Camera, Check, ChevronDown, CircleHelp, Globe2, Grid3X3, Lightbulb, Link2, LoaderCircle, Paperclip, Send, Sparkles, X } from "lucide-react";
 import { modelingTools } from "./data";
 import { IconButton } from "./ui";
 import type { StudioAsset, StudioTool, Transform } from "./types";
@@ -66,6 +66,7 @@ export function Viewport(props: Props) {
   const cameraDrag = useRef<{ x: number; y: number; camera: typeof camera } | null>(null);
   const [workspaceMode, setWorkspaceMode] = useState<"Animate" | "Modeling" | "Images">("Modeling");
   const [activeView, setActiveView] = useState("Perspective");
+  const [chatOpen, setChatOpen] = useState(true);
 
   useEffect(() => {
     if (!props.selectedAsset) return;
@@ -160,7 +161,7 @@ export function Viewport(props: Props) {
         </button>
       )}
 
-      <div className="absolute bottom-[80px] left-1/2 w-[488px] max-w-[calc(100%_-_32px)] -translate-x-1/2 rounded-[14px] border border-[#1687f7] bg-[#202020]/95 px-2 pb-2 pt-1 shadow-[0_10px_34px_rgba(0,0,0,.45),0_0_22px_rgba(22,135,247,.14)] backdrop-blur-md">
+      <div className={`${chatOpen ? "" : "hidden"} absolute bottom-[80px] left-1/2 w-[488px] max-w-[calc(100%_-_32px)] -translate-x-1/2 rounded-[14px] border border-[#1687f7] bg-[#202020]/95 px-2 pb-2 pt-1 shadow-[0_10px_34px_rgba(0,0,0,.45),0_0_22px_rgba(22,135,247,.14)] backdrop-blur-md`}>
         <textarea aria-label="AI model prompt" value={props.prompt} onChange={(event) => props.onPromptChange(event.target.value)} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") props.onGenerate(); }} placeholder="What do you want to create?" className="h-[68px] w-full resize-none bg-transparent px-2 py-3 text-[11px] text-zinc-100 outline-none placeholder:text-zinc-500" />
         {props.error && <div className="mb-2 flex items-center justify-between rounded-md bg-red-950/70 px-3 py-1.5 text-[11px] text-red-200"><span>{props.error}</span><button aria-label="Dismiss error" onClick={props.onClearError}><X size={14} /></button></div>}
         {props.loading && <div className="mb-2 h-1 overflow-hidden rounded-full bg-zinc-700"><div className="h-full bg-[#1687f7] transition-all" style={{ width: `${props.progress}%` }} /></div>}
@@ -180,6 +181,7 @@ export function Viewport(props: Props) {
       {openPanel === "tools" && <div className="absolute bottom-[204px] left-1/2 z-20 grid w-[360px] -translate-x-1/2 grid-cols-4 gap-2 rounded-xl border border-[#333] bg-[#202020] p-2 shadow-xl">{(["x", "y", "rotation", "scale"] as const).map((field) => <label key={field} className="rounded-lg bg-[#303030] px-2 py-1 text-[9px] uppercase text-zinc-400">{field}<input aria-label={field} type="number" step={field === "scale" ? .1 : 1} value={props.transform[field]} onChange={(event) => props.onTransformChange({ ...props.transform, [field]: Number(event.target.value) })} className="mt-0.5 w-full bg-transparent text-[12px] normal-case text-white outline-none" /></label>)}</div>}
 
       <div className="absolute bottom-[18px] left-1/2 flex h-[56px] w-[488px] max-w-[calc(100%_-_32px)] -translate-x-1/2 items-center justify-between rounded-[14px] border border-[#292929] bg-[#202020] px-2 shadow-[0_8px_24px_rgba(0,0,0,.3)]">
+        <IconButton icon={Sparkles} label={chatOpen ? "Hide AI chat" : "Show AI chat"} active={chatOpen} onClick={() => setChatOpen((value) => !value)} />
         {modelingTools.map((tool) => <IconButton key={tool.id} icon={tool.icon} label={tool.label} active={props.activeTool === tool.id} onClick={() => selectTool(tool.id)} />)}
       </div>
       <div aria-live="polite" className="sr-only">{notice}</div>
