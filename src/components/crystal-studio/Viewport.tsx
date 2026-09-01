@@ -4,7 +4,34 @@ import { Check, ChevronDown, Link2, LoaderCircle, Paperclip, Send, X } from "luc
 import { modelingTools } from "./data";
 import { IconButton } from "./ui";
 import type { StudioAsset, StudioTool, Transform } from "./types";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+type Camera = { targetX: number; targetZ: number; distance: number; yaw: number; pitch: number };
+
+function PerspectiveGrid({ camera }: { camera: Camera }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const draw = () => {
+      const bounds = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.max(1, Math.round(bounds.width * dpr)); canvas.height = Math.max(1, Math.round(bounds.height * dpr));
+      const ctx = canvas.getContext("2d"); if (!ctx) return; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, bounds.width, bounds.height);
+      const cp = Math.cos(camera.pitch), sp = Math.sin(camera.pitch), cy = Math.cos(camera.yaw), sy = Math.sin(camera.yaw);
+      const eye = { x: camera.targetX + camera.distance * sy * cp, y: camera.distance * sp, z: camera.targetZ + camera.distance * cy * cp };
+      const f = { x: camera.targetX - eye.x, y: -eye.y, z: camera.targetZ - eye.z }; const fl = Math.hypot(f.x, f.y, f.z); f.x/=fl; f.y/=fl; f.z/=fl;
+      const r = { x: -f.z, y: 0, z: f.x }; const rl = Math.hypot(r.x, r.z); r.x/=rl; r.z/=rl;
+      const u = { x: r.z*f.y, y: f.z*r.x-r.z*f.x, z: -r.x*f.y }; const focal = Math.min(bounds.width, bounds.height) * 1.05;
+      const project = (x:number,z:number) => { const px=x-eye.x, py=-eye.y, pz=z-eye.z; const depth=px*f.x+py*f.y+pz*f.z; if(depth<.12)return null; return { x:bounds.width/2+(px*r.x+pz*r.z)*focal/depth, y:bounds.height*.52-(px*u.x+py*u.y+pz*u.z)*focal/depth, depth }; };
+      const line = (a:{x:number,z:number},b:{x:number,z:number},color:string,width=1) => { const p1=project(a.x,a.z),p2=project(b.x,b.z); if(!p1||!p2)return; ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke(); };
+      for(let i=-40;i<=40;i++){ const major=i%5===0; line({x:i,z:-40},{x:i,z:40},major?"rgba(120,124,130,.31)":"rgba(108,112,118,.18)"); line({x:-40,z:i},{x:40,z:i},major?"rgba(120,124,130,.31)":"rgba(108,112,118,.18)"); }
+      line({x:-40,z:0},{x:40,z:0},"rgba(224,75,75,.9)",1.35); line({x:0,z:-40},{x:0,z:40},"rgba(30,139,255,.95)",1.35);
+    };
+    draw(); const observer = new ResizeObserver(draw); observer.observe(canvas); return () => observer.disconnect();
+  }, [camera]);
+  return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-label="Interactive 3D perspective grid" />;
+}
 
 type Props = {
   selectedAsset?: StudioAsset;
@@ -34,8 +61,9 @@ export function Viewport(props: Props) {
   const [viewportMode, setViewportMode] = useState<"solid" | "wireframe" | "xray">("solid");
   const [openPanel, setOpenPanel] = useState<"brush" | "tools" | null>(null);
   const [notice, setNotice] = useState("Orbit: drag the model to inspect it");
-  const [camera, setCamera] = useState({ x: 0, y: 0, zoom: 1, pitch: 0 });
+  const [camera, setCamera] = useState<Camera>({ targetX: 0, targetZ: 0, distance: 18, yaw: 0, pitch: .72 });
   const cameraDrag = useRef<{ x: number; y: number; camera: typeof camera } | null>(null);
+  const [workspaceMode, setWorkspaceMode] = useState<"Animate" | "Modeling" | "Images">("Modeling");
   const beginDrag = (event: React.PointerEvent) => {
     drag.current = { x: event.clientX, y: event.clientY, transform: props.transform };
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -81,10 +109,10 @@ export function Viewport(props: Props) {
     <section
       className="relative min-h-0 overflow-hidden bg-[#292929]"
       onPointerDown={(event) => { if (event.button === 1 || event.button === 2) { event.preventDefault(); cameraDrag.current = { x: event.clientX, y: event.clientY, camera }; event.currentTarget.setPointerCapture(event.pointerId); } }}
-      onPointerMove={(event) => { moveDrag(event); if (cameraDrag.current) { const dx = event.clientX - cameraDrag.current.x; const dy = event.clientY - cameraDrag.current.y; setCamera({ ...cameraDrag.current.camera, x: cameraDrag.current.camera.x + dx, y: cameraDrag.current.camera.y + dy, pitch: Math.max(-28, Math.min(28, cameraDrag.current.camera.pitch + dy * .08)) }); } }}
+      onPointerMove={(event) => { moveDrag(event); if (cameraDrag.current) { const dx = event.clientX - cameraDrag.current.x; const dy = event.clientY - cameraDrag.current.y; const base=cameraDrag.current.camera; if(event.buttons===4) setCamera({ ...base, targetX:base.targetX-dx*.018, targetZ:base.targetZ+dy*.018 }); else setCamera({ ...base, yaw:base.yaw-dx*.006, pitch:Math.max(.18,Math.min(1.42,base.pitch+dy*.005)) }); } }}
       onPointerUp={() => { drag.current = null; cameraDrag.current = null; }}
       onContextMenu={(event) => event.preventDefault()}
-      onWheel={(event) => { event.preventDefault(); setCamera((value) => ({ ...value, zoom: Math.max(.45, Math.min(2.5, value.zoom - event.deltaY * .001)) })); }}
+      onWheel={(event) => { event.preventDefault(); setCamera((value) => ({ ...value, distance: Math.max(4, Math.min(60, value.distance * Math.exp(event.deltaY * .0012))) })); }}
       onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => {
         event.preventDefault();
@@ -92,9 +120,8 @@ export function Viewport(props: Props) {
         if (assetId) props.onAssetDrop(assetId);
       }}
     >
-      <div className="crystal-grid absolute inset-[-35%] origin-center transition-transform duration-75" style={{ transform: `translate(${camera.x}px, ${camera.y}px) scale(${camera.zoom}) rotateX(${camera.pitch}deg)` }} />
-      <div className="absolute left-0 right-0 top-1/2 h-px bg-[#d95757]/75" style={{ transform: `translateY(${camera.y}px)` }} />
-      <div className="absolute bottom-0 left-1/2 top-0 w-px bg-[#1687f7]/75" style={{ transform: `translateX(${camera.x}px)` }} />
+      <PerspectiveGrid camera={camera} />
+      <div className="absolute left-1/2 top-2 flex -translate-x-1/2 rounded-full bg-[#202020]/90 p-1 shadow-xl backdrop-blur-md">{(["Animate","Modeling","Images"] as const).map((mode)=><button key={mode} onClick={()=>setWorkspaceMode(mode)} className={`rounded-full px-5 py-2 text-[11px] transition-all duration-300 ${workspaceMode===mode?"bg-[#414141] text-white shadow-inner":"text-zinc-500 hover:text-zinc-200"}`}>{mode}</button>)}</div>
 
       <div className="absolute right-8 top-16 h-20 w-20" aria-label="XYZ orientation gizmo">
         <span className="absolute left-[36px] top-[29px] h-3 w-3 rounded-full bg-[#1687f7]" />

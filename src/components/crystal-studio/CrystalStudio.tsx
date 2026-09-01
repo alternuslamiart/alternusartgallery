@@ -49,12 +49,6 @@ export function CrystalStudio() {
   const uploadUrl = useRef<string | null>(null);
   const selectedAsset = useMemo(() => assets.find((asset) => asset.id === selectedAssetId), [assets, selectedAssetId]);
 
-  if (dashboard) return <div className="crystal-dashboard">
-    <header><div className="crystal-dashboard-brand"><Home size={17}/><b>Crystal</b></div><div className="crystal-window-controls">•••　—　×　□</div></header>
-    <aside><button className="crystal-team"><span>B</span> My Team <ChevronDown size={17}/></button><label className="crystal-search"><Search size={16}/><input placeholder="Search" /></label><strong>Project</strong><nav><button className="active"><span>▦</span>All Projects</button><button><Globe2 size={16}/>Community</button><button><Archive size={16}/>Archive...</button><button onClick={() => setDashboard(false)}><Plus size={16}/>Project</button></nav><footer><span>▢　 Invite your team</span><button>Copy link</button></footer></aside>
-    <main><div className="crystal-dashboard-title"><div><h1>♦ Crystal</h1><b>Recent</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => setDashboard(false)}>New Project　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago"},{title:"Architecture Sketch",time:"Viewed 3mo ago"}].map((project) => <button key={project.title} onClick={() => setDashboard(false)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
-  </div>;
-
   useEffect(() => {
     if (!playing) return;
     const timer = window.setInterval(
@@ -65,6 +59,12 @@ export function CrystalStudio() {
   }, [playing, start, end, frameRate]);
 
   useEffect(() => () => { if (uploadUrl.current) URL.revokeObjectURL(uploadUrl.current); }, []);
+
+  if (dashboard) return <div className="crystal-dashboard">
+    <header><div className="crystal-dashboard-brand"><Home size={17}/><b>Crystal</b></div><div className="crystal-window-controls">•••　—　×　□</div></header>
+    <aside><button className="crystal-team"><span>B</span> My Team <ChevronDown size={17}/></button><label className="crystal-search"><Search size={16}/><input placeholder="Search" /></label><strong>Project</strong><nav><button className="active"><span>▦</span>All Projects</button><button><Globe2 size={16}/>Community</button><button><Archive size={16}/>Archive...</button><button onClick={() => setDashboard(false)}><Plus size={16}/>Project</button></nav><footer><span>▢　 Invite your team</span><button>Copy link</button></footer></aside>
+    <main><div className="crystal-dashboard-title"><div><h1>♦ Crystal</h1><b>Recent</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => setDashboard(false)}>New Project　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago"},{title:"Architecture Sketch",time:"Viewed 3mo ago"}].map((project) => <button key={project.title} onClick={() => setDashboard(false)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
+  </div>;
 
   const handleUpload = (file: File) => {
     if (uploadUrl.current) URL.revokeObjectURL(uploadUrl.current);
@@ -98,9 +98,9 @@ export function CrystalStudio() {
   };
 
   return (
-    <div className={`crystal-studio fixed inset-0 z-[90] grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
+    <div className={`crystal-studio crystal-studio-enter fixed inset-0 z-[90] grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
       <header className="col-span-full flex h-16 items-center border-b border-[#303030] bg-[#202020] px-7">
-        <div className="flex items-center gap-3"><Home size={18} /><span className="text-[16px] font-semibold">Crystal</span></div>
+        <button onClick={() => setDashboard(true)} className="flex items-center gap-3"><Home size={18} /><span className="text-[16px] font-semibold">Crystal</span></button>
         <nav aria-label="Application menu" className="ml-16 flex items-center gap-9 text-[12px] text-zinc-300">{["File", "Edit", "Agent", "Help", "Layout"].map((item) => <button key={item} className="hover:text-white">{item}</button>)}</nav>
         <button className="ml-auto flex h-10 w-[124px] items-center justify-center gap-2 rounded-[11px] bg-[#1687f7] text-[12px] font-semibold text-white hover:bg-[#2d9bff]"><Zap size={19} fill="currentColor" />Upgrade</button>
       </header>
