@@ -3,6 +3,7 @@
 import { Box, Download, FileBox, FileText, Grid2X2, Image, Play, Plus, Trash2 } from "lucide-react";
 import type { RenderSettings, StudioAsset } from "./types";
 import { SectionTitle, SelectField } from "./ui";
+import { useState } from "react";
 
 type Props = {
   resolution: string;
@@ -12,6 +13,7 @@ type Props = {
   renderSettings: RenderSettings;
   assets: StudioAsset[];
   selectedAssetId: string | null;
+  exporting: string | null;
   onResolutionChange: (value: string) => void;
   onFrameRateChange: (value: string) => void;
   onColorChange: (value: string) => void;
@@ -28,19 +30,22 @@ const exportOptions = [
 ];
 
 export function RightPanel(props: Props) {
+  const [swatches,setSwatches]=useState(["#4A90D9","#E8793E","#84CC6A"]);
+  const [swatchGrid,setSwatchGrid]=useState(true);
   return (
     <aside className="crystal-right-panel min-h-0 overflow-y-auto border-l border-[#303030] bg-[#202020] px-5 pb-5 pt-4 scrollbar-hide">
       <SectionTitle action={<button aria-label="Collapse right panel" onClick={props.onCollapse} className="sr-only"><Play size={17}/></button>}>Output</SectionTitle>
       <div className="space-y-2">
-        <SelectField label="Canvas" value={props.resolution} onChange={(event) => props.onResolutionChange(event.target.value)}><option>1920x1080</option><option>2560x1440</option><option>3840x2160</option></SelectField>
-        <SelectField label="Frame rate" value={props.frameRate} onChange={(event) => props.onFrameRateChange(event.target.value)}><option>24 fps</option><option>30 fps</option><option>60 fps</option></SelectField>
+        <SelectField label="Canvas" value={props.resolution} onChange={(event) => props.onResolutionChange(event.target.value)}><option>1920x1080</option><option>2560x1440</option><option>3840x2160</option><option>7680x4320</option></SelectField>
+        <SelectField label="Frame rate" value={props.frameRate} onChange={(event) => props.onFrameRateChange(event.target.value)}><option>24 fps</option><option>30 fps</option><option>60 fps</option><option>120 fps</option></SelectField>
       </div>
 
       <div className="mt-7">
-        <SectionTitle action={<div className="flex gap-3 text-zinc-300"><Grid2X2 size={17} /><Plus size={17} /></div>}>Color Swatches</SectionTitle>
+        <SectionTitle action={<div className="flex gap-2 text-zinc-300"><button title="Toggle swatch layout" onClick={()=>setSwatchGrid(v=>!v)}><Grid2X2 size={17}/></button><label title="Add swatch" className="cursor-pointer"><Plus size={17}/><input type="color" className="sr-only" onChange={e=>{setSwatches(x=>[...x,e.target.value]);props.onColorChange(e.target.value)}}/></label></div>}>Color Swatches</SectionTitle>
+        <div className={`mb-2 ${swatchGrid?"flex":"grid grid-cols-1"} gap-1`}>{swatches.map(x=><button aria-label={`Apply swatch ${x}`} key={x} onClick={()=>props.onColorChange(x)} className="h-5 min-w-5 rounded-md border border-white/10" style={{backgroundColor:x}}/>)}</div>
         <div className="flex gap-2">
           <label className="relative flex h-8 flex-1 items-center gap-2 rounded-full bg-[#2b2b2b] px-2 text-[12px] text-zinc-100"><input aria-label="Model color" type="color" value={props.color} onChange={(event) => props.onColorChange(event.target.value)} className="h-5 w-5 cursor-pointer rounded-full border-0 bg-transparent p-0" /><span>{props.color.toUpperCase()}</span></label>
-          <label className="flex h-8 w-[132px] items-center rounded-full bg-[#2b2b2b] px-4 text-[12px] text-zinc-100"><input aria-label="Color opacity" type="range" min="0" max="100" value={props.opacity} onChange={(event) => props.onOpacityChange(Number(event.target.value))} className="mr-2 w-14 accent-[#1687f7]" /><span>{props.opacity}%</span></label>
+          <label className="flex h-8 w-[132px] items-center rounded-full bg-[#2b2b2b] px-3 text-[12px] text-zinc-100"><input aria-label="Color opacity" type="range" min="0" max="100" value={props.opacity} onChange={(event) => props.onOpacityChange(Number(event.target.value))} className="mr-2 w-14 accent-[#1687f7]" /><input aria-label="Opacity value" type="number" min="0" max="100" value={props.opacity} onChange={e=>props.onOpacityChange(Math.max(0,Math.min(100,Number(e.target.value))))} className="w-9 bg-transparent text-right outline-none"/>%</label>
         </div>
       </div>
 
@@ -56,7 +61,7 @@ export function RightPanel(props: Props) {
       <div className="mt-6">
         <SectionTitle>Export Options</SectionTitle>
         <div className="grid grid-cols-2 gap-2">
-          {exportOptions.map(({ label, icon: Icon }, index) => <button key={label} onClick={() => props.onExport(label)} className={`flex h-8 items-center gap-2 rounded-full bg-[#2b2b2b] px-4 text-[11px] text-zinc-200 hover:bg-[#343434] ${index > 3 ? "col-span-2" : ""}`}><Icon size={16} />{label}</button>)}
+          {exportOptions.map(({ label, icon: Icon }, index) => <button disabled={props.exporting!==null} key={label} onClick={() => props.onExport(label)} className={`flex h-8 items-center gap-2 rounded-full bg-[#2b2b2b] px-4 text-[11px] text-zinc-200 hover:bg-[#343434] disabled:opacity-50 ${index > 3 ? "col-span-2" : ""}`}><Icon size={16} />{props.exporting===label?"Preparing...":label}</button>)}
         </div>
       </div>
 

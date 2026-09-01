@@ -9,7 +9,7 @@ import type { CSSProperties } from "react";
 
 type Camera = { targetX: number; targetZ: number; elevation: number; distance: number; yaw: number; pitch: number; orthographic: boolean };
 
-function PerspectiveGrid({ camera, asset, color, transform }: { camera: Camera; asset?: StudioAsset; color: string; transform: Transform }) {
+function PerspectiveGrid({ camera, asset, color, transform, gridVisible }: { camera: Camera; asset?: StudioAsset; color: string; transform: Transform; gridVisible: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -26,8 +26,7 @@ function PerspectiveGrid({ camera, asset, color, transform }: { camera: Camera; 
       const u = { x: r.z*f.y, y: f.z*r.x-r.z*f.x, z: -r.x*f.y }; const focal = Math.min(bounds.width, bounds.height) * 1.05;
       const project = (x:number,y:number,z:number) => { const px=x-eye.x, py=y-eye.y, pz=z-eye.z; const depth=px*f.x+py*f.y+pz*f.z; if(depth<.12)return null; const scale=camera.orthographic ? focal/camera.distance : focal/depth; return { x:bounds.width/2+(px*r.x+pz*r.z)*scale, y:bounds.height*.52-(px*u.x+py*u.y+pz*u.z)*scale, depth }; };
       const line = (a:{x:number,z:number},b:{x:number,z:number},color:string,width=1) => { const p1=project(a.x,0,a.z),p2=project(b.x,0,b.z); if(!p1||!p2)return; ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke(); };
-      for(let i=-40;i<=40;i++){ const major=i%5===0; line({x:i,z:-40},{x:i,z:40},major?"rgba(120,124,130,.31)":"rgba(108,112,118,.18)"); line({x:-40,z:i},{x:40,z:i},major?"rgba(120,124,130,.31)":"rgba(108,112,118,.18)"); }
-      line({x:-40,z:0},{x:40,z:0},"rgba(224,75,75,.9)",1.35); line({x:0,z:-40},{x:0,z:40},"rgba(30,139,255,.95)",1.35);
+      if(gridVisible){for(let i=-40;i<=40;i++){ const major=i%5===0; line({x:i,z:-40},{x:i,z:40},major?"rgba(120,124,130,.31)":"rgba(108,112,118,.18)"); line({x:-40,z:i},{x:40,z:i},major?"rgba(120,124,130,.31)":"rgba(108,112,118,.18)"); } line({x:-40,z:0},{x:40,z:0},"rgba(224,75,75,.9)",1.35); line({x:0,z:-40},{x:0,z:40},"rgba(30,139,255,.95)",1.35);}
       if (`${asset?.name ?? ""} ${asset?.prompt ?? ""}`.toLowerCase().includes("desk")) {
         const shade = ["#9a9a9a", "#5f646a", "#c0c3c8"];
         const offsetX = transform.x / 42, offsetZ = transform.y / 42;
@@ -36,11 +35,12 @@ function PerspectiveGrid({ camera, asset, color, transform }: { camera: Camera; 
       }
     };
     draw(); const observer = new ResizeObserver(draw); observer.observe(canvas); return () => observer.disconnect();
-  }, [camera, asset, color, transform]);
+  }, [camera, asset, color, transform, gridVisible]);
   return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-label="Interactive 3D perspective grid" />;
 }
 
 type Props = {
+  renderer: string;
   selectedAsset?: StudioAsset;
   activeTool: StudioTool;
   prompt: string;
@@ -57,6 +57,7 @@ type Props = {
   onAssetDrop: (id: string) => void;
   onColorChange: (value: string) => void;
   onOpenPricing: () => void;
+  onSnapshot: () => void;
 };
 
 export function Viewport(props: Props) {
@@ -77,6 +78,10 @@ export function Viewport(props: Props) {
   const [workspaceMode, setWorkspaceMode] = useState<"Animate" | "Modeling" | "Images">("Modeling");
   const [activeView, setActiveView] = useState("Perspective");
   const [chatOpen, setChatOpen] = useState(true);
+  const [gridVisible, setGridVisible] = useState(true);
+  const [lightingOpen, setLightingOpen] = useState(false);
+  const [environmentOpen, setEnvironmentOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     if (!props.selectedAsset) return;
@@ -135,7 +140,7 @@ export function Viewport(props: Props) {
 
   return (
     <section
-      className="relative min-h-0 overflow-hidden bg-[#292929]"
+      className={`relative min-h-0 overflow-hidden transition-colors ${props.renderer==="Path-Traced"?"bg-[#25282d]":props.renderer==="Cycles-style"?"bg-[#2b2927]":"bg-[#292929]"}`}
       onPointerDown={(event) => { if (event.button === 0 && props.selectedAsset && ["move", "rotate", "scale"].includes(props.activeTool)) { beginDrag(event); return; } if (event.button === 1 || event.button === 2) { event.preventDefault(); cameraDrag.current = { x: event.clientX, y: event.clientY, camera }; event.currentTarget.setPointerCapture(event.pointerId); } }}
       onPointerMove={(event) => { moveDrag(event); if (cameraDrag.current) { const dx = event.clientX - cameraDrag.current.x; const dy = event.clientY - cameraDrag.current.y; const base=cameraDrag.current.camera; if(event.buttons===4 && event.shiftKey) setCamera({ ...base, elevation:Math.max(-48,Math.min(48,base.elevation-dy*.05)), targetX:base.targetX-dx*.018, orthographic:false }); else if(event.buttons===4) setCamera({ ...base, targetX:base.targetX-dx*.018, targetZ:base.targetZ+dy*.018 }); else setCamera({ ...base, yaw:base.yaw-dx*.006, pitch:Math.max(.12,Math.min(1.42,base.pitch+dy*.005)), orthographic:false }); } }}
       onPointerUp={() => { drag.current = null; cameraDrag.current = null; }}
@@ -148,7 +153,7 @@ export function Viewport(props: Props) {
         if (assetId) props.onAssetDrop(assetId);
       }}
     >
-      <PerspectiveGrid camera={camera} asset={props.selectedAsset} color={props.color} transform={props.transform} />
+      <PerspectiveGrid camera={camera} asset={props.selectedAsset} color={props.color} transform={props.transform} gridVisible={gridVisible} />
       <div className="pointer-events-none absolute bottom-5 left-5 rounded-md bg-black/25 px-2 py-1 text-[10px] text-zinc-400">Wheel: zoom · Middle drag: pan · Shift + middle drag: move above / below grid</div>
       <div className="absolute left-1/2 top-2 flex -translate-x-1/2 rounded-full bg-[#202020]/90 p-1 shadow-xl backdrop-blur-md">{(["Animate","Modeling","Images"] as const).map((mode)=><button key={mode} onClick={()=>{ setWorkspaceMode(mode); setChatOpen(true); }} className={`rounded-full px-5 py-2 text-[11px] transition-all duration-300 ${workspaceMode===mode?"bg-[#414141] text-white shadow-inner":"text-zinc-500 hover:text-zinc-200"}`}>{mode}</button>)}</div>
       {workspaceMode !== "Modeling" && <div className="absolute left-1/2 top-[58px] z-20 w-[310px] -translate-x-1/2 rounded-[14px] border border-white/10 bg-[#232323]/95 p-3 shadow-2xl backdrop-blur-md">{workspaceMode === "Animate" ? <><div className="flex items-center justify-between"><b className="text-[11px]">Animation controls</b><span className="rounded-full bg-[#1687f7]/20 px-2 py-1 text-[9px] text-[#71b4ff]">24 FPS</span></div><p className="mt-2 text-[10px] leading-4 text-zinc-400">Create keyframes and preview the selected asset motion.</p><div className="mt-3 flex gap-2"><button className="rounded-lg bg-[#1687f7] px-3 py-2 text-[10px] font-semibold">Add keyframe</button><button className="rounded-lg bg-[#363636] px-3 py-2 text-[10px]">Auto orbit</button></div></> : <><div className="flex items-center justify-between"><b className="text-[11px]">Image reference</b><span className="text-[9px] text-zinc-500">AI guided</span></div><p className="mt-2 text-[10px] leading-4 text-zinc-400">Attach an image to guide material, form and surface generation.</p><button onClick={() => attachmentInput.current?.click()} className="mt-3 rounded-lg bg-[#363636] px-3 py-2 text-[10px] text-zinc-100">Add image reference</button></>}</div>}
@@ -156,8 +161,9 @@ export function Viewport(props: Props) {
       <div className="hidden crystal-view-cube absolute right-7 top-5 z-30 grid w-[92px] grid-cols-3 gap-1 rounded-[14px] border border-white/10 bg-[#232323]/95 p-2 shadow-2xl backdrop-blur" aria-label="View cube navigation">
         {[["Iso","↖"],["Top","TOP"],["Iso","↗"],["Left","LEFT"],["Perspective","●"],["Right","RIGHT"],["Iso","↙"],["Bottom","BOT"],["Iso","↘"],["Front","FRONT"],["Back","BACK"]].map(([view,label], index)=><button key={`${view}-${index}`} onClick={()=>setView(view)} className={`min-h-5 rounded text-[7px] font-bold transition ${activeView===view?"bg-[#1687f7] text-white shadow-[0_0_12px_rgba(22,135,247,.55)]":"bg-[#373737] text-zinc-300 hover:bg-[#4a4a4a]"}`}>{label}</button>)}
       </div>
-      <div className="absolute right-9 top-5 z-20 h-12 w-12" aria-label="Camera axis indicator"><span className="absolute left-5 top-5 h-2 w-2 rounded-full border border-[#1687f7]"/><span className="absolute left-6 top-0 h-6 w-[2px] bg-[#e95a55]"/><span className="absolute left-0 top-6 h-[2px] w-6 bg-[#73dc50]"/><span className="absolute left-6 top-6 h-5 w-[2px] bg-[#1687f7]"/></div>
-      <div className="absolute right-6 top-[72px] z-20 grid gap-2">{[{icon:Lightbulb,label:"Lighting"},{icon:Globe2,label:"World"},{icon:Camera,label:"Reset view"},{icon:Grid3X3,label:"Assets"},{icon:CircleHelp,label:"Help"}].map(({icon:Icon,label})=><button key={label} aria-label={label} onClick={label==="Reset view"?()=>setView("Perspective"):undefined} className="grid h-10 w-10 place-items-center rounded-[10px] bg-[#252525]/95 text-zinc-100 shadow-lg backdrop-blur hover:bg-[#353535]"><Icon size={20}/></button>)}</div>
+      <button onClick={()=>setView("Top")} className="absolute right-9 top-5 z-20 h-12 w-12" aria-label="Set top camera view"><span className="absolute left-5 top-5 h-2 w-2 rounded-full border border-[#1687f7]"/><span className="absolute left-6 top-0 h-6 w-[2px] bg-[#e95a55]"/><span className="absolute left-0 top-6 h-[2px] w-6 bg-[#73dc50]"/><span className="absolute left-6 top-6 h-5 w-[2px] bg-[#1687f7]"/></button>
+      <div className="absolute right-6 top-[72px] z-20 grid gap-2">{[{icon:Lightbulb,label:"Lighting",active:lightingOpen,action:()=>setLightingOpen(v=>!v)},{icon:Globe2,label:"World",active:environmentOpen,action:()=>setEnvironmentOpen(v=>!v)},{icon:Camera,label:"Capture view",active:false,action:props.onSnapshot},{icon:Grid3X3,label:"Toggle grid",active:gridVisible,action:()=>setGridVisible(v=>!v)},{icon:CircleHelp,label:"Help",active:helpOpen,action:()=>setHelpOpen(v=>!v)}].map(({icon:Icon,label,active,action})=><button key={label} title={label} aria-label={label} aria-pressed={active} onClick={action} className={`grid h-10 w-10 place-items-center rounded-[10px] text-zinc-100 shadow-lg backdrop-blur ${active?"bg-[#4A90D9]":"bg-[#252525]/95 hover:bg-[#353535]"}`}><Icon size={20}/></button>)}</div>
+      {(lightingOpen||environmentOpen||helpOpen)&&<div className="absolute right-20 top-[72px] z-30 w-52 rounded-xl border border-white/10 bg-[#242424]/95 p-4 text-xs shadow-2xl"><b>{helpOpen?"Viewport controls":environmentOpen?"Environment":"Lighting"}</b><p className="mt-2 leading-5 text-zinc-400">{helpOpen?"Wheel zooms, middle drag pans, right drag orbits.":environmentOpen?"Studio Soft HDRI · neutral background":"Key light enabled · intensity 100%"}</p></div>}
 
       {props.selectedAsset && !`${props.selectedAsset.name} ${props.selectedAsset.prompt}`.toLowerCase().includes("desk") && (
         <button
