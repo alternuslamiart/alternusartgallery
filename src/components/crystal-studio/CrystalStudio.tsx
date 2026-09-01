@@ -41,9 +41,9 @@ export function CrystalStudio() {
   const [opacity, setOpacity] = useState(100);
   const [renderSettings, setRenderSettings] = useState<RenderSettings>({ resolution: "2560x1440", sampleCount: 256, exposure: 1.2 });
   const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, rotation: -8, scale: 1 });
-  const [start, setStart] = useState(1);
-  const [end, setEnd] = useState(240);
-  const [current, setCurrent] = useState(1);
+  const [start, setStart] = useState(0);
+  const [end, setEnd] = useState(300);
+  const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [alternateTheme, setAlternateTheme] = useState(false);
   const uploadUrl = useRef<string | null>(null);
