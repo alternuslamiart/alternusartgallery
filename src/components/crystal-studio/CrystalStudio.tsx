@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, ArrowLeft, ChevronDown, Gem, Globe2, Home, Menu, PanelLeftOpen, Plus, Search, Settings, Zap } from "lucide-react";
+import { Archive, ArrowLeft, ChevronDown, Globe2, Home, Menu, PanelLeftOpen, Plus, Search, Settings, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { generateModel } from "@/services/ai";
 import Link from "next/link";
@@ -65,7 +65,7 @@ export function CrystalStudio() {
   useEffect(() => () => { if (uploadUrl.current) URL.revokeObjectURL(uploadUrl.current); }, []);
 
   if (dashboard) return <div className="crystal-dashboard">
-    <header><div className="crystal-dashboard-brand"><Home size={17}/><b>Crystal</b></div><div className="crystal-window-controls">•••　—　×　□</div></header>
+    <header><div className="crystal-dashboard-brand"><img src="/logo.png" alt="Crystal" className="crystal-brand-logo"/><b>Crystal</b></div><div className="crystal-window-controls">•••　—　×　□</div></header>
     <aside><button className="crystal-team"><span>B</span> My Team <ChevronDown size={17}/></button><label className="crystal-search"><Search size={16}/><input placeholder="Search" /></label><strong>Project</strong><nav><button className="active"><span>▦</span>All Projects</button><button><Globe2 size={16}/>Community</button><button><Archive size={16}/>Archive...</button><button onClick={() => setDashboard(false)}><Plus size={16}/>Project</button></nav><footer><span>▢　 Invite your team</span><button>Copy link</button></footer></aside>
     <main><div className="crystal-dashboard-title"><div><h1>♦ Crystal</h1><b>Recent</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => setDashboard(false)}>New Project　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago"},{title:"Architecture Sketch",time:"Viewed 3mo ago"}].map((project) => <button key={project.title} onClick={() => setDashboard(false)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
   </div>;
@@ -104,7 +104,7 @@ export function CrystalStudio() {
   return (
     <div className={`crystal-studio crystal-studio-enter fixed inset-0 z-[90] grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
       <header className="col-span-full flex h-16 items-center border-b border-[#303030] bg-[#202020] px-7">
-        <div className="flex items-center gap-3"><Gem size={26} className="text-zinc-600" fill="currentColor"/><b className="text-[16px]">Crystal</b><button aria-label="Back to projects" onClick={() => setDashboard(true)} className="ml-6 text-zinc-200"><Home size={17}/></button></div>
+        <div className="flex items-center gap-3"><img src="/logo.png" alt="Crystal" className="crystal-brand-logo"/><b className="text-[16px]">Crystal</b><button aria-label="Back to projects" onClick={() => setDashboard(true)} className="ml-6 text-zinc-200"><Home size={17}/></button></div>
         <nav aria-label="Application menu" className="relative ml-7 flex items-center gap-8 text-[12px] text-zinc-300">{["File", "Edit", "Tools", "Help", "View"].map((item) => <button key={item} onClick={() => setOpenMenu(openMenu === item ? null : item)} className={`transition hover:text-white ${openMenu === item ? "text-white" : ""}`}>{item}</button>)}{openMenu && <div className="absolute left-0 top-8 z-50 w-44 rounded-xl border border-white/10 bg-[#272727] p-1.5 shadow-2xl"><div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{openMenu}</div>{(openMenu === "File" ? ["New project", "Import asset", "Export scene"] : openMenu === "Edit" ? ["Undo", "Redo", "Preferences"] : openMenu === "Tools" ? ["Measure", "Transform", "Material tools"] : openMenu === "Help" ? ["Studio guide", "Keyboard shortcuts", "Contact support"] : ["Perspective view", "Orthographic view", "Reset view"]).map(action => <button key={action} onClick={() => setOpenMenu(null)} className="block w-full rounded-lg px-3 py-2 text-left text-[11px] text-zinc-200 hover:bg-[#3a3a3a]">{action}</button>)}</div>}</nav>
         <div className="ml-auto flex items-center gap-3"><button className="flex h-10 items-center gap-2 rounded-[12px] border border-zinc-400 px-3 text-[11px]">Starter <Zap size={17}/>200</button><Link href="/pricing" className="flex h-10 w-[124px] items-center justify-center gap-2 rounded-[11px] bg-[#1687f7] text-[12px] font-semibold text-white hover:bg-[#2d9bff]"><Zap size={19} fill="currentColor" />Go Pro</Link></div>
       </header>
@@ -116,7 +116,7 @@ export function CrystalStudio() {
       <Timeline start={start} end={end} current={current} playing={playing} alternateTheme={alternateTheme} onStartChange={(value) => { setStart(value); setCurrent(Math.max(value, current)); }} onEndChange={(value) => { setEnd(Math.max(value, start + 1)); setCurrent(Math.min(value, current)); }} onCurrentChange={setCurrent} onPlayingChange={setPlaying} onThemeToggle={() => setAlternateTheme((value) => !value)} />
       <button aria-label="Mobile menu" onClick={() => { setMobileMenu(true); setMobileProfile(false); }} className="crystal-mobile-menu-trigger absolute left-3 top-3 hidden h-10 w-10 place-items-center rounded-full bg-[#303030] max-[700px]:grid"><Menu size={19} /></button>
       {mobileMenu && <div className="crystal-mobile-sheet">
-        <div className="flex items-center justify-between"><Gem size={37} className="text-zinc-600" fill="currentColor"/><button aria-label="Close menu" onClick={() => setMobileMenu(false)} className="grid h-11 w-11 place-items-center rounded-full bg-[#2a2a2a]"><ArrowLeft size={22}/></button></div>
+        <div className="flex items-center justify-between"><img src="/logo.png" alt="Crystal" className="crystal-brand-logo crystal-brand-logo-mobile"/><button aria-label="Close menu" onClick={() => setMobileMenu(false)} className="grid h-11 w-11 place-items-center rounded-full bg-[#2a2a2a]"><ArrowLeft size={22}/></button></div>
         <button className="crystal-mobile-pro"><Zap size={20} fill="currentColor"/> <b>Try Crystal Pro</b><span>Pay Now</span></button>
         <label className="crystal-mobile-search"><Search size={19}/><input placeholder="Search" /></label>
         <nav className="crystal-mobile-nav"><button className="active">⠿　All Projects</button><button><Globe2 size={17}/>Community</button><button><Archive size={17}/>Archive...</button><button onClick={() => { setMobileMenu(false); setDashboard(true); }}><Plus size={17}/>Project</button></nav>

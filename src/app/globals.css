@@ -592,3 +592,7 @@
 .auth-page.auth-light .auth-footer-link {
  color: #1c5fd6;
 }
+
+/* Shared raster mark supplied for the Crystal application chrome. */
+.crystal-brand-logo { width: 27px; height: 27px; object-fit: contain; filter: invert(1) brightness(1.55); opacity: .88; }
+.crystal-brand-logo-mobile { width: 40px; height: 40px; }
