@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, ChevronDown, Gem, Globe2, Home, Menu, PanelLeftOpen, Plus, Search, Zap } from "lucide-react";
+import { Archive, ArrowLeft, ChevronDown, Gem, Globe2, Home, Menu, PanelLeftOpen, Plus, Search, Settings, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { generateModel } from "@/services/ai";
 import Link from "next/link";
@@ -48,6 +48,8 @@ export function CrystalStudio() {
   const [playing, setPlaying] = useState(false);
   const [alternateTheme, setAlternateTheme] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [mobileMenu, setMobileMenu] = useState(false);
+  const [mobileProfile, setMobileProfile] = useState(false);
   const uploadUrl = useRef<string | null>(null);
   const selectedAsset = useMemo(() => assets.find((asset) => asset.id === selectedAssetId), [assets, selectedAssetId]);
 
@@ -112,7 +114,22 @@ export function CrystalStudio() {
       <Viewport selectedAsset={selectedAsset} activeTool={activeTool} prompt={prompt} loading={loading} progress={progress} error={error} transform={transform} color={color} onToolChange={setActiveTool} onPromptChange={setPrompt} onGenerate={handleGenerate} onTransformChange={setTransform} onClearError={() => setError(null)} onAssetDrop={(id) => { setSelectedAssetId(id); setTransform({ x: 0, y: 0, rotation: -8, scale: 1 }); }} onColorChange={setColor} />
       {rightOpen && <RightPanel resolution={resolution} frameRate={frameRate} color={color} opacity={opacity} renderSettings={renderSettings} assets={assets} selectedAssetId={selectedAssetId} onResolutionChange={setResolution} onFrameRateChange={setFrameRate} onColorChange={setColor} onOpacityChange={setOpacity} onRenderChange={setRenderSettings} onSelectAsset={(id) => { setSelectedAssetId(id); setTransform({ x: 0, y: 0, rotation: -8, scale: 1 }); }} onDeleteAsset={(id) => { setAssets((items) => items.filter((item) => item.id !== id)); if (selectedAssetId === id) setSelectedAssetId(null); }} onExport={handleExport} onCollapse={() => { setLeftOpen(false); setRightOpen(false); }} />}
       <Timeline start={start} end={end} current={current} playing={playing} alternateTheme={alternateTheme} onStartChange={(value) => { setStart(value); setCurrent(Math.max(value, current)); }} onEndChange={(value) => { setEnd(Math.max(value, start + 1)); setCurrent(Math.min(value, current)); }} onCurrentChange={setCurrent} onPlayingChange={setPlaying} onThemeToggle={() => setAlternateTheme((value) => !value)} />
-      <button aria-label="Mobile menu" className="absolute left-3 top-3 hidden h-10 w-10 place-items-center rounded-lg bg-[#303030] max-[700px]:grid"><Menu size={19} /></button>
+      <button aria-label="Mobile menu" onClick={() => { setMobileMenu(true); setMobileProfile(false); }} className="crystal-mobile-menu-trigger absolute left-3 top-3 hidden h-10 w-10 place-items-center rounded-full bg-[#303030] max-[700px]:grid"><Menu size={19} /></button>
+      {mobileMenu && <div className="crystal-mobile-sheet">
+        <div className="flex items-center justify-between"><Gem size={37} className="text-zinc-600" fill="currentColor"/><button aria-label="Close menu" onClick={() => setMobileMenu(false)} className="grid h-11 w-11 place-items-center rounded-full bg-[#2a2a2a]"><ArrowLeft size={22}/></button></div>
+        <button className="crystal-mobile-pro"><Zap size={20} fill="currentColor"/> <b>Try Crystal Pro</b><span>Pay Now</span></button>
+        <label className="crystal-mobile-search"><Search size={19}/><input placeholder="Search" /></label>
+        <nav className="crystal-mobile-nav"><button className="active">⠿　All Projects</button><button><Globe2 size={17}/>Community</button><button><Archive size={17}/>Archive...</button><button onClick={() => { setMobileMenu(false); setDashboard(true); }}><Plus size={17}/>Project</button></nav>
+        <h2>Recents</h2><button className="crystal-mobile-recent">Architecture build house</button>
+        <div className="mt-auto flex items-center justify-between"><button onClick={() => setMobileProfile(true)} className="grid h-13 w-13 place-items-center rounded-full bg-[#292929] text-sm">B</button><button onClick={() => setMobileProfile(true)} className="grid h-13 w-13 place-items-center rounded-full bg-[#292929]"><Settings size={23}/></button></div>
+      </div>}
+      {mobileProfile && <div className="crystal-mobile-profile">
+        <button aria-label="Back to menu" onClick={() => setMobileProfile(false)} className="mb-3 grid h-11 w-11 place-items-center rounded-full bg-[#272727]"><ArrowLeft size={22}/></button><h1>My Profile</h1>
+        <div className="crystal-profile-user"><span>B</span><div><b>Iam</b><small>email@live.com</small></div></div>
+        <section><b>Upgrade to Pro</b><p>Lorem ipsum dolor sit amet consectetur. Et sit nec habitant mauris.</p><button className="crystal-mobile-pro"><Zap size={17} fill="currentColor"/>Try Crystal Pro <span>Go Pro</span></button></section>
+        {[['Account','Account Details','Billing & Subscription','Account Security'],['Crystal','My Creations','Projects','Generation History','Favorites'],['Preferences','Settings','Appearance'],['Support','Help & Support','Updates']].map(([title,...items]) => <section key={title}><b>{title}</b>{items.map(item => <button key={item}>{item}</button>)}</section>)}
+        <button className="crystal-profile-signout">Sign Out</button>
+      </div>}
     </div>
   );
 }

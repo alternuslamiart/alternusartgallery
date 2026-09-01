@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Check, ChevronDown, CircleHelp, Globe2, Grid3X3, Lightbulb, Link2, LoaderCircle, Paperclip, Send, Sparkles, X } from "lucide-react";
+import { Camera, Check, ChevronDown, CircleHelp, Globe2, Grid3X3, Lightbulb, Link2, LoaderCircle, Paperclip, Send, Sparkles, X, Zap } from "lucide-react";
 import { modelingTools } from "./data";
 import { IconButton } from "./ui";
 import type { StudioAsset, StudioTool, Transform } from "./types";
@@ -67,7 +67,10 @@ export function Viewport(props: Props) {
   const [viewportMode, setViewportMode] = useState<"solid" | "wireframe" | "xray">("solid");
   const [openPanel, setOpenPanel] = useState<"brush" | "tools" | null>(null);
   const [notice, setNotice] = useState("Orbit: drag the model to inspect it");
-  const [camera, setCamera] = useState<Camera>({ targetX: 0, targetZ: 0, elevation: 0, distance: 18, yaw: 0, pitch: .72, orthographic: false });
+  // Keep the normal working perspective above the construction plane.  The
+  // explicit Bottom control is still available, but normal orbiting cannot
+  // accidentally leave the model looking at the underside of the grid.
+  const [camera, setCamera] = useState<Camera>({ targetX: 0, targetZ: 0, elevation: 0, distance: 22, yaw: .72, pitch: .52, orthographic: false });
   const cameraDrag = useRef<{ x: number; y: number; camera: typeof camera } | null>(null);
   const [workspaceMode, setWorkspaceMode] = useState<"Animate" | "Modeling" | "Images">("Modeling");
   const [activeView, setActiveView] = useState("Perspective");
@@ -76,15 +79,15 @@ export function Viewport(props: Props) {
   useEffect(() => {
     if (!props.selectedAsset) return;
     props.onTransformChange({ x: 0, y: 0, rotation: 0, scale: 1 });
-    setCamera({ targetX: 0, targetZ: 0, elevation: 0, distance: 18, yaw: .72, pitch: .62, orthographic: false });
+    setCamera({ targetX: 0, targetZ: 0, elevation: 0, distance: 22, yaw: .72, pitch: .52, orthographic: false });
     setActiveView("Perspective");
   // Center and frame every selected asset in the scene.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.selectedAsset?.id]);
 
   const setView = (view: string) => {
-    const views: Record<string, Pick<Camera, "yaw" | "pitch" | "orthographic">> = { Perspective: { yaw: .72, pitch: .62, orthographic: false }, Top: { yaw: 0, pitch: 1.52, orthographic: true }, Bottom: { yaw: 0, pitch: -.72, orthographic: true }, Front: { yaw: Math.PI, pitch: .02, orthographic: true }, Back: { yaw: 0, pitch: .02, orthographic: true }, Left: { yaw: Math.PI / 2, pitch: .02, orthographic: true }, Right: { yaw: -Math.PI / 2, pitch: .02, orthographic: true }, Iso: { yaw: .78, pitch: .62, orthographic: false } };
-    const from = camera; const to: Camera = { ...camera, ...views[view], targetX: 0, targetZ: 0, elevation: 0, distance: 18 }; const started = performance.now();
+    const views: Record<string, Pick<Camera, "yaw" | "pitch" | "orthographic">> = { Perspective: { yaw: .72, pitch: .52, orthographic: false }, Top: { yaw: 0, pitch: 1.52, orthographic: true }, Bottom: { yaw: 0, pitch: -.72, orthographic: true }, Front: { yaw: Math.PI, pitch: .02, orthographic: true }, Back: { yaw: 0, pitch: .02, orthographic: true }, Left: { yaw: Math.PI / 2, pitch: .02, orthographic: true }, Right: { yaw: -Math.PI / 2, pitch: .02, orthographic: true }, Iso: { yaw: .78, pitch: .55, orthographic: false } };
+    const from = camera; const to: Camera = { ...camera, ...views[view], targetX: 0, targetZ: 0, elevation: 0, distance: 22 }; const started = performance.now();
     const animate = (now: number) => { const p=Math.min(1,(now-started)/260); const ease=1-Math.pow(1-p,3); setCamera({ targetX:from.targetX+(to.targetX-from.targetX)*ease, targetZ:from.targetZ+(to.targetZ-from.targetZ)*ease, elevation:from.elevation+(to.elevation-from.elevation)*ease, distance:from.distance+(to.distance-from.distance)*ease, yaw:from.yaw+(to.yaw-from.yaw)*ease, pitch:from.pitch+(to.pitch-from.pitch)*ease, orthographic:p<1?from.orthographic:to.orthographic }); if(p<1)requestAnimationFrame(animate); }; requestAnimationFrame(animate); setActiveView(view);
   };
   const beginDrag = (event: React.PointerEvent) => {
@@ -132,7 +135,7 @@ export function Viewport(props: Props) {
     <section
       className="relative min-h-0 overflow-hidden bg-[#292929]"
       onPointerDown={(event) => { if (event.button === 1 || event.button === 2) { event.preventDefault(); cameraDrag.current = { x: event.clientX, y: event.clientY, camera }; event.currentTarget.setPointerCapture(event.pointerId); } }}
-      onPointerMove={(event) => { moveDrag(event); if (cameraDrag.current) { const dx = event.clientX - cameraDrag.current.x; const dy = event.clientY - cameraDrag.current.y; const base=cameraDrag.current.camera; if(event.buttons===4 && event.shiftKey) setCamera({ ...base, elevation:Math.max(-48,Math.min(48,base.elevation-dy*.05)), targetX:base.targetX-dx*.018, orthographic:false }); else if(event.buttons===4) setCamera({ ...base, targetX:base.targetX-dx*.018, targetZ:base.targetZ+dy*.018 }); else setCamera({ ...base, yaw:base.yaw-dx*.006, pitch:Math.max(-1.42,Math.min(1.42,base.pitch+dy*.005)), orthographic:false }); } }}
+      onPointerMove={(event) => { moveDrag(event); if (cameraDrag.current) { const dx = event.clientX - cameraDrag.current.x; const dy = event.clientY - cameraDrag.current.y; const base=cameraDrag.current.camera; if(event.buttons===4 && event.shiftKey) setCamera({ ...base, elevation:Math.max(-48,Math.min(48,base.elevation-dy*.05)), targetX:base.targetX-dx*.018, orthographic:false }); else if(event.buttons===4) setCamera({ ...base, targetX:base.targetX-dx*.018, targetZ:base.targetZ+dy*.018 }); else setCamera({ ...base, yaw:base.yaw-dx*.006, pitch:Math.max(.12,Math.min(1.42,base.pitch+dy*.005)), orthographic:false }); } }}
       onPointerUp={() => { drag.current = null; cameraDrag.current = null; }}
       onContextMenu={(event) => event.preventDefault()}
       onWheel={(event) => { event.preventDefault(); setCamera((value) => ({ ...value, distance: Math.max(4, Math.min(60, value.distance * Math.exp(event.deltaY * .0012))) })); }}
@@ -169,6 +172,7 @@ export function Viewport(props: Props) {
       )}
 
       <div className={`${chatOpen ? "" : "hidden"} absolute bottom-[80px] left-1/2 w-[488px] max-w-[calc(100%_-_32px)] -translate-x-1/2 rounded-[14px] border border-[#1687f7] bg-[#202020]/95 px-2 pb-2 pt-1 shadow-[0_10px_34px_rgba(0,0,0,.45),0_0_22px_rgba(22,135,247,.14)] backdrop-blur-md`}>
+        {workspaceMode === "Images" && <div className="crystal-mobile-upgrade"><Zap size={18} fill="currentColor"/><b>Try Crystal Pro</b><button>Pay Now</button></div>}
         <textarea aria-label="AI model prompt" value={props.prompt} onChange={(event) => props.onPromptChange(event.target.value)} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") props.onGenerate(); }} placeholder="What do you want to create?" className="h-[68px] w-full resize-none bg-transparent px-2 py-3 text-[11px] text-zinc-100 outline-none placeholder:text-zinc-500" />
         {props.error && <div className="mb-2 flex items-center justify-between rounded-md bg-red-950/70 px-3 py-1.5 text-[11px] text-red-200"><span>{props.error}</span><button aria-label="Dismiss error" onClick={props.onClearError}><X size={14} /></button></div>}
         {props.loading && <div className="mb-2 h-1 overflow-hidden rounded-full bg-zinc-700"><div className="h-full bg-[#1687f7] transition-all" style={{ width: `${props.progress}%` }} /></div>}

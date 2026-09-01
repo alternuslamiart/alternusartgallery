@@ -71,6 +71,39 @@
   .crystal-studio > header nav, .crystal-studio > header > div { display: none; }
   .crystal-studio > header button { margin-left: auto; height: 36px; width: 104px; }
   .crystal-left-panel, .crystal-right-panel { top: 54px; bottom: 42px; }
+
+  /* Phones use a focused creation canvas instead of a compressed desktop UI. */
+  .crystal-studio { grid-template-rows: minmax(0, 1fr); padding: 0; background: #1b1b1b; }
+  .crystal-studio > header, .crystal-studio > aside, .crystal-studio > footer, .crystal-studio > .crystal-right-panel { display: none !important; }
+  .crystal-studio > section { grid-column: 1; grid-row: 1; margin: 0; border: 0 !important; border-radius: 0; background: #1b1b1b; }
+  .crystal-mobile-menu-trigger { z-index: 31; top: 64px; left: 23px; width: 48px; height: 48px; background: #292929; color: #e4e4e7; }
+  .crystal-studio > section > .absolute.left-1\/2.top-2 { top: 64px; z-index: 30; }
+  .crystal-studio > section > .absolute.left-1\/2.top-2 button { padding: 11px 20px; font-size: 12px; }
+  .crystal-studio > section > .absolute.right-9, .crystal-studio > section > .absolute.right-6, .crystal-studio > section > .pointer-events-none { display: none; }
+  .crystal-studio > section .crystal-object { top: 46%; transform-origin: center; }
+  .crystal-studio > section > .absolute.bottom-\[80px\] { bottom: 20px; width: calc(100% - 46px); max-width: none; padding: 10px 14px; border-color: rgba(38,117,255,.24); border-radius: 29px; background: #292929; box-shadow: 0 0 36px rgba(49,93,255,.2); }
+  .crystal-studio > section > .absolute.bottom-\[80px\] textarea { height: 58px; padding: 13px 0 6px; font-size: 15px; }
+  .crystal-studio > section > .absolute.bottom-\[80px\] > .flex { height: 48px; justify-content: space-between; }
+  .crystal-studio > section > .absolute.bottom-\[80px\] .h-9 { height: 42px; border-radius: 999px; }
+  .crystal-studio > section > .absolute.bottom-\[80px\] .rounded-\[9px\] { border-radius: 999px; }
+  .crystal-studio > section > .absolute.bottom-\[80px\] .ml-auto { width: 46px; height: 46px; border-radius: 50%; }
+  .crystal-mobile-upgrade { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 7px 0 14px; margin-bottom: 4px; border-radius: 999px; background: #414141; color: #1493ff; font-size: 14px; }
+  .crystal-mobile-upgrade button { margin-left: auto; border: 0; border-radius: 999px; padding: 10px 16px; background: #1687f7; color: white; font-size: 11px; }
+  .crystal-mobile-sheet, .crystal-mobile-profile { position: fixed; inset: 0; z-index: 80; display: flex; flex-direction: column; padding: 25px 23px 27px; background: #1b1b1b; color: #f4f4f5; }
+  .crystal-mobile-pro { display: flex; align-items: center; gap: 10px; min-height: 52px; width: 100%; margin: 25px 0 30px; padding: 6px 8px 6px 17px; border: 1px solid #1687f7; border-radius: 999px; background: #18203d; color: #1b9bff; text-align: left; font-size: 16px; box-shadow: 0 0 20px rgba(22,135,247,.18); }
+  .crystal-mobile-pro span { margin-left: auto; border-radius: 999px; padding: 10px 16px; background: #1687f7; color: white; font-size: 11px; }
+  .crystal-mobile-search { display: flex; align-items: center; gap: 12px; height: 51px; padding: 0 22px; border-radius: 999px; background: #292929; color: #fff; }
+  .crystal-mobile-search input { width: 100%; border: 0; outline: 0; background: transparent; color: #fff; font-size: 14px; }
+  .crystal-mobile-nav { display: grid; gap: 8px; margin-top: 30px; }
+  .crystal-mobile-nav button, .crystal-mobile-recent { display: flex; align-items: center; gap: 13px; height: 51px; border: 0; border-radius: 999px; padding: 0 18px; background: transparent; color: #bbb; text-align: left; font-size: 14px; }
+  .crystal-mobile-nav button.active, .crystal-mobile-recent { background: #292929; color: #fff; }
+  .crystal-mobile-sheet h2 { margin: 45px 0 16px; font-size: 16px; font-weight: 500; }
+  .crystal-mobile-profile { overflow-y: auto; align-items: stretch; }
+  .crystal-mobile-profile h1 { margin: 0 0 21px; text-align: center; font-size: 21px; }
+  .crystal-profile-user { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 7px; border-radius: 11px; background: #303030; font-size: 9px; }
+  .crystal-profile-user span { display: grid; width: 26px; height: 26px; place-items: center; border-radius: 5px; background: #1687f7; }.crystal-profile-user div { display:grid; gap:2px; }.crystal-profile-user small{font-size:7px}
+  .crystal-mobile-profile section { display: grid; gap: 11px; margin-top: 13px; padding: 16px 10px; border-radius: 17px; background: #303030; font-size: 12px; }.crystal-mobile-profile section p{margin:0;color:#aaa;font-size:9px}.crystal-mobile-profile section>button:not(.crystal-mobile-pro){border:0;background:transparent;text-align:left;color:#fff;font-size:10px;padding:3px 17px}.crystal-mobile-profile section .crystal-mobile-pro{margin:0;min-height:34px;font-size:10px}.crystal-mobile-profile section .crystal-mobile-pro span{padding:7px 13px;font-size:8px}
+  .crystal-profile-signout { min-height: 36px; margin-top: 13px; border: 0; border-radius: 11px; background: #3a1717; color: red; font-size: 11px; }
 }
 
 @layer utilities {
