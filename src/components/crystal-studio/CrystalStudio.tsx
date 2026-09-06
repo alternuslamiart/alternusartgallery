@@ -10,6 +10,7 @@ import { RightPanel } from "./RightPanel";
 import { Timeline } from "./Timeline";
 import type { MaterialName, RenderSettings, StudioAsset, StudioTool, Transform } from "./types";
 import { Viewport } from "./Viewport";
+import { DesignDashboard } from "./DesignDashboard";
 
 function downloadFile(name: string, content: string, type = "text/plain") {
   const url = URL.createObjectURL(new Blob([content], { type }));
@@ -23,7 +24,7 @@ function downloadFile(name: string, content: string, type = "text/plain") {
 export function CrystalStudio() {
   // Opening /crystal should enter the modeling workspace immediately. The
   // project dashboard remains available from the Home control in the top bar.
-  const [dashboard, setDashboard] = useState(false);
+  const [dashboard, setDashboard] = useState(true);
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -92,12 +93,15 @@ export function CrystalStudio() {
   useEffect(() => { if(!toast)return; const timer=window.setTimeout(()=>setToast(null),2800); return()=>window.clearTimeout(timer); },[toast]);
   useEffect(()=>{const close=(event:PointerEvent)=>{if(openMenu&&!(event.target as HTMLElement).closest("[aria-label='Application menu']"))setOpenMenu(null)};document.addEventListener("pointerdown",close);return()=>document.removeEventListener("pointerdown",close)},[openMenu]);
 
+  if (dashboard) return <DesignDashboard onOpenStudio={() => setDashboard(false)} />;
+
+  /* Legacy project dashboard retained in source for reference.
   if (dashboard) return <div className="crystal-dashboard">
     {mobileSplash && <div className="crystal-mobile-splash"><img src="/logo.png" alt="Crystal" /></div>}
     <header><div className="crystal-dashboard-brand"><img src="/logo.png" alt="Crystal" className="crystal-brand-logo"/><b>Crystal</b></div><div className="crystal-window-controls">•••　—　×　□</div></header>
     <aside><button className="crystal-team"><span>B</span> My Team <ChevronDown size={17}/></button><label className="crystal-search"><Search size={16}/><input placeholder="Search" /></label><strong>Project</strong><nav><button className="active"><span>▦</span>All Projects</button><button><Globe2 size={16}/>Community</button><button><Archive size={16}/>Archive...</button><button onClick={() => setDashboard(false)}><Plus size={16}/>Project</button></nav><footer><span>▢　 Invite your team</span><button>Copy link</button></footer></aside>
     <main><div className="crystal-dashboard-title"><div><h1>♦ Crystal</h1><b>Recent</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => setDashboard(false)}>New Project　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago"},{title:"Architecture Sketch",time:"Viewed 3mo ago"}].map((project) => <button key={project.title} onClick={() => setDashboard(false)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
-  </div>;
+  </div>; */
 
   const handleUpload = (file: File) => {
     if (uploadUrl.current) URL.revokeObjectURL(uploadUrl.current);

@@ -436,6 +436,8 @@
 
 /* Safe area for mobile */
 .pb-safe {
+
+.dash-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;color:#b8b8bd}.dash-icon:hover{background:rgba(255,255,255,.07);color:#fff}.dash-sidebar{position:sticky;top:64px;display:flex;flex-direction:column;width:252px;height:calc(100vh - 64px);flex:none;border-right:1px solid rgba(255,255,255,.08);padding:20px 12px;background:#1b1b1b}.dash-nav{display:flex;align-items:center;gap:12px;width:100%;height:42px;padding:0 12px;border-radius:10px;color:#a7a7ae;font-size:13px;text-align:left}.dash-nav:hover,.dash-nav.active{background:rgba(255,255,255,.075);color:#fff}.dash-nav.active{box-shadow:inset 2px 0 #8b7bff}@media(max-width:900px){.dash-sidebar{width:212px}}@media(max-width:700px){.dash-sidebar{display:none}.dash-nav{min-height:44px}}
  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
