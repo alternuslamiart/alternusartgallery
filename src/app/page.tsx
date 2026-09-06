@@ -351,7 +351,7 @@ export default function HomePage() {
  Open the design workspace, compare floor plans, or review architecture, interiors, furniture layouts, and home-robotics concepts before sharing.
  </p>
  <div style={{ marginTop: 36, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", color: t.fg }}>
- <ActionLink href="/main">
+ <ActionLink href="/design-studio">
  Open Studio <Workflow size={15} />
  </ActionLink>
  <ActionLink href="/pricing" variant="secondary">

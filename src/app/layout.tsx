@@ -226,7 +226,7 @@ export default function RootLayout({
  "@type": "SearchAction",
  "target": {
  "@type": "EntryPoint",
- "urlTemplate": "https://www.alternusart.com/main?query={search_term_string}"
+ "urlTemplate": "https://www.alternusart.com/design-studio?query={search_term_string}"
  },
  "query-input": "required name=search_term_string"
  }

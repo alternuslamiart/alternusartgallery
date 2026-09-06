@@ -6,7 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
  return [
  { url: baseUrl, lastModified: now, changeFrequency: "daily", priority: 1 },
- { url: `${baseUrl}/main`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
+ { url: `${baseUrl}/design-studio`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
  { url: `${baseUrl}/ai-assistant`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
  { url: `${baseUrl}/code-builder`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
  { url: `${baseUrl}/cedium-design`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
