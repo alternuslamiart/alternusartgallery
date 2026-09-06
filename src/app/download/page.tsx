@@ -5,10 +5,10 @@ import { ArrowRight, Check, Cpu, Download, HardDrive, Laptop, ShieldCheck, WifiO
 import { COBALT, CoreforgePage } from "@/components/cedium-shell";
 
 const features = [
-  { Icon: Cpu, title: "Advanced local workflows", copy: "Handle larger projects, deeper modeling steps, automation scripts, and CAD handoff preparation." },
+  { Icon: Cpu, title: "Advanced local workflows", copy: "Handle larger design projects, deeper visualization steps, automation scripts, and documentation preparation." },
   { Icon: WifiOff, title: "Offline project access", copy: "Open project files, references, notes, and selected tools without relying on the browser workspace." },
-  { Icon: HardDrive, title: "Workstation file control", copy: "Keep engineering assets and project folders organized on your own desktop environment." },
-  { Icon: ShieldCheck, title: "Professional validation", copy: "Production and safety-critical outputs must be reviewed by a licensed engineer before use." },
+  { Icon: HardDrive, title: "Workstation file control", copy: "Keep design assets and project folders organized on your own desktop environment." },
+  { Icon: ShieldCheck, title: "Professional validation", copy: "Construction-ready documents must be reviewed by a qualified professional before use." },
 ];
 
 export default function DownloadPage() {
@@ -21,10 +21,10 @@ export default function DownloadPage() {
             <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 32px", textAlign: "center", position: "relative" }}>
               <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 20 }}>CRYSTAL STUDIO DESKTOP / PROFESSIONAL EDITION</div>
               <h1 style={{ margin: 0, fontSize: "clamp(54px,9vw,112px)", lineHeight: 0.88, letterSpacing: "-0.055em", fontWeight: 900 }}>
-                Advanced engineering.<br /><span style={{ color: COBALT, fontStyle: "italic" }}>On your desktop.</span>
+                Advanced design.<br /><span style={{ color: COBALT, fontStyle: "italic" }}>On your desktop.</span>
               </h1>
               <p style={{ margin: "30px auto 0", maxWidth: 720, fontSize: 17, lineHeight: 1.65, color: t.muted }}>
-                The Crystal Studio website focuses on AI-only generation and concept exploration. The desktop application adds advanced local project workflows, larger-file handling, offline access, automation, and deeper CAD handoff controls.
+                The Crystal Studio website focuses on AI-assisted design generation and concept exploration. The desktop application adds advanced local project workflows, larger-file handling, offline access, automation, and deeper design-documentation controls.
               </p>
             </div>
           </section>
@@ -43,12 +43,12 @@ export default function DownloadPage() {
 
               <div style={{ padding: 32, borderRadius: 20, border: `1px solid ${t.faint}`, background: t.surface }}>
                 <div style={{ fontSize: 10, letterSpacing: "0.2em", fontWeight: 800, color: COBALT }}>IMPORTANT PRODUCT DISTINCTION</div>
-                <h2 style={{ margin: "18px 0 0", fontSize: 36, lineHeight: 1, letterSpacing: "-0.035em", fontWeight: 900 }}>Web generation is not engineering approval.</h2>
-                <p style={{ margin: "20px 0 0", color: t.muted, lineHeight: 1.65, fontSize: 14 }}>AI-generated geometry, code, simulations, toolpaths, dimensions, and exports may be incomplete or incorrect. Any output used for manufacturing, construction, certification, regulated work, or safety-critical systems must be independently checked and approved by a licensed engineer.</p>
+                <h2 style={{ margin: "18px 0 0", fontSize: 36, lineHeight: 1, letterSpacing: "-0.035em", fontWeight: 900 }}>Web generation is not professional approval.</h2>
+                <p style={{ margin: "20px 0 0", color: t.muted, lineHeight: 1.65, fontSize: 14 }}>AI-generated floor plans, 3D models, dimensions, visualizations, and exports may be incomplete or incorrect. Any output used for construction, certification, regulated work, or safety-critical systems must be independently checked and approved by a qualified professional.</p>
                 <div style={{ display: "grid", gap: 20, marginTop: 28 }}>
                   {features.map(({ Icon, title, copy }) => <div key={title} style={{ display: "flex", gap: 14 }}><span style={{ width: 38, height: 38, flexShrink: 0, borderRadius: 10, display: "grid", placeItems: "center", background: t.raised, color: COBALT }}><Icon size={18} /></span><div><div style={{ fontSize: 14, fontWeight: 800 }}>{title}</div><div style={{ marginTop: 4, color: t.muted, fontSize: 12.5, lineHeight: 1.5 }}>{copy}</div></div></div>)}
                 </div>
-                <Link href="/terms" style={{ marginTop: 30, display: "inline-flex", alignItems: "center", gap: 8, color: COBALT, fontSize: 13, fontWeight: 800, textDecoration: "none" }}>Read engineering-use terms <ArrowRight size={15} /></Link>
+                <Link href="/terms" style={{ marginTop: 30, display: "inline-flex", alignItems: "center", gap: 8, color: COBALT, fontSize: 13, fontWeight: 800, textDecoration: "none" }}>Read professional-use terms <ArrowRight size={15} /></Link>
               </div>
             </div>
           </section>
