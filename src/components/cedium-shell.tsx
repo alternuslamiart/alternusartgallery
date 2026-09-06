@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useState } from "react";
 
 export const COBALT = "#4284FF";
@@ -77,6 +78,8 @@ export function useCoreforgeTheme() {
 }
 
 export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: ReturnType<typeof useCoreforgeTheme>) {
+ const pathname = usePathname();
+
  return (
  <header className="crystal-glass-nav-shell">
  <div className="crystal-glass-nav" style={{ color: fg, borderColor: faint, background: isDark ? "rgba(28,28,30,.72)" : "rgba(255,255,255,.72)" }}>
@@ -86,7 +89,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  </Link>
  <nav className="hidden md:flex crystal-glass-links" style={{ alignItems: "center", gap: 12 }}>
  {[{ l: "Platform", h: "/platform/overview" }, { l: "CAD Studios", h: "/platform/bridges" }, { l: "Company", h: "/about" }, { l: "Pricing", h: "/pricing" }].map((i) => (
- <Link key={i.l} href={i.h} style={{ fontSize: 13, color: muted, fontWeight: 500, textDecoration: "none", letterSpacing: "-0.01em" }}>{i.l}</Link>
+ <Link key={i.l} href={i.h} className={pathname === i.h ? "is-active" : undefined} style={{ fontSize: 13, color: muted, fontWeight: 500, textDecoration: "none", letterSpacing: "-0.01em" }}>{i.l}</Link>
  ))}
  </nav>
  <div style={{ flex: 1 }} />
