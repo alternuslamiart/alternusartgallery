@@ -5,196 +5,105 @@ interface AIResponse {
 
 const STUDIO_TOPICS = {
  en: {
- studio: `**Coreforge AI Studio**
+ studio: `**Crystal AI Design Studio**
 
 I can help you with:
-- 3D Machinery Engines & Industrial Machinery
-- Automotive & Motorcycles
-- Aerospace & Drones
-- CNC & Machining
-- 3D Studio Integration
-- AI Code Assistant for FEA/CFD, CAD scripting, automation, and APIs
+- Architecture and floor plans
+- Interior design and room styling
+- Furniture and space planning
+- 3D architectural visualization
+- Home robotics
+- Design documentation and workflow automation
 
-Tell me what machine, vehicle, part, or workflow you want to build and I will help you structure it.`,
- tools: `**Available Tools**
+Describe the space or design you want to create, and I will help you shape it.`,
+ tools: `**Design Areas**
 
-- **3D Machinery Engines & Industrial Machinery** - engines, transmissions, hydraulic and pneumatic systems
-- **Automotive & Motorcycles** - body, chassis, suspension, braking systems, cars, trucks, motorcycles, and EVs
-- **Aerospace & Drones** - aerodynamics, wing structures, fuselage modeling, and avionics layout
-- **CNC & Machining** - G-code, toolpath optimization, milling, and turning workflows
-- **3D Studio Integration** - SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD, and more
-- **AI Code Assistant** - FEA/CFD simulations, CAD scripts, parametric automation, and API integrations`,
+- **Architecture** - house plans, building layouts, walls, doors, windows, stairs, roofs, and dimensions
+- **Interior Design** - room layouts, kitchens, bathrooms, lighting, materials, finishes, and styling
+- **Furniture Planner** - furniture placement, room furnishing, circulation, and space optimization
+- **3D Visualization** - architectural models, interior views, cameras, renders, and presentation assets
+- **Home Robotics** - household robot design, components, residential environments, and human-robot interaction
+- **AI Design Assistant** - design briefs, documentation, workflows, and integrations`,
  workflow: `**Typical Workflow**
 
-1. Describe the machine, vehicle system, aerospace part, or CNC task
-2. Pick the target output: CAD model, assembly plan, CAM workflow, simulation code, or API automation
-3. Define constraints, materials, dimensions, tolerances, and target CAD studio
-4. Generate the first engineering plan
-5. Refine parts, scripts, exports, and production notes`,
+1. Describe the home, apartment, room, furniture layout, or home robot
+2. Choose the output: floor plan, interior layout, 3D design model, visualization, or architectural drawing
+3. Define dimensions, rooms, materials, lighting, furniture, and practical requirements
+4. Generate the first design direction
+5. Refine the layout, visuals, documentation, and exports`,
  help: `I can draft:
-- an engine assembly plan
-- an automotive chassis brief
-- a drone fuselage workflow
-- a CNC toolpath prompt
-- a CAD automation script`,
+- a modern 3-bedroom house plan
+- a minimalist living room concept
+- a floor plan for a 120 m² house
+- a furniture arrangement for an apartment
+- a household robot concept for home assistance`,
  },
  sq: {
- studio: `**Coreforge AI Studio**
+ studio: `**Crystal AI Design Studio**
 
-Mund t'ju ndihmoj me:
-- 3D Machinery Engines & Industrial Machinery
-- Automotive & Motorcycles
-- Aerospace & Drones
-- CNC & Machining
-- 3D Studio Integration
-- AI Code Assistant per FEA/CFD, CAD scripting, automation dhe API
+Mund t'ju ndihmoj me arkitekture, dizajn interieri, planifikim mobiliesh, vizualizim 3D, robotike per shtepi dhe dokumentacion dizajni.
 
-Me thuaj cfare makinerie, automjeti, pjese ose workflow do te ndertosh dhe do ta strukturoj.`,
- tools: `**Mjetet e Disponueshme**
+Pershkruani hapesiren ose dizajnin qe deshironi te krijoni dhe do t'ju ndihmoj ta strukturoni.`,
+ tools: `**Fushat e Dizajnit**
 
-- **3D Machinery Engines & Industrial Machinery** - motorre, transmisione, sisteme hidraulike dhe pneumatike
-- **Automotive & Motorcycles** - body, chassis, suspension, braking systems, makina, kamione, motore dhe EV
-- **Aerospace & Drones** - aerodinamike, krahe, fuselage modeling dhe avionics layout
-- **CNC & Machining** - G-code, toolpath optimization, milling dhe turning
-- **3D Studio Integration** - SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD dhe me shume
-- **AI Code Assistant** - FEA/CFD simulations, CAD scripts, parametric automation dhe API integrations`,
+- **Arkitekture** - plane shtepish, layout ndertesash, mure, dyer, dritare, shkalle, çati dhe dimensione
+- **Dizajn Interieri** - layout dhomash, kuzhina, banjo, ndriçim, materiale, perfundime dhe stilim
+- **Furniture Planner** - vendosje mobiliesh, mobilim dhomash dhe optimizim hapesire
+- **Vizualizim 3D** - modele arkitekturore, pamje interieri, kamera dhe rendera
+- **Robotike per Shtepi** - robot shtepie, komponente dhe ambiente rezidenciale`,
  workflow: `**Workflow Tipik**
 
-1. Pershkruaj makinerine, sistemin e automjetit, pjesen aerospace ose detyren CNC
-2. Zgjidh output-in: CAD model, assembly plan, CAM workflow, simulation code ose API automation
-3. Percakto constraints, materiale, dimensione, toleranca dhe CAD studio
-4. Gjenero planin e pare engineering
-5. Rafino pjeset, scripts, exports dhe production notes`,
+1. Pershkruani shtepine, apartamentin, dhomen, layout-in e mobilieve ose robotin e shtepise
+2. Zgjidhni output-in: plan kati, layout interieri, model 3D, vizualizim ose vizatim arkitekturor
+3. Percaktoni dimensionet, dhomat, materialet, ndriçimin, mobiliet dhe kerkesat praktike
+4. Gjeneroni drejtimin e pare te dizajnit
+5. Rafinojeni layout-in, pamjet, dokumentacionin dhe eksportet`,
  help: `Mund te pergatis:
-- engine assembly plan
-- automotive chassis brief
-- drone fuselage workflow
-- CNC toolpath prompt
-- CAD automation script`,
+- plan per nje shtepi moderne me 3 dhoma gjumi
+- koncept per sallon minimalist
+- plan kati per nje shtepi 120 m²
+- vendosje mobiliesh per nje apartament
+- koncept per robot shtepie qe ndihmon familjen`,
  },
 } as const;
 
 function detectLanguage(message: string): "en" | "sq" {
- return /\b(mund|do|treg|ndihm|shkruaj|dizajn|faqe|aplikacion|makineri|motor)\b/i.test(message)
- ? "sq"
- : "en";
+ return /\b(mund|do|treg|ndihm|shkruaj|dizajn|faqe|aplikacion|shtepi|dhom|mobilie)\b/i.test(message) ? "sq" : "en";
 }
 
-function randomChoice<T>(arr: T[]): T {
- return arr[Math.floor(Math.random() * arr.length)];
-}
+function randomChoice<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)]; }
 
 export function getAIResponse(message: string): AIResponse {
  const lower = message.toLowerCase().trim();
  const lang = detectLanguage(message);
-
- if (/^(hi|hello|hey|pershendetje|miredita|tung|miresevini)/i.test(lower)) {
- return {
- content:
- lang === "sq"
- ? "Pershendetje. Jam Coreforge AI Studio. Me thuaj cfare makinerie, motori, automjeti, pjese CNC, drone ose CAD workflow po nderton dhe do ta kthej ne plan engineering."
- : "Hello. I am Coreforge AI Studio. Tell me what machinery, engine, vehicle, CNC part, drone, or CAD workflow you are building and I will turn it into an engineering plan.",
- suggestedQuestions:
- lang === "sq"
- ? ["Nderto nje engine assembly", "Propozo nje chassis design", "Pergatit nje CNC workflow"]
- : ["Build an engine assembly", "Propose a chassis design", "Prepare a CNC workflow"],
+ if (/^(hi|hello|hey|pershendetje|miredita|tung|miresevini)/i.test(lower)) return {
+ content: lang === "sq" ? "Pershendetje. Jam Crystal AI Design Studio. Me tregoni cfare hapesire, interieri, plan mobiliesh ose robot shtepie deshironi te krijoni." : "Hello. I am Crystal AI Design Studio. Tell me what space, interior, furniture layout, or home robot you want to create.",
+ suggestedQuestions: lang === "sq" ? ["Krijo nje shtepi moderne me 3 dhoma gjumi", "Dizajno nje sallon minimalist", "Planifiko mobiliet per kete apartament"] : ["Create a modern 3-bedroom house", "Design a minimalist living room", "Arrange furniture for this apartment"],
  };
- }
-
- if (/\b(thanks|thank you|faleminderit)\b/i.test(lower)) {
+ if (/\b(thanks|thank you|faleminderit)\b/i.test(lower)) return { content: lang === "sq" ? "Me kenaqesi. Mund te vazhdojme me arkitekture, dizajn interieri, planifikim mobiliesh, vizualizim 3D ose robotike per shtepi." : "You're welcome. We can continue with architecture, interior design, furniture planning, 3D visualization, or home robotics." };
+ if (/\b(help|ndihm|assist|what can you do|cfare mundesh)\b/i.test(lower)) return { content: `${STUDIO_TOPICS[lang].studio}\n\n${STUDIO_TOPICS[lang].tools}\n\n${STUDIO_TOPICS[lang].workflow}`, suggestedQuestions: lang === "sq" ? ["Si krijoj nje plan kati?", "Si planifikoj mobiliet?", "Dizajno nje robot per shtepi"] : ["How do I create a floor plan?", "How do I plan furniture?", "Design a robot for a home"] };
+ if (/\b(floor plan|house|apartment|building|room|wall|door|window|stair|roof|architecture|interior|furniture|kitchen|bedroom|bathroom|lighting|material|home robot|robot)\b/i.test(lower)) return { content: `${STUDIO_TOPICS[lang].workflow}\n\n${STUDIO_TOPICS[lang].help}` };
+ if (/\b(code|api|script|automation|parametric|workflow)\b/i.test(lower)) return { content: lang === "sq" ? "AI Design Assistant mund te pergatise workflow per plane kati, dokumentacion arkitekturor, rregulla parametrike te hapesires dhe integrime. Me jepni kerkesat e dizajnit, dimensionet dhe output-in qe deshironi." : "AI Design Assistant can prepare workflows for floor plans, architectural documentation, parametric space rules, and integrations. Share the design requirements, dimensions, and output you need." };
  return {
- content:
- lang === "sq"
- ? "Ne rregull. Mund te vazhdojme me mechanical design, automotive systems, CNC/CAM, CAD studio integration ose code/API automation."
- : "Understood. We can continue with mechanical design, automotive systems, CNC/CAM, CAD studio integration, or code/API automation.",
- };
- }
-
- if (/\b(help|ndihm|assist|what can you do|cfare mundesh)\b/i.test(lower)) {
- return {
- content: `${STUDIO_TOPICS[lang].studio}\n\n${STUDIO_TOPICS[lang].tools}\n\n${STUDIO_TOPICS[lang].workflow}`,
- suggestedQuestions:
- lang === "sq"
- ? ["Si ndertoj engine assembly?", "Si planifikoj CNC toolpaths?", "Me bej nje workflow per SolidWorks"]
- : ["How do I build an engine assembly?", "How do I plan CNC toolpaths?", "Make a SolidWorks workflow"],
- };
- }
-
- if (/\b(cnc|cam|g-code|gcode|milling|turning|toolpath)\b/i.test(lower)) {
- return {
- content: `${STUDIO_TOPICS[lang].workflow}\n\n${STUDIO_TOPICS[lang].help}`,
- };
- }
-
- if (/\b(3d|engine|transmission|hydraulic|pneumatic|machinery|industrial|model|assembly|motor)\b/i.test(lower)) {
- return {
- content:
- lang === "sq"
- ? "Per 3D Machinery mund te pergatis nje plan per engines, transmissions, hydraulic dhe pneumatic systems, me assemblies, constraints, materiale dhe target CAD studio."
- : "For 3D Machinery I can prepare a plan for engines, transmissions, hydraulic and pneumatic systems, with assemblies, constraints, materials, and target CAD studio.",
- };
- }
-
- if (/\b(car|truck|motorcycle|automotive|chassis|suspension|brake|braking|ev)\b/i.test(lower)) {
- return {
- content:
- lang === "sq"
- ? "Per Automotive & Motorcycles mund te strukturoj body, chassis, suspension, braking systems, cars, trucks, motorcycles dhe EV components."
- : "For Automotive & Motorcycles I can structure body, chassis, suspension, braking systems, cars, trucks, motorcycles, and EV components.",
- };
- }
-
- if (/\b(code|api|script|simulation|fea|cfd|automation|parametric)\b/i.test(lower)) {
- return {
- content:
- lang === "sq"
- ? "AI Code Assistant mund te gjeneroje FEA/CFD simulation helpers, CAD scripts, parametric automation dhe API integrations. Me jep CAD studio, input/output dhe constraints."
- : "AI Code Assistant can generate FEA/CFD simulation helpers, CAD scripts, parametric automation, and API integrations. Give me the CAD studio, inputs/outputs, and constraints.",
- };
- }
-
- return {
- content:
- lang === "sq"
- ? randomChoice([
- "Me jep nje makineri, motor, automjet, drone, CNC task ose CAD studio dhe do ta kthej ne strukture engineering.",
- "Mund te ndihmoj me 3D Machinery, Automotive, Aerospace, CNC/CAM, 3D Studio Integration ose AI Code Assistant.",
- ])
- : randomChoice([
- "Give me a machine, engine, vehicle, drone, CNC task, or CAD studio and I will turn it into an engineering structure.",
- "I can help with 3D Machinery, Automotive, Aerospace, CNC/CAM, 3D Studio Integration, or AI Code Assistant.",
- ]),
- suggestedQuestions:
- lang === "sq"
- ? ["Krijo engine assembly", "Bej automotive chassis", "Pergatit CNC toolpath"]
- : ["Create an engine assembly", "Build an automotive chassis", "Prepare a CNC toolpath"],
+ content: lang === "sq" ? randomChoice(["Me tregoni cfare shtepie, apartamenti, dhome, layout mobiliesh ose roboti per shtepi doni te dizajnoni.", "Mund te ndihmoj me arkitekture, dizajn interieri, furniture planning, vizualizim 3D dhe robotike per shtepi."]) : randomChoice(["Tell me what home, apartment, room, furniture layout, or household robot you want to design.", "I can help with architecture, interior design, furniture planning, 3D visualization, and home robotics."]),
+ suggestedQuestions: lang === "sq" ? ["Krijo plan kati per nje shtepi 120 m²", "Dizajno nje kuzhine moderne", "Krijo nje robot shtepie"] : ["Create a floor plan for a 120 m² house", "Design a modern kitchen", "Create a home robot for household assistance"],
  };
 }
 
 export const WELCOME_MESSAGE = {
- en: `Welcome to Coreforge AI Studio.
+ en: `Welcome to Crystal AI Design Studio.
 
-I can help you design 3D machinery, engines, transmissions, hydraulic and pneumatic systems, automotive and motorcycle parts, aerospace and drone structures, CNC/CAM workflows, CAD studio integrations, and engineering code/API automation.
+Design spaces. Visualize ideas. Build intelligent environments.
 
-Ask me for an engine assembly, chassis system, drone fuselage, CNC toolpath, CAD studio workflow, or FEA/CFD code helper.`,
- sq: `Miresevini ne Coreforge AI Studio.
+I can help you create architectural floor plans, interior layouts, furniture arrangements, 3D visualizations, and home robots designed for residential environments.`,
+ sq: `Miresevini ne Crystal AI Design Studio.
 
-Mund t'ju ndihmoj te dizajnoni 3D machinery, engines, transmissions, hydraulic dhe pneumatic systems, automotive dhe motorcycle parts, aerospace dhe drone structures, CNC/CAM workflows, CAD studio integrations dhe engineering code/API automation.
+Dizajnoni hapesira. Vizualizoni ide. Ndertoni ambiente inteligjente.
 
-Kerkoni engine assembly, chassis system, drone fuselage, CNC toolpath, CAD studio workflow ose FEA/CFD code helper.`,
+Mund t'ju ndihmoj te krijoni plane arkitekturore, layout-e interieri, vendosje mobiliesh, vizualizime 3D dhe robote per ambiente rezidenciale.`,
 };
 
 export const SUGGESTED_QUESTIONS = {
- en: [
- "Create an engine assembly",
- "Build an automotive chassis",
- "Prepare a CNC toolpath",
- "Generate a CAD automation script",
- ],
- sq: [
- "Krijo engine assembly",
- "Bej automotive chassis",
- "Pergatit CNC toolpath",
- "Gjenero CAD automation script",
- ],
+ en: ["Create a modern 3-bedroom house", "Design a minimalist living room", "Arrange furniture for this apartment", "Create a home robot designed for household assistance"],
+ sq: ["Krijo nje shtepi moderne me 3 dhoma gjumi", "Dizajno nje sallon minimalist", "Vendos mobiliet per kete apartament", "Krijo nje robot per ndihme ne shtepi"],
 };

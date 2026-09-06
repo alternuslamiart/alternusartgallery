@@ -15,7 +15,7 @@ export default function AccessibilityPage() {
  Accessibility
  </h1>
  <p className="mx-auto max-w-2xl pb-16 text-base text-slate-300 sm:pb-20 sm:text-lg">
- We build Crystal Studio so teams can operate an AI engineering workspace with clear navigation, readable interfaces, and inclusive product flows.
+We build Crystal Studio so teams can operate an AI design workspace with clear navigation, readable interfaces, and inclusive product flows.
  </p>
  </div>
  </div>

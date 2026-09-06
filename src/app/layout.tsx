@@ -36,22 +36,22 @@ export const metadata: Metadata = {
  metadataBase: new URL("https://www.alternusart.com"),
  applicationName: "Crystal Studio",
  title: {
- default: "Crystal Studio | AI Engineering and 3D CAD",
+ default: "Crystal Studio | AI Architecture & Interior Design",
  template: "%s | Crystal Studio",
  },
  description:
- "Crystal Studio is an AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.",
+ "Crystal Studio is an AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics.",
  keywords: [
  "3D machinery design",
  "engine 3D design",
- "industrial machinery CAD",
+ "architectural visualization",
  "automotive 3D design",
  "motorcycle 3D design",
- "CNC CAM AI",
- "CAD studio integration",
+ "floor plan AI",
+ "3D design studio",
  "AI code assistant",
  "Crystal Studio",
- "mechanical engineering AI",
+ "interior design AI",
  ],
  authors: [{ name: "Crystal Studio" }],
  creator: "Crystal Studio",
@@ -68,9 +68,9 @@ export const metadata: Metadata = {
  locale: "en_US",
  url: "https://www.alternusart.com",
  siteName: "Crystal Studio",
- title: "Crystal Studio | AI Engineering and 3D CAD",
+ title: "Crystal Studio | AI Architecture & Interior Design",
  description:
- "AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.",
+ "AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics.",
  images: [
  {
  url: "/logo.png",
@@ -82,9 +82,9 @@ export const metadata: Metadata = {
  },
  twitter: {
  card: "summary_large_image",
- title: "Crystal Studio | AI Engineering and 3D CAD",
+ title: "Crystal Studio | AI Architecture & Interior Design",
  description:
- "AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.",
+ "AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics.",
  images: ["/logo.png"],
  },
  robots: {
@@ -179,7 +179,7 @@ export default function RootLayout({
  "@type": "Organization",
  "@id": "https://www.alternusart.com/#organization",
  "name": "Crystal Studio",
- "alternateName": "Crystal Studio AI Engineering",
+ "alternateName": "Crystal Studio AI Design",
  "url": "https://www.alternusart.com",
  "logo": {
  "@type": "ImageObject",
@@ -188,7 +188,7 @@ export default function RootLayout({
  "height": 512
  },
  "image": "https://www.alternusart.com/logo.png",
- "description": "AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation.",
+ "description": "AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics.",
  "email": "contact@alternusart.com",
  "foundingDate": "2024",
  "sameAs": [
@@ -198,11 +198,11 @@ export default function RootLayout({
  "areaServed": "Worldwide",
  "knowsAbout": [
  "3D Machinery Design",
- "Engines and Industrial Machinery",
+ "Architecture and Building Design",
  "Automotive and Motorcycles",
  "Aerospace and Drones",
- "CNC and Machining",
- "CAD Studio Integration",
+ "Furniture and Space Planning",
+ "Home Robotics",
  "AI Code Assistant"
  ]
  })
@@ -218,7 +218,7 @@ export default function RootLayout({
  "@id": "https://www.alternusart.com/#website",
  "url": "https://www.alternusart.com",
  "name": "Crystal Studio",
- "description": "AI workspace for 3D machinery, engines, automotive systems, CNC machining, aerospace parts, industrial CAD, and engineering code automation",
+ "description": "AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics",
  "publisher": {
  "@id": "https://www.alternusart.com/#organization"
  },

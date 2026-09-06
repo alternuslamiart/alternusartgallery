@@ -24,7 +24,7 @@ export default function About() {
  <div style={{ fontSize: 11, letterSpacing: "0.2em", fontWeight: 700, color: t.muted, position: "sticky", top: 100 }}>§ ORIGIN</div>
  </div>
  <div className="md:col-span-8" style={{ fontSize: 18, lineHeight: 1.75, color: t.fg, fontWeight: 400 }}>
- <p>Crystal Studio was started in 2024 by a small team focused on making AI useful for engineering, 3D machinery, CAD automation, and industrial workflows.</p>
+<p>Crystal Studio was started in 2024 by a small team focused on making AI useful for architecture, interior design, 3D visualization, and intelligent homes.</p>
  <p style={{ marginTop: 24 }}>We started from a simpler question — <em style={{ color: COBALT, fontStyle: "italic" }}>what if the OS were an agent?</em> An operating system that listens, reads, writes, remembers — and that you can talk to in the same way you talk to a colleague.</p>
  </div>
  </div>
@@ -36,7 +36,7 @@ export default function About() {
  <div style={{ fontSize: 11, letterSpacing: "0.2em", fontWeight: 700, color: t.muted, position: "sticky", top: 100 }}>§ TODAY</div>
  </div>
  <div className="md:col-span-8" style={{ fontSize: 18, lineHeight: 1.75, color: t.fg }}>
- <p>Today Crystal Studio combines a browser-based AI generation workspace with a more advanced desktop application for local files, automation, and CAD handoff workflows.</p>
+<p>Today Crystal Studio combines a browser-based AI design workspace with a more advanced desktop application for local files, automation, and architectural documentation workflows.</p>
  </div>
  </div>
 

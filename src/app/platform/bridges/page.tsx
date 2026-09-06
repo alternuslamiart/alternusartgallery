@@ -6,39 +6,39 @@ import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const bridges = [
  {
- app: "3D Machinery",
+ app: "Architecture Studio",
  slug: "machinery",
  v: "Latest",
- kind: "Mechanical CAD",
+ kind: "Architecture tools",
  blurb:
- "3D design of engines, transmissions, hydraulic and pneumatic systems across all major CAD studios.",
- verbs: ["engines", "transmissions", "hydraulics", "pneumatics"],
- install: "Crystal Studio machinery workspace",
+ "Create building layouts, floor plans, room configurations, and 3D architectural models in one connected workspace.",
+ verbs: ["floor plans", "rooms", "walls", "dimensions"],
+ install: "Crystal Studio architecture workspace",
  },
  {
  app: "3D Studio Integration",
  slug: "cad-studios",
- v: "All CAD",
+ v: "3D Design",
  kind: "Studio workflow",
  blurb:
  "Works with SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD and more.",
  verbs: ["SolidWorks", "Fusion 360", "CATIA", "FreeCAD"],
- install: "Crystal Studio CAD workflow",
+ install: "Crystal Studio design workflow",
  },
 ];
 
 const upcomingEngines = [
  {
- app: "Automotive & Motorcycles",
+ app: "Interior & Furniture Planner",
  Icon: Box,
- description: "Design body, chassis, suspension, braking systems, cars, trucks, motorcycles and electric vehicles.",
- tags: ["body", "chassis", "suspension"],
+ description: "Plan furniture placement, kitchen design, lighting, materials, finishes, and room styling.",
+ tags: ["furniture", "lighting", "materials"],
  },
  {
- app: "Aerospace & Drones",
+ app: "Home Robotics",
  Icon: Box,
- description: "Plan aerodynamics, wing structures, fuselage modeling, and avionics system layout.",
- tags: ["aerodynamics", "wings", "avionics"],
+ description: "Design and visualize household robots, their components, and human-robot interaction in residential spaces.",
+ tags: ["robot design", "components", "home environment"],
  },
 ];
 
@@ -63,14 +63,14 @@ export default function Bridges() {
  />
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", position: "relative" }}>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 22 }}>
- PLATFORM / CAD STUDIOS
+ PLATFORM / DESIGN STUDIOS
  </div>
  <h1 style={{ fontSize: "clamp(48px,8vw,128px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.88, margin: 0, fontStretch: "82%", maxWidth: 1100 }}>
- Design <span style={{ color: COBALT, fontStyle: "italic" }}>machines</span>.<br />
- Build industrial 3D.
+ Design <span style={{ color: COBALT, fontStyle: "italic" }}>spaces</span>.<br />
+ Visualize intelligent homes.
  </h1>
  <p style={{ marginTop: 32, fontSize: 18, color: t.muted, maxWidth: 640, lineHeight: 1.55 }}>
- Crystal Studio connects 3D machinery, automotive systems, aerospace and drones, CNC/CAM, major CAD studios, and AI code/API automation.
+ Crystal Studio connects architecture, interior design, furniture planning, 3D visualization, home robotics, and professional design workflows.
  </p>
  </div>
  </section>
@@ -130,13 +130,13 @@ export default function Bridges() {
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
  <div style={{ maxWidth: 720, marginBottom: 34 }}>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 18 }}>
- ROADMAP / ENGINEERING SYSTEMS
+ ROADMAP / DESIGN SYSTEMS
  </div>
  <h2 style={{ fontSize: "clamp(34px,5vw,64px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.96, margin: 0, fontStretch: "86%" }}>
- Vehicle and Aerospace Workflows
+ Interior Planning and Home Robotics
  </h2>
  <p style={{ marginTop: 18, fontSize: 15.5, color: t.muted, maxWidth: 680, lineHeight: 1.65 }}>
- Crystal Studio supports advanced mechanical creation workflows across automotive, motorcycles, aerospace, drones, CNC, and CAD studios.
+ Crystal Studio supports thoughtful design workflows across architecture, interior layouts, furniture planning, 3D visualization, and home robotics.
  </p>
  </div>
 
@@ -268,22 +268,22 @@ export default function Bridges() {
  HOW IT CONNECTS
  </div>
  <h2 style={{ fontSize: "clamp(32px,5vw,56px)", fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1, margin: 0, marginBottom: 48, fontStretch: "88%" }}>
- 3D machinery, CNC, and CAD studios in one flow.
+ Architecture, interiors, and home robotics in one flow.
  </h2>
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-0" style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden" }}>
  {[
  {
  n: "01",
- title: "CNC & Machining",
- d: "AI-assisted G-code generation, toolpath optimization, milling and turning for all CNC workflows.",
- tags: ["CNC", "CAM", "G-code"],
+ title: "Furniture & Space Planning",
+ d: "Use AI to arrange furniture, optimize circulation, and create room layouts that fit the home.",
+ tags: ["Furniture Layout", "Room Furnishing", "Space Optimization"],
  },
  {
  n: "02",
- title: "AI Code Assistant",
- d: "Code generation for FEA/CFD simulations, CAD scripting, parametric automation and API integrations.",
- tags: ["FEA", "CFD", "API"],
+ title: "Home Robotics",
+ d: "Visualize domestic robots, configure their components, and explore their role in everyday residential spaces.",
+ tags: ["Robot Design", "Home Environment", "3D Visualization"],
  },
  ].map((step, i) => (
  <div key={step.n} style={{ padding: "40px 36px", background: t.raised, borderLeft: i === 1 ? `1px solid ${t.faint}` : "none" }}>
@@ -305,17 +305,17 @@ export default function Bridges() {
  <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E" }} />
  <span style={{ fontSize: 11, color: t.muted, fontFamily: "var(--font-geist-mono),monospace", letterSpacing: "0.06em" }}>
- CrystalStudio.cad.api - v1.0
+ CrystalStudio.design.api - v1.0
  </span>
  </div>
  <pre style={{ margin: 0, fontSize: 12.5, fontFamily: "var(--font-geist-mono),monospace", lineHeight: 1.7, color: t.fg }}>
- <span style={{ color: COBALT }}>&gt;</span> CrystalStudio.cad.api({"{"}
- {"\n"} goal: <span style={{ color: "#22C55E" }}>&quot;generate transmission housing automation&quot;</span>,
- {"\n"} studio: <span style={{ color: "#22C55E" }}>&quot;SolidWorks / Fusion 360&quot;</span>,
- {"\n"} output: <span style={{ color: "#22C55E" }}>&quot;Python CAD script + STEP export&quot;</span>,
+ <span style={{ color: COBALT }}>&gt;</span> CrystalStudio.design.api({"{"}
+ {"\n"} goal: <span style={{ color: "#22C55E" }}>&quot;create a modern 3-bedroom house&quot;</span>,
+ {"\n"} studio: <span style={{ color: "#22C55E" }}>&quot;Architecture / Interior Design&quot;</span>,
+ {"\n"} output: <span style={{ color: "#22C55E" }}>&quot;3D design model + floor plan export&quot;</span>,
  {"\n"}
  {"}"}){"\n"}
- <span style={{ color: t.muted }}>{"// read CAD constraints - mapped parameters - wrote automation plan - 200ms"}</span>
+ <span style={{ color: t.muted }}>{"// read room requirements - mapped dimensions - created design plan - 200ms"}</span>
  </pre>
  </div>
  </div>
@@ -324,7 +324,7 @@ export default function Bridges() {
  <section style={{ padding: "96px 0", borderTop: `1px solid ${t.faint}` }}>
  <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
  <h2 style={{ fontSize: "clamp(40px,6vw,80px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.95, margin: 0, fontStretch: "86%" }}>
- Machinery, CNC, and CAD.<br />
+ Architecture, interiors, and robotics.<br />
  <span style={{ color: COBALT, fontStyle: "italic" }}>One agent.</span>
  </h2>
  <div style={{ marginTop: 40, display: "inline-flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>

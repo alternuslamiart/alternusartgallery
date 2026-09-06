@@ -88,7 +88,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  <span className="crystal-glass-brand" style={{ color: fg }}>Crystal</span>
  </Link>
  <nav className="hidden md:flex crystal-glass-links" style={{ alignItems: "center", gap: 12 }}>
- {[{ l: "Platform", h: "/platform/overview" }, { l: "CAD Studios", h: "/platform/bridges" }, { l: "Company", h: "/about" }, { l: "Pricing", h: "/pricing" }].map((i) => (
+ {[{ l: "Platform", h: "/platform/overview" }, { l: "Design Studios", h: "/platform/bridges" }, { l: "Company", h: "/about" }, { l: "Pricing", h: "/pricing" }].map((i) => (
  <Link key={i.l} href={i.h} className={pathname === i.h ? "is-active" : undefined} style={{ fontSize: 13, color: muted, fontWeight: 500, textDecoration: "none", letterSpacing: "-0.01em" }}>{i.l}</Link>
  ))}
  </nav>
@@ -118,20 +118,20 @@ export function CoreforgeFooter({ isDark, fg, muted, faint }: Pick<ReturnType<ty
  const cols = [
  { heading: "Platform", links: [
  { l: "Overview", h: "/platform/overview", ext: false },
- { l: "CAD Studios", h: "/platform/bridges", ext: false },
+ { l: "Design Studios", h: "/platform/bridges", ext: false },
  { l: "AI Code Assistant", h: "/platform/agent-sdk", ext: false },
  { l: "API Reference", h: "/platform/api", ext: true },
  { l: "Changelog", h: "/platform/changelog", ext: false },
  { l: "Status", h: "/platform/status", ext: false },
  ]},
- { heading: "Engineering", links: [
+ { heading: "Design", links: [
  { l: "Launch Studio", h: "/crystal", ext: true },
  { l: "Download Desktop App", h: "/download", ext: false },
- { l: "3D Machinery", h: "/workspace/files", ext: false },
- { l: "Automotive", h: "/workspace/code", ext: false },
- { l: "CNC / CAM", h: "/workspace/knowledge", ext: false },
- { l: "Aerospace", h: "/workspace/voice", ext: false },
- { l: "CAD Assets", h: "/workspace/mail", ext: false },
+ { l: "Architecture", h: "/workspace/files", ext: false },
+ { l: "Interior Design", h: "/workspace/code", ext: false },
+ { l: "Furniture Planner", h: "/workspace/knowledge", ext: false },
+ { l: "Home Robotics", h: "/workspace/voice", ext: false },
+ { l: "Design Library", h: "/workspace/mail", ext: false },
  ]},
  { heading: "Company", links: [
  { l: "About", h: "/about", ext: false },

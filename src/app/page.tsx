@@ -10,24 +10,24 @@ import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 const surfaces = [
  {
  n: "01",
- title: "3D Machinery",
- description: "Engine, transmission, hydraulic, pneumatic, and industrial machinery design in one focused production surface.",
+ title: "Architecture & Floor Plans",
+ description: "Create house plans, building layouts, room configurations, and precise architectural documentation in one focused studio.",
  Icon: Layers3,
  href: "/crystal",
  cta: "Launch Studio",
  },
  {
  n: "02",
- title: "AI Code Assistant",
- description: "Generate CAD scripts, simulation helpers, parametric automation, and API integrations for engineering workflows.",
+ title: "AI Design Assistant",
+ description: "Turn a brief into floor plans, interior concepts, furniture layouts, and presentation-ready 3D designs.",
  Icon: Code2,
  href: "/workspace/code",
  cta: "Open Assistant",
  },
  {
  n: "03",
- title: "CAD Studio Flow",
- description: "Work across SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD, and connected 3D studios.",
+ title: "Home Robotics",
+ description: "Design and visualize helpful household robots in the rooms and environments where they will live.",
  Icon: Cuboid,
  href: "/platform/bridges",
  cta: "View Studios",
@@ -35,31 +35,31 @@ const surfaces = [
 ];
 
 const metrics = [
- { label: "Core focus", value: "3D", detail: "machinery, engines, vehicles, and industrial systems" },
- { label: "Engineering tracks", value: "06", detail: "mechanical, automotive, aerospace, CNC, CAD studio, and code/API" },
- { label: "CAD coverage", value: "All", detail: "major CAD studios, CAM tools, and parametric automation" },
+ { label: "Core focus", value: "3D", detail: "architecture, interiors, furniture, and intelligent homes" },
+ { label: "Design areas", value: "05", detail: "architecture, interiors, furniture, visualization, and home robotics" },
+ { label: "Design coverage", value: "All", detail: "floor plans, 3D models, materials, layouts, and documentation" },
 ];
 
 const workflow = [
  {
- title: "Start with the machine brief",
- copy: "Describe the engine, vehicle part, CNC workflow, drone frame, hydraulic system, or industrial assembly.",
+ title: "Start with a design brief",
+ copy: "Describe the home, apartment, room, furniture layout, or household robot you want to create.",
  },
  {
- title: "Shape the engineering plan",
- copy: "Crystal Studio keeps CAD context, constraints, assemblies, materials, and next actions organized across the build.",
+ title: "Shape the design plan",
+ copy: "Crystal Studio keeps rooms, dimensions, materials, furnishings, and next actions organized across the project.",
  },
  {
- title: "Move into production",
- copy: "Continue into CAD scripting, FEA/CFD support, CAM planning, exports, and project status without losing context.",
+ title: "Visualize and share",
+ copy: "Move from floor plans to 3D views, renderings, architectural drawings, exports, and project status without losing context.",
  },
 ];
 
 const controls = [
- { title: "Mechanical scope", copy: "Engines, transmissions, hydraulic and pneumatic systems stay organized by assemblies and constraints." },
- { title: "Vehicle systems", copy: "Body, chassis, suspension, braking, motorcycle, truck, and EV work stays tied to the same project." },
- { title: "Industrial output", copy: "CNC, CAM, G-code, toolpaths, milling, turning, and export tasks remain easy to track." },
- { title: "Studio coverage", copy: "SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD, and code/API work fit the same flow." },
+ { title: "Architecture", copy: "Walls, doors, windows, stairs, roofs, dimensions, and building elements stay organized by space." },
+ { title: "Interior design", copy: "Furniture, lighting, materials, finishes, and decoration remain tied to each room and layout." },
+ { title: "Home planning", copy: "Space optimization, furniture placement, floor-plan generation, and exports remain easy to track." },
+ { title: "Design workflow", copy: "3D models, floor plans, visualizations, design libraries, and documentation fit the same flow." },
 ];
 
 function ActionLink({
@@ -113,9 +113,9 @@ export default function HomePage() {
  {(t) => (
  <>
  <section className="crystal-first-sector">
- <p>One AI workspace for machinery, engines, vehicles, CNC, industrial CAD, and engineering code automation.</p>
- <div className="crystal-first-card"><div><h1>Turn Ideas Into Reality</h1><p>We transform complex ideas into intelligent 3D designs, automated systems, and precision-engineered solutions. From concept to CAD, Crystal Studio combines AI, engineering, and advanced visualization to turn ambitious ideas into real-world innovation.</p><div><ActionLink href="/crystal">Launch Studio <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">Download App</ActionLink></div></div><div className="crystal-first-image"><Image src="/Section/architectresectionone.png" alt="Futuristic architectural concept" fill priority sizes="(max-width: 700px) 100vw, 55vw" /></div></div>
- <div className="crystal-first-chips">{["3D machinery", "Engines", "Automotive", "CAD", "All CAD studios"].map((item) => <span key={item}>{item}</span>)}</div>
+ <p>Design spaces. Visualize ideas. Build intelligent environments.</p>
+ <div className="crystal-first-card"><div><h1>Design the way people live.</h1><p>Crystal combines AI, architecture, interior design, and advanced 3D visualization to turn a home brief into thoughtful spaces, beautiful interiors, and intelligent environments.</p><div><ActionLink href="/crystal">Launch Studio <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">Download App</ActionLink></div></div><div className="crystal-first-image"><Image src="/Section/architectresectionone.png" alt="Architectural concept" fill priority sizes="(max-width: 700px) 100vw, 55vw" /></div></div>
+ <div className="crystal-first-chips">{["Architecture", "Interior Design", "Furniture Planner", "3D Visualization", "Home Robotics"].map((item) => <span key={item}>{item}</span>)}</div>
  </section>
 
  <section data-crystal-reveal style={{ padding: "42px 0 92px" }}>
@@ -148,7 +148,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <FeatureShowcase title="VR Headset VR Goggles" image="/Section/section1.png" copy="Explore immersive engineering concepts through detailed technical drawings, 3D visualization, specifications, and precision-focused design documentation." />
+ <FeatureShowcase title="Visualize Every Room" image="/Section/section1.png" copy="Explore architectural concepts through floor plans, interior layouts, 3D visualization, materials, lighting, and clear design documentation." />
 
  <section data-crystal-reveal style={{ padding: "94px 0", borderTop: `1px solid ${t.faint}`, borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
@@ -158,12 +158,12 @@ export default function HomePage() {
  WHAT CRYSTAL STUDIO DOES
  </div>
  <h2 style={{ fontSize: "clamp(38px,6vw,72px)", fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 0.94, margin: 0, fontStretch: "84%" }}>
- 3D engineering for<br />
- <span style={{ color: COBALT, fontStyle: "italic" }}>machines and vehicles.</span>
+ Design spaces for<br />
+ <span style={{ color: COBALT, fontStyle: "italic" }}>the way people live.</span>
  </h2>
  </div>
  <p style={{ margin: 0, maxWidth: 410, color: t.muted, fontSize: 15, lineHeight: 1.65 }}>
- Built for mechanical engineering, automotive and motorcycle design, aerospace parts, CNC/CAM workflows, CAD studio integration, and code/API automation.
+ Built for architecture, interior design, furniture and space planning, 3D visualization, and home robotics.
  </p>
  </div>
 
@@ -216,7 +216,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <FeatureShowcase reverse title="Build Robot Humanoid" image="/Section/section0.jpg" copy="Develop intelligent humanoid systems with a workspace for robotic mechanisms, digital prototyping, precision assemblies, and advanced engineering context." />
+ <FeatureShowcase reverse title="Design for Home Robotics" image="/Section/section0.jpg" copy="Develop helpful household robots with a workspace for robot configuration, component visualization, residential environments, and human-robot interaction." />
 
  <section data-crystal-reveal style={{ padding: "96px 0" }}>
  <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
@@ -229,7 +229,7 @@ export default function HomePage() {
  From concept to engineered output.
  </h2>
  <p style={{ marginTop: 22, fontSize: 15.5, color: t.muted, maxWidth: 480, lineHeight: 1.65 }}>
- Keep design goals, CAD files, assemblies, generated assets, and review paths tied to the same workspace from first prompt to final output.
+ Keep design goals, floor plans, 3D design models, generated assets, and review paths tied to the same workspace from first prompt to final output.
  </p>
  </div>
  <div style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden", background: t.raised }}>
@@ -279,8 +279,8 @@ export default function HomePage() {
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT }}>WORKSPACE CONTROL</div>
  </div>
  <h2 style={{ fontSize: "clamp(36px,5vw,62px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 0.96, margin: 0, marginBottom: 42, fontStretch: "86%" }}>
- Mechanical production, clear state,<br />
- <span style={{ color: COBALT, fontStyle: "italic" }}>better engineering flow.</span>
+ Design clarity, visual context,<br />
+ <span style={{ color: COBALT, fontStyle: "italic" }}>better living spaces.</span>
  </h2>
  <div className="grid grid-cols-1 gap-0 md:grid-cols-2" style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden" }}>
  {controls.map((item, index) => (
@@ -313,10 +313,10 @@ export default function HomePage() {
  Take Crystal Studio<br /><span style={{ color: COBALT, fontStyle: "italic" }}>beyond the browser.</span>
  </h2>
  <p style={{ margin: "24px 0 0", maxWidth: 620, color: t.muted, fontSize: 17, lineHeight: 1.65 }}>
- The website provides AI-only model generation and concept exploration. Crystal Studio Desktop adds advanced local project workflows, larger files, offline processing, automation tools, and deeper CAD handoff controls.
+ The website provides AI-assisted design generation and concept exploration. Crystal Studio Desktop adds advanced local project workflows, larger files, offline processing, automation tools, and deeper design-documentation controls.
  </p>
  <p style={{ margin: "16px 0 0", maxWidth: 620, color: t.muted, fontSize: 13, lineHeight: 1.6 }}>
- Professional engineering decisions and production-ready outputs must be reviewed and approved by a licensed engineer.
+ Construction-ready documents and regulated building decisions must be reviewed and approved by a qualified professional in the relevant jurisdiction.
  </p>
  <div style={{ marginTop: 30, display: "flex", gap: 12, flexWrap: "wrap", color: t.fg }}>
  <ActionLink href="/download">Download App <Download size={15} /></ActionLink>
@@ -329,7 +329,7 @@ export default function HomePage() {
  <div style={{ textAlign: "right" }}><div style={{ fontSize: 42, lineHeight: 1, fontWeight: 900, color: COBALT }}>$79</div><div style={{ marginTop: 5, fontSize: 11, color: t.muted }}>one-time</div></div>
  </div>
  <div style={{ display: "grid", gap: 16, paddingTop: 24 }}>
- {[{ Icon: Gauge, title: "Advanced desktop engine", description: "Local processing, larger projects, and extended modeling workflows." }, { Icon: HardDrive, title: "Offline project control", description: "Keep project files and engineering references on your workstation." }, { Icon: ShieldCheck, title: "Professional review required", description: "Outputs remain subject to licensed-engineer validation and applicable standards." }].map(({ Icon, title, description }) => (
+ {[{ Icon: Gauge, title: "Advanced desktop studio", description: "Local processing, larger projects, and extended design workflows." }, { Icon: HardDrive, title: "Offline project control", description: "Keep project files and design references on your workstation." }, { Icon: ShieldCheck, title: "Professional review required", description: "Construction-ready outputs remain subject to qualified professional review and applicable standards." }].map(({ Icon, title, description }) => (
  <div key={title} style={{ display: "flex", gap: 14 }}><span style={{ width: 38, height: 38, borderRadius: 10, display: "grid", placeItems: "center", color: COBALT, background: `${COBALT}14` }}><Icon size={18} /></span><div><div style={{ fontSize: 14, fontWeight: 800 }}>{title}</div><div style={{ marginTop: 4, fontSize: 12.5, lineHeight: 1.5, color: t.muted }}>{description}</div></div></div>
  ))}
  </div>
@@ -348,7 +348,7 @@ export default function HomePage() {
  <span style={{ color: COBALT, fontStyle: "italic" }}>Keep machines moving.</span>
  </h2>
  <p style={{ margin: "26px auto 0", maxWidth: 610, color: t.muted, fontSize: 16, lineHeight: 1.65 }}>
- Open the engineering workspace, compare CAD plans, or review CNC, automotive, aerospace, and machinery workflows before production.
+ Open the design workspace, compare floor plans, or review architecture, interiors, furniture layouts, and home-robotics concepts before sharing.
  </p>
  <div style={{ marginTop: 36, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap", color: t.fg }}>
  <ActionLink href="/main">

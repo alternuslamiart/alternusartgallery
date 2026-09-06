@@ -145,21 +145,21 @@ const sidebarRecentItems: GeneratedRecent[] = [
  },
  {
  id:"recent-landing-page",
- title:"Engine automation script",
+ title:"Floor-plan automation script",
  tool:"AI Code Assistant",
- meta:"CAD API",
+ meta:"Design API",
  time:"Yesterday",
  icon: Code2,
- output:"A recent CAD scripting plan with parametric controls, API notes, and simulation helper steps.",
+ output:"A recent floor-plan workflow with parametric room rules, API notes, and visualization steps.",
  },
  {
  id:"recent-game-scene",
- title:"Industrial engine assembly",
+ title:"Modern apartment layout",
  tool:"3D Studio Integration",
- meta:"Mechanical concept",
+ meta:"Interior concept",
  time:"2 days ago",
  icon: Layers3,
- output:"A saved mechanical assembly concept with part hierarchy, materials, constraints, and export checklist.",
+ output:"A saved interior concept with room hierarchy, materials, furniture placement, and an export checklist.",
  },
 ];
 
@@ -242,21 +242,21 @@ const toolWorkspaces: Record<AssistantToolKey, ToolWorkspaceConfig> = {
  code: {
  key:"code",
  href:"/ai-assistant/tools/code",
- title:"AI Code Assistant",
- description:"Generate FEA/CFD simulation code, CAD scripting, parametric automation, and API integrations.",
+ title:"AI Design Assistant",
+ description:"Generate design workflows, floor-plan rules, documentation helpers, and API integrations.",
  icon: Code2,
- placeholder:"Describe the simulation, CAD script, parametric rule, API integration, or automation you want to build...",
+ placeholder:"Describe the floor plan, design rule, documentation helper, API integration, or automation you want to create...",
  actionLabel:"Generate",
  quickActions: [
- { title:"FEA Script", desc:"Draft finite-element setup helpers.", icon: Code2 },
- { title:"CFD Automation", desc:"Prepare flow simulation scripting.", icon: Monitor },
- { title:"Fix CAD Macro", desc:"Debug CAD automation issues.", icon: AlertTriangle },
+ { title:"Floor-plan Rules", desc:"Draft reusable space-planning helpers.", icon: Code2 },
+ { title:"Room Automation", desc:"Prepare room-layout automation.", icon: Monitor },
+ { title:"Fix Design Rule", desc:"Debug design automation issues.", icon: AlertTriangle },
  { title:"Generate API Endpoint", desc:"Create route logic and payloads.", icon: Plug },
  { title:"Explain Existing Code", desc:"Understand scripts and integration patterns.", icon: FileText },
- { title:"Parametric Model Code", desc:"Translate design rules into automation.", icon: PenLine },
+ { title:"Parametric Space Rules", desc:"Translate space rules into automation.", icon: PenLine },
  ],
  selectors: [
- { label:"Project type", options: ["FEA","CFD","CAD Script","API","Automation"] },
+ { label:"Project type", options: ["Floor Plan","Design Rules","Documentation","API","Automation"] },
  { label:"Tech stack", options: ["Python","JavaScript","TypeScript","C#","Go","Rust"] },
  ],
  previewTabs: ["Plan","Code","Preview"],
@@ -266,50 +266,50 @@ const toolWorkspaces: Record<AssistantToolKey, ToolWorkspaceConfig> = {
  blender: {
  key:"blender",
  href:"/ai-assistant/tools/blender",
- title:"3D Studio Integration",
- description:"Create mechanical assets across SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD, and more.",
+ title:"3D Design Studio",
+ description:"Create architectural models, interior layouts, furniture plans, and home-robot visualizations in 3D.",
  icon: Layers3,
- placeholder:"Describe the machine part, assembly, CAD studio, material, constraint, or export workflow you want to create...",
+ placeholder:"Describe the building, room, furniture layout, material, home robot, or export workflow you want to create...",
  actionLabel:"Create",
  quickActions: [
- { title:"Engine Assembly", desc:"Generate a focused mechanical brief.", icon: Box },
- { title:"Transmission Model", desc:"Stage parts and constraints.", icon: Grid2X2 },
- { title:"Industrial Machinery", desc:"Shape machine systems and modules.", icon: Sparkles },
- { title:"Material Setup", desc:"Define metals, finishes, and surfaces.", icon: ImageIcon },
- { title:"CAD Studio Setup", desc:"Prepare studio-specific workflow notes.", icon: Monitor },
+ { title:"Floor Plan", desc:"Generate a focused architectural brief.", icon: Box },
+ { title:"Room Layout", desc:"Stage rooms, furniture, and dimensions.", icon: Grid2X2 },
+ { title:"Home Robot", desc:"Shape a robot for residential spaces.", icon: Sparkles },
+ { title:"Material Setup", desc:"Define finishes, textures, and surfaces.", icon: ImageIcon },
+ { title:"Design Studio Setup", desc:"Prepare studio-specific workflow notes.", icon: Monitor },
  { title:"Export Asset", desc:"Package assets for delivery.", icon: Download },
  ],
  selectors: [
- { label:"Asset type", options: ["Engine","Transmission","Hydraulics","Machinery","Vehicle"] },
- { label:"CAD studio", options: ["SolidWorks","Fusion 360","CATIA","Rhino 3D","NX","FreeCAD"] },
+ { label:"Asset type", options: ["Floor Plan","Interior","Furniture","Home Robot","Building"] },
+ { label:"Design workspace", options: ["Architecture","Interior Design","Furniture Planner","3D Visualization","Home Robotics"] },
  { label:"Output format", options: ["BLEND","FBX","OBJ","GLB"] },
  ],
  previewType:"blender",
- emptyState:"Your mechanical 3D preview or generated asset will appear here.",
+ emptyState:"Your architectural 3D preview or generated design will appear here.",
  },
  autocad: {
  key:"autocad",
  href:"/ai-assistant/tools/autocad",
- title:"Automotive & Motorcycles",
- description:"Design body, chassis, suspension, braking systems, cars, trucks, motorcycles, and electric vehicles.",
+ title:"Architecture & Interior",
+ description:"Design rooms, walls, doors, windows, furniture layouts, lighting, and complete home interiors.",
  icon: PenLine,
- placeholder:"Describe the vehicle body, chassis, suspension, braking system, motorcycle, truck, or EV component you want to create...",
+ placeholder:"Describe the house plan, room layout, kitchen, furniture arrangement, lighting, or building element you want to create...",
  actionLabel:"Draft",
  quickActions: [
- { title:"Car Body Model", desc:"Start a clean body design plan.", icon: PenLine },
- { title:"Chassis Layout", desc:"Draft frame geometry and dimensions.", icon: Grid2X2 },
- { title:"Suspension Setup", desc:"Organize suspension geometry.", icon: Layers3 },
- { title:"Brake System", desc:"Prepare measurements and clearances.", icon: Monitor },
- { title:"Motorcycle Frame", desc:"Review imported CAD structure.", icon: FileText },
- { title:"Export CAD Files", desc:"Package drawings for delivery.", icon: Upload },
+ { title:"House Plan", desc:"Start a clear architectural layout.", icon: PenLine },
+ { title:"Room Layout", desc:"Draft room geometry and dimensions.", icon: Grid2X2 },
+ { title:"Furniture Placement", desc:"Organize furniture and circulation.", icon: Layers3 },
+ { title:"Lighting Design", desc:"Prepare lighting zones and ambience.", icon: Monitor },
+ { title:"Architectural Drawing", desc:"Review imported drawing structure.", icon: FileText },
+ { title:"Export Design Files", desc:"Package drawings for delivery.", icon: Upload },
  ],
  selectors: [
- { label:"System type", options: ["Body","Chassis","Suspension","Braking","EV System"] },
+ { label:"Design type", options: ["Floor Plan","Interior","Furniture","Lighting","Home Robot"] },
  { label:"Units", options: ["Millimeters","Centimeters","Meters","Inches","Feet"] },
- { label:"Layer options", options: ["Standard","Mechanical","Electrical","Hydraulic","Custom"] },
+ { label:"Layer options", options: ["Standard","Architecture","Furniture","Lighting","Custom"] },
  ],
  previewType:"autocad",
- emptyState:"Your automotive CAD preview will appear here.",
+ emptyState:"Your architectural drawing or interior preview will appear here.",
  },
 };
 
@@ -1168,7 +1168,7 @@ function getModalContent(modal: StudioModalKey) {
 "upload-document": { title:"Upload document", description:"Attach PDFs, docs, text files, and markdown documents.", action:"Upload document", success:"Document added"},
 "prompt-editor": { title:"Create prompt", description:"Save a reusable prompt template for future workflows.", action:"Save prompt", success:"Prompt saved"},
 "project-create": { title:"Create project", description:"Create a project container for generated outputs and assets.", action:"Create project", success:"Project created"},
-"asset-upload": { title:"Upload asset", description:"Add images, 3D models, CAD files, documents, or generated outputs.", action:"Upload asset", success:"Asset uploaded"},
+"asset-upload": { title:"Upload asset", description:"Add images, 3D design models, floor plans, documents, or generated outputs.", action:"Upload asset", success:"Asset uploaded"},
 "voice-dictation": { title:"Voice dictation", description:"Speak directly into the composer and turn speech into a clean prompt draft.", action:"Start dictation", success:"Voice dictation ready"},
 "voice-speak": { title:"Voice Speak", description:"Open a focused voice frame for hands-free conversation with Crystal Studio.", action:"Start voice", success:"Voice Speak ready"},
  support: { title:"Contact support", description:"Send a short support request from your workspace.", action:"Send request", success:"Support request sent"},
@@ -1181,9 +1181,9 @@ function SearchFrame({ onClose }: { onClose: () => void }) {
  const searchTargets = [
  ...studioNavigation.map((item) => ({ title: item.label, desc: "Open studio workspace", href: item.href, icon: item.icon })),
  ...bottomNavigation.map((item) => ({ title: item.label, desc: "Open workspace settings area", href: item.href, icon: item.icon })),
- { title:"AI Code Assistant", desc:"Open guided engineering code assistant", href:"/ai-assistant/tools/code", icon: Code2 },
- { title:"3D Studio Integration", desc:"Open guided mechanical 3D assistant", href:"/ai-assistant/tools/blender", icon: Layers3 },
- { title:"Automotive & Motorcycles", desc:"Open guided vehicle CAD assistant", href:"/ai-assistant/tools/autocad", icon: PenLine },
+ { title:"AI Design Assistant", desc:"Open guided design workflow assistant", href:"/ai-assistant/tools/code", icon: Code2 },
+ { title:"3D Design Studio", desc:"Open guided architecture and interior assistant", href:"/ai-assistant/tools/blender", icon: Layers3 },
+ { title:"Architecture & Interior", desc:"Open guided floor-plan and interior assistant", href:"/ai-assistant/tools/autocad", icon: PenLine },
  { title:"Workspace Files", desc:"Open file workspace", href:"/workspace/files", icon: Folder },
  ];
  const normalizedQuery = query.trim().toLowerCase();
@@ -1237,7 +1237,7 @@ function SearchFrame({ onClose }: { onClose: () => void }) {
 }
 
 function UploadFrame({ kind }: { kind:"file"|"image"|"document"|"asset"}) {
- const label = kind ==="image"?"PNG, JPG, WEBP": kind ==="document"?"PDF, DOCX, TXT, MD": kind ==="asset"?"Images, 3D models, CAD files, documents":"Any supported workspace file";
+ const label = kind ==="image"?"PNG, JPG, WEBP": kind ==="document"?"PDF, DOCX, TXT, MD": kind ==="asset"?"Images, 3D models, floor plans, documents":"Any supported workspace file";
  return (
  <div className="mt-5 rounded-2xl border border-dashed border-[#CFE8F8] bg-[#FAFCFD] p-6 text-center">
  <Upload className="mx-auto h-7 w-7 text-[#4A9BFF]"/>
@@ -1989,11 +1989,11 @@ function OverviewPage() {
  const pipeline = [
  { name:"Engine housing concept", type:"3D", owner:"AI Assistant", status:"Review", progress:78 },
  { name:"FEA helper script", type:"Code", owner:"AI Code Assistant", status:"Building", progress:64 },
- { name:"Industrial machinery assembly", type:"3D", owner:"3D Studio Integration", status:"Ready", progress:92 },
+ { name:"Modern apartment layout", type:"3D", owner:"3D Design Studio", status:"Ready", progress:92 },
  ];
  const modules = [
  { label:"AI Assistant", desc:"Start directed workspace tasks.", icon: Sparkles, action: () => router.push("/ai-assistant") },
- { label:"3D Machinery", desc:"Design engines and industrial systems.", icon: Monitor, action: () => router.push("/cedium-design") },
+ { label:"Architecture", desc:"Design floor plans and building layouts.", icon: Monitor, action: () => router.push("/cedium-design") },
  { label:"Automotive & Motorcycles", desc:"Draft vehicle systems and parts.", icon: PenLine, action: () => router.push("/autocad-design") },
  { label:"AI Code Assistant", desc:"Prepare scripts and API automation.", icon: Code2, action: () => router.push("/code-builder") },
  ];
@@ -2321,7 +2321,7 @@ function CoreforgeDesignPage() {
  <div>
  <PageHeader
  title="3D Machinery"
- subtitle="Design engines, transmissions, hydraulic and pneumatic systems, and industrial machinery in the Crystal Studio workspace."
+ subtitle="Design building layouts, floor plans, rooms, furniture, and residential environments in the Crystal Studio workspace."
  action={<PrimaryButton icon={Sparkles} onClick={() => projectInputRef.current?.focus()}>Create machinery plan</PrimaryButton>}
  />
 
@@ -2333,7 +2333,7 @@ function CoreforgeDesignPage() {
  </div>
  <div>
  <p className={`text-[13px] font-semibold ${strong}`}>New machinery plan</p>
- <p className={`text-[11px] ${muted}`}>Engines, hydraulics, industrial CAD</p>
+ <p className={`text-[11px] ${muted}`}>Floor plans, interiors, 3D design</p>
  </div>
  </div>
 
@@ -2390,7 +2390,7 @@ function CoreforgeDesignPage() {
  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
  <div>
  <p className={`text-[13px] font-semibold ${strong}`}>Machinery plans</p>
- <p className={`mt-1 text-[11px] ${muted}`}>Recent mechanical systems generated with Crystal Studio AI.</p>
+ <p className={`mt-1 text-[11px] ${muted}`}>Recent architectural and interior concepts generated with Crystal AI.</p>
  </div>
  <div className={`flex rounded-2xl p-1 ${dark ?"bg-[#181B20]":"bg-[#EEF3F7]"}`}>
  {(["Recent","Your designs","Design systems"] as const).map((tab) => (
@@ -2423,17 +2423,17 @@ function CoreforgeDesignPage() {
  value={brief}
  onChange={(event) => setBrief(event.target.value)}
  className={`mt-3 min-h-[118px] w-full resize-none rounded-2xl border p-4 text-[13px] outline-none ${dark ?"border-[rgba(255,255,255,0.08)] bg-[#181B20] text-[#F4F6F8] placeholder:text-[#6F7782]":"border-[#E5EAF0] bg-white text-[#171717] placeholder:text-[#A1A7B0]"}`}
- placeholder="Describe the engine, transmission, hydraulic system, pneumatic system, or industrial machine you want Crystal Studio to create..."
+ placeholder="Describe the home, floor plan, room layout, furniture arrangement, or home robot you want Crystal Studio to create..."
  />
  <div className="mt-3 flex flex-wrap gap-2">
- {["Engine assembly","Hydraulics","Pneumatics","Industrial machine"].map((chip) => (
+ {["Floor plan","Living room","Furniture layout","Home robot"].map((chip) => (
  <button key={chip} type="button"onClick={() => handleBriefChip(chip)} className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold ${briefTags.includes(chip) ?"border-[#9BD2FF] bg-[#EEF7FF] text-[#171717]": dark ?"border-[rgba(255,255,255,0.08)] bg-[#202328] text-[#A8B0BA]":"border-[#E5EAF0] bg-[#FAFCFD] text-[#4B5563]"}`}>{chip}</button>
  ))}
  </div>
  </div>
 
  <div className={`rounded-[28px] border p-4 ${shell}`}>
- <p className={`text-[13px] font-semibold ${strong}`}>Engineering system</p>
+ <p className={`text-[13px] font-semibold ${strong}`}>Design system</p>
  <div className="mt-4 space-y-3">
  {[
  ["Color","colorPreset", designSystem.colorPreset,"#4A9BFF"],
