@@ -6,7 +6,7 @@
   --crystal-left-width: 300px;
   --crystal-right-width: 318px;
   grid-template-columns: var(--crystal-left-width) minmax(0, 1fr) var(--crystal-right-width);
-  grid-template-rows: 64px minmax(0, 1fr);
+  grid-template-rows: 72px minmax(0, 1fr);
   font-family: var(--font-roboto), Roboto, system-ui, sans-serif;
   background: #191919;
 }
@@ -22,7 +22,7 @@
 .crystal-right-panel {
   outline: none !important;
 }
-@media (min-width: 701px) {.crystal-studio{column-gap:0;padding-inline:0}.crystal-studio>header{margin-inline:0}.crystal-left-panel,.crystal-right-panel,.crystal-studio>section{margin-block:0;border:1px solid #353535!important;border-radius:12px;box-shadow:none;overflow:hidden}.crystal-left-panel{margin-left:0}.crystal-right-panel{margin-right:0}.crystal-studio>section{background:#292929}.crystal-studio>footer{margin-inline:0}}
+@media (min-width: 701px) {.crystal-studio{column-gap:0;padding-inline:0}.crystal-studio>header{margin-inline:0}.crystal-left-panel,.crystal-right-panel,.crystal-studio>section{margin-block:0;border:1px solid #0C8CE9!important;border-radius:18px;box-shadow:none;overflow:hidden}.crystal-left-panel{margin-left:8px;margin-top:12px}.crystal-right-panel{margin-right:8px;margin-top:12px}.crystal-studio>section{background:#292929;border-color:#353535!important}.crystal-studio>footer{margin-inline:0}}
 .crystal-studio.crystal-left-closed { --crystal-left-width: 0px; }
 .crystal-studio.crystal-right-closed { --crystal-right-width: 0px; }
 
@@ -85,7 +85,7 @@
 
 @media (max-width: 1023px) {
   .crystal-studio { grid-template-columns: minmax(0, 1fr); }
-  .crystal-left-panel, .crystal-right-panel { position: absolute; z-index: 40; top: 64px; bottom: 0; width: min(318px, 88vw); box-shadow: 0 10px 35px rgba(0,0,0,.45); }
+  .crystal-left-panel, .crystal-right-panel { position: absolute; z-index: 40; top: 72px; bottom: 0; width: min(318px, 88vw); box-shadow: 0 10px 35px rgba(0,0,0,.45); }
   .crystal-left-panel { left: 0; }
   .crystal-right-panel { right: 0; }
   .crystal-studio > section { grid-column: 1; }
