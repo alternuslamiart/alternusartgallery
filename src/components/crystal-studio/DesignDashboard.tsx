@@ -161,7 +161,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
           </header>
 
           <div className="mx-auto max-w-[1080px] px-4 py-8 md:px-8 lg:py-10">
-            <section className="rounded-[30px] bg-[#171717] p-5 shadow-[0_35px_90px_rgba(0,0,0,0.5)] md:p-8">
+            <section className="rounded-[30px] bg-[#171717] p-5 md:p-8">
               <div className="flex flex-col items-center text-center">
                 <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-[9px] font-medium uppercase tracking-[0.22em] text-violet-200">
                   <Sparkles size={11} />
@@ -180,7 +180,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                 </p>
               </div>
 
-              <div className="mt-8 rounded-[30px] bg-[#171717] p-3 shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_25px_70px_rgba(100,92,255,0.12)] md:p-4">
+              <div className="mt-8 rounded-[30px] bg-[#171717] p-3 md:p-4">
                 <div className="flex items-start gap-3 rounded-[22px] bg-[#1B1B1B] p-3 md:p-4">
                   <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/25 to-sky-500/20 text-violet-200 ring-1 ring-violet-400/25">
                     <Sparkles size={18} />
@@ -313,4 +313,3 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
     </div>
   );
 }
-
