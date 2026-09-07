@@ -180,8 +180,9 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                 </p>
               </div>
 
-              <div className="mt-8 rounded-[30px] bg-[#171717] p-3 md:p-4">
-                <div className="flex items-start gap-3 rounded-[22px] bg-[#1B1B1B] p-3 md:p-4">
+              <div className="mt-8 flex justify-center">
+                <div className="w-full max-w-[487px] rounded-[22px] bg-gradient-to-r from-[#0C8CE9] via-[#7C5CFF] to-[#F58B9D] p-px">
+                  <div className="flex h-[120px] items-start gap-3 rounded-[21px] bg-[#1B1B1B] p-3 md:p-4">
                   <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/25 to-sky-500/20 text-violet-200 ring-1 ring-violet-400/25">
                     <Sparkles size={18} />
                   </div>
@@ -196,12 +197,14 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
 
                   <button
                     onClick={submit}
-                    className="ml-auto mt-auto inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-500 px-4 py-3 text-sm font-semibold text-white shadow-[0_16px_32px_rgba(108,93,255,0.42)] transition hover:brightness-110 disabled:opacity-50"
+                    aria-label="Generate design"
+                    className="ml-auto mt-auto inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0C8CE9] text-white shadow-[0_8px_18px_rgba(12,140,233,0.35)] transition hover:bg-[#0A7DCE] disabled:opacity-50"
                   >
-                    Generate
                     <ChevronRight size={16} />
                   </button>
+                  </div>
                 </div>
+              </div>
 
                 <div className="mt-4 flex flex-wrap gap-2">
                   {[
@@ -219,7 +222,6 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                     </button>
                   ))}
                 </div>
-              </div>
             </section>
 
             <section className="mt-10">
