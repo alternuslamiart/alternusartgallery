@@ -144,7 +144,7 @@ We build Crystal Studio so teams can operate an AI design workspace with clear n
  If you experience any difficulty accessing any part of our website, desktop application, or studio, we want to hear from you. Your feedback helps us make Crystal Studio accessible to everyone.
  </p>
  <Link
- href="/help-center"
+ href="/contact"
  className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors text-sm sm:text-base"
  >
  Contact Support
@@ -165,7 +165,7 @@ We build Crystal Studio so teams can operate an AI design workspace with clear n
  <div className="flex gap-6">
  <Link href="/privacy" className="hover:text-gray-700 transition-colors">Privacy Policy</Link>
  <Link href="/terms" className="hover:text-gray-700 transition-colors">Terms of Service</Link>
- <Link href="/help-center" className="hover:text-gray-700 transition-colors">Support</Link>
+ <Link href="/contact" className="hover:text-gray-700 transition-colors">Support</Link>
  </div>
  </div>
  </div>

@@ -88,8 +88,7 @@ export type StudioRouteKey =
  |"prompt-lab"
  |"projects"
  |"exports"
- |"settings"
- |"help-center";
+ |"settings";
 
 type NavItem = {
  key: StudioRouteKey;
@@ -117,7 +116,6 @@ export const studioNavigation: NavItem[] = [
 
 const bottomNavigation = [
  { key:"settings"as const, label:"Settings", href:"/settings", icon: Settings },
- { key:"help-center"as const, label:"Help Center", href:"/help-center", icon: AlertTriangle },
 ];
 
 const assistantRailSections = [
@@ -176,7 +174,6 @@ const routeByPath: Record<string, StudioRouteKey> = {
 "/projects":"projects",
 "/exports":"exports",
 "/settings":"settings",
-"/help-center":"help-center",
 "/ai-assistant/tools/code":"ai-assistant",
 "/ai-assistant/tools/blender":"ai-assistant",
 "/ai-assistant/tools/autocad":"ai-assistant",
@@ -1614,8 +1611,6 @@ function StudioContent({ route, assistantTool }: { route: StudioRouteKey; assist
  return <ExportsPage />;
  case"settings":
  return <SettingsPage />;
- case"help-center":
- return <HelpCenterPage />;
  case"ai-assistant":
  default:
  if (assistantTool) return <ToolWorkspace config={toolWorkspaces[assistantTool]} />;
@@ -6187,35 +6182,6 @@ function VoiceSettingRow() {
  </button>
  <SettingSelectValue value="Arbor"/>
  </div>
- </div>
- );
-}
-
-function HelpCenterPage() {
- const { openDrawer, openModal } = useStudioActions();
-
- return (
- <div>
- <PageHeader title="Help Center"subtitle="Find help articles and contact support."/>
- <div className="mb-5 flex h-11 items-center gap-2 rounded-2xl border border-[#E5E7EB] bg-[#FCFDFE] px-4">
- <Search className="h-4 w-4 text-[#9CA3AF]"/>
- <input className="min-w-0 flex-1 bg-transparent text-[13px] outline-none placeholder:text-[#A1A7B0]"placeholder="Search help..."/>
- </div>
- <div className="grid gap-3 md:grid-cols-3">
- {["How do imports work?","Where are exports saved?","How do I manage workspaces?"].map((question) => (
- <ClickableSoftCard key={question} onClick={() => openDrawer("help-preview")} ariaLabel={`Open help article ${question}`}>
- <p className="text-[12px] font-semibold text-[#171717]">{question}</p>
- <p className="mt-2 text-[11px] leading-5 text-[#6B7280]">FAQ card placeholder with concise support guidance.</p>
- </ClickableSoftCard>
- ))}
- </div>
- <SoftCard className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
- <div>
- <p className="text-[13px] font-semibold text-[#171717]">Contact support</p>
- <p className="mt-1 text-[11px] text-[#6B7280]">Support request placeholder for the Personal workspace.</p>
- </div>
- <SecondaryButton onClick={() => openModal("support")}>Open support</SecondaryButton>
- </SoftCard>
  </div>
  );
 }

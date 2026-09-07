@@ -1,5 +1,5 @@
-import { StudioRoutePage } from "@/components/studio/studio-shell";
+import { notFound } from "next/navigation";
 
 export default function HelpCenterPage() {
- return <StudioRoutePage route="help-center" />;
+ notFound();
 }
