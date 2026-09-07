@@ -7,7 +7,8 @@
   --crystal-right-width: 318px;
   grid-template-columns: var(--crystal-left-width) minmax(0, 1fr) var(--crystal-right-width);
   grid-template-rows: 64px minmax(0, 1fr);
-  font-family: Inter, var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-roboto), Roboto, system-ui, sans-serif;
+  background: #191919;
 }
 
 .crystal-studio > header { grid-column: 1 / -1; }
@@ -21,13 +22,7 @@
 .crystal-right-panel {
   outline: none !important;
 }
-.crystal-studio > header,
-.crystal-left-panel,
-.crystal-studio > section,
-.crystal-right-panel {
-  border: 6px solid #1687f7 !important;
-}
-@media (min-width: 701px) {.crystal-studio{column-gap:0;padding-inline:0}.crystal-studio>header{margin-inline:0}.crystal-left-panel,.crystal-right-panel,.crystal-studio>section{margin-block:0;border:1px solid #353535!important;border-radius:16px;box-shadow:none;overflow:hidden}.crystal-left-panel{margin-left:0}.crystal-right-panel{margin-right:0}.crystal-studio>section{background:#292929}.crystal-studio>footer{margin-inline:0}}
+@media (min-width: 701px) {.crystal-studio{column-gap:0;padding-inline:0}.crystal-studio>header{margin-inline:0}.crystal-left-panel,.crystal-right-panel,.crystal-studio>section{margin-block:0;border:1px solid #353535!important;border-radius:12px;box-shadow:none;overflow:hidden}.crystal-left-panel{margin-left:0}.crystal-right-panel{margin-right:0}.crystal-studio>section{background:#292929}.crystal-studio>footer{margin-inline:0}}
 .crystal-studio.crystal-left-closed { --crystal-left-width: 0px; }
 .crystal-studio.crystal-right-closed { --crystal-right-width: 0px; }
 
@@ -44,6 +39,19 @@
     linear-gradient(90deg, rgba(71, 71, 71, .72) 1px, transparent 1px);
   background-size: 68px 68px;
   background-position: center center;
+}
+.crystal-left-panel,
+.crystal-right-panel {
+  scrollbar-width: thin;
+  scrollbar-color: #454545 transparent;
+}
+.crystal-left-panel button,
+.crystal-right-panel button,
+.crystal-left-panel select,
+.crystal-right-panel select,
+.crystal-left-panel input,
+.crystal-right-panel input {
+  font-family: inherit;
 }
 @keyframes crystal-studio-enter { from { opacity: 0; transform: scale(.992); } to { opacity: 1; transform: scale(1); } }
 .crystal-studio-enter { animation: crystal-studio-enter 260ms cubic-bezier(.2,.8,.2,1) both; }
