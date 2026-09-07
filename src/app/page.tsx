@@ -126,7 +126,7 @@ export default function HomePage() {
  key={metric.label}
  style={{
  padding: 28,
- border: `1px solid ${t.faint}`,
+ border: "0",
  borderRadius: 12,
  background: t.raised,
  minHeight: 210,
@@ -176,7 +176,7 @@ export default function HomePage() {
  position: "relative",
  minHeight: 310,
  padding: 30,
- border: `1px solid ${t.faint}`,
+ border: "0",
  borderRadius: 12,
  background: t.raised,
  color: t.fg,
@@ -232,7 +232,7 @@ export default function HomePage() {
  Keep design goals, floor plans, 3D design models, generated assets, and review paths tied to the same workspace from first prompt to final output.
  </p>
  </div>
- <div style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden", background: t.raised }}>
+ <div style={{ border: 0, borderRadius: 12, overflow: "hidden", background: t.raised }}>
  {workflow.map((item, index) => (
  <div
  key={item.title}
@@ -282,7 +282,7 @@ export default function HomePage() {
  Design clarity, visual context,<br />
  <span style={{ color: COBALT, fontStyle: "italic" }}>better living spaces.</span>
  </h2>
- <div className="grid grid-cols-1 gap-0 md:grid-cols-2" style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden" }}>
+ <div className="grid grid-cols-1 gap-0 md:grid-cols-2" style={{ border: 0, borderRadius: 12, overflow: "hidden" }}>
  {controls.map((item, index) => (
  <div
  key={item.title}
@@ -323,7 +323,7 @@ export default function HomePage() {
  <ActionLink href="/pricing" variant="secondary">View all plans</ActionLink>
  </div>
  </div>
- <div style={{ border: `1px solid ${t.faint}`, borderRadius: 24, background: t.raised, padding: 28 }}>
+ <div style={{ border: 0, borderRadius: 24, background: t.raised, padding: 28 }}>
  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 24, paddingBottom: 24, borderBottom: `1px solid ${t.faint}` }}>
  <div><div style={{ fontSize: 12, color: t.muted }}>Crystal Studio Desktop</div><div style={{ marginTop: 8, fontSize: 26, fontWeight: 900 }}>Professional License</div></div>
  <div style={{ textAlign: "right" }}><div style={{ fontSize: 42, lineHeight: 1, fontWeight: 900, color: COBALT }}>$79</div><div style={{ marginTop: 5, fontSize: 11, color: t.muted }}>one-time</div></div>
