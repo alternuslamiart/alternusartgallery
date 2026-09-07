@@ -19,7 +19,8 @@
 .crystal-studio > header,
 .crystal-left-panel,
 .crystal-right-panel {
-  background-color: #0F0F0F !important;
+  background-color: rgba(15, 15, 15, .94) !important;
+  backdrop-filter: blur(1px);
 }
 .crystal-studio > section {
   background-color: #171717 !important;
