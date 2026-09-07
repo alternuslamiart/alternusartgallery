@@ -33,7 +33,7 @@ export function RightPanel(props: Props) {
   const [swatches,setSwatches]=useState(["#4A90D9","#E8793E","#84CC6A"]);
   const [swatchGrid,setSwatchGrid]=useState(true);
   return (
-    <aside className="crystal-right-panel min-h-0 overflow-y-auto border-l border-[#303030] bg-[#202020] px-5 pb-5 pt-4 scrollbar-hide">
+    <aside className="crystal-right-panel min-h-0 overflow-y-auto border-l border-[#303030] bg-[#0F0F0F] px-5 pb-5 pt-4 scrollbar-hide">
       <SectionTitle action={<button aria-label="Collapse right panel" onClick={props.onCollapse} className="sr-only"><Play size={17}/></button>}>Output</SectionTitle>
       <div className="space-y-2">
         <SelectField label="Canvas" value={props.resolution} onChange={(event) => props.onResolutionChange(event.target.value)}><option>1920x1080</option><option>2560x1440</option><option>3840x2160</option><option>7680x4320</option></SelectField>

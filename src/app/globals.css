@@ -8,12 +8,25 @@
   grid-template-columns: var(--crystal-left-width) minmax(0, 1fr) var(--crystal-right-width);
   grid-template-rows: 72px minmax(0, 1fr);
   font-family: var(--font-roboto), Roboto, system-ui, sans-serif;
-  background-color: #191919;
+  background-color: #0F0F0F;
   background-image:
     linear-gradient(#2B2B2B 1px, transparent 1px),
     linear-gradient(90deg, #2B2B2B 1px, transparent 1px);
   background-size: 68px 68px;
   background-position: center center;
+}
+
+.crystal-studio > header,
+.crystal-left-panel,
+.crystal-right-panel {
+  background-color: #0F0F0F !important;
+}
+.crystal-studio > section {
+  background-color: #171717 !important;
+}
+.crystal-studio .crystal-ai-prompt,
+.crystal-studio .crystal-modeling-tools {
+  background-color: #0F0F0F;
 }
 
 .crystal-studio > header { grid-column: 1 / -1; }
@@ -62,7 +75,7 @@
 .crystal-ai-prompt {
   border: 1px solid transparent;
   background:
-    linear-gradient(#202020, #202020) padding-box,
+    linear-gradient(#0F0F0F, #0F0F0F) padding-box,
     linear-gradient(110deg, #1687f7, #54d8a6, #1687f7) border-box;
 }
 .crystal-left-panel,
