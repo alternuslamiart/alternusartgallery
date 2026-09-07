@@ -712,3 +712,55 @@
 .crystal-home-surface:hover { transform: translateY(-7px); border-color: rgba(66,132,255,.85) !important; background: linear-gradient(145deg, rgba(44,67,116,.42), rgba(37,37,37,.98)) !important; box-shadow: 0 20px 38px rgba(0,0,0,.3), 0 0 28px rgba(47,110,255,.22); }
 .crystal-home-surface:hover span, .crystal-home-surface:hover h3 { color: #84adff !important; }
 @media (prefers-reduced-motion: reduce) { [data-crystal-reveal] { opacity: 1; transform: none; transition: none; } }
+
+/* Shapr3D-inspired desktop workspace proportions while preserving Crystal colors. */
+@media (min-width: 1024px) {
+  .crystal-studio {
+    --crystal-left-width: 286px;
+    --crystal-right-width: 326px;
+    grid-template-rows: 52px minmax(0, 1fr);
+  }
+  .crystal-studio > header {
+    height: 52px;
+    padding-inline: 18px;
+  }
+  .crystal-studio > header nav {
+    margin-left: 24px;
+    gap: 26px;
+  }
+  .crystal-studio > header > div:first-child {
+    gap: 10px;
+  }
+  .crystal-studio > header > div:first-child b {
+    font-size: 16px;
+  }
+  .crystal-left-panel,
+  .crystal-right-panel {
+    margin: 0 !important;
+    padding: 14px 10px 10px !important;
+  }
+  .crystal-left-panel {
+    padding-inline: 14px !important;
+  }
+  .crystal-right-panel {
+    padding-inline: 14px !important;
+  }
+  .crystal-modeling-tools {
+    bottom: auto !important;
+    left: 10px !important;
+    top: 16px !important;
+    width: 44px !important;
+    height: auto !important;
+    max-width: none !important;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    background: #0F0F0F !important;
+  }
+  .crystal-modeling-tools button {
+    width: 36px;
+    height: 36px;
+  }
+}
