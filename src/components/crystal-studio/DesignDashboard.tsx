@@ -70,9 +70,12 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
   };
 
   return (
-    <div className="min-h-screen bg-[#08090d] text-zinc-100">
+    <div
+      className="min-h-screen bg-[#0F0F0F] text-[#F5F5F5]"
+      style={{ fontFamily: '"Roboto", "Segoe UI", sans-serif' }}
+    >
       <div className="flex min-h-screen">
-        <aside className="hidden w-[250px] shrink-0 border-r border-white/10 bg-[#0b0d12] px-4 py-5 md:flex md:flex-col">
+        <aside className="hidden w-[250px] shrink-0 border-r border-white/10 bg-[#171717] px-4 py-5 md:flex md:flex-col">
           <div className="flex items-center gap-3 px-2 py-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 via-indigo-500 to-sky-400 shadow-[0_0_25px_rgba(124,92,255,0.45)]">
               <Sparkles size={16} className="text-white" />
@@ -134,8 +137,8 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
           </div>
         </aside>
 
-        <main className="flex-1 bg-[#090b10]">
-          <header className="flex items-center justify-between border-b border-white/10 bg-[#0d0f14]/80 px-5 py-4 backdrop-blur md:px-8">
+        <main className="flex-1 bg-[#0F0F0F]">
+          <header className="flex items-center justify-between border-b border-white/10 bg-[#171717]/90 px-5 py-4 backdrop-blur md:px-8">
             <div>
               <div className="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Design Studio</div>
               <div className="mt-1 text-xl font-semibold tracking-tight">Dashboard</div>
@@ -158,7 +161,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
           </header>
 
           <div className="mx-auto max-w-[1080px] px-4 py-8 md:px-8 lg:py-10">
-            <section className="rounded-[30px] border border-white/10 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.18),_transparent_35%),_#0f1219] p-5 shadow-[0_35px_90px_rgba(0,0,0,0.5)] md:p-8">
+            <section className="rounded-[30px] bg-[#171717] p-5 shadow-[0_35px_90px_rgba(0,0,0,0.5)] md:p-8">
               <div className="flex flex-col items-center text-center">
                 <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-[9px] font-medium uppercase tracking-[0.22em] text-violet-200">
                   <Sparkles size={11} />
@@ -177,8 +180,8 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                 </p>
               </div>
 
-              <div className="mt-8 rounded-[30px] border border-violet-500/20 bg-[#141a21]/90 p-3 shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_25px_70px_rgba(100,92,255,0.12)] md:p-4">
-                <div className="flex items-start gap-3 rounded-[22px] border border-white/8 bg-[#0d1319] p-3 md:p-4">
+              <div className="mt-8 rounded-[30px] bg-[#171717] p-3 shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_25px_70px_rgba(100,92,255,0.12)] md:p-4">
+                <div className="flex items-start gap-3 rounded-[22px] bg-[#1B1B1B] p-3 md:p-4">
                   <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/25 to-sky-500/20 text-violet-200 ring-1 ring-violet-400/25">
                     <Sparkles size={18} />
                   </div>
@@ -232,7 +235,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                 {categories.map(({ title, desc, img, icon: Icon, prompt: cardPrompt }) => (
                   <article
                     key={title}
-                    className="group overflow-hidden rounded-[22px] border border-white/10 bg-[#10151d] text-left transition hover:-translate-y-0.5 hover:border-violet-400/25 hover:bg-[#121922]"
+                    className="group overflow-hidden rounded-[22px] border border-white/10 bg-[#171717] text-left transition hover:-translate-y-0.5 hover:border-violet-400/25 hover:bg-[#1B1B1B]"
                   >
                     <div className="h-40 overflow-hidden border-b border-white/10 bg-zinc-900">
                       <img
@@ -289,7 +292,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                   <button
                     key={name}
                     onClick={onOpenStudio}
-                    className="overflow-hidden rounded-[22px] border border-white/10 bg-[#10151d] text-left transition hover:-translate-y-0.5 hover:border-violet-400/25"
+                    className="overflow-hidden rounded-[22px] border border-white/10 bg-[#171717] text-left transition hover:-translate-y-0.5 hover:border-violet-400/25"
                   >
                     <img src={img} alt={name} className="h-28 w-full object-cover" />
                     <div className="p-4">
