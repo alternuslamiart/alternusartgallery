@@ -2,71 +2,50 @@
 
 import Link from "next/link";
 import {
-  Bell,
+  Bot,
   Box,
-  Building2,
   ChevronRight,
-  Compass,
-  FileText,
-  House,
-  Layers3,
-  LayoutTemplate,
-  Plus,
+  CirclePlus,
+  Grid2X2,
+  Home,
+  Link2,
+  Library,
+  LogOut,
+  Menu,
   Search,
   Settings,
-  Sofa,
   Sparkles,
-  Wand2,
+  Workflow,
 } from "lucide-react";
 import { useState } from "react";
 
-const navItems = [
-  { label: "Home", icon: House },
-  { label: "Studio", icon: LayoutTemplate },
-  { label: "Projects", icon: Layers3 },
-  { label: "Concepts", icon: Compass },
-  { label: "Brand", icon: Wand2 },
-  { label: "Docs", icon: FileText },
+const navigation = [
+  { label: "Agents", icon: Grid2X2 },
+  { label: "Library", icon: Library, active: true },
+  { label: "Workflows", icon: Workflow },
+  { label: "Plugins", icon: Box },
+  { label: "Tools", icon: CirclePlus },
 ];
 
-const categories = [
-  {
-    title: "Architecture",
-    desc: "Create house plans, building layouts and 3D architectural models.",
-    img: "/Section/architectresectionone.png",
-    icon: Building2,
-    prompt: "Create a modern 3-bedroom house floor plan.",
-  },
-  {
-    title: "Interior Design",
-    desc: "Design rooms, styles and materials in 3D.",
-    img: "/Section/section1.png",
-    icon: Sofa,
-    prompt: "Design a modern minimalist living room.",
-  },
-  {
-    title: "Furniture & Layout",
-    desc: "Plan furniture and optimize available space.",
-    img: "/Section/section0.jpg",
-    icon: Box,
-    prompt: "Arrange furniture for this apartment.",
-  },
-  {
-    title: "3D Visualization",
-    desc: "Create realistic architectural and interior visualizations.",
-    img: "/ai-cards/chat-architecture.svg",
-    icon: Sparkles,
-    prompt: "Create a 3D interior for this floor plan.",
-  },
+const inspirations = [
+  { title: "Robotics Concept", image: "/ai-cards/agent.svg", prompt: "Create a futuristic home robot." },
+  { title: "AI Collaboration", image: "/ai-cards/chat-code.svg", prompt: "Create a collaborative AI workspace." },
+  { title: "Autonomous Machine", image: "/ai-cards/engine.svg", prompt: "Design an autonomous machine." },
+  { title: "Smart Home", image: "/ai-cards/chat-architecture.svg", prompt: "Design a smart modern home." },
+  { title: "New Concept", image: "/Section/architectresectionone.png", prompt: "Create a premium architectural concept." },
+  { title: "Mechanical Study", image: "/ai-cards/autocad.svg", prompt: "Create a precise mechanical study." },
+  { title: "Industrial Design", image: "/ai-cards/workflow.svg", prompt: "Design an intelligent industrial product." },
+  { title: "Future Interface", image: "/ai-cards/browser.svg", prompt: "Create a futuristic interface concept." },
+  { title: "Architecture", image: "/Section/section1.png", prompt: "Create a contemporary interior." },
+  { title: "Furniture Layout", image: "/Section/section0.jpg", prompt: "Arrange furniture in a premium living room." },
 ];
 
 export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) {
-  const [prompt, setPrompt] = useState("Luxury contemporary villa with glass walls, warm wood finish, and a poolside lounge.");
-  const [activeNav, setActiveNav] = useState("Home");
+  const [prompt, setPrompt] = useState("");
+  const [activeTab, setActiveTab] = useState("Home");
 
   const submit = () => {
-    if (!prompt.trim()) return;
-    onOpenStudio();
+    if (prompt.trim()) onOpenStudio();
   };
 
   return (
@@ -74,242 +53,134 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
       className="min-h-screen bg-[#0F0F0F] text-[#F5F5F5]"
       style={{ fontFamily: '"Roboto", "Segoe UI", sans-serif' }}
     >
-      <div className="flex min-h-screen">
-        <aside className="hidden w-[250px] shrink-0 border-r border-white/10 bg-[#171717] px-4 py-5 md:flex md:flex-col">
-          <div className="flex items-center gap-3 px-2 py-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 via-indigo-500 to-sky-400 shadow-[0_0_25px_rgba(124,92,255,0.45)]">
-              <Sparkles size={16} className="text-white" />
-            </div>
-            <div>
-              <div className="text-base font-semibold tracking-tight">Crystal</div>
-              <div className="text-[11px] text-zinc-400">Studio</div>
-            </div>
+      <header className="flex h-[62px] items-center border-b border-white/[0.08] bg-[#0F0F0F] px-6">
+        <div className="flex items-center gap-3">
+          <div className="grid h-7 w-7 place-items-center text-zinc-400">
+            <Sparkles size={21} />
           </div>
+          <span className="text-[15px] font-semibold">Crystal</span>
+        </div>
+        <Link href="/design-studio" className="ml-8 text-zinc-300 hover:text-white" aria-label="Home">
+          <Home size={16} />
+        </Link>
+      </header>
 
-          <nav className="mt-7 space-y-1.5">
-            {navItems.map(({ label, icon: Icon }) => {
-              const isActive = activeNav === label;
-              return (
-                <button
-                  key={label}
-                  onClick={() => {
-                    setActiveNav(label);
-                    onOpenStudio();
-                  }}
-                  className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm transition ${
-                    isActive
-                      ? "bg-white/[0.06] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]"
-                      : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
-                  }`}
-                >
-                  <Icon size={15} />
-                  {label}
-                </button>
-              );
-            })}
-          </nav>
-
-          <div className="mt-8 rounded-[22px] border border-violet-500/15 bg-gradient-to-br from-violet-500/10 via-[#0d1320]/60 to-[#0b0d12] p-4">
-            <div className="text-[10px] uppercase tracking-[0.18em] text-violet-200/80">Workspace</div>
-            <div className="mt-3 text-xl font-semibold">AI Design Lab</div>
-            <p className="mt-2 text-sm leading-6 text-zinc-400">
-              Generate concept boards, mockups, and room layouts in one place.
-            </p>
-            <button
-              onClick={onOpenStudio}
-              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-zinc-900"
-            >
-              New project
-              <ChevronRight size={14} />
+      <div className="flex min-h-[calc(100vh-62px)] gap-1.5 bg-[#0F0F0F] p-1.5">
+        <aside className="hidden w-[292px] shrink-0 rounded-[19px] bg-[#111111] px-4 py-5 md:flex md:flex-col">
+          <div className="flex items-center justify-between px-5">
+            <span className="text-[23px] font-semibold tracking-[-0.04em]">Crystal</span>
+            <button className="grid h-8 w-8 place-items-center rounded-xl bg-[#1A1A1A] text-zinc-300" aria-label="Collapse sidebar">
+              <Menu size={15} />
             </button>
           </div>
 
-          <div className="mt-auto flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.02] px-3 py-2.5 text-sm text-zinc-300">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 font-semibold text-xs">
-                B
-              </div>
-              Bulzart
-            </div>
-            <Link href="/settings" className="text-zinc-400 hover:text-white">
-              <Settings size={16} />
+          <div className="mt-8 flex h-10 items-center gap-2 rounded-xl bg-[#1B1B1B] px-3 text-sm text-zinc-400">
+            <Search size={15} />
+            <span>Search</span>
+          </div>
+
+          <nav className="mt-4 space-y-1">
+            {navigation.map(({ label, icon: Icon, active }) => (
+              <button
+                key={label}
+                onClick={onOpenStudio}
+                className={`flex h-10 w-full items-center gap-3 rounded-xl px-3 text-sm transition ${
+                  active ? "bg-[#1B1B1B] text-white" : "text-zinc-400 hover:bg-[#181818] hover:text-white"
+                }`}
+              >
+                <Icon size={16} />
+                {label}
+              </button>
+            ))}
+          </nav>
+
+          <div className="mt-auto flex items-center gap-3 rounded-xl bg-[#1B1B1B] px-3 py-2.5 text-sm text-zinc-300">
+            <div className="h-8 w-8 rounded-lg bg-[#252525]" />
+            <span className="flex-1">Bulzart</span>
+            <Link href="/login" aria-label="Sign out" className="text-zinc-400 hover:text-white">
+              <LogOut size={16} />
             </Link>
           </div>
         </aside>
 
-        <main className="flex-1 bg-[#0F0F0F]">
-          <header className="flex items-center justify-between border-b border-white/10 bg-[#171717]/90 px-5 py-4 backdrop-blur md:px-8">
-            <div>
-              <div className="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Design Studio</div>
-              <div className="mt-1 text-xl font-semibold tracking-tight">Dashboard</div>
-            </div>
+        <main className="min-w-0 flex-1 rounded-[19px] bg-[#101010] px-5 py-12 md:px-8 lg:px-10">
+          <section className="mx-auto max-w-[1560px]">
+            <div className="mx-auto flex max-w-[700px] flex-col items-center text-center">
+              <h1 className="text-3xl font-bold tracking-[-0.05em] text-white md:text-[36px]">
+                Hi, create your ideas
+              </h1>
+              <p className="mt-4 max-w-[330px] text-xs leading-4 text-zinc-500">
+                Lorem ipsum dolor sit amet consectetur. Sollicitudin blandit sit augue urna.
+              </p>
 
-            <div className="flex items-center gap-2">
-              <button className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5 text-zinc-300 hover:bg-white/[0.05]" aria-label="Search">
-                <Search size={16} />
-              </button>
-              <button className="rounded-xl border border-white/10 bg-white/[0.02] p-2.5 text-zinc-300 hover:bg-white/[0.05]" aria-label="Notifications">
-                <Bell size={16} />
-              </button>
-              <button className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.02] px-2.5 py-2 text-sm text-zinc-200 hover:bg-white/[0.05]">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-xs font-bold">
-                  B
-                </span>
-                <span className="hidden sm:inline">Bulzart</span>
-              </button>
-            </div>
-          </header>
-
-          <div className="mx-auto max-w-[1080px] px-4 py-8 md:px-8 lg:py-10">
-            <section className="rounded-[30px] bg-[#171717] p-5 md:p-8">
-              <div className="flex flex-col items-center text-center">
-                <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-[9px] font-medium uppercase tracking-[0.22em] text-violet-200">
-                  <Sparkles size={11} />
-                  Intelligent design
-                </div>
-
-                <h1 className="mt-6 max-w-4xl text-[2.3rem] font-semibold tracking-[-0.08em] text-white md:text-[4rem]">
-                  Design spaces with
-                  <span className="bg-gradient-to-r from-violet-300 via-sky-300 to-cyan-200 bg-clip-text text-transparent">
-                    {" "}AI precision
-                  </span>
-                </h1>
-
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-zinc-400 md:text-base">
-                  Create architecture, interiors, furniture layouts, and photoreal visual concepts from a single prompt.
-                </p>
-              </div>
-
-              <div className="mt-8 flex justify-center">
-                <div className="w-full max-w-[487px] rounded-[22px] bg-gradient-to-r from-[#0C8CE9] via-[#7C5CFF] to-[#F58B9D] p-px">
-                  <div className="flex h-[120px] items-start gap-3 rounded-[21px] bg-[#1B1B1B] p-3 md:p-4">
-                  <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/25 to-sky-500/20 text-violet-200 ring-1 ring-violet-400/25">
-                    <Sparkles size={18} />
-                  </div>
-
+              <div className="mt-8 w-full max-w-[487px] rounded-[15px] bg-gradient-to-r from-[#263BFF] via-[#7B24FF] to-[#FF334F] p-px shadow-[0_0_24px_rgba(73,50,255,0.28)]">
+                <div className="h-[120px] rounded-[14px] bg-[#171717] p-2">
                   <textarea
                     value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    rows={4}
-                    placeholder="Describe your ideal space, architectural style, or room concept..."
-                    className="min-h-[124px] flex-1 resize-none bg-transparent p-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none md:text-base"
+                    onChange={(event) => setPrompt(event.target.value)}
+                    placeholder="What do you want to create?"
+                    className="h-[69px] w-full resize-none bg-transparent px-2 py-1 text-xs text-zinc-100 outline-none placeholder:text-zinc-600"
+                    aria-label="What do you want to create?"
                   />
-
-                  <button
-                    onClick={submit}
-                    aria-label="Generate design"
-                    className="ml-auto mt-auto inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0C8CE9] text-white shadow-[0_8px_18px_rgba(12,140,233,0.35)] transition hover:bg-[#0A7DCE] disabled:opacity-50"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
+                  <div className="flex h-8 items-center gap-2">
+                    <button
+                      className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#1D1D1D] text-zinc-200"
+                      aria-label="Attach reference"
+                    >
+                      <Link2 size={16} />
+                    </button>
+                    <button className="h-8 rounded-[10px] bg-[#1D1D1D] px-4 text-xs text-zinc-200">
+                      Precision Mode
+                    </button>
+                    <button
+                      onClick={submit}
+                      disabled={!prompt.trim()}
+                      className="ml-auto grid h-8 w-8 place-items-center rounded-[9px] bg-[#0C8CE9] text-white transition hover:bg-[#087BCF] disabled:opacity-50"
+                      aria-label="Generate"
+                    >
+                      <ChevronRight size={17} />
+                    </button>
                   </div>
                 </div>
               </div>
+            </div>
 
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {[
-                    "Modern villa",
-                    "Minimal living room",
-                    "Luxury kitchen",
-                    "Outdoor terrace",
-                  ].map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => setPrompt(tag + " with rich textures, warm lighting, and a premium modern aesthetic.")}
-                      className="rounded-full border border-white/10 bg-white/[0.02] px-3 py-1.5 text-xs text-zinc-300 transition hover:bg-white/[0.05]"
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-            </section>
-
-            <section className="mt-10">
-              <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-2xl font-semibold tracking-tight text-white">Explore design areas</h2>
-                <button className="inline-flex items-center gap-2 text-sm text-violet-200 hover:text-violet-100">
-                  Browse all
-                  <ChevronRight size={15} />
+            <div className="mt-16 flex items-center gap-1">
+              {["Service", "Apartment", "Home"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`rounded-full px-5 py-2 text-xs transition ${
+                    activeTab === tab ? "bg-[#1B1B1B] font-semibold text-white" : "text-zinc-500 hover:text-zinc-300"
+                  }`}
+                >
+                  {tab}
                 </button>
-              </div>
+              ))}
+            </div>
 
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {categories.map(({ title, desc, img, icon: Icon, prompt: cardPrompt }) => (
-                  <article
-                    key={title}
-                    className="group overflow-hidden rounded-[22px] border border-white/10 bg-[#171717] text-left transition hover:-translate-y-0.5 hover:border-violet-400/25 hover:bg-[#1B1B1B]"
-                  >
-                    <div className="h-40 overflow-hidden border-b border-white/10 bg-zinc-900">
-                      <img
-                        src={img}
-                        alt={title}
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/10 text-violet-200">
-                          <Icon size={16} />
-                        </div>
-                        <button
-                          onClick={() => setPrompt(cardPrompt)}
-                          className="text-[11px] font-medium uppercase tracking-[0.18em] text-violet-200"
-                        >
-                          Open
-                        </button>
-                      </div>
-
-                      <h3 className="mt-4 text-base font-semibold text-white">{title}</h3>
-                      <p className="mt-2 text-sm leading-6 text-zinc-400">{desc}</p>
-
-                      <button
-                        onClick={() => {
-                          setPrompt(cardPrompt);
-                          onOpenStudio();
-                        }}
-                        className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-sky-300"
-                      >
-                        Start concept
-                        <ChevronRight size={15} />
-                      </button>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="mt-10">
-              <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-2xl font-semibold tracking-tight text-white">Recent projects</h2>
-                <button className="text-sm text-violet-200 hover:text-violet-100">View all</button>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {[
-                  { name: "Modern Villa", tag: "Architecture", time: "2h ago", img: "/Section/architectresectionone.png" },
-                  { name: "Lounge Redesign", tag: "Interior", time: "6h ago", img: "/Section/section1.png" },
-                  { name: "Furniture Flow", tag: "Layout", time: "1d ago", img: "/Section/section0.jpg" },
-                  { name: "Glass Concept", tag: "Visualization", time: "2d ago", img: "/ai-cards/chat-architecture.svg" },
-                ].map(({ name, tag, time, img }) => (
-                  <button
-                    key={name}
-                    onClick={onOpenStudio}
-                    className="overflow-hidden rounded-[22px] border border-white/10 bg-[#171717] text-left transition hover:-translate-y-0.5 hover:border-violet-400/25"
-                  >
-                    <img src={img} alt={name} className="h-28 w-full object-cover" />
-                    <div className="p-4">
-                      <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.16em] text-violet-200">
-                        <span>{tag}</span>
-                        <Plus size={14} />
-                      </div>
-                      <div className="mt-3 text-base font-semibold text-white">{name}</div>
-                      <div className="mt-1 text-xs text-zinc-500">Updated {time}</div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </section>
-          </div>
+            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {inspirations.map(({ title, image, prompt: cardPrompt }) => (
+                <button
+                  key={title}
+                  onClick={() => {
+                    setPrompt(cardPrompt);
+                    onOpenStudio();
+                  }}
+                  className="group relative aspect-[1.18] overflow-hidden rounded-[11px] bg-[#181818] text-left"
+                >
+                  <img
+                    src={image}
+                    alt={title}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-3 pt-8 text-xs font-medium text-white opacity-0 transition group-hover:opacity-100">
+                    {title}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
         </main>
       </div>
     </div>
