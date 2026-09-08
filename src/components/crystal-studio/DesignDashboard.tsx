@@ -145,13 +145,13 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
               </div>
             </div>
 
-            <div className="mt-16 flex items-center gap-1">
+            <div className="mt-16 flex items-center gap-0">
               {["Service", "Apartment", "Home"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`rounded-full px-5 py-2 text-xs transition ${
-                    activeTab === tab ? "bg-[#1B1B1B] font-semibold text-white" : "text-zinc-500 hover:text-zinc-300"
+                  className={`rounded-full px-[18px] py-2.5 text-xs transition ${
+                    activeTab === tab ? "bg-[#171717] font-semibold text-white" : "text-zinc-500 hover:text-zinc-300"
                   }`}
                 >
                   {tab}
