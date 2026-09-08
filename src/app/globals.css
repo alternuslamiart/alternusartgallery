@@ -5,7 +5,8 @@
 .crystal-studio {
   --crystal-left-width: 300px;
   --crystal-right-width: 318px;
-  position: relative;
+  position: fixed;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
