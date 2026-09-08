@@ -11,14 +11,14 @@ export const initialAssets: StudioAsset[] = [
 ];
 
 export const modelingTools: Array<{ id: StudioTool; label: string; icon: typeof Box }> = [
-  { id: "orbit", label: "Orbit view", icon: CirclePlay },
+  { id: "orbit", label: "Realtime — Play / Pause", icon: CirclePlay },
   { id: "focus", label: "Focus selection", icon: Focus },
-  { id: "move", label: "Move object", icon: Move3d },
-  { id: "rotate", label: "Rotate object", icon: Rotate3d },
-  { id: "scale", label: "Scale object", icon: Scaling },
-  { id: "select", label: "Select object", icon: MousePointer2 },
-  { id: "brush", label: "Material brush", icon: Brush },
-  { id: "tools", label: "Modeling tools", icon: Wrench },
-  { id: "model", label: "Model mode", icon: Cuboid },
-  { id: "viewport", label: "Viewport display", icon: Crosshair },
+  { id: "move", label: "Move — W", icon: Move3d },
+  { id: "rotate", label: "Rotate — E", icon: Rotate3d },
+  { id: "scale", label: "Edit Object", icon: Scaling },
+  { id: "select", label: "Select — Q", icon: MousePointer2 },
+  { id: "brush", label: "Draw", icon: Brush },
+  { id: "tools", label: "Measure / Tools", icon: Wrench },
+  { id: "model", label: "Add Object / Asset", icon: Cuboid },
+  { id: "viewport", label: "Viewport Navigation", icon: Crosshair },
 ];
