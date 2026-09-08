@@ -56,7 +56,17 @@
 .crystal-right-panel {
   outline: none !important;
 }
-@media (min-width: 701px) {.crystal-studio{padding-inline:0}.crystal-left-panel,.crystal-right-panel,.crystal-studio>section{border:0!important;border-radius:0;box-shadow:none;overflow:hidden}.crystal-left-panel,.crystal-right-panel{background:#0F0F0F!important}.crystal-studio>section{background:#171717!important}}
+@media (min-width: 701px) {
+  .crystal-studio { padding-inline: 0; background: #171717; }
+  .crystal-left-panel,
+  .crystal-right-panel,
+  .crystal-studio > section { border: 0 !important; border-radius: 0; box-shadow: none; overflow: hidden; }
+  .crystal-left-panel,
+  .crystal-right-panel { background: #0F0F0F !important; top: 72px; bottom: 8px; }
+  .crystal-left-panel { left: 8px; }
+  .crystal-right-panel { right: 8px; }
+  .crystal-studio > section { background: #171717 !important; }
+}
 .crystal-studio.crystal-left-closed { --crystal-left-width: 0px; }
 .crystal-studio.crystal-right-closed { --crystal-right-width: 0px; }
 
