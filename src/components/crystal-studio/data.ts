@@ -1,5 +1,6 @@
 import type { MaterialName, StudioAsset, StudioTool } from "./types";
-import { Box, Brush, CirclePlay, Crosshair, Cuboid, Focus, MousePointer2, Move3d, Rotate3d, Scaling, Wrench } from "lucide-react";
+import type { ComponentType } from "react";
+import { CubeFilled, DrawFilled, EditFaceFilled, FocusFilled, MeasureFilled, MoveFilled, NavigationFilled, PlayFilled, PointerFilled, RotateFilled, SparkleFilled } from "./filled-icons";
 
 export const materials: MaterialName[] = ["Titanium", "Aluminum", "Steel", "Carbon Fiber", "Plastic", "Glass", "Rubber"];
 
@@ -10,15 +11,15 @@ export const initialAssets: StudioAsset[] = [
   { id: "drone", name: "Drone", prompt: "Industrial drone", category: "Aerospace", thumbnail: "from-slate-800 via-sky-800 to-slate-500", createdAt: "2026-08-14T10:00:00.000Z", status: "ready" },
 ];
 
-export const modelingTools: Array<{ id: StudioTool; label: string; icon: typeof Box }> = [
-  { id: "orbit", label: "Realtime — Play / Pause", icon: CirclePlay },
-  { id: "focus", label: "Focus selection", icon: Focus },
-  { id: "move", label: "Move — W", icon: Move3d },
-  { id: "rotate", label: "Rotate — E", icon: Rotate3d },
-  { id: "scale", label: "Edit Object", icon: Scaling },
-  { id: "select", label: "Select — Q", icon: MousePointer2 },
-  { id: "brush", label: "Draw", icon: Brush },
-  { id: "tools", label: "Measure / Tools", icon: Wrench },
-  { id: "model", label: "Add Object / Asset", icon: Cuboid },
-  { id: "viewport", label: "Viewport Navigation", icon: Crosshair },
+export const modelingTools: Array<{ id: StudioTool; label: string; icon: ComponentType<{ size?: number | string; strokeWidth?: number | string; className?: string }> }> = [
+  { id: "orbit", label: "Realtime — Play / Pause", icon: PlayFilled },
+  { id: "focus", label: "Focus Selected", icon: FocusFilled },
+  { id: "move", label: "Move — W", icon: MoveFilled },
+  { id: "rotate", label: "Rotate — E", icon: RotateFilled },
+  { id: "scale", label: "Edit Object", icon: EditFaceFilled },
+  { id: "select", label: "Select — Q", icon: PointerFilled },
+  { id: "brush", label: "Draw", icon: DrawFilled },
+  { id: "tools", label: "Measure / Tools", icon: MeasureFilled },
+  { id: "model", label: "Object / Asset", icon: CubeFilled },
+  { id: "viewport", label: "Viewport Navigation", icon: NavigationFilled },
 ];
