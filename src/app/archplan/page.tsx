@@ -59,7 +59,7 @@ export default function ArchplanPage() {
         </a>
       </header>
 
-      <aside className="fixed bottom-0 left-0 top-[54px] z-20 hidden w-[272px] border-r border-white/[0.04] bg-[#101010] px-[14px] lg:block">
+      <aside className="fixed bottom-0 left-0 top-[54px] z-20 hidden w-[272px] border-r border-white/[0.04] bg-[#101010] px-3 lg:block">
         <div className="flex h-12 items-center justify-between rounded-[7px] bg-[#181818] px-2">
           <div className="flex items-center gap-3">
             <span className="grid h-[34px] w-[34px] place-items-center rounded-[5px] bg-[#2867f2] text-[13px] font-semibold">B</span>
@@ -98,14 +98,14 @@ export default function ArchplanPage() {
           <p className="mt-4 text-[11px] text-zinc-400">Architecture Building</p>
         </div>
 
-        <div className="absolute inset-x-[14px] bottom-[72px] rounded-lg bg-[#181818] p-4">
+        <div className="absolute inset-x-3.5 bottom-[72px] rounded-lg bg-[#181818] p-4">
           <p className="text-xs font-medium">Upgrade to Pro</p>
           <p className="mt-2 text-[10px] leading-[14px] text-zinc-500">Get more credits, faster render<br />and premium models</p>
           <a href="/pricing" className="mt-3 flex h-[29px] w-full items-center justify-center rounded-[5px] bg-[#2867f2] text-[11px] font-semibold transition hover:bg-[#3473f5]">
             Go Pro
           </a>
         </div>
-        <div className="absolute inset-x-[14px] bottom-3 flex items-center justify-between border-t border-white/[0.08] pt-3 text-[10px]">
+        <div className="absolute inset-x-3 bottom-3 flex items-center justify-between border-t border-white/[0.08] pt-3 text-[10px]">
           <a href="mailto:?subject=Join my Crystal team" className="flex items-center gap-2"><Mail size={14} /> Invite your team</a>
           <button type="button" onClick={() => void navigator.clipboard?.writeText(window.location.href)} className="rounded-[6px] bg-[#181818] px-3 py-2"><Copy size={12} className="mr-1 inline" /> Copy link</button>
         </div>
