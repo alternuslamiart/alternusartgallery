@@ -7,12 +7,15 @@ import {
   ChevronRight,
   CirclePlus,
   Copy,
-  Grid2X2,
+  Globe2,
+  House,
   Home,
   ImagePlus,
+  LayoutGrid,
+  Map,
   Mail,
   Search,
-  Sparkles,
+  WandSparkles,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -25,11 +28,11 @@ const styles = [
 ];
 
 const projectLinks = [
-  { label: "All Projects", icon: Grid2X2 },
-  { label: "Architecture", icon: Home, active: true },
-  { label: "Interior Design...", icon: Sparkles },
-  { label: "Urban Planning", icon: Grid2X2 },
-  { label: "Community", icon: Grid2X2 },
+  { label: "All Projects", icon: LayoutGrid },
+  { label: "Architecture", icon: House },
+  { label: "Interior Design...", icon: WandSparkles },
+  { label: "Urban Planning", icon: Map },
+  { label: "Community", icon: Globe2 },
   { label: "Archive...", icon: Archive },
 ];
 
