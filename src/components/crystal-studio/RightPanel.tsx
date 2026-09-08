@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Download, FileBox, FileText, Grid2X2, Image, Play, Plus, Trash2 } from "lucide-react";
+import { Box, Download, FileBox, FileText, Grid2X2, Image, PanelRightClose, Plus, Trash2 } from "lucide-react";
 import type { RenderSettings, StudioAsset } from "./types";
 import { SectionTitle, SelectField } from "./ui";
 import { useState } from "react";
@@ -34,7 +34,7 @@ export function RightPanel(props: Props) {
   const [swatchGrid,setSwatchGrid]=useState(true);
   return (
     <aside className="crystal-right-panel min-h-0 overflow-y-auto border-l border-[#303030] bg-[#0F0F0F] px-5 pb-5 pt-4 scrollbar-hide">
-      <SectionTitle action={<button aria-label="Collapse right panel" onClick={props.onCollapse} className="sr-only"><Play size={17}/></button>}>Output</SectionTitle>
+      <SectionTitle action={<button aria-label="Collapse right panel" onClick={props.onCollapse} className="grid h-8 w-8 place-items-center rounded-[8px] text-zinc-400 transition hover:bg-[#292929] hover:text-white"><PanelRightClose size={16}/></button>}>Output</SectionTitle>
       <div className="space-y-2">
         <SelectField label="Canvas" value={props.resolution} onChange={(event) => props.onResolutionChange(event.target.value)}><option>1920x1080</option><option>2560x1440</option><option>3840x2160</option><option>7680x4320</option></SelectField>
         <SelectField label="Frame rate" value={props.frameRate} onChange={(event) => props.onFrameRateChange(event.target.value)}><option>24 fps</option><option>30 fps</option><option>60 fps</option><option>120 fps</option></SelectField>

@@ -38,6 +38,14 @@
 }
 
 .crystal-studio > header { position: absolute; inset: 0 0 auto; z-index: 30; }
+.crystal-topbar { box-shadow: 0 1px 0 rgba(255,255,255,.025); }
+.crystal-brand-logo { filter: brightness(1.08); }
+.crystal-home-button:hover { background: #242424; color: #fff; }
+.crystal-menu-item:hover, .crystal-menu-item.is-open { background: #242424; color: #fff; }
+.crystal-credit-button { background: #171717; transition: border-color 150ms ease, background 150ms ease; }
+.crystal-credit-button:hover { border-color: #4A90D9; background: #202020; }
+.crystal-pro-button { box-shadow: 0 5px 16px rgba(22,135,247,.18); transition: background 150ms ease, box-shadow 150ms ease; }
+.crystal-pro-button:hover { background: #2d9bff; box-shadow: 0 6px 20px rgba(22,135,247,.3); }
 .crystal-left-panel { position: absolute; left: 0; top: 64px; bottom: 6px; z-index: 20; width: var(--crystal-left-width); }
 .crystal-studio > section { position: absolute; inset: 0; z-index: 0; min-width: 0; min-height: 0; }
 .crystal-right-panel { position: absolute; right: 0; top: 64px; bottom: 6px; z-index: 20; width: var(--crystal-right-width); }
