@@ -79,7 +79,7 @@ export default function ArchplanPage() {
               key={label}
               type="button"
               onClick={() => setActiveProject(label)}
-              className={`flex h-8 w-full items-center gap-2 rounded-[6px] px-2 text-xs transition ${
+              className={`flex h-8 w-full items-center gap-2 rounded-[12px] px-2 text-xs transition ${
                 activeProject === label ? "bg-[#1a1a1a] text-[#f4f4f4]" : "text-[#b7b7b7] hover:bg-[#181818] hover:text-zinc-200"
               }`}
             >
@@ -87,7 +87,7 @@ export default function ArchplanPage() {
               {label}
             </button>
           ))}
-          <button type="button" className="flex h-8 w-full items-center gap-2 px-2 text-xs text-[#b7b7b7] hover:text-white">
+          <button type="button" className="flex h-8 w-full items-center gap-2 rounded-[12px] px-2 text-xs text-[#b7b7b7] transition hover:bg-[#181818] hover:text-white">
             <CirclePlus size={14} strokeWidth={1.5} />
             New Project
           </button>
