@@ -52,14 +52,14 @@ export default function ArchplanPage() {
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] font-sans text-[#f5f5f5]">
-      <header className="fixed inset-x-0 top-0 z-30 flex h-[54px] items-center border-b border-white/[0.04] bg-[#171717] px-[50px]">
+      <header className="fixed inset-x-0 top-0 z-30 flex h-[54px] items-center border-b border-[#242424] bg-[#171717] px-[50px]">
         <span className="text-sm font-semibold tracking-tight">Crystal</span>
         <a href="/design-studio" className="ml-8 text-zinc-400 transition hover:text-white" aria-label="Home">
           <Home size={16} strokeWidth={1.8} />
         </a>
       </header>
 
-      <aside className="fixed bottom-0 left-0 top-[54px] z-20 hidden w-[272px] border-r border-white/[0.04] bg-[#101010] px-3 lg:block">
+      <aside className="fixed bottom-0 left-0 top-[54px] z-20 hidden w-[272px] border-r border-white/[0.04] bg-[#111111] px-3 pt-2 lg:block">
         <div className="flex h-12 items-center justify-between rounded-[12px] bg-[#181818] px-2">
           <div className="flex items-center gap-3">
             <span className="grid h-[34px] w-[34px] place-items-center rounded-[5px] bg-[#2867f2] text-[13px] font-semibold">B</span>
