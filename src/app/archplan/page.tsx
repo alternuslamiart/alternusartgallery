@@ -17,7 +17,7 @@ import {
   Search,
   WandSparkles,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const styles = [
   { name: "Modern", image: "/Section/architectresectionone.png" },
@@ -49,6 +49,53 @@ export default function ArchplanPage() {
   const [activeProject, setActiveProject] = useState("Architecture");
   const [saved, setSaved] = useState(false);
   const [generated, setGenerated] = useState(false);
+  const [instructions, setInstructions] = useState("");
+  const [referenceImage, setReferenceImage] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem("crystal-archplan-draft");
+    if (!stored) return;
+    const draft = JSON.parse(stored) as Partial<{ projectName: string; prompt: string; instructions: string; selectedStyle: string; imageType: string; aspectRatio: string; quality: string; count: number; room: string; model: string }>;
+    if (draft.projectName) setProjectName(draft.projectName);
+    if (draft.prompt) setPrompt(draft.prompt);
+    if (draft.instructions) setInstructions(draft.instructions);
+    if (draft.selectedStyle) setSelectedStyle(draft.selectedStyle);
+    if (draft.imageType) setImageType(draft.imageType);
+    if (draft.aspectRatio) setAspectRatio(draft.aspectRatio);
+    if (draft.quality) setQuality(draft.quality);
+    if (draft.count) setCount(draft.count);
+    if (draft.room) setRoom(draft.room);
+    if (draft.model) setModel(draft.model);
+  }, []);
+
+  const saveDraft = () => {
+    window.localStorage.setItem("crystal-archplan-draft", JSON.stringify({ projectName, prompt, instructions, selectedStyle, imageType, aspectRatio, quality, count, room, model }));
+    setSaved(true);
+  };
+
+  const generatePlan = async () => {
+    if (!prompt.trim() || generating) {
+      setError("Add a description before generating.");
+      return;
+    }
+    setGenerating(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: `${selectedStyle} ${imageType} architecture: ${prompt}` }) });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error ?? "Generation failed.");
+      }
+      await response.json();
+      setGenerated(true);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Generation failed.");
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] font-sans text-[#f5f5f5]">
@@ -164,9 +211,9 @@ export default function ArchplanPage() {
               <div>
                 <p className="mb-3 text-[11px] text-[#a0a0a0]">Style reference</p>
                 <label className="flex h-12 w-full cursor-pointer items-center gap-2 rounded-[12px] bg-[#181818] px-2 text-left text-[9px] text-zinc-400">
-                  <span className="grid h-7 w-7 place-items-center rounded-[4px] bg-[#292929]"><ImagePlus size={14} /></span>
+                  <span className="grid h-7 w-7 place-items-center overflow-hidden rounded-[4px] bg-[#292929]">{referenceImage ? <img src={referenceImage} alt="" className="h-full w-full object-cover" /> : <ImagePlus size={14} />}</span>
                   <span><strong className="block text-[10px] font-medium text-zinc-200">Upload reference image</strong>JPG, PNG · Max 10MB</span>
-                  <input type="file" accept="image/png,image/jpeg" className="sr-only" />
+                  <input type="file" accept="image/png,image/jpeg" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) setReferenceImage(URL.createObjectURL(file)); }} />
                 </label>
               </div>
               <div>
@@ -185,16 +232,17 @@ export default function ArchplanPage() {
               </div>
             </div>
             <label className="mt-6 block text-[11px] text-[#a0a0a0]" htmlFor="instructions">Special instructions</label>
-            <input id="instructions" placeholder="Include a swimming pool, modern furniture" className="mt-2 h-12 w-full rounded-[12px] bg-[#181818] px-3 text-[10px] text-white outline-none placeholder:text-[#888] focus:ring-1 focus:ring-[#3d72ee]" />
+            <input id="instructions" value={instructions} onChange={(event) => setInstructions(event.target.value)} placeholder="Include a swimming pool, modern furniture" className="mt-2 h-12 w-full rounded-[12px] bg-[#181818] px-3 text-[10px] text-white outline-none placeholder:text-[#888] focus:ring-1 focus:ring-[#3d72ee]" />
           </section>
 
           <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
-            <label className="flex cursor-pointer items-center gap-2 text-[10px] text-zinc-400"><input type="checkbox" checked={saved} onChange={(event) => setSaved(event.target.checked)} className="accent-[#2f6df6]" /> Save as Templates</label>
+            <label className="flex cursor-pointer items-center gap-2 text-[10px] text-zinc-400"><input type="checkbox" checked={saved} onChange={(event) => { setSaved(event.target.checked); if (event.target.checked) saveDraft(); }} className="accent-[#2f6df6]" /> Save as Templates</label>
             <div className="flex gap-2">
-              <button type="button" onClick={() => { setPrompt(""); setProjectName(""); setRoom(""); setModel("Autodesk Revit Fusion AI"); setSelectedStyle("Classical"); setImageType("Exterior"); setAspectRatio("1:1"); setQuality("Standard"); setCount(1); setSaved(false); setGenerated(false); }} className="h-[34px] w-[90px] rounded-[12px] bg-[#181818] text-[10px] text-zinc-300 hover:bg-[#242424]">Reset</button>
-              <button type="button" onClick={() => setGenerated(true)} className="h-[34px] w-[91px] rounded-[12px] bg-[#2867f2] text-[10px] font-semibold text-white hover:bg-[#3473f5]">{generated ? "Generated" : "Generate"}</button>
+              <button type="button" onClick={() => { setPrompt(""); setProjectName(""); setInstructions(""); setRoom(""); setModel("Autodesk Revit Fusion AI"); setSelectedStyle("Classical"); setImageType("Exterior"); setAspectRatio("1:1"); setQuality("Standard"); setCount(1); setSaved(false); setGenerated(false); setError(null); window.localStorage.removeItem("crystal-archplan-draft"); }} className="h-[34px] w-[90px] rounded-[12px] bg-[#181818] text-[10px] text-zinc-300 hover:bg-[#242424]">Reset</button>
+              <button type="button" onClick={generatePlan} disabled={generating} className="h-[34px] w-[91px] rounded-[12px] bg-[#2867f2] text-[10px] font-semibold text-white hover:bg-[#3473f5] disabled:opacity-50">{generating ? "..." : generated ? "Generated" : "Generate"}</button>
             </div>
           </div>
+          {error && <p role="alert" className="mt-3 text-right text-[10px] text-red-300">{error}</p>}
         </div>
       </main>
     </div>

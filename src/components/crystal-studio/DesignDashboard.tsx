@@ -18,6 +18,7 @@ import {
   Workflow,
 } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const navigation = [
   { label: "Agents", icon: Grid2X2 },
@@ -43,9 +44,15 @@ const inspirations = [
 export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) {
   const [prompt, setPrompt] = useState("");
   const [activeTab, setActiveTab] = useState("Home");
+  const [precision, setPrecision] = useState("Precision Mode");
+  const [reference, setReference] = useState<string | null>(null);
+  const router = useRouter();
 
   const submit = () => {
-    if (prompt.trim()) onOpenStudio();
+    if (prompt.trim()) {
+      window.sessionStorage.setItem("crystal-design-prompt", prompt.trim());
+      onOpenStudio();
+    }
   };
 
   return (
@@ -83,7 +90,12 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
             {navigation.map(({ label, icon: Icon, active }) => (
               <button
                 key={label}
-                onClick={onOpenStudio}
+                onClick={() => {
+                  if (label === "Agents") router.push("/crystal");
+                  else if (label === "Workflows") router.push("/workflow");
+                  else if (label === "Plugins") router.push("/workflow");
+                  else onOpenStudio();
+                }}
                 className={`flex h-10 w-full items-center gap-3 rounded-xl px-3 text-sm transition ${
                   active ? "bg-[#1B1B1B] text-white" : "text-zinc-400 hover:bg-[#181818] hover:text-white"
                 }`}
@@ -123,14 +135,12 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                     aria-label="What do you want to create?"
                   />
                   <div className="flex h-8 items-center gap-2">
-                    <button
-                      className="grid h-8 w-8 place-items-center rounded-[10px] bg-[#1D1D1D] text-zinc-200"
-                      aria-label="Attach reference"
-                    >
-                      <Link2 size={16} />
-                    </button>
-                    <button className="h-8 rounded-[10px] bg-[#1D1D1D] px-4 text-xs text-zinc-200">
-                      Precision Mode
+                    <label className="grid h-8 w-8 cursor-pointer place-items-center rounded-[10px] bg-[#1D1D1D] text-zinc-200" aria-label="Attach reference">
+                      <Link2 size={16} className={reference ? "text-[#4A90D9]" : undefined} />
+                      <input type="file" accept="image/png,image/jpeg" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) setReference(URL.createObjectURL(file)); }} />
+                    </label>
+                    <button onClick={() => setPrecision((value) => value === "Precision Mode" ? "Fast Concept" : "Precision Mode")} className="h-8 rounded-[10px] bg-[#1D1D1D] px-4 text-xs text-zinc-200">
+                      {precision}
                     </button>
                     <button
                       onClick={submit}
@@ -149,7 +159,11 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
               {["Service", "Apartment", "Home"].map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => {
+                    setActiveTab(tab);
+                    if (tab === "Service") router.push("/workflow");
+                    if (tab === "Apartment") router.push("/archplan");
+                  }}
                   className={`rounded-full px-[18px] py-2.5 text-xs transition ${
                     activeTab === tab ? "bg-[#171717] font-semibold text-white" : "text-zinc-500 hover:text-zinc-300"
                   }`}
@@ -165,6 +179,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                   key={title}
                   onClick={() => {
                     setPrompt(cardPrompt);
+                    window.sessionStorage.setItem("crystal-design-prompt", cardPrompt);
                     onOpenStudio();
                   }}
                   className="group relative aspect-[1.18] overflow-hidden rounded-[11px] bg-[#181818] text-left"

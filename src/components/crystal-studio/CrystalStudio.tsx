@@ -87,6 +87,14 @@ export function CrystalStudio() {
     return () => window.clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    const savedPrompt = window.sessionStorage.getItem("crystal-design-prompt");
+    if (savedPrompt) {
+      setPrompt(savedPrompt);
+      window.sessionStorage.removeItem("crystal-design-prompt");
+    }
+  }, []);
+
   useEffect(() => { const presets:Record<string,RenderSettings>={Draft:{resolution:"1920x1080",sampleCount:64,exposure:1.2},Standard:{resolution:"2560x1440",sampleCount:256,exposure:1.2},High:{resolution:"3840x2160",sampleCount:512,exposure:1.2},Ultra:{resolution:"3840x2160",sampleCount:1024,exposure:1.2}}; setRenderSettings(presets[quality]??presets.Standard); },[quality]);
   useEffect(() => { if(!toast)return; const timer=window.setTimeout(()=>setToast(null),2800); return()=>window.clearTimeout(timer); },[toast]);
   useEffect(()=>{const close=(event:PointerEvent)=>{if(openMenu&&!(event.target as HTMLElement).closest("[aria-label='Application menu']"))setOpenMenu(null)};document.addEventListener("pointerdown",close);return()=>document.removeEventListener("pointerdown",close)},[openMenu]);

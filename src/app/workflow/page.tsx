@@ -15,7 +15,8 @@ import {
   Sparkles,
   Workflow as WorkflowIcon,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Integration = { name: string; description: string; icon: typeof Box };
 
@@ -47,6 +48,24 @@ export default function WorkflowPage() {
   const [connected, setConnected] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [sortOpen, setSortOpen] = useState(false);
+  const [workflowStatus, setWorkflowStatus] = useState<"Idle" | "Draft" | "Saved" | "Running" | "Completed">("Idle");
+  const [workflowSteps, setWorkflowSteps] = useState<string[]>([]);
+  const router = useRouter();
+
+  useEffect(() => {
+    const storedConnections = window.localStorage.getItem("crystal-workflow-connections");
+    const storedWorkflow = window.localStorage.getItem("crystal-workflow-draft");
+    if (storedConnections) setConnected(JSON.parse(storedConnections) as string[]);
+    if (storedWorkflow) {
+      const draft = JSON.parse(storedWorkflow) as { steps?: string[]; status?: typeof workflowStatus };
+      setWorkflowSteps(draft.steps ?? []);
+      setWorkflowStatus(draft.status === "Saved" ? "Saved" : "Draft");
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("crystal-workflow-connections", JSON.stringify(connected));
+  }, [connected]);
 
   const visibleIntegrations = useMemo(() => {
     const filtered = integrations.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()));
@@ -55,6 +74,20 @@ export default function WorkflowPage() {
   }, [search, sort]);
 
   const connect = (name: string) => setConnected((items) => items.includes(name) ? items.filter((item) => item !== name) : [...items, name]);
+  const startWorkflow = () => {
+    const nextSteps = workflowSteps.length ? workflowSteps : ["Connect integration", "Configure output", "Run workflow"];
+    setWorkflowSteps(nextSteps);
+    setWorkflowStatus("Draft");
+    window.localStorage.setItem("crystal-workflow-draft", JSON.stringify({ steps: nextSteps, status: "Draft" }));
+  };
+  const saveWorkflow = () => {
+    setWorkflowStatus("Saved");
+    window.localStorage.setItem("crystal-workflow-draft", JSON.stringify({ steps: workflowSteps, status: "Saved" }));
+  };
+  const runWorkflow = () => {
+    setWorkflowStatus("Running");
+    window.setTimeout(() => setWorkflowStatus("Completed"), 700);
+  };
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[#2a2a2a] text-[#f5f5f5] font-sans">
@@ -82,11 +115,16 @@ export default function WorkflowPage() {
         <div className="mt-6 px-2 text-xs font-medium text-[#e8e8e8]">Type</div>
         <nav className="mt-3 space-y-1" aria-label="Integration types">
           {navItems.map(({ label, icon: Icon }) => (
-            <button key={label} type="button" onClick={() => setActiveNav(label)} className={`flex h-[34px] w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-xs transition ${activeNav === label ? "bg-[#2b2b2b] text-[#e8e8e8]" : "text-[#c5c5c5] hover:bg-[#292929] hover:text-white"}`}>
+            <button key={label} type="button" onClick={() => {
+              setActiveNav(label);
+              if (label === "Architecture" || label === "Urban Planning") router.push("/archplan");
+              else if (label === "Agents" || label === "Plugins") router.push("/crystal");
+              else if (label === "Interior Design...") router.push("/design-studio");
+            }} className={`flex h-[34px] w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-xs transition ${activeNav === label ? "bg-[#2b2b2b] text-[#e8e8e8]" : "text-[#c5c5c5] hover:bg-[#292929] hover:text-white"}`}>
               <Icon size={14} strokeWidth={1.5} />{label}
             </button>
           ))}
-          <button type="button" onClick={() => setActiveNav("Project")} className={`flex h-[34px] w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-xs transition ${activeNav === "Project" ? "bg-[#2b2b2b] text-white" : "text-[#c5c5c5] hover:bg-[#292929] hover:text-white"}`}><CirclePlus size={14} strokeWidth={1.5} />Project</button>
+          <button type="button" onClick={startWorkflow} className="flex h-[34px] w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-xs text-[#c5c5c5] transition hover:bg-[#292929] hover:text-white"><CirclePlus size={14} strokeWidth={1.5} />New Workflow</button>
         </nav>
       </aside>
 
@@ -123,9 +161,14 @@ export default function WorkflowPage() {
             })}
           </div>
 
-          <div className="mt-14 flex items-end justify-between gap-8">
+          <div className="mt-8 flex items-end justify-between gap-8">
             <p className="max-w-[950px] text-[10px] leading-[14px] text-[#8c8c8c]">Lorem ipsum dolor sit amet consectetur. Malesuada ultricies nunc ornare viverra est eget vitae iaculis. Id vel adipiscing nulla et amet lacus convallis mattis sit.<br />Erat nec tempus amet viverra sed ac vitae placerat. Euismod risus nunc commodo porttitor egestas dui amet et egestas at amet. Sed tellus mattis maecenas est felis.</p>
-            <Link href="/archplan" className="flex h-[35px] w-[111px] shrink-0 items-center justify-center gap-2 rounded-[10px] bg-[#168bef] text-[11px] font-medium text-white transition hover:bg-[#2a98f3]">New Project <Plus size={14} /></Link>
+            <div className="flex shrink-0 items-center gap-2">
+              {workflowSteps.length > 0 && <span className="text-[10px] text-[#a8a8a8]">{workflowStatus}</span>}
+              {workflowSteps.length > 0 && <button type="button" onClick={saveWorkflow} className="h-[35px] rounded-[10px] bg-[#333] px-3 text-[11px] hover:bg-[#3a3a3a]">Save</button>}
+              {workflowSteps.length > 0 && <button type="button" onClick={runWorkflow} disabled={workflowStatus === "Running"} className="h-[35px] rounded-[10px] bg-[#168bef] px-3 text-[11px] disabled:opacity-50">{workflowStatus === "Running" ? "Running..." : "Run"}</button>}
+              <Link href="/archplan" className="flex h-[35px] w-[111px] items-center justify-center gap-2 rounded-[10px] bg-[#168bef] text-[11px] font-medium text-white transition hover:bg-[#2a98f3]">New Project <Plus size={14} /></Link>
+            </div>
           </div>
         </div>
       </main>
