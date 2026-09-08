@@ -13,6 +13,7 @@ export type StudioAsset = {
 export type Transform = {
   x: number;
   y: number;
+  z?: number;
   rotation: number;
   scale: number;
 };
