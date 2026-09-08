@@ -59,7 +59,7 @@
 @media (min-width: 701px) {
   .crystal-studio { padding-inline: 0; background: #171717; }
   .crystal-left-panel,
-  .crystal-right-panel { border: 8px solid #171717 !important; border-radius: 16px; box-shadow: none; overflow: hidden; box-sizing: border-box; }
+  .crystal-right-panel { border: 0 !important; border-radius: 16px; box-shadow: none; overflow: hidden; }
   .crystal-studio > section { border: 0 !important; border-radius: 0; box-shadow: none; overflow: hidden; }
   .crystal-left-panel,
   .crystal-right-panel { background: #0F0F0F !important; top: 72px; bottom: 8px; }
