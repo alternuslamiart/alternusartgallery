@@ -238,7 +238,7 @@ export function Viewport(p:Props){
     <div className="crystal-mobile-modebar" role="tablist" aria-label="Mobile studio mode">
       {(["floor-plan", "modeling", "images"] as const).map((item) => <button key={item} type="button" role="tab" aria-selected={mode === item} onClick={() => selectMobileMode(item)} className={mode === item ? "active" : ""}>{item === "floor-plan" ? "Floor plan" : item[0].toUpperCase() + item.slice(1)}</button>)}
     </div>
-    <div className="crystal-mobile-empty-state" aria-hidden="true"><img src="/Logo.png" alt="Crystal" /><span>What should we create?</span></div>
+    <div className="crystal-mobile-empty-state" aria-hidden="true"><img src="/Logopng.png" alt="Crystal" /><span>What should we create?</span></div>
     {textureOpen && <div className="crystal-mobile-texture-panel" aria-label="Texture modeling">
       <div className="crystal-mobile-texture-heading"><div><strong>Texture Modeling</strong><span>Create new texture<br />from photo</span></div><button type="button" aria-label="Add texture"><Plus size={18} /></button></div>
       <div className="crystal-mobile-texture-grid">{["chrome-black","chrome-white","stone","ocean","violet","purple"].map((textureName) => <button type="button" key={textureName} aria-label={`Use ${textureName} texture`} className={`crystal-texture-card ${textureName}`} onClick={() => setTextureOpen(false)}><span /></button>)}</div>

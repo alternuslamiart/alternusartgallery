@@ -73,7 +73,7 @@ export const metadata: Metadata = {
  "AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics.",
  images: [
  {
- url: "/logo.png",
+ url: "/Logopng.png",
  width: 512,
  height: 512,
  alt: "Crystal Studio",
@@ -85,7 +85,7 @@ export const metadata: Metadata = {
  title: "Crystal Studio | AI Architecture & Interior Design",
  description:
  "AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics.",
- images: ["/logo.png"],
+ images: ["/Logopng.png"],
  },
  robots: {
  index: true,
@@ -183,11 +183,11 @@ export default function RootLayout({
  "url": "https://www.alternusart.com",
  "logo": {
  "@type": "ImageObject",
- "url": "https://www.alternusart.com/logo.png",
+ "url": "https://www.alternusart.com/Logopng.png",
  "width": 512,
  "height": 512
  },
- "image": "https://www.alternusart.com/logo.png",
+ "image": "https://www.alternusart.com/Logopng.png",
  "description": "AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics.",
  "email": "contact@alternusart.com",
  "foundingDate": "2024",

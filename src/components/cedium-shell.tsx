@@ -85,7 +85,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  <header className="crystal-glass-nav-shell">
  <div className="crystal-glass-nav" style={{ color: fg, borderColor: faint, background: isDark ? "rgba(28,28,30,.72)" : "rgba(255,255,255,.72)" }}>
  <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
- <img src="/logo.png" alt="Crystal" className="crystal-site-logo" />
+ <img src="/Logopng.png" alt="Crystal" className="crystal-site-logo" />
  <span className="crystal-glass-brand" style={{ color: fg }}>Crystal</span>
  </Link>
  <nav className="hidden md:flex crystal-glass-links" style={{ alignItems: "center", gap: 12 }}>
