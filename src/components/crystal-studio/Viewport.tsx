@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, ChevronDown, CircleHelp, DoorOpen, EyeOff, FolderOpen, Globe2, Grid3X3, Hand, Lightbulb, Link2, LoaderCircle, MessageSquare, MousePointer2, Ruler, Send, Sofa, SquareDashed, TextCursorInput, Trash2, X, Zap } from "lucide-react";
+import { Camera, ChevronDown, CircleHelp, DoorOpen, EyeOff, FolderOpen, Glasses, Globe2, Grid3X3, Hand, Lightbulb, Link2, LoaderCircle, MessageSquare, MousePointer2, Ruler, Send, Sofa, SquareDashed, TextCursorInput, Trash2, X, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { modelingTools } from "./data";
 import { CubeFilled, SparkleFilled } from "./filled-icons";
@@ -8,7 +8,7 @@ import type { FloorPlanObject, FloorPlanPoint, FloorPlanSettings, StudioAsset, S
 import { formatFloorLength, floorSnapPoint, parseFloorLength, roundFloorValue } from "./floor-plan-geometry";
 import { IconButton } from "./ui";
 
-type Props = { renderer:string; selectedAsset?:StudioAsset; activeTool:StudioTool; prompt:string; loading:boolean; progress:number; error:string|null; transform:Transform; color:string; roughness:number; metallic:number; studioMode?:StudioMode; onStudioModeChange?:(v:StudioMode)=>void; floorPlanObjects?:FloorPlanObject[]; selectedFloorPlanId?:string|null; floorPlanSettings?:FloorPlanSettings; onFloorPlanSettingsChange?:(settings:FloorPlanSettings)=>void; onFloorPlanObjectsChange?:(objects:FloorPlanObject[])=>void; onSelectFloorPlanObject?:(id:string|null)=>void; onToolChange:(v:StudioTool)=>void; onPromptChange:(v:string)=>void; onGenerate:()=>void; onTransformChange:(v:Transform)=>void; onClearError:()=>void; onAssetDrop:(v:string)=>void; onCreateObject:()=>void; onSelectAsset:(id:string)=>void; onColorChange:(v:string)=>void; onOpenPricing:()=>void; onSnapshot:()=>void };
+type Props = { renderer:string; selectedAsset?:StudioAsset; activeTool:StudioTool; prompt:string; loading:boolean; progress:number; error:string|null; transform:Transform; color:string; roughness:number; metallic:number; incognito?:boolean; studioMode?:StudioMode; onStudioModeChange?:(v:StudioMode)=>void; floorPlanObjects?:FloorPlanObject[]; selectedFloorPlanId?:string|null; floorPlanSettings?:FloorPlanSettings; onFloorPlanSettingsChange?:(settings:FloorPlanSettings)=>void; onFloorPlanObjectsChange?:(objects:FloorPlanObject[])=>void; onSelectFloorPlanObject?:(id:string|null)=>void; onToolChange:(v:StudioTool)=>void; onPromptChange:(v:string)=>void; onGenerate:()=>void; onTransformChange:(v:Transform)=>void; onClearError:()=>void; onAssetDrop:(v:string)=>void; onCreateObject:()=>void; onSelectAsset:(id:string)=>void; onColorChange:(v:string)=>void; onOpenPricing:()=>void; onSnapshot:()=>void };
 type Camera={yaw:number;pitch:number;distance:number;panX:number;panY:number};
 type Point={x:number;y:number};
 const cameraStart:Camera={yaw:.74,pitch:.48,distance:12,panX:0,panY:0};
@@ -179,6 +179,7 @@ function FloorPlanViewport({ p }: { p: Props }) {
       <button type="button" role="tab" aria-selected="false" onClick={() => p.onStudioModeChange?.("modeling")}>Modeling</button>
       <button type="button" role="tab" aria-selected="false" onClick={() => p.onStudioModeChange?.("modeling")}>Images</button>
     </div>
+    {p.incognito && <div className="crystal-mobile-incognito-mode" role="status"><Glasses size={14} /> Incognito mode</div>}
     <svg ref={svgRef} className="absolute inset-0 h-full w-full cursor-crosshair" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={completeDrag} onPointerCancel={() => {setDrag(null);setPanning(null)}} onWheel={event => { event.preventDefault(); setView(current => ({...current,zoom:Math.max(24,Math.min(180,current.zoom * Math.exp(-event.deltaY * .001)))})); }} onContextMenu={event => event.preventDefault()}>
       <defs><pattern id="floor-dots" width={Math.max(8, settings.gridStepMm / 1000 * view.zoom)} height={Math.max(8, settings.gridStepMm / 1000 * view.zoom)} patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r={view.zoom > 55 ? 1 : .7} fill="#c9cbc8"/></pattern></defs>
       <rect width="100%" height="100%" fill="#fbfbfa"/><rect width="100%" height="100%" fill="url(#floor-dots)"/>

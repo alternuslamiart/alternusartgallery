@@ -178,6 +178,8 @@
   .crystal-mobile-model-tools button { display:grid; width:38px; height:38px; place-items:center; border:0; border-radius:50%; background:#353535; color:#e8e8e8; }
   .crystal-mobile-model-tools button.active { background:#4a4a4a; color:#fff; }
   .crystal-mobile-model-tools .crystal-tool-record { width:22px; height:22px; border-radius:50%; background:#ef6468; box-shadow:0 0 0 5px rgba(255,255,255,.04); }
+  .crystal-mobile-incognito.is-active { background:#1687f7; color:#fff; box-shadow:0 0 0 4px rgba(22,135,247,.22),0 8px 18px rgba(22,135,247,.25); }
+  .crystal-mobile-incognito-mode { position:absolute; top:76px; left:50%; z-index:32; display:flex; align-items:center; gap:6px; transform:translateX(-50%); padding:6px 11px; border:1px solid rgba(22,135,247,.55); border-radius:999px; background:rgba(22,135,247,.16); color:#8dc9ff; font-size:10px; box-shadow:0 5px 16px rgba(0,0,0,.2); }
   .crystal-mobile-upgrade { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 7px 0 14px; margin-bottom: 4px; border-radius: 999px; background: #414141; color: #1493ff; font-size: 14px; }
   .crystal-mobile-upgrade button { margin-left: auto; border: 0; border-radius: 999px; padding: 10px 16px; background: #1687f7; color: white; font-size: 11px; }
   .crystal-mobile-sheet, .crystal-mobile-profile { position: fixed; inset: 0; z-index: 80; display: flex; flex-direction: column; padding: 25px 23px 27px; background: #1b1b1b; color: #f4f4f5; }
@@ -898,6 +900,7 @@
   .crystal-studio > section { padding-inline:0!important; }
   .crystal-studio .crystal-mobile-menu-trigger { left:var(--crystal-mobile-gutter); top:24px; width:48px; height:48px; background:#292929; }
   .crystal-studio .crystal-mobile-incognito { right:var(--crystal-mobile-gutter); top:24px; width:48px; height:48px; background:#292929; }
+  .crystal-studio .crystal-mobile-incognito-mode { top:80px; }
   .crystal-studio .crystal-mobile-modebar { display:flex; }
   .crystal-studio .crystal-mobile-empty-state { display:flex; }
   .crystal-studio .crystal-ai-prompt { bottom:20px!important; left:var(--crystal-mobile-gutter)!important; width:calc(100% - (var(--crystal-mobile-gutter) * 2))!important; max-width:none!important; transform:none!important; border:0!important; border-radius:27px!important; background:#303030!important; padding:12px 14px 13px!important; box-shadow:0 0 0 10px rgba(41,47,91,.18),0 12px 34px rgba(0,0,0,.34)!important; }
