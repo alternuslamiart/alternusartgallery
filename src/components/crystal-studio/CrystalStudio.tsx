@@ -106,7 +106,7 @@ export function CrystalStudio({ initialDashboard = false }: { initialDashboard?:
   if (dashboard) return <div className="crystal-dashboard">
     {mobileSplash && <div className="crystal-mobile-splash"><img src="/logo.png" alt="Crystal" /></div>}
     <header><div className="crystal-dashboard-brand"><img src="/logo.png" alt="Crystal" className="crystal-brand-logo"/><b>Crystal</b></div><div className="crystal-window-controls">•••　—　×　□</div></header>
-    <UnifiedSidebar activePath="/project" className="rounded-none" />
+    <UnifiedSidebar activePath="/project" className="h-full" />
     <main><div className="crystal-dashboard-title"><div><h1>♦ Crystal</h1><b>Recent Projects</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => router.push("/crystal")}>Launch Studio　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago", route:"/archplan"},{title:"Architecture Sketch",time:"Viewed 3mo ago", route:"/archplan"}].map((project) => <button key={project.title} onClick={() => router.push(project.route)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
   </div>;
 
