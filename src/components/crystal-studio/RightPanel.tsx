@@ -32,11 +32,28 @@ const exportOptions = [
 export function RightPanel(props: Props) {
   const [swatches,setSwatches]=useState(["#4A90D9","#E8793E","#84CC6A"]);
   const [swatchGrid,setSwatchGrid]=useState(true);
+  const [canvasOpen, setCanvasOpen] = useState(false);
+  const canvasOptions = ["1920x1080", "2560x1440", "3840x2160", "7680x4320"];
   return (
     <aside className="crystal-right-panel min-h-0 overflow-y-auto border-l border-[#303030] bg-[#0F0F0F] px-5 pb-5 pt-4 scrollbar-hide">
       <SectionTitle action={<button aria-label="Collapse right panel" onClick={props.onCollapse} className="grid h-8 w-8 place-items-center rounded-[8px] text-zinc-400 transition hover:bg-[#292929] hover:text-white"><PanelRightClose size={16}/></button>}>Output</SectionTitle>
       <div className="space-y-2">
-        <SelectField label="Canvas" value={props.resolution} onChange={(event) => props.onResolutionChange(event.target.value)}><option>1920x1080</option><option>2560x1440</option><option>3840x2160</option><option>7680x4320</option></SelectField>
+        <div className="relative">
+          <button type="button" aria-expanded={canvasOpen} onClick={() => setCanvasOpen((value) => !value)} className="flex h-12 w-full items-center rounded-full bg-[#2b2b2b] px-4 text-left text-[13px] text-zinc-100 transition hover:bg-[#343434]">
+            <span className="flex-1">Canvas</span>
+            <span className="mr-3">{props.resolution}</span>
+            <span className={`text-zinc-400 transition-transform ${canvasOpen ? "rotate-180" : ""}`}>⌄</span>
+          </button>
+          {canvasOpen && (
+            <div className="absolute inset-x-0 top-[52px] z-20 rounded-[22px] bg-[#292929] p-2 shadow-[0_14px_35px_rgba(0,0,0,.35)]">
+              {canvasOptions.map((option) => (
+                <button key={option} type="button" onClick={() => { props.onResolutionChange(option); setCanvasOpen(false); }} className={`flex h-16 w-full items-center justify-center rounded-[16px] text-[18px] transition ${props.resolution === option ? "bg-[#3a3a3a] text-white" : "text-zinc-100 hover:bg-[#343434]"}`}>
+                  {option}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <SelectField label="Frame rate" value={props.frameRate} onChange={(event) => props.onFrameRateChange(event.target.value)}><option>24 fps</option><option>30 fps</option><option>60 fps</option><option>120 fps</option></SelectField>
       </div>
 
