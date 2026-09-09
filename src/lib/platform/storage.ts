@@ -2,9 +2,13 @@ import { createHash, randomUUID } from "crypto";
 import { mkdir, readFile, stat, unlink, writeFile } from "fs/promises";
 import path from "path";
 import { AssetType } from "@prisma/client";
-import { sanitizeName, ValidationError } from "./validation";
+import { assertSafePath, sanitizeName, ValidationError } from "./validation";
 
-const unsafeExtensions = new Set(["exe", "sh", "bat", "cmd", "php", "py", "rb", "jar", "dll"]);
+const unsafeExtensions = new Set([
+  "exe", "dll", "com", "scr", "bat", "cmd", "ps1", "psm1", "psd1", "sh", "bash", "zsh", "ksh",
+  "php", "php3", "php4", "php5", "phtml", "py", "pyw", "rb", "pl", "jsp", "asp", "aspx", "jar",
+  "vbs", "js", "mjs", "cjs", "ts", "tsx", "jsx", "html", "htm", "xhtml", "css", "scss", "sass", "less",
+]);
 const extensionTypeMap: Record<string, AssetType> = {
  jpg: "IMAGE",
  jpeg: "IMAGE",
@@ -59,7 +63,7 @@ export function getAssetUploadRoot() {
 }
 
 export function detectTypeFromFile(filename: string, mimeType: string): AssetType {
- const extension = filename.split(".").pop()?.toLowerCase() ?? "";
+ const extension = filename.split(".").pop()?.toLowerCase().replace(/[?#].*$/, "") ?? "";
  if (unsafeExtensions.has(extension)) {
  throw new ValidationError("Executable or server-side file uploads are not allowed.", { extension });
  }
@@ -115,9 +119,7 @@ export async function storeAssetFile(file: File, workspaceId: string): Promise<S
 }
 
 export function resolveStorageKey(storageKey: string) {
- if (!storageKey || storageKey.includes("..") || path.isAbsolute(storageKey)) {
- throw new ValidationError("Storage key is not safe.", { storageKey });
- }
+ assertSafePath(storageKey);
  return path.resolve(getAssetUploadRoot(), storageKey);
 }
 

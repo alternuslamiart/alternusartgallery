@@ -84,11 +84,21 @@ export function sortToOrderBy(sort: string | undefined) {
 }
 
 export function sanitizeName(name: string) {
- return name.replace(/[<>:"/\\|?*\u0000-\u001F]/g, " ").replace(/\s+/g, " ").trim();
+ const cleaned = name
+   .replace(/[<>:"/\\|?*\u0000-\u001F]/g, " ")
+   .replace(/\s+/g, " ")
+   .trim();
+
+ return cleaned.replace(/^\.+$/, "").replace(/\.+$/g, "").trim();
 }
 
 export function assertSafePath(path: string) {
- if (!path || path.length > 260 || path.includes("..") || path.startsWith("/") || /^[a-zA-Z]:/.test(path)) {
+ const candidate = typeof path === "string" ? path.trim() : "";
+ if (!candidate || candidate.length > 260 || candidate.includes("..") || candidate.includes("\\") || candidate.includes(":") || candidate.startsWith("/") || candidate.startsWith("./") || candidate.startsWith("../") || candidate === "." || /^[a-zA-Z]:/.test(candidate)) {
+ throw new ValidationError("Path is not safe.", { path });
+ }
+
+ if (candidate.includes("//")) {
  throw new ValidationError("Path is not safe.", { path });
  }
 }
