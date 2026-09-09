@@ -79,6 +79,7 @@ export function useCoreforgeTheme() {
 
 export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: ReturnType<typeof useCoreforgeTheme>) {
  const pathname = usePathname();
+ const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
  return (
  <header className="crystal-glass-nav-shell">
@@ -93,7 +94,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  ))}
  </nav>
  <div style={{ flex: 1 }} />
- <button aria-label="Toggle color theme" onClick={() => setIsDark(!isDark)} style={{ width: 34, height: 34, border: `1px solid ${faint}`, background: isDark ? "rgba(255,255,255,0.04)" : "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: muted, borderRadius: 8 }}>
+ <button aria-label="Open navigation menu" aria-expanded={mobileMenuOpen} onClick={() => { if (window.innerWidth <= 700) setMobileMenuOpen((open) => !open); else setIsDark(!isDark); }} style={{ width: 34, height: 34, border: `1px solid ${faint}`, background: isDark ? "rgba(255,255,255,0.04)" : "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: muted, borderRadius: 8 }}>
  {isDark
  ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
  : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
@@ -113,6 +114,9 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  Launch Studio <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
  </Link>
  </div>
+ {mobileMenuOpen && <div className="crystal-mobile-nav-menu">
+ <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Log in</Link>
+ </div>}
  </header>
  );
 }
