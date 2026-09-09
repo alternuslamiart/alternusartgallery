@@ -688,17 +688,18 @@
 .crystal-site-logo { width: 28px; height: 28px; object-fit: contain; filter: invert(1) brightness(1.55); opacity: .9; }
 
 @media (max-width:700px) {
- .crystal-glass-nav-shell { position:relative; padding:0; height:88px; }
- .crystal-glass-nav { position:relative; height:64px; width:calc(100% - 28px); margin:12px auto 0; padding:0 10px; border:1px solid rgba(255,255,255,.14)!important; border-radius:17px; background:rgba(31,31,33,.76)!important; box-shadow:0 12px 30px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.08); backdrop-filter:blur(22px) saturate(145%); -webkit-backdrop-filter:blur(22px) saturate(145%); justify-content:space-between; }
+ .crystal-glass-nav-shell { position:relative; padding:0; height:176px; }
+ .crystal-glass-nav { position:relative; height:176px; width:100%; margin:0; padding:0 23px; border:0!important; border-radius:0; background:#1b1b1b!important; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; justify-content:space-between; }
  .crystal-glass-nav>a:first-child { position:absolute; left:50%; transform:translateX(-50%); }
  .crystal-glass-nav>a:first-child .crystal-site-logo { display:none; }
- .crystal-glass-brand { font-size:24px; letter-spacing:-.04em; background:linear-gradient(110deg,#81858b 0%,#f7f8fa 34%,#747980 55%,#e7e9eb 78%,#777c82 100%); -webkit-background-clip:text; background-clip:text; color:transparent!important; text-shadow:0 0 16px rgba(255,255,255,.16); }
- .crystal-glass-nav>button { order:-1; width:40px!important; height:40px!important; border-radius:11px!important; background:rgba(255,255,255,.035)!important; border-color:rgba(255,255,255,.24)!important; }
+ .crystal-glass-brand { font-size:36px; font-weight:500; letter-spacing:-.06em; background:linear-gradient(110deg,#686c72 0%,#d9dcdf 33%,#656a70 52%,#d5d8dc 74%,#656a70 100%); -webkit-background-clip:text; background-clip:text; color:transparent!important; text-shadow:0 1px 0 rgba(255,255,255,.22),0 0 14px rgba(255,255,255,.1); }
+ .crystal-glass-nav>button { order:-1; width:48px!important; height:48px!important; border-radius:15px!important; background:transparent!important; border:1px solid rgba(255,255,255,.42)!important; }
  .crystal-glass-nav>button svg { display:none; }
  .crystal-glass-nav>button::after { display:none; }
- .crystal-glass-nav>button:before { content:""; width:15px; height:15px; background:radial-gradient(circle,#f0f1f2 0 1.5px,transparent 1.8px) 0 0/7px 7px; }
- .crystal-glass-nav a[href="/account"] { display:grid!important; width:40px!important; height:40px!important; border:1px solid rgba(255,255,255,.24)!important; border-radius:11px!important; background:rgba(255,255,255,.035)!important; color:#e7e7e7!important; font-size:0!important; }
+ .crystal-glass-nav>button:before { content:""; width:19px; height:19px; background:radial-gradient(circle,#f0f1f2 0 1.7px,transparent 2px) 0 0/9px 9px; }
+ .crystal-glass-nav a[href="/account"] { display:grid!important; width:48px!important; height:48px!important; border:1px solid rgba(255,255,255,.42)!important; border-radius:15px!important; background:transparent!important; color:#e7e7e7!important; font-size:0!important; }
  .crystal-glass-nav a[href="/account"] .crystal-mobile-profile-icon { display:block; }
+ .crystal-glass-nav>a[href="/project"] { display:none!important; }
  .crystal-desktop-profile-label { display:none; }
 }
 
