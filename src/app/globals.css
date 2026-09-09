@@ -923,5 +923,9 @@
   .crystal-studio .crystal-ai-prompt>div:last-child .ml-auto svg { width:20px; height:20px; }
   .crystal-studio .crystal-ai-prompt>div:last-child>label:first-child { width:40px; height:40px; border-radius:50%; }
   .crystal-studio .crystal-ai-prompt>div:last-child>label:nth-child(2) { min-width:162px; justify-content:center; }
+  .crystal-mobile-tools-open .crystal-ai-prompt { bottom:20px!important; padding:10px 14px!important; }
+  .crystal-mobile-tools-open .crystal-ai-prompt .crystal-mobile-upgrade,
+  .crystal-mobile-tools-open .crystal-ai-prompt textarea,
+  .crystal-mobile-tools-open .crystal-ai-prompt .crystal-mobile-reference { display:none; }
   .crystal-studio .crystal-modeling-tools { display:none!important; }
 }
