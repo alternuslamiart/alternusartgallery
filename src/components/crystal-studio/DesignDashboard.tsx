@@ -58,7 +58,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
 
   return (
     <div
-      className="min-h-screen bg-[#0F0F0F] text-[#F5F5F5]"
+      className="crystal-design-dashboard min-h-screen bg-[#0F0F0F] text-[#F5F5F5]"
       style={{ fontFamily: '"Roboto", "Segoe UI", sans-serif' }}
     >
       <header className="flex h-[62px] items-center border-b border-white/[0.08] bg-[#0F0F0F] px-6">

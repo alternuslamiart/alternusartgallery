@@ -59,7 +59,7 @@ export default function Account() {
  const baseCard: React.CSSProperties = { background: raised, border: `1px solid ${faintBorder}`, borderRadius: 12, boxShadow: cardShadow };
 
  return (
- <div style={{ minHeight: "100vh", background: bg, color: fg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", display: "flex", flexDirection: "column" }}>
+ <div className="crystal-account-page" style={{ minHeight: "100vh", background: bg, color: fg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", display: "flex", flexDirection: "column" }}>
 
  {/* Slim top bar */}
  <header style={{ padding: "16px 24px", borderBottom: `1px solid ${faintBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between", background: raised }}>

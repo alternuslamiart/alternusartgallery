@@ -114,9 +114,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  Launch Studio <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
  </Link>
  </div>
- {mobileMenuOpen && <div className="crystal-mobile-nav-menu">
- <Link href="/login" onClick={() => setMobileMenuOpen(false)}>Log in</Link>
- </div>}
+ {mobileMenuOpen && <div className="crystal-mobile-nav-menu" />}
  </header>
  );
 }

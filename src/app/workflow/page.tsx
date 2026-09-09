@@ -91,7 +91,7 @@ export default function WorkflowPage() {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#2a2a2a] text-[#f5f5f5] font-sans">
+    <div className="crystal-workflow-page flex h-screen w-full overflow-hidden bg-[#2a2a2a] text-[#f5f5f5] font-sans">
       <header className="fixed inset-x-0 top-0 z-30 flex h-[54px] items-center border-b border-white/[0.06] bg-[#151515] px-[28px]">
         <div className="flex items-center gap-3">
           <span className="grid h-6 w-6 place-items-center text-zinc-500"><Sparkles size={21} fill="currentColor" strokeWidth={1.3} /></span>

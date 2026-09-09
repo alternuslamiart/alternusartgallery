@@ -100,7 +100,7 @@ export default function ArchplanPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] font-sans text-[#f5f5f5]">
+    <div className="crystal-archplan-page min-h-screen bg-[#0f0f0f] font-sans text-[#f5f5f5]">
       <header className="fixed inset-x-0 top-0 z-30 flex h-[54px] items-center border-b border-[#242424] bg-[#171717] px-[50px]">
         <span className="text-sm font-semibold tracking-tight">Crystal</span>
         <a href="/design-studio" className="ml-8 text-zinc-400 transition hover:text-white" aria-label="Home">
