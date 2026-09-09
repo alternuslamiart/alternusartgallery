@@ -124,6 +124,7 @@ export default function HomePage() {
  {metrics.map((metric) => (
  <article
  key={metric.label}
+ className={`crystal-core-metric crystal-core-metric-${metric.value.toLowerCase()}`}
  style={{
  padding: 28,
  border: "0",

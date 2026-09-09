@@ -93,7 +93,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  ))}
  </nav>
  <div style={{ flex: 1 }} />
- <button onClick={() => setIsDark(!isDark)} style={{ width: 34, height: 34, border: `1px solid ${faint}`, background: isDark ? "rgba(255,255,255,0.04)" : "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: muted, borderRadius: 8 }}>
+ <button aria-label="Toggle color theme" onClick={() => setIsDark(!isDark)} style={{ width: 34, height: 34, border: `1px solid ${faint}`, background: isDark ? "rgba(255,255,255,0.04)" : "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: muted, borderRadius: 8 }}>
  {isDark
  ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
  : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
@@ -102,7 +102,10 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  <Link href="/login" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }} className="hover:!border-[#4284FF]">
  Log in
  </Link>
- <Link href="/account" aria-label="Account profile" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, fontSize: 12, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.02em" }}>AL</Link>
+ <Link href="/account" aria-label="Account profile" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, fontSize: 12, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.02em" }}>
+ <svg className="crystal-mobile-profile-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.2 3.3-5 7.5-5s6.7 1.8 7.5 5"/></svg>
+ <span className="crystal-desktop-profile-label">AL</span>
+ </Link>
  <Link href="/download" className="hidden sm:inline-flex" style={{ alignItems: "center", height: 36, padding: "0 15px", color: fg, fontSize: 13, fontWeight: 700, textDecoration: "none", border: `1px solid ${faint}`, borderRadius: 8 }}>
  Download App
  </Link>

@@ -689,16 +689,43 @@
 
 @media (max-width:700px) {
  .crystal-glass-nav-shell { position:relative; padding:0; height:88px; }
- .crystal-glass-nav { position:relative; height:88px; width:100%; padding:0 22px; border:0; border-radius:0; background:transparent!important; box-shadow:none; justify-content:space-between; }
+ .crystal-glass-nav { position:relative; height:64px; width:calc(100% - 28px); margin:12px auto 0; padding:0 10px; border:1px solid rgba(255,255,255,.14)!important; border-radius:17px; background:rgba(31,31,33,.76)!important; box-shadow:0 12px 30px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.08); backdrop-filter:blur(22px) saturate(145%); -webkit-backdrop-filter:blur(22px) saturate(145%); justify-content:space-between; }
  .crystal-glass-nav>a:first-child { position:absolute; left:50%; transform:translateX(-50%); }
  .crystal-glass-nav>a:first-child .crystal-site-logo { display:none; }
- .crystal-glass-brand { font-size:25px; color:#f3f4f6!important; }
- .crystal-glass-nav>button { order:-1; width:40px!important; height:40px!important; border-radius:11px!important; background:#222!important; }
+ .crystal-glass-brand { font-size:24px; letter-spacing:-.04em; background:linear-gradient(110deg,#81858b 0%,#f7f8fa 34%,#747980 55%,#e7e9eb 78%,#777c82 100%); -webkit-background-clip:text; background-clip:text; color:transparent!important; text-shadow:0 0 16px rgba(255,255,255,.16); }
+ .crystal-glass-nav>button { order:-1; width:40px!important; height:40px!important; border-radius:11px!important; background:rgba(255,255,255,.035)!important; border-color:rgba(255,255,255,.24)!important; }
  .crystal-glass-nav>button svg { display:none; }
- .crystal-glass-nav>button::after { content:"⠿"; color:#e7e7e7; font-size:21px; line-height:1; }
- .crystal-glass-nav a[href="/account"] { display:grid!important; width:40px!important; height:40px!important; border:1px solid #555!important; border-radius:11px!important; background:transparent!important; color:transparent!important; font-size:0!important; }
- .crystal-glass-nav a[href="/account"]::after { content:"◯"; color:#e7e7e7; font-size:25px; line-height:1; }
+ .crystal-glass-nav>button::after { display:none; }
+ .crystal-glass-nav>button:before { content:""; width:15px; height:15px; background:radial-gradient(circle,#f0f1f2 0 1.5px,transparent 1.8px) 0 0/7px 7px; }
+ .crystal-glass-nav a[href="/account"] { display:grid!important; width:40px!important; height:40px!important; border:1px solid rgba(255,255,255,.24)!important; border-radius:11px!important; background:rgba(255,255,255,.035)!important; color:#e7e7e7!important; font-size:0!important; }
+ .crystal-glass-nav a[href="/account"] .crystal-mobile-profile-icon { display:block; }
+ .crystal-desktop-profile-label { display:none; }
 }
+
+ .crystal-mobile-profile-icon { display:none; }
+
+ @media (max-width:700px) {
+  .crystal-first-sector { width:100%; max-width:none; box-sizing:border-box; padding:0 14px 40px; background:#1b1b1b; }
+  .crystal-first-sector>p { padding:0 12px; margin:0 auto 20px; color:rgba(226,228,232,.76); font-size:9px; }
+  .crystal-first-card { width:100%; box-sizing:border-box; padding:8px; border-radius:22px; background:#292929; box-shadow:0 18px 38px rgba(0,0,0,.2); }
+  .crystal-first-card>div:first-child { padding:14px 8px 10px; }
+  .crystal-first-image { height:190px; border-radius:17px; }
+  .crystal-first-card h1 { font-size:25px; line-height:1.02; letter-spacing:-.045em; }
+  .crystal-first-card p { margin:14px 0 16px; font-size:9px; line-height:1.45; }
+  .crystal-first-card>div:first-child>div { gap:8px; }
+  .crystal-first-card a { height:36px!important; min-height:36px; border-radius:9px!important; font-size:10px; }
+  .crystal-first-chips { margin-top:16px; gap:7px; padding:0 2px 3px; }
+  .crystal-first-chips span { padding:7px 9px; font-size:7px; background:#292929; color:#e7e9ed; }
+  .crystal-first-sector + section { padding:24px 14px 44px!important; background:#1b1b1b!important; }
+  .crystal-first-sector + section>div { padding:0!important; }
+  .crystal-first-sector + section .grid { display:block; }
+  .crystal-core-metric { display:none!important; min-height:0!important; padding:20px!important; border-radius:18px!important; background:#292929!important; }
+  .crystal-core-metric-3d { display:flex!important; }
+  .crystal-core-metric-3d div:first-child { color:rgba(226,228,232,.58)!important; font-size:9px!important; letter-spacing:.2em!important; }
+  .crystal-core-metric-3d div:nth-child(2)>div { font-size:64px!important; color:#4284ff!important; }
+  .crystal-core-metric-3d p { margin-top:12px!important; color:rgba(226,228,232,.72)!important; font-size:10px!important; }
+  .crystal-first-sector ~ footer { display:none; }
+ }
 
 /* Keep a refined 12px image inset on the desktop marketing feature frames. */
 @media (min-width: 701px) {
