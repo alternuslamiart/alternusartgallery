@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, ChevronDown, CircleHelp, Download, DoorOpen, EyeOff, FolderOpen, Glasses, Globe2, Grid3X3, Hand, Lightbulb, Link2, LoaderCircle, MessageSquare, MousePointer2, Ruler, Send, Share2, Sofa, SquareDashed, TextCursorInput, Trash2, X, Zap } from "lucide-react";
+import { Camera, ChevronDown, CircleHelp, Download, DoorOpen, EyeOff, FolderOpen, Glasses, Globe2, Grid3X3, Hand, Lightbulb, Link2, LoaderCircle, MessageSquare, MousePointer2, Plus, Ruler, Send, Share2, Sofa, SquareDashed, TextCursorInput, Trash2, X, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { modelingTools } from "./data";
 import { CubeFilled, SparkleFilled } from "./filled-icons";
@@ -207,7 +207,7 @@ function FloorPlanViewport({ p }: { p: Props }) {
 
 export function Viewport(p:Props){
   const [camera,setCamera]=useState(cameraStart), drag=useRef<{x:number;y:number;base:Camera;mode:"orbit"|"pan"|"dolly"}|null>(null), transformBase=useRef<Transform|null>(null), objectCreate=useRef<{x:number;y:number;transform:Transform}|null>(null);
-  const [mode,setMode]=useState<"floor-plan"|"modeling"|"images">("images"),[chat,setChat]=useState(true),[mobileToolsOpen,setMobileToolsOpen]=useState(false),[showImagePreview,setShowImagePreview]=useState(false),[grid,setGrid]=useState(true),[help,setHelp]=useState(false),[lighting,setLighting]=useState(false),[world,setWorld]=useState(false),[model,setModel]=useState("Precision Mode"),[referenceImage,setReferenceImage]=useState<string|null>(null);
+  const [mode,setMode]=useState<"floor-plan"|"modeling"|"images">("images"),[chat,setChat]=useState(true),[mobileToolsOpen,setMobileToolsOpen]=useState(false),[textureOpen,setTextureOpen]=useState(false),[showImagePreview,setShowImagePreview]=useState(false),[grid,setGrid]=useState(true),[help,setHelp]=useState(false),[lighting,setLighting]=useState(false),[world,setWorld]=useState(false),[model,setModel]=useState("Precision Mode"),[referenceImage,setReferenceImage]=useState<string|null>(null);
   const [playing,setPlaying]=useState(false),[selected,setSelected]=useState(Boolean(p.selectedAsset)),[face,setFace]=useState<number|null>(null),[drawings,setDrawings]=useState<Point[][]>([]),[drawing,setDrawing]=useState<Point[]|null>(null),[measureStart,setMeasureStart]=useState<Point|null>(null),[measurement,setMeasurement]=useState<{a:Point;b:Point}|null>(null),[history,setHistory]=useState<Transform[]>([]),[future,setFuture]=useState<Transform[]>([]);
   const selectMobileMode = (nextMode:"floor-plan"|"modeling"|"images") => {
     setMode(nextMode);
@@ -239,9 +239,13 @@ export function Viewport(p:Props){
       {(["floor-plan", "modeling", "images"] as const).map((item) => <button key={item} type="button" role="tab" aria-selected={mode === item} onClick={() => selectMobileMode(item)} className={mode === item ? "active" : ""}>{item === "floor-plan" ? "Floor plan" : item[0].toUpperCase() + item.slice(1)}</button>)}
     </div>
     <div className="crystal-mobile-empty-state" aria-hidden="true"><img src="/Logo.png" alt="Crystal" /><span>What should we create?</span></div>
+    {textureOpen && <div className="crystal-mobile-texture-panel" aria-label="Texture modeling">
+      <div className="crystal-mobile-texture-heading"><div><strong>Texture Modeling</strong><span>Create new texture<br />from photo</span></div><button type="button" aria-label="Add texture"><Plus size={18} /></button></div>
+      <div className="crystal-mobile-texture-grid">{["chrome-black","chrome-white","stone","ocean","violet","purple"].map((textureName) => <button type="button" key={textureName} aria-label={`Use ${textureName} texture`} className={`crystal-texture-card ${textureName}`} onClick={() => setTextureOpen(false)}><span /></button>)}</div>
+    </div>}
     <div className={`crystal-mobile-model-tools ${mobileToolsOpen ? "is-visible" : ""}`} aria-label="Studio tools">
       <button type="button" aria-label="Play or pause animation" className={playing ? "active" : ""} onClick={() => setPlaying(value => !value)}><span className="crystal-tool-record" /></button>
-      <button type="button" aria-label="Focus selected object" className={selected ? "active" : ""} onClick={focus}><CubeFilled size={20} /></button>
+      <button type="button" aria-label="Texture modeling" className={textureOpen ? "active" : ""} onClick={() => { setTextureOpen(value => !value); setMobileToolsOpen(true); setChat(true); }}><CubeFilled size={20} /></button>
       <button type="button" aria-label="Toggle object visibility" className={!selected ? "active" : ""} onClick={() => { setSelected(value => !value); p.onAssetDrop(selected ? "" : p.selectedAsset?.id ?? "industrial-desk"); }}><EyeOff size={20} /></button>
       <button type="button" aria-label="Open object assets" onClick={() => p.onToolChange("model")}><FolderOpen size={20} /></button>
       <button type="button" aria-label="Take snapshot" onClick={p.onSnapshot}><Camera size={20} /></button>
