@@ -73,8 +73,8 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
         </Link>
       </header>
 
-      <div className="flex min-h-[calc(100vh-62px)] gap-1.5 bg-[#0F0F0F] p-1.5">
-        <UnifiedSidebar activePath="/design-studio" className="hidden md:flex" />
+      <div className="flex h-[calc(100vh-62px)] min-h-[520px] gap-1.5 bg-[#0F0F0F] p-1.5">
+        <UnifiedSidebar activePath="/design-studio" className="hidden h-full md:flex" />
 
         <main className="min-w-0 flex-1 rounded-[19px] bg-[#101010] px-5 py-12 md:px-8 lg:px-10">
           <section className="mx-auto max-w-[1560px]">
