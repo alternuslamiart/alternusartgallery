@@ -25,6 +25,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 type SidebarItem = { label: string; href: string; icon: LucideIcon; badge?: string };
 
@@ -62,12 +63,34 @@ export function UnifiedSidebar({
   onCollapse?: () => void;
   className?: string;
 }) {
-  if (collapsed) {
+  const [localCollapsed, setLocalCollapsed] = useState(false);
+  const isCollapsed = onCollapse ? collapsed : localCollapsed;
+  const toggleCollapse = () => {
+    if (onCollapse) onCollapse();
+    else setLocalCollapsed((value) => !value);
+  };
+  const compactItems = [...primary, ...favorites, ...records];
+
+  if (isCollapsed) {
     return (
-      <aside className={`flex h-full w-[60px] flex-col items-center bg-[#202124] py-4 ${className}`}>
-        <button type="button" onClick={onCollapse} aria-label="Expand sidebar" className="rounded-lg p-2 text-[#a4a6ab] hover:bg-[#303136]">
-          <PanelLeftOpen size={16} />
+      <aside className={`flex h-full w-[60px] flex-col items-center overflow-hidden bg-[#232427] py-3 ${className}`}>
+        <button type="button" onClick={toggleCollapse} aria-label="Expand sidebar" className="grid h-8 w-8 place-items-center rounded-[8px] bg-[#34363a] text-white hover:bg-[#414348]">
+          <Sparkles size={16} />
         </button>
+        <button type="button" onClick={toggleCollapse} aria-label="Expand sidebar" className="mt-4 grid h-8 w-8 place-items-center rounded-[7px] border border-[#45474c] bg-[#2b2c30] text-[#a4a6ab] hover:bg-[#3a3b40]">
+          <Search size={14} />
+        </button>
+        <nav className="mt-3 flex flex-col items-center gap-1" aria-label="Collapsed workspace navigation">
+          {compactItems.map(({ label, href, icon: Icon, badge }) => (
+            <Link key={label} href={href} aria-label={label} title={label} className={`relative grid h-7 w-8 place-items-center rounded-[6px] ${activePath === href ? "bg-[#343538] text-white" : "text-[#898c93] hover:bg-[#303136] hover:text-white"}`}>
+              <Icon size={14} strokeWidth={1.8} />
+              {badge === "✦" && <span className="absolute -right-0.5 -top-0.5 text-[9px] text-[#b86dff]">✦</span>}
+            </Link>
+          ))}
+        </nav>
+        <div className="mt-auto">
+          <Link href="/account" aria-label="Open profile" className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[10px] font-bold text-[#27211c]">LS</Link>
+        </div>
       </aside>
     );
   }
@@ -91,7 +114,7 @@ export function UnifiedSidebar({
           <p className="truncate text-[13px] font-medium leading-4">DesignHub</p>
           <p className="text-[10px] text-[#9b9da3]">● 21 members</p>
         </div>
-        <button type="button" onClick={onCollapse} aria-label="Collapse sidebar" className="rounded-md p-1.5 text-[#b6b8bd] hover:bg-[#343538]">
+        <button type="button" onClick={toggleCollapse} aria-label="Collapse sidebar" className="rounded-md p-1.5 text-[#b6b8bd] hover:bg-[#343538]">
           <PanelLeftClose size={15} />
         </button>
       </div>
