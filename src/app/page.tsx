@@ -114,7 +114,7 @@ export default function HomePage() {
  <>
  <section className="crystal-first-sector">
  <p>Design spaces. Visualize ideas. Build intelligent environments.</p>
- <div className="crystal-first-card"><div><h1>Design the way people live.</h1><p>Crystal combines AI, architecture, interior design, and advanced 3D visualization to turn a home brief into thoughtful spaces, beautiful interiors, and intelligent environments.</p><div><ActionLink href="/crystal">Launch Studio <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">Download App</ActionLink></div></div><div className="crystal-first-image"><Image src="/Section/architectresectionone.png" alt="Architectural concept" fill priority sizes="(max-width: 700px) 100vw, 55vw" /></div></div>
+ <div className="crystal-first-card"><div><h1>Design the way people live.</h1><p>Crystal combines AI, architecture, interior design, and advanced 3D visualization to turn a home brief into thoughtful spaces, beautiful interiors, and intelligent environments.</p> <div><ActionLink href="/project">Launch Studio <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">Download App</ActionLink></div></div><div className="crystal-first-image"><Image src="/Section/architectresectionone.png" alt="Architectural concept" fill priority sizes="(max-width: 700px) 100vw, 55vw" /></div></div>
  <div className="crystal-first-chips">{["Architecture", "Interior Design", "Furniture Planner", "3D Visualization", "Home Robotics"].map((item) => <span key={item}>{item}</span>)}</div>
  </section>
 

@@ -17,6 +17,7 @@ import {
   Search,
   WandSparkles,
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const styles = [
@@ -240,6 +241,7 @@ export default function ArchplanPage() {
             <div className="flex gap-2">
               <button type="button" onClick={() => { setPrompt(""); setProjectName(""); setInstructions(""); setRoom(""); setModel("Autodesk Revit Fusion AI"); setSelectedStyle("Classical"); setImageType("Exterior"); setAspectRatio("1:1"); setQuality("Standard"); setCount(1); setSaved(false); setGenerated(false); setError(null); window.localStorage.removeItem("crystal-archplan-draft"); }} className="h-[34px] w-[90px] rounded-[12px] bg-[#181818] text-[10px] text-zinc-300 hover:bg-[#242424]">Reset</button>
               <button type="button" onClick={generatePlan} disabled={generating} className="h-[34px] w-[91px] rounded-[12px] bg-[#2867f2] text-[10px] font-semibold text-white hover:bg-[#3473f5] disabled:opacity-50">{generating ? "..." : generated ? "Generated" : "Generate"}</button>
+              {generated && <Link href="/crystal" className="inline-flex h-[34px] items-center rounded-[12px] bg-[#3f8f64] px-3 text-[10px] font-semibold text-white">Open in Crystal</Link>}
             </div>
           </div>
           {error && <p role="alert" className="mt-3 text-right text-[10px] text-red-300">{error}</p>}

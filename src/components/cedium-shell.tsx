@@ -106,7 +106,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  <Link href="/download" className="hidden sm:inline-flex" style={{ alignItems: "center", height: 36, padding: "0 15px", color: fg, fontSize: 13, fontWeight: 700, textDecoration: "none", border: `1px solid ${faint}`, borderRadius: 8 }}>
  Download App
  </Link>
- <Link href="/crystal" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
+ <Link href="/project" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
  Launch Studio <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
  </Link>
  </div>
@@ -125,7 +125,7 @@ export function CoreforgeFooter({ isDark, fg, muted, faint }: Pick<ReturnType<ty
  { l: "Status", h: "/platform/status", ext: false },
  ]},
  { heading: "Design", links: [
- { l: "Launch Studio", h: "/crystal", ext: true },
+ { l: "Launch Studio", h: "/project", ext: true },
  { l: "Download Desktop App", h: "/download", ext: false },
  { l: "Architecture", h: "/workspace/files", ext: false },
  { l: "Interior Design", h: "/workspace/code", ext: false },
