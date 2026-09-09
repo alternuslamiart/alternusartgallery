@@ -851,3 +851,37 @@
 [data-coreforgetheme="dark"] .crystal-home-surface:hover {
   background: linear-gradient(145deg, rgba(44,67,116,.42), rgba(37,37,37,.98)) !important;
 }
+
+/* Mobile app gutter system: one symmetric inset for every surface. */
+@media (max-width: 599px) {
+  :root { --crystal-mobile-gutter: 16px; }
+}
+@media (min-width: 390px) and (max-width: 599px) {
+  :root { --crystal-mobile-gutter: 20px; }
+}
+@media (min-width: 600px) and (max-width: 700px) {
+  :root { --crystal-mobile-gutter: 24px; }
+}
+@media (max-width: 700px) {
+  .crystal-glass-nav-shell { padding-inline: var(--crystal-mobile-gutter); }
+  .crystal-glass-nav { width: 100%; padding-inline: 0; }
+  .crystal-first-sector { padding-inline: var(--crystal-mobile-gutter); }
+  .crystal-first-sector + section { padding-inline: var(--crystal-mobile-gutter)!important; }
+  .crystal-account-page { padding-inline: var(--crystal-mobile-gutter); }
+  .crystal-account-page>header { margin-inline: 0; padding-inline: 0!important; }
+  .crystal-design-dashboard>header { padding-inline: 0!important; }
+  .crystal-design-dashboard>div { padding-inline: 0!important; }
+  .crystal-design-dashboard main { padding-inline: var(--crystal-mobile-gutter)!important; }
+  .crystal-archplan-page>header,
+  .crystal-workflow-page>header { padding-inline: 0!important; }
+  .crystal-archplan-page>main,
+  .crystal-workflow-page>main { padding-inline: var(--crystal-mobile-gutter)!important; }
+  .crystal-dashboard>header { padding-inline: 0!important; }
+  .crystal-dashboard main { padding-inline: var(--crystal-mobile-gutter); }
+  .crystal-dashboard-title,
+  .crystal-project-grid { width: 100%; }
+  .crystal-mobile-sheet,
+  .crystal-mobile-profile,
+  .crystal-mobile-pricing { padding-inline: var(--crystal-mobile-gutter); }
+  .crystal-studio > section > .absolute.bottom-\[80px\] { width: calc(100% - (var(--crystal-mobile-gutter) * 2)); }
+}
