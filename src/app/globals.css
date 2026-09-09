@@ -901,6 +901,9 @@
   .crystal-studio .crystal-ai-prompt textarea::placeholder { color:#777; }
   .crystal-studio .crystal-mobile-upgrade { height:44px; margin:0 0 7px; padding-left:12px; border-radius:999px; background:#414141; font-size:14px; }
   .crystal-studio .crystal-mobile-upgrade button { margin-left:auto; padding:10px 15px; border-radius:999px; background:#168bef; }
+  .crystal-studio .crystal-mobile-reference { position:relative; height:112px; margin:0 0 7px; overflow:hidden; border-radius:14px; background:#202020; }
+  .crystal-studio .crystal-mobile-reference img { width:100%; height:100%; display:block; object-fit:cover; }
+  .crystal-studio .crystal-mobile-reference button { position:absolute; top:7px; right:7px; display:grid; width:25px; height:25px; place-items:center; border:0; border-radius:50%; background:rgba(0,0,0,.6); color:#fff; }
   .crystal-studio .crystal-ai-prompt>div:last-child { height:40px!important; }
   .crystal-studio .crystal-ai-prompt>div:last-child label { border-radius:999px; }
   .crystal-studio .crystal-ai-prompt>div:last-child .ml-auto { width:40px; height:40px; border-radius:50%; background:#168bef; }
