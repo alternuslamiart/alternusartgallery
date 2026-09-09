@@ -2,6 +2,7 @@
 
 import { Archive, ArrowLeft, ChevronDown, Glasses, Globe2, Grid2X2, Home, Menu, PanelLeftOpen, Plus, Search, Settings, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { generateModel } from "@/services/ai";
 import Link from "next/link";
 import { initialAssets } from "./data";
@@ -19,10 +20,11 @@ function downloadFile(name: string, content: string, type = "text/plain") {
   URL.revokeObjectURL(url);
 }
 
-export function CrystalStudio() {
+export function CrystalStudio({ initialDashboard = false }: { initialDashboard?: boolean } = {}) {
   // Opening /crystal should enter the modeling workspace immediately. The
   // project dashboard remains available from the Home control in the top bar.
-  const [dashboard, setDashboard] = useState(false);
+  const [dashboard, setDashboard] = useState(initialDashboard);
+  const router = useRouter();
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -42,6 +44,7 @@ export function CrystalStudio() {
   const [renderJobs, setRenderJobs] = useState<Array<{id:string;status:string}>>([]);
   const [dialog, setDialog] = useState<"credits"|"profile"|"signout"|null>(null);
   const [toast, setToast] = useState<string|null>(null);
+  const [copied, setCopied] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<StudioTool>("orbit");
   const [prompt, setPrompt] = useState("");
@@ -102,8 +105,8 @@ export function CrystalStudio() {
   if (dashboard) return <div className="crystal-dashboard">
     {mobileSplash && <div className="crystal-mobile-splash"><img src="/logo.png" alt="Crystal" /></div>}
     <header><div className="crystal-dashboard-brand"><img src="/logo.png" alt="Crystal" className="crystal-brand-logo"/><b>Crystal</b></div><div className="crystal-window-controls">•••　—　×　□</div></header>
-    <aside><button className="crystal-team"><span>B</span> My Team <ChevronDown size={17}/></button><label className="crystal-search"><Search size={16}/><input placeholder="Search" /></label><strong>Project</strong><nav><button className="active"><span>▦</span>All Projects</button><button><Globe2 size={16}/>Community</button><button><Archive size={16}/>Archive...</button><button onClick={() => setDashboard(false)}><Plus size={16}/>Project</button></nav><footer><span>▢　 Invite your team</span><button>Copy link</button></footer></aside>
-    <main><div className="crystal-dashboard-title"><div><h1>♦ Crystal</h1><b>Recent</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => setDashboard(false)}>New Project　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago"},{title:"Architecture Sketch",time:"Viewed 3mo ago"}].map((project) => <button key={project.title} onClick={() => setDashboard(false)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
+    <aside><button className="crystal-team"><span>B</span> My Team <ChevronDown size={17}/></button><label className="crystal-search"><Search size={16}/><input placeholder="Search" /></label><strong>Project</strong><nav><button className="active"><span>▦</span>All Projects</button><button onClick={() => router.push("/archplan")}><span>▱</span>Architecture</button><button onClick={() => router.push("/design-studio")}><span>✧</span>Interior Design...</button><button onClick={() => router.push("/archplan")}><span>⌗</span>Urban Planning</button><button onClick={() => router.push("/workflow")}><Globe2 size={16}/>Community</button><button><Archive size={16}/>Archive...</button><button onClick={() => router.push("/archplan")}><Plus size={16}/>Project</button></nav><footer><span>▢　 Invite your team</span><button onClick={() => { void navigator.clipboard?.writeText(window.location.href); setCopied(true); setToast("Project link copied."); window.setTimeout(() => setCopied(false), 1800); }}>{copied ? "Copied" : "Copy link"}</button></footer></aside>
+    <main><div className="crystal-dashboard-title"><div><h1>♦ Crystal</h1><b>Recent Projects</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => router.push("/crystal")}>Launch Studio　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago", route:"/crystal"},{title:"Architecture Sketch",time:"Viewed 3mo ago", route:"/archplan"}].map((project) => <button key={project.title} onClick={() => router.push(project.route)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
   </div>;
 
   const handleUpload = (file: File) => {
@@ -159,7 +162,7 @@ export function CrystalStudio() {
     <div className={`crystal-studio crystal-studio-enter fixed inset-0 z-[90] grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
       {mobileSplash && <div className="crystal-mobile-splash"><img src="/logo.png" alt="Crystal" /></div>}
       <header className="crystal-topbar col-span-full flex h-16 items-center border-b border-[#292929] bg-[#0F0F0F] px-7">
-        <div className="flex items-center gap-3"><img src="/logo.png" alt="Crystal" className="crystal-brand-logo"/><b className="text-[18px] tracking-[-0.02em] text-zinc-100">Crystal</b><span className="mx-1 h-5 w-px bg-[#303030]" aria-hidden="true"/><button aria-label="Back to projects" onClick={() => setDashboard(true)} className="crystal-home-button grid h-9 w-9 place-items-center rounded-[9px] text-zinc-300"><Home size={18}/></button></div>
+        <div className="flex items-center gap-3"><img src="/logo.png" alt="Crystal" className="crystal-brand-logo"/><b className="text-[18px] tracking-[-0.02em] text-zinc-100">Crystal</b><span className="mx-1 h-5 w-px bg-[#303030]" aria-hidden="true"/><button aria-label="Back to projects" onClick={() => router.push("/project")} className="crystal-home-button grid h-9 w-9 place-items-center rounded-[9px] text-zinc-300"><Home size={18}/></button></div>
         <nav aria-label="Application menu" className="crystal-app-menu relative ml-7 flex h-full items-center gap-1 text-[13px] text-zinc-400">{["File", "Edit", "Tools", "Help", "View"].map((item) => <button aria-expanded={openMenu===item} key={item} onClick={() => setOpenMenu(openMenu === item ? null : item)} className={`crystal-menu-item h-9 rounded-[8px] px-3 transition ${openMenu === item ? "is-open text-white" : ""}`}>{item}</button>)}{openMenu && <div className="absolute left-0 top-[52px] z-50 w-52 rounded-[12px] border border-white/10 bg-[#242424] p-1.5 shadow-2xl"><div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{openMenu}</div>{menuItems[openMenu].map(action => <button key={action} onClick={() => runMenuAction(action)} className="block w-full rounded-lg px-3 py-2 text-left text-[11px] text-zinc-200 hover:bg-[#353535]">{action}</button>)}</div>}</nav>
         <div className="ml-auto flex items-center gap-2.5"><button onClick={()=>setDialog("credits")} className="crystal-credit-button flex h-10 items-center gap-2 rounded-[11px] border border-[#666] px-3 text-[11px] text-zinc-200">Starter <Zap size={16}/>{credits}</button><Link href="/pricing" className="crystal-pro-button flex h-10 w-[124px] items-center justify-center gap-2 rounded-[10px] bg-[#1687f7] text-[12px] font-semibold text-white"><Zap size={18} fill="currentColor" />Go Pro</Link></div>
       </header>
