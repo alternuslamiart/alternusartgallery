@@ -76,6 +76,7 @@ import {
  generateWebsitePlanFromPrompt,
  normalizeCodeBuilderPlan,
 } from"@/lib/code-builder-plan";
+import { UnifiedSidebar } from "@/components/unified-sidebar";
 
 export type StudioRouteKey =
  |"studio-overview"
@@ -574,7 +575,8 @@ function StudioShell({ activeRoute, children }: { activeRoute: StudioRouteKey; c
  isCollapsed ?"w-[60px]":"w-[230px]",
  ].join(" ")}
  >
- <div className={isCollapsed ?"flex min-h-0 flex-1 flex-col px-2":"flex min-h-0 flex-1 flex-col px-3"}>
+ <UnifiedSidebar collapsed={isCollapsed} onCollapse={toggleMenu} className="h-full" />
+ <div className="hidden">
  <div ref={workspaceRef} className="relative mb-4 flex items-center justify-between">
  {isCollapsed ? (
  <button

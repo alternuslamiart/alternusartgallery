@@ -10,6 +10,7 @@ import { LeftSidebar } from "./LeftSidebar";
 import { RightPanel } from "./RightPanel";
 import type { MaterialName, RenderSettings, StudioAsset, StudioTool, Transform } from "./types";
 import { Viewport } from "./Viewport";
+import { UnifiedSidebar } from "@/components/unified-sidebar";
 
 function downloadFile(name: string, content: string, type = "text/plain") {
   const url = URL.createObjectURL(new Blob([content], { type }));
@@ -105,7 +106,7 @@ export function CrystalStudio({ initialDashboard = false }: { initialDashboard?:
   if (dashboard) return <div className="crystal-dashboard">
     {mobileSplash && <div className="crystal-mobile-splash"><img src="/logo.png" alt="Crystal" /></div>}
     <header><div className="crystal-dashboard-brand"><img src="/logo.png" alt="Crystal" className="crystal-brand-logo"/><b>Crystal</b></div><div className="crystal-window-controls">•••　—　×　□</div></header>
-    <aside><button className="crystal-team"><span>B</span> My Team <ChevronDown size={17}/></button><label className="crystal-search"><Search size={16}/><input placeholder="Search" /></label><strong>Project</strong><nav><button className="active"><span>▦</span>All Projects</button><button onClick={() => router.push("/archplan")}><span>▱</span>Architecture</button><button onClick={() => router.push("/design-studio")}><span>✧</span>Interior Design...</button><button onClick={() => router.push("/archplan")}><span>⌗</span>Urban Planning</button><button onClick={() => router.push("/workflow")}><Globe2 size={16}/>Community</button><button><Archive size={16}/>Archive...</button><button onClick={() => router.push("/archplan")}><Plus size={16}/>Project</button></nav><footer><span>▢　 Invite your team</span><button onClick={() => { void navigator.clipboard?.writeText(window.location.href); setCopied(true); setToast("Project link copied."); window.setTimeout(() => setCopied(false), 1800); }}>{copied ? "Copied" : "Copy link"}</button></footer></aside>
+    <UnifiedSidebar activePath="/project" className="rounded-none" />
     <main><div className="crystal-dashboard-title"><div><h1>♦ Crystal</h1><b>Recent Projects</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => router.push("/crystal")}>Launch Studio　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago", route:"/archplan"},{title:"Architecture Sketch",time:"Viewed 3mo ago", route:"/archplan"}].map((project) => <button key={project.title} onClick={() => router.push(project.route)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
   </div>;
 

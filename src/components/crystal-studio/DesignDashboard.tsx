@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { UnifiedSidebar } from "@/components/unified-sidebar";
 
 const navigation = [
   { label: "Agents", icon: Grid2X2 },
@@ -73,47 +74,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
       </header>
 
       <div className="flex min-h-[calc(100vh-62px)] gap-1.5 bg-[#0F0F0F] p-1.5">
-        <aside className="hidden w-[292px] shrink-0 rounded-[19px] bg-[#111111] px-4 py-5 md:flex md:flex-col">
-          <div className="flex items-center justify-between px-5">
-            <span className="text-[23px] font-semibold tracking-[-0.04em]">Crystal</span>
-            <button className="grid h-8 w-8 place-items-center rounded-xl bg-[#1A1A1A] text-zinc-300" aria-label="Collapse sidebar">
-              <Menu size={15} />
-            </button>
-          </div>
-
-          <div className="mt-8 flex h-10 items-center gap-2 rounded-xl bg-[#1B1B1B] px-3 text-sm text-zinc-400">
-            <Search size={15} />
-            <span>Search</span>
-          </div>
-
-          <nav className="mt-4 space-y-1">
-            {navigation.map(({ label, icon: Icon, active }) => (
-              <button
-                key={label}
-                onClick={() => {
-                  if (label === "Agents") router.push("/crystal");
-                  else if (label === "Workflows") router.push("/workflow");
-                  else if (label === "Plugins") router.push("/workflow");
-                  else onOpenStudio();
-                }}
-                className={`flex h-10 w-full items-center gap-3 rounded-xl px-3 text-sm transition ${
-                  active ? "bg-[#1B1B1B] text-white" : "text-zinc-400 hover:bg-[#181818] hover:text-white"
-                }`}
-              >
-                <Icon size={16} />
-                {label}
-              </button>
-            ))}
-          </nav>
-
-          <div className="mt-auto flex items-center gap-3 rounded-xl bg-[#1B1B1B] px-3 py-2.5 text-sm text-zinc-300">
-            <div className="h-8 w-8 rounded-lg bg-[#252525]" />
-            <span className="flex-1">Bulzart</span>
-            <Link href="/login" aria-label="Sign out" className="text-zinc-400 hover:text-white">
-              <LogOut size={16} />
-            </Link>
-          </div>
-        </aside>
+        <UnifiedSidebar activePath="/design-studio" className="hidden md:flex" />
 
         <main className="min-w-0 flex-1 rounded-[19px] bg-[#101010] px-5 py-12 md:px-8 lg:px-10">
           <section className="mx-auto max-w-[1560px]">

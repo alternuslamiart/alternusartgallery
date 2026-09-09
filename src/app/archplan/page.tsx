@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { UnifiedSidebar } from "@/components/unified-sidebar";
 
 const styles = [
   { name: "Modern", image: "/Section/architectresectionone.png" },
@@ -107,7 +108,11 @@ export default function ArchplanPage() {
         </a>
       </header>
 
-      <aside className="fixed bottom-0 left-0 top-[54px] z-20 hidden w-[272px] border-r border-white/[0.04] bg-[#111111] px-3 pt-2 lg:block">
+      <div className="fixed bottom-0 left-0 top-[54px] z-20 hidden p-2 lg:block">
+        <UnifiedSidebar activePath="/archplan" className="h-full" />
+      </div>
+      {/* Project controls remain in the main canvas; navigation is shared across workspaces. */}
+      {/* <aside className="fixed bottom-0 left-0 top-[54px] z-20 hidden w-[272px] border-r border-white/[0.04] bg-[#111111] px-3 pt-2 lg:block">
         <div className="flex h-12 items-center justify-between rounded-[12px] bg-[#181818] px-2">
           <div className="flex items-center gap-3">
             <span className="grid h-[34px] w-[34px] place-items-center rounded-[5px] bg-[#2867f2] text-[13px] font-semibold">B</span>
@@ -157,9 +162,9 @@ export default function ArchplanPage() {
           <a href="mailto:?subject=Join my Crystal team" className="flex items-center gap-2"><Mail size={14} /> Invite your team</a>
           <button type="button" onClick={() => void navigator.clipboard?.writeText(window.location.href)} className="rounded-[12px] bg-[#181818] px-3 py-2"><Copy size={12} className="mr-1 inline" /> Copy link</button>
         </div>
-      </aside>
+      </aside> */}
 
-      <main className="min-h-screen overflow-y-auto px-5 pb-12 pt-[102px] lg:ml-[272px] lg:px-10">
+      <main className="min-h-screen overflow-y-auto px-5 pb-12 pt-[102px] lg:ml-[250px] lg:px-10">
         <div className="mx-auto max-w-[765px]">
           <section>
             <h1 className="text-[20px] font-semibold leading-6 tracking-tight">Project Settings</h1>
