@@ -117,7 +117,7 @@ export function UnifiedSidebar({
   return (
     <aside className={`flex h-full w-[234px] shrink-0 flex-col overflow-hidden rounded-[9px] bg-[#232427] px-[14px] py-[12px] text-[#f4f4f5] ${className}`}>
       <div className="flex items-center gap-2 px-1">
-        <span className="grid h-8 w-8 place-items-center rounded-[9px] bg-[#34363a] text-white"><Sparkles size={17} /></span>
+        <button type="button" onClick={toggleCollapse} aria-label="Collapse sidebar" title="Collapse sidebar" className="grid h-8 w-8 place-items-center rounded-[9px] bg-[#34363a] text-white transition hover:bg-[#414348]"><Sparkles size={17} /></button>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-medium leading-4">DesignHub</p>
           <p className="text-[10px] text-[#9b9da3]">● 21 members</p>
