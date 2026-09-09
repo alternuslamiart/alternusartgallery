@@ -238,7 +238,7 @@ export function Viewport(p:Props){
     <div className="crystal-mobile-modebar" role="tablist" aria-label="Mobile studio mode">
       {(["floor-plan", "modeling", "images"] as const).map((item) => <button key={item} type="button" role="tab" aria-selected={mode === item} onClick={() => selectMobileMode(item)} className={mode === item ? "active" : ""}>{item === "floor-plan" ? "Floor plan" : item[0].toUpperCase() + item.slice(1)}</button>)}
     </div>
-    <div className="crystal-mobile-empty-state" aria-hidden="true"><SparkleFilled /><span>What should we create?</span></div>
+    <div className="crystal-mobile-empty-state" aria-hidden="true"><img src="/Logo.png" alt="Crystal" /><span>What should we create?</span></div>
     <div className={`crystal-mobile-model-tools ${mobileToolsOpen ? "is-visible" : ""}`} aria-label="Studio tools">
       <button type="button" aria-label="Play or pause animation" className={playing ? "active" : ""} onClick={() => setPlaying(value => !value)}><span className="crystal-tool-record" /></button>
       <button type="button" aria-label="Focus selected object" className={selected ? "active" : ""} onClick={focus}><CubeFilled size={20} /></button>

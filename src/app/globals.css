@@ -171,7 +171,7 @@
   .crystal-mobile-modebar button { height:36px; padding:0 17px; border:0; border-radius:999px; background:transparent; color:#a6a6a6; font-size:11px; }
   .crystal-mobile-modebar button.active { background:#414141; color:#f4f4f5; box-shadow:0 2px 8px rgba(0,0,0,.2); }
   .crystal-mobile-empty-state { position:absolute; top:50%; left:50%; z-index:2; display:none; transform:translate(-50%,-50%); flex-direction:column; align-items:center; gap:20px; color:#454545; pointer-events:none; }
-  .crystal-mobile-empty-state svg { width:58px; height:76px; opacity:.82; }
+  .crystal-mobile-empty-state img { width:58px; height:76px; object-fit:contain; opacity:.82; }
   .crystal-mobile-empty-state span { font-size:14px; color:#454545; white-space:nowrap; }
   .crystal-mobile-model-tools { position:absolute; bottom:116px; left:var(--crystal-mobile-gutter); z-index:31; display:none; align-items:center; justify-content:space-between; width:calc(100% - (var(--crystal-mobile-gutter) * 2)); height:50px; padding:0 9px; border-radius:26px; background:#292929; box-shadow:0 0 0 9px rgba(41,47,91,.18),0 12px 28px rgba(0,0,0,.3); }
   .crystal-mobile-model-tools.is-visible { display:flex; }
