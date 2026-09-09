@@ -1,4 +1,4 @@
-export const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash";
+export const DEFAULT_GEMINI_MODEL = "GPT-5.6 Luna";
 export const DEFAULT_GROQ_MODEL = "llama-3.1-8b-instant";
 export const DEFAULT_OPENAI_MODEL = "gpt-4o-mini";
 

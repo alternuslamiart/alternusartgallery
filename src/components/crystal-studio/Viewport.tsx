@@ -1,13 +1,13 @@
 "use client";
 
-import { ChevronDown, CircleHelp, Globe2, Grid3X3, Lightbulb, Link2, LoaderCircle, Send, X, Zap } from "lucide-react";
+import { ChevronDown, CircleHelp, DoorOpen, Globe2, Grid3X3, Hand, Lightbulb, Link2, LoaderCircle, MousePointer2, Ruler, Send, Sofa, SquareDashed, TextCursorInput, Trash2, X, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { modelingTools } from "./data";
 import { SparkleFilled } from "./filled-icons";
-import type { StudioAsset, StudioTool, Transform } from "./types";
+import type { FloorPlanObject, FloorPlanPoint, StudioAsset, StudioMode, StudioTool, Transform } from "./types";
 import { IconButton } from "./ui";
 
-type Props = { renderer:string; selectedAsset?:StudioAsset; activeTool:StudioTool; prompt:string; loading:boolean; progress:number; error:string|null; transform:Transform; color:string; roughness:number; metallic:number; onToolChange:(v:StudioTool)=>void; onPromptChange:(v:string)=>void; onGenerate:()=>void; onTransformChange:(v:Transform)=>void; onClearError:()=>void; onAssetDrop:(v:string)=>void; onCreateObject:()=>void; onSelectAsset:(id:string)=>void; onColorChange:(v:string)=>void; onOpenPricing:()=>void; onSnapshot:()=>void };
+type Props = { renderer:string; selectedAsset?:StudioAsset; activeTool:StudioTool; prompt:string; loading:boolean; progress:number; error:string|null; transform:Transform; color:string; roughness:number; metallic:number; studioMode?:StudioMode; onStudioModeChange?:(v:StudioMode)=>void; floorPlanObjects?:FloorPlanObject[]; selectedFloorPlanId?:string|null; onFloorPlanObjectsChange?:(objects:FloorPlanObject[])=>void; onSelectFloorPlanObject?:(id:string|null)=>void; onToolChange:(v:StudioTool)=>void; onPromptChange:(v:string)=>void; onGenerate:()=>void; onTransformChange:(v:Transform)=>void; onClearError:()=>void; onAssetDrop:(v:string)=>void; onCreateObject:()=>void; onSelectAsset:(id:string)=>void; onColorChange:(v:string)=>void; onOpenPricing:()=>void; onSnapshot:()=>void };
 type Camera={yaw:number;pitch:number;distance:number;panX:number;panY:number};
 type Point={x:number;y:number};
 const cameraStart:Camera={yaw:.74,pitch:.48,distance:12,panX:0,panY:0};
@@ -45,9 +45,135 @@ function CanvasScene({camera,color,roughness,metallic,grid,selected,face,drawing
   return <canvas ref={canvas} aria-label="Interactive 3D perspective grid" className="absolute inset-0 h-full w-full"/>;
 }
 
+const floorSnap = (value:number) => Math.round(value / 0.25) * 0.25;
+const floorDistance = (a:FloorPlanPoint,b:FloorPlanPoint) => Math.hypot(b.x - a.x, b.y - a.y);
+const floorInitialObjects = (objects:FloorPlanObject[]|undefined) => objects ?? [];
+
+function FloorPlanViewport({ p }: { p: Props }) {
+  const objects = floorInitialObjects(p.floorPlanObjects);
+  const [view,setView] = useState({ zoom: 72, panX: 0, panY: 0 });
+  const [size,setSize] = useState({ width: 0, height: 0 });
+  const [tool,setTool] = useState<"select"|"wall"|"door"|"window"|"room"|"dimension"|"measure"|"text"|"furniture"|"delete">("select");
+  const [drag,setDrag] = useState<{start:FloorPlanPoint;current:FloorPlanPoint}|null>(null);
+  const [measure,setMeasure] = useState<{start:FloorPlanPoint;current:FloorPlanPoint}|null>(null);
+  const [panning,setPanning] = useState<{x:number;y:number;panX:number;panY:number}|null>(null);
+  const [chat,setChat] = useState(true);
+  const svgRef = useRef<SVGSVGElement>(null);
+  useEffect(() => {
+    const node = svgRef.current;
+    if (!node) return;
+    const updateSize = () => setSize({ width: node.clientWidth, height: node.clientHeight });
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  const pointFromEvent = (event:React.PointerEvent<SVGSVGElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    return { x: floorSnap((event.clientX - rect.left - rect.width / 2 - view.panX) / view.zoom), y: floorSnap((event.clientY - rect.top - rect.height / 2 - view.panY) / view.zoom) };
+  };
+  const updateObjects = (next:FloorPlanObject[]) => p.onFloorPlanObjectsChange?.(next);
+  const select = (id:string|null) => p.onSelectFloorPlanObject?.(id);
+  const addObject = (object:FloorPlanObject) => { updateObjects([...objects, object]); select(object.id); };
+  const parsePrompt = () => {
+    const text = p.prompt.toLowerCase();
+    const size = text.match(/(\d+(?:\.\d+)?)\s*(?:m|meter|metre)?\s*(?:x|by)\s*(\d+(?:\.\d+)?)/);
+    const width = Number(size?.[1] ?? 8), height = Number(size?.[2] ?? 6);
+    const names = ["living room","kitchen","bedroom","bathroom","office"].filter(name => text.includes(name));
+    const roomNames = names.length ? names : ["Living room","Kitchen"];
+    const next:FloorPlanObject[] = [
+      { id: crypto.randomUUID(), type:"wall", start:{x:0,y:0}, end:{x:width,y:0}, thickness:.18 },
+      { id: crypto.randomUUID(), type:"wall", start:{x:width,y:0}, end:{x:width,y:height}, thickness:.18 },
+      { id: crypto.randomUUID(), type:"wall", start:{x:width,y:height}, end:{x:0,y:height}, thickness:.18 },
+      { id: crypto.randomUUID(), type:"wall", start:{x:0,y:height}, end:{x:0,y:0}, thickness:.18 },
+    ];
+    const columns = Math.max(1, Math.ceil(Math.sqrt(roomNames.length)));
+    roomNames.forEach((name,index) => {
+      const column = index % columns, row = Math.floor(index / columns);
+      next.push({ id: crypto.randomUUID(), type:"room", x:column * width / columns + .25, y:row * height / columns + .25, width:width / columns - .5, height:height / Math.ceil(roomNames.length / columns) - .5, label:name.replace(/\b\w/g, char => char.toUpperCase()) });
+    });
+    updateObjects(next); select(null); p.onPromptChange("");
+  };
+  const completeDrag = (event:React.PointerEvent<SVGSVGElement>) => {
+    if (panning) { setPanning(null); return; }
+    if (!drag) return;
+    const start = drag.start, end = drag.current;
+    if (tool === "wall" && floorDistance(start,end) > .15) addObject({ id:crypto.randomUUID(), type:"wall", start, end, thickness:.18 });
+    if (tool === "dimension" && floorDistance(start,end) > .15) addObject({ id:crypto.randomUUID(), type:"dimension", start, end });
+    if (tool === "measure") setMeasure({ start, current:end });
+    if (tool === "room" && floorDistance(start,end) > .3) addObject({ id:crypto.randomUUID(), type:"room", x:Math.min(start.x,end.x), y:Math.min(start.y,end.y), width:Math.abs(end.x-start.x), height:Math.abs(end.y-start.y), label:"New room" });
+    setDrag(null);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  };
+  const onDown = (event:React.PointerEvent<SVGSVGElement>) => {
+    if ((event.target as Element).closest("button")) return;
+    const point = pointFromEvent(event);
+    if (event.button === 1 || (event.button === 0 && event.shiftKey)) { setPanning({x:event.clientX,y:event.clientY,panX:view.panX,panY:view.panY}); event.currentTarget.setPointerCapture(event.pointerId); return; }
+    if (tool === "select" || tool === "delete") { select(null); return; }
+    if (tool === "door") { addObject({id:crypto.randomUUID(),type:"door",x:point.x,y:point.y,width:.9,height:.12,rotation:0}); return; }
+    if (tool === "window") { addObject({id:crypto.randomUUID(),type:"window",x:point.x,y:point.y,width:1.2,height:.12,rotation:0}); return; }
+    if (tool === "text") { addObject({id:crypto.randomUUID(),type:"text",x:point.x,y:point.y,text:"Note"}); return; }
+    if (tool === "furniture") { addObject({id:crypto.randomUUID(),type:"furniture",x:point.x-.45,y:point.y-.3,width:.9,height:.6,label:"Furniture"}); return; }
+    setDrag({start:point,current:point}); event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const onMove = (event:React.PointerEvent<SVGSVGElement>) => {
+    if (panning) { setView(current => ({...current,panX:panning.panX + event.clientX - panning.x,panY:panning.panY + event.clientY - panning.y})); return; }
+    if (drag) setDrag({...drag,current:pointFromEvent(event)});
+  };
+  const objectAt = (object:FloorPlanObject, point:FloorPlanPoint) => {
+    if (object.type === "wall" || object.type === "dimension") {
+      const length = floorDistance(object.start,object.end), t = Math.max(0,Math.min(1,((point.x-object.start.x)*(object.end.x-object.start.x)+(point.y-object.start.y)*(object.end.y-object.start.y))/(length*length || 1)));
+      return floorDistance(point,{x:object.start.x+(object.end.x-object.start.x)*t,y:object.start.y+(object.end.y-object.start.y)*t}) < .2;
+    }
+    if ("width" in object && "height" in object) return point.x >= object.x && point.x <= object.x+object.width && point.y >= object.y && point.y <= object.y+object.height;
+    return object.type === "text" && floorDistance(point,{x:object.x,y:object.y}) < .35;
+  };
+  const tools = [
+    ["select","Select",MousePointer2],["wall","Wall",SquareDashed],["door","Door",DoorOpen],["window","Window",SquareDashed],["room","Room",SquareDashed],["dimension","Dimension",Ruler],["measure","Measure",Ruler],["text","Text",TextCursorInput],["furniture","Furniture",Sofa],["delete","Delete",Trash2],
+  ] as const;
+  useEffect(() => {
+    const handler = (event:KeyboardEvent) => {
+      if ((event.target as HTMLElement)?.matches("input,textarea,select")) return;
+      const key = event.key.toLowerCase();
+      const shortcuts:Record<string,typeof tool> = { v:"select", w:"wall", d:"door", n:"window", r:"room", m:"measure", t:"text", f:"furniture" };
+      if (shortcuts[key]) setTool(shortcuts[key]);
+      if (event.key === "Delete" || event.key === "Backspace") {
+        const selectedId = p.selectedFloorPlanId;
+        if (selectedId) { updateObjects(objects.filter(object => object.id !== selectedId)); select(null); }
+      }
+      if (event.key === "Escape") { setDrag(null); setMeasure(null); select(null); }
+    };
+    window.addEventListener("keydown",handler); return () => window.removeEventListener("keydown",handler);
+  }, [objects,p.selectedFloorPlanId,tool]);
+  const selectedId = p.selectedFloorPlanId;
+  return <section className="relative min-h-0 overflow-hidden bg-[#f7f7f4] text-zinc-800">
+    <svg ref={svgRef} className="absolute inset-0 h-full w-full cursor-crosshair" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={completeDrag} onPointerCancel={() => {setDrag(null);setPanning(null)}} onWheel={event => { event.preventDefault(); setView(current => ({...current,zoom:Math.max(24,Math.min(180,current.zoom * Math.exp(-event.deltaY * .001)))})); }} onContextMenu={event => event.preventDefault()}>
+      <defs><pattern id="floor-dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.1" fill="#d3d4d0"/></pattern></defs>
+      <rect width="100%" height="100%" fill="#f7f7f4"/><rect width="100%" height="100%" fill="url(#floor-dots)"/>
+      <g transform={`translate(${size.width/2 + view.panX} ${size.height/2 + view.panY}) scale(${view.zoom})`}>
+        {objects.filter(object => object.type === "room").map(room => <g key={room.id} onPointerDown={event => {event.stopPropagation(); if(tool==="delete"){updateObjects(objects.filter(item=>item.id!==room.id));select(null)} else if(tool==="select")select(room.id)}}><rect x={room.x} y={room.y} width={room.width} height={room.height} fill={selectedId===room.id?"#dbeafe":"#edf2f1"} stroke={selectedId===room.id?"#1687f7":"#c7d1d0"} strokeWidth=".025"/><text x={room.x+room.width/2} y={room.y+room.height/2} textAnchor="middle" fontSize=".22" fill="#64748b">{room.label}</text></g>)}
+        {objects.filter(object => object.type === "wall").map(wall => <line key={wall.id} x1={wall.start.x} y1={wall.start.y} x2={wall.end.x} y2={wall.end.y} stroke={selectedId===wall.id?"#1687f7":"#30343b"} strokeWidth={wall.thickness} strokeLinecap="square" onPointerDown={event => {event.stopPropagation(); if(tool==="delete"){updateObjects(objects.filter(item=>item.id!==wall.id));select(null)} else if(tool==="select")select(wall.id)}}/>)}
+        {objects.filter(object => object.type === "door" || object.type === "window").map(opening => <g key={opening.id} transform={`translate(${opening.x} ${opening.y}) rotate(${opening.rotation})`} onPointerDown={event => { event.stopPropagation(); if (tool === "delete") { updateObjects(objects.filter(item => item.id !== opening.id)); select(null); } else if (tool === "select") select(opening.id); }}><rect x={-opening.width/2} y={-opening.height/2} width={opening.width} height={opening.height} fill="#f7f7f4" stroke={selectedId===opening.id ? "#1687f7" : opening.type==="door" ? "#a16207" : "#0891b2"} strokeWidth=".035"/></g>)}
+        {objects.filter(object => object.type === "furniture").map(item => <g key={item.id} onPointerDown={event => {event.stopPropagation(); if(tool==="delete"){updateObjects(objects.filter(object=>object.id!==item.id));select(null)} else if(tool==="select")select(item.id)}}><rect x={item.x} y={item.y} width={item.width} height={item.height} rx=".06" fill={selectedId===item.id?"#bfdbfe":"#d7dee5"} stroke="#64748b" strokeWidth=".025"/><text x={item.x+item.width/2} y={item.y+item.height/2+.06} textAnchor="middle" fontSize=".13" fill="#475569">{item.label}</text></g>)}
+        {objects.filter(object => object.type === "dimension").map(item => <g key={item.id} onPointerDown={event => {event.stopPropagation(); if(tool==="delete"){updateObjects(objects.filter(object=>object.id!==item.id));select(null)} else if(tool==="select")select(item.id)}}><line x1={item.start.x} y1={item.start.y} x2={item.end.x} y2={item.end.y} stroke={selectedId===item.id?"#1687f7":"#d97706"} strokeWidth=".025" strokeDasharray=".12 .08"/><text x={(item.start.x+item.end.x)/2} y={(item.start.y+item.end.y)/2-.1} textAnchor="middle" fontSize=".18" fill="#a16207">{item.label ?? `${floorDistance(item.start,item.end).toFixed(2)} m`}</text></g>)}
+        {objects.filter(object => object.type === "text").map(item => <text key={item.id} x={item.x} y={item.y} fontSize=".24" fill={selectedId===item.id?"#1687f7":"#334155"} onPointerDown={event => {event.stopPropagation(); if(tool==="delete"){updateObjects(objects.filter(object=>object.id!==item.id));select(null)} else if(tool==="select")select(item.id)}}>{item.text}</text>)}
+        {drag && <><line x1={drag.start.x} y1={drag.start.y} x2={drag.current.x} y2={drag.current.y} stroke="#1687f7" strokeWidth=".035" strokeDasharray=".12 .08"/><text x={(drag.start.x+drag.current.x)/2} y={(drag.start.y+drag.current.y)/2-.12} fontSize=".2" fill="#1687f7">{floorDistance(drag.start,drag.current).toFixed(2)} m</text></>}
+        {measure && <><line x1={measure.start.x} y1={measure.start.y} x2={measure.current.x} y2={measure.current.y} stroke="#eab308" strokeWidth=".035" strokeDasharray=".12 .08"/><text x={(measure.start.x+measure.current.x)/2} y={(measure.start.y+measure.current.y)/2-.12} fontSize=".2" fill="#a16207">{floorDistance(measure.start,measure.current).toFixed(2)} m</text></>}
+      </g>
+    </svg>
+    <div className="absolute left-1/2 top-2 flex -translate-x-1/2 rounded-[10px] border border-[#343434] bg-[#202020]/95 p-1 shadow-[0_8px_20px_rgba(0,0,0,.18)]">{(["floor-plan","modeling","images"] as const).map(value => <button key={value} onClick={() => p.onStudioModeChange?.(value)} className={`rounded-[8px] border px-5 py-2 text-[11px] capitalize transition-colors ${value==="floor-plan"?"border-[#4A90D9] bg-[#3b3b3b] text-white":"border-transparent text-zinc-500 hover:text-zinc-300"}`}>{value==="floor-plan"?"Floor plan":value==="modeling"?"Modeling":"Images"}</button>)}</div>
+    <div className="absolute left-5 top-5 rounded-lg border border-[#d8d9d4] bg-white/80 px-3 py-2 text-[10px] text-zinc-500 shadow-sm">Scale 1:100 · {view.zoom.toFixed(0)} px/m · Snap 0.25 m</div>
+    <div className="absolute right-5 top-5 flex gap-2 rounded-xl border border-[#d8d9d4] bg-white/90 p-1 shadow-sm"><button title="Pan" onClick={() => setTool("select")} className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 hover:bg-zinc-100"><Hand size={15}/></button><button title="Zoom in" onClick={() => setView(current => ({...current,zoom:Math.min(180,current.zoom*1.2)}))} className="rounded-lg px-2 text-sm text-zinc-500 hover:bg-zinc-100">+</button><button title="Zoom out" onClick={() => setView(current => ({...current,zoom:Math.max(24,current.zoom/1.2)}))} className="rounded-lg px-2 text-sm text-zinc-500 hover:bg-zinc-100">−</button></div>
+    <div className="absolute bottom-[88px] left-1/2 flex h-[54px] max-w-[calc(100%_-_30px)] -translate-x-1/2 items-center gap-1 rounded-[12px] border border-[#343434] bg-[#202020] px-2 shadow-[0_10px_24px_rgba(0,0,0,.25)]">{tools.map(([id,label,Icon]) => <button key={id} title={`${label}${id==="wall"?" — W":""}`} onClick={() => setTool(id)} className={`grid h-9 min-w-9 place-items-center rounded-[9px] px-2 text-[10px] ${tool===id?"bg-[#1687f7] text-white":"text-zinc-200 hover:bg-[#343434]"}`}><Icon size={16}/><span className="hidden xl:inline ml-1">{label}</span></button>)}</div>
+    <div className={`${chat?"":"hidden"} crystal-ai-prompt absolute bottom-[18px] left-1/2 flex w-[488px] max-w-[calc(100%_-_32px)] -translate-x-1/2 rounded-[12px] bg-[#202020] px-2 py-1 shadow-[0_12px_28px_rgba(0,0,0,.28)]`}><textarea aria-label="AI floor-plan prompt" value={p.prompt} onChange={event => p.onPromptChange(event.target.value)} onKeyDown={event => {if((event.ctrlKey||event.metaKey)&&event.key==="Enter")parsePrompt()}} placeholder="Describe a floor plan, e.g. 8m x 6m with kitchen and bedroom" className="h-9 min-h-9 flex-1 resize-none bg-transparent px-2 py-2 text-[11px] outline-none"/><button disabled={!p.prompt.trim()} onClick={parsePrompt} className="grid h-9 w-9 place-items-center rounded-[9px] bg-[#1687f7] text-white"><Send size={16}/></button></div>
+    <div className="pointer-events-none absolute bottom-2 right-5 text-[10px] text-zinc-500">Wheel zoom · Shift-drag pan · W wall · D door · Delete remove</div>
+  </section>;
+}
+
 export function Viewport(p:Props){
   const [camera,setCamera]=useState(cameraStart), drag=useRef<{x:number;y:number;base:Camera;mode:"orbit"|"pan"|"dolly"}|null>(null), transformBase=useRef<Transform|null>(null), objectCreate=useRef<{x:number;y:number;transform:Transform}|null>(null);
-  const [mode,setMode]=useState<"Animate"|"Modeling"|"Images">("Modeling"),[chat,setChat]=useState(true),[grid,setGrid]=useState(true),[help,setHelp]=useState(false),[lighting,setLighting]=useState(false),[world,setWorld]=useState(false),[model,setModel]=useState("Precision Mode");
+  const [mode,setMode]=useState<StudioMode>("modeling"),[chat,setChat]=useState(true),[grid,setGrid]=useState(true),[help,setHelp]=useState(false),[lighting,setLighting]=useState(false),[world,setWorld]=useState(false),[model,setModel]=useState("Precision Mode");
   const [playing,setPlaying]=useState(false),[selected,setSelected]=useState(Boolean(p.selectedAsset)),[face,setFace]=useState<number|null>(null),[drawings,setDrawings]=useState<Point[][]>([]),[drawing,setDrawing]=useState<Point[]|null>(null),[measureStart,setMeasureStart]=useState<Point|null>(null),[measurement,setMeasurement]=useState<{a:Point;b:Point}|null>(null),[history,setHistory]=useState<Transform[]>([]),[future,setFuture]=useState<Transform[]>([]);
   const canvasRef=useRef<HTMLCanvasElement>(null);
   const setView=useCallback((view:string)=>{const presets:Record<string,Partial<Camera>>={Perspective:{yaw:.74,pitch:.48},Top:{yaw:0,pitch:1.52},Front:{yaw:Math.PI,pitch:.02},Right:{yaw:-Math.PI/2,pitch:.02}};setCamera(c=>({...c,...(presets[view]??presets.Perspective),distance:12,panX:0,panY:0}))},[]);
@@ -66,9 +192,10 @@ export function Viewport(p:Props){
   const onPointerMove=(event:React.PointerEvent)=>{const point=pointFromEvent(event);if(objectCreate.current){const dx=point.x-objectCreate.current.x,dy=point.y-objectCreate.current.y;const size=Math.max(0.05,Math.min(10,Math.hypot(dx,dy)/62));p.onTransformChange({...objectCreate.current.transform,scale:size});return}if(drawing){setDrawing(path=>path?[...path,point]:path);return}const d=drag.current;if(!d)return;const dx=event.clientX-d.x,dy=event.clientY-d.y;if(toolMode==="move"&&transformBase.current){const worldScale=d.base.distance/620;remember({...transformBase.current,x:snapToGrid(transformBase.current.x+dx*worldScale),z:snapToGrid((transformBase.current.z??0)-dy*worldScale)})}else if(toolMode==="rotate"&&transformBase.current)remember({...transformBase.current,rotation:transformBase.current.rotation+dx*.5});else if(toolMode==="scale"&&transformBase.current)remember({...transformBase.current,scale:Math.max(.1,Math.min(10,transformBase.current.scale-dy*.01))});else if(d.mode==="pan")setCamera({...d.base,panX:d.base.panX+dx,panY:d.base.panY+dy});else if(d.mode==="dolly")setCamera({...d.base,distance:Math.max(2.1,Math.min(42,d.base.distance*Math.exp(dy*.012)))});else setCamera({...d.base,yaw:d.base.yaw-dx*.008,pitch:Math.max(-1.38,Math.min(1.38,d.base.pitch+dy*.007))})};
   const onPointerUp=(event:React.PointerEvent)=>{if(objectCreate.current)objectCreate.current=null;if(drawing){if(drawing.length>1)setDrawings(paths=>[...paths,drawing]);setDrawing(null)}drag.current=null;transformBase.current=null;if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId)};
   const submit=()=>{if(toolMode==="ai"&&runCommand()){p.onPromptChange("");return}p.onGenerate()};
+  if (p.studioMode === "floor-plan") return <FloorPlanViewport p={p}/>;
   return <section ref={canvasRef as React.RefObject<HTMLElement>} className={`relative min-h-0 overflow-hidden bg-[#171717] ${toolMode==="object"||toolMode==="draw"?"cursor-crosshair":toolMode==="move"?"cursor-move":toolMode==="rotate"?"cursor-grab":"cursor-default"}`} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={()=>{objectCreate.current=null;drag.current=null;setDrawing(null)}} onContextMenu={e=>e.preventDefault()} onWheel={e=>{e.preventDefault();setCamera(c=>({...c,distance:Math.max(2.1,Math.min(42,c.distance*Math.exp(e.deltaY*.0012)))}))}} onDragOver={e=>e.preventDefault()} onDrop={e=>{const id=e.dataTransfer.getData("text/asset-id");if(id){p.onAssetDrop(id);setSelected(true)}}}>
     <CanvasScene camera={camera} color={p.color} roughness={p.roughness} metallic={p.metallic} grid={grid} selected={selected} face={face} drawings={drawing?[...drawings,drawing]:drawings} measurement={measurement} transform={p.transform}/><div className="pointer-events-none absolute bottom-5 left-5 rounded-md bg-black/25 px-2 py-1 text-[10px] text-zinc-300">RMB / MMB: orbit · Shift + LMB: pan · Ctrl + MMB: dolly · Wheel: zoom</div>
-    <div className="absolute left-1/2 top-2 flex -translate-x-1/2 rounded-[10px] border border-[#343434] bg-[#202020]/95 p-1 shadow-[0_8px_20px_rgba(0,0,0,.18)]">{(["Animate","Modeling","Images"] as const).map(x=><button key={x} onClick={()=>{setMode(x);setChat(true)}} className={`rounded-[8px] border px-5 py-2 text-[11px] transition-colors ${mode===x?"border-[#4A90D9] bg-[#3b3b3b] text-white":"border-transparent text-zinc-500 hover:text-zinc-300"}`}>{x==="Animate"?"Text":x==="Modeling"?"Image":"Multi view"}</button>)}</div>
+    <div className="absolute left-1/2 top-2 flex -translate-x-1/2 rounded-[10px] border border-[#343434] bg-[#202020]/95 p-1 shadow-[0_8px_20px_rgba(0,0,0,.18)]">{(["floor-plan","modeling","images"] as const).map(x=><button key={x} onClick={()=>{setMode(x);p.onStudioModeChange?.(x);setChat(true)}} className={`rounded-[8px] border px-5 py-2 text-[11px] transition-colors ${mode===x?"border-[#4A90D9] bg-[#3b3b3b] text-white":"border-transparent text-zinc-500 hover:text-zinc-300"}`}>{x==="floor-plan"?"Floor plan":x==="modeling"?"Modeling":"Images"}</button>)}</div>
     <div className="crystal-axis-gizmo absolute right-9 top-24 z-20 h-14 w-14" aria-label="Viewport axis navigation">
       <button onClick={()=>setView("Front")} className="absolute left-7 top-0 grid h-5 w-5 place-items-center rounded-full bg-[#78b7ff] text-[9px] font-bold text-[#10233d]" aria-label="View along Y axis">Y</button>
       <button onClick={()=>setView("Right")} className="absolute right-0 top-7 grid h-5 w-5 place-items-center rounded-full bg-[#ef5261] text-[9px] font-bold text-[#3d1118]" aria-label="View along X axis">X</button>
@@ -77,7 +204,7 @@ export function Viewport(p:Props){
       <span className="absolute left-1/2 top-1/2 h-8 w-px -translate-x-1/2 -translate-y-1/2 -rotate-45 bg-[#ef5261]/70" />
     </div>
     <div className="crystal-viewport-tools absolute right-6 top-[168px] z-20 grid gap-2">{[{I:Lightbulb,l:"Lighting",a:lighting,f:()=>setLighting(v=>!v)},{I:Globe2,l:"World",a:world,f:()=>setWorld(v=>!v)},{I:Grid3X3,l:"Toggle grid",a:grid,f:()=>setGrid(v=>!v)},{I:CircleHelp,l:"Help",a:help,f:()=>setHelp(v=>!v)}].map(({I,l,a,f})=><button key={l} title={l} onClick={f} className={`grid h-10 w-10 place-items-center rounded-[10px] border transition-all ${a?"border-[#4A90D9] bg-[#4A90D9] shadow-[0_0_0_3px_rgba(74,144,217,.35),0_4px_12px_rgba(74,144,217,.25)]":"border-transparent bg-[#252525]"}`}><I size={20}/></button>)}</div>{help&&<div className="absolute right-20 top-[168px] z-30 w-52 rounded-xl border border-white/10 bg-[#242424] p-4 text-xs shadow-2xl">MMB orbits, Shift + MMB pans, wheel zooms. Numpad 1/3/7/0 changes view.</div>}
-    <div className={`${chat?"":"hidden"} crystal-ai-prompt absolute bottom-[80px] left-1/2 w-[488px] max-w-[calc(100%_-_32px)] -translate-x-1/2 rounded-[12px] bg-[#202020] px-2 pb-2 pt-1 shadow-[0_12px_28px_rgba(0,0,0,.28)]`}>{selected&&<button type="button" onClick={()=>p.onToolChange("ai")} className="mb-1 flex h-7 w-full items-center gap-2 rounded-[8px] px-2 text-left text-[11px] text-zinc-300 transition hover:bg-[#303030] hover:text-white"><span className="grid h-4 w-4 place-items-center rounded-[4px] bg-[#1687f7] text-[10px] text-white">+</span><span>Ask for changes</span><span className="ml-auto text-[10px] text-zinc-500">Edit object</span></button>}{mode==="Images"&&<div className="crystal-mobile-upgrade"><Zap size={18}/><b>Try Crystal Pro</b><button onClick={p.onOpenPricing}>Pay Now</button></div>}<textarea aria-label="AI model prompt" value={p.prompt} onChange={e=>p.onPromptChange(e.target.value)} onKeyDown={e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter")submit()}} placeholder={selected?"Ask for changes to this object":"What do you want to create?"} className="h-[68px] w-full resize-none bg-transparent px-2 py-3 text-[11px] outline-none"/>{p.error&&<div className="flex justify-between text-xs text-red-200"><span>{p.error}</span><button onClick={p.onClearError}><X size={14}/></button></div>}<div className="flex h-10 items-center gap-2"><IconButton icon={Link2} label="Attach reference" className="bg-[#303030]"/><label className="relative flex h-9 items-center rounded-[9px] bg-[#303030] text-[12px]"><select value={model} onChange={e=>setModel(e.target.value)} className="h-full bg-transparent pl-4 pr-9 outline-none"><option>Precision Mode</option><option>Fast Concept</option></select><ChevronDown size={15} className="absolute right-3 top-2"/></label><button disabled={p.loading||!p.prompt.trim()} onClick={submit} className="ml-auto grid h-9 w-9 place-items-center rounded-[9px] bg-[#1687f7]">{p.loading?<LoaderCircle className="animate-spin" size={18}/>:<Send size={18}/>}</button></div></div>
+    <div className={`${chat?"":"hidden"} crystal-ai-prompt absolute bottom-[80px] left-1/2 w-[488px] max-w-[calc(100%_-_32px)] -translate-x-1/2 rounded-[12px] bg-[#202020] px-2 pb-2 pt-1 shadow-[0_12px_28px_rgba(0,0,0,.28)]`}>{selected&&<button type="button" onClick={()=>p.onToolChange("ai")} className="mb-1 flex h-7 w-full items-center gap-2 rounded-[8px] px-2 text-left text-[11px] text-zinc-300 transition hover:bg-[#303030] hover:text-white"><span className="grid h-4 w-4 place-items-center rounded-[4px] bg-[#1687f7] text-[10px] text-white">+</span><span>Ask for changes</span><span className="ml-auto text-[10px] text-zinc-500">Edit object</span></button>}{mode==="images"&&<div className="crystal-mobile-upgrade"><Zap size={18}/><b>Try Crystal Pro</b><button onClick={p.onOpenPricing}>Pay Now</button></div>}<textarea aria-label="AI model prompt" value={p.prompt} onChange={e=>p.onPromptChange(e.target.value)} onKeyDown={e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter")submit()}} placeholder={selected?"Ask for changes to this object":"What do you want to create?"} className="h-[68px] w-full resize-none bg-transparent px-2 py-3 text-[11px] outline-none"/>{p.error&&<div className="flex justify-between text-xs text-red-200"><span>{p.error}</span><button onClick={p.onClearError}><X size={14}/></button></div>}<div className="flex h-10 items-center gap-2"><IconButton icon={Link2} label="Attach reference" className="bg-[#303030]"/><label className="relative flex h-9 items-center rounded-[9px] bg-[#303030] text-[12px]"><select value={model} onChange={e=>setModel(e.target.value)} className="h-full bg-transparent pl-4 pr-9 outline-none"><option>Precision Mode</option><option>Fast Concept</option></select><ChevronDown size={15} className="absolute right-3 top-2"/></label><button disabled={p.loading||!p.prompt.trim()} onClick={submit} className="ml-auto grid h-9 w-9 place-items-center rounded-[9px] bg-[#1687f7]">{p.loading?<LoaderCircle className="animate-spin" size={18}/>:<Send size={18}/>}</button></div></div>
     <div className="crystal-modeling-tools absolute bottom-[18px] left-1/2 flex h-[52px] w-[488px] max-w-[calc(100%_-_32px)] -translate-x-1/2 items-center justify-between rounded-[12px] border border-[#343434] bg-[#202020] px-2 shadow-[0_10px_24px_rgba(0,0,0,.2)]">{modelingTools.slice(0,5).map(t=><IconButton key={t.id} icon={t.icon} label={t.label} active={p.activeTool===t.id} onClick={()=>{p.onToolChange(t.id);if(t.id==="focus")focus();if(t.id==="orbit")setPlaying(v=>!v);if(t.id==="select")setSelected(false)}}/>)}<IconButton icon={SparkleFilled} label="Crystal AI Assistant" active={p.activeTool==="ai"&&chat} onClick={()=>{p.onToolChange("ai");setChat(v=>!v)}}/>{modelingTools.slice(5).map(t=><IconButton key={t.id} icon={t.icon} label={t.label} active={p.activeTool===t.id} onClick={()=>p.onToolChange(t.id)}/>)}</div>
   </section>;
 }

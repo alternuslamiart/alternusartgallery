@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Download, FileBox, FileText, Grid2X2, Image, PanelRightClose, Plus, Trash2 } from "lucide-react";
-import type { RenderSettings, StudioAsset } from "./types";
+import type { FloorPlanObject, RenderSettings, StudioAsset } from "./types";
 import { SectionTitle, SelectField } from "./ui";
 import { useState } from "react";
 
@@ -23,6 +23,10 @@ type Props = {
   onDeleteAsset: (id: string) => void;
   onExport: (format: string) => void;
   onCollapse: () => void;
+  floorPlanMode?: boolean;
+  selectedFloorPlanObject?: FloorPlanObject;
+  onUpdateFloorPlanObject?: (object: FloorPlanObject) => void;
+  onDeleteFloorPlanObject?: (id: string) => void;
 };
 
 const exportOptions = [
@@ -36,8 +40,23 @@ export function RightPanel(props: Props) {
   const [frameRateOpen, setFrameRateOpen] = useState(false);
   const canvasOptions = ["1920x1080", "2560x1440", "3840x2160", "7680x4320"];
   const frameRateOptions = ["24 fps", "30 fps", "60 fps", "120 fps"];
+  const selected = props.selectedFloorPlanObject;
+  const updateSelected = (patch: Partial<FloorPlanObject>) => {
+    if (selected && props.onUpdateFloorPlanObject) props.onUpdateFloorPlanObject({ ...selected, ...patch } as FloorPlanObject);
+  };
   return (
     <aside className="crystal-right-panel min-h-0 overflow-y-auto border-l border-[#303030] bg-[#0F0F0F] px-5 pb-5 pt-4 scrollbar-hide">
+      {props.floorPlanMode && <div className="mb-7">
+        <SectionTitle action={selected ? <button aria-label="Delete selected floor-plan object" onClick={() => props.onDeleteFloorPlanObject?.(selected.id)} className="text-zinc-400 hover:text-red-300"><Trash2 size={15}/></button> : undefined}>Floor plan properties</SectionTitle>
+        {selected ? <div className="space-y-2 text-[11px]">
+          <div className="rounded-[12px] bg-[#292929] px-3 py-2 text-zinc-300"><span className="text-zinc-500">Type</span><strong className="ml-2 capitalize text-white">{selected.type}</strong></div>
+          {selected.type === "wall" && <><label className="flex h-8 items-center rounded-full bg-[#2b2b2b] px-3"><span className="flex-1">Thickness</span><input type="number" min=".05" step=".01" value={selected.thickness} onChange={e => updateSelected({ thickness: Math.max(.05, Number(e.target.value)) })} className="w-20 rounded bg-[#3b3b3b] px-2 py-1 text-right outline-none" /><span className="ml-1">m</span></label><div className="grid grid-cols-2 gap-2">{(["start","end"] as const).map(point => <div key={point} className="rounded-[10px] bg-[#292929] p-2"><span className="block mb-1 capitalize text-zinc-500">{point}</span><div className="flex gap-1"><input aria-label={`${point} X`} type="number" step=".1" value={selected[point].x} onChange={e => updateSelected({ [point]: { ...selected[point], x: Number(e.target.value) } })} className="w-full rounded bg-[#3b3b3b] px-1 py-1 text-center outline-none" /><input aria-label={`${point} Y`} type="number" step=".1" value={selected[point].y} onChange={e => updateSelected({ [point]: { ...selected[point], y: Number(e.target.value) } })} className="w-full rounded bg-[#3b3b3b] px-1 py-1 text-center outline-none" /></div></div>)}</div></>}
+          {selected.type === "room" && <><label className="flex h-8 items-center rounded-full bg-[#2b2b2b] px-3"><span className="flex-1">Label</span><input value={selected.label} onChange={e => updateSelected({ label: e.target.value })} className="w-28 rounded bg-[#3b3b3b] px-2 py-1 text-right outline-none" /></label><div className="grid grid-cols-2 gap-2">{(["width","height"] as const).map(key => <label key={key} className="flex h-8 items-center rounded-[10px] bg-[#292929] px-2"><span className="flex-1 capitalize">{key}</span><input type="number" min=".2" step=".1" value={selected[key]} onChange={e => updateSelected({ [key]: Math.max(.2, Number(e.target.value)) })} className="w-14 rounded bg-[#3b3b3b] px-1 py-1 text-right outline-none" /></label>)}</div></>}
+          {selected.type === "text" && <label className="flex h-8 items-center rounded-full bg-[#2b2b2b] px-3"><span className="flex-1">Text</span><input value={selected.text} onChange={e => updateSelected({ text: e.target.value })} className="w-28 rounded bg-[#3b3b3b] px-2 py-1 text-right outline-none" /></label>}
+          {(selected.type === "door" || selected.type === "window" || selected.type === "furniture") && <div className="grid grid-cols-2 gap-2">{(["width","height"] as const).map(key => <label key={key} className="flex h-8 items-center rounded-[10px] bg-[#292929] px-2"><span className="flex-1 capitalize">{key}</span><input type="number" min=".05" step=".1" value={selected[key]} onChange={e => updateSelected({ [key]: Math.max(.05, Number(e.target.value)) })} className="w-14 rounded bg-[#3b3b3b] px-1 py-1 text-right outline-none" /></label>)}</div>}
+          {selected.type === "dimension" && <div className="rounded-[10px] bg-[#292929] px-2 py-2 text-zinc-400">Length: <b className="text-white">{Math.hypot(selected.end.x - selected.start.x, selected.end.y - selected.start.y).toFixed(2)} m</b></div>}
+        </div> : <p className="rounded-[12px] bg-[#292929] px-3 py-4 text-[11px] text-zinc-500">Select a wall, room, opening, dimension, or note to edit it.</p>}
+      </div>}
       <SectionTitle action={<button aria-label="Collapse right panel" onClick={props.onCollapse} className="grid h-8 w-8 place-items-center rounded-[8px] text-zinc-400 transition hover:bg-[#292929] hover:text-white"><PanelRightClose size={16}/></button>}>Output</SectionTitle>
       <div className="space-y-2">
         <div className="relative">
