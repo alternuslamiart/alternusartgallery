@@ -896,6 +896,7 @@
   .crystal-studio .crystal-mobile-modebar { display:flex; }
   .crystal-studio .crystal-mobile-empty-state { display:flex; }
   .crystal-studio .crystal-ai-prompt { bottom:20px!important; left:var(--crystal-mobile-gutter)!important; width:calc(100% - (var(--crystal-mobile-gutter) * 2))!important; max-width:none!important; transform:none!important; border:0!important; border-radius:27px!important; background:#303030!important; padding:12px 14px 13px!important; box-shadow:0 0 0 10px rgba(41,47,91,.18),0 12px 34px rgba(0,0,0,.34)!important; }
+  .crystal-studio .crystal-ai-prompt:focus-within { bottom:18px!important; background:#343434!important; box-shadow:0 0 0 11px rgba(41,47,91,.22),0 14px 38px rgba(0,0,0,.42)!important; }
   .crystal-studio .crystal-ai-prompt textarea { height:55px!important; padding:7px 0!important; font-size:14px!important; color:#949494; }
   .crystal-studio .crystal-ai-prompt textarea::placeholder { color:#777; }
   .crystal-studio .crystal-mobile-upgrade { height:44px; margin:0 0 7px; padding-left:12px; border-radius:999px; background:#414141; font-size:14px; }
