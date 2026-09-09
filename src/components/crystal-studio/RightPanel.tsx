@@ -41,15 +41,15 @@ export function RightPanel(props: Props) {
       <SectionTitle action={<button aria-label="Collapse right panel" onClick={props.onCollapse} className="grid h-8 w-8 place-items-center rounded-[8px] text-zinc-400 transition hover:bg-[#292929] hover:text-white"><PanelRightClose size={16}/></button>}>Output</SectionTitle>
       <div className="space-y-2">
         <div className="relative">
-          <button type="button" aria-expanded={canvasOpen} onClick={() => setCanvasOpen((value) => !value)} className="flex h-12 w-full items-center rounded-full bg-[#2b2b2b] px-4 text-left text-[13px] text-zinc-100 transition hover:bg-[#343434]">
+          <button type="button" aria-expanded={canvasOpen} onClick={() => setCanvasOpen((value) => !value)} className="flex h-8 w-full items-center rounded-full bg-[#2b2b2b] px-4 text-left text-[12px] text-zinc-100 transition hover:bg-[#343434]">
             <span className="flex-1">Canvas</span>
             <span className="mr-3">{props.resolution}</span>
             <span className={`text-zinc-400 transition-transform ${canvasOpen ? "rotate-180" : ""}`}>⌄</span>
           </button>
           {canvasOpen && (
-            <div className="absolute inset-x-0 top-[52px] z-20 rounded-[22px] bg-[#292929] p-2 shadow-[0_14px_35px_rgba(0,0,0,.35)]">
+            <div className="absolute inset-x-0 top-[36px] z-20 rounded-[14px] bg-[#292929] p-1 shadow-[0_14px_35px_rgba(0,0,0,.35)]">
               {canvasOptions.map((option) => (
-                <button key={option} type="button" onClick={() => { props.onResolutionChange(option); setCanvasOpen(false); }} className={`flex h-16 w-full items-center justify-center rounded-[16px] text-[18px] transition ${props.resolution === option ? "bg-[#3a3a3a] text-white" : "text-zinc-100 hover:bg-[#343434]"}`}>
+                <button key={option} type="button" onClick={() => { props.onResolutionChange(option); setCanvasOpen(false); }} className={`flex h-8 w-full items-center justify-center rounded-[8px] text-[12px] transition ${props.resolution === option ? "bg-[#3a3a3a] text-white" : "text-zinc-100 hover:bg-[#343434]"}`}>
                   {option}
                 </button>
               ))}
@@ -57,15 +57,15 @@ export function RightPanel(props: Props) {
           )}
         </div>
         <div className="relative">
-          <button type="button" aria-expanded={frameRateOpen} onClick={() => setFrameRateOpen((value) => !value)} className="flex h-12 w-full items-center rounded-full bg-[#2b2b2b] px-4 text-left text-[13px] text-zinc-100 transition hover:bg-[#343434]">
+          <button type="button" aria-expanded={frameRateOpen} onClick={() => setFrameRateOpen((value) => !value)} className="flex h-8 w-full items-center rounded-full bg-[#2b2b2b] px-4 text-left text-[12px] text-zinc-100 transition hover:bg-[#343434]">
             <span className="flex-1">Frame rate</span>
             <span className="mr-3">{props.frameRate}</span>
             <span className={`text-zinc-400 transition-transform ${frameRateOpen ? "rotate-180" : ""}`}>⌄</span>
           </button>
           {frameRateOpen && (
-            <div className="absolute inset-x-0 top-[52px] z-20 rounded-[22px] bg-[#292929] p-2 shadow-[0_14px_35px_rgba(0,0,0,.35)]">
+            <div className="absolute inset-x-0 top-[36px] z-20 rounded-[14px] bg-[#292929] p-1 shadow-[0_14px_35px_rgba(0,0,0,.35)]">
               {frameRateOptions.map((option) => (
-                <button key={option} type="button" onClick={() => { props.onFrameRateChange(option); setFrameRateOpen(false); }} className={`flex h-16 w-full items-center justify-center rounded-[16px] text-[18px] transition ${props.frameRate === option ? "bg-[#3a3a3a] text-white" : "text-zinc-100 hover:bg-[#343434]"}`}>
+                <button key={option} type="button" onClick={() => { props.onFrameRateChange(option); setFrameRateOpen(false); }} className={`flex h-8 w-full items-center justify-center rounded-[8px] text-[12px] transition ${props.frameRate === option ? "bg-[#3a3a3a] text-white" : "text-zinc-100 hover:bg-[#343434]"}`}>
                   {option}
                 </button>
               ))}
