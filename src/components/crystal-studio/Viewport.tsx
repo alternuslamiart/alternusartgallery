@@ -174,6 +174,11 @@ function FloorPlanViewport({ p }: { p: Props }) {
   }, [objects,p.selectedFloorPlanId,tool]);
   const selectedId = p.selectedFloorPlanId;
   return <section className="floor-plan-canvas relative min-h-0 overflow-hidden bg-[#fbfbfa] text-zinc-800">
+    <div className="crystal-mobile-modebar" role="tablist" aria-label="Mobile studio mode">
+      <button type="button" role="tab" aria-selected="true" className="active">Floor plan</button>
+      <button type="button" role="tab" aria-selected="false" onClick={() => p.onStudioModeChange?.("modeling")}>Modeling</button>
+      <button type="button" role="tab" aria-selected="false" onClick={() => p.onStudioModeChange?.("modeling")}>Images</button>
+    </div>
     <svg ref={svgRef} className="absolute inset-0 h-full w-full cursor-crosshair" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={completeDrag} onPointerCancel={() => {setDrag(null);setPanning(null)}} onWheel={event => { event.preventDefault(); setView(current => ({...current,zoom:Math.max(24,Math.min(180,current.zoom * Math.exp(-event.deltaY * .001)))})); }} onContextMenu={event => event.preventDefault()}>
       <defs><pattern id="floor-dots" width={Math.max(8, settings.gridStepMm / 1000 * view.zoom)} height={Math.max(8, settings.gridStepMm / 1000 * view.zoom)} patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r={view.zoom > 55 ? 1 : .7} fill="#c9cbc8"/></pattern></defs>
       <rect width="100%" height="100%" fill="#fbfbfa"/><rect width="100%" height="100%" fill="url(#floor-dots)"/>
@@ -201,7 +206,7 @@ function FloorPlanViewport({ p }: { p: Props }) {
 
 export function Viewport(p:Props){
   const [camera,setCamera]=useState(cameraStart), drag=useRef<{x:number;y:number;base:Camera;mode:"orbit"|"pan"|"dolly"}|null>(null), transformBase=useRef<Transform|null>(null), objectCreate=useRef<{x:number;y:number;transform:Transform}|null>(null);
-  const [mode,setMode]=useState<"animate"|"modeling"|"images">("images"),[chat,setChat]=useState(true),[grid,setGrid]=useState(true),[help,setHelp]=useState(false),[lighting,setLighting]=useState(false),[world,setWorld]=useState(false),[model,setModel]=useState("Precision Mode"),[referenceImage,setReferenceImage]=useState<string|null>(null);
+  const [mode,setMode]=useState<"floor-plan"|"modeling"|"images">("images"),[chat,setChat]=useState(true),[grid,setGrid]=useState(true),[help,setHelp]=useState(false),[lighting,setLighting]=useState(false),[world,setWorld]=useState(false),[model,setModel]=useState("Precision Mode"),[referenceImage,setReferenceImage]=useState<string|null>(null);
   const [playing,setPlaying]=useState(false),[selected,setSelected]=useState(Boolean(p.selectedAsset)),[face,setFace]=useState<number|null>(null),[drawings,setDrawings]=useState<Point[][]>([]),[drawing,setDrawing]=useState<Point[]|null>(null),[measureStart,setMeasureStart]=useState<Point|null>(null),[measurement,setMeasurement]=useState<{a:Point;b:Point}|null>(null),[history,setHistory]=useState<Transform[]>([]),[future,setFuture]=useState<Transform[]>([]);
   const canvasRef=useRef<HTMLCanvasElement>(null);
   const setView=useCallback((view:string)=>{const presets:Record<string,Partial<Camera>>={Perspective:{yaw:.74,pitch:.48},Top:{yaw:0,pitch:1.52},Front:{yaw:Math.PI,pitch:.02},Right:{yaw:-Math.PI/2,pitch:.02}};setCamera(c=>({...c,...(presets[view]??presets.Perspective),distance:12,panX:0,panY:0}))},[]);
@@ -224,7 +229,7 @@ export function Viewport(p:Props){
   return <section ref={canvasRef as React.RefObject<HTMLElement>} className={`relative min-h-0 overflow-hidden bg-[#171717] ${toolMode==="object"||toolMode==="draw"?"cursor-crosshair":toolMode==="move"?"cursor-move":toolMode==="rotate"?"cursor-grab":"cursor-default"}`} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={()=>{objectCreate.current=null;drag.current=null;setDrawing(null)}} onContextMenu={e=>e.preventDefault()} onWheel={e=>{e.preventDefault();setCamera(c=>({...c,distance:Math.max(2.1,Math.min(42,c.distance*Math.exp(e.deltaY*.0012)))}))}} onDragOver={e=>e.preventDefault()} onDrop={e=>{const id=e.dataTransfer.getData("text/asset-id");if(id){p.onAssetDrop(id);setSelected(true)}}}>
     <CanvasScene camera={camera} color={p.color} roughness={p.roughness} metallic={p.metallic} grid={grid} selected={selected} face={face} drawings={drawing?[...drawings,drawing]:drawings} measurement={measurement} transform={p.transform}/><div className="pointer-events-none absolute bottom-5 left-5 rounded-md bg-black/25 px-2 py-1 text-[10px] text-zinc-300">RMB / MMB: orbit · Shift + LMB: pan · Ctrl + MMB: dolly · Wheel: zoom</div>
     <div className="crystal-mobile-modebar" role="tablist" aria-label="Mobile studio mode">
-      {(["animate", "modeling", "images"] as const).map((item) => <button key={item} type="button" role="tab" aria-selected={mode === item} onClick={() => setMode(item)} className={mode === item ? "active" : ""}>{item[0].toUpperCase() + item.slice(1)}</button>)}
+      {(["floor-plan", "modeling", "images"] as const).map((item) => <button key={item} type="button" role="tab" aria-selected={mode === item} onClick={() => { setMode(item); if (item !== "images") p.onStudioModeChange?.(item); else p.onStudioModeChange?.("modeling"); }} className={mode === item ? "active" : ""}>{item === "floor-plan" ? "Floor plan" : item[0].toUpperCase() + item.slice(1)}</button>)}
     </div>
     <div className="crystal-mobile-empty-state" aria-hidden="true"><SparkleFilled /><span>What should we create?</span></div>
     <div className={`crystal-mobile-model-tools ${mode === "modeling" ? "is-visible" : ""}`} aria-label="Studio tools">
