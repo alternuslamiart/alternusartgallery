@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { UnifiedSidebar } from "@/components/unified-sidebar";
 
 type Integration = { name: string; description: string; icon: typeof Box };
 
@@ -32,14 +33,14 @@ const integrations: Integration[] = [
 ];
 
 const navItems = [
-  { label: "Agents", icon: Grid2X2 },
-  { label: "Workflows", icon: Globe2 },
-  { label: "Plugins", icon: Archive },
-  { label: "Architecture", icon: Layers3 },
-  { label: "Interior Design...", icon: WorkflowIcon },
-  { label: "Urban Planning", icon: Grid2X2 },
-  { label: "Community", icon: Globe2 },
-  { label: "Archive...", icon: Archive },
+  { label: "Agents", icon: Grid2X2, href: "/crystal" },
+  { label: "Workflows", icon: Globe2, href: "/workflow" },
+  { label: "Plugins", icon: Archive, href: "/crystal" },
+  { label: "Architecture", icon: Layers3, href: "/archplan" },
+  { label: "Interior Design...", icon: WorkflowIcon, href: "/design-studio" },
+  { label: "Urban Planning", icon: Grid2X2, href: "/archplan" },
+  { label: "Community", icon: Globe2, href: "/workflow" },
+  { label: "Archive...", icon: Archive, href: "/workflow" },
 ];
 
 export default function WorkflowPage() {
@@ -106,29 +107,18 @@ export default function WorkflowPage() {
         </div>
       </header>
 
-      <aside className="fixed bottom-0 left-0 top-[54px] z-20 w-[272px] rounded-br-[8px] bg-[#202020] p-3">
-        <div className="px-3 pt-2 text-[20px] font-semibold">Crystal</div>
-        <label className="mt-5 flex h-[34px] items-center gap-2 rounded-[8px] bg-[#292929] px-3 text-[#8d8d8d]">
-          <Search size={14} />
-          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search" className="w-full bg-transparent text-[11px] outline-none placeholder:text-[#8d8d8d]" />
-        </label>
-        <div className="mt-6 px-2 text-xs font-medium text-[#e8e8e8]">Type</div>
-        <nav className="mt-3 space-y-1" aria-label="Integration types">
-          {navItems.map(({ label, icon: Icon }) => (
-            <button key={label} type="button" onClick={() => {
-              setActiveNav(label);
-              if (label === "Architecture" || label === "Urban Planning") router.push("/archplan");
-              else if (label === "Agents" || label === "Plugins") router.push("/crystal");
-              else if (label === "Interior Design...") router.push("/design-studio");
-            }} className={`flex h-[34px] w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-xs transition ${activeNav === label ? "bg-[#2b2b2b] text-[#e8e8e8]" : "text-[#c5c5c5] hover:bg-[#292929] hover:text-white"}`}>
-              <Icon size={14} strokeWidth={1.5} />{label}
-            </button>
-          ))}
-          <button type="button" onClick={startWorkflow} className="flex h-[34px] w-full items-center gap-2.5 rounded-[8px] px-2.5 text-left text-xs text-[#c5c5c5] transition hover:bg-[#292929] hover:text-white"><CirclePlus size={14} strokeWidth={1.5} />New Workflow</button>
-        </nav>
-      </aside>
+      <div className="fixed bottom-0 left-0 top-[54px] z-20 hidden p-2 lg:block">
+        <UnifiedSidebar
+          activePath="/workflow"
+          items={[...navItems.map((item) => ({ ...item, onClick: () => setActiveNav(item.label) })), { label: "New Workflow", icon: CirclePlus, href: "/workflow", onClick: startWorkflow }]}
+          sectionTitle="Type"
+          searchValue={search}
+          onSearch={setSearch}
+          className="h-full"
+        />
+      </div>
 
-      <main className="ml-[272px] min-w-0 flex-1 overflow-y-auto bg-[#2a2a2a] px-8 pb-10 pt-[74px] xl:px-[160px]">
+      <main className="ml-[250px] min-w-0 flex-1 overflow-y-auto bg-[#2a2a2a] px-8 pb-10 pt-[74px] xl:px-[160px]">
         <div className="relative min-h-full">
           <div className="flex items-start justify-between">
             <div>

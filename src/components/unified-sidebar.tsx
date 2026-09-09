@@ -27,7 +27,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 
-type SidebarItem = { label: string; href: string; icon: LucideIcon; badge?: string };
+type SidebarItem = { label: string; href: string; icon: LucideIcon; badge?: string; onClick?: () => void };
 
 const primary: SidebarItem[] = [
   { label: "Dashboard", href: "/project", icon: LayoutDashboard },
@@ -57,11 +57,19 @@ export function UnifiedSidebar({
   collapsed = false,
   onCollapse,
   className = "",
+  items = primary,
+  sectionTitle,
+  searchValue,
+  onSearch,
 }: {
   activePath?: string;
   collapsed?: boolean;
   onCollapse?: () => void;
   className?: string;
+  items?: SidebarItem[];
+  sectionTitle?: string;
+  searchValue?: string;
+  onSearch?: (value: string) => void;
 }) {
   const [localCollapsed, setLocalCollapsed] = useState(false);
   const isCollapsed = onCollapse ? collapsed : localCollapsed;
@@ -69,7 +77,7 @@ export function UnifiedSidebar({
     if (onCollapse) onCollapse();
     else setLocalCollapsed((value) => !value);
   };
-  const compactItems = [...primary, ...favorites, ...records];
+  const compactItems = [...items, ...(items === primary ? [...favorites, ...records] : [])];
 
   if (isCollapsed) {
     return (
@@ -81,8 +89,8 @@ export function UnifiedSidebar({
           <Search size={14} />
         </button>
         <nav className="mt-3 flex flex-col items-center gap-1" aria-label="Collapsed workspace navigation">
-          {compactItems.map(({ label, href, icon: Icon, badge }) => (
-            <Link key={label} href={href} aria-label={label} title={label} className={`relative grid h-7 w-8 place-items-center rounded-[6px] ${activePath === href ? "bg-[#343538] text-white" : "text-[#898c93] hover:bg-[#303136] hover:text-white"}`}>
+          {compactItems.map(({ label, href, icon: Icon, badge, onClick }) => (
+            <Link key={label} href={href} onClick={onClick} aria-label={label} title={label} className={`relative grid h-7 w-8 place-items-center rounded-[6px] ${activePath === href ? "bg-[#343538] text-white" : "text-[#898c93] hover:bg-[#303136] hover:text-white"}`}>
               <Icon size={14} strokeWidth={1.8} />
               {badge === "✦" && <span className="absolute -right-0.5 -top-0.5 text-[9px] text-[#b86dff]">✦</span>}
             </Link>
@@ -95,10 +103,10 @@ export function UnifiedSidebar({
     );
   }
 
-  const renderItems = (items: SidebarItem[]) => items.map(({ label, href, icon: Icon, badge }) => {
+  const renderItems = (items: SidebarItem[]) => items.map(({ label, href, icon: Icon, badge, onClick }) => {
     const active = activePath === href;
     return (
-      <Link key={label} href={href} className={`group flex h-[29px] items-center gap-2 rounded-[6px] px-2 text-[13px] transition ${active ? "bg-[#343538] text-[#f4f4f5]" : "text-[#c2c3c6] hover:bg-[#2d2e31] hover:text-white"}`}>
+      <Link key={label} href={href} onClick={onClick} className={`group flex h-[29px] items-center gap-2 rounded-[6px] px-2 text-[13px] transition ${active ? "bg-[#343538] text-[#f4f4f5]" : "text-[#c2c3c6] hover:bg-[#2d2e31] hover:text-white"}`}>
         <Icon size={14} strokeWidth={1.8} className="shrink-0 text-[#8d9097] group-hover:text-[#c8cbd2]" />
         <span className="min-w-0 flex-1 truncate">{label}</span>
         {badge && <span className={`text-[10px] ${badge === "✦" ? "text-[#b86dff]" : "rounded bg-[#535458] px-1 text-[#e4e4e5]"}`}>{badge}</span>}
@@ -119,16 +127,18 @@ export function UnifiedSidebar({
         </button>
       </div>
 
-      <button type="button" className="mt-4 flex h-[28px] items-center gap-2 rounded-[6px] border border-[#3e4045] bg-[#2b2c30] px-2 text-left text-[11px] text-[#94969d]">
+      <label className="mt-4 flex h-[28px] items-center gap-2 rounded-[6px] border border-[#3e4045] bg-[#2b2c30] px-2 text-left text-[11px] text-[#94969d]">
         <Search size={14} />
-        <span className="flex-1">Search</span>
+        <input value={searchValue ?? ""} onChange={(event) => onSearch?.(event.target.value)} placeholder="Search" className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-[#94969d]" />
         <kbd className="rounded border border-[#4b4d52] px-1 text-[9px]">⌘K</kbd>
-      </button>
+      </label>
 
-      <nav className="mt-3 space-y-0.5" aria-label="Workspace navigation">{renderItems(primary)}</nav>
+      <nav className="mt-3 space-y-0.5" aria-label="Workspace navigation">
+        {sectionTitle && <div className="mb-2 px-2 text-[11px] font-medium text-[#e8e8e8]">{sectionTitle}</div>}
+        {renderItems(items)}
+      </nav>
 
-      <SidebarSection title="Favorites" items={favorites} renderItems={renderItems} />
-      <SidebarSection title="Records" items={records} renderItems={renderItems} />
+      {items === primary && <><SidebarSection title="Favorites" items={favorites} renderItems={renderItems} /><SidebarSection title="Records" items={records} renderItems={renderItems} /></>}
 
       <div className="mt-auto space-y-2 pt-3">
         <div className="rounded-[7px] border border-[#3d3e42] bg-[#17181a] p-3">
