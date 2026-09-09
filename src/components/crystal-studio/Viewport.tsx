@@ -245,7 +245,7 @@ export function Viewport(p:Props){
     </div>}
     <div className={`crystal-mobile-model-tools ${mobileToolsOpen ? "is-visible" : ""}`} aria-label="Studio tools">
       <button type="button" aria-label="Play or pause animation" className={playing ? "active" : ""} onClick={() => setPlaying(value => !value)}><span className="crystal-tool-record" /></button>
-      <button type="button" aria-label="Texture modeling" className={textureOpen ? "active" : ""} onClick={() => { setTextureOpen(value => !value); setMobileToolsOpen(true); setChat(true); }}><CubeFilled size={20} /></button>
+      <button type="button" aria-label="Texture modeling" className={`crystal-mobile-texture-trigger ${textureOpen ? "active" : ""}`} onClick={() => { setTextureOpen(value => !value); setMobileToolsOpen(true); setChat(true); }}><CubeFilled size={18} /><span>Texture</span></button>
       <button type="button" aria-label="Toggle object visibility" className={!selected ? "active" : ""} onClick={() => { setSelected(value => !value); p.onAssetDrop(selected ? "" : p.selectedAsset?.id ?? "industrial-desk"); }}><EyeOff size={20} /></button>
       <button type="button" aria-label="Open object assets" onClick={() => p.onToolChange("model")}><FolderOpen size={20} /></button>
       <button type="button" aria-label="Take snapshot" onClick={p.onSnapshot}><Camera size={20} /></button>
