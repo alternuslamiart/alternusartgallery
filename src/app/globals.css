@@ -173,6 +173,11 @@
   .crystal-mobile-empty-state { position:absolute; top:50%; left:50%; z-index:2; display:none; transform:translate(-50%,-50%); flex-direction:column; align-items:center; gap:20px; color:#454545; pointer-events:none; }
   .crystal-mobile-empty-state svg { width:58px; height:76px; opacity:.82; }
   .crystal-mobile-empty-state span { font-size:14px; color:#454545; white-space:nowrap; }
+  .crystal-mobile-model-tools { position:absolute; bottom:116px; left:var(--crystal-mobile-gutter); z-index:31; display:none; align-items:center; justify-content:space-between; width:calc(100% - (var(--crystal-mobile-gutter) * 2)); height:50px; padding:0 9px; border-radius:26px; background:#292929; box-shadow:0 0 0 9px rgba(41,47,91,.18),0 12px 28px rgba(0,0,0,.3); }
+  .crystal-mobile-model-tools.is-visible { display:flex; }
+  .crystal-mobile-model-tools button { display:grid; width:38px; height:38px; place-items:center; border:0; border-radius:50%; background:#353535; color:#e8e8e8; }
+  .crystal-mobile-model-tools button.active { background:#4a4a4a; color:#fff; }
+  .crystal-mobile-model-tools .crystal-tool-record { width:22px; height:22px; border-radius:50%; background:#ef6468; box-shadow:0 0 0 5px rgba(255,255,255,.04); }
   .crystal-mobile-upgrade { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 7px 0 14px; margin-bottom: 4px; border-radius: 999px; background: #414141; color: #1493ff; font-size: 14px; }
   .crystal-mobile-upgrade button { margin-left: auto; border: 0; border-radius: 999px; padding: 10px 16px; background: #1687f7; color: white; font-size: 11px; }
   .crystal-mobile-sheet, .crystal-mobile-profile { position: fixed; inset: 0; z-index: 80; display: flex; flex-direction: column; padding: 25px 23px 27px; background: #1b1b1b; color: #f4f4f5; }
@@ -910,4 +915,5 @@
   .crystal-studio .crystal-ai-prompt>div:last-child .ml-auto svg { width:20px; height:20px; }
   .crystal-studio .crystal-ai-prompt>div:last-child>label:first-child { width:40px; height:40px; border-radius:50%; }
   .crystal-studio .crystal-ai-prompt>div:last-child>label:nth-child(2) { min-width:162px; justify-content:center; }
+  .crystal-studio .crystal-modeling-tools { display:none!important; }
 }

@@ -1,9 +1,9 @@
 "use client";
 
-import { ChevronDown, CircleHelp, DoorOpen, Globe2, Grid3X3, Hand, Lightbulb, Link2, LoaderCircle, MessageSquare, MousePointer2, Ruler, Send, Sofa, SquareDashed, TextCursorInput, Trash2, X, Zap } from "lucide-react";
+import { Camera, ChevronDown, CircleHelp, DoorOpen, EyeOff, FolderOpen, Globe2, Grid3X3, Hand, Lightbulb, Link2, LoaderCircle, MessageSquare, MousePointer2, Ruler, Send, Sofa, SquareDashed, TextCursorInput, Trash2, X, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { modelingTools } from "./data";
-import { SparkleFilled } from "./filled-icons";
+import { CubeFilled, SparkleFilled } from "./filled-icons";
 import type { FloorPlanObject, FloorPlanPoint, FloorPlanSettings, StudioAsset, StudioMode, StudioTool, Transform } from "./types";
 import { formatFloorLength, floorSnapPoint, parseFloorLength, roundFloorValue } from "./floor-plan-geometry";
 import { IconButton } from "./ui";
@@ -227,6 +227,15 @@ export function Viewport(p:Props){
       {(["animate", "modeling", "images"] as const).map((item) => <button key={item} type="button" role="tab" aria-selected={mode === item} onClick={() => setMode(item)} className={mode === item ? "active" : ""}>{item[0].toUpperCase() + item.slice(1)}</button>)}
     </div>
     <div className="crystal-mobile-empty-state" aria-hidden="true"><SparkleFilled /><span>What should we create?</span></div>
+    <div className={`crystal-mobile-model-tools ${mode === "modeling" ? "is-visible" : ""}`} aria-label="Studio tools">
+      <button type="button" aria-label="Play or pause animation" className={playing ? "active" : ""} onClick={() => setPlaying(value => !value)}><span className="crystal-tool-record" /></button>
+      <button type="button" aria-label="Focus selected object" className={selected ? "active" : ""} onClick={focus}><CubeFilled size={20} /></button>
+      <button type="button" aria-label="Toggle object visibility" className={!selected ? "active" : ""} onClick={() => { setSelected(value => !value); p.onAssetDrop(selected ? "" : p.selectedAsset?.id ?? "industrial-desk"); }}><EyeOff size={20} /></button>
+      <button type="button" aria-label="Open object assets" onClick={() => p.onToolChange("model")}><FolderOpen size={20} /></button>
+      <button type="button" aria-label="Take snapshot" onClick={p.onSnapshot}><Camera size={20} /></button>
+      <button type="button" aria-label="Toggle lighting tools" className={lighting ? "active" : ""} onClick={() => setLighting(value => !value)}><Lightbulb size={20} /></button>
+      <button type="button" aria-label="Show modeling help" className={help ? "active" : ""} onClick={() => setHelp(value => !value)}><CircleHelp size={20} /></button>
+    </div>
     <div className="crystal-axis-gizmo absolute right-9 top-24 z-20 h-14 w-14" aria-label="Viewport axis navigation">
       <button onClick={()=>setView("Front")} className="absolute left-7 top-0 grid h-5 w-5 place-items-center rounded-full bg-[#78b7ff] text-[9px] font-bold text-[#10233d]" aria-label="View along Y axis">Y</button>
       <button onClick={()=>setView("Right")} className="absolute right-0 top-7 grid h-5 w-5 place-items-center rounded-full bg-[#ef5261] text-[9px] font-bold text-[#3d1118]" aria-label="View along X axis">X</button>
