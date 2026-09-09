@@ -127,7 +127,7 @@ export function UnifiedSidebar({
         </button>
       </div>
 
-      <label className="mt-4 flex h-[28px] items-center gap-2 rounded-[6px] border border-[#333333] bg-[#242424] px-2 text-left text-[11px] text-[#94969d]">
+      <label className="group mt-4 flex h-[28px] items-center gap-2 rounded-[6px] border border-[#333333] bg-[#242424] px-2 text-left text-[11px] text-[#94969d] transition hover:border-[#4a4a4a] hover:bg-[#242424]">
         <Search size={14} />
         <input value={searchValue ?? ""} onChange={(event) => onSearch?.(event.target.value)} placeholder="Search" className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-[#94969d]" />
         <kbd className="rounded border border-[#4b4d52] px-1 text-[9px]">⌘K</kbd>
@@ -141,10 +141,10 @@ export function UnifiedSidebar({
       {items === primary && <><SidebarSection title="Favorites" items={favorites} renderItems={renderItems} /><SidebarSection title="Records" items={records} renderItems={renderItems} /></>}
 
       <div className="mt-auto space-y-2 pt-3">
-        <div className="rounded-[7px] border border-[#3d3e42] bg-[#17181a] p-3">
+        <div className="rounded-[7px] border border-[#333333] bg-[#171717] p-3 transition hover:border-[#4a4a4a] hover:bg-[#242424]">
           <p className="text-[12px] font-semibold">New version available</p>
           <p className="mt-2 text-[10px] leading-[14px] text-[#a5a6aa]">An improved version of App is available. Please restart now to upgrade.</p>
-          <Link href="/download" className="mt-2 inline-flex text-[11px] font-medium text-white hover:text-[#a77bff]">Update →</Link>
+          <Link href="/download" className="mt-2 inline-flex rounded px-1 text-[11px] font-medium text-white transition hover:bg-[#242424] hover:text-[#c18bff]">Update →</Link>
         </div>
         <Link href="/account" className="flex items-center gap-2 rounded-[7px] px-1 py-1.5 hover:bg-[#242424]">
           <span className="grid h-7 w-7 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">LS</span>
@@ -159,7 +159,7 @@ export function UnifiedSidebar({
 function SidebarSection({ title, items, renderItems }: { title: string; items: SidebarItem[]; renderItems: (items: SidebarItem[]) => React.ReactNode }) {
   return (
     <section className="mt-4">
-      <div className="mb-1 flex items-center justify-between px-2 text-[11px] text-[#999ba1]">
+      <div className="mb-1 flex items-center justify-between rounded px-2 py-0.5 text-[11px] text-[#999ba1] transition hover:bg-[#242424] hover:text-[#c2c3c6]">
         <span className="flex items-center gap-1"><ChevronDown size={11} />{title}</span>
         <CirclePlus size={14} />
       </div>
