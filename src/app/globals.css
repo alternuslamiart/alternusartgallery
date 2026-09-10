@@ -944,3 +944,364 @@
   .crystal-mobile-tools-open .crystal-ai-prompt .crystal-mobile-reference { display:none; }
   .crystal-studio .crystal-modeling-tools { display:none!important; }
 }
+
+/* Visual refinement layer
+   Shared polish for marketing pages and the application chrome. This stays
+   intentionally token-based so existing page-specific content and themes are
+   left intact. */
+:root {
+  --landing-bg: #f4f6fb;
+  --landing-fg: #1f1f1f;
+  --landing-muted: rgba(5, 8, 15, 0.62);
+  --landing-muted-strong: rgba(5, 8, 15, 0.78);
+  --landing-surface: rgba(255, 255, 255, 0.84);
+  --landing-surface-soft: rgba(255, 255, 255, 0.58);
+  --landing-line: rgba(5, 8, 15, 0.1);
+  --landing-line-strong: rgba(5, 8, 15, 0.16);
+  --landing-accent: #4284ff;
+  --landing-accent-strong: #1e5ed4;
+  --ui-radius-sm: 10px;
+  --ui-radius-md: 14px;
+  --ui-radius-lg: 18px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+video,
+canvas {
+  max-width: 100%;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid #4284ff;
+  outline-offset: 3px;
+}
+
+::selection {
+  background: rgba(66, 132, 255, 0.24);
+  color: inherit;
+}
+
+.coreforge-page {
+  isolation: isolate;
+}
+
+.coreforge-page h1,
+.coreforge-page h2,
+.coreforge-page h3,
+.coreforge-page p {
+  text-wrap: pretty;
+}
+
+.coreforge-nav-shell {
+  padding: 16px 24px 0;
+}
+
+.coreforge-nav {
+  width: min(1240px, 100%);
+  min-height: 62px;
+  padding: 0 12px 0 22px;
+  gap: 18px;
+  border-radius: var(--ui-radius-lg);
+  box-shadow:
+    0 12px 32px rgba(14, 28, 55, 0.12),
+    inset 0 1px rgba(255, 255, 255, 0.32);
+  transition: box-shadow 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.coreforge-nav:hover {
+  box-shadow:
+    0 16px 38px rgba(14, 28, 55, 0.15),
+    inset 0 1px rgba(255, 255, 255, 0.38);
+}
+
+.coreforge-nav-brand {
+  min-width: max-content;
+}
+
+.coreforge-nav-links {
+  gap: 4px !important;
+  margin-left: 8px;
+}
+
+.coreforge-nav-links a {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 12px !important;
+  border: 1px solid transparent;
+  color: inherit;
+}
+
+.coreforge-nav-links a.is-active {
+  border-color: rgba(66, 132, 255, 0.18);
+  background: rgba(66, 132, 255, 0.1) !important;
+  color: #1e5ed4 !important;
+}
+
+.coreforge-nav-links a:hover {
+  background: rgba(66, 132, 255, 0.1) !important;
+  color: #1e5ed4 !important;
+}
+
+[data-coreforgetheme="dark"] .coreforge-nav-links a.is-active,
+[data-coreforgetheme="dark"] .coreforge-nav-links a:hover {
+  color: #9dbdff !important;
+}
+
+.coreforge-nav-login,
+.coreforge-nav > a[href="/download"] {
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.coreforge-nav-login:hover,
+.coreforge-nav > a[href="/download"]:hover {
+  background: rgba(66, 132, 255, 0.08);
+  border-color: rgba(66, 132, 255, 0.56) !important;
+  transform: translateY(-1px);
+}
+
+.coreforge-nav-cta {
+  box-shadow: 0 8px 18px rgba(66, 132, 255, 0.22);
+  transition: transform 180ms ease, filter 180ms ease, box-shadow 180ms ease;
+}
+
+.coreforge-nav-cta:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(66, 132, 255, 0.3);
+}
+
+.coreforge-footer {
+  margin-top: 0;
+}
+
+.coreforge-footer a,
+.coreforge-footer button {
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.coreforge-footer a:hover {
+  transform: translateX(1px);
+}
+
+.workspace-sidebar {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  border-radius: var(--ui-radius-md) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 30%),
+    #171717 !important;
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.2),
+    inset 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.workspace-sidebar input::placeholder {
+  color: #858890;
+}
+
+.workspace-sidebar button,
+.workspace-sidebar a {
+  transition: color 160ms ease, background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.workspace-sidebar button:focus-visible,
+.workspace-sidebar a:focus-visible {
+  outline-color: #4284ff;
+  outline-offset: 2px;
+}
+
+.workspace-sidebar > div:first-child button:hover {
+  background: #2b2b2b;
+}
+
+.workspace-sidebar label:focus-within {
+  border-color: rgba(66, 132, 255, 0.56);
+  box-shadow: 0 0 0 3px rgba(66, 132, 255, 0.12);
+}
+
+@media (max-width: 900px) {
+  .coreforge-nav-shell {
+    padding-inline: 16px;
+  }
+
+  .coreforge-nav {
+    gap: 12px;
+  }
+
+  .coreforge-nav-links {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .coreforge-nav-shell {
+    height: 84px;
+    padding: 10px var(--crystal-mobile-gutter, 16px) 0;
+  }
+
+  .coreforge-nav {
+    height: 64px;
+    min-height: 64px;
+    padding-inline: 8px;
+    border-radius: var(--ui-radius-md);
+  }
+
+  .coreforge-nav-brand {
+    left: 50%;
+  }
+
+  .coreforge-nav-brand .crystal-glass-brand {
+    font-size: 28px;
+  }
+
+  .coreforge-footer {
+    padding: 56px 0 28px !important;
+  }
+
+  .coreforge-footer > div {
+    padding-inline: var(--crystal-mobile-gutter, 16px) !important;
+  }
+
+  .coreforge-footer > div > div:first-child {
+    gap: 28px 20px !important;
+    padding-bottom: 44px !important;
+  }
+
+  .coreforge-footer > div > div:last-child {
+    align-items: flex-start !important;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Application workspace surfaces */
+.crystal-studio .crystal-topbar {
+  min-height: 64px;
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.crystal-studio .crystal-left-panel,
+.crystal-studio .crystal-right-panel {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px;
+}
+
+.crystal-studio .crystal-left-panel {
+  padding-inline: 16px;
+}
+
+.crystal-studio .crystal-right-panel {
+  padding-inline: 14px;
+}
+
+.crystal-studio .crystal-sidebar-heading button:hover,
+.crystal-studio .crystal-topbar button:hover {
+  background: #242424;
+}
+
+.crystal-dashboard {
+  background:
+    radial-gradient(circle at 76% 10%, rgba(66, 132, 255, 0.08), transparent 28%),
+    #202020;
+}
+
+.crystal-dashboard > header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(25, 25, 25, 0.92);
+}
+
+.crystal-dashboard main {
+  min-width: 0;
+  overflow: auto;
+  padding: 42px clamp(24px, 5vw, 80px);
+}
+
+.crystal-dashboard-title {
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.crystal-project-grid {
+  max-width: 1180px;
+  margin-inline: auto;
+  flex-wrap: wrap;
+}
+
+.crystal-project-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.crystal-project-card:hover {
+  border-color: rgba(66, 132, 255, 0.5);
+  box-shadow: 0 20px 36px rgba(0, 0, 0, 0.24);
+  transform: translateY(-3px);
+}
+
+.crystal-account-page main article,
+.crystal-account-page main section {
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+@media (max-width: 700px) {
+  .crystal-studio .crystal-left-panel,
+  .crystal-studio .crystal-right-panel {
+    border-radius: 0;
+    border-inline: 0 !important;
+  }
+
+  .crystal-dashboard main {
+    overflow-x: hidden;
+    padding-inline: var(--crystal-mobile-gutter, 16px);
+  }
+
+  .crystal-project-grid {
+    flex-direction: column;
+  }
+
+  .crystal-project-card {
+    width: 100%;
+  }
+}

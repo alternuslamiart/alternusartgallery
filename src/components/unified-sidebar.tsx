@@ -81,7 +81,7 @@ export function UnifiedSidebar({
 
   if (isCollapsed) {
     return (
-      <aside className={`flex h-full w-[60px] flex-col items-center overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] py-3 ${className}`}>
+      <aside className={`workspace-sidebar flex h-full w-[60px] flex-col items-center overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] py-3 ${className}`}>
         <button type="button" onClick={toggleCollapse} aria-label="Expand sidebar" className="grid h-8 w-8 place-items-center rounded-[8px] bg-[#242424] text-white hover:bg-[#242424]">
           <Sparkles size={16} />
         </button>
@@ -115,7 +115,7 @@ export function UnifiedSidebar({
   });
 
   return (
-    <aside className={`flex h-full w-[234px] shrink-0 flex-col overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] px-[14px] py-[12px] text-[#f4f4f5] shadow-[0_8px_24px_rgba(0,0,0,0.16)] ${className}`}>
+    <aside className={`workspace-sidebar flex h-full w-[234px] shrink-0 flex-col overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] px-[14px] py-[12px] text-[#f4f4f5] shadow-[0_8px_24px_rgba(0,0,0,0.16)] ${className}`}>
       <div className="flex items-center gap-2 px-1">
         <button type="button" onClick={toggleCollapse} aria-label="Collapse sidebar" title="Collapse sidebar" className="grid h-8 w-8 place-items-center rounded-[9px] bg-[#242424] text-white transition hover:bg-[#242424]"><Sparkles size={17} /></button>
         <div className="min-w-0 flex-1">

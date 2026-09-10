@@ -82,13 +82,13 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
  return (
- <header className="crystal-glass-nav-shell">
- <div className="crystal-glass-nav" style={{ color: fg, borderColor: faint, background: isDark ? "rgba(28,28,30,.72)" : "rgba(255,255,255,.72)" }}>
- <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+ <header className="crystal-glass-nav-shell coreforge-nav-shell">
+ <div className="crystal-glass-nav coreforge-nav" style={{ color: fg, borderColor: faint, background: isDark ? "rgba(28,28,30,.72)" : "rgba(255,255,255,.72)" }}>
+ <Link href="/" className="coreforge-nav-brand" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
  <img src="/Logopng.png" alt="Crystal" className="crystal-site-logo" />
  <span className="crystal-glass-brand" style={{ color: fg }}>Crystal</span>
  </Link>
- <nav className="hidden md:flex crystal-glass-links" style={{ alignItems: "center", gap: 12 }}>
+ <nav className="hidden md:flex crystal-glass-links coreforge-nav-links" style={{ alignItems: "center", gap: 12 }}>
  {[{ l: "Platform", h: "/platform/overview" }, { l: "Design Studios", h: "/platform/bridges" }, { l: "Company", h: "/about" }, { l: "Pricing", h: "/pricing" }].map((i) => (
  <Link key={i.l} href={i.h} className={pathname === i.h ? "is-active" : undefined} style={{ fontSize: 13, color: muted, fontWeight: 500, textDecoration: "none", letterSpacing: "-0.01em" }}>{i.l}</Link>
  ))}
@@ -100,7 +100,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
  }
  </button>
- <Link href="/login" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }} className="hover:!border-[#4284FF]">
+ <Link href="/login" className="coreforge-nav-login hover:!border-[#4284FF]" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}>
  Log in
  </Link>
  <Link href="/account" aria-label="Account profile" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, fontSize: 12, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.02em" }}>
@@ -110,7 +110,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  <Link href="/download" className="hidden sm:inline-flex" style={{ alignItems: "center", height: 36, padding: "0 15px", color: fg, fontSize: 13, fontWeight: 700, textDecoration: "none", border: `1px solid ${faint}`, borderRadius: 8 }}>
  Download App
  </Link>
- <Link href="/project" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
+ <Link href="/project" className="coreforge-nav-cta" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
  Launch Studio <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
  </Link>
  </div>
@@ -163,7 +163,7 @@ export function CoreforgeFooter({ isDark, fg, muted, faint }: Pick<ReturnType<ty
  ];
 
  return (
- <footer style={{ paddingTop: 96, paddingBottom: 40, background: isDark ? DARK_BG : PAPER, borderTop: `3px solid ${COBALT}` }}>
+ <footer className="coreforge-footer" style={{ paddingTop: 96, paddingBottom: 40, background: isDark ? DARK_BG : PAPER, borderTop: `3px solid ${COBALT}` }}>
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
  <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-12" style={{ paddingBottom: 80 }}>
  {cols.map((col) => (
@@ -215,7 +215,7 @@ export type CoreforgeTheme = ReturnType<typeof useCoreforgeTheme>;
 export function CoreforgePage({ children }: { children: ReactNode | ((t: CoreforgeTheme) => ReactNode) }) {
  const theme = useCoreforgeTheme();
  return (
- <div style={{ minHeight: "100vh", background: theme.bg, color: theme.fg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", transition: "background 0.3s,color 0.3s", overflowX: "hidden" }}>
+ <div className="coreforge-page" style={{ minHeight: "100vh", background: theme.bg, color: theme.fg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", transition: "background 0.3s,color 0.3s", overflowX: "hidden" }}>
  <CoreforgeNav {...theme} />
  {typeof children === "function" ? children(theme) : children}
  <CoreforgeFooter {...theme} />
