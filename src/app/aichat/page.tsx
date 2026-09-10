@@ -171,7 +171,23 @@ export default function AIChatPage() {
             <button aria-label="Account menu" title="Account menu" className="text-zinc-600 transition hover:text-white"><MoreHorizontal size={16} /></button>
           </div>
         </div>}
-        {sidebarCollapsed && <div className="mt-auto flex flex-col items-center gap-3"><Link href="/account" aria-label="Open account" className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</Link><button onClick={() => setSidebarCollapsed(false)} aria-label="Expand sidebar" className="rounded-lg p-2 text-zinc-500 hover:bg-[#1c1c1c] hover:text-white"><PanelLeftOpen size={16} /></button></div>}
+        {sidebarCollapsed && (
+          <div className="flex min-h-0 flex-1 flex-col items-center">
+            <nav className="mt-5 flex flex-col items-center gap-2" aria-label="Collapsed AI chat navigation">
+              <Link href="/archplan" aria-label="New Project" title="New Project" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><FolderPlus size={16} /></Link>
+              <button type="button" onClick={() => { setMessages([]); setInput(""); }} aria-label="New Chat" title="New Chat" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Plus size={17} /></button>
+              <Link href="/crystal" aria-label="Image" title="Image" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Image size={16} /></Link>
+              <Link href="/platform/bridges" aria-label="Plugin" title="Plugin" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Plug size={16} /></Link>
+              <span className="my-1 h-px w-6 bg-[#2a2a2a]" />
+              <button type="button" onClick={() => setModelsOpen(true)} aria-label="AI models" title="AI models" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Bot size={16} /></button>
+              <button type="button" onClick={() => setSearch("")} aria-label="Search" title="Search" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Search size={16} /></button>
+            </nav>
+            <div className="mt-auto flex flex-col items-center gap-3">
+              <Link href="/account" aria-label="Open account" className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</Link>
+              <button onClick={() => setSidebarCollapsed(false)} aria-label="Expand sidebar" className="rounded-lg p-2 text-zinc-500 hover:bg-[#1c1c1c] hover:text-white"><PanelLeftOpen size={16} /></button>
+            </div>
+          </div>
+        )}
       </aside>
 
       <main className="relative flex min-w-0 flex-1 flex-col bg-[#111111]">

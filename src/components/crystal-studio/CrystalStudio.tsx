@@ -28,6 +28,7 @@ export function CrystalStudio({ initialDashboard = false }: { initialDashboard?:
   // Opening /crystal should enter the modeling workspace immediately. The
   // project dashboard remains available from the Home control in the top bar.
   const [dashboard, setDashboard] = useState(initialDashboard);
+  const [dashboardSidebarCollapsed, setDashboardSidebarCollapsed] = useState(false);
   const router = useRouter();
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
@@ -122,10 +123,10 @@ export function CrystalStudio({ initialDashboard = false }: { initialDashboard?:
   useEffect(() => { if(!toast)return; const timer=window.setTimeout(()=>setToast(null),2800); return()=>window.clearTimeout(timer); },[toast]);
   useEffect(()=>{const close=(event:PointerEvent)=>{if(openMenu&&!(event.target as HTMLElement).closest("[aria-label='Application menu']"))setOpenMenu(null)};document.addEventListener("pointerdown",close);return()=>document.removeEventListener("pointerdown",close)},[openMenu]);
 
-  if (dashboard) return <div className="crystal-dashboard">
+  if (dashboard) return <div className={`crystal-dashboard ${dashboardSidebarCollapsed ? "sidebar-collapsed" : ""}`}>
     {mobileSplash && <div className="crystal-mobile-splash"><img src="/Logopng.png" alt="Crystal" /></div>}
     <header><div className="crystal-dashboard-brand"><img src="/Logopng.png" alt="Crystal" className="crystal-brand-logo"/><b>Crystal</b></div><div className="crystal-window-controls">•••　—　×　□</div></header>
-    <UnifiedSidebar activePath="/project" className="h-full" />
+    <UnifiedSidebar collapsed={dashboardSidebarCollapsed} onCollapse={() => setDashboardSidebarCollapsed((value) => !value)} activePath="/project" className="h-full" />
     <main><div className="crystal-dashboard-title"><div><h1>♦ Crystal</h1><b>Recent Projects</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => router.push("/crystal")}>Launch Studio　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago", route:"/archplan"},{title:"Architecture Sketch",time:"Viewed 3mo ago", route:"/archplan"}].map((project) => <button key={project.title} onClick={() => router.push(project.route)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
   </div>;
 
