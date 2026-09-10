@@ -109,7 +109,7 @@ export default function ArchplanPage() {
       </header>
 
       <div className="fixed bottom-0 left-0 top-[54px] z-20 hidden p-2 lg:block">
-        <UnifiedSidebar activePath="/archplan" className="h-full" />
+        <UnifiedSidebar activePath="/archplan" className="h-full w-[234px] rounded-[12px]" />
       </div>
       {/* Project controls remain in the main canvas; navigation is shared across workspaces. */}
       {/* <aside className="fixed bottom-0 left-0 top-[54px] z-20 hidden w-[272px] border-r border-white/[0.04] bg-[#111111] px-3 pt-2 lg:block">
