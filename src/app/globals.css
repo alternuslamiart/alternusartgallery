@@ -561,6 +561,15 @@
  body {
  @apply bg-background text-foreground;
  }
+
+ body:has(.crystal-archplan-page) {
+   background: #0f0f0f;
+ }
+
+ .crystal-archplan-page {
+   width: 100%;
+   min-width: 0;
+ }
 }
 
 /* Marquee Animation */
