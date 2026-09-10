@@ -24,6 +24,7 @@ type ChatMessage = {
 };
 
 type RequestBody = {
+ messages?: unknown;
  message?: unknown;
  history?: unknown;
  conversationHistory?: unknown;
@@ -275,6 +276,12 @@ async function askOpenAICompatible({
  throw new Error(`Missing ${providerName} API key.`);
  }
 
+ console.info("[ai-chat] executing provider request", {
+ provider: providerName,
+ model: modelName,
+ messageCount: history.length + 1,
+ });
+
  const response = await fetch(endpoint, {
  method: "POST",
  headers: {
@@ -287,6 +294,12 @@ async function askOpenAICompatible({
  temperature: 0.7,
  max_tokens: 4096,
  }),
+ });
+
+ console.info("[ai-chat] provider response received", {
+ provider: providerName,
+ model: modelName,
+ status: response.status,
  });
 
  if (!response.ok) {
@@ -308,6 +321,13 @@ async function askOpenAICompatible({
  if (!answer) {
  throw new Error(`Invalid ${providerName} response.`);
  }
+
+ console.info("[ai-chat] assistant text extracted", {
+ provider: providerName,
+ model: modelName,
+ characterCount: answer.length,
+ textPreview: answer.slice(0, 120),
+ });
 
  return answer;
 }
@@ -371,7 +391,10 @@ export async function GET() {
 export async function POST(request: NextRequest) {
  try {
  const body = (await request.json()) as RequestBody;
- const message = typeof body.message === "string" ? body.message.trim() : "";
+ const requestMessages = normalizeHistory(body.messages);
+ const legacyMessage = typeof body.message === "string" ? body.message.trim() : "";
+ const lastRequestMessage = requestMessages[requestMessages.length - 1];
+ const message = legacyMessage || (lastRequestMessage?.role === "user" ? lastRequestMessage.content : "");
 
  if (!message) {
  return NextResponse.json(
@@ -380,8 +403,23 @@ export async function POST(request: NextRequest) {
  );
  }
 
- const history = normalizeHistory(body.history ?? body.conversationHistory);
+ const history = requestMessages.length > 0
+ ? requestMessages.slice(0, lastRequestMessage?.role === "user" ? -1 : undefined)
+ : normalizeHistory(body.history ?? body.conversationHistory);
  const provider = getPreferredProvider();
+ const model = provider === "openai"
+ ? getOpenAIModel()
+ : provider === "groq"
+ ? getGroqModel()
+ : provider === "gemini"
+ ? getGeminiModel()
+ : "local-fallback";
+
+ console.info("[ai-chat] request received", {
+ messageCount: requestMessages.length || 1,
+ message,
+ });
+ console.info("[ai-chat] selected provider", { provider, model });
 
  if (provider === "openai" || provider === "gemini" || provider === "groq") {
  const providerAttempts = getProviderAttempts(provider);
@@ -391,36 +429,43 @@ export async function POST(request: NextRequest) {
  try {
  const answer = await askProvider(providerAttempt, message, history);
  return NextResponse.json({
- content: answer,
- answer,
+ success: true,
+ message: answer,
+ model: providerAttempt === "openai"
+ ? getOpenAIModel()
+ : providerAttempt === "groq"
+ ? getGroqModel()
+ : getGeminiModel(),
  provider: providerAttempt,
- fallbackFrom: providerAttempt === provider ? undefined : provider,
  });
  } catch (providerError) {
  const errorMessage = getSafeAIErrorMessage(providerError);
  providerErrors.push({ provider: providerAttempt, message: errorMessage });
- console.warn(`AI provider ${providerAttempt} failed.`, providerError);
+ console.warn(`AI provider ${providerAttempt} failed.`, errorMessage);
  }
  }
 
  const primaryError = providerErrors.find((entry) => entry.provider === provider);
  const surfacedError = primaryError ?? providerErrors[providerErrors.length - 1];
- const fallback = getAIResponse(message);
- return NextResponse.json({
- content: fallback.content,
- answer: fallback.content,
- suggestedQuestions: fallback.suggestedQuestions,
- provider: "local",
- fallbackFrom: surfacedError?.provider ?? provider,
- providerError: surfacedError?.message,
- providerErrors: providerErrors.map((entry) => ({ provider: entry.provider, message: entry.message })),
- });
+ const providerError = getProviderError(
+ surfacedError?.message || `${provider} request failed.`,
+ provider,
+ );
+ return NextResponse.json(
+ {
+ error: providerError.error,
+ code: providerError.code,
+ provider,
+ },
+ { status: providerError.status },
+ );
  }
 
  const fallback = getAIResponse(message);
  return NextResponse.json({
- content: fallback.content,
- answer: fallback.content,
+ success: true,
+ message: fallback.content,
+ model: "local-fallback",
  suggestedQuestions: fallback.suggestedQuestions,
  provider,
  });

@@ -70,16 +70,19 @@ export default function AIChatPage() {
     setIsSending(true);
 
     try {
+      const conversation = [...messages, userMessage].map(({ role, content }) => ({ role, content }));
       const response = await fetch("/api/ai-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ messages: conversation }),
       });
-      const data = (await response.json()) as { content?: string; answer?: string; error?: string };
+      const data = (await response.json()) as { message?: string; content?: string; answer?: string; error?: string };
       if (!response.ok) throw new Error(data.error || "The AI request failed.");
+      const assistantMessage = data.message || data.content || data.answer;
+      if (!assistantMessage) throw new Error("The AI returned an empty response.");
       setMessages((current) => [
         ...current,
-        { id: Date.now() + 1, role: "assistant", content: data.content || data.answer || "I could not generate a response." },
+        { id: Date.now() + 1, role: "assistant", content: assistantMessage },
       ]);
     } catch (error) {
       setMessages((current) => [
