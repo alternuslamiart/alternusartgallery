@@ -237,13 +237,15 @@ export default function AIChatPage() {
       <main className="relative flex min-w-0 flex-1 flex-col bg-[#111111]">
         <header className="flex h-16 items-center justify-between px-5 sm:px-8">
           <button onClick={() => setSidebarOpen(true)} aria-label="Open sidebar" className="rounded-xl p-2 text-zinc-400 transition hover:bg-[#1c1c1c] hover:text-white lg:hidden"><Menu size={20} /></button>
-          <div className="mx-auto flex items-center gap-1 rounded-full border border-[#2a2a2a] bg-[#141414] p-1 shadow-lg">
-            <button onClick={() => setMode("chat")} className={`flex items-center gap-2 rounded-full px-5 py-2 text-xs font-medium transition-all ${mode === "chat" ? "bg-[#3b82f6] text-white shadow-md shadow-blue-500/20" : "text-zinc-500 hover:text-white"}`}><Sparkles size={14} /> Chat</button>
-            <button onClick={() => setMode("workflow")} className={`flex items-center gap-2 rounded-full px-5 py-2 text-xs font-medium transition-all ${mode === "workflow" ? "bg-[#3b82f6] text-white shadow-md shadow-blue-500/20" : "text-zinc-500 hover:text-white"}`}><GitBranch size={14} /> Workflow</button>
-          </div>
-          <div className="absolute left-1/2 top-16 hidden -translate-x-1/2 items-center gap-1 rounded-lg border border-[#2a2a2a] bg-[#141414] p-1 md:flex">
+          <div className="mx-auto flex items-center gap-2">
+            <div className="flex items-center gap-1 rounded-full border border-[#2a2a2a] bg-[#141414] p-1 shadow-lg">
+              <button onClick={() => setMode("chat")} className={`flex items-center gap-2 rounded-full px-5 py-2 text-xs font-medium transition-all ${mode === "chat" ? "bg-[#3b82f6] text-white shadow-md shadow-blue-500/20" : "text-zinc-500 hover:text-white"}`}><Sparkles size={14} /> Chat</button>
+              <button onClick={() => setMode("workflow")} className={`flex items-center gap-2 rounded-full px-5 py-2 text-xs font-medium transition-all ${mode === "workflow" ? "bg-[#3b82f6] text-white shadow-md shadow-blue-500/20" : "text-zinc-500 hover:text-white"}`}><GitBranch size={14} /> Workflow</button>
+            </div>
+            <div className="hidden items-center gap-1 rounded-lg border border-[#2a2a2a] bg-[#141414] p-1 md:flex">
             <button type="button" onClick={() => setSplitView(false)} aria-label="Use chat only" title="Single panel" className={`grid h-7 w-7 place-items-center rounded-md transition ${!splitView ? "bg-[#2a2a2a] text-white" : "text-zinc-600 hover:text-zinc-300"}`}><PanelRightClose size={14} /></button>
             <button type="button" onClick={() => setSplitView(true)} aria-label="Enable split view" title="Split view" className={`grid h-7 w-7 place-items-center rounded-md transition ${splitView ? "bg-[#3b82f6] text-white" : "text-zinc-600 hover:text-zinc-300"}`}><Columns2 size={14} /></button>
+            </div>
           </div>
           <Link href="/crystal" className="hidden rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-zinc-400 transition hover:border-blue-500/50 hover:text-white sm:block">Go to Studio</Link>
         </header>
