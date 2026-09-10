@@ -46,6 +46,7 @@ export function useCoreforgeMode() {
  const next = saved ? saved === "dark" : false;
  setIsDark(next);
  document.documentElement.dataset.CoreforgeTheme = next ? "dark" : "light";
+ document.documentElement.setAttribute("data-coreforge-theme", next ? "dark" : "light");
  document.documentElement.classList.toggle("dark", next);
  }, []);
 
@@ -54,6 +55,7 @@ export function useCoreforgeMode() {
  const value = typeof next === "function" ? next(current) : next;
  window.localStorage.setItem(THEME_KEY, value ? "dark" : "light");
  document.documentElement.dataset.CoreforgeTheme = value ? "dark" : "light";
+ document.documentElement.setAttribute("data-coreforge-theme", value ? "dark" : "light");
  document.documentElement.classList.toggle("dark", value);
  return value;
  });

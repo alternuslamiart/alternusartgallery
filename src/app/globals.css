@@ -977,6 +977,54 @@
   background: linear-gradient(145deg, rgba(44,67,116,.42), rgba(37,37,37,.98)) !important;
 }
 
+/* Keep every homepage frame and section tied to the active Crystal mode. */
+[data-coreforge-theme="light"] .coreforge-page {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+[data-coreforge-theme="light"] .coreforge-page .crystal-first-sector,
+[data-coreforge-theme="light"] .coreforge-page .crystal-first-sector + section,
+[data-coreforge-theme="light"] .coreforge-page .crystal-feature-showcase,
+[data-coreforge-theme="light"] .coreforge-page .coreforge-footer {
+  background: #ffffff !important;
+}
+[data-coreforge-theme="light"] .coreforge-page .crystal-first-card,
+[data-coreforge-theme="light"] .coreforge-page .crystal-home-surface,
+[data-coreforge-theme="light"] .coreforge-page .crystal-process article {
+  background: #ebebeb !important;
+  color: #000000 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+[data-coreforge-theme="light"] .coreforge-page .crystal-first-chips span {
+  background: #d7d7d7 !important;
+  color: #282828 !important;
+}
+[data-coreforge-theme="light"] .coreforge-page .crystal-first-card p,
+[data-coreforge-theme="light"] .coreforge-page .crystal-feature-copy p,
+[data-coreforge-theme="light"] .coreforge-page .crystal-first-sector > p {
+  color: #282828 !important;
+}
+[data-coreforge-theme="light"] .coreforge-page .crystal-home-surface:hover {
+  background: #ffffff !important;
+  border-color: #3b82f6 !important;
+}
+[data-coreforge-theme="dark"] .coreforge-page {
+  background: #0a0a0a !important;
+  color: #ffffff !important;
+}
+[data-coreforge-theme="dark"] .coreforge-page .crystal-first-sector,
+[data-coreforge-theme="dark"] .coreforge-page .crystal-first-sector + section,
+[data-coreforge-theme="dark"] .coreforge-page .crystal-feature-showcase,
+[data-coreforge-theme="dark"] .coreforge-page .coreforge-footer {
+  background: #0a0a0a !important;
+}
+[data-coreforge-theme="dark"] .coreforge-page .crystal-first-card,
+[data-coreforge-theme="dark"] .coreforge-page .crystal-home-surface,
+[data-coreforge-theme="dark"] .coreforge-page .crystal-process article {
+  background: #1c1c1c !important;
+  color: #ffffff !important;
+}
+
 /* Mobile app gutter system: one symmetric inset for every surface. */
 @media (max-width: 599px) {
   :root { --crystal-mobile-gutter: 16px; }
