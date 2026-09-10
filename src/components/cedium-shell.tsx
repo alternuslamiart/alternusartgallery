@@ -7,14 +7,17 @@ import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useState }
 export const COBALT = "#4284FF";
 export const COBALT_DEEP = "#1E5ED4";
 export const INK = "#1F1F1F";
-export const PAPER = "#F4F6FB";
-export const DARK_BG = "#1B1B1B";
-export const DARK_SURFACE = "#262626";
-export const DARK_SURFACE_SOFT = "#202020";
-export const DARK_BORDER = "rgba(255,255,255,0.16)";
-export const DARK_BORDER_SOFT = "rgba(255,255,255,0.10)";
-export const DARK_MUTED = "rgba(193,194,191,0.72)";
-export const DARK_TEXT = "#C1C2BF";
+export const PAPER = "#FFFFFF";
+export const PAPER_SECONDARY = "#EBEBEB";
+export const PAPER_TERTIARY = "#D7D7D7";
+export const PAPER_QUATERNARY = "#C3C3C3";
+export const DARK_BG = "#0A0A0A";
+export const DARK_SURFACE = "#1C1C1C";
+export const DARK_SURFACE_SOFT = "#141414";
+export const DARK_BORDER = "#2A2A2A";
+export const DARK_BORDER_SOFT = "#262626";
+export const DARK_MUTED = "#A1A1AA";
+export const DARK_TEXT = "#FFFFFF";
 const THEME_KEY = "Coreforge_theme";
 
 /**
@@ -43,6 +46,7 @@ export function useCoreforgeMode() {
  const next = saved ? saved === "dark" : false;
  setIsDark(next);
  document.documentElement.dataset.CoreforgeTheme = next ? "dark" : "light";
+ document.documentElement.classList.toggle("dark", next);
  }, []);
 
  const setMode: Dispatch<SetStateAction<boolean>> = useCallback((next) => {
@@ -50,6 +54,7 @@ export function useCoreforgeMode() {
  const value = typeof next === "function" ? next(current) : next;
  window.localStorage.setItem(THEME_KEY, value ? "dark" : "light");
  document.documentElement.dataset.CoreforgeTheme = value ? "dark" : "light";
+ document.documentElement.classList.toggle("dark", value);
  return value;
  });
  }, []);
@@ -68,10 +73,10 @@ export function useCoreforgeTheme() {
  }, []);
 
  const bg = isDark ? DARK_BG : PAPER;
- const fg = isDark ? DARK_TEXT : INK;
- const muted = isDark ? DARK_MUTED : "rgba(5,8,15,0.62)";
- const faint = isDark ? DARK_BORDER : "rgba(5,8,15,0.1)";
- const surface = isDark ? "rgba(255,255,255,0.04)" : "rgba(5,8,15,0.035)";
+ const fg = isDark ? DARK_TEXT : "#000000";
+ const muted = isDark ? DARK_MUTED : "#282828";
+ const faint = isDark ? DARK_BORDER : "#E5E5E5";
+ const surface = isDark ? DARK_SURFACE_SOFT : PAPER_SECONDARY;
  const raised = isDark ? DARK_SURFACE : "#FFFFFF";
 
  return { isDark, setIsDark, scrolled, bg, fg, muted, faint, surface, raised };

@@ -19,6 +19,14 @@ const config: Config = {
   	},
   	extend: {
   		colors: {
+  			"surface-primary": 'hsl(var(--background))',
+  			"surface-secondary": 'hsl(var(--secondary))',
+  			"surface-tertiary": 'hsl(var(--muted))',
+  			"surface-quaternary": 'hsl(var(--accent))',
+  			"label-primary": 'hsl(var(--label-primary))',
+  			"label-secondary": 'hsl(var(--label-secondary))',
+  			"label-tertiary": 'hsl(var(--label-tertiary))',
+  			"label-quaternary": 'hsl(var(--label-quaternary))',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

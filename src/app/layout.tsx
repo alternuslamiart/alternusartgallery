@@ -119,23 +119,50 @@ export default function RootLayout({
  __html: `
  html[data-cedium-theme="dark"],
  .dark {
- --background: 0 0% 11%;
- --foreground: 80 2% 75%;
- --card: 0 0% 15%;
- --card-foreground: 80 2% 75%;
- --popover: 0 0% 15%;
- --popover-foreground: 80 2% 75%;
- --primary: 218 100% 63%;
+ --background: 0 0% 3.92%;
+ --foreground: 0 0% 100%;
+ --card: 0 0% 10.98%;
+ --card-foreground: 0 0% 100%;
+ --popover: 0 0% 10.98%;
+ --popover-foreground: 0 0% 100%;
+ --primary: 217 91% 60%;
  --primary-foreground: 0 0% 100%;
- --secondary: 0 0% 15%;
- --secondary-foreground: 80 2% 75%;
- --muted: 0 0% 15%;
- --muted-foreground: 80 2% 75%;
- --accent: 0 0% 15%;
- --accent-foreground: 80 2% 75%;
- --border: 0 0% 20%;
- --input: 0 0% 20%;
- --ring: 218 100% 63%;
+ --secondary: 0 0% 7.84%;
+ --secondary-foreground: 0 0% 63.14%;
+ --muted: 0 0% 10.98%;
+ --muted-foreground: 0 0% 63.14%;
+ --accent: 0 0% 14.9%;
+ --accent-foreground: 0 0% 100%;
+ --border: 0 0% 16.47%;
+ --input: 0 0% 16.47%;
+ --ring: 217 91% 60%;
+ --label-primary: 0 0% 100%;
+ --label-secondary: 240 4% 63%;
+ --label-tertiary: 240 5% 46%;
+ --label-quaternary: 240 5% 32%;
+ }
+ :root {
+ --background: 0 0% 100%;
+ --foreground: 0 0% 0%;
+ --card: 0 0% 100%;
+ --card-foreground: 0 0% 0%;
+ --popover: 0 0% 100%;
+ --popover-foreground: 0 0% 0%;
+ --primary: 217 91% 60%;
+ --primary-foreground: 0 0% 100%;
+ --secondary: 0 0% 92.16%;
+ --secondary-foreground: 0 0% 15.69%;
+ --muted: 0 0% 84.31%;
+ --muted-foreground: 0 0% 23.53%;
+ --accent: 0 0% 76.47%;
+ --accent-foreground: 0 0% 0%;
+ --border: 0 0% 89.8%;
+ --input: 0 0% 89.8%;
+ --ring: 217 91% 60%;
+ --label-primary: 0 0% 0%;
+ --label-secondary: 0 0% 15.69%;
+ --label-tertiary: 0 0% 23.53%;
+ --label-quaternary: 0 0% 31.37%;
  }
  html[data-cedium-theme="dark"] *,
  html[data-cedium-theme="dark"] *::before,
