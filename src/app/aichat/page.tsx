@@ -4,17 +4,22 @@ import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import {
   ArrowUp,
+  Bot,
   Check,
-  ChevronDown,
   Copy,
+  FolderPlus,
   GitBranch,
+  Image,
   Menu,
   Mic,
   MoreHorizontal,
+  PanelLeftClose,
+  PanelLeftOpen,
   Plus,
+  Plug,
+  Search,
   Share2,
   Sparkles,
-  Workflow,
   X,
 } from "lucide-react";
 
@@ -30,6 +35,8 @@ const conversations = [
   "Create 3D Environment",
   "AutoCAD Course for Leaning",
 ];
+const models = ["Claude", "OpenAI", "Gemini", "Grok", "Groq", "Copilot"];
+const recentItems = ["House Architecture", "Modern Interior", "Robot Concept", "Living Room Design", "New Project"];
 
 export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -37,6 +44,9 @@ export default function AIChatPage() {
   const [isSending, setIsSending] = useState(false);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("Gemini");
+  const [search, setSearch] = useState("");
   const [mode, setMode] = useState<"chat" | "workflow">("chat");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -88,28 +98,53 @@ export default function AIChatPage() {
   return (
     <div className="flex min-h-screen w-full overflow-hidden bg-[#0a0a0a] font-roboto text-white">
       {sidebarOpen && <button aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-black/60 lg:hidden" />}
-      <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex w-[276px] shrink-0 flex-col border-r border-[#2a2a2a] bg-[#0e0e0e] p-5 transition-transform duration-300 lg:static lg:translate-x-0`}>
-        <div className="flex items-center justify-between">
-          <Link href="/aichat" className="flex items-center gap-3 text-lg font-semibold tracking-tight text-white">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><Sparkles size={18} /></span>
-            Crystal
+      <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[78px]" : "w-[276px]"} shrink-0 flex-col border-r border-[#2a2a2a] bg-[#0e0e0e] p-3 transition-[width,transform] duration-300 lg:static lg:translate-x-0`}>
+        <div className="flex items-center justify-between rounded-xl px-2 py-2">
+          <Link href="/aichat" aria-label="Crystal AI Chat" className={`flex items-center gap-3 text-lg font-semibold tracking-tight text-white ${sidebarCollapsed ? "mx-auto" : ""}`}>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><Sparkles size={18} /></span>
+            {!sidebarCollapsed && "Crystal"}
           </Link>
-          <button onClick={() => setSidebarOpen(false)} className="rounded-lg p-2 text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white lg:hidden"><X size={18} /></button>
+          <button onClick={() => setSidebarCollapsed((value) => !value)} aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} className="rounded-lg p-2 text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white lg:block hidden"><PanelLeftClose size={16} /></button>
+          <button onClick={() => setSidebarOpen(false)} aria-label="Close sidebar" className="rounded-lg p-2 text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white lg:hidden"><X size={18} /></button>
         </div>
 
-        <div className="mt-9 flex items-center justify-between text-[11px] text-zinc-500">
-          <span>Your conversations</span>
-          <button onClick={() => setMessages([])} className="text-[#3b82f6] transition hover:text-blue-300">Clear All</button>
-        </div>
-        <nav className="mt-4 space-y-1.5">
-          {conversations.map((conversation, index) => (
-            <button key={conversation} onClick={() => setSidebarOpen(false)} className={`group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-[13px] transition-all duration-200 hover:bg-[#1c1c1c] ${index === 0 ? "border-l-2 border-[#3b82f6] bg-[#1c1c1c] text-white" : "border-l-2 border-transparent text-zinc-500 hover:text-zinc-200"}`}>
-              <span className="truncate">{conversation}</span>
-              {index === 0 && <MoreHorizontal size={16} className="shrink-0 text-zinc-300" />}
-            </button>
-          ))}
-        </nav>
-        <button className="mt-auto flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#3b82f6] to-[#2563eb] py-3 text-sm font-semibold shadow-lg shadow-blue-500/10 transition-all duration-200 hover:scale-[1.02] hover:shadow-blue-500/25 active:scale-95"><Sparkles size={15} /> Upgrade Now</button>
+        {!sidebarCollapsed && <div className="flex min-h-0 flex-1 flex-col">
+          <label className="mt-4 flex h-9 items-center gap-2 rounded-xl border border-[#2a2a2a] bg-[#141414] px-3 text-zinc-500 focus-within:border-blue-500/60">
+            <Search size={14} />
+            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search" className="min-w-0 flex-1 bg-transparent text-xs text-white outline-none placeholder:text-zinc-600" />
+            <kbd className="rounded border border-[#2a2a2a] px-1.5 py-0.5 text-[9px] text-zinc-600">⌘K</kbd>
+          </label>
+
+          <nav className="mt-5 space-y-1">
+            <Link href="/archplan" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><FolderPlus size={16} className="text-zinc-500" /> New Project</Link>
+            <button onClick={() => { setMessages([]); setInput(""); setSidebarOpen(false); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><Plus size={16} className="text-zinc-500" /> New Chat</button>
+            <Link href="/crystal" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><Image size={16} className="text-zinc-500" /> Image</Link>
+            <Link href="/platform/bridges" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><Plug size={16} className="text-zinc-500" /> Plugin</Link>
+          </nav>
+
+          <div className="mt-6">
+            <div className="mb-2 px-3 text-[10px] font-medium uppercase tracking-[0.16em] text-zinc-600">AI Models</div>
+            <div className="space-y-0.5">
+              {models.map((model) => <button key={model} onClick={() => setSelectedModel(model)} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-[12px] transition ${selectedModel === model ? "bg-[#1c1c1c] text-white" : "text-zinc-500 hover:bg-[#181818] hover:text-zinc-200"}`}><span className={`grid h-5 w-5 place-items-center rounded-md ${selectedModel === model ? "bg-blue-500/15 text-blue-400" : "bg-[#1a1a1a] text-zinc-500"}`}><Bot size={13} /></span>{model}{selectedModel === model && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#22c55e]" />}</button>)}
+            </div>
+          </div>
+
+          <div className="mt-6 min-h-0 flex-1 overflow-y-auto">
+            <div className="mb-2 px-3 text-[10px] font-medium uppercase tracking-[0.16em] text-zinc-600">Recent</div>
+            <div className="space-y-0.5">
+              {recentItems.filter((item) => item.toLowerCase().includes(search.toLowerCase())).map((item, index) => <button key={item} onClick={() => { setInput(item); setSidebarOpen(false); }} className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[12px] text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-zinc-200"><Sparkles size={14} className="shrink-0 text-zinc-600" /><span className="min-w-0 flex-1 truncate">{item}</span><MoreHorizontal size={14} className="shrink-0 opacity-0 transition group-hover:opacity-100" /></button>)}
+            </div>
+            <div className="mt-5 space-y-1.5 border-t border-[#242424] pt-4">
+              {conversations.filter((item) => item.toLowerCase().includes(search.toLowerCase())).slice(0, 5).map((conversation, index) => <button key={conversation} onClick={() => setSidebarOpen(false)} className={`group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-[12px] transition hover:bg-[#1c1c1c] ${index === 0 ? "text-white" : "text-zinc-600 hover:text-zinc-300"}`}><span className="truncate">{conversation}</span><MoreHorizontal size={14} className="shrink-0 opacity-0 transition group-hover:opacity-100" /></button>)}
+            </div>
+          </div>
+          <div className="mt-3 flex items-center gap-3 rounded-xl border border-[#2a2a2a] bg-[#141414] p-2.5">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</span>
+            <Link href="/account" className="min-w-0 flex-1"><span className="block truncate text-xs text-zinc-200">Crystal User</span><span className="block truncate text-[10px] text-zinc-600">you@alternusart.com</span></Link>
+            <button aria-label="Account menu" title="Account menu" className="text-zinc-600 transition hover:text-white"><MoreHorizontal size={16} /></button>
+          </div>
+        </div>}
+        {sidebarCollapsed && <div className="mt-auto flex flex-col items-center gap-3"><Link href="/account" aria-label="Open account" className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</Link><button onClick={() => setSidebarCollapsed(false)} aria-label="Expand sidebar" className="rounded-lg p-2 text-zinc-500 hover:bg-[#1c1c1c] hover:text-white"><PanelLeftOpen size={16} /></button></div>}
       </aside>
 
       <main className="relative flex min-w-0 flex-1 flex-col bg-[#111111]">
