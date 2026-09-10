@@ -120,7 +120,7 @@ export default function AIChatPage() {
           <nav className="mt-5 space-y-1">
             <Link href="/archplan" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><FolderPlus size={16} className="text-zinc-500" /> New Project</Link>
             <button onClick={() => { setMessages([]); setInput(""); setSidebarOpen(false); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><Plus size={16} className="text-zinc-500" /> New Chat</button>
-            <Link href="/crystal" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><Image size={16} className="text-zinc-500" /> Image</Link>
+            <Link href="/design-studio" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><Image size={16} className="text-zinc-500" /> Image</Link>
             <Link href="/platform/bridges" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><Plug size={16} className="text-zinc-500" /> Plugin</Link>
           </nav>
 
@@ -176,7 +176,7 @@ export default function AIChatPage() {
             <nav className="mt-5 flex flex-col items-center gap-2" aria-label="Collapsed AI chat navigation">
               <Link href="/archplan" aria-label="New Project" title="New Project" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><FolderPlus size={16} /></Link>
               <button type="button" onClick={() => { setMessages([]); setInput(""); }} aria-label="New Chat" title="New Chat" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Plus size={17} /></button>
-              <Link href="/crystal" aria-label="Image" title="Image" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Image size={16} /></Link>
+              <Link href="/design-studio" aria-label="Image" title="Image" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Image size={16} /></Link>
               <Link href="/platform/bridges" aria-label="Plugin" title="Plugin" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Plug size={16} /></Link>
               <span className="my-1 h-px w-6 bg-[#2a2a2a]" />
               <button type="button" onClick={() => setModelsOpen(true)} aria-label="AI models" title="AI models" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Bot size={16} /></button>
