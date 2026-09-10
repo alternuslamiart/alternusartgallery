@@ -21,6 +21,13 @@
   background-position: center center;
 }
 
+.crystal-studio.crystal-studio-embedded {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .crystal-studio > header,
 .crystal-left-panel,
 .crystal-right-panel {
@@ -989,8 +996,11 @@
   background: #ffffff !important;
 }
 [data-coreforge-theme="light"] .coreforge-page .crystal-first-card,
+[data-coreforge-theme="light"] .coreforge-page .crystal-feature-showcase,
 [data-coreforge-theme="light"] .coreforge-page .crystal-home-surface,
-[data-coreforge-theme="light"] .coreforge-page .crystal-process article {
+[data-coreforge-theme="light"] .coreforge-page .crystal-process article,
+[data-coreforge-theme="light"] .coreforge-page .crystal-core-metric,
+[data-coreforge-theme="light"] .coreforge-page .crystal-workflow-panel {
   background: #ebebeb !important;
   color: #000000 !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);

@@ -6,6 +6,7 @@ import {
   ArrowUp,
   Bot,
   Check,
+  Columns2,
   Copy,
   ChevronDown,
   FolderPlus,
@@ -16,6 +17,7 @@ import {
   MoreHorizontal,
   PanelLeftClose,
   PanelLeftOpen,
+  PanelRightClose,
   Plus,
   Plug,
   Search,
@@ -23,6 +25,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+import { CrystalStudio } from "@/components/crystal-studio/CrystalStudio";
 
 type Message = { id: number; role: "user" | "assistant"; content: string };
 
@@ -50,6 +53,11 @@ export default function AIChatPage() {
   const [modelsOpen, setModelsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [mode, setMode] = useState<"chat" | "workflow">("chat");
+  const [splitView, setSplitView] = useState(false);
+  const [splitRatio, setSplitRatio] = useState(50);
+  const [activePanel, setActivePanel] = useState<"chat" | "studio">("chat");
+  const workspaceRef = useRef<HTMLDivElement>(null);
+  const resizingRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -58,6 +66,35 @@ export default function AIChatPage() {
     textarea.style.height = "auto";
     textarea.style.height = `${Math.min(textarea.scrollHeight, 160)}px`;
   }, [input]);
+
+  useEffect(() => {
+    if (!resizingRef.current) return;
+    const handlePointerMove = (event: PointerEvent) => {
+      const workspace = workspaceRef.current;
+      if (!workspace) return;
+      const bounds = workspace.getBoundingClientRect();
+      const nextRatio = ((event.clientX - bounds.left) / bounds.width) * 100;
+      setSplitRatio(Math.min(70, Math.max(30, nextRatio)));
+    };
+    const stopResizing = () => {
+      resizingRef.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", stopResizing);
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", stopResizing);
+    };
+  }, [splitView]);
+
+  const startResizing = (event: React.PointerEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    resizingRef.current = true;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  };
 
   const sendMessage = async (event?: FormEvent) => {
     event?.preventDefault();
@@ -101,7 +138,11 @@ export default function AIChatPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full overflow-hidden bg-[#0a0a0a] font-roboto text-white">
+    <div ref={workspaceRef} className="flex min-h-screen w-full overflow-hidden bg-[#0a0a0a] font-roboto text-white">
+      <div
+        className={`flex min-w-0 flex-1 ${splitView && activePanel === "studio" ? "hidden md:flex" : ""}`}
+        style={splitView ? { flex: `0 0 ${splitRatio}%` } : undefined}
+      >
       {sidebarOpen && <button aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-black/60 lg:hidden" />}
       <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[60px]" : "w-[276px]"} shrink-0 flex-col border border-[#2a2a2a] bg-[#0e0e0e] p-3 transition-[width,transform] duration-300 lg:inset-y-auto lg:static lg:m-3 lg:h-[calc(100vh-24px)] lg:rounded-[12px] lg:translate-x-0`}>
         <div className={`flex items-center rounded-xl px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
@@ -200,6 +241,10 @@ export default function AIChatPage() {
             <button onClick={() => setMode("chat")} className={`flex items-center gap-2 rounded-full px-5 py-2 text-xs font-medium transition-all ${mode === "chat" ? "bg-[#3b82f6] text-white shadow-md shadow-blue-500/20" : "text-zinc-500 hover:text-white"}`}><Sparkles size={14} /> Chat</button>
             <button onClick={() => setMode("workflow")} className={`flex items-center gap-2 rounded-full px-5 py-2 text-xs font-medium transition-all ${mode === "workflow" ? "bg-[#3b82f6] text-white shadow-md shadow-blue-500/20" : "text-zinc-500 hover:text-white"}`}><GitBranch size={14} /> Workflow</button>
           </div>
+          <div className="absolute left-1/2 top-16 hidden -translate-x-1/2 items-center gap-1 rounded-lg border border-[#2a2a2a] bg-[#141414] p-1 md:flex">
+            <button type="button" onClick={() => setSplitView(false)} aria-label="Use chat only" title="Single panel" className={`grid h-7 w-7 place-items-center rounded-md transition ${!splitView ? "bg-[#2a2a2a] text-white" : "text-zinc-600 hover:text-zinc-300"}`}><PanelRightClose size={14} /></button>
+            <button type="button" onClick={() => setSplitView(true)} aria-label="Enable split view" title="Split view" className={`grid h-7 w-7 place-items-center rounded-md transition ${splitView ? "bg-[#3b82f6] text-white" : "text-zinc-600 hover:text-zinc-300"}`}><Columns2 size={14} /></button>
+          </div>
           <Link href="/crystal" className="hidden rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-zinc-400 transition hover:border-blue-500/50 hover:text-white sm:block">Go to Studio</Link>
         </header>
 
@@ -233,6 +278,27 @@ export default function AIChatPage() {
           <button type="submit" aria-label="Send message" disabled={!input.trim() || isSending} className="mb-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] text-white shadow-lg shadow-blue-500/20 transition-all hover:scale-105 hover:bg-[#2563eb] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"><ArrowUp size={17} /></button>
         </form>
       </main>
+      </div>
+      {splitView && (
+        <>
+          <button
+            type="button"
+            aria-label="Resize chat and studio panels"
+            title="Drag to resize panels"
+            onPointerDown={startResizing}
+            className="group relative z-20 hidden w-2 shrink-0 cursor-col-resize items-center justify-center border-x border-[#252525] bg-[#111111] transition hover:bg-[#1a1a1a] md:flex"
+          >
+            <span className="h-12 w-px bg-[#3b82f6]/40 transition group-hover:h-20 group-hover:bg-[#3b82f6]" />
+          </button>
+          <section className={`relative min-w-0 flex-1 overflow-hidden border-l border-[#252525] bg-[#191919] ${activePanel === "chat" ? "hidden md:block" : "block"}`}>
+            <CrystalStudio embedded />
+          </section>
+        </>
+      )}
+      <div className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 rounded-full border border-[#2a2a2a] bg-[#141414]/95 p-1 shadow-xl backdrop-blur md:hidden">
+        <button type="button" onClick={() => setActivePanel("chat")} className={`rounded-full px-4 py-2 text-xs transition ${activePanel === "chat" ? "bg-[#3b82f6] text-white" : "text-zinc-500"}`}><Sparkles size={13} className="mr-1 inline" />Chat</button>
+        <button type="button" onClick={() => { setSplitView(true); setActivePanel("studio"); }} className={`rounded-full px-4 py-2 text-xs transition ${activePanel === "studio" ? "bg-[#3b82f6] text-white" : "text-zinc-500"}`}><Columns2 size={13} className="mr-1 inline" />Studio</button>
+      </div>
     </div>
   );
 }
