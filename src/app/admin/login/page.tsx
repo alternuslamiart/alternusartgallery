@@ -149,7 +149,7 @@ export default function AdminLogin() {
  </label>
  </div>
  <a
- href="#"
+ href="/reset-password"
  className="text-sm text-primary hover:underline transition-colors"
  >
  Forgot password?

@@ -34,7 +34,7 @@ export default function Careers() {
  <div style={{ fontSize: 12, fontWeight: 700, color: t.muted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 20 }}>Open roles — {roles.length}</div>
  <div style={{ border: `1px solid ${t.faint}`, borderRadius: 12, overflow: "hidden", background: t.raised }}>
  {roles.map((r, i) => (
- <a key={r.t} href="#" style={{ display: "grid", gridTemplateColumns: "140px 1fr auto auto", gap: 24, alignItems: "center", padding: "22px 28px", borderTop: i > 0 ? `1px solid ${t.faint}` : "none", textDecoration: "none", color: t.fg, transition: "background 0.15s" }} className="hover:bg-[#4284FF]/5">
+ <a key={r.t} href={`mailto:careers@alternusart.com?subject=${encodeURIComponent(r.t)}`} style={{ display: "grid", gridTemplateColumns: "140px 1fr auto auto", gap: 24, alignItems: "center", padding: "22px 28px", borderTop: i > 0 ? `1px solid ${t.faint}` : "none", textDecoration: "none", color: t.fg, transition: "background 0.15s" }} className="hover:bg-[#4284FF]/5">
  <span style={{ fontSize: 10, fontWeight: 700, color: COBALT, letterSpacing: "0.12em", textTransform: "uppercase" }}>{r.team}</span>
  <span style={{ fontSize: 17, fontWeight: 700, letterSpacing: "-0.015em" }}>{r.t}</span>
  <span style={{ fontSize: 13, color: t.muted }}>{r.loc}</span>

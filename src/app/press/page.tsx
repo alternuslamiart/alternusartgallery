@@ -42,7 +42,7 @@ export default function Press() {
  <div style={{ fontSize: 11, letterSpacing: "0.18em", fontWeight: 700, color: t.muted, marginBottom: 24, textTransform: "uppercase" }}>Recent coverage</div>
  <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
  {press.map((p, i) => (
- <a key={p.t} href="#" style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: 24, alignItems: "baseline", padding: "28px 0", borderTop: i > 0 ? `1px solid ${t.faint}` : `1px solid ${t.faint}`, textDecoration: "none", color: t.fg }} className="group">
+ <a key={p.t} href={`mailto:press@alternusart.com?subject=${encodeURIComponent(p.t)}`} style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: 24, alignItems: "baseline", padding: "28px 0", borderTop: i > 0 ? `1px solid ${t.faint}` : `1px solid ${t.faint}`, textDecoration: "none", color: t.fg }} className="group">
  <span style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em", transition: "color 0.15s" }} className="group-hover:!text-[#4284FF]">{p.t}</span>
  <span style={{ fontSize: 12, color: COBALT, fontFamily: "var(--font-geist-mono),monospace" }}>{p.by}</span>
  <span style={{ fontSize: 12, color: t.muted }}>{p.d}</span>
@@ -57,7 +57,7 @@ export default function Press() {
  </div>
  <div style={{ display: "flex", gap: 12 }}>
  <a href="mailto:press@alternusart.com" style={{ height: 44, padding: "0 20px", background: COBALT, color: "#fff", fontSize: 13.5, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>Email press@</a>
- <a href="#" style={{ height: 44, padding: "0 20px", background: "transparent", color: t.fg, fontSize: 13.5, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", border: `1px solid ${t.faint}` }}>Brand kit .zip</a>
+ <a href="/download" style={{ height: 44, padding: "0 20px", background: "transparent", color: t.fg, fontSize: 13.5, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", border: `1px solid ${t.faint}` }}>Brand kit .zip</a>
  </div>
  </div>
  </div>

@@ -116,7 +116,7 @@ export default function Bridges() {
 
  <div style={{ paddingTop: 14, borderTop: `1px solid ${t.faint}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
  <span style={{ fontSize: 11, color: t.muted }}>{b.install}</span>
- <Link href="#" style={{ fontSize: 12.5, fontWeight: 700, color: COBALT, textDecoration: "none" }}>
+ <Link href="/download" style={{ fontSize: 12.5, fontWeight: 700, color: COBALT, textDecoration: "none" }}>
  Install
  </Link>
  </div>

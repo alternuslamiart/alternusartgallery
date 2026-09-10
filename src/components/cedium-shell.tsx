@@ -185,7 +185,7 @@ export function CoreforgeFooter({ isDark, fg, muted, faint }: Pick<ReturnType<ty
  <div style={{ borderTop: `1px solid ${faint}`, paddingTop: 28, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 20 }}>
  <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
  {socials.map((s) => (
- <Link key={s.l} href="#" aria-label={s.l} style={{ color: muted, display: "flex", transition: "color 0.15s" }} className="hover:!text-[#4284FF]">
+ <Link key={s.l} href={{ X: "https://x.com/alternusart", GitHub: "https://github.com/alternuslamiart", LinkedIn: "https://www.linkedin.com/company/alternusart", YouTube: "https://www.youtube.com/@alternusart", Discord: "https://discord.com", RSS: "/blog" }[s.l] ?? "/"} target={s.l === "RSS" ? undefined : "_blank"} rel={s.l === "RSS" ? undefined : "noreferrer"} aria-label={s.l} style={{ color: muted, display: "flex", transition: "color 0.15s" }} className="hover:!text-[#4284FF]">
  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d={s.d}/></svg>
  </Link>
  ))}

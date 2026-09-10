@@ -614,7 +614,7 @@ export default function OSLandingPage() {
  <Link href="/main" className="flex items-center gap-1.5 text-xs no-underline" style={{ color: t.accentText }}>
  <I d={ic.arrowRight} s={11} color={t.accentText} /> Launch in OS
  </Link>
- <a href="#" className="flex items-center gap-1.5 text-xs no-underline" style={{ color: t.accentText }}>
+ <a href="/help-center" className="flex items-center gap-1.5 text-xs no-underline" style={{ color: t.accentText }}>
  <I d={ic.fileText} s={11} color={t.accentText} /> Learn more
  </a>
  </div>
@@ -742,7 +742,7 @@ export default function OSLandingPage() {
  Our support team is here to help you get the most out of Crystal Studio. Browse docs, join the community, or contact us directly.
  </p>
  <div className="flex flex-col sm:flex-row gap-3 justify-center">
- <a href="#" className="px-5 py-2.5 rounded-lg text-sm font-medium no-underline" style={{ background: t.accent, color: "#fff" }}>
+ <a href="/help-center" className="px-5 py-2.5 rounded-lg text-sm font-medium no-underline" style={{ background: t.accent, color: "#fff" }}>
  Documentation
  </a>
  <a href="/contact" className="px-5 py-2.5 rounded-lg text-sm font-medium no-underline" style={{ border: `1px solid ${t.border}`, color: t.text }}>
@@ -814,11 +814,11 @@ export default function OSLandingPage() {
  <div className="flex flex-col gap-2">
  {[
  { label: "Try Crystal Studio", href: "/main" },
- { label: "Crystal Studio Web", href: "#pricing" },
+ { label: "Crystal Studio Web", href: "/pricing" },
  { label: "Crystal Studio Desktop", href: "/download" },
- { label: "System Requirements", href: "#" },
- { label: "Release Notes", href: "#" },
- { label: "What's New", href: "#" },
+ { label: "System Requirements", href: "/download" },
+ { label: "Release Notes", href: "/platform/changelog" },
+ { label: "What's New", href: "/platform/changelog" },
  ].map(l => (
  <a key={l.label} href={l.href} style={{ color: t.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
  {l.label}
@@ -833,11 +833,11 @@ export default function OSLandingPage() {
  <div className="flex flex-col gap-2">
  {[
  { label: "Download OS", href: "/main" },
- { label: "Installation Guide", href: "#" },
- { label: "Help Center", href: "#" },
- { label: "Report a Bug", href: "#" },
- { label: "Feature Requests", href: "#" },
- { label: "Status Page", href: "#" },
+ { label: "Installation Guide", href: "/download" },
+ { label: "Help Center", href: "/help-center" },
+ { label: "Report a Bug", href: "/contact" },
+ { label: "Feature Requests", href: "/community" },
+ { label: "Status Page", href: "/platform/status" },
  ].map(l => (
  <a key={l.label} href={l.href} style={{ color: t.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
  {l.label}
@@ -851,12 +851,12 @@ export default function OSLandingPage() {
  <h4 style={{ color: t.textSec }} className="text-xs font-semibold uppercase tracking-wider mb-3">Developers</h4>
  <div className="flex flex-col gap-2">
  {[
- { label: "Documentation", href: "#" },
- { label: "API Reference", href: "#" },
- { label: "Developer Tools", href: "#" },
- { label: "Extensions & Plugins", href: "#" },
- { label: "Open Source", href: "#" },
- { label: "Community Forum", href: "#" },
+ { label: "Documentation", href: "/help-center" },
+ { label: "API Reference", href: "/platform/api" },
+ { label: "Developer Tools", href: "/platform/agent-sdk" },
+ { label: "Extensions & Plugins", href: "/platform/bridges" },
+ { label: "Open Source", href: "/community" },
+ { label: "Community Forum", href: "/community" },
  ].map(l => (
  <a key={l.label} href={l.href} style={{ color: t.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
  {l.label}
@@ -875,7 +875,7 @@ export default function OSLandingPage() {
  { label: "Terms of Service", href: "/terms" },
  { label: "Privacy Policy", href: "/privacy" },
  { label: "Cookie Policy", href: "/cookie-notice" },
- { label: "Security", href: "#" },
+ { label: "Security", href: "/security" },
  ].map(l => (
  <a key={l.label} href={l.href} style={{ color: t.textMuted }} className="text-xs no-underline hover:opacity-80 transition-opacity">
  {l.label}
