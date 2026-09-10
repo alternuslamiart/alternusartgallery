@@ -86,7 +86,7 @@ export default function AIChatPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full overflow-hidden bg-[#0a0a0a] text-white">
+    <div className="flex min-h-screen w-full overflow-hidden bg-[#0a0a0a] font-roboto text-white">
       {sidebarOpen && <button aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-black/60 lg:hidden" />}
       <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex w-[276px] shrink-0 flex-col border-r border-[#2a2a2a] bg-[#0e0e0e] p-5 transition-transform duration-300 lg:static lg:translate-x-0`}>
         <div className="flex items-center justify-between">
