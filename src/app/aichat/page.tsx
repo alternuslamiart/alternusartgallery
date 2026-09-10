@@ -100,13 +100,13 @@ export default function AIChatPage() {
   return (
     <div className="flex min-h-screen w-full overflow-hidden bg-[#0a0a0a] font-roboto text-white">
       {sidebarOpen && <button aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-black/60 lg:hidden" />}
-      <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[78px]" : "w-[276px]"} shrink-0 flex-col border-r border-[#2a2a2a] bg-[#0e0e0e] p-3 transition-[width,transform] duration-300 lg:static lg:translate-x-0`}>
-        <div className="flex items-center justify-between rounded-xl px-2 py-2">
+      <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[60px]" : "w-[276px]"} shrink-0 flex-col border border-[#2a2a2a] bg-[#0e0e0e] p-3 transition-[width,transform] duration-300 lg:inset-y-auto lg:static lg:m-3 lg:h-[calc(100vh-24px)] lg:rounded-[12px] lg:translate-x-0`}>
+        <div className={`flex items-center rounded-xl px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
           <Link href="/aichat" aria-label="Crystal AI Chat" className={`flex items-center gap-3 text-lg font-semibold tracking-tight text-white ${sidebarCollapsed ? "mx-auto" : ""}`}>
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><Sparkles size={18} /></span>
             {!sidebarCollapsed && "Crystal"}
           </Link>
-          <button onClick={() => setSidebarCollapsed((value) => !value)} aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} className="rounded-lg p-2 text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white lg:block hidden"><PanelLeftClose size={16} /></button>
+          <button onClick={() => setSidebarCollapsed((value) => !value)} aria-label="Collapse sidebar" title="Collapse sidebar" className={`rounded-lg p-2 text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white lg:block ${sidebarCollapsed ? "hidden" : ""}`}><PanelLeftClose size={16} /></button>
           <button onClick={() => setSidebarOpen(false)} aria-label="Close sidebar" className="rounded-lg p-2 text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white lg:hidden"><X size={18} /></button>
         </div>
 
