@@ -1010,6 +1010,9 @@ textarea {
 
 .coreforge-page {
   isolation: isolate;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
 }
 
 .coreforge-page h1,
