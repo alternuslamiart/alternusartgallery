@@ -7,6 +7,7 @@ import {
   Bot,
   Check,
   Copy,
+  ChevronDown,
   FolderPlus,
   GitBranch,
   Image,
@@ -35,7 +36,7 @@ const conversations = [
   "Create 3D Environment",
   "AutoCAD Course for Leaning",
 ];
-const models = ["Claude", "OpenAI", "Gemini", "Grok", "Groq", "Copilot"];
+const models = ["Claude", "ChatGPT", "Gemini", "Grok", "Groq", "Copilot"];
 const recentItems = ["House Architecture", "Modern Interior", "Robot Concept", "Living Room Design", "New Project"];
 
 export default function AIChatPage() {
@@ -46,6 +47,7 @@ export default function AIChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedModel, setSelectedModel] = useState("Gemini");
+  const [modelsOpen, setModelsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [mode, setMode] = useState<"chat" | "workflow">("chat");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -123,10 +125,35 @@ export default function AIChatPage() {
           </nav>
 
           <div className="mt-6">
-            <div className="mb-2 px-3 text-[10px] font-medium uppercase tracking-[0.16em] text-zinc-600">AI Models</div>
-            <div className="space-y-0.5">
-              {models.map((model) => <button key={model} onClick={() => setSelectedModel(model)} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-[12px] transition ${selectedModel === model ? "bg-[#1c1c1c] text-white" : "text-zinc-500 hover:bg-[#181818] hover:text-zinc-200"}`}><span className={`grid h-5 w-5 place-items-center rounded-md ${selectedModel === model ? "bg-blue-500/15 text-blue-400" : "bg-[#1a1a1a] text-zinc-500"}`}><Bot size={13} /></span>{model}{selectedModel === model && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#22c55e]" />}</button>)}
+          <button
+            type="button"
+            onClick={() => setModelsOpen((value) => !value)}
+            aria-expanded={modelsOpen}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"
+          >
+            <Bot size={16} className="text-zinc-500" />
+            <span className="flex-1">AI Model</span>
+            <span className="text-[11px] text-zinc-600">{selectedModel}</span>
+            <ChevronDown size={15} className={`text-zinc-600 transition-transform ${modelsOpen ? "rotate-180" : ""}`} />
+          </button>
+          {modelsOpen && (
+            <div className="mt-1 space-y-0.5 rounded-xl bg-[#121212] p-1">
+              {models.map((model) => (
+                <button
+                  key={model}
+                  type="button"
+                  onClick={() => setSelectedModel(model)}
+                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-[12px] transition ${selectedModel === model ? "bg-[#1c1c1c] text-white" : "text-zinc-500 hover:bg-[#181818] hover:text-zinc-200"}`}
+                >
+                  <span className={`grid h-5 w-5 place-items-center rounded-md ${selectedModel === model ? "bg-blue-500/15 text-blue-400" : "bg-[#1a1a1a] text-zinc-500"}`}>
+                    <Bot size={13} />
+                  </span>
+                  {model}
+                  {selectedModel === model && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#22c55e]" />}
+                </button>
+              ))}
             </div>
+          )}
           </div>
 
           <div className="mt-6 min-h-0 flex-1 overflow-y-auto">
