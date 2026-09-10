@@ -31,7 +31,7 @@ export function getGeminiModel() {
  if (!configuredModel || configuredModel.toLowerCase() === "gpt-5.6 luna" || configuredModel.toLowerCase() === "gpt-5.6-luna") {
   return DEFAULT_GEMINI_MODEL;
  }
- return configuredModel;
+ return configuredModel.replace(/^models\//i, "");
 }
 
 export function getOpenAIApiKey() {
