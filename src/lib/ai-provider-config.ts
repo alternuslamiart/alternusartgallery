@@ -1,4 +1,4 @@
-export const DEFAULT_GEMINI_MODEL = "GPT-5.6 Luna";
+export const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
 export const DEFAULT_GROQ_MODEL = "llama-3.1-8b-instant";
 export const DEFAULT_OPENAI_MODEL = "gpt-4o-mini";
 
@@ -26,7 +26,12 @@ export function getGeminiApiKey() {
 }
 
 export function getGeminiModel() {
- return process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL;
+ const configuredModel = process.env.GEMINI_MODEL?.trim();
+ // This legacy label is not a Gemini API model identifier.
+ if (!configuredModel || configuredModel.toLowerCase() === "gpt-5.6 luna" || configuredModel.toLowerCase() === "gpt-5.6-luna") {
+  return DEFAULT_GEMINI_MODEL;
+ }
+ return configuredModel;
 }
 
 export function getOpenAIApiKey() {
