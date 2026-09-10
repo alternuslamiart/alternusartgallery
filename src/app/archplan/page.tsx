@@ -164,7 +164,7 @@ export default function ArchplanPage() {
         </div>
       </aside> */}
 
-      <main className="min-h-screen min-w-0 w-full overflow-y-auto px-5 pb-12 pt-[102px] lg:ml-[250px] lg:px-10">
+      <main className="min-h-screen min-w-0 w-full overflow-y-auto px-5 pb-12 pt-[102px] lg:ml-[250px] lg:w-[calc(100%-250px)] lg:px-10">
         <div className="mx-auto max-w-[765px]">
           <section>
             <h1 className="text-[20px] font-semibold leading-6 tracking-tight">Project Settings</h1>
