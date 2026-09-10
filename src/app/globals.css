@@ -1379,6 +1379,14 @@ textarea {
   transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
+.crystal-account-page {
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-self: stretch;
+  box-sizing: border-box;
+}
+
 @media (max-width: 700px) {
   .crystal-studio .crystal-left-panel,
   .crystal-studio .crystal-right-panel {
