@@ -15,8 +15,14 @@ import {
 } from "@/components/cedium-shell";
 
 const COBALT = "#4284FF";
-const INK = "#1F1F1F";
-const PAPER = "#F4F6FB";
+const LIGHT_BACKGROUND_PRIMARY = "#FFFFFF";
+const LIGHT_BACKGROUND_SECONDARY = "#EBEBEB";
+const LIGHT_BACKGROUND_TERTIARY = "#D7D7D7";
+const LIGHT_BACKGROUND_QUATERNARY = "#C3C3C3";
+const LIGHT_LABEL_PRIMARY = "#000000";
+const LIGHT_LABEL_SECONDARY = "#282828";
+const LIGHT_LABEL_TERTIARY = "#3C3C3C";
+const LIGHT_LABEL_QUATERNARY = "#505050";
 
 type SectionId =
  | "organization" | "access" | "members"
@@ -47,13 +53,13 @@ export default function Account() {
  const [isDark, setIsDark] = useCoreforgeMode();
  const [active, setActive] = useState<SectionId>("usage");
 
- const bg = isDark ? DARK_BG : PAPER;
- const fg = isDark ? DARK_TEXT : INK;
- const muted = isDark ? DARK_MUTED : "rgba(5,8,15,0.62)";
- const faint = isDark ? DARK_BORDER_SOFT : "rgba(5,8,15,0.08)";
- const faintBorder = isDark ? DARK_BORDER : "rgba(5,8,15,0.05)";
- const raised = isDark ? DARK_SURFACE : "#FFFFFF";
- const softFill = isDark ? DARK_SURFACE_SOFT : "#F5F7FB";
+ const bg = isDark ? DARK_BG : LIGHT_BACKGROUND_PRIMARY;
+ const fg = isDark ? DARK_TEXT : LIGHT_LABEL_PRIMARY;
+ const muted = isDark ? DARK_MUTED : LIGHT_LABEL_SECONDARY;
+ const faint = isDark ? DARK_BORDER_SOFT : LIGHT_BACKGROUND_TERTIARY;
+ const faintBorder = isDark ? DARK_BORDER : LIGHT_BACKGROUND_QUATERNARY;
+ const raised = isDark ? DARK_SURFACE : LIGHT_BACKGROUND_PRIMARY;
+ const softFill = isDark ? DARK_SURFACE_SOFT : LIGHT_BACKGROUND_SECONDARY;
 
  const cardShadow = isDark ? "none" : "0 1px 4px rgba(5,8,15,0.04)";
  const baseCard: React.CSSProperties = { background: raised, border: `1px solid ${faintBorder}`, borderRadius: 12, boxShadow: cardShadow };
@@ -130,7 +136,7 @@ export default function Account() {
 
  {/* ── Main ── */}
  <main style={{ overflowY: "auto", padding: "36px 48px 80px" }}>
- <Section id={active} t={{ fg, muted, faint, faintBorder, raised, softFill, baseCard, cardShadow }} />
+ <Section id={active} t={{ fg, muted, labelTertiary: isDark ? DARK_MUTED : LIGHT_LABEL_TERTIARY, labelQuaternary: isDark ? DARK_MUTED : LIGHT_LABEL_QUATERNARY, faint, faintBorder, raised, softFill, baseCard, cardShadow }} />
  </main>
  </div>
  </div>
@@ -138,7 +144,7 @@ export default function Account() {
 }
 
 type Tokens = {
- fg: string; muted: string; faint: string; faintBorder: string; raised: string; softFill: string;
+ fg: string; muted: string; labelTertiary: string; labelQuaternary: string; faint: string; faintBorder: string; raised: string; softFill: string;
  baseCard: React.CSSProperties; cardShadow: string;
 };
 
@@ -147,7 +153,7 @@ function SectionHeading({ eyebrow, title, desc, t }: { eyebrow: string; title: s
  <div style={{ marginBottom: 32, maxWidth: 820 }}>
  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", color: COBALT, marginBottom: 10 }}>{eyebrow}</div>
  <h1 style={{ fontSize: "clamp(32px,3.6vw,44px)", fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1, margin: 0, marginBottom: 10, fontStretch: "90%", color: t.fg }}>{title}</h1>
- <p style={{ fontSize: 14.5, color: t.muted, margin: 0, lineHeight: 1.55, maxWidth: 640 }}>{desc}</p>
+ <p style={{ fontSize: 14.5, color: t.labelTertiary, margin: 0, lineHeight: 1.55, maxWidth: 640 }}>{desc}</p>
  </div>
  );
 }
@@ -155,7 +161,7 @@ function SectionHeading({ eyebrow, title, desc, t }: { eyebrow: string; title: s
 function Field({ label, value, placeholder, t }: { label: string; value?: string; placeholder?: string; t: Tokens }) {
  return (
  <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
- <span style={{ fontSize: 11, fontWeight: 700, color: t.muted, letterSpacing: "0.08em", textTransform: "uppercase" }}>{label}</span>
+ <span style={{ fontSize: 11, fontWeight: 700, color: t.labelQuaternary, letterSpacing: "0.08em", textTransform: "uppercase" }}>{label}</span>
  <input defaultValue={value} placeholder={placeholder} style={{ height: 42, padding: "0 14px", border: `1px solid ${t.faintBorder}`, borderRadius: 8, background: t.softFill, color: t.fg, fontSize: 14, outline: "none", fontFamily: "inherit", letterSpacing: "-0.01em" }} />
  </label>
  );
