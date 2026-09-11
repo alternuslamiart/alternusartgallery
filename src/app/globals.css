@@ -1847,5 +1847,14 @@ textarea {
   .crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:first-child { width: 34px; height: 34px; border-radius: 9px; background: #303030; }
   .crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:nth-child(2) { height: 34px; padding-inline: 12px; border-radius: 9px; background: #303030; }
   .crystal-modeling-mode .crystal-ai-prompt > div:last-child > button { width: 34px; height: 34px; border-radius: 9px; background: #1687f7; }
-  .crystal-modeling-mode .crystal-modeling-tools { width: 488px !important; min-width: 360px; max-width: calc(100% - 32px); box-sizing: border-box; }
+  .crystal-modeling-mode .crystal-modeling-tools {
+    width: auto !important;
+    min-width: 360px;
+    max-width: calc(100% - 32px);
+    height: 48px;
+    gap: 2px;
+    padding: 4px 6px;
+    box-sizing: border-box;
+  }
+  .crystal-modeling-mode .crystal-modeling-tools button[aria-label*="Realtime"] { display: grid; }
 }
