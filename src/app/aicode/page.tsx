@@ -55,8 +55,8 @@ export default function AICodePage() {
   const [code, setCode] = useState(source);
   const [bottomTab, setBottomTab] = useState("Terminal");
   const [mobileTab, setMobileTab] = useState<"AI" | "Files" | "Code" | "Terminal">("Code");
-  const [leftWidth, setLeftWidth] = useState(300);
-  const [filesWidth, setFilesWidth] = useState(230);
+  const [leftWidth, setLeftWidth] = useState(450);
+  const [filesWidth, setFilesWidth] = useState(335);
   const [terminalHeight, setTerminalHeight] = useState(220);
   const resizing = useRef<"left" | "files" | "terminal" | null>(null);
 
@@ -64,8 +64,8 @@ export default function AICodePage() {
     event.preventDefault();
     resizing.current = kind;
     const move = (moveEvent: PointerEvent) => {
-      if (resizing.current === "left") setLeftWidth(Math.max(260, Math.min(440, moveEvent.clientX)));
-      if (resizing.current === "files") setFilesWidth(Math.max(180, Math.min(360, moveEvent.clientX - leftWidth)));
+      if (resizing.current === "left") setLeftWidth(Math.max(320, Math.min(560, moveEvent.clientX)));
+      if (resizing.current === "files") setFilesWidth(Math.max(220, Math.min(460, moveEvent.clientX - leftWidth)));
       if (resizing.current === "terminal") setTerminalHeight(Math.max(140, Math.min(420, window.innerHeight - moveEvent.clientY)));
     };
     const stop = () => { resizing.current = null; window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", stop); };
@@ -112,18 +112,18 @@ export default function AICodePage() {
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-        <section className={`${panelVisible("AI")} min-w-0 flex-col border-r border-white/[0.08] bg-[#101115]`} style={{ width: leftWidth }}>
-          <div className="flex h-12 items-center justify-between border-b border-white/[0.08] px-4"><div className="flex items-center gap-2 text-xs font-semibold"><Bot size={15} className="text-[#6ca5ff]" /> AI Code Assistant</div><button aria-label="New task" className="text-zinc-500 hover:text-white"><Plus size={16} /></button></div>
+        <section className={`${panelVisible("AI")} min-w-0 flex-col border-r border-white/[0.08] bg-[#111216]`} style={{ width: leftWidth }}>
+          <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/[0.08] px-5"><div className="flex items-center gap-2 text-xs font-semibold tracking-[-0.01em]"><Bot size={15} className="text-[#6ca5ff]" /> AI Code Assistant</div><button aria-label="New task" className="text-zinc-500 transition hover:text-white"><Plus size={16} /></button></div>
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
             {messages.map((message) => <article key={message.id} className={message.role === "user" ? "rounded-lg bg-[#1b2739] p-3 text-xs text-blue-100" : "text-xs leading-5 text-zinc-300"}><div className="mb-2 flex items-center gap-2 font-semibold text-zinc-400">{message.role === "user" ? "You" : <><Sparkles size={12} className="text-blue-400" /> Crystal</>}</div><p className="whitespace-pre-wrap">{message.content}</p></article>)}
-            <div className="rounded-lg border border-white/[0.07] bg-[#14161b] p-3"><div className="mb-3 flex items-center gap-2 text-xs font-semibold"><ChevronRight size={14} className="text-blue-400" /> Plan</div>{["Set up project structure", "Create components", "Configure styling", "Implement responsive layout", "Run build", "Verify errors"].map((item, index) => <div key={item} className="flex items-center gap-2 py-1.5 text-[11px] text-zinc-400">{index < 2 ? <Check size={13} className="text-emerald-400" /> : <span className="h-3 w-3 rounded-full border border-zinc-600" />}{item}</div>)}</div>
+            <div className="rounded-lg border border-white/[0.07] bg-[#15171c] p-4"><div className="mb-3 flex items-center gap-2 text-xs font-semibold"><ChevronRight size={14} className="text-blue-400" /> Plan</div>{["Set up project structure", "Create components", "Configure styling", "Implement responsive layout", "Run build", "Verify errors"].map((item, index) => <div key={item} className="flex items-center gap-2 py-1.5 text-[11px] text-zinc-400">{index < 2 ? <Check size={13} className="text-emerald-400" /> : <span className="h-3 w-3 rounded-full border border-zinc-600" />}{item}</div>)}</div>
           </div>
           <form onSubmit={send} className="m-3 rounded-xl border border-white/[0.1] bg-[#181a20] p-2 focus-within:border-blue-500/60"><textarea value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void send(); } }} rows={2} placeholder="How can I help you today?" className="w-full resize-none bg-transparent px-2 py-1 text-xs outline-none placeholder:text-zinc-600" /><div className="flex items-center gap-1"><button type="button" aria-label="Add attachment" className="grid h-7 w-7 place-items-center rounded-md text-zinc-500 hover:bg-white/[0.06] hover:text-white"><Plus size={15} /></button><span className="rounded-md bg-[#22252c] px-2 py-1 text-[10px] text-zinc-400">Standard <ChevronDown size={11} className="ml-1 inline" /></span><button type="button" aria-label="Voice input" className="ml-auto p-1.5 text-zinc-500 hover:text-white"><Mic size={14} /></button><button type="submit" aria-label="Send prompt" disabled={!input.trim() || sending} className="grid h-7 w-7 place-items-center rounded-md bg-[#3188f4] text-white disabled:opacity-40"><ArrowUp size={14} /></button></div></form>
         </section>
         <ResizeHandle onStart={startResize("left")} />
 
-        <section className={`${panelVisible("Files")} min-w-0 flex-col border-r border-white/[0.08] bg-[#111216]`} style={{ width: filesWidth }}>
-          <div className="flex h-12 items-center gap-4 border-b border-white/[0.08] px-3"><span className="flex items-center gap-2 text-xs font-semibold"><Folder size={14} className="text-blue-400" /> Files</span><button aria-label="Search files" className="text-zinc-500 hover:text-white"><Search size={14} /></button></div>
+        <section className={`${panelVisible("Files")} min-w-0 flex-col border-r border-white/[0.08] bg-[#121316]`} style={{ width: filesWidth }}>
+          <div className="flex h-12 shrink-0 items-center gap-4 border-b border-white/[0.08] px-4"><span className="flex items-center gap-2 text-xs font-semibold"><Folder size={14} className="text-blue-400" /> Files</span><button aria-label="Search files" className="text-zinc-500 transition hover:text-white"><Search size={14} /></button></div>
           <div className="min-h-0 flex-1 overflow-y-auto py-2">{files.map((file) => <button type="button" key={file.path} onClick={() => file.kind === "file" && setActiveFile(file.path)} className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-[11px] transition hover:bg-white/[0.05] ${activeFile === file.path ? "bg-[#1d3c68] text-white" : "text-zinc-400"}`} style={{ paddingLeft: `${12 + (file.indent ?? 0) * 16}px` }}>{file.kind === "folder" ? <ChevronRight size={13} /> : <FileCode2 size={13} className="text-zinc-500" />}{file.name}</button>)}</div>
         </section>
         <ResizeHandle onStart={startResize("files")} />
