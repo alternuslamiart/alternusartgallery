@@ -75,7 +75,6 @@
   .crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:first-child { width: 34px; height: 34px; border-radius: 9px; background: #242424; }
   .crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:nth-child(2) { height: 34px; padding-inline: 12px; border-radius: 9px; background: #242424; }
   .crystal-modeling-mode .crystal-ai-prompt > div:last-child > button { width: 34px; height: 34px; border-radius: 9px; background: #176a9c; }
-  .crystal-modeling-mode .crystal-modeling-tools { width: 488px; min-width: 488px; box-sizing: border-box; }
 }
 
 .crystal-studio.crystal-studio-embedded {
@@ -1837,4 +1836,5 @@ textarea {
   .crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:first-child { width: 34px; height: 34px; border-radius: 9px; background: #242424; }
   .crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:nth-child(2) { height: 34px; padding-inline: 12px; border-radius: 9px; background: #242424; }
   .crystal-modeling-mode .crystal-ai-prompt > div:last-child > button { width: 34px; height: 34px; border-radius: 9px; background: #176a9c; }
+  .crystal-modeling-mode .crystal-modeling-tools { width: 488px !important; min-width: 488px !important; max-width: 488px; box-sizing: border-box; }
 }
