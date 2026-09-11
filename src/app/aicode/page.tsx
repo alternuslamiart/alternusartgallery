@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import {
   ArrowLeft, ArrowUp, Bot, Check, ChevronDown, ChevronRight, Code2,
   Copy, FileCode2, Folder, Github, Mic, Play,
@@ -53,7 +53,9 @@ export default function AICodePage() {
   const [sending, setSending] = useState(false);
   const [activeFile, setActiveFile] = useState("src/app/aichat/page.tsx");
   const [code, setCode] = useState(source);
-  const [mobileTab, setMobileTab] = useState<"AI" | "Files" | "Code">("Code");
+  const [mobileTab, setMobileTab] = useState<"AI" | "Files" | "Code" | "Preview">("Code");
+  const [previewMode, setPreviewMode] = useState(false);
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const [leftWidth, setLeftWidth] = useState(450);
   const [filesWidth, setFilesWidth] = useState(335);
   const resizing = useRef<"left" | "files" | null>(null);
@@ -90,15 +92,48 @@ export default function AICodePage() {
 
   const panelVisible = (panel: "AI" | "Files" | "Code" | "Terminal") => mobileTab === panel ? "flex" : "hidden md:flex";
 
+  useEffect(() => {
+    if (!previewMode) return;
+    const canvas = previewCanvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    const draw = () => {
+      const rect = canvas.getBoundingClientRect();
+      const scale = window.devicePixelRatio || 1;
+      canvas.width = rect.width * scale;
+      canvas.height = rect.height * scale;
+      context.setTransform(scale, 0, 0, scale, 0, 0);
+      context.fillStyle = "#151922";
+      context.fillRect(0, 0, rect.width, rect.height);
+      context.strokeStyle = "rgba(91,132,190,.18)";
+      context.lineWidth = 1;
+      for (let x = 0; x < rect.width; x += 28) { context.beginPath(); context.moveTo(x, 0); context.lineTo(x, rect.height); context.stroke(); }
+      for (let y = 0; y < rect.height; y += 28) { context.beginPath(); context.moveTo(0, y); context.lineTo(rect.width, y); context.stroke(); }
+      const cx = rect.width / 2;
+      const cy = rect.height / 2 + 10;
+      context.fillStyle = "#4778b8";
+      context.strokeStyle = "#a5c7ff";
+      context.beginPath(); context.moveTo(cx, cy - 82); context.lineTo(cx + 72, cy - 42); context.lineTo(cx, cy - 2); context.lineTo(cx - 72, cy - 42); context.closePath(); context.fill(); context.stroke();
+      context.fillStyle = "#315584";
+      context.beginPath(); context.moveTo(cx - 72, cy - 42); context.lineTo(cx, cy - 2); context.lineTo(cx, cy + 80); context.lineTo(cx - 72, cy + 38); context.closePath(); context.fill(); context.stroke();
+      context.fillStyle = "#203b60";
+      context.beginPath(); context.moveTo(cx, cy - 2); context.lineTo(cx + 72, cy - 42); context.lineTo(cx + 72, cy + 38); context.lineTo(cx, cy + 80); context.closePath(); context.fill(); context.stroke();
+    };
+    draw();
+    window.addEventListener("resize", draw);
+    return () => window.removeEventListener("resize", draw);
+  }, [previewMode]);
+
   return (
     <main className="flex h-screen min-h-[620px] w-full min-w-0 flex-1 flex-col overflow-hidden bg-[#0b0c0f] font-roboto text-[#e7eaf0]">
       <header className="flex h-[52px] shrink-0 items-center gap-4 border-b border-white/[0.08] bg-[#111216] px-4">
         <Link href="/aichat" aria-label="Back to AI Chat" className="rounded-md p-1.5 text-zinc-400 hover:bg-white/[0.06] hover:text-white"><ArrowLeft size={16} /></Link>
         <div className="flex items-center gap-2 text-sm font-semibold"><span className="grid h-7 w-7 place-items-center rounded-lg bg-[#3b82f6] text-white"><Sparkles size={15} /></span>Crystal <span className="text-zinc-500">/</span> <span>AI Code</span></div>
         <nav className="ml-5 hidden items-center gap-1 rounded-lg border border-white/[0.08] bg-[#17191e] p-1 text-xs md:flex">
-          <Link href="/aichat" className="rounded-md px-3 py-1.5 text-zinc-500 hover:text-white">Preview</Link>
+          <button type="button" onClick={() => setPreviewMode(true)} className={`rounded-md px-3 py-1.5 hover:text-white ${previewMode ? "bg-[#1d3c68] text-[#8db8ff]" : "text-zinc-500"}`}>Preview</button>
           <Link href="/workflow" className="rounded-md px-3 py-1.5 text-zinc-500 hover:text-white">Workflow</Link>
-          <span className="flex items-center gap-1 rounded-md bg-[#1d3c68] px-3 py-1.5 font-medium text-[#8db8ff]"><Code2 size={13} /> Code</span>
+          <button type="button" onClick={() => setPreviewMode(false)} className={`flex items-center gap-1 rounded-md px-3 py-1.5 font-medium ${!previewMode ? "bg-[#1d3c68] text-[#8db8ff]" : "text-zinc-500 hover:text-white"}`}><Code2 size={13} /> Code</button>
         </nav>
         <div className="ml-auto flex items-center gap-2 text-zinc-400">
           <button className="hidden rounded-md p-2 hover:bg-white/[0.06] hover:text-white md:block" aria-label="GitHub"><Github size={16} /></button>
@@ -109,7 +144,7 @@ export default function AICodePage() {
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-        <section className={`${panelVisible("AI")} min-w-0 flex-col border-r border-white/[0.08] bg-[#111216]`} style={{ width: leftWidth }}>
+        <section className={`${previewMode ? "hidden" : panelVisible("AI")} min-w-0 flex-col border-r border-white/[0.08] bg-[#111216]`} style={{ width: leftWidth }}>
           <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/[0.08] px-5"><div className="flex items-center gap-2 text-xs font-semibold tracking-[-0.01em]"><Bot size={15} className="text-[#6ca5ff]" /> AI Code Assistant</div><button aria-label="New task" className="text-zinc-500 transition hover:text-white"><Plus size={16} /></button></div>
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
             {messages.map((message) => <article key={message.id} className={message.role === "user" ? "rounded-lg bg-[#1b2739] p-3 text-xs text-blue-100" : "text-xs leading-5 text-zinc-300"}><div className="mb-2 flex items-center gap-2 font-semibold text-zinc-400">{message.role === "user" ? "You" : <><Sparkles size={12} className="text-blue-400" /> Crystal</>}</div><p className="whitespace-pre-wrap">{message.content}</p></article>)}
@@ -117,21 +152,21 @@ export default function AICodePage() {
           </div>
           <form onSubmit={send} className="m-3 rounded-xl border border-white/[0.1] bg-[#181a20] p-2 focus-within:border-blue-500/60"><textarea value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void send(); } }} rows={2} placeholder="How can I help you today?" className="w-full resize-none bg-transparent px-2 py-1 text-xs outline-none placeholder:text-zinc-600" /><div className="flex items-center gap-1"><button type="button" aria-label="Add attachment" className="grid h-7 w-7 place-items-center rounded-md text-zinc-500 hover:bg-white/[0.06] hover:text-white"><Plus size={15} /></button><span className="rounded-md bg-[#22252c] px-2 py-1 text-[10px] text-zinc-400">Standard <ChevronDown size={11} className="ml-1 inline" /></span><button type="button" aria-label="Voice input" className="ml-auto p-1.5 text-zinc-500 hover:text-white"><Mic size={14} /></button><button type="submit" aria-label="Send prompt" disabled={!input.trim() || sending} className="grid h-7 w-7 place-items-center rounded-md bg-[#3188f4] text-white disabled:opacity-40"><ArrowUp size={14} /></button></div></form>
         </section>
-        <ResizeHandle onStart={startResize("left")} />
+        {!previewMode && <ResizeHandle onStart={startResize("left")} />}
 
-        <section className={`${panelVisible("Files")} min-w-0 flex-col border-r border-white/[0.08] bg-[#121316]`} style={{ width: filesWidth }}>
+        <section className={`${previewMode ? "hidden" : panelVisible("Files")} min-w-0 flex-col border-r border-white/[0.08] bg-[#121316]`} style={{ width: filesWidth }}>
           <div className="flex h-12 shrink-0 items-center gap-4 border-b border-white/[0.08] px-4"><span className="flex items-center gap-2 text-xs font-semibold"><Folder size={14} className="text-blue-400" /> Files</span><button aria-label="Search files" className="text-zinc-500 transition hover:text-white"><Search size={14} /></button></div>
           <div className="min-h-0 flex-1 overflow-y-auto py-2">{files.map((file) => <button type="button" key={file.path} onClick={() => file.kind === "file" && setActiveFile(file.path)} className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-[11px] transition hover:bg-white/[0.05] ${activeFile === file.path ? "bg-[#1d3c68] text-white" : "text-zinc-400"}`} style={{ paddingLeft: `${12 + (file.indent ?? 0) * 16}px` }}>{file.kind === "folder" ? <ChevronRight size={13} /> : <FileCode2 size={13} className="text-zinc-500" />}{file.name}</button>)}</div>
         </section>
-        <ResizeHandle onStart={startResize("files")} />
+        {!previewMode && <ResizeHandle onStart={startResize("files")} />}
 
-        <section className={`${panelVisible("Code")} min-w-0 flex-1 flex-col bg-[#0e0f12]`}>
+        <section className={`${previewMode ? "flex" : panelVisible("Code")} min-w-0 flex-1 flex-col bg-[#0e0f12]`}>
           <div className="flex h-12 items-center justify-between border-b border-white/[0.08] px-3"><div className="flex h-full items-center gap-3 text-xs"><span className="flex h-full items-center gap-2 border-b-2 border-blue-400 text-zinc-200"><FileCode2 size={14} />{activeFile.split("/").pop()}<span className="text-amber-400">●</span></span><button className="text-zinc-600 hover:text-white"><Plus size={14} /></button></div><div className="flex items-center gap-2 text-zinc-500"><button aria-label="Copy code" onClick={() => void navigator.clipboard?.writeText(code)}><Copy size={14} /></button><button aria-label="Run code" className="hover:text-white"><Play size={14} /></button></div></div>
-          <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-auto bg-[#0e0f12] p-4 md:grid-cols-2"><div className="group relative min-h-[280px] overflow-hidden rounded-xl border border-white/[0.08] bg-[#151922]"><div className="absolute inset-0 opacity-60" style={{ backgroundImage: "linear-gradient(rgba(91,132,190,.16) 1px, transparent 1px), linear-gradient(90deg, rgba(91,132,190,.16) 1px, transparent 1px)", backgroundSize: "28px 28px" }} /><div className="absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rotate-12 transform-gpu rounded-[28%] border border-[#8db8ff]/70 bg-gradient-to-br from-[#5b8bd8]/80 via-[#315384]/80 to-[#17243a] shadow-[0_24px_50px_rgba(47,121,230,.24)] [clip-path:polygon(50%_0%,100%_25%,100%_75%,50%_100%,0%_75%,0%_25%)] transition group-hover:scale-105" /><div className="absolute bottom-3 left-3 rounded-md bg-black/30 px-2 py-1 text-[10px] text-zinc-400">3D preview</div></div><div className="min-h-[280px] rounded-xl border border-white/[0.08] bg-[#111216] p-3 font-mono text-[11px] leading-5"><div className="mb-2 flex items-center gap-2 text-zinc-400"><FileCode2 size={13} />{activeFile.split("/").pop()}<span className="text-amber-400">●</span></div><textarea value={code} onChange={(event) => setCode(event.target.value)} spellCheck={false} aria-label="Code editor" className="h-[calc(100%-28px)] min-h-[240px] w-full resize-none bg-transparent text-[#c9d1dc] outline-none" style={{ tabSize: 2 }} /></div></div>
+          <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-auto bg-[#0e0f12] p-4 md:grid-cols-2"><div className="relative min-h-[280px] overflow-hidden rounded-xl border border-white/[0.08] bg-[#151922]"><canvas ref={previewCanvasRef} className="h-full min-h-[280px] w-full" aria-label="Crystal Studio 3D grid preview" /><div className="absolute bottom-3 left-3 rounded-md bg-black/30 px-2 py-1 text-[10px] text-zinc-400">Crystal Studio grid</div></div><div className="min-h-[280px] rounded-xl border border-white/[0.08] bg-[#111216] p-3 font-mono text-[11px] leading-5"><div className="mb-2 flex items-center gap-2 text-zinc-400"><FileCode2 size={13} />{activeFile.split("/").pop()}<span className="text-amber-400">●</span></div><textarea value={code} onChange={(event) => setCode(event.target.value)} spellCheck={false} aria-label="Code editor" className="h-[calc(100%-28px)] min-h-[240px] w-full resize-none bg-transparent text-[#c9d1dc] outline-none" style={{ tabSize: 2 }} /></div></div>
         </section>
       </div>
 
-      <div className="flex border-t border-white/[0.08] bg-[#111216] p-1 md:hidden">{(["AI", "Files", "Code"] as const).map((tab) => <button type="button" key={tab} onClick={() => setMobileTab(tab)} className={`flex-1 rounded-md py-2 text-[11px] ${mobileTab === tab ? "bg-[#1d3c68] text-white" : "text-zinc-500"}`}>{tab}</button>)}</div>
+      <div className="flex border-t border-white/[0.08] bg-[#111216] p-1 md:hidden">{(["AI", "Files", "Code", "Preview"] as const).map((tab) => <button type="button" key={tab} onClick={() => { setMobileTab(tab === "Preview" ? "Code" : tab); setPreviewMode(tab === "Preview"); }} className={`flex-1 rounded-md py-2 text-[11px] ${mobileTab === tab || (tab === "Preview" && previewMode) ? "bg-[#1d3c68] text-white" : "text-zinc-500"}`}>{tab}</button>)}</div>
     </main>
   );
 }
