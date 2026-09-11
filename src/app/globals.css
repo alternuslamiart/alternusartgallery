@@ -87,7 +87,7 @@
   bottom: 10px;
   z-index: 20;
   overflow-y: auto;
-  width: 232px;
+  width: 258px;
   padding: 16px 14px;
   border: 1px solid rgba(255,255,255,.1);
   border-radius: 14px;
@@ -97,7 +97,7 @@
   scrollbar-color: #454545 transparent;
 }
 .crystal-modeling-mode .crystal-modeling-sidebar { left: 10px; }
-.crystal-modeling-mode .crystal-modeling-inspector { right: 10px; width: 238px; }
+.crystal-modeling-mode .crystal-modeling-inspector { right: 10px; width: 258px; }
 .crystal-modeling-sidebar header,
 .crystal-modeling-inspector header { display: flex; align-items: flex-start; justify-content: space-between; padding: 0 2px 14px; }
 .crystal-modeling-sidebar header span,
@@ -151,6 +151,10 @@
 .crystal-inspector-assets svg { position: absolute; top: 5px; right: 5px; color: #7c8795; }
 .crystal-asset-preview { display: block; height: 42px; border-radius: 5px; background-image: linear-gradient(135deg, #525862, #20242b); }
 .crystal-inspector-export { width: 100%; margin-top: 8px; color: #dbe8f7; background: #1687f7; }
+.crystal-status-pill { display: flex; align-items: center; gap: 6px; min-height: 24px; padding: 0 11px; border: 1px solid rgba(255,255,255,.1); border-radius: 999px; color: #c8d0dc; background: rgba(25,25,25,.9); box-shadow: 0 8px 18px rgba(0,0,0,.22); font-size: 10px; backdrop-filter: blur(10px); }
+.crystal-status-pill svg { color: #dfe7f0; }
+.crystal-add-menu button { transition: background 150ms ease, color 150ms ease; }
+.crystal-modeling-mode .crystal-modeling-tools { z-index: 31; }
 @media (max-width: 1023px) {
   .crystal-modeling-mode .crystal-modeling-sidebar,
   .crystal-modeling-mode .crystal-modeling-inspector { width: min(250px, 82vw); }
