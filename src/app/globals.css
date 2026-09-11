@@ -96,11 +96,16 @@
   scrollbar-width: thin;
   scrollbar-color: #454545 transparent;
 }
-.crystal-modeling-mode,
-.crystal-modeling-mode button,
-.crystal-modeling-mode input,
-.crystal-modeling-mode textarea,
-.crystal-modeling-mode select {
+.crystal-modeling-mode .crystal-modeling-sidebar,
+.crystal-modeling-mode .crystal-modeling-inspector,
+.crystal-modeling-mode .crystal-modeling-sidebar button,
+.crystal-modeling-mode .crystal-modeling-sidebar input,
+.crystal-modeling-mode .crystal-modeling-sidebar textarea,
+.crystal-modeling-mode .crystal-modeling-sidebar select,
+.crystal-modeling-mode .crystal-modeling-inspector button,
+.crystal-modeling-mode .crystal-modeling-inspector input,
+.crystal-modeling-mode .crystal-modeling-inspector textarea,
+.crystal-modeling-mode .crystal-modeling-inspector select {
   font-family: var(--font-roboto), Roboto, Arial, sans-serif;
 }
 .crystal-modeling-mode .crystal-modeling-sidebar { left: 10px; }
