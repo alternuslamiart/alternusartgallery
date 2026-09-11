@@ -165,6 +165,88 @@
     padding: 8px 10px 9px !important;
   }
 
+  /* Modeling studio: compact floating 3D-software layout. */
+  .crystal-modeling-mode {
+    --crystal-left-width: 224px;
+    --crystal-right-width: 224px;
+    background: #171717 !important;
+  }
+  .crystal-modeling-mode > header {
+    height: 58px !important;
+    padding-inline: 22px !important;
+    background: rgba(15, 15, 15, .96) !important;
+    backdrop-filter: blur(14px);
+  }
+  .crystal-modeling-mode > header .crystal-brand-logo { width: 22px; height: 22px; }
+  .crystal-modeling-mode > header b { font-size: 16px; }
+  .crystal-modeling-mode > header nav { margin-left: 18px; gap: 0; }
+  .crystal-modeling-mode > header .crystal-menu-item { height: 32px; padding-inline: 10px; font-size: 11px; color: #858e9b; }
+  .crystal-modeling-mode > header [role="group"] { height: 36px; margin-left: 12px; }
+  .crystal-modeling-mode > header [role="group"] button { height: 28px; padding-inline: 10px; font-size: 10px; }
+  .crystal-modeling-mode .crystal-left-panel,
+  .crystal-modeling-mode .crystal-right-panel {
+    top: 68px;
+    bottom: 10px;
+    border: 1px solid rgba(255,255,255,.09) !important;
+    border-radius: 14px;
+    background: rgba(20,20,20,.96) !important;
+    box-shadow: 0 16px 40px rgba(0,0,0,.28);
+  }
+  .crystal-modeling-mode .crystal-left-panel { left: 10px; width: var(--crystal-left-width); padding: 14px 12px 12px; }
+  .crystal-modeling-mode .crystal-right-panel { right: 10px; width: var(--crystal-right-width); padding: 14px 12px 18px; }
+  .crystal-modeling-mode .crystal-left-panel .crystal-left-scroll { padding-bottom: 8px; }
+  .crystal-modeling-mode .crystal-sidebar-heading { padding: 0 3px 14px; }
+  .crystal-modeling-mode .crystal-sidebar-heading h1 { margin-top: 3px; font-size: 15px; }
+  .crystal-modeling-kicker { display: block; color: #788291; font-size: 8px; letter-spacing: .15em; text-transform: uppercase; }
+  .crystal-modeling-mode .crystal-sidebar-heading button { width: 32px; height: 32px; border-radius: 9px; }
+  .crystal-modeling-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin: 0 0 15px; padding: 3px; border-radius: 9px; background: #292929; }
+  .crystal-modeling-tabs button { height: 25px; border: 0; border-radius: 6px; color: #7f8997; background: transparent; font-size: 9px; }
+  .crystal-modeling-tabs button.is-active { color: #fff; background: #3b3b3b; }
+  .crystal-generative-panel { margin: 0 1px 13px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 13px; }
+  .crystal-panel-label { margin-bottom: 9px; color: #7f8997; font-size: 9px; letter-spacing: .13em; }
+  .crystal-reference-upload { display: flex; align-items: center; gap: 8px; min-height: 58px; padding: 9px; border: 1px dashed rgba(255,255,255,.18); border-radius: 9px; color: #bac2cd; background: rgba(255,255,255,.025); font-size: 9px; cursor: pointer; }
+  .crystal-reference-upload small { display: block; margin-top: 4px; color: #707b8b; font-size: 8px; }
+  .crystal-generative-panel textarea { width: 100%; min-height: 62px; margin-top: 8px; padding: 9px; resize: vertical; border: 1px solid rgba(255,255,255,.08); border-radius: 9px; outline: 0; color: #e3e7ed; background: rgba(255,255,255,.025); font-size: 10px; }
+  .crystal-generative-panel textarea::placeholder { color: #687382; }
+  .crystal-generation-meta { display: flex; justify-content: space-between; margin: 9px 2px; color: #788291; font-size: 9px; }
+  .crystal-generation-meta b { display: block; margin-top: 3px; color: #d5dbe4; font-weight: 500; }
+  .crystal-generation-button { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; height: 32px; border: 0; border-radius: 8px; color: white; background: #1687f7; font-size: 10px; font-weight: 600; box-shadow: 0 6px 16px rgba(22,135,247,.18); }
+  .crystal-generation-button:disabled { cursor: not-allowed; opacity: .45; }
+  .crystal-modeling-mode .crystal-left-panel > .crystal-left-footer { margin-top: 10px; }
+  .crystal-modeling-mode .crystal-left-panel > .crystal-left-footer .crystal-render-queue,
+  .crystal-modeling-mode .crystal-left-panel > .crystal-left-footer > a { font-size: 9px; }
+  .crystal-modeling-mode .crystal-ai-prompt { display: none; }
+  .crystal-modeling-mode .crystal-modeling-tools {
+    bottom: 18px;
+    width: auto;
+    min-width: 360px;
+    height: 48px;
+    gap: 2px;
+    padding: 4px 6px;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 12px;
+    background: rgba(24,24,24,.94);
+    box-shadow: 0 12px 30px rgba(0,0,0,.38);
+    backdrop-filter: blur(12px);
+  }
+  .crystal-modeling-mode .crystal-modeling-tools button { width: 36px; height: 36px; border-radius: 8px; }
+  .crystal-modeling-mode .crystal-modeling-tools button[aria-label*="Realtime"] { display: none; }
+  .crystal-modeling-mode .crystal-right-panel .mb-7,
+  .crystal-modeling-mode .crystal-right-panel .mt-7,
+  .crystal-modeling-mode .crystal-right-panel .mt-8,
+  .crystal-modeling-mode .crystal-right-panel .mt-6,
+  .crystal-modeling-mode .crystal-right-panel .mt-5 { margin-top: 14px; margin-bottom: 14px; }
+  .crystal-modeling-mode .crystal-right-panel .mb-3 { margin-bottom: 8px; }
+  .crystal-modeling-mode .crystal-right-panel h2 { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+  .crystal-modeling-mode .crystal-right-panel label,
+  .crystal-modeling-mode .crystal-right-panel > div > button { min-height: 30px; font-size: 10px; }
+  .crystal-modeling-mode .crystal-right-panel article { height: 92px; }
+  .crystal-modeling-mode .crystal-right-panel .grid.grid-cols-2 { gap: 5px; }
+  @media (max-width: 1023px) {
+    .crystal-modeling-mode .crystal-left-panel,
+    .crystal-modeling-mode .crystal-right-panel { width: min(250px, 82vw); }
+  }
+
   .crystal-studio .crystal-ai-prompt textarea {
     height: 58px !important;
     padding: 8px 6px !important;
@@ -1472,4 +1554,61 @@ textarea {
   .crystal-project-card {
     width: 100%;
   }
+}
+
+@media (min-width: 701px) {
+  .crystal-modeling-mode {
+    --crystal-left-width: 224px;
+    --crystal-right-width: 224px;
+    background: #171717 !important;
+  }
+  .crystal-modeling-mode > header {
+    height: 58px !important;
+    padding-inline: 22px !important;
+    background: rgba(15, 15, 15, .96) !important;
+    backdrop-filter: blur(14px);
+  }
+  .crystal-modeling-mode > header .crystal-brand-logo { width: 22px; height: 22px; }
+  .crystal-modeling-mode > header b { font-size: 16px; }
+  .crystal-modeling-mode > header nav { margin-left: 18px; gap: 0; }
+  .crystal-modeling-mode > header .crystal-menu-item { height: 32px; padding-inline: 10px; font-size: 11px; color: #858e9b; }
+  .crystal-modeling-mode > header [role="group"] { height: 36px; margin-left: 12px; }
+  .crystal-modeling-mode > header [role="group"] button { height: 28px; padding-inline: 10px; font-size: 10px; }
+  .crystal-modeling-mode .crystal-left-panel,
+  .crystal-modeling-mode .crystal-right-panel {
+    top: 68px; bottom: 10px; border: 1px solid rgba(255,255,255,.09) !important;
+    border-radius: 14px; background: rgba(20,20,20,.96) !important;
+    box-shadow: 0 16px 40px rgba(0,0,0,.28);
+  }
+  .crystal-modeling-mode .crystal-left-panel { left: 10px; width: var(--crystal-left-width); padding: 14px 12px 12px; }
+  .crystal-modeling-mode .crystal-right-panel { right: 10px; width: var(--crystal-right-width); padding: 14px 12px 18px; }
+  .crystal-modeling-mode .crystal-sidebar-heading { padding: 0 3px 14px; }
+  .crystal-modeling-mode .crystal-sidebar-heading h1 { margin-top: 3px; font-size: 15px; }
+  .crystal-modeling-kicker { display: block; color: #788291; font-size: 8px; letter-spacing: .15em; text-transform: uppercase; }
+  .crystal-modeling-mode .crystal-sidebar-heading button { width: 32px; height: 32px; border-radius: 9px; }
+  .crystal-modeling-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin: 0 0 15px; padding: 3px; border-radius: 9px; background: #292929; }
+  .crystal-modeling-tabs button { height: 25px; border: 0; border-radius: 6px; color: #7f8997; background: transparent; font-size: 9px; }
+  .crystal-modeling-tabs button.is-active { color: #fff; background: #3b3b3b; }
+  .crystal-generative-panel { margin: 0 1px 13px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 13px; }
+  .crystal-panel-label { margin-bottom: 9px; color: #7f8997; font-size: 9px; letter-spacing: .13em; }
+  .crystal-reference-upload { display: flex; align-items: center; gap: 8px; min-height: 58px; padding: 9px; border: 1px dashed rgba(255,255,255,.18); border-radius: 9px; color: #bac2cd; background: rgba(255,255,255,.025); font-size: 9px; cursor: pointer; }
+  .crystal-reference-upload small { display: block; margin-top: 4px; color: #707b8b; font-size: 8px; }
+  .crystal-generative-panel textarea { width: 100%; min-height: 62px; margin-top: 8px; padding: 9px; resize: vertical; border: 1px solid rgba(255,255,255,.08); border-radius: 9px; outline: 0; color: #e3e7ed; background: rgba(255,255,255,.025); font-size: 10px; }
+  .crystal-generative-panel textarea::placeholder { color: #687382; }
+  .crystal-generation-meta { display: flex; justify-content: space-between; margin: 9px 2px; color: #788291; font-size: 9px; }
+  .crystal-generation-meta b { display: block; margin-top: 3px; color: #d5dbe4; font-weight: 500; }
+  .crystal-generation-button { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; height: 32px; border: 0; border-radius: 8px; color: white; background: #1687f7; font-size: 10px; font-weight: 600; }
+  .crystal-generation-button:disabled { cursor: not-allowed; opacity: .45; }
+  .crystal-modeling-mode .crystal-ai-prompt { display: none; }
+  .crystal-modeling-mode .crystal-modeling-tools { bottom: 18px; width: auto; min-width: 360px; height: 48px; gap: 2px; padding: 4px 6px; border: 1px solid rgba(255,255,255,.13); border-radius: 12px; background: rgba(24,24,24,.94); box-shadow: 0 12px 30px rgba(0,0,0,.38); backdrop-filter: blur(12px); }
+  .crystal-modeling-mode .crystal-modeling-tools button { width: 36px; height: 36px; border-radius: 8px; }
+  .crystal-modeling-mode .crystal-modeling-tools button[aria-label*="Realtime"] { display: none; }
+  .crystal-modeling-mode .crystal-right-panel .mb-7,
+  .crystal-modeling-mode .crystal-right-panel .mt-7,
+  .crystal-modeling-mode .crystal-right-panel .mt-8,
+  .crystal-modeling-mode .crystal-right-panel .mt-6,
+  .crystal-modeling-mode .crystal-right-panel .mt-5 { margin-top: 14px; margin-bottom: 14px; }
+  .crystal-modeling-mode .crystal-right-panel h2 { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+  .crystal-modeling-mode .crystal-right-panel label,
+  .crystal-modeling-mode .crystal-right-panel > div > button { min-height: 30px; font-size: 10px; }
 }
