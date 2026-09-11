@@ -1,12 +1,13 @@
 "use client";
 
 import { Canvas, ThreeEvent } from "@react-three/fiber";
-import { Grid, Html, OrbitControls } from "@react-three/drei";
+import { Grid, Html, OrbitControls, useTexture } from "@react-three/drei";
 import { Roboto } from "next/font/google";
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import {
   AlertTriangle, Armchair, Bike, BusFront, ChevronDown, Download, Fence,
-  Footprints, Home, LampCeiling, Lightbulb, Loader2, MapPin, MessageCircle, MousePointer2, Plus,
+  Building2, Footprints, Home, LampCeiling, Lightbulb, Loader2, MapPin, MessageCircle, MousePointer2, Plus,
   Redo2, Route, Ruler, Send, Signpost, Sparkles, Trash2, TreePine,
   Undo2, Zap,
 } from "lucide-react";
@@ -15,7 +16,7 @@ const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"], displ
 
 type ElementType =
   | "road" | "sidewalk" | "tree" | "streetlight" | "crosswalk"
-  | "bikeLane" | "busStop" | "trafficLight" | "roadSign" | "barrier" | "bench";
+  | "bikeLane" | "busStop" | "trafficLight" | "roadSign" | "barrier" | "bench" | "cityModel";
 type Tool = "select" | "move" | "delete" | "measure" | ElementType;
 type StreetElement = { id: number; type: ElementType; x: number; z: number };
 type Point = { x: number; z: number };
@@ -32,6 +33,7 @@ const elementLabels: Record<ElementType, string> = {
   roadSign: "Road sign",
   barrier: "Fence / barrier",
   bench: "Bench",
+  cityModel: "City model",
 };
 
 const toolItems: Array<{ type: Tool; label: string; icon: typeof Route }> = [
@@ -43,6 +45,7 @@ const toolItems: Array<{ type: Tool; label: string; icon: typeof Route }> = [
   { type: "roadSign", label: "Add Road Sign", icon: Signpost },
   { type: "barrier", label: "Add Fence / Barrier", icon: Fence },
   { type: "bench", label: "Add Bench", icon: Armchair },
+  { type: "cityModel", label: "Add 3D City Model", icon: Building2 },
   { type: "tree", label: "Add Tree", icon: TreePine },
   { type: "streetlight", label: "Add Streetlight", icon: Zap },
   { type: "crosswalk", label: "Add Crosswalk", icon: MapPin },
@@ -64,6 +67,7 @@ function Element({ item, selected, onSelect }: { item: StreetElement; selected: 
     </mesh>
   ) : null;
 
+  if (item.type === "cityModel") return <CityModelElement item={item} selected={selected} onClick={click} highlight={highlight} />;
   if (item.type === "tree") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, 0.65, 0]}><cylinderGeometry args={[0.12, 0.16, 1.3, 10]} /><meshStandardMaterial color="#76513b" /></mesh><mesh position={[0, 1.55, 0]}><icosahedronGeometry args={[0.75, 1]} /><meshStandardMaterial color={selected ? "#8ee6a0" : "#3d9b5b"} /></mesh></group>;
   if (item.type === "streetlight") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, 1.25, 0]}><cylinderGeometry args={[0.045, 0.06, 2.5, 8]} /><meshStandardMaterial color={selected ? "#b9d8ff" : "#77818d"} /></mesh><mesh position={[0.18, 2.45, 0]}><boxGeometry args={[0.38, 0.08, 0.08]} /><meshStandardMaterial color="#d9e7ff" emissive="#6c9cff" emissiveIntensity={0.35} /></mesh></group>;
   if (item.type === "crosswalk") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, 0.035, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[3, 1.4]} /><meshStandardMaterial color={selected ? "#dbeafe" : "#e5e7eb"} /></mesh></group>;
@@ -75,6 +79,22 @@ function Element({ item, selected, onSelect }: { item: StreetElement; selected: 
   if (item.type === "bench") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, 0.55, 0]}><boxGeometry args={[1.7, 0.14, 0.45]} /><meshStandardMaterial color={selected ? "#d7a66c" : "#9b6b3f"} /></mesh><mesh position={[0, 0.95, 0.17]}><boxGeometry args={[1.7, 0.75, 0.1]} /><meshStandardMaterial color="#875b38" /></mesh>{[-0.65, 0.65].map((offset) => <mesh key={offset} position={[offset, 0.25, 0]}><boxGeometry args={[0.1, 0.5, 0.3]} /><meshStandardMaterial color="#444b55" /></mesh>)}</group>;
   const sidewalk = item.type === "sidewalk";
   return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, sidewalk ? 0.12 : 0.08, 0]}><boxGeometry args={[sidewalk ? 2 : 4, sidewalk ? 0.24 : 0.16, 8]} /><meshStandardMaterial color={selected ? "#8eb8ee" : sidewalk ? "#89929c" : "#282d34"} /></mesh></group>;
+}
+
+function CityModelElement({ item, selected, onClick, highlight }: { item: StreetElement; selected: boolean; onClick: (event: ThreeEvent<MouseEvent>) => void; highlight: ReactNode }) {
+  const texture = useTexture("/Section/infra.jpg");
+  texture.colorSpace = "srgb";
+  return <group position={[item.x, 0.2, item.z]} rotation={[-0.42, 0, 0]} onClick={onClick}>
+    {highlight}
+    <mesh position={[0, 0, 0.1]}>
+      <boxGeometry args={[8.4, 0.12, 8.4]} />
+      <meshStandardMaterial color="#1c2633" roughness={0.8} />
+    </mesh>
+    <mesh position={[0, 0.12, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[8, 8]} />
+      <meshStandardMaterial map={texture} color={selected ? "#b8d9ff" : "#ffffff"} roughness={0.7} />
+    </mesh>
+  </group>;
 }
 
 function MeasureGuide({ points }: { points: Point[] }) {
@@ -119,7 +139,7 @@ function Scene({ tool, elements, selectedId, selected, selectedSuggestion, measu
 
 export default function InfrastructurePage() {
   const [tool, setTool] = useState<Tool>("select");
-  const [elements, setElements] = useState<StreetElement[]>([{ id: 1, type: "road", x: 0, z: 0 }, { id: 2, type: "sidewalk", x: -3, z: 0 }, { id: 3, type: "sidewalk", x: 3, z: 0 }]);
+  const [elements, setElements] = useState<StreetElement[]>([{ id: 1, type: "road", x: 0, z: 0 }, { id: 2, type: "sidewalk", x: -3, z: 0 }, { id: 3, type: "sidewalk", x: 3, z: 0 }, { id: 4, type: "cityModel", x: 0, z: 0 }]);
   const [past, setPast] = useState<StreetElement[][]>([]);
   const [future, setFuture] = useState<StreetElement[][]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
