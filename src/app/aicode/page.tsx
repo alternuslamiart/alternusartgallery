@@ -5,7 +5,7 @@ import { FormEvent, useRef, useState } from "react";
 import {
   ArrowLeft, ArrowUp, Bot, Check, ChevronDown, ChevronRight, Code2,
   Copy, FileCode2, Folder, Github, Mic, Play,
-  Plus, Search, Settings, Share2, Sparkles, TerminalSquare, X, Zap,
+  Plus, Search, Settings, Share2, Sparkles,
 } from "lucide-react";
 
 type Message = { id: number; role: "user" | "assistant"; content: string };
@@ -53,20 +53,17 @@ export default function AICodePage() {
   const [sending, setSending] = useState(false);
   const [activeFile, setActiveFile] = useState("src/app/aichat/page.tsx");
   const [code, setCode] = useState(source);
-  const [bottomTab, setBottomTab] = useState("Terminal");
-  const [mobileTab, setMobileTab] = useState<"AI" | "Files" | "Code" | "Terminal">("Code");
+  const [mobileTab, setMobileTab] = useState<"AI" | "Files" | "Code">("Code");
   const [leftWidth, setLeftWidth] = useState(450);
   const [filesWidth, setFilesWidth] = useState(335);
-  const [terminalHeight, setTerminalHeight] = useState(220);
-  const resizing = useRef<"left" | "files" | "terminal" | null>(null);
+  const resizing = useRef<"left" | "files" | null>(null);
 
-  const startResize = (kind: "left" | "files" | "terminal") => (event: React.PointerEvent<HTMLButtonElement>) => {
+  const startResize = (kind: "left" | "files") => (event: React.PointerEvent<HTMLButtonElement>) => {
     event.preventDefault();
     resizing.current = kind;
     const move = (moveEvent: PointerEvent) => {
       if (resizing.current === "left") setLeftWidth(Math.max(320, Math.min(560, moveEvent.clientX)));
       if (resizing.current === "files") setFilesWidth(Math.max(220, Math.min(460, moveEvent.clientX - leftWidth)));
-      if (resizing.current === "terminal") setTerminalHeight(Math.max(140, Math.min(420, window.innerHeight - moveEvent.clientY)));
     };
     const stop = () => { resizing.current = null; window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", stop); };
     window.addEventListener("pointermove", move);
@@ -134,13 +131,7 @@ export default function AICodePage() {
         </section>
       </div>
 
-      <ResizeHandle direction="vertical" onStart={startResize("terminal")} />
-      <section className={`${panelVisible("Terminal")} shrink-0 flex-col bg-[#0d0e11]`} style={{ height: terminalHeight }}>
-        <div className="flex h-10 items-center gap-1 border-b border-white/[0.08] px-3 text-[11px]">{["Bolt / AI", "Publish Output", "Terminal"].map((tab) => <button type="button" key={tab} onClick={() => setBottomTab(tab)} className={`flex h-full items-center gap-2 border-b-2 px-3 ${bottomTab === tab ? "border-blue-400 text-white" : "border-transparent text-zinc-500 hover:text-white"}`}>{tab === "Terminal" ? <TerminalSquare size={13} /> : <Zap size={13} />}{tab}</button>)}<button className="ml-auto text-zinc-500 hover:text-white"><X size={14} /></button></div>
-        <pre className="flex-1 overflow-auto p-4 font-mono text-[11px] leading-5 text-zinc-400"><span className="text-zinc-600">&gt; </span>npm run typecheck{"\n"}<span className="text-emerald-400">✓</span> Crystal AI Code workspace ready{"\n"}<span className="text-zinc-600">  Active file: </span>{activeFile}{"\n"}<span className="text-zinc-600">  {bottomTab} output will appear here when a task runs.</span></pre>
-      </section>
-
-      <div className="flex border-t border-white/[0.08] bg-[#111216] p-1 md:hidden">{(["AI", "Files", "Code", "Terminal"] as const).map((tab) => <button type="button" key={tab} onClick={() => setMobileTab(tab)} className={`flex-1 rounded-md py-2 text-[11px] ${mobileTab === tab ? "bg-[#1d3c68] text-white" : "text-zinc-500"}`}>{tab}</button>)}</div>
+      <div className="flex border-t border-white/[0.08] bg-[#111216] p-1 md:hidden">{(["AI", "Files", "Code"] as const).map((tab) => <button type="button" key={tab} onClick={() => setMobileTab(tab)} className={`flex-1 rounded-md py-2 text-[11px] ${mobileTab === tab ? "bg-[#1d3c68] text-white" : "text-zinc-500"}`}>{tab}</button>)}</div>
     </main>
   );
 }
