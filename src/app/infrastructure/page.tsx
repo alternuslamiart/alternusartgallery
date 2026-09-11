@@ -84,15 +84,19 @@ function Element({ item, selected, onSelect }: { item: StreetElement; selected: 
 function CityModelElement({ item, selected, onClick, highlight }: { item: StreetElement; selected: boolean; onClick: (event: ThreeEvent<MouseEvent>) => void; highlight: ReactNode }) {
   const texture = useTexture("/Section/infra.jpg");
   texture.colorSpace = "srgb";
-  return <group position={[item.x, 0.2, item.z]} rotation={[-0.42, 0, 0]} onClick={onClick}>
+  return <group position={[item.x, 0.22, item.z]} onClick={onClick}>
     {highlight}
-    <mesh position={[0, 0, 0.1]}>
-      <boxGeometry args={[8.4, 0.12, 8.4]} />
-      <meshStandardMaterial color="#1c2633" roughness={0.8} />
+    <mesh position={[0, 0, 0]}>
+      <boxGeometry args={[8.4, 0.42, 8.4]} />
+      <meshStandardMaterial color={selected ? "#6f9ed0" : "#202b3a"} roughness={0.78} metalness={0.08} />
     </mesh>
-    <mesh position={[0, 0.12, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+    <mesh position={[0, 0.235, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[8, 8]} />
       <meshStandardMaterial map={texture} color={selected ? "#b8d9ff" : "#ffffff"} roughness={0.7} />
+    </mesh>
+    <mesh position={[0, -0.235, 0]} rotation={[Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[8, 8]} />
+      <meshStandardMaterial color="#151b24" roughness={0.9} />
     </mesh>
   </group>;
 }
