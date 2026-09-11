@@ -144,7 +144,7 @@ export default function AICodePage() {
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-        <section className={`${previewMode ? "hidden" : panelVisible("AI")} min-w-0 flex-col border-r border-white/[0.08] bg-[#111216]`} style={{ width: leftWidth }}>
+        <section className={`${panelVisible("AI")} min-w-0 flex-col border-r border-white/[0.08] bg-[#111216]`} style={{ width: leftWidth }}>
           <div className="flex h-12 shrink-0 items-center justify-between border-b border-white/[0.08] px-5"><div className="flex items-center gap-2 text-xs font-semibold tracking-[-0.01em]"><Bot size={15} className="text-[#6ca5ff]" /> AI Code Assistant</div><button aria-label="New task" className="text-zinc-500 transition hover:text-white"><Plus size={16} /></button></div>
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
             {messages.map((message) => <article key={message.id} className={message.role === "user" ? "rounded-lg bg-[#1b2739] p-3 text-xs text-blue-100" : "text-xs leading-5 text-zinc-300"}><div className="mb-2 flex items-center gap-2 font-semibold text-zinc-400">{message.role === "user" ? "You" : <><Sparkles size={12} className="text-blue-400" /> Crystal</>}</div><p className="whitespace-pre-wrap">{message.content}</p></article>)}
