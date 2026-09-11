@@ -1,5 +1,3 @@
-import { CrystalWorkspace } from "@/components/crystal-workspace";
+"use client";
 
-export function CrystalAssistantPage() {
-  return <CrystalWorkspace />;
-}
+export { CrystalStudio as CrystalAssistantPage } from "@/components/crystal-studio/CrystalStudio";
