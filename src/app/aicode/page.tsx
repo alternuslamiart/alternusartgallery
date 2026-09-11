@@ -96,7 +96,7 @@ export default function AICodePage() {
         <Link href="/aichat" aria-label="Back to AI Chat" className="rounded-md p-1.5 text-zinc-400 hover:bg-white/[0.06] hover:text-white"><ArrowLeft size={16} /></Link>
         <div className="flex items-center gap-2 text-sm font-semibold"><span className="grid h-7 w-7 place-items-center rounded-lg bg-[#3b82f6] text-white"><Sparkles size={15} /></span>Crystal <span className="text-zinc-500">/</span> <span>AI Code</span></div>
         <nav className="ml-5 hidden items-center gap-1 rounded-lg border border-white/[0.08] bg-[#17191e] p-1 text-xs md:flex">
-          <Link href="/aichat" className="rounded-md px-3 py-1.5 text-zinc-500 hover:text-white">Chat</Link>
+          <Link href="/aichat" className="rounded-md px-3 py-1.5 text-zinc-500 hover:text-white">Preview</Link>
           <Link href="/workflow" className="rounded-md px-3 py-1.5 text-zinc-500 hover:text-white">Workflow</Link>
           <span className="flex items-center gap-1 rounded-md bg-[#1d3c68] px-3 py-1.5 font-medium text-[#8db8ff]"><Code2 size={13} /> Code</span>
         </nav>
