@@ -244,13 +244,13 @@ export default function AIChatPage() {
               <button onClick={() => setMode("chat")} className={`flex items-center gap-2 rounded-full px-5 py-2 text-xs font-medium transition-all ${mode === "chat" ? "bg-[#3b82f6] text-white shadow-md shadow-blue-500/20" : "text-zinc-500 hover:text-white"}`}><Sparkles size={14} /> Chat</button>
               <button onClick={() => setMode("workflow")} className={`flex items-center gap-2 rounded-full px-5 py-2 text-xs font-medium transition-all ${mode === "workflow" ? "bg-[#3b82f6] text-white shadow-md shadow-blue-500/20" : "text-zinc-500 hover:text-white"}`}><GitBranch size={14} /> Workflow</button>
             </div>
-            <div className="hidden items-center gap-1 rounded-lg border border-[#2a2a2a] bg-[#141414] p-1 md:flex">
-            <button type="button" onClick={() => setSplitView(false)} aria-label="Use chat only" title="Single panel" className={`grid h-7 w-7 place-items-center rounded-md transition ${!splitView ? "bg-[#2a2a2a] text-white" : "text-zinc-600 hover:text-zinc-300"}`}><PanelRightClose size={14} /></button>
-            <button type="button" onClick={() => setSplitView(true)} aria-label="Enable split view" title="Split view" className={`grid h-7 w-7 place-items-center rounded-md transition ${splitView ? "bg-[#3b82f6] text-white" : "text-zinc-600 hover:text-zinc-300"}`}><Columns2 size={14} /></button>
-            <Link href="/aicode" aria-label="Open AI Code" title="AI Code" className="grid h-7 w-7 place-items-center rounded-md text-zinc-600 transition hover:bg-[#2a2a2a] hover:text-[#6ca5ff]"><Code2 size={15} strokeWidth={2.2} /></Link>
-            </div>
+            <Link href="/aicode" aria-label="Open AI Code" title="AI Code" className="hidden h-7 w-7 items-center justify-center rounded-md text-zinc-600 transition hover:bg-[#2a2a2a] hover:text-[#6ca5ff] md:flex"><Code2 size={15} strokeWidth={2.2} /></Link>
           </div>
           <div className="hidden items-center gap-2 sm:flex">
+            <div className="flex items-center gap-1 rounded-lg border border-[#2a2a2a] bg-[#141414] p-1">
+              <button type="button" onClick={() => setSplitView(false)} aria-label="Use chat only" title="Single panel" className={`grid h-7 w-7 place-items-center rounded-md transition ${!splitView ? "bg-[#2a2a2a] text-white" : "text-zinc-600 hover:text-zinc-300"}`}><PanelRightClose size={14} /></button>
+              <button type="button" onClick={() => setSplitView(true)} aria-label="Enable split view" title="Split view" className={`grid h-7 w-7 place-items-center rounded-md transition ${splitView ? "bg-[#3b82f6] text-white" : "text-zinc-600 hover:text-zinc-300"}`}><Columns2 size={14} /></button>
+            </div>
             <Link href="/crystal" className="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-zinc-400 transition hover:border-blue-500/50 hover:text-white">Go to Studio</Link>
             <Link href="/3d-studio" aria-label="Open 3D Studio Modeling" title="3D Studio Modeling" className="grid h-9 w-9 place-items-center rounded-lg border border-[#2a2a2a] text-zinc-400 transition hover:border-blue-500/50 hover:bg-[#1c1c1c] hover:text-[#6ca5ff]"><Box size={16} strokeWidth={2.2} /></Link>
           </div>
