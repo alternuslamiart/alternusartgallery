@@ -8,6 +8,7 @@ import {
   Box,
   Check,
   Columns2,
+  Code2,
   Copy,
   ChevronDown,
   FolderPlus,
@@ -246,6 +247,7 @@ export default function AIChatPage() {
             <div className="hidden items-center gap-1 rounded-lg border border-[#2a2a2a] bg-[#141414] p-1 md:flex">
             <button type="button" onClick={() => setSplitView(false)} aria-label="Use chat only" title="Single panel" className={`grid h-7 w-7 place-items-center rounded-md transition ${!splitView ? "bg-[#2a2a2a] text-white" : "text-zinc-600 hover:text-zinc-300"}`}><PanelRightClose size={14} /></button>
             <button type="button" onClick={() => setSplitView(true)} aria-label="Enable split view" title="Split view" className={`grid h-7 w-7 place-items-center rounded-md transition ${splitView ? "bg-[#3b82f6] text-white" : "text-zinc-600 hover:text-zinc-300"}`}><Columns2 size={14} /></button>
+            <Link href="/aicode" aria-label="Open AI Code" title="AI Code" className="grid h-7 w-7 place-items-center rounded-md text-zinc-600 transition hover:bg-[#2a2a2a] hover:text-[#6ca5ff]"><Code2 size={15} strokeWidth={2.2} /></Link>
             </div>
           </div>
           <div className="hidden items-center gap-2 sm:flex">
