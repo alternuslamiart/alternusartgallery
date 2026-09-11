@@ -250,6 +250,7 @@ export default function AIChatPage() {
             </div>
           </div>
           <Link href="/crystal" className="hidden rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-zinc-400 transition hover:border-blue-500/50 hover:text-white sm:block">Go to Studio</Link>
+          <Link href="/design-studio" aria-label="Open 3D Studio Code design" title="3D Studio Code" className="hidden items-center gap-1.5 rounded-lg border border-[#3b82f6]/40 bg-[#182641] px-3 py-2 text-xs font-medium text-[#8db8ff] transition hover:border-[#3b82f6] hover:bg-[#203557] hover:text-white sm:inline-flex"><Box size={14} strokeWidth={2.2} />3D Studio Code</Link>
         </header>
 
         <section className="flex flex-1 flex-col overflow-y-auto px-4 pb-36 sm:px-8">
