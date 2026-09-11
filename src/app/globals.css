@@ -113,7 +113,7 @@
 .crystal-modeling-tabs button.is-active,
 .crystal-inspector-tabs button.is-active { color: #fff; background: #3b3b3b; }
 .crystal-inspector-tabs { grid-template-columns: repeat(2, 1fr); margin-bottom: 4px; }
-.crystal-modeling-block { margin-top: 15px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 11px; }
+.crystal-modeling-block { margin-top: 12px; padding: 10px; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; background: rgba(255,255,255,.018); }
 .crystal-modeling-block h2,
 .crystal-inspector-block h2 { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 8px; color: #7e8998; font-size: 9px; letter-spacing: .13em; font-weight: 600; }
 .crystal-modeling-block h2 button { border: 0; color: #aeb8c5; background: transparent; font-size: 15px; }
@@ -135,7 +135,7 @@
 .crystal-generation-button { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; height: 32px; border: 0; border-radius: 8px; color: #fff; background: #1687f7; font-size: 10px; font-weight: 600; }
 .crystal-generation-button:disabled { opacity: .45; cursor: not-allowed; }
 .crystal-modeling-user { display: flex; align-items: center; gap: 7px; width: 100%; margin-top: 16px; padding: 9px 4px; border: 0; border-top: 1px solid rgba(255,255,255,.08); color: #8792a1; background: transparent; font-size: 10px; text-align: left; }
-.crystal-inspector-block { margin-top: 14px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 12px; }
+.crystal-inspector-block { margin-top: 12px; padding: 10px; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; background: rgba(255,255,255,.018); }
 .crystal-inspector-block > div { display: grid; gap: 5px; }
 .crystal-inspector-property { display: flex; align-items: center; justify-content: space-between; min-height: 30px; padding: 0 8px; border-radius: 7px; color: #808b9a; background: rgba(255,255,255,.04); font-size: 9px; }
 .crystal-inspector-property b { color: #d7dee8; font-size: 9px; font-weight: 500; }
