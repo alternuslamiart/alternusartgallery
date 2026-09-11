@@ -94,7 +94,7 @@ export default function AICodePage() {
   const panelVisible = (panel: "AI" | "Files" | "Code" | "Terminal") => mobileTab === panel ? "flex" : "hidden md:flex";
 
   return (
-    <main className="flex h-screen min-h-[620px] flex-col overflow-hidden bg-[#0b0c0f] font-roboto text-[#e7eaf0]">
+    <main className="flex h-screen min-h-[620px] w-full min-w-0 flex-1 flex-col overflow-hidden bg-[#0b0c0f] font-roboto text-[#e7eaf0]">
       <header className="flex h-[52px] shrink-0 items-center gap-4 border-b border-white/[0.08] bg-[#111216] px-4">
         <Link href="/aichat" aria-label="Back to AI Chat" className="rounded-md p-1.5 text-zinc-400 hover:bg-white/[0.06] hover:text-white"><ArrowLeft size={16} /></Link>
         <div className="flex items-center gap-2 text-sm font-semibold"><span className="grid h-7 w-7 place-items-center rounded-lg bg-[#3b82f6] text-white"><Sparkles size={15} /></span>Crystal <span className="text-zinc-500">/</span> <span>AI Code</span></div>
