@@ -36,6 +36,199 @@
       linear-gradient(110deg, #244cff, #7338ff 48%, #fa2c76) border-box;
     box-shadow: 0 14px 32px rgba(0,0,0,.34);
   }
+
+  /* Shared Spline-style workspace language for Crystal surfaces. */
+  :root {
+    --crystal-ui-bg: #08090b;
+    --crystal-ui-surface: #101216;
+    --crystal-ui-raised: #15181d;
+    --crystal-ui-border: rgba(255, 255, 255, .09);
+    --crystal-ui-border-strong: rgba(255, 255, 255, .14);
+    --crystal-ui-text: #f4f6f8;
+    --crystal-ui-muted: #8b929d;
+    --crystal-ui-accent: #8db8ff;
+  }
+
+  .crystal-studio,
+  .crystal-design-dashboard,
+  .crystal-archplan-page,
+  .crystal-infrastructure-page {
+    --tw-bg-opacity: 1;
+    background: var(--crystal-ui-bg) !important;
+    color: var(--crystal-ui-text);
+  }
+
+  .crystal-studio,
+  .crystal-studio > header,
+  .crystal-studio > section,
+  .crystal-studio .crystal-left-panel,
+  .crystal-studio .crystal-right-panel,
+  .crystal-studio .crystal-modeling-sidebar,
+  .crystal-studio .crystal-modeling-inspector {
+    background-image: none !important;
+    box-shadow: none !important;
+  }
+
+  .crystal-studio > header,
+  .crystal-studio .crystal-left-panel,
+  .crystal-studio .crystal-right-panel,
+  .crystal-studio .crystal-modeling-sidebar,
+  .crystal-studio .crystal-modeling-inspector {
+    border-color: var(--crystal-ui-border) !important;
+    background-color: var(--crystal-ui-surface) !important;
+  }
+
+  .crystal-studio > section {
+    background-color: var(--crystal-ui-bg) !important;
+  }
+
+  .crystal-studio .floor-plan-canvas {
+    background: #0b0d10 !important;
+    color: var(--crystal-ui-text) !important;
+  }
+
+  .crystal-studio .crystal-topbar {
+    background: rgba(8, 9, 11, .94) !important;
+    border-bottom-color: var(--crystal-ui-border) !important;
+    backdrop-filter: blur(18px);
+  }
+
+  .crystal-studio .crystal-left-panel,
+  .crystal-studio .crystal-right-panel,
+  .crystal-studio .crystal-modeling-sidebar,
+  .crystal-studio .crystal-modeling-inspector {
+    border-radius: 10px !important;
+  }
+
+  .crystal-studio .crystal-modeling-tools,
+  .crystal-studio .crystal-ai-prompt {
+    border-color: var(--crystal-ui-border-strong) !important;
+    background: rgba(16, 18, 22, .96) !important;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, .34) !important;
+  }
+
+  .crystal-studio .crystal-modeling-tools button,
+  .crystal-studio .crystal-viewport-tools button,
+  .crystal-studio .crystal-home-button,
+  .crystal-studio .crystal-menu-item {
+    color: var(--crystal-ui-muted);
+  }
+
+  .crystal-studio .crystal-modeling-tools button:hover,
+  .crystal-studio .crystal-viewport-tools button:hover,
+  .crystal-studio .crystal-home-button:hover,
+  .crystal-studio .crystal-menu-item:hover,
+  .crystal-studio .crystal-menu-item.is-open {
+    color: var(--crystal-ui-text);
+    background: rgba(255, 255, 255, .07);
+  }
+
+  .crystal-studio .crystal-modeling-tools button[aria-pressed="true"],
+  .crystal-studio .crystal-viewport-tools button[aria-pressed="true"] {
+    color: var(--crystal-ui-text);
+    background: rgba(141, 184, 255, .16);
+    border-color: rgba(141, 184, 255, .42);
+    box-shadow: none;
+  }
+
+  .crystal-design-dashboard,
+  .crystal-archplan-page {
+    background: var(--crystal-ui-bg) !important;
+  }
+
+  .crystal-design-dashboard > header,
+  .crystal-archplan-page > header {
+    height: 58px;
+    background: rgba(8, 9, 11, .94) !important;
+    border-color: var(--crystal-ui-border) !important;
+    backdrop-filter: blur(18px);
+  }
+
+  .crystal-design-dashboard main,
+  .crystal-archplan-page main {
+    background: var(--crystal-ui-bg) !important;
+  }
+
+  .crystal-design-dashboard .rounded-\[19px\],
+  .crystal-design-dashboard .rounded-\[15px\],
+  .crystal-design-dashboard .rounded-\[14px\],
+  .crystal-design-dashboard .rounded-\[11px\],
+  .crystal-archplan-page input,
+  .crystal-archplan-page textarea,
+  .crystal-archplan-page select,
+  .crystal-archplan-page button {
+    box-shadow: none !important;
+  }
+
+  .crystal-design-dashboard .bg-\[\#171717\],
+  .crystal-design-dashboard .bg-\[\#181818\],
+  .crystal-design-dashboard .bg-\[\#1D1D1D\],
+  .crystal-archplan-page .bg-\[\#181818\],
+  .crystal-archplan-page .bg-\[\#242424\] {
+    background-color: var(--crystal-ui-surface) !important;
+  }
+
+  .crystal-design-dashboard .bg-gradient-to-r {
+    background: var(--crystal-ui-border-strong) !important;
+    padding: 1px !important;
+    box-shadow: none !important;
+  }
+
+  .crystal-design-dashboard button:hover,
+  .crystal-archplan-page button:hover,
+  .crystal-infrastructure-page button:hover {
+    filter: none;
+  }
+
+  .crystal-infrastructure-page {
+    gap: 8px !important;
+    padding: 8px !important;
+    padding-top: 76px !important;
+  }
+
+  .crystal-infrastructure-page > aside,
+  .crystal-infrastructure-page > section > header,
+  .crystal-infrastructure-page > section > aside {
+    border-color: var(--crystal-ui-border) !important;
+    background: var(--crystal-ui-surface) !important;
+    box-shadow: none !important;
+  }
+
+  .crystal-infrastructure-page > section {
+    background: var(--crystal-ui-bg) !important;
+  }
+
+  .crystal-infrastructure-page .bg-\[\#202020\],
+  .crystal-infrastructure-page .bg-\[\#171717\],
+  .crystal-infrastructure-page .bg-\[\#101112\] {
+    background-color: var(--crystal-ui-raised) !important;
+  }
+
+  .crystal-infrastructure-page .border-white\/\[0\.08\],
+  .crystal-infrastructure-page .border-\[\#292929\],
+  .crystal-infrastructure-page .border-\[\#303030\] {
+    border-color: var(--crystal-ui-border) !important;
+  }
+
+  .crystal-infrastructure-page .bg-blue-500\/20,
+  .crystal-infrastructure-page .bg-blue-400\/\[0\.06\],
+  .crystal-infrastructure-page .bg-blue-500 {
+    background-color: rgba(141, 184, 255, .14) !important;
+  }
+
+  .crystal-infrastructure-page .text-\[\#9ac3ff\],
+  .crystal-infrastructure-page .text-blue-100,
+  .crystal-infrastructure-page .text-blue-200,
+  .crystal-infrastructure-page .text-blue-300 {
+    color: var(--crystal-ui-accent) !important;
+  }
+
+  @media (max-width: 700px) {
+    .crystal-infrastructure-page {
+      padding: 0 !important;
+      padding-top: 64px !important;
+    }
+  }
   .crystal-modeling-mode .crystal-ai-prompt > button:first-child { display: none; }
   .crystal-modeling-mode .crystal-ai-prompt textarea {
     height: 68px;
@@ -1874,4 +2067,132 @@ textarea {
 }
 @media (min-width:701px){
 .crystal-reference-left,.crystal-reference-inspector{font-family:Arial,sans-serif!important;font-size:10px!important;color:#a4aab3!important}.crystal-reference-project-header,.crystal-reference-tabs,.crystal-scene-title,.crystal-reference-search,.crystal-reference-tree-row,.crystal-reference-footer button{display:flex;align-items:center}.crystal-reference-project-header{height:27px;padding:0 2px 8px;border-bottom:1px solid #24272b}.crystal-reference-project-header b{flex:1;margin-left:6px;color:#eee;font-size:11px}.crystal-reference-project-header button,.crystal-scene-title button{border:0;color:#7c8590;background:transparent}.crystal-reference-tabs{height:31px;gap:18px;border-bottom:1px solid #24272b}.crystal-reference-tabs button{height:30px;border:0;border-bottom:1px solid transparent;color:#737b85;background:transparent;font-size:10px}.crystal-reference-tabs .is-active{border-bottom-color:#e6e9ee;color:#fff}.crystal-scene-title{justify-content:space-between;margin:9px 3px 7px;color:#cdd2d9}.crystal-reference-search{gap:6px;height:25px;margin:0 2px 8px;padding:0 7px;border-radius:7px;background:#191b1f;color:#737c87}.crystal-reference-search input{width:100%;border:0;outline:0;color:#dbe0e6;background:transparent;font-size:10px}.crystal-reference-tree-row{width:100%;height:23px;gap:4px;padding:0 5px;border:0;border-radius:4px;color:#969da7;background:transparent;font-size:10px;text-align:left}.crystal-reference-tree-row.is-child{padding-left:15px}.crystal-reference-tree-row.is-selected{color:#fff;background:#244565}.crystal-reference-tree-row i{display:flex;gap:5px;margin-left:auto}.crystal-reference-generator{position:absolute;right:8px;bottom:88px;left:8px;padding-top:8px;border-top:1px solid #24272b}.crystal-reference-generator>div,.crystal-reference-generator label{display:flex;align-items:center;gap:6px}.crystal-reference-generator>div{margin-bottom:5px;color:#87919d}.crystal-reference-generator label,.crystal-reference-generator textarea{width:100%;box-sizing:border-box;background:#191b1f;color:#cbd2da;border:0;border-radius:6px}.crystal-reference-generator label{height:25px;padding:0 7px}.crystal-reference-generator label input{display:none}.crystal-reference-generator textarea{height:42px;margin-top:5px;padding:6px;resize:none;outline:0;font-size:9px}.crystal-reference-generator button,.crystal-reference-export{width:100%;height:27px;margin-top:5px;border:0;border-radius:6px;color:#fff;background:#1677e8;font-size:10px}.crystal-reference-footer{position:absolute;right:8px;bottom:8px;left:8px;border-top:1px solid #24272b;padding-top:5px}.crystal-reference-footer button{width:100%;height:22px;gap:6px;border:0;color:#78818c;background:transparent;font-size:9px}.crystal-reference-inspector{overflow:auto!important;padding:10px 9px 44px!important}.crystal-reference-inspector-header{display:flex;justify-content:space-between;padding-bottom:7px}.crystal-reference-inspector-header>span{display:grid;place-items:center;width:21px;height:21px;border-radius:50%;color:#4a2b00;background:#efad32}.crystal-reference-inspector-header button,.crystal-reference-select,.crystal-reference-binary button,.crystal-reference-snap button{border:0;border-radius:5px;color:#c4cad2;background:#191b1f;font-size:9px}.crystal-reference-section,.crystal-reference-collapsible,.crystal-reference-switch-row,.crystal-reference-assets{padding:7px 0;border-top:1px solid #24272b}.crystal-reference-section>b{display:block;margin-bottom:5px;color:#d2d7de}.crystal-reference-section label,.crystal-reference-collapsible,.crystal-reference-switch-row,.crystal-reference-assets{display:flex;align-items:center;justify-content:space-between;min-height:24px}.crystal-reference-section label{color:#858d98}.crystal-reference-select{height:21px;padding:0 6px}.crystal-reference-toggle{width:23px;height:13px;padding:0;border:0;border-radius:9px;background:#3b4149}.crystal-reference-toggle i{display:block;width:9px;height:9px;margin:2px;border-radius:50%;background:#aab1ba}.crystal-reference-toggle.is-on{background:#1677e8}.crystal-reference-toggle.is-on i{margin-left:12px;background:#fff}.crystal-reference-assets>button{display:flex;align-items:center;gap:5px;border:0;color:#bcc3cc;background:#191b1f;font-size:9px}.crystal-reference-assets>button i{width:12px;height:12px;border-radius:3px}.crystal-reference-export{position:absolute;right:9px;bottom:9px;left:9px}.crystal-reference-inspector .crystal-reference-snap{display:flex}.crystal-reference-inspector .crystal-reference-snap .is-active,.crystal-reference-inspector .crystal-reference-binary .is-active{background:#1677e8;color:#fff}
+}
+
+/* Final workspace overrides: keep every Studio surface on one restrained dark palette. */
+:root {
+  --crystal-ui-bg: #08090b;
+  --crystal-ui-surface: #101216;
+  --crystal-ui-raised: #15181d;
+  --crystal-ui-border: rgba(255, 255, 255, .09);
+  --crystal-ui-border-strong: rgba(255, 255, 255, .14);
+  --crystal-ui-text: #f4f6f8;
+  --crystal-ui-muted: #8b929d;
+  --crystal-ui-accent: #8db8ff;
+}
+
+.crystal-studio,
+.crystal-design-dashboard,
+.crystal-archplan-page,
+.crystal-infrastructure-page {
+  background: var(--crystal-ui-bg) !important;
+  color: var(--crystal-ui-text);
+}
+
+.crystal-studio,
+.crystal-studio > header,
+.crystal-studio > section,
+.crystal-studio .crystal-left-panel,
+.crystal-studio .crystal-right-panel,
+.crystal-studio .crystal-modeling-sidebar,
+.crystal-studio .crystal-modeling-inspector {
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.crystal-studio > header,
+.crystal-studio .crystal-left-panel,
+.crystal-studio .crystal-right-panel,
+.crystal-studio .crystal-modeling-sidebar,
+.crystal-studio .crystal-modeling-inspector,
+.crystal-infrastructure-page > aside,
+.crystal-infrastructure-page > section > header,
+.crystal-infrastructure-page > section > aside {
+  border-color: var(--crystal-ui-border) !important;
+  background-color: var(--crystal-ui-surface) !important;
+  box-shadow: none !important;
+}
+
+.crystal-studio > section,
+.crystal-infrastructure-page > section {
+  background-color: var(--crystal-ui-bg) !important;
+}
+
+.crystal-studio .floor-plan-canvas {
+  background: #0b0d10 !important;
+  color: var(--crystal-ui-text) !important;
+}
+
+.crystal-studio .crystal-topbar,
+.crystal-design-dashboard > header,
+.crystal-archplan-page > header {
+  background: rgba(8, 9, 11, .94) !important;
+  border-color: var(--crystal-ui-border) !important;
+  backdrop-filter: blur(18px);
+}
+
+.crystal-studio .crystal-left-panel,
+.crystal-studio .crystal-right-panel,
+.crystal-studio .crystal-modeling-sidebar,
+.crystal-studio .crystal-modeling-inspector {
+  border-radius: 10px !important;
+}
+
+.crystal-studio .crystal-modeling-tools,
+.crystal-studio .crystal-ai-prompt {
+  border-color: var(--crystal-ui-border-strong) !important;
+  background: rgba(16, 18, 22, .96) !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, .34) !important;
+}
+
+.crystal-studio .crystal-modeling-tools button:hover,
+.crystal-studio .crystal-viewport-tools button:hover,
+.crystal-studio .crystal-home-button:hover,
+.crystal-studio .crystal-menu-item:hover,
+.crystal-studio .crystal-menu-item.is-open,
+.crystal-infrastructure-page button:hover {
+  color: var(--crystal-ui-text);
+  background: rgba(255, 255, 255, .07);
+  filter: none;
+}
+
+.crystal-design-dashboard main,
+.crystal-archplan-page main {
+  background: var(--crystal-ui-bg) !important;
+}
+
+.crystal-design-dashboard .bg-gradient-to-r {
+  background: var(--crystal-ui-border-strong) !important;
+  padding: 1px !important;
+  box-shadow: none !important;
+}
+
+.crystal-infrastructure-page {
+  gap: 8px !important;
+  padding: 8px !important;
+  padding-top: 76px !important;
+}
+
+.crystal-infrastructure-page .bg-\[\#202020\],
+.crystal-infrastructure-page .bg-\[\#171717\],
+.crystal-infrastructure-page .bg-\[\#101112\] {
+  background-color: var(--crystal-ui-raised) !important;
+}
+
+.crystal-infrastructure-page .border-white\/\[0\.08\],
+.crystal-infrastructure-page .border-\[\#292929\],
+.crystal-infrastructure-page .border-\[\#303030\] {
+  border-color: var(--crystal-ui-border) !important;
+}
+
+.crystal-infrastructure-page .bg-blue-500\/20,
+.crystal-infrastructure-page .bg-blue-400\/\[0\.06\] {
+  background-color: rgba(141, 184, 255, .14) !important;
+}
+
+@media (max-width: 700px) {
+  .crystal-infrastructure-page {
+    padding: 0 !important;
+    padding-top: 64px !important;
+  }
 }
