@@ -2262,6 +2262,191 @@ textarea {
 
 /* Compact floating Crystal workspace */
 @media (min-width:701px) {
+  .crystal-modeling-mode .crystal-reference-inspector {
+    top: 8px !important;
+    right: 8px !important;
+    bottom: 8px !important;
+    width: 264px !important;
+    padding: 12px 10px 12px !important;
+    border: 1px solid rgba(255,255,255,.08) !important;
+    border-radius: 12px !important;
+    background: #0e1013 !important;
+    color: #a4aab3 !important;
+    font-size: 10px !important;
+    line-height: 1.35;
+    scrollbar-width: none;
+  }
+
+  .crystal-modeling-mode .crystal-reference-inspector::-webkit-scrollbar {
+    display: none;
+  }
+
+  .crystal-modeling-mode .crystal-reference-inspector-header {
+    height: 32px;
+    align-items: center;
+    padding: 0 2px 8px !important;
+    border-bottom: 1px solid #24272b;
+  }
+
+  .crystal-modeling-mode .crystal-reference-inspector-header > span {
+    width: 23px;
+    height: 23px;
+    border: 1px solid rgba(255,196,77,.45);
+    border-radius: 50%;
+    background: #f1ad32;
+    box-shadow: 0 0 0 3px rgba(241,173,50,.08);
+  }
+
+  .crystal-modeling-mode .crystal-reference-inspector-header > div {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .crystal-modeling-mode .crystal-reference-inspector-header button {
+    height: 24px !important;
+    min-width: 24px;
+    padding: 0 7px;
+    border: 0 !important;
+    border-radius: 6px !important;
+    color: #b7bec8 !important;
+    background: #191b1f !important;
+    font-size: 9px;
+  }
+
+  .crystal-modeling-mode .crystal-reference-inspector-header button[aria-label] {
+    padding: 0;
+    background: transparent !important;
+  }
+
+  .crystal-modeling-mode .crystal-reference-section,
+  .crystal-modeling-mode .crystal-reference-collapsible,
+  .crystal-modeling-mode .crystal-reference-switch-row,
+  .crystal-modeling-mode .crystal-reference-assets {
+    min-height: 34px;
+    padding: 8px 0;
+    border-top: 1px solid #24272b;
+  }
+
+  .crystal-modeling-mode .crystal-reference-section:first-of-type {
+    border-top: 0;
+  }
+
+  .crystal-modeling-mode .crystal-reference-section > b,
+  .crystal-modeling-mode .crystal-reference-assets > b {
+    margin-bottom: 7px;
+    color: #e1e5eb;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .01em;
+  }
+
+  .crystal-modeling-mode .crystal-reference-section label,
+  .crystal-modeling-mode .crystal-reference-collapsible,
+  .crystal-modeling-mode .crystal-reference-switch-row,
+  .crystal-modeling-mode .crystal-reference-assets {
+    color: #a4aab3;
+  }
+
+  .crystal-modeling-mode .crystal-reference-section label {
+    min-height: 27px;
+    padding: 2px 0;
+  }
+
+  .crystal-modeling-mode .crystal-reference-select {
+    min-width: 118px;
+    height: 23px;
+    padding: 0 7px;
+    border: 1px solid rgba(255,255,255,.04) !important;
+    border-radius: 6px;
+    color: #c5cbd3 !important;
+    background: #191b1f !important;
+    font-size: 9px;
+  }
+
+  .crystal-modeling-mode .crystal-reference-collapsible > button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 25px;
+    gap: 7px;
+    padding: 0 2px;
+    color: #c5cbd3;
+    background: transparent;
+    font-size: 10px;
+    text-align: left;
+  }
+
+  .crystal-modeling-mode .crystal-reference-collapsible > button svg:last-child {
+    margin-left: auto;
+  }
+
+  .crystal-modeling-mode .crystal-reference-toggle {
+    width: 27px;
+    height: 15px;
+    background: #3b4149;
+  }
+
+  .crystal-modeling-mode .crystal-reference-toggle i {
+    width: 11px;
+    height: 11px;
+    margin: 2px;
+  }
+
+  .crystal-modeling-mode .crystal-reference-toggle.is-on i {
+    margin-left: 14px;
+  }
+
+  .crystal-modeling-mode .crystal-reference-snap {
+    display: flex;
+    gap: 3px;
+  }
+
+  .crystal-modeling-mode .crystal-reference-snap button,
+  .crystal-modeling-mode .crystal-reference-binary button {
+    height: 23px;
+    padding: 0 8px;
+    border-radius: 6px;
+    color: #9da5b0;
+    background: #191b1f;
+    font-size: 9px;
+  }
+
+  .crystal-modeling-mode .crystal-reference-snap .is-active,
+  .crystal-modeling-mode .crystal-reference-binary .is-active {
+    color: #fff;
+    background: #1687f7;
+  }
+
+  .crystal-modeling-mode .crystal-reference-assets {
+    min-height: 31px;
+  }
+
+  .crystal-modeling-mode .crystal-reference-assets-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .crystal-modeling-mode .crystal-reference-assets-heading b {
+    margin: 0;
+  }
+
+  .crystal-modeling-mode .crystal-reference-assets > button {
+    width: 100%;
+    min-height: 27px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #191b1f;
+  }
+
+  .crystal-modeling-mode .crystal-reference-ai-chat {
+    position: static;
+    margin-top: 10px;
+  }
+}
+
+@media (min-width:701px) {
  .crystal-modeling-mode{--crystal-left-width:264px;--crystal-right-width:264px;background:#050505!important}
  .crystal-modeling-mode>header{display:none!important}
  .crystal-modeling-mode>section{background:#050505!important}
