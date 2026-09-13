@@ -1,73 +1,93 @@
-# Copilot instructions for Alternus Art Gallery / Crystal Studio
+# Copilot instructions for Cedium Art Gallery / Alternus Platform
 
-## Project shape
+## Repository overview
 
-This repository contains two applications:
+This repository is a Next.js 14 App Router application with a React + TypeScript frontend and a Prisma/PostgreSQL backend. The main app lives under `src/` and covers both the public marketplace and the newer platform/workspace surfaces.
 
-- The primary application is a Next.js 14 App Router site in `src/`, using React 18, TypeScript, Tailwind CSS, NextAuth, Prisma, and PostgreSQL.
-- `altrenus-business-manager/` is a separate Python desktop utility. Its dependencies are listed in `altrenus-business-manager/requirements.txt`; it is not part of the Next.js build.
+There is also a separate Python desktop utility under `altrenus-business-manager/`; it is not part of the Next.js app build or lint/test flow.
 
-The web app has two broad product areas. The public/customer and admin pages live under `src/app/**/page.tsx`, while the platform workspace (projects, assets, jobs, prompts, settings, help, and assistant features) is exposed through `src/app/api/**/route.ts` and consumed by workspace screens. Shared server integrations and policies belong in `src/lib/`; reusable UI belongs in `src/components/`. `prisma/schema.prisma` is the database source of truth; `DATABASE_SCHEMA.md` is supplementary documentation and can lag behind the Prisma schema.
+Key folders:
+- `src/app`: routes, pages, and App Router handlers
+- `src/components`: reusable UI components
+- `src/lib`: auth, Prisma client, shared server utilities, and platform contracts
+- `src/lib/platform`: workspace API helpers (`api.ts`, `validation.ts`, `storage.ts`, `stub-provider.ts`)
+- `prisma/schema.prisma`: source of truth for DB schema
+- `tests/`: application-level validation tests (Node built-in runner)
+- `docs/`: backend/platform and Blender-specific docs
 
-## Commands
+## Build, lint, typecheck, and tests
 
-Run these from the repository root:
+Run from the repository root:
 
 ```bash
 npm install
 npx prisma generate
-npx prisma db push             # initialize/synchronize a local database
+npx prisma db push      # initialize or sync a local database
 npm run dev
-npm run build                  # prisma generate, then next build
-npm run start                  # serve a production build
+npm run build           # runs prisma generate && next build
+npm run start
 npm run lint
 npm run typecheck
 npm test
 ```
 
-The app needs a PostgreSQL `DATABASE_URL` and `DIRECT_URL` for Prisma operations. Copy `.env.example` to `.env` and configure the services used by the feature being exercised. Do not commit `.env` or credentials.
-
-The test script is Node's built-in test runner over `tests/*.test.mjs`. Run the existing test file directly when iterating on validation behavior:
+Single-test patterns:
 
 ```bash
 node --test tests/platform-validation.test.mjs
-```
-
-To run one named test from that file:
-
-```bash
 node --test --test-name-pattern="sanitizeName" tests/platform-validation.test.mjs
 ```
 
-For the separate Python utility on Windows, run `altrenus-business-manager\run.bat`, or from that directory install `requirements.txt` and run `python src\main.py`.
+Notes:
+- `npm run build` runs Prisma generation before `next build`, but `next.config.mjs` ignores ESLint failures during build; keep `npm run lint` as a separate check.
+- `npm run typecheck` runs `tsc --noEmit`.
+- The app expects PostgreSQL settings like `DATABASE_URL` and `DIRECT_URL`. Use `.env.example` as a starting point and keep only the services needed for the feature you are working on.
 
-## Web architecture and request flow
+## High-level architecture
 
-- Next.js App Router is the routing boundary. Pages/layouts are server components unless they need browser state, event handlers, or client-only APIs; those files begin with `"use client"`.
-- Use the `@/*` TypeScript alias for imports from `src/*` (for example, `@/lib/prisma` and `@/components/ui/button`).
-- `src/lib/prisma.ts` owns the singleton Prisma client and enables query/warn/error logging in development. Reuse it; do not instantiate another `PrismaClient` in a route or component.
-- `src/lib/auth.ts` configures NextAuth with Google, GitHub, Discord, and credentials providers, using JWT sessions. Server code should use the exported `auth()` helper. Credential users are looked up case-insensitively and passwords are checked with `bcryptjs`.
-- Admin authentication is separate from normal user authentication. Admin login uses the HMAC `admin-session` cookie, `src/lib/admin-auth.ts` verifies it in API routes, and `src/middleware.ts` applies admin-route/IP checks and rate limiting. Admin API handlers must call `verifyAdminRequest()` (or retain the established role check where that route is using NextAuth).
-- Workspace/platform APIs should begin with `requirePlatformContext()` from `src/lib/platform/api.ts`. It authenticates the NextAuth session and creates/repairs the user's personal workspace defaults when needed. Use `isApiResponse()` before continuing when the helper returns an error response.
-- Platform API responses use `ok()` for successful JSON and `apiError()` with the established `ApiErrorCode` values for failures. Use `mapUnknownError()` for unexpected server errors so they are logged without exposing internals.
-- Parse request data through the shared helpers in `src/lib/platform/validation.ts`: `asString`, `asEnum`, `asJsonArray`, `asJsonObject`, `parseListQuery`, and `ValidationError`. Route handlers should catch validation errors and return a structured `VALIDATION_ERROR`.
-- Scope every workspace query by `context.workspaceId` (and user/member identity where appropriate). Resource lookups should verify ownership before update/delete/download/preview operations.
-- Local asset storage is handled by `src/lib/platform/storage.ts`. Preserve filename sanitization, safe-path checks, extension/MIME allowlisting, upload-size limits, and the `ASSET_STORAGE_PROVIDER`, `ASSET_UPLOAD_DIR`, and `MAX_ASSET_UPLOAD_MB` environment settings. Do not write uploaded files into source directories.
-- AI, CAD, Blender, rendering, and payment platform routes currently use explicit local stub behavior documented in `docs/backend-platform.md`; do not describe or implement a provider call as if it were real unless the route is intentionally being integrated.
+The app has two related backend surfaces:
+- Public marketplace: storefront, customer/account, artist, checkout/order, uploads, AI chat, admin, and legacy APIs
+- Platform/workspace: projects, prototypes, assets, jobs, prompts, settings, help, notifications, assistant features
 
-## Conventions to preserve
+The shared backend contract is:
+- App Router route handlers live under `src/app/api/**/route.ts`
+- Server-side shared logic lives in `src/lib/`
+- Workspace routes rely on helpers in `src/lib/platform/`
+- UI components live in `src/components/`
 
-- Route handlers are explicit HTTP-method exports (`GET`, `POST`, `PATCH`, `DELETE`) and commonly set `dynamic = "force-dynamic"` and/or `runtime = "nodejs"` when Prisma, filesystem, or other Node APIs are involved.
-- Keep API error shapes stable: platform errors are `{ error: { code, message, details } }`; avoid returning ad-hoc success-shaped fallbacks for failures.
-- Use Prisma enums/types from `@prisma/client` and update `prisma/schema.prisma` before relying on a new persisted field or relation. Regenerate the client after schema changes.
-- Platform list endpoints use the shared query parsing and bounded `limit`; use `sortToOrderBy()` rather than accepting arbitrary Prisma order fields from query strings.
-- Activity and user-facing notification records are part of platform mutations. Reuse `logActivity()` and `createNotification()` when a mutation represents a meaningful workspace event.
-- Client pages use the shared Radix/shadcn-style primitives in `src/components/ui/`, the `cn()` helper from `src/lib/utils`, and Tailwind classes. Theme colors and typography are defined through CSS variables in `src/app/globals.css` and the extensions in `tailwind.config.ts`; prefer those tokens over introducing one-off color systems.
-- For UI changes, use only the Tailwind classes necessary for the requested behavior and visual design. Preserve the requested layout, spacing, responsive behavior, typography, and component structure exactly; do not add speculative styling, decorative elements, or alternate layouts.
-- Keep browser-only state and effects in client components, and keep database/auth/secrets/filesystem work on the server. Never expose secret environment variables through `NEXT_PUBLIC_*`.
-- Use the existing route and component naming conventions: kebab-case route directories/files, PascalCase React component exports, and `route.ts` for API handlers.
-- `next.config.mjs` intentionally sets `eslint.ignoreDuringBuilds`; lint remains a separate `npm run lint` check. A successful production build does not replace running lint and typecheck.
+Important repo conventions:
+- `src/lib/prisma.ts` owns the singleton Prisma client; do not create a new `PrismaClient` in handlers.
+- `src/lib/auth.ts` configures NextAuth and the app’s server-side auth helpers.
+- `requirePlatformContext()` in `src/lib/platform/api.ts` is the entry point for workspace APIs; it creates the user’s personal workspace, membership, subscription state, settings, and defaults if missing.
+- `apiError()`, `ok()`, `mapUnknownError()`, and `ValidationError` are the standard response/error shapes in platform routes.
+- `parseListQuery()` and `sortToOrderBy()` are used for list endpoints instead of accepting arbitrary sort/query strings.
 
-## Documentation boundaries
+## Key conventions that matter in this repo
 
-When changing platform APIs, storage, stub-provider behavior, environment variables, or the Blender integration, update the matching documentation in `docs/` or `README.md` as part of the same change. Keep `docs/backend-platform.md` aligned with actual API behavior and keep `docs/blender-addon.md` aligned with the `/api/blender/chat` response contract.
+- Route handlers are explicit HTTP method exports (`GET`, `POST`, `PATCH`, `DELETE`) and often set `dynamic = "force-dynamic"` or `runtime = "nodejs"` when touching Prisma/filesystem/auth.
+- Keep platform error payloads stable: `{ error: { code, message, details } }`.
+- Scope workspace queries by `context.workspaceId` and verify ownership before delete/download/preview/update operations.
+- Use `src/lib/platform/validation.ts` for request parsing and safety checks (`asString`, `asEnum`, `asJsonArray`, `asJsonObject`, `parseListQuery`, `sanitizeName`, `assertSafePath`).
+- Preserve asset safety rules: reject traversal, unsafe extensions, unsupported MIME types, and oversized uploads. Do not write uploads into source directories.
+- For AI/CAD/Blender/rendering/payment flows, prefer the local stub behavior documented in `docs/backend-platform.md`; do not describe real provider calls unless the route is intentionally integrated.
+- Activity and notification records are part of meaningful workspace mutations; reuse `logActivity()` and `createNotification()` when appropriate.
+- Keep database and secrets on the server; browser code should call API routes rather than importing server integration code.
+- Prefer `@/*` imports from `src/*` and keep components/class names in the repo’s existing conventions.
+
+## When a change touches the backend or schema
+
+- Update `prisma/schema.prisma` before depending on new persisted fields or relations.
+- Regenerate the Prisma client after schema changes.
+- Update the matching docs in `docs/` or `README.md` when changing platform APIs, storage rules, stub-provider behavior, environment variables, or Blender integration.
+- Keep `docs/backend-platform.md` aligned with implementation details and `docs/blender-addon.md` aligned with the relevant `/api/blender/*` contract.
+
+## Relevant docs
+
+- `README.md`: install/setup and environment-variable guidance
+- `docs/backend-platform.md`: workspace API architecture and local stub-provider behavior
+- `docs/blender-addon.md`: Blender API contract expectations
+- `DATABASE_SCHEMA.md`: supplementary schema reference (can lag behind Prisma)
+
+## MCP server guidance
+
+This repository is a Next.js web app with Prisma/PostgreSQL and browser-driven flows. If additional MCP tooling is desired, the most relevant options are browser-testing support (for example Playwright) and a database helper for Prisma/Postgres introspection. Keep the setup focused on the web app rather than broad, unrelated toolchains.

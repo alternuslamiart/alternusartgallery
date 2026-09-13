@@ -3295,7 +3295,7 @@ function CodeBuilderWorkspace({
  return (
  <div className="flex h-[calc(100vh-76px)] min-h-[720px] w-full flex-col overflow-hidden rounded-[8px] border border-[#DDE3EA] bg-[#F2F5F8]">
  <BuilderHeader plan={plan} onRegenerate={onRegenerate} onSave={onSave} onExport={onExport} />
- <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] 2xl:grid-cols-[320px_minmax(0,1fr)]">
+ <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[264px_minmax(0,1fr)] 2xl:grid-cols-[264px_minmax(0,1fr)]">
  <CodeLayerSidebar
  plan={plan}
  activeLayerId={activeLayerId}
