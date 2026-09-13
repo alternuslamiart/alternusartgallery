@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Box, ChevronDown, CircleHelp, Eye, Folder, Grid2X2, Lightbulb, Lock, Menu, PanelLeftClose, Plus, Search, Sparkles, Upload } from "lucide-react";
+import { ArrowLeft, Box, ChevronDown, CircleHelp, Eye, Folder, Grid2X2, Lightbulb, Lock, Menu, MessageSquare, PanelLeftClose, Plus, Search, Sparkles, Upload } from "lucide-react";
 import { useState } from "react";
 import type { MaterialName } from "./types";
 
@@ -25,7 +25,7 @@ export function ModelingSidebar({ renderer, quality, material, prompt, loading, 
     <label className="crystal-reference-search"><Search size={12}/><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search"/></label>
     {tab === "objects" ? <div className="crystal-reference-tree">{objects.filter(([name]) => name.toLowerCase().includes(query.toLowerCase())).map(([name, Icon], index) => <button key={name} onClick={() => setSelected(name)} className={`crystal-reference-tree-row ${selected === name ? "is-selected" : ""} ${index > 1 ? "is-child" : ""}`}><ChevronDown size={11} className={name === "Scene 1" ? "-rotate-90" : "opacity-0"}/><Icon size={13}/><span>{name}</span>{name === "Scene 1" && <i><Lock size={10}/><Eye size={11}/></i>}</button>)}</div> : <div className="crystal-reference-empty"><Folder size={17}/><span>Assets</span><small>Drop media here</small></div>}
     <section className="crystal-reference-generator"><div><Sparkles size={12}/><span>Quick generate</span></div><label><Upload size={13}/><span>{uploadedImage ? "Reference ready" : "Add reference"}</span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={event => { const file = event.target.files?.[0]; if (file) onUpload(file); event.currentTarget.value = ""; }}/></label><textarea value={prompt} onChange={event => onPromptChange(event.target.value)} placeholder="Describe an object..."/><button disabled={!prompt.trim() || loading} onClick={onGenerate}><Sparkles size={13}/>{loading ? "Generating" : "Generate"}</button></section>
-    <footer className="crystal-reference-footer"><button><Folder size={13}/>Library</button><button><Upload size={13}/>Import</button><button><CircleHelp size={13}/>Help &amp; Feedback</button><button aria-label="Collapse panel" onClick={onCollapse}><PanelLeftClose size={14}/></button></footer>
+    <footer className="crystal-reference-footer"><button className="crystal-reference-ai-chat" onClick={() => window.dispatchEvent(new CustomEvent("crystal:toggle-ai-chat"))}><MessageSquare size={13}/>AI Chat</button><div className="crystal-reference-footer-actions"><button><Folder size={13}/>Library</button><button><Upload size={13}/>Import</button><button><CircleHelp size={13}/>Help &amp; Feedback</button><button aria-label="Collapse panel" onClick={onCollapse}><PanelLeftClose size={14}/></button></div></footer>
   </aside>;
   /* legacy layout
     <header><div className="crystal-modeling-identity"><span className="crystal-modeling-mark"><Sparkles size={15} /></span><div><b>Crystal</b><small>3D Studio&nbsp; • &nbsp;Modeling</small></div></div><button aria-label="Collapse modeling sidebar" onClick={onCollapse}><PanelLeftClose size={16} /></button></header>
