@@ -165,6 +165,45 @@ type Tokens = {
  baseCard: React.CSSProperties; cardShadow: string;
 };
 
+const modalBackdrop: React.CSSProperties = {
+ position: "fixed",
+ inset: 0,
+ zIndex: 100,
+ display: "flex",
+ alignItems: "center",
+ justifyContent: "center",
+ padding: 16,
+ background: "rgba(0,0,0,.58)",
+};
+const primaryButton: React.CSSProperties = {
+ height: 40,
+ padding: "0 16px",
+ border: 0,
+ borderRadius: 8,
+ background: COBALT,
+ color: "#fff",
+ fontSize: 12,
+ fontWeight: 700,
+ cursor: "pointer",
+};
+const modalActions: React.CSSProperties = {
+ display: "flex",
+ justifyContent: "flex-end",
+ gap: 8,
+ marginTop: 22,
+};
+const secondaryButton = (t: Tokens): React.CSSProperties => ({
+ height: 40,
+ padding: "0 16px",
+ border: `1px solid ${t.faintBorder}`,
+ borderRadius: 8,
+ background: "transparent",
+ color: t.fg,
+ fontSize: 12,
+ fontWeight: 700,
+ cursor: "pointer",
+});
+
 function SectionHeading({ eyebrow, title, desc, t }: { eyebrow: string; title: string; desc: string; t: Tokens }) {
  return (
  <div style={{ marginBottom: 32, maxWidth: 820 }}>
@@ -508,6 +547,44 @@ function Billing({ t }: { t: Tokens }) {
  { id: "INV-2026-0419", d: "2025-04-24", amt: "$228.00", s: "Paid" },
  { id: "INV-2025-0416", d: "2024-04-24", amt: "$192.00", s: "Paid" },
  ];
+ const [paymentOpen, setPaymentOpen] = useState(false);
+ const [addressOpen, setAddressOpen] = useState(false);
+ const [invoice, setInvoice] = useState<(typeof invoices)[number] | null>(null);
+ const [payment, setPayment] = useState({ number: "4242", expiry: "08/29", name: "Crystal Studio" });
+ const [address, setAddress] = useState({ company: "Crystal Studio by Alternus Art", street: "Rr. e Kavajës", city: "Tirana 1001", country: "Albania" });
+ const [notice, setNotice] = useState("");
+
+ useEffect(() => {
+  const savedPayment = window.localStorage.getItem("crystal-payment-method");
+  const savedAddress = window.localStorage.getItem("crystal-billing-address");
+  if (savedPayment) setPayment(JSON.parse(savedPayment));
+  if (savedAddress) setAddress(JSON.parse(savedAddress));
+ }, []);
+
+ const savePayment = () => {
+  window.localStorage.setItem("crystal-payment-method", JSON.stringify(payment));
+  setPaymentOpen(false);
+  setNotice("Payment method updated successfully.");
+ };
+
+ const saveAddress = () => {
+  window.localStorage.setItem("crystal-billing-address", JSON.stringify(address));
+  setAddressOpen(false);
+  setNotice("Billing address updated successfully.");
+ };
+
+ const printInvoice = (selectedInvoice: (typeof invoices)[number]) => {
+  const printWindow = window.open("", "_blank", "width=900,height=1100");
+  if (!printWindow) {
+   setNotice("Allow pop-ups to download the invoice.");
+   return;
+  }
+  printWindow.document.write(`<!doctype html><html><head><title>${selectedInvoice.id} - Crystal Studio</title><style>
+   *{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#172033;font:14px Arial,sans-serif}.invoice{width:760px;margin:40px auto;padding:52px;background:#fff;box-shadow:0 12px 40px #17203318}.top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #4284ff;padding-bottom:30px}.brand{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:800}.logo{width:38px;height:38px;border-radius:10px;background:#4284ff;display:grid;place-items:center;color:#fff;font-size:24px}.muted{color:#65728a}.right{text-align:right}.title{font-size:34px;font-weight:800;margin:38px 0 8px}.meta{display:flex;justify-content:space-between;margin:32px 0}.box{background:#f4f7fb;border-radius:10px;padding:18px;min-width:220px}.table{width:100%;border-collapse:collapse;margin-top:30px}.table th,.table td{text-align:left;padding:16px 0;border-bottom:1px solid #e4e9f1}.table th{color:#65728a;font-size:11px;text-transform:uppercase;letter-spacing:.12em}.total{text-align:right;font-size:25px;font-weight:800;margin-top:26px}.paid{display:inline-block;color:#149447;background:#e4f7eb;border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700;text-transform:uppercase}.foot{margin-top:70px;padding-top:18px;border-top:1px solid #e4e9f1;color:#65728a;font-size:12px}@media print{body{background:#fff}.invoice{margin:0;width:auto;box-shadow:none}}
+  </style></head><body><main class="invoice"><div class="top"><div class="brand"><span class="logo">✦</span>Crystal Studio</div><div class="right"><strong>INVOICE</strong><br><span class="muted">${selectedInvoice.id}</span></div></div><div class="title">Invoice</div><div class="meta"><div class="box"><strong>From</strong><br>Crystal Studio by Alternus Art<br>Rr. e Kavajës, Tirana 1001<br>Albania</div><div class="box"><strong>Invoice details</strong><br>Date: ${selectedInvoice.d}<br>Status: <span class="paid">${selectedInvoice.s}</span></div></div><table class="table"><thead><tr><th>Description</th><th>Date</th><th style="text-align:right">Amount</th></tr></thead><tbody><tr><td>Crystal Studio professional subscription</td><td>${selectedInvoice.d}</td><td style="text-align:right">${selectedInvoice.amt}</td></tr></tbody></table><div class="total">Total paid: ${selectedInvoice.amt}</div><div class="foot">Thank you for choosing Crystal Studio. This invoice was generated from your account billing history.</div></main><script>window.onload=()=>window.print()<\/script></body></html>`);
+  printWindow.document.close();
+ };
+
  return (
  <>
  <SectionHeading eyebrow="§ BILLING" title="Billing." desc="Manage your payment method, billing address, and download invoices." t={t} />
@@ -518,20 +595,18 @@ function Billing({ t }: { t: Tokens }) {
  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
  <div style={{ width: 44, height: 30, borderRadius: 6, background: `linear-gradient(135deg,${COBALT},#7DA9FF)`, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10, fontWeight: 800 }}>VISA</div>
  <div>
- <div style={{ fontSize: 14, fontWeight: 700, fontFamily: "var(--font-geist-mono),monospace" }}>•••• 4242</div>
- <div style={{ fontSize: 11, color: t.muted }}>Expires 08/29</div>
+ <div style={{ fontSize: 14, fontWeight: 700, fontFamily: "var(--font-geist-mono),monospace" }}>•••• {payment.number}</div>
+ <div style={{ fontSize: 11, color: t.muted }}>Expires {payment.expiry}</div>
  </div>
  </div>
- <button style={{ marginTop: 18, fontSize: 12.5, fontWeight: 700, color: COBALT, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}>Update payment method →</button>
+ <button type="button" onClick={() => setPaymentOpen(true)} style={{ marginTop: 18, fontSize: 12.5, fontWeight: 700, color: COBALT, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}>Update payment method →</button>
  </div>
  <div style={{ ...t.baseCard, padding: 22 }}>
  <div style={{ fontSize: 11, fontWeight: 700, color: t.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Billing address</div>
  <div style={{ fontSize: 13.5, lineHeight: 1.55 }}>
- Crystal Studio by Alternus Art<br/>
- Rr. e Kavajës, Tirana 1001<br/>
- Albania
+ {address.company}<br/>{address.street}, {address.city}<br/>{address.country}
  </div>
- <button style={{ marginTop: 18, fontSize: 12.5, fontWeight: 700, color: COBALT, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}>Edit address →</button>
+ <button type="button" onClick={() => setAddressOpen(true)} style={{ marginTop: 18, fontSize: 12.5, fontWeight: 700, color: COBALT, background: "transparent", border: "none", cursor: "pointer", padding: 0 }}>Edit address →</button>
  </div>
  </div>
 
@@ -545,10 +620,27 @@ function Billing({ t }: { t: Tokens }) {
  <span style={{ fontSize: 12.5, color: t.muted }}>{inv.d}</span>
  <span style={{ fontSize: 13, fontWeight: 700 }}>{inv.amt}</span>
  <span style={{ fontSize: 10.5, fontWeight: 800, color: "#22C55E", background: "rgba(34,197,94,0.1)", padding: "3px 10px", borderRadius: 999, justifySelf: "start", letterSpacing: "0.06em" }}>{inv.s.toUpperCase()}</span>
- <button style={{ fontSize: 12, fontWeight: 700, color: COBALT, background: "transparent", border: "none", cursor: "pointer", justifySelf: "end" }}>PDF ↓</button>
+ <button type="button" onClick={() => setInvoice(inv)} style={{ fontSize: 12, fontWeight: 700, color: COBALT, background: "transparent", border: "none", cursor: "pointer", justifySelf: "end" }}>PDF ↓</button>
  </div>
  ))}
  </div>
+ {notice && <div role="status" style={{ marginTop: 12, color: "#16A34A", fontSize: 12, fontWeight: 700 }}>{notice}</div>}
+ {paymentOpen && <div style={modalBackdrop}><div style={{ ...t.baseCard, width: "min(440px, calc(100vw - 32px))", padding: 24 }}>
+  <h2 style={{ margin: 0, fontSize: 20 }}>Update payment method</h2>
+  <div style={{ display: "grid", gap: 12, marginTop: 18 }}><Field label="Card last four digits" value={payment.number} onChange={(value) => setPayment({ ...payment, number: value.replace(/\D/g, "").slice(-4) })} t={t} /><Field label="Expiry" value={payment.expiry} onChange={(value) => setPayment({ ...payment, expiry: value })} t={t} /><Field label="Name on card" value={payment.name} onChange={(value) => setPayment({ ...payment, name: value })} t={t} /></div>
+  <div style={modalActions}><button type="button" onClick={() => setPaymentOpen(false)} style={secondaryButton(t)}>Cancel</button><button type="button" onClick={savePayment} style={primaryButton}>Save payment method</button></div>
+ </div></div>}
+ {addressOpen && <div style={modalBackdrop}><div style={{ ...t.baseCard, width: "min(520px, calc(100vw - 32px))", padding: 24 }}>
+  <h2 style={{ margin: 0, fontSize: 20 }}>Edit billing address</h2>
+  <div style={{ display: "grid", gap: 12, marginTop: 18 }}><Field label="Company" value={address.company} onChange={(value) => setAddress({ ...address, company: value })} t={t} /><Field label="Street" value={address.street} onChange={(value) => setAddress({ ...address, street: value })} t={t} /><Field label="City and postal code" value={address.city} onChange={(value) => setAddress({ ...address, city: value })} t={t} /><Field label="Country" value={address.country} onChange={(value) => setAddress({ ...address, country: value })} t={t} /></div>
+  <div style={modalActions}><button type="button" onClick={() => setAddressOpen(false)} style={secondaryButton(t)}>Cancel</button><button type="button" onClick={saveAddress} style={primaryButton}>Save address</button></div>
+ </div></div>}
+ {invoice && <div style={modalBackdrop}><div style={{ ...t.baseCard, width: "min(680px, calc(100vw - 32px))", maxHeight: "calc(100vh - 40px)", overflowY: "auto", padding: 32 }}>
+  <div style={{ display: "flex", justifyContent: "space-between", borderBottom: `2px solid ${COBALT}`, paddingBottom: 18 }}><div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 22, fontWeight: 900 }}><CoreforgeLogo size={34} radius={9} /> Crystal Studio</div><div style={{ textAlign: "right", fontSize: 12, color: t.muted }}>INVOICE<br/><strong style={{ color: t.fg }}>{invoice.id}</strong></div></div>
+  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 28, gap: 20 }}><div style={{ fontSize: 13, lineHeight: 1.6 }}><strong>Crystal Studio by Alternus Art</strong><br/>Rr. e Kavajës, Tirana 1001<br/>Albania</div><div style={{ textAlign: "right", fontSize: 13, lineHeight: 1.6 }}><strong>Date</strong><br/>{invoice.d}<br/><span style={{ color: "#16A34A", fontWeight: 700 }}>PAID</span></div></div>
+  <div style={{ marginTop: 30, padding: "18px 0", borderTop: `1px solid ${t.faintBorder}`, borderBottom: `1px solid ${t.faintBorder}`, display: "flex", justifyContent: "space-between", fontSize: 14 }}><span>Crystal Studio professional subscription</span><strong>{invoice.amt}</strong></div>
+  <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 24 }}><button type="button" onClick={() => printInvoice(invoice)} style={primaryButton}>Download / Save PDF</button><button type="button" onClick={() => setInvoice(null)} style={secondaryButton(t)}>Close</button></div>
+ </div></div>}
  </>
  );
 }
