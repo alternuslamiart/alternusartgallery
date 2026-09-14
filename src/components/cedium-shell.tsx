@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useState } from "react";
+import { createContext, Dispatch, ReactNode, SetStateAction, useCallback, useContext, useEffect, useState } from "react";
 
 export const COBALT = "#4284FF";
 export const COBALT_DEEP = "#1E5ED4";
@@ -19,6 +19,25 @@ export const DARK_BORDER_SOFT = "#262626";
 export const DARK_MUTED = "#A1A1AA";
 export const DARK_TEXT = "#FFFFFF";
 const THEME_KEY = "Coreforge_theme";
+export const CORE_LANGUAGES = [
+ { code: "en", label: "English" },
+ { code: "de", label: "German" },
+ { code: "fr", label: "French" },
+ { code: "it", label: "Italian" },
+ { code: "zh", label: "Chinese" },
+ { code: "ja", label: "Japanese" },
+ { code: "ar", label: "Arabic" },
+] as const;
+export type CoreLanguage = (typeof CORE_LANGUAGES)[number]["code"];
+const LANGUAGE_KEY = "Coreforge_language";
+const LanguageContext = createContext<{ language: CoreLanguage; setLanguage: (language: CoreLanguage) => void }>({
+ language: "en",
+ setLanguage: () => undefined,
+});
+
+export function useCoreforgeLanguage() {
+ return useContext(LanguageContext);
+}
 
 /**
  * AI-branded Coreforge mark. A cobalt rounded tile with a 4-point sparkle
@@ -130,6 +149,8 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
 }
 
 export function CoreforgeFooter({ isDark, fg, muted, faint }: Pick<ReturnType<typeof useCoreforgeTheme>, "isDark" | "fg" | "muted" | "faint">) {
+ const { language, setLanguage } = useCoreforgeLanguage();
+ const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
  const cols = [
  { heading: "Platform", links: [
  { l: "Overview", h: "/platform/overview", ext: false },
@@ -208,12 +229,17 @@ export function CoreforgeFooter({ isDark, fg, muted, faint }: Pick<ReturnType<ty
  <span style={{ fontSize: 11.5, color: muted }}>Copyright &copy;2026</span>
  <Link href="/cookie-notice" style={{ fontSize: 11.5, color: muted, textDecoration: "none", borderBottom: `1px dashed ${faint}`, paddingBottom: 1 }}>Manage Cookies</Link>
  </div>
- <button style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 14px", border: `1px solid ${faint}`, background: "transparent", color: fg, fontSize: 12.5, fontWeight: 500, cursor: "pointer", borderRadius: 999 }} className="hover:!border-[#4284FF]">
+ <div style={{ position: "relative" }}>
+ <button onClick={() => setLanguageMenuOpen((open) => !open)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 14px", border: `1px solid ${faint}`, background: "transparent", color: fg, fontSize: 12.5, fontWeight: 500, cursor: "pointer", borderRadius: 999 }} className="hover:!border-[#4284FF]">
  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
  <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/>
  </svg>
- English <span style={{ color: muted }}>Albania</span>
+ {CORE_LANGUAGES.find((item) => item.code === language)?.label}
  </button>
+ {languageMenuOpen && <div style={{ position: "absolute", right: 0, bottom: "calc(100% + 8px)", zIndex: 50, minWidth: 140, padding: 6, border: `1px solid ${faint}`, borderRadius: 12, background: isDark ? DARK_SURFACE : PAPER, boxShadow: "0 14px 30px rgba(0,0,0,.18)" }}>
+ {CORE_LANGUAGES.map((item) => <button key={item.code} onClick={() => { setLanguage(item.code); setLanguageMenuOpen(false); }} style={{ display: "block", width: "100%", padding: "8px 10px", border: 0, borderRadius: 8, background: item.code === language ? `${COBALT}18` : "transparent", color: item.code === language ? COBALT : fg, textAlign: "left", fontSize: 12, cursor: "pointer" }}>{item.label}</button>)}
+ </div>}
+ </div>
  </div>
  </div>
  </footer>
@@ -224,11 +250,22 @@ export type CoreforgeTheme = ReturnType<typeof useCoreforgeTheme>;
 
 export function CoreforgePage({ children }: { children: ReactNode | ((t: CoreforgeTheme) => ReactNode) }) {
  const theme = useCoreforgeTheme();
+ const [language, setLanguageState] = useState<CoreLanguage>("en");
+ useEffect(() => {
+  const saved = window.localStorage.getItem(LANGUAGE_KEY) as CoreLanguage | null;
+  if (saved && CORE_LANGUAGES.some((item) => item.code === saved)) setLanguageState(saved);
+ }, []);
+ const setLanguage = useCallback((next: CoreLanguage) => {
+  setLanguageState(next);
+  window.localStorage.setItem(LANGUAGE_KEY, next);
+ }, []);
  return (
+ <LanguageContext.Provider value={{ language, setLanguage }}>
  <div className="coreforge-page" style={{ minHeight: "100vh", background: theme.bg, color: theme.fg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", transition: "background 0.3s,color 0.3s", overflowX: "hidden" }}>
  <CoreforgeNav {...theme} />
  {typeof children === "function" ? children(theme) : children}
  <CoreforgeFooter {...theme} />
  </div>
+ </LanguageContext.Provider>
  );
 }

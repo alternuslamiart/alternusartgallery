@@ -5,7 +5,31 @@ import Link from "next/link";
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { ArrowRight, Code2, Cuboid, Download, Gauge, HardDrive, Layers3, ShieldCheck, Sparkles, Workflow } from "lucide-react";
-import { CoreforgePage, COBALT } from "@/components/cedium-shell";
+import { CoreforgePage, COBALT, useCoreforgeLanguage } from "@/components/cedium-shell";
+
+const homeTranslations: Record<string, Record<string, string>> = {
+ en: {
+  eyebrow: "Design spaces. Visualize ideas. Build intelligent environments.", hero: "Design the way people live.", heroCopy: "Crystal combines AI, architecture, interior design, and advanced 3D visualization to turn a home brief into thoughtful spaces, beautiful interiors, and intelligent environments.", launch: "Launch Studio", download: "Download App", architecture: "Architecture", interior: "Interior Design", furniture: "Furniture Planner", visualization: "3D Visualization", robotics: "Home Robotics", infrastructure: "Infrastructure", planarch: "Planarch 3: Turn Plans into Places", planarchCopy: "Transform architectural ideas into complete living spaces with detailed floor plans, room layouts, materials, and 3D visualizations designed around everyday life.", infra: "Infra: Build Smarter Systems", infraCopy: "Design the infrastructure that keeps communities moving, connecting buildings, utilities, transport, clean energy, and resilient public spaces in one intelligent plan.", explore: "Explore",
+ },
+ de: {
+  eyebrow: "Räume gestalten. Ideen visualisieren. Intelligente Umgebungen entwickeln.", hero: "Gestalte die Art, wie Menschen leben.", heroCopy: "Crystal verbindet KI, Architektur, Innenarchitektur und fortschrittliche 3D-Visualisierung, um aus einem Wohnbrief durchdachte Räume und intelligente Umgebungen zu machen.", launch: "Studio starten", download: "App herunterladen", architecture: "Architektur", interior: "Innenarchitektur", furniture: "Möbelplanung", visualization: "3D-Visualisierung", robotics: "Hausrobotik", infrastructure: "Infrastruktur", planarch: "Planarch 3: Pläne werden zu Orten", planarchCopy: "Verwandle architektonische Ideen mit Grundrissen, Raumaufteilungen, Materialien und 3D-Visualisierungen in vollständige Wohnräume.", infra: "Infra: Intelligentere Systeme bauen", infraCopy: "Plane Infrastruktur für Gebäude, Versorgung, Verkehr, saubere Energie und widerstandsfähige öffentliche Räume in einem intelligenten Konzept.", explore: "Entdecken",
+ },
+ fr: {
+  eyebrow: "Concevez des espaces. Visualisez vos idées. Créez des environnements intelligents.", hero: "Concevez la façon dont les gens vivent.", heroCopy: "Crystal réunit IA, architecture, design intérieur et visualisation 3D avancée pour transformer une intention en espaces réfléchis et environnements intelligents.", launch: "Lancer le studio", download: "Télécharger l’app", architecture: "Architecture", interior: "Design intérieur", furniture: "Planificateur mobilier", visualization: "Visualisation 3D", robotics: "Robotique domestique", infrastructure: "Infrastructure", planarch: "Planarch 3 : des plans aux espaces", planarchCopy: "Transformez vos idées architecturales en espaces de vie complets grâce aux plans, agencements, matériaux et visualisations 3D.", infra: "Infra : construire des systèmes plus intelligents", infraCopy: "Concevez les infrastructures reliant bâtiments, réseaux, transports, énergie propre et espaces publics résilients.", explore: "Explorer",
+ },
+ it: {
+  eyebrow: "Progetta gli spazi. Visualizza le idee. Crea ambienti intelligenti.", hero: "Progetta il modo in cui le persone vivono.", heroCopy: "Crystal unisce IA, architettura, interior design e visualizzazione 3D avanzata per trasformare un’idea in spazi curati e ambienti intelligenti.", launch: "Avvia Studio", download: "Scarica l’app", architecture: "Architettura", interior: "Interior design", furniture: "Planner arredi", visualization: "Visualizzazione 3D", robotics: "Robotica domestica", infrastructure: "Infrastrutture", planarch: "Planarch 3: dai piani agli spazi", planarchCopy: "Trasforma le idee architettoniche in spazi abitativi completi con planimetrie, layout, materiali e visualizzazioni 3D.", infra: "Infra: sistemi più intelligenti", infraCopy: "Progetta infrastrutture che collegano edifici, servizi, trasporti, energia pulita e spazi pubblici resilienti.", explore: "Esplora",
+ },
+ zh: {
+  eyebrow: "设计空间。可视化创意。构建智能环境。", hero: "设计人们生活的方式。", heroCopy: "Crystal 将 AI、建筑、室内设计和先进的 3D 可视化结合，把住宅需求转化为经过思考的空间、美丽的室内和智能环境。", launch: "启动工作室", download: "下载应用", architecture: "建筑", interior: "室内设计", furniture: "家具规划", visualization: "3D 可视化", robotics: "家庭机器人", infrastructure: "基础设施", planarch: "Planarch 3：从平面图到空间", planarchCopy: "通过详细的平面图、空间布局、材料和 3D 可视化，将建筑创意转化为完整的生活空间。", infra: "Infra：构建更智能的系统", infraCopy: "在一个智能方案中连接建筑、公共设施、交通、清洁能源和韧性公共空间。", explore: "探索",
+ },
+ ja: {
+  eyebrow: "空間をデザイン。アイデアを可視化。インテリジェントな環境を構築。", hero: "人々の暮らし方をデザインする。", heroCopy: "Crystal は AI、建築、インテリアデザイン、高度な 3D ビジュアルを組み合わせ、住まいの要望を美しく知的な空間へ変えます。", launch: "スタジオを起動", download: "アプリをダウンロード", architecture: "建築", interior: "インテリアデザイン", furniture: "家具プランナー", visualization: "3D ビジュアル", robotics: "ホームロボティクス", infrastructure: "インフラ", planarch: "Planarch 3：図面を空間へ", planarchCopy: "詳細な平面図、レイアウト、素材、3D ビジュアルで建築アイデアを暮らしの空間へ変えます。", infra: "Infra：よりスマートなシステム", infraCopy: "建物、設備、交通、クリーンエネルギー、強い公共空間を一つの計画でつなぎます。", explore: "探索",
+ },
+ ar: {
+  eyebrow: "صمّم المساحات. تصوّر الأفكار. ابنِ بيئات ذكية.", hero: "صمّم طريقة عيش الناس.", heroCopy: "يجمع Crystal بين الذكاء الاصطناعي والهندسة المعمارية والتصميم الداخلي والتصور ثلاثي الأبعاد لتحويل فكرة المنزل إلى مساحات جميلة وبيئات ذكية.", launch: "فتح الاستوديو", download: "تنزيل التطبيق", architecture: "الهندسة المعمارية", interior: "التصميم الداخلي", furniture: "مخطط الأثاث", visualization: "التصور ثلاثي الأبعاد", robotics: "روبوتات المنزل", infrastructure: "البنية التحتية", planarch: "Planarch 3: من المخططات إلى المساحات", planarchCopy: "حوّل الأفكار المعمارية إلى مساحات معيشة كاملة مع المخططات وتوزيع الغرف والمواد والتصور ثلاثي الأبعاد.", infra: "Infra: بناء أنظمة أكثر ذكاءً", infraCopy: "صمّم بنية تحتية تربط المباني والخدمات والنقل والطاقة النظيفة والمساحات العامة المرنة.", explore: "استكشف",
+ },
+};
 
 const surfaces = [
  {
@@ -102,6 +126,8 @@ function FeatureShowcase({ title, copy, image, reverse = false }: { title: strin
 }
 
 export default function HomePage() {
+ const { language } = useCoreforgeLanguage();
+ const tr = homeTranslations[language] ?? homeTranslations.en;
  useEffect(() => {
   const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-crystal-reveal]"));
   const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("crystal-revealed"); observer.unobserve(entry.target); } }), { threshold: 0.14, rootMargin: "0px 0px -40px" });
@@ -113,9 +139,9 @@ export default function HomePage() {
  {(t) => (
  <>
  <section className="crystal-first-sector">
- <p>Design spaces. Visualize ideas. Build intelligent environments.</p>
- <div className="crystal-first-card"><div><h1>Design the way people live.</h1><p>Crystal combines AI, architecture, interior design, and advanced 3D visualization to turn a home brief into thoughtful spaces, beautiful interiors, and intelligent environments.</p> <div><ActionLink href="/project">Launch Studio <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">Download App</ActionLink></div></div><div className="crystal-first-image"><Image src="/Section/architectresectionone.png" alt="Architectural concept" fill priority sizes="(max-width: 700px) 100vw, 55vw" /></div></div>
- <div className="crystal-first-chips">{["Architecture", "Interior Design", "Furniture Planner", "3D Visualization", "Home Robotics", "Infrastructure"].map((item) => <span key={item}>{item}</span>)}</div>
+ <p>{tr.eyebrow}</p>
+ <div className="crystal-first-card"><div><h1>{tr.hero}</h1><p>{tr.heroCopy}</p> <div><ActionLink href="/project">{tr.launch} <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">{tr.download}</ActionLink></div></div><div className="crystal-first-image"><Image src="/Section/architectresectionone.png" alt={tr.architecture} fill priority sizes="(max-width: 700px) 100vw, 55vw" /></div></div>
+ <div className="crystal-first-chips">{[tr.architecture, tr.interior, tr.furniture, tr.visualization, tr.robotics, tr.infrastructure].map((item) => <span key={item}>{item}</span>)}</div>
  </section>
 
  <section data-crystal-reveal style={{ padding: "42px 0 92px" }}>
@@ -149,7 +175,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <FeatureShowcase title="Planarch 3: Turn Plans into Places" image="/Section/Planarch.png" copy="Transform architectural ideas into complete living spaces with detailed floor plans, room layouts, materials, and 3D visualizations designed around everyday life." />
+ <FeatureShowcase title={tr.planarch} image="/Section/Planarch.png" copy={tr.planarchCopy} />
 
  <section data-crystal-reveal style={{ padding: "94px 0", borderTop: `1px solid ${t.faint}`, borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
@@ -217,7 +243,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <FeatureShowcase reverse title="Infra: Build Smarter Systems" image="/Section/Infra.png" copy="Design the infrastructure that keeps communities moving, connecting buildings, utilities, transport, clean energy, and resilient public spaces in one intelligent plan." />
+ <FeatureShowcase reverse title={tr.infra} image="/Section/Infra.png" copy={tr.infraCopy} />
 
  <section data-crystal-reveal style={{ padding: "96px 0" }}>
  <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
