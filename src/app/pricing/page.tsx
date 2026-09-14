@@ -171,6 +171,21 @@ export default function Pricing() {
  setPaymentStatus("");
  };
 
+ const requestPlan = async () => {
+ if (!checkoutTier) return;
+ setPaymentStatus("Saving your plan request...");
+ const response = await fetch("/api/subscription/upgrade-intent", {
+ method: "POST",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify({
+ plan: checkoutTier.n === "Basic Plan" ? "BASIC" : checkoutTier.n.toUpperCase(),
+ billingCycle: yearly ? "yearly" : "monthly",
+ }),
+ });
+ const result = await response.json() as { message?: string; error?: { message?: string } };
+ setPaymentStatus(response.ok ? "Your plan request was saved. Billing will be connected when payments are enabled." : result.error?.message ?? "Unable to save your plan request.");
+ };
+
  return (
  <CoreforgePage>
  {(t) => (
@@ -678,7 +693,7 @@ export default function Pricing() {
  <form
  onSubmit={(event) => {
  event.preventDefault();
- setPaymentStatus("Payment frame submitted. Connect Stripe or another gateway to process live charges.");
+ void requestPlan();
  }}
  style={{ padding: 26 }}
  >
