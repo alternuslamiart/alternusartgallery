@@ -851,11 +851,50 @@ function Limits({ t }: { t: Tokens }) {
 }
 
 function Workspaces({ t }: { t: Tokens }) {
- const list = [
- { n: "Personal", m: 1, s: "Pro", u: "today" },
- { n: "Design team", m: 6, s: "Team", u: "2h ago" },
- { n: "Research", m: 3, s: "Team", u: "yesterday" },
+ type Workspace = { id: string; n: string; m: number; s: string; u: string };
+ const defaults: Workspace[] = [
+  { id: "personal", n: "Personal", m: 1, s: "Pro", u: "today" },
+  { id: "design-team", n: "Design team", m: 6, s: "Team", u: "2h ago" },
+  { id: "research", n: "Research", m: 3, s: "Team", u: "yesterday" },
  ];
+ const [list, setList] = useState<Workspace[]>(defaults);
+ const [open, setOpen] = useState(false);
+ const [name, setName] = useState("");
+ const [plan, setPlan] = useState("Team");
+ const [message, setMessage] = useState("");
+
+ useEffect(() => {
+  const saved = window.localStorage.getItem("crystal-workspaces");
+  if (!saved) return;
+  try {
+   setList(JSON.parse(saved) as Workspace[]);
+  } catch {
+   window.localStorage.removeItem("crystal-workspaces");
+  }
+ }, []);
+
+ const createWorkspace = () => {
+  const trimmedName = name.trim();
+  if (!trimmedName) {
+   setMessage("Enter a workspace name.");
+   return;
+  }
+  const workspace: Workspace = {
+   id: `${Date.now()}-${trimmedName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+   n: trimmedName,
+   m: 1,
+   s: plan,
+   u: "just now",
+  };
+  const next = [...list, workspace];
+  setList(next);
+  window.localStorage.setItem("crystal-workspaces", JSON.stringify(next));
+  setName("");
+  setPlan("Team");
+  setMessage(`${trimmedName} workspace created.`);
+  setOpen(false);
+ };
+
  return (
  <>
  <SectionHeading eyebrow="§ WORKSPACES" title="Your workspaces." desc="Each workspace has its own knowledge layer, members, and billing line." t={t} />
@@ -868,11 +907,29 @@ function Workspaces({ t }: { t: Tokens }) {
  <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${t.faintBorder}`, fontSize: 11, color: t.muted }}>Active {w.u}</div>
  </div>
  ))}
- <button style={{ ...t.baseCard, padding: 20, border: `1px dashed ${t.faint}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, background: "transparent", cursor: "pointer", minHeight: 140, color: t.muted }}>
+ <button type="button" onClick={() => { setOpen(true); setMessage(""); }} style={{ ...t.baseCard, padding: 20, border: `1px dashed ${t.faint}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, background: "transparent", cursor: "pointer", minHeight: 140, color: t.muted }}>
  <span style={{ fontSize: 20, color: COBALT }}>+</span>
  <span style={{ fontSize: 12, fontWeight: 600 }}>New workspace</span>
  </button>
  </div>
+ {message && <div role="status" style={{ maxWidth: 820, marginTop: 14, color: message.includes("created") ? "#16A34A" : "#EF4444", fontSize: 12, fontWeight: 700 }}>{message}</div>}
+ {open && <div style={modalBackdrop}>
+  <div style={{ ...t.baseCard, width: "min(440px, calc(100vw - 32px))", padding: 24 }}>
+   <h2 style={{ margin: 0, fontSize: 20, letterSpacing: "-0.03em" }}>Create workspace</h2>
+   <p style={{ margin: "8px 0 20px", color: t.muted, fontSize: 13, lineHeight: 1.5 }}>Create a separate space for projects, members, and knowledge.</p>
+   <div style={{ display: "grid", gap: 14 }}>
+    <Field label="Workspace name" value={name} onChange={setName} placeholder="e.g. Architecture team" t={t} />
+    <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+     <span style={{ fontSize: 11, fontWeight: 700, color: t.labelQuaternary, letterSpacing: "0.08em", textTransform: "uppercase" }}>Plan</span>
+     <select value={plan} onChange={(event) => setPlan(event.target.value)} style={{ height: 42, padding: "0 12px", border: `1px solid ${t.faintBorder}`, borderRadius: 8, background: t.softFill, color: t.fg, fontSize: 14, fontFamily: "inherit" }}>
+      <option value="Team">Team</option><option value="Pro">Pro</option>
+     </select>
+    </label>
+   </div>
+   {message && <div style={{ marginTop: 12, color: "#EF4444", fontSize: 12 }}>{message}</div>}
+   <div style={modalActions}><button type="button" onClick={() => setOpen(false)} style={secondaryButton(t)}>Cancel</button><button type="button" onClick={createWorkspace} style={primaryButton}>Create workspace</button></div>
+  </div>
+ </div>}
  </>
  );
 }
