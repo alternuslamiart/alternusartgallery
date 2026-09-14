@@ -285,7 +285,7 @@ export default function CommunityPage() {
  };
 
  return (
- <main className={`community-page min-h-screen font-roboto ${isDark ? "community-dark" : "community-light"}`}>
+ <main className={`community-page w-full min-h-screen font-roboto ${isDark ? "community-dark" : "community-light"}`}>
  <style>{`
    .community-page { background:#f3f6f8; color:#111827; }
    .community-page .community-soft { background:#F8FCFF; border-color:#DCEAF5; color:#475569; }
@@ -316,8 +316,8 @@ export default function CommunityPage() {
    .community-page.community-dark .community-hub-nav .hub-item:hover { background:#22272B; color:#F4F7FA; }
    .community-page.community-dark .community-hub-nav .hub-item.is-active { background:#263B4A; color:#7DD3FC; }
  `}</style>
- <header className="sticky top-0 z-30 border-b border-[#D8E2EA] bg-white/92 backdrop-blur-xl">
- <div className="relative mx-auto grid h-14 max-w-[1180px] grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 px-3 sm:px-4">
+ <header className="sticky top-0 z-30 w-full border-b border-[#D8E2EA] bg-white/92 backdrop-blur-xl">
+ <div className="relative mx-auto grid h-14 w-full max-w-[1180px] grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 px-3 sm:px-4">
  <Link href="/" className="inline-flex items-center gap-2 rounded-[12px] px-2 py-1.5 text-sm font-semibold text-[#0F172A] hover:bg-[#F1F5F9]">
  <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#38BDF8] text-white">
  <Sparkles className="h-4 w-4 fill-current" />
@@ -353,7 +353,7 @@ export default function CommunityPage() {
  </div>
  </header>
 
- <div className="mx-auto grid max-w-[1180px] grid-cols-1 gap-4 px-3 py-5 sm:px-4 lg:grid-cols-[56px_200px_minmax(0,1fr)_240px]">
+ <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-4 px-3 py-5 sm:px-4 lg:grid-cols-[56px_200px_minmax(0,1fr)_240px] lg:justify-center">
  <aside className="hidden lg:flex lg:flex-col lg:items-center lg:gap-3">
  <IconTile icon={Home} active={activeSpace === "all"} label="Home" onClick={() => selectSpace("all")} />
  <IconTile icon={Sparkles} active={activeSpace === "showcase"} label="AI Community" onClick={() => selectSpace("showcase")} />
