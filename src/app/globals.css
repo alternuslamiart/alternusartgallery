@@ -1727,8 +1727,8 @@
   background: #0a0a0a !important;
 }
 [data-coreforge-theme="dark"] .coreforge-page .crystal-feature-visual {
-  border: 2px solid #4284ff;
-  box-shadow: 0 0 0 1px rgba(66, 132, 255, 0.18), 0 12px 30px rgba(45, 104, 231, 0.16);
+  border: 12px solid #262626;
+  box-shadow: none;
 }
 [data-coreforge-theme="dark"] .coreforge-page .crystal-first-card,
 [data-coreforge-theme="dark"] .coreforge-page .crystal-home-surface,
