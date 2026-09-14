@@ -28,93 +28,92 @@ import {
 } from "lucide-react";
 
 const spaces = [
- { name: "showcase", label: "Showcase", count: "320 creations", icon: Sparkles },
- { name: "feedback", label: "Feedback", count: "118 reviews", icon: MessageSquareText },
- { name: "prompts-workflows", label: "Prompts & Workflows", count: "246 workflows", icon: Workflow },
- { name: "code-apps", label: "Code & Apps", count: "174 projects", icon: Code2 },
- { name: "game-environments", label: "Game Environments", count: "89 worlds", icon: Gamepad2 },
+ { name: "architecture", label: "Architecture", count: "320 projects", icon: Layers3 },
+ { name: "house-modeling", label: "House Modeling", count: "118 models", icon: Home },
+ { name: "interior-design", label: "Interior Design", count: "246 designs", icon: Wand2 },
+ { name: "infrastructure", label: "Infrastructure", count: "174 plans", icon: Workflow },
 ];
 
 const feedPosts = [
  {
- id: "cyberpunk-city",
- title: "Built a cyberpunk city environment with AI",
- space: "showcase",
+ id: "modern-house",
+ title: "Modern house concept with architectural modeling",
+ space: "architecture",
  author: "Dren Gashi",
  time: "18 min ago",
- type: "Game Environment",
+ type: "Architecture",
  description:
- "Dense neon city block with rain lighting, modular buildings, market props, NPC route notes, and optimization checklist.",
- stack: ["Blender", "AI prompts", "Unreal plan"],
- notes: "Prompt chain includes mood references, asset list, lighting passes, and version notes.",
+ "A contemporary residential concept with clean volumes, natural lighting, floor planning, facade studies, and material exploration.",
+ stack: ["Floor plan", "3D modeling", "Facade study"],
+ notes: "Includes site orientation, room program, facade references, and a first-pass architectural visualization.",
  comments: 18,
  likes: 142,
  saves: 36,
  forks: 11,
- icon: Gamepad2,
+ icon: Layers3,
  accent: "from-[#312E81] via-[#6D28D9] to-[#38BDF8]",
  },
  {
- id: "saas-launch-page",
- title: "Generated a React landing page for SaaS",
- space: "feedback",
+ id: "warm-interior",
+ title: "Warm interior design for a compact living space",
+ space: "interior-design",
  author: "Elira Morina",
  time: "42 min ago",
- type: "Website Template",
+ type: "Interior Design",
  description:
- "Looking for critique on hero copy, section order, pricing cards, mobile rhythm, and CTA hierarchy.",
- stack: ["Next.js", "Tailwind", "Copy workflow"],
- notes: "Generation notes cover three hero variants, conversion copy, and responsive component decisions.",
+ "Looking for feedback on furniture layout, lighting layers, textures, color balance, and the relationship between living and dining areas.",
+ stack: ["Space planning", "Materials", "Lighting"],
+ notes: "Design notes include mood references, furniture dimensions, lighting zones, and a balanced neutral palette.",
  comments: 24,
  likes: 210,
  saves: 58,
  forks: 19,
- icon: Globe2,
+ icon: Wand2,
  accent: "from-[#0F766E] via-[#0284C7] to-[#7DD3FC]",
  },
  {
- id: "rust-api-review",
- title: "Can someone improve this Rust backend structure?",
- space: "code-apps",
+ id: "urban-infrastructure",
+ title: "Infrastructure plan for a growing urban district",
+ space: "infrastructure",
  author: "Arben Krasniqi",
  time: "1 hr ago",
- type: "Code Structure",
+ type: "Infrastructure",
  description:
- "API starter asking for security feedback, endpoint naming, database structure, and performance risks.",
- stack: ["Rust", "Postgres", "API design"],
- notes: "Includes route map, auth questions, schema notes, and AI review output.",
+ "A coordinated plan for roads, pedestrian routes, public space, utilities, drainage, and future development phases.",
+ stack: ["Site planning", "Road network", "Utilities"],
+ notes: "Includes zoning assumptions, circulation studies, infrastructure phases, and key site constraints.",
  comments: 31,
  likes: 96,
  saves: 22,
  forks: 7,
- icon: FileCode2,
+ icon: Workflow,
  accent: "from-[#1E293B] via-[#334155] to-[#38BDF8]",
  },
 ];
 
 const aiReviewCards = [
  {
- title: "App idea",
- body: "AI can generate feature breakdown, MVP scope, database structure, frontend screens, backend endpoints, risks, and improvements.",
+title: "Architecture",
+body: "AI can help develop concepts, floor plans, facade directions, material palettes, site responses, and presentation-ready design notes.",
  icon: Layers3,
  },
  {
- title: "Game environment",
- body: "AI can suggest lighting, biome details, asset lists, quest ideas, level design issues, and optimization notes.",
- icon: Gamepad2,
+title: "House modeling",
+body: "AI can suggest room programs, massing studies, furniture layouts, elevations, dimensions, and modeling workflows.",
+icon: Home,
  },
  {
- title: "Code project",
- body: "AI can review architecture, refactors, security notes, performance risks, and implementation tradeoffs.",
- icon: Code2,
+title: "Interior & infrastructure",
+body: "AI can review lighting, materials, circulation, utilities, roads, public space, and development tradeoffs.",
+icon: Workflow,
  },
 ];
 
 const remixChain = [
- "Medieval environment",
- "Night lighting fork",
- "NPC village version",
- "Unity asset plan",
+ "House concept",
+ "Facade variation",
+ "Interior layout study",
+ "Infrastructure context plan",
 ];
 
 const reputation = [
@@ -127,11 +126,11 @@ const reputation = [
 ];
 
 const marketplaceLater = [
- "Environment packs",
- "Website templates",
- "App starter kits",
- "Prompt packs",
- "Code boilerplates",
+ "Architecture templates",
+ "House model libraries",
+ "Interior material boards",
+ "Infrastructure plans",
+ "CAD block collections",
  "Premium workflows",
 ];
 
@@ -178,7 +177,7 @@ export default function CommunityPage() {
  const [searchQuery, setSearchQuery] = useState("");
  const [isJoined, setIsJoined] = useState(false);
  const [draft, setDraft] = useState("");
- const [draftType, setDraftType] = useState("Project");
+ const [draftType, setDraftType] = useState("Architecture");
  const [publishedDraft, setPublishedDraft] = useState("");
  const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
  const [savedPosts, setSavedPosts] = useState<Record<string, boolean>>({});
@@ -196,14 +195,20 @@ export default function CommunityPage() {
  {
  id: "local-draft",
  title: publishedDraft,
- space: draftType === "Ask feedback" ? "feedback" : draftType === "Fork request" ? "prompts-workflows" : "showcase",
+ space: draftType === "Interior Design"
+ ? "interior-design"
+ : draftType === "Infrastructure"
+ ? "infrastructure"
+ : draftType === "House Modeling"
+ ? "house-modeling"
+ : "architecture",
  author: "You",
  time: "just now",
  type: draftType,
  description:
  "Local preview post created from the composer. Connect this action to the backend when community posting is ready.",
- stack: ["Community draft", "AI creation", "Preview"],
- notes: "Draft post includes project title, creation type, and a placeholder for prompt history or generation notes.",
+ stack: ["Community draft", "Design study", "Preview"],
+ notes: "Draft post includes the design category, project title, modeling notes, and a placeholder for project development details.",
  comments: 0,
  likes: 0,
  saves: 0,
@@ -231,13 +236,13 @@ export default function CommunityPage() {
 
  const toggleJoined = () => {
  setIsJoined((current) => !current);
- setNotice(isJoined ? "You left the community preview." : "Joined AI Creation Hub. This is local preview state.");
+ setNotice(isJoined ? "You left the design community preview." : "Joined Architecture & Design Community. This is local preview state.");
  };
 
  const scrollToComposer = () => {
  composerRef.current?.focus();
  composerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
- setNotice("Composer opened. Write a creation idea and publish a local preview post.");
+ setNotice("Composer opened. Share an architecture, house modeling, interior, or infrastructure idea.");
  };
 
  const selectSpace = (space: string) => {
@@ -257,7 +262,7 @@ export default function CommunityPage() {
  const publishDraft = () => {
  const cleanDraft = draft.trim();
  if (!cleanDraft) {
- setNotice("Write a project, prompt workflow, code snippet, app idea, or game environment first.");
+ setNotice("Write an architecture, house modeling, interior design, or infrastructure idea first.");
  composerRef.current?.focus();
  return;
  }
@@ -384,10 +389,10 @@ export default function CommunityPage() {
  <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-4 px-3 py-5 sm:px-4 lg:grid-cols-[56px_200px_minmax(0,1fr)_240px] lg:justify-center">
  <aside className="hidden lg:flex lg:flex-col lg:items-center lg:gap-3">
  <IconTile icon={Home} active={activeSpace === "all"} label="Home" onClick={() => selectSpace("all")} />
- <IconTile icon={Sparkles} active={activeSpace === "showcase"} label="AI Community" onClick={() => selectSpace("showcase")} />
- <IconTile icon={Gamepad2} active={activeSpace === "game-environments"} label="Game environments" onClick={() => selectSpace("game-environments")} />
- <IconTile icon={Code2} active={activeSpace === "code-apps"} label="Code and apps" onClick={() => selectSpace("code-apps")} />
- <IconTile icon={Workflow} active={activeSpace === "prompts-workflows"} label="Workflows" onClick={() => selectSpace("prompts-workflows")} />
+ <IconTile icon={Layers3} active={activeSpace === "architecture"} label="Architecture" onClick={() => selectSpace("architecture")} />
+ <IconTile icon={Home} active={activeSpace === "house-modeling"} label="House modeling" onClick={() => selectSpace("house-modeling")} />
+ <IconTile icon={Wand2} active={activeSpace === "interior-design"} label="Interior design" onClick={() => selectSpace("interior-design")} />
+ <IconTile icon={Workflow} active={activeSpace === "infrastructure"} label="Infrastructure" onClick={() => selectSpace("infrastructure")} />
  <IconTile icon={Plus} label="Create new space" onClick={scrollToComposer} />
  </aside>
 
@@ -395,8 +400,8 @@ export default function CommunityPage() {
  <div className="bg-gradient-to-br from-[#7C3AED] via-[#38BDF8] to-[#F0F9FF] p-4">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-semibold">AI Creation Hub</p>
- <p className="hub-muted mt-1 text-xs text-white/75">Projects, remixes, feedback</p>
+ <p className="text-sm font-semibold">Architecture Community</p>
+ <p className="hub-muted mt-1 text-xs text-white/75">Homes, interiors, infrastructure</p>
  </div>
  <ChevronDown className="h-4 w-4" />
  </div>
@@ -405,7 +410,7 @@ export default function CommunityPage() {
  <div className="community-soft mb-4 rounded-[14px] p-3">
  <p className="text-xs font-semibold">Creation loop</p>
  <p className="hub-muted mt-2 text-[11px] leading-5 text-white/62">
- AI tool to project to preview to publish to feedback to remix.
+ Concept to model to visualize to present to refine.
  </p>
  </div>
  <div className="space-y-1">
@@ -438,8 +443,8 @@ export default function CommunityPage() {
  <Wand2 className="h-9 w-9" />
  </div>
  <div className="pb-1">
- <h1 className="text-2xl font-semibold tracking-[-0.01em] text-[#0F172A]">AI Community</h1>
- <p className="mt-1 text-sm text-[#64748B]">Creation-first space for AI projects, prompts, code, worlds, and remixes.</p>
+ <h1 className="text-2xl font-semibold tracking-[-0.01em] text-[#0F172A]">Architecture Community</h1>
+ <p className="mt-1 text-sm text-[#64748B]">A focused space for architecture, homes, interiors, infrastructure, and design studies.</p>
  </div>
  </div>
  <div className="flex gap-2">
@@ -480,12 +485,12 @@ export default function CommunityPage() {
  value={draft}
  onChange={(event) => setDraft(event.target.value)}
  rows={2}
- placeholder="Share a project, prompt workflow, code snippet, app idea, or game environment"
+ placeholder="Share an architecture concept, house model, interior design, or infrastructure plan"
  className="min-h-10 flex-1 resize-none rounded-[18px] border border-[#DCEAF5] bg-[#F8FCFF] px-4 py-3 text-sm text-[#0F172A] outline-none placeholder:text-[#64748B] focus:border-[#38BDF8] focus:bg-white"
  />
  </div>
  <div className="mt-3 flex flex-wrap items-center gap-2 pl-0 sm:pl-[52px]">
- {["Project", "Preview", "Prompt history", "Ask feedback", "Fork request"].map((item) => (
+ {["Architecture", "House Modeling", "Interior Design", "Infrastructure"].map((item) => (
  <button
  key={item}
  type="button"
@@ -581,7 +586,7 @@ export default function CommunityPage() {
  <div className="flex items-center justify-between gap-4">
  <div>
  <p className="text-sm font-semibold text-[#0284C7]">Remix / Fork system</p>
- <h2 className="mt-2 text-xl font-semibold text-[#0F172A]">Every useful creation can become a project chain.</h2>
+ <h2 className="mt-2 text-xl font-semibold text-[#0F172A]">Every design can become a refined project chain.</h2>
  </div>
  <GitFork className="hidden h-6 w-6 text-[#0284C7] sm:block" />
  </div>
@@ -600,8 +605,8 @@ export default function CommunityPage() {
  <section className="community-surface rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
  <div className="flex items-start justify-between">
  <div>
- <h2 className="text-base font-semibold text-[#0F172A]">AI Creation Hub</h2>
- <p className="mt-1 text-xs text-[#64748B]">u/ai_creation_hub</p>
+ <h2 className="text-base font-semibold text-[#0F172A]">Architecture Community</h2>
+ <p className="mt-1 text-xs text-[#64748B]">u/architecture_community</p>
  </div>
  <button type="button" onClick={() => setNotice("Community options are a preview menu placeholder.")} aria-label="Community options" className="rounded-full p-2 text-[#64748B] hover:bg-[#F1F5F9]">
  <ChevronDown className="h-4 w-4" />
