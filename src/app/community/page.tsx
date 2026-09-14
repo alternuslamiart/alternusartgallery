@@ -315,6 +315,27 @@ export default function CommunityPage() {
    .community-page.community-dark .community-hub-nav .hub-count { color:#98A5B2; }
    .community-page.community-dark .community-hub-nav .hub-item:hover { background:#22272B; color:#F4F7FA; }
    .community-page.community-dark .community-hub-nav .hub-item.is-active { background:#263B4A; color:#7DD3FC; }
+   @media (min-width:1024px) {
+     .community-page { height:100vh; overflow:hidden; }
+     .community-page > header { position:fixed; top:0; right:0; left:0; }
+     .community-page > div {
+       height:calc(100vh - 56px);
+       margin-top:56px;
+       align-items:start;
+       overflow:hidden;
+     }
+     .community-page > div > aside { position:sticky; top:0; max-height:calc(100vh - 72px); }
+     .community-page > div > section {
+       height:100%;
+       min-height:0;
+       overflow-y:auto;
+       overscroll-behavior:contain;
+       scrollbar-width:thin;
+     }
+     .community-page > div > section::-webkit-scrollbar { width:8px; }
+     .community-page > div > section::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:999px; }
+     .community-page.community-dark > div > section::-webkit-scrollbar-thumb { background:#46515B; }
+   }
    @media (max-width:1023px) {
      .community-page > header { display:none; }
      .community-page > div { display:block; max-width:640px; margin:0 auto; padding:16px; }
