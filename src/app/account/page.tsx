@@ -678,28 +678,70 @@ function ChatSection({ t }: { t: Tokens }) {
 }
 
 function APIKeys({ t }: { t: Tokens }) {
- const keys = [
- { n: "Production", p: "sk-alt_live_•••••2k9f", c: "2026-01-12", last: "2h ago" },
- { n: "CI · Vercel", p: "sk-alt_live_•••••mc41", c: "2026-03-08", last: "yesterday" },
- { n: "Local dev", p: "sk-alt_test_•••••a0b3", c: "2026-04-20", last: "today" },
+ type ApiKey = { id: string; n: string; p: string; c: string; last: string; mode: "live" | "test" };
+ const defaults: ApiKey[] = [
+  { id: "production", n: "Production", p: "sk-alt_live_•••••2k9f", c: "2026-01-12", last: "2h ago", mode: "live" },
+  { id: "vercel", n: "CI · Vercel", p: "sk-alt_live_•••••mc41", c: "2026-03-08", last: "yesterday", mode: "live" },
+  { id: "local", n: "Local dev", p: "sk-alt_test_•••••a0b3", c: "2026-04-20", last: "today", mode: "test" },
  ];
+ const [keys, setKeys] = useState<ApiKey[]>(defaults);
+ const [message, setMessage] = useState("");
+
+ useEffect(() => {
+  const saved = window.localStorage.getItem("crystal-api-keys");
+  if (!saved) return;
+  try {
+   setKeys(JSON.parse(saved) as ApiKey[]);
+  } catch {
+   window.localStorage.removeItem("crystal-api-keys");
+  }
+ }, []);
+
+ const persist = (next: ApiKey[]) => {
+  setKeys(next);
+  window.localStorage.setItem("crystal-api-keys", JSON.stringify(next));
+ };
+
+ const createKey = () => {
+  const name = window.prompt("Name this API key", "New key")?.trim();
+  if (!name) return;
+  const suffix = Math.random().toString(36).slice(2, 8);
+  const next: ApiKey = {
+   id: `${Date.now()}-${suffix}`,
+   n: name,
+   p: `sk-alt_live_•••••${suffix}`,
+   c: new Intl.DateTimeFormat("en-CA").format(new Date()),
+   last: "never",
+   mode: "live",
+  };
+  persist([next, ...keys]);
+  setMessage(`"${name}" created. Copy the key now: sk-alt_live_${suffix}`);
+ };
+
+ const revokeKey = (key: ApiKey) => {
+  if (!window.confirm(`Revoke "${key.n}"? This action cannot be undone.`)) return;
+  persist(keys.filter((item) => item.id !== key.id));
+  setMessage(`"${key.n}" was revoked.`);
+ };
+
  return (
  <>
  <SectionHeading eyebrow="§ API KEYS" title="API keys." desc="Keys the agent runtime will accept. Rotate often, never commit them." t={t} />
  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, maxWidth: 820 }}>
- <div style={{ fontSize: 12.5, color: t.muted }}>{keys.length} keys · 2 live / 1 test</div>
- <button style={{ height: 40, padding: "0 18px", background: COBALT, color: "#fff", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 8, cursor: "pointer" }}>+ Create key</button>
+ <div style={{ fontSize: 12.5, color: t.muted }}>{keys.length} keys · {keys.filter((key) => key.mode === "live").length} live / {keys.filter((key) => key.mode === "test").length} test</div>
+ <button type="button" onClick={createKey} style={{ height: 40, padding: "0 18px", background: COBALT, color: "#fff", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 8, cursor: "pointer" }}>+ Create key</button>
  </div>
+ {message && <div role="status" style={{ maxWidth: 820, marginBottom: 14, padding: "11px 14px", borderRadius: 8, background: `${COBALT}12`, color: t.fg, fontSize: 12 }}>{message}</div>}
  <div style={{ ...t.baseCard, overflow: "hidden", maxWidth: 820 }}>
  {keys.map((k, i) => (
- <div key={k.p} style={{ display: "grid", gridTemplateColumns: "200px 1fr auto auto", gap: 16, padding: "18px 22px", borderTop: i > 0 ? `1px solid ${t.faintBorder}` : "none", alignItems: "center" }}>
+ <div key={k.id} style={{ display: "grid", gridTemplateColumns: "200px 1fr auto auto", gap: 16, padding: "18px 22px", borderTop: i > 0 ? `1px solid ${t.faintBorder}` : "none", alignItems: "center" }}>
  <div>
  <div style={{ fontSize: 13.5, fontWeight: 700, letterSpacing: "-0.01em" }}>{k.n}</div>
  <div style={{ fontSize: 11, color: t.muted, marginTop: 2 }}>Created {k.c}</div>
  </div>
  <code style={{ fontSize: 12, fontFamily: "var(--font-geist-mono),monospace", color: t.muted, background: t.softFill, padding: "6px 10px", borderRadius: 6, justifySelf: "start" }}>{k.p}</code>
  <span style={{ fontSize: 11.5, color: t.muted }}>Used {k.last}</span>
- <button style={{ fontSize: 12, fontWeight: 700, color: "#EF4444", background: "transparent", border: "none", cursor: "pointer" }}>Revoke</button>
+ <button type="button" onClick={() => revokeKey(k)} style={{ fontSize: 12, fontWeight: 700, color: "#EF4444", background: "transparent", border: "none", cursor: "pointer" }}>Revoke</button>
  </div>
  ))}
  </div>
