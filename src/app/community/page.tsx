@@ -27,6 +27,81 @@ import {
  Workflow,
 } from "lucide-react";
 
+const languages = [
+ { code: "en", label: "English" },
+ { code: "de", label: "German" },
+ { code: "fr", label: "French" },
+ { code: "it", label: "Italian" },
+ { code: "zh", label: "Chinese" },
+ { code: "ja", label: "Japanese" },
+ { code: "ar", label: "Arabic" },
+] as const;
+
+type LanguageCode = (typeof languages)[number]["code"];
+
+const translations: Record<LanguageCode, Record<string, string>> = {
+ en: {
+  community: "Architecture Community", description: "A focused space for architecture, homes, interiors, infrastructure, and design studies.",
+  explore: "Explore", join: "Join", joined: "Joined", projects: "Projects", forks: "Forks", reviews: "Reviews", workflows: "Workflows",
+  overview: "Overview", posts: "Posts", remix: "Remix chains", aiReview: "AI Review", spaces: "Spaces", creationLoop: "Creation loop",
+  concept: "Concept to model to visualize to present to refine.", publish: "Publish preview", notes: "Generation notes:",
+  share: "Share an architecture concept, house model, interior design, or infrastructure plan", architecture: "Architecture",
+  house: "House Modeling", interior: "Interior Design", infrastructure: "Infrastructure", joinCommunity: "Join Community",
+  aiInside: "AI inside projects", reputation: "Reputation", marketplace: "Marketplace later",
+ },
+ de: {
+  community: "Architektur-Community", description: "Ein fokussierter Raum für Architektur, Häuser, Innenräume, Infrastruktur und Designstudien.",
+  explore: "Entdecken", join: "Beitreten", joined: "Beigetreten", projects: "Projekte", forks: "Forks", reviews: "Bewertungen", workflows: "Workflows",
+  overview: "Übersicht", posts: "Beiträge", remix: "Remix-Ketten", aiReview: "KI-Review", spaces: "Bereiche", creationLoop: "Erstellungsprozess",
+  concept: "Vom Konzept zum Modell, zur Visualisierung und zur Verfeinerung.", publish: "Vorschau veröffentlichen", notes: "Generierungsnotizen:",
+  share: "Teile ein Architekturkonzept, Hausmodell, Interior-Design oder Infrastrukturprojekt", architecture: "Architektur",
+  house: "Hausmodellierung", interior: "Innenarchitektur", infrastructure: "Infrastruktur", joinCommunity: "Community beitreten",
+  aiInside: "KI in Projekten", reputation: "Reputation", marketplace: "Marktplatz später",
+ },
+ fr: {
+  community: "Communauté d’architecture", description: "Un espace dédié à l’architecture, aux maisons, aux intérieurs, aux infrastructures et aux études de design.",
+  explore: "Explorer", join: "Rejoindre", joined: "Membre", projects: "Projets", forks: "Forks", reviews: "Avis", workflows: "Workflows",
+  overview: "Aperçu", posts: "Publications", remix: "Chaînes de remix", aiReview: "Avis IA", spaces: "Espaces", creationLoop: "Processus de création",
+  concept: "Du concept au modèle, à la visualisation et au perfectionnement.", publish: "Publier l’aperçu", notes: "Notes de génération :",
+  share: "Partagez un concept architectural, un modèle de maison, un intérieur ou un plan d’infrastructure", architecture: "Architecture",
+  house: "Modélisation de maison", interior: "Design intérieur", infrastructure: "Infrastructure", joinCommunity: "Rejoindre la communauté",
+  aiInside: "IA dans les projets", reputation: "Réputation", marketplace: "Marketplace bientôt",
+ },
+ it: {
+  community: "Community di architettura", description: "Uno spazio dedicato ad architettura, case, interni, infrastrutture e studi di design.",
+  explore: "Esplora", join: "Unisciti", joined: "Iscritto", projects: "Progetti", forks: "Fork", reviews: "Recensioni", workflows: "Workflow",
+  overview: "Panoramica", posts: "Post", remix: "Catene remix", aiReview: "Revisione IA", spaces: "Spazi", creationLoop: "Processo creativo",
+  concept: "Dal concept al modello, alla visualizzazione e al perfezionamento.", publish: "Pubblica anteprima", notes: "Note di generazione:",
+  share: "Condividi un concept architettonico, un modello di casa, un interior design o un piano infrastrutturale", architecture: "Architettura",
+  house: "Modellazione case", interior: "Interior design", infrastructure: "Infrastrutture", joinCommunity: "Unisciti alla community",
+  aiInside: "IA nei progetti", reputation: "Reputazione", marketplace: "Marketplace in arrivo",
+ },
+ zh: {
+  community: "建筑社区", description: "专注于建筑、住宅、室内设计、基础设施和设计研究的空间。",
+  explore: "探索", join: "加入", joined: "已加入", projects: "项目", forks: "分支", reviews: "评价", workflows: "工作流",
+  overview: "概览", posts: "帖子", remix: "创作链", aiReview: "AI 评审", spaces: "空间", creationLoop: "创作流程",
+  concept: "从概念到模型，再到可视化、展示和完善。", publish: "发布预览", notes: "生成说明：",
+  share: "分享建筑概念、住宅模型、室内设计或基础设施方案", architecture: "建筑", house: "住宅建模", interior: "室内设计", infrastructure: "基础设施",
+  joinCommunity: "加入社区", aiInside: "项目中的 AI", reputation: "声誉", marketplace: "市场即将推出",
+ },
+ ja: {
+  community: "建築コミュニティ", description: "建築、住宅、インテリア、インフラ、デザイン研究のためのスペースです。",
+  explore: "探索", join: "参加", joined: "参加済み", projects: "プロジェクト", forks: "フォーク", reviews: "レビュー", workflows: "ワークフロー",
+  overview: "概要", posts: "投稿", remix: "リミックスチェーン", aiReview: "AIレビュー", spaces: "スペース", creationLoop: "制作の流れ",
+  concept: "コンセプトからモデル、可視化、発表、改善まで。", publish: "プレビューを公開", notes: "生成ノート：",
+  share: "建築コンセプト、住宅モデル、インテリア、インフラ計画を共有", architecture: "建築", house: "住宅モデリング", interior: "インテリアデザイン", infrastructure: "インフラ",
+  joinCommunity: "コミュニティに参加", aiInside: "プロジェクトの AI", reputation: "評価", marketplace: "マーケットプレイス準備中",
+ },
+ ar: {
+  community: "مجتمع الهندسة المعمارية", description: "مساحة متخصصة للهندسة المعمارية والمنازل والتصميم الداخلي والبنية التحتية ودراسات التصميم.",
+  explore: "استكشف", join: "انضمام", joined: "منضم", projects: "مشاريع", forks: "تفرعات", reviews: "مراجعات", workflows: "سير العمل",
+  overview: "نظرة عامة", posts: "منشورات", remix: "سلاسل إعادة المزج", aiReview: "مراجعة الذكاء الاصطناعي", spaces: "المساحات", creationLoop: "دورة الإنشاء",
+  concept: "من الفكرة إلى النموذج والتصور والعرض والتحسين.", publish: "نشر المعاينة", notes: "ملاحظات التوليد:",
+  share: "شارك فكرة معمارية أو نموذج منزل أو تصميم داخلي أو خطة بنية تحتية", architecture: "الهندسة المعمارية", house: "نمذجة المنازل", interior: "التصميم الداخلي", infrastructure: "البنية التحتية",
+  joinCommunity: "انضم إلى المجتمع", aiInside: "الذكاء الاصطناعي في المشاريع", reputation: "السمعة", marketplace: "السوق قريباً",
+ },
+};
+
 const spaces = [
  { name: "architecture", label: "Architecture", count: "320 projects", icon: Layers3 },
  { name: "house-modeling", label: "House Modeling", count: "118 models", icon: Home },
@@ -175,6 +250,13 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 export default function CommunityPage() {
  const [isDark, setIsDark] = useState(false);
+ const [language, setLanguage] = useState<LanguageCode>("en");
+ const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+ const t = (key: string) => translations[language][key] ?? translations.en[key] ?? key;
+ const spaceLabel = (name: string) =>
+  name === "architecture" ? t("architecture") :
+  name === "house-modeling" ? t("house") :
+  name === "interior-design" ? t("interior") : t("infrastructure");
  const [activeSpace, setActiveSpace] = useState("all");
  const [activeTab, setActiveTab] = useState("overview");
  const [searchQuery, setSearchQuery] = useState("");
@@ -294,7 +376,7 @@ export default function CommunityPage() {
  };
 
  return (
- <main className={`community-page w-full min-h-screen font-roboto ${isDark ? "community-dark" : "community-light"}`}>
+ <main dir={language === "ar" ? "rtl" : "ltr"} className={`community-page w-full min-h-screen font-roboto ${isDark ? "community-dark" : "community-light"}`}>
  <style>{`
    .community-page { width:100vw; max-width:none; min-height:100vh; margin:0; background:#f3f6f8; color:#111827; }
    .community-page .community-soft { background:#F8FCFF; border-color:#DCEAF5; color:#475569; }
@@ -370,7 +452,7 @@ export default function CommunityPage() {
  className="min-w-0 flex-1 bg-transparent text-sm text-[#0F172A] outline-none placeholder:text-[#64748B]"
  />
  </label>
- <div className="absolute left-1/2 flex -translate-x-1/2 justify-center">
+ <div className="absolute left-1/2 flex -translate-x-1/2 items-center justify-center gap-2">
  <button type="button" onClick={() => setIsDark((value) => !value)} aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"} aria-pressed={isDark} className="community-nav inline-flex h-9 items-center gap-2 rounded-full border border-[#DCEAF5] bg-white px-3 text-xs font-semibold shadow-sm transition hover:bg-[#F0F9FF]">
  {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />} {isDark ? "Light" : "Dark"}
  </button>
@@ -386,6 +468,20 @@ export default function CommunityPage() {
  <button type="button" onClick={() => setNotice("No new notifications in this local preview.")} aria-label="Notifications" className="flex h-9 w-9 items-center justify-center rounded-full border border-[#DCEAF5] bg-white text-[#64748B] hover:bg-[#F0F9FF]">
  <Bell className="h-4 w-4" />
  </button>
+ <div className="relative">
+  <button type="button" onClick={() => setLanguageMenuOpen((value) => !value)} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[#DCEAF5] bg-white px-3 text-xs font-semibold text-[#0F172A] shadow-sm">
+   <Globe2 className="h-4 w-4" /> {languages.find((item) => item.code === language)?.label}
+  </button>
+  {languageMenuOpen && (
+   <div className="absolute right-0 top-11 z-40 w-36 rounded-[14px] border border-[#DCEAF5] bg-white p-1.5 shadow-xl">
+    {languages.map((item) => (
+     <button key={item.code} type="button" onClick={() => { setLanguage(item.code); setLanguageMenuOpen(false); }} className={`block w-full rounded-[9px] px-3 py-2 text-left text-xs font-semibold ${language === item.code ? "bg-[#E0F2FE] text-[#0369A1]" : "text-[#475569] hover:bg-[#F1F5F9]"}`}>
+      {item.label}
+     </button>
+    ))}
+   </div>
+  )}
+ </div>
  </div>
  </div>
  </header>
@@ -404,7 +500,7 @@ export default function CommunityPage() {
  <div className="bg-gradient-to-br from-[#7C3AED] via-[#38BDF8] to-[#F0F9FF] p-4">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-semibold">Architecture Community</p>
+ <p className="text-sm font-semibold">{t("community")}</p>
  <p className="hub-muted mt-1 text-xs text-white/75">Homes, interiors, infrastructure</p>
  </div>
  <ChevronDown className="h-4 w-4" />
@@ -412,13 +508,13 @@ export default function CommunityPage() {
  </div>
  <div className="p-3">
  <div className="community-soft mb-4 rounded-[14px] p-3">
- <p className="text-xs font-semibold">Creation loop</p>
+ <p className="text-xs font-semibold">{t("creationLoop")}</p>
  <p className="hub-muted mt-2 text-[11px] leading-5 text-white/62">
- Concept to model to visualize to present to refine.
+ {t("concept")}
  </p>
  </div>
  <div className="space-y-1">
- <p className="hub-muted mb-2 px-2 text-[11px] font-semibold uppercase tracking-wide text-white/45">Spaces</p>
+ <p className="hub-muted mb-2 px-2 text-[11px] font-semibold uppercase tracking-wide text-white/45">{t("spaces")}</p>
  {spaces.map(({ name, label, count, icon: Icon }) => (
  <button
  key={name}
@@ -429,7 +525,7 @@ export default function CommunityPage() {
  }`}
  >
  <Icon className={`h-4 w-4 ${activeSpace === name ? "text-[#0284C7]" : "text-[#94A3B8] group-hover:text-[#0284C7]"}`} />
- <span className="min-w-0 flex-1 truncate">{label}</span>
+ <span className="min-w-0 flex-1 truncate">{spaceLabel(name)}</span>
  <span className="hub-count text-[10px] text-white/35">{count.split(" ")[0]}</span>
  </button>
  ))}
@@ -447,31 +543,31 @@ export default function CommunityPage() {
  <Wand2 className="h-9 w-9" />
  </div>
  <div className="pb-1">
- <h1 className="text-2xl font-semibold tracking-[-0.01em] text-[#0F172A]">Architecture Community</h1>
- <p className="mt-1 text-sm text-[#64748B]">A focused space for architecture, homes, interiors, infrastructure, and design studies.</p>
+ <h1 className="text-2xl font-semibold tracking-[-0.01em] text-[#0F172A]">{t("community")}</h1>
+ <p className="mt-1 text-sm text-[#64748B]">{t("description")}</p>
  </div>
  </div>
  <div className="flex gap-2">
  <button type="button" onClick={() => selectTab("posts")} className="h-10 rounded-full border border-[#DCEAF5] bg-white px-4 text-sm font-semibold text-[#0F172A] hover:bg-[#F0F9FF]">
- Explore
+ {t("explore")}
  </button>
  <button type="button" onClick={toggleJoined} className={`h-10 rounded-full px-4 text-sm font-semibold transition ${isJoined ? "bg-[#E0F2FE] text-[#0369A1] hover:bg-[#BAE6FD]" : "bg-[#38BDF8] text-white hover:bg-[#0EA5E9]"}`}>
- {isJoined ? "Joined" : "Join"}
+ {isJoined ? t("joined") : t("join")}
  </button>
  </div>
  </div>
  <div className="mt-5 grid grid-cols-2 gap-4 border-t border-[#EEF3F7] pt-4 sm:grid-cols-4">
- <Stat label="Projects" value="920" />
- <Stat label="Forks" value="310" />
- <Stat label="Reviews" value="1.8k" />
- <Stat label="Workflows" value="246" />
+ <Stat label={t("projects")} value="920" />
+ <Stat label={t("forks")} value="310" />
+ <Stat label={t("reviews")} value="1.8k" />
+ <Stat label={t("workflows")} value="246" />
  </div>
  <div className="mt-5 flex flex-wrap gap-6 border-t border-[#EEF3F7] pt-4 text-sm font-semibold text-[#64748B]">
  {[
- ["overview", "Overview"],
- ["posts", "Posts"],
- ["remix", "Remix chains"],
- ["ai-review", "AI Review"],
+ ["overview", t("overview")],
+ ["posts", t("posts")],
+ ["remix", t("remix")],
+ ["ai-review", t("aiReview")],
  ].map(([key, label]) => (
  <button key={key} type="button" onClick={() => selectTab(key)} className={activeTab === key ? "text-[#0284C7]" : "hover:text-[#0284C7]"}>
  {label}
@@ -489,12 +585,12 @@ export default function CommunityPage() {
  value={draft}
  onChange={(event) => setDraft(event.target.value)}
  rows={2}
- placeholder="Share an architecture concept, house model, interior design, or infrastructure plan"
+ placeholder={t("share")}
  className="min-h-10 flex-1 resize-none rounded-[18px] border border-[#DCEAF5] bg-[#F8FCFF] px-4 py-3 text-sm text-[#0F172A] outline-none placeholder:text-[#64748B] focus:border-[#38BDF8] focus:bg-white"
  />
  </div>
  <div className="mt-3 flex flex-wrap items-center gap-2 pl-0 sm:pl-[52px]">
- {["Architecture", "House Modeling", "Interior Design", "Infrastructure"].map((item) => (
+ {[["Architecture", "architecture"], ["House Modeling", "house"], ["Interior Design", "interior"], ["Infrastructure", "infrastructure"]].map(([item, key]) => (
  <button
  key={item}
  type="button"
@@ -503,7 +599,7 @@ export default function CommunityPage() {
  draftType === item ? "border-[#38BDF8] bg-[#E0F2FE] text-[#0369A1]" : "border-[#DCEAF5] bg-white text-[#475569] hover:bg-[#F0F9FF]"
  }`}
  >
- {item}
+ {t(key)}
  </button>
  ))}
  <button type="button" onClick={publishDraft} className="ml-auto rounded-full bg-[#38BDF8] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#0EA5E9]">
@@ -546,7 +642,7 @@ export default function CommunityPage() {
  ))}
  </div>
  <div className="mt-4 rounded-[14px] border border-[#DCEAF5] bg-[#F8FCFF] p-3 text-xs leading-5 text-[#64748B]">
- <span className="font-semibold text-[#0F172A]">Generation notes:</span> {notes}
+ <span className="font-semibold text-[#0F172A]">{t("notes")}</span> {notes}
  </div>
  <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold text-[#64748B]">
  <button
@@ -611,7 +707,7 @@ export default function CommunityPage() {
  <section className="community-surface rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
  <div className="flex items-start justify-between">
  <div>
- <h2 className="text-base font-semibold text-[#0F172A]">Architecture Community</h2>
+ <h2 className="text-base font-semibold text-[#0F172A]">{t("community")}</h2>
  <p className="mt-1 text-xs text-[#64748B]">u/architecture_community</p>
  </div>
  <button type="button" onClick={() => setNotice("Community options are a preview menu placeholder.")} aria-label="Community options" className="rounded-full p-2 text-[#64748B] hover:bg-[#F1F5F9]">
@@ -624,12 +720,12 @@ export default function CommunityPage() {
  <Stat label="Created" value="2026" />
  </div>
  <button type="button" onClick={toggleJoined} className={`mt-4 h-10 w-full rounded-full text-sm font-semibold transition ${isJoined ? "bg-[#E0F2FE] text-[#0369A1] hover:bg-[#BAE6FD]" : "bg-[#38BDF8] text-white hover:bg-[#0EA5E9]"}`}>
- {isJoined ? "Joined Community" : "Join Community"}
+ {isJoined ? t("joined") : t("joinCommunity")}
  </button>
  </section>
 
  <section id="ai-review" ref={aiReviewRef} className="community-surface scroll-mt-20 rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
- <h2 className="text-sm font-semibold uppercase tracking-wide text-[#64748B]">AI inside projects</h2>
+ <h2 className="text-sm font-semibold uppercase tracking-wide text-[#64748B]">{t("aiInside")}</h2>
  <div className="mt-4 space-y-3">
  {aiReviewCards.map(({ title, body, icon: Icon }) => (
  <div key={title} className="rounded-[14px] border border-[#DCEAF5] bg-[#F8FCFF] p-3">
@@ -644,7 +740,7 @@ export default function CommunityPage() {
  </section>
 
  <section className="community-surface rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
- <h2 className="text-sm font-semibold uppercase tracking-wide text-[#64748B]">Reputation</h2>
+ <h2 className="text-sm font-semibold uppercase tracking-wide text-[#64748B]">{t("reputation")}</h2>
  <div className="mt-4 space-y-2">
  {reputation.map((item) => (
  <div key={item} className="flex items-center gap-2 rounded-[12px] bg-[#F8FCFF] px-3 py-2 text-xs font-semibold text-[#475569]">
@@ -656,7 +752,7 @@ export default function CommunityPage() {
  </section>
 
  <section className="community-surface rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
- <h2 className="text-sm font-semibold uppercase tracking-wide text-[#64748B]">Marketplace later</h2>
+ <h2 className="text-sm font-semibold uppercase tracking-wide text-[#64748B]">{t("marketplace")}</h2>
  <div className="mt-4 flex flex-wrap gap-2">
  {marketplaceLater.map((item) => (
  <span key={item} className="rounded-full bg-[#F0F9FF] px-3 py-1 text-xs font-semibold text-[#0369A1]">
