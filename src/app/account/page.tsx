@@ -54,6 +54,7 @@ export default function Account() {
  const [isDark, setIsDark] = useCoreforgeMode();
  const { data: session } = useSession();
  const [active, setActive] = useState<SectionId>("usage");
+ const [profileOpen, setProfileOpen] = useState(false);
  const accountName = session?.user?.name?.trim() || "Crystal Studio User";
  const accountEmail = session?.user?.email || "you@alternusart.com";
  const accountInitials = accountName
@@ -97,7 +98,30 @@ export default function Account() {
  <Link href="/ai-assistant" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 32, padding: "0 14px", background: COBALT, color: "#FFF", fontSize: 12.5, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
  Launch Studio <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
  </Link>
- <div style={{ width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, letterSpacing: "-0.02em" }}>{accountInitials}</div>
+ <div style={{ position: "relative" }}>
+ <button type="button" aria-label="Open profile menu" aria-expanded={profileOpen} onClick={() => setProfileOpen((open) => !open)} style={{ width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, letterSpacing: "-0.02em", border: "none", cursor: "pointer" }}>{accountInitials}</button>
+ {profileOpen && <div role="menu" onClick={(event) => event.stopPropagation()} style={{ position: "absolute", top: 44, right: 0, zIndex: 90, width: 248, height: 327, padding: 9, boxSizing: "border-box", overflow: "hidden", borderRadius: 12, background: "#242424", boxShadow: "0 18px 42px rgba(0,0,0,.35)" }}>
+  <div style={{ height: 58, width: 229, display: "flex", alignItems: "center", gap: 12, padding: "0 12px", boxSizing: "border-box", borderRadius: 12 }}>
+   <div style={{ width: 40, height: 40, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, background: "#363636", color: "#fff", fontSize: 13, fontWeight: 800 }}>{accountInitials}</div>
+   <div style={{ minWidth: 0, flex: 1, color: "#fff" }}><div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 14, fontWeight: 700 }}>{accountName}</div><div style={{ marginTop: 2, color: "#A1A1AA", fontSize: 12 }}>Free Plan</div></div>
+   <span style={{ color: "#D4D4D8", fontSize: 24, lineHeight: 1 }}>›</span>
+  </div>
+  <div style={{ width: 229, height: 1, margin: "0 0 3px", background: "#383838" }} />
+  {[
+   { label: "Profile", icon: "♙", action: () => { setProfileOpen(false); setActive("organization"); } },
+   { label: "Settings", icon: "☷", action: () => { setProfileOpen(false); setActive("privacy"); } },
+   { label: "Upgrade plan", icon: "✦", action: () => { setProfileOpen(false); setActive("subscriptions"); } },
+   { label: "Get apps and extensions", icon: "⇩", action: () => { setProfileOpen(false); window.location.href = "/"; } },
+   { label: "Get help", icon: "?", arrow: true, action: () => { setProfileOpen(false); window.location.href = "/community"; } },
+   { label: "Learn more", icon: "ⓘ", action: () => { setProfileOpen(false); window.location.href = "/"; } },
+   { label: "Log out", icon: "↪", action: () => { setProfileOpen(false); window.location.href = "/login"; } },
+  ].map((item) => (
+   <button key={item.label} type="button" role="menuitem" onClick={item.action} style={{ width: 229, height: 36, minHeight: 36, display: "flex", alignItems: "center", gap: 12, padding: "0 12px", border: "none", borderRadius: 12, background: "transparent", color: "#F4F4F5", textAlign: "left", fontFamily: "inherit", fontSize: 12, cursor: "pointer" }} onMouseEnter={(event) => { event.currentTarget.style.background = "#363636"; }} onMouseLeave={(event) => { event.currentTarget.style.background = "transparent"; }}>
+    <span style={{ width: 18, textAlign: "center", fontSize: 19, lineHeight: 1 }}>{item.icon}</span><span style={{ flex: 1 }}>{item.label}</span>{item.arrow && <span style={{ fontSize: 20, lineHeight: 1 }}>›</span>}
+   </button>
+  ))}
+ </div>}
+ </div>
  </div>
  </header>
 
