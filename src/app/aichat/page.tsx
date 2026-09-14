@@ -285,7 +285,7 @@ function ConversationMenu({ onAction }: { onAction: (action: string) => void }) 
     { action: "share", label: "Share", icon: Share2, arrow: true },
     { action: "delete", label: "Delete", icon: Trash2, danger: true },
   ];
-  return <div role="menu" onClick={(event) => event.stopPropagation()} className="absolute right-0 top-10 z-[80] flex h-[218px] w-[195px] flex-col items-center justify-start overflow-hidden rounded-[28px] border-[5px] border-[#303030] bg-[#242424] p-[6px] shadow-2xl">
+  return <div role="menu" onClick={(event) => event.stopPropagation()} className="absolute right-0 top-10 z-[80] flex h-[218px] w-[195px] flex-col items-center justify-start overflow-hidden rounded-[28px] border-0 bg-[#242424] p-[6px] shadow-2xl">
     {items.map(({ action, label, icon: Icon, arrow, danger }) => <button key={action} role="menuitem" onClick={() => onAction(action)} className={`flex h-8 min-h-8 w-[182px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left text-sm font-medium transition hover:bg-[#363636] ${danger ? "text-[#FF6B6B]" : "text-zinc-100"}`}><Icon size={20} strokeWidth={2} /><span className="flex-1">{label}</span>{arrow && <span className="text-lg leading-none">›</span>}</button>)}
   </div>;
 }
