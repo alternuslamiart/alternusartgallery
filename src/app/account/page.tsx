@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import {
  CoreforgeLogo,
  DARK_BG,
@@ -51,7 +52,17 @@ const nav: { heading: string; items: { id: SectionId; label: string }[] }[] = [
 
 export default function Account() {
  const [isDark, setIsDark] = useCoreforgeMode();
+ const { data: session } = useSession();
  const [active, setActive] = useState<SectionId>("usage");
+ const accountName = session?.user?.name?.trim() || "Crystal Studio User";
+ const accountEmail = session?.user?.email || "you@alternusart.com";
+ const accountInitials = accountName
+  .split(/\s+/)
+  .map((part) => part[0])
+  .filter(Boolean)
+  .slice(0, 2)
+  .join("")
+  .toUpperCase() || "AL";
 
  const bg = isDark ? DARK_BG : LIGHT_BACKGROUND_PRIMARY;
  const fg = isDark ? DARK_TEXT : LIGHT_LABEL_PRIMARY;
@@ -86,7 +97,7 @@ export default function Account() {
  <Link href="/ai-assistant" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 32, padding: "0 14px", background: COBALT, color: "#FFF", fontSize: 12.5, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
  Launch Studio <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
  </Link>
- <div style={{ width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, letterSpacing: "-0.02em" }}>AL</div>
+ <div style={{ width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, letterSpacing: "-0.02em" }}>{accountInitials}</div>
  </div>
  </header>
 
@@ -96,10 +107,10 @@ export default function Account() {
  <aside style={{ borderRight: `1px solid ${faintBorder}`, padding: "28px 20px", overflowY: "auto" }}>
  {/* User identity card */}
  <div style={{ ...baseCard, padding: "14px 14px", marginBottom: 24, display: "flex", alignItems: "center", gap: 12 }}>
- <div style={{ width: 36, height: 36, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>AL</div>
+ <div style={{ width: 36, height: 36, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800 }}>{accountInitials}</div>
  <div style={{ minWidth: 0, flex: 1 }}>
- <div style={{ fontSize: 13, fontWeight: 700, color: fg, letterSpacing: "-0.01em" }}>Crystal Studio User</div>
- <div style={{ fontSize: 11, color: muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>you@alternusart.com</div>
+ <div style={{ fontSize: 13, fontWeight: 700, color: fg, letterSpacing: "-0.01em" }}>{accountName}</div>
+ <div style={{ fontSize: 11, color: muted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{accountEmail}</div>
  </div>
  </div>
 
@@ -237,7 +248,7 @@ function Access({ t }: { t: Tokens }) {
 
 function Members({ t }: { t: Tokens }) {
  const people = [
- { n: "Crystal Studio User", e: "you@alternusart.com", r: "Owner", c: "AL" },
+ { n: accountName, e: accountEmail, r: "Owner", c: accountInitials },
  { n: "Maya Ibrahim", e: "maya@alternusart.com", r: "Admin", c: "MI" },
  { n: "Luca Ferrari", e: "luca@alternusart.com", r: "Member", c: "LF" },
  { n: "Priya Sharma", e: "priya@alternusart.com", r: "Member", c: "PS" },

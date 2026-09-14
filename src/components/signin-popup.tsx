@@ -6,7 +6,7 @@ import { signIn } from "next-auth/react";
 import { X } from "lucide-react";
 
 const POPUP_KEY = "cedium_signin_popup_dismissed";
-const STUDIO_HOME = "/ai-assistant";
+const STUDIO_HOME = "/";
 
 function CoreforgeMark() {
  return (

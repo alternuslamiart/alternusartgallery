@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const STUDIO_HOME = "/ai-assistant";
+const STUDIO_HOME = "/";
 const AUTH_THEME_KEY = "Coreforge_auth_theme";
 
 type OAuthProvider = "google" | "github" | "discord";
