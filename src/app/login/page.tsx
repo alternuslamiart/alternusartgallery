@@ -60,13 +60,18 @@ function useAuthTheme() {
  const [isLight, setIsLight] = useState(false);
 
  useEffect(() => {
- setIsLight(window.localStorage.getItem(AUTH_THEME_KEY) === "light");
+ const storedTheme = window.localStorage.getItem(AUTH_THEME_KEY);
+ const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+ const nextIsLight = storedTheme ? storedTheme === "light" : prefersLight;
+ setIsLight(nextIsLight);
+ document.documentElement.style.colorScheme = nextIsLight ? "light" : "dark";
  }, []);
 
  const toggleTheme = () => {
  setIsLight((current) => {
  const next = !current;
  window.localStorage.setItem(AUTH_THEME_KEY, next ? "light" : "dark");
+ document.documentElement.style.colorScheme = next ? "light" : "dark";
  return next;
  });
  };
@@ -129,6 +134,8 @@ export default function LoginPage() {
  onClick={toggleTheme}
  className="auth-theme-toggle inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors"
  aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
+ aria-pressed={isLight}
+ title={isLight ? "Switch to dark mode" : "Switch to light mode"}
  >
  {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
  </button>
