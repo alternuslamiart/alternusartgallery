@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import {
  CoreforgeLogo,
@@ -175,11 +175,11 @@ function SectionHeading({ eyebrow, title, desc, t }: { eyebrow: string; title: s
  );
 }
 
-function Field({ label, value, placeholder, t }: { label: string; value?: string; placeholder?: string; t: Tokens }) {
+function Field({ label, value, placeholder, onChange, t }: { label: string; value?: string; placeholder?: string; onChange?: (value: string) => void; t: Tokens }) {
  return (
  <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
  <span style={{ fontSize: 11, fontWeight: 700, color: t.labelQuaternary, letterSpacing: "0.08em", textTransform: "uppercase" }}>{label}</span>
- <input defaultValue={value} placeholder={placeholder} style={{ height: 42, padding: "0 14px", border: `1px solid ${t.faintBorder}`, borderRadius: 8, background: t.softFill, color: t.fg, fontSize: 14, outline: "none", fontFamily: "inherit", letterSpacing: "-0.01em" }} />
+ <input value={value ?? ""} onChange={onChange ? (event) => onChange(event.target.value) : undefined} placeholder={placeholder} style={{ height: 42, padding: "0 14px", border: `1px solid ${t.faintBorder}`, borderRadius: 8, background: t.softFill, color: t.fg, fontSize: 14, outline: "none", fontFamily: "inherit", letterSpacing: "-0.01em" }} />
  </label>
  );
 }
@@ -209,19 +209,55 @@ function Section({ id, t, accountName, accountEmail, accountInitials }: { id: Se
 /* ─────────── Panels ─────────── */
 
 function Organization({ t }: { t: Tokens }) {
+ const [form, setForm] = useState({
+  name: "Crystal Studio",
+  domain: "alternusart.com",
+  email: "billing@alternusart.com",
+  country: "Albania",
+ });
+ const [savedAt, setSavedAt] = useState("2 days ago");
+ const [saveMessage, setSaveMessage] = useState("");
+
+ useEffect(() => {
+  const saved = window.localStorage.getItem("crystal-organization-settings");
+  if (!saved) return;
+  try {
+   const parsed = JSON.parse(saved) as Partial<typeof form> & { savedAt?: string };
+   setForm((current) => ({ ...current, ...parsed }));
+   if (parsed.savedAt) setSavedAt(parsed.savedAt);
+  } catch {
+   window.localStorage.removeItem("crystal-organization-settings");
+  }
+ }, []);
+
+ const updateField = (field: keyof typeof form, value: string) => {
+  setForm((current) => ({ ...current, [field]: value }));
+  setSaveMessage("");
+ };
+
+ const saveChanges = () => {
+  const savedAtValue = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date());
+  window.localStorage.setItem("crystal-organization-settings", JSON.stringify({ ...form, savedAt: savedAtValue }));
+  setSavedAt(savedAtValue);
+  setSaveMessage("Changes saved successfully.");
+ };
+
  return (
  <>
  <SectionHeading eyebrow="§ ORGANIZATION" title="Your organization." desc="Public name, logo, and domain that everyone in your workspace sees." t={t} />
  <div style={{ ...t.baseCard, padding: 28, maxWidth: 720 }}>
  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
- <Field label="Organization name" value="Crystal Studio" t={t} />
- <Field label="Primary domain" value="alternusart.com" t={t} />
- <Field label="Billing email" value="billing@alternusart.com" t={t} />
- <Field label="Country" value="Albania" t={t} />
+ <Field label="Organization name" value={form.name} onChange={(value) => updateField("name", value)} t={t} />
+ <Field label="Primary domain" value={form.domain} onChange={(value) => updateField("domain", value)} t={t} />
+ <Field label="Billing email" value={form.email} onChange={(value) => updateField("email", value)} t={t} />
+ <Field label="Country" value={form.country} onChange={(value) => updateField("country", value)} t={t} />
  </div>
  <div style={{ marginTop: 24, paddingTop: 20, borderTop: `1px solid ${t.faintBorder}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
- <div style={{ fontSize: 12, color: t.muted }}>Last updated · 2 days ago</div>
- <button style={{ height: 40, padding: "0 20px", background: COBALT, color: "#fff", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 8, cursor: "pointer" }}>Save changes</button>
+ <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+ <div style={{ fontSize: 12, color: t.muted }}>Last updated · {savedAt}</div>
+ {saveMessage && <div role="status" style={{ fontSize: 12, color: "#16A34A", fontWeight: 700 }}>{saveMessage}</div>}
+ </div>
+ <button type="button" onClick={saveChanges} style={{ height: 40, padding: "0 20px", background: COBALT, color: "#fff", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 8, cursor: "pointer" }}>Save changes</button>
  </div>
  </div>
  </>
