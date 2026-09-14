@@ -433,7 +433,21 @@ function APIKeys({ t }: { t: Tokens }) {
 }
 
 function Usage({ t }: { t: Tokens }) {
- const bars = [42, 68, 55, 88, 74, 92, 61, 72, 80, 95, 67, 58, 77, 89, 93];
+ const [range, setRange] = useState<"7d" | "15d" | "30d" | "90d">("15d");
+ const usageByRange: Record<typeof range, number[]> = {
+  "7d": [58, 74, 63, 89, 77, 95, 68],
+  "15d": [42, 68, 55, 88, 74, 92, 61, 72, 80, 95, 67, 58, 77, 89, 93],
+  "30d": [35, 48, 52, 66, 59, 73, 81, 62, 76, 84, 69, 91, 78, 64, 88, 94, 71, 83, 57, 75, 86, 92, 68, 79, 87, 96, 73, 82, 90, 85],
+  "90d": [28, 35, 42, 51, 46, 62, 58, 71, 64, 76, 69, 82, 74, 88, 79, 91, 84, 73, 86, 95, 81, 77, 89, 93, 72, 83, 96, 87, 78, 92],
+ };
+ const bars = usageByRange[range];
+ const peak = Math.max(...bars);
+ const average = Math.round(bars.reduce((sum, value) => sum + value, 0) / bars.length);
+ const periodLabel = range === "7d" ? "last 7 days" : range === "15d" ? "last 15 days" : range === "30d" ? "last 30 days" : "last 90 days";
+ const periodMultiplier = range === "7d" ? 0.48 : range === "15d" ? 1 : range === "30d" ? 1.9 : 5.6;
+ const agentRuns = Math.round(3482 * periodMultiplier).toLocaleString();
+ const knowledge = (42.8 * Math.min(1.4, periodMultiplier)).toFixed(1);
+ const voice = (12.4 * Math.min(1.4, periodMultiplier)).toFixed(1);
  return (
  <>
  <SectionHeading eyebrow="§ USAGE" title="Usage this period." desc="Agent runs, knowledge indexing, and voice minutes used since 2026-04-01." t={t} />
@@ -441,9 +455,9 @@ function Usage({ t }: { t: Tokens }) {
  {/* Stat triplet */}
  <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, maxWidth: 820, marginBottom: 20 }}>
  {[
- { v: "3,482", l: "Agent runs", pct: 34, max: "of unlimited", consumed: "Unlimited", remaining: "No cap" },
- { v: "42.8 GB", l: "Knowledge", pct: 43, max: "of 100 GB", consumed: "42.8%", remaining: "57.2 GB left" },
- { v: "12.4 h", l: "Voice minutes", pct: 21, max: "of 60 h", consumed: "20.7%", remaining: "47.6 h left" },
+ { v: agentRuns, l: "Agent runs", pct: 34, max: "of unlimited", consumed: "Unlimited", remaining: "No cap" },
+ { v: `${knowledge} GB`, l: "Knowledge", pct: 43, max: "of 100 GB", consumed: `${knowledge}%`, remaining: `${(100 - Number(knowledge)).toFixed(1)} GB left` },
+ { v: `${voice} h`, l: "Voice minutes", pct: 21, max: "of 60 h", consumed: `${((Number(voice) / 60) * 100).toFixed(1)}%`, remaining: `${(60 - Number(voice)).toFixed(1)} h left` },
  ].map((s) => (
  <div key={s.l} style={{ ...t.baseCard, padding: "20px 22px" }}>
  <div style={{ fontSize: 11, fontWeight: 700, color: t.muted, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10 }}>{s.l}</div>
@@ -470,20 +484,20 @@ function Usage({ t }: { t: Tokens }) {
  <div style={{ ...t.baseCard, padding: 28, maxWidth: 820 }}>
  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
  <div>
- <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: "-0.01em" }}>Agent runs · last 15 days</div>
- <div style={{ fontSize: 11.5, color: t.muted, marginTop: 2 }}>Peak 95 runs/day · avg 74</div>
+ <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: "-0.01em" }}>Agent runs · {periodLabel}</div>
+ <div style={{ fontSize: 11.5, color: t.muted, marginTop: 2 }}>Peak {peak} runs/day · avg {average}</div>
  </div>
  <div style={{ display: "flex", gap: 6 }}>
- {["7d", "15d", "30d", "90d"].map((r, i) => (
- <button key={r} style={{ padding: "6px 12px", fontSize: 11, fontWeight: 700, background: i === 1 ? COBALT : "transparent", color: i === 1 ? "#fff" : t.muted, border: i === 1 ? "none" : `1px solid ${t.faintBorder}`, borderRadius: 6, cursor: "pointer" }}>{r}</button>
+ {["7d", "15d", "30d", "90d"].map((r) => (
+ <button key={r} onClick={() => setRange(r as typeof range)} style={{ padding: "6px 12px", fontSize: 11, fontWeight: 700, background: range === r ? COBALT : "transparent", color: range === r ? "#fff" : t.muted, border: range === r ? "none" : `1px solid ${t.faintBorder}`, borderRadius: 6, cursor: "pointer" }}>{r}</button>
  ))}
  </div>
  </div>
  <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 160, paddingTop: 20 }}>
  {bars.map((h, i) => (
- <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+ <div key={i} title={`${h} runs`} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minWidth: 0 }}>
  <div style={{ width: "100%", height: `${h}%`, background: COBALT, opacity: 0.15 + (h / 100) * 0.85, borderRadius: "4px 4px 0 0" }} />
- <span style={{ fontSize: 9, color: t.muted, fontFamily: "var(--font-geist-mono),monospace" }}>{10 + i}</span>
+ <span style={{ fontSize: 9, color: t.muted, fontFamily: "var(--font-geist-mono),monospace" }}>{i + 1}</span>
  </div>
  ))}
  </div>
