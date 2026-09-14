@@ -265,18 +265,50 @@ function Organization({ t }: { t: Tokens }) {
 }
 
 function Access({ t }: { t: Tokens }) {
- const rows = [
+ type AccessRow = { role: string; can: string[]; count: number };
+ const [rows, setRows] = useState<AccessRow[]>([
  { role: "Owner", can: ["manage org", "billing", "invite", "delete"], count: 1 },
  { role: "Admin", can: ["manage workspaces", "invite", "view billing"], count: 2 },
  { role: "Member", can: ["use workspace", "create tasks"], count: 12 },
  { role: "Guest", can: ["view-only"], count: 4 },
- ];
+ ]);
+ const [editingRole, setEditingRole] = useState<string | null>(null);
+ const [draft, setDraft] = useState<AccessRow | null>(null);
+ const [saveMessage, setSaveMessage] = useState("");
+
+ useEffect(() => {
+  const saved = window.localStorage.getItem("crystal-access-settings");
+  if (!saved) return;
+  try {
+   setRows(JSON.parse(saved) as AccessRow[]);
+  } catch {
+   window.localStorage.removeItem("crystal-access-settings");
+  }
+ }, []);
+
+ const startEditing = (row: AccessRow) => {
+  setEditingRole(row.role);
+  setDraft({ ...row, can: [...row.can] });
+  setSaveMessage("");
+ };
+
+ const saveRole = () => {
+  if (!draft) return;
+  const nextRows = rows.map((row) => row.role === editingRole ? draft : row);
+  setRows(nextRows);
+  window.localStorage.setItem("crystal-access-settings", JSON.stringify(nextRows));
+  setEditingRole(null);
+  setDraft(null);
+  setSaveMessage("Permissions saved successfully.");
+ };
+
  return (
  <>
  <SectionHeading eyebrow="§ ACCESS" title="Roles and permissions." desc="Who can do what inside your organization." t={t} />
  <div style={{ ...t.baseCard, overflow: "hidden", maxWidth: 820 }}>
  {rows.map((r, i) => (
- <div key={r.role} style={{ display: "grid", gridTemplateColumns: "140px 1fr 80px", gap: 16, padding: "20px 24px", borderTop: i > 0 ? `1px solid ${t.faintBorder}` : "none", alignItems: "center" }}>
+  <div key={r.role}>
+ <div style={{ display: "grid", gridTemplateColumns: "140px 1fr 80px", gap: 16, padding: "20px 24px", borderTop: i > 0 ? `1px solid ${t.faintBorder}` : "none", alignItems: "center" }}>
  <div>
  <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.015em" }}>{r.role}</div>
  <div style={{ fontSize: 11, color: t.muted, marginTop: 2 }}>{r.count} seat{r.count === 1 ? "" : "s"}</div>
@@ -286,10 +318,34 @@ function Access({ t }: { t: Tokens }) {
  <span key={c} style={{ fontSize: 11, color: COBALT, background: `${COBALT}10`, padding: "4px 10px", borderRadius: 999, fontWeight: 600 }}>{c}</span>
  ))}
  </div>
- <button style={{ fontSize: 12, fontWeight: 700, color: t.muted, background: "transparent", border: `1px solid ${t.faintBorder}`, borderRadius: 8, padding: "6px 12px", cursor: "pointer" }}>Edit</button>
+ <button type="button" onClick={() => startEditing(r)} style={{ fontSize: 12, fontWeight: 700, color: t.muted, background: "transparent", border: `1px solid ${t.faintBorder}`, borderRadius: 8, padding: "6px 12px", cursor: "pointer" }}>Edit</button>
+ </div>
+ {editingRole === r.role && draft && (
+ <div style={{ padding: "18px 24px 22px", borderTop: `1px solid ${t.faintBorder}`, background: t.softFill }}>
+  <div style={{ display: "grid", gridTemplateColumns: "1fr 120px", gap: 14, marginBottom: 14 }}>
+   <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <span style={{ fontSize: 10, fontWeight: 800, color: t.muted, letterSpacing: "0.1em", textTransform: "uppercase" }}>Role</span>
+    <input value={draft.role} onChange={(event) => setDraft({ ...draft, role: event.target.value })} style={{ height: 36, padding: "0 10px", border: `1px solid ${t.faintBorder}`, borderRadius: 7, background: t.raised, color: t.fg, fontSize: 13 }} />
+   </label>
+   <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <span style={{ fontSize: 10, fontWeight: 800, color: t.muted, letterSpacing: "0.1em", textTransform: "uppercase" }}>Seats</span>
+    <input type="number" min={0} value={draft.count} onChange={(event) => setDraft({ ...draft, count: Math.max(0, Number(event.target.value) || 0) })} style={{ height: 36, padding: "0 10px", border: `1px solid ${t.faintBorder}`, borderRadius: 7, background: t.raised, color: t.fg, fontSize: 13 }} />
+   </label>
+  </div>
+  <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+   <span style={{ fontSize: 10, fontWeight: 800, color: t.muted, letterSpacing: "0.1em", textTransform: "uppercase" }}>Permissions (comma separated)</span>
+   <input value={draft.can.join(", ")} onChange={(event) => setDraft({ ...draft, can: event.target.value.split(",").map((permission) => permission.trim()).filter(Boolean) })} style={{ height: 36, padding: "0 10px", border: `1px solid ${t.faintBorder}`, borderRadius: 7, background: t.raised, color: t.fg, fontSize: 13 }} />
+  </label>
+  <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 14 }}>
+   <button type="button" onClick={() => { setEditingRole(null); setDraft(null); }} style={{ height: 34, padding: "0 14px", border: `1px solid ${t.faintBorder}`, borderRadius: 7, background: "transparent", color: t.muted, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
+   <button type="button" onClick={saveRole} style={{ height: 34, padding: "0 14px", border: "none", borderRadius: 7, background: COBALT, color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Save changes</button>
+  </div>
+ </div>
+ )}
  </div>
  ))}
  </div>
+ {saveMessage && <div role="status" style={{ marginTop: 12, color: "#16A34A", fontSize: 12, fontWeight: 700 }}>{saveMessage}</div>}
  </>
  );
 }
