@@ -355,9 +355,36 @@ export default function HomePage() {
  <ActionLink href="/design-studio">
  Open Studio <Workflow size={15} />
  </ActionLink>
+ <ActionLink href="/aichat" variant="secondary">
+ Try AI Chat <ArrowRight size={15} />
+ </ActionLink>
  <ActionLink href="/pricing" variant="secondary">
  See Pricing
  </ActionLink>
+ </div>
+ </div>
+ </section>
+
+ <section data-crystal-reveal style={{ padding: "92px 0 108px", borderTop: `1px solid ${t.faint}`, background: t.surface }}>
+ <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
+ <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 18 }}>CRYSTAL STUDIO / AVAILABLE EVERYWHERE</div>
+ <h2 style={{ margin: 0, fontSize: "clamp(38px,6vw,72px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.94 }}>
+ Design wherever ideas take you.
+ </h2>
+ <p style={{ margin: "22px auto 0", maxWidth: 560, color: t.muted, fontSize: 16, lineHeight: 1.65 }}>
+ Keep your projects close, move from inspiration to execution, and continue designing across the tools and devices you use every day.
+ </p>
+ <div className="grid grid-cols-1 gap-4 sm:grid-cols-3" style={{ marginTop: 38 }}>
+ {[
+ { label: "App Store", detail: "For iPhone and iPad", mark: "A" },
+ { label: "Google Play", detail: "For Android devices", mark: "▶" },
+ { label: "Crystal Store", detail: "Desktop for professionals", mark: "C" },
+ ].map((store) => (
+ <Link key={store.label} href="/download" style={{ display: "flex", alignItems: "center", gap: 14, minHeight: 82, padding: "16px 20px", border: `1px solid ${t.faint}`, borderRadius: 14, background: t.raised, color: t.fg, textAlign: "left", textDecoration: "none" }} className="transition hover:border-[#4284FF]">
+ <span style={{ display: "grid", placeItems: "center", width: 40, height: 40, flexShrink: 0, borderRadius: 10, background: `${COBALT}16`, color: COBALT, fontSize: 16, fontWeight: 900 }}>{store.mark}</span>
+ <span><strong style={{ display: "block", fontSize: 15, fontWeight: 800 }}>{store.label}</strong><span style={{ display: "block", marginTop: 4, color: t.muted, fontSize: 12 }}>{store.detail}</span></span>
+ </Link>
+ ))}
  </div>
  </div>
  </section>

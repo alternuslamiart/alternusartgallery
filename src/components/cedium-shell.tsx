@@ -117,6 +117,9 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  <Link href="/download" className="hidden sm:inline-flex" style={{ alignItems: "center", height: 36, padding: "0 15px", color: fg, fontSize: 13, fontWeight: 700, textDecoration: "none", border: `1px solid ${faint}`, borderRadius: 8 }}>
  Download App
  </Link>
+ <Link href="/aichat" className="hidden sm:inline-flex" style={{ alignItems: "center", height: 36, padding: "0 15px", color: fg, fontSize: 13, fontWeight: 700, textDecoration: "none", border: `1px solid ${faint}`, borderRadius: 8 }}>
+ AI Chat
+ </Link>
  <Link href="/project" className="coreforge-nav-cta" style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 18px", background: COBALT, color: "#FFF", fontSize: 13, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8 }}>
  Launch Studio <span style={{ fontSize: 10, opacity: 0.8 }}>↗</span>
  </Link>
