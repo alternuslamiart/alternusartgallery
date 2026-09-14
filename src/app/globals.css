@@ -1726,6 +1726,10 @@
 [data-coreforge-theme="dark"] .coreforge-page .coreforge-footer {
   background: #0a0a0a !important;
 }
+[data-coreforge-theme="dark"] .coreforge-page .crystal-feature-visual {
+  border: 2px solid #4284ff;
+  box-shadow: 0 0 0 1px rgba(66, 132, 255, 0.18), 0 12px 30px rgba(45, 104, 231, 0.16);
+}
 [data-coreforge-theme="dark"] .coreforge-page .crystal-first-card,
 [data-coreforge-theme="dark"] .coreforge-page .crystal-home-surface,
 [data-coreforge-theme="dark"] .coreforge-page .crystal-process article {
