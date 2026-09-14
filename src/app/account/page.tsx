@@ -420,6 +420,10 @@ function Members({ t, accountName, accountEmail, accountInitials }: { t: Tokens 
   }
   persist(people.filter((item) => item.e !== person.e));
   setOpenMenu(null);
+  if (editingEmail === person.e) {
+   setEditingEmail(null);
+   setDraft(null);
+  }
   setNotice(`${person.n} was removed from the organization.`);
  };
 
@@ -433,7 +437,7 @@ function Members({ t, accountName, accountEmail, accountInitials }: { t: Tokens 
  {notice && <div role="status" style={{ marginTop: -8, marginBottom: 14, color: notice.includes("successfully") || notice.includes("updated") ? "#16A34A" : "#EF4444", fontSize: 12, fontWeight: 700 }}>{notice}</div>}
  <div style={{ ...t.baseCard, overflow: "hidden", maxWidth: 820 }}>
  {people.map((p, i) => (
- <div key={p.e}>
+ <div key={p.e} className="group">
  <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 120px 80px", gap: 16, padding: "16px 22px", borderTop: i > 0 ? `1px solid ${t.faintBorder}` : "none", alignItems: "center" }}>
  <div style={{ width: 36, height: 36, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800 }}>{p.c}</div>
  <div style={{ minWidth: 0 }}>
@@ -442,7 +446,7 @@ function Members({ t, accountName, accountEmail, accountInitials }: { t: Tokens 
  </div>
  <div style={{ fontSize: 11.5, fontWeight: 700, color: t.muted, letterSpacing: "0.06em", textTransform: "uppercase" }}>{p.r}</div>
  <div style={{ position: "relative", justifySelf: "end" }}>
- <button type="button" onClick={() => setOpenMenu(openMenu === p.e ? null : p.e)} aria-label={`Actions for ${p.n}`} style={{ fontSize: 16, lineHeight: 1, color: t.muted, background: "transparent", border: "none", cursor: "pointer", padding: "4px 8px" }}>⋯</button>
+ <button type="button" onClick={() => setOpenMenu(openMenu === p.e ? null : p.e)} aria-label={`Actions for ${p.n}`} className="opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100" style={{ fontSize: 16, lineHeight: 1, color: t.muted, background: "transparent", border: "none", cursor: "pointer", padding: "4px 8px" }}>⋯</button>
  {openMenu === p.e && <div style={{ position: "absolute", right: 0, top: 30, zIndex: 10, minWidth: 130, padding: 5, border: `1px solid ${t.faintBorder}`, borderRadius: 8, background: t.raised, boxShadow: "0 10px 24px rgba(0,0,0,.18)" }}>
  <button type="button" onClick={() => startEdit(p)} style={{ display: "block", width: "100%", padding: "8px 10px", border: 0, borderRadius: 5, background: "transparent", color: t.fg, textAlign: "left", fontSize: 12, cursor: "pointer" }}>Edit</button>
  <button type="button" onClick={() => deleteMember(p)} style={{ display: "block", width: "100%", padding: "8px 10px", border: 0, borderRadius: 5, background: "transparent", color: "#EF4444", textAlign: "left", fontSize: 12, cursor: "pointer" }}>Delete</button>
