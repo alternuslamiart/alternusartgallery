@@ -751,6 +751,7 @@ function APIKeys({ t }: { t: Tokens }) {
 
 function Usage({ t }: { t: Tokens }) {
  const [range, setRange] = useState<"7d" | "15d" | "30d" | "90d">("15d");
+ const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
  const usageByRange: Record<typeof range, number[]> = {
   "7d": [58, 74, 63, 89, 77, 95, 68],
   "15d": [42, 68, 55, 88, 74, 92, 61, 72, 80, 95, 67, 58, 77, 89, 93],
@@ -810,11 +811,15 @@ function Usage({ t }: { t: Tokens }) {
  ))}
  </div>
  </div>
- <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 160, paddingTop: 20 }}>
+ <div style={{ display: "flex", alignItems: "stretch", gap: 8, height: 160, paddingTop: 20 }}>
  {bars.map((h, i) => (
- <div key={i} title={`${h} runs`} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minWidth: 0 }}>
- <div style={{ width: "100%", height: `${h}%`, background: COBALT, opacity: 0.15 + (h / 100) * 0.85, borderRadius: "4px 4px 0 0" }} />
- <span style={{ fontSize: 9, color: t.muted, fontFamily: "var(--font-geist-mono),monospace" }}>{i + 1}</span>
+ <div key={i} onMouseEnter={() => setHoveredIndex(i)} onMouseLeave={() => setHoveredIndex(null)} style={{ flex: 1, position: "relative", display: "flex", flexDirection: "column", alignItems: "center", minWidth: 0, cursor: "crosshair" }}>
+ {hoveredIndex === i && <div style={{ position: "absolute", top: 0, bottom: 18, left: "50%", width: 1, background: COBALT, opacity: 0.75, pointerEvents: "none" }} />}
+ {hoveredIndex === i && <div style={{ position: "absolute", zIndex: 2, top: -9, left: "50%", transform: "translateX(-50%)", padding: "5px 8px", borderRadius: 5, background: t.fg, color: t.raised, fontSize: 10, fontWeight: 800, whiteSpace: "nowrap", boxShadow: "0 4px 12px rgba(0,0,0,0.18)", pointerEvents: "none" }}>{h} runs</div>}
+ <div style={{ flex: 1, width: "100%", display: "flex", alignItems: "flex-end" }}>
+ <div style={{ width: "100%", height: `${h}%`, background: COBALT, opacity: hoveredIndex === i ? 1 : 0.15 + (h / 100) * 0.85, borderRadius: "4px 4px 0 0", transition: "opacity 120ms ease" }} />
+ </div>
+ <span style={{ position: "relative", zIndex: 1, fontSize: 9, color: hoveredIndex === i ? COBALT : t.muted, fontWeight: hoveredIndex === i ? 800 : 400, fontFamily: "var(--font-geist-mono),monospace", transition: "color 120ms ease" }}>{i + 1}</span>
  </div>
  ))}
  </div>
