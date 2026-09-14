@@ -162,6 +162,7 @@ export function CoreforgeFooter({ isDark, fg, muted, faint }: Pick<ReturnType<ty
  ]},
  { heading: "Design", links: [
  { l: "Launch Studio", h: "/project", ext: true },
+ { l: "Community", h: "/community", ext: false },
  { l: "Download Desktop App", h: "/download", ext: false },
  { l: "Architecture", h: "/workspace/files", ext: false },
  { l: "Interior Design", h: "/workspace/code", ext: false },
