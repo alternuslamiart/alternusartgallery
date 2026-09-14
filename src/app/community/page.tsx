@@ -14,12 +14,14 @@ import {
  Globe2,
  Home,
  Layers3,
+ Moon,
  MessageCircle,
  MessageSquareText,
  Plus,
  Search,
  Sparkles,
  Star,
+ Sun,
  ThumbsUp,
  Wand2,
  Workflow,
@@ -170,6 +172,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 export default function CommunityPage() {
+ const [isDark, setIsDark] = useState(false);
  const [activeSpace, setActiveSpace] = useState("all");
  const [activeTab, setActiveTab] = useState("overview");
  const [searchQuery, setSearchQuery] = useState("");
@@ -282,16 +285,33 @@ export default function CommunityPage() {
  };
 
  return (
- <main className="min-h-screen bg-[#EEF3F7] font-roboto text-[#111827]">
+ <main className={`community-page min-h-screen font-roboto ${isDark ? "community-dark" : "community-light"}`}>
+ <style>{`
+   .community-page { background:#f3f6f8; color:#111827; }
+   .community-page.community-dark { background:#111315; color:#f4f7fa; }
+   .community-page.community-dark header { background:rgba(17,19,21,.92); border-color:#2a3035; }
+   .community-page.community-dark .community-surface { background:#1a1d20; border-color:#30363d; color:#f4f7fa; }
+   .community-page.community-dark .community-soft { background:#22272b; border-color:#343b42; color:#dce3e9; }
+   .community-page.community-dark .community-muted { color:#98a5b2; }
+   .community-page.community-dark .community-border { border-color:#30363d; }
+   .community-page.community-dark h1,.community-page.community-dark h2,.community-page.community-dark h3 { color:#f4f7fa; }
+   .community-page.community-dark p,.community-page.community-dark label { color:#aab6c1; }
+   .community-page.community-dark .bg-white { background:#1a1d20; }
+   .community-page.community-dark .border-[#DCEAF5],.community-page.community-dark .border-[#EEF3F7] { border-color:#30363d; }
+   .community-page.community-dark .text-[#0F172A],.community-page.community-dark .text-[#111827] { color:#f4f7fa; }
+   .community-page.community-dark .text-[#64748B],.community-page.community-dark .text-[#475569] { color:#98a5b2; }
+   .community-page.community-dark input, .community-page.community-dark textarea { background:#1d2125; border-color:#343b42; color:#f4f7fa; }
+   .community-page.community-dark .community-nav { color:#c6d0d9; }
+ `}</style>
  <header className="sticky top-0 z-30 border-b border-[#D8E2EA] bg-white/92 backdrop-blur-xl">
- <div className="mx-auto flex h-14 max-w-[1440px] items-center gap-3 px-3 sm:px-4">
+ <div className="mx-auto grid h-14 max-w-[1280px] grid-cols-[1fr_auto_1fr] items-center gap-3 px-3 sm:px-4">
  <Link href="/" className="inline-flex items-center gap-2 rounded-[12px] px-2 py-1.5 text-sm font-semibold text-[#0F172A] hover:bg-[#F1F5F9]">
  <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#38BDF8] text-white">
  <Sparkles className="h-4 w-4 fill-current" />
  </span>
  Crystal Studio
  </Link>
- <label className="hidden h-9 min-w-0 flex-1 items-center gap-2 rounded-full bg-[#EEF3F7] px-4 text-sm text-[#64748B] md:flex">
+ <label className="hidden h-9 min-w-0 max-w-[430px] items-center gap-2 rounded-full bg-[#EEF3F7] px-4 text-sm text-[#64748B] md:flex">
  <Search className="h-4 w-4" />
  <input
  value={searchQuery}
@@ -300,6 +320,12 @@ export default function CommunityPage() {
  className="min-w-0 flex-1 bg-transparent text-sm text-[#0F172A] outline-none placeholder:text-[#64748B]"
  />
  </label>
+ <div className="flex justify-center">
+ <button type="button" onClick={() => setIsDark((value) => !value)} aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"} aria-pressed={isDark} className="community-nav inline-flex h-9 items-center gap-2 rounded-full border border-[#DCEAF5] bg-white px-3 text-xs font-semibold shadow-sm transition hover:bg-[#F0F9FF]">
+ {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />} {isDark ? "Light" : "Dark"}
+ </button>
+ </div>
+ <div className="flex items-center justify-end gap-2">
  <Link href="/main" className="hidden h-9 items-center gap-2 rounded-full border border-[#DCEAF5] bg-white px-4 text-sm font-semibold text-[#0F172A] hover:bg-[#F0F9FF] sm:inline-flex">
  Open Studio
  </Link>
@@ -311,9 +337,10 @@ export default function CommunityPage() {
  <Bell className="h-4 w-4" />
  </button>
  </div>
+ </div>
  </header>
 
- <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-4 px-3 py-4 sm:px-4 lg:grid-cols-[72px_230px_minmax(0,1fr)_310px]">
+ <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-4 px-3 py-5 sm:px-4 lg:grid-cols-[64px_214px_minmax(0,1fr)_280px]">
  <aside className="hidden lg:flex lg:flex-col lg:items-center lg:gap-3">
  <IconTile icon={Home} active={activeSpace === "all"} label="Home" onClick={() => selectSpace("all")} />
  <IconTile icon={Sparkles} active={activeSpace === "showcase"} label="AI Community" onClick={() => selectSpace("showcase")} />
@@ -323,7 +350,7 @@ export default function CommunityPage() {
  <IconTile icon={Plus} label="Create new space" onClick={scrollToComposer} />
  </aside>
 
- <aside className="hidden overflow-hidden rounded-[20px] border border-[#DCEAF5] bg-[#101114] text-white shadow-sm lg:block">
+ <aside className="community-surface hidden overflow-hidden rounded-[20px] border border-[#DCEAF5] bg-[#101114] text-white shadow-sm lg:block">
  <div className="bg-gradient-to-br from-[#7C3AED] via-[#38BDF8] to-[#F0F9FF] p-4">
  <div className="flex items-center justify-between">
  <div>
@@ -361,7 +388,7 @@ export default function CommunityPage() {
  </aside>
 
  <section className="min-w-0">
- <div className="overflow-hidden rounded-[20px] border border-[#DCEAF5] bg-white shadow-sm">
+ <div className="community-surface overflow-hidden rounded-[20px] border border-[#DCEAF5] bg-white shadow-sm">
  <div className="h-28 bg-gradient-to-br from-[#111827] via-[#1D4ED8] to-[#38BDF8]" />
  <div className="px-5 pb-5">
  <div className="-mt-9 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -404,7 +431,7 @@ export default function CommunityPage() {
  </div>
  </div>
 
- <div className="mt-4 rounded-[18px] border border-[#DCEAF5] bg-white p-4 shadow-sm">
+ <div className="community-surface mt-4 rounded-[18px] border border-[#DCEAF5] bg-white p-4 shadow-sm">
  <div className="flex gap-3">
  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#E0F2FE] text-sm font-semibold text-[#0369A1]">AL</div>
  <textarea
@@ -443,7 +470,7 @@ export default function CommunityPage() {
  </div>
  )}
  {filteredPosts.map(({ id, title, space, author, time, type, description, stack, notes, comments, likes, saves, forks, icon: Icon, accent }) => (
- <article key={title} className="overflow-hidden rounded-[18px] border border-[#DCEAF5] bg-white shadow-sm">
+ <article key={title} className="community-surface overflow-hidden rounded-[18px] border border-[#DCEAF5] bg-white shadow-sm">
  <div className="grid gap-0 md:grid-cols-[220px_minmax(0,1fr)]">
  <div className={`flex min-h-[190px] items-center justify-center bg-gradient-to-br ${accent} p-5 text-white`}>
  <div className="text-center">
@@ -509,7 +536,7 @@ export default function CommunityPage() {
  ))}
  </div>
 
- <div id="remix" ref={remixRef} className="mt-4 scroll-mt-20 rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
+ <div id="remix" ref={remixRef} className="community-surface mt-4 scroll-mt-20 rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
  <div className="flex items-center justify-between gap-4">
  <div>
  <p className="text-sm font-semibold text-[#0284C7]">Remix / Fork system</p>
@@ -529,7 +556,7 @@ export default function CommunityPage() {
  </section>
 
  <aside className="space-y-4 lg:sticky lg:top-[72px] lg:self-start">
- <section className="rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
+ <section className="community-surface rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
  <div className="flex items-start justify-between">
  <div>
  <h2 className="text-base font-semibold text-[#0F172A]">AI Creation Hub</h2>
@@ -549,7 +576,7 @@ export default function CommunityPage() {
  </button>
  </section>
 
- <section id="ai-review" ref={aiReviewRef} className="scroll-mt-20 rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
+ <section id="ai-review" ref={aiReviewRef} className="community-surface scroll-mt-20 rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
  <h2 className="text-sm font-semibold uppercase tracking-wide text-[#64748B]">AI inside projects</h2>
  <div className="mt-4 space-y-3">
  {aiReviewCards.map(({ title, body, icon: Icon }) => (
@@ -564,7 +591,7 @@ export default function CommunityPage() {
  </div>
  </section>
 
- <section className="rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
+ <section className="community-surface rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
  <h2 className="text-sm font-semibold uppercase tracking-wide text-[#64748B]">Reputation</h2>
  <div className="mt-4 space-y-2">
  {reputation.map((item) => (
@@ -576,7 +603,7 @@ export default function CommunityPage() {
  </div>
  </section>
 
- <section className="rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
+ <section className="community-surface rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
  <h2 className="text-sm font-semibold uppercase tracking-wide text-[#64748B]">Marketplace later</h2>
  <div className="mt-4 flex flex-wrap gap-2">
  {marketplaceLater.map((item) => (
