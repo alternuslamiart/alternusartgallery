@@ -22,6 +22,10 @@ import {
   Search,
   Share2,
   Sparkles,
+  Target,
+  EyeOff,
+  Pencil,
+  Trash2,
   X,
 } from "lucide-react";
 
@@ -38,7 +42,7 @@ const conversations = [
   "AutoCAD Course for Leaning",
 ];
 const models = ["Claude", "ChatGPT", "Gemini", "Grok", "Groq", "Copilot"];
-const recentItems = ["House Architecture", "Modern Interior", "Robot Concept", "Living Room Design", "New Project"];
+const initialRecentItems = ["House Architecture", "Modern Interior", "Robot Concept", "Living Room Design", "New Project"];
 
 export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -51,6 +55,9 @@ export default function AIChatPage() {
   const [modelsOpen, setModelsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [mode, setMode] = useState<"chat" | "workflow">("chat");
+  const [recentItems, setRecentItems] = useState(initialRecentItems);
+  const [openConversationMenu, setOpenConversationMenu] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -99,6 +106,28 @@ export default function AIChatPage() {
     await navigator.clipboard?.writeText(message.content);
     setCopiedId(message.id);
     window.setTimeout(() => setCopiedId(null), 1500);
+  };
+
+  const handleConversationAction = async (action: string, item: string) => {
+    setOpenConversationMenu(null);
+    if (action === "pin") {
+      setRecentItems((items) => [item, ...items.filter((current) => current !== item)]);
+      setToast(`${item} pinned.`);
+    } else if (action === "project") {
+      setToast(`${item} added to project.`);
+    } else if (action === "unread") {
+      setToast(`${item} marked as unread.`);
+    } else if (action === "rename") {
+      const nextName = window.prompt("Rename conversation", item)?.trim();
+      if (nextName && nextName !== item) setRecentItems((items) => items.map((current) => current === item ? nextName : current));
+    } else if (action === "share") {
+      await navigator.clipboard?.writeText(window.location.href);
+      setToast("Conversation link copied.");
+    } else if (action === "delete") {
+      setRecentItems((items) => items.filter((current) => current !== item));
+      setToast(`${item} deleted.`);
+    }
+    window.setTimeout(() => setToast(null), 1800);
   };
 
   return (
@@ -163,7 +192,10 @@ export default function AIChatPage() {
           <div className="mt-6 min-h-0 flex-1 overflow-y-auto">
             <div className="mb-2 px-3 text-[10px] font-medium uppercase tracking-[0.16em] text-zinc-600">Recent</div>
             <div className="space-y-0.5">
-              {recentItems.filter((item) => item.toLowerCase().includes(search.toLowerCase())).map((item, index) => <button key={item} onClick={() => { setInput(item); setSidebarOpen(false); }} className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[12px] text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-zinc-200"><Sparkles size={14} className="shrink-0 text-zinc-600" /><span className="min-w-0 flex-1 truncate">{item}</span><MoreHorizontal size={14} className="shrink-0 opacity-0 transition group-hover:opacity-100" /></button>)}
+              {recentItems.filter((item) => item.toLowerCase().includes(search.toLowerCase())).map((item) => <div key={item} className="group relative">
+                <button onClick={() => { setInput(item); setSidebarOpen(false); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[12px] text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-zinc-200"><Sparkles size={14} className="shrink-0 text-zinc-600" /><span className="min-w-0 flex-1 truncate">{item}</span><span role="button" tabIndex={0} aria-label={`Options for ${item}`} onClick={(event) => { event.stopPropagation(); setOpenConversationMenu(openConversationMenu === item ? null : item); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setOpenConversationMenu(openConversationMenu === item ? null : item); } }} className="shrink-0 rounded-md p-1 text-zinc-500 opacity-0 transition hover:bg-[#363636] group-hover:opacity-100"><MoreHorizontal size={14} /></span></button>
+                {openConversationMenu === item && <ConversationMenu onAction={(action) => void handleConversationAction(action, item)} />}
+              </div>)}
             </div>
             <div className="mt-5 space-y-1.5 border-t border-[#242424] pt-4">
               {conversations.filter((item) => item.toLowerCase().includes(search.toLowerCase())).slice(0, 5).map((conversation, index) => <button key={conversation} onClick={() => setSidebarOpen(false)} className={`group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-[12px] transition hover:bg-[#1c1c1c] ${index === 0 ? "text-white" : "text-zinc-600 hover:text-zinc-300"}`}><span className="truncate">{conversation}</span><MoreHorizontal size={14} className="shrink-0 opacity-0 transition group-hover:opacity-100" /></button>)}
@@ -239,6 +271,21 @@ export default function AIChatPage() {
           <button type="submit" aria-label="Send message" disabled={!input.trim() || isSending} className="mb-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] text-white shadow-lg shadow-blue-500/20 transition-all hover:scale-105 hover:bg-[#2563eb] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"><ArrowUp size={17} /></button>
         </form>
       </main>
+      {toast && <div role="status" className="fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 rounded-lg border border-[#2a2a2a] bg-[#242424] px-4 py-2 text-xs text-white shadow-xl">{toast}</div>}
     </div>
   );
+}
+
+function ConversationMenu({ onAction }: { onAction: (action: string) => void }) {
+  const items = [
+    { action: "pin", label: "Pin", icon: Target },
+    { action: "project", label: "Add to project", icon: FolderPlus, arrow: true },
+    { action: "unread", label: "Mark as unread", icon: EyeOff },
+    { action: "rename", label: "Rename", icon: Pencil },
+    { action: "share", label: "Share", icon: Share2, arrow: true },
+    { action: "delete", label: "Delete", icon: Trash2, danger: true },
+  ];
+  return <div role="menu" onClick={(event) => event.stopPropagation()} className="absolute right-0 top-10 z-[80] flex h-[218px] w-[195px] flex-col justify-center gap-1 rounded-[20px] border-[2px] border-[#303030] bg-[#242424] p-1 shadow-2xl">
+    {items.map(({ action, label, icon: Icon, arrow, danger }) => <button key={action} role="menuitem" onClick={() => onAction(action)} className={`flex h-9 min-h-9 w-full items-center gap-3 rounded-[12px] px-3 text-left text-sm font-medium transition hover:bg-[#363636] ${danger ? "text-[#FF6B6B]" : "text-zinc-100"}`}><Icon size={20} strokeWidth={2} /><span className="flex-1">{label}</span>{arrow && <span className="text-lg leading-none">›</span>}</button>)}
+  </div>;
 }
