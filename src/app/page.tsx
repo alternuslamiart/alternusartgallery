@@ -149,7 +149,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <FeatureShowcase title="Visualize Every Room" image="/Section/section1.png" copy="Explore architectural concepts through floor plans, interior layouts, 3D visualization, materials, lighting, and clear design documentation." />
+ <FeatureShowcase title="Planarch 3" image="/Section/Planarch.png" copy="Shape thoughtful homes with detailed floor plans, room layouts, materials, and 3D visualizations designed around everyday living." />
 
  <section data-crystal-reveal style={{ padding: "94px 0", borderTop: `1px solid ${t.faint}`, borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
@@ -217,7 +217,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <FeatureShowcase reverse title="Design for Home Robotics" image="/Section/section0.jpg" copy="Develop helpful household robots with a workspace for robot configuration, component visualization, residential environments, and human-robot interaction." />
+ <FeatureShowcase reverse title="Infra" image="/Section/Infra.png" copy="Plan smarter infrastructure with connected buildings, sustainable energy systems, utilities, transport, and resilient public spaces." />
 
  <section data-crystal-reveal style={{ padding: "96px 0" }}>
  <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
