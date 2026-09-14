@@ -149,7 +149,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <FeatureShowcase title="Planarch 3" image="/Section/Planarch.png" copy="Shape thoughtful homes with detailed floor plans, room layouts, materials, and 3D visualizations designed around everyday living." />
+ <FeatureShowcase title="Planarch 3: Turn Plans into Places" image="/Section/Planarch.png" copy="Transform architectural ideas into complete living spaces with detailed floor plans, room layouts, materials, and 3D visualizations designed around everyday life." />
 
  <section data-crystal-reveal style={{ padding: "94px 0", borderTop: `1px solid ${t.faint}`, borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
@@ -217,7 +217,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <FeatureShowcase reverse title="Infra" image="/Section/Infra.png" copy="Plan smarter infrastructure with connected buildings, sustainable energy systems, utilities, transport, and resilient public spaces." />
+ <FeatureShowcase reverse title="Infra: Build Smarter Systems" image="/Section/Infra.png" copy="Design the infrastructure that keeps communities moving, connecting buildings, utilities, transport, clean energy, and resilient public spaces in one intelligent plan." />
 
  <section data-crystal-reveal style={{ padding: "96px 0" }}>
  <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
