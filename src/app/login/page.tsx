@@ -128,7 +128,7 @@ export default function LoginPage() {
  return (
  <div className={`auth-page ${isLight ? "auth-light" : "auth-dark"}`}>
  <div className="auth-glow pointer-events-none fixed inset-x-0 top-0 h-[520px]" />
- <header className="relative z-10 mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
+ <header className="absolute inset-x-0 top-0 z-10 mx-auto flex h-20 w-full items-center justify-between px-5 sm:px-8 lg:px-10">
  <Brand />
  <div className="flex items-center gap-3">
  <button
@@ -145,7 +145,7 @@ export default function LoginPage() {
  </div>
  </header>
 
- <main className="relative z-10 flex min-h-[calc(100vh-80px)] items-center justify-center px-5 pb-16 pt-8">
+ <main className="relative z-10 flex min-h-screen w-full items-center justify-center overflow-y-auto px-5 pb-8 pt-24">
  <Card className="auth-card w-full max-w-md rounded-[24px] border shadow-none backdrop-blur-xl">
  <CardHeader className="space-y-3 p-7 text-center">
  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Crystal Studio workspace</p>
