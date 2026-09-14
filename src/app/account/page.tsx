@@ -351,30 +351,117 @@ function Access({ t }: { t: Tokens }) {
 }
 
 function Members({ t, accountName, accountEmail, accountInitials }: { t: Tokens } & AccountIdentity) {
- const people = [
+ type Member = { n: string; e: string; r: string; c: string };
+ const defaultPeople: Member[] = [
  { n: accountName, e: accountEmail, r: "Owner", c: accountInitials },
  { n: "Maya Ibrahim", e: "maya@alternusart.com", r: "Admin", c: "MI" },
  { n: "Luca Ferrari", e: "luca@alternusart.com", r: "Member", c: "LF" },
  { n: "Priya Sharma", e: "priya@alternusart.com", r: "Member", c: "PS" },
  { n: "David Chen", e: "david@alternusart.com", r: "Guest", c: "DC" },
  ];
+ const [people, setPeople] = useState<Member[]>(defaultPeople);
+ const [email, setEmail] = useState("");
+ const [notice, setNotice] = useState("");
+ const [openMenu, setOpenMenu] = useState<string | null>(null);
+ const [editingEmail, setEditingEmail] = useState<string | null>(null);
+ const [draft, setDraft] = useState<Member | null>(null);
+
+ useEffect(() => {
+  const saved = window.localStorage.getItem("crystal-members");
+  if (!saved) return;
+  try {
+   setPeople(JSON.parse(saved) as Member[]);
+  } catch {
+   window.localStorage.removeItem("crystal-members");
+  }
+ }, []);
+
+ const persist = (next: Member[]) => {
+  setPeople(next);
+  window.localStorage.setItem("crystal-members", JSON.stringify(next));
+ };
+
+ const inviteMember = () => {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+   setNotice("Enter a valid email address.");
+   return;
+  }
+  if (people.some((person) => person.e === normalizedEmail)) {
+   setNotice("This email is already a member.");
+   return;
+  }
+  const name = normalizedEmail.split("@")[0].replace(/[._-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const initials = name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+  persist([...people, { n: name || "New member", e: normalizedEmail, r: "Member", c: initials || "NM" }]);
+  setEmail("");
+  setNotice("Invitation added successfully.");
+ };
+
+ const startEdit = (person: Member) => {
+  setEditingEmail(person.e);
+  setDraft({ ...person });
+  setOpenMenu(null);
+ };
+
+ const saveEdit = () => {
+  if (!draft) return;
+  persist(people.map((person) => person.e === editingEmail ? draft : person));
+  setEditingEmail(null);
+  setDraft(null);
+  setNotice("Member details updated.");
+ };
+
+ const deleteMember = (person: Member) => {
+  if (person.r === "Owner") {
+   setNotice("The organization owner cannot be deleted.");
+   setOpenMenu(null);
+   return;
+  }
+  persist(people.filter((item) => item.e !== person.e));
+  setOpenMenu(null);
+  setNotice(`${person.n} was removed from the organization.`);
+ };
+
  return (
  <>
  <SectionHeading eyebrow="§ MEMBERS" title="Team members." desc="Invite your team, assign roles, and manage seat usage." t={t} />
  <div style={{ display: "flex", gap: 12, marginBottom: 18 }}>
- <input placeholder="Add by email…" style={{ flex: 1, maxWidth: 420, height: 42, padding: "0 14px", border: `1px solid ${t.faintBorder}`, borderRadius: 8, background: t.softFill, color: t.fg, fontSize: 14, outline: "none", fontFamily: "inherit" }} />
- <button style={{ height: 42, padding: "0 20px", background: COBALT, color: "#fff", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 8, cursor: "pointer" }}>+ Invite</button>
+ <input value={email} onChange={(event) => { setEmail(event.target.value); setNotice(""); }} onKeyDown={(event) => { if (event.key === "Enter") inviteMember(); }} placeholder="Add by email…" style={{ flex: 1, maxWidth: 420, height: 42, padding: "0 14px", border: `1px solid ${t.faintBorder}`, borderRadius: 8, background: t.softFill, color: t.fg, fontSize: 14, outline: "none", fontFamily: "inherit" }} />
+ <button type="button" onClick={inviteMember} style={{ height: 42, padding: "0 20px", background: COBALT, color: "#fff", fontSize: 13, fontWeight: 700, border: "none", borderRadius: 8, cursor: "pointer" }}>+ Invite</button>
  </div>
+ {notice && <div role="status" style={{ marginTop: -8, marginBottom: 14, color: notice.includes("successfully") || notice.includes("updated") ? "#16A34A" : "#EF4444", fontSize: 12, fontWeight: 700 }}>{notice}</div>}
  <div style={{ ...t.baseCard, overflow: "hidden", maxWidth: 820 }}>
  {people.map((p, i) => (
- <div key={p.e} style={{ display: "grid", gridTemplateColumns: "auto 1fr 120px 80px", gap: 16, padding: "16px 22px", borderTop: i > 0 ? `1px solid ${t.faintBorder}` : "none", alignItems: "center" }}>
+ <div key={p.e}>
+ <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 120px 80px", gap: 16, padding: "16px 22px", borderTop: i > 0 ? `1px solid ${t.faintBorder}` : "none", alignItems: "center" }}>
  <div style={{ width: 36, height: 36, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800 }}>{p.c}</div>
  <div style={{ minWidth: 0 }}>
  <div style={{ fontSize: 13.5, fontWeight: 700, letterSpacing: "-0.01em" }}>{p.n}</div>
  <div style={{ fontSize: 11.5, color: t.muted }}>{p.e}</div>
  </div>
  <div style={{ fontSize: 11.5, fontWeight: 700, color: t.muted, letterSpacing: "0.06em", textTransform: "uppercase" }}>{p.r}</div>
- <button style={{ fontSize: 12, fontWeight: 600, color: t.muted, background: "transparent", border: "none", cursor: "pointer", justifySelf: "end" }}>⋯</button>
+ <div style={{ position: "relative", justifySelf: "end" }}>
+ <button type="button" onClick={() => setOpenMenu(openMenu === p.e ? null : p.e)} aria-label={`Actions for ${p.n}`} style={{ fontSize: 16, lineHeight: 1, color: t.muted, background: "transparent", border: "none", cursor: "pointer", padding: "4px 8px" }}>⋯</button>
+ {openMenu === p.e && <div style={{ position: "absolute", right: 0, top: 30, zIndex: 10, minWidth: 130, padding: 5, border: `1px solid ${t.faintBorder}`, borderRadius: 8, background: t.raised, boxShadow: "0 10px 24px rgba(0,0,0,.18)" }}>
+ <button type="button" onClick={() => startEdit(p)} style={{ display: "block", width: "100%", padding: "8px 10px", border: 0, borderRadius: 5, background: "transparent", color: t.fg, textAlign: "left", fontSize: 12, cursor: "pointer" }}>Edit</button>
+ <button type="button" onClick={() => deleteMember(p)} style={{ display: "block", width: "100%", padding: "8px 10px", border: 0, borderRadius: 5, background: "transparent", color: "#EF4444", textAlign: "left", fontSize: 12, cursor: "pointer" }}>Delete</button>
+ </div>}
+ </div>
+ </div>
+ {editingEmail === p.e && draft && <div style={{ padding: "16px 22px 20px", borderTop: `1px solid ${t.faintBorder}`, background: t.softFill }}>
+ <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 120px", gap: 10 }}>
+ <input value={draft.n} onChange={(event) => setDraft({ ...draft, n: event.target.value, c: event.target.value.split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase() || "NM" })} aria-label="Member name" style={{ height: 36, padding: "0 10px", border: `1px solid ${t.faintBorder}`, borderRadius: 7, background: t.raised, color: t.fg, fontSize: 12 }} />
+ <input value={draft.e} onChange={(event) => setDraft({ ...draft, e: event.target.value })} aria-label="Member email" style={{ height: 36, padding: "0 10px", border: `1px solid ${t.faintBorder}`, borderRadius: 7, background: t.raised, color: t.fg, fontSize: 12 }} />
+ <select value={draft.r} onChange={(event) => setDraft({ ...draft, r: event.target.value })} aria-label="Member role" style={{ height: 36, padding: "0 8px", border: `1px solid ${t.faintBorder}`, borderRadius: 7, background: t.raised, color: t.fg, fontSize: 12 }}>
+  {["Owner", "Admin", "Member", "Guest"].map((role) => <option key={role}>{role}</option>)}
+ </select>
+ </div>
+ <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 12 }}>
+  <button type="button" onClick={() => { setEditingEmail(null); setDraft(null); }} style={{ height: 32, padding: "0 12px", border: `1px solid ${t.faintBorder}`, borderRadius: 6, background: "transparent", color: t.muted, fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
+  <button type="button" onClick={saveEdit} style={{ height: 32, padding: "0 12px", border: 0, borderRadius: 6, background: COBALT, color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>Save changes</button>
+ </div>
+ </div>}
  </div>
  ))}
  </div>
