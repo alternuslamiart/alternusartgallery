@@ -87,6 +87,8 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   const [playing, setPlaying] = useState(false);
   const [alternateTheme, setAlternateTheme] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [contextSubmenu, setContextSubmenu] = useState<"widget" | "plugins" | null>(null);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [mobileProfile, setMobileProfile] = useState(false);
   const [mobilePricing, setMobilePricing] = useState(false);
@@ -217,9 +219,38 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   const menuItems:Record<string,string[]>={File:["New Scene","Open","Save","Save As","Export","Import","Recent Files"],Edit:["Undo  Ctrl+Z","Redo  Ctrl+Y","Cut","Copy","Paste","Duplicate","Delete","Select All","Preferences"],Tools:["Move","Rotate","Scale","Measure","Snap"],Help:["Documentation","Keyboard Shortcuts","Report a Bug","About"],View:["Toggle Grid","Toggle Axis Gizmo","Wireframe Mode","Front Camera","Top Camera","Side Camera","Perspective","Fullscreen"]};
   const openScene = (file: File) => { void file.text().then(raw => { const saved = JSON.parse(raw) as Partial<{ assets: StudioAsset[]; material: MaterialName; roughness: number; metallic: number; renderSettings: RenderSettings; floorPlanObjects: FloorPlanObject[]; floorPlanSettings: FloorPlanSettings; settings: FloorPlanSettings; units: FloorPlanSettings["unit"]; scale: string; precision: number }>; if (saved.assets) setAssets(saved.assets); if (saved.material) setMaterial(saved.material); if (typeof saved.roughness === "number") setRoughness(saved.roughness); if (typeof saved.metallic === "number") setMetallic(saved.metallic); if (saved.renderSettings) setRenderSettings(saved.renderSettings); if (saved.floorPlanObjects) setFloorPlanObjects(saved.floorPlanObjects); const settings = saved.floorPlanSettings ?? saved.settings ?? { ...DEFAULT_FLOOR_PLAN_SETTINGS, unit: saved.units ?? DEFAULT_FLOOR_PLAN_SETTINGS.unit, scale: Number(saved.scale?.split(":").pop()) || DEFAULT_FLOOR_PLAN_SETTINGS.scale, precision: saved.precision ?? DEFAULT_FLOOR_PLAN_SETTINGS.precision }; setFloorPlanSettings({ ...DEFAULT_FLOOR_PLAN_SETTINGS, ...settings }); setToast("Scene opened."); }).catch(() => setToast("Could not open scene.")); };
   const runMenuAction=(raw:string)=>{const action=raw.split("  ")[0];setOpenMenu(null);if(action==="New Scene"){setAssets(initialAssets);setSelectedAssetId(null);setToast("New scene created.")}else if(action==="Open"){sceneFileInput.current?.click()}else if(action==="Save"||action==="Save As"){localStorage.setItem("crystal-studio-state",JSON.stringify({assets,material,roughness,metallic,renderSettings,floorPlanObjects,floorPlanSettings}));setToast("Scene saved locally.")}else if(action==="Delete"&&selectedAssetId){setAssets(x=>x.filter(a=>a.id!==selectedAssetId));setSelectedAssetId(null);setToast("Asset deleted.")}else if(action==="Duplicate"&&selectedAsset){setAssets(x=>[{...selectedAsset,id:crypto.randomUUID(),name:`${selectedAsset.name} Copy`},...x]);setToast("Asset duplicated.")}else if(["Move","Rotate","Scale"].includes(action)){setActiveTool(action.toLowerCase() as StudioTool);setToast(`${action} tool active.`)}else if(action==="Fullscreen"){document.documentElement.requestFullscreen?.();}else if(action==="Export"){handleExport("glTF 2.0")}else setToast(`${action} selected.`)};
+  const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setOpenMenu(null);
+    setContextSubmenu(null);
+    setContextMenu({ x: Math.min(event.clientX, window.innerWidth - 418), y: Math.min(event.clientY, window.innerHeight - 478) });
+  };
+  const closeContextMenu = () => {
+    setContextMenu(null);
+    setContextSubmenu(null);
+  };
+  const runContextAction = async (action: "copy" | "paste" | "chat" | "toggle-ui" | "widget" | "plugins") => {
+    closeContextMenu();
+    if (action === "copy") {
+      await navigator.clipboard?.writeText(window.location.href);
+      setToast("Link copied.");
+    } else if (action === "paste") {
+      const text = await navigator.clipboard?.readText();
+      if (text) setPrompt(current => current ? `${current} ${text}` : text);
+    } else if (action === "chat") {
+      router.push("/aichat");
+    } else if (action === "toggle-ui") {
+      setLeftOpen(current => !current);
+      setRightOpen(current => !current);
+    } else if (action === "widget") {
+      setToast("Widget options selected.");
+    } else if (action === "plugins") {
+      setToast("Plugin options selected.");
+    }
+  };
 
   return (
-    <div className={`crystal-studio crystal-ui-kit crystal-studio-enter ${studioMode === "modeling" ? "crystal-modeling-mode" : ""} ${embedded ? "crystal-studio-embedded" : "fixed inset-0 z-[90]"} grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
+    <div onClick={() => contextMenu && closeContextMenu()} onContextMenu={handleContextMenu} className={`crystal-studio crystal-ui-kit crystal-studio-enter ${studioMode === "modeling" ? "crystal-modeling-mode" : ""} ${embedded ? "crystal-studio-embedded" : "fixed inset-0 z-[90]"} grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
       {mobileSplash && <div className="crystal-mobile-splash"><img src="/Logopng.png" alt="Crystal" /></div>}
       <input ref={sceneFileInput} type="file" accept="application/json,.json" className="sr-only" onChange={event => { const file = event.target.files?.[0]; if (file) openScene(file); event.currentTarget.value = ""; }} />
       <header className="crystal-topbar col-span-full flex h-16 items-center border-b border-[#292929] bg-[#0F0F0F] px-7">
@@ -260,6 +291,20 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
         <div className="crystal-pricing-tabs">{["Basic","Pro","Teams","Studio"].map(plan=><button key={plan} onClick={() => setPricingPlan(plan)} className={pricingPlan===plan?"active":""}>{plan}</button>)}</div>
         <div className="crystal-pricing-cycle"><button className="active">Monthly</button><button>Yearly 25% off</button></div>
         <div className="crystal-pricing-cards">{[{name:"Basic",price:"$5",cta:"Start Basic"},{name:"Pro",price:"$19",cta:"Upgrade to Pro"},{name:"Teams",price:"$39",cta:"Start Team trial"},{name:"Studio",price:"$100",cta:"Upgrade to Studio"}].map(plan=><article key={plan.name} className={pricingPlan===plan.name?"selected":""}><h2>{plan.name} Plan</h2><p>For starting with Crystal and running a single workspace.</p><strong>{plan.price}<small>/mo, billed yearly</small></strong><ul><li>1 personal workspace</li><li>Claude Haiku agent</li><li>5 GB knowledge layer</li><li>Mail · Files · Notes</li><li>Community support</li></ul><button onClick={() => setPricingPlan(plan.name)}>{plan.cta}</button></article>)}</div>
+      </div>}
+      {contextMenu && <div role="menu" onPointerDown={event => event.stopPropagation()} className="fixed z-[120] w-[398px] max-w-[calc(100vw-24px)] rounded-[28px] border-[11px] border-[#303030] bg-[#242424] p-1.5 text-white shadow-2xl" style={{ left: contextMenu.x, top: contextMenu.y }}>
+        <button role="menuitem" onClick={() => void runContextAction("copy")} className="flex h-14 w-full items-center justify-between rounded-[18px] bg-[#363636] px-7 text-[22px] font-medium hover:bg-[#414141]"><span>Copy</span><span>Ctrl + C</span></button>
+        <button role="menuitem" onClick={() => void runContextAction("paste")} className="flex h-14 w-full items-center justify-between rounded-[18px] px-7 text-[22px] font-medium hover:bg-[#303030]"><span>Paste</span><span>Ctrl + V</span></button>
+        <button role="menuitem" onClick={() => void runContextAction("chat")} className="flex h-14 w-full items-center justify-between rounded-[18px] px-7 text-[22px] font-medium hover:bg-[#303030]"><span>Cursor Chat</span><span>/</span></button>
+        <button role="menuitem" onClick={() => void runContextAction("toggle-ui")} className="flex h-14 w-full items-center justify-between rounded-[18px] px-7 text-[22px] font-medium hover:bg-[#303030]"><span>Show/Hide UI</span><span>‘</span></button>
+        <div className="relative">
+          <button role="menuitem" onMouseEnter={() => setContextSubmenu("widget")} className="flex h-14 w-full items-center justify-between rounded-[18px] px-7 text-[22px] font-medium hover:bg-[#303030]"><span>Widget</span><span>▹</span></button>
+          {contextSubmenu === "widget" && <div className="absolute left-full top-0 ml-2 w-52 rounded-2xl border border-white/10 bg-[#242424] p-2 shadow-2xl"><button onClick={() => void runContextAction("widget")} className="w-full rounded-xl px-4 py-3 text-left text-sm hover:bg-[#353535]">Manage widgets</button><button onClick={() => void runContextAction("widget")} className="w-full rounded-xl px-4 py-3 text-left text-sm hover:bg-[#353535]">Add widget</button></div>}
+        </div>
+        <div className="relative">
+          <button role="menuitem" onMouseEnter={() => setContextSubmenu("plugins")} className="flex h-14 w-full items-center justify-between rounded-[18px] px-7 text-[22px] font-medium hover:bg-[#303030]"><span>Plugins</span><span>▹</span></button>
+          {contextSubmenu === "plugins" && <div className="absolute left-full bottom-0 ml-2 w-52 rounded-2xl border border-white/10 bg-[#242424] p-2 shadow-2xl"><button onClick={() => void runContextAction("plugins")} className="w-full rounded-xl px-4 py-3 text-left text-sm hover:bg-[#353535]">Plugin manager</button><button onClick={() => void runContextAction("plugins")} className="w-full rounded-xl px-4 py-3 text-left text-sm hover:bg-[#353535]">Browse plugins</button></div>}
+        </div>
       </div>}
       {toast && <div role="status" className="fixed bottom-14 left-1/2 z-[110] -translate-x-1/2 rounded-xl border border-[#4A90D9]/40 bg-[#202020] px-5 py-3 text-xs shadow-2xl">{toast}</div>}
       {dialog && <div role="dialog" aria-modal="true" className="fixed inset-0 z-[105] grid place-items-center bg-black/65 p-5 backdrop-blur-sm"><div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#252525] p-6 shadow-2xl"><div className="flex items-center justify-between"><h2 className="text-lg font-semibold">{dialog==="credits"?"Starter plan":dialog==="profile"?"User account":"Sign out"}</h2><button aria-label="Close dialog" onClick={()=>setDialog(null)} className="rounded-lg px-3 py-1 text-zinc-400 hover:bg-white/10">×</button></div>{dialog==="credits"&&<><p className="mt-3 text-sm text-zinc-400">Current credit balance</p><div className="mt-2 flex items-center gap-2 text-3xl font-bold"><Zap className="text-[#4A90D9]"/>{credits}</div><div className="mt-5 space-y-2">{renderJobs.length?renderJobs.slice(0,5).map(job=><div key={job.id} className="flex justify-between rounded-lg bg-[#303030] px-3 py-2 text-xs"><span>Render {job.id.slice(0,6)}</span><span className="text-[#74adff]">{job.status}</span></div>):<p className="text-xs text-zinc-500">No render usage yet.</p>}</div><Link href="/pricing" className="mt-5 flex h-10 items-center justify-center rounded-lg bg-[#4A90D9] text-sm font-semibold">Upgrade plan</Link></>}{dialog==="profile"&&<div className="mt-4 grid gap-2">{["Profile","Settings","Billing"].map(x=><button key={x} onClick={()=>setToast(`${x} opened`)} className="rounded-lg bg-[#303030] px-4 py-3 text-left text-sm hover:bg-[#383838]">{x}</button>)}</div>}{dialog==="signout"&&<><p className="mt-4 text-sm text-zinc-400">Are you sure you want to sign out?</p><div className="mt-5 flex gap-2"><button onClick={()=>setDialog(null)} className="h-10 flex-1 rounded-lg bg-[#363636]">Cancel</button><button onClick={()=>{localStorage.removeItem("crystal-studio-state");location.href="/login"}} className="h-10 flex-1 rounded-lg bg-red-600">Sign Out</button></div></>}</div></div>}
