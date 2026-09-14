@@ -448,8 +448,8 @@ function Members({ t, accountName, accountEmail, accountInitials }: { t: Tokens 
  <div style={{ position: "relative", justifySelf: "end" }}>
  <button type="button" onClick={() => setOpenMenu(openMenu === p.e ? null : p.e)} aria-label={`Actions for ${p.n}`} className="opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100" style={{ fontSize: 16, lineHeight: 1, color: t.muted, background: "transparent", border: "none", cursor: "pointer", padding: "4px 8px" }}>⋯</button>
  {openMenu === p.e && <div style={{ position: "absolute", right: 0, top: 30, zIndex: 10, minWidth: 130, padding: 5, border: `1px solid ${t.faintBorder}`, borderRadius: 8, background: t.raised, boxShadow: "0 10px 24px rgba(0,0,0,.18)" }}>
- <button type="button" onClick={() => startEdit(p)} style={{ display: "block", width: "100%", padding: "8px 10px", border: 0, borderRadius: 5, background: "transparent", color: t.fg, textAlign: "left", fontSize: 12, cursor: "pointer" }}>Edit</button>
- <button type="button" onClick={() => deleteMember(p)} style={{ display: "block", width: "100%", padding: "8px 10px", border: 0, borderRadius: 5, background: "transparent", color: "#EF4444", textAlign: "left", fontSize: 12, cursor: "pointer" }}>Delete</button>
+ <button type="button" onClick={() => startEdit(p)} className="transition-colors hover:bg-black/[0.06] dark:hover:bg-white/[0.08]" style={{ display: "block", width: "100%", padding: "8px 10px", border: 0, borderRadius: 5, background: "transparent", color: t.fg, textAlign: "left", fontSize: 12, cursor: "pointer" }}>Edit</button>
+ <button type="button" onClick={() => deleteMember(p)} className="transition-colors hover:bg-red-500/[0.10]" style={{ display: "block", width: "100%", padding: "8px 10px", border: 0, borderRadius: 5, background: "transparent", color: "#EF4444", textAlign: "left", fontSize: 12, cursor: "pointer" }}>Delete</button>
  </div>}
  </div>
  </div>
