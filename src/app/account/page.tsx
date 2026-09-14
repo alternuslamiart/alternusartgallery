@@ -147,7 +147,13 @@ export default function Account() {
 
  {/* ── Main ── */}
  <main style={{ overflowY: "auto", padding: "36px 48px 80px" }}>
- <Section id={active} t={{ fg, muted, labelTertiary: isDark ? DARK_MUTED : LIGHT_LABEL_TERTIARY, labelQuaternary: isDark ? DARK_MUTED : LIGHT_LABEL_QUATERNARY, faint, faintBorder, raised, softFill, baseCard, cardShadow }} />
+ <Section
+  id={active}
+  t={{ fg, muted, labelTertiary: isDark ? DARK_MUTED : LIGHT_LABEL_TERTIARY, labelQuaternary: isDark ? DARK_MUTED : LIGHT_LABEL_QUATERNARY, faint, faintBorder, raised, softFill, baseCard, cardShadow }}
+  accountName={accountName}
+  accountEmail={accountEmail}
+  accountInitials={accountInitials}
+ />
  </main>
  </div>
  </div>
@@ -178,11 +184,17 @@ function Field({ label, value, placeholder, t }: { label: string; value?: string
  );
 }
 
-function Section({ id, t }: { id: SectionId; t: Tokens }) {
+type AccountIdentity = {
+ accountName: string;
+ accountEmail: string;
+ accountInitials: string;
+};
+
+function Section({ id, t, accountName, accountEmail, accountInitials }: { id: SectionId; t: Tokens } & AccountIdentity) {
  switch (id) {
  case "organization": return <Organization t={t} />;
  case "access": return <Access t={t} />;
- case "members": return <Members t={t} />;
+ case "members": return <Members t={t} accountName={accountName} accountEmail={accountEmail} accountInitials={accountInitials} />;
  case "subscriptions": return <Subscriptions t={t} />;
  case "billing": return <Billing t={t} />;
  case "chat": return <ChatSection t={t} />;
@@ -246,7 +258,7 @@ function Access({ t }: { t: Tokens }) {
  );
 }
 
-function Members({ t }: { t: Tokens }) {
+function Members({ t, accountName, accountEmail, accountInitials }: { t: Tokens } & AccountIdentity) {
  const people = [
  { n: accountName, e: accountEmail, r: "Owner", c: accountInitials },
  { n: "Maya Ibrahim", e: "maya@alternusart.com", r: "Admin", c: "MI" },
