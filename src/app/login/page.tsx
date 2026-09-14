@@ -77,7 +77,7 @@ function useAuthTheme() {
 function Brand() {
  return (
  <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Crystal home">
- <CoreforgeMark />
+ <img src="/Logopng.png" alt="" className="h-8 w-8 object-contain" />
  <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Crystal</span>
  </Link>
  );
