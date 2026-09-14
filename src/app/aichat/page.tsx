@@ -107,7 +107,7 @@ export default function AIChatPage() {
       <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[60px]" : "w-[276px]"} shrink-0 flex-col border border-[#2a2a2a] bg-[#0e0e0e] p-3 transition-[width,transform] duration-300 lg:inset-y-auto lg:static lg:m-3 lg:h-[calc(100vh-24px)] lg:rounded-[12px] lg:translate-x-0`}>
         <div className={`flex items-center rounded-xl px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
           <Link href="/aichat" aria-label="Crystal AI Chat" className={`flex items-center gap-3 text-lg font-semibold tracking-tight text-white ${sidebarCollapsed ? "mx-auto" : ""}`}>
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><Sparkles size={18} /></span>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><img src="/Logopng.png" alt="" className="h-5 w-5 object-contain brightness-0 invert" /></span>
             {!sidebarCollapsed && "Crystal"}
           </Link>
           <button onClick={() => setSidebarCollapsed((value) => !value)} aria-label="Collapse sidebar" title="Collapse sidebar" className={`rounded-lg p-2 text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white lg:block ${sidebarCollapsed ? "hidden" : ""}`}><PanelLeftClose size={16} /></button>
