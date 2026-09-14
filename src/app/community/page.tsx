@@ -287,7 +287,7 @@ export default function CommunityPage() {
  return (
  <main className={`community-page w-full min-h-screen font-roboto ${isDark ? "community-dark" : "community-light"}`}>
  <style>{`
-   .community-page { background:#f3f6f8; color:#111827; }
+   .community-page { width:100vw; max-width:none; min-height:100vh; margin:0; background:#f3f6f8; color:#111827; }
    .community-page .community-soft { background:#F8FCFF; border-color:#DCEAF5; color:#475569; }
    .community-page.community-dark { background:#111315; color:#f4f7fa; }
    .community-page.community-dark header { background:rgba(17,19,21,.92); border-color:#2a3035; }
