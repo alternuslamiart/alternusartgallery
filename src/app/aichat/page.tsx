@@ -326,10 +326,10 @@ function AccountMenu({ onAction }: { onAction: (action: string) => void }) {
     { action: "logout", label: "Log out", icon: LogOut },
   ];
   return <div role="menu" onClick={(event) => event.stopPropagation()} className="absolute bottom-11 right-0 z-[90] flex h-[327px] w-[248px] flex-col items-center justify-start overflow-hidden rounded-[12px] bg-[#242424] p-[9px] shadow-2xl">
-    <div className="flex h-[52px] w-[229px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[8px] bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</span>
+    <div className="flex h-[58px] w-[229px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[8px] bg-[#363636] text-zinc-100"><UserRound size={22} strokeWidth={1.8} /></span>
       <div className="min-w-0 flex-1"><div className="truncate text-sm font-semibold text-white">Lam</div><div className="text-xs text-zinc-400">Free Plan</div></div>
-      <span className="text-xl leading-none text-zinc-300">›</span>
+      <span className="text-2xl leading-none text-zinc-300">›</span>
     </div>
     <div className="h-px w-[229px] bg-[#383838]" />
     {items.map(({ action, label, icon: Icon, arrow }) => <button key={action} role="menuitem" onClick={() => onAction(action)} className="flex h-9 min-h-9 w-[229px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left text-xs text-zinc-100 transition hover:bg-[#363636]"><Icon size={18} strokeWidth={1.8} /><span className="flex-1">{label}</span>{arrow && <span className="text-lg leading-none">›</span>}</button>)}
