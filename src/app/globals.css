@@ -1705,14 +1705,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 [data-coreforge-theme="light"] .coreforge-page .crystal-feature-showcase {
-  padding: 24px;
-  border-radius: 56px;
-}
-@media (max-width: 700px) {
-  [data-coreforge-theme="light"] .coreforge-page .crystal-feature-showcase {
-   padding: 9px;
-   border-radius: 25px;
-  }
+  background: #e7e7e7 !important;
 }
 [data-coreforge-theme="light"] .coreforge-page .crystal-first-chips span {
   background: #d7d7d7 !important;
@@ -1739,14 +1732,6 @@
 [data-coreforge-theme="dark"] .coreforge-page .crystal-feature-showcase {
   background: #262626 !important;
   color: #f4f4f5;
-  padding: 24px;
-  border-radius: 56px;
-}
-@media (max-width: 700px) {
-  [data-coreforge-theme="dark"] .coreforge-page .crystal-feature-showcase {
-    padding: 9px;
-    border-radius: 25px;
-  }
 }
 [data-coreforge-theme="dark"] .coreforge-page .crystal-first-card,
 [data-coreforge-theme="dark"] .coreforge-page .crystal-home-surface,
