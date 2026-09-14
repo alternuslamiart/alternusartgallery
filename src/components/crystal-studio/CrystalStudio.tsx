@@ -250,7 +250,7 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   };
 
   return (
-    <div onClick={() => contextMenu && closeContextMenu()} onContextMenu={handleContextMenu} className={`crystal-studio crystal-ui-kit crystal-studio-enter ${studioMode === "modeling" ? "crystal-modeling-mode" : ""} ${embedded ? "crystal-studio-embedded" : "fixed inset-0 z-[90]"} grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
+    <div onClick={() => contextMenu && closeContextMenu()} onContextMenuCapture={handleContextMenu} className={`crystal-studio crystal-ui-kit crystal-studio-enter ${studioMode === "modeling" ? "crystal-modeling-mode" : ""} ${embedded ? "crystal-studio-embedded" : "fixed inset-0 z-[90]"} grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
       {mobileSplash && <div className="crystal-mobile-splash"><img src="/Logopng.png" alt="Crystal" /></div>}
       <input ref={sceneFileInput} type="file" accept="application/json,.json" className="sr-only" onChange={event => { const file = event.target.files?.[0]; if (file) openScene(file); event.currentTarget.value = ""; }} />
       <header className="crystal-topbar col-span-full flex h-16 items-center border-b border-[#292929] bg-[#0F0F0F] px-7">
