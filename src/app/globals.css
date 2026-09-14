@@ -1699,9 +1699,19 @@
 [data-coreforge-theme="light"] .coreforge-page .crystal-process article,
 [data-coreforge-theme="light"] .coreforge-page .crystal-core-metric,
 [data-coreforge-theme="light"] .coreforge-page .crystal-workflow-panel {
-  background: #ebebeb !important;
+  background: #e7e7e7 !important;
   color: #000000 !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+[data-coreforge-theme="light"] .coreforge-page .crystal-feature-showcase {
+  padding: 24px;
+  border-radius: 56px;
+}
+@media (max-width: 700px) {
+  [data-coreforge-theme="light"] .coreforge-page .crystal-feature-showcase {
+   padding: 9px;
+   border-radius: 25px;
+  }
 }
 [data-coreforge-theme="light"] .coreforge-page .crystal-first-chips span {
   background: #d7d7d7 !important;
