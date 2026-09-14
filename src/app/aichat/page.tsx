@@ -131,7 +131,14 @@ export default function AIChatPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full overflow-hidden bg-[#0a0a0a] font-roboto text-white">
+    <div
+      onClick={(event) => {
+        if (openConversationMenu && !(event.target as HTMLElement).closest("[data-conversation-menu]")) {
+          setOpenConversationMenu(null);
+        }
+      }}
+      className="flex min-h-screen w-full overflow-hidden bg-[#0a0a0a] font-roboto text-white"
+    >
       {sidebarOpen && <button aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-black/60 lg:hidden" />}
       <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[60px]" : "w-[276px]"} shrink-0 flex-col border border-[#2a2a2a] bg-[#0e0e0e] p-3 transition-[width,transform] duration-300 lg:inset-y-auto lg:static lg:m-3 lg:h-[calc(100vh-24px)] lg:rounded-[12px] lg:translate-x-0`}>
         <div className={`flex items-center rounded-xl px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
@@ -285,7 +292,7 @@ function ConversationMenu({ onAction }: { onAction: (action: string) => void }) 
     { action: "share", label: "Share", icon: Share2, arrow: true },
     { action: "delete", label: "Delete", icon: Trash2, danger: true },
   ];
-  return <div role="menu" onClick={(event) => event.stopPropagation()} className="absolute right-0 top-10 z-[80] flex h-[218px] w-[195px] flex-col items-center justify-between overflow-hidden rounded-[16px] border-0 bg-[#242424] p-[6px] shadow-2xl">
+  return <div data-conversation-menu role="menu" onClick={(event) => event.stopPropagation()} className="absolute right-0 top-10 z-[80] flex h-[218px] w-[195px] flex-col items-center justify-between overflow-hidden rounded-[16px] border-0 bg-[#242424] p-[6px] shadow-2xl">
     {items.map(({ action, label, icon: Icon, arrow, danger }) => <button key={action} role="menuitem" onClick={() => onAction(action)} className={`flex h-8 min-h-8 w-[182px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left text-sm font-medium transition hover:bg-[#363636] ${danger ? "text-[#FF6B6B]" : "text-zinc-100"}`}><Icon size={20} strokeWidth={2} /><span className="flex-1">{label}</span>{arrow && <span className="text-lg leading-none">›</span>}</button>)}
   </div>;
 }
