@@ -315,6 +315,13 @@ export default function CommunityPage() {
    .community-page.community-dark .community-hub-nav .hub-count { color:#98A5B2; }
    .community-page.community-dark .community-hub-nav .hub-item:hover { background:#22272B; color:#F4F7FA; }
    .community-page.community-dark .community-hub-nav .hub-item.is-active { background:#263B4A; color:#7DD3FC; }
+   @media (max-width:1023px) {
+     .community-page > header { display:none; }
+     .community-page > div { display:block; max-width:640px; margin:0 auto; padding:16px; }
+     .community-page > div > aside { display:none; }
+     .community-page > div > section { width:100%; }
+     .community-page > div > section > .community-surface:first-child { margin-top:0; }
+   }
  `}</style>
  <header className="sticky top-0 z-30 w-full border-b border-[#D8E2EA] bg-white/92 backdrop-blur-xl">
  <div className="relative mx-auto grid h-14 w-full max-w-[1180px] grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 px-3 sm:px-4">
@@ -568,7 +575,7 @@ export default function CommunityPage() {
  </div>
  </section>
 
- <aside className="space-y-4 lg:sticky lg:top-[72px] lg:self-start">
+ <aside className="hidden space-y-4 lg:sticky lg:top-[72px] lg:block lg:self-start">
  <section className="community-surface rounded-[18px] border border-[#DCEAF5] bg-white p-5 shadow-sm">
  <div className="flex items-start justify-between">
  <div>
