@@ -26,6 +26,11 @@ import {
   EyeOff,
   Pencil,
   Trash2,
+  UserRound,
+  Settings2,
+  CircleHelp,
+  Info,
+  LogOut,
   X,
 } from "lucide-react";
 
@@ -57,6 +62,7 @@ export default function AIChatPage() {
   const [mode, setMode] = useState<"chat" | "workflow">("chat");
   const [recentItems, setRecentItems] = useState(initialRecentItems);
   const [openConversationMenu, setOpenConversationMenu] = useState<string | null>(null);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -136,6 +142,9 @@ export default function AIChatPage() {
         if (openConversationMenu && !(event.target as HTMLElement).closest("[data-conversation-menu]")) {
           setOpenConversationMenu(null);
         }
+        if (accountMenuOpen && !(event.target as HTMLElement).closest("[data-account-menu]")) {
+          setAccountMenuOpen(false);
+        }
       }}
       className="flex min-h-screen w-full overflow-hidden bg-[#0a0a0a] font-roboto text-white"
     >
@@ -211,7 +220,16 @@ export default function AIChatPage() {
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-[#2a2a2a] bg-[#141414] p-2.5">
             <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</span>
             <Link href="/account" className="min-w-0 flex-1"><span className="block truncate text-xs text-zinc-200">Crystal User</span><span className="block truncate text-[10px] text-zinc-600">you@alternusart.com</span></Link>
-            <button aria-label="Account menu" title="Account menu" className="text-zinc-600 transition hover:text-white"><MoreHorizontal size={16} /></button>
+            <div data-account-menu className="relative">
+              <button aria-label="Account menu" title="Account menu" onClick={() => setAccountMenuOpen((value) => !value)} className="rounded-lg p-1 text-zinc-600 transition hover:bg-[#2a2a2a] hover:text-white"><MoreHorizontal size={16} /></button>
+              {accountMenuOpen && <AccountMenu onAction={(action) => {
+                setAccountMenuOpen(false);
+                if (action === "profile") window.location.href = "/account";
+                else if (action === "logout") window.location.href = "/login";
+                else setToast(`${action} selected.`);
+                window.setTimeout(() => setToast(null), 1800);
+              }} />}
+            </div>
           </div>
         </div>}
         {sidebarCollapsed && (
@@ -294,5 +312,26 @@ function ConversationMenu({ onAction }: { onAction: (action: string) => void }) 
   ];
   return <div data-conversation-menu role="menu" onClick={(event) => event.stopPropagation()} className="absolute right-0 top-10 z-[80] flex h-[218px] w-[195px] flex-col items-center justify-between overflow-hidden rounded-[16px] border-0 bg-[#242424] p-[6px] shadow-2xl">
     {items.map(({ action, label, icon: Icon, arrow, danger }) => <button key={action} role="menuitem" onClick={() => onAction(action)} className={`flex h-8 min-h-8 w-[182px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left text-sm font-medium transition hover:bg-[#363636] ${danger ? "text-[#FF6B6B]" : "text-zinc-100"}`}><Icon size={20} strokeWidth={2} /><span className="flex-1">{label}</span>{arrow && <span className="text-lg leading-none">›</span>}</button>)}
+  </div>;
+}
+
+function AccountMenu({ onAction }: { onAction: (action: string) => void }) {
+  const items = [
+    { action: "profile", label: "Profile", icon: UserRound },
+    { action: "settings", label: "Settings", icon: Settings2 },
+    { action: "upgrade", label: "Upgrade plan", icon: Sparkles },
+    { action: "apps", label: "Get apps and extensions", icon: LogOut },
+    { action: "help", label: "Get help", icon: CircleHelp, arrow: true },
+    { action: "learn", label: "Learn more", icon: Info },
+    { action: "logout", label: "Log out", icon: LogOut },
+  ];
+  return <div role="menu" onClick={(event) => event.stopPropagation()} className="absolute bottom-11 right-0 z-[90] flex h-[327px] w-[248px] flex-col items-center justify-start overflow-hidden rounded-[12px] bg-[#242424] p-[9px] shadow-2xl">
+    <div className="flex h-[52px] w-[229px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left">
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[8px] bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</span>
+      <div className="min-w-0 flex-1"><div className="truncate text-sm font-semibold text-white">Lam</div><div className="text-xs text-zinc-400">Free Plan</div></div>
+      <span className="text-xl leading-none text-zinc-300">›</span>
+    </div>
+    <div className="h-px w-[229px] bg-[#383838]" />
+    {items.map(({ action, label, icon: Icon, arrow }) => <button key={action} role="menuitem" onClick={() => onAction(action)} className="flex h-9 min-h-9 w-[229px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left text-xs text-zinc-100 transition hover:bg-[#363636]"><Icon size={18} strokeWidth={1.8} /><span className="flex-1">{label}</span>{arrow && <span className="text-lg leading-none">›</span>}</button>)}
   </div>;
 }
