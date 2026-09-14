@@ -288,6 +288,7 @@ export default function CommunityPage() {
  <main className={`community-page min-h-screen font-roboto ${isDark ? "community-dark" : "community-light"}`}>
  <style>{`
    .community-page { background:#f3f6f8; color:#111827; }
+   .community-page .community-soft { background:#F8FCFF; border-color:#DCEAF5; color:#475569; }
    .community-page.community-dark { background:#111315; color:#f4f7fa; }
    .community-page.community-dark header { background:rgba(17,19,21,.92); border-color:#2a3035; }
    .community-page.community-dark .community-surface { background:#1a1d20; border-color:#30363d; color:#f4f7fa; }
@@ -302,9 +303,21 @@ export default function CommunityPage() {
    .community-page.community-dark .text-[#64748B],.community-page.community-dark .text-[#475569] { color:#98a5b2; }
    .community-page.community-dark input, .community-page.community-dark textarea { background:#1d2125; border-color:#343b42; color:#f4f7fa; }
    .community-page.community-dark .community-nav { color:#c6d0d9; }
+   .community-page .community-hub-nav { color:#0F172A; }
+   .community-page .community-hub-nav .hub-muted { color:#64748B; }
+   .community-page .community-hub-nav .hub-label { color:#475569; }
+   .community-page .community-hub-nav .hub-count { color:#94A3B8; }
+   .community-page .community-hub-nav .hub-item:hover { background:#F1F5F9; color:#0F172A; }
+   .community-page .community-hub-nav .hub-item.is-active { background:#E0F2FE; color:#0369A1; }
+   .community-page.community-dark .community-hub-nav { color:#F4F7FA; }
+   .community-page.community-dark .community-hub-nav .hub-muted { color:#AAB6C1; }
+   .community-page.community-dark .community-hub-nav .hub-label { color:#DCE3E9; }
+   .community-page.community-dark .community-hub-nav .hub-count { color:#98A5B2; }
+   .community-page.community-dark .community-hub-nav .hub-item:hover { background:#22272B; color:#F4F7FA; }
+   .community-page.community-dark .community-hub-nav .hub-item.is-active { background:#263B4A; color:#7DD3FC; }
  `}</style>
  <header className="sticky top-0 z-30 border-b border-[#D8E2EA] bg-white/92 backdrop-blur-xl">
- <div className="mx-auto grid h-14 max-w-[1280px] grid-cols-[1fr_auto_1fr] items-center gap-3 px-3 sm:px-4">
+ <div className="relative mx-auto grid h-14 max-w-[1180px] grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 px-3 sm:px-4">
  <Link href="/" className="inline-flex items-center gap-2 rounded-[12px] px-2 py-1.5 text-sm font-semibold text-[#0F172A] hover:bg-[#F1F5F9]">
  <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#38BDF8] text-white">
  <Sparkles className="h-4 w-4 fill-current" />
@@ -320,7 +333,7 @@ export default function CommunityPage() {
  className="min-w-0 flex-1 bg-transparent text-sm text-[#0F172A] outline-none placeholder:text-[#64748B]"
  />
  </label>
- <div className="flex justify-center">
+ <div className="absolute left-1/2 flex -translate-x-1/2 justify-center">
  <button type="button" onClick={() => setIsDark((value) => !value)} aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"} aria-pressed={isDark} className="community-nav inline-flex h-9 items-center gap-2 rounded-full border border-[#DCEAF5] bg-white px-3 text-xs font-semibold shadow-sm transition hover:bg-[#F0F9FF]">
  {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />} {isDark ? "Light" : "Dark"}
  </button>
@@ -340,7 +353,7 @@ export default function CommunityPage() {
  </div>
  </header>
 
- <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-4 px-3 py-5 sm:px-4 lg:grid-cols-[64px_214px_minmax(0,1fr)_280px]">
+ <div className="mx-auto grid max-w-[1180px] grid-cols-1 gap-4 px-3 py-5 sm:px-4 lg:grid-cols-[56px_200px_minmax(0,1fr)_240px]">
  <aside className="hidden lg:flex lg:flex-col lg:items-center lg:gap-3">
  <IconTile icon={Home} active={activeSpace === "all"} label="Home" onClick={() => selectSpace("all")} />
  <IconTile icon={Sparkles} active={activeSpace === "showcase"} label="AI Community" onClick={() => selectSpace("showcase")} />
@@ -350,37 +363,37 @@ export default function CommunityPage() {
  <IconTile icon={Plus} label="Create new space" onClick={scrollToComposer} />
  </aside>
 
- <aside className="community-surface hidden overflow-hidden rounded-[20px] border border-[#DCEAF5] bg-[#101114] text-white shadow-sm lg:block">
+ <aside className="community-surface community-hub-nav hidden overflow-hidden rounded-[20px] border border-[#DCEAF5] bg-white shadow-sm lg:block">
  <div className="bg-gradient-to-br from-[#7C3AED] via-[#38BDF8] to-[#F0F9FF] p-4">
  <div className="flex items-center justify-between">
  <div>
  <p className="text-sm font-semibold">AI Creation Hub</p>
- <p className="mt-1 text-xs text-white/75">Projects, remixes, feedback</p>
+ <p className="hub-muted mt-1 text-xs text-white/75">Projects, remixes, feedback</p>
  </div>
  <ChevronDown className="h-4 w-4" />
  </div>
  </div>
  <div className="p-3">
- <div className="mb-4 rounded-[14px] bg-white/6 p-3">
- <p className="text-xs font-semibold text-white">Creation loop</p>
- <p className="mt-2 text-[11px] leading-5 text-white/62">
+ <div className="community-soft mb-4 rounded-[14px] p-3">
+ <p className="text-xs font-semibold">Creation loop</p>
+ <p className="hub-muted mt-2 text-[11px] leading-5 text-white/62">
  AI tool to project to preview to publish to feedback to remix.
  </p>
  </div>
  <div className="space-y-1">
- <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-wide text-white/45">Spaces</p>
+ <p className="hub-muted mb-2 px-2 text-[11px] font-semibold uppercase tracking-wide text-white/45">Spaces</p>
  {spaces.map(({ name, label, count, icon: Icon }) => (
  <button
  key={name}
  type="button"
  onClick={() => selectSpace(name)}
- className={`group flex w-full items-center gap-2 rounded-[10px] px-2 py-2 text-left text-sm transition ${
- activeSpace === name ? "bg-white/12 text-white" : "text-white/72 hover:bg-white/8 hover:text-white"
+ className={`hub-item group flex w-full items-center gap-2 rounded-[10px] px-2 py-2 text-left text-sm transition ${
+ activeSpace === name ? "is-active" : "hub-label"
  }`}
  >
- <Icon className={`h-4 w-4 ${activeSpace === name ? "text-[#7DD3FC]" : "text-white/35 group-hover:text-[#7DD3FC]"}`} />
+ <Icon className={`h-4 w-4 ${activeSpace === name ? "text-[#0284C7]" : "text-[#94A3B8] group-hover:text-[#0284C7]"}`} />
  <span className="min-w-0 flex-1 truncate">{label}</span>
- <span className="text-[10px] text-white/35">{count.split(" ")[0]}</span>
+ <span className="hub-count text-[10px] text-white/35">{count.split(" ")[0]}</span>
  </button>
  ))}
  </div>
