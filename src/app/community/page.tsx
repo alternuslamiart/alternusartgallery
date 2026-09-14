@@ -51,6 +51,7 @@ const feedPosts = [
  saves: 36,
  forks: 11,
  icon: Layers3,
+ image: "/Section/architectresectionone.png",
  accent: "from-[#312E81] via-[#6D28D9] to-[#38BDF8]",
  },
  {
@@ -69,6 +70,7 @@ const feedPosts = [
  saves: 58,
  forks: 19,
  icon: Wand2,
+ image: "/Section/Planarch.png",
  accent: "from-[#0F766E] via-[#0284C7] to-[#7DD3FC]",
  },
  {
@@ -87,6 +89,7 @@ const feedPosts = [
  saves: 22,
  forks: 7,
  icon: Workflow,
+ image: "/Section/Infra.png",
  accent: "from-[#1E293B] via-[#334155] to-[#38BDF8]",
  },
 ];
@@ -214,6 +217,7 @@ export default function CommunityPage() {
  saves: 0,
  forks: 0,
  icon: Sparkles,
+ image: undefined,
  accent: "from-[#0284C7] via-[#38BDF8] to-[#BAE6FD]",
  },
  ...feedPosts,
@@ -515,11 +519,13 @@ export default function CommunityPage() {
  No creation posts match this filter yet.
  </div>
  )}
- {filteredPosts.map(({ id, title, space, author, time, type, description, stack, notes, comments, likes, saves, forks, icon: Icon, accent }) => (
+ {filteredPosts.map(({ id, title, space, author, time, type, description, stack, notes, comments, likes, saves, forks, icon: Icon, image, accent }) => (
  <article key={title} className="community-surface overflow-hidden rounded-[18px] border border-[#DCEAF5] bg-white shadow-sm">
  <div className="grid gap-0 md:grid-cols-[220px_minmax(0,1fr)]">
- <div className={`flex min-h-[190px] items-center justify-center bg-gradient-to-br ${accent} p-5 text-white`}>
- <div className="text-center">
+ <div className={`relative flex min-h-[190px] items-center justify-center overflow-hidden bg-gradient-to-br ${accent} p-5 text-white`}>
+ <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover" />
+ <div className="absolute inset-0 bg-black/25" />
+ <div className="relative z-10 text-center drop-shadow-[0_1px_3px_rgba(0,0,0,0.65)]">
  <Icon className="mx-auto h-10 w-10" />
  <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-white/75">{type}</p>
  </div>
