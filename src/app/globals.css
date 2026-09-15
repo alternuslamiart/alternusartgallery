@@ -3009,3 +3009,173 @@ textarea {
     padding-top: 64px !important;
   }
 }
+
+/* The mobile home must stay outside the desktop-only media block above. */
+@media (max-width: 700px) {
+  .crystal-mobile-home-active {
+    display: block !important;
+    min-height: 100dvh;
+    overflow: hidden !important;
+    background:
+      radial-gradient(circle at 88% 28%, rgba(177, 62, 155, .24), transparent 32%),
+      radial-gradient(circle at 92% 86%, rgba(188, 119, 47, .18), transparent 30%),
+      #090a0d !important;
+  }
+
+  .crystal-mobile-home-active > .crystal-topbar,
+  .crystal-mobile-home-active > .crystal-modeling-sidebar,
+  .crystal-mobile-home-active > .crystal-modeling-inspector,
+  .crystal-mobile-home-active > .crystal-mobile-menu-trigger,
+  .crystal-mobile-home-active > .crystal-mobile-incognito,
+  .crystal-mobile-home-active > .crystal-mobile-sheet,
+  .crystal-mobile-home-active > .crystal-mobile-profile,
+  .crystal-mobile-home-active > .crystal-mobile-pricing,
+  .crystal-mobile-home-active > .crystal-mobile-splash,
+  .crystal-mobile-home-active > section:not(.crystal-mobile-home),
+  .crystal-mobile-home-active > button {
+    display: none !important;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home {
+    display: flex !important;
+    position: relative;
+    z-index: 1;
+    min-height: 100dvh;
+    flex-direction: column;
+    padding: max(18px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+    color: #f5f7fb;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home-header {
+    display: grid;
+    grid-template-columns: 42px 1fr 42px;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home-header > button,
+  .crystal-mobile-home-active .crystal-mobile-theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 50%;
+    color: #eef0f5;
+    background: rgba(255,255,255,.07);
+    backdrop-filter: blur(18px);
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-workspace-tabs {
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+    height: 42px;
+    padding: 4px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px;
+    background: rgba(255,255,255,.07);
+    backdrop-filter: blur(18px);
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-workspace-tabs button {
+    min-height: 34px;
+    padding: 0 9px;
+    border-radius: 999px;
+    color: #9297a2;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-workspace-tabs button[aria-selected="true"] {
+    color: #fff;
+    background: rgba(255,255,255,.16);
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home-hero {
+    display: flex;
+    flex: 1;
+    min-height: 280px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-mark {
+    display: grid;
+    place-items: center;
+    width: 78px;
+    height: 78px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,.38);
+    border-radius: 28px 28px 28px 8px;
+    color: #f4f5f8;
+    background: linear-gradient(145deg, rgba(255,255,255,.26), rgba(73,103,220,.3));
+    box-shadow: 0 20px 46px rgba(57,77,181,.28), inset 0 1px rgba(255,255,255,.4);
+    transform: rotate(-8deg);
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-mark svg { transform: rotate(8deg); }
+  .crystal-mobile-home-active .crystal-mobile-home-hero h1 { margin: 0; color: #dadde4; font-size: 21px; font-weight: 500; letter-spacing: -.04em; }
+  .crystal-mobile-home-active .crystal-mobile-home-hero p { max-width: 260px; margin: 9px 0 0; color: #747a86; font-size: 11px; }
+
+  .crystal-mobile-home-active .crystal-mobile-date-strip,
+  .crystal-mobile-home-active .crystal-mobile-activity,
+  .crystal-mobile-home-active .crystal-mobile-composer {
+    display: grid;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-date-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 10px;
+    color: #9297a2;
+    font-size: 12px;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-date-strip b { color: #f1f2f5; font-weight: 500; }
+  .crystal-mobile-home-active .crystal-mobile-date-strip button { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid rgba(255,255,255,.14); border-radius: 50%; color: #e2e4e9; background: rgba(255,255,255,.06); }
+  .crystal-mobile-home-active .crystal-mobile-date-strip button:last-child svg { transform: rotate(-90deg); }
+  .crystal-mobile-home-active .crystal-mobile-activity { gap: 8px; margin-bottom: 12px; }
+  .crystal-mobile-home-active .crystal-mobile-activity > div:first-child { display: flex; justify-content: space-between; padding: 0 4px 2px; color: #858b96; font-size: 10px; }
+  .crystal-mobile-home-active .crystal-mobile-activity > div:first-child button { color: #b2c5ff; font-size: 10px; }
+  .crystal-mobile-home-active .crystal-mobile-activity article { display: flex; align-items: center; gap: 10px; min-height: 57px; padding: 8px 12px; border: 1px solid rgba(255,255,255,.14); border-radius: 18px; background: rgba(255,255,255,.07); box-shadow: inset 0 1px rgba(255,255,255,.1), 0 12px 26px rgba(0,0,0,.2); backdrop-filter: blur(18px); }
+  .crystal-mobile-home-active .crystal-mobile-activity article.is-featured { min-height: 76px; border-color: rgba(232,132,220,.48); background: linear-gradient(105deg, rgba(193,71,171,.38), rgba(103,50,128,.15)); }
+  .crystal-mobile-home-active .crystal-mobile-activity article.is-muted { opacity: .55; }
+  .crystal-mobile-home-active .crystal-activity-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 12px; color: #f3e9ff; background: rgba(195,95,207,.3); }
+  .crystal-mobile-home-active .crystal-activity-icon.is-blue { color: #dae5ff; background: rgba(73,115,255,.25); }
+  .crystal-mobile-home-active .crystal-activity-icon.is-amber { color: #ffe0b3; background: rgba(206,137,64,.22); }
+  .crystal-mobile-home-active .crystal-mobile-activity article div { display: grid; flex: 1; gap: 2px; }
+  .crystal-mobile-home-active .crystal-mobile-activity b { color: #f0f1f5; font-size: 11px; }
+  .crystal-mobile-home-active .crystal-mobile-activity small { color: #9399a4; font-size: 9px; }
+  .crystal-mobile-home-active .crystal-mobile-activity time { width: max-content; margin-top: 4px; padding: 3px 7px; border-radius: 999px; color: #e7e2eb; background: rgba(0,0,0,.24); font-size: 9px; }
+  .crystal-mobile-home-active .crystal-mobile-activity strong { color: #dfc6ff; font-size: 11px; }
+  .crystal-mobile-home-active .crystal-mobile-activity strong.is-done { color: #b5efd2; }
+
+  .crystal-mobile-home-active .crystal-mobile-composer {
+    gap: 11px;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,.24);
+    border-radius: 26px;
+    background: rgba(22,23,27,.74);
+    box-shadow: 0 20px 60px rgba(0,0,0,.42), inset 0 1px rgba(255,255,255,.14);
+    backdrop-filter: blur(24px);
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-pro-banner { display: flex; align-items: center; gap: 9px; min-height: 44px; padding: 0 7px 0 10px; border: 1px solid rgba(255,255,255,.24); border-radius: 999px; color: #c5d5ff; background: rgba(255,255,255,.09); text-align: left; }
+  .crystal-mobile-home-active .crystal-mobile-pro-banner > span { display: grid; flex: 1; gap: 1px; }
+  .crystal-mobile-home-active .crystal-mobile-pro-banner b { font-size: 12px; }
+  .crystal-mobile-home-active .crystal-mobile-pro-banner small { color: #858d9f; font-size: 9px; }
+  .crystal-mobile-home-active .crystal-mobile-pro-banner em { padding: 9px 13px; border-radius: 999px; color: #fff; background: #168df1; font-size: 10px; font-style: normal; }
+  .crystal-mobile-home-active .crystal-mobile-composer-label { color: #8d929d; font-size: 11px; }
+  .crystal-mobile-home-active .crystal-mobile-composer textarea { width: 100%; resize: none; border: 0; outline: 0; color: #f1f3f7; background: transparent; font-size: 13px; }
+  .crystal-mobile-home-active .crystal-mobile-composer textarea::placeholder { color: #6f7580; }
+  .crystal-mobile-home-active .crystal-mobile-composer-actions { display: flex; gap: 8px; }
+  .crystal-mobile-home-active .crystal-mobile-composer-actions > button { display: grid; place-items: center; min-width: 42px; height: 42px; border-radius: 13px; color: #e5e8ee; background: rgba(255,255,255,.1); }
+  .crystal-mobile-home-active .crystal-mobile-composer-actions > button:last-child { color: #fff; background: #168df1; }
+  .crystal-mobile-home-active .crystal-mobile-model-select { display: flex !important; flex: 1; align-items: center; justify-content: center; gap: 8px; font-size: 11px; }
+  .crystal-mobile-home-active .crystal-mobile-theme-toggle { position: absolute; right: 22px; bottom: 185px; width: 34px; height: 34px; opacity: .7; }
+}
