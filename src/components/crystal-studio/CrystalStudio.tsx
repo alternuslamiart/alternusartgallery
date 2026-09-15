@@ -283,7 +283,6 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
         </div>
         <div className="crystal-mobile-activity" aria-label="Recent Crystal work">
           <div><span>Monday 15, September</span><button type="button" onClick={() => setToast("All projects opened.")}>See all</button></div>
-          <article className="is-featured"><span className="crystal-activity-icon"><Home size={16} /></span><div><b>Modern Villa</b><small>Architecture · AI study</small><time>11:30 AM</time></div><strong>82%</strong></article>
           <article><span className="crystal-activity-icon is-blue"><Grid2X2 size={16} /></span><div><b>Floor plan</b><small>2D draft · Completed</small><time>02:30 PM</time></div><strong className="is-done">Done</strong></article>
           <article className="is-muted"><span className="crystal-activity-icon is-amber"><Globe2 size={16} /></span><div><b>Infrastructure study</b><small>Site planning · In progress</small><time>05:30 PM</time></div><strong>64%</strong></article>
         </div>
