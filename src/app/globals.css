@@ -3179,3 +3179,28 @@ textarea {
   .crystal-mobile-home-active .crystal-mobile-model-select { display: flex !important; flex: 1; align-items: center; justify-content: center; gap: 8px; font-size: 11px; }
   .crystal-mobile-home-active .crystal-mobile-theme-toggle { position: absolute; right: 22px; bottom: 185px; width: 34px; height: 34px; opacity: .7; }
 }
+
+@media (max-width: 700px) {
+  html,
+  body {
+    min-width: 0;
+    min-height: 100%;
+    margin: 0;
+    overflow-x: hidden;
+    background: #090a0d !important;
+  }
+
+  .crystal-studio.crystal-mobile-home-active {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+}
