@@ -476,6 +476,35 @@
       padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
       color: #f5f7fb;
       overflow: hidden;
+      isolation: isolate;
+    }
+
+    .crystal-mobile-home::before,
+    .crystal-mobile-home::after {
+      position: absolute;
+      z-index: -1;
+      width: 210px;
+      height: 360px;
+      border-radius: 50%;
+      content: "";
+      filter: blur(48px);
+      opacity: .42;
+      pointer-events: none;
+    }
+
+    .crystal-mobile-home::before {
+      top: 18%;
+      right: -120px;
+      background: #a44993;
+      transform: rotate(-18deg);
+    }
+
+    .crystal-mobile-home::after {
+      right: -100px;
+      bottom: -85px;
+      background: #b27639;
+      opacity: .28;
+      transform: rotate(24deg);
     }
 
     .crystal-mobile-home-header {
@@ -533,12 +562,12 @@
 
     .crystal-mobile-home-hero {
       display: flex;
-      flex: 1;
+      flex: 1 1 auto;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 300px;
-      padding: 30px 8px 16px;
+      min-height: 260px;
+      padding: 28px 8px 12px;
       text-align: center;
     }
 
@@ -576,6 +605,36 @@
       line-height: 1.5;
     }
 
+    .crystal-mobile-date-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin: 0 0 12px;
+      color: #8b909c;
+      font-size: 12px;
+    }
+
+    .crystal-mobile-date-strip span b {
+      color: #f0f1f5;
+      font-weight: 500;
+    }
+
+    .crystal-mobile-date-strip button {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 50%;
+      color: #d9dce4;
+      background: rgba(255,255,255,.05);
+    }
+
+    .crystal-mobile-date-strip button:last-child svg {
+      transform: rotate(-90deg);
+    }
+
     .crystal-mobile-activity {
       display: grid;
       gap: 8px;
@@ -604,9 +663,20 @@
       padding: 8px 12px;
       border: 1px solid rgba(255,255,255,.1);
       border-radius: 18px;
-      background: linear-gradient(105deg, rgba(255,255,255,.1), rgba(255,255,255,.035));
+      background: linear-gradient(105deg, rgba(255,255,255,.085), rgba(255,255,255,.025));
       box-shadow: inset 0 1px rgba(255,255,255,.08), 0 12px 26px rgba(0,0,0,.16);
       backdrop-filter: blur(18px);
+    }
+
+    .crystal-mobile-activity article.is-featured {
+      min-height: 76px;
+      border-color: rgba(231, 133, 220, .38);
+      background: linear-gradient(105deg, rgba(193,71,171,.34), rgba(132,52,129,.13));
+      box-shadow: inset 0 1px rgba(255,255,255,.16), 0 14px 32px rgba(142,41,128,.2);
+    }
+
+    .crystal-mobile-activity article.is-muted {
+      opacity: .56;
     }
 
     .crystal-activity-icon {
@@ -624,6 +694,11 @@
       background: rgba(73,115,255,.22);
     }
 
+    .crystal-activity-icon.is-amber {
+      color: #ffe0b3;
+      background: rgba(206,137,64,.2);
+    }
+
     .crystal-mobile-activity article div {
       display: grid;
       flex: 1;
@@ -632,6 +707,7 @@
 
     .crystal-mobile-activity b { color: #e7e9ef; font-size: 11px; font-weight: 600; }
     .crystal-mobile-activity small { color: #858b96; font-size: 9px; }
+    .crystal-mobile-activity time { width: max-content; margin-top: 4px; padding: 3px 7px; border-radius: 999px; color: #e3dfe7; background: rgba(0,0,0,.22); font-size: 9px; }
     .crystal-mobile-activity strong { color: #d6b8ff; font-size: 11px; }
     .crystal-mobile-activity strong.is-done { color: #a9e5ca; }
 
@@ -639,12 +715,22 @@
       position: relative;
       display: grid;
       gap: 11px;
+      margin-top: 2px;
       padding: 12px;
-      border: 1px solid rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.22);
       border-radius: 26px;
-      background: linear-gradient(145deg, rgba(255,255,255,.1), rgba(255,255,255,.045));
+      background: linear-gradient(145deg, rgba(255,255,255,.095), rgba(255,255,255,.035));
       box-shadow: 0 20px 60px rgba(0,0,0,.38), inset 0 1px rgba(255,255,255,.11);
       backdrop-filter: blur(24px) saturate(130%);
+    }
+
+    .crystal-mobile-composer::before {
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: inherit;
+      content: "";
+      pointer-events: none;
     }
 
     .crystal-mobile-pro-banner {
