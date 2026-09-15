@@ -437,6 +437,269 @@
       padding-top: 64px !important;
     }
   }
+
+  /* Crystal mobile home: intentionally scoped below the mobile breakpoint so
+     the existing desktop studio remains unchanged. */
+  .crystal-mobile-home {
+    display: none;
+  }
+
+  @media (max-width: 700px) {
+    .crystal-mobile-home-active {
+      display: block !important;
+      min-height: 100dvh;
+      background:
+        radial-gradient(circle at 82% 18%, rgba(82, 120, 255, .13), transparent 30%),
+        radial-gradient(circle at 14% 76%, rgba(196, 75, 188, .1), transparent 30%),
+        #090a0d !important;
+    }
+
+    .crystal-mobile-home-active > .crystal-topbar,
+    .crystal-mobile-home-active > .crystal-modeling-sidebar,
+    .crystal-mobile-home-active > .crystal-modeling-inspector,
+    .crystal-mobile-home-active > .crystal-mobile-menu-trigger,
+    .crystal-mobile-home-active > .crystal-mobile-incognito,
+    .crystal-mobile-home-active > .crystal-mobile-sheet,
+    .crystal-mobile-home-active > .crystal-mobile-profile,
+    .crystal-mobile-home-active > .crystal-mobile-pricing,
+    .crystal-mobile-home-active > .crystal-mobile-splash,
+    .crystal-mobile-home-active > section:not(.crystal-mobile-home),
+    .crystal-mobile-home-active > button {
+      display: none !important;
+    }
+
+    .crystal-mobile-home {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+      padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
+      color: #f5f7fb;
+      overflow: hidden;
+    }
+
+    .crystal-mobile-home-header {
+      display: grid;
+      grid-template-columns: 42px 1fr 42px;
+      align-items: center;
+      gap: 8px;
+      height: 46px;
+      z-index: 2;
+    }
+
+    .crystal-mobile-home-header > button,
+    .crystal-mobile-theme-toggle {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 50%;
+      color: #e8ebf0;
+      background: rgba(255,255,255,.055);
+      box-shadow: inset 0 1px rgba(255,255,255,.1), 0 10px 30px rgba(0,0,0,.16);
+      backdrop-filter: blur(18px);
+    }
+
+    .crystal-mobile-workspace-tabs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+      height: 42px;
+      padding: 4px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      background: rgba(255,255,255,.055);
+      backdrop-filter: blur(18px);
+    }
+
+    .crystal-mobile-workspace-tabs button {
+      min-width: 0;
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 999px;
+      color: #858b97;
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .crystal-mobile-workspace-tabs button[aria-selected="true"] {
+      color: #fff;
+      background: rgba(255,255,255,.14);
+      box-shadow: inset 0 1px rgba(255,255,255,.13);
+    }
+
+    .crystal-mobile-home-hero {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      padding: 30px 8px 16px;
+      text-align: center;
+    }
+
+    .crystal-mobile-mark {
+      display: grid;
+      place-items: center;
+      width: 78px;
+      height: 78px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255,255,255,.32);
+      border-radius: 25px 25px 25px 8px;
+      color: #f3f5f8;
+      background: linear-gradient(145deg, rgba(255,255,255,.22), rgba(87,119,255,.28) 58%, rgba(255,255,255,.07));
+      box-shadow: 0 22px 46px rgba(45,77,185,.2), inset 0 1px rgba(255,255,255,.35);
+      transform: rotate(-8deg);
+    }
+
+    .crystal-mobile-mark svg {
+      transform: rotate(8deg);
+    }
+
+    .crystal-mobile-home-hero h1 {
+      margin: 0;
+      color: #d6d9e0;
+      font-size: clamp(20px, 5.5vw, 25px);
+      font-weight: 500;
+      letter-spacing: -.04em;
+    }
+
+    .crystal-mobile-home-hero p {
+      max-width: 260px;
+      margin: 10px auto 0;
+      color: #6d7380;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .crystal-mobile-activity {
+      display: grid;
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+
+    .crystal-mobile-activity > div:first-child {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px 2px;
+      color: #787f8b;
+      font-size: 10px;
+    }
+
+    .crystal-mobile-activity > div:first-child button {
+      color: #a7bfff;
+      font-size: 10px;
+    }
+
+    .crystal-mobile-activity article {
+      display: flex;
+      align-items: center;
+      min-height: 54px;
+      gap: 10px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 18px;
+      background: linear-gradient(105deg, rgba(255,255,255,.1), rgba(255,255,255,.035));
+      box-shadow: inset 0 1px rgba(255,255,255,.08), 0 12px 26px rgba(0,0,0,.16);
+      backdrop-filter: blur(18px);
+    }
+
+    .crystal-activity-icon {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      color: #f2eaff;
+      background: rgba(195,95,207,.28);
+    }
+
+    .crystal-activity-icon.is-blue {
+      color: #d5e1ff;
+      background: rgba(73,115,255,.22);
+    }
+
+    .crystal-mobile-activity article div {
+      display: grid;
+      flex: 1;
+      gap: 2px;
+    }
+
+    .crystal-mobile-activity b { color: #e7e9ef; font-size: 11px; font-weight: 600; }
+    .crystal-mobile-activity small { color: #858b96; font-size: 9px; }
+    .crystal-mobile-activity strong { color: #d6b8ff; font-size: 11px; }
+    .crystal-mobile-activity strong.is-done { color: #a9e5ca; }
+
+    .crystal-mobile-composer {
+      position: relative;
+      display: grid;
+      gap: 11px;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 26px;
+      background: linear-gradient(145deg, rgba(255,255,255,.1), rgba(255,255,255,.045));
+      box-shadow: 0 20px 60px rgba(0,0,0,.38), inset 0 1px rgba(255,255,255,.11);
+      backdrop-filter: blur(24px) saturate(130%);
+    }
+
+    .crystal-mobile-pro-banner {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 44px;
+      padding: 0 7px 0 10px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      color: #c0d0ff;
+      background: rgba(255,255,255,.08);
+      text-align: left;
+    }
+
+    .crystal-mobile-pro-banner > span { display: grid; flex: 1; gap: 1px; }
+    .crystal-mobile-pro-banner b { font-size: 12px; font-weight: 600; }
+    .crystal-mobile-pro-banner small { color: #858d9f; font-size: 9px; }
+    .crystal-mobile-pro-banner em { padding: 9px 13px; border-radius: 999px; color: #fff; background: #168df1; font-size: 10px; font-style: normal; font-weight: 600; }
+    .crystal-mobile-composer-label { color: #858b96; font-size: 11px; }
+    .crystal-mobile-composer textarea { width: 100%; resize: none; border: 0; outline: 0; color: #e8ebf2; background: transparent; font: inherit; font-size: 13px; line-height: 1.45; }
+    .crystal-mobile-composer textarea::placeholder { color: #666d79; }
+
+    .crystal-mobile-composer-actions { display: flex; align-items: center; gap: 8px; }
+    .crystal-mobile-composer-actions > button { display: grid; place-items: center; min-width: 42px; height: 42px; border-radius: 13px; color: #e3e6ec; background: rgba(255,255,255,.1); }
+    .crystal-mobile-composer-actions > button:last-child { color: #fff; background: #168df1; box-shadow: 0 7px 20px rgba(22,141,241,.28); }
+    .crystal-mobile-model-select { display: flex !important; flex: 1; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; font-size: 11px; }
+    .crystal-mobile-theme-toggle { position: absolute; right: 22px; bottom: 186px; width: 34px; height: 34px; opacity: .7; }
+
+    .crystal-mobile-model-overlay { position: fixed; inset: 0; z-index: 150; display: flex; align-items: flex-end; background: rgba(0,0,0,.48); backdrop-filter: blur(10px); }
+    .crystal-mobile-model-sheet { width: 100%; padding: 10px 18px max(24px, env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,.16); border-radius: 28px 28px 0 0; background: #17191e; box-shadow: 0 -18px 50px rgba(0,0,0,.45); }
+    .crystal-sheet-handle { width: 38px; height: 4px; margin: 0 auto 18px; border-radius: 999px; background: #686e78; }
+    .crystal-mobile-model-sheet > div:not(.crystal-sheet-handle) { margin-bottom: 12px; }
+    .crystal-mobile-model-sheet b { display: block; color: #f1f3f7; font-size: 16px; }
+    .crystal-mobile-model-sheet small { color: #838a96; font-size: 10px; }
+    .crystal-mobile-model-sheet > div button { color: #9ba2ae; font-size: 24px; }
+    .crystal-mobile-model-sheet > button { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 50px; padding: 0 12px; border-radius: 14px; color: #aeb4bf; font-size: 12px; }
+    .crystal-mobile-model-sheet > button span:first-child { display: flex; align-items: center; gap: 10px; }
+    .crystal-mobile-model-sheet > button.is-selected { color: #fff; background: rgba(255,255,255,.09); }
+
+    .crystal-alt-theme.crystal-mobile-home-active {
+      background: #f4f1eb !important;
+      color: #24262b;
+    }
+    .crystal-alt-theme.crystal-mobile-home-active .crystal-mobile-home-header > button,
+    .crystal-alt-theme.crystal-mobile-home-active .crystal-mobile-workspace-tabs,
+    .crystal-alt-theme.crystal-mobile-home-active .crystal-mobile-composer,
+    .crystal-alt-theme.crystal-mobile-home-active .crystal-mobile-activity article { border-color: rgba(33,38,48,.12); background: rgba(255,255,255,.62); }
+    .crystal-alt-theme.crystal-mobile-home-active .crystal-mobile-home-hero h1,
+    .crystal-alt-theme.crystal-mobile-home-active .crystal-mobile-activity b { color: #252832; }
+    .crystal-alt-theme.crystal-mobile-home-active .crystal-mobile-home-hero p,
+    .crystal-alt-theme.crystal-mobile-home-active .crystal-mobile-composer-label { color: #76716d; }
+    .crystal-alt-theme.crystal-mobile-home-active .crystal-mobile-composer textarea { color: #252832; }
+    .crystal-alt-theme.crystal-mobile-home-active .crystal-mobile-workspace-tabs button[aria-selected="true"] { color: #252832; background: rgba(33,38,48,.1); }
+  }
   .crystal-modeling-mode .crystal-ai-prompt > button:first-child { display: none; }
   .crystal-modeling-mode .crystal-ai-prompt textarea {
     height: 68px;

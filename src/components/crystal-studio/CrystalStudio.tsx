@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, ArrowLeft, ChevronDown, Glasses, Globe2, Grid2X2, Home, Menu, PanelLeftOpen, Plus, Search, Settings, Share2, Zap } from "lucide-react";
+import { Archive, ArrowLeft, ChevronDown, Glasses, Globe2, Grid2X2, Home, Menu, Moon, PanelLeftOpen, Paperclip, Plus, Search, Settings, Share2, Sparkles, Sun, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { generateModel } from "@/services/ai";
@@ -92,6 +92,10 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   const [mobileMenu, setMobileMenu] = useState(false);
   const [mobileProfile, setMobileProfile] = useState(false);
   const [mobilePricing, setMobilePricing] = useState(false);
+  const [mobileHome, setMobileHome] = useState(true);
+  const [mobileModelSheet, setMobileModelSheet] = useState(false);
+  const [mobileWorkspace, setMobileWorkspace] = useState<"architecture" | "floor-plan" | "infrastructure">("architecture");
+  const [mobileModel, setMobileModel] = useState("Crystal AI");
   const [pricingPlan, setPricingPlan] = useState("Basic");
   const [mobileSplash, setMobileSplash] = useState(true);
   const uploadUrl = useRef<string | null>(null);
@@ -250,9 +254,50 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   };
 
   return (
-    <div onClick={() => contextMenu && closeContextMenu()} onContextMenuCapture={handleContextMenu} className={`crystal-studio crystal-ui-kit crystal-studio-enter ${studioMode === "modeling" ? "crystal-modeling-mode" : ""} ${embedded ? "crystal-studio-embedded" : "fixed inset-0 z-[90]"} grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
+    <div onClick={() => contextMenu && closeContextMenu()} onContextMenuCapture={handleContextMenu} className={`crystal-studio crystal-ui-kit crystal-studio-enter ${studioMode === "modeling" ? "crystal-modeling-mode" : ""} ${mobileHome ? "crystal-mobile-home-active" : ""} ${embedded ? "crystal-studio-embedded" : "fixed inset-0 z-[90]"} grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
       {mobileSplash && <div className="crystal-mobile-splash"><img src="/Logopng.png" alt="Crystal" /></div>}
       <input ref={sceneFileInput} type="file" accept="application/json,.json" className="sr-only" onChange={event => { const file = event.target.files?.[0]; if (file) openScene(file); event.currentTarget.value = ""; }} />
+      <section className="crystal-mobile-home" aria-label="Crystal mobile home">
+        <header className="crystal-mobile-home-header">
+          <button type="button" aria-label="Open Crystal menu" onClick={() => setMobileMenu(true)}><Grid2X2 size={19} /></button>
+          <div className="crystal-mobile-workspace-tabs" role="tablist" aria-label="Crystal workspaces">
+            {(["architecture", "floor-plan", "infrastructure"] as const).map((workspace) => (
+              <button key={workspace} type="button" role="tab" aria-selected={mobileWorkspace === workspace} onClick={() => {
+                setMobileWorkspace(workspace);
+                if (workspace === "floor-plan") { setStudioMode("floor-plan"); setMobileHome(false); }
+                if (workspace === "infrastructure") router.push("/infrastructure");
+              }}>{workspace === "floor-plan" ? "Floor plan" : workspace[0].toUpperCase() + workspace.slice(1)}</button>
+            ))}
+          </div>
+          <button type="button" aria-label="Open profile" onClick={() => setMobileProfile(true)}><Settings size={19} /></button>
+        </header>
+        <div className="crystal-mobile-home-hero">
+          <div className="crystal-mobile-mark"><Sparkles size={28} /></div>
+          <h1>{mobileWorkspace === "architecture" ? "What should we create?" : "Your workspace is ready"}</h1>
+          <p>Architecture, floor plans and infrastructure — made with Crystal.</p>
+        </div>
+        <div className="crystal-mobile-activity" aria-label="Recent Crystal work">
+          <div><span>Today</span><button type="button" onClick={() => setToast("All projects opened.")}>See all</button></div>
+          <article><span className="crystal-activity-icon"><Home size={16} /></span><div><b>Modern Villa</b><small>Architecture · AI study</small></div><strong>82%</strong></article>
+          <article><span className="crystal-activity-icon is-blue"><Grid2X2 size={16} /></span><div><b>Floor plan</b><small>2D draft · Completed</small></div><strong className="is-done">Done</strong></article>
+        </div>
+        <form className="crystal-mobile-composer" onSubmit={(event) => { event.preventDefault(); if (!prompt.trim()) return; setMobileHome(false); void handleGenerate(); }}>
+          <button type="button" className="crystal-mobile-pro-banner" onClick={() => setMobilePricing(true)}><Zap size={15} fill="currentColor" /><span><b>Try Crystal Pro</b><small>Unlock faster generations</small></span><em>Pay Now</em></button>
+          <label className="crystal-mobile-composer-label" htmlFor="mobile-crystal-prompt">What do you want to create?</label>
+          <textarea id="mobile-crystal-prompt" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="Describe your next architectural idea..." rows={2} />
+          <div className="crystal-mobile-composer-actions">
+            <button type="button" aria-label="Attach reference" onClick={() => sceneFileInput.current?.click()}><Paperclip size={18} /></button>
+            <button type="button" className="crystal-mobile-model-select" onClick={() => setMobileModelSheet(true)}>{mobileModel}<ChevronDown size={15} /></button>
+            <button type="submit" aria-label="Generate with Crystal" disabled={loading}><Sparkles size={18} /></button>
+          </div>
+        </form>
+        {mobileModelSheet && <div className="crystal-mobile-model-overlay" role="dialog" aria-modal="true" aria-label="Choose AI model" onClick={() => setMobileModelSheet(false)}>
+          <div className="crystal-mobile-model-sheet" onClick={(event) => event.stopPropagation()}><div className="crystal-sheet-handle" /><div className="flex items-center justify-between"><div><b>AI model</b><small>Choose your creative partner</small></div><button type="button" aria-label="Close model selector" onClick={() => setMobileModelSheet(false)}>×</button></div>
+            {["Crystal AI", "Claude", "OpenAI", "Gemini", "Grok", "Copilot"].map((model) => <button type="button" key={model} className={mobileModel === model ? "is-selected" : ""} onClick={() => { setMobileModel(model); setMobileModelSheet(false); }}><span><Sparkles size={17} />{model}</span>{mobileModel === model && <span>✓</span>}</button>)}
+          </div>
+        </div>}
+        <button type="button" className="crystal-mobile-theme-toggle" aria-label="Toggle light and dark mode" onClick={() => setAlternateTheme((value) => !value)}>{alternateTheme ? <Moon size={17} /> : <Sun size={17} />}</button>
+      </section>
       <header className="crystal-topbar col-span-full flex h-16 items-center border-b border-[#292929] bg-[#0F0F0F] px-7">
         <div className="flex items-center gap-3"><img src="/Logopng.png" alt="Crystal" className="crystal-brand-logo"/><b className="text-[18px] tracking-[-0.02em] text-zinc-100">Crystal</b><span className="mx-1 h-5 w-px bg-[#303030]" aria-hidden="true"/><button aria-label={dedicated ? "Back to Crystal AI Chat" : "Back to projects"} onClick={() => router.push(dedicated ? "/aichat" : "/project")} className="crystal-home-button grid h-9 w-9 place-items-center rounded-[9px] text-zinc-300"><Home size={18}/></button><span className="hidden h-5 w-px bg-[#303030] sm:block" aria-hidden="true"/><span className="hidden text-[12px] font-semibold tracking-wide text-zinc-300 sm:block">3D Studio <span className="text-zinc-500">/ Modeling</span></span></div>
         <nav aria-label="Application menu" className="crystal-app-menu relative ml-7 flex h-full items-center gap-1 text-[13px] text-zinc-400">{["File", "Edit", "Tools", "Help", "View"].map((item) => <button aria-expanded={openMenu===item} key={item} onClick={() => setOpenMenu(openMenu === item ? null : item)} className={`crystal-menu-item h-9 rounded-[8px] px-3 transition ${openMenu === item ? "is-open text-white" : ""}`}>{item}</button>)}{openMenu && <div className="absolute left-0 top-[52px] z-50 w-52 rounded-[12px] border border-white/10 bg-[#242424] p-1.5 shadow-2xl"><div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{openMenu}</div>{menuItems[openMenu].map(action => <button key={action} onClick={() => runMenuAction(action)} className="block w-full rounded-lg px-3 py-2 text-left text-[11px] text-zinc-200 hover:bg-[#353535]">{action}</button>)}</div>}</nav>
