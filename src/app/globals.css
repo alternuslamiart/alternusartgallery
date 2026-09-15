@@ -3181,6 +3181,34 @@ textarea {
 }
 
 @media (max-width: 700px) {
+  .crystal-mobile-home-active .crystal-mobile-home {
+    --crystal-mobile-space: 16px;
+    --crystal-mobile-section-space: 20px;
+    padding-inline: var(--crystal-mobile-space);
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home-header {
+    margin-bottom: var(--crystal-mobile-space);
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home-hero {
+    padding-inline: var(--crystal-mobile-space);
+    padding-bottom: var(--crystal-mobile-section-space);
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-date-strip {
+    margin-bottom: var(--crystal-mobile-space);
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-activity {
+    gap: var(--crystal-mobile-space);
+    margin-bottom: var(--crystal-mobile-section-space);
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-composer {
+    gap: var(--crystal-mobile-space);
+  }
+
   html,
   body {
     min-width: 0;
