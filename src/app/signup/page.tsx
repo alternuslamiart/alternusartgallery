@@ -67,13 +67,18 @@ function useAuthTheme() {
  const [isLight, setIsLight] = useState(false);
 
  useEffect(() => {
- setIsLight(window.localStorage.getItem(AUTH_THEME_KEY) === "light");
+ const storedTheme = window.localStorage.getItem(AUTH_THEME_KEY);
+ const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+ const nextIsLight = storedTheme ? storedTheme === "light" : prefersLight;
+ setIsLight(nextIsLight);
+ document.documentElement.style.colorScheme = nextIsLight ? "light" : "dark";
  }, []);
 
  const toggleTheme = () => {
  setIsLight((current) => {
  const next = !current;
  window.localStorage.setItem(AUTH_THEME_KEY, next ? "light" : "dark");
+ document.documentElement.style.colorScheme = next ? "light" : "dark";
  return next;
  });
  };
@@ -83,9 +88,9 @@ function useAuthTheme() {
 
 function Brand() {
  return (
- <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Crystal Studio home">
- <CoreforgeMark />
- <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Crystal Studio</span>
+ <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Crystal homepage" title="Go to homepage">
+ <span className="auth-brand-mark inline-flex h-8 w-8 items-center justify-center rounded-lg"><CoreforgeMark /></span>
+ <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Crystal</span>
  </Link>
  );
 }
@@ -159,7 +164,7 @@ export default function SignUpPage() {
  <button
  type="button"
  onClick={toggleTheme}
- className="auth-theme-toggle inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors"
+ className={`auth-theme-toggle inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors ${isLight ? "is-light" : "is-dark"}`}
  aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
  >
  {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
@@ -176,7 +181,7 @@ export default function SignUpPage() {
  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Start Crystal Studio</p>
  <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">Create account</h1>
  <p className="auth-copy mx-auto max-w-xs text-sm leading-6">
- Join the AI workspace for 3D machinery, CAD studios, CNC, automotive, aerospace, and engineering code.
+ Create your Crystal workspace for AI-assisted architecture, floor plans, 3D modeling, infrastructure planning, image generation, and professional PDF documentation.
  </p>
  </CardHeader>
  <CardContent className="space-y-5 p-7 pt-0">

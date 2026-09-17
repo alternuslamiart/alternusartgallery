@@ -153,7 +153,7 @@ export default function LoginPage() {
  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Crystal Studio workspace</p>
  <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">Sign in</h1>
  <p className="auth-copy mx-auto max-w-xs text-sm leading-6">
- Open your AI workspace for 3D machinery, CAD studios, CNC, and engineering code workflows.
+ Open your Crystal workspace for Claude AI, OpenAI Codex, architecture, floor plans, 3D modeling, infrastructure planning, and professional project documentation.
  </p>
  </CardHeader>
  <CardContent className="space-y-5 p-7 pt-0">
