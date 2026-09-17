@@ -28,12 +28,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
  credentials: {
  email: { label: "Email", type: "email" },
  password: { label: "Password", type: "password" },
+ verificationCode: { label: "Verification code", type: "text" },
  },
  async authorize(credentials) {
  const email = (credentials?.email as string)?.trim()?.toLowerCase()
  const password = credentials?.password as string
+ const verificationCode = (credentials?.verificationCode as string)?.trim()
 
- if (!email || !password) {
+ if (!email || !password || !verificationCode) {
  return null
  }
 
@@ -51,6 +53,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
  if (!isValidPassword) {
  return null
  }
+
+ const verification = await prisma.verificationToken.findFirst({
+ where: {
+  identifier: `login:${email}`,
+  token: verificationCode,
+  expires: { gt: new Date() },
+ },
+ })
+
+ if (!verification) {
+ return null
+ }
+
+ await prisma.verificationToken.delete({ where: { token: verification.token } })
 
  return {
  id: user.id,

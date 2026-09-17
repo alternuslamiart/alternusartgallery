@@ -139,20 +139,8 @@ export default function SignUpPage() {
  return;
  }
 
- const signInResult = await signIn("credentials", {
- email,
- password,
- redirect: false,
- });
-
  setIsSubmitting(false);
-
- if (signInResult?.error) {
- router.replace("/login");
- return;
- }
-
- router.replace(STUDIO_HOME);
+ router.replace(`/login?registered=1&email=${encodeURIComponent(email)}`);
  };
 
  return (

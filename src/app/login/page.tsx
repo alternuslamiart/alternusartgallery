@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { ArrowRight, Lock, Mail, Moon, Sun } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, KeyRound, Lock, Mail, Moon, RefreshCw, ShieldCheck, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -96,9 +96,24 @@ export default function LoginPage() {
  const [isLight, toggleTheme] = useAuthTheme();
  const [email, setEmail] = useState("");
  const [password, setPassword] = useState("");
+ const [verificationCode, setVerificationCode] = useState("");
+ const [verificationStep, setVerificationStep] = useState<"credentials" | "code">("credentials");
+ const [resendSeconds, setResendSeconds] = useState(0);
+
+ useEffect(() => {
+  const registeredEmail = searchParams.get("email");
+  if (registeredEmail) setEmail(registeredEmail);
+ }, [searchParams]);
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [error, setError] = useState<string | null>(null);
  const callbackUrl = searchParams.get("callbackUrl") || STUDIO_HOME;
+ const registered = searchParams.get("registered") === "1";
+
+ useEffect(() => {
+  if (resendSeconds <= 0) return;
+  const timer = window.setInterval(() => setResendSeconds((value) => Math.max(0, value - 1)), 1000);
+  return () => window.clearInterval(timer);
+ }, [resendSeconds]);
 
  const handleOAuthSignIn = (provider: OAuthProvider) => {
  signIn(provider, { callbackUrl: STUDIO_HOME });
@@ -109,20 +124,53 @@ export default function LoginPage() {
  setError(null);
  setIsSubmitting(true);
 
- const result = await signIn("credentials", {
- email,
- password,
- redirect: false,
- });
+ if (verificationStep === "credentials") {
+  const response = await fetch("/api/auth/request-login-code", {
+   method: "POST",
+   headers: { "Content-Type": "application/json" },
+   body: JSON.stringify({ email, password }),
+  });
+  const data = (await response.json()) as { error?: string };
+  setIsSubmitting(false);
+  if (!response.ok) {
+   setError(data.error || "Could not send the verification code.");
+   return;
+  }
+  setVerificationStep("code");
+  setResendSeconds(30);
+  return;
+ }
+
+ const result = await signIn("credentials", { email, password, verificationCode, redirect: false });
 
  setIsSubmitting(false);
 
  if (result?.error) {
- setError("Email or password is incorrect.");
+ setError("That code is invalid or expired. Request a new code and try again.");
+ setVerificationCode("");
  return;
  }
 
  router.replace(callbackUrl);
+ };
+
+ const handleResend = async () => {
+  if (resendSeconds > 0 || isSubmitting) return;
+  setError(null);
+  setIsSubmitting(true);
+  const response = await fetch("/api/auth/request-login-code", {
+   method: "POST",
+   headers: { "Content-Type": "application/json" },
+   body: JSON.stringify({ email, password }),
+  });
+  const data = (await response.json()) as { error?: string };
+  setIsSubmitting(false);
+  if (!response.ok) {
+   setError(data.error || "Could not resend the verification code.");
+   return;
+  }
+  setResendSeconds(30);
+  setVerificationCode("");
  };
 
  return (
@@ -151,12 +199,44 @@ export default function LoginPage() {
  <Card className="auth-card w-full max-w-md rounded-[24px] border shadow-none backdrop-blur-xl">
  <CardHeader className="space-y-3 p-7 text-center">
  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Crystal Studio workspace</p>
- <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">Sign in</h1>
+ <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">{verificationStep === "credentials" ? "Sign in" : "Check your email"}</h1>
  <p className="auth-copy mx-auto max-w-xs text-sm leading-6">
- Open your Crystal workspace for Claude AI, OpenAI Codex, architecture, floor plans, 3D modeling, infrastructure planning, and professional project documentation.
+ {verificationStep === "credentials"
+  ? "Open your Crystal workspace for Claude AI, OpenAI Codex, architecture, floor plans, 3D modeling, infrastructure planning, and professional project documentation."
+  : <>We sent a 6-digit verification code to <strong className="auth-title font-semibold">{email}</strong>.</>}
  </p>
  </CardHeader>
  <CardContent className="space-y-5 p-7 pt-0">
+ {verificationStep === "code" ? (
+  <div className="auth-verification-panel space-y-5">
+   <div className="auth-verification-icon mx-auto flex h-14 w-14 items-center justify-center rounded-2xl">
+    <ShieldCheck className="h-7 w-7" />
+   </div>
+   <div className="space-y-2 text-center">
+    <p className="auth-label text-sm font-semibold">Secure verification</p>
+    <p className="auth-copy text-xs leading-5">Enter the code from your inbox to continue to Crystal Studio. It expires in 10 minutes.</p>
+   </div>
+   <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-2">
+     <Label htmlFor="verificationCode" className="auth-label text-xs font-medium">Verification code</Label>
+     <div className="relative">
+      <KeyRound className="auth-input-icon absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+      <Input id="verificationCode" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={verificationCode} onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, ""))} placeholder="000000" autoComplete="one-time-code" required className="auth-input h-14 rounded-[10px] pl-9 text-center text-xl tracking-[0.35em] shadow-none focus-visible:ring-[#068fff]" />
+     </div>
+    </div>
+    {error ? <p className="rounded-[10px] border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p> : null}
+    <Button type="submit" disabled={isSubmitting || verificationCode.length !== 6} className="h-11 w-full rounded-[10px] bg-[#068fff] text-sm font-semibold text-white shadow-none hover:bg-[#1b9dff]">
+     {isSubmitting ? "Verifying..." : "Verify and open Studio"} <ArrowRight className="h-4 w-4" />
+    </Button>
+   </form>
+   <div className="flex items-center justify-between text-xs">
+    <button type="button" onClick={() => { setVerificationStep("credentials"); setVerificationCode(""); setError(null); }} className="auth-footer-link inline-flex items-center gap-1.5 font-semibold"><ArrowLeft className="h-3.5 w-3.5" /> Change email</button>
+    <button type="button" onClick={handleResend} disabled={resendSeconds > 0 || isSubmitting} className="auth-footer-link inline-flex items-center gap-1.5 font-semibold disabled:cursor-not-allowed disabled:opacity-50"><RefreshCw className="h-3.5 w-3.5" /> {resendSeconds > 0 ? `Resend in ${resendSeconds}s` : "Resend code"}</button>
+   </div>
+   <p className="auth-copy flex items-center justify-center gap-1.5 text-center text-[11px]"><CheckCircle2 className="h-3.5 w-3.5 text-[#35b8ff]" /> Your account stays protected with email verification.</p>
+  </div>
+ ) : (
+ <>
  <div className="grid gap-2.5">
  {socialProviders.map((provider) => (
  <Button
@@ -227,6 +307,11 @@ export default function LoginPage() {
  {error}
  </p>
  ) : null}
+ {registered ? (
+  <p className="rounded-[10px] border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+   Account created. Sign in to receive your email verification code.
+  </p>
+ ) : null}
 
  <Button
  type="submit"
@@ -237,6 +322,8 @@ export default function LoginPage() {
  <ArrowRight className="h-4 w-4" />
  </Button>
  </form>
+ </>
+ )}
 
  <p className="auth-footer-copy text-center text-xs">
  New to Crystal Studio?{" "}

@@ -1888,6 +1888,31 @@
  color: #1c5fd6;
 }
 
+.auth-page .auth-verification-panel {
+ border: 1px solid rgba(141, 184, 255, .16);
+ border-radius: 18px;
+ padding: 18px;
+ background: linear-gradient(145deg, rgba(141, 184, 255, .08), rgba(6, 143, 255, .02));
+}
+
+.auth-page .auth-verification-icon {
+ color: #8db8ff;
+ border: 1px solid rgba(141, 184, 255, .22);
+ background: rgba(141, 184, 255, .1);
+ box-shadow: 0 0 28px rgba(6, 143, 255, .12);
+}
+
+.auth-page.auth-light .auth-verification-panel {
+ border-color: rgba(6, 143, 255, .14);
+ background: linear-gradient(145deg, rgba(6, 143, 255, .06), rgba(255, 255, 255, .5));
+}
+
+.auth-page.auth-light .auth-verification-icon {
+ color: #1671d9;
+ border-color: rgba(6, 143, 255, .18);
+ background: rgba(6, 143, 255, .08);
+}
+
 /* Shared raster mark supplied for the Crystal application chrome. */
 .crystal-brand-logo { width: 27px; height: 27px; object-fit: contain; filter: invert(1) brightness(1.55); opacity: .88; }
 .crystal-brand-logo-mobile { width: 40px; height: 40px; }
