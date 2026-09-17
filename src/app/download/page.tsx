@@ -1,11 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Check, Cpu, Download, HardDrive, Laptop, ShieldCheck, WifiOff } from "lucide-react";
+import { Apple, ArrowRight, Bot, Check, Code2, Cpu, Download, FileText, HardDrive, Image as ImageIcon, Laptop, ShieldCheck, WifiOff } from "lucide-react";
 import { COBALT, CoreforgePage } from "@/components/cedium-shell";
 
 const features = [
   { Icon: Cpu, title: "Advanced local workflows", copy: "Handle larger design projects, deeper visualization steps, automation scripts, and documentation preparation." },
+  { Icon: Bot, title: "Claude AI design assistant", copy: "Use Claude AI for architectural research, design reasoning, project guidance, and structured decision support." },
+  { Icon: Code2, title: "OpenAI Codex development tools", copy: "Use Codex to generate code, automate technical workflows, and prepare repeatable project tools." },
+  { Icon: ImageIcon, title: "AI visualization and concept generation", copy: "Create concept imagery, design references, spatial studies, and presentation-ready visual material." },
+  { Icon: FileText, title: "Architectural reports and PDF deliverables", copy: "Prepare clear project summaries, statistics, design documentation, and professional PDF exports." },
   { Icon: WifiOff, title: "Offline project access", copy: "Open project files, references, notes, and selected tools without relying on the browser workspace." },
   { Icon: HardDrive, title: "Workstation file control", copy: "Keep design assets and project folders organized on your own desktop environment." },
   { Icon: ShieldCheck, title: "Professional validation", copy: "Construction-ready documents must be reviewed by a qualified professional before use." },
@@ -37,7 +41,11 @@ export default function DownloadPage() {
                 <p style={{ color: t.muted, fontSize: 13, lineHeight: 1.6 }}>Includes one desktop license and product updates for the first 12 months. Optional updates after the included period do not disable your existing version.</p>
                 <Link href="/contact" style={{ marginTop: 24, height: 48, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: COBALT, color: "#fff", fontSize: 14, fontWeight: 800, textDecoration: "none" }}>Get Desktop App <Download size={17} /></Link>
                 <div style={{ marginTop: 24, display: "grid", gap: 12 }}>
-                  {["Windows 11 and Windows 10 (64-bit)", "Minimum 16 GB RAM; 32 GB recommended", "Dedicated GPU recommended for larger projects", "Commercial use subject to professional review"].map((item) => <div key={item} style={{ display: "flex", gap: 10, fontSize: 13 }}><Check size={16} color={COBALT} /><span>{item}</span></div>)}
+                  {["Windows 11 and Windows 10 (64-bit)", "Apple macOS for MacBook Air and MacBook Pro", "Apple Silicon and Intel Mac support", "Minimum 16 GB RAM; 32 GB recommended", "Dedicated GPU recommended for larger projects", "Commercial use subject to professional review"].map((item) => <div key={item} style={{ display: "flex", gap: 10, fontSize: 13 }}><Check size={16} color={COBALT} /><span>{item}</span></div>)}
+                </div>
+                <div style={{ marginTop: 28, paddingTop: 22, borderTop: `1px solid ${t.faint}`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, color: t.fg, fontSize: 13, fontWeight: 700 }}><Laptop size={17} color={COBALT} /> Windows desktop</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, color: t.fg, fontSize: 13, fontWeight: 700 }}><Apple size={17} color={COBALT} /> MacBook / macOS</div>
                 </div>
               </div>
 
