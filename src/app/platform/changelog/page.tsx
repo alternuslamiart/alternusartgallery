@@ -2,12 +2,12 @@
 import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const log = [
- { d: "2026-04-22", v: "0.9.4", k: "feat", t: "3D machinery agent goes public", b: "Mechanical engineering, automotive systems, CNC/CAM, CAD studio integration, and AI code workflows are available in all workspaces." },
- { d: "2026-04-14", v: "0.9.3", k: "fix", t: "File search re-ranking", b: "Semantic FS search now cold-starts ~40% faster and de-duplicates near-identical matches." },
- { d: "2026-04-02", v: "0.9.2", k: "feat", t: "Code Studio multi-repo", b: "Open up to 8 repositories in a single Code Studio window with shared agent context." },
- { d: "2026-03-18", v: "0.9.1", k: "feat", t: "Agent SDK (beta)", b: "Embed the Crystal Studio agent into any TypeScript app. npm i @crystal-studio/agent." },
- { d: "2026-03-01", v: "0.9.0", k: "feat", t: "Engineering workflow upgrade", b: "Default agent upgraded for 3D machinery, automotive, CNC/CAM, CAD studio, and code/API workflows." },
- { d: "2026-02-11", v: "0.8.7", k: "fix", t: "OOBE skip for returning users", b: "We no longer replay the setup flow on every visit — restored from profile cookie." },
+ { d: "2026-09-17", v: "1.0.0", k: "feat", t: "Crystal platform launch", b: "Crystal now brings AI Chat, AI Code, Architecture Studio, image generation, PDF documentation, and connected project workflows into one platform." },
+ { d: "2026-09-12", v: "0.9.9", k: "feat", t: "GPT Astra joins the workspace", b: "GPT Astra, powered by OpenAI technology, provides structured assistance for architectural research, design decisions, project planning, and technical workflows." },
+ { d: "2026-09-08", v: "0.9.8", k: "feat", t: "Architecture Studio workflows", b: "Create and organize architectural concepts with project context, spatial studies, floor-plan generation, statistics, and design documentation." },
+ { d: "2026-09-03", v: "0.9.7", k: "feat", t: "Modeling and infrastructure tools", b: "Crystal adds connected workflows for 3D modeling, floor plans, infrastructure systems, visual studies, and professional project handoff." },
+ { d: "2026-08-27", v: "0.9.6", k: "feat", t: "Claude AI and Codex workflows", b: "Use Claude AI for research and design reasoning, and OpenAI Codex for code generation, automation, and technical project tools." },
+ { d: "2026-08-19", v: "0.9.5", k: "feat", t: "Desktop workflows for Windows and Mac", b: "Crystal Studio Desktop now supports local project files, offline access, automation, and documentation workflows on Windows and Apple MacBook devices." },
 ];
 
 const tagColor: Record<string, string> = { feat: COBALT, fix: "#F59E0B", chore: "#64748B" };
