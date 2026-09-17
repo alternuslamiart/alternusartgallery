@@ -81,8 +81,10 @@ function useAuthTheme() {
 
 function Brand() {
  return (
- <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Crystal home">
- <img src="/Logopng.png" alt="" className="h-8 w-8 object-contain" />
+ <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Crystal homepage" title="Go to homepage">
+ <span className="auth-brand-mark inline-flex h-8 w-8 items-center justify-center rounded-lg">
+ <img src="/Logopng.png" alt="Crystal homepage" className="h-8 w-8 object-contain" />
+ </span>
  <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Crystal</span>
  </Link>
  );
@@ -132,7 +134,7 @@ export default function LoginPage() {
  <button
  type="button"
  onClick={toggleTheme}
- className="auth-theme-toggle inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors"
+ className={`auth-theme-toggle inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors ${isLight ? "is-light" : "is-dark"}`}
  aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
  aria-pressed={isLight}
  title={isLight ? "Switch to dark mode" : "Switch to light mode"}

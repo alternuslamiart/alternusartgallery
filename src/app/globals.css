@@ -1722,6 +1722,22 @@
  color: #ffffff;
 }
 
+.auth-page .auth-brand-link {
+ text-decoration: none;
+}
+
+.auth-page .auth-brand-link:hover .auth-brand-mark {
+ background: rgba(6, 143, 255, 0.14);
+}
+
+.auth-page .auth-brand-mark {
+ transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.auth-page .auth-brand-link:active .auth-brand-mark {
+ transform: scale(0.94);
+}
+
 .auth-page.auth-light .auth-brand,
 .auth-page.auth-light .auth-title {
  color: #101114;
@@ -1757,10 +1773,21 @@
  color: #d4d4d8;
 }
 
+.auth-page .auth-theme-toggle.is-dark {
+ box-shadow: inset 0 0 0 1px rgba(6, 143, 255, 0.34), 0 0 0 3px rgba(6, 143, 255, 0.08);
+}
+
 .auth-page.auth-light .auth-theme-toggle {
  border-color: rgba(16, 17, 20, 0.12);
  background: rgba(255, 255, 255, 0.84);
  color: #3f4654;
+}
+
+.auth-page.auth-light .auth-theme-toggle.is-light {
+ border-color: rgba(6, 143, 255, 0.5);
+ background: rgba(6, 143, 255, 0.12);
+ color: #068fff;
+ box-shadow: inset 0 0 0 1px rgba(6, 143, 255, 0.2), 0 0 0 3px rgba(6, 143, 255, 0.08);
 }
 
 .auth-page .auth-card {
