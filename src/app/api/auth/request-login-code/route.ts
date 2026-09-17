@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomInt } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail } from "@/lib/email";
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
    return NextResponse.json({ error: "Email or password is incorrect." }, { status: 401 });
   }
 
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const code = randomInt(100000, 1000000).toString();
   await prisma.verificationToken.deleteMany({ where: { identifier: `login:${email}` } });
   await prisma.verificationToken.create({
    data: {
