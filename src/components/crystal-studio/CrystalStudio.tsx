@@ -94,7 +94,7 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   const [mobilePricing, setMobilePricing] = useState(false);
   const [mobileHome, setMobileHome] = useState(true);
   const [mobileModelSheet, setMobileModelSheet] = useState(false);
-  const [mobileWorkspace, setMobileWorkspace] = useState<"architecture" | "floor-plan" | "infrastructure">("architecture");
+  const [mobileWorkspace, setMobileWorkspace] = useState<"floor-plan" | "modeling" | "infrastructure">("floor-plan");
   const [mobileModel, setMobileModel] = useState("Crystal AI");
   const [pricingPlan, setPricingPlan] = useState("Basic");
   const [mobileSplash, setMobileSplash] = useState(true);
@@ -260,20 +260,21 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
       <section className="crystal-mobile-home" aria-label="Crystal mobile home">
         <header className="crystal-mobile-home-header">
           <button type="button" aria-label="Open Crystal menu" onClick={() => setMobileMenu(true)}><Grid2X2 size={19} /></button>
-          <div className="crystal-mobile-workspace-tabs" role="tablist" aria-label="Crystal workspaces">
-            {(["architecture", "floor-plan", "infrastructure"] as const).map((workspace) => (
+          <div className="crystal-mobile-workspace-tabs" role="tablist" aria-label="Crystal studios">
+            {(["floor-plan", "modeling", "infrastructure"] as const).map((workspace) => (
               <button key={workspace} type="button" role="tab" aria-selected={mobileWorkspace === workspace} onClick={() => {
                 setMobileWorkspace(workspace);
                 if (workspace === "floor-plan") { setStudioMode("floor-plan"); setMobileHome(false); }
+                if (workspace === "modeling") { setStudioMode("modeling"); setMobileHome(false); }
                 if (workspace === "infrastructure") router.push("/infrastructure");
-              }}>{workspace === "floor-plan" ? "Floor plan" : workspace[0].toUpperCase() + workspace.slice(1)}</button>
+              }}>{workspace === "floor-plan" ? "Floor Plan Studio" : workspace === "modeling" ? "Modeling Studio" : "Infrastructure Studio"}</button>
             ))}
           </div>
           <button type="button" aria-label="Open profile" onClick={() => setMobileProfile(true)}><Settings size={19} /></button>
         </header>
         <div className="crystal-mobile-home-hero">
           <div className="crystal-mobile-mark"><Sparkles size={28} /></div>
-          <h1>{mobileWorkspace === "architecture" ? "What should we create?" : "Your workspace is ready"}</h1>
+          <h1>{mobileWorkspace === "floor-plan" ? "Create a floor plan." : mobileWorkspace === "modeling" ? "Build your model." : "Plan your infrastructure."}</h1>
           <p>Architecture, floor plans and infrastructure — made with Crystal.</p>
         </div>
         <div className="crystal-mobile-date-strip" aria-label="Crystal activity period">
