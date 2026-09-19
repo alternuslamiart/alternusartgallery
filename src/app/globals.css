@@ -3641,6 +3641,22 @@ textarea {
     bottom: 8px !important;
   }
 }
+
+@media (min-width: 701px) {
+  .crystal-modeling-mode .crystal-modeling-sidebar,
+  .crystal-modeling-mode .crystal-right-panel {
+    top: 8px !important;
+    right: 8px !important;
+    bottom: 8px !important;
+    border: 1px solid rgba(255, 255, 255, .1) !important;
+    border-radius: 12px !important;
+    box-sizing: border-box;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-sidebar {
+    left: 8px !important;
+  }
+}
 }
 
 /* Final workspace overrides: keep every Studio surface on one restrained dark palette. */
