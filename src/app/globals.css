@@ -3631,6 +3631,16 @@ textarea {
     padding-top: 4px;
   }
 }
+
+@media (min-width: 701px) {
+  .crystal-modeling-mode .crystal-ai-prompt {
+    bottom: 8px !important;
+  }
+
+  .crystal-modeling-mode .crystal-ai-chat-toggle {
+    bottom: 8px !important;
+  }
+}
 }
 
 /* Final workspace overrides: keep every Studio surface on one restrained dark palette. */
