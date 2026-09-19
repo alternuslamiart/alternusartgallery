@@ -4471,3 +4471,22 @@ textarea {
     padding-inline: 8px !important;
   }
 }
+
+@media (min-width: 701px) {
+  .crystal-modeling-mode .crystal-ai-prompt {
+    border: 1px solid transparent !important;
+    background:
+      linear-gradient(#17191c, #17191c) padding-box,
+      linear-gradient(
+        110deg,
+        #1f0ade 0%,
+        #0c8ce9 25%,
+        #ff6e5b 52%,
+        #21b803 76%,
+        #0094ff 100%
+      ) border-box !important;
+    box-shadow:
+      0 12px 30px rgba(0, 0, 0, .38),
+      0 0 18px rgba(12, 140, 233, .12) !important;
+  }
+}
