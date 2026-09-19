@@ -2,7 +2,6 @@
 
 import {
   BadgeCheck,
-  Bell,
   BriefcaseBusiness,
   CheckSquare,
   ChevronDown,
@@ -11,6 +10,7 @@ import {
   FileText,
   FolderKanban,
   Grid2X2,
+  LayoutGrid,
   LayoutDashboard,
   Mail,
   PanelLeftClose,
@@ -28,10 +28,10 @@ type SidebarItem = { label: string; href: string; icon: LucideIcon; badge?: stri
 
 const primary: SidebarItem[] = [
   { label: "Dashboard", href: "/project", icon: LayoutDashboard },
-  { label: "Messages", href: "/ai-assistant", icon: Bell, badge: "16" },
-  { label: "Tasks", href: "/projects", icon: CheckSquare },
+  { label: "Floor Plan", href: "/crystal?mode=floor-plan", icon: LayoutGrid },
+  { label: "Modeling", href: "/crystal", icon: CheckSquare },
   { label: "Notes", href: "/workspace/knowledge", icon: FileText },
-  { label: "Emails", href: "/workspace/mail", icon: Mail },
+  { label: "Infrastructure", href: "/infrastructure", icon: Mail },
   { label: "Reports", href: "/exports", icon: ClipboardList },
   { label: "Automations", href: "/workflow", icon: Settings2, badge: "✦" },
   { label: "Workflows", href: "/workflow", icon: Workflow, badge: "✦" },

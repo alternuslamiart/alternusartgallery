@@ -55,6 +55,11 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   const [activeTool, setActiveTool] = useState<StudioTool>("orbit");
   const [incognito, setIncognito] = useState(false);
   const [studioMode, setStudioMode] = useState<StudioMode>("modeling");
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("mode") === "floor-plan") {
+      setStudioMode("floor-plan");
+    }
+  }, []);
   const [floorPlanObjects, setFloorPlanObjects] = useState<FloorPlanObject[]>([
     { id: "wall-exterior-top", type: "wall", start: { x: 0, y: 0 }, end: { x: 8, y: 0 }, thickness: 0.18 },
     { id: "wall-exterior-right", type: "wall", start: { x: 8, y: 0 }, end: { x: 8, y: 6 }, thickness: 0.18 },
