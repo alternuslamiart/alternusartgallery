@@ -568,6 +568,79 @@
     }
   }
 
+  @media (min-width: 701px) {
+    .crystal-modeling-mode .crystal-modeling-sidebar,
+    .crystal-modeling-mode .crystal-right-panel {
+      top: 8px !important;
+      bottom: 8px !important;
+      width: 291px !important;
+      height: calc(100% - 16px) !important;
+    }
+
+    .crystal-modeling-mode .crystal-modeling-sidebar {
+      left: 8px !important;
+    }
+
+    .crystal-modeling-mode .crystal-right-panel {
+      right: 8px !important;
+    }
+
+    .crystal-modeling-mode .crystal-modeling-tools {
+      top: 18px !important;
+      width: 662px !important;
+      min-width: 662px !important;
+      height: 54px !important;
+      padding: 7px 9px !important;
+      border-radius: 13px !important;
+    }
+
+    .crystal-modeling-mode .crystal-modeling-tools button {
+      width: 40px !important;
+      height: 40px !important;
+      border-radius: 8px !important;
+    }
+
+    .crystal-modeling-mode .crystal-modeling-tool-divider {
+      height: 26px;
+    }
+
+    .crystal-modeling-mode .crystal-modeling-action {
+      height: 32px !important;
+      min-width: 32px !important;
+      padding-inline: 8px !important;
+    }
+
+    .crystal-modeling-mode .crystal-modeling-action[aria-label="Export viewport"] {
+      width: 79px !important;
+      min-width: 79px !important;
+    }
+
+    .crystal-modeling-mode .crystal-ai-prompt {
+      bottom: 8px !important;
+      width: 487px !important;
+      min-height: 120px !important;
+      box-sizing: border-box;
+      padding: 8px !important;
+    }
+
+    .crystal-modeling-mode .crystal-ai-prompt > div:last-child {
+      height: 32px !important;
+    }
+
+    .crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:first-child,
+    .crystal-modeling-mode .crystal-ai-prompt > div:last-child > button {
+      width: 32px !important;
+      height: 32px !important;
+    }
+
+    .crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:nth-child(2) {
+      width: 108px !important;
+      height: 32px !important;
+      min-width: 108px !important;
+      padding-inline: 10px !important;
+    }
+  }
+
   .crystal-infrastructure-page > aside,
   .crystal-infrastructure-page > section > header,
   .crystal-infrastructure-page > section > aside {
