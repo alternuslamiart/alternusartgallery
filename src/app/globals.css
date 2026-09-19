@@ -3985,38 +3985,171 @@ textarea {
 }
 
 @media (min-width: 701px) {
-  .crystal-modeling-mode { background: #0a0a0b !important; }
-  .crystal-modeling-mode > header { height: 60px !important; padding-inline: 18px !important; background: rgba(10,10,11,.92) !important; border-bottom-color: rgba(255,255,255,.07) !important; }
-  .crystal-modeling-mode .crystal-reference-left,
-  .crystal-modeling-mode .crystal-reference-inspector {
-    top: 68px !important;
-    bottom: 10px !important;
-    border: 1px solid rgba(255,255,255,.075) !important;
-    border-radius: 12px !important;
-    background: #0d0f12 !important;
-    box-shadow: 0 16px 38px rgba(0,0,0,.22);
+  .crystal-modeling-mode {
+    --crystal-left-width: 300px;
+    --crystal-right-width: 320px;
+    grid-template-rows: 0 minmax(0, 1fr) !important;
+    background: #0d0d0e !important;
   }
-  .crystal-modeling-mode .crystal-reference-left { left: 8px !important; width: 264px !important; }
-  .crystal-modeling-mode .crystal-reference-inspector { right: 8px !important; width: 264px !important; padding: 10px 9px 28px !important; }
-  .crystal-modeling-mode .crystal-reference-tabs { height: 39px; gap: 22px; border-bottom-color: rgba(255,255,255,.08); }
-  .crystal-modeling-mode .crystal-reference-tabs button { height: 39px; color: #788290; font-size: 10px; }
-  .crystal-modeling-mode .crystal-reference-tabs button.is-active { color: #e6edf7; border-bottom-color: #3b82f6; }
-  .crystal-modeling-mode .crystal-reference-search { height: 34px; margin: 0 2px 13px; border: 1px solid rgba(255,255,255,.07); border-radius: 8px; background: #171a1f; }
-  .crystal-modeling-mode .crystal-reference-search:focus-within { border-color: rgba(59,130,246,.65); box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
-  .crystal-modeling-mode .crystal-reference-tree-row { height: 32px; border-radius: 7px; color: #8e98a7; font-size: 11px; }
-  .crystal-modeling-mode .crystal-reference-tree-row:hover { color: #e5eaf2; background: rgba(255,255,255,.045); }
-  .crystal-modeling-mode .crystal-reference-tree-row.is-selected { color: #edf5ff; background: rgba(59,130,246,.30); box-shadow: inset 2px 0 #3b82f6; }
+
+  .crystal-modeling-mode > .crystal-topbar {
+    display: none !important;
+  }
+
+  .crystal-modeling-mode .crystal-left-panel,
+  .crystal-modeling-mode .crystal-right-panel {
+    top: 0 !important;
+    bottom: 0 !important;
+    border-radius: 0 !important;
+    border-color: rgba(255,255,255,.08) !important;
+    background: #0d0d0e !important;
+    box-shadow: none !important;
+  }
+
+  .crystal-modeling-mode .crystal-left-panel {
+    left: 0 !important;
+    width: 300px !important;
+    padding: 22px 16px 16px !important;
+  }
+
+  .crystal-modeling-mode .crystal-right-panel {
+    right: 0 !important;
+    width: 320px !important;
+    padding: 24px 22px 20px !important;
+  }
+
+  .crystal-modeling-mode .crystal-sidebar-heading {
+    padding: 0 8px 22px !important;
+  }
+
+  .crystal-modeling-mode .crystal-sidebar-heading h1 {
+    color: #f3f4f6;
+    font-size: 16px;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-kicker {
+    color: #f1f5f9;
+    font-size: 14px;
+    letter-spacing: -.02em;
+    text-transform: none;
+  }
+
+  .crystal-modeling-mode .crystal-sidebar-heading button {
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 9px;
+    background: #18191c;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-tabs {
+    margin: 0 -16px 18px;
+    padding: 0 16px 8px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-tabs button {
+    height: 34px;
+    border-radius: 0;
+    color: #7f8792;
+    background: transparent;
+    font-size: 13px;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-tabs button.is-active {
+    color: #f8fafc;
+    border-bottom: 2px solid #3b82f6;
+    background: transparent;
+  }
+
+  .crystal-modeling-mode .crystal-generative-panel {
+    margin-inline: 0;
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .crystal-modeling-mode .crystal-panel-label,
+  .crystal-modeling-mode .crystal-sidebar-heading + label {
+    color: #c6cbd3;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-mode .crystal-left-scroll {
+    scrollbar-width: none;
+  }
+
+  .crystal-modeling-mode .crystal-reference-inspector-header {
+    height: 52px;
+    padding-bottom: 14px;
+  }
+
+  .crystal-modeling-mode .crystal-reference-inspector-header > span {
+    width: 34px;
+    height: 34px;
+    color: #fff;
+    background: #f6b51c;
+  }
+
   .crystal-modeling-mode .crystal-reference-section,
   .crystal-modeling-mode .crystal-reference-collapsible,
   .crystal-modeling-mode .crystal-reference-switch-row,
-  .crystal-modeling-mode .crystal-reference-assets { border-top-color: rgba(255,255,255,.075); color: #aeb7c3; }
-  .crystal-modeling-mode .crystal-reference-section > b { color: #e1e6ed; }
-  .crystal-modeling-mode .crystal-reference-binary .is-active,
-  .crystal-modeling-mode .crystal-reference-snap .is-active,
-  .crystal-modeling-mode .crystal-reference-toggle.is-on { background: #256dcc; color: #fff; }
-  .crystal-modeling-mode .crystal-reference-toggle { background: #363d47; }
-  .crystal-modeling-mode .crystal-ai-prompt { display: block !important; bottom: 76px; border-color: rgba(59,130,246,.62) !important; border-radius: 13px !important; background: rgba(12,14,17,.96) !important; box-shadow: 0 14px 36px rgba(0,0,0,.32), 0 0 0 1px rgba(59,130,246,.08); }
-  .crystal-modeling-mode .crystal-ai-prompt > div:last-child > button { background: #256dcc; }
-  .crystal-modeling-mode .crystal-modeling-tools { bottom: 17px; height: 45px !important; border-color: rgba(255,255,255,.09) !important; border-radius: 11px !important; background: rgba(13,15,18,.94) !important; box-shadow: 0 10px 28px rgba(0,0,0,.28); }
-  .crystal-modeling-mode .crystal-modeling-tools button { width: 32px !important; height: 32px !important; border-radius: 7px !important; }
+  .crystal-modeling-mode .crystal-reference-assets {
+    min-height: 44px;
+    padding-block: 10px;
+  }
+
+  .crystal-modeling-mode .crystal-reference-section > b {
+    color: #f1f5f9;
+    font-size: 13px;
+  }
+
+  .crystal-modeling-mode .crystal-reference-select,
+  .crystal-modeling-mode .crystal-reference-binary button,
+  .crystal-modeling-mode .crystal-reference-snap button {
+    min-height: 32px;
+    border-radius: 7px;
+    background: #1c1e22;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-tools {
+    top: 24px;
+    bottom: auto;
+    height: 48px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    border-color: rgba(255,255,255,.08) !important;
+    border-radius: 10px !important;
+    background: rgba(14,15,17,.94) !important;
+    box-shadow: 0 10px 28px rgba(0,0,0,.3);
+  }
+
+  .crystal-modeling-mode .crystal-status-pill {
+    display: none;
+  }
+
+  .crystal-modeling-mode .crystal-axis-gizmo {
+    top: 28px;
+    right: 344px;
+  }
+
+  .crystal-modeling-mode .crystal-viewport-tools {
+    top: 28px;
+    right: 350px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .crystal-modeling-mode .crystal-viewport-tools button {
+    width: 40px;
+    height: 40px;
+    border-radius: 9px;
+  }
+
+  .crystal-modeling-mode .crystal-ai-prompt {
+    bottom: 24px;
+    border-color: rgba(59,130,246,.76) !important;
+    border-radius: 12px !important;
+    background: rgba(13,14,16,.97) !important;
+  }
 }
