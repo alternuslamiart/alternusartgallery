@@ -3,7 +3,7 @@
 import {
   BadgeCheck,
   BriefcaseBusiness,
-  CheckSquare,
+  Box,
   ChevronDown,
   CirclePlus,
   ClipboardList,
@@ -12,7 +12,7 @@ import {
   Grid2X2,
   LayoutGrid,
   LayoutDashboard,
-  Mail,
+  Globe2,
   PanelLeftClose,
   Search,
   Settings2,
@@ -29,9 +29,9 @@ type SidebarItem = { label: string; href: string; icon: LucideIcon; badge?: stri
 const primary: SidebarItem[] = [
   { label: "Dashboard", href: "/project", icon: LayoutDashboard },
   { label: "Floor Plan", href: "/crystal?mode=floor-plan", icon: LayoutGrid },
-  { label: "Modeling", href: "/crystal", icon: CheckSquare },
+  { label: "Modeling", href: "/crystal", icon: Box },
   { label: "Notes", href: "/workspace/knowledge", icon: FileText },
-  { label: "Infrastructure", href: "/infrastructure", icon: Mail },
+  { label: "Infrastructure", href: "/infrastructure", icon: Globe2 },
   { label: "Reports", href: "/exports", icon: ClipboardList },
   { label: "Automations", href: "/workflow", icon: Settings2, badge: "✦" },
   { label: "Workflows", href: "/workflow", icon: Workflow, badge: "✦" },
@@ -101,7 +101,7 @@ export function UnifiedSidebar({
   }
 
   const renderItems = (items: SidebarItem[]) => items.map(({ label, href, icon: Icon, badge, onClick }) => {
-    const active = activePath === href;
+    const active = activePath === href || (href.includes("?") && activePath?.startsWith(href.split("?")[0] ?? "") === true);
     return (
       <Link key={label} href={href} onClick={onClick} aria-current={active ? "page" : undefined} className={`group flex h-8 items-center gap-2 rounded-[6px] px-2 text-[13px] transition ${active ? "bg-[#2b2b2b] text-[#f4f4f5]" : "text-[#c2c3c6] hover:bg-[#242424] hover:text-white"}`}>
         <Icon size={14} strokeWidth={1.8} className="shrink-0 text-[#8d9097] group-hover:text-[#c8cbd2]" />
