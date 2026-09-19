@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Download, FileBox, FileText, Grid2X2, Image, PanelRightClose, Plus, Trash2 } from "lucide-react";
+import { Box, Camera, CircleHelp, Download, FileBox, FileText, Globe2, Grid2X2, Image, Lightbulb, PanelRightClose, Plus, Trash2 } from "lucide-react";
 import type { FloorPlanObject, FloorPlanSettings, RenderSettings, StudioAsset } from "./types";
 import { formatFloorLength, parseFloorLength, roundFloorValue } from "./floor-plan-geometry";
 import { SectionTitle, SelectField } from "./ui";
@@ -59,6 +59,7 @@ export function RightPanel(props: Props) {
   };
   return (
     <aside className="crystal-right-panel min-h-0 overflow-y-auto border-l border-[#303030] bg-[#0F0F0F] px-5 pb-5 pt-4 scrollbar-hide">
+      {!props.floorPlanMode && <div className="crystal-utility-icons" aria-label="Viewport utilities"><button type="button" aria-label="Lighting"><Lightbulb size={16}/></button><button type="button" aria-label="World"><Globe2 size={16}/></button><button type="button" aria-label="Camera"><Camera size={16}/></button><button type="button" aria-label="Grid"><Grid2X2 size={16}/></button><button type="button" aria-label="Help"><CircleHelp size={16}/></button></div>}
       {props.floorPlanMode && <div className="mb-7">
         <SectionTitle action={selected ? <button aria-label="Delete selected floor-plan object" onClick={() => props.onDeleteFloorPlanObject?.(selected.id)} className="text-zinc-400 hover:text-red-300"><Trash2 size={15}/></button> : undefined}>Floor plan properties</SectionTitle>
         {selected ? <div className="space-y-2 text-[11px]">
