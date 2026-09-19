@@ -1,10 +1,8 @@
 "use client";
 
 import {
-  Archive,
   BadgeCheck,
   Bell,
-  BookOpen,
   BriefcaseBusiness,
   CheckSquare,
   ChevronDown,
@@ -16,7 +14,6 @@ import {
   LayoutDashboard,
   Mail,
   PanelLeftClose,
-  PanelLeftOpen,
   Search,
   Settings2,
   Sparkles,
@@ -81,16 +78,16 @@ export function UnifiedSidebar({
 
   if (isCollapsed) {
     return (
-      <aside className={`workspace-sidebar flex h-full w-[60px] flex-col items-center overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] py-3 ${className}`}>
-        <button type="button" onClick={toggleCollapse} aria-label="Expand sidebar" className="grid h-8 w-8 place-items-center rounded-[8px] bg-[#242424] text-white hover:bg-[#242424]">
+      <aside className={`workspace-sidebar flex h-full w-[60px] min-w-[60px] flex-col items-center overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] py-3 ${className}`}>
+        <button type="button" onClick={toggleCollapse} aria-label="Expand sidebar" className="grid h-9 w-9 place-items-center rounded-[8px] bg-[#242424] text-white hover:bg-[#303030]">
           <Sparkles size={16} />
         </button>
-        <button type="button" onClick={toggleCollapse} aria-label="Expand sidebar" className="mt-4 grid h-8 w-8 place-items-center rounded-[7px] border border-[#333333] bg-[#242424] text-[#a4a6ab] hover:bg-[#242424]">
+        <button type="button" onClick={toggleCollapse} aria-label="Expand sidebar" className="mt-4 grid h-9 w-9 place-items-center rounded-[7px] border border-[#333333] bg-[#242424] text-[#a4a6ab] hover:bg-[#303030]">
           <Search size={14} />
         </button>
         <nav className="mt-3 flex flex-col items-center gap-1" aria-label="Collapsed workspace navigation">
           {compactItems.map(({ label, href, icon: Icon, badge, onClick }) => (
-            <Link key={label} href={href} onClick={onClick} aria-label={label} title={label} className={`relative grid h-7 w-8 place-items-center rounded-[6px] ${activePath === href ? "bg-[#242424] text-white" : "text-[#898c93] hover:bg-[#242424] hover:text-white"}`}>
+            <Link key={label} href={href} onClick={onClick} aria-label={label} title={label} className={`relative grid h-8 w-9 place-items-center rounded-[6px] ${activePath === href ? "bg-[#2b2b2b] text-white" : "text-[#898c93] hover:bg-[#242424] hover:text-white"}`}>
               <Icon size={14} strokeWidth={1.8} />
               {badge === "✦" && <span className="absolute -right-0.5 -top-0.5 text-[9px] text-[#b86dff]">✦</span>}
             </Link>
@@ -106,7 +103,7 @@ export function UnifiedSidebar({
   const renderItems = (items: SidebarItem[]) => items.map(({ label, href, icon: Icon, badge, onClick }) => {
     const active = activePath === href;
     return (
-      <Link key={label} href={href} onClick={onClick} className={`group flex h-[29px] items-center gap-2 rounded-[6px] px-2 text-[13px] transition ${active ? "bg-[#242424] text-[#f4f4f5]" : "text-[#c2c3c6] hover:bg-[#242424] hover:text-white"}`}>
+      <Link key={label} href={href} onClick={onClick} aria-current={active ? "page" : undefined} className={`group flex h-8 items-center gap-2 rounded-[6px] px-2 text-[13px] transition ${active ? "bg-[#2b2b2b] text-[#f4f4f5]" : "text-[#c2c3c6] hover:bg-[#242424] hover:text-white"}`}>
         <Icon size={14} strokeWidth={1.8} className="shrink-0 text-[#8d9097] group-hover:text-[#c8cbd2]" />
         <span className="min-w-0 flex-1 truncate">{label}</span>
         {badge && <span className={`text-[10px] ${badge === "✦" ? "text-[#b86dff]" : "rounded bg-[#535458] px-1 text-[#e4e4e5]"}`}>{badge}</span>}
@@ -115,7 +112,7 @@ export function UnifiedSidebar({
   });
 
   return (
-    <aside className={`workspace-sidebar flex h-full w-[234px] shrink-0 flex-col overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] px-[14px] py-[12px] text-[#f4f4f5] shadow-[0_8px_24px_rgba(0,0,0,0.16)] ${className}`}>
+    <aside className={`workspace-sidebar flex h-full w-[234px] min-w-0 shrink-0 flex-col overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] px-[14px] py-[12px] text-[#f4f4f5] shadow-[0_8px_24px_rgba(0,0,0,0.16)] ${className}`}>
       <div className="flex items-center gap-2 px-1">
         <button type="button" onClick={toggleCollapse} aria-label="Collapse sidebar" title="Collapse sidebar" className="grid h-8 w-8 place-items-center rounded-[9px] bg-[#242424] text-white transition hover:bg-[#242424]"><Sparkles size={17} /></button>
         <div className="min-w-0 flex-1">
@@ -127,7 +124,7 @@ export function UnifiedSidebar({
         </button>
       </div>
 
-      <label className="group mt-4 flex h-[28px] items-center gap-2 rounded-[6px] border border-[#333333] bg-[#242424] px-2 text-left text-[11px] text-[#94969d] transition hover:border-[#4a4a4a] hover:bg-[#242424]">
+      <label className="group mt-4 flex h-9 items-center gap-2 rounded-[7px] border border-[#333333] bg-[#242424] px-2.5 text-left text-[11px] text-[#94969d] transition hover:border-[#4a4a4a] hover:bg-[#292929]">
         <Search size={14} />
         <input value={searchValue ?? ""} onChange={(event) => onSearch?.(event.target.value)} placeholder="Search" className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-[#94969d]" />
         <kbd className="rounded border border-[#4b4d52] px-1 text-[9px]">⌘K</kbd>

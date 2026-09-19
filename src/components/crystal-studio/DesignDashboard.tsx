@@ -2,32 +2,14 @@
 
 import Link from "next/link";
 import {
-  Bot,
-  Box,
   ChevronRight,
-  CirclePlus,
-  Grid2X2,
   Home,
   Link2,
-  Library,
-  LogOut,
-  Menu,
-  Search,
-  Settings,
   Sparkles,
-  Workflow,
 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UnifiedSidebar } from "@/components/unified-sidebar";
-
-const navigation = [
-  { label: "Agents", icon: Grid2X2 },
-  { label: "Library", icon: Library, active: true },
-  { label: "Workflows", icon: Workflow },
-  { label: "Plugins", icon: Box },
-  { label: "Tools", icon: CirclePlus },
-];
 
 const inspirations = [
   { title: "Robotics Concept", image: "/ai-cards/agent.svg", prompt: "Create a futuristic home robot." },
@@ -61,14 +43,14 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
       className="crystal-design-dashboard min-h-screen bg-[#0F0F0F] text-[#F5F5F5]"
       style={{ fontFamily: '"Roboto", "Segoe UI", sans-serif' }}
     >
-      <header className="flex h-[62px] items-center border-b border-white/[0.08] bg-[#0F0F0F] px-6">
+      <header className="flex h-[62px] items-center border-b border-white/[0.08] bg-[#0F0F0F] px-4 sm:px-6">
         <div className="flex items-center gap-3">
           <div className="grid h-7 w-7 place-items-center text-zinc-400">
             <Sparkles size={21} />
           </div>
           <span className="text-[15px] font-semibold">Crystal</span>
         </div>
-        <Link href="/design-studio" className="ml-8 text-zinc-300 hover:text-white" aria-label="Home">
+        <Link href="/design-studio" className="ml-5 rounded-md p-2 text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] sm:ml-8" aria-label="Home">
           <Home size={16} />
         </Link>
       </header>
@@ -76,10 +58,10 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
       <div className="flex h-[calc(100vh-62px)] min-h-[520px] gap-1.5 bg-[#0F0F0F] p-1.5">
         <UnifiedSidebar activePath="/design-studio" className="hidden h-full md:flex" />
 
-        <main className="min-w-0 flex-1 rounded-[19px] bg-[#101010] px-5 py-12 md:px-8 lg:px-10">
+        <main className="min-w-0 flex-1 overflow-y-auto rounded-[19px] bg-[#101010] px-4 py-10 sm:px-6 md:px-8 md:py-12 lg:px-10">
           <section className="mx-auto max-w-[1560px]">
             <div className="mx-auto flex max-w-[700px] flex-col items-center text-center">
-              <h1 className="text-3xl font-bold tracking-[-0.05em] text-white md:text-[36px]">
+              <h1 className="text-[30px] font-bold tracking-[-0.05em] text-white md:text-[36px]">
                 Hi, create your ideas
               </h1>
               <p className="mt-4 max-w-[330px] text-xs leading-4 text-zinc-500">
@@ -92,21 +74,21 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                     value={prompt}
                     onChange={(event) => setPrompt(event.target.value)}
                     placeholder="What do you want to create?"
-                    className="h-[69px] w-full resize-none bg-transparent px-2 py-1 text-xs text-zinc-100 outline-none placeholder:text-zinc-600"
+                    className="h-[69px] w-full resize-none rounded-[8px] bg-transparent px-2 py-1 text-xs text-zinc-100 outline-none placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#4A90D9]/60"
                     aria-label="What do you want to create?"
                   />
                   <div className="flex h-8 items-center gap-2">
-                    <label className="grid h-8 w-8 cursor-pointer place-items-center rounded-[10px] bg-[#1D1D1D] text-zinc-200" aria-label="Attach reference">
+                    <label className="grid h-9 w-9 cursor-pointer place-items-center rounded-[9px] bg-[#1D1D1D] text-zinc-200 transition-colors hover:bg-[#292929] focus-within:ring-2 focus-within:ring-[#4A90D9]/60" aria-label="Attach reference">
                       <Link2 size={16} className={reference ? "text-[#4A90D9]" : undefined} />
                       <input type="file" accept="image/png,image/jpeg" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) setReference(URL.createObjectURL(file)); }} />
                     </label>
-                    <button onClick={() => setPrecision((value) => value === "Precision Mode" ? "Fast Concept" : "Precision Mode")} className="h-8 rounded-[10px] bg-[#1D1D1D] px-4 text-xs text-zinc-200">
+                    <button onClick={() => setPrecision((value) => value === "Precision Mode" ? "Fast Concept" : "Precision Mode")} className="h-9 rounded-[9px] bg-[#1D1D1D] px-4 text-xs text-zinc-200 transition-colors hover:bg-[#292929] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9]">
                       {precision}
                     </button>
                     <button
                       onClick={submit}
                       disabled={!prompt.trim()}
-                      className="ml-auto grid h-8 w-8 place-items-center rounded-[9px] bg-[#0C8CE9] text-white transition hover:bg-[#087BCF] disabled:opacity-50"
+                      className="ml-auto grid h-9 w-9 place-items-center rounded-[9px] bg-[#0C8CE9] text-white transition hover:bg-[#087BCF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#171717] disabled:cursor-not-allowed disabled:opacity-50"
                       aria-label="Generate"
                     >
                       <ChevronRight size={17} />
@@ -116,7 +98,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
               </div>
             </div>
 
-            <div className="mt-16 flex items-center gap-0">
+            <div className="mt-12 flex items-center gap-1 sm:mt-16">
               {["Service", "Apartment", "Home"].map((tab) => (
                 <button
                   key={tab}
@@ -125,7 +107,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                     if (tab === "Service") router.push("/workflow");
                     if (tab === "Apartment") router.push("/archplan");
                   }}
-                  className={`rounded-full px-[18px] py-2.5 text-xs transition ${
+                  className={`rounded-full px-4 py-2.5 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] ${
                     activeTab === tab ? "bg-[#171717] font-semibold text-white" : "text-zinc-500 hover:text-zinc-300"
                   }`}
                 >
@@ -134,7 +116,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
               ))}
             </div>
 
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
               {inspirations.map(({ title, image, prompt: cardPrompt }) => (
                 <button
                   key={title}
@@ -143,7 +125,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                     window.sessionStorage.setItem("crystal-design-prompt", cardPrompt);
                     onOpenStudio();
                   }}
-                  className="group relative aspect-[1.18] overflow-hidden rounded-[11px] bg-[#181818] text-left"
+                  className="group relative aspect-[1.18] overflow-hidden rounded-[11px] bg-[#181818] text-left transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(0,0,0,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#101010]"
                 >
                   <img
                     src={image}
