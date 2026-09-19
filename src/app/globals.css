@@ -4400,3 +4400,74 @@ textarea {
     transform: translateX(-50%);
   }
 }
+
+@media (min-width: 701px) {
+  .crystal-modeling-mode .crystal-modeling-tools {
+    top: 20px !important;
+    bottom: auto !important;
+    left: 50% !important;
+    width: 616px !important;
+    min-width: 616px !important;
+    height: 46px !important;
+    box-sizing: border-box;
+    padding: 6px 8px !important;
+    gap: 7px !important;
+    border: 1px solid rgba(255, 255, 255, .045) !important;
+    border-radius: 13px !important;
+    background: #17191c !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .26) !important;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-tool-group {
+    flex: 1;
+    justify-content: space-between;
+    gap: 5px;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-tools button {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+    color: #b8bec8;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-tools button:hover {
+    background: rgba(255, 255, 255, .07);
+    color: #fff;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-tools button[aria-pressed="true"],
+  .crystal-modeling-mode .crystal-modeling-tools .active {
+    background: #24272c;
+    color: #fff;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-tool-divider {
+    height: 24px;
+    margin-inline: 0;
+    background: rgba(255, 255, 255, .13);
+  }
+
+  .crystal-modeling-mode .crystal-modeling-action {
+    height: 34px !important;
+    min-width: 34px !important;
+    padding-inline: 10px !important;
+    border-radius: 8px !important;
+    color: #b8bec8 !important;
+    font-size: 10px;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-action[aria-label="Export viewport"] {
+    min-width: 78px !important;
+    color: #fff !important;
+    background: #1687f7 !important;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-action[aria-label="Export viewport"]:hover {
+    background: #2d9bff !important;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-play {
+    padding-inline: 8px !important;
+  }
+}
