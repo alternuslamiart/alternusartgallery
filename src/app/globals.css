@@ -5223,6 +5223,19 @@ textarea {
     background: #161616 !important;
   }
 
+  .crystal-studio:not(.crystal-modeling-mode) > section,
+  .crystal-studio:not(.crystal-modeling-mode) .floor-plan-canvas {
+    background: #191919 !important;
+  }
+
+  .crystal-studio:not(.crystal-modeling-mode) .crystal-left-panel [class*="bg-[#292929]"],
+  .crystal-studio:not(.crystal-modeling-mode) .crystal-right-panel [class*="bg-[#292929]"],
+  .crystal-infrastructure-page [class*="bg-[#202020]"],
+  .crystal-infrastructure-page [class*="bg-[#171717]"],
+  .crystal-infrastructure-page [class*="bg-[#101112]"] {
+    background-color: #161616 !important;
+  }
+
   .crystal-infrastructure-page {
     position: fixed !important;
     inset: 0 !important;
