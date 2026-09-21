@@ -39,7 +39,7 @@ const extensionTypeMap: Record<string, AssetType> = {
 };
 
 const safePreviewMimePrefixes = ["image/", "audio/", "text/"];
-const safePreviewMimes = new Set(["application/pdf", "image/svg+xml"]);
+const safePreviewMimes = new Set(["application/pdf"]);
 
 export type StoredFile = {
  storageKey: string;
@@ -85,6 +85,9 @@ export function assertSupportedAsset(filename: string, mimeType: string) {
 
 export async function storeAssetFile(file: File, workspaceId: string): Promise<StoredFile> {
  const maxBytes = getMaxAssetUploadBytes();
+ if (!file.size) {
+  throw new ValidationError("Empty files cannot be uploaded.");
+ }
  if (file.size > maxBytes) {
  throw new ValidationError("File is larger than the configured upload limit.", { maxBytes });
  }
@@ -94,12 +97,16 @@ export async function storeAssetFile(file: File, workspaceId: string): Promise<S
  const mimeType = file.type || "application/octet-stream";
  const type = assertSupportedAsset(originalFilename, mimeType);
  const bytes = Buffer.from(await file.arrayBuffer());
+ if (!bytes.length || bytes.length > maxBytes) {
+  throw new ValidationError("File is larger than the configured upload limit.", { maxBytes });
+ }
  const checksum = createHash("sha256").update(bytes).digest("hex");
  const storageKey = `${workspaceId}/${new Date().getFullYear()}/${randomUUID()}.${extension}`;
  const root = getAssetUploadRoot();
  const absolutePath = resolveStorageKey(storageKey);
 
- if (!absolutePath.startsWith(root)) {
+ const relativePath = path.relative(root, absolutePath);
+ if (!relativePath || relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
  throw new ValidationError("Storage path is not safe.", { storageKey });
  }
 
@@ -138,7 +145,7 @@ export async function deleteStoredFile(storageKey: string) {
 }
 
 export function canPreviewInline(mimeType: string) {
- return safePreviewMimePrefixes.some((prefix) => mimeType.startsWith(prefix)) || safePreviewMimes.has(mimeType);
+ return mimeType !== "image/svg+xml" && (safePreviewMimePrefixes.some((prefix) => mimeType.startsWith(prefix)) || safePreviewMimes.has(mimeType));
 }
 
 export function contentDisposition(filename: string, inline = false) {

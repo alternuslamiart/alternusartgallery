@@ -20,6 +20,8 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
  "Content-Type": asset.mimeType,
  "Content-Length": String(file.length),
  "Content-Disposition": contentDisposition(asset.originalFilename),
+ "X-Content-Type-Options": "nosniff",
+ "Cache-Control": "private, no-store",
  },
  });
  } catch (error) {

@@ -15,8 +15,12 @@ export async function uploadImage(
  folder: string = 'Coreforge-assets'
 ): Promise<{ url: string; publicId: string }> {
  try {
+ if (!file.startsWith("data:image/")) {
+ throw new Error("Only image data URLs are accepted.");
+ }
+ const folderName = folder.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 64) || "Coreforge-assets";
  const result = await cloudinary.uploader.upload(file, {
- folder: `Coreforge/${folder}`,
+ folder: `Coreforge/${folderName}`,
  resource_type: 'image',
  transformation: [
  { quality: 'auto:best' },
