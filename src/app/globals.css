@@ -5140,6 +5140,11 @@ textarea {
 
 /* Keep tool controls neutral until they are hovered or selected. */
 @media (min-width: 701px) {
+  .crystal-studio.crystal-modeling-mode .crystal-modeling-tools {
+    border: 0 !important;
+    border-color: transparent !important;
+  }
+
   .crystal-studio.crystal-modeling-mode .crystal-modeling-tools button:not([aria-label="Export viewport"]) {
     background: transparent !important;
   }
