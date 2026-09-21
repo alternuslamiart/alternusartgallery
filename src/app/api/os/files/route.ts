@@ -4,28 +4,16 @@ import { auth } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-async function getUserId(request: NextRequest): Promise<string | null> {
- try {
+async function getUserId(): Promise<string | null> {
  const session = await auth();
- if (session?.user?.email) {
- const user = await prisma.user.findUnique({
- where: { email: session.user.email },
- select: { id: true },
- });
- if (user) return user.id;
- }
- } catch {
- // session not available
- }
- // Fall back to demo user from env
- return process.env.OS_DEMO_USER_ID || null;
+ return session?.user?.id || null;
 }
 
 // GET /api/os/files?parentId=xxx OR ?path=/Documents (defaults to root)
 export async function GET(request: NextRequest) {
- const userId = await getUserId(request);
+ const userId = await getUserId();
  if (!userId) {
- return NextResponse.json({ files: [] });
+ return NextResponse.json({ error: 'No user session' }, { status: 401 });
  }
 
  const { searchParams } = new URL(request.url);
@@ -51,7 +39,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/os/files — create file or folder
 export async function POST(request: NextRequest) {
- const userId = await getUserId(request);
+ const userId = await getUserId();
  if (!userId) {
  return NextResponse.json({ error: 'No user session' }, { status: 401 });
  }
@@ -61,6 +49,10 @@ export async function POST(request: NextRequest) {
 
  if (!name) {
  return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+ }
+ if (parentId) {
+ const parent = await prisma.osFile.findFirst({ where: { id: parentId, userId, type: 'FOLDER' } });
+ if (!parent) return NextResponse.json({ error: 'Parent folder not found' }, { status: 404 });
  }
 
  const file = await prisma.osFile.create({

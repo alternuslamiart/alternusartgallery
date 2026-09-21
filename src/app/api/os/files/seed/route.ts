@@ -5,19 +5,8 @@ import { auth } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 async function getUserId(): Promise<string | null> {
- try {
  const session = await auth();
- if (session?.user?.email) {
- const user = await prisma.user.findUnique({
- where: { email: session.user.email },
- select: { id: true },
- });
- if (user) return user.id;
- }
- } catch {
- // session not available
- }
- return process.env.OS_DEMO_USER_ID || null;
+ return session?.user?.id || null;
 }
 
 // POST /api/os/files/seed — create default folder structure for a user

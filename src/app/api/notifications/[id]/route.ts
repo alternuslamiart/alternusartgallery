@@ -10,9 +10,9 @@ export async function DELETE(_request: NextRequest, { params }: { params: { id: 
  if (isApiResponse(context)) return context;
  const id = parseId(params);
  if (!id) return apiError("VALIDATION_ERROR", "Invalid notification id.", 400);
- const existing = await prisma.notification.findFirst({ where: { id, userId: context.userId } });
+ const existing = await prisma.notification.findFirst({ where: { id, userId: context.userId, workspaceId: context.workspaceId } });
  if (!existing) return apiError("NOT_FOUND", "Notification not found.", 404);
- await prisma.notification.delete({ where: { id } });
+ await prisma.notification.deleteMany({ where: { id, userId: context.userId, workspaceId: context.workspaceId } });
  return ok({ success: true });
  } catch (error) {
  return mapUnknownError(error);
