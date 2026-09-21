@@ -2997,6 +2997,8 @@
 .crystal-brand-logo { width: 27px; height: 27px; object-fit: contain; filter: invert(1) brightness(1.55); opacity: .88; }
 .crystal-brand-logo-mobile { width: 40px; height: 40px; }
 .crystal-site-logo { width: 28px; height: 28px; object-fit: contain; filter: invert(1) brightness(1.55); opacity: .9; }
+.crystal-desktop-profile-label { display:inline; }
+.crystal-mobile-profile-icon { display:none; }
 
 @media (max-width:700px) {
  .crystal-glass-nav-shell { position:relative; padding:0; height:176px; }
@@ -3014,7 +3016,6 @@
  .crystal-desktop-profile-label { display:none; }
 }
 
- .crystal-mobile-profile-icon { display:none; }
  .crystal-mobile-nav-menu { display:none; }
 
  @media (max-width:700px) {

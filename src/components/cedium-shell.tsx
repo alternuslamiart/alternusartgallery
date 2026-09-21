@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { createContext, Dispatch, ReactNode, SetStateAction, useCallback, useContext, useEffect, useState } from "react";
 
 export const COBALT = "#4284FF";
@@ -105,7 +106,12 @@ export function useCoreforgeTheme() {
 
 export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: ReturnType<typeof useCoreforgeTheme>) {
  const pathname = usePathname();
+ const { data: session, status } = useSession();
  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+ const isAuthenticated = status === "authenticated" && Boolean(session?.user);
+ const profileLabel = session?.user?.name?.trim()?.charAt(0).toUpperCase()
+  || session?.user?.email?.charAt(0).toUpperCase()
+  || "U";
 
  return (
  <header className="crystal-glass-nav-shell coreforge-nav-shell">
@@ -126,12 +132,18 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
  }
  </button>
+ {isAuthenticated ? (
+ <button type="button" onClick={() => signOut({ callbackUrl: "/" })} className="coreforge-nav-login hover:!border-[#4284FF]" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, background: "transparent", cursor: "pointer", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}>
+  Log out
+ </button>
+ ) : (
  <Link href="/login" className="coreforge-nav-login hover:!border-[#4284FF]" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}>
- Log in
+  Log in
  </Link>
- <Link href="/account" aria-label="Account profile" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, fontSize: 12, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.02em" }}>
+ )}
+ <Link href="/account" aria-label="Account profile" title={isAuthenticated ? session?.user?.email || "Account" : "Account"} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, fontSize: 12, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.02em" }}>
  <svg className="crystal-mobile-profile-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.2 3.3-5 7.5-5s6.7 1.8 7.5 5"/></svg>
- <span className="crystal-desktop-profile-label">AL</span>
+ <span className="crystal-desktop-profile-label">{isAuthenticated ? profileLabel : "AL"}</span>
  </Link>
  <Link href="/download" className="hidden sm:inline-flex" style={{ alignItems: "center", height: 36, padding: "0 15px", color: fg, fontSize: 13, fontWeight: 700, textDecoration: "none", border: `1px solid ${faint}`, borderRadius: 8 }}>
  Download App

@@ -4,7 +4,7 @@ import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { ArrowLeft, ArrowRight, CheckCircle2, KeyRound, Lock, Mail, Moon, RefreshCw, ShieldCheck, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -93,6 +93,7 @@ function Brand() {
 export default function LoginPage() {
  const router = useRouter();
  const searchParams = useSearchParams();
+ const { update: updateSession } = useSession();
  const [isLight, toggleTheme] = useAuthTheme();
  const [email, setEmail] = useState("");
  const [password, setPassword] = useState("");
@@ -151,7 +152,9 @@ export default function LoginPage() {
  return;
  }
 
+ await updateSession();
  router.replace(callbackUrl);
+ router.refresh();
  };
 
  const handleResend = async () => {
