@@ -5186,6 +5186,11 @@ textarea {
 
 /* Shared Crystal Product Design shell for Floor Plan and Infrastructure. */
 @media (min-width: 701px) {
+  .crystal-studio:not(.crystal-modeling-mode) > .crystal-topbar,
+  .crystal-infrastructure-page > section > .crystal-ui-header {
+    display: none !important;
+  }
+
   .crystal-studio:not(.crystal-modeling-mode) .crystal-left-panel,
   .crystal-studio:not(.crystal-modeling-mode) .crystal-right-panel {
     top: 8px !important;
