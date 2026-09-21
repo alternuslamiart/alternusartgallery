@@ -5126,3 +5126,12 @@ textarea {
   .crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:first-child,
   .crystal-modeling-mode .crystal-ai-prompt > div:last-child > button { width: 32px !important; height: 32px !important; }
 }
+
+/* Keep both Crystal modeling sidebars flush with the viewport top. */
+@media (min-width: 701px) {
+  .crystal-modeling-mode .crystal-modeling-sidebar,
+  .crystal-modeling-mode .crystal-right-panel {
+    top: 0 !important;
+    bottom: 8px !important;
+  }
+}
