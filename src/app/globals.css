@@ -5135,3 +5135,44 @@ textarea {
     bottom: 8px !important;
   }
 }
+
+/* Keep tool controls neutral until they are hovered or selected. */
+@media (min-width: 701px) {
+  .crystal-studio.crystal-modeling-mode .crystal-modeling-tools button:not([aria-label="Export viewport"]) {
+    background: transparent !important;
+  }
+
+  .crystal-studio.crystal-modeling-mode .crystal-modeling-tools button:not([aria-label="Export viewport"]):hover,
+  .crystal-studio.crystal-modeling-mode .crystal-modeling-tools button:not([aria-label="Export viewport"]):focus-visible,
+  .crystal-studio.crystal-modeling-mode .crystal-modeling-tools button:not([aria-label="Export viewport"])[aria-pressed="true"],
+  .crystal-studio.crystal-modeling-mode .crystal-modeling-tools button:not([aria-label="Export viewport"]).is-active {
+    background: #161616 !important;
+  }
+
+  .crystal-studio.crystal-modeling-mode .crystal-ai-prompt {
+    background:
+      linear-gradient(#0F0F0F, #0F0F0F) padding-box,
+      linear-gradient(110deg, #1f0ade 0%, #0c8ce9 25%, #ff6e5b 52%, #21b803 76%, #0094ff 100%) border-box !important;
+  }
+
+  .crystal-studio.crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:first-child,
+  .crystal-studio.crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:nth-child(2) {
+    background: #0F0F0F !important;
+  }
+
+  .crystal-studio.crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:first-child:hover,
+  .crystal-studio.crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:first-child:focus-within,
+  .crystal-studio.crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:nth-child(2):hover,
+  .crystal-studio.crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:nth-child(2):focus-within {
+    background: #161616 !important;
+  }
+
+  .crystal-studio.crystal-modeling-mode .crystal-ai-prompt > div:last-child > button {
+    background: #1687f7 !important;
+  }
+
+  .crystal-studio.crystal-modeling-mode .crystal-ai-prompt > div:last-child > button:hover,
+  .crystal-studio.crystal-modeling-mode .crystal-ai-prompt > div:last-child > button:focus-visible {
+    background: #2d9bff !important;
+  }
+}
