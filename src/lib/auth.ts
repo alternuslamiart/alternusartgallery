@@ -44,7 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
  where: { email: { equals: email, mode: 'insensitive' } },
  })
 
- if (!user || !user.passwordHash) {
+ if (!user || !user.passwordHash || !user.isActive) {
  return null
  }
 
@@ -67,6 +67,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
  }
 
  await prisma.verificationToken.delete({ where: { token: verification.token } })
+ await prisma.user.update({
+  where: { id: user.id },
+  data: { emailVerified: true, lastLogin: new Date() },
+ })
 
  return {
  id: user.id,

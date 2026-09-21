@@ -1,117 +1,84 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { sendVerificationEmail } from '@/lib/email';
+import { NextRequest, NextResponse } from "next/server";
+import { randomInt } from "node:crypto";
+import { prisma } from "@/lib/prisma";
+import { sendVerificationEmail } from "@/lib/email";
 
-// Store verification codes temporarily (in production, use Redis or database)
-const globalForVerification = globalThis as unknown as {
- verificationCodes: Map<string, { code: string; expires: Date }>;
-};
+export const dynamic = "force-dynamic";
 
-if (!globalForVerification.verificationCodes) {
- globalForVerification.verificationCodes = new Map();
+function normalizeEmail(value: unknown) {
+ return typeof value === "string" ? value.trim().toLowerCase() : "";
 }
 
-const verificationCodes = globalForVerification.verificationCodes;
-
-// POST - Send verification code
 export async function POST(request: NextRequest) {
  try {
- const { email, action } = await request.json();
+  const body = (await request.json()) as { email?: unknown; action?: unknown };
+  const email = normalizeEmail(body.email);
 
- if (!email) {
- return NextResponse.json(
- { error: 'Email is required' },
- { status: 400 }
- );
- }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+   return NextResponse.json({ error: "Please provide a valid email address." }, { status: 400 });
+  }
+  if (body.action !== "send") {
+   return NextResponse.json({ error: "Invalid action." }, { status: 400 });
+  }
 
- if (action === 'send') {
- // Generate 6-digit code
- const code = Math.floor(100000 + Math.random() * 900000).toString();
- const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+   return NextResponse.json({ error: "No account was found for this email." }, { status: 404 });
+  }
+  if (user.emailVerified) {
+   return NextResponse.json({ success: true, message: "Email is already verified." });
+  }
 
- // Store the code
- verificationCodes.set(email, { code, expires });
+  const code = randomInt(100000, 1000000).toString();
+  await prisma.verificationToken.deleteMany({ where: { identifier: `signup:${email}` } });
+  await prisma.verificationToken.create({
+   data: {
+    identifier: `signup:${email}`,
+    token: code,
+    expires: new Date(Date.now() + 10 * 60 * 1000),
+   },
+  });
 
- // Send verification email
- const emailSent = await sendVerificationEmail(email, code);
+  try {
+   if (!(await sendVerificationEmail(email, code))) throw new Error("Email delivery is not configured.");
+  } catch (error) {
+   await prisma.verificationToken.deleteMany({ where: { identifier: `signup:${email}` } });
+   console.error("[Auth] Verification email failed:", error);
+   return NextResponse.json({ error: "Could not send the verification code." }, { status: 502 });
+  }
 
- if (!emailSent) {
- console.error(`[Verification] Failed to send email to ${email}`);
- return NextResponse.json(
- { error: 'Failed to send verification email. Please try again.' },
- { status: 500 }
- );
- }
-
- console.log(`[Verification] Email sent successfully to ${email}`);
-
- return NextResponse.json({
- success: true,
- message: 'Verification code sent to your email',
- });
- }
-
- return NextResponse.json(
- { error: 'Invalid action' },
- { status: 400 }
- );
+  return NextResponse.json({ success: true, message: "Verification code sent." });
  } catch (error) {
- console.error('Email verification error:', error);
- return NextResponse.json(
- { error: 'Failed to send verification code' },
- { status: 500 }
- );
+  console.error("[Auth] Verification request failed:", error);
+  return NextResponse.json({ error: "Failed to send verification code." }, { status: 500 });
  }
 }
 
-// PUT - Verify code
 export async function PUT(request: NextRequest) {
  try {
- const { email, code } = await request.json();
+  const body = (await request.json()) as { email?: unknown; code?: unknown };
+  const email = normalizeEmail(body.email);
+  const code = typeof body.code === "string" ? body.code.trim() : "";
 
- if (!email || !code) {
- return NextResponse.json(
- { error: 'Email and code are required' },
- { status: 400 }
- );
- }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\d{6}$/.test(code)) {
+   return NextResponse.json({ error: "Email and a valid 6-digit code are required." }, { status: 400 });
+  }
 
- const stored = verificationCodes.get(email);
+  const verification = await prisma.verificationToken.findFirst({
+   where: { identifier: `signup:${email}`, token: code, expires: { gt: new Date() } },
+  });
+  if (!verification) {
+   return NextResponse.json({ error: "Invalid or expired verification code." }, { status: 400 });
+  }
 
- if (!stored) {
- return NextResponse.json(
- { error: 'No verification code found. Please request a new one.' },
- { status: 400 }
- );
- }
+  await prisma.$transaction([
+   prisma.verificationToken.delete({ where: { token: verification.token } }),
+   prisma.user.updateMany({ where: { email, emailVerified: false }, data: { emailVerified: true } }),
+  ]);
 
- if (new Date() > stored.expires) {
- verificationCodes.delete(email);
- return NextResponse.json(
- { error: 'Verification code has expired. Please request a new one.' },
- { status: 400 }
- );
- }
-
- if (stored.code !== code) {
- return NextResponse.json(
- { error: 'Invalid verification code' },
- { status: 400 }
- );
- }
-
- // Code is valid - remove it
- verificationCodes.delete(email);
-
- return NextResponse.json({
- success: true,
- message: 'Email verified successfully',
- });
+  return NextResponse.json({ success: true, message: "Email verified successfully." });
  } catch (error) {
- console.error('Code verification error:', error);
- return NextResponse.json(
- { error: 'Failed to verify code' },
- { status: 500 }
- );
+  console.error("[Auth] Email verification failed:", error);
+  return NextResponse.json({ error: "Failed to verify email." }, { status: 500 });
  }
 }

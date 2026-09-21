@@ -6,8 +6,16 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
  try {
- const body = await request.json()
- const { email, password, firstName, lastName } = body
+ const body = (await request.json()) as {
+  email?: unknown
+  password?: unknown
+  firstName?: unknown
+  lastName?: unknown
+ }
+ const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : ""
+ const password = typeof body.password === "string" ? body.password : ""
+ const firstName = typeof body.firstName === "string" ? body.firstName.trim() : ""
+ const lastName = typeof body.lastName === "string" ? body.lastName.trim() : ""
 
  // Validate required fields
  if (!email || !password) {
@@ -19,7 +27,7 @@ export async function POST(request: NextRequest) {
 
  // Validate email format
  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
- if (!emailRegex.test(email)) {
+ if (!emailRegex.test(email) || email.length > 320) {
  return NextResponse.json(
  { error: "Invalid email format" },
  { status: 400 }
@@ -27,7 +35,7 @@ export async function POST(request: NextRequest) {
  }
 
  // Validate password strength
- if (password.length < 8) {
+ if (password.length < 8 || password.length > 128) {
  return NextResponse.json(
  { error: "Password must be at least 8 characters" },
  { status: 400 }
