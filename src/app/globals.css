@@ -1595,6 +1595,24 @@
   scrollbar-width: thin;
   scrollbar-color: #454545 transparent;
 }
+
+@media (min-width: 701px) {
+  .crystal-modeling-mode .crystal-modeling-sidebar,
+  .crystal-modeling-mode .crystal-modeling-inspector {
+    top: 0;
+    bottom: 8px;
+    border: 0 !important;
+    border-color: transparent !important;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-sidebar {
+    left: 8px;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-inspector {
+    right: 8px;
+  }
+}
 .crystal-modeling-mode .crystal-modeling-sidebar,
 .crystal-modeling-mode .crystal-modeling-inspector,
 .crystal-modeling-mode .crystal-modeling-sidebar button,
