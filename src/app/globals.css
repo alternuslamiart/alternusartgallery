@@ -5131,7 +5131,7 @@ textarea {
 @media (min-width: 701px) {
   .crystal-modeling-mode .crystal-modeling-sidebar,
   .crystal-modeling-mode .crystal-right-panel {
-    top: 0 !important;
+    top: 8px !important;
     bottom: 8px !important;
   }
 }
