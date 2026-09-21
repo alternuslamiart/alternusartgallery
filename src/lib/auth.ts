@@ -5,6 +5,7 @@ import Discord from "next-auth/providers/discord"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { prisma } from "./prisma"
+import { consumePersistentRateLimit } from "./persistent-rate-limit"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
  providers: [
@@ -37,6 +38,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
  if (!email || !password || !verificationCode) {
  return null
+ }
+ const verificationLimit = await consumePersistentRateLimit(
+  `login-code:${email}`,
+  { limit: 10, windowSeconds: 900 },
+ )
+ if (!verificationLimit.success) {
+  return null
  }
 
  // Find user in database

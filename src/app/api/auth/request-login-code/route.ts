@@ -3,6 +3,7 @@ import { randomInt } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail } from "@/lib/email";
+import { consumePersistentRateLimit, rateLimitResponse } from "@/lib/persistent-rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,11 @@ export async function POST(request: NextRequest) {
 
   if (!email || !body.password) {
    return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
+  }
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const limit = await consumePersistentRateLimit(`login:ip:${ip}`, { limit: 5, windowSeconds: 900 });
+  if (!limit.success) {
+   return NextResponse.json({ error: "Too many login attempts. Please try again later." }, rateLimitResponse(limit));
   }
 
   const user = await prisma.user.findFirst({

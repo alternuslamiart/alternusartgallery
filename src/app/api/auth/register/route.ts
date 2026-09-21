@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { consumePersistentRateLimit, rateLimitResponse } from "@/lib/persistent-rate-limit";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
  try {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const limit = await consumePersistentRateLimit(`register:ip:${ip}`, { limit: 5, windowSeconds: 900 });
+  if (!limit.success) {
+   return NextResponse.json({ error: "Too many registration attempts. Please try again later." }, rateLimitResponse(limit));
+  }
   const body = (await request.json()) as {
    email?: unknown;
    password?: unknown;

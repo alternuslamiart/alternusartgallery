@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomInt } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail } from "@/lib/email";
+import { consumePersistentRateLimit, rateLimitResponse } from "@/lib/persistent-rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,11 @@ export async function POST(request: NextRequest) {
   }
   if (body.action !== "send") {
    return NextResponse.json({ error: "Invalid action." }, { status: 400 });
+  }
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const limit = await consumePersistentRateLimit(`verify-send:ip:${ip}`, { limit: 3, windowSeconds: 900 });
+  if (!limit.success) {
+   return NextResponse.json({ error: "Too many verification requests. Please try again later." }, rateLimitResponse(limit));
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
@@ -62,6 +68,11 @@ export async function PUT(request: NextRequest) {
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\d{6}$/.test(code)) {
    return NextResponse.json({ error: "Email and a valid 6-digit code are required." }, { status: 400 });
+  }
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const limit = await consumePersistentRateLimit(`verify-code:ip:${ip}:${email}`, { limit: 10, windowSeconds: 900 });
+  if (!limit.success) {
+   return NextResponse.json({ error: "Too many verification attempts. Please request a new code later." }, rateLimitResponse(limit));
   }
 
   const verification = await prisma.verificationToken.findFirst({

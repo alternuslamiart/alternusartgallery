@@ -122,6 +122,16 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
+model RateLimitBucket {
+  id        String   @id
+  count     Int      @default(0)
+  resetAt   DateTime @map("reset_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([resetAt])
+  @@map("rate_limit_buckets")
+}
+
 model Artist {
   id                String            @id @default(uuid())
   userId            String            @unique @map("user_id")
