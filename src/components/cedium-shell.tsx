@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import { createContext, Dispatch, ReactNode, SetStateAction, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, Dispatch, ReactNode, SetStateAction, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 export const COBALT = "#4284FF";
 export const COBALT_DEEP = "#1E5ED4";
@@ -108,10 +108,23 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  const pathname = usePathname();
  const { data: session, status } = useSession();
  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+ const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+ const profileMenuRef = useRef<HTMLDivElement>(null);
  const isAuthenticated = status === "authenticated" && Boolean(session?.user);
  const profileLabel = session?.user?.name?.trim()?.charAt(0).toUpperCase()
   || session?.user?.email?.charAt(0).toUpperCase()
   || "U";
+
+ useEffect(() => {
+  if (!profileMenuOpen) return;
+  const closeMenu = (event: MouseEvent) => {
+   if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+    setProfileMenuOpen(false);
+   }
+  };
+  document.addEventListener("mousedown", closeMenu);
+  return () => document.removeEventListener("mousedown", closeMenu);
+ }, [profileMenuOpen]);
 
  return (
  <header className="crystal-glass-nav-shell coreforge-nav-shell">
@@ -133,18 +146,45 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  }
  </button>
  {isAuthenticated ? (
- <button type="button" onClick={() => signOut({ callbackUrl: "/" })} className="coreforge-nav-login hover:!border-[#4284FF]" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, background: "transparent", cursor: "pointer", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}>
-  Log out
- </button>
+ <div ref={profileMenuRef} style={{ position: "relative" }}>
+  <button
+   type="button"
+   aria-label="Open profile menu"
+   aria-expanded={profileMenuOpen}
+   onClick={() => setProfileMenuOpen((open) => !open)}
+   className="coreforge-profile-trigger"
+   style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 11px", fontSize: 13, fontWeight: 600, color: fg, background: "transparent", cursor: "pointer", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}
+  >
+   <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: "50%", background: `${COBALT}22`, color: COBALT, fontSize: 11, fontWeight: 800 }}>{profileLabel}</span>
+   <span>Profile</span>
+   <span style={{ fontSize: 11, opacity: 0.7 }}>⌄</span>
+  </button>
+  {profileMenuOpen && <div role="menu" className="coreforge-profile-menu" style={{ position: "absolute", top: 44, right: 0, zIndex: 100, width: 238, padding: 8, border: `1px solid ${faint}`, borderRadius: 12, background: isDark ? "#242424" : "#fff", color: fg, boxShadow: "0 18px 42px rgba(0,0,0,.28)" }}>
+   <div style={{ padding: "9px 10px 11px", borderBottom: `1px solid ${faint}` }}>
+    <div style={{ fontSize: 13, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{session.user?.name || "Crystal user"}</div>
+    <div style={{ marginTop: 3, color: muted, fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{session.user?.email}</div>
+   </div>
+   {[
+    ["Profile", "organization"],
+    ["Usage", "usage"],
+    ["Billing", "billing"],
+    ["Settings", "privacy"],
+   ].map(([label, section]) => (
+    <Link key={section} role="menuitem" href={`/account?section=${section}`} onClick={() => setProfileMenuOpen(false)} style={{ display: "flex", alignItems: "center", height: 34, padding: "0 10px", borderRadius: 8, color: fg, fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
+     {label}
+    </Link>
+   ))}
+   <div style={{ margin: "5px 0", borderTop: `1px solid ${faint}` }} />
+   <button type="button" role="menuitem" onClick={() => signOut({ callbackUrl: "/" })} style={{ display: "flex", alignItems: "center", width: "100%", height: 34, padding: "0 10px", border: 0, borderRadius: 8, background: "transparent", color: fg, cursor: "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: 600, textAlign: "left" }}>
+    Log out
+   </button>
+  </div>}
+ </div>
  ) : (
  <Link href="/login" className="coreforge-nav-login hover:!border-[#4284FF]" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}>
   Log in
  </Link>
  )}
- <Link href="/account" aria-label="Account profile" title={isAuthenticated ? session?.user?.email || "Account" : "Account"} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: `${COBALT}14`, color: COBALT, fontSize: 12, fontWeight: 800, textDecoration: "none", letterSpacing: "-0.02em" }}>
- <svg className="crystal-mobile-profile-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c.8-3.2 3.3-5 7.5-5s6.7 1.8 7.5 5"/></svg>
- <span className="crystal-desktop-profile-label">{isAuthenticated ? profileLabel : "AL"}</span>
- </Link>
  <Link href="/download" className="hidden sm:inline-flex" style={{ alignItems: "center", height: 36, padding: "0 15px", color: fg, fontSize: 13, fontWeight: 700, textDecoration: "none", border: `1px solid ${faint}`, borderRadius: 8 }}>
  Download App
  </Link>

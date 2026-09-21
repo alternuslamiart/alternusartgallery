@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import {
  CoreforgeLogo,
  DARK_BG,
@@ -53,7 +54,13 @@ const nav: { heading: string; items: { id: SectionId; label: string }[] }[] = [
 export default function Account() {
  const [isDark, setIsDark] = useCoreforgeMode();
  const { data: session } = useSession();
- const [active, setActive] = useState<SectionId>("usage");
+ const searchParams = useSearchParams();
+ const requestedSection = searchParams.get("section");
+ const initialSection: SectionId = requestedSection && [
+  "organization", "access", "members", "subscriptions", "billing", "chat",
+  "api-keys", "usage", "limits", "workspaces", "privacy",
+ ].includes(requestedSection) ? requestedSection as SectionId : "usage";
+ const [active, setActive] = useState<SectionId>(initialSection);
  const [profileOpen, setProfileOpen] = useState(false);
  const accountName = session?.user?.name?.trim() || "Crystal Studio User";
  const accountEmail = session?.user?.email || "you@alternusart.com";
@@ -64,6 +71,10 @@ export default function Account() {
   .slice(0, 2)
   .join("")
   .toUpperCase() || "AL";
+
+ useEffect(() => {
+  setActive(initialSection);
+ }, [initialSection]);
 
  const bg = isDark ? DARK_BG : LIGHT_BACKGROUND_PRIMARY;
  const fg = isDark ? DARK_TEXT : LIGHT_LABEL_PRIMARY;
