@@ -1543,6 +1543,37 @@
   background-color: #0F0F0F;
 }
 
+/* Crystal modeling palette. */
+.crystal-studio.crystal-modeling-mode,
+.crystal-studio.crystal-modeling-mode > section {
+  background-color: #191919 !important;
+}
+
+.crystal-studio.crystal-modeling-mode .crystal-modeling-sidebar,
+.crystal-studio.crystal-modeling-mode .crystal-right-panel,
+.crystal-studio.crystal-modeling-mode .crystal-modeling-tools,
+.crystal-studio.crystal-modeling-mode .crystal-ai-prompt {
+  background: #0F0F0F !important;
+}
+
+.crystal-studio.crystal-modeling-mode .crystal-reference-tabs,
+.crystal-studio.crystal-modeling-mode .crystal-reference-search,
+.crystal-studio.crystal-modeling-mode .crystal-reference-select,
+.crystal-studio.crystal-modeling-mode .crystal-reference-binary button,
+.crystal-studio.crystal-modeling-mode .crystal-reference-snap button,
+.crystal-studio.crystal-modeling-mode .crystal-utility-icons button,
+.crystal-studio.crystal-modeling-mode .crystal-modeling-render-card,
+.crystal-studio.crystal-modeling-mode .crystal-modeling-account,
+.crystal-studio.crystal-modeling-mode .crystal-ai-prompt textarea,
+.crystal-studio.crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:first-child,
+.crystal-studio.crystal-modeling-mode .crystal-ai-prompt > div:last-child > label:nth-child(2) {
+  background: #161616 !important;
+}
+
+.crystal-studio.crystal-modeling-mode .crystal-modeling-tools button {
+  background: #161616 !important;
+}
+
 .crystal-studio > header { position: absolute; inset: 0 0 auto; z-index: 30; }
 .crystal-topbar { box-shadow: 0 1px 0 rgba(255,255,255,.025); }
 .crystal-brand-logo { filter: brightness(1.08); }
