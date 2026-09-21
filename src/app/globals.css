@@ -5133,6 +5133,8 @@ textarea {
   .crystal-modeling-mode .crystal-right-panel {
     top: 8px !important;
     bottom: 8px !important;
+    border: 0 !important;
+    border-color: transparent !important;
   }
 }
 
