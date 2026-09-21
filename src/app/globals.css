@@ -5202,12 +5202,17 @@ textarea {
   }
 
   .crystal-studio:not(.crystal-modeling-mode) .crystal-modeling-tools {
+    top: 16px !important;
+    bottom: auto !important;
+    z-index: 40 !important;
     border: 0 !important;
     border-color: transparent !important;
     background: #0F0F0F !important;
   }
 
   .crystal-studio:not(.crystal-modeling-mode) .crystal-ai-prompt {
+    bottom: 8px !important;
+    z-index: 40 !important;
     background:
       linear-gradient(#0F0F0F, #0F0F0F) padding-box,
       linear-gradient(110deg, #1f0ade 0%, #0c8ce9 25%, #ff6e5b 52%, #21b803 76%, #0094ff 100%) border-box !important;
