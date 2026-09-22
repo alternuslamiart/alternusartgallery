@@ -206,7 +206,7 @@ export default function AIChatPage() {
           )}
           </div>
 
-          <div className="mt-6 min-h-0 flex-1 overflow-y-auto">
+          <div className="mt-6 min-h-0 flex-1 overflow-y-auto scrollbar-hide">
             <div className="mb-2 px-3 text-[10px] font-medium uppercase tracking-[0.16em] text-zinc-600">Recent</div>
             <div className="space-y-0.5">
               {recentItems.filter((item) => item.toLowerCase().includes(search.toLowerCase())).map((item) => <div key={item} className="group relative">
@@ -268,7 +268,7 @@ export default function AIChatPage() {
           </div>
         </header>
 
-        <section className="flex flex-1 flex-col overflow-y-auto px-4 pb-36 sm:px-8">
+        <section className="flex flex-1 flex-col overflow-y-auto scrollbar-hide px-4 pb-36 sm:px-8">
           {messages.length === 0 ? (
             <div className="m-auto text-center">
               <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-2xl border border-[#2a2a2a] bg-[#1c1c1c] text-[#3b82f6]"><Sparkles size={21} /></div>
