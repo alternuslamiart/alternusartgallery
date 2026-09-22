@@ -39,18 +39,8 @@ import {
 
 type Message = { id: number; role: "user" | "assistant"; content: string };
 
-const conversations = [
-  "Create HTML Game...",
-  "Apply To Leave For Emergency",
-  "What is UI UX Design?",
-  "Create UI System",
-  "What is UX Design",
-  "Create Prompt...",
-  "Create 3D Environment",
-  "AutoCAD Course for Leaning",
-];
 const models = ["Claude", "ChatGPT", "Gemini", "Grok", "Groq", "Copilot"];
-const initialRecentItems = ["House Architecture", "Modern Interior", "Robot Concept", "Living Room Design", "New Project"];
+type ChatSession = { id: string; title: string; messages: Message[]; updatedAt: number };
 type ChatSection = { id: string; label: string };
 const TEST_RESPONSE = `A Vision of Architecture, Technology, and Human Experience
 
@@ -89,7 +79,9 @@ export default function AIChatPage() {
   const [modelsOpen, setModelsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [mode, setMode] = useState<"chat" | "workflow">("chat");
-  const [recentItems, setRecentItems] = useState(initialRecentItems);
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+  const [sessionsLoaded, setSessionsLoaded] = useState(false);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [openConversationMenu, setOpenConversationMenu] = useState<string | null>(null);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -107,7 +99,21 @@ export default function AIChatPage() {
 
   useEffect(() => {
     setIsLight(window.localStorage.getItem("Coreforge_auth_theme") === "light");
+    try {
+      const savedSessions = window.localStorage.getItem("crystal_ai_chat_sessions");
+      if (savedSessions) setChatSessions(JSON.parse(savedSessions) as ChatSession[]);
+    } catch {
+      setToast("Saved chats could not be loaded.");
+    } finally {
+      setSessionsLoaded(true);
+    }
   }, []);
+
+  useEffect(() => {
+    if (!sessionsLoaded) return;
+    if (chatSessions.length > 0) window.localStorage.setItem("crystal_ai_chat_sessions", JSON.stringify(chatSessions));
+    else window.localStorage.removeItem("crystal_ai_chat_sessions");
+  }, [chatSessions, sessionsLoaded]);
 
   const toggleTheme = () => {
     setIsLight((current) => {
@@ -133,18 +139,41 @@ export default function AIChatPage() {
     const message = input.trim();
     if (!message || isSending) return;
 
+    const sessionId = activeSessionId ?? `chat-${Date.now()}`;
     const userMessage: Message = { id: Date.now(), role: "user", content: message };
+    const title = message.replace(/\s+/g, " ").slice(0, 42) || "New Chat";
+    setActiveSessionId(sessionId);
     setMessages((current) => [...current, userMessage]);
+    setChatSessions((current) => {
+      const existing = current.find((session) => session.id === sessionId);
+      if (existing) return current.map((session) => session.id === sessionId ? { ...session, messages: [...session.messages, userMessage], updatedAt: Date.now() } : session);
+      return [{ id: sessionId, title, messages: [userMessage], updatedAt: Date.now() }, ...current];
+    });
     setInput("");
     setHasPastedInput(false);
     setIsSending(true);
 
     await new Promise((resolve) => window.setTimeout(resolve, 250));
-    setMessages((current) => [
-      ...current,
-      { id: Date.now() + 1, role: "assistant", content: TEST_RESPONSE },
-    ]);
+    const assistantMessage: Message = { id: Date.now() + 1, role: "assistant", content: TEST_RESPONSE };
+    setMessages((current) => [...current, assistantMessage]);
+    setChatSessions((current) => current.map((session) => session.id === sessionId ? { ...session, messages: [...session.messages, assistantMessage], updatedAt: Date.now() } : session));
     setIsSending(false);
+  };
+
+  const startNewChat = () => {
+    setActiveSessionId(null);
+    setMessages([]);
+    setInput("");
+    setHasPastedInput(false);
+    setSidebarOpen(false);
+  };
+
+  const openChat = (session: ChatSession) => {
+    setActiveSessionId(session.id);
+    setMessages(session.messages);
+    setInput("");
+    setHasPastedInput(false);
+    setSidebarOpen(false);
   };
 
   const copyMessage = async (message: Message) => {
@@ -153,24 +182,25 @@ export default function AIChatPage() {
     window.setTimeout(() => setCopiedId(null), 1500);
   };
 
-  const handleConversationAction = async (action: string, item: string) => {
+  const handleConversationAction = async (action: string, item: ChatSession) => {
     setOpenConversationMenu(null);
     if (action === "pin") {
-      setRecentItems((items) => [item, ...items.filter((current) => current !== item)]);
-      setToast(`${item} pinned.`);
+      setChatSessions((items) => [item, ...items.filter((current) => current.id !== item.id)]);
+      setToast(`${item.title} pinned.`);
     } else if (action === "project") {
-      setToast(`${item} added to project.`);
+      setToast(`${item.title} added to project.`);
     } else if (action === "unread") {
-      setToast(`${item} marked as unread.`);
+      setToast(`${item.title} marked as unread.`);
     } else if (action === "rename") {
-      const nextName = window.prompt("Rename conversation", item)?.trim();
-      if (nextName && nextName !== item) setRecentItems((items) => items.map((current) => current === item ? nextName : current));
+      const nextName = window.prompt("Rename conversation", item.title)?.trim();
+      if (nextName && nextName !== item.title) setChatSessions((items) => items.map((current) => current.id === item.id ? { ...current, title: nextName } : current));
     } else if (action === "share") {
       await navigator.clipboard?.writeText(window.location.href);
       setToast("Conversation link copied.");
     } else if (action === "delete") {
-      setRecentItems((items) => items.filter((current) => current !== item));
-      setToast(`${item} deleted.`);
+      setChatSessions((items) => items.filter((current) => current.id !== item.id));
+      if (activeSessionId === item.id) startNewChat();
+      setToast(`${item.title} deleted.`);
     }
     window.setTimeout(() => setToast(null), 1800);
   };
@@ -207,7 +237,7 @@ export default function AIChatPage() {
 
           <nav className="mt-5 space-y-1">
             <Link href="/archplan" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><FolderPlus size={16} className="text-zinc-500" /> New Project</Link>
-            <button onClick={() => { setMessages([]); setInput(""); setHasPastedInput(false); setSidebarOpen(false); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><Plus size={16} className="text-zinc-500" /> New Chat</button>
+            <button onClick={startNewChat} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><Plus size={16} className="text-zinc-500" /> New Chat</button>
             <Link href="/design-studio" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><Image size={16} className="text-zinc-500" /> Image</Link>
             <Link href="/platform/bridges" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><Plug size={16} className="text-zinc-500" /> Plugin</Link>
           </nav>
@@ -247,13 +277,10 @@ export default function AIChatPage() {
           <div className="mt-6 min-h-0 flex-1 overflow-y-auto scrollbar-hide">
             <div className="mb-2 px-3 text-[10px] font-medium uppercase tracking-[0.16em] text-zinc-600">Recent</div>
             <div className="space-y-0.5">
-              {recentItems.filter((item) => item.toLowerCase().includes(search.toLowerCase())).map((item) => <div key={item} className="group relative">
-                <button onClick={() => { setInput(item); setSidebarOpen(false); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[12px] text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-zinc-200"><Sparkles size={14} className="shrink-0 text-zinc-600" /><span className="min-w-0 flex-1 truncate">{item}</span><span role="button" tabIndex={0} aria-label={`Options for ${item}`} onClick={(event) => { event.stopPropagation(); setOpenConversationMenu(openConversationMenu === item ? null : item); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setOpenConversationMenu(openConversationMenu === item ? null : item); } }} className="shrink-0 rounded-md p-1 text-zinc-500 opacity-0 transition hover:bg-[#363636] group-hover:opacity-100"><MoreHorizontal size={14} /></span></button>
-                {openConversationMenu === item && <ConversationMenu onAction={(action) => void handleConversationAction(action, item)} />}
+              {[...chatSessions].sort((first, second) => second.updatedAt - first.updatedAt).filter((session) => session.title.toLowerCase().includes(search.toLowerCase())).map((session) => <div key={session.id} className="group relative">
+                <button onClick={() => openChat(session)} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[12px] transition ${activeSessionId === session.id ? "bg-[#1c1c1c] text-white" : "text-zinc-500 hover:bg-[#1c1c1c] hover:text-zinc-200"}`}><Sparkles size={14} className="shrink-0 text-zinc-600" /><span className="min-w-0 flex-1 truncate">{session.title}</span><span role="button" tabIndex={0} aria-label={`Options for ${session.title}`} onClick={(event) => { event.stopPropagation(); setOpenConversationMenu(openConversationMenu === session.id ? null : session.id); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setOpenConversationMenu(openConversationMenu === session.id ? null : session.id); } }} className="shrink-0 rounded-md p-1 text-zinc-500 opacity-0 transition hover:bg-[#363636] group-hover:opacity-100"><MoreHorizontal size={14} /></span></button>
+                {openConversationMenu === session.id && <ConversationMenu onAction={(action) => void handleConversationAction(action, session)} />}
               </div>)}
-            </div>
-            <div className="mt-5 space-y-1.5 border-t border-[#242424] pt-4">
-              {conversations.filter((item) => item.toLowerCase().includes(search.toLowerCase())).slice(0, 5).map((conversation, index) => <button key={conversation} onClick={() => setSidebarOpen(false)} className={`group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-[12px] transition hover:bg-[#1c1c1c] ${index === 0 ? "text-white" : "text-zinc-600 hover:text-zinc-300"}`}><span className="truncate">{conversation}</span><MoreHorizontal size={14} className="shrink-0 opacity-0 transition group-hover:opacity-100" /></button>)}
             </div>
           </div>
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-[#2a2a2a] bg-[#141414] p-2.5">
@@ -276,7 +303,7 @@ export default function AIChatPage() {
           <div className="flex min-h-0 flex-1 flex-col items-center">
             <nav className="mt-5 flex flex-col items-center gap-2" aria-label="Collapsed AI chat navigation">
               <Link href="/archplan" aria-label="New Project" title="New Project" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><FolderPlus size={16} /></Link>
-              <button type="button" onClick={() => { setMessages([]); setInput(""); setHasPastedInput(false); }} aria-label="New Chat" title="New Chat" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Plus size={17} /></button>
+              <button type="button" onClick={startNewChat} aria-label="New Chat" title="New Chat" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Plus size={17} /></button>
               <Link href="/design-studio" aria-label="Image" title="Image" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Image size={16} /></Link>
               <Link href="/platform/bridges" aria-label="Plugin" title="Plugin" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Plug size={16} /></Link>
               <span className="my-1 h-px w-6 bg-[#2a2a2a]" />
