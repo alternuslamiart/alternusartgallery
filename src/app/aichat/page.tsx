@@ -340,11 +340,11 @@ export default function AIChatPage() {
                 <div
                   key={message.id}
                   ref={(element) => { sectionRefs.current[`message-${message.id}`] = element; }}
-                  className={`scroll-mt-6 group flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                  className={`scroll-mt-6 group flex ${message.role === "user" ? "justify-end" : "justify-center"}`}
                 >
-                  <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-7 ${message.role === "user" ? "bg-[#1c1c1c] text-zinc-100" : "border border-[#2a2a2a] bg-[#171717] text-zinc-300"}`}>
+                  <div className={message.role === "user" ? "max-w-[85%] rounded-2xl bg-[#1c1c1c] px-4 py-3 text-sm leading-7 text-zinc-100" : "w-full max-w-2xl px-4 py-3 text-center text-sm leading-7 text-zinc-300"}>
                     <p className="whitespace-pre-wrap">{message.content}</p>
-                    {message.role === "assistant" && <div className="mt-3 flex gap-1 opacity-60 transition group-hover:opacity-100"><button onClick={() => void copyMessage(message)} aria-label="Copy response" className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]">{copiedId === message.id ? <Check size={14} /> : <Copy size={14} />}</button><button aria-label="Share response" className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]"><Share2 size={14} /></button><Link href="/crystal" className="ml-1 rounded-lg px-2 py-1 text-[11px] text-[#3b82f6] transition hover:bg-blue-500/10">Go to Crystal</Link></div>}
+                    {message.role === "assistant" && <div className="mt-3 flex justify-center gap-1 opacity-60 transition group-hover:opacity-100"><button onClick={() => void copyMessage(message)} aria-label="Copy response" className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]">{copiedId === message.id ? <Check size={14} /> : <Copy size={14} />}</button><button aria-label="Share response" className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]"><Share2 size={14} /></button><Link href="/crystal" className="ml-1 rounded-lg px-2 py-1 text-[11px] text-[#3b82f6] transition hover:bg-blue-500/10">Go to Crystal</Link></div>}
                   </div>
                 </div>
               ))}
