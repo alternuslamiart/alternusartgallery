@@ -50,6 +50,43 @@ const conversations = [
 const models = ["Claude", "ChatGPT", "Gemini", "Grok", "Groq", "Copilot"];
 const initialRecentItems = ["House Architecture", "Modern Interior", "Robot Concept", "Living Room Design", "New Project"];
 type ChatSection = { id: string; label: string };
+const TEST_RESPONSE = `But the main point is this:
+
+A large company doesn't just buy a beautiful UI.
+
+If Crystal had:
+
+⚡ a very fast renderer
+🤖 AI that creates/modifies 3D
+🧱 procedural modeling
+🎨 PBR/material system
+📦 professional export: GLTF, STEP, OBJ, etc.
+🖥️ a serious desktop application
+☁️ cloud collaboration
+🔌 plugin ecosystem/API
+👥 real users
+💰 recurring revenue
+🧠 technology/IP that is hard to copy
+
+...then the situation changes significantly.
+
+At that point, Crystal might not just be "a piece of software"; it could become a strategic asset.
+
+Autodesk, for instance, has a history of scouting for technology to integrate into its ecosystem: e.g., acquiring Solid Angle for the Arnold renderer and Wonder Dynamics for AI/VFX.
+
+And there is an even more interesting scenario.
+
+If Crystal is built in such a way that:
+
+"A person with no 3D knowledge can create a professional asset simply by describing it in text."
+
+...then Crystal could position itself not just against Blender/Maya/3ds Max, but in a brand-new category:
+
+An AI-powered 3D creation platform.
+
+This would make it far more attractive to a large company.
+
+So, yes: an exit via acquisition is a realistic goal. But first, you have to build something of strategic value—not just a product with a lot of features.`;
 
 const getGeneratedSection = (content: string, index: number): string => {
   const normalized = content.toLowerCase();
@@ -107,29 +144,12 @@ export default function AIChatPage() {
     setInput("");
     setIsSending(true);
 
-    try {
-      const conversation = [...messages, userMessage].map(({ role, content }) => ({ role, content }));
-      const response = await fetch("/api/ai-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: conversation }),
-      });
-      const data = (await response.json()) as { message?: string; content?: string; answer?: string; error?: string };
-      if (!response.ok) throw new Error(data.error || "The AI request failed.");
-      const assistantMessage = data.message || data.content || data.answer;
-      if (!assistantMessage) throw new Error("The AI returned an empty response.");
-      setMessages((current) => [
-        ...current,
-        { id: Date.now() + 1, role: "assistant", content: assistantMessage },
-      ]);
-    } catch (error) {
-      setMessages((current) => [
-        ...current,
-        { id: Date.now() + 1, role: "assistant", content: error instanceof Error ? error.message : "The AI request failed." },
-      ]);
-    } finally {
-      setIsSending(false);
-    }
+    await new Promise((resolve) => window.setTimeout(resolve, 250));
+    setMessages((current) => [
+      ...current,
+      { id: Date.now() + 1, role: "assistant", content: TEST_RESPONSE },
+    ]);
+    setIsSending(false);
   };
 
   const copyMessage = async (message: Message) => {
