@@ -49,7 +49,7 @@ const conversations = [
 ];
 const models = ["Claude", "ChatGPT", "Gemini", "Grok", "Groq", "Copilot"];
 const initialRecentItems = ["House Architecture", "Modern Interior", "Robot Concept", "Living Room Design", "New Project"];
-const chatSections = ["Header", "Chat mode", "Workflow", "Welcome", "Messages", "Recent", "Composer", "Account"];
+const chatSections = ["Header", "Chat mode", "Workflow", "Welcome", "Messages", "Recent", "Projects", "AI model", "Composer", "Account"];
 
 export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -268,7 +268,7 @@ export default function AIChatPage() {
             <Link href="/crystal" className="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-zinc-400 transition hover:border-blue-500/50 hover:text-white">Go to Studio</Link>
           </div>
         </header>
-        <nav className="aichat-section-scroll absolute right-3 top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-2 lg:flex" aria-label="Chat sections">
+        <nav className="aichat-section-scroll absolute right-3 top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-3 lg:flex" aria-label="Chat sections">
           {chatSections.map((section, index) => (
             <button
               key={section}
