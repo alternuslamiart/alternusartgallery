@@ -292,7 +292,7 @@ export default function AIChatPage() {
               }} />}
             </div>
           </div>
-          <Link href="/pricing" className="mt-3 flex h-[46px] w-[236px] shrink-0 items-center justify-center rounded-xl bg-[#1a1a1a] text-sm font-semibold text-white transition hover:bg-[#242424]">Upgrade Now</Link>
+          <Link href="/pricing" className="mt-3 flex h-[46px] w-full shrink-0 items-center justify-center rounded-xl bg-[#1a1a1a] text-sm font-semibold text-white transition hover:bg-[#242424]">Upgrade Now</Link>
         </div>}
         {sidebarCollapsed && (
           <div className="flex min-h-0 flex-1 flex-col items-center">
