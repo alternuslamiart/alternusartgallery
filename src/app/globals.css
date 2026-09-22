@@ -3765,7 +3765,7 @@ textarea {
 .aichat-light aside button:hover,
 .aichat-light header button:hover,
 .aichat-light header a:hover {
-  background-color: #e6e6e6 !important;
+  background-color: #ddd !important;
   color: #202020 !important;
 }
 
@@ -3811,7 +3811,7 @@ textarea {
 }
 
 .aichat-light form button:not([type="submit"]):hover {
-  background-color: #e6e6e6 !important;
+  background-color: #ddd !important;
   color: #202020 !important;
 }
 
@@ -3828,8 +3828,16 @@ textarea {
 }
 
 .aichat-light header > div > div button:not(.bg-\[\#3b82f6\]):hover {
-  background-color: #e6e6e6 !important;
+  background-color: #ddd !important;
   color: #202020 !important;
+}
+
+.aichat-light .aichat-welcome-title {
+  color: #4a4a4a !important;
+}
+
+.aichat-light .aichat-welcome-subtitle {
+  color: #121212 !important;
 }
 
 .aichat-light section [class*="text-zinc-300"] {
