@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowUp,
   Bot,
@@ -49,7 +49,17 @@ const conversations = [
 ];
 const models = ["Claude", "ChatGPT", "Gemini", "Grok", "Groq", "Copilot"];
 const initialRecentItems = ["House Architecture", "Modern Interior", "Robot Concept", "Living Room Design", "New Project"];
-const chatSections = ["Header", "Chat mode", "Workflow", "Welcome", "Messages", "Recent", "Projects", "AI model", "Composer", "Account"];
+type ChatSection = { id: string; label: string };
+
+const getGeneratedSection = (content: string, index: number): string => {
+  const normalized = content.toLowerCase();
+  if (/\b(pdf|portable document)\b/.test(normalized)) return "PDF";
+  if (/\b(docx|word document|document)\b/.test(normalized)) return "DOCX";
+  if (/\b(photo|image|jpg|jpeg|png|render|visual)\b/.test(normalized)) return "Photo";
+  if (/\b(plan|floor plan|architecture|architectural)\b/.test(normalized)) return "Architecture plan";
+  if (/\b(file|download|attachment|export)\b/.test(normalized)) return "File";
+  return index === 0 ? "Description" : `Description ${index + 1}`;
+};
 
 export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -67,6 +77,18 @@ export default function AIChatPage() {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const chatSections = useMemo<ChatSection[]>(() => [
+    { id: "header", label: "Header" },
+    ...messages.map((message, index) => ({
+      id: `message-${message.id}`,
+      label: message.role === "assistant" ? getGeneratedSection(message.content, index) : "Prompt",
+    })),
+  ], [messages]);
+
+  const scrollToSection = (id: string) => {
+    sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -271,21 +293,22 @@ export default function AIChatPage() {
         <nav className="aichat-section-scroll absolute right-3 top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-3 lg:flex" aria-label="Chat sections">
           {chatSections.map((section, index) => (
             <button
-              key={section}
+              key={section.id}
               type="button"
-              aria-label={`Go to ${section}`}
+              aria-label={`Go to ${section.label}`}
+              onClick={() => scrollToSection(section.id)}
               className={`group relative h-[6px] w-4 rounded-full transition-all ${index === 0 ? "bg-zinc-200" : "bg-zinc-600 hover:bg-zinc-300"}`}
             >
               <span className="pointer-events-none absolute right-7 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-[#3a3a3a] px-4 py-1.5 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-                {section}
+                {section.label}
               </span>
             </button>
           ))}
         </nav>
 
-        <section className="flex flex-1 flex-col overflow-y-auto scrollbar-hide px-4 pb-36 sm:px-8">
+        <section ref={(element) => { sectionRefs.current.header = element; }} className="flex flex-1 flex-col overflow-y-auto scrollbar-hide px-4 pb-36 sm:px-8">
           {messages.length === 0 ? (
-            <div className="m-auto text-center">
+            <div ref={(element) => { sectionRefs.current.header = element; }} className="m-auto text-center">
               <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-2xl border border-[#2a2a2a] bg-[#1c1c1c] text-[#3b82f6]"><Sparkles size={21} /></div>
               <p className="text-2xl font-semibold tracking-tight text-zinc-200 sm:text-3xl">Good Morning, Toby</p>
               <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-200 sm:text-3xl">How Can I <span className="text-[#3b82f6]">Assist You Today?</span></h1>
@@ -294,7 +317,11 @@ export default function AIChatPage() {
           ) : (
             <div className="mx-auto w-full max-w-3xl space-y-6 py-8">
               {messages.map((message) => (
-                <div key={message.id} className={`group flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div
+                  key={message.id}
+                  ref={(element) => { sectionRefs.current[`message-${message.id}`] = element; }}
+                  className={`scroll-mt-6 group flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                >
                   <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-7 ${message.role === "user" ? "bg-[#1c1c1c] text-zinc-100" : "border border-[#2a2a2a] bg-[#171717] text-zinc-300"}`}>
                     <p className="whitespace-pre-wrap">{message.content}</p>
                     {message.role === "assistant" && <div className="mt-3 flex gap-1 opacity-60 transition group-hover:opacity-100"><button onClick={() => void copyMessage(message)} aria-label="Copy response" className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]">{copiedId === message.id ? <Check size={14} /> : <Copy size={14} />}</button><button aria-label="Share response" className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]"><Share2 size={14} /></button><Link href="/crystal" className="ml-1 rounded-lg px-2 py-1 text-[11px] text-[#3b82f6] transition hover:bg-blue-500/10">Go to Crystal</Link></div>}
