@@ -49,6 +49,7 @@ const conversations = [
 ];
 const models = ["Claude", "ChatGPT", "Gemini", "Grok", "Groq", "Copilot"];
 const initialRecentItems = ["House Architecture", "Modern Interior", "Robot Concept", "Living Room Design", "New Project"];
+const chatSections = ["Header", "Chat mode", "Workflow", "Welcome", "Messages", "Recent", "Composer", "Account"];
 
 export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -267,6 +268,20 @@ export default function AIChatPage() {
             <Link href="/crystal" className="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-zinc-400 transition hover:border-blue-500/50 hover:text-white">Go to Studio</Link>
           </div>
         </header>
+        <nav className="aichat-section-scroll absolute right-3 top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-2 lg:flex" aria-label="Chat sections">
+          {chatSections.map((section, index) => (
+            <button
+              key={section}
+              type="button"
+              aria-label={`Go to ${section}`}
+              className={`group relative h-[6px] w-4 rounded-full transition-all ${index === 0 ? "bg-zinc-200" : "bg-zinc-600 hover:bg-zinc-300"}`}
+            >
+              <span className="pointer-events-none absolute right-7 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-[#3a3a3a] px-4 py-1.5 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+                {section}
+              </span>
+            </button>
+          ))}
+        </nav>
 
         <section className="flex flex-1 flex-col overflow-y-auto scrollbar-hide px-4 pb-36 sm:px-8">
           {messages.length === 0 ? (
