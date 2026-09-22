@@ -3766,7 +3766,7 @@ textarea {
 .aichat-light aside input,
 .aichat-light aside label {
   color: #121212 !important;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .aichat-light aside a:hover,
@@ -3879,7 +3879,14 @@ textarea {
 .aichat-light aside input,
 .aichat-light aside label {
   color: #121212 !important;
-  font-weight: 500;
+  font-weight: 600;
+}
+
+.aichat-page > aside a,
+.aichat-page > aside button,
+.aichat-page > aside input,
+.aichat-page > aside label {
+  font-weight: 600;
 }
 
 .aichat-light aside .group > button {
