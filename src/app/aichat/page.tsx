@@ -349,7 +349,7 @@ export default function AIChatPage() {
         <section ref={(element) => { sectionRefs.current.header = element; }} className="flex flex-1 flex-col overflow-y-auto scrollbar-hide px-4 pb-36 sm:px-8">
           {messages.length === 0 ? (
             <div ref={(element) => { sectionRefs.current.header = element; }} className="m-auto text-center">
-              <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-2xl border border-[#2a2a2a] bg-[#1c1c1c]"><img src="/Logopng.png" alt="Crystal" className="h-6 w-6 object-contain" /></div>
+              <div className="mx-auto mb-5 grid h-12 w-[220px] place-items-center rounded-2xl border border-[#2a2a2a] bg-[#1c1c1c]"><img src="/Logopng.png" alt="Crystal" className="h-6 w-6 object-contain" /></div>
               <p className="aichat-welcome-title text-2xl font-medium tracking-tight text-zinc-200 sm:text-3xl">Good Morning, Toby</p>
               <h1 className="aichat-welcome-subtitle mt-2 text-2xl font-medium tracking-tight text-zinc-200 sm:text-3xl">How Can I <span className="text-[#1d9bf0]">Assist You Today?</span></h1>
               {mode === "workflow" && <p className="mt-4 text-sm text-zinc-500">Build a repeatable creative workflow with Crystal.</p>}
