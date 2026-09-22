@@ -3871,6 +3871,15 @@ textarea {
   font-weight: 500;
 }
 
+@media (min-width: 701px) {
+  .crystal-first-sector {
+    width: min(1240px, calc(100% - 48px));
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
 .design-studio-sidebar > div.mt-auto > div {
   background-color: #101010 !important;
 }
