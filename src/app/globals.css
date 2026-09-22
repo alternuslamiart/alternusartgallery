@@ -3882,6 +3882,28 @@ textarea {
   font-weight: 600;
 }
 
+.aichat-page textarea {
+  scrollbar-color: #777 transparent;
+  scrollbar-width: thin;
+}
+
+.aichat-page textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+.aichat-page textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.aichat-page textarea::-webkit-scrollbar-thumb {
+  background: #777;
+  border-radius: 999px;
+}
+
+.aichat-page textarea::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
 .aichat-page > aside a,
 .aichat-page > aside button,
 .aichat-page > aside input,
