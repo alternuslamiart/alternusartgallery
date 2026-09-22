@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowUp,
@@ -87,6 +88,7 @@ export default function AIChatPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [hasPastedInput, setHasPastedInput] = useState(false);
   const [isLight, setIsLight] = useState(false);
+  const { data: session, status: sessionStatus } = useSession();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const chatSections = useMemo<ChatSection[]>(() => [
@@ -98,22 +100,34 @@ export default function AIChatPage() {
   ], [messages]);
 
   useEffect(() => {
+    if (sessionStatus === "loading") return;
+    setSessionsLoaded(false);
     setIsLight(window.localStorage.getItem("Coreforge_auth_theme") === "light");
+    const profileKey = session?.user?.email ?? session?.user?.name ?? null;
+    if (!profileKey) {
+      setChatSessions([]);
+      setSessionsLoaded(true);
+      return;
+    }
+    const storageKey = `crystal_ai_chat_sessions:${encodeURIComponent(profileKey)}`;
     try {
-      const savedSessions = window.localStorage.getItem("crystal_ai_chat_sessions");
+      const savedSessions = window.localStorage.getItem(storageKey);
       if (savedSessions) setChatSessions(JSON.parse(savedSessions) as ChatSession[]);
+      else setChatSessions([]);
     } catch {
       setToast("Saved chats could not be loaded.");
     } finally {
       setSessionsLoaded(true);
     }
-  }, []);
+  }, [session?.user?.email, session?.user?.name, sessionStatus]);
 
   useEffect(() => {
-    if (!sessionsLoaded) return;
-    if (chatSessions.length > 0) window.localStorage.setItem("crystal_ai_chat_sessions", JSON.stringify(chatSessions));
-    else window.localStorage.removeItem("crystal_ai_chat_sessions");
-  }, [chatSessions, sessionsLoaded]);
+    const profileKey = session?.user?.email ?? session?.user?.name ?? null;
+    if (!sessionsLoaded || !profileKey) return;
+    const storageKey = `crystal_ai_chat_sessions:${encodeURIComponent(profileKey)}`;
+    if (chatSessions.length > 0) window.localStorage.setItem(storageKey, JSON.stringify(chatSessions));
+    else window.localStorage.removeItem(storageKey);
+  }, [chatSessions, session?.user?.email, session?.user?.name, sessionsLoaded]);
 
   const toggleTheme = () => {
     setIsLight((current) => {
