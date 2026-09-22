@@ -3872,11 +3872,9 @@ textarea {
 }
 
 @media (min-width: 701px) {
-  .crystal-first-sector {
-    width: min(1240px, calc(100% - 48px));
-    max-width: none;
-    padding-left: 0;
-    padding-right: 0;
+  .crystal-first-card {
+    width: calc(100% + 64px);
+    margin-left: -32px;
   }
 }
 
