@@ -18,6 +18,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
+  Paperclip,
   Plug,
   Search,
   Share2,
@@ -146,10 +147,10 @@ export default function AIChatPage() {
           setAccountMenuOpen(false);
         }
       }}
-      className="flex min-h-screen w-full overflow-hidden bg-[#0a0a0a] font-roboto text-white"
+      className="flex min-h-screen w-full overflow-hidden bg-[#101010] font-roboto text-white"
     >
       {sidebarOpen && <button aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-black/60 lg:hidden" />}
-      <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[60px]" : "w-[276px]"} shrink-0 flex-col border border-[#2a2a2a] bg-[#0e0e0e] p-3 transition-[width,transform] duration-300 lg:inset-y-auto lg:static lg:m-3 lg:h-[calc(100vh-24px)] lg:rounded-[12px] lg:translate-x-0`}>
+      <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[60px]" : "w-[284px]"} shrink-0 flex-col bg-[#101010] p-3 transition-[width,transform] duration-300 lg:inset-y-auto lg:static lg:h-screen lg:translate-x-0`}>
         <div className={`flex items-center rounded-xl px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
           <Link href="/aichat" aria-label="Crystal AI Chat" className={`flex items-center gap-3 text-lg font-semibold tracking-tight text-white ${sidebarCollapsed ? "mx-auto" : ""}`}>
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><img src="/Logopng.png" alt="" className="h-5 w-5 object-contain brightness-0 invert" /></span>
@@ -231,6 +232,7 @@ export default function AIChatPage() {
               }} />}
             </div>
           </div>
+          <Link href="/pricing" className="mt-3 flex h-[46px] w-[236px] shrink-0 items-center justify-center rounded-xl bg-[#1a1a1a] text-sm font-semibold text-white transition hover:bg-[#242424]">Upgrade Now</Link>
         </div>}
         {sidebarCollapsed && (
           <div className="flex min-h-0 flex-1 flex-col items-center">
@@ -251,7 +253,7 @@ export default function AIChatPage() {
         )}
       </aside>
 
-      <main className="relative flex min-w-0 flex-1 flex-col bg-[#111111]">
+      <main className="relative m-2 flex min-w-0 flex-1 flex-col overflow-hidden rounded-[8px] bg-[#1a1a1a]">
         <header className="flex h-16 items-center justify-between px-5 sm:px-8">
           <button onClick={() => setSidebarOpen(true)} aria-label="Open sidebar" className="rounded-xl p-2 text-zinc-400 transition hover:bg-[#1c1c1c] hover:text-white lg:hidden"><Menu size={20} /></button>
           <div className="mx-auto flex items-center gap-2">
@@ -289,11 +291,11 @@ export default function AIChatPage() {
           )}
         </section>
 
-        <form onSubmit={sendMessage} className="absolute bottom-6 left-1/2 flex w-[calc(100%-32px)] max-w-[620px] -translate-x-1/2 items-end gap-2 rounded-2xl border border-[#2a2a2a] bg-[#1c1c1c]/90 p-2 shadow-2xl backdrop-blur-xl transition focus-within:border-blue-500/60 focus-within:ring-4 focus-within:ring-blue-500/10">
-          <button type="button" aria-label="New conversation" onClick={() => { setMessages([]); setInput(""); }} className="mb-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#2a2a2a] text-zinc-400 transition hover:scale-105 hover:text-white active:scale-95"><Plus size={18} /></button>
+        <form onSubmit={sendMessage} className="absolute bottom-6 left-1/2 flex h-16 w-[calc(100%-32px)] max-w-[781px] -translate-x-1/2 items-center gap-2 rounded-2xl border border-[#333] bg-[#282828] p-2 shadow-2xl transition focus-within:border-blue-500/60 focus-within:ring-4 focus-within:ring-blue-500/10">
+          <button type="button" aria-label="Attach file" onClick={() => { setToast("File attachments are available in chat."); window.setTimeout(() => setToast(null), 1800); }} className="grid h-[46px] w-[46px] shrink-0 place-items-center rounded-xl bg-[#3c3c3c] text-zinc-300 transition hover:bg-[#484848] hover:text-white active:scale-95"><Paperclip size={24} /></button>
           <textarea ref={textareaRef} value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage(); } }} rows={1} placeholder="Ask Crystal anything..." className="max-h-40 min-h-9 flex-1 resize-none bg-transparent px-2 py-2 text-sm text-white outline-none placeholder:text-zinc-600" />
-          <button type="button" aria-label="Use microphone" className="mb-0.5 hidden h-9 w-9 shrink-0 place-items-center rounded-xl text-zinc-500 transition hover:bg-[#2a2a2a] hover:text-white sm:grid"><Mic size={17} /></button>
-          <button type="submit" aria-label="Send message" disabled={!input.trim() || isSending} className="mb-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] text-white shadow-lg shadow-blue-500/20 transition-all hover:scale-105 hover:bg-[#2563eb] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"><ArrowUp size={17} /></button>
+          <button type="button" aria-label="Use microphone" className="grid h-[46px] w-[46px] shrink-0 place-items-center rounded-xl bg-[#3c3c3c] text-zinc-300 transition hover:bg-[#484848] hover:text-white active:scale-95"><Mic size={24} /></button>
+          <button type="submit" aria-label="Send message" disabled={!input.trim() || isSending} className="grid h-[46px] w-[46px] shrink-0 place-items-center rounded-xl bg-[#3b82f6] text-white shadow-lg shadow-blue-500/20 transition-all hover:scale-105 hover:bg-[#2563eb] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"><ArrowUp size={24} /></button>
         </form>
       </main>
       {toast && <div role="status" className="fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 rounded-lg border border-[#2a2a2a] bg-[#242424] px-4 py-2 text-xs text-white shadow-xl">{toast}</div>}
