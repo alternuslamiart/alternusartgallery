@@ -3871,6 +3871,35 @@ textarea {
   font-weight: 500;
 }
 
+.aichat-light [role="menu"] {
+  background-color: #fff !important;
+  border: 1px solid #e7e7e7;
+  color: #121212 !important;
+}
+
+.aichat-light [role="menu"] button {
+  color: #121212 !important;
+}
+
+.aichat-light [role="menu"] button:hover {
+  background-color: #ddd !important;
+  color: #121212 !important;
+}
+
+.aichat-light [role="menu"] [class*="bg-[#363636]"] {
+  background-color: #e7e7e7 !important;
+}
+
+.aichat-light [role="menu"] [class*="text-zinc-100"],
+.aichat-light [role="menu"] [class*="text-zinc-300"],
+.aichat-light [role="menu"] [class*="text-zinc-400"] {
+  color: #121212 !important;
+}
+
+.aichat-light [role="menu"] [class*="bg-[#383838]"] {
+  background-color: #e7e7e7 !important;
+}
+
 @media (min-width: 701px) {
   .crystal-first-card {
     width: calc(100% + 64px);
