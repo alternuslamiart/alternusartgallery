@@ -2872,6 +2872,14 @@
  color: #101114;
 }
 
+.auth-page .auth-kicker {
+ color: #8fccff;
+}
+
+.auth-page.auth-light .auth-kicker {
+ color: #1769c2;
+}
+
 .auth-page .auth-top-link,
 .auth-page .auth-copy,
 .auth-page .auth-footer-copy {
