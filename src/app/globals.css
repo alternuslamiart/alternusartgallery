@@ -3733,6 +3733,120 @@ textarea {
   background-color: #141414 !important;
 }
 
+.aichat-light {
+  background: #fff !important;
+  color: #202020 !important;
+}
+
+.aichat-light aside {
+  background: #fff !important;
+  border-color: #e9e9e9 !important;
+}
+
+.aichat-light main {
+  background: #fff !important;
+}
+
+.aichat-light header,
+.aichat-light aside,
+.aichat-light main {
+  color: #202020;
+}
+
+.aichat-light aside input,
+.aichat-light aside a,
+.aichat-light aside button,
+.aichat-light header button,
+.aichat-light header a {
+  color: #555 !important;
+}
+
+.aichat-light aside a:hover,
+.aichat-light aside button:hover,
+.aichat-light header button:hover,
+.aichat-light header a:hover {
+  background-color: #e6e6e6 !important;
+  color: #202020 !important;
+}
+
+.aichat-light aside label,
+.aichat-light aside > div > div:last-child,
+.aichat-light header > div > div {
+  background-color: #fff !important;
+  border-color: #e9e9e9 !important;
+}
+
+.aichat-light aside [class*="bg-[#121212]"],
+.aichat-light aside [class*="bg-[#141414]"],
+.aichat-light aside [class*="bg-[#1a1a1a]"] {
+  background-color: #fff !important;
+}
+
+.aichat-light aside [class*="border-[#242424]"] {
+  border-color: #e9e9e9 !important;
+}
+
+.aichat-light aside [class*="text-zinc-600"],
+.aichat-light aside [class*="text-zinc-500"],
+.aichat-light header [class*="text-zinc-600"],
+.aichat-light header [class*="text-zinc-500"] {
+  color: #666 !important;
+}
+
+.aichat-light aside [class*="text-zinc-300"],
+.aichat-light aside [class*="text-zinc-200"],
+.aichat-light aside [class*="text-white"],
+.aichat-light header [class*="text-white"] {
+  color: #202020 !important;
+}
+
+.aichat-light form {
+  background-color: #f0f0f0 !important;
+  border-color: #e8e8e8 !important;
+}
+
+.aichat-light form button:not([type="submit"]) {
+  background-color: #e8e8e8 !important;
+  color: #555 !important;
+}
+
+.aichat-light form button:not([type="submit"]):hover {
+  background-color: #e6e6e6 !important;
+  color: #202020 !important;
+}
+
+.aichat-light form textarea {
+  color: #202020 !important;
+}
+
+.aichat-light header > div > div {
+  border-color: #e8e8e8 !important;
+}
+
+.aichat-light header > div > div button:not(.bg-\[\#3b82f6\]) {
+  color: #555 !important;
+}
+
+.aichat-light header > div > div button:not(.bg-\[\#3b82f6\]):hover {
+  background-color: #e6e6e6 !important;
+  color: #202020 !important;
+}
+
+.aichat-light section [class*="text-zinc-300"] {
+  color: #303030 !important;
+}
+
+.aichat-light section [class*="bg-[#1c1c1c]"] {
+  background-color: #f0f0f0 !important;
+  color: #202020 !important;
+}
+
+.aichat-light section [class*="border-[#2a2a2a]"],
+.aichat-light section [class*="bg-[#171717]"] {
+  border-color: #e8e8e8 !important;
+  background-color: #f0f0f0 !important;
+}
+
 .design-studio-sidebar > div.mt-auto > div {
   background-color: #101010 !important;
 }

@@ -33,6 +33,8 @@ import {
   Info,
   LogOut,
   X,
+  Moon,
+  Sun,
 } from "lucide-react";
 
 type Message = { id: number; role: "user" | "assistant"; content: string };
@@ -114,6 +116,7 @@ export default function AIChatPage() {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [hasPastedInput, setHasPastedInput] = useState(false);
+  const [isLight, setIsLight] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const chatSections = useMemo<ChatSection[]>(() => [
@@ -123,6 +126,18 @@ export default function AIChatPage() {
       label: message.role === "assistant" ? getGeneratedSection(message.content, index) : "Prompt",
     })),
   ], [messages]);
+
+  useEffect(() => {
+    setIsLight(window.localStorage.getItem("Coreforge_auth_theme") === "light");
+  }, []);
+
+  const toggleTheme = () => {
+    setIsLight((current) => {
+      const next = !current;
+      window.localStorage.setItem("Coreforge_auth_theme", next ? "light" : "dark");
+      return next;
+    });
+  };
 
   const scrollToSection = (id: string) => {
     sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -192,7 +207,7 @@ export default function AIChatPage() {
           setAccountMenuOpen(false);
         }
       }}
-      className="flex min-h-screen w-full overflow-hidden bg-[#101010] font-roboto text-white"
+      className={`aichat-page flex min-h-screen w-full overflow-hidden bg-[#101010] font-roboto text-white ${isLight ? "aichat-light" : ""}`}
     >
       {sidebarOpen && <button aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-black/60 lg:hidden" />}
       <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[60px]" : "w-[284px]"} shrink-0 flex-col bg-[#101010] p-3 transition-[width,transform] duration-300 lg:inset-y-auto lg:static lg:h-screen lg:translate-x-0`}>
@@ -309,6 +324,9 @@ export default function AIChatPage() {
             <Link href="/aicode" aria-label="Open AI Code" title="AI Code" className="hidden h-7 w-7 items-center justify-center rounded-md text-zinc-600 transition hover:bg-[#2a2a2a] hover:text-[#6ca5ff] md:flex"><Code2 size={15} strokeWidth={2.2} /></Link>
           </div>
           <div className="hidden items-center gap-2 sm:flex">
+            <button type="button" onClick={toggleTheme} aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"} title={isLight ? "Dark mode" : "Light mode"} className="grid h-8 w-8 place-items-center rounded-lg border border-[#2a2a2a] text-zinc-400 transition hover:bg-[#2a2a2a] hover:text-white">
+              {isLight ? <Moon size={15} /> : <Sun size={15} />}
+            </button>
             <Link href="/crystal" className="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-zinc-400 transition hover:border-blue-500/50 hover:text-white">Go to Studio</Link>
           </div>
         </header>
