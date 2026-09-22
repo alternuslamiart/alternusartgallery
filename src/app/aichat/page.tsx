@@ -113,6 +113,7 @@ export default function AIChatPage() {
   const [openConversationMenu, setOpenConversationMenu] = useState<string | null>(null);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [hasPastedInput, setHasPastedInput] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const chatSections = useMemo<ChatSection[]>(() => [
@@ -131,8 +132,8 @@ export default function AIChatPage() {
     const textarea = textareaRef.current;
     if (!textarea) return;
     textarea.style.height = "auto";
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 160)}px`;
-  }, [input]);
+    textarea.style.height = `${Math.min(textarea.scrollHeight, hasPastedInput ? 208 : 160)}px`;
+  }, [hasPastedInput, input]);
 
   const sendMessage = async (event?: FormEvent) => {
     event?.preventDefault();
@@ -142,6 +143,7 @@ export default function AIChatPage() {
     const userMessage: Message = { id: Date.now(), role: "user", content: message };
     setMessages((current) => [...current, userMessage]);
     setInput("");
+    setHasPastedInput(false);
     setIsSending(true);
 
     await new Promise((resolve) => window.setTimeout(resolve, 250));
@@ -353,9 +355,9 @@ export default function AIChatPage() {
           )}
         </section>
 
-        <form onSubmit={sendMessage} className="absolute bottom-6 left-1/2 flex h-12 w-[calc(100%-32px)] max-w-[640px] -translate-x-1/2 items-center gap-2 rounded-2xl border border-[#333] bg-[#282828] p-2 shadow-2xl transition focus-within:border-blue-500/60 focus-within:ring-4 focus-within:ring-blue-500/10">
+        <form onSubmit={sendMessage} className={`absolute bottom-6 left-1/2 flex w-[calc(100%-32px)] max-w-[640px] -translate-x-1/2 items-center gap-2 rounded-2xl border border-[#333] bg-[#282828] p-2 shadow-2xl transition focus-within:border-blue-500/60 focus-within:ring-4 focus-within:ring-blue-500/10 ${hasPastedInput ? "h-[240px]" : "h-12"}`}>
           <button type="button" aria-label="Attach file" onClick={() => { setToast("File attachments are available in chat."); window.setTimeout(() => setToast(null), 1800); }} className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[#3c3c3c] text-zinc-300 transition hover:bg-[#484848] hover:text-white active:scale-95"><Paperclip size={20} /></button>
-          <textarea ref={textareaRef} value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage(); } }} rows={1} placeholder="Ask Crystal anything..." className="max-h-40 min-h-9 flex-1 resize-none bg-transparent px-2 py-2 text-sm text-white outline-none placeholder:text-zinc-600" />
+          <textarea ref={textareaRef} value={input} onChange={(event) => { setInput(event.target.value); if (!event.target.value) setHasPastedInput(false); }} onPaste={(event) => { if (event.clipboardData.getData("text")) setHasPastedInput(true); }} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage(); } }} rows={1} placeholder="Ask Crystal anything..." className={`min-h-9 flex-1 resize-none bg-transparent px-2 py-2 text-sm text-white outline-none placeholder:text-zinc-600 ${hasPastedInput ? "max-h-[208px] overflow-y-auto" : "max-h-40 overflow-y-hidden"}`} />
           <button type="button" aria-label="Use microphone" className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[#3c3c3c] text-zinc-300 transition hover:bg-[#484848] hover:text-white active:scale-95"><Mic size={20} /></button>
           <button type="submit" aria-label="Send message" disabled={!input.trim() || isSending} className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[#3b82f6] text-white shadow-lg shadow-blue-500/20 transition-all hover:scale-105 hover:bg-[#2563eb] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"><ArrowUp size={20} /></button>
         </form>
