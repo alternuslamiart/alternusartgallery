@@ -52,43 +52,21 @@ const conversations = [
 const models = ["Claude", "ChatGPT", "Gemini", "Grok", "Groq", "Copilot"];
 const initialRecentItems = ["House Architecture", "Modern Interior", "Robot Concept", "Living Room Design", "New Project"];
 type ChatSection = { id: string; label: string };
-const TEST_RESPONSE = `But the main point is this:
+const TEST_RESPONSE = `A Vision of Architecture, Technology, and Human Experience
 
-A large company doesn't just buy a beautiful UI.
+Design and generate a breathtaking futuristic architectural complex called The Crystal Horizon, a monumental structure that combines modern minimalism, organic architecture, advanced engineering, and sustainable technology. The building should feel like a landmark from a distant future, yet remain believable, functional, and suitable for real-world architectural visualization.
 
-If Crystal had:
+The project is located on a vast elevated landscape overlooking a calm ocean. The site is surrounded by natural cliffs, green hills, tall grasses, reflective water surfaces, and carefully designed gardens. The architecture should create a strong connection between the building and its environment, making it appear as though it has grown naturally from the landscape rather than being placed upon it.
 
-⚡ a very fast renderer
-🤖 AI that creates/modifies 3D
-🧱 procedural modeling
-🎨 PBR/material system
-📦 professional export: GLTF, STEP, OBJ, etc.
-🖥️ a serious desktop application
-☁️ cloud collaboration
-🔌 plugin ecosystem/API
-👥 real users
-💰 recurring revenue
-🧠 technology/IP that is hard to copy
+The main structure consists of a large central tower surrounded by several interconnected architectural wings. The central tower rises approximately 180 meters above the ground and has a sculptural, elegant silhouette. Its form is inspired by the geometry of a crystal, the curvature of flowing water, and the structure of a futuristic spacecraft. The tower is not a simple rectangular skyscraper. Instead, it has a gently twisting vertical shape, with several faceted surfaces that reflect sunlight throughout the day.
 
-...then the situation changes significantly.
+The exterior facade is composed of transparent and semi-transparent glass panels, brushed titanium, polished aluminum, and large sections of white architectural concrete. The materials should have realistic physical properties, including accurate reflections, subtle roughness, natural imperfections, and physically based shading. The glass should reflect the sky, the ocean, and the surrounding landscape while remaining partially transparent in selected areas.
 
-At that point, Crystal might not just be "a piece of software"; it could become a strategic asset.
+The main entrance is located at the front of the complex and is accessed through a wide ceremonial plaza. A long pedestrian bridge extends from the landscape toward the entrance, crossing a shallow reflective pool. The bridge has a minimalist design with a floating appearance. Its structure is made of dark metal and translucent glass, with discreet integrated lighting along its edges.
 
-Autodesk, for instance, has a history of scouting for technology to integrate into its ecosystem: e.g., acquiring Solid Angle for the Arnold renderer and Wonder Dynamics for AI/VFX.
+At the end of the bridge, visitors arrive at a monumental entrance formed by two enormous curved architectural walls. These walls rise approximately 25 meters and create a dramatic gateway into the main building. Between them is a large glass entrance with automatic sliding doors. Above the entrance, a sculptural canopy extends outward like a crystalline wing, protecting visitors from rain and sunlight.
 
-And there is an even more interesting scenario.
-
-If Crystal is built in such a way that:
-
-"A person with no 3D knowledge can create a professional asset simply by describing it in text."
-
-...then Crystal could position itself not just against Blender/Maya/3ds Max, but in a brand-new category:
-
-An AI-powered 3D creation platform.
-
-This would make it far more attractive to a large company.
-
-So, yes: an exit via acquisition is a realistic goal. But first, you have to build something of strategic value—not just a product with a lot of features.`;
+The entrance plaza should include carefully arranged trees, geometric planters, elegant benches, water channels, and subtle landscape lighting. The ground is paved with large slabs of light gray natural stone, arranged in a precise geometric pattern. Some sections of the pavement should contain thin lines of illuminated glass, creating a delicate futuristic effect after sunset.`;
 
 const getGeneratedSection = (content: string, index: number): string => {
   const normalized = content.toLowerCase();
