@@ -193,7 +193,7 @@ export default function AIChatPage() {
                   key={model}
                   type="button"
                   onClick={() => setSelectedModel(model)}
-                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-[12px] transition ${selectedModel === model ? "bg-[#1c1c1c] text-white" : "text-zinc-500 hover:bg-[#181818] hover:text-zinc-200"}`}
+                  className={`flex w-full items-center gap-3 rounded-[6px] px-3 py-2 text-left text-[12px] transition-colors ${selectedModel === model ? "bg-[#1c1c1c] text-white" : "text-zinc-500 hover:rounded-[6px] hover:bg-[#181818] hover:text-zinc-200"}`}
                 >
                   <span className={`grid h-5 w-5 place-items-center rounded-md ${selectedModel === model ? "bg-blue-500/15 text-blue-400" : "bg-[#1a1a1a] text-zinc-500"}`}>
                     <Bot size={13} />
@@ -334,6 +334,6 @@ function AccountMenu({ onAction }: { onAction: (action: string) => void }) {
       <span className="text-2xl leading-none text-zinc-300">›</span>
     </div>
     <div className="h-px w-[229px] bg-[#383838]" />
-    {items.map(({ action, label, icon: Icon, arrow }) => <button key={action} role="menuitem" onClick={() => onAction(action)} className="flex h-9 min-h-9 w-[229px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left text-xs text-zinc-100 transition hover:bg-[#363636]"><Icon size={18} strokeWidth={1.8} /><span className="flex-1">{label}</span>{arrow && <span className="text-lg leading-none">›</span>}</button>)}
+    {items.map(({ action, label, icon: Icon, arrow }) => <button key={action} role="menuitem" onClick={() => onAction(action)} className="flex h-9 min-h-9 w-[229px] shrink-0 items-center gap-3 rounded-[9px] px-3 text-left text-xs text-zinc-100 transition-colors hover:rounded-[9px] hover:bg-[#363636]"><Icon size={18} strokeWidth={1.8} /><span className="flex-1">{label}</span>{arrow && <span className="text-lg leading-none">›</span>}</button>)}
   </div>;
 }
