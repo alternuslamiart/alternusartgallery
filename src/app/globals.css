@@ -3711,6 +3711,7 @@ textarea {
 
 .design-studio-sidebar {
   background: #101010 !important;
+  background-image: none !important;
 }
 
 .design-studio-sidebar a:hover,
