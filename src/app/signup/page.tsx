@@ -53,16 +53,6 @@ const socialProviders: Array<{
  },
 ];
 
-function CoreforgeMark() {
- return (
- <span className="relative inline-flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#068fff]" aria-hidden="true">
- <span className="absolute inset-[4px] rounded-full border-[3px] border-[#071014] border-r-white/0 border-t-white/0" />
- <span className="absolute right-[6px] top-[5px] h-2 w-2 rounded-full bg-[#071014]" />
- <span className="absolute left-[7px] top-[7px] h-2.5 w-2.5 rounded-full bg-[#071014]" />
- </span>
- );
-}
-
 function useAuthTheme() {
  const [isLight, setIsLight] = useState(false);
 
@@ -89,7 +79,9 @@ function useAuthTheme() {
 function Brand() {
  return (
  <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Crystal homepage" title="Go to homepage">
- <span className="auth-brand-mark inline-flex h-8 w-8 items-center justify-center rounded-lg"><CoreforgeMark /></span>
+ <span className="auth-brand-mark inline-flex h-8 w-8 items-center justify-center rounded-lg">
+ <img src="/Logopng.png" alt="Crystal homepage" className="h-8 w-8 object-contain" />
+ </span>
  <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Crystal</span>
  </Link>
  );
