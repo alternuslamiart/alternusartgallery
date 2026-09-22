@@ -3863,6 +3863,17 @@ textarea {
   background-color: #f0f0f0 !important;
 }
 
+.aichat-light section button[aria-label="Copy response"],
+.aichat-light section button[aria-label="Share response"] {
+  color: #555 !important;
+}
+
+.aichat-light section button[aria-label="Copy response"]:hover,
+.aichat-light section button[aria-label="Share response"]:hover {
+  background-color: #ddd !important;
+  color: #1d9bf0 !important;
+}
+
 .aichat-light aside a span,
 .aichat-light aside button span,
 .aichat-light aside input,
