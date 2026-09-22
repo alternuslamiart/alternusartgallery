@@ -3882,6 +3882,20 @@ textarea {
   font-weight: 500;
 }
 
+.aichat-light aside .group > button {
+  background-color: transparent !important;
+  color: #121212 !important;
+}
+
+.aichat-light aside .group > button:hover {
+  background-color: #ddd !important;
+  color: #121212 !important;
+}
+
+.aichat-light aside .group > button span[role="button"]:hover {
+  background-color: #d2d2d2 !important;
+}
+
 .aichat-light [role="menu"] {
   background-color: #fff !important;
   border: 1px solid #e7e7e7;
