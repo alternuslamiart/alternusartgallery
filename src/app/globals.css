@@ -3883,6 +3883,8 @@ textarea {
 }
 
 .aichat-page textarea {
+  font-family: var(--font-roboto), Roboto, Arial, sans-serif;
+  font-size: 12px;
   scrollbar-color: #777 transparent;
   scrollbar-width: thin;
 }
