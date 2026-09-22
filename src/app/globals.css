@@ -3380,7 +3380,7 @@
 }
 [data-coreforgetheme="dark"] .crystal-first-card,
 [data-coreforgetheme="dark"] .crystal-feature-showcase {
-  background: #262626 !important;
+  background: #1c1c1c !important;
   color: #f4f4f5;
 }
 [data-coreforgetheme="dark"] .crystal-home-surface:hover {
@@ -3436,7 +3436,7 @@
   background: #0a0a0a !important;
 }
 [data-coreforge-theme="dark"] .coreforge-page .crystal-feature-showcase {
-  background: #262626 !important;
+  background: #1c1c1c !important;
   color: #f4f4f5;
 }
 [data-coreforge-theme="dark"] .coreforge-page .crystal-first-card,
