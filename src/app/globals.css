@@ -3886,10 +3886,6 @@ textarea {
   color: #121212 !important;
 }
 
-.aichat-light [role="menu"] [class*="bg-[#363636]"] {
-  background-color: #e7e7e7 !important;
-}
-
 .aichat-light [role="menu"] [class*="text-zinc-100"],
 .aichat-light [role="menu"] [class*="text-zinc-300"],
 .aichat-light [role="menu"] [class*="text-zinc-400"] {
