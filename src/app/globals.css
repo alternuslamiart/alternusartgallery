@@ -3761,6 +3761,14 @@ textarea {
   color: #555 !important;
 }
 
+.aichat-light aside a,
+.aichat-light aside button,
+.aichat-light aside input,
+.aichat-light aside label {
+  color: #121212 !important;
+  font-weight: 500;
+}
+
 .aichat-light aside a:hover,
 .aichat-light aside button:hover,
 .aichat-light header button:hover,
@@ -3853,6 +3861,14 @@ textarea {
 .aichat-light section [class*="bg-[#171717]"] {
   border-color: #e8e8e8 !important;
   background-color: #f0f0f0 !important;
+}
+
+.aichat-light aside a span,
+.aichat-light aside button span,
+.aichat-light aside input,
+.aichat-light aside label {
+  color: #121212 !important;
+  font-weight: 500;
 }
 
 .design-studio-sidebar > div.mt-auto > div {
