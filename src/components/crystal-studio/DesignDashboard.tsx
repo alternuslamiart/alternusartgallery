@@ -56,7 +56,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
       </header>
 
       <div className="flex h-[calc(100vh-62px)] min-h-[520px] gap-1.5 bg-[#0F0F0F] p-1.5">
-        <UnifiedSidebar activePath="/design-studio" className="hidden h-full md:flex" />
+        <UnifiedSidebar activePath="/design-studio" className="design-studio-sidebar hidden h-full md:flex" />
 
         <main className="min-w-0 flex-1 overflow-y-auto rounded-[19px] bg-[#101010] px-4 py-10 sm:px-6 md:px-8 md:py-12 lg:px-10">
           <section className="mx-auto max-w-[1560px]">
@@ -68,8 +68,8 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                 Lorem ipsum dolor sit amet consectetur. Sollicitudin blandit sit augue urna.
               </p>
 
-              <div className="mt-8 w-full max-w-[487px] rounded-[15px] bg-gradient-to-r from-[#263BFF] via-[#7B24FF] to-[#FF334F] p-px shadow-[0_0_24px_rgba(73,50,255,0.28)]">
-                <div className="h-[120px] rounded-[14px] bg-[#171717] p-2">
+              <div className="mt-8 w-full max-w-[487px] rounded-[15px] border border-[#1687f7] bg-[#101010] p-2 shadow-[0_0_24px_rgba(22,135,247,0.18)]">
+                <div className="h-[104px] rounded-[8px] bg-transparent">
                   <textarea
                     value={prompt}
                     onChange={(event) => setPrompt(event.target.value)}

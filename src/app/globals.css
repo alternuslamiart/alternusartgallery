@@ -3709,6 +3709,25 @@ textarea {
   box-shadow: 0 0 0 3px rgba(66, 132, 255, 0.12);
 }
 
+.design-studio-sidebar {
+  background: #101010 !important;
+}
+
+.design-studio-sidebar a:hover,
+.design-studio-sidebar button:hover,
+.design-studio-sidebar label:hover,
+.design-studio-sidebar label:hover input {
+  background-color: #141414 !important;
+}
+
+.design-studio-sidebar label {
+  background-color: #141414 !important;
+}
+
+.design-studio-sidebar > div.mt-auto > div {
+  background-color: #101010 !important;
+}
+
 @media (max-width: 900px) {
   .coreforge-nav-shell {
     padding-inline: 16px;
