@@ -3875,6 +3875,7 @@ textarea {
   .crystal-first-card {
     width: calc(100% + 64px);
     margin-left: -32px;
+    min-height: 500px;
   }
 }
 
