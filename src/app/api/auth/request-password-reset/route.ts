@@ -2,15 +2,11 @@ import { createHmac } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
-import { consumePersistentRateLimit, rateLimitResponse } from "@/lib/persistent-rate-limit";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
  try {
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  const limit = await consumePersistentRateLimit(`password-reset:ip:${ip}`, { limit: 5, windowSeconds: 900 });
-  if (!limit.success) return NextResponse.json({ error: "Too many requests. Please try again later." }, rateLimitResponse(limit));
   const body = (await request.json()) as { email?: unknown };
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 320) {
