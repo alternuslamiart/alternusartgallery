@@ -1,4 +1,4 @@
-import { randomBytes } from "node:crypto";
+import { createHmac } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
@@ -19,17 +19,18 @@ export async function POST(request: NextRequest) {
 
   const user = await prisma.user.findFirst({ where: { email: { equals: email, mode: "insensitive" }, isActive: true } });
   if (user?.passwordHash) {
-   const token = randomBytes(32).toString("hex");
-   await prisma.verificationToken.deleteMany({ where: { identifier: `password-reset:${email}` } });
-   await prisma.verificationToken.create({ data: { identifier: `password-reset:${email}`, token, expires: new Date(Date.now() + 60 * 60 * 1000) } });
+   const expires = Date.now() + 60 * 60 * 1000;
+   const payload = Buffer.from(JSON.stringify({ email, expires }), "utf8").toString("base64url");
+   const secret = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET;
+   if (!secret) throw new Error("Password reset signing secret is not configured.");
+   const signature = createHmac("sha256", secret).update(payload).digest("base64url");
+   const token = `${payload}.${signature}`;
    try {
     const emailSent = await sendPasswordResetEmail(email, token);
     if (!emailSent) {
-     await prisma.verificationToken.deleteMany({ where: { identifier: `password-reset:${email}` } });
      return NextResponse.json({ error: "Email delivery is not configured. Please contact support." }, { status: 503 });
     }
    } catch (error) {
-    await prisma.verificationToken.deleteMany({ where: { identifier: `password-reset:${email}` } });
     console.error("[Auth] Password reset email failed:", error);
     return NextResponse.json({ error: "Could not send the reset link." }, { status: 502 });
    }
