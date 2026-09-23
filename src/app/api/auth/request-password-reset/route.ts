@@ -1,6 +1,5 @@
 import { createHmac } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
@@ -13,29 +12,29 @@ export async function POST(request: NextRequest) {
    return NextResponse.json({ error: "Please provide a valid email address." }, { status: 400 });
   }
 
-  const user = await prisma.user.findFirst({ where: { email: { equals: email, mode: "insensitive" }, isActive: true } });
-  if (user?.passwordHash) {
-   const expires = Date.now() + 60 * 60 * 1000;
-   const payload = Buffer.from(JSON.stringify({ email, expires }), "utf8").toString("base64url");
-   const secret = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || process.env.SMTP_PASS?.replace(/\s/g, "");
-   if (!secret) throw new Error("Password reset signing secret is not configured.");
-   const signature = createHmac("sha256", secret).update(payload).digest("base64url");
-   const token = `${payload}.${signature}`;
-   try {
-    const emailSent = await sendPasswordResetEmail(email, token);
-    if (!emailSent) {
-     return NextResponse.json({ error: "Email delivery is not configured. Please contact support." }, { status: 503 });
-    }
-   } catch (error) {
-    console.error("[Auth] Password reset email failed:", error);
-    const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "";
-    const message = code === "EAUTH"
-     ? "Gmail rejected the SMTP login. Use a Google App Password in SMTP_PASS, not your normal Gmail password."
-     : code === "ETIMEDOUT" || code === "ESOCKET"
-      ? "The email server could not be reached. Check SMTP_HOST, SMTP_PORT, and SMTP_SECURE."
-      : "Could not send the reset link. Check the SMTP settings in Vercel.";
-    return NextResponse.json({ error: message }, { status: 502 });
+  const expires = Date.now() + 60 * 60 * 1000;
+  const payload = Buffer.from(JSON.stringify({ email, expires }), "utf8").toString("base64url");
+  const secret = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || process.env.SMTP_PASS?.replace(/\s/g, "");
+  if (!secret) {
+   console.error("[Auth] Password reset signing secret is not configured.");
+   return NextResponse.json({ error: "Password reset is not configured. Please contact support." }, { status: 503 });
+  }
+  const signature = createHmac("sha256", secret).update(payload).digest("base64url");
+  const token = `${payload}.${signature}`;
+  try {
+   const emailSent = await sendPasswordResetEmail(email, token);
+   if (!emailSent) {
+    return NextResponse.json({ error: "Email delivery is not configured. Please contact support." }, { status: 503 });
    }
+  } catch (error) {
+   console.error("[Auth] Password reset email failed:", error);
+   const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "";
+   const message = code === "EAUTH"
+    ? "Gmail rejected the SMTP login. Use a Google App Password in SMTP_PASS, not your normal Gmail password."
+    : code === "ETIMEDOUT" || code === "ESOCKET"
+     ? "The email server could not be reached. Check SMTP_HOST, SMTP_PORT, and SMTP_SECURE."
+     : "Could not send the reset link. Check the SMTP settings in Vercel.";
+   return NextResponse.json({ error: message }, { status: 502 });
   }
   return NextResponse.json({ success: true });
  } catch (error) {
