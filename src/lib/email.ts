@@ -57,16 +57,33 @@ function getSmtpConfig() {
  return { host, user, pass, from, port, secure };
 }
 
+function createTransport(config: ReturnType<typeof getSmtpConfig>) {
+ if (!config) return null;
+ const isGmail = config.host.toLowerCase() === "smtp.gmail.com";
+ return nodemailer.createTransport(isGmail
+  ? {
+    service: "gmail",
+    auth: { user: config.user, pass: config.pass },
+    connectionTimeout: 15_000,
+    greetingTimeout: 15_000,
+    socketTimeout: 15_000,
+   }
+  : {
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    auth: { user: config.user, pass: config.pass },
+    connectionTimeout: 15_000,
+    greetingTimeout: 15_000,
+    socketTimeout: 15_000,
+   });
+}
+
 export async function sendVerificationEmail(email: string, code: string) {
  const config = getSmtpConfig();
  if (!config) return false;
-
- const transporter = nodemailer.createTransport({
-  host: config.host,
-  port: config.port,
-  secure: config.secure,
-  auth: { user: config.user, pass: config.pass },
- });
+ const transporter = createTransport(config);
+ if (!transporter) return false;
 
  await transporter.sendMail({
   from: config.from,
@@ -112,12 +129,8 @@ export async function sendPasswordResetEmail(email: string, token: string) {
  const config = getSmtpConfig();
  if (!config) return false;
  const resetUrl = `${process.env.NEXTAUTH_URL || "https://www.alternusart.com"}/reset-password?token=${encodeURIComponent(token)}`;
- const transporter = nodemailer.createTransport({
-  host: config.host,
-  port: config.port,
-  secure: config.secure,
-  auth: { user: config.user, pass: config.pass },
- });
+ const transporter = createTransport(config);
+ if (!transporter) return false;
  await transporter.sendMail({
   from: config.from,
   to: email,

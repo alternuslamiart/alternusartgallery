@@ -32,7 +32,13 @@ export async function POST(request: NextRequest) {
     }
    } catch (error) {
     console.error("[Auth] Password reset email failed:", error);
-    return NextResponse.json({ error: "Could not send the reset link. Check the SMTP_USER, SMTP_PASS, and SMTP_FROM settings in Vercel." }, { status: 502 });
+    const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "";
+    const message = code === "EAUTH"
+     ? "Gmail rejected the SMTP login. Use a Google App Password in SMTP_PASS, not your normal Gmail password."
+     : code === "ETIMEDOUT" || code === "ESOCKET"
+      ? "The email server could not be reached. Check SMTP_HOST, SMTP_PORT, and SMTP_SECURE."
+      : "Could not send the reset link. Check the SMTP settings in Vercel.";
+    return NextResponse.json({ error: message }, { status: 502 });
    }
   }
   return NextResponse.json({ success: true });
