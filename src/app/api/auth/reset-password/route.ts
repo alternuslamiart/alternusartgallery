@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
    return NextResponse.json({ error: "The reset link or password is invalid." }, { status: 400 });
   }
   const [payload, signature] = token.split(".");
-  const secret = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET;
+  const secret = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || process.env.SMTP_PASS?.replace(/\s/g, "");
   if (!payload || !signature || !secret) {
    return NextResponse.json({ error: "This reset link is invalid or has expired." }, { status: 400 });
   }

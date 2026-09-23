@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   if (user?.passwordHash) {
    const expires = Date.now() + 60 * 60 * 1000;
    const payload = Buffer.from(JSON.stringify({ email, expires }), "utf8").toString("base64url");
-   const secret = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET;
+   const secret = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || process.env.SMTP_PASS?.replace(/\s/g, "");
    if (!secret) throw new Error("Password reset signing secret is not configured.");
    const signature = createHmac("sha256", secret).update(payload).digest("base64url");
    const token = `${payload}.${signature}`;

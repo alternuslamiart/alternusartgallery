@@ -42,7 +42,7 @@ type AdminOrderPayload = {
 export async function sendVerificationEmail(email: string, code: string) {
  const host = process.env.SMTP_HOST;
  const user = process.env.SMTP_USER;
- const pass = process.env.SMTP_PASS;
+ const pass = process.env.SMTP_PASS?.replace(/\s/g, "");
  const from = process.env.SMTP_FROM || user;
 
  if (!host || !user || !pass || !from) {
@@ -78,7 +78,7 @@ export async function sendVerificationEmail(email: string, code: string) {
 export async function sendPasswordResetEmail(email: string, token: string) {
  const host = process.env.SMTP_HOST;
  const user = process.env.SMTP_USER;
- const pass = process.env.SMTP_PASS;
+ const pass = process.env.SMTP_PASS?.replace(/\s/g, "");
  const from = process.env.SMTP_FROM || user;
  if (!host || !user || !pass || !from) {
   console.error("[Email] SMTP configuration is incomplete");
