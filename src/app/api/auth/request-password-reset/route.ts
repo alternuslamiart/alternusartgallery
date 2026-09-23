@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
    } catch (error) {
     console.error("[Auth] Password reset email failed:", error);
-    return NextResponse.json({ error: "Could not send the reset link." }, { status: 502 });
+    return NextResponse.json({ error: "Could not send the reset link. Check the SMTP_USER, SMTP_PASS, and SMTP_FROM settings in Vercel." }, { status: 502 });
    }
   }
   return NextResponse.json({ success: true });

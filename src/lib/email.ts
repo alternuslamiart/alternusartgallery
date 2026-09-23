@@ -39,26 +39,37 @@ type AdminOrderPayload = {
  shippingAddress: OrderAddress;
 };
 
-export async function sendVerificationEmail(email: string, code: string) {
- const host = process.env.SMTP_HOST;
- const user = process.env.SMTP_USER;
+function getSmtpConfig() {
+ const host = process.env.SMTP_HOST?.trim();
+ const user = process.env.SMTP_USER?.trim();
  const pass = process.env.SMTP_PASS?.replace(/\s/g, "");
- const from = process.env.SMTP_FROM || user;
+ const port = Number.parseInt(process.env.SMTP_PORT?.trim() || "587", 10);
+ const secureValue = process.env.SMTP_SECURE?.trim().toLowerCase();
+ const secure = secureValue ? secureValue === "true" || secureValue === "1" : port === 465;
+ const configuredFrom = process.env.SMTP_FROM?.trim();
+ const from = host?.toLowerCase().includes("gmail") ? user : configuredFrom || user;
 
- if (!host || !user || !pass || !from) {
-  console.error("[Email] SMTP configuration is incomplete");
-  return false;
+ if (!host || !user || !pass || !from || !Number.isInteger(port)) {
+  console.error("[Email] SMTP configuration is incomplete or invalid");
+  return null;
  }
 
+ return { host, user, pass, from, port, secure };
+}
+
+export async function sendVerificationEmail(email: string, code: string) {
+ const config = getSmtpConfig();
+ if (!config) return false;
+
  const transporter = nodemailer.createTransport({
-  host,
-  port: Number(process.env.SMTP_PORT || 587),
-  secure: process.env.SMTP_SECURE === "true",
-  auth: { user, pass },
+  host: config.host,
+  port: config.port,
+  secure: config.secure,
+  auth: { user: config.user, pass: config.pass },
  });
 
  await transporter.sendMail({
-  from,
+  from: config.from,
   to: email,
   subject: `${code} is your Crystal sign-in code`,
   text: `Your Crystal sign-in code is ${code}. It expires in 10 minutes. Open Crystal Studio: https://www.alternusart.com/login`,
@@ -98,23 +109,17 @@ export async function sendVerificationEmail(email: string, code: string) {
 }
 
 export async function sendPasswordResetEmail(email: string, token: string) {
- const host = process.env.SMTP_HOST;
- const user = process.env.SMTP_USER;
- const pass = process.env.SMTP_PASS?.replace(/\s/g, "");
- const from = process.env.SMTP_FROM || user;
- if (!host || !user || !pass || !from) {
-  console.error("[Email] SMTP configuration is incomplete");
-  return false;
- }
+ const config = getSmtpConfig();
+ if (!config) return false;
  const resetUrl = `${process.env.NEXTAUTH_URL || "https://www.alternusart.com"}/reset-password?token=${encodeURIComponent(token)}`;
  const transporter = nodemailer.createTransport({
-  host,
-  port: Number(process.env.SMTP_PORT || 587),
-  secure: process.env.SMTP_SECURE === "true",
-  auth: { user, pass },
+  host: config.host,
+  port: config.port,
+  secure: config.secure,
+  auth: { user: config.user, pass: config.pass },
  });
  await transporter.sendMail({
-  from,
+  from: config.from,
   to: email,
   subject: "Reset your Crystal password",
   text: `Reset your Crystal password here: ${resetUrl}. This link expires in 1 hour.`,
