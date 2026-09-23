@@ -22,7 +22,17 @@ export async function POST(request: NextRequest) {
    const token = randomBytes(32).toString("hex");
    await prisma.verificationToken.deleteMany({ where: { identifier: `password-reset:${email}` } });
    await prisma.verificationToken.create({ data: { identifier: `password-reset:${email}`, token, expires: new Date(Date.now() + 60 * 60 * 1000) } });
-   await sendPasswordResetEmail(email, token);
+   try {
+    const emailSent = await sendPasswordResetEmail(email, token);
+    if (!emailSent) {
+     await prisma.verificationToken.deleteMany({ where: { identifier: `password-reset:${email}` } });
+     return NextResponse.json({ error: "Email delivery is not configured. Please contact support." }, { status: 503 });
+    }
+   } catch (error) {
+    await prisma.verificationToken.deleteMany({ where: { identifier: `password-reset:${email}` } });
+    console.error("[Auth] Password reset email failed:", error);
+    return NextResponse.json({ error: "Could not send the reset link." }, { status: 502 });
+   }
   }
   return NextResponse.json({ success: true });
  } catch (error) {
