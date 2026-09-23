@@ -75,6 +75,32 @@ export async function sendVerificationEmail(email: string, code: string) {
  return true;
 }
 
+export async function sendPasswordResetEmail(email: string, token: string) {
+ const host = process.env.SMTP_HOST;
+ const user = process.env.SMTP_USER;
+ const pass = process.env.SMTP_PASS;
+ const from = process.env.SMTP_FROM || user;
+ if (!host || !user || !pass || !from) {
+  console.error("[Email] SMTP configuration is incomplete");
+  return false;
+ }
+ const resetUrl = `${process.env.NEXTAUTH_URL || "https://www.alternusart.com"}/reset-password?token=${encodeURIComponent(token)}`;
+ const transporter = nodemailer.createTransport({
+  host,
+  port: Number(process.env.SMTP_PORT || 587),
+  secure: process.env.SMTP_SECURE === "true",
+  auth: { user, pass },
+ });
+ await transporter.sendMail({
+  from,
+  to: email,
+  subject: "Reset your Crystal password",
+  text: `Reset your Crystal password here: ${resetUrl}. This link expires in 1 hour.`,
+  html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;padding:32px;color:#111827"><p style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#1687f7;font-weight:700">Crystal Studio</p><h1 style="font-size:28px;margin:20px 0 8px">Reset your password</h1><p style="color:#64748b;line-height:1.6">Use the button below to create a new password for your Crystal workspace.</p><p style="margin:28px 0"><a href="${resetUrl}" style="display:inline-block;padding:13px 22px;border-radius:8px;background:#068fff;color:#fff;text-decoration:none;font-weight:700">Reset password</a></p><p style="font-size:13px;color:#64748b">This link expires in 1 hour. If you did not request it, you can safely ignore this email.</p></div>`,
+ });
+ return true;
+}
+
 export async function sendOrderConfirmationEmail(_payload: unknown) {
  return true;
 }
