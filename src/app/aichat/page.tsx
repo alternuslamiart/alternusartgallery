@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
+  ArrowRight,
   ArrowUp,
   Bot,
   Check,
@@ -42,6 +43,17 @@ type Message = { id: number; role: "user" | "assistant"; content: string };
 const models = ["Claude", "ChatGPT", "Gemini", "Grok", "Groq", "Copilot"];
 type ChatSession = { id: string; title: string; messages: Message[]; updatedAt: number };
 type ChatSection = { id: string; label: string };
+type SearchDestination = { label: string; description: string; href: string };
+type SearchResult = { type: "destination"; destination: SearchDestination } | { type: "conversation"; conversation: ChatSession };
+const searchDestinations: SearchDestination[] = [
+  { label: "AI Chat", description: "Start a conversation with Crystal", href: "/aichat" },
+  { label: "Crystal Studio", description: "Open the 3D design workspace", href: "/crystal" },
+  { label: "Infrastructure Studio", description: "Plan roads, utilities, and public spaces", href: "/infrastructure" },
+  { label: "Architecture plans", description: "Create and organize floor plans", href: "/archplan" },
+  { label: "Design Studio", description: "Explore visual design tools", href: "/design-studio" },
+  { label: "AI Code", description: "Build with the AI code workspace", href: "/aicode" },
+  { label: "Projects", description: "Browse your workspace projects", href: "/project" },
+];
 const TEST_RESPONSE = `A Vision of Architecture, Technology, and Human Experience
 
 Design and generate a breathtaking futuristic architectural complex called The Crystal Horizon, a monumental structure that combines modern minimalism, organic architecture, advanced engineering, and sustainable technology. The building should feel like a landmark from a distant future, yet remain believable, functional, and suitable for real-world architectural visualization.
@@ -78,6 +90,8 @@ export default function AIChatPage() {
   const [selectedModel, setSelectedModel] = useState("Gemini");
   const [modelsOpen, setModelsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [activeSearchResult, setActiveSearchResult] = useState(0);
   const [mode, setMode] = useState<"chat" | "workflow">("chat");
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [sessionsLoaded, setSessionsLoaded] = useState(false);
@@ -89,6 +103,7 @@ export default function AIChatPage() {
   const [isLight, setIsLight] = useState(false);
   const { data: session, status: sessionStatus } = useSession();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const chatSections = useMemo<ChatSection[]>(() => [
     { id: "header", label: "Header" },
@@ -97,6 +112,18 @@ export default function AIChatPage() {
       label: message.role === "assistant" ? getGeneratedSection(message.content, index) : "Prompt",
     })),
   ], [messages]);
+  const searchResults = useMemo<SearchResult[]>(() => {
+    const query = search.trim().toLowerCase();
+    const destinations = searchDestinations
+      .filter((destination) => !query || `${destination.label} ${destination.description}`.toLowerCase().includes(query))
+      .map((destination): SearchResult => ({ type: "destination", destination }));
+    const conversations = [...chatSessions]
+      .sort((first, second) => second.updatedAt - first.updatedAt)
+      .filter((conversation) => !query || `${conversation.title} ${conversation.messages.map((message) => message.content).join(" ")}`.toLowerCase().includes(query))
+      .slice(0, 8)
+      .map((conversation): SearchResult => ({ type: "conversation", conversation }));
+    return [...destinations, ...conversations];
+  }, [chatSessions, search]);
 
   useEffect(() => {
     if (sessionStatus === "loading") return;
@@ -146,6 +173,34 @@ export default function AIChatPage() {
     textarea.style.height = "auto";
     textarea.style.height = `${Math.min(textarea.scrollHeight, hasPastedInput ? 208 : 160)}px`;
   }, [hasPastedInput, input]);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    searchInputRef.current?.focus();
+    setActiveSearchResult(0);
+  }, [searchOpen]);
+
+  useEffect(() => {
+    const handleSearchShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setSearchOpen((open) => !open);
+      } else if (event.key === "Escape" && searchOpen) {
+        setSearchOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleSearchShortcut);
+    return () => window.removeEventListener("keydown", handleSearchShortcut);
+  }, [searchOpen]);
+
+  const selectSearchResult = (result: SearchResult) => {
+    if (result.type === "conversation") {
+      openChat(result.conversation);
+    } else {
+      window.location.href = result.destination.href;
+    }
+    setSearchOpen(false);
+  };
 
   const sendMessage = async (event?: FormEvent) => {
     event?.preventDefault();
@@ -244,11 +299,11 @@ export default function AIChatPage() {
         </div>
 
         {!sidebarCollapsed && <div className="flex min-h-0 flex-1 flex-col">
-          <label className="mt-4 flex h-9 items-center gap-2 rounded-xl border border-[#2a2a2a] bg-[#141414] px-3 text-zinc-500 focus-within:border-blue-500/60">
+          <button type="button" onClick={() => setSearchOpen(true)} className="mt-4 flex h-9 w-full items-center gap-2 rounded-xl border border-[#2a2a2a] bg-[#141414] px-3 text-left text-zinc-500 transition hover:border-blue-500/40 hover:bg-[#191c22] hover:text-zinc-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500">
             <Search size={14} />
-            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search" className="min-w-0 flex-1 bg-transparent text-xs text-white outline-none placeholder:text-zinc-600" />
+            <span className="min-w-0 flex-1 text-xs">Search chats, tools, pages...</span>
             <kbd className="rounded border border-[#2a2a2a] px-1.5 py-0.5 text-[9px] text-zinc-600">⌘K</kbd>
-          </label>
+          </button>
 
           <nav className="mt-5 space-y-1">
             <Link href="/archplan" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-zinc-300 transition hover:bg-[#1c1c1c] hover:text-white"><FolderPlus size={16} className="text-zinc-500" /> New Project</Link>
@@ -323,7 +378,7 @@ export default function AIChatPage() {
               <Link href="/platform/bridges" aria-label="Plugin" title="Plugin" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Plug size={16} /></Link>
               <span className="my-1 h-px w-6 bg-[#2a2a2a]" />
               <button type="button" onClick={() => setModelsOpen(true)} aria-label="AI models" title="AI models" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Bot size={16} /></button>
-              <button type="button" onClick={() => setSearch("")} aria-label="Search" title="Search" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Search size={16} /></button>
+              <button type="button" onClick={() => setSearchOpen(true)} aria-label="Search" title="Search" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Search size={16} /></button>
             </nav>
             <div className="mt-auto flex flex-col items-center gap-3">
               <Link href="/account" aria-label="Open account" className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</Link>
@@ -399,6 +454,43 @@ export default function AIChatPage() {
           <button type="submit" aria-label="Send message" disabled={!input.trim() || isSending} className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[#3b82f6] text-white shadow-lg shadow-blue-500/20 transition-all hover:scale-105 hover:bg-[#2563eb] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"><ArrowUp size={20} /></button>
         </form>
       </main>
+      {searchOpen && <div className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-[#05070b]/75 px-4 pb-8 pt-[min(12vh,88px)] backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) setSearchOpen(false); }}>
+        <section role="dialog" aria-modal="true" aria-label="Search Crystal" className={`w-full max-w-[720px] overflow-hidden rounded-[20px] border shadow-[0_32px_100px_rgba(0,0,0,.55)] ${isLight ? "border-[#d9e1ed] bg-white text-[#171b24]" : "border-white/[0.09] bg-[#111419] text-[#eef2f8]"}`}>
+          <div className={`flex h-[68px] items-center gap-3 border-b px-5 ${isLight ? "border-[#e8edf4]" : "border-white/[0.08]"}`}>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-blue-500/10 text-blue-400"><Search size={18} /></span>
+            <input ref={searchInputRef} value={search} onChange={(event) => { setSearch(event.target.value); setActiveSearchResult(0); }} onKeyDown={(event) => {
+              if (event.key === "ArrowDown") { event.preventDefault(); setActiveSearchResult((index) => Math.min(index + 1, searchResults.length - 1)); }
+              if (event.key === "ArrowUp") { event.preventDefault(); setActiveSearchResult((index) => Math.max(0, index - 1)); }
+              if (event.key === "Enter" && searchResults[activeSearchResult]) { event.preventDefault(); selectSearchResult(searchResults[activeSearchResult]); }
+            }} placeholder="Search conversations, tools, and Crystal..." className={`min-w-0 flex-1 bg-transparent text-[15px] font-medium outline-none placeholder:font-normal ${isLight ? "text-[#171b24] placeholder:text-[#8a94a4]" : "text-white placeholder:text-zinc-500"}`} />
+            <button type="button" onClick={() => setSearchOpen(false)} aria-label="Close search" className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition ${isLight ? "bg-[#f1f4f8] text-[#6b7482] hover:bg-[#e7edf5]" : "bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] hover:text-white"}`}>ESC</button>
+          </div>
+          {!search.trim() && <div className={`border-b px-5 py-4 ${isLight ? "border-[#e8edf4] bg-[#fafcff]" : "border-white/[0.07] bg-[#0d1014]"}`}>
+            <div className={`mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] ${isLight ? "text-[#8792a2]" : "text-zinc-500"}`}>Quick access</div>
+            <div className="flex flex-wrap gap-2">
+              {searchDestinations.slice(0, 4).map((destination) => <button key={destination.href} type="button" onClick={() => { window.location.href = destination.href; setSearchOpen(false); }} className={`rounded-full border px-3 py-2 text-[12px] font-medium transition ${isLight ? "border-[#e1e7f0] bg-white text-[#4d5969] hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" : "border-white/[0.08] bg-white/[0.025] text-zinc-300 hover:border-blue-400/40 hover:bg-blue-500/10 hover:text-blue-200"}`}>{destination.label}</button>)}
+            </div>
+          </div>}
+          <div className="max-h-[min(58vh,480px)] overflow-y-auto p-3">
+            <div className={`px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${isLight ? "text-[#8792a2]" : "text-zinc-500"}`}>{search.trim() ? "Search results" : "Explore Crystal"}</div>
+            {searchResults.length ? <div className="space-y-1">
+              {searchResults.map((result, index) => {
+                const label = result.type === "conversation" ? result.conversation.title : result.destination.label;
+                const description = result.type === "conversation" ? `${result.conversation.messages.length} messages · Open conversation` : result.destination.description;
+                return <button key={`${result.type}-${result.type === "conversation" ? result.conversation.id : result.destination.href}`} type="button" onMouseEnter={() => setActiveSearchResult(index)} onClick={() => selectSearchResult(result)} className={`flex min-h-[56px] w-full items-center gap-3 rounded-xl px-3 text-left transition ${index === activeSearchResult ? (isLight ? "bg-[#edf4ff] text-[#14243c]" : "bg-blue-500/[0.12] text-white") : (isLight ? "text-[#293241] hover:bg-[#f4f7fb]" : "text-zinc-200 hover:bg-white/[0.045]")}`}>
+                  <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${isLight ? "bg-white text-blue-600 shadow-sm" : "bg-white/[0.06] text-blue-300"}`}>{result.type === "conversation" ? <Sparkles size={16} /> : <ArrowRight size={16} />}</span>
+                  <span className="min-w-0 flex-1"><span className="block truncate text-[13px] font-semibold">{label}</span><span className={`mt-0.5 block truncate text-[12px] ${isLight ? "text-[#738094]" : "text-zinc-500"}`}>{description}</span></span>
+                  <span className={`text-[10px] font-medium ${isLight ? "text-[#8a94a4]" : "text-zinc-600"}`}>{result.type === "conversation" ? "CHAT" : "OPEN"}</span>
+                </button>;
+              })}
+            </div> : <div className={`flex min-h-36 flex-col items-center justify-center gap-2 text-center ${isLight ? "text-[#7d8796]" : "text-zinc-500"}`}><Search size={20} /><p className="text-[13px]">No results. Try another search.</p></div>}
+          </div>
+          <div className={`flex h-11 items-center justify-between border-t px-5 text-[11px] ${isLight ? "border-[#e8edf4] bg-[#fafcff] text-[#7d8796]" : "border-white/[0.07] bg-[#0d1014] text-zinc-500"}`}>
+            <span><kbd className={`rounded px-1.5 py-1 font-semibold ${isLight ? "bg-white text-[#667184]" : "bg-white/[0.06] text-zinc-400"}`}>↑</kbd> <kbd className={`rounded px-1.5 py-1 font-semibold ${isLight ? "bg-white text-[#667184]" : "bg-white/[0.06] text-zinc-400"}`}>↓</kbd> Navigate <span className="mx-2">·</span> <kbd className={`rounded px-1.5 py-1 font-semibold ${isLight ? "bg-white text-[#667184]" : "bg-white/[0.06] text-zinc-400"}`}>↵</kbd> Select</span>
+            <span className="font-medium">Crystal Search</span>
+          </div>
+        </section>
+      </div>}
       {toast && <div role="status" className="fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 rounded-lg border border-[#2a2a2a] bg-[#242424] px-4 py-2 text-xs text-white shadow-xl">{toast}</div>}
     </div>
   );
