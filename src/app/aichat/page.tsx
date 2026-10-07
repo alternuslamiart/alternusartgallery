@@ -288,7 +288,11 @@ export default function AIChatPage() {
     >
       {sidebarOpen && <button aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-black/60 lg:hidden" />}
       <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[60px]" : "w-[284px]"} shrink-0 flex-col bg-[#101010] p-3 transition-[width,transform] duration-300 lg:inset-y-auto lg:static lg:h-screen lg:translate-x-0`}>
-        <div className={`relative flex items-center rounded-xl px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-end"}`}>
+        <div className={`relative flex items-center rounded-xl px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
+          {!sidebarCollapsed && <Link href="/aichat" aria-label="Crystal AI Chat" className="flex items-center gap-3 rounded-lg text-lg font-semibold tracking-tight text-white transition hover:opacity-80">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><img src="/Logopng.png" alt="" className="h-5 w-5 object-contain brightness-0 invert" /></span>
+            Crystal
+          </Link>}
           <button type="button" onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!sidebarCollapsed} className="hidden h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400 lg:grid">{sidebarCollapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}</button>
           <button onClick={() => setSidebarOpen(false)} aria-label="Close sidebar" className="absolute right-0 rounded-lg p-2 text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white lg:hidden"><X size={18} /></button>
         </div>
@@ -348,10 +352,6 @@ export default function AIChatPage() {
               </div>)}
             </div>
           </div>
-          <Link href="/aichat" aria-label="Crystal AI Chat" className="mb-3 flex items-center gap-3 rounded-xl px-2 py-2 text-lg font-semibold tracking-tight text-white transition hover:bg-[#1c1c1c]">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><img src="/Logopng.png" alt="" className="h-5 w-5 object-contain brightness-0 invert" /></span>
-            Crystal
-          </Link>
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-[#2a2a2a] bg-[#141414] p-2.5">
             <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</span>
             <Link href="/account" className="min-w-0 flex-1"><span className="block truncate text-xs text-zinc-200">Crystal User</span><span className="block truncate text-[10px] text-zinc-600">you@alternusart.com</span></Link>
