@@ -459,7 +459,7 @@ export default function AIChatPage() {
         </form>
       </main>
       {searchOpen && <div className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-[#05070b]/75 px-4 pb-8 pt-[min(12vh,88px)] backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) setSearchOpen(false); }}>
-        <section role="dialog" aria-modal="true" aria-label="Search Crystal" className={`w-full max-w-[720px] overflow-hidden rounded-[20px] border shadow-[0_32px_100px_rgba(0,0,0,.55)] ${isLight ? "border-[#d9e1ed] bg-white text-[#171b24]" : "border-white/[0.09] bg-[#111419] text-[#eef2f8]"}`}>
+        <section role="dialog" aria-modal="true" aria-label="Search Crystal" className={`w-full max-w-[720px] overflow-hidden rounded-[20px] border shadow-[0_32px_100px_rgba(0,0,0,.55)] ${isLight ? "border-[#d9e1ed] bg-white text-[#171b24]" : "border-white/[0.09] bg-[#1a1a1a] text-[#eef2f8]"}`}>
           <div className={`flex h-[68px] items-center gap-3 border-b px-5 ${isLight ? "border-[#e8edf4]" : "border-white/[0.08]"}`}>
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-blue-500/10 text-blue-400"><Search size={18} /></span>
             <input ref={searchInputRef} value={search} onChange={(event) => { setSearch(event.target.value); setActiveSearchResult(0); }} onKeyDown={(event) => {
@@ -469,7 +469,7 @@ export default function AIChatPage() {
             }} placeholder="Search conversations, tools, and Crystal..." className={`min-w-0 flex-1 bg-transparent text-[15px] font-medium outline-none placeholder:font-normal ${isLight ? "text-[#171b24] placeholder:text-[#8a94a4]" : "text-white placeholder:text-zinc-500"}`} />
             <button type="button" onClick={() => setSearchOpen(false)} aria-label="Close search" className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition ${isLight ? "bg-[#f1f4f8] text-[#6b7482] hover:bg-[#e7edf5]" : "bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] hover:text-white"}`}>ESC</button>
           </div>
-          {!search.trim() && <div className={`border-b px-5 py-4 ${isLight ? "border-[#e8edf4] bg-[#fafcff]" : "border-white/[0.07] bg-[#0d1014]"}`}>
+          {!search.trim() && <div className={`border-b px-5 py-4 ${isLight ? "border-[#e8edf4] bg-[#fafcff]" : "border-white/[0.07] bg-[#141414]"}`}>
             <div className={`mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] ${isLight ? "text-[#8792a2]" : "text-zinc-500"}`}>Quick access</div>
             <div className="flex flex-wrap gap-2">
               {searchDestinations.slice(0, 4).map((destination) => <button key={destination.href} type="button" onClick={() => { window.location.href = destination.href; setSearchOpen(false); }} className={`rounded-full border px-3 py-2 text-[12px] font-medium transition ${isLight ? "border-[#e1e7f0] bg-white text-[#4d5969] hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700" : "border-white/[0.08] bg-white/[0.025] text-zinc-300 hover:border-blue-400/40 hover:bg-blue-500/10 hover:text-blue-200"}`}>{destination.label}</button>)}
@@ -489,7 +489,7 @@ export default function AIChatPage() {
               })}
             </div> : <div className={`flex min-h-36 flex-col items-center justify-center gap-2 text-center ${isLight ? "text-[#7d8796]" : "text-zinc-500"}`}><Search size={20} /><p className="text-[13px]">No results. Try another search.</p></div>}
           </div>
-          <div className={`flex h-11 items-center justify-between border-t px-5 text-[11px] ${isLight ? "border-[#e8edf4] bg-[#fafcff] text-[#7d8796]" : "border-white/[0.07] bg-[#0d1014] text-zinc-500"}`}>
+          <div className={`flex h-11 items-center justify-between border-t px-5 text-[11px] ${isLight ? "border-[#e8edf4] bg-[#fafcff] text-[#7d8796]" : "border-white/[0.07] bg-[#141414] text-zinc-500"}`}>
             <span><kbd className={`rounded px-1.5 py-1 font-semibold ${isLight ? "bg-white text-[#667184]" : "bg-white/[0.06] text-zinc-400"}`}>↑</kbd> <kbd className={`rounded px-1.5 py-1 font-semibold ${isLight ? "bg-white text-[#667184]" : "bg-white/[0.06] text-zinc-400"}`}>↓</kbd> Navigate <span className="mx-2">·</span> <kbd className={`rounded px-1.5 py-1 font-semibold ${isLight ? "bg-white text-[#667184]" : "bg-white/[0.06] text-zinc-400"}`}>↵</kbd> Select</span>
             <span className="font-medium">Crystal Search</span>
           </div>
