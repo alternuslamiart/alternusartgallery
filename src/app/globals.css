@@ -3656,13 +3656,14 @@ textarea {
   transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
 }
 
-.coreforge-nav-login:hover,
 .coreforge-nav > a[href="/download"]:hover {
   background: rgba(66, 132, 255, 0.08);
   border-color: rgba(66, 132, 255, 0.56) !important;
   transform: translateY(-1px);
 }
 
+.coreforge-nav-login:hover,
+.coreforge-nav-login:focus-visible,
 .coreforge-nav-theme-toggle:hover,
 .coreforge-nav-theme-toggle:focus-visible,
 .coreforge-nav-ai-chat:hover,
@@ -3673,6 +3674,8 @@ textarea {
   transform: translateY(-1px);
 }
 
+[data-coreforgetheme="dark"] .coreforge-nav-login:hover,
+[data-coreforgetheme="dark"] .coreforge-nav-login:focus-visible,
 [data-coreforgetheme="dark"] .coreforge-nav-theme-toggle:hover,
 [data-coreforgetheme="dark"] .coreforge-nav-theme-toggle:focus-visible,
 [data-coreforgetheme="dark"] .coreforge-nav-ai-chat:hover,
@@ -3680,6 +3683,7 @@ textarea {
   color: #9dbdff !important;
 }
 
+.coreforge-nav-login:focus-visible,
 .coreforge-nav-theme-toggle:focus-visible,
 .coreforge-nav-ai-chat:focus-visible {
   outline: 2px solid rgba(66, 132, 255, 0.68);
