@@ -3651,11 +3651,39 @@ textarea {
   transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
 }
 
+.coreforge-nav-theme-toggle,
+.coreforge-nav-ai-chat {
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
 .coreforge-nav-login:hover,
 .coreforge-nav > a[href="/download"]:hover {
   background: rgba(66, 132, 255, 0.08);
   border-color: rgba(66, 132, 255, 0.56) !important;
   transform: translateY(-1px);
+}
+
+.coreforge-nav-theme-toggle:hover,
+.coreforge-nav-theme-toggle:focus-visible,
+.coreforge-nav-ai-chat:hover,
+.coreforge-nav-ai-chat:focus-visible {
+  background: rgba(66, 132, 255, 0.1) !important;
+  border-color: rgba(66, 132, 255, 0.56) !important;
+  color: #1e5ed4 !important;
+  transform: translateY(-1px);
+}
+
+[data-coreforgetheme="dark"] .coreforge-nav-theme-toggle:hover,
+[data-coreforgetheme="dark"] .coreforge-nav-theme-toggle:focus-visible,
+[data-coreforgetheme="dark"] .coreforge-nav-ai-chat:hover,
+[data-coreforgetheme="dark"] .coreforge-nav-ai-chat:focus-visible {
+  color: #9dbdff !important;
+}
+
+.coreforge-nav-theme-toggle:focus-visible,
+.coreforge-nav-ai-chat:focus-visible {
+  outline: 2px solid rgba(66, 132, 255, 0.68);
+  outline-offset: 2px;
 }
 
 .coreforge-nav-cta {
