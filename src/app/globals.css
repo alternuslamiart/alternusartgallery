@@ -5613,3 +5613,295 @@ textarea {
       linear-gradient(110deg, #1f0ade 0%, #0c8ce9 25%, #ff6e5b 52%, #21b803 76%, #0094ff 100%) border-box !important;
   }
 }
+
+/* Refined dark workspace controls for modeling and infrastructure studios. */
+@media (min-width: 701px) {
+  .crystal-modeling-mode .crystal-modeling-sidebar,
+  .crystal-modeling-mode .crystal-right-panel,
+  .crystal-infrastructure-page > aside {
+    background: #111316 !important;
+    border: 0 !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.2) !important;
+    color: #e1e5eb;
+    scrollbar-color: #3b414b transparent;
+    scrollbar-width: thin;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-sidebar {
+    display: flex !important;
+    flex-direction: column;
+    overflow: hidden !important;
+    padding: 16px 14px !important;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-sidebar .crystal-reference-tabs {
+    flex: 0 0 40px;
+    margin-inline: -14px;
+    padding-inline: 14px;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-sidebar .crystal-reference-tree {
+    flex: 0 1 auto;
+    max-height: min(28vh, 220px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: #3b414b transparent;
+    scrollbar-width: thin;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-sidebar .crystal-modeling-properties {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: #3b414b transparent;
+    scrollbar-width: thin;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-sidebar > header {
+    flex: 0 0 40px;
+    height: 40px !important;
+    padding: 0 2px 8px !important;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-sidebar .crystal-scene-title {
+    flex: 0 0 40px;
+    font-size: 14px !important;
+    font-weight: 600;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-sidebar .crystal-reference-search {
+    flex: 0 0 36px;
+  }
+
+  .crystal-modeling-mode .crystal-reference-search input,
+  .crystal-modeling-mode .crystal-reference-tree-row,
+  .crystal-modeling-mode .crystal-modeling-properties label,
+  .crystal-modeling-mode .crystal-modeling-properties .crystal-property-toggle,
+  .crystal-modeling-mode .crystal-modeling-properties h3 + div button,
+  .crystal-modeling-mode .crystal-right-panel,
+  .crystal-infrastructure-page > aside {
+    font-size: 13px !important;
+  }
+
+  .crystal-modeling-mode .crystal-reference-tree-row {
+    height: 36px !important;
+    gap: 8px;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+
+  .crystal-modeling-mode .crystal-reference-tree-row:hover,
+  .crystal-modeling-mode .crystal-modeling-properties button:hover,
+  .crystal-modeling-mode .crystal-modeling-properties select:hover,
+  .crystal-modeling-mode .crystal-right-panel button:hover {
+    background-color: #20252d !important;
+    color: #f3f6fb !important;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-properties {
+    margin: 12px -14px 0 !important;
+    padding: 0 14px 12px !important;
+    border-top-color: rgba(255, 255, 255, 0.09) !important;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-properties h2 {
+    margin-top: 14px !important;
+    color: #f1f4f8 !important;
+    font-size: 15px !important;
+    font-weight: 600;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-properties h3 {
+    margin-top: 16px !important;
+    color: #c5cbd4 !important;
+    font-size: 13px !important;
+    font-weight: 600;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-properties label {
+    min-height: 40px !important;
+    color: #d8dde5 !important;
+    font-weight: 500;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-properties select,
+  .crystal-modeling-mode .crystal-modeling-properties h3 + div button {
+    min-height: 32px;
+    font-size: 13px !important;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-properties h3 + div {
+    gap: 4px;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-properties h3 + div button {
+    height: 32px !important;
+    border-radius: 7px;
+    background: #1b1f25;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-properties .crystal-property-toggle {
+    min-height: 36px !important;
+    border-radius: 7px;
+    padding-inline: 8px;
+    font-weight: 500;
+  }
+
+  .crystal-modeling-mode .crystal-right-panel {
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    padding: 18px !important;
+  }
+
+  .crystal-modeling-mode .crystal-right-panel button,
+  .crystal-modeling-mode .crystal-topbar button,
+  .crystal-modeling-mode .crystal-topbar a {
+    min-height: 32px;
+    font-size: 13px !important;
+    font-weight: 500;
+  }
+
+  .crystal-modeling-mode .crystal-topbar {
+    height: 60px !important;
+    border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+    background: rgba(12, 13, 15, 0.96) !important;
+  }
+
+  .crystal-modeling-mode .crystal-topbar .crystal-menu-item {
+    height: 36px !important;
+    border-radius: 8px;
+    padding-inline: 12px;
+  }
+
+  .crystal-modeling-mode .crystal-topbar [role="group"] {
+    height: 40px;
+    gap: 2px;
+    padding: 4px;
+    border: 0;
+    background: #191c21;
+  }
+
+  .crystal-modeling-mode .crystal-topbar [role="group"] button,
+  .crystal-modeling-mode .crystal-topbar [role="group"] a {
+    height: 32px !important;
+    border-radius: 7px !important;
+    padding-inline: 12px;
+  }
+
+  .crystal-modeling-mode .crystal-modeling-tools {
+    background: rgba(17, 19, 22, 0.96) !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+  }
+
+  .crystal-modeling-mode .crystal-modeling-tools button {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 8px !important;
+  }
+
+  .crystal-infrastructure-page > aside {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    padding: 16px !important;
+    gap: 8px;
+  }
+
+  .crystal-infrastructure-page > aside:first-of-type > div:first-child {
+    margin-bottom: 8px !important;
+  }
+
+  .crystal-infrastructure-page > aside:first-of-type > div.max-h-\[52vh\] {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+
+  .crystal-infrastructure-page > aside:first-of-type > div.max-h-\[52vh\] button {
+    min-height: 36px;
+    padding-block: 6px;
+    font-size: 13px !important;
+    font-weight: 500;
+  }
+
+  .crystal-infrastructure-page > aside:first-of-type > div:nth-child(2) {
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    font-size: 14px !important;
+    font-weight: 600;
+  }
+
+  .crystal-infrastructure-page > aside:first-of-type > div.max-h-\[52vh\] button:hover,
+  .crystal-infrastructure-page > aside:first-of-type > div.max-h-\[52vh\] button:focus-visible,
+  .crystal-infrastructure-page > aside:last-of-type button:hover,
+  .crystal-infrastructure-page > aside:last-of-type button:focus-visible {
+    background-color: rgba(66, 132, 255, 0.14) !important;
+    color: #eaf2ff !important;
+  }
+
+  .crystal-infrastructure-page > aside:first-of-type > div:nth-child(2),
+  .crystal-infrastructure-page > aside:first-of-type > div:nth-child(5),
+  .crystal-infrastructure-page > aside:last-of-type > div.space-y-2 > div {
+    border: 0 !important;
+    background: #191c21 !important;
+    box-shadow: none !important;
+  }
+
+  .crystal-infrastructure-page > aside:first-of-type > div:nth-child(6) {
+    border: 0 !important;
+    background: #191c21 !important;
+    box-shadow: none !important;
+  }
+
+  .crystal-infrastructure-page > aside:first-of-type > p,
+  .crystal-infrastructure-page > aside:last-of-type p {
+    font-size: 13px !important;
+    font-weight: 500;
+  }
+
+  .crystal-infrastructure-page > aside:last-of-type > div.space-y-2 > div p:first-child {
+    font-size: 14px !important;
+    font-weight: 600;
+    color: #e6eaf0 !important;
+  }
+
+  .crystal-infrastructure-page > aside:last-of-type > div.space-y-2 > div p + p {
+    font-size: 13px !important;
+    line-height: 1.5;
+    color: #aab2bf !important;
+  }
+
+  .crystal-infrastructure-page > aside:last-of-type > div.space-y-2 > button > span > span:first-child {
+    font-size: 13px !important;
+    font-weight: 600;
+    color: #e1e5eb !important;
+  }
+
+  .crystal-infrastructure-page > aside:last-of-type > div.space-y-2 > button > span > span + span {
+    font-size: 13px !important;
+    line-height: 1.45;
+    color: #aab2bf !important;
+  }
+
+  .crystal-infrastructure-page > aside:last-of-type button {
+    min-height: 32px;
+    font-size: 13px !important;
+  }
+
+  .crystal-infrastructure-page .crystal-infrastructure-tools button {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 8px !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .crystal-modeling-mode .crystal-modeling-sidebar .crystal-reference-tree,
+  .crystal-modeling-mode .crystal-modeling-sidebar .crystal-modeling-properties,
+  .crystal-modeling-mode .crystal-right-panel,
+  .crystal-infrastructure-page > aside {
+    scroll-behavior: smooth;
+  }
+}
