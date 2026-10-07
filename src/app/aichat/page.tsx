@@ -17,6 +17,7 @@ import {
   Menu,
   Mic,
   MoreHorizontal,
+  PanelLeftClose,
   PanelLeftOpen,
   Plus,
   Paperclip,
@@ -287,14 +288,16 @@ export default function AIChatPage() {
     >
       {sidebarOpen && <button aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-black/60 lg:hidden" />}
       <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[60px]" : "w-[284px]"} shrink-0 flex-col bg-[#101010] p-3 transition-[width,transform] duration-300 lg:inset-y-auto lg:static lg:h-screen lg:translate-x-0`}>
-        <div className={`relative flex items-center rounded-xl px-2 py-2 ${sidebarCollapsed ? "flex-col justify-center gap-2" : "justify-center"}`}>
+        <div className={`relative flex items-center rounded-xl px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-start gap-3"}`}>
           {sidebarCollapsed
-            ? <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><img src="/Logopng.png" alt="Crystal" className="h-5 w-5 object-contain brightness-0 invert" /></span>
-            : <button type="button" onClick={() => setSidebarCollapsed(true)} aria-label="Collapse sidebar" title="Collapse sidebar" aria-expanded="true" className="flex items-center gap-3 rounded-lg text-lg font-semibold tracking-tight text-white transition hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-400">
+            ? <button type="button" onClick={() => setSidebarCollapsed(false)} aria-label="Expand sidebar" title="Expand sidebar" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400"><PanelLeftOpen size={17} /></button>
+            : <>
+              <button type="button" onClick={() => setSidebarCollapsed(true)} aria-label="Collapse sidebar" title="Collapse sidebar" aria-expanded="true" className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400"><PanelLeftClose size={17} /></button>
+              <Link href="/aichat" aria-label="Crystal AI Chat" className="flex items-center gap-3 rounded-lg text-lg font-semibold tracking-tight text-white transition hover:opacity-80">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><img src="/Logopng.png" alt="" className="h-5 w-5 object-contain brightness-0 invert" /></span>
                 Crystal
-              </button>}
-          {sidebarCollapsed && <button type="button" onClick={() => setSidebarCollapsed(false)} aria-label="Expand sidebar" title="Expand sidebar" className="grid h-7 w-7 place-items-center rounded-md text-zinc-400 transition hover:bg-[#1c1c1c] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400"><PanelLeftOpen size={16} /></button>}
+              </Link>
+            </>}
           <button onClick={() => setSidebarOpen(false)} aria-label="Close sidebar" className="absolute right-0 rounded-lg p-2 text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white lg:hidden"><X size={18} /></button>
         </div>
 
@@ -382,6 +385,7 @@ export default function AIChatPage() {
             </nav>
             <div className="mt-auto flex flex-col items-center gap-3">
               <Link href="/account" aria-label="Open account" className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</Link>
+              <span aria-hidden="true" className="grid h-8 w-8 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><img src="/Logopng.png" alt="" className="h-4 w-4 object-contain brightness-0 invert" /></span>
             </div>
           </div>
         )}
