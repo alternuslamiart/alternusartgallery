@@ -234,8 +234,8 @@ export default function AIChatPage() {
       {sidebarOpen && <button aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-black/60 lg:hidden" />}
       <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[60px]" : "w-[284px]"} shrink-0 flex-col bg-[#101010] p-3 transition-[width,transform] duration-300 lg:inset-y-auto lg:static lg:h-screen lg:translate-x-0`}>
         <div className={`flex items-center rounded-xl px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
-          <Link href="/aichat" aria-label="Crystal AI Chat" className={`flex items-center gap-3 text-lg font-semibold tracking-tight text-white ${sidebarCollapsed ? "mx-auto" : ""}`}>
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><img src="/Logopng.png" alt="" className="h-5 w-5 object-contain brightness-0 invert" /></span>
+          <Link href="/aichat" onClick={(event) => { if (sidebarCollapsed) { event.preventDefault(); setSidebarCollapsed(false); } }} aria-label={sidebarCollapsed ? "Expand sidebar" : "Crystal AI Chat"} title={sidebarCollapsed ? "Expand sidebar" : undefined} className={`group flex items-center gap-3 text-lg font-semibold tracking-tight text-white ${sidebarCollapsed ? "mx-auto" : ""}`}>
+            <span className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><img src="/Logopng.png" alt="" className={`h-5 w-5 object-contain brightness-0 invert transition-opacity ${sidebarCollapsed ? "group-hover:opacity-0 group-focus-visible:opacity-0" : ""}`} />{sidebarCollapsed && <PanelLeftOpen aria-hidden="true" size={17} className="absolute opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />}</span>
             {!sidebarCollapsed && "Crystal"}
           </Link>
           <button onClick={() => setSidebarCollapsed((value) => !value)} aria-label="Collapse sidebar" title="Collapse sidebar" className={`rounded-lg p-2 text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white lg:block ${sidebarCollapsed ? "hidden" : ""}`}><PanelLeftClose size={16} /></button>
@@ -326,7 +326,6 @@ export default function AIChatPage() {
             </nav>
             <div className="mt-auto flex flex-col items-center gap-3">
               <Link href="/account" aria-label="Open account" className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</Link>
-              <button onClick={() => setSidebarCollapsed(false)} aria-label="Expand sidebar" className="rounded-lg p-2 text-zinc-500 hover:bg-[#1c1c1c] hover:text-white"><PanelLeftOpen size={16} /></button>
             </div>
           </div>
         )}
