@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { ArrowRight, Code2, Cuboid, Download, Gauge, HardDrive, Layers3, ShieldCheck, Sparkles, Workflow } from "lucide-react";
+import { ArrowRight, Code2, Cuboid, Download, Gauge, HardDrive, Layers3, ShieldCheck, Sparkles, Workflow, X } from "lucide-react";
 import { CoreforgePage, COBALT, useCoreforgeLanguage } from "@/components/cedium-shell";
 
 const homeTranslations: Record<string, Record<string, string>> = {
@@ -129,7 +129,7 @@ export default function HomePage() {
  const { language } = useCoreforgeLanguage();
  const tr = homeTranslations[language] ?? homeTranslations.en;
  const introVideoRef = useRef<HTMLVideoElement>(null);
- const [showIntroVideo, setShowIntroVideo] = useState(false);
+ const [isIntroVideoOpen, setIsIntroVideoOpen] = useState(false);
  const [introVideoError, setIntroVideoError] = useState(false);
  const playIntroVideo = async () => {
   const video = introVideoRef.current;
@@ -138,12 +138,16 @@ export default function HomePage() {
    return;
   }
   setIntroVideoError(false);
-  setShowIntroVideo(true);
+  setIsIntroVideoOpen(true);
   try {
    await video.play();
   } catch {
    setIntroVideoError(true);
   }
+ };
+ const closeIntroVideo = () => {
+  introVideoRef.current?.pause();
+  setIsIntroVideoOpen(false);
  };
  useEffect(() => {
   const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-crystal-reveal]"));
@@ -151,6 +155,19 @@ export default function HomePage() {
   elements.forEach((element) => observer.observe(element));
   return () => observer.disconnect();
  }, []);
+ useEffect(() => {
+  if (!isIntroVideoOpen) return;
+  const previousOverflow = document.body.style.overflow;
+  const handleKeyDown = (event: KeyboardEvent) => {
+   if (event.key === "Escape") closeIntroVideo();
+  };
+  document.body.style.overflow = "hidden";
+  window.addEventListener("keydown", handleKeyDown);
+  return () => {
+   document.body.style.overflow = previousOverflow;
+   window.removeEventListener("keydown", handleKeyDown);
+  };
+ }, [isIntroVideoOpen]);
  return (
  <CoreforgePage>
  {(t) => (
@@ -158,26 +175,12 @@ export default function HomePage() {
  <section className="crystal-first-sector">
  <p>{tr.eyebrow}</p>
  <div className="crystal-first-card"><div><h1>{tr.hero}</h1><p>{tr.heroCopy}</p> <div><ActionLink href="/project">{tr.launch} <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">{tr.download}</ActionLink></div></div><div className="crystal-first-image">
-  {!showIntroVideo && <Image src="/Section/architectresectionone.png" alt={tr.architecture} fill priority sizes="(max-width: 700px) 100vw, 55vw" />}
-  <video
-   ref={introVideoRef}
-   controls={showIntroVideo}
-   loop
-   playsInline
-   preload="none"
-   aria-label="Crystal Studio introduction video"
-   onError={() => setIntroVideoError(true)}
-   style={{ position: "absolute", inset: 0, display: showIntroVideo ? "block" : "none", width: "100%", height: "100%", objectFit: "cover", background: "#080b10" }}
-  >
-   <source src="/crystalintro.mp4" type="video/mp4" />
-   Your browser does not support embedded videos.
-  </video>
-  {!showIntroVideo && <button type="button" aria-label="Play Crystal Studio introduction video" onClick={() => void playIntroVideo()} style={{ position: "absolute", inset: 0, display: "grid", width: "100%", height: "100%", placeItems: "center", padding: 0, border: 0, borderRadius: "inherit", background: "transparent", cursor: "pointer" }}>
+  <Image src="/Section/architectresectionone.png" alt={tr.architecture} fill priority sizes="(max-width: 700px) 100vw, 55vw" />
+  <button type="button" aria-label="Play Crystal Studio introduction video" onClick={() => void playIntroVideo()} style={{ position: "absolute", inset: 0, display: "grid", width: "100%", height: "100%", placeItems: "center", padding: 0, border: 0, borderRadius: "inherit", background: "transparent", cursor: "pointer" }}>
    <span aria-hidden="true" style={{ display: "grid", width: 72, height: 72, placeItems: "center", marginLeft: 6, border: "1px solid rgba(255,255,255,.55)", borderRadius: "50%", background: "rgba(255,255,255,.55)" }}>
     <span style={{ width: 0, height: 0, borderTop: "13px solid transparent", borderBottom: "13px solid transparent", borderLeft: "20px solid white" }} />
    </span>
-  </button>}
-  {introVideoError && <p role="alert" style={{ position: "absolute", right: 8, bottom: 8, left: 8, margin: 0, padding: "8px 12px", color: "#fff", background: "#7f1d1d", fontSize: 13 }}>The video could not be played. Please try again.</p>}
+  </button>
  </div></div>
  <div className="crystal-first-chips">{[tr.architecture, tr.interior, tr.furniture, tr.visualization, tr.robotics, tr.infrastructure].map((item) => <span key={item}>{item}</span>)}</div>
  </section>
@@ -428,6 +431,51 @@ export default function HomePage() {
  </div>
  </div>
  </section>
+
+ <div
+  role="dialog"
+  aria-modal="true"
+  aria-label="Crystal Studio introduction video"
+  aria-hidden={!isIntroVideoOpen}
+  onMouseDown={(event) => {
+   if (event.target === event.currentTarget) closeIntroVideo();
+  }}
+  style={{
+   position: "fixed",
+   inset: 0,
+   zIndex: 10000,
+   display: "flex",
+   alignItems: "center",
+   justifyContent: "center",
+   padding: 24,
+   boxSizing: "border-box",
+   background: "rgba(0,0,0,.82)",
+   backdropFilter: "blur(8px)",
+   opacity: isIntroVideoOpen ? 1 : 0,
+   visibility: isIntroVideoOpen ? "visible" : "hidden",
+   transition: "opacity 220ms ease, visibility 220ms ease",
+  }}
+ >
+  <div style={{ position: "relative", width: "min(1176px, calc(100vw - 48px), calc((100dvh - 48px) * 1.692))", aspectRatio: "1176 / 695", overflow: "hidden", border: "10px solid #d5d7dc", borderRadius: 36, background: "#080b10", boxShadow: "0 24px 80px rgba(0,0,0,.5)", transform: isIntroVideoOpen ? "scale(1)" : "scale(.92)", transition: "transform 260ms cubic-bezier(.2,.8,.2,1)" }}>
+   <video
+    ref={introVideoRef}
+    controls={isIntroVideoOpen}
+    loop
+    playsInline
+    preload="none"
+    aria-label="Crystal Studio introduction video"
+    onError={() => setIntroVideoError(true)}
+    style={{ display: "block", width: "100%", height: "100%", objectFit: "cover", borderRadius: 25, background: "#080b10" }}
+   >
+    <source src="/crystalintro.mp4" type="video/mp4" />
+    Your browser does not support embedded videos.
+   </video>
+   <button type="button" onClick={closeIntroVideo} aria-label="Close video" style={{ position: "absolute", top: 14, right: 14, zIndex: 1, display: "grid", width: 40, height: 40, placeItems: "center", border: "1px solid rgba(255,255,255,.35)", borderRadius: "50%", background: "rgba(0,0,0,.65)", color: "#fff", cursor: "pointer" }}>
+    <X size={20} />
+   </button>
+   {introVideoError && <p role="alert" style={{ position: "absolute", right: 12, bottom: 12, left: 12, margin: 0, padding: "8px 12px", color: "#fff", background: "#7f1d1d", fontSize: 13 }}>The video could not be played. Please try again.</p>}
+  </div>
+ </div>
 
  <section data-crystal-reveal style={{ padding: "92px 0 108px", borderTop: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
