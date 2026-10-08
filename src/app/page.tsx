@@ -177,8 +177,7 @@ export default function HomePage() {
  <div className="crystal-first-card"><div><h1>{tr.hero}</h1><p>{tr.heroCopy}</p> <div><ActionLink href="/project">{tr.launch} <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">{tr.download}</ActionLink></div></div><div className="crystal-first-image">
   <Image src="/Section/architectresectionone.png" alt={tr.architecture} fill priority sizes="(max-width: 700px) 100vw, 55vw" />
   <button type="button" aria-label="Play Crystal Studio introduction video" onClick={() => void playIntroVideo()} className="crystal-intro-play-overlay">
-   <span aria-hidden="true" className="crystal-intro-play-button"><Play size={25} fill="currentColor" strokeWidth={1.5} /></span>
-   <span className="crystal-intro-play-label">Watch introduction</span>
+   <span aria-hidden="true" className="crystal-intro-play-button"><Play size={76} fill="currentColor" strokeWidth={1} /></span>
   </button>
  </div></div>
  <div className="crystal-first-chips">{[tr.architecture, tr.interior, tr.furniture, tr.visualization, tr.robotics, tr.infrastructure].map((item) => <span key={item}>{item}</span>)}</div>
