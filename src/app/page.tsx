@@ -133,7 +133,10 @@ export default function HomePage() {
  const [introVideoError, setIntroVideoError] = useState(false);
  const playIntroVideo = async () => {
   const video = introVideoRef.current;
-  if (!video) return;
+  if (!video) {
+   setIntroVideoError(true);
+   return;
+  }
   setIntroVideoError(false);
   setShowIntroVideo(true);
   try {
@@ -154,7 +157,28 @@ export default function HomePage() {
  <>
  <section className="crystal-first-sector">
  <p>{tr.eyebrow}</p>
- <div className="crystal-first-card"><div><h1>{tr.hero}</h1><p>{tr.heroCopy}</p> <div><ActionLink href="/project">{tr.launch} <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">{tr.download}</ActionLink></div></div><div className="crystal-first-image"><Image src="/Section/architectresectionone.png" alt={tr.architecture} fill priority sizes="(max-width: 700px) 100vw, 55vw" /></div></div>
+ <div className="crystal-first-card"><div><h1>{tr.hero}</h1><p>{tr.heroCopy}</p> <div><ActionLink href="/project">{tr.launch} <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">{tr.download}</ActionLink></div></div><div className="crystal-first-image">
+  {!showIntroVideo && <Image src="/Section/architectresectionone.png" alt={tr.architecture} fill priority sizes="(max-width: 700px) 100vw, 55vw" />}
+  <video
+   ref={introVideoRef}
+   controls={showIntroVideo}
+   loop
+   playsInline
+   preload="none"
+   aria-label="Crystal Studio introduction video"
+   onError={() => setIntroVideoError(true)}
+   style={{ position: "absolute", inset: 0, display: showIntroVideo ? "block" : "none", width: "100%", height: "100%", objectFit: "cover", background: "#080b10" }}
+  >
+   <source src="/crystalintro.mp4" type="video/mp4" />
+   Your browser does not support embedded videos.
+  </video>
+  {!showIntroVideo && <button type="button" aria-label="Play Crystal Studio introduction video" onClick={() => void playIntroVideo()} style={{ position: "absolute", inset: 0, display: "grid", width: "100%", height: "100%", placeItems: "center", padding: 0, border: 0, borderRadius: "inherit", background: "transparent", cursor: "pointer" }}>
+   <span aria-hidden="true" style={{ display: "grid", width: 72, height: 72, placeItems: "center", marginLeft: 6, border: "1px solid rgba(255,255,255,.55)", borderRadius: "50%", background: "rgba(255,255,255,.55)" }}>
+    <span style={{ width: 0, height: 0, borderTop: "13px solid transparent", borderBottom: "13px solid transparent", borderLeft: "20px solid white" }} />
+   </span>
+  </button>}
+  {introVideoError && <p role="alert" style={{ position: "absolute", right: 8, bottom: 8, left: 8, margin: 0, padding: "8px 12px", color: "#fff", background: "#7f1d1d", fontSize: 13 }}>The video could not be played. Please try again.</p>}
+ </div></div>
  <div className="crystal-first-chips">{[tr.architecture, tr.interior, tr.furniture, tr.visualization, tr.robotics, tr.infrastructure].map((item) => <span key={item}>{item}</span>)}</div>
  </section>
 
@@ -401,66 +425,6 @@ export default function HomePage() {
  <ActionLink href="/pricing" variant="secondary">
  See Pricing
  </ActionLink>
- </div>
- <div
-  style={{
-   boxSizing: "border-box",
-   width: "100%",
-   maxWidth: 1176,
-   aspectRatio: "1176 / 695",
-   marginInline: "auto",
-   marginTop: 48,
-   overflow: "hidden",
-   padding: 7,
-   border: "4px solid #d5d7dc",
-   borderRadius: 36,
-   background: "#d5d7dc",
-   boxShadow: "0 24px 70px rgba(0,0,0,.28)",
-  }}
- >
-  <div style={{ position: "relative", width: "100%" }}>
-   <video
-    ref={introVideoRef}
-    controls={showIntroVideo}
-    loop
-    playsInline
-    preload={showIntroVideo ? "auto" : "none"}
-    poster="/Section/architectresectionone.png"
-    aria-label="Crystal Studio introduction video"
-    onError={() => setIntroVideoError(true)}
-    style={{ display: "block", width: "100%", aspectRatio: "1154 / 674", objectFit: "cover", borderRadius: 25, background: "#080b10" }}
-   >
-    <source src="/crystalintro.mp4" type="video/mp4" />
-    Your browser does not support embedded videos.
-   </video>
-   {!showIntroVideo && (
-    <button
-     type="button"
-     aria-label="Play Crystal Studio introduction with audio"
-     onClick={() => void playIntroVideo()}
-     style={{
-      position: "absolute",
-      inset: 0,
-      display: "grid",
-      placeItems: "center",
-      width: "100%",
-      height: "100%",
-      padding: 0,
-      border: 0,
-      borderRadius: 25,
-      overflow: "hidden",
-      background: "transparent",
-      cursor: "pointer",
-     }}
-    >
-     <Image src="/Section/architectresectionone.png" alt="" fill sizes="(max-width: 700px) 100vw, 1154px" style={{ objectFit: "cover" }} />
-     <span aria-hidden="true" style={{ position: "relative", display: "grid", width: 72, height: 72, placeItems: "center", border: "1px solid rgba(255,255,255,.55)", borderRadius: "50%", background: "rgba(255,255,255,.55)" }}>
-      <span style={{ width: 0, height: 0, marginLeft: 6, borderTop: "13px solid transparent", borderBottom: "13px solid transparent", borderLeft: "20px solid white" }} />
-     </span>
-    </button>
-   )}
-   {introVideoError && <p role="alert" style={{ margin: 0, padding: "8px 12px", color: "#fff", background: "#7f1d1d", fontSize: 13 }}>The video could not be played. Please try again.</p>}
-  </div>
  </div>
  </div>
  </section>
