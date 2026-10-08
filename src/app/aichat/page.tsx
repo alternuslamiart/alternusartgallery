@@ -41,6 +41,41 @@ import {
 
 type Message = { id: number; role: "user" | "assistant"; content: string };
 
+const thinkingDots = [
+  { cx: 12, cy: 3.2, color: "#47B3FF" },
+  { cx: 17.7, cy: 5.6, color: "#0182DF" },
+  { cx: 20.8, cy: 11, color: "#0085E3" },
+  { cx: 19.7, cy: 17.2, color: "#0672BF" },
+  { cx: 14.8, cy: 20.7, color: "#0166AF" },
+  { cx: 8.5, cy: 20.2, color: "#0A6EB5" },
+  { cx: 3.7, cy: 16.1, color: "#054E83" },
+  { cx: 3.2, cy: 9.7, color: "#024D83" },
+  { cx: 7.5, cy: 4.7, color: "#012F50" },
+];
+
+function ThinkingIndicator() {
+  return (
+    <div role="status" aria-label="Thinking..." className="flex items-center gap-2 px-4 py-3 text-white">
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6 shrink-0">
+        {thinkingDots.map((dot, index) => (
+          <circle
+            key={dot.color}
+            cx={dot.cx}
+            cy={dot.cy}
+            r="2.4"
+            fill={dot.color}
+            className="animate-pulse"
+            style={{ animationDelay: `${index * 100}ms` }}
+          />
+        ))}
+      </svg>
+      <span className="font-medium text-[12px] leading-4" style={{ fontFamily: "var(--font-roboto), Roboto, Arial, sans-serif" }}>
+        Thinking...
+      </span>
+    </div>
+  );
+}
+
 const models = ["Claude", "ChatGPT", "Gemini", "Grok", "Groq", "Copilot"];
 type ChatSession = { id: string; title: string; messages: Message[]; updatedAt: number };
 type ChatSection = { id: string; label: string };
@@ -442,7 +477,7 @@ export default function AIChatPage() {
                   </div>
                 </div>
               ))}
-              {isSending && <div className="flex"><div className="flex items-center gap-1 rounded-2xl border border-[#2a2a2a] bg-[#171717] px-4 py-4"><span className="h-1.5 w-1.5 animate-bounce rounded-full bg-blue-400 [animation-delay:-.3s]" /><span className="h-1.5 w-1.5 animate-bounce rounded-full bg-blue-400 [animation-delay:-.15s]" /><span className="h-1.5 w-1.5 animate-bounce rounded-full bg-blue-400" /></div></div>}
+              {isSending && <ThinkingIndicator />}
             </div>
           )}
         </section>
