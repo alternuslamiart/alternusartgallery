@@ -43,14 +43,14 @@ type Message = { id: number; role: "user" | "assistant"; content: string };
 
 const thinkingDots = [
   { cx: 12, cy: 3.2, color: "#47B3FF" },
-  { cx: 17.7, cy: 5.6, color: "#0182DF" },
-  { cx: 20.8, cy: 11, color: "#0085E3" },
-  { cx: 19.7, cy: 17.2, color: "#0672BF" },
-  { cx: 14.8, cy: 20.7, color: "#0166AF" },
-  { cx: 8.5, cy: 20.2, color: "#0A6EB5" },
-  { cx: 3.7, cy: 16.1, color: "#054E83" },
-  { cx: 3.2, cy: 9.7, color: "#024D83" },
-  { cx: 7.5, cy: 4.7, color: "#012F50" },
+  { cx: 6.7, cy: 7.1, color: "#0182DF" },
+  { cx: 17.3, cy: 7.1, color: "#0085E3" },
+  { cx: 3.2, cy: 12, color: "#0672BF" },
+  { cx: 12, cy: 12, color: "#0166AF" },
+  { cx: 20.8, cy: 12, color: "#0A6EB5" },
+  { cx: 6.7, cy: 16.9, color: "#054E83" },
+  { cx: 17.3, cy: 16.9, color: "#024D83" },
+  { cx: 12, cy: 20.8, color: "#012F50" },
 ];
 
 function ThinkingIndicator() {
