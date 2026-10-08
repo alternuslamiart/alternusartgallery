@@ -180,7 +180,7 @@ export default function HomePage() {
    <span aria-hidden="true" className="crystal-intro-play-button"><Play size={76} fill="currentColor" strokeWidth={1} /></span>
   </button>
  </div></div>
- <div className="crystal-first-chips">{[tr.architecture, tr.interior, tr.furniture, tr.visualization, tr.robotics, tr.infrastructure].map((item) => <span key={item}>{item}</span>)}</div>
+ <div className="crystal-first-chips crystal-home-categories">{[tr.architecture, tr.interior, tr.furniture, tr.infrastructure, tr.visualization].map((item) => <span key={item}>{item}</span>)}</div>
  </section>
 
  <section data-crystal-reveal style={{ padding: "42px 0 92px" }}>
