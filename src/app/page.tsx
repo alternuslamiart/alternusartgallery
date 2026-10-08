@@ -139,22 +139,34 @@ export default function HomePage() {
  useEffect(() => {
   const section = introCtaRef.current;
   if (!section) return;
+  const scrollTargets: HTMLElement[] = [];
+  let parent = section.parentElement;
+  while (parent) {
+   scrollTargets.push(parent);
+   parent = parent.parentElement;
+  }
   const revealVideoWhenVisible = () => {
    const bounds = section.getBoundingClientRect();
-   if (bounds.top < window.innerHeight && bounds.bottom > 0) {
+   if (bounds.top < window.innerHeight + 200 && bounds.bottom > 0) {
     setShowIntroVideo(true);
     window.removeEventListener("scroll", revealVideoWhenVisible);
-    document.removeEventListener("scroll", revealVideoWhenVisible, true);
+    scrollTargets.forEach((target) => target.removeEventListener("scroll", revealVideoWhenVisible));
+    observer.disconnect();
     window.removeEventListener("resize", revealVideoWhenVisible);
    }
   };
+  const observer = new IntersectionObserver((entries) => {
+   if (entries.some((entry) => entry.isIntersecting)) revealVideoWhenVisible();
+  }, { rootMargin: "200px 0px", threshold: 0 });
+  observer.observe(section);
   window.addEventListener("scroll", revealVideoWhenVisible, { passive: true });
-  document.addEventListener("scroll", revealVideoWhenVisible, { passive: true, capture: true });
+  scrollTargets.forEach((target) => target.addEventListener("scroll", revealVideoWhenVisible, { passive: true }));
   window.addEventListener("resize", revealVideoWhenVisible, { passive: true });
   revealVideoWhenVisible();
   return () => {
    window.removeEventListener("scroll", revealVideoWhenVisible);
-   document.removeEventListener("scroll", revealVideoWhenVisible, true);
+   scrollTargets.forEach((target) => target.removeEventListener("scroll", revealVideoWhenVisible));
+   observer.disconnect();
    window.removeEventListener("resize", revealVideoWhenVisible);
   };
  }, []);
