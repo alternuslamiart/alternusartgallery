@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { ArrowRight, Code2, Cuboid, Download, Gauge, HardDrive, Layers3, ShieldCheck, Sparkles, Workflow } from "lucide-react";
 import { CoreforgePage, COBALT, useCoreforgeLanguage } from "@/components/cedium-shell";
@@ -128,10 +128,26 @@ function FeatureShowcase({ title, copy, image, reverse = false }: { title: strin
 export default function HomePage() {
  const { language } = useCoreforgeLanguage();
  const tr = homeTranslations[language] ?? homeTranslations.en;
+ const introCtaRef = useRef<HTMLElement>(null);
+ const [showIntroVideo, setShowIntroVideo] = useState(false);
+ const [reduceMotion, setReduceMotion] = useState(false);
  useEffect(() => {
   const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-crystal-reveal]"));
   const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("crystal-revealed"); observer.unobserve(entry.target); } }), { threshold: 0.14, rootMargin: "0px 0px -40px" });
   elements.forEach((element) => observer.observe(element));
+  return () => observer.disconnect();
+ }, []);
+ useEffect(() => {
+  setReduceMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const section = introCtaRef.current;
+  if (!section) return;
+  const observer = new IntersectionObserver((entries) => {
+   if (entries.some((entry) => entry.isIntersecting)) {
+    setShowIntroVideo(true);
+    observer.disconnect();
+   }
+  }, { threshold: 0.2 });
+  observer.observe(section);
   return () => observer.disconnect();
  }, []);
  return (
@@ -365,7 +381,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <section style={{ padding: "108px 0" }}>
+ <section ref={introCtaRef} style={{ padding: "108px 0" }}>
  <div style={{ maxWidth: 980, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, color: COBALT, fontWeight: 900, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 20 }}>
  <Sparkles size={15} /> Begin
@@ -387,6 +403,35 @@ export default function HomePage() {
  <ActionLink href="/pricing" variant="secondary">
  See Pricing
  </ActionLink>
+ </div>
+ <div
+  aria-hidden={!showIntroVideo}
+  style={{
+   maxHeight: showIntroVideo ? 600 : 0,
+   marginTop: showIntroVideo ? 48 : 0,
+   overflow: "hidden",
+   border: showIntroVideo ? `1px solid ${t.faint}` : "1px solid transparent",
+   borderRadius: 24,
+   opacity: showIntroVideo ? 1 : 0,
+   boxShadow: showIntroVideo ? "0 24px 70px rgba(0,0,0,.28)" : "none",
+   transition: "max-height 900ms cubic-bezier(.2,.8,.2,1), margin-top 900ms cubic-bezier(.2,.8,.2,1), opacity 700ms ease, box-shadow 900ms ease",
+  }}
+ >
+  {showIntroVideo && (
+   <video
+    autoPlay={!reduceMotion}
+    controls
+    loop
+    muted
+    playsInline
+    preload="metadata"
+    aria-label="Crystal Studio introduction video"
+    style={{ display: "block", width: "100%", aspectRatio: "16 / 9", objectFit: "cover", background: "#080b10" }}
+   >
+    <source src="/crystalintro.mp4" type="video/mp4" />
+    Your browser does not support embedded videos.
+   </video>
+  )}
  </div>
  </div>
  </section>
