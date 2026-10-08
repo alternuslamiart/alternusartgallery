@@ -129,7 +129,20 @@ export default function HomePage() {
  const { language } = useCoreforgeLanguage();
  const tr = homeTranslations[language] ?? homeTranslations.en;
  const introCtaRef = useRef<HTMLElement>(null);
+ const introVideoRef = useRef<HTMLVideoElement>(null);
  const [showIntroVideo, setShowIntroVideo] = useState(false);
+ const [introVideoPlaying, setIntroVideoPlaying] = useState(false);
+ const [introVideoError, setIntroVideoError] = useState(false);
+ const playIntroVideo = async () => {
+  const video = introVideoRef.current;
+  if (!video) return;
+  setIntroVideoError(false);
+  try {
+   await video.play();
+  } catch {
+   setIntroVideoError(true);
+  }
+ };
  useEffect(() => {
   const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-crystal-reveal]"));
   const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("crystal-revealed"); observer.unobserve(entry.target); } }), { threshold: 0.14, rootMargin: "0px 0px -40px" });
@@ -445,19 +458,48 @@ export default function HomePage() {
   }}
  >
   {showIntroVideo && (
-   <video
-    autoPlay
-    controls
-    loop
-    muted
-    playsInline
-    preload="metadata"
-    aria-label="Crystal Studio introduction video"
-    style={{ display: "block", width: "100%", height: "100%", aspectRatio: "1154 / 674", objectFit: "cover", borderRadius: 25, background: "#080b10" }}
-   >
-    <source src="/crystalintro.mp4" type="video/mp4" />
-    Your browser does not support embedded videos.
-   </video>
+   <div style={{ position: "relative", width: "100%" }}>
+    <video
+     ref={introVideoRef}
+     controls
+     loop
+     playsInline
+     preload="auto"
+     aria-label="Crystal Studio introduction video"
+     onPlay={() => setIntroVideoPlaying(true)}
+     onPause={() => setIntroVideoPlaying(false)}
+     onError={() => setIntroVideoError(true)}
+     style={{ display: "block", width: "100%", aspectRatio: "1154 / 674", objectFit: "cover", borderRadius: 25, background: "#080b10" }}
+    >
+     <source src="/crystalintro.mp4" type="video/mp4" />
+     Your browser does not support embedded videos.
+    </video>
+    {!introVideoPlaying && (
+     <button
+      type="button"
+      aria-label="Play Crystal Studio introduction with audio"
+      onClick={() => void playIntroVideo()}
+      style={{
+       position: "absolute",
+       top: "50%",
+       left: "50%",
+       display: "grid",
+       width: 72,
+       height: 72,
+       placeItems: "center",
+       padding: 0,
+       border: "1px solid rgba(255,255,255,.55)",
+       borderRadius: "50%",
+       background: "rgba(255,255,255,.55)",
+       transform: "translate(-50%, -50%)",
+       cursor: "pointer",
+      }}
+     >
+      <span aria-hidden="true" style={{ width: 0, height: 0, marginLeft: 6, borderTop: "13px solid transparent", borderBottom: "13px solid transparent", borderLeft: "20px solid white" }} />
+     </button>
+    )}
+    {introVideoError && <p role="alert" style={{ margin: 0, padding: "8px 12px", color: "#fff", background: "#7f1d1d", fontSize: 13 }}>The video could not be played. Please try again.</p>}
+   </div>
   )}
  </div>
  </div>
