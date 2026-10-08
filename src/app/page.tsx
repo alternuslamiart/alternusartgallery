@@ -128,15 +128,14 @@ function FeatureShowcase({ title, copy, image, reverse = false }: { title: strin
 export default function HomePage() {
  const { language } = useCoreforgeLanguage();
  const tr = homeTranslations[language] ?? homeTranslations.en;
- const introCtaRef = useRef<HTMLElement>(null);
  const introVideoRef = useRef<HTMLVideoElement>(null);
  const [showIntroVideo, setShowIntroVideo] = useState(false);
- const [introVideoPlaying, setIntroVideoPlaying] = useState(false);
  const [introVideoError, setIntroVideoError] = useState(false);
  const playIntroVideo = async () => {
   const video = introVideoRef.current;
   if (!video) return;
   setIntroVideoError(false);
+  setShowIntroVideo(true);
   try {
    await video.play();
   } catch {
@@ -148,40 +147,6 @@ export default function HomePage() {
   const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("crystal-revealed"); observer.unobserve(entry.target); } }), { threshold: 0.14, rootMargin: "0px 0px -40px" });
   elements.forEach((element) => observer.observe(element));
   return () => observer.disconnect();
- }, []);
- useEffect(() => {
-  const section = introCtaRef.current;
-  if (!section) return;
-  const scrollTargets: HTMLElement[] = [];
-  let parent = section.parentElement;
-  while (parent) {
-   scrollTargets.push(parent);
-   parent = parent.parentElement;
-  }
-  const revealVideoWhenVisible = () => {
-   const bounds = section.getBoundingClientRect();
-   if (bounds.top < window.innerHeight + 200 && bounds.bottom > 0) {
-    setShowIntroVideo(true);
-    window.removeEventListener("scroll", revealVideoWhenVisible);
-    scrollTargets.forEach((target) => target.removeEventListener("scroll", revealVideoWhenVisible));
-    observer.disconnect();
-    window.removeEventListener("resize", revealVideoWhenVisible);
-   }
-  };
-  const observer = new IntersectionObserver((entries) => {
-   if (entries.some((entry) => entry.isIntersecting)) revealVideoWhenVisible();
-  }, { rootMargin: "200px 0px", threshold: 0 });
-  observer.observe(section);
-  window.addEventListener("scroll", revealVideoWhenVisible, { passive: true });
-  scrollTargets.forEach((target) => target.addEventListener("scroll", revealVideoWhenVisible, { passive: true }));
-  window.addEventListener("resize", revealVideoWhenVisible, { passive: true });
-  revealVideoWhenVisible();
-  return () => {
-   window.removeEventListener("scroll", revealVideoWhenVisible);
-   scrollTargets.forEach((target) => target.removeEventListener("scroll", revealVideoWhenVisible));
-   observer.disconnect();
-   window.removeEventListener("resize", revealVideoWhenVisible);
-  };
  }, []);
  return (
  <CoreforgePage>
@@ -414,7 +379,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <section ref={introCtaRef} style={{ padding: "108px 0" }}>
+ <section style={{ padding: "108px 0" }}>
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, color: COBALT, fontWeight: 900, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 20 }}>
  <Sparkles size={15} /> Begin
@@ -438,69 +403,64 @@ export default function HomePage() {
  </ActionLink>
  </div>
  <div
-  aria-hidden={!showIntroVideo}
   style={{
    boxSizing: "border-box",
    width: "100%",
    maxWidth: 1176,
    aspectRatio: "1176 / 695",
    marginInline: "auto",
-   maxHeight: showIntroVideo ? 900 : 0,
-   marginTop: showIntroVideo ? 48 : 0,
+   marginTop: 48,
    overflow: "hidden",
-   padding: showIntroVideo ? 7 : 0,
-   border: showIntroVideo ? "4px solid #d5d7dc" : "4px solid transparent",
+   padding: 7,
+   border: "4px solid #d5d7dc",
    borderRadius: 36,
-   background: showIntroVideo ? "#d5d7dc" : "transparent",
-   opacity: showIntroVideo ? 1 : 0,
-   boxShadow: showIntroVideo ? "0 24px 70px rgba(0,0,0,.28)" : "none",
-   transition: "max-height 900ms cubic-bezier(.2,.8,.2,1), margin-top 900ms cubic-bezier(.2,.8,.2,1), opacity 700ms ease, box-shadow 900ms ease",
+   background: "#d5d7dc",
+   boxShadow: "0 24px 70px rgba(0,0,0,.28)",
   }}
  >
-  {showIntroVideo && (
-   <div style={{ position: "relative", width: "100%" }}>
-    <video
-     ref={introVideoRef}
-     controls
-     loop
-     playsInline
-     preload="auto"
-     aria-label="Crystal Studio introduction video"
-     onPlay={() => setIntroVideoPlaying(true)}
-     onPause={() => setIntroVideoPlaying(false)}
-     onError={() => setIntroVideoError(true)}
-     style={{ display: "block", width: "100%", aspectRatio: "1154 / 674", objectFit: "cover", borderRadius: 25, background: "#080b10" }}
+  <div style={{ position: "relative", width: "100%" }}>
+   <video
+    ref={introVideoRef}
+    controls={showIntroVideo}
+    loop
+    playsInline
+    preload={showIntroVideo ? "auto" : "none"}
+    poster="/Section/architectresectionone.png"
+    aria-label="Crystal Studio introduction video"
+    onError={() => setIntroVideoError(true)}
+    style={{ display: "block", width: "100%", aspectRatio: "1154 / 674", objectFit: "cover", borderRadius: 25, background: "#080b10" }}
+   >
+    <source src="/crystalintro.mp4" type="video/mp4" />
+    Your browser does not support embedded videos.
+   </video>
+   {!showIntroVideo && (
+    <button
+     type="button"
+     aria-label="Play Crystal Studio introduction with audio"
+     onClick={() => void playIntroVideo()}
+     style={{
+      position: "absolute",
+      inset: 0,
+      display: "grid",
+      placeItems: "center",
+      width: "100%",
+      height: "100%",
+      padding: 0,
+      border: 0,
+      borderRadius: 25,
+      overflow: "hidden",
+      background: "transparent",
+      cursor: "pointer",
+     }}
     >
-     <source src="/crystalintro.mp4" type="video/mp4" />
-     Your browser does not support embedded videos.
-    </video>
-    {!introVideoPlaying && (
-     <button
-      type="button"
-      aria-label="Play Crystal Studio introduction with audio"
-      onClick={() => void playIntroVideo()}
-      style={{
-       position: "absolute",
-       top: "50%",
-       left: "50%",
-       display: "grid",
-       width: 72,
-       height: 72,
-       placeItems: "center",
-       padding: 0,
-       border: "1px solid rgba(255,255,255,.55)",
-       borderRadius: "50%",
-       background: "rgba(255,255,255,.55)",
-       transform: "translate(-50%, -50%)",
-       cursor: "pointer",
-      }}
-     >
-      <span aria-hidden="true" style={{ width: 0, height: 0, marginLeft: 6, borderTop: "13px solid transparent", borderBottom: "13px solid transparent", borderLeft: "20px solid white" }} />
-     </button>
-    )}
-    {introVideoError && <p role="alert" style={{ margin: 0, padding: "8px 12px", color: "#fff", background: "#7f1d1d", fontSize: 13 }}>The video could not be played. Please try again.</p>}
-   </div>
-  )}
+     <Image src="/Section/architectresectionone.png" alt="" fill sizes="(max-width: 700px) 100vw, 1154px" style={{ objectFit: "cover" }} />
+     <span aria-hidden="true" style={{ position: "relative", display: "grid", width: 72, height: 72, placeItems: "center", border: "1px solid rgba(255,255,255,.55)", borderRadius: "50%", background: "rgba(255,255,255,.55)" }}>
+      <span style={{ width: 0, height: 0, marginLeft: 6, borderTop: "13px solid transparent", borderBottom: "13px solid transparent", borderLeft: "20px solid white" }} />
+     </span>
+    </button>
+   )}
+   {introVideoError && <p role="alert" style={{ margin: 0, padding: "8px 12px", color: "#fff", background: "#7f1d1d", fontSize: 13 }}>The video could not be played. Please try again.</p>}
+  </div>
  </div>
  </div>
  </section>
