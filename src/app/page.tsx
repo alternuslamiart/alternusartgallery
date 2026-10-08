@@ -350,7 +350,7 @@ export default function HomePage() {
  <ActionLink href="/pricing" variant="secondary">View all plans</ActionLink>
  </div>
  </div>
- <div style={{ border: 0, borderRadius: 24, background: t.raised, padding: 28 }}>
+ <div style={{ border: 0, borderRadius: 24, background: t.raised, padding: 28, minHeight: 310 }}>
  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 24, paddingBottom: 24, borderBottom: `1px solid ${t.faint}` }}>
  <div><div style={{ fontSize: 12, color: t.muted }}>Crystal Studio Desktop</div><div style={{ marginTop: 8, fontSize: 26, fontWeight: 900 }}>Professional License</div></div>
  <div style={{ textAlign: "right" }}><div style={{ fontSize: 42, lineHeight: 1, fontWeight: 900, color: COBALT }}>$79</div><div style={{ marginTop: 5, fontSize: 11, color: t.muted }}>one-time</div></div>
