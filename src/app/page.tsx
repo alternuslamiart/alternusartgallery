@@ -139,14 +139,24 @@ export default function HomePage() {
  useEffect(() => {
   const section = introCtaRef.current;
   if (!section) return;
-  const observer = new IntersectionObserver((entries) => {
-   if (entries.some((entry) => entry.isIntersecting)) {
+  const revealVideoWhenVisible = () => {
+   const bounds = section.getBoundingClientRect();
+   if (bounds.top < window.innerHeight && bounds.bottom > 0) {
     setShowIntroVideo(true);
-    observer.disconnect();
+    window.removeEventListener("scroll", revealVideoWhenVisible);
+    document.removeEventListener("scroll", revealVideoWhenVisible, true);
+    window.removeEventListener("resize", revealVideoWhenVisible);
    }
-  }, { threshold: 0 });
-  observer.observe(section);
-  return () => observer.disconnect();
+  };
+  window.addEventListener("scroll", revealVideoWhenVisible, { passive: true });
+  document.addEventListener("scroll", revealVideoWhenVisible, { passive: true, capture: true });
+  window.addEventListener("resize", revealVideoWhenVisible, { passive: true });
+  revealVideoWhenVisible();
+  return () => {
+   window.removeEventListener("scroll", revealVideoWhenVisible);
+   document.removeEventListener("scroll", revealVideoWhenVisible, true);
+   window.removeEventListener("resize", revealVideoWhenVisible);
+  };
  }, []);
  return (
  <CoreforgePage>
