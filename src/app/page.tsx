@@ -130,7 +130,6 @@ export default function HomePage() {
  const tr = homeTranslations[language] ?? homeTranslations.en;
  const introCtaRef = useRef<HTMLElement>(null);
  const [showIntroVideo, setShowIntroVideo] = useState(false);
- const [reduceMotion, setReduceMotion] = useState(false);
  useEffect(() => {
   const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-crystal-reveal]"));
   const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("crystal-revealed"); observer.unobserve(entry.target); } }), { threshold: 0.14, rootMargin: "0px 0px -40px" });
@@ -138,7 +137,6 @@ export default function HomePage() {
   return () => observer.disconnect();
  }, []);
  useEffect(() => {
-  setReduceMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const section = introCtaRef.current;
   if (!section) return;
   const observer = new IntersectionObserver((entries) => {
@@ -146,7 +144,7 @@ export default function HomePage() {
     setShowIntroVideo(true);
     observer.disconnect();
    }
-  }, { threshold: 0.2 });
+  }, { threshold: 0 });
   observer.observe(section);
   return () => observer.disconnect();
  }, []);
@@ -419,7 +417,7 @@ export default function HomePage() {
  >
   {showIntroVideo && (
    <video
-    autoPlay={!reduceMotion}
+    autoPlay
     controls
     loop
     muted
