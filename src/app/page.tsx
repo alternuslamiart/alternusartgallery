@@ -390,7 +390,7 @@ export default function HomePage() {
  </section>
 
  <section ref={introCtaRef} style={{ padding: "108px 0" }}>
- <div style={{ maxWidth: 980, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
+ <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, color: COBALT, fontWeight: 900, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 20 }}>
  <Sparkles size={15} /> Begin
  </div>
@@ -415,11 +415,18 @@ export default function HomePage() {
  <div
   aria-hidden={!showIntroVideo}
   style={{
-   maxHeight: showIntroVideo ? 600 : 0,
+   boxSizing: "border-box",
+   width: "100%",
+   maxWidth: 1176,
+   aspectRatio: "1176 / 695",
+   marginInline: "auto",
+   maxHeight: showIntroVideo ? 900 : 0,
    marginTop: showIntroVideo ? 48 : 0,
    overflow: "hidden",
-   border: showIntroVideo ? `1px solid ${t.faint}` : "1px solid transparent",
-   borderRadius: 24,
+   padding: showIntroVideo ? 7 : 0,
+   border: showIntroVideo ? "4px solid #d5d7dc" : "4px solid transparent",
+   borderRadius: 36,
+   background: showIntroVideo ? "#d5d7dc" : "transparent",
    opacity: showIntroVideo ? 1 : 0,
    boxShadow: showIntroVideo ? "0 24px 70px rgba(0,0,0,.28)" : "none",
    transition: "max-height 900ms cubic-bezier(.2,.8,.2,1), margin-top 900ms cubic-bezier(.2,.8,.2,1), opacity 700ms ease, box-shadow 900ms ease",
@@ -434,7 +441,7 @@ export default function HomePage() {
     playsInline
     preload="metadata"
     aria-label="Crystal Studio introduction video"
-    style={{ display: "block", width: "100%", aspectRatio: "16 / 9", objectFit: "cover", background: "#080b10" }}
+    style={{ display: "block", width: "100%", height: "100%", aspectRatio: "1154 / 674", objectFit: "cover", borderRadius: 25, background: "#080b10" }}
    >
     <source src="/crystalintro.mp4" type="video/mp4" />
     Your browser does not support embedded videos.
