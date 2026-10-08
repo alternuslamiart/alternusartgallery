@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { ArrowRight, Code2, Cuboid, Download, Gauge, HardDrive, Layers3, ShieldCheck, Sparkles, Workflow, X } from "lucide-react";
+import { ArrowRight, Code2, Cuboid, Download, Gauge, HardDrive, Layers3, Play, ShieldCheck, Sparkles, Workflow, X } from "lucide-react";
 import { CoreforgePage, COBALT, useCoreforgeLanguage } from "@/components/cedium-shell";
 
 const homeTranslations: Record<string, Record<string, string>> = {
@@ -176,10 +176,9 @@ export default function HomePage() {
  <p>{tr.eyebrow}</p>
  <div className="crystal-first-card"><div><h1>{tr.hero}</h1><p>{tr.heroCopy}</p> <div><ActionLink href="/project">{tr.launch} <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">{tr.download}</ActionLink></div></div><div className="crystal-first-image">
   <Image src="/Section/architectresectionone.png" alt={tr.architecture} fill priority sizes="(max-width: 700px) 100vw, 55vw" />
-  <button type="button" aria-label="Play Crystal Studio introduction video" onClick={() => void playIntroVideo()} style={{ position: "absolute", inset: 0, display: "grid", width: "100%", height: "100%", placeItems: "center", padding: 0, border: 0, borderRadius: "inherit", background: "transparent", cursor: "pointer" }}>
-   <span aria-hidden="true" style={{ display: "grid", width: 72, height: 72, placeItems: "center", marginLeft: 6, border: "1px solid rgba(255,255,255,.55)", borderRadius: "50%", background: "rgba(255,255,255,.55)" }}>
-    <span style={{ width: 0, height: 0, borderTop: "13px solid transparent", borderBottom: "13px solid transparent", borderLeft: "20px solid white" }} />
-   </span>
+  <button type="button" aria-label="Play Crystal Studio introduction video" onClick={() => void playIntroVideo()} className="crystal-intro-play-overlay">
+   <span aria-hidden="true" className="crystal-intro-play-button"><Play size={25} fill="currentColor" strokeWidth={1.5} /></span>
+   <span className="crystal-intro-play-label">Watch introduction</span>
   </button>
  </div></div>
  <div className="crystal-first-chips">{[tr.architecture, tr.interior, tr.furniture, tr.visualization, tr.robotics, tr.infrastructure].map((item) => <span key={item}>{item}</span>)}</div>
