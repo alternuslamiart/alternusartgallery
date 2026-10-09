@@ -214,7 +214,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <FeatureShowcase title={tr.planarch} image="/Section/Planarch.png" copy={tr.planarchCopy} />
+ <FeatureShowcase title={tr.planarch} image="/Section/interior.jpg" copy={tr.planarchCopy} />
 
  <section data-crystal-reveal style={{ padding: "94px 0", borderTop: `1px solid ${t.faint}`, borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
