@@ -95,7 +95,8 @@ export default function LoginPage() {
  const [email, setEmail] = useState("");
  const [password, setPassword] = useState("");
  const [verificationCode, setVerificationCode] = useState("");
- const [verificationStep, setVerificationStep] = useState<"credentials" | "code">("credentials");
+ const [verificationStep, setVerificationStep] = useState<"credentials" | "code" | "age">("credentials");
+ const [age, setAge] = useState("");
  const [resendSeconds, setResendSeconds] = useState(0);
 
  useEffect(() => {
@@ -141,17 +142,63 @@ export default function LoginPage() {
 
  const result = await signIn("credentials", { email, password, verificationCode, redirect: false });
 
- setIsSubmitting(false);
-
  if (result?.error) {
+ setIsSubmitting(false);
  setError("That code is invalid or expired. Request a new code and try again.");
  setVerificationCode("");
  return;
  }
 
+ try {
  await updateSession();
- router.replace(callbackUrl);
- router.refresh();
+ const ageResponse = await fetch("/api/auth/age", { cache: "no-store" });
+ const ageData = (await ageResponse.json()) as { age?: number | null; error?: string };
+ if (!ageResponse.ok) {
+  setVerificationStep("age");
+  setIsSubmitting(false);
+  setError(ageData.error || "Could not check your age. Enter it below to continue.");
+  return;
+ }
+ if (typeof ageData.age === "number") {
+  setIsSubmitting(false);
+  router.replace(callbackUrl);
+  router.refresh();
+  return;
+ }
+
+ setVerificationStep("age");
+ setIsSubmitting(false);
+ } catch {
+ setVerificationStep("age");
+ setIsSubmitting(false);
+ setError("Could not check your age. Enter it below to continue.");
+ }
+ };
+
+ const handleAgeSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
+  setError(null);
+  setIsSubmitting(true);
+
+  try {
+   const response = await fetch("/api/auth/age", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ age: Number(age) }),
+   });
+   const data = (await response.json()) as { error?: string };
+   if (!response.ok) {
+    setError(data.error || "Could not save your age.");
+    return;
+   }
+
+   router.replace(callbackUrl);
+   router.refresh();
+  } catch {
+   setError("Could not save your age. Please try again.");
+  } finally {
+   setIsSubmitting(false);
+  }
  };
 
  const handleResend = async () => {
@@ -199,11 +246,15 @@ export default function LoginPage() {
  <Card className="auth-card w-full max-w-md rounded-[24px] border shadow-none backdrop-blur-xl">
  <CardHeader className="space-y-3 p-7 text-center">
  <p className="auth-kicker text-[11px] font-semibold uppercase tracking-[0.2em]">Crystal Studio workspace</p>
- <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">{verificationStep === "credentials" ? "Sign in" : "Check your email"}</h1>
+ <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">
+  {verificationStep === "credentials" ? "Sign in" : verificationStep === "code" ? "Check your email" : "Your age"}
+ </h1>
  <p className="auth-copy mx-auto max-w-xs text-sm leading-6">
  {verificationStep === "credentials"
   ? "Open your Crystal workspace for Claude AI, OpenAI Codex, architecture, floor plans, 3D modeling, infrastructure planning, and professional project documentation."
-  : <>We sent a 6-digit verification code to <strong className="auth-title font-semibold">{email}</strong>.</>}
+  : verificationStep === "code"
+   ? <>We sent a 6-digit verification code to <strong className="auth-title font-semibold">{email}</strong>.</>
+   : "Enter your age to finish signing in to Crystal Studio."}
  </p>
  </CardHeader>
  <CardContent className="space-y-5 p-7 pt-0">
@@ -235,6 +286,37 @@ export default function LoginPage() {
    </div>
    <p className="auth-copy flex items-center justify-center gap-1.5 text-center text-[11px]"><CheckCircle2 className="h-3.5 w-3.5 text-[#35b8ff]" /> Your account stays protected with email verification.</p>
   </div>
+ ) : verificationStep === "age" ? (
+  <form onSubmit={handleAgeSubmit} className="space-y-4">
+   <div className="space-y-2">
+    <Label htmlFor="age" className="auth-label text-xs font-medium">Age</Label>
+    <Input
+     id="age"
+     type="number"
+     inputMode="numeric"
+     min={1}
+     max={120}
+     step={1}
+     value={age}
+     onChange={(event) => setAge(event.target.value)}
+     placeholder="Enter your age"
+     autoComplete="off"
+     required
+     className="auth-input h-11 rounded-[10px] text-sm shadow-none focus-visible:ring-[#068fff]"
+    />
+   </div>
+   {error ? (
+    <p className="rounded-[10px] border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p>
+   ) : null}
+   <Button
+    type="submit"
+    disabled={isSubmitting || !age}
+    className="h-11 w-full rounded-[10px] bg-[#068fff] text-sm font-semibold text-white shadow-none hover:bg-[#1b9dff]"
+   >
+    {isSubmitting ? "Saving..." : "Continue to Studio"}
+    <ArrowRight className="h-4 w-4" />
+   </Button>
+  </form>
  ) : (
  <>
  <div className="grid gap-2.5">

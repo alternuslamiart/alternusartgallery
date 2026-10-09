@@ -4,6 +4,8 @@
 
 The platform backend uses the existing Next.js App Router route-handler architecture with Prisma/PostgreSQL and NextAuth.
 
+Email/password sign-in asks users for their age after email verification. The age is stored on the user record and can be read or updated through the authenticated `GET|POST /api/auth/age` endpoint.
+
 Shared backend code lives in `src/lib/platform`:
 
 - `api.ts`: authenticated workspace context, JSON errors, activity logs, notifications.
