@@ -1,278 +1,746 @@
 "use client";
 
-import { Canvas, ThreeEvent } from "@react-three/fiber";
-import { Grid, Html, OrbitControls, useTexture } from "@react-three/drei";
 import { Roboto } from "next/font/google";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import {
-  AlertTriangle, Armchair, Bike, BusFront, ChevronDown, Download, Fence,
-  Building2, Footprints, Home, LampCeiling, Lightbulb, Loader2, MapPin, MessageCircle, MousePointer2, Plus,
-  Redo2, Route, Ruler, Send, Signpost, Sparkles, Trash2, TreePine,
-  Undo2, Zap,
+  AlertTriangle,
+  Armchair,
+  Bike,
+  Building2,
+  BusFront,
+  ChevronDown,
+  Check,
+  CircleHelp,
+  Copy,
+  Eye,
+  EyeOff,
+  Focus,
+  Footprints,
+  Gauge,
+  Home,
+  LampCeiling,
+  Lightbulb,
+  Lock,
+  MessageCircle,
+  MousePointer2,
+  ParkingSquare,
+  Redo2,
+  Rotate3D,
+  Route,
+  Ruler,
+  Send,
+  Signpost,
+  Sun,
+  Trash2,
+  TreePine,
+  Undo2,
+  Unlock,
+  Waves,
+  TrafficCone,
+  X,
+  Zap,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { InfrastructureViewport } from "./infrastructure-scene";
+import type {
+  CameraPreset,
+  LightingSettings,
+  TransformMode,
+  ViewportApi,
+} from "./infrastructure-scene";
+import {
+  createInitialInfrastructure,
+  infrastructureLabels,
+  makeInfrastructureObject,
+} from "./infrastructure-types";
+import type {
+  InfrastructureObject,
+  InfrastructureType,
+  LightingPreset,
+} from "./infrastructure-types";
 
 const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"], display: "swap" });
 
-type ElementType =
-  | "road" | "sidewalk" | "tree" | "streetlight" | "crosswalk"
-  | "bikeLane" | "busStop" | "trafficLight" | "roadSign" | "barrier" | "bench" | "cityModel";
-type Tool = "select" | "move" | "delete" | "measure" | ElementType;
-type StreetElement = { id: number; type: ElementType; x: number; z: number };
-type Point = { x: number; z: number };
-
-const elementLabels: Record<ElementType, string> = {
-  road: "Road",
-  sidewalk: "Sidewalk",
-  tree: "Tree",
-  streetlight: "Streetlight",
-  crosswalk: "Crosswalk",
-  bikeLane: "Bike lane",
-  busStop: "Bus stop",
-  trafficLight: "Traffic light",
-  roadSign: "Road sign",
-  barrier: "Fence / barrier",
-  bench: "Bench",
-  cityModel: "City model",
-};
-
-const toolItems: Array<{ type: Tool; label: string; icon: typeof Route }> = [
-  { type: "road", label: "Draw Road", icon: Route },
-  { type: "sidewalk", label: "Add Sidewalk", icon: Footprints },
-  { type: "bikeLane", label: "Add Bike Lane", icon: Bike },
-  { type: "busStop", label: "Add Bus Stop", icon: BusFront },
-  { type: "trafficLight", label: "Add Traffic Light", icon: LampCeiling },
-  { type: "roadSign", label: "Add Road Sign", icon: Signpost },
-  { type: "barrier", label: "Add Fence / Barrier", icon: Fence },
-  { type: "bench", label: "Add Bench", icon: Armchair },
-  { type: "cityModel", label: "Add 3D City Model", icon: Building2 },
-  { type: "tree", label: "Add Tree", icon: TreePine },
-  { type: "streetlight", label: "Add Streetlight", icon: Zap },
-  { type: "crosswalk", label: "Add Crosswalk", icon: MapPin },
-  { type: "select", label: "Select", icon: MousePointer2 },
-  { type: "move", label: "Move", icon: Plus },
-  { type: "delete", label: "Delete", icon: Trash2 },
-  { type: "measure", label: "Measure distance", icon: Ruler },
+const cameraPresets: CameraPreset[] = ["Perspective", "Front", "Back", "Left", "Right", "Top", "Bottom"];
+const lightPresets: LightingPreset[] = ["Day", "Golden hour", "Night", "Studio"];
+const categories: Array<{ title: string; items: Array<{ type: InfrastructureType; label: string; icon: LucideIcon }> }> = [
+  { title: "Roads & circulation", items: [
+    { type: "road", label: "Road segment", icon: Route },
+    { type: "roundabout", label: "Roundabout", icon: Rotate3D },
+    { type: "parking", label: "Parking lot", icon: ParkingSquare },
+    { type: "crosswalk", label: "Crosswalk", icon: Footprints },
+    { type: "barrier", label: "Road barrier", icon: Route },
+    { type: "sidewalk", label: "Sidewalk", icon: Footprints },
+    { type: "bikeLane", label: "Bike lane", icon: Bike },
+    { type: "busStop", label: "Bus stop", icon: BusFront },
+    { type: "trafficLight", label: "Traffic light", icon: TrafficCone },
+    { type: "roadSign", label: "Road sign", icon: Signpost },
+    { type: "vehicle", label: "Vehicle", icon: Gauge },
+  ] },
+  { title: "Buildings", items: [
+    { type: "building", label: "Commercial building", icon: Building2 },
+    { type: "pavilion", label: "Pavilion", icon: Home },
+  ] },
+  { title: "Landscape & public realm", items: [
+    { type: "tree", label: "Tree", icon: TreePine },
+    { type: "shrub", label: "Shrub bed", icon: TreePine },
+    { type: "path", label: "Pedestrian path", icon: Footprints },
+    { type: "water", label: "Waterway", icon: Waves },
+    { type: "bridge", label: "Pedestrian bridge", icon: Route },
+    { type: "plaza", label: "Public plaza", icon: Armchair },
+    { type: "fountain", label: "Fountain", icon: Waves },
+    { type: "bench", label: "Bench", icon: Armchair },
+    { type: "lamp", label: "Street light", icon: LampCeiling },
+  ] },
 ];
 
-function Element({ item, selected, onSelect }: { item: StreetElement; selected: boolean; onSelect: () => void }) {
-  const click = (event: ThreeEvent<MouseEvent>) => {
-    event.stopPropagation();
-    onSelect();
-  };
-  const highlight = selected ? (
-    <mesh position={[0, 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[0.9, 1.04, 32]} />
-      <meshBasicMaterial color="#70b7ff" transparent opacity={0.9} />
-    </mesh>
-  ) : null;
+const toolButtons: Array<{ id: TransformMode; title: string; icon: LucideIcon }> = [
+  { id: "select", title: "Select (V)", icon: MousePointer2 },
+  { id: "move", title: "Move (G)", icon: Route },
+  { id: "rotate", title: "Rotate (R)", icon: Rotate3D },
+  { id: "scale", title: "Scale (S)", icon: Focus },
+  { id: "measure", title: "Measure distance", icon: Ruler },
+];
 
-  if (item.type === "cityModel") return <CityModelElement item={item} selected={selected} onClick={click} highlight={highlight} />;
-  if (item.type === "tree") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, 0.65, 0]}><cylinderGeometry args={[0.12, 0.16, 1.3, 10]} /><meshStandardMaterial color="#76513b" /></mesh><mesh position={[0, 1.55, 0]}><icosahedronGeometry args={[0.75, 1]} /><meshStandardMaterial color={selected ? "#8ee6a0" : "#3d9b5b"} /></mesh></group>;
-  if (item.type === "streetlight") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, 1.25, 0]}><cylinderGeometry args={[0.045, 0.06, 2.5, 8]} /><meshStandardMaterial color={selected ? "#b9d8ff" : "#77818d"} /></mesh><mesh position={[0.18, 2.45, 0]}><boxGeometry args={[0.38, 0.08, 0.08]} /><meshStandardMaterial color="#d9e7ff" emissive="#6c9cff" emissiveIntensity={0.35} /></mesh></group>;
-  if (item.type === "crosswalk") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, 0.035, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[3, 1.4]} /><meshStandardMaterial color={selected ? "#dbeafe" : "#e5e7eb"} /></mesh></group>;
-  if (item.type === "bikeLane") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, 0.07, 0]}><boxGeometry args={[2.2, 0.12, 8]} /><meshStandardMaterial color={selected ? "#72b5f8" : "#2879bd"} /></mesh><mesh position={[0, 0.14, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[0.8, 1.5]} /><meshBasicMaterial color="#d9f3ff" /></mesh></group>;
-  if (item.type === "busStop") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[-1, 1, 0]}><boxGeometry args={[0.08, 2, 0.08]} /><meshStandardMaterial color="#8693a1" /></mesh><mesh position={[0, 1.9, 0]}><boxGeometry args={[2.2, 0.08, 1.1]} /><meshStandardMaterial color="#74b8e8" transparent opacity={0.7} /></mesh><mesh position={[0, 0.45, 0]}><boxGeometry args={[1.7, 0.12, 0.5]} /><meshStandardMaterial color="#4b5563" /></mesh></group>;
-  if (item.type === "trafficLight") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, 1.2, 0]}><cylinderGeometry args={[0.05, 0.07, 2.4, 8]} /><meshStandardMaterial color="#3f4650" /></mesh><mesh position={[0, 2.1, 0]}><boxGeometry args={[0.25, 0.6, 0.2]} /><meshStandardMaterial color={selected ? "#8eb8ee" : "#222a33"} /></mesh><mesh position={[0, 2.28, 0.11]}><sphereGeometry args={[0.055, 12, 8]} /><meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={0.4} /></mesh></group>;
-  if (item.type === "roadSign") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, 0.8, 0]}><cylinderGeometry args={[0.045, 0.05, 1.6, 8]} /><meshStandardMaterial color="#9ba4ad" /></mesh><mesh position={[0, 1.55, 0]} rotation={[0, 0, Math.PI / 4]}><boxGeometry args={[0.55, 0.55, 0.05]} /><meshStandardMaterial color={selected ? "#fca5a5" : "#dc4b4b"} /></mesh></group>;
-  if (item.type === "barrier") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}{[-1.2, 0, 1.2].map((offset) => <mesh key={offset} position={[offset, 0.45, 0]}><cylinderGeometry args={[0.07, 0.09, 0.9, 8]} /><meshStandardMaterial color="#d6a744" /></mesh>)}<mesh position={[0, 0.55, 0]}><boxGeometry args={[2.7, 0.12, 0.12]} /><meshStandardMaterial color={selected ? "#f5d27a" : "#b5862d"} /></mesh></group>;
-  if (item.type === "bench") return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, 0.55, 0]}><boxGeometry args={[1.7, 0.14, 0.45]} /><meshStandardMaterial color={selected ? "#d7a66c" : "#9b6b3f"} /></mesh><mesh position={[0, 0.95, 0.17]}><boxGeometry args={[1.7, 0.75, 0.1]} /><meshStandardMaterial color="#875b38" /></mesh>{[-0.65, 0.65].map((offset) => <mesh key={offset} position={[offset, 0.25, 0]}><boxGeometry args={[0.1, 0.5, 0.3]} /><meshStandardMaterial color="#444b55" /></mesh>)}</group>;
-  const sidewalk = item.type === "sidewalk";
-  return <group position={[item.x, 0, item.z]} onClick={click}>{highlight}<mesh position={[0, sidewalk ? 0.12 : 0.08, 0]}><boxGeometry args={[sidewalk ? 2 : 4, sidewalk ? 0.24 : 0.16, 8]} /><meshStandardMaterial color={selected ? "#8eb8ee" : sidewalk ? "#89929c" : "#282d34"} /></mesh></group>;
-}
+const initialLighting: LightingSettings = {
+  preset: "Day",
+  intensity: 1,
+  azimuth: -42,
+  elevation: 48,
+  shadowSoftness: 3,
+  shadows: true,
+};
 
-function CityModelElement({ item, selected, onClick, highlight }: { item: StreetElement; selected: boolean; onClick: (event: ThreeEvent<MouseEvent>) => void; highlight: ReactNode }) {
-  const texture = useTexture("/Section/infra.jpg");
-  texture.colorSpace = "srgb";
-  return <group position={[item.x, 0.22, item.z]} onClick={onClick}>
-    {highlight}
-    <mesh position={[0, 0, 0]}>
-      <boxGeometry args={[8.4, 0.42, 8.4]} />
-      <meshStandardMaterial color={selected ? "#6f9ed0" : "#202b3a"} roughness={0.78} metalness={0.08} />
-    </mesh>
-    <mesh position={[0, 0.235, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[8, 8]} />
-      <meshStandardMaterial map={texture} color={selected ? "#b8d9ff" : "#ffffff"} roughness={0.7} />
-    </mesh>
-    <mesh position={[0, -0.235, 0]} rotation={[Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[8, 8]} />
-      <meshStandardMaterial color="#151b24" roughness={0.9} />
-    </mesh>
-  </group>;
-}
-
-function MeasureGuide({ points }: { points: Point[] }) {
-  if (points.length < 1) return null;
-  return <>{points.map((point) => <mesh key={`${point.x}-${point.z}`} position={[point.x, 0.12, point.z]}><sphereGeometry args={[0.12, 12, 8]} /><meshBasicMaterial color="#70b7ff" /></mesh>)}{points.length === 2 && (() => {
-    const [start, end] = points;
-    const dx = end.x - start.x;
-    const dz = end.z - start.z;
-    const distance = Math.sqrt(dx * dx + dz * dz);
-    return <mesh position={[(start.x + end.x) / 2, 0.12, (start.z + end.z) / 2]} rotation={[0, Math.atan2(dz, dx), 0]}><boxGeometry args={[distance, 0.04, 0.04]} /><meshBasicMaterial color="#70b7ff" /></mesh>;
-  })()}</>;
-}
-
-function SelectedOverlay({ item, suggestion, onFix }: { item: StreetElement; suggestion: string; onFix: () => void }) {
-  return <Html position={[item.x, 2.8, item.z]} center distanceFactor={9} occlude={false}>
-    <div className="w-64 rounded-xl border border-blue-300/25 bg-[#202020]/95 p-3 text-left text-zinc-100 shadow-xl shadow-black/40 backdrop-blur-sm">
-      <div className="mb-2 flex items-center justify-between border-b border-white/[0.08] pb-2">
-        <span className="text-[11px] font-semibold text-blue-100">Selected element</span>
-        <span className="rounded-md bg-blue-400/10 px-2 py-1 text-[10px] text-blue-200">{elementLabels[item.type]}</span>
-      </div>
-      <p className="text-[10px] leading-4 text-zinc-300">{suggestion}</p>
-      <button onClick={onFix} className="mt-3 w-full rounded-lg border border-blue-300/20 bg-blue-400/10 px-3 py-2 text-[10px] text-blue-100 transition hover:bg-blue-400/20">AI Suggest Fix</button>
-    </div>
-  </Html>;
-}
-
-function Scene({ tool, elements, selectedId, selected, selectedSuggestion, measurePoints, undergroundUtilities, onPlace, onSelect, onEmpty, onFix }: {
-  tool: Tool;
-  elements: StreetElement[];
-  selectedId: number | null;
-  selected: StreetElement | null;
-  selectedSuggestion: string;
-  measurePoints: Point[];
-  undergroundUtilities: boolean;
-  onPlace: (event: ThreeEvent<MouseEvent>) => void;
-  onSelect: (id: number) => void;
-  onEmpty: (event: ThreeEvent<MouseEvent>) => void;
-  onFix: () => void;
+function NumericField({
+  label,
+  value,
+  step = 0.5,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  step?: number;
+  onChange: (value: number) => void;
 }) {
-  return <><color attach="background" args={["#191919"]} /><ambientLight intensity={0.7} /><directionalLight position={[5, 8, 4]} intensity={1.4} /><Grid args={[100, 100]} cellSize={0.5} sectionSize={5} cellColor="#303640" sectionColor="#566170" fadeDistance={30} fadeStrength={1.3} infiniteGrid /><mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} onClick={tool === "measure" ? onPlace : onEmpty}><planeGeometry args={[100, 100]} /><meshBasicMaterial transparent opacity={0} /></mesh>{undergroundUtilities && <group position={[0, -0.18, 0]}>{[-2, 0, 2].map((x) => <mesh key={x} rotation={[0, 0, Math.PI / 2]} position={[x, 0, 0]}><cylinderGeometry args={[0.045, 0.045, 100, 8]} /><meshBasicMaterial color={x === -2 ? "#3b82f6" : x === 0 ? "#eab308" : "#ef4444"} transparent opacity={0.75} /></mesh>)}</group>}<MeasureGuide points={measurePoints} />{elements.map((item) => <Element key={item.id} item={item} selected={item.id === selectedId} onSelect={() => onSelect(item.id)} />)}{selected && <SelectedOverlay item={selected} suggestion={selectedSuggestion} onFix={onFix} />}<OrbitControls makeDefault enableDamping /></>;
+  return (
+    <label className="infra-field">
+      <span>{label}</span>
+      <input
+        type="number"
+        value={Number(value.toFixed(2))}
+        step={step}
+        onChange={(event) => {
+          const next = event.currentTarget.valueAsNumber;
+          if (Number.isFinite(next)) onChange(next);
+        }}
+      />
+    </label>
+  );
+}
+
+function ActionButton({
+  title,
+  onClick,
+  children,
+  active = false,
+  disabled = false,
+  className = "",
+}: {
+  title: string;
+  onClick: () => void;
+  children: ReactNode;
+  active?: boolean;
+  disabled?: boolean;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-label={title}
+      aria-pressed={active}
+      disabled={disabled}
+      onClick={onClick}
+      className={`infra-action ${active ? "is-active" : ""} ${className}`}
+    >
+      {children}
+    </button>
+  );
 }
 
 export default function InfrastructurePage() {
-  const [tool, setTool] = useState<Tool>("select");
-  const [elements, setElements] = useState<StreetElement[]>([{ id: 1, type: "road", x: 0, z: 0 }, { id: 2, type: "sidewalk", x: -3, z: 0 }, { id: 3, type: "sidewalk", x: 3, z: 0 }, { id: 4, type: "cityModel", x: 0, z: 0 }]);
-  const [past, setPast] = useState<StreetElement[][]>([]);
-  const [future, setFuture] = useState<StreetElement[][]>([]);
+  const [objects, setObjects] = useState<InfrastructureObject[]>(createInitialInfrastructure);
+  const [past, setPast] = useState<InfrastructureObject[][]>([]);
+  const [future, setFuture] = useState<InfrastructureObject[][]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [measurePoints, setMeasurePoints] = useState<Point[]>([]);
+  const [tool, setTool] = useState<TransformMode>("select");
+  const [roadStart, setRoadStart] = useState<[number, number] | null>(null);
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [lighting, setLighting] = useState<LightingSettings>(initialLighting);
   const [undergroundUtilities, setUndergroundUtilities] = useState(false);
-  const [specialOpen, setSpecialOpen] = useState(false);
-  const [aiLoading, setAiLoading] = useState<string | null>(null);
-  const [chatInput, setChatInput] = useState("");
+  const [lightingOpen, setLightingOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(true);
-  const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; text: string }>>([
-    { role: "assistant", text: "I can analyze mobility, accessibility, drainage, safety, and zoning for this layout." },
+  const [chatInput, setChatInput] = useState("");
+  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; text: string }>>([
+    { role: "assistant", text: "I can review access, mobility, public space and landscape across this concept site." },
   ]);
-  const aiTimer = useRef<number | null>(null);
+  const [measurePoints, setMeasurePoints] = useState<Array<[number, number]>>([]);
+  const viewport = useRef<ViewportApi>(null);
 
-  useEffect(() => () => { if (aiTimer.current) window.clearTimeout(aiTimer.current); }, []);
-  useEffect(() => {
-    const escape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setSelectedId(null);
-        setMeasurePoints([]);
-      }
-    };
-    window.addEventListener("keydown", escape);
-    return () => window.removeEventListener("keydown", escape);
-  }, []);
+  const selected = objects.find((object) => object.id === selectedId) ?? null;
+  const visibleObjects = useMemo(() => objects.filter((object) => object.visible), [objects]);
+  const counts = useMemo(() => objects.reduce((summary, object) => {
+    summary[object.type] = (summary[object.type] ?? 0) + 1;
+    return summary;
+  }, {} as Partial<Record<InfrastructureType, number>>), [objects]);
+  const measuredDistance = measurePoints.length === 2
+    ? Math.hypot(measurePoints[1][0] - measurePoints[0][0], measurePoints[1][1] - measurePoints[0][1])
+    : null;
 
-  const commitElements = (next: StreetElement[]) => {
-    setPast((history) => [...history, elements]);
-    setElements(next);
+  const commitObjects = (next: InfrastructureObject[]) => {
+    setPast((history) => [...history.slice(-39), objects]);
+    setObjects(next);
     setFuture([]);
+  };
+  const updateObject = (id: number, changes: Partial<InfrastructureObject>) => {
+    const target = objects.find((object) => object.id === id);
+    if (target?.locked && !("locked" in changes) && !("visible" in changes)) return;
+    commitObjects(objects.map((object) => object.id === id ? { ...object, ...changes } : object));
   };
   const undo = () => {
     const previous = past[past.length - 1];
     if (!previous) return;
-    setFuture((history) => [elements, ...history]);
-    setElements(previous);
+    setFuture((history) => [objects, ...history]);
+    setObjects(previous);
     setPast((history) => history.slice(0, -1));
-    setSelectedId(null);
   };
   const redo = () => {
     const next = future[0];
     if (!next) return;
-    setPast((history) => [...history, elements]);
-    setElements(next);
+    setPast((history) => [...history, objects]);
+    setObjects(next);
     setFuture((history) => history.slice(1));
-    setSelectedId(null);
   };
 
-  const counts = useMemo(() => Object.fromEntries(Object.keys(elementLabels).map((type) => [type, elements.filter((item) => item.type === type).length])) as Record<ElementType, number>, [elements]);
-  const selected = elements.find((item) => item.id === selectedId) ?? null;
-  const selectedDimensions = selected ? (selected.type === "road" ? "4m wide x 8m long" : selected.type === "sidewalk" ? "2m wide x 8m long" : "1m wide x 1m long") : "";
-  const selectedSuggestion = selected?.type === "sidewalk" ? "Width: 1.5m — meets accessibility standard" : selected?.type === "tree" ? "Distance to nearest tree: 4m" : selected ? "No element-specific issues detected." : "";
-  const measuredDistance = measurePoints.length === 2 ? Math.hypot(measurePoints[1].x - measurePoints[0].x, measurePoints[1].z - measurePoints[0].z) : null;
-  const suggestions = useMemo(() => [
-    ...(counts.sidewalk === 0 ? ["Sidewalk coverage is missing — add a continuous accessible route"] : []),
-    ...(counts.tree === 0 ? ["No trees within 50m — consider adding greenery"] : []),
-    ...(counts.crosswalk === 0 ? ["Crosswalk spacing exceeds 150m — consider adding a crossing point"] : []),
-    ...(counts.trafficLight > 0 && counts.crosswalk === 0 ? ["Traffic control should connect to a marked crossing"] : []),
-  ], [counts]);
-  const aiInsight = counts.busStop === 0 ? "Transit coverage is the next opportunity." : counts.bikeLane === 0 ? "A bike connection would improve multimodal access." : "Your active network has a strong multimodal mix.";
+  const placeObject = (
+    type: InfrastructureType,
+    point: { x: number; z: number },
+    roadPath?: [number, number][],
+  ) => {
+    const nextId = objects.reduce((max, object) => Math.max(max, object.id), 0) + 1;
+    const defaults: Partial<InfrastructureObject> = type === "road"
+      ? {
+        name: "New road segment",
+        width: 7,
+        depth: roadPath ? Math.hypot(roadPath[1][0] - roadPath[0][0], roadPath[1][1] - roadPath[0][1]) : 24,
+        lanes: 2,
+        path: roadPath ?? [[-12, 0], [12, 0]],
+      }
+      : type === "building"
+        ? { name: "New commercial building", width: 10, depth: 8, height: 5, style: "commercial" }
+        : type === "pavilion"
+          ? { name: "New public pavilion", width: 6, depth: 6, height: 4 }
+          : {};
+    const object = makeInfrastructureObject(
+      nextId,
+      type,
+      Math.round(point.x * 2) / 2,
+      Math.round(point.z * 2) / 2,
+      defaults,
+    );
+    commitObjects([...objects, object]);
+    setSelectedId(object.id);
+    setTool("select");
+    setLibraryOpen(false);
+    setInspectorOpen(true);
+  };
 
-  const place = (event: ThreeEvent<MouseEvent>) => {
-    if (tool === "measure") {
-      setMeasurePoints((points) => points.length === 2 ? [{ x: event.point.x, z: event.point.z }] : [...points, { x: Math.round(event.point.x), z: Math.round(event.point.z) }]);
-      setSelectedId(null);
-      return;
+  const handlePlacement = (point: { x: number; z: number }) => {
+    if (tool === "road") {
+      const snapped: [number, number] = [Math.round(point.x * 2) / 2, Math.round(point.z * 2) / 2];
+      if (!roadStart) {
+        setRoadStart(snapped);
+        return;
+      }
+      const center: [number, number] = [(roadStart[0] + snapped[0]) / 2, (roadStart[1] + snapped[1]) / 2];
+      const deltaX = snapped[0] - roadStart[0];
+      const deltaZ = snapped[1] - roadStart[1];
+      const arc = Math.hypot(deltaX, deltaZ) * 0.14;
+      const path: [number, number][] = [
+        [roadStart[0] - center[0], roadStart[1] - center[1]],
+        [
+          (roadStart[0] + snapped[0]) / 2 - center[0] - (deltaZ / Math.max(1, Math.hypot(deltaX, deltaZ))) * arc,
+          (roadStart[1] + snapped[1]) / 2 - center[1] + (deltaX / Math.max(1, Math.hypot(deltaX, deltaZ))) * arc,
+        ],
+        [snapped[0] - center[0], snapped[1] - center[1]],
+      ];
+      placeObject("road", { x: center[0], z: center[1] }, path);
+      setRoadStart(null);
+    } else {
+      placeObject(tool as InfrastructureType, point);
     }
-    if (!toolItems.some((item) => item.type === tool && !["select", "move", "delete", "measure"].includes(item.type))) return;
-    const nextId = elements.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-    commitElements([...elements, { id: nextId, type: tool as ElementType, x: Math.round(event.point.x), z: Math.round(event.point.z) }]);
-    setSelectedId(nextId);
   };
-  const select = (id: number) => {
-    if (tool === "delete") {
-      commitElements(elements.filter((item) => item.id !== id));
-      if (selectedId === id) setSelectedId(null);
+
+  const handleSceneSelect = (id: number, point: { x: number; z: number }) => {
+    if (categories.some((category) => category.items.some((item) => item.type === tool))) {
+      handlePlacement(point);
+    } else if (tool === "measure") {
+      setMeasurePoints((current) => current.length === 2
+        ? [[point.x, point.z]]
+        : [...current, [point.x, point.z]]);
+    } else if (tool === "delete") {
+      const object = objects.find((item) => item.id === id);
+      if (object && window.confirm(`Delete "${object.name}" from the site?`)) {
+        commitObjects(objects.filter((item) => item.id !== id));
+        setSelectedId((current) => current === id ? null : current);
+      }
     } else {
       setSelectedId(id);
+      setInspectorOpen(true);
     }
   };
-  const deleteSelected = () => {
-    if (!selected) return;
-    commitElements(elements.filter((item) => item.id !== selected.id));
+
+  const handleEmptyClick = (point: { x: number; z: number }) => {
+    if (categories.some((category) => category.items.some((item) => item.type === tool))) {
+      handlePlacement(point);
+    } else if (tool === "measure") {
+      setMeasurePoints((current) => current.length === 2
+        ? [[point.x, point.z]]
+        : [...current, [point.x, point.z]]);
+    } else {
+      setSelectedId(null);
+    }
+  };
+
+  const confirmDeleteSelected = () => {
+    if (!selected || !window.confirm(`Delete "${selected.name}" from the site?`)) return;
+    commitObjects(objects.filter((object) => object.id !== selected.id));
     setSelectedId(null);
     setTool("select");
   };
-  const runAiAction = (action: "auto-layout" | "optimize" | "accessibility" | "greenery" | "transit") => {
-    setAiLoading(action);
-    aiTimer.current = window.setTimeout(() => {
-      const additions: StreetElement[] = [];
-      const nextId = () => elements.reduce((max, item) => Math.max(max, item.id, ...additions.map((added) => added.id)), 0) + 1;
-      if (action === "auto-layout") {
-        if (counts.road === 0) additions.push({ id: nextId(), type: "road", x: 0, z: 0 });
-        if (counts.sidewalk < 2) [-3, 3].slice(counts.sidewalk).forEach((x) => additions.push({ id: nextId(), type: "sidewalk", x, z: 0 }));
-        if (counts.tree < 4) [-6, -2, 2, 6].slice(counts.tree).forEach((x) => additions.push({ id: nextId(), type: "tree", x, z: 4 }));
-        if (counts.streetlight < 2) [-4, 4].slice(counts.streetlight).forEach((x) => additions.push({ id: nextId(), type: "streetlight", x, z: -3 }));
-      }
-      if (action === "optimize" && counts.tree < 3) [-4, 0, 4].slice(counts.tree).forEach((x) => additions.push({ id: nextId(), type: "tree", x, z: 4 }));
-      if (action === "accessibility" && counts.crosswalk === 0) additions.push({ id: nextId(), type: "crosswalk", x: 0, z: 5 });
-      if (action === "greenery" && counts.tree < 3) {
-        [-4, 0, 4].slice(counts.tree).forEach((x) => additions.push({ id: nextId(), type: "tree", x, z: 4 }));
-      }
-      if (action === "transit" && counts.busStop === 0) additions.push({ id: nextId(), type: "busStop", x: 5, z: -3 });
-      if (additions.length) commitElements([...elements, ...additions]);
-      setAiLoading(null);
-    }, 650);
+  const duplicateSelected = () => {
+    if (!selected) return;
+    const id = objects.reduce((max, object) => Math.max(max, object.id), 0) + 1;
+    const duplicate = { ...selected, id, name: `${selected.name} copy`, x: selected.x + 2, z: selected.z + 2, locked: false };
+    commitObjects([...objects, duplicate]);
+    setSelectedId(id);
   };
-  const applySuggestion = (suggestion: string) => {
-    if (suggestion.includes("trees")) runAiAction("greenery");
-    else if (suggestion.includes("crosswalk") || suggestion.includes("crossing")) runAiAction("accessibility");
-    else runAiAction("optimize");
-  };
-  const sendChat = () => {
-    const prompt = chatInput.trim();
-    if (!prompt) return;
-    const lower = prompt.toLowerCase();
-    const response = lower.includes("drain") ? "Drainage review: keep utility corridors clear and add a low-point inspection near the road edge." : lower.includes("safety") || lower.includes("emergency") ? "Safety review: place traffic lights at crossings and keep a continuous emergency access lane." : lower.includes("bike") || lower.includes("mobility") ? "Mobility review: connect the bike lane to the bus stop and keep the sidewalk at least 1.5m wide." : "Layout review: the current scene is ready for an accessibility and greenery pass.";
-    setChatMessages((messages) => [...messages, { role: "user", text: prompt }, { role: "assistant", text: response }]);
-    setChatInput("");
-  };
-  const exportLayout = (format: string) => {
-    const content = format === "GeoJSON" ? JSON.stringify({ type: "FeatureCollection", features: elements.map((item) => ({ type: "Feature", properties: { type: item.type }, geometry: { type: "Point", coordinates: [item.x, item.z] } })) }) : elements.map((item) => `${item.type},${item.x},${item.z}`).join("\n");
-    const url = URL.createObjectURL(new Blob([content], { type: "text/plain" }));
-    const anchor = document.createElement("a"); anchor.href = url; anchor.download = `infrastructure.${format === "GeoJSON" ? "geojson" : "csv"}`; anchor.click(); URL.revokeObjectURL(url);
+  const resetSelectedTransform = () => {
+    if (selected) updateObject(selected.id, { x: 0, y: 0, z: 0, rotation: 0 });
   };
 
-  return <main className={`crystal-infrastructure-page ${roboto.className} crystal-ui-kit flex h-screen w-full gap-2 overflow-hidden bg-[#0a0a0a] p-2 pt-20 text-zinc-100`}>
-    <aside className="crystal-ui-panel crystal-infrastructure-sidebar relative z-40 flex w-[264px] shrink-0 flex-col rounded-xl border border-white/[0.08] bg-[#171717] p-4 shadow-lg shadow-black/30"><div className="mb-5 flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-lg bg-[#3188f4] shadow-sm shadow-blue-500/20"><Route size={18} /></span><div><b className="text-sm">Crystal</b><p className="text-[10px] uppercase tracking-[0.18em] text-zinc-500">Infrastructure</p></div></div><div className="mb-4 rounded-lg border border-white/[0.08] bg-[#202020] px-3 py-2 text-xs text-zinc-200">Items <ChevronDown size={13} className="float-right mt-0.5 text-zinc-500" /></div><p className="mb-2 px-1 text-[10px] uppercase tracking-[0.18em] text-zinc-600">Tools</p><div className="max-h-[52vh] space-y-1 overflow-y-auto pr-1">{toolItems.map(({ type, label, icon: Icon }) => <button key={type} onClick={() => { setTool(type); if (type !== "measure") setMeasurePoints([]); }} className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-xs transition-all duration-200 active:scale-95 ${tool === type ? "border border-blue-400/20 bg-blue-500/20 text-[#9ac3ff] shadow-sm shadow-blue-500/10" : "text-zinc-400 hover:bg-white/[0.06] hover:text-white"}`}><Icon size={15} />{label}</button>)}</div><div className="mt-3 flex items-center justify-between rounded-lg border border-white/[0.08] bg-[#202020] px-3 py-2 text-xs"><span className="flex items-center gap-2 text-zinc-400"><Zap size={13} />Underground utilities</span><button aria-label="Toggle underground utilities" onClick={() => setUndergroundUtilities((value) => !value)} className={`relative h-5 w-9 rounded-full transition ${undergroundUtilities ? "bg-blue-500" : "bg-zinc-700"}`}><span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition ${undergroundUtilities ? "left-[18px]" : "left-0.5"}`} /></button></div><div className="mt-3 flex gap-2"><button disabled={!past.length} onClick={undo} title="Undo" className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-white/[0.08] bg-[#202020] py-2 text-xs text-zinc-300 disabled:cursor-not-allowed disabled:opacity-30"><Undo2 size={14} />Undo</button><button disabled={!future.length} onClick={redo} title="Redo" className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-white/[0.08] bg-[#202020] py-2 text-xs text-zinc-300 disabled:cursor-not-allowed disabled:opacity-30"><Redo2 size={14} />Redo</button></div><div className="mt-auto rounded-xl border border-white/[0.08] bg-[#202020] p-3 text-[11px] text-zinc-500 shadow-sm shadow-black/20">Click the grid to place the active element. Escape clears selection.</div></aside>
-    <section className="crystal-ui-workspace flex min-w-0 flex-1 flex-col bg-[#101112]"><header className="crystal-ui-header fixed left-2 right-2 top-2 z-30 flex h-16 shrink-0 items-center gap-4 border-b border-[#292929] bg-[#0f0f0f] px-6"><div className="flex items-center gap-3"><img src="/Logopng.png" alt="Crystal" className="h-6 w-6 object-contain" /><b className="text-[18px] tracking-[-0.02em] text-zinc-100">Crystal</b><span className="mx-1 h-5 w-px bg-[#303030]" /><Home size={17} className="text-zinc-300" /><span className="h-5 w-px bg-[#303030] text-zinc-300" /><span className="text-[12px] font-semibold tracking-wide text-zinc-300">3D Studio <span className="text-zinc-500">/ Infrastructure</span></span></div><nav className="ml-7 flex h-full items-center gap-1 text-[13px] text-zinc-400">{["File", "Edit", "Tools", "Help", "View"].map((item) => <button key={item} className="h-9 rounded-lg px-3 transition hover:bg-white/[0.05] hover:text-white">{item}</button>)}</nav><div className="ml-3 flex h-10 items-center rounded-full border border-[#303030] bg-[#202020] p-1 text-[11px]"><a href="/crystal" className="rounded-full px-3 py-2 text-zinc-400 transition hover:text-white">Floor plan</a><a href="/crystal" className="rounded-full px-3 py-2 text-zinc-400 transition hover:text-white">Modeling</a><a href="/infrastructure" className="rounded-full bg-[#3b3b3b] px-3 py-2 font-semibold text-white shadow-[0_3px_10px_rgba(0,0,0,.24)]">Infrastructure</a></div><div className="ml-auto flex items-center gap-2.5"><div className="relative"><button onClick={() => setSpecialOpen((value) => !value)} className="flex items-center gap-2 rounded-[11px] border border-[#666] px-3 py-2 text-[11px] text-zinc-200 transition hover:bg-[#202020]">Special <ChevronDown size={13} /></button>{specialOpen && <div className="absolute right-0 top-11 z-20 w-48 rounded-xl border border-white/[0.08] bg-[#202020] p-2 shadow-lg">{["Residential Street", "Main Avenue", "Pedestrian-only Zone"].map((preset) => <button key={preset} onClick={() => setSpecialOpen(false)} className="block w-full rounded-lg px-3 py-2 text-left text-xs text-zinc-400 transition-all duration-200 hover:bg-white/[0.06] hover:text-white">{preset}</button>)}</div>}</div><button onClick={() => exportLayout("GeoJSON")} className="flex items-center gap-2 rounded-[11px] border border-[#666] px-3 py-2 text-[11px] text-zinc-200 transition hover:bg-[#202020]"><Download size={14} />Export</button><button className="flex h-10 items-center gap-2 rounded-[11px] border border-[#666] px-3 text-[11px] text-zinc-200">Starter <Zap size={15} />200</button><button className="flex h-10 items-center gap-2 rounded-[10px] bg-[#1687f7] px-4 py-2 text-[12px] font-semibold text-white shadow-[0_8px_20px_rgba(22,135,247,.2)]"><Zap size={17} fill="currentColor" />Go Pro</button></div></header><div className="relative min-h-0 flex-1">    <div className="crystal-infrastructure-tools absolute left-3 top-3 z-10 flex flex-col gap-1 rounded-lg border border-white/[0.08] bg-[#202020]/95 p-1 shadow-lg">{toolItems.slice(0, 5).map(({ type, label, icon: Icon }) => <button key={type} onClick={() => setTool(type)} title={label} className={`grid h-9 w-9 place-items-center rounded-md transition-all duration-200 active:scale-95 ${tool === type ? "bg-blue-500/20 text-[#9ac3ff]" : "text-zinc-400 hover:bg-white/[0.07] hover:text-white"}`}><Icon size={16} /></button>)}</div>        <Canvas camera={{ position: [9, 8, 10], fov: 45 }}><Scene tool={tool} elements={elements} selectedId={selectedId} selected={selected} selectedSuggestion={selectedSuggestion} measurePoints={measurePoints} undergroundUtilities={undergroundUtilities} onPlace={place} onSelect={select} onEmpty={() => setSelectedId(null)} onFix={() => applySuggestion(selectedSuggestion)} /></Canvas>{tool === "measure" && <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-blue-400/20 bg-[#202020]/95 px-4 py-2 text-xs text-blue-100 shadow-lg">{measuredDistance ? `Distance: ${measuredDistance.toFixed(1)} m` : "Click two points to measure distance"}</div>}{chatOpen ?     <div className="crystal-infrastructure-ai absolute bottom-4 left-1/2 z-20 w-[min(520px,calc(100%-2rem))] -translate-x-1/2 rounded-xl border border-blue-400/30 bg-[#101010]/95 p-3 shadow-xl shadow-black/40 backdrop-blur-sm"><div className="mb-2 flex items-center justify-between"><div className="flex items-center gap-2 text-xs font-medium text-zinc-200"><MessageCircle size={15} className="text-blue-300" />AI Chat</div><button onClick={() => setChatOpen(false)} className="rounded-md px-2 py-1 text-[10px] text-zinc-500 hover:bg-white/[0.06] hover:text-white">Hide</button></div><div className="mb-2 max-h-20 overflow-y-auto">{chatMessages.slice(-2).map((message, index) => <div key={`${message.role}-${index}`} className="mb-1 rounded-lg bg-white/[0.05] px-3 py-2 text-[10px] leading-4 text-zinc-300">{message.text}</div>)}</div><div className="mb-2 flex flex-wrap gap-1"><button onClick={() => setChatInput("Analyze mobility and transit connections")} className="rounded-md border border-white/[0.08] px-2 py-1 text-[9px] text-zinc-400 hover:bg-white/[0.06]">Mobility</button><button onClick={() => setChatInput("Review drainage and utility corridors")} className="rounded-md border border-white/[0.08] px-2 py-1 text-[9px] text-zinc-400 hover:bg-white/[0.06]">Drainage</button><button onClick={() => setChatInput("Check emergency route safety")} className="rounded-md border border-white/[0.08] px-2 py-1 text-[9px] text-zinc-400 hover:bg-white/[0.06]">Safety</button></div><div className="flex gap-2"><input value={chatInput} onChange={(event) => setChatInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") sendChat(); }} placeholder="Ask about this layout..." className="min-w-0 flex-1 rounded-lg border border-white/[0.08] bg-[#171717] px-3 py-2 text-[10px] text-zinc-200 outline-none placeholder:text-zinc-600 focus:border-blue-400/40" /><button onClick={sendChat} aria-label="Send AI message" className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-blue-500/20 text-blue-200 hover:bg-blue-500/30"><Send size={13} /></button></div></div> : <button onClick={() => setChatOpen(true)} className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full border border-blue-400/30 bg-[#202020]/95 px-4 py-2 text-xs text-blue-100 shadow-lg"><MessageCircle size={14} />Show AI Chat</button>}</div></section>
-    <aside className="crystal-ui-panel relative z-40 w-[264px] shrink-0 overflow-y-auto rounded-xl border border-white/[0.08] bg-[#171717] p-4 shadow-lg shadow-black/30"><div className="mb-5 flex items-center justify-between"><h2 className="text-sm font-semibold">Statistics</h2><button className="rounded-md p-1.5 text-zinc-500 transition hover:bg-white/[0.06] hover:text-white"><ChevronDown size={14} /></button></div><div className="space-y-2">{[["Total Street Length", `${counts.road * 100} m`], ["Sidewalk Width", counts.sidewalk ? "1.5 m" : "0 m"], ["Tree Count", `${counts.tree}`], ["Bike Lanes", `${counts.bikeLane}`], ["Transit Stops", `${counts.busStop}`], ["Traffic Controls", `${counts.trafficLight}`], ["Green Coverage", `${Math.min(100, counts.tree * 8)}%`], ["Underground Utilities", undergroundUtilities ? "Enabled" : "Surface"]].map(([label, value]) => <div key={label} className="rounded-lg border border-white/[0.08] bg-[#202020] p-3 shadow-sm shadow-black/20"><p className="text-[10px] text-zinc-500">{label}</p><p className="mt-1 text-sm font-semibold text-zinc-200">{value}</p></div>)}</div>{selected && <div className="mt-6 rounded-xl border border-blue-400/20 bg-blue-400/[0.06] p-3"><div className="mb-3 flex items-center justify-between"><h2 className="text-sm font-semibold text-blue-100">Inspector</h2><button onClick={() => setSelectedId(null)} className="text-[10px] text-blue-200/60 hover:text-white">Clear</button></div>    <p className="text-xs font-medium text-zinc-100">{elementLabels[selected.type]}</p><p className="mt-1 text-[11px] text-zinc-400">Position {selected.x}, {selected.z}</p><p className="mt-1 text-[11px] text-zinc-400">Dimensions {selectedDimensions}</p><p className="mt-2 text-[11px] leading-4 text-blue-100/80">{selectedSuggestion}</p><button onClick={deleteSelected} className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-red-400/20 bg-red-400/[0.08] py-2 text-xs text-red-200 hover:bg-red-400/[0.15]"><Trash2 size={13} />Delete selected</button></div>}<div className="mt-6 rounded-xl border border-white/[0.08] bg-[#202020] p-3"><div className="mb-2 flex items-center gap-2"><Sparkles size={15} className="text-blue-300" /><h2 className="text-sm font-semibold">AI Tools</h2></div><p className="mb-3 text-[11px] leading-4 text-zinc-500">{aiInsight} Actions use the current layout and run locally.</p>    <div className="space-y-2">{[["auto-layout", "AI Auto-Layout", "Generate a complete street arrangement"], ["optimize", "AI Optimize", "Adjust spacing to planning standards"], ["accessibility", "Improve accessibility", "Add a crossing where one is missing"], ["greenery", "Balance greenery", "Place trees along the active corridor"], ["transit", "Add transit coverage", "Place a bus stop near the road"]].map(([action, label, description]) => <button key={action} disabled={!!aiLoading} onClick={() => runAiAction(action as "auto-layout" | "optimize" | "accessibility" | "greenery" | "transit")} className="flex w-full items-center justify-between rounded-lg border border-white/[0.08] px-3 py-2 text-left transition hover:bg-white/[0.06] disabled:cursor-wait disabled:opacity-60"><span><span className="block text-xs text-zinc-200">{aiLoading === action ? action === "auto-layout" ? "Generating suggestions..." : "Analyzing layout..." : label}</span><span className="block text-[10px] text-zinc-500">{description}</span></span>{aiLoading === action ? <Loader2 size={14} className="animate-spin text-blue-300" /> : <Sparkles size={13} className="text-zinc-500" />}</button>)}</div></div><h2 className="mb-3 mt-6 text-sm font-semibold">Suggestions</h2><div className="space-y-2">{suggestions.map((suggestion) => <div key={suggestion} className="flex gap-2 rounded-lg border border-amber-400/20 bg-amber-400/[0.06] p-3 text-[11px] leading-4 text-amber-100 shadow-sm shadow-black/20">    <AlertTriangle size={14} className="mt-0.5 shrink-0 text-amber-300" /><span className="flex-1">{suggestion}</span><button onClick={() => applySuggestion(suggestion)} disabled={!!aiLoading} className="shrink-0 rounded-md border border-amber-300/20 px-2 py-1 text-[10px] text-amber-100 transition hover:bg-amber-300/10 disabled:opacity-50">AI Fix</button></div>)}{suggestions.length === 0 && <div className="flex gap-2 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] p-3 text-[11px] text-emerald-100 shadow-sm shadow-black/20"><Lightbulb size={14} />Layout looks balanced.</div>}</div></aside>
-  </main>;
+  const setLightPreset = (preset: LightingPreset) => {
+    const sun = preset === "Night"
+      ? { azimuth: 18, elevation: 12 }
+      : preset === "Golden hour"
+        ? { azimuth: -28, elevation: 16 }
+        : preset === "Studio"
+          ? { azimuth: -42, elevation: 65 }
+          : { azimuth: -42, elevation: 48 };
+    setLighting((current) => ({ ...current, preset, ...sun }));
+  };
+
+  const exportLayout = (format: "GeoJSON" | "CSV") => {
+    const content = format === "GeoJSON"
+      ? JSON.stringify({
+        type: "FeatureCollection",
+        features: objects.map((object) => ({
+          type: "Feature",
+          properties: {
+            id: object.id,
+            name: object.name,
+            type: object.type,
+            width: object.width,
+            depth: object.depth,
+            height: object.height,
+            rotation: object.rotation,
+            color: object.color,
+          },
+          geometry: { type: "Point", coordinates: [object.x, object.z] },
+        })),
+      }, null, 2)
+      : [
+        "id,name,type,x,y,z,rotation,width,depth,height,lanes,color",
+        ...objects.map((object) => [
+          object.id, `"${object.name.replaceAll('"', '""')}"`, object.type, object.x, object.y, object.z,
+          object.rotation, object.width, object.depth, object.height, object.lanes ?? "", object.color,
+        ].join(",")),
+      ].join("\n");
+    const url = URL.createObjectURL(new Blob([content], { type: "text/plain" }));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `crystal-infrastructure.${format === "GeoJSON" ? "geojson" : "csv"}`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const applySiteAction = (action: string) => {
+    const additions: InfrastructureObject[] = [];
+    const add = (type: InfrastructureType, x: number, z: number, name: string) => {
+      const id = objects.reduce((max, object) => Math.max(max, object.id), 0) + additions.length + 1;
+      additions.push(makeInfrastructureObject(id, type, x, z, { name }));
+    };
+    if (action === "auto-layout" || action === "greenery") {
+      if ((counts.tree ?? 0) < 30) {
+        [[-13, 7], [-11, 5], [12, 11], [14, 9]].forEach(([x, z], index) => add("tree", x, z, `Suggested landscape tree ${index + 1}`));
+      } else if ((counts.shrub ?? 0) < 6) {
+        add("shrub", -5, 12, "Suggested planted bed");
+      }
+      if (action === "auto-layout" && !(counts.lamp ?? 0)) add("lamp", 5, 16, "Suggested promenade light");
+    }
+    if (action === "accessibility" && (counts.crosswalk ?? 0) < 5) {
+      add("crosswalk", 0, 8, "Suggested accessible crossing");
+    }
+    if (action === "transit" && (counts.busStop ?? 0) < 2) {
+      add("busStop", -13, 20, "Suggested transit shelter");
+    }
+    if (action === "optimize") {
+      add("bikeLane", 29, 0, "Suggested cycle connection");
+    }
+    if (!additions.length) return;
+    commitObjects([...objects, ...additions]);
+    setSelectedId(additions[0].id);
+  };
+
+  const sendMessage = () => {
+    const text = chatInput.trim();
+    if (!text) return;
+    const lower = text.toLowerCase();
+    const response = lower.includes("parking") || lower.includes("access")
+      ? "Access review: the east and west parking areas connect to the internal boulevard; keep the pedestrian crossings clear at each gateway."
+      : lower.includes("water") || lower.includes("drain")
+        ? "Water review: the creek crosses the public realm with a dedicated pedestrian bridge. Keep planting and path edges clear of the channel."
+        : lower.includes("tree") || lower.includes("green")
+          ? `Landscape review: ${counts.tree ?? 0} individual trees are distributed around the perimeter and public spaces.`
+          : `Site review: ${objects.length} editable objects are arranged across roads, buildings, parking and public space.`;
+    setMessages((current) => [...current, { role: "user", text }, { role: "assistant", text: response }]);
+    setChatInput("");
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))) return;
+      const key = event.key.toLowerCase();
+      if ((event.ctrlKey || event.metaKey) && key === "z") {
+        event.preventDefault();
+        if (event.shiftKey) redo();
+        else undo();
+      } else if ((event.ctrlKey || event.metaKey) && key === "y") {
+        event.preventDefault();
+        redo();
+      } else if (key === "escape") {
+        setSelectedId(null);
+        setMeasurePoints([]);
+        setRoadStart(null);
+        setTool("select");
+      } else if (key === "f" && selected) {
+        viewport.current?.focus(selected);
+      } else if (key === "delete" || key === "backspace") {
+        if (selected && window.confirm(`Delete "${selected.name}" from the site?`)) {
+          commitObjects(objects.filter((object) => object.id !== selected.id));
+          setSelectedId(null);
+        }
+      } else if (["1", "2", "3", "4", "5", "6", "7"].includes(key)) {
+        viewport.current?.preset(cameraPresets[Number(key) - 1]);
+      } else if (key === "+" || key === "=") {
+        viewport.current?.zoom(true);
+      } else if (key === "-") {
+        viewport.current?.zoom(false);
+      } else if (key === "v") setTool("select");
+      else if (key === "g") setTool("move");
+      else if (key === "r") setTool("rotate");
+      else if (key === "s") setTool("scale");
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  });
+
+  return (
+    <main className={`crystal-infrastructure-page ${roboto.className} fixed inset-0 z-20 flex h-screen w-full overflow-hidden bg-[#08090b] pt-16 text-zinc-100`}>
+      <header className="infra-topbar fixed left-0 right-0 top-0 z-50 flex h-16 items-center gap-3 border-b border-white/[0.08] bg-[#0c0e11]/95 px-4 backdrop-blur-xl">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-blue-500 text-white"><Route size={17} /></span>
+          <div className="leading-tight">
+            <b className="text-[13px] tracking-wide">CRYSTAL</b>
+            <div className="text-[10px] text-zinc-500">Infrastructure Studio</div>
+          </div>
+          <span className="mx-2 hidden h-6 w-px bg-white/10 sm:block" />
+          <span className="hidden text-xs text-zinc-400 sm:block">Willow Creek District</span>
+        </div>
+        <div className="infra-mobile-actions">
+          <button type="button" onClick={() => setLibraryOpen((open) => !open)} aria-expanded={libraryOpen}>Library</button>
+          <button type="button" onClick={() => setInspectorOpen((open) => !open)} aria-expanded={inspectorOpen}>Edit</button>
+        </div>
+        <nav className="infra-main-nav ml-3 flex items-center gap-1 text-[11px] text-zinc-400" aria-label="Studio views">
+          <button type="button" className="rounded-md px-2.5 py-2 hover:bg-white/[0.06] hover:text-white">File</button>
+          <button type="button" className="rounded-md px-2.5 py-2 hover:bg-white/[0.06] hover:text-white">Edit</button>
+          <button type="button" className="rounded-md px-2.5 py-2 hover:bg-white/[0.06] hover:text-white">View</button>
+        </nav>
+        <div className="infra-top-actions ml-auto flex items-center gap-1.5">
+          <ActionButton title="Undo (Ctrl+Z)" onClick={undo} disabled={!past.length}><Undo2 size={15} /></ActionButton>
+          <ActionButton title="Redo (Ctrl+Y)" onClick={redo} disabled={!future.length}><Redo2 size={15} /></ActionButton>
+          <span className="mx-1 hidden h-5 w-px bg-white/10 sm:block" />
+          <button type="button" onClick={() => exportLayout("GeoJSON")} className="infra-text-button">Export</button>
+          <button type="button" onClick={() => exportLayout("CSV")} className="infra-text-button infra-csv-button">CSV</button>
+        </div>
+      </header>
+
+      <aside className={`infra-sidebar infra-left-panel flex w-[252px] shrink-0 flex-col border-r border-white/[0.08] bg-[#101216] ${libraryOpen ? "is-open" : ""}`}>
+        <div className="infra-panel-heading">
+          <div><b>Site tools</b><p>Build your district</p></div>
+          <CircleHelp size={15} className="text-zinc-500" />
+        </div>
+        <div className="infra-section-label">TRANSFORM</div>
+        <div className="infra-transform-tools">
+          {toolButtons.map(({ id, title, icon: Icon }) => (
+            <ActionButton key={id} title={title} active={tool === id} onClick={() => setTool(id)}><Icon size={16} /></ActionButton>
+          ))}
+          <ActionButton title="Delete object" active={tool === "delete"} onClick={() => setTool("delete")}><Trash2 size={15} /></ActionButton>
+        </div>
+        <div className="infra-section-label infra-assets-title">ADD TO SCENE</div>
+        <div className="infra-asset-categories">
+          {categories.map((category) => (
+            <details key={category.title} open>
+              <summary>{category.title}<ChevronDown size={13} /></summary>
+              <div className="infra-asset-grid">
+                {category.items.map(({ type, label, icon: Icon }) => (
+                  <button
+                    type="button"
+                    key={type}
+                    title={`Add ${label.toLowerCase()} to the scene`}
+                    aria-pressed={tool === type}
+                    onClick={() => { setTool(tool === type ? "select" : type); setMeasurePoints([]); setRoadStart(null); setLibraryOpen(false); }}
+                    className={`infra-asset-button ${tool === type ? "is-active" : ""}`}
+                  >
+                    <Icon size={15} /><span>{label}</span>
+                  </button>
+                ))}
+              </div>
+            </details>
+          ))}
+        </div>
+        <div className="infra-hierarchy">
+          <div className="infra-section-label flex items-center justify-between">
+            <span>SCENE HIERARCHY</span><span className="font-normal normal-case tracking-normal text-zinc-600">{visibleObjects.length} visible</span>
+          </div>
+          <div className="infra-hierarchy-list">
+            {objects.map((object) => (
+              <button
+                type="button"
+                key={object.id}
+                onClick={() => { setSelectedId(object.id); setTool("select"); setInspectorOpen(true); setLibraryOpen(false); }}
+                className={`infra-tree-row ${object.id === selectedId ? "is-selected" : ""} ${!object.visible ? "is-hidden" : ""}`}
+                title={object.name}
+              >
+                <span className="infra-tree-dot" />
+                <span className="min-w-0 flex-1 truncate">{object.name}</span>
+                {!object.visible && <EyeOff size={12} />}
+              </button>
+            ))}
+          </div>
+        </div>
+        <label className="infra-utility-toggle">
+          <span><Zap size={13} />Show underground utilities</span>
+          <input type="checkbox" checked={undergroundUtilities} onChange={(event) => setUndergroundUtilities(event.target.checked)} />
+        </label>
+        <div className="infra-status"><span className="infra-online-dot" /> Session-only concept <span className="ml-auto">V / G / R / S</span></div>
+      </aside>
+
+      <section className="infra-workspace relative flex min-w-0 flex-1 flex-col bg-[#0b0d10]">
+        <div className="infra-viewport relative min-h-0 flex-1">
+          <InfrastructureViewport
+            ref={viewport}
+            objects={objects}
+            selectedId={selectedId}
+            tool={tool}
+            lighting={lighting}
+            undergroundUtilities={undergroundUtilities}
+            onSelect={handleSceneSelect}
+            onEmpty={handleEmptyClick}
+            onFocus={(object) => viewport.current?.focus(object)}
+            onTransform={(id, values) => updateObject(id, values)}
+          />
+          <div className="infra-floating-tools infra-transform-floating" aria-label="Object tools">
+            {toolButtons.map(({ id, title, icon: Icon }) => (
+              <ActionButton key={id} title={title} active={tool === id} onClick={() => setTool(id)}><Icon size={15} /></ActionButton>
+            ))}
+          </div>
+          <div className="infra-view-controls" aria-label="Camera controls">
+            <label className="sr-only" htmlFor="infra-camera-view">Camera view</label>
+            <select id="infra-camera-view" defaultValue="Perspective" onChange={(event) => viewport.current?.preset(event.target.value as CameraPreset)}>
+              {cameraPresets.map((preset) => <option key={preset}>{preset}</option>)}
+            </select>
+            <ActionButton title="Zoom in" onClick={() => viewport.current?.zoom(true)}><ZoomIn size={15} /></ActionButton>
+            <ActionButton title="Zoom out" onClick={() => viewport.current?.zoom(false)}><ZoomOut size={15} /></ActionButton>
+            <ActionButton title="Fit entire scene" onClick={() => viewport.current?.fit()}><Focus size={15} /></ActionButton>
+            <ActionButton title="Reset camera" onClick={() => viewport.current?.reset()}><Home size={15} /></ActionButton>
+            {selected && <ActionButton title="Focus selected object (F)" onClick={() => viewport.current?.focus(selected)} active><Focus size={15} /></ActionButton>}
+          </div>
+          <div className="infra-lighting">
+            <button type="button" className="infra-lighting-trigger" onClick={() => setLightingOpen((open) => !open)} aria-expanded={lightingOpen}>
+              <Sun size={15} /><span>{lighting.preset}</span><ChevronDown size={13} />
+            </button>
+            {lightingOpen && (
+              <div className="infra-lighting-panel">
+                <div className="infra-lighting-title"><span><Lightbulb size={14} />Lighting & sun</span><button type="button" onClick={() => setLightingOpen(false)} aria-label="Close lighting controls"><X size={14} /></button></div>
+                <div className="infra-light-presets">
+                  {lightPresets.map((preset) => (
+                    <button type="button" key={preset} className={lighting.preset === preset ? "is-active" : ""} onClick={() => setLightPreset(preset)}>{preset}</button>
+                  ))}
+                </div>
+                <label className="infra-slider"><span>Sun intensity <b>{lighting.intensity.toFixed(1)}</b></span><input type="range" min="0.25" max="1.8" step="0.05" value={lighting.intensity} onChange={(event) => setLighting((current) => ({ ...current, intensity: Number(event.target.value) }))} /></label>
+                <label className="infra-slider"><span>Azimuth <b>{lighting.azimuth}°</b></span><input type="range" min="-180" max="180" step="1" value={lighting.azimuth} onChange={(event) => setLighting((current) => ({ ...current, azimuth: Number(event.target.value) }))} /></label>
+                <label className="infra-slider"><span>Elevation <b>{lighting.elevation}°</b></span><input type="range" min="8" max="85" step="1" value={lighting.elevation} onChange={(event) => setLighting((current) => ({ ...current, elevation: Number(event.target.value) }))} /></label>
+                <label className="infra-slider"><span>Shadow softness <b>{lighting.shadowSoftness}</b></span><input type="range" min="0" max="8" step="1" value={lighting.shadowSoftness} disabled={!lighting.shadows} onChange={(event) => setLighting((current) => ({ ...current, shadowSoftness: Number(event.target.value) }))} /></label>
+                <label className="infra-switch"><span>Cast shadows</span><input type="checkbox" checked={lighting.shadows} onChange={(event) => setLighting((current) => ({ ...current, shadows: event.target.checked }))} /></label>
+              </div>
+            )}
+          </div>
+
+          {selected && (
+            <div className="infra-selection-pill">
+              <span className="infra-selection-indicator" />
+              <span>{selected.name}</span>
+              <button type="button" onClick={() => setSelectedId(null)} aria-label="Clear selection"><X size={13} /></button>
+            </div>
+          )}
+          {tool === "measure" && (
+            <div className="infra-measure-pill">
+              <Ruler size={14} />{measuredDistance === null ? "Click two points to measure" : `${measuredDistance.toFixed(2)} m`}
+              <button type="button" onClick={() => setMeasurePoints([])} aria-label="Clear measurement"><X size={13} /></button>
+            </div>
+          )}
+          {tool === "road" && (
+            <div className="infra-road-hint">
+              <Route size={14} />{roadStart ? "Click the second endpoint · curved road" : "Click a start point to draw a curved road"}
+              {roadStart && <button type="button" onClick={() => setRoadStart(null)}>Cancel</button>}
+            </div>
+          )}
+
+          {chatOpen ? (
+            <div className="infra-ai-chat">
+              <div className="infra-chat-heading"><span><MessageCircle size={14} />Crystal site assistant</span><button type="button" onClick={() => setChatOpen(false)} aria-label="Hide AI chat"><X size={14} /></button></div>
+              <div className="infra-chat-messages">
+                {messages.slice(-2).map((message, index) => <div key={`${message.role}-${index}`} className={`infra-chat-message ${message.role}`}>{message.text}</div>)}
+              </div>
+              <div className="infra-chat-compose">
+                <input value={chatInput} onChange={(event) => setChatInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") sendMessage(); }} placeholder="Ask about site access, landscape..." aria-label="Message the site assistant" />
+                <button type="button" onClick={sendMessage} aria-label="Send message"><Send size={14} /></button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" className="infra-chat-reopen" onClick={() => setChatOpen(true)}><MessageCircle size={14} />Show site assistant</button>
+          )}
+        </div>
+        <footer className="infra-bottom-bar">
+          <div><span className="infra-online-dot" /> 3D viewport ready</div>
+          <span>{objects.length} objects</span>
+          <span>Orbit: drag · Pan: right-click / two fingers · Zoom: scroll</span>
+          <button type="button" onClick={() => viewport.current?.fit()}>Fit view</button>
+        </footer>
+      </section>
+
+      <aside className={`infra-sidebar infra-inspector flex w-[278px] shrink-0 flex-col border-l border-white/[0.08] bg-[#101216] ${inspectorOpen ? "is-open" : ""}`}>
+        <div className="infra-panel-heading"><div><b>Inspector</b><p>Site properties & scene</p></div><button type="button" className="infra-icon-button" title="Lighting settings" onClick={() => setLightingOpen((open) => !open)}><Sun size={15} /></button></div>
+        <div className="infra-ai-actions">
+          <div className="infra-ai-actions-title"><span><Lightbulb size={13} />Planning suggestions</span><small>local demo</small></div>
+          <div className="infra-ai-action-grid">
+            {[
+              ["auto-layout", "Auto layout"],
+              ["accessibility", "Accessibility"],
+              ["greenery", "Add greenery"],
+              ["transit", "Transit stop"],
+              ["optimize", "Cycle link"],
+            ].map(([action, label]) => (
+              <button key={action} type="button" onClick={() => applySiteAction(action)}><Check size={12} />{label}</button>
+            ))}
+          </div>
+        </div>
+        {selected ? (
+          <div className="infra-inspector-scroll">
+            <div className="infra-object-title">
+              <span className="infra-object-icon"><Building2 size={16} /></span>
+              <div className="min-w-0 flex-1"><div className="infra-muted-label">{infrastructureLabels[selected.type]}</div><input aria-label="Object name" value={selected.name} onChange={(event) => updateObject(selected.id, { name: event.target.value })} /></div>
+            </div>
+            <div className="infra-inspector-actions">
+              <ActionButton title={selected.visible ? "Hide object" : "Show object"} active={!selected.visible} onClick={() => updateObject(selected.id, { visible: !selected.visible })}>{selected.visible ? <Eye size={15} /> : <EyeOff size={15} />}</ActionButton>
+              <ActionButton title={selected.locked ? "Unlock object" : "Lock object"} active={selected.locked} onClick={() => updateObject(selected.id, { locked: !selected.locked })}>{selected.locked ? <Lock size={15} /> : <Unlock size={15} />}</ActionButton>
+              <ActionButton title="Duplicate selected object" onClick={duplicateSelected}><Copy size={15} /></ActionButton>
+              <ActionButton title="Reset selected transform" onClick={resetSelectedTransform}><Rotate3D size={15} /></ActionButton>
+              <ActionButton title="Delete selected object" onClick={confirmDeleteSelected} className="infra-danger"><Trash2 size={15} /></ActionButton>
+            </div>
+            <div className="infra-inspector-section">
+              <div className="infra-inspector-section-title">TRANSFORM <button type="button" title="Focus selected object (F)" onClick={() => viewport.current?.focus(selected)}><Focus size={13} />Focus</button></div>
+              <div className="infra-field-grid">
+                <NumericField label="X" value={selected.x} onChange={(x) => updateObject(selected.id, { x })} />
+                <NumericField label="Y" value={selected.y} onChange={(y) => updateObject(selected.id, { y })} />
+                <NumericField label="Z" value={selected.z} onChange={(z) => updateObject(selected.id, { z })} />
+                <NumericField label="Rotation °" step={1} value={(selected.rotation * 180) / Math.PI} onChange={(rotation) => updateObject(selected.id, { rotation: (rotation * Math.PI) / 180 })} />
+              </div>
+            </div>
+            <div className="infra-inspector-section">
+              <div className="infra-inspector-section-title">DIMENSIONS <span>metres</span></div>
+              <div className="infra-field-grid">
+                <NumericField label="Width" value={selected.width} onChange={(width) => updateObject(selected.id, { width: Math.max(0.4, width) })} />
+                <NumericField
+                  label={selected.type === "road" || selected.type === "water" || selected.type === "path" ? "Length" : "Depth"}
+                  value={selected.depth}
+                  onChange={(depth) => {
+                    const nextDepth = Math.max(0.4, depth);
+                    if (!selected.path && selected.type !== "road") {
+                      updateObject(selected.id, { depth: nextDepth });
+                      return;
+                    }
+                    const ratio = nextDepth / Math.max(0.4, selected.depth);
+                    const path = (selected.path ?? [[-selected.depth / 2, 0], [selected.depth / 2, 0]])
+                      .map(([x, z]) => [x * ratio, z * ratio] as [number, number]);
+                    updateObject(selected.id, { depth: nextDepth, path });
+                  }}
+                />
+                <NumericField label="Height" value={selected.height} onChange={(height) => updateObject(selected.id, { height: Math.max(0.3, height) })} />
+                {selected.type === "road" && <NumericField label="Lanes" step={1} value={selected.lanes ?? 2} onChange={(lanes) => updateObject(selected.id, { lanes: Math.max(1, Math.min(8, Math.round(lanes))) })} />}
+              </div>
+              {selected.type === "building" && (
+                <label className="infra-field infra-style-field"><span>Building style</span><select value={selected.style ?? "commercial"} onChange={(event) => updateObject(selected.id, { style: event.target.value as InfrastructureObject["style"] })}><option value="commercial">Commercial</option><option value="retail">Retail</option><option value="service">Service</option><option value="curved">Curved corner</option><option value="solar">Solar roof</option><option value="glass">Glass facade</option></select></label>
+              )}
+            </div>
+            <div className="infra-inspector-section">
+              <div className="infra-inspector-section-title">MATERIAL</div>
+              <label className="infra-color-field"><span>Surface color</span><input type="color" value={selected.color} onChange={(event) => updateObject(selected.id, { color: event.target.value })} /></label>
+            </div>
+            <div className="infra-inspector-note">
+              {selected.type === "road"
+                ? "Road width and lane count regenerate the curved pavement and markings."
+                : selected.type === "building"
+                  ? "Footprint, facade and roof are generated from the editable building parameters."
+                  : "Geometry and proportions update with the dimensions above."}
+            </div>
+          </div>
+        ) : (
+          <div className="infra-empty-inspector">
+            <span><MousePointer2 size={18} /></span>
+            <b>Select an object</b>
+            <p>Choose a building, road, tree or site element to edit its dimensions, materials and transform.</p>
+            <button type="button" onClick={() => viewport.current?.fit()}><Focus size={14} />Fit entire scene</button>
+          </div>
+        )}
+        <div className="infra-site-summary">
+          <div className="infra-section-label">SITE OVERVIEW</div>
+          <div className="infra-summary-grid">
+            <div><b>{objects.length}</b><span>Objects</span></div>
+            <div><b>{counts.road ?? 0}</b><span>Roads</span></div>
+            <div><b>{counts.building ?? 0}</b><span>Buildings</span></div>
+            <div><b>{counts.tree ?? 0}</b><span>Trees</span></div>
+          </div>
+          <div className="infra-saved-state"><span className="infra-online-dot" /> Local concept · not connected to a project API</div>
+        </div>
+        <div className="infra-shortcuts"><AlertTriangle size={13} /> V select · G move · R rotate · S scale · F focus · Del remove</div>
+      </aside>
+    </main>
+  );
 }
