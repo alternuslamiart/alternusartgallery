@@ -90,22 +90,6 @@ const searchDestinations: SearchDestination[] = [
   { label: "AI Code", description: "Build with the AI code workspace", href: "/aicode" },
   { label: "Projects", description: "Browse your workspace projects", href: "/project" },
 ];
-const TEST_RESPONSE = `A Vision of Architecture, Technology, and Human Experience
-
-Design and generate a breathtaking futuristic architectural complex called The Crystal Horizon, a monumental structure that combines modern minimalism, organic architecture, advanced engineering, and sustainable technology. The building should feel like a landmark from a distant future, yet remain believable, functional, and suitable for real-world architectural visualization.
-
-The project is located on a vast elevated landscape overlooking a calm ocean. The site is surrounded by natural cliffs, green hills, tall grasses, reflective water surfaces, and carefully designed gardens. The architecture should create a strong connection between the building and its environment, making it appear as though it has grown naturally from the landscape rather than being placed upon it.
-
-The main structure consists of a large central tower surrounded by several interconnected architectural wings. The central tower rises approximately 180 meters above the ground and has a sculptural, elegant silhouette. Its form is inspired by the geometry of a crystal, the curvature of flowing water, and the structure of a futuristic spacecraft. The tower is not a simple rectangular skyscraper. Instead, it has a gently twisting vertical shape, with several faceted surfaces that reflect sunlight throughout the day.
-
-The exterior facade is composed of transparent and semi-transparent glass panels, brushed titanium, polished aluminum, and large sections of white architectural concrete. The materials should have realistic physical properties, including accurate reflections, subtle roughness, natural imperfections, and physically based shading. The glass should reflect the sky, the ocean, and the surrounding landscape while remaining partially transparent in selected areas.
-
-The main entrance is located at the front of the complex and is accessed through a wide ceremonial plaza. A long pedestrian bridge extends from the landscape toward the entrance, crossing a shallow reflective pool. The bridge has a minimalist design with a floating appearance. Its structure is made of dark metal and translucent glass, with discreet integrated lighting along its edges.
-
-At the end of the bridge, visitors arrive at a monumental entrance formed by two enormous curved architectural walls. These walls rise approximately 25 meters and create a dramatic gateway into the main building. Between them is a large glass entrance with automatic sliding doors. Above the entrance, a sculptural canopy extends outward like a crystalline wing, protecting visitors from rain and sunlight.
-
-The entrance plaza should include carefully arranged trees, geometric planters, elegant benches, water channels, and subtle landscape lighting. The ground is paved with large slabs of light gray natural stone, arranged in a precise geometric pattern. Some sections of the pavement should contain thin lines of illuminated glass, creating a delicate futuristic effect after sunset.`;
-
 const getGeneratedSection = (content: string, index: number): string => {
   const normalized = content.toLowerCase();
   if (/\b(pdf|portable document)\b/.test(normalized)) return "PDF";
@@ -257,11 +241,37 @@ export default function AIChatPage() {
     setHasPastedInput(false);
     setIsSending(true);
 
-    await new Promise((resolve) => window.setTimeout(resolve, 250));
-    const assistantMessage: Message = { id: Date.now() + 1, role: "assistant", content: TEST_RESPONSE };
-    setMessages((current) => [...current, assistantMessage]);
-    setChatSessions((current) => current.map((session) => session.id === sessionId ? { ...session, messages: [...session.messages, assistantMessage], updatedAt: Date.now() } : session));
-    setIsSending(false);
+    try {
+      const response = await fetch("/api/ai-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
+        }),
+      });
+      const result = (await response.json()) as { message?: string; error?: string };
+      if (!response.ok) {
+        throw new Error(result.error || "Crystal could not answer right now. Please try again.");
+      }
+      if (!result.message?.trim()) {
+        throw new Error("Crystal returned an empty response. Please try again.");
+      }
+
+      const assistantMessage: Message = {
+        id: Date.now() + 1,
+        role: "assistant",
+        content: result.message.trim(),
+      };
+      setMessages((current) => [...current, assistantMessage]);
+      setChatSessions((current) => current.map((chat) => chat.id === sessionId
+        ? { ...chat, messages: [...chat.messages, assistantMessage], updatedAt: Date.now() }
+        : chat));
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "Crystal could not answer right now. Please try again.");
+      window.setTimeout(() => setToast(null), 3500);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const startNewChat = () => {

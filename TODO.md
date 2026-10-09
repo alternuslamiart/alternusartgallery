@@ -14,8 +14,9 @@
 ## Blockers
 
 - Production build and full-project typecheck currently exceed available Node
-  heap during compilation in this environment. Retry when a larger-memory
-  runner is available.
+  heap during compilation in this environment. The latest full-project
+  typecheck now passes; only the production build remains to retry on a
+  larger-memory runner.
 - Browser automation/WebGL verification is not configured in the current test
   tooling. Use a browser-capable environment before claiming camera or
   responsive interaction verification.

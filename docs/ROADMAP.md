@@ -28,7 +28,9 @@ requirements provide new evidence.
 
 ## Deferred provider integrations
 
-AI, CAD, Blender generation, rendering, and payment capabilities that are
-documented as local stubs remain deferred until a real provider is configured,
-secured, and covered by integration tests. Do not present stub output as a live
+`/aichat` is integrated with the server-side Gemini, Groq, and OpenAI provider
+route when credentials are configured. AI capabilities exposed through
+workspace stub endpoints, along with CAD, Blender generation, rendering, and
+payment, remain deferred until their own providers are configured, secured,
+and covered by integration tests. Do not present stub output as a live
 provider result.

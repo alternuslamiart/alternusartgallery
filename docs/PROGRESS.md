@@ -1,6 +1,19 @@
 # Verified progress
 
-Last updated: 2026-10-09
+Last updated: 2026-10-10
+
+## `/aichat` live provider responses
+
+- Replaced the hard-coded sample reply with a request to `/api/ai-chat`, passing
+  the conversation history to the server-side configured provider.
+- Provider/API failures and empty responses are surfaced to the user rather
+  than replaced by a success-shaped sample answer.
+- Gemini/Groq/OpenAI API keys are present in local `.env` configuration and
+  `.env` is ignored by Git; key values were not inspected or recorded.
+- `npm test`: passed (8 tests); `npm run typecheck`: passed.
+- Focused ESLint completed with no errors and five existing image/alt-text
+  warnings in the page.
+- `git diff --check`: passed. Live provider execution was not tested.
 
 ## Infrastructure Studio
 
