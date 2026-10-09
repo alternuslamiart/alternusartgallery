@@ -681,6 +681,9 @@ function Billing({ t }: { t: Tokens }) {
 }
 
 function ChatSection({ t }: { t: Tokens }) {
+ const [selectedModel, setSelectedModel] = useState("opus");
+ const [hoveredModel, setHoveredModel] = useState<string | null>(null);
+
  return (
  <>
  <SectionHeading eyebrow="§ CHAT" title="Chat preferences." desc="Tune the default model, tone, and memory used by the agent in your workspaces." t={t} />
@@ -689,15 +692,32 @@ function ChatSection({ t }: { t: Tokens }) {
  <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: "-0.01em", marginBottom: 16 }}>Default model</div>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
  {[
- { id: "opus", n: "Claude Opus 4.6", d: "Default · most capable", active: true },
- { id: "sonnet", n: "Claude Sonnet 4.6", d: "Balanced latency + cost", active: false },
- { id: "haiku", n: "Claude Haiku 4.5", d: "Fastest · cheapest", active: false },
+ { id: "opus", n: "Claude Opus 4.6", d: "Default · most capable" },
+ { id: "sonnet", n: "Claude Sonnet 4.6", d: "Balanced latency + cost" },
+ { id: "haiku", n: "Claude Haiku 4.5", d: "Fastest · cheapest" },
  ].map((m) => (
- <div key={m.id} style={{ padding: 16, border: `1px solid ${m.active ? COBALT : t.faintBorder}`, borderRadius: 10, background: m.active ? `${COBALT}08` : "transparent", cursor: "pointer" }}>
+ <button
+  key={m.id}
+  type="button"
+  aria-pressed={selectedModel === m.id}
+  onClick={() => setSelectedModel(m.id)}
+  onMouseEnter={() => setHoveredModel(m.id)}
+  onMouseLeave={() => setHoveredModel(null)}
+  style={{
+   padding: 16,
+   border: `1px solid ${selectedModel === m.id || hoveredModel === m.id ? COBALT : t.faintBorder}`,
+   borderRadius: 10,
+   background: selectedModel === m.id || hoveredModel === m.id ? `${COBALT}08` : "transparent",
+   color: t.fg,
+   fontFamily: "inherit",
+   textAlign: "left",
+   cursor: "pointer",
+  }}
+ >
  <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: "-0.01em" }}>{m.n}</div>
  <div style={{ fontSize: 11, color: t.muted, marginTop: 4 }}>{m.d}</div>
- {m.active && <div style={{ marginTop: 10, fontSize: 10, fontWeight: 800, color: COBALT, letterSpacing: "0.12em" }}>✓ ACTIVE</div>}
- </div>
+ {selectedModel === m.id && <div style={{ marginTop: 10, fontSize: 10, fontWeight: 800, color: COBALT, letterSpacing: "0.12em" }}>✓ ACTIVE</div>}
+ </button>
  ))}
  </div>
  </div>
