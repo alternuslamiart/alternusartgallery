@@ -1,5 +1,5 @@
 export const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
-export const DEFAULT_GROQ_MODEL = "llama-3.1-8b-instant";
+export const DEFAULT_GROQ_MODEL = "openai/gpt-oss-20b";
 export const DEFAULT_OPENAI_MODEL = "gpt-4o-mini";
 
 const SECRET_PATTERNS = [
@@ -47,7 +47,11 @@ export function getGroqApiKey() {
 }
 
 export function getGroqModel() {
- return process.env.GROQ_MODEL?.trim() || DEFAULT_GROQ_MODEL;
+ const configuredModel = process.env.GROQ_MODEL?.trim();
+ if (!configuredModel || configuredModel.toLowerCase() === "llama-3.1-8b-instant") {
+  return DEFAULT_GROQ_MODEL;
+ }
+ return configuredModel;
 }
 
 export function getGroqBaseUrl() {

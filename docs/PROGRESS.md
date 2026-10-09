@@ -6,14 +6,22 @@ Last updated: 2026-10-10
 
 - Replaced the hard-coded sample reply with a request to `/api/ai-chat`, passing
   the conversation history to the server-side configured provider.
+- Added working Gemini/Groq model selection; each selection uses its provider
+  key on the server, with the other configured provider as a failover.
+- Removed local sample-response fallback so missing provider configuration is
+  returned as an error instead of appearing to be a real answer.
 - Provider/API failures and empty responses are surfaced to the user rather
   than replaced by a success-shaped sample answer.
-- Gemini/Groq/OpenAI API keys are present in local `.env` configuration and
+- Gemini and Groq API keys are present in local `.env` configuration and
   `.env` is ignored by Git; key values were not inspected or recorded.
+- Updated the deprecated Groq model default to `openai/gpt-oss-20b` and
+  normalize the old `llama-3.1-8b-instant` setting to the working default.
+- Live Groq API request succeeded and returned `OK`; selecting Gemini currently
+  fails over to Groq because Gemini reports that its free tier is unavailable
+  in this country and billing must be enabled for the Google AI project.
 - `npm test`: passed (8 tests); `npm run typecheck`: passed.
 - Focused ESLint completed with no errors and five existing image/alt-text
-  warnings in the page.
-- `git diff --check`: passed. Live provider execution was not tested.
+  warnings in the page. `git diff --check`: passed.
 
 ## Infrastructure Studio
 

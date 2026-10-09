@@ -13,6 +13,9 @@
 
 ## Blockers
 
+- Gemini direct responses require billing to be enabled on the Google AI
+  project: the configured key's API reports that the free tier is unavailable
+  in this country. Groq is working and serves as the automatic fallback.
 - The production build exceeds the available Node heap during compilation in
   this environment. The latest full-project typecheck passes; retry the
   production build on a larger-memory runner.

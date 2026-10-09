@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAIResponse } from "@/lib/ai-assistant";
 import {
- DEFAULT_GROQ_MODEL,
- DEFAULT_OPENAI_MODEL,
  getConfiguredAIProvider,
  getGeminiApiKey,
  getGeminiModel,
+ getGroqApiKey as getConfiguredGroqApiKey,
+ getGroqModel as getConfiguredGroqModel,
+ getGroqBaseUrl,
  getSafeAIErrorMessage,
 } from "@/lib/ai-provider-config";
 
@@ -13,7 +13,6 @@ export const dynamic = "force-dynamic";
 
 const MAX_HISTORY_MESSAGES = 16;
 const GEMINI_GENERATE_CONTENT_URL = "https://generativelanguage.googleapis.com/v1beta/models";
-const OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions";
 
 const SYSTEM_PROMPT = `You are the Crystal Studio AI Assistant. Answer clearly, thoroughly, and helpfully. For coding, design, business, product, CAD, and engineering questions, give complete, practical, well-structured answers with examples and steps where useful. Make clear that AI-generated engineering output requires independent verification and licensed-engineer approval when used professionally. Respond in the user's language when clear.`;
 
@@ -28,45 +27,40 @@ type RequestBody = {
  message?: unknown;
  history?: unknown;
  conversationHistory?: unknown;
+ provider?: unknown;
 };
 
-type AIProvider = "openai" | "gemini" | "groq" | "local";
+type AIProvider = "gemini" | "groq" | "local";
 type RemoteAIProvider = Exclude<AIProvider, "local">;
-const PROVIDER_PRIORITY: RemoteAIProvider[] = ["gemini", "groq", "openai"];
-
-function getOpenAIApiKey() {
- return process.env.OPENAI_API_KEY?.trim();
-}
-
-function getOpenAIModel() {
- return process.env.OPENAI_MODEL?.trim() || DEFAULT_OPENAI_MODEL;
-}
+const PROVIDER_PRIORITY: RemoteAIProvider[] = ["gemini", "groq"];
 
 function getGroqApiKey() {
- return process.env.GROQ_API_KEY?.trim();
+ return getConfiguredGroqApiKey();
 }
 
 function getGroqModel() {
- return process.env.GROQ_MODEL?.trim() || DEFAULT_GROQ_MODEL;
+ return getConfiguredGroqModel();
 }
 
 function getGroqChatCompletionsUrl() {
- const baseUrl = (process.env.GROQ_BASE_URL?.trim() || "https://api.groq.com/openai/v1").replace(/\/+$/, "");
+ const baseUrl = getGroqBaseUrl();
  return `${baseUrl}/chat/completions`;
 }
 
 function hasProviderKey(provider: RemoteAIProvider) {
  if (provider === "gemini") return Boolean(getGeminiApiKey());
- if (provider === "groq") return Boolean(getGroqApiKey());
- return Boolean(getOpenAIApiKey());
+ return Boolean(getGroqApiKey());
 }
 
-function getPreferredProvider(): AIProvider {
- const configuredProvider = getConfiguredAIProvider();
-
- if (configuredProvider === "openai" && getOpenAIApiKey()) {
- return "openai";
+function getPreferredProvider(requestedProvider?: unknown): AIProvider {
+ if (
+  (requestedProvider === "gemini" || requestedProvider === "groq") &&
+  hasProviderKey(requestedProvider)
+ ) {
+  return requestedProvider;
  }
+
+ const configuredProvider = getConfiguredAIProvider();
 
  if (configuredProvider === "gemini" && getGeminiApiKey()) {
  return "gemini";
@@ -154,7 +148,7 @@ function toOpenAIMessages(history: ChatMessage[], message: string) {
 function getProviderError(error: unknown, provider: RemoteAIProvider) {
  const message = getSafeAIErrorMessage(error);
  const lower = message.toLowerCase();
- const name = provider === "openai" ? "OpenAI" : provider === "groq" ? "Groq" : "Gemini";
+ const name = provider === "groq" ? "Groq" : "Gemini";
 
  if (lower.includes("quota") || lower.includes("rate") || lower.includes("429")) {
  return {
@@ -270,7 +264,7 @@ async function askOpenAICompatible({
  history: ChatMessage[];
  message: string;
  modelName: string;
- providerName: "OpenAI" | "Groq";
+ providerName: "Groq";
 }) {
  if (!apiKey) {
  throw new Error(`Missing ${providerName} API key.`);
@@ -332,17 +326,6 @@ async function askOpenAICompatible({
  return answer;
 }
 
-async function askOpenAI(message: string, history: ChatMessage[]) {
- return askOpenAICompatible({
- apiKey: getOpenAIApiKey(),
- endpoint: OPENAI_CHAT_COMPLETIONS_URL,
- history,
- message,
- modelName: getOpenAIModel(),
- providerName: "OpenAI",
- });
-}
-
 async function askGroq(message: string, history: ChatMessage[]) {
  return askOpenAICompatible({
  apiKey: getGroqApiKey(),
@@ -355,7 +338,6 @@ async function askGroq(message: string, history: ChatMessage[]) {
 }
 
 async function askProvider(provider: RemoteAIProvider, message: string, history: ChatMessage[]) {
- if (provider === "openai") return askOpenAI(message, history);
  if (provider === "groq") return askGroq(message, history);
  return askGemini(message, history);
 }
@@ -363,7 +345,10 @@ async function askProvider(provider: RemoteAIProvider, message: string, history:
 export async function GET() {
  const provider = getPreferredProvider();
  const configuredProvider = getConfiguredAIProvider();
- const configuredProviderReady = configuredProvider ? hasProviderKey(configuredProvider) : undefined;
+ const configuredProviderReady =
+ configuredProvider === "gemini" || configuredProvider === "groq"
+ ? hasProviderKey(configuredProvider)
+ : undefined;
 
  return NextResponse.json({
  ok: true,
@@ -371,20 +356,17 @@ export async function GET() {
  configuredProvider,
  configuredProviderReady,
  model:
- provider === "openai"
- ? getOpenAIModel()
- : provider === "groq"
+ provider === "groq"
  ? getGroqModel()
  : provider === "gemini"
  ? getGeminiModel()
- : "local-fallback",
- configured: Boolean(getGeminiApiKey() || getGroqApiKey() || getOpenAIApiKey()),
+ : null,
+ configured: Boolean(getGeminiApiKey() || getGroqApiKey()),
  providers: {
  gemini: Boolean(getGeminiApiKey()),
  groq: Boolean(getGroqApiKey()),
- openai: Boolean(getOpenAIApiKey()),
  },
- groqBaseUrl: process.env.GROQ_BASE_URL?.trim() || "https://api.groq.com/openai/v1",
+ groqBaseUrl: getGroqBaseUrl(),
  });
 }
 
@@ -406,10 +388,8 @@ export async function POST(request: NextRequest) {
  const history = requestMessages.length > 0
  ? requestMessages.slice(0, lastRequestMessage?.role === "user" ? -1 : undefined)
  : normalizeHistory(body.history ?? body.conversationHistory);
- const provider = getPreferredProvider();
- const model = provider === "openai"
- ? getOpenAIModel()
- : provider === "groq"
+ const provider = getPreferredProvider(body.provider);
+ const model = provider === "groq"
  ? getGroqModel()
  : provider === "gemini"
  ? getGeminiModel()
@@ -421,7 +401,7 @@ export async function POST(request: NextRequest) {
  });
  console.info("[ai-chat] selected provider", { provider, model });
 
- if (provider === "openai" || provider === "gemini" || provider === "groq") {
+ if (provider !== "local") {
  const providerAttempts = getProviderAttempts(provider);
  const providerErrors: Array<{ provider: RemoteAIProvider; message: string }> = [];
 
@@ -431,9 +411,7 @@ export async function POST(request: NextRequest) {
  return NextResponse.json({
  success: true,
  message: answer,
- model: providerAttempt === "openai"
- ? getOpenAIModel()
- : providerAttempt === "groq"
+ model: providerAttempt === "groq"
  ? getGroqModel()
  : getGeminiModel(),
  provider: providerAttempt,
@@ -461,17 +439,14 @@ export async function POST(request: NextRequest) {
  );
  }
 
- const fallback = getAIResponse(message);
  return NextResponse.json({
- success: true,
- message: fallback.content,
- model: "local-fallback",
- suggestedQuestions: fallback.suggestedQuestions,
+ error: "No AI provider is configured. Set GEMINI_API_KEY or GROQ_API_KEY on the server.",
+ code: "AI_PROVIDER_NOT_CONFIGURED",
  provider,
- });
+ }, { status: 503 });
  } catch (error) {
  const provider = getPreferredProvider();
- const remoteProvider: RemoteAIProvider = provider === "openai" || provider === "groq" ? provider : "gemini";
+ const remoteProvider: RemoteAIProvider = provider === "groq" ? provider : "gemini";
  const providerError = getProviderError(error, remoteProvider);
  console.error("AI chat error:", error);
 

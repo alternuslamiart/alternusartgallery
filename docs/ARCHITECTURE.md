@@ -29,8 +29,9 @@
   data to `context.workspaceId`.
 - AI/CAD/Blender/rendering workflows documented in `docs/backend-platform.md`
   use local stubs unless a route is explicitly integrated with a real provider.
-- `/aichat` submits conversations to `/api/ai-chat`; that server-side route
-  selects a configured Gemini, Groq, or OpenAI provider from environment keys.
+- `/aichat` lets the user select Gemini or Groq and submits conversations to
+  `/api/ai-chat`; provider credentials are read only on the server, and the
+  other configured provider is tried if the selected one fails.
 
 ## Tests and commands
 

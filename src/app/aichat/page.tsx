@@ -76,7 +76,7 @@ function ThinkingIndicator() {
   );
 }
 
-const models = ["Claude", "ChatGPT", "Gemini", "Grok", "Groq", "Copilot"];
+const models = ["Gemini", "Groq"] as const;
 type ChatSession = { id: string; title: string; messages: Message[]; updatedAt: number };
 type ChatSection = { id: string; label: string };
 type SearchDestination = { label: string; description: string; href: string };
@@ -246,16 +246,23 @@ export default function AIChatPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          provider: selectedModel.toLowerCase(),
           messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
         }),
       });
-      const result = (await response.json()) as { message?: string; error?: string };
+      const result = (await response.json()) as {
+        message?: string;
+        error?: string;
+        provider?: "gemini" | "groq";
+      };
       if (!response.ok) {
         throw new Error(result.error || "Crystal could not answer right now. Please try again.");
       }
       if (!result.message?.trim()) {
         throw new Error("Crystal returned an empty response. Please try again.");
       }
+      if (result.provider === "gemini") setSelectedModel("Gemini");
+      else if (result.provider === "groq") setSelectedModel("Groq");
 
       const assistantMessage: Message = {
         id: Date.now() + 1,

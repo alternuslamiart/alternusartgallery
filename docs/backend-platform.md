@@ -83,7 +83,7 @@ The backend rejects path traversal, unsafe server-side/executable extensions, un
 
 ## Stub Provider Behavior
 
-The workspace stub endpoints persist records and jobs with explicit `local_stub` output messages; they do not call real AI, AutoCAD, Blender, code execution, or payment providers. The dedicated `/api/ai-chat` route is an exception: it calls the configured Gemini, Groq, or OpenAI provider server-side when a provider key is available.
+The workspace stub endpoints persist records and jobs with explicit `local_stub` output messages; they do not call real AI, AutoCAD, Blender, code execution, or payment providers. The dedicated `/api/ai-chat` route is an exception: it calls the selected Gemini or Groq provider server-side, tries the other configured provider if that request fails, and returns an error rather than a local sample when neither provider is available.
 
 ## Frontend Consumption
 
@@ -93,6 +93,6 @@ List endpoints support `search`, `type`, `status`, `projectId`, `sort`, and `lim
 
 - No real payment checkout is configured.
 - No external CAD/Blender/rendering provider is invoked by the workspace stub endpoints.
-- `/aichat` uses `/api/ai-chat`, which requires a configured provider key for live AI responses; keep keys server-side in environment configuration.
+- `/aichat` uses `/api/ai-chat` for live Gemini/Groq responses; keep keys server-side in environment configuration.
 - Local asset duplication is not enabled because it must copy binary files safely.
 - Existing frontend screens still need follow-up wiring from local UI state to these APIs.
