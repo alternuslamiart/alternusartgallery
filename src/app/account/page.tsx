@@ -692,9 +692,9 @@ function ChatSection({ t }: { t: Tokens }) {
  <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: "-0.01em", marginBottom: 16 }}>Default model</div>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
  {[
- { id: "opus", n: "Claude Opus 4.6", d: "Default · most capable" },
- { id: "sonnet", n: "Claude Sonnet 4.6", d: "Balanced latency + cost" },
- { id: "haiku", n: "Claude Haiku 4.5", d: "Fastest · cheapest" },
+ { id: "astra", n: "ChatGPT Astra 6", d: "Default · most capable" },
+ { id: "opus", n: "Claude Opus 5.5", d: "Balanced latency + cost" },
+ { id: "sonnet", n: "Claude Sonnet 5", d: "Fastest · cheapest" },
  ].map((m) => (
  <button
   key={m.id}
