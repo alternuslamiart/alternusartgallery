@@ -11,8 +11,8 @@ import {
   BusFront,
   ChevronDown,
   Check,
-  CircleHelp,
   Copy,
+  Download,
   Eye,
   EyeOff,
   Focus,
@@ -56,11 +56,16 @@ import {
   infrastructureLabels,
   makeInfrastructureObject,
 } from "./infrastructure-types";
+import { loadInfrastructure, saveInfrastructure } from "./infrastructure-storage.mjs";
 import type {
   InfrastructureObject,
   InfrastructureType,
   LightingPreset,
 } from "./infrastructure-types";
+import type {
+  InfrastructureLoadResult,
+  InfrastructureSaveResult,
+} from "./infrastructure-storage.mjs";
 
 const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"], display: "swap" });
 
@@ -175,6 +180,9 @@ export default function InfrastructurePage() {
   const [objects, setObjects] = useState<InfrastructureObject[]>(createInitialInfrastructure);
   const [past, setPast] = useState<InfrastructureObject[][]>([]);
   const [future, setFuture] = useState<InfrastructureObject[][]>([]);
+  const [storageReady, setStorageReady] = useState(false);
+  const [storageWritable, setStorageWritable] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("Loading local site…");
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [tool, setTool] = useState<TransformMode>("select");
   const [roadStart, setRoadStart] = useState<[number, number] | null>(null);
@@ -205,6 +213,7 @@ export default function InfrastructurePage() {
     setPast((history) => [...history.slice(-39), objects]);
     setObjects(next);
     setFuture([]);
+    setStorageWritable(true);
   };
   const updateObject = (id: number, changes: Partial<InfrastructureObject>) => {
     const target = objects.find((object) => object.id === id);
@@ -422,6 +431,44 @@ export default function InfrastructurePage() {
   };
 
   useEffect(() => {
+    let result: InfrastructureLoadResult;
+    try {
+      result = loadInfrastructure(window.localStorage);
+    } catch (error) {
+      result = {
+        status: "error",
+        message: `Could not access this browser's local storage: ${error instanceof Error ? error.message : "Unknown error."}`,
+      };
+    }
+    if (result.status === "loaded") {
+      setObjects(result.objects);
+      setStorageWritable(true);
+      setSaveMessage("Site restored from this device");
+    } else if (result.status === "empty") {
+      setStorageWritable(true);
+      setSaveMessage("Saving changes on this device");
+    } else {
+      setStorageWritable(false);
+      setSaveMessage(result.message);
+    }
+    setStorageReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!storageReady || !storageWritable) return;
+    let result: InfrastructureSaveResult;
+    try {
+      result = saveInfrastructure(window.localStorage, objects);
+    } catch (error) {
+      result = {
+        ok: false as const,
+        message: `Could not access this browser's local storage: ${error instanceof Error ? error.message : "Unknown error."}`,
+      };
+    }
+    setSaveMessage(result.ok ? "Saved on this device" : result.message);
+  }, [objects, storageReady, storageWritable]);
+
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       if (target && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))) return;
@@ -461,39 +508,17 @@ export default function InfrastructurePage() {
   });
 
   return (
-    <main className={`crystal-infrastructure-page ${roboto.className} fixed inset-0 z-20 flex h-screen w-full overflow-hidden bg-[#08090b] pt-16 text-zinc-100`}>
-      <header className="infra-topbar fixed left-0 right-0 top-0 z-50 flex h-16 items-center gap-3 border-b border-white/[0.08] bg-[#0c0e11]/95 px-4 backdrop-blur-xl">
-        <div className="flex min-w-0 items-center gap-2.5">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-blue-500 text-white"><Route size={17} /></span>
-          <div className="leading-tight">
-            <b className="text-[13px] tracking-wide">CRYSTAL</b>
-            <div className="text-[10px] text-zinc-500">Infrastructure Studio</div>
-          </div>
-          <span className="mx-2 hidden h-6 w-px bg-white/10 sm:block" />
-          <span className="hidden text-xs text-zinc-400 sm:block">Willow Creek District</span>
-        </div>
-        <div className="infra-mobile-actions">
-          <button type="button" onClick={() => setLibraryOpen((open) => !open)} aria-expanded={libraryOpen}>Library</button>
-          <button type="button" onClick={() => setInspectorOpen((open) => !open)} aria-expanded={inspectorOpen}>Edit</button>
-        </div>
-        <nav className="infra-main-nav ml-3 flex items-center gap-1 text-[11px] text-zinc-400" aria-label="Studio views">
-          <button type="button" className="rounded-md px-2.5 py-2 hover:bg-white/[0.06] hover:text-white">File</button>
-          <button type="button" className="rounded-md px-2.5 py-2 hover:bg-white/[0.06] hover:text-white">Edit</button>
-          <button type="button" className="rounded-md px-2.5 py-2 hover:bg-white/[0.06] hover:text-white">View</button>
-        </nav>
-        <div className="infra-top-actions ml-auto flex items-center gap-1.5">
-          <ActionButton title="Undo (Ctrl+Z)" onClick={undo} disabled={!past.length}><Undo2 size={15} /></ActionButton>
-          <ActionButton title="Redo (Ctrl+Y)" onClick={redo} disabled={!future.length}><Redo2 size={15} /></ActionButton>
-          <span className="mx-1 hidden h-5 w-px bg-white/10 sm:block" />
-          <button type="button" onClick={() => exportLayout("GeoJSON")} className="infra-text-button">Export</button>
-          <button type="button" onClick={() => exportLayout("CSV")} className="infra-text-button infra-csv-button">CSV</button>
-        </div>
-      </header>
-
+    <main className={`crystal-infrastructure-page ${roboto.className} fixed inset-0 z-20 h-screen w-full overflow-hidden bg-[#08090b] text-zinc-100`}>
       <aside className={`infra-sidebar infra-left-panel flex w-[252px] shrink-0 flex-col border-r border-white/[0.08] bg-[#101216] ${libraryOpen ? "is-open" : ""}`}>
         <div className="infra-panel-heading">
-          <div><b>Site tools</b><p>Build your district</p></div>
-          <CircleHelp size={15} className="text-zinc-500" />
+          <div className="infra-project-heading">
+            <span className="infra-project-mark"><Route size={15} /></span>
+            <div><b>Site tools</b><p>Willow Creek District</p></div>
+          </div>
+          <div className="infra-panel-heading-actions">
+            <ActionButton title="Undo (Ctrl+Z)" onClick={undo} disabled={!past.length}><Undo2 size={14} /></ActionButton>
+            <ActionButton title="Redo (Ctrl+Y)" onClick={redo} disabled={!future.length}><Redo2 size={14} /></ActionButton>
+          </div>
         </div>
         <div className="infra-section-label">TRANSFORM</div>
         <div className="infra-transform-tools">
@@ -548,11 +573,20 @@ export default function InfrastructurePage() {
           <span><Zap size={13} />Show underground utilities</span>
           <input type="checkbox" checked={undergroundUtilities} onChange={(event) => setUndergroundUtilities(event.target.checked)} />
         </label>
-        <div className="infra-status"><span className="infra-online-dot" /> Session-only concept <span className="ml-auto">V / G / R / S</span></div>
+        <div className="infra-status" title={saveMessage}>
+          {saveMessage.startsWith("Saved") || saveMessage.startsWith("Site restored")
+            ? <span className="infra-online-dot" />
+            : <span className={`infra-save-dot ${saveMessage.startsWith("Could not") || saveMessage.startsWith("Saved site") ? "has-error" : ""}`} />}
+          <span className="truncate">{saveMessage}</span><span className="ml-auto">V / G / R / S</span>
+        </div>
       </aside>
 
       <section className="infra-workspace relative flex min-w-0 flex-1 flex-col bg-[#0b0d10]">
         <div className="infra-viewport relative min-h-0 flex-1">
+          <div className="infra-mobile-actions" aria-label="Studio panels">
+            <button type="button" onClick={() => setLibraryOpen((open) => !open)} aria-expanded={libraryOpen}>Library</button>
+            <button type="button" onClick={() => setInspectorOpen((open) => !open)} aria-expanded={inspectorOpen}>Inspector</button>
+          </div>
           <InfrastructureViewport
             ref={viewport}
             objects={objects}
@@ -580,6 +614,9 @@ export default function InfrastructurePage() {
             <ActionButton title="Fit entire scene" onClick={() => viewport.current?.fit()}><Focus size={15} /></ActionButton>
             <ActionButton title="Reset camera" onClick={() => viewport.current?.reset()}><Home size={15} /></ActionButton>
             {selected && <ActionButton title="Focus selected object (F)" onClick={() => viewport.current?.focus(selected)} active><Focus size={15} /></ActionButton>}
+            <span className="infra-control-divider" />
+            <ActionButton title="Export scene as GeoJSON" onClick={() => exportLayout("GeoJSON")}><Download size={14} /></ActionButton>
+            <ActionButton title="Export scene as CSV" onClick={() => exportLayout("CSV")}><span className="infra-csv-icon">CSV</span></ActionButton>
           </div>
           <div className="infra-lighting">
             <button type="button" className="infra-lighting-trigger" onClick={() => setLightingOpen((open) => !open)} aria-expanded={lightingOpen}>
@@ -639,7 +676,7 @@ export default function InfrastructurePage() {
         </div>
         <footer className="infra-bottom-bar">
           <div><span className="infra-online-dot" /> 3D viewport ready</div>
-          <span>{objects.length} objects</span>
+          <span>{objects.length} objects · {saveMessage.startsWith("Saved") ? "saved locally" : "local draft"}</span>
           <span>Orbit: drag · Pan: right-click / two fingers · Zoom: scroll</span>
           <button type="button" onClick={() => viewport.current?.fit()}>Fit view</button>
         </footer>
