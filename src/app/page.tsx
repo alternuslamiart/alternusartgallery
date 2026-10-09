@@ -282,7 +282,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <FeatureShowcase reverse title={tr.infra} image="/Section/Infra.png" copy={tr.infraCopy} />
+ <FeatureShowcase reverse title={tr.infra} image="/Section/infrastruct.png" copy={tr.infraCopy} />
 
  <section data-crystal-reveal style={{ padding: "96px 0" }}>
  <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
