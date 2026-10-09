@@ -3927,6 +3927,11 @@ textarea {
   scrollbar-width: thin;
 }
 
+.aichat-page form textarea:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
 .aichat-page textarea::-webkit-scrollbar {
   width: 8px;
 }
