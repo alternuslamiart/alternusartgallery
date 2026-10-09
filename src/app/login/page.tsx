@@ -2,10 +2,11 @@
 
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
-import { ArrowLeft, ArrowRight, CheckCircle2, KeyRound, Lock, Mail, Moon, RefreshCw, ShieldCheck, Sun } from "lucide-react";
+import { ArrowLeft, ArrowRight, Box, CheckCircle2, KeyRound, Layers3, Lock, Mail, Moon, RefreshCw, ShieldCheck, Sparkles, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -221,9 +222,9 @@ export default function LoginPage() {
  };
 
  return (
- <div className={`auth-page ${isLight ? "auth-light" : "auth-dark"}`}>
+ <div className={`auth-page auth-login-page ${isLight ? "auth-light" : "auth-dark"}`}>
  <div className="auth-glow pointer-events-none fixed inset-x-0 top-0 h-[520px]" />
- <header className="absolute inset-x-0 top-0 z-10 mx-auto flex h-20 w-full items-center justify-between px-5 sm:px-8 lg:px-10">
+ <header className="auth-login-header relative z-10 mx-auto flex h-[76px] w-full items-center justify-between px-5 sm:px-8">
  <Brand />
  <div className="flex items-center gap-3">
  <button
@@ -236,28 +237,54 @@ export default function LoginPage() {
  >
  {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
  </button>
- <Link href="/signup" className="auth-top-link text-xs font-semibold transition-colors">
- Create account
- </Link>
+ <span className="auth-login-header-label hidden text-[10px] font-semibold uppercase tracking-[0.18em] sm:block">AI design workspace</span>
+ <Link href="/signup" className="auth-create-link text-xs font-semibold transition-colors">Create account <ArrowRight className="h-3.5 w-3.5" /></Link>
  </div>
  </header>
 
- <main className="relative z-10 flex min-h-screen w-full items-center justify-center overflow-y-auto px-5 pb-8 pt-24">
- <Card className="auth-card w-full max-w-md rounded-[24px] border shadow-none backdrop-blur-xl">
- <CardHeader className="space-y-3 p-7 text-center">
- <p className="auth-kicker text-[11px] font-semibold uppercase tracking-[0.2em]">Crystal Studio workspace</p>
- <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">
-  {verificationStep === "credentials" ? "Sign in" : verificationStep === "code" ? "Check your email" : "Your age"}
+ <main className="auth-login-main relative z-10 mx-auto grid w-full max-w-[1440px] items-center gap-12 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(390px,0.85fr)] lg:gap-16 lg:px-12 lg:py-10">
+ <section className="auth-showcase relative hidden min-h-[650px] overflow-hidden rounded-[28px] lg:block" aria-label="Crystal AI architecture and CAD studio">
+  <Image src="/Section/architectresectionone.png" alt="Contemporary architectural design by Crystal Studio" fill priority sizes="(max-width: 1200px) 50vw, 58vw" className="auth-showcase-image object-cover" />
+  <div className="auth-showcase-shade absolute inset-0" />
+  <div className="auth-showcase-grid absolute inset-0" />
+  <div className="relative flex h-full flex-col justify-between p-9 xl:p-12">
+   <div className="flex items-center justify-between">
+    <span className="auth-showcase-badge inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[0.16em]"><Sparkles className="h-3.5 w-3.5" /> AI-powered design</span>
+    <span className="auth-showcase-index font-mono text-[11px] tracking-[0.18em]">CRYSTAL / 01</span>
+   </div>
+   <div className="max-w-[560px]">
+    <p className="auth-showcase-kicker mb-4 text-[11px] font-semibold uppercase tracking-[0.24em]">Imagine it. Shape it. Build with clarity.</p>
+    <h2 className="auth-showcase-title text-4xl font-semibold leading-[1.04] tracking-[-0.045em] xl:text-[52px]">Your next great space starts with an idea.</h2>
+    <p className="auth-showcase-copy mt-5 max-w-[460px] text-sm leading-6">Bring architecture, interiors and CAD into one intelligent studio— from the first sketch to a detailed 3D vision.</p>
+    <div className="mt-8 flex flex-wrap gap-2.5">
+     <span className="auth-capability-chip"><Layers3 className="h-4 w-4" /> Architecture</span>
+     <span className="auth-capability-chip"><Sparkles className="h-4 w-4" /> AI design</span>
+     <span className="auth-capability-chip"><Box className="h-4 w-4" /> 3D & CAD</span>
+    </div>
+   </div>
+   <div className="auth-showcase-note flex items-center justify-between gap-4 border-t pt-5">
+    <span className="text-xs">A thoughtful workspace for your next project.</span>
+    <span className="font-mono text-[10px] tracking-[0.14em]">DESIGN / VISUALIZE / REFINE</span>
+   </div>
+  </div>
+ </section>
+
+ <section className="auth-login-form-wrap mx-auto w-full max-w-[460px]">
+ <Card className="auth-card auth-login-card w-full rounded-[24px] border shadow-none backdrop-blur-xl">
+ <CardHeader className="space-y-3 px-7 pb-6 pt-8 sm:px-9 sm:pt-10">
+ <p className="auth-kicker flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em]"><span className="auth-status-dot" /> Crystal Studio / Secure access</p>
+ <h1 className="auth-title text-[34px] font-semibold tracking-[-0.05em] sm:text-[38px]">
+  {verificationStep === "credentials" ? "Welcome back." : verificationStep === "code" ? "Check your inbox." : "One last detail."}
  </h1>
- <p className="auth-copy mx-auto max-w-xs text-sm leading-6">
+ <p className="auth-copy text-sm leading-6">
  {verificationStep === "credentials"
-  ? "Open your Crystal workspace for Claude AI, OpenAI Codex, architecture, floor plans, 3D modeling, infrastructure planning, and professional project documentation."
+  ? "Sign in to continue designing with AI, architecture and 3D tools."
   : verificationStep === "code"
    ? <>We sent a 6-digit verification code to <strong className="auth-title font-semibold">{email}</strong>.</>
-   : "Enter your age to finish signing in to Crystal Studio."}
+   : "Enter your age to finish setting up your Crystal Studio account."}
  </p>
  </CardHeader>
- <CardContent className="space-y-5 p-7 pt-0">
+ <CardContent className="space-y-5 px-7 pb-8 sm:px-9 sm:pb-10">
  {verificationStep === "code" ? (
   <div className="auth-verification-panel space-y-5">
    <div className="auth-verification-icon mx-auto flex h-14 w-14 items-center justify-center rounded-2xl">
@@ -415,6 +442,8 @@ export default function LoginPage() {
  </p>
  </CardContent>
  </Card>
+ <p className="auth-login-privacy mt-5 text-center text-[11px] leading-5">Your projects and account details stay protected.</p>
+ </section>
  </main>
  </div>
  );

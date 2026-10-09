@@ -3050,6 +3050,220 @@
  background: rgba(6, 143, 255, .08);
 }
 
+.auth-login-page {
+ min-height: 100dvh;
+ overflow-x: hidden;
+ overflow-y: auto;
+ background:
+  radial-gradient(ellipse at 78% 12%, rgba(42, 105, 185, .12), transparent 36%),
+  #0b0d10;
+}
+
+.auth-login-page.auth-light {
+ background:
+  radial-gradient(ellipse at 78% 12%, rgba(66, 132, 255, .09), transparent 36%),
+  #f4f6f9;
+}
+
+.auth-login-page .auth-glow {
+ background: radial-gradient(ellipse at 76% 14%, rgba(54, 128, 226, .13), transparent 46%);
+}
+
+.auth-login-page.auth-light .auth-glow {
+ background: radial-gradient(ellipse at 76% 14%, rgba(66, 132, 255, .1), transparent 46%);
+}
+
+.auth-login-header {
+ max-width: 1440px;
+ border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+
+.auth-login-page.auth-light .auth-login-header {
+ border-bottom-color: rgba(18, 28, 43, .08);
+}
+
+.auth-login-header-label {
+ color: #797f89;
+}
+
+.auth-login-page.auth-light .auth-login-header-label {
+ color: #727b89;
+}
+
+.auth-create-link {
+ display: inline-flex;
+ min-height: 38px;
+ align-items: center;
+ justify-content: center;
+ gap: 7px;
+ padding: 0 14px;
+ border: 1px solid rgba(255, 255, 255, .12);
+ border-radius: 10px;
+ color: #e5e9ef;
+ text-decoration: none;
+}
+
+.auth-create-link:hover {
+ border-color: rgba(80, 153, 255, .52);
+ background: rgba(80, 153, 255, .08);
+ color: #fff;
+}
+
+.auth-login-page.auth-light .auth-create-link {
+ border-color: rgba(18, 28, 43, .14);
+ color: #283142;
+}
+
+.auth-login-page.auth-light .auth-create-link:hover {
+ border-color: rgba(66, 132, 255, .44);
+ background: rgba(66, 132, 255, .07);
+ color: #145bc0;
+}
+
+.auth-login-main {
+ min-height: calc(100dvh - 76px);
+}
+
+.auth-showcase {
+ isolation: isolate;
+ border: 1px solid rgba(255, 255, 255, .12);
+ background: #161b21;
+ box-shadow: 0 28px 90px rgba(0, 0, 0, .24);
+}
+
+.auth-showcase-image {
+ z-index: -3;
+ filter: saturate(.72) brightness(.8);
+}
+
+.auth-showcase-shade {
+ z-index: -2;
+ background: linear-gradient(180deg, rgba(9, 14, 20, .25) 0%, rgba(9, 14, 20, .1) 38%, rgba(9, 14, 20, .86) 100%);
+}
+
+.auth-showcase-grid {
+ z-index: -1;
+ opacity: .18;
+ background-image:
+  linear-gradient(rgba(220, 235, 255, .12) 1px, transparent 1px),
+  linear-gradient(90deg, rgba(220, 235, 255, .12) 1px, transparent 1px);
+ background-size: 52px 52px;
+ mask-image: linear-gradient(to bottom, transparent 5%, #000 100%);
+}
+
+.auth-showcase-badge {
+ border: 1px solid rgba(255, 255, 255, .2);
+ background: rgba(13, 18, 24, .48);
+ color: #e9f2ff;
+ backdrop-filter: blur(12px);
+}
+
+.auth-showcase-index {
+ color: rgba(239, 245, 255, .74);
+}
+
+.auth-showcase-kicker {
+ color: #9ccaff;
+}
+
+.auth-showcase-title {
+ max-width: 550px;
+ color: #fff;
+ text-wrap: balance;
+}
+
+.auth-showcase-copy {
+ color: rgba(244, 247, 252, .76);
+}
+
+.auth-capability-chip {
+ display: inline-flex;
+ min-height: 38px;
+ align-items: center;
+ gap: 8px;
+ padding: 0 12px;
+ border: 1px solid rgba(255, 255, 255, .19);
+ border-radius: 10px;
+ background: rgba(11, 16, 23, .42);
+ color: #f0f4fa;
+ font-size: 11px;
+ font-weight: 600;
+ backdrop-filter: blur(10px);
+}
+
+.auth-capability-chip svg {
+ color: #9ccaff;
+}
+
+.auth-showcase-note {
+ border-color: rgba(255, 255, 255, .22);
+ color: rgba(240, 245, 252, .72);
+}
+
+.auth-login-page .auth-card {
+ border-color: rgba(255, 255, 255, .1);
+ background: rgba(18, 21, 26, .88);
+ box-shadow: 0 24px 80px rgba(0, 0, 0, .2);
+}
+
+.auth-login-page.auth-light .auth-card {
+ border-color: rgba(22, 36, 56, .1);
+ background: rgba(255, 255, 255, .94);
+ box-shadow: 0 24px 70px rgba(25, 45, 75, .08);
+}
+
+.auth-login-page .auth-status-dot {
+ width: 7px;
+ height: 7px;
+ border-radius: 50%;
+ background: #53a6ff;
+ box-shadow: 0 0 12px rgba(83, 166, 255, .65);
+}
+
+.auth-login-page .auth-login-privacy {
+ color: #777f8c;
+}
+
+.auth-login-page.auth-light .auth-login-privacy {
+ color: #727b89;
+}
+
+@media (max-width: 1023px) {
+ .auth-login-main {
+  min-height: calc(100dvh - 76px);
+  max-width: 620px;
+  padding-top: 42px;
+  padding-bottom: 42px;
+ }
+}
+
+@media (max-width: 520px) {
+ .auth-login-header {
+  height: 66px;
+  padding-right: 16px;
+  padding-left: 16px;
+ }
+
+ .auth-login-header .auth-brand {
+  font-size: 1.15rem;
+ }
+
+ .auth-create-link {
+  min-height: 35px;
+  padding: 0 10px;
+  font-size: 11px;
+ }
+
+ .auth-login-main {
+  min-height: calc(100dvh - 66px);
+  padding: 24px 16px 32px;
+ }
+
+ .auth-login-page .auth-card {
+  border-radius: 20px;
+ }
+}
+
 /* Shared raster mark supplied for the Crystal application chrome. */
 .crystal-brand-logo { width: 27px; height: 27px; object-fit: contain; filter: invert(1) brightness(1.55); opacity: .88; }
 .crystal-brand-logo-mobile { width: 40px; height: 40px; }
