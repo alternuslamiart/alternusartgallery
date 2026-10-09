@@ -127,7 +127,7 @@ export default function AIChatPage() {
   const [modelsOpen, setModelsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const [activeSearchResult, setActiveSearchResult] = useState(0);
+  const [activeSearchResult, setActiveSearchResult] = useState(-1);
   const [mode, setMode] = useState<"chat" | "workflow">("chat");
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [sessionsLoaded, setSessionsLoaded] = useState(false);
@@ -213,7 +213,7 @@ export default function AIChatPage() {
   useEffect(() => {
     if (!searchOpen) return;
     searchInputRef.current?.focus();
-    setActiveSearchResult(0);
+    setActiveSearchResult(-1);
   }, [searchOpen]);
 
   useEffect(() => {
@@ -493,9 +493,9 @@ export default function AIChatPage() {
         <section role="dialog" aria-modal="true" aria-label="Search Crystal" className={`w-full max-w-[720px] overflow-hidden rounded-[20px] border shadow-[0_32px_100px_rgba(0,0,0,.55)] ${isLight ? "border-[#d9e1ed] bg-white text-[#171b24]" : "border-white/[0.09] bg-[#1a1a1a] text-[#eef2f8]"}`}>
           <div className={`flex h-[68px] items-center gap-3 border-b px-5 ${isLight ? "border-[#e8edf4]" : "border-white/[0.08]"}`}>
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-blue-500/10 text-blue-400"><Search size={18} /></span>
-            <input ref={searchInputRef} value={search} onChange={(event) => { setSearch(event.target.value); setActiveSearchResult(0); }} onKeyDown={(event) => {
-              if (event.key === "ArrowDown") { event.preventDefault(); setActiveSearchResult((index) => Math.min(index + 1, searchResults.length - 1)); }
-              if (event.key === "ArrowUp") { event.preventDefault(); setActiveSearchResult((index) => Math.max(0, index - 1)); }
+            <input ref={searchInputRef} value={search} onChange={(event) => { setSearch(event.target.value); setActiveSearchResult(-1); }} onKeyDown={(event) => {
+              if (event.key === "ArrowDown" && searchResults.length) { event.preventDefault(); setActiveSearchResult((index) => index < 0 ? 0 : Math.min(index + 1, searchResults.length - 1)); }
+              if (event.key === "ArrowUp" && searchResults.length) { event.preventDefault(); setActiveSearchResult((index) => index < 0 ? searchResults.length - 1 : Math.max(index - 1, 0)); }
               if (event.key === "Enter" && searchResults[activeSearchResult]) { event.preventDefault(); selectSearchResult(searchResults[activeSearchResult]); }
             }} placeholder="Search conversations, tools, and Crystal..." className={`min-w-0 flex-1 bg-transparent text-[15px] font-medium outline-none placeholder:font-normal ${isLight ? "text-[#171b24] placeholder:text-[#8a94a4]" : "text-white placeholder:text-zinc-500"}`} />
             <button type="button" onClick={() => setSearchOpen(false)} aria-label="Close search" className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition ${isLight ? "bg-[#f1f4f8] text-[#6b7482] hover:bg-[#e7edf5]" : "bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] hover:text-white"}`}>ESC</button>
@@ -512,7 +512,7 @@ export default function AIChatPage() {
               {searchResults.map((result, index) => {
                 const label = result.type === "conversation" ? result.conversation.title : result.destination.label;
                 const description = result.type === "conversation" ? `${result.conversation.messages.length} messages · Open conversation` : result.destination.description;
-                return <button key={`${result.type}-${result.type === "conversation" ? result.conversation.id : result.destination.href}`} type="button" onMouseEnter={() => setActiveSearchResult(index)} onClick={() => selectSearchResult(result)} className={`flex min-h-[56px] w-full items-center gap-3 rounded-xl px-3 text-left transition ${index === activeSearchResult ? (isLight ? "bg-[#edf4ff] text-[#14243c]" : "bg-blue-500/[0.12] text-white") : (isLight ? "text-[#293241] hover:bg-[#f4f7fb]" : "text-zinc-200 hover:bg-white/[0.045]")}`}>
+                return <button key={`${result.type}-${result.type === "conversation" ? result.conversation.id : result.destination.href}`} type="button" onMouseEnter={() => setActiveSearchResult(index)} onMouseLeave={() => setActiveSearchResult(-1)} onClick={() => selectSearchResult(result)} className={`flex min-h-[56px] w-full items-center gap-3 rounded-xl px-3 text-left transition ${index === activeSearchResult ? (isLight ? "bg-[#edf4ff] text-[#14243c]" : "bg-blue-500/[0.12] text-white") : (isLight ? "text-[#293241] hover:bg-[#f4f7fb]" : "text-zinc-200 hover:bg-white/[0.045]")}`}>
                   <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${isLight ? "bg-white text-blue-600 shadow-sm" : "bg-white/[0.06] text-blue-300"}`}>{result.type === "conversation" ? <Sparkles size={16} /> : <ArrowRight size={16} />}</span>
                   <span className="min-w-0 flex-1"><span className="block truncate text-[13px] font-semibold">{label}</span><span className={`mt-0.5 block truncate text-[12px] ${isLight ? "text-[#738094]" : "text-zinc-500"}`}>{description}</span></span>
                   <span className={`text-[10px] font-medium ${isLight ? "text-[#8a94a4]" : "text-zinc-600"}`}>{result.type === "conversation" ? "CHAT" : "OPEN"}</span>
