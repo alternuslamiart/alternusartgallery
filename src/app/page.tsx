@@ -426,6 +426,30 @@ export default function HomePage() {
  <ActionLink href="/pricing" variant="secondary">
  See Pricing
  </ActionLink>
+ <button
+  type="button"
+  aria-haspopup="dialog"
+  onClick={() => void playIntroVideo()}
+  className="crystal-action-link crystal-action-link-secondary"
+  style={{
+   height: 46,
+   padding: "0 20px",
+   borderRadius: 8,
+   display: "inline-flex",
+   alignItems: "center",
+   justifyContent: "center",
+   gap: 9,
+   fontSize: 14,
+   fontWeight: 800,
+   letterSpacing: "-0.01em",
+   background: "transparent",
+   color: "inherit",
+   border: "1px solid currentColor",
+   cursor: "pointer",
+  }}
+ >
+  <Play size={15} /> Watch intro video
+ </button>
  </div>
  </div>
  </section>
