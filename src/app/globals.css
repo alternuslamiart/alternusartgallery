@@ -5395,8 +5395,9 @@ textarea {
 
 .aichat-page textarea {
   font-family: var(--font-roboto), Roboto, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
   scrollbar-color: #777 transparent;
   scrollbar-width: thin;
 }
