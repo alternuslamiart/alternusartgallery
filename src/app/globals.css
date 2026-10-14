@@ -5403,9 +5403,9 @@ textarea {
 .aichat-response {
   color: #cbd0d8;
   font-family: var(--font-roboto), Roboto, Arial, sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.7;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.65;
   overflow-wrap: anywhere;
 }
 
@@ -5422,7 +5422,7 @@ textarea {
 
 .aichat-response h3 {
   color: #f4f4f5;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 700;
   line-height: inherit;
 }
@@ -5440,7 +5440,7 @@ textarea {
   background: #292929;
   padding: 1px 3px;
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .aichat-response-list-item {

@@ -6,12 +6,20 @@ Last updated: 2026-10-15
 
 - Assistant responses now render markdown-style headings, numbered and bulleted
   lines, bold emphasis, and inline code instead of showing those markers raw.
-- Applied 12px Roboto Medium body text in light gray, 12px bold headings and
-  numbered markers, and underlining for emphasized text; light mode has matching
-  readable colors.
+- Assistant body text and headings use the common 16px chat reading size in
+  Roboto; body text is regular weight, headings and numbered markers are bold,
+  and emphasized text is underlined. Light mode has matching readable colors.
 - `npm test`: passed (8 tests); `npm run typecheck`: passed.
 - Focused ESLint completed with no errors and five existing image/alt-text
   warnings in the page. `git diff --check`: passed.
+- Browser rendering was not verified.
+
+## `/aichat` standard reading size
+
+- Increased assistant response body and heading text from 12px to 16px, matching
+  the common default reading size used in chat interfaces; body weight is 400
+  and headings retain bold emphasis.
+- Inline code scales to 14px to remain legible within the larger response text.
 - Browser rendering was not verified.
 
 ## `/aichat` live provider responses
