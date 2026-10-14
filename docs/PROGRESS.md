@@ -37,6 +37,13 @@ Last updated: 2026-10-15
   1 after paragraphs, headings, blank lines, or explicitly numbered items.
 - Browser rendering was not verified.
 
+## `/aichat` composer typography
+
+- Increased the composer text and placeholder to 16px Roboto and aligned its
+  single-line content vertically in the existing input frame using matching
+  line height and compact vertical padding.
+- Browser rendering was not verified.
+
 ## `/aichat` live provider responses
 
 - Replaced the hard-coded sample reply with a request to `/api/ai-chat`, passing
