@@ -5355,6 +5355,10 @@ textarea {
   color: #4a4a4a !important;
 }
 
+.aichat-page:not(.aichat-light) .aichat-welcome-title {
+  color: #f4f4f5;
+}
+
 .aichat-light section [class*="text-zinc-300"] {
   color: #303030 !important;
 }
@@ -5426,9 +5430,6 @@ textarea {
 .aichat-response strong {
   color: #f4f4f5;
   font-weight: 700;
-  text-decoration: underline;
-  text-decoration-color: #9ca3af;
-  text-underline-offset: 3px;
 }
 
 .aichat-response code {
@@ -5462,10 +5463,6 @@ textarea {
 .aichat-light .aichat-response strong,
 .aichat-light .aichat-response-list-number {
   color: #202020;
-}
-
-.aichat-light .aichat-response strong {
-  text-decoration-color: #737373;
 }
 
 .aichat-light .aichat-response code {

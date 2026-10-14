@@ -89,6 +89,8 @@ function renderInlineContent(text: string) {
 }
 
 function AssistantResponse({ content }: { content: string }) {
+  let bulletNumber = 0;
+
   return (
     <div className="aichat-response">
       {content.split(/\r?\n/).map((line, index) => {
@@ -96,9 +98,16 @@ function AssistantResponse({ content }: { content: string }) {
         const orderedItem = line.match(/^\s*(\d+)[.)]\s+(.+)$/);
         const unorderedItem = line.match(/^\s*[-*]\s+(.+)$/);
 
-        if (!line.trim()) return <div key={index} className="aichat-response-spacer" aria-hidden="true" />;
-        if (heading) return <h3 key={index}>{renderInlineContent(heading[1])}</h3>;
+        if (!line.trim()) {
+          bulletNumber = 0;
+          return <div key={index} className="aichat-response-spacer" aria-hidden="true" />;
+        }
+        if (heading) {
+          bulletNumber = 0;
+          return <h3 key={index}>{renderInlineContent(heading[1])}</h3>;
+        }
         if (orderedItem) {
+          bulletNumber = 0;
           return (
             <div key={index} className="aichat-response-list-item">
               <span className="aichat-response-list-number">{orderedItem[1]}.</span>
@@ -107,13 +116,15 @@ function AssistantResponse({ content }: { content: string }) {
           );
         }
         if (unorderedItem) {
+          bulletNumber += 1;
           return (
             <div key={index} className="aichat-response-list-item">
-              <span aria-hidden="true">•</span>
+              <span className="aichat-response-list-number">{bulletNumber}.</span>
               <span>{renderInlineContent(unorderedItem[1])}</span>
             </div>
           );
         }
+        bulletNumber = 0;
         return <p key={index}>{renderInlineContent(line)}</p>;
       })}
     </div>

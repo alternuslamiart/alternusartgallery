@@ -8,7 +8,7 @@ Last updated: 2026-10-15
   lines, bold emphasis, and inline code instead of showing those markers raw.
 - Assistant body text and headings use the common 16px chat reading size in
   Roboto; body text is regular weight, headings and numbered markers are bold,
-  and emphasized text is underlined. Light mode has matching readable colors.
+  and emphasized text is bold. Light mode has matching readable colors.
 - `npm test`: passed (8 tests); `npm run typecheck`: passed.
 - Focused ESLint completed with no errors and five existing image/alt-text
   warnings in the page. `git diff --check`: passed.
@@ -26,7 +26,15 @@ Last updated: 2026-10-15
 
 - Removed the centered Crystal logo and replaced the two-line personalized
   greeting with “What's on your mind today?” at the existing heading size.
-- Kept the welcome text gray in dark mode and a darker gray in light mode.
+- Kept the welcome text gray in dark mode and a darker gray in light mode. The
+  heading was subsequently brightened for readability in dark mode.
+- Browser rendering was not verified.
+
+## `/aichat` response emphasis and lists
+
+- Removed underlines from emphasized response text while retaining bold weight.
+- Rendered consecutive markdown bullet items as numbered lists, restarting at
+  1 after paragraphs, headings, blank lines, or explicitly numbered items.
 - Browser rendering was not verified.
 
 ## `/aichat` live provider responses
