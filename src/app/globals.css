@@ -5400,6 +5400,82 @@ textarea {
   scrollbar-width: thin;
 }
 
+.aichat-response {
+  color: #cbd0d8;
+  font-family: var(--font-roboto), Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.aichat-response p,
+.aichat-response h3 {
+  margin: 0;
+}
+
+.aichat-response p + p,
+.aichat-response h3,
+.aichat-response-list-item + .aichat-response-list-item {
+  margin-top: 5px;
+}
+
+.aichat-response h3 {
+  color: #f4f4f5;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: inherit;
+}
+
+.aichat-response strong {
+  color: #f4f4f5;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: #9ca3af;
+  text-underline-offset: 3px;
+}
+
+.aichat-response code {
+  border-radius: 3px;
+  background: #292929;
+  padding: 1px 3px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 11px;
+}
+
+.aichat-response-list-item {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.aichat-response-list-number {
+  color: #f4f4f5;
+  font-weight: 700;
+}
+
+.aichat-response-spacer {
+  height: 9px;
+}
+
+.aichat-light .aichat-response {
+  color: #555;
+}
+
+.aichat-light .aichat-response h3,
+.aichat-light .aichat-response strong,
+.aichat-light .aichat-response-list-number {
+  color: #202020;
+}
+
+.aichat-light .aichat-response strong {
+  text-decoration-color: #737373;
+}
+
+.aichat-light .aichat-response code {
+  background: #eee;
+}
+
 .aichat-page form textarea:focus-visible {
   outline: none;
   box-shadow: none;

@@ -76,6 +76,50 @@ function ThinkingIndicator() {
   );
 }
 
+function renderInlineContent(text: string) {
+  return text.split(/(\*\*.+?\*\*|__.+?__|`[^`]+`)/g).map((part, index) => {
+    if ((part.startsWith("**") && part.endsWith("**")) || (part.startsWith("__") && part.endsWith("__"))) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return <code key={index}>{part.slice(1, -1)}</code>;
+    }
+    return part;
+  });
+}
+
+function AssistantResponse({ content }: { content: string }) {
+  return (
+    <div className="aichat-response">
+      {content.split(/\r?\n/).map((line, index) => {
+        const heading = line.match(/^#{1,6}\s+(.+)$/);
+        const orderedItem = line.match(/^\s*(\d+)[.)]\s+(.+)$/);
+        const unorderedItem = line.match(/^\s*[-*]\s+(.+)$/);
+
+        if (!line.trim()) return <div key={index} className="aichat-response-spacer" aria-hidden="true" />;
+        if (heading) return <h3 key={index}>{renderInlineContent(heading[1])}</h3>;
+        if (orderedItem) {
+          return (
+            <div key={index} className="aichat-response-list-item">
+              <span className="aichat-response-list-number">{orderedItem[1]}.</span>
+              <span>{renderInlineContent(orderedItem[2])}</span>
+            </div>
+          );
+        }
+        if (unorderedItem) {
+          return (
+            <div key={index} className="aichat-response-list-item">
+              <span aria-hidden="true">•</span>
+              <span>{renderInlineContent(unorderedItem[1])}</span>
+            </div>
+          );
+        }
+        return <p key={index}>{renderInlineContent(line)}</p>;
+      })}
+    </div>
+  );
+}
+
 const models = ["Gemini", "Groq"] as const;
 type ChatSession = { id: string; title: string; messages: Message[]; updatedAt: number };
 type ChatSection = { id: string; label: string };
@@ -488,8 +532,8 @@ export default function AIChatPage() {
                   ref={(element) => { sectionRefs.current[`message-${message.id}`] = element; }}
                   className={`scroll-mt-6 group flex ${message.role === "user" ? "justify-end" : "justify-center"}`}
                 >
-                  <div className={message.role === "user" ? "max-w-[85%] rounded-2xl bg-[#1c1c1c] px-4 py-3 text-sm leading-7 text-zinc-100" : "w-full max-w-2xl px-4 py-3 text-left text-sm leading-7 text-zinc-300"}>
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                  <div className={message.role === "user" ? "max-w-[85%] rounded-2xl bg-[#1c1c1c] px-4 py-3 text-sm leading-7 text-zinc-100" : "w-full max-w-2xl px-4 py-3 text-left"}>
+                    {message.role === "assistant" ? <AssistantResponse content={message.content} /> : <p className="whitespace-pre-wrap">{message.content}</p>}
                     {message.role === "assistant" && <div className="mt-3 flex justify-start gap-1 opacity-60 transition group-hover:opacity-100"><button onClick={() => void copyMessage(message)} aria-label="Copy response" className="grid h-9 w-9 place-items-center rounded-[6px] p-0 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]">{copiedId === message.id ? <Check size={14} /> : <Copy size={14} />}</button><button aria-label="Share response" className="grid h-9 w-9 place-items-center rounded-[6px] p-0 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]"><Share2 size={14} /></button><Link href="/crystal" className="ml-1 rounded-[6px] px-2 py-1 text-[11px] text-[#3b82f6] transition hover:bg-blue-500/10">Go to Crystal</Link></div>}
                   </div>
                 </div>

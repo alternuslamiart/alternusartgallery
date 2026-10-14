@@ -1,4 +1,4 @@
-# Next tasks
+# Next tasks (reviewed 2026-10-15)
 
 ## Next concrete task
 

@@ -1,6 +1,18 @@
 # Verified progress
 
-Last updated: 2026-10-10
+Last updated: 2026-10-15
+
+## `/aichat` response typography
+
+- Assistant responses now render markdown-style headings, numbered and bulleted
+  lines, bold emphasis, and inline code instead of showing those markers raw.
+- Applied 12px Roboto Medium body text in light gray, 12px bold headings and
+  numbered markers, and underlining for emphasized text; light mode has matching
+  readable colors.
+- `npm test`: passed (8 tests); `npm run typecheck`: passed.
+- Focused ESLint completed with no errors and five existing image/alt-text
+  warnings in the page. `git diff --check`: passed.
+- Browser rendering was not verified.
 
 ## `/aichat` live provider responses
 
