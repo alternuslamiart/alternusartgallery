@@ -22,6 +22,13 @@ Last updated: 2026-10-15
 - Inline code scales to 14px to remain legible within the larger response text.
 - Browser rendering was not verified.
 
+## `/aichat` empty-chat welcome
+
+- Removed the centered Crystal logo and replaced the two-line personalized
+  greeting with “What's on your mind today?” at the existing heading size.
+- Kept the welcome text gray in dark mode and a darker gray in light mode.
+- Browser rendering was not verified.
+
 ## `/aichat` live provider responses
 
 - Replaced the hard-coded sample reply with a request to `/api/ai-chat`, passing
