@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthenticatedAIChatUserId } from "@/lib/ai-chat-auth";
-import { consumePersistentRateLimit } from "@/lib/persistent-rate-limit";
-import { prisma } from "@/lib/prisma";
 import {
  getConfiguredAIProvider,
  getGeminiApiKey,
@@ -31,8 +28,6 @@ type RequestBody = {
  history?: unknown;
  conversationHistory?: unknown;
  provider?: unknown;
- conversationId?: unknown;
- requestId?: unknown;
 };
 
 type AIProvider = "gemini" | "groq" | "local";
@@ -89,6 +84,40 @@ function getProviderAttempts(provider: AIProvider): RemoteAIProvider[] {
  }
 
  return attempts;
+}
+
+function normalizeHistory(value: unknown): ChatMessage[] {
+ if (!Array.isArray(value)) return [];
+
+ const messages = value
+ .map((item): ChatMessage | null => {
+ if (!item || typeof item !== "object") return null;
+
+ const record = item as Record<string, unknown>;
+ const content = typeof record.content === "string" ? record.content.trim() : "";
+ if (!content) return null;
+
+ return {
+ role: record.role === "assistant" ? "assistant" : "user",
+ content,
+ };
+ })
+ .filter((item): item is ChatMessage => Boolean(item))
+ .slice(-MAX_HISTORY_MESSAGES);
+
+ const normalized: ChatMessage[] = [];
+ for (const message of messages) {
+ if (normalized.length === 0 && message.role === "assistant") continue;
+
+ const previous = normalized[normalized.length - 1];
+ if (previous?.role === message.role) {
+ previous.content = `${previous.content}\n\n${message.content}`;
+ } else {
+ normalized.push({ ...message });
+ }
+ }
+
+ return normalized;
 }
 
 function toGeminiHistory(messages: ChatMessage[]) {
@@ -342,219 +371,50 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
- let conversationId: string | null = null;
- let requestId: string | null = null;
- let userId: string | null = null;
- let assistantMessageId: string | null = null;
  try {
- userId = await getAuthenticatedAIChatUserId();
- if (!userId) {
- return NextResponse.json({ error: "Sign in to use and save AI chat history.", code: "UNAUTHENTICATED" }, { status: 401 });
- }
- let rateLimit: Awaited<ReturnType<typeof consumePersistentRateLimit>>;
- try {
- rateLimit = await consumePersistentRateLimit(`ai-chat:${userId}`, { limit: 30, windowSeconds: 60 });
- } catch (error) {
- console.error("AI chat rate limit could not be checked:", error);
- return NextResponse.json({ error: "Chat is temporarily unavailable. Please try again shortly.", code: "RATE_LIMIT_UNAVAILABLE" }, { status: 503 });
- }
- if (!rateLimit.success) {
- return NextResponse.json({ error: "Too many chat requests. Please wait a moment and try again.", code: "RATE_LIMITED" }, { status: 429 });
- }
+ const body = (await request.json()) as RequestBody;
+ const requestMessages = normalizeHistory(body.messages);
+ const legacyMessage = typeof body.message === "string" ? body.message.trim() : "";
+ const lastRequestMessage = requestMessages[requestMessages.length - 1];
+ const message = legacyMessage || (lastRequestMessage?.role === "user" ? lastRequestMessage.content : "");
 
- let body: RequestBody;
- try {
- const contentLength = Number(request.headers.get("content-length") ?? "0");
- if (contentLength > 150_000) {
- return NextResponse.json({ error: "Chat request is too large.", code: "REQUEST_TOO_LARGE" }, { status: 413 });
- }
- const rawBody = await request.text();
- if (rawBody.length > 150_000) {
- return NextResponse.json({ error: "Chat request is too large.", code: "REQUEST_TOO_LARGE" }, { status: 413 });
- }
- body = JSON.parse(rawBody) as RequestBody;
- } catch {
- return NextResponse.json({ error: "Invalid JSON request.", code: "INVALID_JSON" }, { status: 400 });
- }
- const message = typeof body.message === "string" ? body.message.trim() : "";
- conversationId = typeof body.conversationId === "string" ? body.conversationId : null;
- requestId = typeof body.requestId === "string" ? body.requestId : null;
- const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
- if (!message || message.length > 32_000) {
+ if (!message) {
  return NextResponse.json(
- { error: message ? "Message exceeds the 32,000 character limit." : "Message is required.", code: "INVALID_MESSAGE" },
+ { error: "Message is required.", code: "EMPTY_MESSAGE" },
  { status: 400 },
  );
  }
- if (!conversationId || !uuidPattern.test(conversationId) || !requestId || !uuidPattern.test(requestId)) {
- return NextResponse.json({ error: "Valid conversation and request IDs are required.", code: "INVALID_CONVERSATION" }, { status: 400 });
- }
 
- const requestedProvider = getPreferredProvider(body.provider);
- const configuredModel = requestedProvider === "groq"
+ const history = requestMessages.length > 0
+ ? requestMessages.slice(0, lastRequestMessage?.role === "user" ? -1 : undefined)
+ : normalizeHistory(body.history ?? body.conversationHistory);
+ const provider = getPreferredProvider(body.provider);
+ const model = provider === "groq"
  ? getGroqModel()
- : requestedProvider === "gemini"
+ : provider === "gemini"
  ? getGeminiModel()
  : "local-fallback";
 
- const persisted = await prisma.$transaction(async (transaction) => {
- const messageCreatedAt = new Date();
- const conversation = await transaction.aIChatConversation.findFirst({
- where: { id: conversationId!, userId: userId! },
- select: { id: true, title: true },
- });
- if (!conversation) return { error: "Conversation not found.", status: 404 as const };
-
- const userMessage = await transaction.aIChatMessage.upsert({
- where: {
- conversationId_requestId_role: {
- conversationId: conversation.id,
- requestId: requestId!,
- role: "USER",
- },
- },
- create: {
- conversationId: conversation.id,
- userId: userId!,
- requestId: requestId!,
- role: "USER",
- content: message,
- status: "COMPLETED",
- createdAt: messageCreatedAt,
- },
- update: {},
- select: { id: true, content: true },
- });
- if (userMessage.content !== message) {
- return { error: "This request ID is already in use.", status: 409 as const };
- }
-
- const staleBefore = new Date(Date.now() - 2 * 60 * 1000);
- await transaction.aIChatMessage.updateMany({
- where: {
- conversationId: conversation.id,
- requestId: requestId!,
- role: "ASSISTANT",
- status: "GENERATING",
- updatedAt: { lt: staleBefore },
- },
- data: { status: "FAILED" },
- });
-
- const assistant = await transaction.aIChatMessage.findUnique({
- where: {
- conversationId_requestId_role: {
- conversationId: conversation.id,
- requestId: requestId!,
- role: "ASSISTANT",
- },
- },
- select: { id: true, status: true, content: true, model: true },
- });
- if (assistant?.status === "COMPLETED") {
- return { completed: assistant, conversation };
- }
- if (assistant?.status === "GENERATING") {
- return { error: "This message is already being answered.", status: 409 as const };
- }
-
- const newAssistant = assistant
- ? await transaction.aIChatMessage.update({
- where: { id: assistant.id, userId: userId! },
- data: { status: "GENERATING", content: "", model: configuredModel },
- select: { id: true },
- })
- : await transaction.aIChatMessage.create({
- data: {
- conversationId: conversation.id,
- userId: userId!,
- requestId: requestId!,
- role: "ASSISTANT",
- content: "",
- status: "GENERATING",
- model: configuredModel,
- createdAt: new Date(messageCreatedAt.getTime() + 1),
- },
- select: { id: true },
- });
-
- const history = await transaction.aIChatMessage.findMany({
- where: {
- conversationId: conversation.id,
- status: "COMPLETED",
- NOT: { id: userMessage.id },
- },
- orderBy: [{ createdAt: "desc" }, { id: "desc" }],
- take: MAX_HISTORY_MESSAGES,
- select: { role: true, content: true },
- });
- const updatedConversation = await transaction.aIChatConversation.update({
- where: { id: conversation.id, userId: userId! },
- data: {
- title: conversation.title === "New Chat"
- ? Array.from(message.replace(/\s+/g, " ").replace(/[\u0000-\u001f\u007f]/g, " ")).slice(0, 80).join("").trim() || "New Chat"
- : undefined,
- lastMessageAt: new Date(),
- model: configuredModel,
- },
- select: { id: true, title: true },
- });
- return {
- assistantMessageId: newAssistant.id,
- conversation: updatedConversation,
- history: history.reverse().map((entry) => ({
- role: entry.role === "ASSISTANT" ? "assistant" as const : "user" as const,
- content: entry.content,
- })),
- };
- });
-
- if ("error" in persisted) {
- return NextResponse.json({ error: persisted.error, code: persisted.status === 404 ? "NOT_FOUND" : "REQUEST_CONFLICT" }, { status: persisted.status });
- }
- if ("completed" in persisted && persisted.completed) {
- return NextResponse.json({
- success: true,
- message: persisted.completed.content,
- model: persisted.completed.model,
- conversationId,
- saved: true,
- });
- }
- assistantMessageId = persisted.assistantMessageId;
-
  console.info("[ai-chat] request received", {
- conversationId,
- requestId,
+ messageCount: requestMessages.length || 1,
+ message,
  });
- console.info("[ai-chat] selected provider", { provider: requestedProvider, model: configuredModel });
+ console.info("[ai-chat] selected provider", { provider, model });
 
- if (requestedProvider !== "local") {
- const providerAttempts = getProviderAttempts(requestedProvider);
+ if (provider !== "local") {
+ const providerAttempts = getProviderAttempts(provider);
  const providerErrors: Array<{ provider: RemoteAIProvider; message: string }> = [];
 
  for (const providerAttempt of providerAttempts) {
  try {
- const answer = await askProvider(providerAttempt, message, persisted.history);
- const actualModel = providerAttempt === "groq" ? getGroqModel() : getGeminiModel();
- await prisma.$transaction([
- prisma.aIChatMessage.update({
- where: { id: assistantMessageId!, userId: userId! },
- data: { content: answer, status: "COMPLETED", model: actualModel },
- }),
- prisma.aIChatConversation.update({
- where: { id: conversationId!, userId: userId! },
- data: { lastMessageAt: new Date(), model: actualModel },
- }),
- ]);
+ const answer = await askProvider(providerAttempt, message, history);
  return NextResponse.json({
  success: true,
  message: answer,
- model: actualModel,
+ model: providerAttempt === "groq"
+ ? getGroqModel()
+ : getGeminiModel(),
  provider: providerAttempt,
- conversationId,
- saved: true,
  });
  } catch (providerError) {
  const errorMessage = getSafeAIErrorMessage(providerError);
@@ -563,67 +423,35 @@ export async function POST(request: NextRequest) {
  }
  }
 
- const primaryError = providerErrors.find((entry) => entry.provider === requestedProvider);
+ const primaryError = providerErrors.find((entry) => entry.provider === provider);
  const surfacedError = primaryError ?? providerErrors[providerErrors.length - 1];
- const providerError = getProviderError(surfacedError?.message || `${requestedProvider} request failed.`, requestedProvider);
- await prisma.aIChatMessage.update({
- where: { id: assistantMessageId!, userId: userId! },
- data: { status: "FAILED" },
- });
- return NextResponse.json(
- {
- error: providerError.error,
- code: providerError.code,
- provider: requestedProvider,
- conversationId,
- saved: true,
- },
- { status: providerError.status },
+ const providerError = getProviderError(
+ surfacedError?.message || `${provider} request failed.`,
+ provider,
  );
- }
-
- await prisma.aIChatMessage.update({
- where: { id: assistantMessageId!, userId: userId! },
- data: { status: "FAILED" },
- });
- return NextResponse.json({
- error: "No AI provider is configured. Set GEMINI_API_KEY or GROQ_API_KEY on the server.",
- code: "AI_PROVIDER_NOT_CONFIGURED",
- provider: requestedProvider,
- conversationId,
- saved: true,
- }, { status: 503 });
- } catch (error) {
- console.error("AI chat error:", error);
-
- if (userId && !assistantMessageId) {
- return NextResponse.json({
- error: "Your message could not be saved. Please retry.",
- code: "CHAT_PERSISTENCE_FAILED",
- saved: false,
- }, { status: 500 });
- }
-
- if (assistantMessageId && userId) {
- try {
- await prisma.aIChatMessage.updateMany({
- where: { id: assistantMessageId, userId, status: "GENERATING" },
- data: { status: "FAILED" },
- });
- } catch (saveError) {
- console.error("Could not mark failed AI chat response:", saveError);
- }
- }
- const provider = getPreferredProvider();
- const remoteProvider: RemoteAIProvider = provider === "groq" ? provider : "gemini";
- const providerError = getProviderError(error, remoteProvider);
  return NextResponse.json(
  {
  error: providerError.error,
  code: providerError.code,
  provider,
- ...(conversationId ? { conversationId, saved: Boolean(userId) } : {}),
  },
+ { status: providerError.status },
+ );
+ }
+
+ return NextResponse.json({
+ error: "No AI provider is configured. Set GEMINI_API_KEY or GROQ_API_KEY on the server.",
+ code: "AI_PROVIDER_NOT_CONFIGURED",
+ provider,
+ }, { status: 503 });
+ } catch (error) {
+ const provider = getPreferredProvider();
+ const remoteProvider: RemoteAIProvider = provider === "groq" ? provider : "gemini";
+ const providerError = getProviderError(error, remoteProvider);
+ console.error("AI chat error:", error);
+
+ return NextResponse.json(
+ { error: providerError.error, code: providerError.code, provider },
  { status: providerError.status },
  );
  }

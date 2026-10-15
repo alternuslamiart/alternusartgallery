@@ -17,18 +17,6 @@ const AUTH_THEME_KEY = "Coreforge_auth_theme";
 
 type OAuthProvider = "google" | "github" | "discord";
 
-function getSafeCallbackUrl(value: string | null) {
- if (!value) return STUDIO_HOME;
- try {
-  const baseUrl = "https://callback.invalid";
-  const callbackUrl = new URL(value, baseUrl);
-  if (callbackUrl.origin !== baseUrl) return STUDIO_HOME;
-  return `${callbackUrl.pathname}${callbackUrl.search}${callbackUrl.hash}`;
- } catch {
-  return STUDIO_HOME;
- }
-}
-
 const socialProviders: Array<{
  id: OAuthProvider;
  label: string;
@@ -118,7 +106,7 @@ export default function LoginPage() {
  }, [searchParams]);
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [error, setError] = useState<string | null>(null);
- const callbackUrl = getSafeCallbackUrl(searchParams.get("callbackUrl"));
+ const callbackUrl = searchParams.get("callbackUrl") || STUDIO_HOME;
  const registered = searchParams.get("registered") === "1";
 
  useEffect(() => {
@@ -128,7 +116,7 @@ export default function LoginPage() {
  }, [resendSeconds]);
 
  const handleOAuthSignIn = (provider: OAuthProvider) => {
- signIn(provider, { callbackUrl });
+ signIn(provider, { callbackUrl: STUDIO_HOME });
  };
 
  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {

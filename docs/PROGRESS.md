@@ -2,36 +2,6 @@
 
 Last updated: 2026-10-15
 
-## `/aichat` account-owned history
-
-- Replaced per-email `localStorage` chat history with PostgreSQL conversations
-  and full message records owned by the authenticated database user.
-- Added authenticated, owner-scoped APIs for listing, creating, loading,
-  renaming, and deleting conversations, plus idempotent message-request IDs.
-- Added a bounded one-time import of legacy per-account browser history; the
-  old local copy is removed only after a successful import.
-- Messages are saved before AI generation; failed provider calls preserve the
-  submitted user message and mark the pending assistant record failed.
-- Recent is fetched from the database, sorted by activity, paginated by 50,
-  restored from the `?chat=` URL on reload, and cleared on account changes/logout.
-- `npx prisma validate`, `npx prisma generate`, `npm run typecheck`, and the
-  existing tests passed. The new database integration test was skipped because
-  `DATABASE_URL` is not configured in this environment.
-- `npm run build` completed, including Prisma Client generation and Next.js
-  production compilation. The build reports existing Browserslist freshness and
-  `useSearchParams()` client-rendering warnings on unrelated pages.
-- Focused ESLint passes with no errors and four existing image/alt-text
-  warnings; `git diff --check` passes.
-- Database migration application and authenticated end-to-end behavior remain
-  unverified until a PostgreSQL `DATABASE_URL` is configured.
-- Fixed the signed-out `/aichat` account control so its visible Sign in link
-  opens `/login` and returns to `/aichat`; the collapsed-sidebar account link
-  and guest menu use the same flow. Login callback URLs are restricted to
-  same-origin paths, and OAuth sign-in now honors the requested callback.
-- `npm run typecheck`, focused ESLint, and `npm test` passed after the fix.
-  Focused lint reports five existing image/alt-text warnings; the PostgreSQL
-  persistence test remains skipped without `DATABASE_URL`.
-
 ## `/aichat` response typography
 
 - Assistant responses now render markdown-style headings, numbered and bulleted

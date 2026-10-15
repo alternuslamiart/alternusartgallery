@@ -74,17 +74,6 @@ npx prisma generate
 npx prisma db push
 ```
 
-For an existing production database, deploy committed migrations with:
-
-```bash
-npx prisma migrate deploy
-```
-
-The AI chat history migration creates owner-scoped conversation and message
-tables. `/aichat` history is available to authenticated users and is read from
-PostgreSQL; browser storage is not used as the chat-history source of truth.
-Existing per-account browser chat data is imported once after authentication.
-
 ## Environment Variables
 
 The repository includes `.env.example`, but it is not fully aligned with the current codebase. Use it as a starting point, then verify values against the sections below.
