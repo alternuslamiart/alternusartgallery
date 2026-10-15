@@ -41,6 +41,17 @@ enum PayoutStatus {
   FAILED
 }
 
+enum AIChatMessageRole {
+  USER
+  ASSISTANT
+}
+
+enum AIChatMessageStatus {
+  GENERATING
+  COMPLETED
+  FAILED
+}
+
 enum OrderStatus {
   PENDING
   PROCESSING
@@ -67,18 +78,20 @@ model User {
 
   stripeCustomerId String? @unique @map("stripe_customer_id")
 
-  artist           Artist?
-  orders           Order[]
-  reviews          Review[]
-  notifications    Notification[]
-  sentMessages     Message[]      @relation("SentMessages")
-  receivedMessages Message[]      @relation("ReceivedMessages")
-  adminActions     AdminAction[]
-  addresses        Address[]
-  accounts         Account[]
-  sessions         Session[]
-  following        Follow[]
-  osFiles          OsFile[]
+  artist              Artist?
+  orders              Order[]
+  reviews             Review[]
+  notifications       Notification[]
+  sentMessages        Message[]            @relation("SentMessages")
+  receivedMessages    Message[]            @relation("ReceivedMessages")
+  adminActions        AdminAction[]
+  addresses           Address[]
+  accounts            Account[]
+  sessions            Session[]
+  following           Follow[]
+  osFiles             OsFile[]
+  aiChatConversations AIChatConversation[]
+  aiChatMessages      AIChatMessage[]
 
   @@map("users")
 }
@@ -373,6 +386,45 @@ model Message {
   replies       Message[] @relation("MessageThread")
 
   @@map("messages")
+}
+
+model AIChatConversation {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  legacyId      String?  @map("legacy_id")
+  title         String   @default("New Chat") @db.VarChar(80)
+  model         String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  lastMessageAt DateTime @default(now()) @map("last_message_at")
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AIChatMessage[]
+
+  @@unique([userId, legacyId])
+  @@index([userId, lastMessageAt(sort: Desc)])
+  @@index([userId, updatedAt(sort: Desc)])
+  @@map("ai_chat_conversations")
+}
+
+model AIChatMessage {
+  id             String              @id @default(uuid())
+  conversationId String              @map("conversation_id")
+  userId         String              @map("user_id")
+  requestId      String              @map("request_id")
+  role           AIChatMessageRole
+  content        String              @db.Text
+  status         AIChatMessageStatus @default(COMPLETED)
+  model          String?
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+
+  conversation AIChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, requestId, role])
+  @@index([userId, conversationId, createdAt])
+  @@map("ai_chat_messages")
 }
 
 model AdminAction {

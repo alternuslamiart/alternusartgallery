@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { signOut, useSession } from "next-auth/react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   ArrowUp,
@@ -25,8 +25,6 @@ import {
   Search,
   Share2,
   Sparkles,
-  Target,
-  EyeOff,
   Pencil,
   Trash2,
   UserRound,
@@ -39,7 +37,7 @@ import {
   Sun,
 } from "lucide-react";
 
-type Message = { id: number; role: "user" | "assistant"; content: string };
+type Message = { id: string; role: "user" | "assistant"; content: string; status?: string };
 
 const thinkingDots = [
   { cx: 12, cy: 3.2, color: "#47B3FF" },
@@ -132,7 +130,7 @@ function AssistantResponse({ content }: { content: string }) {
 }
 
 const models = ["Gemini", "Groq"] as const;
-type ChatSession = { id: string; title: string; messages: Message[]; updatedAt: number };
+type ChatSession = { id: string; title: string; messages: Message[]; updatedAt: number; model?: string | null };
 type ChatSection = { id: string; label: string };
 type SearchDestination = { label: string; description: string; href: string };
 type SearchResult = { type: "destination"; destination: SearchDestination } | { type: "conversation"; conversation: ChatSession };
@@ -159,7 +157,7 @@ export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedModel, setSelectedModel] = useState("Gemini");
@@ -170,6 +168,12 @@ export default function AIChatPage() {
   const [mode, setMode] = useState<"chat" | "workflow">("chat");
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [sessionsLoaded, setSessionsLoaded] = useState(false);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
+  const [sessionsError, setSessionsError] = useState<string | null>(null);
+  const [hasMoreSessions, setHasMoreSessions] = useState(false);
+  const [sessionsPage, setSessionsPage] = useState(0);
+  const [loadingMoreSessions, setLoadingMoreSessions] = useState(false);
+  const [loadingConversation, setLoadingConversation] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [openConversationMenu, setOpenConversationMenu] = useState<string | null>(null);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
@@ -177,9 +181,15 @@ export default function AIChatPage() {
   const [hasPastedInput, setHasPastedInput] = useState(false);
   const [isLight, setIsLight] = useState(false);
   const { data: session, status: sessionStatus } = useSession();
+  const currentUserIdRef = useRef<string | undefined>(undefined);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const activeSessionIdRef = useRef<string | null>(null);
+  const conversationLoadIdRef = useRef(0);
+  const conversationAbortRef = useRef<AbortController | null>(null);
+  const pendingRequestRef = useRef<{ requestId: string; message: string; conversationId: string | null; ownerId: string } | null>(null);
+  currentUserIdRef.current = session?.user?.id;
   const chatSections = useMemo<ChatSection[]>(() => [
     { id: "header", label: "Header" },
     ...messages.map((message, index) => ({
@@ -194,7 +204,7 @@ export default function AIChatPage() {
       .map((destination): SearchResult => ({ type: "destination", destination }));
     const conversations = [...chatSessions]
       .sort((first, second) => second.updatedAt - first.updatedAt)
-      .filter((conversation) => !query || `${conversation.title} ${conversation.messages.map((message) => message.content).join(" ")}`.toLowerCase().includes(query))
+      .filter((conversation) => !query || conversation.title.toLowerCase().includes(query))
       .slice(0, 8)
       .map((conversation): SearchResult => ({ type: "conversation", conversation }));
     return [...destinations, ...conversations];
@@ -202,33 +212,82 @@ export default function AIChatPage() {
 
   useEffect(() => {
     if (sessionStatus === "loading") return;
-    setSessionsLoaded(false);
     setIsLight(window.localStorage.getItem("Coreforge_auth_theme") === "light");
-    const profileKey = session?.user?.email ?? session?.user?.name ?? null;
-    if (!profileKey) {
+    const userId = session?.user?.id;
+    conversationAbortRef.current?.abort();
+    conversationLoadIdRef.current += 1;
+    setLoadingConversation(false);
+    activeSessionIdRef.current = null;
+    setActiveSessionId(null);
+    setMessages([]);
+    setIsSending(false);
+    pendingRequestRef.current = null;
+    setChatSessions([]);
+    setSessionsError(null);
+    setHasMoreSessions(false);
+    setSessionsPage(0);
+    setSessionsLoaded(false);
+    if (!userId) {
+      setSessionsLoading(false);
       setChatSessions([]);
       setSessionsLoaded(true);
       return;
     }
-    const storageKey = `crystal_ai_chat_sessions:${encodeURIComponent(profileKey)}`;
-    try {
-      const savedSessions = window.localStorage.getItem(storageKey);
-      if (savedSessions) setChatSessions(JSON.parse(savedSessions) as ChatSession[]);
-      else setChatSessions([]);
-    } catch {
-      setToast("Saved chats could not be loaded.");
-    } finally {
-      setSessionsLoaded(true);
-    }
-  }, [session?.user?.email, session?.user?.name, sessionStatus]);
-
-  useEffect(() => {
-    const profileKey = session?.user?.email ?? session?.user?.name ?? null;
-    if (!sessionsLoaded || !profileKey) return;
-    const storageKey = `crystal_ai_chat_sessions:${encodeURIComponent(profileKey)}`;
-    if (chatSessions.length > 0) window.localStorage.setItem(storageKey, JSON.stringify(chatSessions));
-    else window.localStorage.removeItem(storageKey);
-  }, [chatSessions, session?.user?.email, session?.user?.name, sessionsLoaded]);
+    setSessionsLoading(true);
+    setSessionsLoaded(false);
+    const controller = new AbortController();
+    const legacyProfile = session?.user?.email ?? session?.user?.name;
+    const legacyStorageKey = legacyProfile
+      ? `crystal_ai_chat_sessions:${encodeURIComponent(legacyProfile)}`
+      : null;
+    void (async () => {
+      try {
+        if (legacyStorageKey) {
+          const legacyValue = window.localStorage.getItem(legacyStorageKey);
+          if (legacyValue) {
+            const legacySessions = JSON.parse(legacyValue) as unknown;
+            if (Array.isArray(legacySessions) && legacySessions.length > 0) {
+              const importResponse = await fetch("/api/ai-chat/conversations/import", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ conversations: legacySessions }),
+                signal: controller.signal,
+              });
+              const importResult = await importResponse.json() as { error?: string };
+              if (!importResponse.ok) throw new Error(importResult.error || "Older browser chats could not be imported.");
+            }
+            window.localStorage.removeItem(legacyStorageKey);
+          }
+        }
+        const response = await fetch("/api/ai-chat/conversations?page=0", { signal: controller.signal });
+        const result = await response.json() as {
+          error?: string;
+          conversations?: Array<{ id: string; title: string; model: string | null; lastMessageAt: string }>;
+          hasMore?: boolean;
+        };
+        if (!response.ok) throw new Error(result.error || "Chat history could not be loaded.");
+        const conversations = (result.conversations ?? []).map((item) => ({
+          id: item.id,
+          title: item.title,
+          model: item.model,
+          messages: [],
+          updatedAt: Date.parse(item.lastMessageAt),
+        }));
+        setChatSessions(conversations);
+        setHasMoreSessions(Boolean(result.hasMore));
+        setSessionsPage(0);
+        setSessionsError(null);
+        setSessionsLoaded(true);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setSessionsError(error instanceof Error ? error.message : "Chat history could not be loaded.");
+        setSessionsLoaded(true);
+      } finally {
+        setSessionsLoading(false);
+      }
+    })();
+    return () => controller.abort();
+  }, [session?.user?.email, session?.user?.id, session?.user?.name, sessionStatus]);
 
   const toggleTheme = () => {
     setIsLight((current) => {
@@ -277,40 +336,192 @@ export default function AIChatPage() {
     setSearchOpen(false);
   };
 
+  const updateActiveConversation = useCallback((id: string | null) => {
+    activeSessionIdRef.current = id;
+    setActiveSessionId(id);
+    const url = new URL(window.location.href);
+    if (id) url.searchParams.set("chat", id);
+    else url.searchParams.delete("chat");
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  }, []);
+
+  const loadConversation = useCallback(async (conversationId: string) => {
+    conversationAbortRef.current?.abort();
+    const controller = new AbortController();
+    conversationAbortRef.current = controller;
+    const loadId = ++conversationLoadIdRef.current;
+    const ownerId = currentUserIdRef.current;
+    updateActiveConversation(conversationId);
+    setMessages([]);
+    setLoadingConversation(true);
+    setInput("");
+    setHasPastedInput(false);
+    try {
+      const response = await fetch(`/api/ai-chat/conversations/${encodeURIComponent(conversationId)}`, { signal: controller.signal });
+      const result = await response.json() as {
+        error?: string;
+        conversation?: {
+          id: string;
+          title: string;
+          model: string | null;
+          lastMessageAt: string;
+          messages: Array<{ id: string; role: "USER" | "ASSISTANT"; content: string; status: string }>;
+        };
+      };
+      if (!response.ok || !result.conversation) throw new Error(result.error || "Conversation could not be loaded.");
+      if (loadId !== conversationLoadIdRef.current || currentUserIdRef.current !== ownerId) return;
+      const conversation = result.conversation;
+      const loadedMessages: Message[] = conversation.messages
+        .filter((item) => item.content.length > 0)
+        .map((item) => ({
+          id: item.id,
+          role: item.role === "USER" ? "user" : "assistant",
+          content: item.content,
+          status: item.status,
+        }));
+      setMessages(loadedMessages);
+      setChatSessions((current) => [{
+        id: conversation.id,
+        title: conversation.title,
+        model: conversation.model,
+        messages: loadedMessages,
+        updatedAt: Date.parse(conversation.lastMessageAt),
+      }, ...current.filter((item) => item.id !== conversation.id)]);
+      setSessionsError(null);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      if (loadId === conversationLoadIdRef.current && currentUserIdRef.current === ownerId) {
+        setToast(error instanceof Error ? error.message : "Conversation could not be loaded.");
+        window.setTimeout(() => setToast(null), 3500);
+      }
+    } finally {
+      if (loadId === conversationLoadIdRef.current) setLoadingConversation(false);
+    }
+  }, [updateActiveConversation]);
+
+  useEffect(() => {
+    if (sessionStatus !== "authenticated" || !sessionsLoaded || activeSessionIdRef.current) return;
+    const selectedId = new URL(window.location.href).searchParams.get("chat");
+    if (selectedId && chatSessions.some((item) => item.id === selectedId)) void loadConversation(selectedId);
+  }, [chatSessions, loadConversation, session?.user?.id, sessionStatus, sessionsLoaded]);
+
+  const loadMoreSessions = async () => {
+    if (loadingMoreSessions || !hasMoreSessions) return;
+    const ownerId = session?.user?.id;
+    setLoadingMoreSessions(true);
+    try {
+      const nextPage = sessionsPage + 1;
+      const response = await fetch(`/api/ai-chat/conversations?page=${nextPage}`);
+      const result = await response.json() as {
+        error?: string;
+        conversations?: Array<{ id: string; title: string; model: string | null; lastMessageAt: string }>;
+        hasMore?: boolean;
+      };
+      if (!response.ok) throw new Error(result.error || "Older chats could not be loaded.");
+      if (currentUserIdRef.current !== ownerId) return;
+      const loaded = (result.conversations ?? []).map((item): ChatSession => ({
+        id: item.id,
+        title: item.title,
+        model: item.model,
+        messages: [],
+        updatedAt: Date.parse(item.lastMessageAt),
+      }));
+      setChatSessions((current) => {
+        const knownIds = new Set(current.map((item) => item.id));
+        return [...current, ...loaded.filter((item) => !knownIds.has(item.id))];
+      });
+      setSessionsPage(nextPage);
+      setHasMoreSessions(Boolean(result.hasMore));
+    } catch (error) {
+      setSessionsError(error instanceof Error ? error.message : "Older chats could not be loaded.");
+    } finally {
+      setLoadingMoreSessions(false);
+    }
+  };
+
+  const createConversation = async (): Promise<ChatSession> => {
+    const ownerId = session?.user?.id;
+    if (!ownerId) throw new Error("Sign in to save and reopen chat history.");
+    const response = await fetch("/api/ai-chat/conversations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    const result = await response.json() as {
+      error?: string;
+      conversation?: { id: string; title: string; model: string | null; lastMessageAt: string };
+    };
+    if (!response.ok || !result.conversation) throw new Error(result.error || "A new chat could not be created.");
+    if (currentUserIdRef.current !== ownerId) throw new Error("Your account changed before the chat could be opened.");
+    const created: ChatSession = {
+      id: result.conversation.id,
+      title: result.conversation.title,
+      model: result.conversation.model,
+      messages: [],
+      updatedAt: Date.parse(result.conversation.lastMessageAt),
+    };
+    setChatSessions((current) => [created, ...current.filter((item) => item.id !== created.id)]);
+    return created;
+  };
+
   const sendMessage = async (event?: FormEvent) => {
     event?.preventDefault();
     const message = input.trim();
-    if (!message || isSending) return;
-
-    const sessionId = activeSessionId ?? `chat-${Date.now()}`;
-    const userMessage: Message = { id: Date.now(), role: "user", content: message };
-    const title = message.replace(/\s+/g, " ").slice(0, 42) || "New Chat";
-    setActiveSessionId(sessionId);
-    setMessages((current) => [...current, userMessage]);
-    setChatSessions((current) => {
-      const existing = current.find((session) => session.id === sessionId);
-      if (existing) return current.map((session) => session.id === sessionId ? { ...session, messages: [...session.messages, userMessage], updatedAt: Date.now() } : session);
-      return [{ id: sessionId, title, messages: [userMessage], updatedAt: Date.now() }, ...current];
-    });
-    setInput("");
-    setHasPastedInput(false);
+    if (!message || isSending || loadingConversation) return;
+    if (sessionStatus !== "authenticated" || !session?.user?.id) {
+      setToast("Sign in to save and use AI chat history.");
+      window.setTimeout(() => setToast(null), 3500);
+      return;
+    }
+    const ownerId = session.user.id;
     setIsSending(true);
+    let conversationId = activeSessionIdRef.current;
+    const previousRequest = pendingRequestRef.current;
+    const requestId = previousRequest
+      && previousRequest.ownerId === ownerId
+      && previousRequest.message === message
+      && previousRequest.conversationId === conversationId
+      ? previousRequest.requestId
+      : window.crypto.randomUUID();
+    pendingRequestRef.current = { requestId, message, conversationId, ownerId };
+    let persisted = false;
 
     try {
+      if (!conversationId) {
+        const created = await createConversation();
+        conversationId = created.id;
+        pendingRequestRef.current = { requestId, message, conversationId, ownerId };
+        updateActiveConversation(conversationId);
+        setMessages([]);
+        setSidebarOpen(false);
+      }
+      if (currentUserIdRef.current !== ownerId) return;
+      const userMessage: Message = { id: requestId, role: "user", content: message };
+      setMessages((current) => [...current, userMessage]);
+      setInput("");
+      setHasPastedInput(false);
       const response = await fetch("/api/ai-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          conversationId,
+          requestId,
+          message,
           provider: selectedModel.toLowerCase(),
-          messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
         }),
       });
       const result = (await response.json()) as {
         message?: string;
         error?: string;
         provider?: "gemini" | "groq";
+        model?: string;
+        saved?: boolean;
       };
+      persisted = Boolean(result.saved);
+      if (currentUserIdRef.current !== ownerId) return;
+      if (persisted && pendingRequestRef.current?.requestId === requestId) pendingRequestRef.current = null;
       if (!response.ok) {
+        if (result.saved && conversationId) await loadConversation(conversationId);
         throw new Error(result.error || "Crystal could not answer right now. Please try again.");
       }
       if (!result.message?.trim()) {
@@ -320,36 +531,91 @@ export default function AIChatPage() {
       else if (result.provider === "groq") setSelectedModel("Groq");
 
       const assistantMessage: Message = {
-        id: Date.now() + 1,
+        id: `${requestId}-assistant`,
         role: "assistant",
         content: result.message.trim(),
       };
-      setMessages((current) => [...current, assistantMessage]);
-      setChatSessions((current) => current.map((chat) => chat.id === sessionId
-        ? { ...chat, messages: [...chat.messages, assistantMessage], updatedAt: Date.now() }
+      if (activeSessionIdRef.current === conversationId) setMessages((current) => [...current, assistantMessage]);
+      setChatSessions((current) => current.map((chat) => chat.id === conversationId
+        ? {
+          ...chat,
+          title: chat.title === "New Chat" ? Array.from(message.replace(/\s+/g, " ")).slice(0, 80).join("") : chat.title,
+          model: result.model ?? chat.model,
+          messages: [...chat.messages, userMessage, assistantMessage],
+          updatedAt: Date.now(),
+        }
         : chat));
     } catch (error) {
-      setToast(error instanceof Error ? error.message : "Crystal could not answer right now. Please try again.");
-      window.setTimeout(() => setToast(null), 3500);
+      if (currentUserIdRef.current === ownerId) {
+        if (conversationId && !persisted) {
+          try {
+            const savedResponse = await fetch(`/api/ai-chat/conversations/${encodeURIComponent(conversationId)}`);
+            if (savedResponse.ok) {
+              const savedResult = await savedResponse.json() as {
+                conversation?: {
+                  id: string;
+                  title: string;
+                  model: string | null;
+                  lastMessageAt: string;
+                  messages: Array<{ id: string; role: "USER" | "ASSISTANT"; content: string; status: string }>;
+                };
+              };
+              const savedConversation = savedResult.conversation;
+              if (savedConversation && currentUserIdRef.current === ownerId) {
+                const recoveredMessages = savedConversation.messages.filter((item) => item.content).map((item): Message => ({
+                  id: item.id,
+                  role: item.role === "USER" ? "user" : "assistant",
+                  content: item.content,
+                  status: item.status,
+                }));
+                persisted = recoveredMessages.some((item) => item.id === requestId);
+                if (persisted && pendingRequestRef.current?.requestId === requestId) pendingRequestRef.current = null;
+                setChatSessions((current) => [{
+                  id: savedConversation.id,
+                  title: savedConversation.title,
+                  model: savedConversation.model,
+                  messages: recoveredMessages,
+                  updatedAt: Date.parse(savedConversation.lastMessageAt),
+                }, ...current.filter((item) => item.id !== savedConversation.id)]);
+                if (activeSessionIdRef.current === conversationId) setMessages(recoveredMessages);
+              }
+            }
+          } catch (recoveryError) {
+            console.error("Could not verify AI chat save after request failure:", recoveryError);
+          }
+        }
+        if (!persisted) setInput(message);
+        setToast(persisted
+          ? (error instanceof Error ? error.message : "The response failed. Your message is saved in this conversation.")
+          : "The message could not be confirmed as saved. It remains in the input; please retry.");
+        window.setTimeout(() => setToast(null), 4500);
+      }
     } finally {
-      setIsSending(false);
+      if (currentUserIdRef.current === ownerId) setIsSending(false);
     }
   };
 
-  const startNewChat = () => {
-    setActiveSessionId(null);
+  const startNewChat = async () => {
+    conversationAbortRef.current?.abort();
+    conversationLoadIdRef.current += 1;
+    setLoadingConversation(false);
     setMessages([]);
     setInput("");
     setHasPastedInput(false);
     setSidebarOpen(false);
+    updateActiveConversation(null);
+    try {
+      const created = await createConversation();
+      updateActiveConversation(created.id);
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "A new chat could not be created.");
+      window.setTimeout(() => setToast(null), 3500);
+    }
   };
 
-  const openChat = (session: ChatSession) => {
-    setActiveSessionId(session.id);
-    setMessages(session.messages);
-    setInput("");
-    setHasPastedInput(false);
+  const openChat = (conversation: ChatSession) => {
     setSidebarOpen(false);
+    if (activeSessionIdRef.current !== conversation.id) void loadConversation(conversation.id);
   };
 
   const copyMessage = async (message: Message) => {
@@ -360,25 +626,44 @@ export default function AIChatPage() {
 
   const handleConversationAction = async (action: string, item: ChatSession) => {
     setOpenConversationMenu(null);
-    if (action === "pin") {
-      setChatSessions((items) => [item, ...items.filter((current) => current.id !== item.id)]);
-      setToast(`${item.title} pinned.`);
-    } else if (action === "project") {
-      setToast(`${item.title} added to project.`);
-    } else if (action === "unread") {
-      setToast(`${item.title} marked as unread.`);
-    } else if (action === "rename") {
+    if (action === "rename") {
       const nextName = window.prompt("Rename conversation", item.title)?.trim();
-      if (nextName && nextName !== item.title) setChatSessions((items) => items.map((current) => current.id === item.id ? { ...current, title: nextName } : current));
+      if (!nextName || nextName === item.title) return;
+      try {
+        const response = await fetch(`/api/ai-chat/conversations/${encodeURIComponent(item.id)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title: nextName }),
+        });
+        const result = await response.json() as { error?: string; conversation?: { title: string } };
+        if (!response.ok || !result.conversation) throw new Error(result.error || "Conversation could not be renamed.");
+        setChatSessions((items) => items.map((current) => current.id === item.id ? { ...current, title: result.conversation!.title } : current));
+      } catch (error) {
+        setToast(error instanceof Error ? error.message : "Conversation could not be renamed.");
+      }
     } else if (action === "share") {
-      await navigator.clipboard?.writeText(window.location.href);
+      const url = new URL(window.location.href);
+      url.searchParams.set("chat", item.id);
+      await navigator.clipboard?.writeText(url.toString());
       setToast("Conversation link copied.");
-    } else if (action === "delete") {
-      setChatSessions((items) => items.filter((current) => current.id !== item.id));
-      if (activeSessionId === item.id) startNewChat();
-      setToast(`${item.title} deleted.`);
+    } else if (action === "delete" && window.confirm(`Delete "${item.title}" and its messages?`)) {
+      try {
+        const response = await fetch(`/api/ai-chat/conversations/${encodeURIComponent(item.id)}`, { method: "DELETE" });
+        const result = await response.json() as { error?: string };
+        if (!response.ok) throw new Error(result.error || "Conversation could not be deleted.");
+        setChatSessions((items) => items.filter((current) => current.id !== item.id));
+        if (activeSessionIdRef.current === item.id) {
+          conversationAbortRef.current?.abort();
+          conversationLoadIdRef.current += 1;
+          setLoadingConversation(false);
+          setMessages([]);
+          updateActiveConversation(null);
+        }
+      } catch (error) {
+        setToast(error instanceof Error ? error.message : "Conversation could not be deleted.");
+      }
     }
-    window.setTimeout(() => setToast(null), 1800);
+    window.setTimeout(() => setToast(null), 3500);
   };
 
   return (
@@ -452,22 +737,43 @@ export default function AIChatPage() {
 
           <div className="mt-6 min-h-0 flex-1 overflow-y-auto scrollbar-hide">
             <div className="mb-2 px-3 text-[10px] font-medium uppercase tracking-[0.16em] text-zinc-600">Recent</div>
+            {sessionsLoading && <p className="px-3 py-2 text-xs text-zinc-500">Loading chats...</p>}
+            {sessionsError && <div className="px-3 py-2 text-xs text-red-300"><p>{sessionsError}</p><button type="button" onClick={() => window.location.reload()} className="mt-1 text-blue-400 hover:text-blue-300">Retry</button></div>}
+            {!sessionsLoading && !sessionsError && sessionStatus !== "authenticated" && <p className="px-3 py-2 text-xs text-zinc-500">Sign in to save and reopen chats.</p>}
+            {!sessionsLoading && !sessionsError && sessionStatus === "authenticated" && chatSessions.length === 0 && <p className="px-3 py-2 text-xs text-zinc-500">Your recent chats will appear here.</p>}
             <div className="space-y-0.5">
-              {[...chatSessions].sort((first, second) => second.updatedAt - first.updatedAt).filter((session) => session.title.toLowerCase().includes(search.toLowerCase())).map((session) => <div key={session.id} className="group relative">
-                <button onClick={() => openChat(session)} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[12px] transition ${activeSessionId === session.id ? "bg-[#1c1c1c] text-white" : "text-zinc-500 hover:bg-[#1c1c1c] hover:text-zinc-200"}`}><Sparkles size={14} className="shrink-0 text-zinc-600" /><span className="min-w-0 flex-1 truncate">{session.title}</span><span role="button" tabIndex={0} aria-label={`Options for ${session.title}`} onClick={(event) => { event.stopPropagation(); setOpenConversationMenu(openConversationMenu === session.id ? null : session.id); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setOpenConversationMenu(openConversationMenu === session.id ? null : session.id); } }} className="shrink-0 rounded-md p-1 text-zinc-500 opacity-0 transition hover:bg-[#363636] group-hover:opacity-100"><MoreHorizontal size={14} /></span></button>
-                {openConversationMenu === session.id && <ConversationMenu onAction={(action) => void handleConversationAction(action, session)} />}
+              {[...chatSessions].sort((first, second) => second.updatedAt - first.updatedAt).filter((chat) => chat.title.toLowerCase().includes(search.toLowerCase())).map((conversation) => <div key={conversation.id} className="group relative">
+                <div className={`flex items-center rounded-xl transition ${activeSessionId === conversation.id ? "bg-[#1c1c1c] text-white" : "text-zinc-500 hover:bg-[#1c1c1c] hover:text-zinc-200"}`}>
+                  <button type="button" onClick={() => openChat(conversation)} className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[12px]">
+                    <Sparkles size={14} className="shrink-0 text-zinc-600" />
+                    <span className="min-w-0 flex-1 truncate">{conversation.title}</span>
+                  </button>
+                  <button type="button" aria-label={`Options for ${conversation.title}`} onClick={() => setOpenConversationMenu(openConversationMenu === conversation.id ? null : conversation.id)} className="mr-1 shrink-0 rounded-md p-1 text-zinc-500 opacity-0 transition hover:bg-[#363636] group-hover:opacity-100 focus-visible:opacity-100">
+                    <MoreHorizontal size={14} />
+                  </button>
+                </div>
+                {openConversationMenu === conversation.id && <ConversationMenu onAction={(action) => void handleConversationAction(action, conversation)} />}
               </div>)}
             </div>
+            {hasMoreSessions && <button type="button" disabled={loadingMoreSessions} onClick={() => void loadMoreSessions()} className="mt-2 w-full px-3 py-2 text-left text-xs text-zinc-500 hover:text-zinc-200 disabled:opacity-50">{loadingMoreSessions ? "Loading..." : "Load older chats"}</button>}
           </div>
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-[#2a2a2a] bg-[#141414] p-2.5">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</span>
-            <Link href="/account" className="min-w-0 flex-1"><span className="block truncate text-xs text-zinc-200">Crystal User</span><span className="block truncate text-[10px] text-zinc-600">you@alternusart.com</span></Link>
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">{(session?.user?.name?.[0] ?? "U").toUpperCase()}</span>
+            <Link href="/account" className="min-w-0 flex-1"><span className="block truncate text-xs text-zinc-200">{session?.user?.name || "Guest"}</span><span className="block truncate text-[10px] text-zinc-600">{session?.user?.email || "Sign in to sync chats"}</span></Link>
             <div data-account-menu className="relative">
               <button aria-label="Account menu" title="Account menu" onClick={() => setAccountMenuOpen((value) => !value)} className="rounded-lg p-1 text-zinc-600 transition hover:bg-[#2a2a2a] hover:text-white"><MoreHorizontal size={16} /></button>
               {accountMenuOpen && <AccountMenu onAction={(action) => {
                 setAccountMenuOpen(false);
                 if (action === "profile") window.location.href = "/account";
-                else if (action === "logout") window.location.href = "/login";
+                else if (action === "logout") {
+                  conversationAbortRef.current?.abort();
+                  conversationLoadIdRef.current += 1;
+                  setMessages([]);
+                  setChatSessions([]);
+                  activeSessionIdRef.current = null;
+                  setActiveSessionId(null);
+                  void signOut({ callbackUrl: "/login" });
+                }
                 else setToast(`${action} selected.`);
                 window.setTimeout(() => setToast(null), 1800);
               }} />}
@@ -487,7 +793,7 @@ export default function AIChatPage() {
               <button type="button" onClick={() => setSearchOpen(true)} aria-label="Search" title="Search" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Search size={16} /></button>
             </nav>
             <div className="mt-auto flex flex-col items-center gap-3">
-              <Link href="/account" aria-label="Open account" className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</Link>
+              <Link href="/account" aria-label="Open account" className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">{(session?.user?.name?.[0] ?? "U").toUpperCase()}</Link>
               <span aria-hidden="true" className="grid h-8 w-8 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><img src="/Logopng.png" alt="" className="h-4 w-4 object-contain brightness-0 invert" /></span>
             </div>
           </div>
@@ -530,7 +836,9 @@ export default function AIChatPage() {
         <section ref={(element) => { sectionRefs.current.header = element; }} className="flex flex-1 flex-col overflow-y-auto scrollbar-hide px-4 pb-36 sm:px-8">
           {messages.length === 0 ? (
             <div ref={(element) => { sectionRefs.current.header = element; }} className="m-auto text-center">
+              {loadingConversation ? <p className="text-sm text-zinc-500">Loading conversation...</p> : (
               <h1 className="aichat-welcome-title text-2xl font-medium tracking-tight text-zinc-200 sm:text-3xl">What&apos;s on your mind today?</h1>
+              )}
               {mode === "workflow" && <p className="mt-4 text-sm text-zinc-500">Build a repeatable creative workflow with Crystal.</p>}
             </div>
           ) : (
@@ -603,14 +911,11 @@ export default function AIChatPage() {
 
 function ConversationMenu({ onAction }: { onAction: (action: string) => void }) {
   const items = [
-    { action: "pin", label: "Pin", icon: Target },
-    { action: "project", label: "Add to project", icon: FolderPlus, arrow: true },
-    { action: "unread", label: "Mark as unread", icon: EyeOff },
     { action: "rename", label: "Rename", icon: Pencil },
     { action: "share", label: "Share", icon: Share2, arrow: true },
     { action: "delete", label: "Delete", icon: Trash2, danger: true },
   ];
-  return <div data-conversation-menu role="menu" onClick={(event) => event.stopPropagation()} className="absolute right-0 top-10 z-[80] flex h-[218px] w-[195px] flex-col items-center justify-between overflow-hidden rounded-[16px] border-0 bg-[#242424] p-[6px] shadow-2xl">
+  return <div data-conversation-menu role="menu" onClick={(event) => event.stopPropagation()} className="absolute right-0 top-10 z-[80] flex w-[195px] flex-col items-center gap-1 overflow-hidden rounded-[16px] border-0 bg-[#242424] p-[6px] shadow-2xl">
     {items.map(({ action, label, icon: Icon, arrow, danger }) => <button key={action} role="menuitem" onClick={() => onAction(action)} className={`flex h-8 min-h-8 w-[182px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left text-sm font-medium transition hover:bg-[#363636] ${danger ? "text-[#FF6B6B]" : "text-zinc-100"}`}><Icon size={20} strokeWidth={2} /><span className="flex-1">{label}</span>{arrow && <span className="text-lg leading-none">›</span>}</button>)}
   </div>;
 }

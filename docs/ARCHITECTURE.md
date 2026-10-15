@@ -32,6 +32,11 @@
 - `/aichat` lets the user select Gemini or Groq and submits conversations to
   `/api/ai-chat`; provider credentials are read only on the server, and the
   other configured provider is tried if the selected one fails.
+- Authenticated AI chat history is stored in `AIChatConversation` and
+  `AIChatMessage` Prisma models. Conversation APIs live under
+  `src/app/api/ai-chat/conversations/`; they resolve user identity from the
+  server-side NextAuth session, enforce owner filters, and use
+  `lastMessageAt` for Recent ordering.
 
 ## Tests and commands
 

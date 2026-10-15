@@ -21,6 +21,8 @@ requirements provide new evidence.
 
 - [ ] Wire existing workspace screens to the authenticated platform APIs where
   the UI still relies on local-only state.
+- [x] Persist `/aichat` conversations and messages in owner-scoped PostgreSQL
+  records and load Recent from the authenticated user's history.
 - [ ] Keep API routes, request validation, and `docs/backend-platform.md`
   consistent as workspace features are connected.
 - [ ] Add durable, workspace-scoped infrastructure scene storage only after

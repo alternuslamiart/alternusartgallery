@@ -89,10 +89,32 @@ The workspace stub endpoints persist records and jobs with explicit `local_stub`
 
 List endpoints support `search`, `type`, `status`, `projectId`, `sort`, and `limit` where relevant. Dates are ISO strings from Prisma serialization. Asset records include stable `previewUrl` and `downloadUrl` values.
 
+## Persistent AI Chat History
+
+- `/api/ai-chat/conversations` lists the authenticated user's conversations
+  (50 per page) and creates an empty conversation.
+- `/api/ai-chat/conversations/:conversationId` loads the complete ordered
+  message history and supports owner-scoped rename and deletion.
+- The first authenticated visit imports any per-account legacy browser chat
+  history once, then removes that browser-only copy after successful import.
+- `/api/ai-chat/conversations/import` accepts that migration payload only for
+  the authenticated owner and enforces limits on message size and batch size.
+- `POST /api/ai-chat` requires the conversation ID, a client-generated UUID
+  request ID, and the new user message. It stores the user message before
+  generation, saves the complete assistant response, and returns the saved
+  conversation ID. A failed provider response leaves the user message and a
+  failed assistant status in PostgreSQL.
+- Ownership is derived from the verified NextAuth session and resolved to the
+  database user on the server. Client-provided owner IDs are not accepted.
+- `prisma/migrations/20261015000000_ai_chat_history/migration.sql` creates the
+  tables and indexes. Apply it with `npx prisma migrate deploy`, or use
+  `npx prisma db push` for local schema synchronization.
+
 ## Limitations
 
 - No real payment checkout is configured.
 - No external CAD/Blender/rendering provider is invoked by the workspace stub endpoints.
-- `/aichat` uses `/api/ai-chat` for live Gemini/Groq responses; keep keys server-side in environment configuration.
+- `/aichat` uses `/api/ai-chat` for live Gemini/Groq responses and persistent
+  history; keep provider keys server-side in environment configuration.
 - Local asset duplication is not enabled because it must copy binary files safely.
 - Existing frontend screens still need follow-up wiring from local UI state to these APIs.
