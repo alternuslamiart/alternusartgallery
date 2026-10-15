@@ -24,6 +24,13 @@ Last updated: 2026-10-15
   warnings; `git diff --check` passes.
 - Database migration application and authenticated end-to-end behavior remain
   unverified until a PostgreSQL `DATABASE_URL` is configured.
+- Fixed the signed-out `/aichat` account control so its visible Sign in link
+  opens `/login` and returns to `/aichat`; the collapsed-sidebar account link
+  and guest menu use the same flow. Login callback URLs are restricted to
+  same-origin paths, and OAuth sign-in now honors the requested callback.
+- `npm run typecheck`, focused ESLint, and `npm test` passed after the fix.
+  Focused lint reports five existing image/alt-text warnings; the PostgreSQL
+  persistence test remains skipped without `DATABASE_URL`.
 
 ## `/aichat` response typography
 

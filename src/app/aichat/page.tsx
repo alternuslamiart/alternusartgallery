@@ -181,6 +181,9 @@ export default function AIChatPage() {
   const [hasPastedInput, setHasPastedInput] = useState(false);
   const [isLight, setIsLight] = useState(false);
   const { data: session, status: sessionStatus } = useSession();
+  const accountHref = sessionStatus === "authenticated"
+    ? "/account"
+    : `/login?callbackUrl=${encodeURIComponent("/aichat")}`;
   const currentUserIdRef = useRef<string | undefined>(undefined);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -758,13 +761,20 @@ export default function AIChatPage() {
             {hasMoreSessions && <button type="button" disabled={loadingMoreSessions} onClick={() => void loadMoreSessions()} className="mt-2 w-full px-3 py-2 text-left text-xs text-zinc-500 hover:text-zinc-200 disabled:opacity-50">{loadingMoreSessions ? "Loading..." : "Load older chats"}</button>}
           </div>
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-[#2a2a2a] bg-[#141414] p-2.5">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">{(session?.user?.name?.[0] ?? "U").toUpperCase()}</span>
-            <Link href="/account" className="min-w-0 flex-1"><span className="block truncate text-xs text-zinc-200">{session?.user?.name || "Guest"}</span><span className="block truncate text-[10px] text-zinc-600">{session?.user?.email || "Sign in to sync chats"}</span></Link>
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">{(session?.user?.name?.[0] ?? (sessionStatus === "loading" ? "U" : "G")).toUpperCase()}</span>
+            <Link href={accountHref} className="min-w-0 flex-1" aria-label={sessionStatus === "authenticated" ? "Open account" : "Sign in to sync chats"}>
+              <span className="block truncate text-xs text-zinc-200">{session?.user?.name || (sessionStatus === "loading" ? "Checking account..." : "Sign in")}</span>
+              <span className="block truncate text-[10px] text-zinc-600">{session?.user?.email || (sessionStatus === "loading" ? "Checking sign-in status..." : "Save and sync chat history")}</span>
+            </Link>
             <div data-account-menu className="relative">
               <button aria-label="Account menu" title="Account menu" onClick={() => setAccountMenuOpen((value) => !value)} className="rounded-lg p-1 text-zinc-600 transition hover:bg-[#2a2a2a] hover:text-white"><MoreHorizontal size={16} /></button>
-              {accountMenuOpen && <AccountMenu onAction={(action) => {
+              {accountMenuOpen && <AccountMenu
+                isAuthenticated={sessionStatus === "authenticated"}
+                userName={session?.user?.name || "Guest"}
+                onAction={(action) => {
                 setAccountMenuOpen(false);
-                if (action === "profile") window.location.href = "/account";
+                if (action === "signin") window.location.href = accountHref;
+                else if (action === "profile") window.location.href = "/account";
                 else if (action === "logout") {
                   conversationAbortRef.current?.abort();
                   conversationLoadIdRef.current += 1;
@@ -793,7 +803,7 @@ export default function AIChatPage() {
               <button type="button" onClick={() => setSearchOpen(true)} aria-label="Search" title="Search" className="grid h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white"><Search size={16} /></button>
             </nav>
             <div className="mt-auto flex flex-col items-center gap-3">
-              <Link href="/account" aria-label="Open account" className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">{(session?.user?.name?.[0] ?? "U").toUpperCase()}</Link>
+              <Link href={accountHref} aria-label={sessionStatus === "authenticated" ? "Open account" : "Sign in to sync chats"} className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">{(session?.user?.name?.[0] ?? (sessionStatus === "loading" ? "U" : "G")).toUpperCase()}</Link>
               <span aria-hidden="true" className="grid h-8 w-8 place-items-center rounded-xl bg-[#3b82f6] shadow-lg shadow-blue-500/20"><img src="/Logopng.png" alt="" className="h-4 w-4 object-contain brightness-0 invert" /></span>
             </div>
           </div>
@@ -920,8 +930,8 @@ function ConversationMenu({ onAction }: { onAction: (action: string) => void }) 
   </div>;
 }
 
-function AccountMenu({ onAction }: { onAction: (action: string) => void }) {
-  const items = [
+function AccountMenu({ isAuthenticated, userName, onAction }: { isAuthenticated: boolean; userName: string; onAction: (action: string) => void }) {
+  const items = isAuthenticated ? [
     { action: "profile", label: "Profile", icon: UserRound },
     { action: "settings", label: "Settings", icon: Settings2 },
     { action: "upgrade", label: "Upgrade plan", icon: Sparkles },
@@ -929,11 +939,13 @@ function AccountMenu({ onAction }: { onAction: (action: string) => void }) {
     { action: "help", label: "Get help", icon: CircleHelp, arrow: true },
     { action: "learn", label: "Learn more", icon: Info },
     { action: "logout", label: "Log out", icon: LogOut },
+  ] : [
+    { action: "signin", label: "Sign in", icon: UserRound },
   ];
   return <div role="menu" onClick={(event) => event.stopPropagation()} className="absolute bottom-11 right-0 z-[90] flex h-[327px] w-[248px] flex-col items-center justify-start overflow-hidden rounded-[12px] bg-[#242424] p-[9px] shadow-2xl">
     <div className="flex h-[58px] w-[229px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left">
       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[8px] bg-[#363636] text-zinc-100"><UserRound size={22} strokeWidth={1.8} /></span>
-      <div className="min-w-0 flex-1"><div className="truncate text-sm font-semibold text-white">Lam</div><div className="text-xs text-zinc-400">Free Plan</div></div>
+      <div className="min-w-0 flex-1"><div className="truncate text-sm font-semibold text-white">{userName}</div><div className="text-xs text-zinc-400">{isAuthenticated ? "Free Plan" : "Not signed in"}</div></div>
       <span className="text-2xl leading-none text-zinc-300">›</span>
     </div>
     <div className="h-px w-[229px] bg-[#383838]" />
