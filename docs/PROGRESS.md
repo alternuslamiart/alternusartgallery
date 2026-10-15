@@ -2,6 +2,13 @@
 
 Last updated: 2026-10-15
 
+## `/aichat` Crystal logo theme styling
+
+- Removed the blue square background and shadow from the Crystal mark in both
+  expanded and collapsed sidebar states.
+- The mark is white in dark mode and medium gray in light mode.
+- Browser rendering was not verified.
+
 ## `/aichat` response typography
 
 - Assistant responses now render markdown-style headings, numbered and bulleted
