@@ -4,12 +4,13 @@ Last updated: 2026-10-18
 
 ## Mobile text sizing
 
-- Standardized visible mobile interface text, including labels, buttons, menus,
-  and content, at a fixed 16px while excluding SVG icons.
+- Standardized readable mobile interface text, including labels, buttons,
+  menus, and content, to a minimum of 16px; larger display typography remains
+  intact and SVG icons are excluded.
 - The rule is limited to viewports at or below 700px; desktop styles are
   unchanged.
-- PostCSS parsing and a focused assertion of the mobile font-size rule passed;
-  `npm test` passed (8 tests). Browser rendering was not verified.
+- PostCSS parsing and a focused assertion that mobile text does not fall below
+  16px passed; `npm test` passed (8 tests). Browser rendering was not verified.
 
 ## Homepage mobile CTA
 
