@@ -8198,22 +8198,14 @@ textarea {
 @media (max-width: 700px) {
   .coreforge-page .crystal-first-sector .crystal-first-chips {
     display: flex !important;
-    flex-wrap: nowrap !important;
-    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
     gap: 8px;
     width: 100%;
     max-width: 100%;
     margin-top: 16px;
     padding: 4px 0 10px;
-    overflow-x: auto !important;
-    overflow-y: hidden;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .coreforge-page .crystal-first-sector .crystal-first-chips::-webkit-scrollbar {
-    display: none;
+    overflow: visible !important;
   }
 
   .coreforge-page .crystal-first-sector .crystal-first-chips > span {

@@ -1,6 +1,13 @@
 # Verified progress
 
-Last updated: 2026-10-18
+Last updated: 2026-10-19
+
+## Homepage mobile category placement
+
+- Centered the homepage category chips on mobile and allowed them to wrap into
+  rows, keeping Architecture and Interior Design visually centered between the
+  hero and the following section. Desktop category layout is unchanged.
+- Browser rendering has not been verified.
 
 ## Mobile text sizing
 

@@ -1,7 +1,9 @@
-# Next tasks (reviewed 2026-10-18)
+# Next tasks (reviewed 2026-10-19)
 
 ## Next concrete task
 
+- [ ] Verify homepage category-chip centering and wrapping at narrow and wide
+  mobile viewport widths in a browser.
 - [ ] Verify the `/casynus` modeling UI in a browser at desktop and mobile
   widths, including toolbar actions, sidebar controls, asset selection, and
   right-panel utility actions.
