@@ -146,22 +146,12 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  }
  </button>
  {isAuthenticated ? (
- <div
-  ref={profileMenuRef}
-  onMouseEnter={() => setProfileMenuOpen(true)}
-  onMouseLeave={() => setProfileMenuOpen(false)}
-  onFocus={() => setProfileMenuOpen(true)}
-  onBlur={(event) => {
-   if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-    setProfileMenuOpen(false);
-   }
-  }}
-  style={{ position: "relative" }}
- >
+ <div ref={profileMenuRef} style={{ position: "relative" }}>
   <button
    type="button"
    aria-label="Open profile menu"
    aria-expanded={profileMenuOpen}
+   onClick={() => setProfileMenuOpen((open) => !open)}
    className="coreforge-profile-trigger"
    style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 11px", fontSize: 13, fontWeight: 600, color: fg, background: "transparent", cursor: "pointer", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}
   >

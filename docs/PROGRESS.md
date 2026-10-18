@@ -4,10 +4,9 @@ Last updated: 2026-10-18
 
 ## Main navigation profile hover
 
-- The signed-in profile dropdown now opens on hover and keyboard focus, and
-  closes when the pointer or keyboard focus leaves it. The trigger does not
-  toggle the menu on click, and its menu items have rounded hover highlights.
-  The dropdown meets the trigger so the pointer can move into it without closing.
+- The signed-in profile dropdown opens and closes when its trigger is clicked;
+  hovering over the trigger does not open it. Menu items have rounded corners
+  and a light gray hover highlight.
 - `npm run typecheck`, `npm test` (8 tests), and `git diff --check`: passed.
 - ESLint reports one existing unused `scrolled` parameter error and an existing
   `<img>` warning in this component; rerunning with only the unused-variable
