@@ -34,10 +34,17 @@ Last updated: 2026-10-18
 - Removed the rounded panel frame behind the mobile wordmark and controls in
   both light and dark themes while preserving the individual navigation
   actions.
+- Precisely centered the mobile Casynus wordmark and standardized the Menu and
+  Profile controls to matching 48×48px frames with identical borders and
+  corners.
 - PostCSS parsing and responsive layout assertions passed; `npm run typecheck`,
   `npm test` (8 tests), and `git diff --check` passed. Focused ESLint passed
   with one existing `<img>` warning after disabling the known unused
   `scrolled` parameter error. Browser rendering was not verified.
+- Follow-up CSS measurement assertion and `npm test` passed for the centered
+  wordmark and matching Menu/Profile frames. A repeated `npm run typecheck`
+  and focused ESLint invocation terminated because Node ran out of memory;
+  neither check completed for this follow-up.
 
 ## Mobile studio creation screen
 

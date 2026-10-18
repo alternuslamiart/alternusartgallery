@@ -8223,7 +8223,7 @@ textarea {
 
   .coreforge-nav {
     display: grid !important;
-    grid-template-columns: 52px minmax(0, 1fr) 52px;
+    grid-template-columns: 48px minmax(0, 1fr) 48px;
     column-gap: 8px;
     height: 76px !important;
     padding: 0 14px !important;
@@ -8276,7 +8276,8 @@ textarea {
     justify-self: start;
     width: 48px !important;
     height: 48px !important;
-    border-radius: 17px !important;
+    border: 1px solid rgba(127, 127, 127, .35) !important;
+    border-radius: 16px !important;
     background: transparent !important;
   }
 
@@ -8300,10 +8301,14 @@ textarea {
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
-    width: 52px;
-    height: 52px !important;
+    box-sizing: border-box;
+    width: 48px !important;
+    min-width: 48px;
+    height: 48px !important;
     padding: 0 !important;
-    border-radius: 18px !important;
+    border: 1px solid rgba(127, 127, 127, .35) !important;
+    border-radius: 16px !important;
+    background: transparent !important;
   }
 
   .coreforge-profile-trigger > span:first-child,
