@@ -20,6 +20,9 @@ Last updated: 2026-10-18
 - Kept the homepage's Platform, Design, Company, and Legal footer visible and
   scrollable on mobile; retained its responsive column layout and set the
   footer content to a precise 24px left/right inset.
+- Changed the homepage design-category chips to a single horizontal,
+  touch-scrollable row with stable chip widths and the existing mobile side
+  gutter.
 - PostCSS parsing and a focused assertion of the mobile CTA order, button
   dimensions, shape, and label size passed; `npm test` passed (8 tests), and
   `git diff --check` passed. Browser rendering was not verified.
