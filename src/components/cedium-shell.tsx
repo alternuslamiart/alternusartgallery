@@ -146,12 +146,23 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  }
  </button>
  {isAuthenticated ? (
- <div ref={profileMenuRef} style={{ position: "relative" }}>
+ <div
+  ref={profileMenuRef}
+  onMouseEnter={() => setProfileMenuOpen(true)}
+  onMouseLeave={() => setProfileMenuOpen(false)}
+  onFocus={() => setProfileMenuOpen(true)}
+  onBlur={(event) => {
+   if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+    setProfileMenuOpen(false);
+   }
+  }}
+  style={{ position: "relative" }}
+ >
   <button
    type="button"
    aria-label="Open profile menu"
    aria-expanded={profileMenuOpen}
-   onClick={() => setProfileMenuOpen((open) => !open)}
+   onClick={() => setProfileMenuOpen(true)}
    className="coreforge-profile-trigger"
    style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 11px", fontSize: 13, fontWeight: 600, color: fg, background: "transparent", cursor: "pointer", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}
   >
@@ -159,7 +170,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
    <span>Profile</span>
    <span style={{ fontSize: 11, opacity: 0.7 }}>⌄</span>
   </button>
-  {profileMenuOpen && <div role="menu" className="coreforge-profile-menu" style={{ position: "absolute", top: 44, right: 0, zIndex: 100, width: 238, padding: 8, border: `1px solid ${faint}`, borderRadius: 12, background: isDark ? "#242424" : "#fff", color: fg, boxShadow: "0 18px 42px rgba(0,0,0,.28)" }}>
+  {profileMenuOpen && <div role="menu" className="coreforge-profile-menu" style={{ position: "absolute", top: 36, right: 0, zIndex: 100, width: 238, padding: 8, border: `1px solid ${faint}`, borderRadius: 12, background: isDark ? "#242424" : "#fff", color: fg, boxShadow: "0 18px 42px rgba(0,0,0,.28)" }}>
    <div style={{ padding: "9px 10px 11px", borderBottom: `1px solid ${faint}` }}>
     <div style={{ fontSize: 13, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{session.user?.name || "Casynus user"}</div>
     <div style={{ marginTop: 3, color: muted, fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{session.user?.email}</div>
