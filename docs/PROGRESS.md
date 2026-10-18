@@ -34,6 +34,10 @@ Last updated: 2026-10-18
 - Replaced the mobile studio activity list with a focused creation home,
   segmented studio modes, central welcome mark, Pro banner, prompt composer,
   and bottom shortcut navigation inspired by the supplied reference.
+- Refined the mobile components to the reference dimensions: 362×197px
+  composer, 49px Pro banner, 40px attachment/model/action controls, 292×58px
+  primary bottom navigation, and 58px search control. The top tabs now match
+  Interior, Modeling, and Images, with Nano Banana as the default model.
 - The `/project` entry now opens this creation home on mobile while retaining
   the project dashboard on desktop. Menu, profile, pricing, workspace
   switching, new-scene, prompt, attachment, and generation actions remain

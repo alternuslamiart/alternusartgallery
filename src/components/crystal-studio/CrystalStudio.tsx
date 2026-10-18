@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, ArrowLeft, BookOpen, ChevronDown, FilePlus2, Glasses, Globe2, Grid2X2, Home, Moon, PanelLeftOpen, Paperclip, Plus, Search, Settings, Share2, Sparkles, Sun, Wand2, Zap } from "lucide-react";
+import { Archive, ArrowLeft, AudioLines, BookOpen, ChevronDown, FilePlus2, Glasses, Globe2, Grid2X2, Home, Moon, PanelLeftOpen, Paperclip, Plus, Search, Settings, Share2, Sparkles, Sun, Wand2, Zap } from "lucide-react";
 import NextImage from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -100,8 +100,8 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   const [mobileHome, setMobileHome] = useState(true);
   const [mobileViewport, setMobileViewport] = useState(false);
   const [mobileModelSheet, setMobileModelSheet] = useState(false);
-  const [mobileWorkspace, setMobileWorkspace] = useState<"floor-plan" | "modeling" | "infrastructure">("floor-plan");
-  const [mobileModel, setMobileModel] = useState("Casynus AI");
+  const [mobileWorkspace, setMobileWorkspace] = useState<"floor-plan" | "modeling" | "images">("images");
+  const [mobileModel, setMobileModel] = useState("Nano Banana");
   const [pricingPlan, setPricingPlan] = useState("Basic");
   const [mobileSplash, setMobileSplash] = useState(true);
   const uploadUrl = useRef<string | null>(null);
@@ -275,13 +275,13 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
         <header className="crystal-mobile-home-header">
           <button type="button" aria-label="Open Casynus menu" onClick={() => setMobileMenu(true)}><Grid2X2 size={19} /></button>
           <div className="crystal-mobile-workspace-tabs" role="tablist" aria-label="Casynus studios">
-            {(["floor-plan", "modeling", "infrastructure"] as const).map((workspace) => (
+            {(["floor-plan", "modeling", "images"] as const).map((workspace) => (
               <button key={workspace} type="button" role="tab" aria-selected={mobileWorkspace === workspace} onClick={() => {
                 setMobileWorkspace(workspace);
-                if (workspace === "floor-plan") { setDashboard(false); setStudioMode("floor-plan"); setMobileHome(false); }
-                if (workspace === "modeling") { setDashboard(false); setStudioMode("modeling"); setMobileHome(false); }
-                if (workspace === "infrastructure") router.push("/infrastructure");
-              }}>{workspace === "floor-plan" ? "Plan" : workspace === "modeling" ? "Model" : "Site"}</button>
+                setDashboard(false);
+                setStudioMode(workspace);
+                setMobileHome(workspace === "images");
+              }}>{workspace === "floor-plan" ? "Interior" : workspace === "modeling" ? "Modeling" : "Images"}</button>
             ))}
           </div>
           <button type="button" aria-label={incognito ? "Disable incognito mode" : "Enable incognito mode"} aria-pressed={incognito} onClick={() => setIncognito((value) => !value)}><Glasses size={21} /></button>
@@ -297,12 +297,12 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
           <div className="crystal-mobile-composer-actions">
             <button type="button" aria-label="Attach reference" onClick={() => sceneFileInput.current?.click()}><Paperclip size={18} /></button>
             <button type="button" className="crystal-mobile-model-select" onClick={() => setMobileModelSheet(true)}>{mobileModel}<ChevronDown size={15} /></button>
-            <button type="submit" aria-label="Generate with Casynus" disabled={loading}><Sparkles size={18} /></button>
+            <button type="submit" aria-label="Generate with Casynus" disabled={loading}><AudioLines size={22} /></button>
           </div>
         </form>
         <nav className="crystal-mobile-bottom-nav" aria-label="Studio shortcuts">
           <div>
-            <button type="button" aria-label="Home" aria-current="page" onClick={() => setMobileHome(true)}><Home size={20} fill="currentColor" /></button>
+            <button type="button" aria-label="Home" aria-current={mobileHome ? "page" : undefined} onClick={() => { setDashboard(false); setMobileHome(true); }}><Home size={20} fill="currentColor" /></button>
             <button type="button" aria-label="Open floor plan studio" onClick={() => { setDashboard(false); setStudioMode("floor-plan"); setMobileWorkspace("floor-plan"); setMobileHome(false); }}><BookOpen size={20} /></button>
             <button type="button" aria-label="Create a new scene" onClick={() => { setDashboard(false); runMenuAction("New Scene"); setMobileHome(false); }}><FilePlus2 size={20} /></button>
             <button type="button" aria-label="Focus creation prompt" onClick={() => document.getElementById("mobile-crystal-prompt")?.focus()}><Wand2 size={20} /></button>
@@ -312,7 +312,7 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
         </nav>
         {mobileModelSheet && <div className="crystal-mobile-model-overlay" role="dialog" aria-modal="true" aria-label="Choose AI model" onClick={() => setMobileModelSheet(false)}>
           <div className="crystal-mobile-model-sheet" onClick={(event) => event.stopPropagation()}><div className="crystal-sheet-handle" /><div className="flex items-center justify-between"><div><b>AI model</b><small>Choose your creative partner</small></div><button type="button" aria-label="Close model selector" onClick={() => setMobileModelSheet(false)}>×</button></div>
-            {["Casynus AI", "Claude", "OpenAI", "Gemini", "Grok", "Copilot"].map((model) => <button type="button" key={model} className={mobileModel === model ? "is-selected" : ""} onClick={() => { setMobileModel(model); setMobileModelSheet(false); }}><span><Sparkles size={17} />{model}</span>{mobileModel === model && <span>✓</span>}</button>)}
+            {["Nano Banana", "Casynus AI", "Claude", "OpenAI", "Gemini", "Grok", "Copilot"].map((model) => <button type="button" key={model} className={mobileModel === model ? "is-selected" : ""} onClick={() => { setMobileModel(model); setMobileModelSheet(false); }}><span><Sparkles size={17} />{model}</span>{mobileModel === model && <span>✓</span>}</button>)}
           </div>
         </div>}
         <button type="button" className="crystal-mobile-theme-toggle" aria-label="Toggle light and dark mode" onClick={() => setAlternateTheme((value) => !value)}>{alternateTheme ? <Moon size={17} /> : <Sun size={17} />}</button>
