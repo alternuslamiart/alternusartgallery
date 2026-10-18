@@ -4569,7 +4569,6 @@
   .crystal-core-metric-3d div:first-child { color:rgba(226,228,232,.58)!important; font-size:12px!important; letter-spacing:.2em!important; }
   .crystal-core-metric-3d div:nth-child(2)>div { font-size:64px!important; color:#4284ff!important; }
   .crystal-core-metric-3d p { margin-top:12px!important; color:rgba(226,228,232,.72)!important; font-size:12px!important; }
-  .crystal-first-sector ~ footer { display:none; }
   .crystal-account-page { display:block!important; min-height:100vh; padding:0 16px 28px; background:#1b1b1b!important; color:#f5f5f5!important; }
   .crystal-account-page>header { height:72px; margin:0 -16px 18px; padding:0 16px!important; border:0!important; background:#1b1b1b!important; }
   .crystal-account-page>header>div:first-child a span:last-child { display:none; }
@@ -5596,7 +5595,7 @@ textarea {
   }
 
   .coreforge-footer > div {
-    padding-inline: var(--crystal-mobile-gutter, 16px) !important;
+    padding-inline: 24px !important;
   }
 
   .coreforge-footer > div > div:first-child {

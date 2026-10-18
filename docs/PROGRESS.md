@@ -17,6 +17,9 @@ Last updated: 2026-10-18
 - On mobile only, reordered the homepage CTA buttons to show Download App
   before Launch Studio and enlarged them to rounded pill controls, matching the
   provided reference while keeping the label text at the 12px mobile standard.
+- Kept the homepage's Platform, Design, Company, and Legal footer visible and
+  scrollable on mobile; retained its responsive column layout and set the
+  footer content to a precise 24px left/right inset.
 - PostCSS parsing and a focused assertion of the mobile CTA order, button
   dimensions, shape, and label size passed; `npm test` passed (8 tests), and
   `git diff --check` passed. Browser rendering was not verified.
