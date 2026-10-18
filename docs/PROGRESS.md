@@ -38,6 +38,8 @@ Last updated: 2026-10-18
   composer, 49px Pro banner, 40px attachment/model/action controls, 292×58px
   primary bottom navigation, and 58px search control. The top tabs now match
   Interior, Modeling, and Images, with Nano Banana as the default model.
+- Set the mobile screen's horizontal inset to 20px; the segmented header
+  center column contracts on narrower phones to preserve both side controls.
 - The `/project` entry now opens this creation home on mobile while retaining
   the project dashboard on desktop. Menu, profile, pricing, workspace
   switching, new-scene, prompt, attachment, and generation actions remain

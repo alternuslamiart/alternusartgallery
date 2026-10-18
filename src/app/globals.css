@@ -8299,7 +8299,7 @@ textarea {
     box-sizing: border-box;
     height: 100dvh;
     min-height: 0;
-    padding: max(28px, env(safe-area-inset-top)) 14px max(24px, env(safe-area-inset-bottom));
+    padding: max(28px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
     background: #111;
   }
 
