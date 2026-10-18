@@ -2,6 +2,15 @@
 
 Last updated: 2026-10-18
 
+## Homepage feature headings
+
+- Removed the legacy “Planarch 3” and “Infra” prefixes from the homepage
+  feature headings and replaced them with descriptive titles.
+- Updated the matching titles across English, German, French, Italian, Chinese,
+  Japanese, and Arabic translations.
+- `npm run typecheck`, `npm test` (8 tests), `npx eslint src/app/page.tsx`, and
+  `git diff --check`: passed. Browser rendering was not verified.
+
 ## Casynus product rebrand
 
 - Replaced the former product name across user-facing page copy,
