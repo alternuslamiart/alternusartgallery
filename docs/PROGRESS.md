@@ -49,6 +49,10 @@ Last updated: 2026-10-18
 - Standardized the mobile bottom row to the 20px screen inset, kept the Search
   control in a distinct 58px circular frame, and made the five capsule actions
   shrink evenly on narrow screens without overflowing.
+- Aligned the complete mobile studio layout to the supplied measurement scale:
+  44px top safe spacing, 40px header controls, 8/12/16/24px spacing increments,
+  a 208px composer, 48px bottom navigation controls, and 24px bottom safe
+  spacing; the 12px mobile text standard and desktop layout are preserved.
 - The `/project` entry now opens this creation home on mobile while retaining
   the project dashboard on desktop. Menu, profile, pricing, workspace
   switching, new-scene, prompt, attachment, and generation actions remain
