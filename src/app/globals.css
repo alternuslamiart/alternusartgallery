@@ -8190,3 +8190,96 @@ textarea {
     font-size: 16px !important;
   }
 }
+
+.coreforge-nav-mobile-menu-icon,
+.coreforge-nav-profile-icon {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .coreforge-nav {
+    display: grid !important;
+    grid-template-columns: 52px minmax(0, 1fr) 52px;
+    column-gap: 8px;
+    height: 76px !important;
+    padding: 0 14px !important;
+    border-radius: 22px !important;
+  }
+
+  .coreforge-nav-brand {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: center;
+    min-width: 0;
+  }
+
+  .coreforge-nav-brand .crystal-site-logo {
+    display: none !important;
+  }
+
+  .coreforge-nav-brand .crystal-glass-brand {
+    color: transparent !important;
+    background: linear-gradient(180deg, #f2f2f2 18%, #858585 52%, #dedede 82%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.42);
+    font-size: 30px !important;
+    font-weight: 800;
+    letter-spacing: -0.055em;
+    white-space: nowrap;
+  }
+
+  .coreforge-nav > nav,
+  .coreforge-nav > div[style*="flex: 1"],
+  .coreforge-nav > a[href="/download"],
+  .coreforge-nav > a[href="/aichat"],
+  .coreforge-nav > a.coreforge-nav-cta {
+    display: none !important;
+  }
+
+  .coreforge-nav-theme-toggle {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 17px !important;
+    background: transparent !important;
+  }
+
+  .coreforge-nav-mobile-menu-icon {
+    display: block;
+  }
+
+  .coreforge-nav-desktop-theme-icon {
+    display: none;
+  }
+
+  .coreforge-profile-container,
+  .coreforge-nav-profile-guest {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .coreforge-profile-trigger,
+  .coreforge-nav-profile-guest {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px !important;
+    padding: 0 !important;
+    border-radius: 18px !important;
+  }
+
+  .coreforge-profile-trigger > span:first-child,
+  .coreforge-nav-profile-label,
+  .coreforge-nav-profile-chevron {
+    display: none !important;
+  }
+
+  .coreforge-nav-profile-icon {
+    display: inline-flex;
+  }
+}

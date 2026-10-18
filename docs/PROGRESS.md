@@ -20,6 +20,15 @@ Last updated: 2026-10-18
   dimensions, shape, and label size passed; `npm test` passed (8 tests), and
   `git diff --check` passed. Browser rendering was not verified.
 
+## Homepage mobile navigation
+
+- Reworked the mobile header into a left menu-grid control, centered Casynus
+  wordmark, and right profile icon; desktop navigation remains unchanged.
+- PostCSS parsing and responsive layout assertions passed; `npm run typecheck`,
+  `npm test` (8 tests), and `git diff --check` passed. Focused ESLint passed
+  with one existing `<img>` warning after disabling the known unused
+  `scrolled` parameter error. Browser rendering was not verified.
+
 ## Main navigation profile hover
 
 - The signed-in profile dropdown opens and closes when its trigger is clicked;

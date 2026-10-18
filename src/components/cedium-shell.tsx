@@ -140,13 +140,21 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  </nav>
  <div style={{ flex: 1 }} />
  <button aria-label="Open navigation menu" aria-expanded={mobileMenuOpen} onClick={() => { if (window.innerWidth <= 700) setMobileMenuOpen((open) => !open); else setIsDark(!isDark); }} className="coreforge-nav-theme-toggle" style={{ width: 34, height: 34, border: `1px solid ${faint}`, background: isDark ? "rgba(255,255,255,0.04)" : "transparent", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: muted, borderRadius: 8 }}>
+ <svg className="coreforge-nav-mobile-menu-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+  <rect x="3.5" y="3.5" width="7" height="7" rx="2" />
+  <rect x="13.5" y="3.5" width="7" height="7" rx="2" />
+  <rect x="3.5" y="13.5" width="7" height="7" rx="2" />
+  <rect x="13.5" y="13.5" width="7" height="7" rx="2" />
+ </svg>
+ <span className="coreforge-nav-desktop-theme-icon">
  {isDark
  ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
  : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
  }
+ </span>
  </button>
  {isAuthenticated ? (
- <div ref={profileMenuRef} style={{ position: "relative" }}>
+ <div ref={profileMenuRef} className="coreforge-profile-container" style={{ position: "relative" }}>
   <button
    type="button"
    aria-label="Open profile menu"
@@ -156,8 +164,9 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
    style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 11px", fontSize: 13, fontWeight: 600, color: fg, background: "transparent", cursor: "pointer", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}
   >
    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: "50%", background: `${COBALT}22`, color: COBALT, fontSize: 11, fontWeight: 800 }}>{profileLabel}</span>
-   <span>Profile</span>
-   <span style={{ fontSize: 11, opacity: 0.7 }}>⌄</span>
+   <span className="coreforge-nav-profile-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg></span>
+   <span className="coreforge-nav-profile-label">Profile</span>
+   <span className="coreforge-nav-profile-chevron" style={{ fontSize: 11, opacity: 0.7 }}>⌄</span>
   </button>
   {profileMenuOpen && <div role="menu" className="coreforge-profile-menu" style={{ position: "absolute", top: 36, right: 0, zIndex: 100, width: 238, padding: 8, border: `1px solid ${faint}`, borderRadius: 12, background: isDark ? "#242424" : "#fff", color: fg, boxShadow: "0 18px 42px rgba(0,0,0,.28)" }}>
    <div style={{ padding: "9px 10px 11px", borderBottom: `1px solid ${faint}` }}>
@@ -181,10 +190,11 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
   </div>}
  </div>
  ) : (
- <Link href="/login" className="coreforge-nav-login hover:!border-[#4284FF]" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}>
-  Log in
- </Link>
- )}
+  <Link href="/login" aria-label="Open profile" className="coreforge-nav-login coreforge-nav-profile-guest hover:!border-[#4284FF]" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}>
+   <span className="coreforge-nav-profile-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg></span>
+   <span className="coreforge-nav-profile-label">Log in</span>
+  </Link>
+  )}
  <Link href="/download" className="hidden sm:inline-flex" style={{ alignItems: "center", height: 36, padding: "0 15px", color: fg, fontSize: 13, fontWeight: 700, textDecoration: "none", border: `1px solid ${faint}`, borderRadius: 8 }}>
  Download App
  </Link>
