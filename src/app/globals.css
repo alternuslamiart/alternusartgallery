@@ -8283,3 +8283,236 @@ textarea {
     display: inline-flex;
   }
 }
+
+@media (max-width: 700px) {
+  .crystal-mobile-home-active {
+    background: #111 !important;
+  }
+
+  .crystal-mobile-home-active > .crystal-mobile-sheet,
+  .crystal-mobile-home-active > .crystal-mobile-profile,
+  .crystal-mobile-home-active > .crystal-mobile-pricing {
+    display: flex !important;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home {
+    box-sizing: border-box;
+    height: 100dvh;
+    min-height: 0;
+    padding: max(28px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+    background: #111;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home::before,
+  .crystal-mobile-home-active .crystal-mobile-home::after {
+    display: none;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home-header {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    gap: 10px;
+    height: 48px;
+    margin: 0 0 12px;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home-header > button {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: #1a1a1a;
+    box-shadow: none;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-workspace-tabs {
+    height: 44px;
+    justify-content: space-between;
+    padding: 4px;
+    border: 0;
+    background: #1a1a1a;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-workspace-tabs button {
+    flex: 1;
+    min-height: 36px;
+    padding: 0 5px;
+    color: #888;
+    font-size: 16px !important;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-workspace-tabs button[aria-selected="true"] {
+    color: #f5f5f5;
+    background: #252525;
+    box-shadow: none;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home-hero {
+    min-height: 0;
+    padding: 24px 0;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-mark {
+    width: auto;
+    height: auto;
+    margin: 0 0 20px;
+    border: 0;
+    border-radius: 0;
+    color: #ddd;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-mark img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home-hero h1 {
+    color: #555;
+    font-size: 16px !important;
+    font-weight: 500;
+    letter-spacing: 0;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-composer {
+    flex: 0 0 auto;
+    gap: 12px;
+    margin: 0;
+    padding: 14px;
+    border: 0;
+    border-radius: 28px;
+    background: #171717;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-pro-banner {
+    min-height: 48px;
+    padding: 0 6px 0 12px;
+    border: 0;
+    background: #1e1e1e;
+    color: #1597ff;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-pro-banner b,
+  .crystal-mobile-home-active .crystal-mobile-pro-banner small,
+  .crystal-mobile-home-active .crystal-mobile-pro-banner em,
+  .crystal-mobile-home-active .crystal-mobile-composer-label {
+    font-size: 16px !important;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-pro-banner small {
+    color: #858585;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-pro-banner em {
+    padding: 10px 13px;
+    background: #168df1;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-composer-label {
+    color: #777;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-composer textarea {
+    min-height: 50px;
+    padding: 5px 0;
+    color: #eee;
+    font-size: 16px !important;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-composer-actions {
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-composer-actions > button {
+    min-width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #222;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-model-select {
+    min-width: 0;
+    border-radius: 999px !important;
+    background: #222 !important;
+    font-size: 16px !important;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-composer-actions > button:last-child {
+    background: #168df1;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-bottom-nav {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+    padding-bottom: max(2px, env(safe-area-inset-bottom));
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-bottom-nav > div,
+  .crystal-mobile-home-active .crystal-mobile-bottom-nav > button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 54px;
+    border-radius: 999px;
+    background: #191919;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-bottom-nav > div {
+    flex: 1;
+    justify-content: space-around;
+    padding: 0 7px;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-bottom-nav button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: #686868;
+    background: transparent;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-bottom-nav button[aria-current="page"] {
+    color: #f5f5f5;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-bottom-nav > button {
+    flex: 0 0 54px;
+    width: 54px;
+    color: #eee;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-bottom-nav button,
+  .crystal-mobile-home-active .crystal-mobile-workspace-tabs button,
+  .crystal-mobile-home-active .crystal-mobile-composer-actions > button {
+    transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-bottom-nav button:active,
+  .crystal-mobile-home-active .crystal-mobile-composer-actions > button:active {
+    transform: scale(.96);
+    background: #292929;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-home button:focus-visible,
+  .crystal-mobile-home-active .crystal-mobile-home textarea:focus-visible {
+    outline: 2px solid #168df1;
+    outline-offset: 3px;
+  }
+
+  .crystal-mobile-home-active .crystal-mobile-composer-actions > button:disabled {
+    cursor: not-allowed;
+    opacity: .5;
+  }
+}

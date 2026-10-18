@@ -29,6 +29,20 @@ Last updated: 2026-10-18
   with one existing `<img>` warning after disabling the known unused
   `scrolled` parameter error. Browser rendering was not verified.
 
+## Mobile studio creation screen
+
+- Replaced the mobile studio activity list with a focused creation home,
+  segmented studio modes, central welcome mark, Pro banner, prompt composer,
+  and bottom shortcut navigation inspired by the supplied reference.
+- The `/project` entry now opens this creation home on mobile while retaining
+  the project dashboard on desktop. Menu, profile, pricing, workspace
+  switching, new-scene, prompt, attachment, and generation actions remain
+  connected to existing controls.
+- `npm run typecheck`, `npm test` (8 tests), PostCSS parsing, responsive-rule
+  assertions, and `git diff --check` passed. Focused ESLint reports existing
+  unused-state errors; with that rule disabled it reports five existing
+  `<img>` warnings. Browser rendering was not verified.
+
 ## Main navigation profile hover
 
 - The signed-in profile dropdown opens and closes when its trigger is clicked;

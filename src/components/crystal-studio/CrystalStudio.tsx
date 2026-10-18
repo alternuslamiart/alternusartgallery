@@ -1,6 +1,7 @@
 "use client";
 
-import { Archive, ArrowLeft, ChevronDown, Glasses, Globe2, Grid2X2, Home, Menu, Moon, PanelLeftOpen, Paperclip, Plus, Search, Settings, Share2, Sparkles, Sun, Zap } from "lucide-react";
+import { Archive, ArrowLeft, BookOpen, ChevronDown, FilePlus2, Glasses, Globe2, Grid2X2, Home, Moon, PanelLeftOpen, Paperclip, Plus, Search, Settings, Share2, Sparkles, Sun, Wand2, Zap } from "lucide-react";
+import NextImage from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { generateModel } from "@/services/ai";
@@ -97,6 +98,7 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   const [mobileProfile, setMobileProfile] = useState(false);
   const [mobilePricing, setMobilePricing] = useState(false);
   const [mobileHome, setMobileHome] = useState(true);
+  const [mobileViewport, setMobileViewport] = useState(false);
   const [mobileModelSheet, setMobileModelSheet] = useState(false);
   const [mobileWorkspace, setMobileWorkspace] = useState<"floor-plan" | "modeling" | "infrastructure">("floor-plan");
   const [mobileModel, setMobileModel] = useState("Casynus AI");
@@ -124,6 +126,14 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   }, []);
 
   useEffect(() => {
+    const breakpoint = window.matchMedia("(max-width: 700px)");
+    const updateViewport = () => setMobileViewport(breakpoint.matches);
+    updateViewport();
+    breakpoint.addEventListener("change", updateViewport);
+    return () => breakpoint.removeEventListener("change", updateViewport);
+  }, []);
+
+  useEffect(() => {
     const savedPrompt = window.sessionStorage.getItem("crystal-design-prompt");
     if (savedPrompt) {
       setPrompt(savedPrompt);
@@ -135,7 +145,7 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   useEffect(() => { if(!toast)return; const timer=window.setTimeout(()=>setToast(null),2800); return()=>window.clearTimeout(timer); },[toast]);
   useEffect(()=>{const close=(event:PointerEvent)=>{if(openMenu&&!(event.target as HTMLElement).closest("[aria-label='Application menu']"))setOpenMenu(null)};document.addEventListener("pointerdown",close);return()=>document.removeEventListener("pointerdown",close)},[openMenu]);
 
-  if (dashboard) return <div className={`crystal-dashboard ${dashboardSidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+  if (dashboard && !mobileViewport) return <div className={`crystal-dashboard ${dashboardSidebarCollapsed ? "sidebar-collapsed" : ""}`}>
     {mobileSplash && <div className="crystal-mobile-splash"><img src="/Logopng.png" alt="Casynus" /></div>}
     <header><div className="crystal-dashboard-brand"><img src="/Logopng.png" alt="Casynus" className="crystal-brand-logo"/><b>Casynus</b><Link href="/project" aria-label="Home" className="crystal-dashboard-home"><Home size={16} /></Link></div><div className="crystal-window-controls">•••　—　×　□</div></header>
     <UnifiedSidebar collapsed={dashboardSidebarCollapsed} onCollapse={() => setDashboardSidebarCollapsed((value) => !value)} activePath="/project" className="h-full" />
@@ -268,30 +278,19 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
             {(["floor-plan", "modeling", "infrastructure"] as const).map((workspace) => (
               <button key={workspace} type="button" role="tab" aria-selected={mobileWorkspace === workspace} onClick={() => {
                 setMobileWorkspace(workspace);
-                if (workspace === "floor-plan") { setStudioMode("floor-plan"); setMobileHome(false); }
-                if (workspace === "modeling") { setStudioMode("modeling"); setMobileHome(false); }
+                if (workspace === "floor-plan") { setDashboard(false); setStudioMode("floor-plan"); setMobileHome(false); }
+                if (workspace === "modeling") { setDashboard(false); setStudioMode("modeling"); setMobileHome(false); }
                 if (workspace === "infrastructure") router.push("/infrastructure");
-              }}>{workspace === "floor-plan" ? "Floor Plan Studio" : workspace === "modeling" ? "Modeling Studio" : "Infrastructure Studio"}</button>
+              }}>{workspace === "floor-plan" ? "Plan" : workspace === "modeling" ? "Model" : "Site"}</button>
             ))}
           </div>
-          <button type="button" aria-label="Open profile" onClick={() => setMobileProfile(true)}><Settings size={19} /></button>
+          <button type="button" aria-label={incognito ? "Disable incognito mode" : "Enable incognito mode"} aria-pressed={incognito} onClick={() => setIncognito((value) => !value)}><Glasses size={21} /></button>
         </header>
         <div className="crystal-mobile-home-hero">
-          <div className="crystal-mobile-mark"><Sparkles size={28} /></div>
-          <h1>{mobileWorkspace === "floor-plan" ? "Create a floor plan." : mobileWorkspace === "modeling" ? "Build your model." : "Plan your infrastructure."}</h1>
-          <p>Architecture, floor plans and infrastructure — made with Casynus.</p>
+          <div className="crystal-mobile-mark" aria-hidden="true"><NextImage src="/Logopng.png" alt="" width={72} height={72} /></div>
+          <h1>What’s on your mind today?</h1>
         </div>
-        <div className="crystal-mobile-date-strip" aria-label="Casynus activity period">
-          <button type="button" aria-label="Previous activity period"><ArrowLeft size={15} /></button>
-          <span><b>September</b> 15–21</span>
-          <button type="button" aria-label="Next activity period"><ChevronDown size={15} /></button>
-        </div>
-        <div className="crystal-mobile-activity" aria-label="Recent Casynus work">
-          <div><span>Monday 15, September</span><button type="button" onClick={() => setToast("All projects opened.")}>See all</button></div>
-          <article><span className="crystal-activity-icon is-blue"><Grid2X2 size={16} /></span><div><b>Floor plan</b><small>2D draft · Completed</small><time>02:30 PM</time></div><strong className="is-done">Done</strong></article>
-          <article className="is-muted"><span className="crystal-activity-icon is-amber"><Globe2 size={16} /></span><div><b>Infrastructure study</b><small>Site planning · In progress</small><time>05:30 PM</time></div><strong>64%</strong></article>
-        </div>
-        <form className="crystal-mobile-composer" onSubmit={(event) => { event.preventDefault(); if (!prompt.trim()) return; setMobileHome(false); void handleGenerate(); }}>
+        <form className="crystal-mobile-composer" onSubmit={(event) => { event.preventDefault(); if (!prompt.trim()) return; setDashboard(false); setMobileHome(false); void handleGenerate(); }}>
           <button type="button" className="crystal-mobile-pro-banner" onClick={() => setMobilePricing(true)}><Zap size={15} fill="currentColor" /><span><b>Try Casynus Pro</b><small>Unlock faster generations</small></span><em>Pay Now</em></button>
           <label className="crystal-mobile-composer-label" htmlFor="mobile-crystal-prompt">What do you want to create?</label>
           <textarea id="mobile-crystal-prompt" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="Describe your next architectural idea..." rows={2} />
@@ -301,6 +300,16 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
             <button type="submit" aria-label="Generate with Casynus" disabled={loading}><Sparkles size={18} /></button>
           </div>
         </form>
+        <nav className="crystal-mobile-bottom-nav" aria-label="Studio shortcuts">
+          <div>
+            <button type="button" aria-label="Home" aria-current="page" onClick={() => setMobileHome(true)}><Home size={20} fill="currentColor" /></button>
+            <button type="button" aria-label="Open floor plan studio" onClick={() => { setDashboard(false); setStudioMode("floor-plan"); setMobileWorkspace("floor-plan"); setMobileHome(false); }}><BookOpen size={20} /></button>
+            <button type="button" aria-label="Create a new scene" onClick={() => { setDashboard(false); runMenuAction("New Scene"); setMobileHome(false); }}><FilePlus2 size={20} /></button>
+            <button type="button" aria-label="Focus creation prompt" onClick={() => document.getElementById("mobile-crystal-prompt")?.focus()}><Wand2 size={20} /></button>
+            <button type="button" aria-label="Open profile and settings" onClick={() => setMobileProfile(true)}><Settings size={20} /></button>
+          </div>
+          <button type="button" aria-label="Search studio" onClick={() => setMobileMenu(true)}><Search size={20} /></button>
+        </nav>
         {mobileModelSheet && <div className="crystal-mobile-model-overlay" role="dialog" aria-modal="true" aria-label="Choose AI model" onClick={() => setMobileModelSheet(false)}>
           <div className="crystal-mobile-model-sheet" onClick={(event) => event.stopPropagation()}><div className="crystal-sheet-handle" /><div className="flex items-center justify-between"><div><b>AI model</b><small>Choose your creative partner</small></div><button type="button" aria-label="Close model selector" onClick={() => setMobileModelSheet(false)}>×</button></div>
             {["Casynus AI", "Claude", "OpenAI", "Gemini", "Grok", "Copilot"].map((model) => <button type="button" key={model} className={mobileModel === model ? "is-selected" : ""} onClick={() => { setMobileModel(model); setMobileModelSheet(false); }}><span><Sparkles size={17} />{model}</span>{mobileModel === model && <span>✓</span>}</button>)}
@@ -329,7 +338,7 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
         <div className="flex items-center justify-between"><img src="/Logopng.png" alt="Casynus" className="crystal-brand-logo crystal-brand-logo-mobile"/><button aria-label="Close menu" onClick={() => setMobileMenu(false)} className="grid h-11 w-11 place-items-center rounded-full bg-[#2a2a2a]"><ArrowLeft size={22}/></button></div>
         <button onClick={() => setMobilePricing(true)} className="crystal-mobile-pro"><Zap size={20} fill="currentColor"/> <b>Try Casynus Pro</b><span>Pay Now</span></button>
         <label className="crystal-mobile-search"><Search size={19}/><input placeholder="Search" /></label>
-        <nav className="crystal-mobile-nav"><button className="active">⠿　All Projects</button><button><Globe2 size={17}/>Community</button><button><Archive size={17}/>Archive...</button><button onClick={() => { setMobileMenu(false); setDashboard(true); }}><Plus size={17}/>Project</button></nav>
+        <nav className="crystal-mobile-nav"><button className="active">⠿　All Projects</button><button><Globe2 size={17}/>Community</button><button><Archive size={17}/>Archive...</button><button onClick={() => { setMobileMenu(false); setDashboard(false); runMenuAction("New Scene"); setMobileHome(false); }}><Plus size={17}/>Project</button></nav>
         <h2>Recents</h2><button className="crystal-mobile-recent">Architecture build house</button>
         <div className="mt-auto flex items-center justify-between"><button onClick={() => setMobileProfile(true)} className="grid h-13 w-13 place-items-center rounded-full bg-[#292929] text-sm">B</button><button onClick={() => setMobileProfile(true)} className="grid h-13 w-13 place-items-center rounded-full bg-[#292929]"><Settings size={23}/></button></div>
       </div>}
