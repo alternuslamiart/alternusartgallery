@@ -18,7 +18,7 @@ export type Transform = {
   scale: number;
 };
 
-export type StudioTool = "orbit" | "focus" | "move" | "rotate" | "scale" | "ai" | "select" | "brush" | "tools" | "model" | "viewport";
+export type StudioTool = "orbit" | "focus" | "move" | "rotate" | "scale" | "ai" | "select" | "brush" | "erase" | "tools" | "model" | "viewport";
 
 export type StudioMode = "floor-plan" | "modeling" | "images";
 

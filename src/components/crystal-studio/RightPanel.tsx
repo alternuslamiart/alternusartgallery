@@ -1,9 +1,9 @@
 "use client";
 
-import { Box, Camera, CircleHelp, Download, FileBox, FileText, Globe2, Grid2X2, Image, Lightbulb, PanelRightClose, Plus, Trash2 } from "lucide-react";
+import { Box, Camera, CircleHelp, Download, FileBox, FileText, Grid2X2, Image, Layers3, Lightbulb, PanelRightClose, Plus, Trash2 } from "lucide-react";
 import type { FloorPlanObject, FloorPlanSettings, RenderSettings, StudioAsset } from "./types";
 import { formatFloorLength, parseFloorLength, roundFloorValue } from "./floor-plan-geometry";
-import { SectionTitle, SelectField } from "./ui";
+import { SectionTitle } from "./ui";
 import { useState } from "react";
 
 type Props = {
@@ -49,8 +49,16 @@ export function RightPanel(props: Props) {
   const [swatchGrid,setSwatchGrid]=useState(true);
   const [canvasOpen, setCanvasOpen] = useState(false);
   const [frameRateOpen, setFrameRateOpen] = useState(false);
+  const [activeUtility, setActiveUtility] = useState("grid");
   const canvasOptions = ["1920x1080", "2560x1440", "3840x2160", "7680x4320"];
   const frameRateOptions = ["24 fps", "30 fps", "60 fps", "120 fps"];
+  const utilities = [
+    { id: "lighting", label: "Lighting", icon: Lightbulb },
+    { id: "world", label: "Layers", icon: Layers3 },
+    { id: "camera", label: "Camera", icon: Camera },
+    { id: "grid", label: "Grid", icon: Grid2X2 },
+    { id: "help", label: "Help", icon: CircleHelp },
+  ];
   const selected = props.selectedFloorPlanObject;
   const floorSettings = props.floorPlanSettings ?? { unit: "mm", scale: 100, precision: 1, gridStepMm: 100, snapToGrid: true, snapToPoints: true, orthogonal: true };
   const updateFloorSettings = (patch: Partial<FloorPlanSettings>) => props.onFloorPlanSettingsChange?.({ ...floorSettings, ...patch });
@@ -59,7 +67,7 @@ export function RightPanel(props: Props) {
   };
   return (
     <aside className="crystal-right-panel min-h-0 overflow-y-auto border-l border-[#303030] bg-[#0F0F0F] px-5 pb-5 pt-4 scrollbar-hide">
-      {!props.floorPlanMode && <div className="crystal-utility-icons" aria-label="Viewport utilities"><button type="button" aria-label="Lighting"><Lightbulb size={16}/></button><button type="button" aria-label="World"><Globe2 size={16}/></button><button type="button" aria-label="Camera"><Camera size={16}/></button><button type="button" aria-label="Grid"><Grid2X2 size={16}/></button><button type="button" aria-label="Help"><CircleHelp size={16}/></button></div>}
+      {!props.floorPlanMode && <div className="crystal-utility-icons" role="group" aria-label="Viewport utilities">{utilities.map(({ id, label, icon: Icon }) => <button key={id} type="button" aria-label={label} title={label} aria-pressed={activeUtility === id} className={activeUtility === id ? "is-active" : ""} onClick={() => { setActiveUtility(id); window.dispatchEvent(new CustomEvent("crystal:viewport-control", { detail: id })); }}><Icon size={16}/></button>)}</div>}
       {props.floorPlanMode && <div className="mb-7">
         <SectionTitle action={selected ? <button aria-label="Delete selected floor-plan object" onClick={() => props.onDeleteFloorPlanObject?.(selected.id)} className="text-zinc-400 hover:text-red-300"><Trash2 size={15}/></button> : undefined}>Floor plan properties</SectionTitle>
         {selected ? <div className="space-y-2 text-[11px]">

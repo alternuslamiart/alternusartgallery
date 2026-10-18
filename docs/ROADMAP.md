@@ -19,6 +19,8 @@ requirements provide new evidence.
 
 ## P2 — Existing platform integration
 
+- [x] Bring the `/crystal` modeling workspace into the dark Crystal UI kit with
+  componentized scene, properties, viewport toolbar, and output controls.
 - [ ] Wire existing workspace screens to the authenticated platform APIs where
   the UI still relies on local-only state.
 - [ ] Keep API routes, request validation, and `docs/backend-platform.md`

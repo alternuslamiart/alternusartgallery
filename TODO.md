@@ -1,7 +1,10 @@
-# Next tasks (reviewed 2026-10-15)
+# Next tasks (reviewed 2026-10-18)
 
 ## Next concrete task
 
+- [ ] Verify the `/crystal` modeling UI in a browser at desktop and mobile
+  widths, including toolbar actions, sidebar controls, asset selection, and
+  right-panel utility actions.
 - [ ] Verify the compact floating Infrastructure Studio layout in a browser at
   desktop and mobile widths, including camera toolbar placement and panel
   toggles.

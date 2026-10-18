@@ -1,6 +1,24 @@
 # Verified progress
 
-Last updated: 2026-10-15
+Last updated: 2026-10-18
+
+## Crystal modeling UI kit
+
+- Refined the `/crystal` modeling workspace into a componentized dark UI kit
+  with a scene/assets sidebar, live model properties, viewport toolbar, and
+  output controls.
+- Connected topology, texture, and advanced toggles to workspace state; added
+  searchable asset selection, hierarchy lock/visibility states, render queue,
+  and sign-out actions.
+- Reworked the viewport toolbar to include play, fullscreen, transform,
+  selection, pen/eraser, cube, lighting, export, and camera navigation controls.
+  The right utility buttons now drive viewport lighting, world, camera, grid,
+  and help controls.
+- `npm test`: passed (8 tests); `npm run typecheck`: passed; PostCSS parsing and
+  `git diff --check`: passed.
+- Focused ESLint reported no errors; it retains six existing warnings in
+  `Viewport.tsx` (hook dependencies and `<img>` usage). Browser rendering and
+  responsive interaction were not verified.
 
 ## `/aichat` Crystal logo theme styling
 

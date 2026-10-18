@@ -9,6 +9,11 @@
 - `src/components/**` contains reusable UI and Crystal Studio surfaces.
 - `/infrastructure` is the canonical infrastructure editor route;
   `/infrastructur` currently re-exports the same page for compatibility.
+- `/crystal` renders the Crystal modeling workspace from
+  `src/components/crystal-studio/CrystalStudio.tsx`. Its modeling sidebar,
+  viewport, and output panel are separate components; the viewport owns canvas
+  interaction and toolbar controls, while shared modeling properties live in
+  the workspace state.
 - The infrastructure viewport uses Three.js, React Three Fiber, and Drei.
   Procedural scene/object data is in
   `src/app/infrastructure/infrastructure-types.ts`, scene rendering and camera
