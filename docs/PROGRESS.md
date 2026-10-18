@@ -28,6 +28,9 @@ Last updated: 2026-10-18
 
 - Reworked the mobile header into a left menu-grid control, centered Casynus
   wordmark, and right profile icon; desktop navigation remains unchanged.
+- Removed the rounded panel frame behind the mobile wordmark and controls in
+  both light and dark themes while preserving the individual navigation
+  actions.
 - PostCSS parsing and responsive layout assertions passed; `npm run typecheck`,
   `npm test` (8 tests), and `git diff --check` passed. Focused ESLint passed
   with one existing `<img>` warning after disabling the known unused
@@ -42,14 +45,14 @@ Last updated: 2026-10-18
   composer, 49px Pro banner, 40px attachment/model/action controls, 292×58px
   primary bottom navigation, and 58px search control. The top tabs now match
   Interior, Modeling, and Images, with Nano Banana as the default model.
-- Set the mobile screen's horizontal inset to 20px; the segmented header
+- Set the mobile screen's horizontal inset to 24px; the segmented header
   center column contracts on narrower phones to preserve both side controls.
 - Refined the mobile bottom navigation to match the supplied reference: a
   separated five-action capsule, a distinct active Home circle, subdued
   inactive icons, and a standalone circular Search control.
 - Replaced the mobile prompt submit button's voice-wave icon with an
   enter-style right arrow to match the supplied reference.
-- Standardized the mobile bottom row to the 20px screen inset, kept the Search
+- Standardized the mobile bottom row to the 24px screen inset, kept the Search
   control in a distinct 58px circular frame, and made the five capsule actions
   shrink evenly on narrow screens without overflowing.
 - Aligned the complete mobile studio layout to the supplied measurement scale:
