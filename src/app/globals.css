@@ -8169,3 +8169,9 @@ textarea {
     transition: none;
   }
 }
+
+@media (max-width: 700px) {
+  body *:not(svg):not(svg *) {
+    font-size: clamp(16px, 4.5vw, 20px) !important;
+  }
+}

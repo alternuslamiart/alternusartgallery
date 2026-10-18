@@ -2,6 +2,16 @@
 
 Last updated: 2026-10-18
 
+## Mobile text sizing
+
+- Applied a mobile-only 16–20px font-size range to visible interface text,
+  including labels, buttons, menus, and content, while excluding SVG icons.
+- The rule is limited to viewports at or below 700px; desktop styles are
+  unchanged.
+- The stylesheet parsed successfully, the mobile rule was confirmed by a
+  focused CSS check, and `npm test` passed (8 tests). Browser rendering was not
+  verified.
+
 ## Main navigation profile hover
 
 - The signed-in profile dropdown opens and closes when its trigger is clicked;
