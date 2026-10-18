@@ -161,7 +161,7 @@ export function createInitialInfrastructure(): InfrastructureObject[] {
   add("crosswalk", 28, 24, { name: "East gateway crossing", width: 8, depth: 4 });
 
   add("building", -27, -8, {
-    name: "Crystal Central · curved commercial",
+    name: "Casynus Central · curved commercial",
     width: 17,
     depth: 12,
     height: 7,
@@ -169,7 +169,7 @@ export function createInitialInfrastructure(): InfrastructureObject[] {
     style: "curved",
   });
   add("building", 1, -8, {
-    name: "Crystal Gallery · retail",
+    name: "Casynus Gallery · retail",
     width: 15,
     depth: 11,
     height: 6,

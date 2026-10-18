@@ -37,11 +37,11 @@ function useAuthTheme() {
 
 function Brand() {
  return (
-  <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Crystal homepage">
+  <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Casynus homepage">
    <span className="auth-brand-mark inline-flex h-8 w-8 items-center justify-center rounded-lg">
-    <img src="/Logopng.png" alt="Crystal homepage" className="h-8 w-8 object-contain" />
+    <img src="/Logopng.png" alt="Casynus homepage" className="h-8 w-8 object-contain" />
    </span>
-   <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Crystal</span>
+   <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Casynus</span>
   </Link>
  );
 }
@@ -132,12 +132,12 @@ export default function ResetPasswordPage() {
    <main className="relative z-10 flex min-h-screen w-full items-center justify-center overflow-y-auto px-5 pb-8 pt-24">
     <Card className="auth-card w-full max-w-md rounded-[24px] border shadow-none backdrop-blur-xl">
      <CardHeader className="space-y-3 p-7 text-center">
-      <p className="auth-kicker text-[11px] font-semibold uppercase tracking-[0.2em]">Crystal Studio workspace</p>
+      <p className="auth-kicker text-[11px] font-semibold uppercase tracking-[0.2em]">Casynus Studio workspace</p>
       <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">{success ? "You're all set" : isResetForm ? "Create new password" : "Forgot password?"}</h1>
       <p className="auth-copy mx-auto max-w-xs text-sm leading-6">
        {success
         ? isResetForm ? "Your password has been updated. You can now sign in with your new password." : "If an account exists for that email, you will receive a password reset link shortly."
-        : isResetForm ? "Choose a strong password to secure your Crystal workspace." : "Enter your email and we’ll send you a secure link to reset your password."}
+        : isResetForm ? "Choose a strong password to secure your Casynus workspace." : "Enter your email and we’ll send you a secure link to reset your password."}
       </p>
      </CardHeader>
      <CardContent className="space-y-5 p-7 pt-0">

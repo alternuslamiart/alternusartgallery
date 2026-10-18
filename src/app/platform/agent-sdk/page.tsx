@@ -23,7 +23,7 @@ export default function AgentSDK() {
  Three lines<br/>to a working agent.
  </h1>
  <p style={{ marginTop: 28, fontSize: 17, color: t.muted, maxWidth: 560, lineHeight: 1.55 }}>
- The same runtime that powers Crystal Studio — shipped as a typed TypeScript SDK. Bring your own tools, your own memory, and your own UI.
+ The same runtime that powers Casynus Studio — shipped as a typed TypeScript SDK. Bring your own tools, your own memory, and your own UI.
  </p>
  </div>
  </section>

@@ -9,13 +9,13 @@ export default function AccessibilityPage() {
  <div className="border-b border-[#E5E7EB] bg-[#0B1120] text-white">
  <div className="container mx-auto px-4 text-center">
  <p className="mb-3 pt-16 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300 sm:pt-20 sm:text-sm">
- Crystal Studio
+ Casynus Studio
  </p>
  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
  Accessibility
  </h1>
  <p className="mx-auto max-w-2xl pb-16 text-base text-slate-300 sm:pb-20 sm:text-lg">
-We build Crystal Studio so teams can operate an AI design workspace with clear navigation, readable interfaces, and inclusive product flows.
+We build Casynus Studio so teams can operate an AI design workspace with clear navigation, readable interfaces, and inclusive product flows.
  </p>
  </div>
  </div>
@@ -34,7 +34,7 @@ We build Crystal Studio so teams can operate an AI design workspace with clear n
  <div>
  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Our Commitment</h2>
  <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
- Crystal Studio is dedicated to ensuring that our website, desktop application, studio, and digital experiences are accessible to all users, including those with disabilities. We strive to meet or exceed the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards.
+ Casynus Studio is dedicated to ensuring that our website, desktop application, studio, and digital experiences are accessible to all users, including those with disabilities. We strive to meet or exceed the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards.
  </p>
  </div>
  </div>
@@ -141,7 +141,7 @@ We build Crystal Studio so teams can operate an AI design workspace with clear n
  <section className="bg-gray-50 rounded-2xl p-6 sm:p-8">
  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">Feedback & Assistance</h2>
  <p className="text-gray-600 leading-relaxed mb-6">
- If you experience any difficulty accessing any part of our website, desktop application, or studio, we want to hear from you. Your feedback helps us make Crystal Studio accessible to everyone.
+ If you experience any difficulty accessing any part of our website, desktop application, or studio, we want to hear from you. Your feedback helps us make Casynus Studio accessible to everyone.
  </p>
  <Link
  href="/contact"

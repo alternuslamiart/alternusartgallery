@@ -9,25 +9,25 @@ import { CoreforgePage, COBALT, useCoreforgeLanguage } from "@/components/cedium
 
 const homeTranslations: Record<string, Record<string, string>> = {
  en: {
-  eyebrow: "Design spaces. Visualize ideas. Build intelligent environments.", hero: "Design the way people live.", heroCopy: "Crystal combines AI, architecture, interior design, and advanced 3D visualization to turn a home brief into thoughtful spaces, beautiful interiors, and intelligent environments.", launch: "Launch Studio", download: "Download App", architecture: "Architecture", interior: "Interior Design", furniture: "Furniture Planner", visualization: "3D Visualization", robotics: "Home Robotics", infrastructure: "Infrastructure", planarch: "Planarch 3: Turn Plans into Places", planarchCopy: "Transform architectural ideas into complete living spaces with detailed floor plans, room layouts, materials, and 3D visualizations designed around everyday life.", infra: "Infra: Build Smarter Systems", infraCopy: "Design the infrastructure that keeps communities moving, connecting buildings, utilities, transport, clean energy, and resilient public spaces in one intelligent plan.", explore: "Explore",
+  eyebrow: "Design spaces. Visualize ideas. Build intelligent environments.", hero: "Design the way people live.", heroCopy: "Casynus combines AI, architecture, interior design, and advanced 3D visualization to turn a home brief into thoughtful spaces, beautiful interiors, and intelligent environments.", launch: "Launch Studio", download: "Download App", architecture: "Architecture", interior: "Interior Design", furniture: "Furniture Planner", visualization: "3D Visualization", robotics: "Home Robotics", infrastructure: "Infrastructure", planarch: "Planarch 3: Turn Plans into Places", planarchCopy: "Transform architectural ideas into complete living spaces with detailed floor plans, room layouts, materials, and 3D visualizations designed around everyday life.", infra: "Infra: Build Smarter Systems", infraCopy: "Design the infrastructure that keeps communities moving, connecting buildings, utilities, transport, clean energy, and resilient public spaces in one intelligent plan.", explore: "Explore",
  },
  de: {
-  eyebrow: "Räume gestalten. Ideen visualisieren. Intelligente Umgebungen entwickeln.", hero: "Gestalte die Art, wie Menschen leben.", heroCopy: "Crystal verbindet KI, Architektur, Innenarchitektur und fortschrittliche 3D-Visualisierung, um aus einem Wohnbrief durchdachte Räume und intelligente Umgebungen zu machen.", launch: "Studio starten", download: "App herunterladen", architecture: "Architektur", interior: "Innenarchitektur", furniture: "Möbelplanung", visualization: "3D-Visualisierung", robotics: "Hausrobotik", infrastructure: "Infrastruktur", planarch: "Planarch 3: Pläne werden zu Orten", planarchCopy: "Verwandle architektonische Ideen mit Grundrissen, Raumaufteilungen, Materialien und 3D-Visualisierungen in vollständige Wohnräume.", infra: "Infra: Intelligentere Systeme bauen", infraCopy: "Plane Infrastruktur für Gebäude, Versorgung, Verkehr, saubere Energie und widerstandsfähige öffentliche Räume in einem intelligenten Konzept.", explore: "Entdecken",
+  eyebrow: "Räume gestalten. Ideen visualisieren. Intelligente Umgebungen entwickeln.", hero: "Gestalte die Art, wie Menschen leben.", heroCopy: "Casynus verbindet KI, Architektur, Innenarchitektur und fortschrittliche 3D-Visualisierung, um aus einem Wohnbrief durchdachte Räume und intelligente Umgebungen zu machen.", launch: "Studio starten", download: "App herunterladen", architecture: "Architektur", interior: "Innenarchitektur", furniture: "Möbelplanung", visualization: "3D-Visualisierung", robotics: "Hausrobotik", infrastructure: "Infrastruktur", planarch: "Planarch 3: Pläne werden zu Orten", planarchCopy: "Verwandle architektonische Ideen mit Grundrissen, Raumaufteilungen, Materialien und 3D-Visualisierungen in vollständige Wohnräume.", infra: "Infra: Intelligentere Systeme bauen", infraCopy: "Plane Infrastruktur für Gebäude, Versorgung, Verkehr, saubere Energie und widerstandsfähige öffentliche Räume in einem intelligenten Konzept.", explore: "Entdecken",
  },
  fr: {
-  eyebrow: "Concevez des espaces. Visualisez vos idées. Créez des environnements intelligents.", hero: "Concevez la façon dont les gens vivent.", heroCopy: "Crystal réunit IA, architecture, design intérieur et visualisation 3D avancée pour transformer une intention en espaces réfléchis et environnements intelligents.", launch: "Lancer le studio", download: "Télécharger l’app", architecture: "Architecture", interior: "Design intérieur", furniture: "Planificateur mobilier", visualization: "Visualisation 3D", robotics: "Robotique domestique", infrastructure: "Infrastructure", planarch: "Planarch 3 : des plans aux espaces", planarchCopy: "Transformez vos idées architecturales en espaces de vie complets grâce aux plans, agencements, matériaux et visualisations 3D.", infra: "Infra : construire des systèmes plus intelligents", infraCopy: "Concevez les infrastructures reliant bâtiments, réseaux, transports, énergie propre et espaces publics résilients.", explore: "Explorer",
+  eyebrow: "Concevez des espaces. Visualisez vos idées. Créez des environnements intelligents.", hero: "Concevez la façon dont les gens vivent.", heroCopy: "Casynus réunit IA, architecture, design intérieur et visualisation 3D avancée pour transformer une intention en espaces réfléchis et environnements intelligents.", launch: "Lancer le studio", download: "Télécharger l’app", architecture: "Architecture", interior: "Design intérieur", furniture: "Planificateur mobilier", visualization: "Visualisation 3D", robotics: "Robotique domestique", infrastructure: "Infrastructure", planarch: "Planarch 3 : des plans aux espaces", planarchCopy: "Transformez vos idées architecturales en espaces de vie complets grâce aux plans, agencements, matériaux et visualisations 3D.", infra: "Infra : construire des systèmes plus intelligents", infraCopy: "Concevez les infrastructures reliant bâtiments, réseaux, transports, énergie propre et espaces publics résilients.", explore: "Explorer",
  },
  it: {
-  eyebrow: "Progetta gli spazi. Visualizza le idee. Crea ambienti intelligenti.", hero: "Progetta il modo in cui le persone vivono.", heroCopy: "Crystal unisce IA, architettura, interior design e visualizzazione 3D avanzata per trasformare un’idea in spazi curati e ambienti intelligenti.", launch: "Avvia Studio", download: "Scarica l’app", architecture: "Architettura", interior: "Interior design", furniture: "Planner arredi", visualization: "Visualizzazione 3D", robotics: "Robotica domestica", infrastructure: "Infrastrutture", planarch: "Planarch 3: dai piani agli spazi", planarchCopy: "Trasforma le idee architettoniche in spazi abitativi completi con planimetrie, layout, materiali e visualizzazioni 3D.", infra: "Infra: sistemi più intelligenti", infraCopy: "Progetta infrastrutture che collegano edifici, servizi, trasporti, energia pulita e spazi pubblici resilienti.", explore: "Esplora",
+  eyebrow: "Progetta gli spazi. Visualizza le idee. Crea ambienti intelligenti.", hero: "Progetta il modo in cui le persone vivono.", heroCopy: "Casynus unisce IA, architettura, interior design e visualizzazione 3D avanzata per trasformare un’idea in spazi curati e ambienti intelligenti.", launch: "Avvia Studio", download: "Scarica l’app", architecture: "Architettura", interior: "Interior design", furniture: "Planner arredi", visualization: "Visualizzazione 3D", robotics: "Robotica domestica", infrastructure: "Infrastrutture", planarch: "Planarch 3: dai piani agli spazi", planarchCopy: "Trasforma le idee architettoniche in spazi abitativi completi con planimetrie, layout, materiali e visualizzazioni 3D.", infra: "Infra: sistemi più intelligenti", infraCopy: "Progetta infrastrutture che collegano edifici, servizi, trasporti, energia pulita e spazi pubblici resilienti.", explore: "Esplora",
  },
  zh: {
-  eyebrow: "设计空间。可视化创意。构建智能环境。", hero: "设计人们生活的方式。", heroCopy: "Crystal 将 AI、建筑、室内设计和先进的 3D 可视化结合，把住宅需求转化为经过思考的空间、美丽的室内和智能环境。", launch: "启动工作室", download: "下载应用", architecture: "建筑", interior: "室内设计", furniture: "家具规划", visualization: "3D 可视化", robotics: "家庭机器人", infrastructure: "基础设施", planarch: "Planarch 3：从平面图到空间", planarchCopy: "通过详细的平面图、空间布局、材料和 3D 可视化，将建筑创意转化为完整的生活空间。", infra: "Infra：构建更智能的系统", infraCopy: "在一个智能方案中连接建筑、公共设施、交通、清洁能源和韧性公共空间。", explore: "探索",
+  eyebrow: "设计空间。可视化创意。构建智能环境。", hero: "设计人们生活的方式。", heroCopy: "Casynus 将 AI、建筑、室内设计和先进的 3D 可视化结合，把住宅需求转化为经过思考的空间、美丽的室内和智能环境。", launch: "启动工作室", download: "下载应用", architecture: "建筑", interior: "室内设计", furniture: "家具规划", visualization: "3D 可视化", robotics: "家庭机器人", infrastructure: "基础设施", planarch: "Planarch 3：从平面图到空间", planarchCopy: "通过详细的平面图、空间布局、材料和 3D 可视化，将建筑创意转化为完整的生活空间。", infra: "Infra：构建更智能的系统", infraCopy: "在一个智能方案中连接建筑、公共设施、交通、清洁能源和韧性公共空间。", explore: "探索",
  },
  ja: {
-  eyebrow: "空間をデザイン。アイデアを可視化。インテリジェントな環境を構築。", hero: "人々の暮らし方をデザインする。", heroCopy: "Crystal は AI、建築、インテリアデザイン、高度な 3D ビジュアルを組み合わせ、住まいの要望を美しく知的な空間へ変えます。", launch: "スタジオを起動", download: "アプリをダウンロード", architecture: "建築", interior: "インテリアデザイン", furniture: "家具プランナー", visualization: "3D ビジュアル", robotics: "ホームロボティクス", infrastructure: "インフラ", planarch: "Planarch 3：図面を空間へ", planarchCopy: "詳細な平面図、レイアウト、素材、3D ビジュアルで建築アイデアを暮らしの空間へ変えます。", infra: "Infra：よりスマートなシステム", infraCopy: "建物、設備、交通、クリーンエネルギー、強い公共空間を一つの計画でつなぎます。", explore: "探索",
+  eyebrow: "空間をデザイン。アイデアを可視化。インテリジェントな環境を構築。", hero: "人々の暮らし方をデザインする。", heroCopy: "Casynus は AI、建築、インテリアデザイン、高度な 3D ビジュアルを組み合わせ、住まいの要望を美しく知的な空間へ変えます。", launch: "スタジオを起動", download: "アプリをダウンロード", architecture: "建築", interior: "インテリアデザイン", furniture: "家具プランナー", visualization: "3D ビジュアル", robotics: "ホームロボティクス", infrastructure: "インフラ", planarch: "Planarch 3：図面を空間へ", planarchCopy: "詳細な平面図、レイアウト、素材、3D ビジュアルで建築アイデアを暮らしの空間へ変えます。", infra: "Infra：よりスマートなシステム", infraCopy: "建物、設備、交通、クリーンエネルギー、強い公共空間を一つの計画でつなぎます。", explore: "探索",
  },
  ar: {
-  eyebrow: "صمّم المساحات. تصوّر الأفكار. ابنِ بيئات ذكية.", hero: "صمّم طريقة عيش الناس.", heroCopy: "يجمع Crystal بين الذكاء الاصطناعي والهندسة المعمارية والتصميم الداخلي والتصور ثلاثي الأبعاد لتحويل فكرة المنزل إلى مساحات جميلة وبيئات ذكية.", launch: "فتح الاستوديو", download: "تنزيل التطبيق", architecture: "الهندسة المعمارية", interior: "التصميم الداخلي", furniture: "مخطط الأثاث", visualization: "التصور ثلاثي الأبعاد", robotics: "روبوتات المنزل", infrastructure: "البنية التحتية", planarch: "Planarch 3: من المخططات إلى المساحات", planarchCopy: "حوّل الأفكار المعمارية إلى مساحات معيشة كاملة مع المخططات وتوزيع الغرف والمواد والتصور ثلاثي الأبعاد.", infra: "Infra: بناء أنظمة أكثر ذكاءً", infraCopy: "صمّم بنية تحتية تربط المباني والخدمات والنقل والطاقة النظيفة والمساحات العامة المرنة.", explore: "استكشف",
+  eyebrow: "صمّم المساحات. تصوّر الأفكار. ابنِ بيئات ذكية.", hero: "صمّم طريقة عيش الناس.", heroCopy: "يجمع Casynus بين الذكاء الاصطناعي والهندسة المعمارية والتصميم الداخلي والتصور ثلاثي الأبعاد لتحويل فكرة المنزل إلى مساحات جميلة وبيئات ذكية.", launch: "فتح الاستوديو", download: "تنزيل التطبيق", architecture: "الهندسة المعمارية", interior: "التصميم الداخلي", furniture: "مخطط الأثاث", visualization: "التصور ثلاثي الأبعاد", robotics: "روبوتات المنزل", infrastructure: "البنية التحتية", planarch: "Planarch 3: من المخططات إلى المساحات", planarchCopy: "حوّل الأفكار المعمارية إلى مساحات معيشة كاملة مع المخططات وتوزيع الغرف والمواد والتصور ثلاثي الأبعاد.", infra: "Infra: بناء أنظمة أكثر ذكاءً", infraCopy: "صمّم بنية تحتية تربط المباني والخدمات والنقل والطاقة النظيفة والمساحات العامة المرنة.", explore: "استكشف",
  },
 };
 
@@ -37,7 +37,7 @@ const surfaces = [
  title: "Architecture & Floor Plans",
  description: "Create house plans, building layouts, room configurations, and precise architectural documentation in one focused studio.",
  Icon: Layers3,
- href: "/crystal",
+ href: "/casynus",
  cta: "Launch Studio",
  },
  {
@@ -71,7 +71,7 @@ const workflow = [
  },
  {
  title: "Shape the design plan",
- copy: "Crystal Studio keeps rooms, dimensions, materials, furnishings, and next actions organized across the project.",
+ copy: "Casynus Studio keeps rooms, dimensions, materials, furnishings, and next actions organized across the project.",
  },
  {
  title: "Visualize and share",
@@ -122,7 +122,7 @@ function ActionLink({
 }
 
 function FeatureShowcase({ title, copy, image, reverse = false }: { title: string; copy: string; image: string; reverse?: boolean }) {
- return <section data-crystal-reveal className={`crystal-feature-showcase${reverse ? " reverse" : ""}`}><div className="crystal-feature-visual"><Image src={image} alt={title} fill sizes="(max-width: 700px) 100vw, 55vw" /></div><div className="crystal-feature-copy"><h2>{title}</h2><p>{copy}</p><ActionLink href="/crystal">Explore <ArrowRight size={15} /></ActionLink></div></section>;
+ return <section data-crystal-reveal className={`crystal-feature-showcase${reverse ? " reverse" : ""}`}><div className="crystal-feature-visual"><Image src={image} alt={title} fill sizes="(max-width: 700px) 100vw, 55vw" /></div><div className="crystal-feature-copy"><h2>{title}</h2><p>{copy}</p><ActionLink href="/casynus">Explore <ArrowRight size={15} /></ActionLink></div></section>;
 }
 
 export default function HomePage() {
@@ -176,7 +176,7 @@ export default function HomePage() {
  <p>{tr.eyebrow}</p>
  <div className="crystal-first-card"><div><h1>{tr.hero}</h1><p>{tr.heroCopy}</p> <div><ActionLink href="/project">{tr.launch} <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">{tr.download}</ActionLink></div></div><div className="crystal-first-image">
   <Image src="/Section/architectresectionone.png" alt={tr.architecture} fill priority sizes="(max-width: 700px) 100vw, 55vw" />
-  <button type="button" aria-label="Play Crystal Studio introduction video" onClick={() => void playIntroVideo()} className="crystal-intro-play-overlay">
+  <button type="button" aria-label="Play Casynus Studio introduction video" onClick={() => void playIntroVideo()} className="crystal-intro-play-overlay">
    <span aria-hidden="true" className="crystal-intro-play-button"><Play size={76} fill="currentColor" strokeWidth={1} /></span>
   </button>
  </div></div>
@@ -221,7 +221,7 @@ export default function HomePage() {
  <div style={{ display: "flex", alignItems: "end", justifyContent: "space-between", gap: 24, flexWrap: "wrap", marginBottom: 42 }}>
  <div>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 18 }}>
- WHAT CRYSTAL STUDIO DOES
+ WHAT CASYNUS STUDIO DOES
  </div>
  <h2 style={{ fontSize: "clamp(38px,6vw,72px)", fontWeight: 900, letterSpacing: "-0.045em", lineHeight: 0.94, margin: 0, fontStretch: "84%" }}>
  Design spaces for<br />
@@ -376,10 +376,10 @@ export default function HomePage() {
  <div>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 18 }}>DESKTOP EDITION / PROFESSIONAL WORKFLOW</div>
  <h2 style={{ margin: 0, fontSize: "clamp(42px,6vw,76px)", lineHeight: 0.94, letterSpacing: "-0.045em", fontWeight: 900 }}>
- Take Crystal Studio<br /><span style={{ color: COBALT, fontStyle: "italic" }}>beyond the browser.</span>
+ Take Casynus Studio<br /><span style={{ color: COBALT, fontStyle: "italic" }}>beyond the browser.</span>
  </h2>
  <p style={{ margin: "24px 0 0", maxWidth: 620, color: t.muted, fontSize: 17, lineHeight: 1.65 }}>
- The website provides AI-assisted design generation and concept exploration. Crystal Studio Desktop adds advanced local project workflows, larger files, offline processing, automation tools, and deeper design-documentation controls.
+ The website provides AI-assisted design generation and concept exploration. Casynus Studio Desktop adds advanced local project workflows, larger files, offline processing, automation tools, and deeper design-documentation controls.
  </p>
  <p style={{ margin: "16px 0 0", maxWidth: 620, color: t.muted, fontSize: 13, lineHeight: 1.6 }}>
  Construction-ready documents and regulated building decisions must be reviewed and approved by a qualified professional in the relevant jurisdiction.
@@ -391,7 +391,7 @@ export default function HomePage() {
  </div>
  <div style={{ border: 0, borderRadius: 24, background: t.raised, padding: 28, minHeight: 310 }}>
  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 24, paddingBottom: 24, borderBottom: `1px solid ${t.faint}` }}>
- <div><div style={{ fontSize: 12, color: t.muted }}>Crystal Studio Desktop</div><div style={{ marginTop: 8, fontSize: 26, fontWeight: 900 }}>Professional License</div></div>
+ <div><div style={{ fontSize: 12, color: t.muted }}>Casynus Studio Desktop</div><div style={{ marginTop: 8, fontSize: 26, fontWeight: 900 }}>Professional License</div></div>
  <div style={{ textAlign: "right" }}><div style={{ fontSize: 42, lineHeight: 1, fontWeight: 900, color: COBALT }}>$79</div><div style={{ marginTop: 5, fontSize: 11, color: t.muted }}>one-time</div></div>
  </div>
  <div style={{ display: "grid", gap: 16, paddingTop: 24 }}>
@@ -410,7 +410,7 @@ export default function HomePage() {
  <Sparkles size={15} /> Begin
  </div>
  <h2 style={{ fontSize: "clamp(44px,7vw,88px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.9, margin: 0, fontStretch: "84%" }}>
- Start in Crystal Studio.<br />
+ Start in Casynus Studio.<br />
  <span style={{ color: COBALT, fontStyle: "italic" }}>Keep machines moving.</span>
  </h2>
  <p style={{ margin: "26px auto 0", maxWidth: 610, color: t.muted, fontSize: 16, lineHeight: 1.65 }}>
@@ -457,7 +457,7 @@ export default function HomePage() {
  <div
   role="dialog"
   aria-modal="true"
-  aria-label="Crystal Studio introduction video"
+  aria-label="Casynus Studio introduction video"
   aria-hidden={!isIntroVideoOpen}
   onMouseDown={(event) => {
    if (event.target === event.currentTarget) closeIntroVideo();
@@ -485,7 +485,7 @@ export default function HomePage() {
     loop
     playsInline
     preload="none"
-    aria-label="Crystal Studio introduction video"
+    aria-label="Casynus Studio introduction video"
     onError={() => setIntroVideoError(true)}
     style={{ display: "block", width: "100%", height: "100%", objectFit: "cover", borderRadius: 25, background: "#080b10" }}
    >
@@ -501,7 +501,7 @@ export default function HomePage() {
 
  <section data-crystal-reveal style={{ padding: "92px 0 108px", borderTop: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
- <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 18 }}>CRYSTAL STUDIO / AVAILABLE EVERYWHERE</div>
+ <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 18 }}>CASYNUS STUDIO / AVAILABLE EVERYWHERE</div>
  <h2 style={{ margin: 0, fontSize: "clamp(38px,6vw,72px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.94 }}>
  Design wherever ideas take you.
  </h2>
@@ -512,7 +512,7 @@ export default function HomePage() {
  {[
  { label: "App Store", detail: "For iPhone and iPad", mark: "A" },
  { label: "Google Play", detail: "For Android devices", mark: "▶" },
- { label: "Crystal Store", detail: "Desktop for professionals", mark: "C" },
+ { label: "Casynus Store", detail: "Desktop for professionals", mark: "C" },
  ].map((store) => (
  <Link key={store.label} href="/download" style={{ display: "flex", alignItems: "center", gap: 14, minHeight: 82, padding: "16px 20px", border: `1px solid ${t.faint}`, borderRadius: 14, background: t.raised, color: t.fg, textAlign: "left", textDecoration: "none" }} className="transition hover:border-[#4284FF]">
  <span style={{ display: "grid", placeItems: "center", width: 40, height: 40, flexShrink: 0, borderRadius: 10, background: `${COBALT}16`, color: COBALT, fontSize: 16, fontWeight: 900 }}>{store.mark}</span>

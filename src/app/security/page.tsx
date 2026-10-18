@@ -32,7 +32,7 @@ export default function Security() {
  Built for the<br/><span style={{ color: COBALT, fontStyle: "italic" }}>paranoid.</span>
  </h1>
  <p style={{ marginTop: 28, fontSize: 17, color: t.muted, maxWidth: 600, lineHeight: 1.6 }}>
- Crystal Studio handles engineering prompts, files, models, and code, so security is the foundation rather than a bolt-on.
+ Casynus Studio handles engineering prompts, files, models, and code, so security is the foundation rather than a bolt-on.
  </p>
  </div>
  </section>

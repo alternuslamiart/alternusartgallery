@@ -661,7 +661,7 @@ export default function InfrastructurePage() {
 
           {chatOpen ? (
             <div className="infra-ai-chat">
-              <div className="infra-chat-heading"><span><MessageCircle size={14} />Crystal site assistant</span><button type="button" onClick={() => setChatOpen(false)} aria-label="Hide AI chat"><X size={14} /></button></div>
+              <div className="infra-chat-heading"><span><MessageCircle size={14} />Casynus site assistant</span><button type="button" onClick={() => setChatOpen(false)} aria-label="Hide AI chat"><X size={14} /></button></div>
               <div className="infra-chat-messages">
                 {messages.slice(-2).map((message, index) => <div key={`${message.role}-${index}`} className={`infra-chat-message ${message.role}`}>{message.text}</div>)}
               </div>

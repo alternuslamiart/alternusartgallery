@@ -34,13 +34,13 @@ const robotoFlex = Roboto_Flex({
 
 export const metadata: Metadata = {
  metadataBase: new URL("https://www.alternusart.com"),
- applicationName: "Crystal Studio",
+ applicationName: "Casynus Studio",
  title: {
- default: "Crystal Studio | AI Architecture & Interior Design",
- template: "%s | Crystal Studio",
+ default: "Casynus Studio | AI Architecture & Interior Design",
+ template: "%s | Casynus Studio",
  },
  description:
- "Crystal Studio is an AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics.",
+ "Casynus Studio is an AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics.",
  keywords: [
  "3D machinery design",
  "engine 3D design",
@@ -50,12 +50,12 @@ export const metadata: Metadata = {
  "floor plan AI",
  "3D design studio",
  "AI code assistant",
- "Crystal Studio",
+ "Casynus Studio",
  "interior design AI",
  ],
- authors: [{ name: "Crystal Studio" }],
- creator: "Crystal Studio",
- publisher: "Crystal Studio",
+ authors: [{ name: "Casynus Studio" }],
+ creator: "Casynus Studio",
+ publisher: "Casynus Studio",
  icons: {
  icon: [
  { url: "/favicon.jpeg", sizes: "512x512", type: "image/jpeg" },
@@ -67,8 +67,8 @@ export const metadata: Metadata = {
  type: "website",
  locale: "en_US",
  url: "https://www.alternusart.com",
- siteName: "Crystal Studio",
- title: "Crystal Studio | AI Architecture & Interior Design",
+ siteName: "Casynus Studio",
+ title: "Casynus Studio | AI Architecture & Interior Design",
  description:
  "AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics.",
  images: [
@@ -76,13 +76,13 @@ export const metadata: Metadata = {
  url: "/Logopng.png",
  width: 512,
  height: 512,
- alt: "Crystal Studio",
+ alt: "Casynus Studio",
  },
  ],
  },
  twitter: {
  card: "summary_large_image",
- title: "Crystal Studio | AI Architecture & Interior Design",
+ title: "Casynus Studio | AI Architecture & Interior Design",
  description:
  "AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics.",
  images: ["/Logopng.png"],
@@ -205,8 +205,8 @@ export default function RootLayout({
  "@context": "https://schema.org",
  "@type": "Organization",
  "@id": "https://www.alternusart.com/#organization",
- "name": "Crystal Studio",
- "alternateName": "Crystal Studio AI Design",
+ "name": "Casynus Studio",
+ "alternateName": "Casynus Studio AI Design",
  "url": "https://www.alternusart.com",
  "logo": {
  "@type": "ImageObject",
@@ -244,7 +244,7 @@ export default function RootLayout({
  "@type": "WebSite",
  "@id": "https://www.alternusart.com/#website",
  "url": "https://www.alternusart.com",
- "name": "Crystal Studio",
+ "name": "Casynus Studio",
  "description": "AI-powered studio for architecture, interior design, furniture planning, 3D visualization, and home robotics",
  "publisher": {
  "@id": "https://www.alternusart.com/#organization"

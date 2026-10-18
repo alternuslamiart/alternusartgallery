@@ -78,11 +78,11 @@ function useAuthTheme() {
 
 function Brand() {
  return (
- <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Crystal homepage" title="Go to homepage">
+ <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Casynus homepage" title="Go to homepage">
  <span className="auth-brand-mark inline-flex h-8 w-8 items-center justify-center rounded-lg">
- <img src="/Logopng.png" alt="Crystal homepage" className="h-8 w-8 object-contain" />
+ <img src="/Logopng.png" alt="Casynus homepage" className="h-8 w-8 object-contain" />
  </span>
- <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Crystal</span>
+ <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Casynus</span>
  </Link>
  );
 }
@@ -158,10 +158,10 @@ export default function SignUpPage() {
  <main className="relative z-10 flex min-h-[calc(100vh-80px)] items-center justify-center px-5 pb-16 pt-8">
  <Card className="auth-card w-full max-w-md rounded-[24px] border shadow-none backdrop-blur-xl">
  <CardHeader className="space-y-3 p-7 text-center">
- <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Start Crystal Studio</p>
+ <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Start Casynus Studio</p>
  <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">Create account</h1>
  <p className="auth-copy mx-auto max-w-xs text-sm leading-6">
- Create your Crystal workspace for AI-assisted architecture, floor plans, 3D modeling, infrastructure planning, image generation, and professional PDF documentation.
+ Create your Casynus workspace for AI-assisted architecture, floor plans, 3D modeling, infrastructure planning, image generation, and professional PDF documentation.
  </p>
  </CardHeader>
  <CardContent className="space-y-5 p-7 pt-0">

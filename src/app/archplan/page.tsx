@@ -102,7 +102,7 @@ export default function ArchplanPage() {
   return (
     <div className="crystal-archplan-page min-h-screen w-full min-w-0 bg-[#0f0f0f] font-sans text-[#f5f5f5]">
       <header className="fixed inset-x-0 top-0 z-30 flex h-[54px] items-center border-b border-[#242424] bg-[#171717] px-[50px]">
-        <span className="text-sm font-semibold tracking-tight">Crystal</span>
+        <span className="text-sm font-semibold tracking-tight">Casynus</span>
         <a href="/design-studio" className="ml-8 text-zinc-400 transition hover:text-white" aria-label="Home">
           <Home size={16} strokeWidth={1.8} />
         </a>
@@ -159,7 +159,7 @@ export default function ArchplanPage() {
           </a>
         </div>
         <div className="absolute inset-x-3 bottom-3 flex items-center justify-between border-t border-white/[0.08] pt-3 text-[10px]">
-          <a href="mailto:?subject=Join my Crystal team" className="flex items-center gap-2"><Mail size={14} /> Invite your team</a>
+          <a href="mailto:?subject=Join my Casynus team" className="flex items-center gap-2"><Mail size={14} /> Invite your team</a>
           <button type="button" onClick={() => void navigator.clipboard?.writeText(window.location.href)} className="rounded-[12px] bg-[#181818] px-3 py-2"><Copy size={12} className="mr-1 inline" /> Copy link</button>
         </div>
       </aside> */}
@@ -197,7 +197,7 @@ export default function ArchplanPage() {
                 <p className="mb-3 text-[11px] text-[#a0a0a0]">Room / AI Powered (optional)</p>
                 <div className="space-y-3">
                   <label className="flex h-10 w-full items-center justify-between rounded-[12px] bg-[#181818] px-3 text-[11px] text-zinc-400"><select value={room} onChange={(event) => setRoom(event.target.value)} className="w-full appearance-none bg-transparent outline-none"><option value="">e.g Living Room Kitchen...</option><option>Living Room</option><option>Kitchen</option><option>Bedroom</option></select><ChevronDown size={14} /></label>
-                  <label className="flex h-10 w-full items-center gap-3 rounded-[12px] bg-[#181818] px-2 text-[11px] text-zinc-400"><span className="grid h-7 w-7 place-items-center rounded bg-[#dd155a] text-base font-bold text-white">A</span><select value={model} onChange={(event) => setModel(event.target.value)} className="min-w-0 flex-1 appearance-none bg-transparent outline-none"><option>Autodesk Revit Fusion AI</option><option>Crystal Architecture AI</option><option>Concept Render AI</option></select><ChevronDown size={14} /></label>
+                  <label className="flex h-10 w-full items-center gap-3 rounded-[12px] bg-[#181818] px-2 text-[11px] text-zinc-400"><span className="grid h-7 w-7 place-items-center rounded bg-[#dd155a] text-base font-bold text-white">A</span><select value={model} onChange={(event) => setModel(event.target.value)} className="min-w-0 flex-1 appearance-none bg-transparent outline-none"><option>Autodesk Revit Fusion AI</option><option>Casynus Architecture AI</option><option>Concept Render AI</option></select><ChevronDown size={14} /></label>
                 </div>
               </div>
             </div>
@@ -246,7 +246,7 @@ export default function ArchplanPage() {
             <div className="flex gap-2">
               <button type="button" onClick={() => { setPrompt(""); setProjectName(""); setInstructions(""); setRoom(""); setModel("Autodesk Revit Fusion AI"); setSelectedStyle("Classical"); setImageType("Exterior"); setAspectRatio("1:1"); setQuality("Standard"); setCount(1); setSaved(false); setGenerated(false); setError(null); window.localStorage.removeItem("crystal-archplan-draft"); }} className="h-[34px] w-[90px] rounded-[12px] bg-[#181818] text-[10px] text-zinc-300 hover:bg-[#242424]">Reset</button>
               <button type="button" onClick={generatePlan} disabled={generating} className="h-[34px] w-[91px] rounded-[12px] bg-[#2867f2] text-[10px] font-semibold text-white hover:bg-[#3473f5] disabled:opacity-50">{generating ? "..." : generated ? "Generated" : "Generate"}</button>
-              {generated && <Link href="/crystal" className="inline-flex h-[34px] items-center rounded-[12px] bg-[#3f8f64] px-3 text-[10px] font-semibold text-white">Open in Crystal</Link>}
+              {generated && <Link href="/casynus" className="inline-flex h-[34px] items-center rounded-[12px] bg-[#3f8f64] px-3 text-[10px] font-semibold text-white">Open in Casynus</Link>}
             </div>
           </div>
           {error && <p role="alert" className="mt-3 text-right text-[10px] text-red-300">{error}</p>}

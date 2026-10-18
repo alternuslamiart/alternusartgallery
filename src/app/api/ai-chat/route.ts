@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 const MAX_HISTORY_MESSAGES = 16;
 const GEMINI_GENERATE_CONTENT_URL = "https://generativelanguage.googleapis.com/v1beta/models";
 
-const SYSTEM_PROMPT = `You are the Crystal Studio AI Assistant. Answer clearly, thoroughly, and helpfully. For coding, design, business, product, CAD, and engineering questions, give complete, practical, well-structured answers with examples and steps where useful. Make clear that AI-generated engineering output requires independent verification and licensed-engineer approval when used professionally. Respond in the user's language when clear.`;
+const SYSTEM_PROMPT = `You are the Casynus Studio AI Assistant. Answer clearly, thoroughly, and helpfully. For coding, design, business, product, CAD, and engineering questions, give complete, practical, well-structured answers with examples and steps where useful. Make clear that AI-generated engineering output requires independent verification and licensed-engineer approval when used professionally. Respond in the user's language when clear.`;
 
 type ChatRole = "user" | "assistant";
 type ChatMessage = {

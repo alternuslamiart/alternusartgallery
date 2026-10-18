@@ -137,8 +137,8 @@ type ChatSection = { id: string; label: string };
 type SearchDestination = { label: string; description: string; href: string };
 type SearchResult = { type: "destination"; destination: SearchDestination } | { type: "conversation"; conversation: ChatSession };
 const searchDestinations: SearchDestination[] = [
-  { label: "AI Chat", description: "Start a conversation with Crystal", href: "/aichat" },
-  { label: "Crystal Studio", description: "Open the 3D design workspace", href: "/crystal" },
+  { label: "AI Chat", description: "Start a conversation with Casynus", href: "/aichat" },
+  { label: "Casynus Studio", description: "Open the 3D design workspace", href: "/casynus" },
   { label: "Infrastructure Studio", description: "Plan roads, utilities, and public spaces", href: "/infrastructure" },
   { label: "Architecture plans", description: "Create and organize floor plans", href: "/archplan" },
   { label: "Design Studio", description: "Explore visual design tools", href: "/design-studio" },
@@ -311,10 +311,10 @@ export default function AIChatPage() {
         provider?: "gemini" | "groq";
       };
       if (!response.ok) {
-        throw new Error(result.error || "Crystal could not answer right now. Please try again.");
+        throw new Error(result.error || "Casynus could not answer right now. Please try again.");
       }
       if (!result.message?.trim()) {
-        throw new Error("Crystal returned an empty response. Please try again.");
+        throw new Error("Casynus returned an empty response. Please try again.");
       }
       if (result.provider === "gemini") setSelectedModel("Gemini");
       else if (result.provider === "groq") setSelectedModel("Groq");
@@ -329,7 +329,7 @@ export default function AIChatPage() {
         ? { ...chat, messages: [...chat.messages, assistantMessage], updatedAt: Date.now() }
         : chat));
     } catch (error) {
-      setToast(error instanceof Error ? error.message : "Crystal could not answer right now. Please try again.");
+      setToast(error instanceof Error ? error.message : "Casynus could not answer right now. Please try again.");
       window.setTimeout(() => setToast(null), 3500);
     } finally {
       setIsSending(false);
@@ -396,9 +396,9 @@ export default function AIChatPage() {
       {sidebarOpen && <button aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-black/60 lg:hidden" />}
       <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[60px]" : "w-[284px]"} shrink-0 flex-col bg-[#101010] p-3 transition-[width,transform] duration-300 lg:inset-y-auto lg:static lg:h-screen lg:translate-x-0`}>
         <div className={`relative flex items-center rounded-xl px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
-          {!sidebarCollapsed && <Link href="/aichat" aria-label="Crystal AI Chat" className="flex items-center gap-3 rounded-lg text-lg font-semibold tracking-tight text-white transition hover:opacity-80">
+          {!sidebarCollapsed && <Link href="/aichat" aria-label="Casynus AI Chat" className="flex items-center gap-3 rounded-lg text-lg font-semibold tracking-tight text-white transition hover:opacity-80">
             <span className="grid h-9 w-9 shrink-0 place-items-center"><img src="/Logopng.png" alt="" className={`h-5 w-5 object-contain brightness-0 ${isLight ? "opacity-50" : "invert"}`} /></span>
-            Crystal
+            Casynus
           </Link>}
           <button type="button" onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!sidebarCollapsed} className="hidden h-8 w-8 place-items-center rounded-lg text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400 lg:grid">{sidebarCollapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}</button>
           <button onClick={() => setSidebarOpen(false)} aria-label="Close sidebar" className="absolute right-0 rounded-lg p-2 text-zinc-500 transition hover:bg-[#1c1c1c] hover:text-white lg:hidden"><X size={18} /></button>
@@ -461,7 +461,7 @@ export default function AIChatPage() {
           </div>
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-[#2a2a2a] bg-[#141414] p-2.5">
             <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">AL</span>
-            <Link href="/account" className="min-w-0 flex-1"><span className="block truncate text-xs text-zinc-200">Crystal User</span><span className="block truncate text-[10px] text-zinc-600">you@alternusart.com</span></Link>
+            <Link href="/account" className="min-w-0 flex-1"><span className="block truncate text-xs text-zinc-200">Casynus User</span><span className="block truncate text-[10px] text-zinc-600">you@alternusart.com</span></Link>
             <div data-account-menu className="relative">
               <button aria-label="Account menu" title="Account menu" onClick={() => setAccountMenuOpen((value) => !value)} className="rounded-lg p-1 text-zinc-600 transition hover:bg-[#2a2a2a] hover:text-white"><MoreHorizontal size={16} /></button>
               {accountMenuOpen && <AccountMenu onAction={(action) => {
@@ -508,7 +508,7 @@ export default function AIChatPage() {
             <button type="button" onClick={toggleTheme} aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"} title={isLight ? "Dark mode" : "Light mode"} className="grid h-8 w-8 place-items-center rounded-lg border border-[#2a2a2a] text-zinc-400 transition hover:bg-[#2a2a2a] hover:text-white">
               {isLight ? <Moon size={15} /> : <Sun size={15} />}
             </button>
-            <Link href="/crystal" className="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-zinc-400 transition hover:border-blue-500/50 hover:text-white">Go to Studio</Link>
+            <Link href="/casynus" className="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-zinc-400 transition hover:border-blue-500/50 hover:text-white">Go to Studio</Link>
           </div>
         </header>
         <nav className="aichat-section-scroll absolute right-3 top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-3 lg:flex" aria-label="Chat sections">
@@ -531,7 +531,7 @@ export default function AIChatPage() {
           {messages.length === 0 ? (
             <div ref={(element) => { sectionRefs.current.header = element; }} className="m-auto text-center">
               <h1 className="aichat-welcome-title text-2xl font-medium tracking-tight text-zinc-200 sm:text-3xl">What&apos;s on your mind today?</h1>
-              {mode === "workflow" && <p className="mt-4 text-sm text-zinc-500">Build a repeatable creative workflow with Crystal.</p>}
+              {mode === "workflow" && <p className="mt-4 text-sm text-zinc-500">Build a repeatable creative workflow with Casynus.</p>}
             </div>
           ) : (
             <div className="mx-auto w-full max-w-3xl space-y-6 py-8">
@@ -543,7 +543,7 @@ export default function AIChatPage() {
                 >
                   <div className={message.role === "user" ? "max-w-[85%] rounded-2xl bg-[#1c1c1c] px-4 py-3 text-sm leading-7 text-zinc-100" : "w-full max-w-2xl px-4 py-3 text-left"}>
                     {message.role === "assistant" ? <AssistantResponse content={message.content} /> : <p className="whitespace-pre-wrap">{message.content}</p>}
-                    {message.role === "assistant" && <div className="mt-3 flex justify-start gap-1 opacity-60 transition group-hover:opacity-100"><button onClick={() => void copyMessage(message)} aria-label="Copy response" className="grid h-9 w-9 place-items-center rounded-[6px] p-0 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]">{copiedId === message.id ? <Check size={14} /> : <Copy size={14} />}</button><button aria-label="Share response" className="grid h-9 w-9 place-items-center rounded-[6px] p-0 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]"><Share2 size={14} /></button><Link href="/crystal" className="ml-1 rounded-[6px] px-2 py-1 text-[11px] text-[#3b82f6] transition hover:bg-blue-500/10">Go to Crystal</Link></div>}
+                    {message.role === "assistant" && <div className="mt-3 flex justify-start gap-1 opacity-60 transition group-hover:opacity-100"><button onClick={() => void copyMessage(message)} aria-label="Copy response" className="grid h-9 w-9 place-items-center rounded-[6px] p-0 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]">{copiedId === message.id ? <Check size={14} /> : <Copy size={14} />}</button><button aria-label="Share response" className="grid h-9 w-9 place-items-center rounded-[6px] p-0 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]"><Share2 size={14} /></button><Link href="/casynus" className="ml-1 rounded-[6px] px-2 py-1 text-[11px] text-[#3b82f6] transition hover:bg-blue-500/10">Go to Casynus</Link></div>}
                   </div>
                 </div>
               ))}
@@ -554,20 +554,20 @@ export default function AIChatPage() {
 
         <form onSubmit={sendMessage} className={`absolute bottom-6 left-1/2 flex w-[calc(100%-32px)] max-w-[640px] -translate-x-1/2 ${hasPastedInput ? "items-end h-[240px]" : "items-center h-12"} gap-2 rounded-2xl border border-[#333] bg-[#282828] p-2 shadow-2xl transition`}>
           <button type="button" aria-label="Attach file" onClick={() => { setToast("File attachments are available in chat."); window.setTimeout(() => setToast(null), 1800); }} className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[#3c3c3c] text-zinc-300 transition hover:bg-[#484848] hover:text-white active:scale-95"><Paperclip size={20} /></button>
-          <textarea ref={textareaRef} value={input} onChange={(event) => { setInput(event.target.value); if (!event.target.value) setHasPastedInput(false); }} onPaste={(event) => { if (event.clipboardData.getData("text")) setHasPastedInput(true); }} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage(); } }} rows={1} placeholder="Ask Crystal anything..." className={`min-h-8 flex-1 resize-none bg-transparent px-2 py-1 text-sm font-normal leading-[21px] text-white outline-none placeholder:text-zinc-600 ${hasPastedInput ? "max-h-[208px] overflow-y-auto" : "max-h-40 overflow-y-hidden"}`} />
+          <textarea ref={textareaRef} value={input} onChange={(event) => { setInput(event.target.value); if (!event.target.value) setHasPastedInput(false); }} onPaste={(event) => { if (event.clipboardData.getData("text")) setHasPastedInput(true); }} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage(); } }} rows={1} placeholder="Ask Casynus anything..." className={`min-h-8 flex-1 resize-none bg-transparent px-2 py-1 text-sm font-normal leading-[21px] text-white outline-none placeholder:text-zinc-600 ${hasPastedInput ? "max-h-[208px] overflow-y-auto" : "max-h-40 overflow-y-hidden"}`} />
           <button type="button" aria-label="Use microphone" className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[#3c3c3c] text-zinc-300 transition hover:bg-[#484848] hover:text-white active:scale-95"><Mic size={20} /></button>
           <button type="submit" aria-label="Send message" disabled={!input.trim() || isSending} className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[#3b82f6] text-white shadow-lg shadow-blue-500/20 transition-all hover:scale-105 hover:bg-[#2563eb] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"><ArrowUp size={20} /></button>
         </form>
       </main>
       {searchOpen && <div className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-[#05070b]/75 px-4 pb-8 pt-[min(12vh,88px)] backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) setSearchOpen(false); }}>
-        <section role="dialog" aria-modal="true" aria-label="Search Crystal" className={`w-full max-w-[720px] overflow-hidden rounded-[20px] border shadow-[0_32px_100px_rgba(0,0,0,.55)] ${isLight ? "border-[#d9e1ed] bg-white text-[#171b24]" : "border-white/[0.09] bg-[#1a1a1a] text-[#eef2f8]"}`}>
+        <section role="dialog" aria-modal="true" aria-label="Search Casynus" className={`w-full max-w-[720px] overflow-hidden rounded-[20px] border shadow-[0_32px_100px_rgba(0,0,0,.55)] ${isLight ? "border-[#d9e1ed] bg-white text-[#171b24]" : "border-white/[0.09] bg-[#1a1a1a] text-[#eef2f8]"}`}>
           <div className={`flex h-[68px] items-center gap-3 border-b px-5 ${isLight ? "border-[#e8edf4]" : "border-white/[0.08]"}`}>
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-blue-500/10 text-blue-400"><Search size={18} /></span>
             <input ref={searchInputRef} value={search} onChange={(event) => { setSearch(event.target.value); setActiveSearchResult(-1); }} onKeyDown={(event) => {
               if (event.key === "ArrowDown" && searchResults.length) { event.preventDefault(); setActiveSearchResult((index) => index < 0 ? 0 : Math.min(index + 1, searchResults.length - 1)); }
               if (event.key === "ArrowUp" && searchResults.length) { event.preventDefault(); setActiveSearchResult((index) => index < 0 ? searchResults.length - 1 : Math.max(index - 1, 0)); }
               if (event.key === "Enter" && searchResults[activeSearchResult]) { event.preventDefault(); selectSearchResult(searchResults[activeSearchResult]); }
-            }} placeholder="Search conversations, tools, and Crystal..." className={`min-w-0 flex-1 bg-transparent text-[15px] font-medium outline-none placeholder:font-normal ${isLight ? "text-[#171b24] placeholder:text-[#8a94a4]" : "text-white placeholder:text-zinc-500"}`} />
+            }} placeholder="Search conversations, tools, and Casynus..." className={`min-w-0 flex-1 bg-transparent text-[15px] font-medium outline-none placeholder:font-normal ${isLight ? "text-[#171b24] placeholder:text-[#8a94a4]" : "text-white placeholder:text-zinc-500"}`} />
             <button type="button" onClick={() => setSearchOpen(false)} aria-label="Close search" className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition ${isLight ? "bg-[#f1f4f8] text-[#6b7482] hover:bg-[#e7edf5]" : "bg-white/[0.06] text-zinc-400 hover:bg-white/[0.1] hover:text-white"}`}>ESC</button>
           </div>
           {!search.trim() && <div className={`border-b px-5 py-4 ${isLight ? "border-[#e8edf4] bg-[#fafcff]" : "border-white/[0.07] bg-[#141414]"}`}>
@@ -577,7 +577,7 @@ export default function AIChatPage() {
             </div>
           </div>}
           <div className="max-h-[min(58vh,480px)] overflow-y-auto p-3">
-            <div className={`px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${isLight ? "text-[#8792a2]" : "text-zinc-500"}`}>{search.trim() ? "Search results" : "Explore Crystal"}</div>
+            <div className={`px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${isLight ? "text-[#8792a2]" : "text-zinc-500"}`}>{search.trim() ? "Search results" : "Explore Casynus"}</div>
             {searchResults.length ? <div className="space-y-1">
               {searchResults.map((result, index) => {
                 const label = result.type === "conversation" ? result.conversation.title : result.destination.label;
@@ -592,7 +592,7 @@ export default function AIChatPage() {
           </div>
           <div className={`flex h-11 items-center justify-between border-t px-5 text-[11px] ${isLight ? "border-[#e8edf4] bg-[#fafcff] text-[#7d8796]" : "border-white/[0.07] bg-[#141414] text-zinc-500"}`}>
             <span><kbd className={`rounded px-1.5 py-1 font-semibold ${isLight ? "bg-white text-[#667184]" : "bg-white/[0.06] text-zinc-400"}`}>↑</kbd> <kbd className={`rounded px-1.5 py-1 font-semibold ${isLight ? "bg-white text-[#667184]" : "bg-white/[0.06] text-zinc-400"}`}>↓</kbd> Navigate <span className="mx-2">·</span> <kbd className={`rounded px-1.5 py-1 font-semibold ${isLight ? "bg-white text-[#667184]" : "bg-white/[0.06] text-zinc-400"}`}>↵</kbd> Select</span>
-            <span className="font-medium">Crystal Search</span>
+            <span className="font-medium">Casynus Search</span>
           </div>
         </section>
       </div>}

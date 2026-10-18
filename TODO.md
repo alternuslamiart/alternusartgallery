@@ -2,7 +2,7 @@
 
 ## Next concrete task
 
-- [ ] Verify the `/crystal` modeling UI in a browser at desktop and mobile
+- [ ] Verify the `/casynus` modeling UI in a browser at desktop and mobile
   widths, including toolbar actions, sidebar controls, asset selection, and
   right-panel utility actions.
 - [ ] Verify the compact floating Infrastructure Studio layout in a browser at

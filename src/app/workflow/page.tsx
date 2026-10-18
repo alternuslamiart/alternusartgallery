@@ -33,9 +33,9 @@ const integrations: Integration[] = [
 ];
 
 const navItems = [
-  { label: "Agents", icon: Grid2X2, href: "/crystal" },
+  { label: "Agents", icon: Grid2X2, href: "/casynus" },
   { label: "Workflows", icon: Globe2, href: "/workflow" },
-  { label: "Plugins", icon: Archive, href: "/crystal" },
+  { label: "Plugins", icon: Archive, href: "/casynus" },
   { label: "Architecture", icon: Layers3, href: "/archplan" },
   { label: "Interior Design...", icon: WorkflowIcon, href: "/design-studio" },
   { label: "Urban Planning", icon: Grid2X2, href: "/archplan" },
@@ -95,7 +95,7 @@ export default function WorkflowPage() {
       <header className="fixed inset-x-0 top-0 z-30 flex h-[54px] items-center border-b border-white/[0.06] bg-[#151515] px-[28px]">
         <div className="flex items-center gap-3">
           <span className="grid h-6 w-6 place-items-center text-zinc-500"><Sparkles size={21} fill="currentColor" strokeWidth={1.3} /></span>
-          <span className="text-[16px] font-semibold">Crystal</span>
+          <span className="text-[16px] font-semibold">Casynus</span>
           <Link href="/design-studio" className="ml-5 text-zinc-300 transition hover:text-white" aria-label="Home"><Home size={17} strokeWidth={1.7} /></Link>
         </div>
         <nav className="ml-8 flex items-center gap-8 text-[12px] text-[#d0d0d0]" aria-label="Workspace menu">

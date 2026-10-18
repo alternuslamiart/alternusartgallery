@@ -79,11 +79,11 @@ function useAuthTheme() {
 
 function Brand() {
  return (
- <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Crystal homepage" title="Go to homepage">
+ <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Casynus homepage" title="Go to homepage">
  <span className="auth-brand-mark inline-flex h-8 w-8 items-center justify-center rounded-lg">
- <img src="/Logopng.png" alt="Crystal homepage" className="h-8 w-8 object-contain" />
+ <img src="/Logopng.png" alt="Casynus homepage" className="h-8 w-8 object-contain" />
  </span>
- <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Crystal</span>
+ <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Casynus</span>
  </Link>
  );
 }
@@ -243,14 +243,14 @@ export default function LoginPage() {
  </header>
 
  <main className="auth-login-main relative z-10 mx-auto grid w-full max-w-[1440px] items-center gap-12 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(390px,0.85fr)] lg:gap-16 lg:px-12 lg:py-10">
- <section className="auth-showcase relative hidden min-h-[650px] overflow-hidden rounded-[28px] lg:block" aria-label="Crystal AI architecture and CAD studio">
-  <Image src="/Section/architectresectionone.png" alt="Contemporary architectural design by Crystal Studio" fill priority sizes="(max-width: 1200px) 50vw, 58vw" className="auth-showcase-image object-cover" />
+ <section className="auth-showcase relative hidden min-h-[650px] overflow-hidden rounded-[28px] lg:block" aria-label="Casynus AI architecture and CAD studio">
+  <Image src="/Section/architectresectionone.png" alt="Contemporary architectural design by Casynus Studio" fill priority sizes="(max-width: 1200px) 50vw, 58vw" className="auth-showcase-image object-cover" />
   <div className="auth-showcase-shade absolute inset-0" />
   <div className="auth-showcase-grid absolute inset-0" />
   <div className="relative flex h-full flex-col justify-between p-9 xl:p-12">
    <div className="flex items-center justify-between">
     <span className="auth-showcase-badge inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[0.16em]"><Sparkles className="h-3.5 w-3.5" /> AI-powered design</span>
-    <span className="auth-showcase-index font-mono text-[11px] tracking-[0.18em]">CRYSTAL / 01</span>
+    <span className="auth-showcase-index font-mono text-[11px] tracking-[0.18em]">CASYNUS / 01</span>
    </div>
    <div className="max-w-[560px]">
     <p className="auth-showcase-kicker mb-4 text-[11px] font-semibold uppercase tracking-[0.24em]">Imagine it. Shape it. Build with clarity.</p>
@@ -272,7 +272,7 @@ export default function LoginPage() {
  <section className="auth-login-form-wrap mx-auto w-full max-w-[460px]">
  <Card className="auth-card auth-login-card w-full rounded-[24px] border shadow-none backdrop-blur-xl">
  <CardHeader className="space-y-3 px-7 pb-6 pt-8 sm:px-9 sm:pt-10">
- <p className="auth-kicker flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em]"><span className="auth-status-dot" /> Crystal Studio / Secure access</p>
+ <p className="auth-kicker flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em]"><span className="auth-status-dot" /> Casynus Studio / Secure access</p>
  <h1 className="auth-title text-[34px] font-semibold tracking-[-0.05em] sm:text-[38px]">
   {verificationStep === "credentials" ? "Welcome back." : verificationStep === "code" ? "Check your inbox." : "One last detail."}
  </h1>
@@ -281,7 +281,7 @@ export default function LoginPage() {
   ? "Sign in to continue designing with AI, architecture and 3D tools."
   : verificationStep === "code"
    ? <>We sent a 6-digit verification code to <strong className="auth-title font-semibold">{email}</strong>.</>
-   : "Enter your age to finish setting up your Crystal Studio account."}
+   : "Enter your age to finish setting up your Casynus Studio account."}
  </p>
  </CardHeader>
  <CardContent className="space-y-5 px-7 pb-8 sm:px-9 sm:pb-10">
@@ -292,7 +292,7 @@ export default function LoginPage() {
    </div>
    <div className="space-y-2 text-center">
     <p className="auth-label text-sm font-semibold">Secure verification</p>
-    <p className="auth-copy text-xs leading-5">Enter the code from your inbox to continue to Crystal Studio. It expires in 10 minutes.</p>
+    <p className="auth-copy text-xs leading-5">Enter the code from your inbox to continue to Casynus Studio. It expires in 10 minutes.</p>
    </div>
    <form onSubmit={handleSubmit} className="space-y-4">
     <div className="space-y-2">
@@ -435,7 +435,7 @@ export default function LoginPage() {
  )}
 
  <p className="auth-footer-copy text-center text-xs">
- New to Crystal Studio?{" "}
+ New to Casynus Studio?{" "}
  <Link href="/signup" className="auth-footer-link font-semibold">
  Create an account
  </Link>

@@ -392,10 +392,10 @@ export default function Pricing() {
  <div>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 16 }}>DESKTOP LICENSE</div>
  <h2 style={{ margin: 0, fontSize: "clamp(38px,5vw,64px)", lineHeight: 0.95, letterSpacing: "-0.04em", fontWeight: 900 }}>Advanced local tools.<br /><span style={{ color: COBALT, fontStyle: "italic" }}>One clear price.</span></h2>
- <p style={{ margin: "22px 0 0", maxWidth: 600, color: t.muted, fontSize: 15, lineHeight: 1.65 }}>Crystal Studio Desktop is more advanced than the AI-generation website. It adds local file workflows, larger projects, offline access, automation, and deeper CAD handoff preparation.</p>
+ <p style={{ margin: "22px 0 0", maxWidth: 600, color: t.muted, fontSize: 15, lineHeight: 1.65 }}>Casynus Studio Desktop is more advanced than the AI-generation website. It adds local file workflows, larger projects, offline access, automation, and deeper CAD handoff preparation.</p>
  </div>
  <div style={{ padding: 28, borderRadius: 18, border: `1px solid ${COBALT}`, background: t.raised, boxShadow: `10px 10px 0 ${COBALT}` }}>
- <div style={{ display: "flex", justifyContent: "space-between", gap: 20 }}><div><div style={{ fontSize: 12, color: t.muted }}>Crystal Studio Desktop</div><div style={{ marginTop: 7, fontSize: 24, fontWeight: 900 }}>Professional License</div></div><div style={{ textAlign: "right" }}><div style={{ fontSize: 48, lineHeight: 1, fontWeight: 900 }}>$79</div><div style={{ fontSize: 11, color: t.muted }}>one-time</div></div></div>
+ <div style={{ display: "flex", justifyContent: "space-between", gap: 20 }}><div><div style={{ fontSize: 12, color: t.muted }}>Casynus Studio Desktop</div><div style={{ marginTop: 7, fontSize: 24, fontWeight: 900 }}>Professional License</div></div><div style={{ textAlign: "right" }}><div style={{ fontSize: 48, lineHeight: 1, fontWeight: 900 }}>$79</div><div style={{ fontSize: 11, color: t.muted }}>one-time</div></div></div>
  <p style={{ margin: "20px 0 0", color: t.muted, fontSize: 12.5, lineHeight: 1.6 }}>Includes one workstation license and 12 months of updates. Professional outputs require review and approval by a licensed engineer.</p>
  <Link href="/download" style={{ marginTop: 22, height: 46, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, background: COBALT, color: "#fff", fontSize: 14, fontWeight: 800, textDecoration: "none" }}>Download App</Link>
  </div>
@@ -462,7 +462,7 @@ export default function Pricing() {
  <div>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 700, color: COBALT, marginBottom: 14 }}>ENTERPRISE</div>
  <h2 style={{ fontSize: "clamp(32px,5vw,52px)", fontWeight: 900, letterSpacing: "-0.035em", lineHeight: 1, margin: 0, marginBottom: 16, fontStretch: "88%" }}>
- Running Crystal Studio at scale?
+ Running Casynus Studio at scale?
  </h2>
  <p style={{ fontSize: 15.5, color: t.muted, lineHeight: 1.6, margin: 0, maxWidth: 480 }}>
  Custom knowledge volume, dedicated throughput, SOC 2 artifacts on request, and a named account engineer.
@@ -534,11 +534,11 @@ export default function Pricing() {
  <span style={{ fontStyle: "italic" }}>Upgrade when it pays for itself.</span>
  </h2>
  <p style={{ margin: "26px auto 0", maxWidth: 560, fontSize: 18, lineHeight: 1.7, color: "rgba(255,255,255,0.84)" }}>
- Crystal Studio starts with Basic. Move into larger plans only when the workflow starts returning real value.
+ Casynus Studio starts with Basic. Move into larger plans only when the workflow starts returning real value.
  </p>
  <div style={{ marginTop: 36, display: "inline-flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
  <Link href="/design-studio" style={{ height: 48, padding: "0 24px", background: "#fff", color: COBALT, fontSize: 15, fontWeight: 800, borderRadius: 18, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10, boxShadow: "0 16px 28px rgba(18,46,120,0.18)" }}>
- Launch Crystal Studio <span style={{ fontSize: 13 }}>↗</span>
+ Launch Casynus Studio <span style={{ fontSize: 13 }}>↗</span>
  </Link>
  <Link href="/contact" style={{ height: 48, padding: "0 24px", background: "transparent", color: "#fff", fontSize: 15, fontWeight: 700, borderRadius: 18, textDecoration: "none", display: "inline-flex", alignItems: "center", border: "1px solid rgba(255,255,255,0.28)" }}>
  Talk to sales

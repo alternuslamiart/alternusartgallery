@@ -14,7 +14,7 @@ export default function PlatformOverview() {
  One platform.<br/><span style={{ color: COBALT, fontStyle: "italic" }}>Every space.</span>
  </h1>
  <p style={{ marginTop: 32, fontSize: 18, color: t.muted, maxWidth: 640, lineHeight: 1.55 }}>
- Crystal Studio is an AI-powered design workspace for architecture, interiors, furniture planning, 3D visualization, and home robotics. The browser experience focuses on AI-assisted generation; the desktop application adds advanced local workflows and architectural-documentation tools.
+ Casynus Studio is an AI-powered design workspace for architecture, interiors, furniture planning, 3D visualization, and home robotics. The browser experience focuses on AI-assisted generation; the desktop application adds advanced local workflows and architectural-documentation tools.
  </p>
  </div>
  </section>

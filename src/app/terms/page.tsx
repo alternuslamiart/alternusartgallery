@@ -2,12 +2,12 @@
 import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const clauses = [
- { t: "Acceptance", b: "By creating a Crystal Studio workspace, you agree to these terms. If you do not agree, do not use the service." },
+ { t: "Acceptance", b: "By creating a Casynus Studio workspace, you agree to these terms. If you do not agree, do not use the service." },
  { t: "Your account", b: "You're responsible for securing your credentials. One workspace per person unless you're on an Enterprise plan." },
- { t: "Acceptable use", b: "Do not use Crystal Studio to harm others, break laws, bypass safety requirements, or generate harmful content. We reserve the right to terminate workspaces that do." },
- { t: "Your content", b: "You retain full ownership of everything you put into Crystal Studio. We need a minimal license to process and display it back to you — nothing more." },
- { t: "Professional responsibility", b: "Crystal Studio does not replace professional architectural, construction, or safety judgment. Any design used for construction, certification, or regulatory submission must be independently reviewed and approved by a qualified professional in the relevant jurisdiction." },
- { t: "Website and desktop products", b: "The Crystal Studio website provides AI-generated design concepts, 3D models, visualizations, scripts, and workflow assistance only. Crystal Studio Desktop is a more advanced application with local project, file, automation, and architectural-documentation capabilities. Neither product guarantees that an output is accurate, compliant, or fit for a particular purpose." },
+ { t: "Acceptable use", b: "Do not use Casynus Studio to harm others, break laws, bypass safety requirements, or generate harmful content. We reserve the right to terminate workspaces that do." },
+ { t: "Your content", b: "You retain full ownership of everything you put into Casynus Studio. We need a minimal license to process and display it back to you — nothing more." },
+ { t: "Professional responsibility", b: "Casynus Studio does not replace professional architectural, construction, or safety judgment. Any design used for construction, certification, or regulatory submission must be independently reviewed and approved by a qualified professional in the relevant jurisdiction." },
+ { t: "Website and desktop products", b: "The Casynus Studio website provides AI-generated design concepts, 3D models, visualizations, scripts, and workflow assistance only. Casynus Studio Desktop is a more advanced application with local project, file, automation, and architectural-documentation capabilities. Neither product guarantees that an output is accurate, compliant, or fit for a particular purpose." },
  { t: "Output verification", b: "You are responsible for validating dimensions, materials, building requirements, layouts, code, exports, and safety assumptions before relying on or distributing any output." },
  { t: "Agent behavior", b: "The agent is powerful but not infallible. High-risk actions (sending mail, deleting files, paying invoices) always require your confirmation." },
  { t: "Availability", b: "We target 99.9% uptime for hosted services. Desktop features, third-party design integrations, and AI providers may have separate availability limits." },

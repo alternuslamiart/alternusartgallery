@@ -2,12 +2,12 @@
 import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const log = [
- { d: "2026-09-17", v: "1.0.0", k: "feat", t: "Crystal platform launch", b: "Crystal now brings AI Chat, AI Code, Architecture Studio, image generation, PDF documentation, and connected project workflows into one platform." },
+ { d: "2026-09-17", v: "1.0.0", k: "feat", t: "Casynus platform launch", b: "Casynus now brings AI Chat, AI Code, Architecture Studio, image generation, PDF documentation, and connected project workflows into one platform." },
  { d: "2026-09-12", v: "0.9.9", k: "feat", t: "GPT Astra joins the workspace", b: "GPT Astra, powered by OpenAI technology, provides structured assistance for architectural research, design decisions, project planning, and technical workflows." },
  { d: "2026-09-08", v: "0.9.8", k: "feat", t: "Architecture Studio workflows", b: "Create and organize architectural concepts with project context, spatial studies, floor-plan generation, statistics, and design documentation." },
- { d: "2026-09-03", v: "0.9.7", k: "feat", t: "Modeling and infrastructure tools", b: "Crystal adds connected workflows for 3D modeling, floor plans, infrastructure systems, visual studies, and professional project handoff." },
+ { d: "2026-09-03", v: "0.9.7", k: "feat", t: "Modeling and infrastructure tools", b: "Casynus adds connected workflows for 3D modeling, floor plans, infrastructure systems, visual studies, and professional project handoff." },
  { d: "2026-08-27", v: "0.9.6", k: "feat", t: "Claude AI and Codex workflows", b: "Use Claude AI for research and design reasoning, and OpenAI Codex for code generation, automation, and technical project tools." },
- { d: "2026-08-19", v: "0.9.5", k: "feat", t: "Desktop workflows for Windows and Mac", b: "Crystal Studio Desktop now supports local project files, offline access, automation, and documentation workflows on Windows and Apple MacBook devices." },
+ { d: "2026-08-19", v: "0.9.5", k: "feat", t: "Desktop workflows for Windows and Mac", b: "Casynus Studio Desktop now supports local project files, offline access, automation, and documentation workflows on Windows and Apple MacBook devices." },
 ];
 
 const tagColor: Record<string, string> = { feat: COBALT, fix: "#F59E0B", chore: "#64748B" };

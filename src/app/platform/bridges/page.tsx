@@ -13,7 +13,7 @@ const bridges = [
  blurb:
  "Create building layouts, floor plans, room configurations, and 3D architectural models in one connected workspace.",
  verbs: ["floor plans", "rooms", "walls", "dimensions"],
- install: "Crystal Studio architecture workspace",
+ install: "Casynus Studio architecture workspace",
  },
  {
  app: "3D Studio Integration",
@@ -23,7 +23,7 @@ const bridges = [
  blurb:
  "Works with SolidWorks, Fusion 360, CATIA, Rhino 3D, Onshape, NX, FreeCAD and more.",
  verbs: ["SolidWorks", "Fusion 360", "CATIA", "FreeCAD"],
- install: "Crystal Studio design workflow",
+ install: "Casynus Studio design workflow",
  },
 ];
 
@@ -70,7 +70,7 @@ export default function Bridges() {
  Visualize intelligent homes.
  </h1>
  <p style={{ marginTop: 32, fontSize: 18, color: t.muted, maxWidth: 640, lineHeight: 1.55 }}>
- Crystal Studio connects architecture, interior design, furniture planning, 3D visualization, home robotics, and professional design workflows.
+ Casynus Studio connects architecture, interior design, furniture planning, 3D visualization, home robotics, and professional design workflows.
  </p>
  </div>
  </section>
@@ -136,7 +136,7 @@ export default function Bridges() {
  Interior Planning and Home Robotics
  </h2>
  <p style={{ marginTop: 18, fontSize: 15.5, color: t.muted, maxWidth: 680, lineHeight: 1.65 }}>
- Crystal Studio supports thoughtful design workflows across architecture, interior layouts, furniture planning, 3D visualization, and home robotics.
+ Casynus Studio supports thoughtful design workflows across architecture, interior layouts, furniture planning, 3D visualization, and home robotics.
  </p>
  </div>
 
@@ -329,7 +329,7 @@ export default function Bridges() {
  </h2>
  <div style={{ marginTop: 40, display: "inline-flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
  <Link href="/main" style={{ height: 48, padding: "0 22px", background: COBALT, color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8 }}>
- Launch Crystal Studio
+ Launch Casynus Studio
  </Link>
  <Link href="/platform/agent-sdk" style={{ height: 48, padding: "0 22px", background: "transparent", color: t.fg, fontSize: 14, fontWeight: 700, borderRadius: 8, textDecoration: "none", display: "inline-flex", alignItems: "center", border: `1px solid ${t.faint}` }}>
  Build the bridge

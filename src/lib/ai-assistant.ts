@@ -5,7 +5,7 @@ interface AIResponse {
 
 const STUDIO_TOPICS = {
  en: {
- studio: `**Crystal AI Design Studio**
+ studio: `**Casynus AI Design Studio**
 
 I can help you with:
 - Architecture and floor plans
@@ -39,7 +39,7 @@ Describe the space or design you want to create, and I will help you shape it.`,
 - a household robot concept for home assistance`,
  },
  sq: {
- studio: `**Crystal AI Design Studio**
+ studio: `**Casynus AI Design Studio**
 
 Mund t'ju ndihmoj me arkitekture, dizajn interieri, planifikim mobiliesh, vizualizim 3D, robotike per shtepi dhe dokumentacion dizajni.
 
@@ -77,7 +77,7 @@ export function getAIResponse(message: string): AIResponse {
  const lower = message.toLowerCase().trim();
  const lang = detectLanguage(message);
  if (/^(hi|hello|hey|pershendetje|miredita|tung|miresevini)/i.test(lower)) return {
- content: lang === "sq" ? "Pershendetje. Jam Crystal AI Design Studio. Me tregoni cfare hapesire, interieri, plan mobiliesh ose robot shtepie deshironi te krijoni." : "Hello. I am Crystal AI Design Studio. Tell me what space, interior, furniture layout, or home robot you want to create.",
+ content: lang === "sq" ? "Pershendetje. Jam Casynus AI Design Studio. Me tregoni cfare hapesire, interieri, plan mobiliesh ose robot shtepie deshironi te krijoni." : "Hello. I am Casynus AI Design Studio. Tell me what space, interior, furniture layout, or home robot you want to create.",
  suggestedQuestions: lang === "sq" ? ["Krijo nje shtepi moderne me 3 dhoma gjumi", "Dizajno nje sallon minimalist", "Planifiko mobiliet per kete apartament"] : ["Create a modern 3-bedroom house", "Design a minimalist living room", "Arrange furniture for this apartment"],
  };
  if (/\b(thanks|thank you|faleminderit)\b/i.test(lower)) return { content: lang === "sq" ? "Me kenaqesi. Mund te vazhdojme me arkitekture, dizajn interieri, planifikim mobiliesh, vizualizim 3D ose robotike per shtepi." : "You're welcome. We can continue with architecture, interior design, furniture planning, 3D visualization, or home robotics." };
@@ -91,12 +91,12 @@ export function getAIResponse(message: string): AIResponse {
 }
 
 export const WELCOME_MESSAGE = {
- en: `Welcome to Crystal AI Design Studio.
+ en: `Welcome to Casynus AI Design Studio.
 
 Design spaces. Visualize ideas. Build intelligent environments.
 
 I can help you create architectural floor plans, interior layouts, furniture arrangements, 3D visualizations, and home robots designed for residential environments.`,
- sq: `Miresevini ne Crystal AI Design Studio.
+ sq: `Miresevini ne Casynus AI Design Studio.
 
 Dizajnoni hapesira. Vizualizoni ide. Ndertoni ambiente inteligjente.
 

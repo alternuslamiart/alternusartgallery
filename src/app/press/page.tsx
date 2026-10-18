@@ -2,9 +2,9 @@
 import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 const press = [
- { by: "TechCrunch", t: "Crystal Studio expands AI engineering workflows", d: "Apr 2026" },
+ { by: "TechCrunch", t: "Casynus Studio expands AI engineering workflows", d: "Apr 2026" },
  { by: "The Verge", t: "I replaced my desktop with a browser tab and it worked", d: "Mar 2026" },
- { by: "Hacker News", t: "Show HN: Crystal Studio for AI-assisted engineering", d: "Feb 2026" },
+ { by: "Hacker News", t: "Show HN: Casynus Studio for AI-assisted engineering", d: "Feb 2026" },
  { by: "Wired", t: "The return of the command line — but this time it talks back", d: "Jan 2026" },
 ];
 

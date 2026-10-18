@@ -61,7 +61,7 @@ export function svgToPdf(objects: FloorPlanObject[], settings: FloorPlanSettings
     if (object.type === "text") return `BT /F1 8 Tf ${sx(object.x) * 2.83465} ${sy(object.y) * 2.83465} Td (${escapePdf(object.text)}) Tj ET`;
     return "";
   }).join("\n");
-  const stream = `0.15 0.19 0.23 RG 0.8 w\n${commands}\nBT /F1 8 Tf 20 20 Td (Crystal Floor Plan - Scale 1:${settings.scale}) Tj ET\n`;
+  const stream = `0.15 0.19 0.23 RG 0.8 w\n${commands}\nBT /F1 8 Tf 20 20 Td (Casynus Floor Plan - Scale 1:${settings.scale}) Tj ET\n`;
   const pdfObjects = [`<< /Type /Catalog /Pages 2 0 R >>`, `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${paper.width * 2.83465} ${paper.height * 2.83465}] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>`, `<< /Length ${stream.length} >>\nstream\n${stream}endstream`, `<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`];
   let pdf = "%PDF-1.4\n", offsets = [0];
   pdfObjects.forEach((object, index) => { offsets[index + 1] = pdf.length; pdf += `${index + 1} 0 obj\n${object}\nendobj\n`; });

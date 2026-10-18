@@ -130,8 +130,8 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
  <header className="crystal-glass-nav-shell coreforge-nav-shell">
  <div className="crystal-glass-nav coreforge-nav" style={{ color: fg, borderColor: faint, background: isDark ? "rgba(28,28,30,.72)" : "rgba(255,255,255,.72)" }}>
  <Link href="/" className="coreforge-nav-brand" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
- <img src="/Logopng.png" alt="Crystal" className="crystal-site-logo" />
- <span className="crystal-glass-brand" style={{ color: fg }}>Crystal</span>
+ <img src="/Logopng.png" alt="Casynus" className="crystal-site-logo" />
+ <span className="crystal-glass-brand" style={{ color: fg }}>Casynus</span>
  </Link>
  <nav className="hidden md:flex crystal-glass-links coreforge-nav-links" style={{ alignItems: "center", gap: 12 }}>
  {[{ l: "Platform", h: "/platform/overview" }, { l: "Design Studios", h: "/platform/bridges" }, { l: "Company", h: "/about" }, { l: "Pricing", h: "/pricing" }].map((i) => (
@@ -161,7 +161,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
   </button>
   {profileMenuOpen && <div role="menu" className="coreforge-profile-menu" style={{ position: "absolute", top: 44, right: 0, zIndex: 100, width: 238, padding: 8, border: `1px solid ${faint}`, borderRadius: 12, background: isDark ? "#242424" : "#fff", color: fg, boxShadow: "0 18px 42px rgba(0,0,0,.28)" }}>
    <div style={{ padding: "9px 10px 11px", borderBottom: `1px solid ${faint}` }}>
-    <div style={{ fontSize: 13, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{session.user?.name || "Crystal user"}</div>
+    <div style={{ fontSize: 13, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{session.user?.name || "Casynus user"}</div>
     <div style={{ marginTop: 3, color: muted, fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{session.user?.email}</div>
    </div>
    {[
@@ -277,7 +277,7 @@ export function CoreforgeFooter({ isDark, fg, muted, faint }: Pick<ReturnType<ty
  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
  <CoreforgeLogo size={18} radius={5} />
- <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>Crystal Studio</span>
+ <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "-0.01em", color: fg, fontStretch: "90%" }}>Casynus Studio</span>
  </div>
  <span style={{ fontSize: 11.5, color: muted }}>Copyright &copy;2026</span>
  <Link href="/cookie-notice" style={{ fontSize: 11.5, color: muted, textDecoration: "none", borderBottom: `1px dashed ${faint}`, paddingBottom: 1 }}>Manage Cookies</Link>

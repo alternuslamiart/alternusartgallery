@@ -1,4 +1,4 @@
-# Alternus AI / Crystal Roadmap
+# Alternus AI / Casynus Roadmap
 
 This roadmap tracks repository work from the current implementation, not
 aspirational provider integrations. Priorities may change when code or user
@@ -19,7 +19,9 @@ requirements provide new evidence.
 
 ## P2 — Existing platform integration
 
-- [x] Bring the `/crystal` modeling workspace into the dark Crystal UI kit with
+- [x] Rebrand user-facing product content, browser metadata, and email
+  templates to Casynus while preserving the legacy route.
+- [x] Bring the `/casynus` modeling workspace into the dark Casynus UI kit with
   componentized scene, properties, viewport toolbar, and output controls.
 - [ ] Wire existing workspace screens to the authenticated platform APIs where
   the UI still relies on local-only state.

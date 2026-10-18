@@ -29,12 +29,12 @@ export default function DownloadPage() {
           <section style={{ padding: "112px 0 70px", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", left: "50%", top: "-42%", transform: "translateX(-50%)", width: 920, height: 680, borderRadius: "50%", background: `radial-gradient(closest-side,${COBALT}28,transparent 72%)`, filter: "blur(42px)", pointerEvents: "none" }} />
             <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 32px", textAlign: "center", position: "relative" }}>
-              <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 20 }}>CRYSTAL STUDIO DESKTOP / PROFESSIONAL EDITION</div>
+              <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 20 }}>CASYNUS STUDIO DESKTOP / PROFESSIONAL EDITION</div>
               <h1 style={{ margin: 0, fontSize: "clamp(54px,9vw,112px)", lineHeight: 0.88, letterSpacing: "-0.055em", fontWeight: 900 }}>
                 Advanced design.<br /><span style={{ color: COBALT, fontStyle: "italic" }}>On your desktop.</span>
               </h1>
               <p style={{ margin: "30px auto 0", maxWidth: 720, fontSize: 17, lineHeight: 1.65, color: t.muted }}>
-                The Crystal Studio website focuses on AI-assisted design generation and concept exploration. The desktop application adds advanced local project workflows, larger-file handling, offline access, automation, and deeper design-documentation controls.
+                The Casynus Studio website focuses on AI-assisted design generation and concept exploration. The desktop application adds advanced local project workflows, larger-file handling, offline access, automation, and deeper design-documentation controls.
               </p>
             </div>
           </section>
@@ -42,7 +42,7 @@ export default function DownloadPage() {
           <section style={{ padding: "30px 0 100px" }}>
             <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 32px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 28 }}>
               <div style={{ padding: 32, borderRadius: 20, border: `1px solid ${t.faint}`, background: t.raised }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}><span style={{ width: 42, height: 42, borderRadius: 12, display: "grid", placeItems: "center", background: `${COBALT}16`, color: COBALT }}><Laptop size={20} /></span><div><div style={{ fontSize: 12, color: t.muted }}>Professional license</div><div style={{ fontSize: 24, fontWeight: 900 }}>Crystal Studio Desktop</div></div></div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}><span style={{ width: 42, height: 42, borderRadius: 12, display: "grid", placeItems: "center", background: `${COBALT}16`, color: COBALT }}><Laptop size={20} /></span><div><div style={{ fontSize: 12, color: t.muted }}>Professional license</div><div style={{ fontSize: 24, fontWeight: 900 }}>Casynus Studio Desktop</div></div></div>
                 <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 30 }}><span style={{ fontSize: 68, fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 1 }}>$79</span><span style={{ color: t.muted, fontSize: 13 }}>one-time</span></div>
                 <p style={{ color: t.muted, fontSize: 13, lineHeight: 1.6 }}>Includes one desktop license and product updates for the first 12 months. Optional updates after the included period do not disable your existing version.</p>
                 <button type="button" onClick={() => { setDownloadOpen(true); setPlatformChoiceOpen(false); setDownloadMessage(""); }} style={{ marginTop: 24, width: "100%", height: 48, border: "none", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", gap: 9, background: COBALT, color: "#fff", fontSize: 14, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>Get Desktop App <Download size={17} /></button>
@@ -76,13 +76,13 @@ export default function DownloadPage() {
               style={{ position: "fixed", inset: 0, zIndex: 80, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "rgba(15,23,42,0.46)", backdropFilter: "blur(10px)" }}
             >
               <div onClick={(event) => event.stopPropagation()} style={{ width: "min(620px, 100%)", borderRadius: 20, border: `1px solid ${t.faint}`, background: t.raised, boxShadow: "0 30px 100px rgba(15,23,42,0.28)", padding: 30 }}>
-                <div style={{ fontSize: 10, letterSpacing: "0.2em", fontWeight: 800, color: COBALT }}>CRYSTAL STUDIO DESKTOP</div>
+                <div style={{ fontSize: 10, letterSpacing: "0.2em", fontWeight: 800, color: COBALT }}>CASYNUS STUDIO DESKTOP</div>
                 <h2 id="download-dialog-title" style={{ margin: "12px 0 0", fontSize: 34, lineHeight: 1, letterSpacing: "-0.04em", fontWeight: 900 }}>Download Now</h2>
                 <p style={{ margin: "16px 0 0", color: t.muted, fontSize: 14, lineHeight: 1.6 }}>
-                  Before downloading Crystal Studio Desktop, please review the professional-use conditions and choose whether you would like to subscribe to a Crystal plan.
+                  Before downloading Casynus Studio Desktop, please review the professional-use conditions and choose whether you would like to subscribe to a Casynus plan.
                 </p>
                 <div style={{ marginTop: 22, padding: 18, borderRadius: 14, background: t.surface, border: `1px solid ${t.faint}` }}>
-                  <div style={{ fontSize: 14, fontWeight: 800 }}>Would you like to pay for a Crystal plan?</div>
+                  <div style={{ fontSize: 14, fontWeight: 800 }}>Would you like to pay for a Casynus plan?</div>
                   <p style={{ margin: "7px 0 0", color: t.muted, fontSize: 13, lineHeight: 1.5 }}>Plans include Claude AI, OpenAI Codex, Architecture Studio, modeling, floor plans, infrastructure tools, and more.</p>
                   <Link href="/pricing" onClick={() => setDownloadOpen(false)} style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 7, color: COBALT, fontSize: 13, fontWeight: 800, textDecoration: "none" }}>View plans and pricing <ArrowRight size={14} /></Link>
                 </div>
@@ -92,7 +92,7 @@ export default function DownloadPage() {
                 </label>
                 {platformChoiceOpen ? (
                   <div style={{ marginTop: 24 }}>
-                    <div style={{ fontSize: 14, fontWeight: 800 }}>Choose where to download Crystal</div>
+                    <div style={{ fontSize: 14, fontWeight: 800 }}>Choose where to download Casynus</div>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" style={{ marginTop: 12 }}>
                       <a href="https://www.apple.com/app-store/" target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, minHeight: 58, padding: "0 16px", borderRadius: 10, border: `1px solid ${t.faint}`, color: t.fg, textDecoration: "none", fontWeight: 800 }}><Apple size={20} color={COBALT} /><span><span style={{ display: "block", fontSize: 13 }}>App Store</span><span style={{ display: "block", marginTop: 2, color: t.muted, fontSize: 11, fontWeight: 500 }}>For iPhone and iPad</span></span></a>
                       <a href="https://play.google.com/store" target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, minHeight: 58, padding: "0 16px", borderRadius: 10, border: `1px solid ${t.faint}`, color: t.fg, textDecoration: "none", fontWeight: 800 }}><Play size={20} color={COBALT} /><span><span style={{ display: "block", fontSize: 13 }}>Google Play</span><span style={{ display: "block", marginTop: 2, color: t.muted, fontSize: 11, fontWeight: 500 }}>For Android devices</span></span></a>

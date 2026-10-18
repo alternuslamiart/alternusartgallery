@@ -2,9 +2,24 @@
 
 Last updated: 2026-10-18
 
-## Crystal modeling UI kit
+## Casynus product rebrand
 
-- Refined the `/crystal` modeling workspace into a componentized dark UI kit
+- Replaced the former product name across user-facing page copy,
+  descriptions, navigation labels, email templates, generated billing pages,
+  and SEO/social browser metadata with Casynus.
+- Added `/casynus` as the primary modeling route, updated internal links, and
+  kept `/crystal` as a query-preserving redirect for existing links.
+- Retained lowercase implementation identifiers and browser storage keys to
+  preserve CSS bindings, component imports, and saved user data.
+- `npm run typecheck`: passed; `npm test`: passed (8 tests); focused lint for the
+  new/legacy routes and app metadata passed. Linting all changed TypeScript files
+  reported 38 existing lint errors and 26 warnings, mainly unused symbols plus
+  image/hook warnings; those unrelated findings were not changed for this
+  rebrand.
+
+## Casynus modeling UI kit
+
+- Refined the `/casynus` modeling workspace into a componentized dark UI kit
   with a scene/assets sidebar, live model properties, viewport toolbar, and
   output controls.
 - Connected topology, texture, and advanced toggles to workspace state; added
@@ -20,9 +35,9 @@ Last updated: 2026-10-18
   `Viewport.tsx` (hook dependencies and `<img>` usage). Browser rendering and
   responsive interaction were not verified.
 
-## `/aichat` Crystal logo theme styling
+## `/aichat` Casynus logo theme styling
 
-- Removed the blue square background and shadow from the Crystal mark in both
+- Removed the blue square background and shadow from the Casynus mark in both
   expanded and collapsed sidebar states.
 - The mark is white in dark mode and medium gray in light mode.
 - Browser rendering was not verified.
@@ -49,7 +64,7 @@ Last updated: 2026-10-18
 
 ## `/aichat` empty-chat welcome
 
-- Removed the centered Crystal logo and replaced the two-line personalized
+- Removed the centered Casynus logo and replaced the two-line personalized
   greeting with “What's on your mind today?” at the existing heading size.
 - Kept the welcome text gray in dark mode and a darker gray in light mode. The
   heading was subsequently brightened for readability in dark mode.

@@ -99,7 +99,7 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   const [mobileHome, setMobileHome] = useState(true);
   const [mobileModelSheet, setMobileModelSheet] = useState(false);
   const [mobileWorkspace, setMobileWorkspace] = useState<"floor-plan" | "modeling" | "infrastructure">("floor-plan");
-  const [mobileModel, setMobileModel] = useState("Crystal AI");
+  const [mobileModel, setMobileModel] = useState("Casynus AI");
   const [pricingPlan, setPricingPlan] = useState("Basic");
   const [mobileSplash, setMobileSplash] = useState(true);
   const uploadUrl = useRef<string | null>(null);
@@ -136,10 +136,10 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   useEffect(()=>{const close=(event:PointerEvent)=>{if(openMenu&&!(event.target as HTMLElement).closest("[aria-label='Application menu']"))setOpenMenu(null)};document.addEventListener("pointerdown",close);return()=>document.removeEventListener("pointerdown",close)},[openMenu]);
 
   if (dashboard) return <div className={`crystal-dashboard ${dashboardSidebarCollapsed ? "sidebar-collapsed" : ""}`}>
-    {mobileSplash && <div className="crystal-mobile-splash"><img src="/Logopng.png" alt="Crystal" /></div>}
-    <header><div className="crystal-dashboard-brand"><img src="/Logopng.png" alt="Crystal" className="crystal-brand-logo"/><b>Crystal</b><Link href="/project" aria-label="Home" className="crystal-dashboard-home"><Home size={16} /></Link></div><div className="crystal-window-controls">•••　—　×　□</div></header>
+    {mobileSplash && <div className="crystal-mobile-splash"><img src="/Logopng.png" alt="Casynus" /></div>}
+    <header><div className="crystal-dashboard-brand"><img src="/Logopng.png" alt="Casynus" className="crystal-brand-logo"/><b>Casynus</b><Link href="/project" aria-label="Home" className="crystal-dashboard-home"><Home size={16} /></Link></div><div className="crystal-window-controls">•••　—　×　□</div></header>
     <UnifiedSidebar collapsed={dashboardSidebarCollapsed} onCollapse={() => setDashboardSidebarCollapsed((value) => !value)} activePath="/project" className="h-full" />
-    <main><div className="crystal-dashboard-title"><div><h1>♦ Crystal</h1><b>Recent Projects</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => router.push("/crystal")}>Launch Studio　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago", route:"/archplan"},{title:"Architecture Sketch",time:"Viewed 3mo ago", route:"/archplan"}].map((project) => <button key={project.title} onClick={() => router.push(project.route)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
+    <main><div className="crystal-dashboard-title"><div><h1>♦ Casynus</h1><b>Recent Projects</b></div><div><button className="crystal-sort">Last viewed　⌄</button><button className="crystal-new-project" onClick={() => router.push("/casynus")}>Launch Studio　<Plus size={16}/></button></div></div><div className="crystal-project-grid">{[{title:"Machinery - Turbbin", time:"Viewed 1mo ago", route:"/archplan"},{title:"Architecture Sketch",time:"Viewed 3mo ago", route:"/archplan"}].map((project) => <button key={project.title} onClick={() => router.push(project.route)} className="crystal-project-card"><div/><section><b>{project.title}</b><small>{project.time}</small><em>Free</em></section></button>)}</div></main>
   </div>;
 
   const handleUpload = (file: File) => {
@@ -211,9 +211,9 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
       if (!canvas) throw new Error("Viewport unavailable");
       ["image/png", "image/jpeg"].forEach((type) => canvas.toBlob((blob) => { if (!blob) return; const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = `${slug}-viewport.${type === "image/png" ? "png" : "jpg"}`; anchor.click(); URL.revokeObjectURL(url); }, type, .94));
     } else if (format === "STL File") downloadFile(`${slug}.stl`, `solid ${slug}\n facet normal 0 0 1\n  outer loop\n   vertex 0 0 0\n   vertex 1 0 0\n   vertex 0 1 0\n  endloop\n endfacet\nendsolid ${slug}`);
-    else if (format === "STEP File") downloadFile(`${slug}.step`, `ISO-10303-21;\nHEADER;\nFILE_DESCRIPTION(('Crystal mock STEP export'),'2;1');\nENDSEC;\nDATA;\n/* ${JSON.stringify(metadata)} */\nENDSEC;\nEND-ISO-10303-21;`);
-    else if (format === "G-Code") downloadFile(`${slug}.gcode`, `; Crystal generated toolpath\nG21\nG90\nG0 X0 Y0 Z5\nG1 X20 Y0 Z0 F1200\nG1 X20 Y20\nG1 X0 Y20\nG1 X0 Y0\nM30`);
-    else if (format === "Parameter Sheet (PDF)") downloadFile(`${slug}-parameters.pdf`, `%PDF-1.1\n% Crystal parameter sheet\n${JSON.stringify(metadata, null, 2)}\n%%EOF`, "application/pdf");
+    else if (format === "STEP File") downloadFile(`${slug}.step`, `ISO-10303-21;\nHEADER;\nFILE_DESCRIPTION(('Casynus mock STEP export'),'2;1');\nENDSEC;\nDATA;\n/* ${JSON.stringify(metadata)} */\nENDSEC;\nEND-ISO-10303-21;`);
+    else if (format === "G-Code") downloadFile(`${slug}.gcode`, `; Casynus generated toolpath\nG21\nG90\nG0 X0 Y0 Z5\nG1 X20 Y0 Z0 F1200\nG1 X20 Y20\nG1 X0 Y20\nG1 X0 Y0\nM30`);
+    else if (format === "Parameter Sheet (PDF)") downloadFile(`${slug}-parameters.pdf`, `%PDF-1.1\n% Casynus parameter sheet\n${JSON.stringify(metadata, null, 2)}\n%%EOF`, "application/pdf");
     else downloadFile(`${slug}-simulation-log.json`, JSON.stringify({ status: "completed", frames: end - start + 1, ...metadata }, null, 2), "application/json");
     setToast(`${format} export ready.`);
     } catch { setToast("Export failed. Please try again."); } finally { setExporting(null); }
@@ -259,12 +259,12 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
 
   return (
     <div onClick={() => contextMenu && closeContextMenu()} onContextMenuCapture={handleContextMenu} className={`crystal-studio crystal-ui-kit crystal-studio-enter ${studioMode === "modeling" ? "crystal-modeling-mode" : ""} ${mobileHome ? "crystal-mobile-home-active" : ""} ${embedded ? "crystal-studio-embedded" : "fixed inset-0 z-[90]"} grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
-      {mobileSplash && <div className="crystal-mobile-splash"><img src="/Logopng.png" alt="Crystal" /></div>}
+      {mobileSplash && <div className="crystal-mobile-splash"><img src="/Logopng.png" alt="Casynus" /></div>}
       <input ref={sceneFileInput} type="file" accept="application/json,.json" className="sr-only" onChange={event => { const file = event.target.files?.[0]; if (file) openScene(file); event.currentTarget.value = ""; }} />
-      <section className="crystal-mobile-home" aria-label="Crystal mobile home">
+      <section className="crystal-mobile-home" aria-label="Casynus mobile home">
         <header className="crystal-mobile-home-header">
-          <button type="button" aria-label="Open Crystal menu" onClick={() => setMobileMenu(true)}><Grid2X2 size={19} /></button>
-          <div className="crystal-mobile-workspace-tabs" role="tablist" aria-label="Crystal studios">
+          <button type="button" aria-label="Open Casynus menu" onClick={() => setMobileMenu(true)}><Grid2X2 size={19} /></button>
+          <div className="crystal-mobile-workspace-tabs" role="tablist" aria-label="Casynus studios">
             {(["floor-plan", "modeling", "infrastructure"] as const).map((workspace) => (
               <button key={workspace} type="button" role="tab" aria-selected={mobileWorkspace === workspace} onClick={() => {
                 setMobileWorkspace(workspace);
@@ -279,37 +279,37 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
         <div className="crystal-mobile-home-hero">
           <div className="crystal-mobile-mark"><Sparkles size={28} /></div>
           <h1>{mobileWorkspace === "floor-plan" ? "Create a floor plan." : mobileWorkspace === "modeling" ? "Build your model." : "Plan your infrastructure."}</h1>
-          <p>Architecture, floor plans and infrastructure — made with Crystal.</p>
+          <p>Architecture, floor plans and infrastructure — made with Casynus.</p>
         </div>
-        <div className="crystal-mobile-date-strip" aria-label="Crystal activity period">
+        <div className="crystal-mobile-date-strip" aria-label="Casynus activity period">
           <button type="button" aria-label="Previous activity period"><ArrowLeft size={15} /></button>
           <span><b>September</b> 15–21</span>
           <button type="button" aria-label="Next activity period"><ChevronDown size={15} /></button>
         </div>
-        <div className="crystal-mobile-activity" aria-label="Recent Crystal work">
+        <div className="crystal-mobile-activity" aria-label="Recent Casynus work">
           <div><span>Monday 15, September</span><button type="button" onClick={() => setToast("All projects opened.")}>See all</button></div>
           <article><span className="crystal-activity-icon is-blue"><Grid2X2 size={16} /></span><div><b>Floor plan</b><small>2D draft · Completed</small><time>02:30 PM</time></div><strong className="is-done">Done</strong></article>
           <article className="is-muted"><span className="crystal-activity-icon is-amber"><Globe2 size={16} /></span><div><b>Infrastructure study</b><small>Site planning · In progress</small><time>05:30 PM</time></div><strong>64%</strong></article>
         </div>
         <form className="crystal-mobile-composer" onSubmit={(event) => { event.preventDefault(); if (!prompt.trim()) return; setMobileHome(false); void handleGenerate(); }}>
-          <button type="button" className="crystal-mobile-pro-banner" onClick={() => setMobilePricing(true)}><Zap size={15} fill="currentColor" /><span><b>Try Crystal Pro</b><small>Unlock faster generations</small></span><em>Pay Now</em></button>
+          <button type="button" className="crystal-mobile-pro-banner" onClick={() => setMobilePricing(true)}><Zap size={15} fill="currentColor" /><span><b>Try Casynus Pro</b><small>Unlock faster generations</small></span><em>Pay Now</em></button>
           <label className="crystal-mobile-composer-label" htmlFor="mobile-crystal-prompt">What do you want to create?</label>
           <textarea id="mobile-crystal-prompt" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="Describe your next architectural idea..." rows={2} />
           <div className="crystal-mobile-composer-actions">
             <button type="button" aria-label="Attach reference" onClick={() => sceneFileInput.current?.click()}><Paperclip size={18} /></button>
             <button type="button" className="crystal-mobile-model-select" onClick={() => setMobileModelSheet(true)}>{mobileModel}<ChevronDown size={15} /></button>
-            <button type="submit" aria-label="Generate with Crystal" disabled={loading}><Sparkles size={18} /></button>
+            <button type="submit" aria-label="Generate with Casynus" disabled={loading}><Sparkles size={18} /></button>
           </div>
         </form>
         {mobileModelSheet && <div className="crystal-mobile-model-overlay" role="dialog" aria-modal="true" aria-label="Choose AI model" onClick={() => setMobileModelSheet(false)}>
           <div className="crystal-mobile-model-sheet" onClick={(event) => event.stopPropagation()}><div className="crystal-sheet-handle" /><div className="flex items-center justify-between"><div><b>AI model</b><small>Choose your creative partner</small></div><button type="button" aria-label="Close model selector" onClick={() => setMobileModelSheet(false)}>×</button></div>
-            {["Crystal AI", "Claude", "OpenAI", "Gemini", "Grok", "Copilot"].map((model) => <button type="button" key={model} className={mobileModel === model ? "is-selected" : ""} onClick={() => { setMobileModel(model); setMobileModelSheet(false); }}><span><Sparkles size={17} />{model}</span>{mobileModel === model && <span>✓</span>}</button>)}
+            {["Casynus AI", "Claude", "OpenAI", "Gemini", "Grok", "Copilot"].map((model) => <button type="button" key={model} className={mobileModel === model ? "is-selected" : ""} onClick={() => { setMobileModel(model); setMobileModelSheet(false); }}><span><Sparkles size={17} />{model}</span>{mobileModel === model && <span>✓</span>}</button>)}
           </div>
         </div>}
         <button type="button" className="crystal-mobile-theme-toggle" aria-label="Toggle light and dark mode" onClick={() => setAlternateTheme((value) => !value)}>{alternateTheme ? <Moon size={17} /> : <Sun size={17} />}</button>
       </section>
       <header className="crystal-topbar col-span-full flex h-16 items-center border-b border-[#292929] bg-[#0F0F0F] px-7">
-        <div className="flex items-center gap-3"><img src="/Logopng.png" alt="Crystal" className="crystal-brand-logo"/><b className="text-[18px] tracking-[-0.02em] text-zinc-100">Crystal</b><span className="mx-1 h-5 w-px bg-[#303030]" aria-hidden="true"/><button aria-label={dedicated ? "Back to Crystal AI Chat" : "Back to projects"} onClick={() => router.push(dedicated ? "/aichat" : "/project")} className="crystal-home-button grid h-9 w-9 place-items-center rounded-[9px] text-zinc-300"><Home size={18}/></button><span className="hidden h-5 w-px bg-[#303030] sm:block" aria-hidden="true"/><span className="hidden text-[12px] font-semibold tracking-wide text-zinc-300 sm:block">3D Studio <span className="text-zinc-500">/ Modeling</span></span></div>
+        <div className="flex items-center gap-3"><img src="/Logopng.png" alt="Casynus" className="crystal-brand-logo"/><b className="text-[18px] tracking-[-0.02em] text-zinc-100">Casynus</b><span className="mx-1 h-5 w-px bg-[#303030]" aria-hidden="true"/><button aria-label={dedicated ? "Back to Casynus AI Chat" : "Back to projects"} onClick={() => router.push(dedicated ? "/aichat" : "/project")} className="crystal-home-button grid h-9 w-9 place-items-center rounded-[9px] text-zinc-300"><Home size={18}/></button><span className="hidden h-5 w-px bg-[#303030] sm:block" aria-hidden="true"/><span className="hidden text-[12px] font-semibold tracking-wide text-zinc-300 sm:block">3D Studio <span className="text-zinc-500">/ Modeling</span></span></div>
         <nav aria-label="Application menu" className="crystal-app-menu relative ml-7 flex h-full items-center gap-1 text-[13px] text-zinc-400">{["File", "Edit", "Tools", "Help", "View"].map((item) => <button aria-expanded={openMenu===item} key={item} onClick={() => setOpenMenu(openMenu === item ? null : item)} className={`crystal-menu-item h-9 rounded-[8px] px-3 transition ${openMenu === item ? "is-open text-white" : ""}`}>{item}</button>)}{openMenu && <div className="absolute left-0 top-[52px] z-50 w-52 rounded-[12px] border border-white/10 bg-[#242424] p-1.5 shadow-2xl"><div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{openMenu}</div>{menuItems[openMenu].map(action => <button key={action} onClick={() => runMenuAction(action)} className="block w-full rounded-lg px-3 py-2 text-left text-[11px] text-zinc-200 hover:bg-[#353535]">{action}</button>)}</div>}</nav>
         <div className="ml-3 flex h-10 items-center rounded-full border border-[#303030] bg-[#202020] p-1" role="group" aria-label="Studio mode">
           <button type="button" aria-pressed={studioMode === "floor-plan"} onClick={() => { setStudioMode("floor-plan"); setOpenMenu(null); }} className={`h-8 rounded-full px-3 text-[11px] font-semibold transition ${studioMode === "floor-plan" ? "bg-[#1687f7] text-white shadow-[0_3px_10px_rgba(22,135,247,.28)]" : "text-zinc-400 hover:text-white"}`}>Floor Plan Studio</button>
@@ -326,8 +326,8 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
       <button aria-label="Mobile menu" onClick={() => { setMobileMenu(true); setMobileProfile(false); }} className="crystal-mobile-menu-trigger absolute left-3 top-3 hidden h-10 w-10 place-items-center rounded-full bg-[#303030] max-[700px]:grid"><Grid2X2 size={21} /></button>
       <button type="button" aria-label="Toggle Incognito mode" aria-pressed={incognito} title={incognito ? "Incognito mode active" : "Enable Incognito mode"} onClick={() => setIncognito(value => !value)} className={`crystal-mobile-incognito absolute right-3 top-3 hidden h-10 w-10 place-items-center rounded-full bg-[#303030] max-[700px]:grid ${incognito ? "is-active" : ""}`}><Glasses size={22} /></button>
       {mobileMenu && <div className="crystal-mobile-sheet">
-        <div className="flex items-center justify-between"><img src="/Logopng.png" alt="Crystal" className="crystal-brand-logo crystal-brand-logo-mobile"/><button aria-label="Close menu" onClick={() => setMobileMenu(false)} className="grid h-11 w-11 place-items-center rounded-full bg-[#2a2a2a]"><ArrowLeft size={22}/></button></div>
-        <button onClick={() => setMobilePricing(true)} className="crystal-mobile-pro"><Zap size={20} fill="currentColor"/> <b>Try Crystal Pro</b><span>Pay Now</span></button>
+        <div className="flex items-center justify-between"><img src="/Logopng.png" alt="Casynus" className="crystal-brand-logo crystal-brand-logo-mobile"/><button aria-label="Close menu" onClick={() => setMobileMenu(false)} className="grid h-11 w-11 place-items-center rounded-full bg-[#2a2a2a]"><ArrowLeft size={22}/></button></div>
+        <button onClick={() => setMobilePricing(true)} className="crystal-mobile-pro"><Zap size={20} fill="currentColor"/> <b>Try Casynus Pro</b><span>Pay Now</span></button>
         <label className="crystal-mobile-search"><Search size={19}/><input placeholder="Search" /></label>
         <nav className="crystal-mobile-nav"><button className="active">⠿　All Projects</button><button><Globe2 size={17}/>Community</button><button><Archive size={17}/>Archive...</button><button onClick={() => { setMobileMenu(false); setDashboard(true); }}><Plus size={17}/>Project</button></nav>
         <h2>Recents</h2><button className="crystal-mobile-recent">Architecture build house</button>
@@ -336,13 +336,13 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
       {mobileProfile && <div className="crystal-mobile-profile">
         <button aria-label="Back to menu" onClick={() => setMobileProfile(false)} className="mb-3 grid h-11 w-11 place-items-center rounded-full bg-[#272727]"><ArrowLeft size={22}/></button><h1>My Profile</h1>
         <div className="crystal-profile-user"><span>B</span><div><b>Iam</b><small>email@live.com</small></div></div>
-        <section><b>Upgrade to Pro</b><p>Lorem ipsum dolor sit amet consectetur. Et sit nec habitant mauris.</p><button onClick={() => setMobilePricing(true)} className="crystal-mobile-pro"><Zap size={17} fill="currentColor"/>Try Crystal Pro <span>Go Pro</span></button></section>
-        {[['Account','Account Details','Billing & Subscription','Account Security'],['Crystal','My Creations','Projects','Generation History','Favorites'],['Preferences','Settings','Appearance'],['Support','Help & Support','Updates']].map(([title,...items]) => <section key={title}><b>{title}</b>{items.map(item => <button key={item}>{item}</button>)}</section>)}
+        <section><b>Upgrade to Pro</b><p>Lorem ipsum dolor sit amet consectetur. Et sit nec habitant mauris.</p><button onClick={() => setMobilePricing(true)} className="crystal-mobile-pro"><Zap size={17} fill="currentColor"/>Try Casynus Pro <span>Go Pro</span></button></section>
+        {[['Account','Account Details','Billing & Subscription','Account Security'],['Casynus','My Creations','Projects','Generation History','Favorites'],['Preferences','Settings','Appearance'],['Support','Help & Support','Updates']].map(([title,...items]) => <section key={title}><b>{title}</b>{items.map(item => <button key={item}>{item}</button>)}</section>)}
         <button className="crystal-profile-signout">Sign Out</button>
       </div>}
       {mobilePricing && <div className="crystal-mobile-pricing">
         <button aria-label="Back to studio" onClick={() => setMobilePricing(false)} className="grid h-11 w-11 place-items-center rounded-full bg-[#272727]"><ArrowLeft size={22}/></button>
-        <h1>Try <em>Crystal</em> Pro Plan</h1><p>Try for $0.00 for 7 Days</p>
+        <h1>Try <em>Casynus</em> Pro Plan</h1><p>Try for $0.00 for 7 Days</p>
         <div className="crystal-pricing-tabs">{["Basic","Pro","Team","Studio"].map(plan=><button key={plan} onClick={() => setPricingPlan(plan)} className={pricingPlan===plan?"active":""}>{plan}</button>)}</div>
         <div className="crystal-pricing-cycle"><button>Monthly</button><button className="active">Yearly</button></div>
         <div className="crystal-pricing-cards">{[{name:"Basic",price:"$5",cta:"Start Basic",features:["Claude AI architectural assistant","Architectural metrics and statistics","AI-generated concept imagery","Professional PDF documentation"]},{name:"Pro",price:"$48",cta:"Upgrade to Pro",features:["Claude AI research and design support","OpenAI Codex development tools","Advanced architectural analysis","Presentation-ready image and PDF exports"]},{name:"Team",price:"$124",cta:"Start Team trial",features:["Claude AI and Codex for team workflows","Shared Architecture Studio","Centralized project knowledge and files","Collaborative review and documentation"]},{name:"Studio",price:"$248",cta:"Upgrade to Studio",features:["Claude AI and OpenAI Codex","Studio-grade 3D modeling","Intelligent floor plan generation","Infrastructure systems planning","Technical reports and deliverables"]}].map(plan=><article key={plan.name} className={pricingPlan===plan.name?"selected":""}><h2>{plan.name} Plan</h2><p>Professional AI tools for architecture and design workflows.</p><strong>{plan.price}<small>/mo, billed yearly</small></strong><ul>{plan.features.map(feature=><li key={feature}>{feature}</li>)}</ul><button onClick={() => setPricingPlan(plan.name)}>{plan.cta}</button></article>)}</div>
@@ -358,7 +358,7 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
         </div>
         <div className="relative">
           <button role="menuitem" onMouseEnter={() => setContextSubmenu("plugins")} className="flex h-9 min-h-9 w-full items-center justify-between rounded-[12px] px-4 text-sm font-medium hover:bg-[#363636]"><span>Plugins</span><span>▹</span></button>
-          {contextSubmenu === "plugins" && <div className="absolute left-full bottom-0 ml-2 flex h-[132px] w-[220px] flex-col justify-center gap-1 rounded-2xl border-[2px] border-[#303030] bg-[#242424] p-1 shadow-2xl"><button onClick={() => setToast("Crystal tools opened.")} className="h-9 min-h-9 w-full rounded-xl px-4 text-left text-sm hover:bg-[#353535]">Crystal tool</button><button onClick={() => setToast("Development plugins opened.")} className="flex h-9 min-h-9 w-full items-center justify-between rounded-xl px-4 text-left text-sm hover:bg-[#353535]">Development <span>▹</span></button><button onClick={() => void runContextAction("plugins")} className="h-9 min-h-9 w-full rounded-xl px-4 text-left text-sm hover:bg-[#353535]">Manage plugin</button></div>}
+          {contextSubmenu === "plugins" && <div className="absolute left-full bottom-0 ml-2 flex h-[132px] w-[220px] flex-col justify-center gap-1 rounded-2xl border-[2px] border-[#303030] bg-[#242424] p-1 shadow-2xl"><button onClick={() => setToast("Casynus tools opened.")} className="h-9 min-h-9 w-full rounded-xl px-4 text-left text-sm hover:bg-[#353535]">Casynus tool</button><button onClick={() => setToast("Development plugins opened.")} className="flex h-9 min-h-9 w-full items-center justify-between rounded-xl px-4 text-left text-sm hover:bg-[#353535]">Development <span>▹</span></button><button onClick={() => void runContextAction("plugins")} className="h-9 min-h-9 w-full rounded-xl px-4 text-left text-sm hover:bg-[#353535]">Manage plugin</button></div>}
         </div>
       </div>}
       {toast && <div role="status" className="fixed bottom-14 left-1/2 z-[110] -translate-x-1/2 rounded-xl border border-[#4A90D9]/40 bg-[#202020] px-5 py-3 text-xs shadow-2xl">{toast}</div>}

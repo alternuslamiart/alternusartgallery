@@ -23,7 +23,7 @@ export default function Careers() {
  Build the<br/><span style={{ color: COBALT }}>robots of tomorrow.</span>
  </h1>
  <p style={{ fontSize: 17, color: t.muted, lineHeight: 1.6, margin: 0 }}>
- Crystal is building the intelligence layer for spaces, machines, and robots. We are connecting AI Chat, spatial design, 3D modeling, infrastructure planning, and simulation into tools that help people imagine, build, and operate the physical world.
+ Casynus is building the intelligence layer for spaces, machines, and robots. We are connecting AI Chat, spatial design, 3D modeling, infrastructure planning, and simulation into tools that help people imagine, build, and operate the physical world.
  </p>
  </div>
  </div>

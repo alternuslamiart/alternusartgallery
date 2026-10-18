@@ -62,7 +62,7 @@ export default function Account() {
  ].includes(requestedSection) ? requestedSection as SectionId : "usage";
  const [active, setActive] = useState<SectionId>(initialSection);
  const [profileOpen, setProfileOpen] = useState(false);
- const accountName = session?.user?.name?.trim() || "Crystal Studio User";
+ const accountName = session?.user?.name?.trim() || "Casynus Studio User";
  const accountEmail = session?.user?.email || "you@alternusart.com";
  const accountInitials = accountName
   .split(/\s+/)
@@ -94,8 +94,8 @@ export default function Account() {
  <header style={{ padding: "16px 24px", borderBottom: `1px solid ${faintBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between", background: raised }}>
  <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
  <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
- <img src="/Logopng.png" alt="Crystal Studio" width={26} height={26} style={{ display: "block", objectFit: "contain" }} />
- <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>Crystal Studio</span>
+ <img src="/Logopng.png" alt="Casynus Studio" width={26} height={26} style={{ display: "block", objectFit: "contain" }} />
+ <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: "-0.02em", color: fg, fontStretch: "90%" }}>Casynus Studio</span>
  <span style={{ fontSize: 10, fontWeight: 600, color: muted, padding: "2px 6px", border: `1px solid ${faintBorder}`, borderRadius: 4, letterSpacing: "0.08em" }}>ACCOUNT</span>
  </Link>
  </div>
@@ -284,7 +284,7 @@ function Section({ id, t, accountName, accountEmail, accountInitials }: { id: Se
 
 function Organization({ t }: { t: Tokens }) {
  const [form, setForm] = useState({
-  name: "Crystal Studio",
+  name: "Casynus Studio",
   domain: "alternusart.com",
   email: "billing@alternusart.com",
   country: "Albania",
@@ -585,8 +585,8 @@ function Billing({ t }: { t: Tokens }) {
  const [paymentOpen, setPaymentOpen] = useState(false);
  const [addressOpen, setAddressOpen] = useState(false);
  const [invoice, setInvoice] = useState<(typeof invoices)[number] | null>(null);
- const [payment, setPayment] = useState({ number: "4242", expiry: "08/29", name: "Crystal Studio" });
- const [address, setAddress] = useState({ company: "Crystal Studio by Alternus Art", street: "Rr. e Kavajës", city: "Tirana 1001", country: "Albania" });
+ const [payment, setPayment] = useState({ number: "4242", expiry: "08/29", name: "Casynus Studio" });
+ const [address, setAddress] = useState({ company: "Casynus Studio by Alternus Art", street: "Rr. e Kavajës", city: "Tirana 1001", country: "Albania" });
  const [notice, setNotice] = useState("");
 
  useEffect(() => {
@@ -614,9 +614,9 @@ function Billing({ t }: { t: Tokens }) {
    setNotice("Allow pop-ups to download the invoice.");
    return;
   }
-  printWindow.document.write(`<!doctype html><html><head><title>${selectedInvoice.id} - Crystal Studio</title><style>
+  printWindow.document.write(`<!doctype html><html><head><title>${selectedInvoice.id} - Casynus Studio</title><style>
    *{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#172033;font:14px Arial,sans-serif}.invoice{width:760px;margin:40px auto;padding:52px;background:#fff;box-shadow:0 12px 40px #17203318}.top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #4284ff;padding-bottom:30px}.brand{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:800}.logo{width:38px;height:38px;border-radius:10px;background:#4284ff;display:grid;place-items:center;color:#fff;font-size:24px}.muted{color:#65728a}.right{text-align:right}.title{font-size:34px;font-weight:800;margin:38px 0 8px}.meta{display:flex;justify-content:space-between;margin:32px 0}.box{background:#f4f7fb;border-radius:10px;padding:18px;min-width:220px}.table{width:100%;border-collapse:collapse;margin-top:30px}.table th,.table td{text-align:left;padding:16px 0;border-bottom:1px solid #e4e9f1}.table th{color:#65728a;font-size:11px;text-transform:uppercase;letter-spacing:.12em}.total{text-align:right;font-size:25px;font-weight:800;margin-top:26px}.paid{display:inline-block;color:#149447;background:#e4f7eb;border-radius:999px;padding:5px 12px;font-size:11px;font-weight:700;text-transform:uppercase}.foot{margin-top:70px;padding-top:18px;border-top:1px solid #e4e9f1;color:#65728a;font-size:12px}@media print{body{background:#fff}.invoice{margin:0;width:auto;box-shadow:none}}
-  </style></head><body><main class="invoice"><div class="top"><div class="brand"><span class="logo">✦</span>Crystal Studio</div><div class="right"><strong>INVOICE</strong><br><span class="muted">${selectedInvoice.id}</span></div></div><div class="title">Invoice</div><div class="meta"><div class="box"><strong>From</strong><br>Crystal Studio by Alternus Art<br>Rr. e Kavajës, Tirana 1001<br>Albania</div><div class="box"><strong>Invoice details</strong><br>Date: ${selectedInvoice.d}<br>Status: <span class="paid">${selectedInvoice.s}</span></div></div><table class="table"><thead><tr><th>Description</th><th>Date</th><th style="text-align:right">Amount</th></tr></thead><tbody><tr><td>Crystal Studio professional subscription</td><td>${selectedInvoice.d}</td><td style="text-align:right">${selectedInvoice.amt}</td></tr></tbody></table><div class="total">Total paid: ${selectedInvoice.amt}</div><div class="foot">Thank you for choosing Crystal Studio. This invoice was generated from your account billing history.</div></main><script>window.onload=()=>window.print()<\/script></body></html>`);
+  </style></head><body><main class="invoice"><div class="top"><div class="brand"><span class="logo">✦</span>Casynus Studio</div><div class="right"><strong>INVOICE</strong><br><span class="muted">${selectedInvoice.id}</span></div></div><div class="title">Invoice</div><div class="meta"><div class="box"><strong>From</strong><br>Casynus Studio by Alternus Art<br>Rr. e Kavajës, Tirana 1001<br>Albania</div><div class="box"><strong>Invoice details</strong><br>Date: ${selectedInvoice.d}<br>Status: <span class="paid">${selectedInvoice.s}</span></div></div><table class="table"><thead><tr><th>Description</th><th>Date</th><th style="text-align:right">Amount</th></tr></thead><tbody><tr><td>Casynus Studio professional subscription</td><td>${selectedInvoice.d}</td><td style="text-align:right">${selectedInvoice.amt}</td></tr></tbody></table><div class="total">Total paid: ${selectedInvoice.amt}</div><div class="foot">Thank you for choosing Casynus Studio. This invoice was generated from your account billing history.</div></main><script>window.onload=()=>window.print()<\/script></body></html>`);
   printWindow.document.close();
  };
 
@@ -671,9 +671,9 @@ function Billing({ t }: { t: Tokens }) {
   <div style={modalActions}><button type="button" onClick={() => setAddressOpen(false)} style={secondaryButton(t)}>Cancel</button><button type="button" onClick={saveAddress} style={primaryButton}>Save address</button></div>
  </div></div>}
  {invoice && <div style={modalBackdrop}><div style={{ ...t.baseCard, width: "min(680px, calc(100vw - 32px))", maxHeight: "calc(100vh - 40px)", overflowY: "auto", padding: 32 }}>
-  <div style={{ display: "flex", justifyContent: "space-between", borderBottom: `2px solid ${COBALT}`, paddingBottom: 18 }}><div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 22, fontWeight: 900 }}><CoreforgeLogo size={34} radius={9} /> Crystal Studio</div><div style={{ textAlign: "right", fontSize: 12, color: t.muted }}>INVOICE<br/><strong style={{ color: t.fg }}>{invoice.id}</strong></div></div>
-  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 28, gap: 20 }}><div style={{ fontSize: 13, lineHeight: 1.6 }}><strong>Crystal Studio by Alternus Art</strong><br/>Rr. e Kavajës, Tirana 1001<br/>Albania</div><div style={{ textAlign: "right", fontSize: 13, lineHeight: 1.6 }}><strong>Date</strong><br/>{invoice.d}<br/><span style={{ color: "#16A34A", fontWeight: 700 }}>PAID</span></div></div>
-  <div style={{ marginTop: 30, padding: "18px 0", borderTop: `1px solid ${t.faintBorder}`, borderBottom: `1px solid ${t.faintBorder}`, display: "flex", justifyContent: "space-between", fontSize: 14 }}><span>Crystal Studio professional subscription</span><strong>{invoice.amt}</strong></div>
+  <div style={{ display: "flex", justifyContent: "space-between", borderBottom: `2px solid ${COBALT}`, paddingBottom: 18 }}><div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 22, fontWeight: 900 }}><CoreforgeLogo size={34} radius={9} /> Casynus Studio</div><div style={{ textAlign: "right", fontSize: 12, color: t.muted }}>INVOICE<br/><strong style={{ color: t.fg }}>{invoice.id}</strong></div></div>
+  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 28, gap: 20 }}><div style={{ fontSize: 13, lineHeight: 1.6 }}><strong>Casynus Studio by Alternus Art</strong><br/>Rr. e Kavajës, Tirana 1001<br/>Albania</div><div style={{ textAlign: "right", fontSize: 13, lineHeight: 1.6 }}><strong>Date</strong><br/>{invoice.d}<br/><span style={{ color: "#16A34A", fontWeight: 700 }}>PAID</span></div></div>
+  <div style={{ marginTop: 30, padding: "18px 0", borderTop: `1px solid ${t.faintBorder}`, borderBottom: `1px solid ${t.faintBorder}`, display: "flex", justifyContent: "space-between", fontSize: 14 }}><span>Casynus Studio professional subscription</span><strong>{invoice.amt}</strong></div>
   <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 24 }}><button type="button" onClick={() => printInvoice(invoice)} style={primaryButton}>Download / Save PDF</button><button type="button" onClick={() => setInvoice(null)} style={secondaryButton(t)}>Close</button></div>
  </div></div>}
  </>

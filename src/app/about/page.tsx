@@ -24,8 +24,8 @@ export default function About() {
  <div style={{ fontSize: 11, letterSpacing: "0.2em", fontWeight: 700, color: t.muted, position: "sticky", top: 100 }}>§ ORIGIN</div>
  </div>
  <div className="md:col-span-8" style={{ fontSize: 18, lineHeight: 1.75, color: t.fg, fontWeight: 400 }}>
-<p>Crystal is an AI-native platform for architecture, interior design, 3D visualization, infrastructure, and intelligent environments. It brings research, spatial planning, image generation, code, modeling, and project documentation into one connected workspace.</p>
- <p style={{ marginTop: 24 }}>Founded in 2026, Crystal was created around a simple idea — <em style={{ color: COBALT, fontStyle: "italic" }}>professional design work should have an intelligent layer.</em> GPT Astra, built with OpenAI technology, helps transform briefs into structured ideas, visual studies, technical workflows, and clearer decisions.</p>
+<p>Casynus is an AI-native platform for architecture, interior design, 3D visualization, infrastructure, and intelligent environments. It brings research, spatial planning, image generation, code, modeling, and project documentation into one connected workspace.</p>
+ <p style={{ marginTop: 24 }}>Founded in 2026, Casynus was created around a simple idea — <em style={{ color: COBALT, fontStyle: "italic" }}>professional design work should have an intelligent layer.</em> GPT Astra, built with OpenAI technology, helps transform briefs into structured ideas, visual studies, technical workflows, and clearer decisions.</p>
  </div>
  </div>
 

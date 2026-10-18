@@ -48,7 +48,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
           <div className="grid h-7 w-7 place-items-center text-zinc-400">
             <Sparkles size={21} />
           </div>
-          <span className="text-[15px] font-semibold">Crystal</span>
+          <span className="text-[15px] font-semibold">Casynus</span>
         </div>
         <Link href="/design-studio" className="ml-5 rounded-md p-2 text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] sm:ml-8" aria-label="Home">
           <Home size={16} />

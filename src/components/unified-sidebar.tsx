@@ -28,8 +28,8 @@ type SidebarItem = { label: string; href: string; icon: LucideIcon; badge?: stri
 
 const primary: SidebarItem[] = [
   { label: "Dashboard", href: "/project", icon: LayoutDashboard },
-  { label: "Floor Plan", href: "/crystal?mode=floor-plan", icon: LayoutGrid },
-  { label: "Modeling", href: "/crystal", icon: Box },
+  { label: "Floor Plan", href: "/casynus?mode=floor-plan", icon: LayoutGrid },
+  { label: "Modeling", href: "/casynus", icon: Box },
   { label: "Notes", href: "/workspace/knowledge", icon: FileText },
   { label: "Infrastructure", href: "/infrastructure", icon: Globe2 },
   { label: "Reports", href: "/exports", icon: ClipboardList },
