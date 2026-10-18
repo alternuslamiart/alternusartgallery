@@ -8175,3 +8175,18 @@ textarea {
     font-size: clamp(16px, 4.5vw, 20px) !important;
   }
 }
+
+@media (max-width: 700px) {
+  .coreforge-page .crystal-first-card > div:first-child > div {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 16px;
+  }
+
+  .coreforge-page .crystal-first-card a {
+    min-height: 60px !important;
+    height: 60px !important;
+    border-radius: 999px !important;
+    font-size: 18px !important;
+  }
+}

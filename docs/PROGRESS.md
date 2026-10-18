@@ -12,6 +12,15 @@ Last updated: 2026-10-18
   focused CSS check, and `npm test` passed (8 tests). Browser rendering was not
   verified.
 
+## Homepage mobile CTA
+
+- On mobile only, reordered the homepage CTA buttons to show Download App
+  before Launch Studio and enlarged them to rounded pill controls, matching the
+  provided reference while keeping the label text within the mobile type scale.
+- PostCSS parsing and a focused assertion of the mobile CTA order, button
+  dimensions, shape, and label size passed; `npm test` passed (8 tests), and
+  `git diff --check` passed. Browser rendering was not verified.
+
 ## Main navigation profile hover
 
 - The signed-in profile dropdown opens and closes when its trigger is clicked;
