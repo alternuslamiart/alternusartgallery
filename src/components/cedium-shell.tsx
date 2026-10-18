@@ -162,7 +162,6 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
    type="button"
    aria-label="Open profile menu"
    aria-expanded={profileMenuOpen}
-   onClick={() => setProfileMenuOpen(true)}
    className="coreforge-profile-trigger"
    style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 11px", fontSize: 13, fontWeight: 600, color: fg, background: "transparent", cursor: "pointer", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}
   >
@@ -181,12 +180,12 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
     ["Billing", "billing"],
     ["Settings", "privacy"],
    ].map(([label, section]) => (
-    <Link key={section} role="menuitem" href={`/account?section=${section}`} onClick={() => setProfileMenuOpen(false)} style={{ display: "flex", alignItems: "center", height: 34, padding: "0 10px", borderRadius: 8, color: fg, fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
+    <Link key={section} role="menuitem" href={`/account?section=${section}`} onClick={() => setProfileMenuOpen(false)} className={`transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`} style={{ display: "flex", alignItems: "center", height: 34, padding: "0 10px", borderRadius: 8, color: fg, fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
      {label}
     </Link>
    ))}
    <div style={{ margin: "5px 0", borderTop: `1px solid ${faint}` }} />
-   <button type="button" role="menuitem" onClick={() => signOut({ callbackUrl: "/" })} style={{ display: "flex", alignItems: "center", width: "100%", height: 34, padding: "0 10px", border: 0, borderRadius: 8, background: "transparent", color: fg, cursor: "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: 600, textAlign: "left" }}>
+   <button type="button" role="menuitem" onClick={() => signOut({ callbackUrl: "/" })} className={`transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`} style={{ display: "flex", alignItems: "center", width: "100%", height: 34, padding: "0 10px", border: 0, borderRadius: 8, background: "transparent", color: fg, cursor: "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: 600, textAlign: "left" }}>
     Log out
    </button>
   </div>}
