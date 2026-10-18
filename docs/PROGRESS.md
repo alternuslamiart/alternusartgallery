@@ -6,7 +6,7 @@ Last updated: 2026-10-18
 
 - The signed-in profile dropdown opens and closes when its trigger is clicked;
   hovering over the trigger does not open it. Menu items have rounded corners
-  and a light gray hover highlight.
+  and a light gray hover highlight, including the Log out button.
 - `npm run typecheck`, `npm test` (8 tests), and `git diff --check`: passed.
 - ESLint reports one existing unused `scrolled` parameter error and an existing
   `<img>` warning in this component; rerunning with only the unused-variable

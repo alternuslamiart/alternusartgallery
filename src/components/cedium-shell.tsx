@@ -175,7 +175,7 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
     </Link>
    ))}
    <div style={{ margin: "5px 0", borderTop: `1px solid ${faint}` }} />
-   <button type="button" role="menuitem" onClick={() => signOut({ callbackUrl: "/" })} className={`transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`} style={{ display: "flex", alignItems: "center", width: "100%", height: 34, padding: "0 10px", border: 0, borderRadius: 8, background: "transparent", color: fg, cursor: "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: 600, textAlign: "left" }}>
+   <button type="button" role="menuitem" onClick={() => signOut({ callbackUrl: "/" })} className={`transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`} style={{ display: "flex", alignItems: "center", width: "100%", height: 34, padding: "0 10px", border: 0, borderRadius: 8, color: fg, cursor: "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: 600, textAlign: "left" }}>
     Log out
    </button>
   </div>}
