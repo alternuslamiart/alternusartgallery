@@ -4,19 +4,18 @@ Last updated: 2026-10-18
 
 ## Mobile text sizing
 
-- Applied a mobile-only 16–20px font-size range to visible interface text,
-  including labels, buttons, menus, and content, while excluding SVG icons.
+- Standardized visible mobile interface text, including labels, buttons, menus,
+  and content, at a fixed 16px while excluding SVG icons.
 - The rule is limited to viewports at or below 700px; desktop styles are
   unchanged.
-- The stylesheet parsed successfully, the mobile rule was confirmed by a
-  focused CSS check, and `npm test` passed (8 tests). Browser rendering was not
-  verified.
+- PostCSS parsing and a focused assertion of the mobile font-size rule passed;
+  `npm test` passed (8 tests). Browser rendering was not verified.
 
 ## Homepage mobile CTA
 
 - On mobile only, reordered the homepage CTA buttons to show Download App
   before Launch Studio and enlarged them to rounded pill controls, matching the
-  provided reference while keeping the label text within the mobile type scale.
+  provided reference while keeping the label text at the 16px mobile standard.
 - PostCSS parsing and a focused assertion of the mobile CTA order, button
   dimensions, shape, and label size passed; `npm test` passed (8 tests), and
   `git diff --check` passed. Browser rendering was not verified.
