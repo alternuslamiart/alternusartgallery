@@ -41,6 +41,9 @@ Last updated: 2026-10-18
   Interior, Modeling, and Images, with Nano Banana as the default model.
 - Set the mobile screen's horizontal inset to 20px; the segmented header
   center column contracts on narrower phones to preserve both side controls.
+- Refined the mobile bottom navigation to match the supplied reference: a
+  separated five-action capsule, a distinct active Home circle, subdued
+  inactive icons, and a standalone circular Search control.
 - The `/project` entry now opens this creation home on mobile while retaining
   the project dashboard on desktop. Menu, profile, pricing, workspace
   switching, new-scene, prompt, attachment, and generation actions remain
