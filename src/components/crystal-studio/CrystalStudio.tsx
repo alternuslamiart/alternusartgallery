@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, ArrowLeft, AudioLines, BookOpen, ChevronDown, FilePlus2, Glasses, Globe2, Grid2X2, Home, Moon, PanelLeftOpen, Paperclip, Plus, Search, Settings, Share2, Sparkles, Sun, Wand2, Zap } from "lucide-react";
+import { Archive, ArrowLeft, ArrowRight, BookOpen, ChevronDown, FilePlus2, Glasses, Globe2, Grid2X2, Home, Moon, PanelLeftOpen, Paperclip, Plus, Search, Settings, Share2, Sparkles, Sun, Wand2, Zap } from "lucide-react";
 import NextImage from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -297,7 +297,7 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
           <div className="crystal-mobile-composer-actions">
             <button type="button" aria-label="Attach reference" onClick={() => sceneFileInput.current?.click()}><Paperclip size={18} /></button>
             <button type="button" className="crystal-mobile-model-select" onClick={() => setMobileModelSheet(true)}>{mobileModel}<ChevronDown size={15} /></button>
-            <button type="submit" aria-label="Generate with Casynus" disabled={loading}><AudioLines size={22} /></button>
+            <button type="submit" aria-label="Generate with Casynus" disabled={loading}><ArrowRight size={22} strokeWidth={1.8} /></button>
           </div>
         </form>
         <nav className="crystal-mobile-bottom-nav" aria-label="Studio shortcuts">

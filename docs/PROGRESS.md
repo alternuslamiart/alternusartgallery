@@ -44,6 +44,11 @@ Last updated: 2026-10-18
 - Refined the mobile bottom navigation to match the supplied reference: a
   separated five-action capsule, a distinct active Home circle, subdued
   inactive icons, and a standalone circular Search control.
+- Replaced the mobile prompt submit button's voice-wave icon with an
+  enter-style right arrow to match the supplied reference.
+- Standardized the mobile bottom row to the 20px screen inset, kept the Search
+  control in a distinct 58px circular frame, and made the five capsule actions
+  shrink evenly on narrow screens without overflowing.
 - The `/project` entry now opens this creation home on mobile while retaining
   the project dashboard on desktop. Menu, profile, pricing, workspace
   switching, new-scene, prompt, attachment, and generation actions remain

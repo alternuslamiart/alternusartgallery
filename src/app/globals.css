@@ -8297,6 +8297,7 @@ textarea {
 
   .crystal-mobile-home-active .crystal-mobile-home {
     box-sizing: border-box;
+    width: 100%;
     height: 100dvh;
     min-height: 0;
     padding: max(28px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
@@ -8482,9 +8483,12 @@ textarea {
     flex: 0 0 auto;
     align-items: center;
     justify-content: space-between;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
     gap: 12px;
     margin-top: 14px;
-    padding-bottom: max(2px, env(safe-area-inset-bottom));
+    padding-bottom: 0;
   }
 
   .crystal-mobile-home-active .crystal-mobile-bottom-nav > div,
@@ -8501,14 +8505,18 @@ textarea {
     box-sizing: border-box;
     flex: 0 1 292px;
     width: min(292px, calc(100% - 70px));
+    min-width: 0;
     justify-content: space-around;
     padding: 0 7px;
   }
 
   .crystal-mobile-home-active .crystal-mobile-bottom-nav button {
     display: grid;
+    box-sizing: border-box;
+    flex: 1 1 0;
     place-items: center;
     width: 48px;
+    min-width: 0;
     height: 48px;
     border-radius: 50%;
     color: #686868;
@@ -8527,7 +8535,9 @@ textarea {
     width: 58px;
     height: 58px;
     color: #eee;
-    background: #191919;
+    border: 1px solid rgba(255, 255, 255, .055);
+    background: #1b1b1b;
+    box-shadow: inset 0 1px rgba(255, 255, 255, .025);
   }
 
   .crystal-mobile-home-active .crystal-mobile-bottom-nav > button svg {
