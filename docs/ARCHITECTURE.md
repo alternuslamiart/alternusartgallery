@@ -38,6 +38,11 @@
 - `/aichat` lets the user select Gemini or Groq and submits conversations to
   `/api/ai-chat`; provider credentials are read only on the server, and the
   other configured provider is tried if the selected one fails.
+- `src/lib/security/cyber-shield.mjs` and `src/middleware.ts` implement the
+  application's Web Application Firewall (WAF), CSRF same-origin mutation guard,
+  adaptive IP reputation and brute-force lockout tracker, Web Crypto HMAC-SHA256
+  edge admin session verification, and recursive JSON payload sanitization.
+  `/api/security/status` reports active protection layers and admin telemetry.
 
 ## Tests and commands
 

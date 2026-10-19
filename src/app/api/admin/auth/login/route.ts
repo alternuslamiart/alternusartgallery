@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createHmac, randomBytes, timingSafeEqual } from 'crypto';
+import { globalCyberDefense, sanitizeAndInspectPayload } from '@/lib/security/cyber-shield.mjs';
 
 export const dynamic = 'force-dynamic';
+
+function getClientIP(request: NextRequest): string {
+ const forwardedFor = request.headers.get('x-forwarded-for');
+ if (forwardedFor) return forwardedFor.split(',')[0].trim();
+ const realIP = request.headers.get('x-real-ip');
+ if (realIP) return realIP.trim();
+ return 'unknown';
+}
 
 // Generate a cryptographically secure session token with HMAC signature
 function generateSessionToken(): string {
@@ -22,13 +31,23 @@ function generateSessionToken(): string {
 }
 
 export async function POST(request: NextRequest) {
+ const ip = getClientIP(request);
  try {
- const body = await request.json();
+ const lockout = globalCyberDefense.checkAuthLockout(ip);
+ if (lockout.blocked) {
+ return NextResponse.json(
+ { error: 'Too many failed login attempts. Try again later.', retryAfter: lockout.retryAfter },
+ { status: 429, headers: { 'Retry-After': String(lockout.retryAfter) } }
+ );
+ }
+
+ const rawBody = await request.json();
+ const body = sanitizeAndInspectPayload(rawBody, { maxDepth: 4, maxKeys: 10, maxStringLength: 512 }) as Record<string, unknown>;
  const { email, password } = body;
 
  // Validate input
- const inputEmail = (email || '').trim().toLowerCase();
- const inputPassword = (password || '').toString();
+ const inputEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+ const inputPassword = typeof password === 'string' ? password : '';
 
  if (!inputEmail || !inputPassword) {
  return NextResponse.json(
@@ -50,16 +69,21 @@ export async function POST(request: NextRequest) {
  }
 
  // Constant-time comparison to prevent timing attacks
- const emailMatch = inputEmail === envEmail;
+ const emailMatch = inputEmail.length === envEmail.length &&
+ timingSafeEqual(Buffer.from(inputEmail), Buffer.from(envEmail));
  const passwordMatch = inputPassword.length === envPassword.length &&
  timingSafeEqual(Buffer.from(inputPassword), Buffer.from(envPassword));
 
  if (!emailMatch || !passwordMatch) {
+ globalCyberDefense.recordAuthFailure(ip);
+ globalCyberDefense.recordStrike(ip, 'ADMIN_LOGIN_FAILED', 1);
  return NextResponse.json(
  { error: 'Invalid email or password' },
  { status: 401 }
  );
  }
+
+ globalCyberDefense.clearAuthFailures(ip);
 
  // Generate HMAC-signed session token
  const sessionToken = generateSessionToken();

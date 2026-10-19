@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ValidationError } from "@/lib/platform/validation";
+import { sanitizeAndInspectPayload } from "@/lib/security/cyber-shield.mjs";
 
 export type PlatformContext = {
  userId: string;
@@ -130,10 +132,27 @@ export function defaultAllowedAssetTypes(): Prisma.InputJsonArray {
  return ["image", "vector", "model", "document", "texture", "reference", "export", "audio", "code", "unknown"];
 }
 
-export async function readJsonBody(request: NextRequest) {
+export async function readJsonBody(request: NextRequest, maxBytes = 262_144) {
  try {
- return (await request.json()) as Record<string, unknown>;
- } catch {
+ const contentLength = Number(request.headers.get("content-length") || "0");
+ if (Number.isFinite(contentLength) && contentLength > maxBytes) {
+ throw new ValidationError("Request payload exceeds maximum allowed size.", { maxBytes });
+ }
+ const rawText = await request.text();
+ if (!rawText.trim()) return {};
+ if (rawText.length > maxBytes) {
+ throw new ValidationError("Request payload exceeds maximum allowed size.", { maxBytes });
+ }
+ const parsed = JSON.parse(rawText) as unknown;
+ if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+ return {};
+ }
+ return sanitizeAndInspectPayload(parsed) as Record<string, unknown>;
+ } catch (error) {
+ if (error instanceof ValidationError) throw error;
+ if (error instanceof Error && (error.message.includes("Forbidden object key") || error.message.includes("Null byte") || error.message.includes("exceeds maximum"))) {
+ throw new ValidationError(error.message);
+ }
  return {};
  }
 }

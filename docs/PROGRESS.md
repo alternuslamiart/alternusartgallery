@@ -1,6 +1,47 @@
 # Verified progress
 
-Last updated: 2026-10-19
+Last updated: 2026-10-20
+
+## Casynus Cyber-Shield Website Security System
+
+- Built and integrated the multi-layered **Casynus Cyber-Shield** security engine
+  (`src/lib/security/cyber-shield.mjs`, `src/lib/security/cyber-shield.d.ts`)
+  across Edge Middleware (`src/middleware.ts`), platform API helpers
+  (`src/lib/platform/api.ts`), AI Chat (`src/app/api/ai-chat/route.ts`), Admin
+  Auth (`src/app/api/admin/auth/login/route.ts`), and Next.js config
+  (`next.config.mjs`):
+  - **Multi-Pass WAF Threat Inspector (`inspectRequestThreat`, `decodeInspectableText`):**
+    Performs multi-pass URL decoding to defeat double/triple encoding evasion and
+    blocks SQL Injection (`UNION SELECT`, `INFORMATION_SCHEMA`, blind `SLEEP` /
+    `WAITFOR DELAY`), Cross-Site Scripting (`<script>`, `javascript:`, event
+    handlers), Command Injection / RCE, SSRF (`169.254.169.254`,
+    `metadata.google.internal`, `gopher://`, `file://`), XXE, Path Traversal,
+    Null-Byte Injection, sensitive path probes (`/.env`, `/.git`, `/wp-admin`,
+    `/phpmyadmin`, `/actuator`), and automated vulnerability scanners (`sqlmap`,
+    `nuclei`, `nikto`, `nmap`, `masscan`, `gobuster`, `acunetix`, `nessus`).
+  - **CSRF Same-Origin Mutation Guard (`verifySameOriginMutation`):** Protects
+    state-changing API requests (`POST`, `PUT`, `PATCH`, `DELETE`) by verifying
+    `Origin`, `Referer`, and `Sec-Fetch-Site` against the target `Host` while
+    preserving webhook exemptions (`/api/stripe/webhook`, `/api/paypal/webhook`,
+    `/api/auth/`).
+  - **Cryptographic Edge Admin Session Verification (`verifyAdminSessionEdge`):**
+    Replaced the format-only Edge middleware cookie check with Web Crypto API
+    (`crypto.subtle`) constant-time HMAC-SHA256 verification for both `/admin/*`
+    routes and `/api/admin/*` endpoints.
+  - **Adaptive IP Reputation & Tiered Rate Limiting (`CyberDefenseTracker`):**
+    Tracks security strikes per IP with automatic temporary ban escalation for
+    repeat offenders, exponential backoff lockouts on failed admin logins, and
+    tiered per-minute rate limits (`auth`, `ai`, `payment`, `support`, `api`).
+  - **Recursive JSON Payload Sanitizer (`sanitizeAndInspectPayload`):** Enforces
+    payload size/depth/key bounds and blocks `__proto__` / `constructor.prototype`
+    pollution, NoSQL operator injection (`$ne`, `$where`, `$regex`), and null
+    bytes in `readJsonBody`, `/api/ai-chat`, and `/api/admin/auth/login`.
+  - **Security Posture Endpoint (`/api/security/status`):** Reports active
+    defense layers and (when authenticated as admin) live WAF/rate-limit
+    telemetry.
+- Added 6 focused automated tests in `tests/cyber-shield.test.mjs`; `npm test`
+  passed (14/14 tests), `npx eslint` passed (0 errors), and
+  `NODE_OPTIONS="--max-old-space-size=4096" npm run typecheck` passed.
 
 ## Casynus Studio Ecosystem UI/UX redesign
 

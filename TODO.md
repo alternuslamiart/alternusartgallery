@@ -14,6 +14,9 @@
   ownership checks first; decide whether the scene belongs in a project
   snapshot or dedicated schema before implementation. Add a migration and
   authenticated API tests only after that decision.
+- [ ] Optionally bridge `CyberDefenseTracker` strike/lockout state in Node API
+  routes with Prisma `RateLimitBucket` (`src/lib/persistent-rate-limit.ts`) for
+  multi-instance serverless persistence alongside Edge middleware protection.
 
 ## Blockers
 

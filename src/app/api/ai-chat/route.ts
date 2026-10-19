@@ -8,6 +8,7 @@ import {
  getGroqBaseUrl,
  getSafeAIErrorMessage,
 } from "@/lib/ai-provider-config";
+import { sanitizeAndInspectPayload } from "@/lib/security/cyber-shield.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -372,7 +373,23 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
  try {
- const body = (await request.json()) as RequestBody;
+ const rawBody = await request.json();
+ let body: RequestBody;
+ try {
+ body = sanitizeAndInspectPayload(rawBody, {
+ maxDepth: 8,
+ maxKeys: 120,
+ maxStringLength: 16_000,
+ }) as RequestBody;
+ } catch (securityError) {
+ return NextResponse.json(
+ {
+ error: securityError instanceof Error ? securityError.message : "Invalid request payload.",
+ code: "INVALID_PAYLOAD",
+ },
+ { status: 400 },
+ );
+ }
  const requestMessages = normalizeHistory(body.messages);
  const legacyMessage = typeof body.message === "string" ? body.message.trim() : "";
  const lastRequestMessage = requestMessages[requestMessages.length - 1];
@@ -381,6 +398,13 @@ export async function POST(request: NextRequest) {
  if (!message) {
  return NextResponse.json(
  { error: "Message is required.", code: "EMPTY_MESSAGE" },
+ { status: 400 },
+ );
+ }
+
+ if (message.length > 12_000) {
+ return NextResponse.json(
+ { error: "Message exceeds the 12,000 character safety limit.", code: "MESSAGE_TOO_LONG" },
  { status: 400 },
  );
  }

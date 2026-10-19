@@ -1,295 +1,264 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-// Simple in-memory rate limiter for edge runtime
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-
-// Track failed login attempts per IP for brute-force protection
-const loginAttemptMap = new Map<string, { count: number; lockUntil: number }>();
-
-function rateLimit(ip: string, limit: number, windowMs: number): boolean {
- const now = Date.now();
- const entry = rateLimitMap.get(ip);
-
- // Clean old entries periodically
- if (rateLimitMap.size > 10000) {
- rateLimitMap.forEach((val, key) => {
- if (val.resetTime < now) rateLimitMap.delete(key);
- });
- }
-
- if (!entry || entry.resetTime < now) {
- rateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
- return true;
- }
-
- if (entry.count >= limit) {
- return false;
- }
-
- entry.count++;
- return true;
-}
-
-// Brute-force protection: exponential backoff after failed attempts
-function checkLoginBlocked(ip: string): { blocked: boolean; retryAfter?: number } {
- const now = Date.now();
- const entry = loginAttemptMap.get(ip);
-
- // Clean old entries periodically
- if (loginAttemptMap.size > 5000) {
- loginAttemptMap.forEach((val, key) => {
- if (val.lockUntil < now) loginAttemptMap.delete(key);
- });
- }
-
- if (!entry) return { blocked: false };
-
- if (entry.lockUntil > now) {
- return { blocked: true, retryAfter: Math.ceil((entry.lockUntil - now) / 1000) };
- }
-
- return { blocked: false };
-}
+import {
+  getSecurityHeaders,
+  globalCyberDefense,
+  inspectRequestThreat,
+  verifyAdminSessionEdge,
+  verifySameOriginMutation,
+} from "@/lib/security/cyber-shield.mjs";
 
 function getClientIP(request: NextRequest): string {
- // On Vercel/Cloudflare, use their trusted headers
- // x-forwarded-for is set by the platform's reverse proxy, not by the client
- const forwardedFor = request.headers.get("x-forwarded-for");
- if (forwardedFor) return forwardedFor.split(",")[0].trim();
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) return forwardedFor.split(",")[0].trim();
 
- const realIP = request.headers.get("x-real-ip");
- if (realIP) return realIP;
+  const realIP = request.headers.get("x-real-ip");
+  if (realIP) return realIP.trim();
 
- return "unknown";
+  return "unknown";
 }
 
-// Define protected routes
+function applySecurityHeaders(response: NextResponse): NextResponse {
+  const headers = getSecurityHeaders();
+  for (const [key, value] of Object.entries(headers)) {
+    response.headers.set(key, value);
+  }
+  return response;
+}
+
 const protectedRoutes: string[] = [];
-
-// Admin routes that require authentication
 const adminRoutes = ["/admin"];
-const adminPublicRoutes = ["/admin/login"]; // Routes accessible without auth
+const adminPublicRoutes = ["/admin/login"];
+const adminPublicApiRoutes = ["/api/admin/auth/login", "/api/admin/auth/logout"];
 
-// Get allowed IPs from environment (comma-separated)
 function isIPAllowed(ip: string): boolean {
- const allowedIPs = process.env.ADMIN_ALLOWED_IPS;
+  const allowedIPs = process.env.ADMIN_ALLOWED_IPS;
+  if (!allowedIPs || allowedIPs === "*") {
+    return true;
+  }
 
- // If no IP restriction is set, allow all (for development)
- if (!allowedIPs || allowedIPs === '*') {
- return true;
- }
-
- const allowedList = allowedIPs.split(',').map(ip => ip.trim());
-
- return allowedList.some(allowed => {
- if (allowed.endsWith('.')) {
- return ip.startsWith(allowed);
- }
- return ip === allowed;
- });
+  const allowedList = allowedIPs.split(",").map((entry) => entry.trim());
+  return allowedList.some((allowed) => {
+    if (allowed.endsWith(".")) {
+      return ip.startsWith(allowed);
+    }
+    return ip === allowed;
+  });
 }
 
-// HMAC-based admin session verification
-// Must match the token format generated in /api/admin/auth/login
-function verifyAdminSession(token: string | undefined): boolean {
- if (!token) return false;
+function resolveRateLimitTier(pathname: string): { bucket: string; limit: number; windowMs: number } {
+  const windowMs = 60 * 1000;
+  const isOAuthCallback = pathname.startsWith("/api/auth/callback/");
 
- const secret = process.env.ADMIN_SESSION_SECRET;
- if (!secret) return false;
-
- const parts = token.split('.');
- if (parts.length !== 3) return false;
-
- const [providedSignature, timestamp, nonce] = parts;
- const timestampNum = parseInt(timestamp, 10);
- if (isNaN(timestampNum)) return false;
-
- // Check if token is expired (24 hours)
- const maxAge = 24 * 60 * 60 * 1000;
- if (Date.now() - timestampNum > maxAge) return false;
-
- // Validate format before crypto operations
- if (providedSignature.length !== 64 || nonce.length !== 32) return false;
-
- // Edge runtime doesn't have node:crypto, so we use Web Crypto API approach
- // For middleware (edge), we do a format + expiry check here.
- // The actual HMAC verification happens in the API route handlers.
- // This is acceptable because middleware is a first line of defense,
- // and the API routes perform full HMAC verification.
- return true;
+  if (!isOAuthCallback && (pathname.includes("/auth") || pathname.includes("/login"))) {
+    return { bucket: "auth", limit: 8, windowMs };
+  }
+  if (pathname.startsWith("/api/ai-chat") || pathname.startsWith("/api/ai")) {
+    return { bucket: "ai", limit: 25, windowMs };
+  }
+  if (pathname.includes("/payment") || pathname.includes("/paypal") || pathname.includes("/stripe")) {
+    return { bucket: "payment", limit: 20, windowMs };
+  }
+  if (pathname.includes("/support")) {
+    return { bucket: "support", limit: 6, windowMs };
+  }
+  const group = pathname.split("/")[2] || "api";
+  return { bucket: `api:${group}`, limit: 100, windowMs };
 }
 
-export function middleware(request: NextRequest) {
- const { pathname } = request.nextUrl;
- const ip = getClientIP(request);
+export async function middleware(request: NextRequest) {
+  const { pathname, search } = request.nextUrl;
+  const ip = getClientIP(request);
+  const now = Date.now();
 
- // Admin route protection
- const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
- const isAdminPublicRoute = adminPublicRoutes.some((route) => pathname === route);
- const isAdminApi = pathname.startsWith("/api/admin");
+  globalCyberDefense.stats.totalInspected += 1;
 
- // IP restriction for ALL admin routes (including login page)
- if (isAdminRoute || isAdminApi) {
- if (!isIPAllowed(ip)) {
- return NextResponse.json(
- { error: "Not Found" },
- { status: 404 }
- );
- }
- }
+  // 1. Check Adaptive IP Reputation Ban (repeat WAF / exploit offenders)
+  const banStatus = globalCyberDefense.isIpBanned(ip, now);
+  if (banStatus.banned) {
+    globalCyberDefense.stats.reputationBlocked += 1;
+    return applySecurityHeaders(
+      NextResponse.json(
+        {
+          error: "Access temporarily blocked by Cyber-Shield",
+          code: "IP_REPUTATION_BLOCKED",
+          retryAfter: banStatus.retryAfter,
+        },
+        {
+          status: 403,
+          headers: {
+            "Retry-After": String(banStatus.retryAfter),
+          },
+        }
+      )
+    );
+  }
 
- if (isAdminRoute && !isAdminPublicRoute) {
- const adminSession = request.cookies.get('admin-session')?.value;
+  // 2. Web Application Firewall (WAF) — Inspect Method, Scanner UA, Sensitive Paths, SQLi, XSS, RCE, SSRF, Traversal
+  const threat = inspectRequestThreat({
+    pathname,
+    search,
+    userAgent: request.headers.get("user-agent") || "",
+    method: request.method,
+  });
 
- if (!verifyAdminSession(adminSession)) {
- const loginUrl = new URL("/admin/login", request.url);
- return NextResponse.redirect(loginUrl);
- }
- }
+  if (threat.blocked) {
+    globalCyberDefense.stats.wafBlocked += 1;
+    const strikeWeight = threat.severity === "critical" ? 2 : 1;
+    globalCyberDefense.recordStrike(ip, threat.code || "WAF_RULE", strikeWeight, now);
 
- // If user is authenticated and trying to access login page, redirect to dashboard
- if (pathname === "/admin/login") {
- const adminSession = request.cookies.get('admin-session')?.value;
- if (verifyAdminSession(adminSession)) {
- const dashboardUrl = new URL("/admin/dashboard", request.url);
- return NextResponse.redirect(dashboardUrl);
- }
- }
+    return applySecurityHeaders(
+      NextResponse.json(
+        {
+          error: threat.status === 404 ? "Not Found" : "Request blocked by security policy",
+          code: threat.code,
+        },
+        { status: threat.status }
+      )
+    );
+  }
 
- // Rate limiting for API routes
- if (pathname.startsWith("/api")) {
- let limit = 100; // Default: 100 requests per minute
- const windowMs = 60 * 1000;
+  // 3. CSRF Origin / Referer / Sec-Fetch-Site Protection on State-Changing API Requests
+  const csrfCheck = verifySameOriginMutation({
+    method: request.method,
+    pathname,
+    origin: request.headers.get("origin"),
+    referer: request.headers.get("referer"),
+    host: request.headers.get("x-forwarded-host") || request.headers.get("host"),
+    secFetchSite: request.headers.get("sec-fetch-site"),
+  });
 
- // Skip strict rate limiting for OAuth callbacks (Google, GitHub)
- const isOAuthCallback = pathname.startsWith("/api/auth/callback/");
+  if (!csrfCheck.allowed) {
+    globalCyberDefense.stats.csrfBlocked += 1;
+    globalCyberDefense.recordStrike(ip, "CSRF_ORIGIN_MISMATCH", 1, now);
+    return applySecurityHeaders(
+      NextResponse.json(
+        {
+          error: "Cross-origin mutation rejected by CSRF protection",
+          code: "CSRF_VERIFICATION_FAILED",
+        },
+        { status: 403 }
+      )
+    );
+  }
 
- // Stricter limits for login endpoints (but not OAuth callbacks)
- if (!isOAuthCallback && (pathname.includes("/auth") || pathname.includes("/login"))) {
- // Check brute-force lockout
- const lockStatus = checkLoginBlocked(ip);
- if (lockStatus.blocked) {
- return NextResponse.json(
- {
- error: "Too many failed attempts",
- message: "Account temporarily locked. Please try again later.",
- retryAfter: lockStatus.retryAfter
- },
- {
- status: 429,
- headers: {
- "Retry-After": String(lockStatus.retryAfter || 60),
- }
- }
- );
- }
- limit = 5; // 5 requests per minute for auth (stricter)
- } else if (pathname.includes("/payment") || pathname.includes("/paypal")) {
- limit = 20;
- } else if (pathname.includes("/support")) {
- limit = 5;
- }
+  // 4. Admin Route & Admin API Protection (IP Allowlist + Cryptographic Edge HMAC Verification)
+  const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
+  const isAdminPublicRoute = adminPublicRoutes.some((route) => pathname === route);
+  const isAdminApi = pathname.startsWith("/api/admin");
+  const isAdminPublicApi = adminPublicApiRoutes.some((route) => pathname === route);
 
- const allowed = rateLimit(`${ip}:${pathname.split("/")[2] || "api"}`, limit, windowMs);
+  if (isAdminRoute || isAdminApi) {
+    if (!isIPAllowed(ip)) {
+      return applySecurityHeaders(
+        NextResponse.json({ error: "Not Found" }, { status: 404 })
+      );
+    }
+  }
 
- if (!allowed) {
- return NextResponse.json(
- {
- error: "Too many requests",
- message: "Please try again later",
- retryAfter: 60
- },
- {
- status: 429,
- headers: {
- "Retry-After": "60",
- "X-RateLimit-Limit": limit.toString(),
- "X-RateLimit-Remaining": "0",
- }
- }
- );
- }
- }
+  if ((isAdminRoute && !isAdminPublicRoute) || (isAdminApi && !isAdminPublicApi)) {
+    const adminSession = request.cookies.get("admin-session")?.value;
+    const validAdmin = await verifyAdminSessionEdge(
+      adminSession,
+      process.env.ADMIN_SESSION_SECRET,
+      { now }
+    );
 
- // Block suspicious request patterns
- const userAgent = request.headers.get("user-agent") || "";
- const suspiciousPatterns = [
- /sqlmap/i,
- /nikto/i,
- /nmap/i,
- /masscan/i,
- /python-requests\/2\.[0-9]+\.[0-9]+$/i,
- /havij/i,
- /w3af/i,
- /acunetix/i,
- /nessus/i,
- ];
+    if (!validAdmin) {
+      if (isAdminApi) {
+        return applySecurityHeaders(
+          NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+        );
+      }
+      const loginUrl = new URL("/admin/login", request.url);
+      return applySecurityHeaders(NextResponse.redirect(loginUrl));
+    }
+  }
 
- for (const pattern of suspiciousPatterns) {
- if (pattern.test(userAgent)) {
- return NextResponse.json(
- { error: "Access denied" },
- { status: 403 }
- );
- }
- }
+  if (pathname === "/admin/login") {
+    const adminSession = request.cookies.get("admin-session")?.value;
+    const validAdmin = await verifyAdminSessionEdge(
+      adminSession,
+      process.env.ADMIN_SESSION_SECRET,
+      { now }
+    );
+    if (validAdmin) {
+      const dashboardUrl = new URL("/admin/dashboard", request.url);
+      return applySecurityHeaders(NextResponse.redirect(dashboardUrl));
+    }
+  }
 
- // Block requests with suspicious query parameters
- const url = request.nextUrl.toString();
- const dangerousPatterns = [
- /<script/i,
- /javascript:/i,
- /onclick/i,
- /onerror/i,
- /union.*select/i,
- /drop.*table/i,
- /insert.*into/i,
- /delete.*from/i,
- /\.\.\/\.\.\//, // Path traversal
- /%00/, // Null byte
- /\bexec\b.*\(/i, // exec() calls
- /\beval\b.*\(/i, // eval() calls
- ];
+  // 5. Tiered API Rate Limiting & Brute-Force Lockout Protection
+  if (pathname.startsWith("/api")) {
+    const isOAuthCallback = pathname.startsWith("/api/auth/callback/");
+    if (!isOAuthCallback && (pathname.includes("/auth") || pathname.includes("/login"))) {
+      const lockStatus = globalCyberDefense.checkAuthLockout(ip, now);
+      if (lockStatus.blocked) {
+        return applySecurityHeaders(
+          NextResponse.json(
+            {
+              error: "Too many failed attempts",
+              message: "Account temporarily locked. Please try again later.",
+              retryAfter: lockStatus.retryAfter,
+            },
+            {
+              status: 429,
+              headers: {
+                "Retry-After": String(lockStatus.retryAfter || 60),
+              },
+            }
+          )
+        );
+      }
+    }
 
- for (const pattern of dangerousPatterns) {
- if (pattern.test(url)) {
- return NextResponse.json(
- { error: "Invalid request" },
- { status: 400 }
- );
- }
- }
+    const tier = resolveRateLimitTier(pathname);
+    const rateResult = globalCyberDefense.consumeRateLimit(
+      `${ip}:${tier.bucket}`,
+      tier.limit,
+      tier.windowMs,
+      now
+    );
 
- // Check if the route is protected
- const isProtectedRoute = protectedRoutes.some((route) =>
- pathname.startsWith(route)
- );
+    if (!rateResult.allowed) {
+      return applySecurityHeaders(
+        NextResponse.json(
+          {
+            error: "Too many requests",
+            message: "Please try again later",
+            retryAfter: rateResult.retryAfter,
+          },
+          {
+            status: 429,
+            headers: {
+              "Retry-After": String(rateResult.retryAfter),
+              "X-RateLimit-Limit": String(tier.limit),
+              "X-RateLimit-Remaining": "0",
+            },
+          }
+        )
+      );
+    }
 
- // Get auth token from cookies
- const authToken = request.cookies.get("auth-token")?.value;
+    const response = applySecurityHeaders(NextResponse.next());
+    response.headers.set("X-RateLimit-Limit", String(tier.limit));
+    response.headers.set("X-RateLimit-Remaining", String(rateResult.remaining));
+    return response;
+  }
 
- // If route is protected and user is not authenticated
- if (isProtectedRoute && !authToken) {
- const loginUrl = new URL("/login", request.url);
- loginUrl.searchParams.set("callbackUrl", pathname);
- return NextResponse.redirect(loginUrl);
- }
+  // 6. Protected Route Check
+  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+  const authToken = request.cookies.get("auth-token")?.value;
 
- // Add security headers to response
- const response = NextResponse.next();
+  if (isProtectedRoute && !authToken) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return applySecurityHeaders(NextResponse.redirect(loginUrl));
+  }
 
- // Additional security headers
- response.headers.set("X-DNS-Prefetch-Control", "on");
- response.headers.set("X-Download-Options", "noopen");
- response.headers.set("X-Permitted-Cross-Domain-Policies", "none");
-
- return response;
+  return applySecurityHeaders(NextResponse.next());
 }
 
-// Configure which routes to run middleware on
 export const config = {
- matcher: [
- "/((?!_next/static|_next/image|favicon.ico|public).*)",
- ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|public).*)"],
 };
