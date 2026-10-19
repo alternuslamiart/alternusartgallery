@@ -2,14 +2,13 @@
 
 ## Next concrete task
 
+- [ ] Verify the unified Casynus Studio Ecosystem UI (`/casynus`,
+  `/casynus?mode=floor-plan`, and `/infrastructure`) in a browser at desktop and
+  mobile widths, including the `StudioModeNav` switcher, `StudioAIChat`
+  conversation drawer/composer, Floor Plan light drafting canvas and inspector,
+  and collapsible sidebars.
 - [ ] Verify homepage category-chip centering and wrapping at narrow and wide
   mobile viewport widths in a browser.
-- [ ] Verify the `/casynus` modeling UI in a browser at desktop and mobile
-  widths, including toolbar actions, sidebar controls, asset selection, and
-  right-panel utility actions.
-- [ ] Verify the compact floating Infrastructure Studio layout in a browser at
-  desktop and mobile widths, including camera toolbar placement and panel
-  toggles.
 - [ ] Design authenticated infrastructure-scene persistence within an
   existing workspace/project API. Inspect Prisma project/asset models and
   ownership checks first; decide whether the scene belongs in a project

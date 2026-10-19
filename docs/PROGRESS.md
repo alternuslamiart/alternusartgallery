@@ -2,6 +2,32 @@
 
 Last updated: 2026-10-19
 
+## Casynus Studio Ecosystem UI/UX redesign
+
+- Unified the desktop-grade dark graphite/blue design system (`--studio-*` CSS
+  tokens and `.studio-*` components in `src/app/globals.css`) across Casynus 3D
+  Studio (`/casynus`), Floor Plan Studio (`/casynus?mode=floor-plan`), and
+  Infrastructure Studio (`/infrastructure`).
+- Created `src/components/crystal-studio/StudioAIChat.tsx` and integrated it
+  across all three studios with expandable conversation history, studio-specific
+  prompt suggestions, reference image attachment preview, custom model/mode
+  selector dropdown, new-chat reset, two-step clear confirmation, expand/compact
+  toggle, and minimize pill.
+- Added `StudioModeNav` in `src/components/crystal-studio/ui.tsx` so all three
+  studios share a consistent sidebar header (`Back to projects`, studio badge,
+  panel collapse toggle) and 3-way workspace switcher (`3D Studio`,
+  `Floor Plan`, `Infra`) while preserving `?mode=floor-plan` URL routing.
+- Restored the Floor Plan Studio light drafting canvas (`#f8f9fa` / `#fbfbfa`),
+  connected `RightPanel` (`floorPlanMode={studioMode === "floor-plan"}`), and
+  added interactive Plan Elements selection and precision/scale controls in
+  `LeftSidebar` and `RightPanel`.
+- Upgraded `InfrastructureStudioPage` (`src/app/infrastructure/page.tsx`) with
+  collapsible left/right sidebars, scene hierarchy search and inline
+  lock/visibility controls, and unified legible typography.
+- Focused ESLint on all modified studio files passed (0 errors), full-project
+  typecheck (`NODE_OPTIONS="--max-old-space-size=4096" npm run typecheck`)
+  passed, and `npm test` passed (8 tests). Browser rendering was not verified.
+
 ## Homepage mobile category placement
 
 - Centered the homepage category chips on mobile and allowed them to wrap into

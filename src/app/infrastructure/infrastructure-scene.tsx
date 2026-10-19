@@ -206,15 +206,35 @@ function Road({
     return offsetPath(points, laneOffset);
   });
   const stopLine = object.name.toLowerCase().includes("connector") ? offsetPath([[-object.width / 2, 9], [object.width / 2, 9]], 0, 2) : null;
+  const elevated = object.style === "highway";
+  const deckHeight = elevated ? object.height : 0;
   return (
-    <group onClick={onClick}>
-      <Ribbon points={points} width={object.width + 1.2} color="#88877f" y={0.015} />
+    <group position={[0, deckHeight, 0]} onClick={onClick}>
+      {elevated && points.slice(0, -1).map(([x, z], index) => {
+        const [nextX, nextZ] = points[index + 1];
+        const span = Math.hypot(nextX - x, nextZ - z);
+        const supports = Math.max(1, Math.ceil(span / 9));
+        return Array.from({ length: supports }, (_, support) => {
+          const t = (support + 0.5) / supports;
+          return (
+            <mesh
+              key={`pier-${index}-${support}`}
+              position={[x + (nextX - x) * t, -deckHeight / 2, z + (nextZ - z) * t]}
+              castShadow
+            >
+              <boxGeometry args={[0.75, deckHeight, 0.9]} />
+              <meshStandardMaterial color="#aaa99f" roughness={0.78} />
+            </mesh>
+          );
+        });
+      })}
+      <Ribbon points={points} width={object.width + 1.2} color={elevated ? "#b9b8ae" : "#88877f"} y={0.015} />
       <Ribbon points={points} width={object.width} color={object.color} y={0.045} />
-      {edges.map((line, index) => <Line key={`edge-${index}`} points={line} color="#d7d1b3" lineWidth={1.25} />)}
+      {edges.map((line, index) => <Line key={`edge-${index}`} points={line.map((point) => [point.x, point.y + 0.025, point.z])} color="#d7d1b3" lineWidth={1.25} />)}
       {dividers.map((line, index) => (
-        <Line key={`lane-${index}`} points={line} color="#eee7cb" lineWidth={0.85} dashed dashSize={1.5} gapSize={1.1} />
+        <Line key={`lane-${index}`} points={line.map((point) => [point.x, point.y + 0.025, point.z])} color="#eee7cb" lineWidth={0.85} dashed dashSize={1.5} gapSize={1.1} />
       ))}
-      {stopLine && <Line points={stopLine} color="#f6f0d9" lineWidth={3} />}
+      {stopLine && <Line points={stopLine.map((point) => [point.x, point.y + 0.025, point.z])} color="#f6f0d9" lineWidth={3} />}
     </group>
   );
 }
@@ -244,6 +264,20 @@ function Building({ object }: { object: InfrastructureObject }) {
           <meshStandardMaterial color="#a8d4df" roughness={0.2} metalness={0.32} />
         </mesh>
       ))}
+      {style !== "service" && windows.map((x, index) => (
+        <group key={`side-${index}`} position={[width / 2 + 0.07, height * 0.64 + 0.6, x * depth / width]} rotation={[0, Math.PI / 2, 0]}>
+          <mesh>
+            <boxGeometry args={[0.82, Math.min(1.35, height * 0.24), 0.045]} />
+            <meshStandardMaterial color="#a8d4df" roughness={0.2} metalness={0.32} />
+          </mesh>
+        </group>
+      ))}
+      {style === "curved" && [0.34, 0.68].map((floor) => (
+        <mesh key={floor} position={[0, height * floor + 0.6, depth / 2 + 0.1]}>
+          <boxGeometry args={[width * 0.98, 0.13, 0.08]} />
+          <meshStandardMaterial color="#e1e5e2" roughness={0.5} />
+        </mesh>
+      ))}
       <mesh position={[0, height + 0.65, 0]} castShadow>
         <boxGeometry args={[width + 0.32, 0.28, depth + 0.32]} />
         <meshStandardMaterial color={style === "solar" ? "#344753" : "#e6ebea"} roughness={0.62} />
@@ -263,6 +297,60 @@ function Building({ object }: { object: InfrastructureObject }) {
       <mesh position={[0, 0.17, depth / 2 + 0.1]}>
         <boxGeometry args={[Math.min(2.8, width * 0.22), 2.2, 0.12]} />
         <meshStandardMaterial color="#364f58" roughness={0.26} metalness={0.3} />
+      </mesh>
+    </group>
+  );
+}
+
+function FerrisWheel({ object }: { object: InfrastructureObject }) {
+  const radius = object.height * 0.44;
+  const rim = object.color;
+  return (
+    <group>
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * object.width * 0.19, object.height * 0.42, 0]} rotation={[0, 0, side * -0.34]}>
+          <cylinderGeometry args={[0.16, 0.25, object.height * 0.82, 8]} />
+          <meshStandardMaterial color="#a6a49a" metalness={0.55} roughness={0.42} />
+        </mesh>
+      ))}
+      <group position={[0, object.height * 0.72, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh>
+          <torusGeometry args={[radius, 0.16, 10, 64]} />
+          <meshStandardMaterial color={rim} metalness={0.64} roughness={0.28} />
+        </mesh>
+        <mesh>
+          <torusGeometry args={[radius * 0.93, 0.07, 8, 64]} />
+          <meshStandardMaterial color="#d8cda9" metalness={0.55} roughness={0.3} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.34, 0.34, 0.5, 24]} />
+          <meshStandardMaterial color="#d5c79c" metalness={0.68} roughness={0.3} />
+        </mesh>
+        {Array.from({ length: 18 }, (_, index) => {
+          const angle = (index / 18) * Math.PI * 2;
+          return (
+            <group key={index} rotation={[0, 0, angle]}>
+              <mesh position={[0, radius / 2, 0]}>
+                <cylinderGeometry args={[0.035, 0.035, radius, 6]} />
+                <meshStandardMaterial color="#e6dfc8" metalness={0.62} roughness={0.3} />
+              </mesh>
+              <group position={[0, radius, 0]} rotation={[0, 0, -angle]}>
+                <mesh position={[0, -0.44, 0]}>
+                  <boxGeometry args={[0.84, 0.88, 0.62]} />
+                  <meshStandardMaterial color={index % 3 === 0 ? "#c98264" : "#75959a"} roughness={0.36} metalness={0.12} />
+                </mesh>
+                <mesh position={[0, 0.04, 0]}>
+                  <boxGeometry args={[0.86, 0.1, 0.66]} />
+                  <meshStandardMaterial color="#ded8c6" roughness={0.52} />
+                </mesh>
+              </group>
+            </group>
+          );
+        })}
+      </group>
+      <mesh position={[0, 0.17, 0]} castShadow>
+        <cylinderGeometry args={[object.width * 0.3, object.width * 0.34, 0.32, 32]} />
+        <meshStandardMaterial color="#b7ad98" roughness={0.68} />
       </mesh>
     </group>
   );
@@ -546,6 +634,7 @@ function SceneObject({
           </group>
         )}
         {object.type === "building" && <Building object={object} />}
+        {object.type === "ferrisWheel" && <FerrisWheel object={object} />}
         {object.type === "tree" && <Tree object={object} />}
         {object.type === "pavilion" && <Pavilion object={object} />}
         {object.type === "vehicle" && <Vehicle object={object} />}

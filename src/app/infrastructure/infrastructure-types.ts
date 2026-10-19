@@ -20,7 +20,8 @@ export type InfrastructureType =
   | "bikeLane"
   | "busStop"
   | "trafficLight"
-  | "roadSign";
+  | "roadSign"
+  | "ferrisWheel";
 
 export type InfrastructureObject = {
   id: number;
@@ -38,7 +39,7 @@ export type InfrastructureObject = {
   locked: boolean;
   lanes?: number;
   path?: [number, number][];
-  style?: "commercial" | "retail" | "service" | "curved" | "solar" | "glass";
+  style?: "commercial" | "retail" | "service" | "curved" | "solar" | "glass" | "highway";
 };
 
 export type LightingPreset = "Day" | "Golden hour" | "Night" | "Studio";
@@ -66,6 +67,7 @@ export const infrastructureLabels: Record<InfrastructureType, string> = {
   busStop: "Bus stop",
   trafficLight: "Traffic signal",
   roadSign: "Road sign",
+  ferrisWheel: "Ferris wheel",
 };
 
 export const makeInfrastructureObject = (
@@ -108,6 +110,7 @@ export const makeInfrastructureObject = (
     busStop: "#94b9c6",
     trafficLight: "#50565a",
     roadSign: "#d45145",
+    ferrisWheel: "#f0ede2",
   }[type],
   visible: true,
   locked: false,
@@ -124,11 +127,20 @@ export function createInitialInfrastructure(): InfrastructureObject[] {
   ) => objects.push(makeInfrastructureObject(objects.length + 1, type, x, z, overrides));
 
   add("road", 0, 24, {
-    name: "South arterial · 4 lanes",
-    width: 10,
+    name: "South arterial · 6 lanes",
+    width: 16,
     depth: 92,
-    lanes: 4,
+    lanes: 6,
     path: [[-46, 0], [46, 0]],
+  });
+  add("road", -35, -38, {
+    name: "Northwest elevated expressway",
+    width: 12,
+    depth: 48,
+    height: 4,
+    lanes: 4,
+    style: "highway",
+    path: [[-16, 18], [-5, 10], [7, 1], [21, -13]],
   });
   add("road", -25, 1, {
     name: "West access boulevard",
@@ -208,6 +220,14 @@ export function createInitialInfrastructure(): InfrastructureObject[] {
     color: "#c4cdd0",
     style: "service",
   });
+  add("building", 8, -17, {
+    name: "Riverside food hall",
+    width: 8,
+    depth: 6,
+    height: 4,
+    color: "#c8b18b",
+    style: "retail",
+  });
 
   add("water", -8, -1, {
     name: "Willow Creek",
@@ -231,6 +251,7 @@ export function createInitialInfrastructure(): InfrastructureObject[] {
   add("barrier", 36, 18, { name: "East road guardrail", width: 8, depth: 0.25, height: 1.1 });
   add("pavilion", 8, -1, { name: "Glass event pavilion", width: 8, depth: 7, height: 4.5 });
   add("pavilion", -10, 10, { name: "Garden rotunda", width: 5.5, depth: 5.5, height: 4 });
+  add("ferrisWheel", 1, -27, { name: "Willow Creek observation wheel", width: 12, depth: 3, height: 14 });
   add("busStop", 13, 20, { name: "Willow Creek transit stop", width: 2.8, depth: 1.4, height: 2.6 });
   add("trafficLight", -1.8, 19, { name: "Central crossing signal", width: 0.4, depth: 0.4, height: 4.2 });
   add("roadSign", 31, 18.5, { name: "District wayfinding sign", width: 1.2, depth: 0.2, height: 2.5 });
@@ -244,7 +265,11 @@ export function createInitialInfrastructure(): InfrastructureObject[] {
     [35, -20, 0.9], [37, -11, 1.15], [38, -3, 0.9], [37, 7, 1.1],
     [36, 16, 0.95], [-18, 8, 0.9], [-16, 15, 1.1], [-12, 18, 0.8],
     [13, 13, 1.05], [17, 15, 0.9], [20, 14, 1.15], [10, -16, 0.85],
-    [-10, -13, 0.85], [12, 2, 0.8],
+    [-10, -13, 0.85], [12, 2, 0.8], [-20, -3, 1.1], [-21, 5, 0.85],
+    [-14, -5, 0.9], [-13, 2, 0.95], [-5, 15, 0.85], [2, 13, 1.05],
+    [15, 7, 0.9], [18, 4, 1.1], [21, 1, 0.85], [29, -16, 0.95],
+    [-30, -18, 0.8], [-28, -15, 0.95], [31, -6, 0.9], [32, 2, 0.85],
+    [-34, 7, 0.8], [-33, 15, 0.9], [33, 11, 0.85], [28, -2, 0.9],
   ];
   trees.forEach(([x, z, scale], index) =>
     add("tree", x, z, { name: `Landscape tree ${String(index + 1).padStart(2, "0")}`, width: scale, depth: scale, height: 4 * scale }),
@@ -257,6 +282,19 @@ export function createInitialInfrastructure(): InfrastructureObject[] {
     ([x, z], index) => add("vehicle", x, z, { name: `Arterial vehicle ${index + 1}`, width: 2.1, depth: 4.3, height: 1.2, color: ["#f3f3ed", "#6d8fbd", "#d58c59", "#89958c"][index % 4] }),
   );
   add("vehicle", 26, 8, { name: "Parking vehicle", width: 2, depth: 4, height: 1.2, color: "#d2d8d7", rotation: Math.PI / 2 });
+  [
+    [21, 5], [25, 5], [29, 5], [33, 5], [21, 11], [25, 11], [29, 11], [33, 11],
+    [-33, 7], [-29, 7], [-25, 7], [-33, 12], [-29, 12],
+  ].forEach(([x, z], index) =>
+    add("vehicle", x, z, {
+      name: `Visitor parking vehicle ${String(index + 1).padStart(2, "0")}`,
+      width: 1.85,
+      depth: 3.9,
+      height: 1.15,
+      color: ["#e7e5dc", "#718aa1", "#9c5d4c", "#929985", "#c8b891"][index % 5],
+      rotation: Math.PI / 2,
+    }),
+  );
 
   return objects;
 }
