@@ -1318,7 +1318,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         onAttachImage={(file) => setReferenceImage(URL.createObjectURL(file))}
         onRemoveImage={() => setReferenceImage(null)}
         quickPrompts={FLOOR_PLAN_QUICK_PROMPTS}
-        placeholder="Describe what you want to create or change (e.g., 10m by 8m with living room, kitchen, bedroom)…"
+        placeholder="What do you want to create?"
         statusLabel={`1:${settings.scale} · ${settings.unit}`}
         className="studio-ai-floating-floorplan"
       />
@@ -2199,7 +2199,7 @@ export function Viewport(p: Props) {
         }}
         onRemoveImage={() => setReferenceImage(null)}
         quickPrompts={MODELING_QUICK_PROMPTS}
-        placeholder="Describe what you want to create or change…"
+        placeholder="What do you want to create?"
         statusLabel={p.selectedAsset ? p.selectedAsset.name : p.renderer}
       />
 

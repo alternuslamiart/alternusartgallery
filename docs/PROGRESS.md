@@ -29,8 +29,12 @@ Last updated: 2026-10-19
     and `Show`/`Hide` blue pills), `Post-Processing` switch, `Environment`
     (`Light`, `Ambient`, `Fog` gear icons + `Yes`/`No` pills), and `Export`.
   - Bottom `StudioAIChat` (`src/components/crystal-studio/StudioAIChat.tsx`)
-    starting in a compact composer state with a `Tools ▾` dropdown menu, Model
-    Selector, attachment preview, and expandable message history.
+    unified across `/casynus`, `/interior`, and `/infrastructure` as a sleek
+    single-card rainbow-bordered dark composer (`#0b0c10`, `18px` radius,
+    spectrum border + soft blue glow) with `"What do you want to create?"`
+    placeholder, bottom-left paperclip attachment button + `"Precision Mode"`
+    pill selector, and bottom-right solid blue (`#0d8bf2`) paper-plane send
+    button, expanding conversation messages only after user submission.
 - Focused ESLint on all modified studio files passed (0 errors), full-project
   typecheck (`NODE_OPTIONS="--max-old-space-size=4096" npm run typecheck`)
   passed, and `npm test` passed (8 tests). Browser rendering was not verified.

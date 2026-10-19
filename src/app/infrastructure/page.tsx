@@ -255,7 +255,7 @@ export default function InfrastructurePage() {
   const [lightingOpen, setLightingOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(true);
   const [chatInput, setChatInput] = useState("");
-  const [chatModel, setChatModel] = useState("Site Assistant");
+  const [chatModel, setChatModel] = useState("Precision Mode");
   const [treeGroupsOpen, setTreeGroupsOpen] = useState({
     circulation: true,
     buildings: true,
@@ -1770,7 +1770,7 @@ export default function InfrastructurePage() {
               setChatInput("");
             }}
             quickPrompts={INFRA_QUICK_PROMPTS}
-            placeholder="Describe what you want to create or change…"
+            placeholder="What do you want to create?"
             statusLabel={`${objects.length} site objects`}
             className="infra-ai-chat studio-ai-floating-infra"
           />
