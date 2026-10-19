@@ -28,7 +28,7 @@ type SidebarItem = { label: string; href: string; icon: LucideIcon; badge?: stri
 
 const primary: SidebarItem[] = [
   { label: "Dashboard", href: "/project", icon: LayoutDashboard },
-  { label: "Floor Plan", href: "/casynus?mode=floor-plan", icon: LayoutGrid },
+  { label: "Interior & Plan", href: "/interior", icon: LayoutGrid },
   { label: "Modeling", href: "/casynus", icon: Box },
   { label: "Notes", href: "/workspace/knowledge", icon: FileText },
   { label: "Infrastructure", href: "/infrastructure", icon: Globe2 },

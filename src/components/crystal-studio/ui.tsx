@@ -95,7 +95,7 @@ export function StudioModeNav({
           type="button"
           aria-pressed={activeStudio === "modeling"}
           onClick={() => onStudioModeChange("modeling")}
-          title="3D Modeling Studio (/casynus)"
+          title="3D Studio (/casynus)"
           className={`studio-mode-pill ${activeStudio === "modeling" ? "is-active" : ""}`}
         >
           <Box size={13} />
@@ -104,7 +104,7 @@ export function StudioModeNav({
       ) : (
         <Link
           href="/casynus"
-          title="3D Modeling Studio (/casynus)"
+          title="3D Studio (/casynus)"
           className={`studio-mode-pill ${activeStudio === "modeling" ? "is-active" : ""}`}
         >
           <Box size={13} />
@@ -117,20 +117,20 @@ export function StudioModeNav({
           type="button"
           aria-pressed={activeStudio === "floor-plan"}
           onClick={() => onStudioModeChange("floor-plan")}
-          title="2D Floor Plan Studio (/casynus?mode=floor-plan)"
+          title="Interior & Floor Plan Studio (/interior)"
           className={`studio-mode-pill ${activeStudio === "floor-plan" ? "is-active" : ""}`}
         >
           <Layers3 size={13} />
-          <span>Floor Plan</span>
+          <span>Interior</span>
         </button>
       ) : (
         <Link
-          href="/casynus?mode=floor-plan"
-          title="2D Floor Plan Studio (/casynus?mode=floor-plan)"
+          href="/interior"
+          title="Interior & Floor Plan Studio (/interior)"
           className={`studio-mode-pill ${activeStudio === "floor-plan" ? "is-active" : ""}`}
         >
           <Layers3 size={13} />
-          <span>Floor Plan</span>
+          <span>Interior</span>
         </Link>
       )}
 
@@ -144,5 +144,130 @@ export function StudioModeNav({
         <span>Infra</span>
       </Link>
     </nav>
+  );
+}
+
+export function BinaryToggle({
+  label,
+  value,
+  onChange,
+  onLabel,
+  offLabel,
+  trueLabel,
+  falseLabel,
+  leadingAction,
+}: {
+  label?: string;
+  value: boolean;
+  onChange: (next: boolean) => void;
+  onLabel?: string;
+  offLabel?: string;
+  trueLabel?: string;
+  falseLabel?: string;
+  leadingAction?: ReactNode;
+}) {
+  const activeText = trueLabel ?? onLabel ?? "Yes";
+  const inactiveText = falseLabel ?? offLabel ?? "No";
+
+  const pillGroup = (
+    <div className="ref-binary-toggle ref-binary-group">
+      <button
+        type="button"
+        aria-pressed={value}
+        onClick={() => onChange(true)}
+        className={`ref-binary-option ref-binary-btn ${value ? "is-active" : ""}`}
+      >
+        {activeText}
+      </button>
+      <button
+        type="button"
+        aria-pressed={!value}
+        onClick={() => onChange(false)}
+        className={`ref-binary-option ref-binary-btn ${!value ? "is-active" : ""}`}
+      >
+        {inactiveText}
+      </button>
+    </div>
+  );
+
+  if (!label) {
+    return pillGroup;
+  }
+
+  return (
+    <div className="ref-prop-row ref-setting-row" role="group" aria-label={label}>
+      <span className="ref-prop-label ref-setting-label">{label}</span>
+      <div className="ref-prop-control-group flex items-center gap-1.5">
+        {leadingAction}
+        {pillGroup}
+      </div>
+    </div>
+  );
+}
+
+export function InspectorCollaboratorBar({
+  onInvite,
+  onAction,
+  actionLabel = "Invite",
+  onCollapse,
+}: {
+  onInvite?: () => void;
+  onAction?: () => void;
+  actionLabel?: string;
+  onCollapse?: () => void;
+}) {
+  const collaborators = [
+    { initial: "J", bg: "#e855a0", ring: "#ff72b6" },
+    { initial: "D", bg: "#5e43d8", ring: "#8b6eff" },
+    { initial: "G", bg: "#1c9c68", ring: "#34d399" },
+    { initial: "M", bg: "#1687f7", ring: "#60a5fa" },
+  ];
+
+  return (
+    <div className="ref-collab-header">
+      <div
+        className="ref-collab-stack ref-avatar-stack"
+        aria-label="Active workspace collaborators"
+      >
+        {collaborators.map((user) => (
+          <span
+            key={user.initial}
+            className="ref-collab-avatar ref-avatar-pill"
+            style={{
+              backgroundColor: user.bg,
+              boxShadow: `0 0 0 2px #141518, 0 0 0 3.5px ${user.ring}`,
+            }}
+          >
+            {user.initial}
+          </span>
+        ))}
+        <span className="ref-collab-count ref-avatar-count">5</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => {
+            if (onInvite) onInvite();
+            else if (onAction) onAction();
+            else void navigator.clipboard?.writeText(window.location.href);
+          }}
+          title="Copy workspace invite link"
+          className="ref-invite-btn"
+        >
+          {actionLabel}
+        </button>
+        {onCollapse && (
+          <button
+            type="button"
+            onClick={onCollapse}
+            aria-label="Collapse inspector"
+            title="Collapse inspector"
+            className="ref-collapse-mini-btn ref-header-icon-btn"
+          >
+            ×
+          </button>
+        )}
+      </div>
+    </div>
   );
 }

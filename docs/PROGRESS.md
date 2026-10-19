@@ -4,26 +4,33 @@ Last updated: 2026-10-19
 
 ## Casynus Studio Ecosystem UI/UX redesign
 
-- Unified the desktop-grade dark graphite/blue design system (`--studio-*` CSS
-  tokens and `.studio-*` components in `src/app/globals.css`) across Casynus 3D
-  Studio (`/casynus`), Floor Plan Studio (`/casynus?mode=floor-plan`), and
-  Infrastructure Studio (`/infrastructure`).
-- Created `src/components/crystal-studio/StudioAIChat.tsx` and integrated it
-  across all three studios with expandable conversation history, studio-specific
-  prompt suggestions, reference image attachment preview, custom model/mode
-  selector dropdown, new-chat reset, two-step clear confirmation, expand/compact
-  toggle, and minimize pill.
-- Added `StudioModeNav` in `src/components/crystal-studio/ui.tsx` so all three
-  studios share a consistent sidebar header (`Back to projects`, studio badge,
-  panel collapse toggle) and 3-way workspace switcher (`3D Studio`,
-  `Floor Plan`, `Infra`) while preserving `?mode=floor-plan` URL routing.
-- Restored the Floor Plan Studio light drafting canvas (`#f8f9fa` / `#fbfbfa`),
-  connected `RightPanel` (`floorPlanMode={studioMode === "floor-plan"}`), and
-  added interactive Plan Elements selection and precision/scale controls in
-  `LeftSidebar` and `RightPanel`.
-- Upgraded `InfrastructureStudioPage` (`src/app/infrastructure/page.tsx`) with
-  collapsible left/right sidebars, scene hierarchy search and inline
-  lock/visibility controls, and unified legible typography.
+- Added the dedicated `/interior` route (`src/app/interior/page.tsx`) for the 2D
+  Floor Plan & Interior Studio while preserving `/casynus?mode=floor-plan`
+  compatibility and updating `StudioModeNav` (`src/components/crystal-studio/ui.tsx`)
+  and `UnifiedSidebar` (`src/components/unified-sidebar.tsx`) to link to
+  `/interior`.
+- Redesigned `/casynus`, `/interior` (`/casynus?mode=floor-plan`), and
+  `/infrastructure` (`/infrastructur`) to match the reference 3D/CAD studio
+  layout (`src/app/globals.css`, `.ref-*` classes):
+  - Floating dark charcoal rounded side panels (`#141518`, `16px` radius) with
+    hierarchical scene trees, connector lines (`├`, `└`, `│`), disclosure
+    chevrons, inline visibility/lock controls, collapsible setup drawers, and
+    the bottom `Library` / `Import` / `Help & Feedback` footer.
+  - Compact top-center floating pill toolbar (`.ref-top-toolbar`) with `+` add
+    and shape/drawing tools, solid electric blue (`#1a8cff`) active selection
+    state, view framing, zoom percentage readout (`100% ▾`), solid blue
+    `Export` button, and preview/play trigger.
+  - Circular 3D Orientation Axis Gizmo (`X` / `Y` / `Z`) and
+    `Orthographic` | `Perspective` projection switcher on the 3D viewports,
+    while preserving a pure 2D drafting canvas on `/interior`.
+  - Right properties inspector with top collaborator avatar stack
+    (`InspectorCollaboratorBar` + `Invite`), `Camera`, `Frame` (color swatch,
+    hex, opacity, `Edit Frame`), `Global Settings` (`BinaryToggle` `Yes`/`No`
+    and `Show`/`Hide` blue pills), `Post-Processing` switch, `Environment`
+    (`Light`, `Ambient`, `Fog` gear icons + `Yes`/`No` pills), and `Export`.
+  - Bottom `StudioAIChat` (`src/components/crystal-studio/StudioAIChat.tsx`)
+    starting in a compact composer state with a `Tools ▾` dropdown menu, Model
+    Selector, attachment preview, and expandable message history.
 - Focused ESLint on all modified studio files passed (0 errors), full-project
   typecheck (`NODE_OPTIONS="--max-old-space-size=4096" npm run typecheck`)
   passed, and `npm test` passed (8 tests). Browser rendering was not verified.

@@ -79,9 +79,31 @@ const DEFAULT_MODELS: Record<StudioAIChatProps["studio"], StudioChatModelOption[
 };
 
 const STUDIO_TITLES: Record<StudioAIChatProps["studio"], { title: string; subtitle: string }> = {
-  modeling: { title: "Casynus AI Assistant", subtitle: "3D Object & Scene Generation" },
-  "floor-plan": { title: "Drafting AI Assistant", subtitle: "2D Floor Plan & Room Layout" },
-  infrastructure: { title: "Site Planning Assistant", subtitle: "Civil & Landscape Concept Review" },
+  modeling: { title: "Casynus AI", subtitle: "3D Studio" },
+  "floor-plan": { title: "Casynus AI", subtitle: "Interior & Floor Plan" },
+  infrastructure: { title: "Casynus AI", subtitle: "Infrastructure Studio" },
+};
+
+const STUDIO_TOOLS_MENU: Record<
+  StudioAIChatProps["studio"],
+  Array<{ label: string; prompt: string; tag: string }>
+> = {
+  modeling: [
+    { label: "Generate 3D Concept Mesh", prompt: "Generate a modular architectural pavilion with glass and brushed titanium ribs", tag: "Mesh" },
+    { label: "Rotate Active Object 45°", prompt: "rotate 45", tag: "Transform" },
+    { label: "Translate Object +2m", prompt: "move right 2", tag: "Transform" },
+  ],
+  "floor-plan": [
+    { label: "Generate 10×8m Apartment Plan", prompt: "10m by 8m apartment with living room, kitchen, bedroom, bathroom", tag: "Layout" },
+    { label: "Open-Concept Studio Suite", prompt: "8m by 6m studio with living room, kitchen, bathroom", tag: "Layout" },
+    { label: "Executive Office Floor", prompt: "12m by 9m office with reception, meeting room, studio, kitchen", tag: "Commercial" },
+  ],
+  infrastructure: [
+    { label: "Add 4-Lane Arterial Road", prompt: "Add a 4-lane arterial road with planted median", tag: "Corridor" },
+    { label: "Insert Mobility Roundabout", prompt: "Add a central roundabout with pedestrian crosswalks", tag: "Junction" },
+    { label: "Add Pedestrian Overpass", prompt: "Add a pedestrian bridge over Willow Creek", tag: "Structure" },
+    { label: "Run Site Drainage & Access Check", prompt: "Review site circulation, transit access, and permeable drainage balance", tag: "Audit" },
+  ],
 };
 
 export function StudioAIChat({
@@ -107,21 +129,30 @@ export function StudioAIChat({
   onRemoveImage,
   quickPrompts = [],
   onQuickPrompt,
-  placeholder = "What do you want to create?",
+  placeholder = "Describe what you want to create or change…",
   statusLabel,
   className = "",
 }: StudioAIChatProps) {
   const [expanded, setExpanded] = useState(false);
-  const [showHistory, setShowHistory] = useState(true);
+  const [showHistory, setShowHistory] = useState(false);
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
+  const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const threadRef = useRef<HTMLDivElement>(null);
   const modelDropdownRef = useRef<HTMLDivElement>(null);
+  const toolsDropdownRef = useRef<HTMLDivElement>(null);
 
   const availableModels = models ?? DEFAULT_MODELS[studio];
   const activeModel = availableModels.find((item) => item.id === model || item.label === model) ?? availableModels[0];
   const meta = STUDIO_TITLES[studio];
+  const studioTools = STUDIO_TOOLS_MENU[studio];
+
+  useEffect(() => {
+    if (messages.length > 1) {
+      setShowHistory(true);
+    }
+  }, [messages.length]);
 
   useEffect(() => {
     if (threadRef.current && showHistory) {
@@ -130,15 +161,18 @@ export function StudioAIChat({
   }, [messages.length, loading, showHistory]);
 
   useEffect(() => {
-    if (!modelMenuOpen) return;
+    if (!modelMenuOpen && !toolsMenuOpen) return;
     const handlePointerDown = (event: PointerEvent) => {
       if (modelDropdownRef.current && !modelDropdownRef.current.contains(event.target as Node)) {
         setModelMenuOpen(false);
       }
+      if (toolsDropdownRef.current && !toolsDropdownRef.current.contains(event.target as Node)) {
+        setToolsMenuOpen(false);
+      }
     };
     document.addEventListener("pointerdown", handlePointerDown);
     return () => document.removeEventListener("pointerdown", handlePointerDown);
-  }, [modelMenuOpen]);
+  }, [modelMenuOpen, toolsMenuOpen]);
 
   if (!open) {
     return (
@@ -460,6 +494,56 @@ export function StudioAIChat({
                       </button>
                     );
                   })}
+                </div>
+              )}
+            </div>
+
+            {/* Studio Tools / Actions Selector */}
+            <div ref={toolsDropdownRef} className="studio-ai-model-wrap">
+              <button
+                type="button"
+                aria-label="Studio AI tools"
+                aria-expanded={toolsMenuOpen}
+                onClick={() => {
+                  setToolsMenuOpen((current) => !current);
+                  setModelMenuOpen(false);
+                }}
+                title="Studio AI tools and templates"
+                className="studio-ai-model-trigger"
+              >
+                <Wand2 size={12.5} className="text-[#1a8cff]" />
+                <span>Tools</span>
+                <ChevronDown size={12} className={`transition-transform ${toolsMenuOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {toolsMenuOpen && (
+                <div className="studio-ai-model-menu" role="menu" aria-label="Studio AI tools">
+                  <div className="studio-ai-model-menu-header">Studio Actions</div>
+                  {studioTools.map((toolItem) => (
+                    <button
+                      key={toolItem.label}
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setToolsMenuOpen(false);
+                        if (onQuickPrompt) {
+                          onQuickPrompt(toolItem.prompt);
+                        } else {
+                          onPromptChange(toolItem.prompt);
+                          textareaRef.current?.focus();
+                        }
+                      }}
+                      className="studio-ai-model-option"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span>{toolItem.label}</span>
+                          <em>{toolItem.tag}</em>
+                        </div>
+                        <small className="truncate">{toolItem.prompt}</small>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>

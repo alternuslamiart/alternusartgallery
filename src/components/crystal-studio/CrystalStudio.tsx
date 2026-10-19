@@ -26,9 +26,19 @@ function downloadFile(name: string, content: string, type = "text/plain") {
   URL.revokeObjectURL(url);
 }
 
-export function CrystalStudio({ initialDashboard = false, embedded = false, dedicated = false }: { initialDashboard?: boolean; embedded?: boolean; dedicated?: boolean } = {}) {
-  // Opening /crystal should enter the modeling workspace immediately. The
-  // project dashboard remains available from the Home control in the top bar.
+export function CrystalStudio({
+  initialDashboard = false,
+  embedded = false,
+  dedicated = false,
+  initialStudioMode = "modeling",
+}: {
+  initialDashboard?: boolean;
+  embedded?: boolean;
+  dedicated?: boolean;
+  initialStudioMode?: StudioMode;
+} = {}) {
+  // Opening /casynus or /interior should enter the active workspace immediately.
+  // The project dashboard remains available from the Home control.
   const [dashboard, setDashboard] = useState(initialDashboard);
   const [dashboardSidebarCollapsed, setDashboardSidebarCollapsed] = useState(false);
   const router = useRouter();
@@ -54,22 +64,23 @@ export function CrystalStudio({ initialDashboard = false, embedded = false, dedi
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<StudioTool>("orbit");
   const [incognito, setIncognito] = useState(false);
-  const [studioMode, setStudioMode] = useState<StudioMode>("modeling");
+  const [studioMode, setStudioMode] = useState<StudioMode>(initialStudioMode);
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("mode") === "floor-plan") {
+    if (
+      window.location.pathname === "/interior" ||
+      new URLSearchParams(window.location.search).get("mode") === "floor-plan"
+    ) {
       setStudioMode("floor-plan");
     }
   }, []);
   const switchStudioMode = (nextMode: StudioMode) => {
     setStudioMode(nextMode);
     if (typeof window !== "undefined") {
-      const url = new URL(window.location.href);
       if (nextMode === "floor-plan") {
-        url.searchParams.set("mode", "floor-plan");
+        window.history.replaceState({}, "", "/interior");
       } else {
-        url.searchParams.delete("mode");
+        window.history.replaceState({}, "", "/casynus");
       }
-      window.history.replaceState({}, "", `${url.pathname}${url.search}`);
     }
   };
   const [floorPlanObjects, setFloorPlanObjects] = useState<FloorPlanObject[]>([

@@ -2,11 +2,11 @@
 
 ## Next concrete task
 
-- [ ] Verify the unified Casynus Studio Ecosystem UI (`/casynus`,
-  `/casynus?mode=floor-plan`, and `/infrastructure`) in a browser at desktop and
-  mobile widths, including the `StudioModeNav` switcher, `StudioAIChat`
-  conversation drawer/composer, Floor Plan light drafting canvas and inspector,
-  and collapsible sidebars.
+- [ ] Verify the reference-based Casynus Studio Ecosystem UI (`/casynus`,
+  `/interior`, `/casynus?mode=floor-plan`, and `/infrastructure`) in a browser
+  at desktop and mobile widths, including the floating rounded sidebars,
+  hierarchical scene tree connectors, top floating toolbar, `BinaryToggle`
+  pills, `StudioAIChat` composer/tools menu, and `/interior` 2D drafting canvas.
 - [ ] Verify homepage category-chip centering and wrapping at narrow and wide
   mobile viewport widths in a browser.
 - [ ] Design authenticated infrastructure-scene persistence within an

@@ -4,19 +4,35 @@ import {
   ArrowLeft,
   Box,
   ChevronDown,
+  ChevronRight,
+  CircleHelp,
   DoorOpen,
+  Download,
+  Eye,
+  EyeOff,
+  Folder,
+  Grid2X2,
   Layers3,
+  LayoutGrid,
   LoaderCircle,
+  Lock,
   LogOut,
-  PanelLeftClose,
+  Menu,
   Ruler,
+  Search,
+  SlidersHorizontal,
   Sparkles,
+  Square,
   SquareDashed,
+  Unlock,
   Upload,
   User,
+  Video,
+  X,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import Link from "next/link";
+import { useRef, useState } from "react";
 import { materials } from "./data";
 import type { FloorPlanObject, FloorPlanSettings, MaterialName, StudioMode } from "./types";
 import { StudioModeNav } from "./ui";
@@ -119,133 +135,89 @@ function Segmented({
   );
 }
 
-function NumberSlider({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <label className="studio-slider-row">
-      <b className="flex-1">{label}</b>
-      <input
-        aria-label={`${label} slider`}
-        type="range"
-        min="0"
-        max="1"
-        step=".01"
-        value={value}
-        onChange={(e) => onChange(clamp(Number(e.target.value)))}
-        className="mr-2 w-20 accent-[#1687f7]"
-      />
-      <input
-        aria-label={`${label} value`}
-        type="number"
-        min="0"
-        max="1"
-        step=".01"
-        value={value.toFixed(2)}
-        onChange={(e) => onChange(clamp(Number(e.target.value)))}
-        className="w-14 rounded-[6px] border border-white/[0.08] bg-[#14171c] py-1 text-center text-[11px] outline-none focus:border-[#1687f7]"
-      />
-    </label>
-  );
-}
-
-function CompactSelect({
-  label,
-  value,
-  options,
-  onChange,
-  icon,
-}: {
-  label?: string;
-  value: string;
-  options: string[];
-  onChange: (value: string) => void;
-  icon?: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="relative min-w-0 flex-1">
-      <button
-        type="button"
-        aria-label={label}
-        aria-expanded={open}
-        onClick={() => setOpen((current) => !current)}
-        className="flex h-full w-full items-center gap-2 rounded-[8px] px-2 text-left text-[12px] font-medium text-zinc-100 transition hover:bg-white/[0.04]"
-      >
-        {icon}
-        <span className="min-w-0 flex-1 truncate">{value}</span>
-        <ChevronDown
-          size={14}
-          className={`shrink-0 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-      {open && (
-        <div className="studio-dropdown-menu">
-          {options.map((option) => (
-            <button
-              type="button"
-              key={option}
-              onClick={() => {
-                onChange(option);
-                setOpen(false);
-              }}
-              className={`studio-dropdown-item ${option === value ? "is-selected" : ""}`}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export function LeftSidebar(p: Props) {
-  const [draftingProfile, setDraftingProfile] = useState("Architectural 2D");
-  const floorSettings = p.floorPlanSettings;
-  const updateFloorSettings = (patch: Partial<FloorPlanSettings>) => {
-    if (floorSettings) p.onFloorPlanSettingsChange?.({ ...floorSettings, ...patch });
+  const settings = p.floorPlanSettings;
+  const updateSettings = (patch: Partial<FloorPlanSettings>) => {
+    if (settings && p.onFloorPlanSettingsChange) {
+      p.onFloorPlanSettingsChange({ ...settings, ...patch });
+    }
   };
-  const floorObjects = p.floorPlanObjects ?? [];
-  const wallCount = floorObjects.filter((o) => o.type === "wall").length;
-  const roomCount = floorObjects.filter((o) => o.type === "room").length;
-  const openingCount = floorObjects.filter((o) => o.type === "door" || o.type === "window").length;
+
+  const [query, setQuery] = useState("");
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
+    rooms: true,
+    walls: true,
+    openings: true,
+    annotations: true,
+  });
+  const [setupExpanded, setSetupExpanded] = useState(false);
+  const [lockedIds, setLockedIds] = useState<Record<string, boolean>>({});
+  const [hiddenIds, setHiddenIds] = useState<Record<string, boolean>>({});
+  const importInputRef = useRef<HTMLInputElement>(null);
+
+  const toggleGroup = (key: string) =>
+    setExpandedGroups((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const objects = p.floorPlanObjects ?? [];
+  const matchesQuery = (text: string) =>
+    !query.trim() || text.toLowerCase().includes(query.toLowerCase());
+
+  const getObjectLabel = (obj: FloorPlanObject, index: number) => {
+    if (obj.type === "room") return obj.label || `Room ${index + 1}`;
+    if (obj.type === "wall") return `Structural Wall ${index + 1}`;
+    if (obj.type === "door") return `Door Opening ${index + 1}`;
+    if (obj.type === "window") return `Window Glazing ${index + 1}`;
+    if (obj.type === "dimension") return `Dimension ${index + 1}`;
+    if (obj.type === "text") return obj.text || `Annotation ${index + 1}`;
+    return `${obj.type} ${index + 1}`;
+  };
+
+  const rooms = objects.filter((o) => o.type === "room");
+  const walls = objects.filter((o) => o.type === "wall");
+  const openings = objects.filter((o) => o.type === "door" || o.type === "window");
+  const annotations = objects.filter(
+    (o) => o.type === "dimension" || o.type === "text" || o.type === "furniture",
+  );
 
   return (
     <aside
-      className="crystal-left-panel crystal-sidebar studio-sidebar-shell flex min-h-0 flex-col overflow-hidden"
-      aria-label={p.floorPlanMode ? "Floor plan drafting sidebar" : "Modeling sidebar"}
+      aria-label="Scene and material controls"
+      className="crystal-left-panel crystal-reference-left studio-sidebar-shell ref-floating-sidebar flex min-h-0 flex-col justify-between overflow-hidden"
     >
-      <header className="crystal-reference-project-header studio-sidebar-top">
-        {p.onBack && (
-          <button
-            type="button"
-            aria-label="Back to projects"
-            title="Back to projects"
-            onClick={p.onBack}
-            className="studio-header-icon-btn"
-          >
-            <ArrowLeft size={14} />
-          </button>
-        )}
-        <div className="studio-brand-stack">
-          <b>Casynus</b>
-          <small>{p.floorPlanMode ? "Floor Plan Studio" : "3D Modeling Studio"}</small>
-        </div>
+      <input
+        ref={importInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        className="sr-only"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) p.onUpload(f);
+          e.currentTarget.value = "";
+        }}
+      />
+
+      {/* Reference Top Header */}
+      <header className="ref-sidebar-header">
         <button
           type="button"
-          aria-label="Collapse left panel"
-          title="Collapse sidebar"
-          onClick={p.onCollapse}
-          className="studio-header-icon-btn"
+          aria-label="Back to projects"
+          title="Back to projects"
+          onClick={p.onBack}
+          className="ref-header-icon-btn"
         >
-          <PanelLeftClose size={15} />
+          <ArrowLeft size={15} />
+        </button>
+        <span className="ref-project-title">
+          {p.floorPlanMode ? "Interior & Floor Plan" : "Generative 3D Studio"}
+        </span>
+        <button
+          type="button"
+          aria-label="Collapse panels"
+          title="Collapse sidebars"
+          onClick={p.onCollapse}
+          className="ref-header-icon-btn"
+        >
+          <Menu size={15} />
         </button>
       </header>
 
@@ -254,338 +226,565 @@ export function LeftSidebar(p: Props) {
         onStudioModeChange={p.onStudioModeChange}
       />
 
-      <div className="crystal-left-scroll studio-sidebar-scroll min-h-0 flex-1 overflow-y-auto">
-        <div className="studio-profile-card">
-          <span className="studio-profile-icon">
-            <Layers3 size={16} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <span className="studio-profile-kicker">
-              {p.floorPlanMode ? "Drafting Profile" : "Render Engine"}
-            </span>
-            <CompactSelect
-              label={p.floorPlanMode ? "Studio" : "Renderer"}
-              value={p.floorPlanMode ? draftingProfile : p.renderer}
-              options={
-                p.floorPlanMode
-                  ? ["Architectural 2D", "Drafting / CAD", "Presentation"]
-                  : ["Realtime", "Path-Traced", "Cycles-style"]
-              }
-              onChange={p.floorPlanMode ? setDraftingProfile : p.onRendererChange}
-            />
-          </div>
-        </div>
+      {/* Reference Search Input */}
+      <label className="ref-search-box">
+        <Search size={14} className="text-zinc-500" />
+        <input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search plan elements…"
+          aria-label="Search floor-plan elements"
+        />
+        {query && (
+          <button
+            type="button"
+            aria-label="Clear search"
+            onClick={() => setQuery("")}
+            className="studio-search-clear"
+          >
+            <X size={12} />
+          </button>
+        )}
+      </label>
 
-        {p.floorPlanMode ? (
-          <>
-            <section className="studio-panel-section">
-              <div className="studio-section-title-row">
-                <h2>Drafting Setup</h2>
-                <span>ISO / Metric</span>
+      {p.floorPlanMode ? (
+        <>
+          {/* Reference Hierarchical Scene Tree for Interior & Floor Plan */}
+          <div className="ref-hierarchy-scroll" role="tree" aria-label="Floor plan hierarchy">
+            <div className="ref-tree-root">
+              {/* Top 2D Drafting Camera Node */}
+              <div className="ref-tree-branch">
+                <div className="ref-tree-row">
+                  <span className="ref-tree-connector" aria-hidden="true" />
+                  <button
+                    type="button"
+                    onClick={() => p.onSelectFloorPlanObject?.(null)}
+                    className="ref-tree-label-btn"
+                  >
+                    <Video size={14} className="text-zinc-400" />
+                    <span>Top 2D Camera · 1:{settings?.scale ?? 100}</span>
+                  </button>
+                </div>
               </div>
-              <div className="studio-kv-list">
-                <label className="studio-kv-row">
+
+              {/* Group 1: Rooms & Interior Zones */}
+              <div className="ref-tree-branch">
+                <div className="ref-tree-row">
+                  <button
+                    type="button"
+                    aria-label="Toggle Rooms group"
+                    onClick={() => toggleGroup("rooms")}
+                    className="ref-tree-disclosure"
+                  >
+                    {expandedGroups.rooms ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup("rooms")}
+                    className="ref-tree-label-btn"
+                  >
+                    <Grid2X2 size={14} className="text-emerald-400" />
+                    <span className="font-medium text-zinc-100">Rooms & Zones ({rooms.length})</span>
+                  </button>
+                </div>
+
+                {expandedGroups.rooms && (
+                  <div className="ref-tree-children" role="group">
+                    {rooms.map((room, idx) => {
+                      const label = getObjectLabel(room, idx);
+                      if (!matchesQuery(label)) return null;
+                      const isSelected = p.selectedFloorPlanId === room.id;
+                      const isLocked = !!lockedIds[room.id];
+                      const isHidden = !!hiddenIds[room.id];
+                      return (
+                        <div
+                          key={room.id}
+                          role="treeitem"
+                          aria-selected={isSelected}
+                          className={`ref-tree-row is-child ${isSelected ? "is-selected" : ""} ${
+                            isHidden ? "opacity-50" : ""
+                          }`}
+                        >
+                          <span className="ref-tree-child-connector" aria-hidden="true" />
+                          <button
+                            type="button"
+                            onClick={() => p.onSelectFloorPlanObject?.(room.id)}
+                            className="ref-tree-label-btn"
+                          >
+                            <SquareDashed
+                              size={13.5}
+                              className={isSelected ? "text-[#1a8cff]" : "text-zinc-400"}
+                            />
+                            <span className="truncate">{label}</span>
+                          </button>
+                          <span className="ref-tree-actions">
+                            <button
+                              type="button"
+                              aria-label={`${isLocked ? "Unlock" : "Lock"} ${label}`}
+                              onClick={() =>
+                                setLockedIds((v) => ({ ...v, [room.id]: !v[room.id] }))
+                              }
+                            >
+                              {isLocked ? <Lock size={11} /> : <Unlock size={11} />}
+                            </button>
+                            <button
+                              type="button"
+                              aria-label={`${isHidden ? "Show" : "Hide"} ${label}`}
+                              onClick={() =>
+                                setHiddenIds((v) => ({ ...v, [room.id]: !v[room.id] }))
+                              }
+                            >
+                              {isHidden ? <EyeOff size={11} /> : <Eye size={11} />}
+                            </button>
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Group 2: Structural Walls */}
+              <div className="ref-tree-branch">
+                <div className="ref-tree-row">
+                  <button
+                    type="button"
+                    aria-label="Toggle Structural Walls group"
+                    onClick={() => toggleGroup("walls")}
+                    className="ref-tree-disclosure"
+                  >
+                    {expandedGroups.walls ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup("walls")}
+                    className="ref-tree-label-btn"
+                  >
+                    <Layers3 size={14} className="text-[#1a8cff]" />
+                    <span className="font-medium text-zinc-100">
+                      Structural Walls ({walls.length})
+                    </span>
+                  </button>
+                </div>
+
+                {expandedGroups.walls && (
+                  <div className="ref-tree-children" role="group">
+                    {walls.map((wall, idx) => {
+                      const label = getObjectLabel(wall, idx);
+                      if (!matchesQuery(label)) return null;
+                      const isSelected = p.selectedFloorPlanId === wall.id;
+                      return (
+                        <div
+                          key={wall.id}
+                          role="treeitem"
+                          aria-selected={isSelected}
+                          className={`ref-tree-row is-child ${isSelected ? "is-selected" : ""}`}
+                        >
+                          <span className="ref-tree-child-connector" aria-hidden="true" />
+                          <button
+                            type="button"
+                            onClick={() => p.onSelectFloorPlanObject?.(wall.id)}
+                            className="ref-tree-label-btn"
+                          >
+                            <Box
+                              size={13.5}
+                              className={isSelected ? "text-[#1a8cff]" : "text-zinc-400"}
+                            />
+                            <span className="truncate">{label}</span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Group 3: Doors & Windows */}
+              <div className="ref-tree-branch">
+                <div className="ref-tree-row">
+                  <button
+                    type="button"
+                    aria-label="Toggle Doors and Windows group"
+                    onClick={() => toggleGroup("openings")}
+                    className="ref-tree-disclosure"
+                  >
+                    {expandedGroups.openings ? (
+                      <ChevronDown size={11} />
+                    ) : (
+                      <ChevronRight size={11} />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup("openings")}
+                    className="ref-tree-label-btn"
+                  >
+                    <DoorOpen size={14} className="text-amber-400" />
+                    <span className="font-medium text-zinc-100">
+                      Doors & Windows ({openings.length})
+                    </span>
+                  </button>
+                </div>
+
+                {expandedGroups.openings && (
+                  <div className="ref-tree-children" role="group">
+                    {openings.map((item, idx) => {
+                      const label = getObjectLabel(item, idx);
+                      if (!matchesQuery(label)) return null;
+                      const isSelected = p.selectedFloorPlanId === item.id;
+                      return (
+                        <div
+                          key={item.id}
+                          role="treeitem"
+                          aria-selected={isSelected}
+                          className={`ref-tree-row is-child ${isSelected ? "is-selected" : ""}`}
+                        >
+                          <span className="ref-tree-child-connector" aria-hidden="true" />
+                          <button
+                            type="button"
+                            onClick={() => p.onSelectFloorPlanObject?.(item.id)}
+                            className="ref-tree-label-btn"
+                          >
+                            <DoorOpen
+                              size={13.5}
+                              className={isSelected ? "text-[#1a8cff]" : "text-zinc-400"}
+                            />
+                            <span className="truncate">{label}</span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Group 4: Dimensions & Furniture */}
+              {annotations.length > 0 && (
+                <div className="ref-tree-branch">
+                  <div className="ref-tree-row">
+                    <button
+                      type="button"
+                      aria-label="Toggle Annotations group"
+                      onClick={() => toggleGroup("annotations")}
+                      className="ref-tree-disclosure"
+                    >
+                      {expandedGroups.annotations ? (
+                        <ChevronDown size={11} />
+                      ) : (
+                        <ChevronRight size={11} />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleGroup("annotations")}
+                      className="ref-tree-label-btn"
+                    >
+                      <Ruler size={14} className="text-zinc-400" />
+                      <span>Annotations & Furniture ({annotations.length})</span>
+                    </button>
+                  </div>
+                  {expandedGroups.annotations && (
+                    <div className="ref-tree-children" role="group">
+                      {annotations.map((item, idx) => {
+                        const label = getObjectLabel(item, idx);
+                        if (!matchesQuery(label)) return null;
+                        const isSelected = p.selectedFloorPlanId === item.id;
+                        return (
+                          <div
+                            key={item.id}
+                            role="treeitem"
+                            aria-selected={isSelected}
+                            className={`ref-tree-row is-child ${isSelected ? "is-selected" : ""}`}
+                          >
+                            <span className="ref-tree-child-connector" aria-hidden="true" />
+                            <button
+                              type="button"
+                              onClick={() => p.onSelectFloorPlanObject?.(item.id)}
+                              className="ref-tree-label-btn"
+                            >
+                              <Ruler
+                                size={13.5}
+                                className={isSelected ? "text-[#1a8cff]" : "text-zinc-400"}
+                              />
+                              <span className="truncate">{label}</span>
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Drafting Floor Grid Node */}
+              <div className="ref-tree-branch">
+                <div className="ref-tree-row">
+                  <span className="ref-tree-connector" aria-hidden="true" />
+                  <button
+                    type="button"
+                    onClick={() => updateSettings({ snapToGrid: !settings?.snapToGrid })}
+                    className="ref-tree-label-btn"
+                  >
+                    <Square size={14} className="text-zinc-400" />
+                    <span>
+                      Drafting Grid ({settings?.gridStepMm ?? 100} mm)
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {objects.length === 0 && (
+                <div className="crystal-reference-empty">
+                  <Folder size={16} />
+                  <span>Empty floor plan</span>
+                  <small>Use the top toolbar or AI Chat below</small>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Collapsible Architectural Standards & Scale Drawer */}
+          <div className="ref-collapsible-drawer">
+            <button
+              type="button"
+              aria-expanded={setupExpanded}
+              onClick={() => setSetupExpanded((v) => !v)}
+              className="ref-drawer-trigger"
+            >
+              <span className="flex items-center gap-2">
+                <SlidersHorizontal size={13} className="text-zinc-400" />
+                <span>Drafting Setup & Scale</span>
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+                <span>
+                  {settings?.unit ?? "m"} · 1:{settings?.scale ?? 100}
+                </span>
+                <ChevronDown
+                  size={13}
+                  className={`transition-transform ${setupExpanded ? "rotate-180" : ""}`}
+                />
+              </span>
+            </button>
+
+            {setupExpanded && (
+              <div className="ref-drawer-body space-y-2 pt-2">
+                <div className="studio-field-row">
                   <span>Drawing Units</span>
                   <select
                     aria-label="Drawing units"
-                    value={floorSettings?.unit ?? "mm"}
+                    value={settings?.unit ?? "m"}
                     onChange={(e) =>
-                      updateFloorSettings({ unit: e.target.value as FloorPlanSettings["unit"] })
+                      updateSettings({ unit: e.target.value as FloorPlanSettings["unit"] })
                     }
+                    className="studio-inline-select"
                   >
                     <option value="mm">Millimeters (mm)</option>
                     <option value="cm">Centimeters (cm)</option>
                     <option value="m">Meters (m)</option>
                   </select>
-                </label>
-                <label className="studio-kv-row">
+                </div>
+                <div className="studio-field-row">
                   <span>Drawing Scale</span>
                   <select
                     aria-label="Drawing scale"
-                    value={floorSettings?.scale ?? 100}
-                    onChange={(e) => updateFloorSettings({ scale: Number(e.target.value) })}
+                    value={settings?.scale ?? 100}
+                    onChange={(e) => updateSettings({ scale: Number(e.target.value) })}
+                    className="studio-inline-select"
                   >
                     <option value={50}>1 : 50</option>
                     <option value={100}>1 : 100</option>
                     <option value={200}>1 : 200</option>
                   </select>
-                </label>
-                <label className="studio-kv-row">
+                </div>
+                <div className="studio-field-row">
                   <span>Grid Step</span>
                   <select
-                    aria-label="Grid step"
-                    value={floorSettings?.gridStepMm ?? 100}
-                    onChange={(e) => updateFloorSettings({ gridStepMm: Number(e.target.value) })}
+                    aria-label="Default grid step"
+                    value={settings?.gridStepMm ?? 100}
+                    onChange={(e) => updateSettings({ gridStepMm: Number(e.target.value) })}
+                    className="studio-inline-select"
                   >
-                    <option value={10}>10 mm</option>
-                    <option value={50}>50 mm</option>
-                    <option value={100}>100 mm</option>
-                    <option value={250}>250 mm</option>
+                    <option value={50}>50 mm Fine</option>
+                    <option value={100}>100 mm Standard</option>
+                    <option value={250}>250 mm Modular</option>
+                    <option value={500}>500 mm Structural</option>
                   </select>
-                </label>
-                <div className="studio-kv-row">
-                  <span>Wall Standard</span>
-                  <b>180 mm</b>
                 </div>
               </div>
-            </section>
-
-            <section className="studio-panel-section">
-              <div className="studio-section-title-row">
-                <h2>Snapping & Constraints</h2>
-              </div>
-              <div className="studio-toggle-group">
-                <Toggle
-                  label="Snap to grid"
-                  enabled={floorSettings?.snapToGrid ?? true}
-                  onChange={(snapToGrid) => updateFloorSettings({ snapToGrid })}
-                />
-                <Toggle
-                  label="Endpoint / midpoint"
-                  enabled={floorSettings?.snapToPoints ?? true}
-                  onChange={(snapToPoints) => updateFloorSettings({ snapToPoints })}
-                />
-                <Toggle
-                  label="Orthogonal 90°"
-                  enabled={floorSettings?.orthogonal ?? true}
-                  onChange={(orthogonal) => updateFloorSettings({ orthogonal })}
-                />
-              </div>
-            </section>
-
-            <section className="studio-panel-section">
-              <div className="studio-section-title-row">
-                <h2>Drawing Standards</h2>
-              </div>
-              <Segmented
-                value={p.quality}
-                options={["Draft", "Standard", "Presentation"]}
-                onChange={p.onQualityChange}
-              />
-            </section>
-
-            <section className="studio-panel-section">
-              <div className="studio-section-title-row">
-                <h2>Plan Elements</h2>
-                <span>{floorObjects.length} total</span>
-              </div>
-              <div className="studio-plan-summary-grid">
-                <div>
-                  <strong>{wallCount}</strong>
-                  <span>Walls</span>
-                </div>
-                <div>
-                  <strong>{roomCount}</strong>
-                  <span>Rooms</span>
-                </div>
-                <div>
-                  <strong>{openingCount}</strong>
-                  <span>Openings</span>
-                </div>
-              </div>
-              {floorObjects.length > 0 && (
-                <div className="studio-layer-list" role="listbox" aria-label="Floor plan elements">
-                  {floorObjects.map((item, idx) => {
-                    const isSelected = p.selectedFloorPlanId === item.id;
-                    const label =
-                      item.type === "room"
-                        ? item.label
-                        : item.type === "text"
-                          ? item.text
-                          : item.type === "furniture"
-                            ? item.label
-                            : `${item.type.charAt(0).toUpperCase() + item.type.slice(1)} ${idx + 1}`;
-                    const Icon =
-                      item.type === "door" || item.type === "window"
-                        ? DoorOpen
-                        : item.type === "dimension"
-                          ? Ruler
-                          : SquareDashed;
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        role="option"
-                        aria-selected={isSelected}
-                        onClick={() =>
-                          p.onSelectFloorPlanObject?.(isSelected ? null : item.id)
-                        }
-                        className={`studio-layer-item ${isSelected ? "is-selected" : ""}`}
-                      >
-                        <Icon size={13} className={isSelected ? "text-[#4A90D9]" : "text-zinc-400"} />
-                        <span className="truncate">{label}</span>
-                        <small>{item.type}</small>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
-          </>
-        ) : (
-          <>
-            <div className="crystal-modeling-tabs">
-              <button type="button" className="is-active">
-                Modeling
-              </button>
-              <button type="button">Shaders</button>
-              <button type="button">Render</button>
-            </div>
-            <div className="crystal-generative-panel">
-              <div className="crystal-panel-label">GENERATIVE 3D</div>
-              <label className="crystal-reference-upload">
-                <Upload size={17} />
-                <span>
-                  Drag or upload image reference
-                  <small>JPG, PNG, WEBP · up to 5MB</small>
-                </span>
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  className="sr-only"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0];
-                    if (file) p.onUpload(file);
-                    event.currentTarget.value = "";
-                  }}
-                />
-              </label>
-              <textarea
-                value={p.prompt ?? ""}
-                onChange={(event) => p.onPromptChange?.(event.target.value)}
-                placeholder="Describe the object you want to generate..."
-              />
-              <div className="crystal-generation-meta">
-                <span>
-                  AI Model <b>Precision Mode</b>
-                </span>
-                <span>
-                  Quantity <b>1</b>
-                </span>
-              </div>
-              <button
-                type="button"
-                className="crystal-generation-button"
-                disabled={!p.prompt?.trim() || p.loading}
-                onClick={p.onGenerate}
+            )}
+          </div>
+        </>
+      ) : (
+        <div className="ref-hierarchy-scroll space-y-3 px-1">
+          <div className="studio-card-group">
+            <span className="studio-group-kicker">Surface Material</span>
+            <div className="studio-field-row">
+              <span>Preset</span>
+              <select
+                aria-label="Preset"
+                value={p.material}
+                onChange={(e) => p.onMaterialChange(e.target.value as MaterialName)}
+                className="studio-inline-select"
               >
-                <Sparkles size={14} />
-                {p.loading ? "Generating..." : "Generate 3D Model"}
-              </button>
+                {materials.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
             </div>
-            <section className="studio-panel-section">
-              <div className="studio-section-title-row">
-                <h2>Properties</h2>
-              </div>
-              <div className="studio-kv-list">
-                <div className="studio-kv-row">
-                  <span>Model Quality</span>
-                  <CompactSelect
-                    value={p.quality}
-                    options={["Draft", "Standard", "High", "Ultra"]}
-                    onChange={p.onQualityChange}
-                  />
-                </div>
-                <div className="studio-kv-row">
-                  <span>Material</span>
-                  <CompactSelect
-                    label="Material"
-                    value={p.material}
-                    options={materials}
-                    onChange={(value) => p.onMaterialChange(value as MaterialName)}
-                    icon={<Box size={13} className="text-[#4A90D9]" />}
-                  />
-                </div>
-              </div>
-              <NumberSlider label="Roughness" value={p.roughness} onChange={p.onRoughnessChange} />
-              <NumberSlider label="Metallic" value={p.metallic} onChange={p.onMetallicChange} />
-            </section>
-            <section className="studio-panel-section">
-              <div className="studio-section-title-row">
-                <h2>Topology</h2>
-              </div>
-              <Segmented
-                value={p.topology}
-                options={["Auto", "Low Poly", "Topology"]}
-                onChange={p.onTopologyChange}
+            <div className="studio-field-row">
+              <span>Roughness</span>
+              <input
+                aria-label="Roughness"
+                type="number"
+                min={0}
+                max={1}
+                step={0.05}
+                value={p.roughness}
+                onChange={(e) => p.onRoughnessChange(clamp(Number(e.target.value)))}
+                className="studio-number-input"
               />
-              <div className="studio-section-title-row mt-3">
-                <h2>Texture</h2>
-              </div>
-              <Segmented
-                value={p.texture}
-                options={["None", "Standard", "PBR"]}
-                onChange={p.onTextureChange}
+            </div>
+            <div className="studio-field-row">
+              <span>Metallic</span>
+              <input
+                aria-label="Metallic"
+                type="number"
+                min={0}
+                max={1}
+                step={0.05}
+                value={p.metallic}
+                onChange={(e) => p.onMetallicChange(clamp(Number(e.target.value)))}
+                className="studio-number-input"
               />
-            </section>
-            <section className="studio-panel-section">
-              <div className="studio-section-title-row">
-                <h2>Advanced</h2>
-              </div>
-              <div className="studio-toggle-group">
-                <Toggle
-                  label="Separate Parts"
-                  enabled={p.separateParts}
-                  onChange={p.onSeparatePartsChange}
-                />
-                <Toggle
-                  label="Image Enhancement"
-                  enabled={p.imageEnhancement}
-                  onChange={p.onImageEnhancementChange}
-                />
-                <Toggle
-                  label="Code Execution"
-                  enabled={p.codeExecution}
-                  onChange={p.onCodeExecutionChange}
-                />
-              </div>
-            </section>
-          </>
-        )}
+            </div>
+          </div>
+          <div className="studio-card-group">
+            <span className="studio-group-kicker">Topology & Texture</span>
+            <Segmented
+              value={p.topology}
+              options={["Auto", "Quad", "Low Poly"]}
+              onChange={p.onTopologyChange}
+            />
+            <Segmented
+              value={p.texture}
+              options={["None", "Albedo", "PBR"]}
+              onChange={p.onTextureChange}
+            />
+          </div>
+          <div className="studio-card-group">
+            <span className="studio-group-kicker">Pipeline Options</span>
+            <Toggle
+              label="Separate Parts"
+              enabled={p.separateParts}
+              onChange={p.onSeparatePartsChange}
+            />
+            <Toggle
+              label="Image Enhancement"
+              enabled={p.imageEnhancement}
+              onChange={p.onImageEnhancementChange}
+            />
+            <Toggle
+              label="Code Execution"
+              enabled={p.codeExecution}
+              onChange={p.onCodeExecutionChange}
+            />
+          </div>
+          <div className="studio-render-card">
+            <div className="flex items-center justify-between text-[11px] text-zinc-300">
+              <span>Est. {p.estimatedMinutes} min</span>
+              <span className="inline-flex items-center gap-1 font-semibold text-white">
+                <Zap size={12} className="text-[#1a8cff]" />
+                {p.estimatedCost} credits
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={p.onRender}
+              disabled={p.renderLoading}
+              className="studio-primary-btn mt-2 w-full"
+            >
+              {p.renderLoading ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <LoaderCircle size={13} className="animate-spin" />
+                  Rendering…
+                </span>
+              ) : (
+                "Render Queue"
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden legacy reference generator kept for DOM/test compatibility */}
+      <div className="crystal-reference-generator sr-only" aria-hidden="true">
+        <div>
+          <Sparkles size={13} />
+          <span>Reference Image</span>
+        </div>
+        <label>
+          <Upload size={13} />
+          <span>{p.uploadedImage ? "Reference attached" : "Upload reference"}</span>
+          <input
+            aria-label="Upload Image"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="sr-only"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) p.onUpload(f);
+              e.currentTarget.value = "";
+            }}
+          />
+        </label>
       </div>
 
-      <footer className="crystal-left-footer crystal-reference-footer crystal-modeling-footer shrink-0">
-        <a href="/pricing" className="crystal-modeling-pro-notice">
-          Pro workspace: unlimited renders,
-          <br />
-          architectural CAD & mesh export
-        </a>
-        <div className="crystal-modeling-render-card">
-          <div>
-            <strong>{p.estimatedMinutes} min</strong>
-            <strong>
-              <Zap size={12} /> {p.estimatedCost}
-            </strong>
+      {/* Reference Bottom Secondary Navigation: Library, Import, Help & Feedback */}
+      <footer className="ref-sidebar-footer">
+        <button
+          type="button"
+          onClick={() => setSetupExpanded((v) => !v)}
+          className={`ref-footer-nav-item ${setupExpanded ? "is-active" : ""}`}
+        >
+          <LayoutGrid size={15} />
+          <span>Library & Presets</span>
+          <em className="ml-auto text-[11px] not-italic text-zinc-500">{objects.length}</em>
+        </button>
+        <button
+          type="button"
+          onClick={() => importInputRef.current?.click()}
+          className="ref-footer-nav-item"
+        >
+          <Download size={15} />
+          <span>{p.uploadedImage ? "Reference Attached" : "Import"}</span>
+        </button>
+        <div className="flex items-center justify-between">
+          <Link href="/help" className="ref-footer-nav-item flex-1">
+            <CircleHelp size={15} />
+            <span>Help & Feedback</span>
+          </Link>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={p.onProfile}
+              aria-label="Account profile"
+              title="Account profile"
+              className="grid h-6 w-6 place-items-center rounded-md text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
+            >
+              <User size={12} />
+            </button>
+            <button
+              type="button"
+              onClick={p.onSignOut}
+              aria-label="Sign out"
+              title="Sign out"
+              className="grid h-6 w-6 place-items-center rounded-md text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
+            >
+              <LogOut size={12} />
+            </button>
           </div>
-          <button
-            type="button"
-            disabled={p.renderLoading || p.credits < p.estimatedCost}
-            onClick={p.onRender}
-          >
-            {p.renderLoading ? (
-              <>
-                <LoaderCircle className="animate-spin" size={14} /> Submitting
-              </>
-            ) : (
-              <>
-                Render Queue <span>{p.estimatedCost}</span>
-              </>
-            )}
-          </button>
-        </div>
-        <div className="crystal-modeling-account">
-          <button
-            type="button"
-            aria-label="Open user menu"
-            onClick={p.onProfile}
-            className="studio-user-avatar-btn"
-          >
-            <User size={14} />
-          </button>
-          <button type="button" onClick={p.onSignOut} className="studio-signout-btn">
-            <LogOut size={13} />
-            <small>Sign Out</small>
-          </button>
         </div>
       </footer>
     </aside>

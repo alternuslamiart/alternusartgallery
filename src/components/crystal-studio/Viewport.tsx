@@ -3,18 +3,12 @@
 import {
   Box,
   Camera,
-  Check,
   CircleHelp,
-   Compass,
   Download,
   DoorOpen,
-  Eraser,
   EyeOff,
   FolderOpen,
   Glasses,
-  Globe2,
-  Grid3X3,
-  Hand,
   Lightbulb,
   Maximize,
   MousePointer2,
@@ -31,8 +25,6 @@ import {
   SquareDashed,
   TextCursorInput,
   Trash2,
-  ZoomIn,
-  ZoomOut,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CubeFilled } from "./filled-icons";
@@ -1170,7 +1162,112 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         </g>
       </svg>
 
-      {/* Top Drafting Status HUD & View Controls */}
+      {/* Reference Top Floating Toolbar for Interior & 2D Floor Plan Studio */}
+      <div
+        className="crystal-modeling-tools studio-floating-toolbar ref-top-toolbar"
+        role="toolbar"
+        aria-label="Architectural drafting tools"
+      >
+        <div className="crystal-modeling-tool-group">
+          <IconButton
+            icon={Plus}
+            label="Add room to floor plan"
+            active={false}
+            onClick={() => {
+              const id = `room-${crypto.randomUUID().slice(0, 6)}`;
+              updateObjects([
+                ...objects,
+                {
+                  id,
+                  type: "room",
+                  x: 1.2,
+                  y: 1.2,
+                  width: 3.2,
+                  height: 2.6,
+                  label: `Room ${objects.filter((o) => o.type === "room").length + 1}`,
+                },
+              ]);
+              select(id);
+            }}
+          />
+          {tools
+            .filter(([id]) => id !== "select" && id !== "delete")
+            .map(([id, label, shortcut, Icon]) => (
+              <IconButton
+                key={id}
+                icon={Icon}
+                label={shortcut ? `${label} (${shortcut})` : label}
+                active={tool === id}
+                onClick={() => setTool(id)}
+              />
+            ))}
+        </div>
+
+        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
+
+        <IconButton
+          icon={MousePointer2}
+          label="Select & Move (V)"
+          active={tool === "select"}
+          onClick={() => setTool("select")}
+          className={tool === "select" ? "ref-select-active-blue" : ""}
+        />
+
+        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
+
+        <IconButton
+          icon={Maximize}
+          label="Fit drawing to view"
+          active={false}
+          onClick={() => setView({ zoom: 72, panX: 0, panY: 0 })}
+        />
+
+        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
+
+        <button
+          type="button"
+          title="Cycle drafting zoom level"
+          aria-label="Drafting zoom percentage"
+          onClick={() => {
+            const zoomSteps = [36, 54, 72, 90, 108, 144];
+            const currentIdx = zoomSteps.findIndex((z) => Math.abs(z - view.zoom) < 8);
+            const nextZoom = zoomSteps[(currentIdx + 1) % zoomSteps.length];
+            setView((current) => ({ ...current, zoom: nextZoom }));
+          }}
+          className="ref-zoom-readout-btn"
+        >
+          <span>{Math.round((view.zoom / 72) * 100)}%</span>
+          <span className="text-[9px] opacity-65">▾</span>
+        </button>
+
+        <button
+          type="button"
+          className="crystal-modeling-action ref-export-primary-btn"
+          aria-label="Export viewport"
+          title="Export floor plan sheet"
+          onClick={p.onSnapshot}
+        >
+          <span>Export</span>
+        </button>
+
+        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
+
+        <IconButton
+          icon={Trash2}
+          label="Delete selected element (Del)"
+          active={tool === "delete"}
+          onClick={() => {
+            if (selectedId) {
+              updateObjects(objects.filter((item) => item.id !== selectedId));
+              select(null);
+            } else {
+              setTool("delete");
+            }
+          }}
+        />
+      </div>
+
+      {/* Top Drafting Status HUD */}
       <div className="floor-plan-hud-bar" role="status">
         <span className="floor-plan-hud-badge">2D CAD</span>
         <span>Top view</span>
@@ -1179,128 +1276,29 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         <i />
         <span>{settings.gridStepMm} mm grid</span>
         <i />
-        <span>
-          {formatFloorLength(view.panX / view.zoom, settings)} /{" "}
-          {formatFloorLength(view.panY / view.zoom, settings)}
-        </span>
-      </div>
-
-      <div className="floor-plan-top-controls" role="toolbar" aria-label="Drafting view and snap controls">
         <button
           type="button"
-          title="Pan / Select (V)"
-          onClick={() => setTool("select")}
-          className={`floor-plan-ctrl-btn ${tool === "select" ? "is-active" : ""}`}
-        >
-          <Hand size={14} />
-        </button>
-        <button
-          type="button"
-          title="Zoom in (+)"
-          onClick={() =>
-            setView((current) => ({
-              ...current,
-              zoom: Math.min(260, current.zoom * 1.2),
-            }))
-          }
-          className="floor-plan-ctrl-btn"
-        >
-          <ZoomIn size={14} />
-        </button>
-        <button
-          type="button"
-          title="Zoom out (−)"
-          onClick={() =>
-            setView((current) => ({
-              ...current,
-              zoom: Math.max(24, current.zoom / 1.2),
-            }))
-          }
-          className="floor-plan-ctrl-btn"
-        >
-          <ZoomOut size={14} />
-        </button>
-        <button
-          type="button"
-          title="Fit drawing to view"
-          onClick={() => setView({ zoom: 72, panX: 0, panY: 0 })}
-          className="floor-plan-ctrl-btn px-2 text-[11px] font-medium"
-        >
-          Fit
-        </button>
-        <span className="floor-plan-ctrl-divider" aria-hidden="true" />
-        <button
-          type="button"
-          title="Toggle grid snap"
           aria-pressed={settings.snapToGrid}
           onClick={() => setSettings({ snapToGrid: !settings.snapToGrid })}
-          className={`floor-plan-ctrl-pill ${settings.snapToGrid ? "is-active" : ""}`}
+          className={`rounded px-1.5 py-0.5 text-[10px] font-semibold transition ${
+            settings.snapToGrid ? "bg-[#1a8cff] text-white" : "text-zinc-400 hover:text-white"
+          }`}
         >
           Grid
         </button>
         <button
           type="button"
-          title="Toggle endpoint/midpoint snap"
-          aria-pressed={settings.snapToPoints}
-          onClick={() => setSettings({ snapToPoints: !settings.snapToPoints })}
-          className={`floor-plan-ctrl-pill ${settings.snapToPoints ? "is-active" : ""}`}
-        >
-          Points
-        </button>
-        <button
-          type="button"
-          title="Toggle orthogonal 90° constraint"
           aria-pressed={settings.orthogonal}
           onClick={() => setSettings({ orthogonal: !settings.orthogonal })}
-          className={`floor-plan-ctrl-pill ${settings.orthogonal ? "is-active" : ""}`}
+          className={`rounded px-1.5 py-0.5 text-[10px] font-semibold transition ${
+            settings.orthogonal ? "bg-[#1a8cff] text-white" : "text-zinc-400 hover:text-white"
+          }`}
         >
-          Ortho
+          Ortho 90°
         </button>
-        <select
-          aria-label="Grid spacing"
-          value={settings.gridStepMm}
-          onChange={(event) =>
-            setSettings({ gridStepMm: Number(event.target.value) })
-          }
-          className="floor-plan-grid-select"
-        >
-          <option value="10">10 mm</option>
-          <option value="50">50 mm</option>
-          <option value="100">100 mm</option>
-          <option value="250">250 mm</option>
-        </select>
       </div>
 
-      {/* Bottom Architectural Tool Dock */}
-      <div
-        className="floor-plan-tool-dock"
-        role="toolbar"
-        aria-label="Architectural drafting tools"
-      >
-        {tools.map(([id, label, shortcut, Icon], index) => (
-          <div key={id} className="flex items-center">
-            {(index === 1 || index === 5 || index === 8) && (
-              <span className="floor-plan-ctrl-divider mx-1" aria-hidden="true" />
-            )}
-            <button
-              type="button"
-              title={shortcut ? `${label} (${shortcut})` : label}
-              aria-label={label}
-              aria-pressed={tool === id}
-              onClick={() => setTool(id)}
-              className={`floor-plan-dock-btn ${tool === id ? "is-active" : ""} ${
-                id === "delete" ? "is-danger" : ""
-              }`}
-            >
-              <Icon size={15} />
-              <span>{label}</span>
-              {shortcut && <kbd>{shortcut}</kbd>}
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Unified Studio AI Chat */}
+      {/* Unified Studio AI Chat at Bottom of Workspace */}
       <StudioAIChat
         studio="floor-plan"
         open={chat}
@@ -1320,7 +1318,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         onAttachImage={(file) => setReferenceImage(URL.createObjectURL(file))}
         onRemoveImage={() => setReferenceImage(null)}
         quickPrompts={FLOOR_PLAN_QUICK_PROMPTS}
-        placeholder="Describe room dimensions & layout (e.g., 10m by 8m with living room, kitchen, bedroom)…"
+        placeholder="Describe what you want to create or change (e.g., 10m by 8m with living room, kitchen, bedroom)…"
         statusLabel={`1:${settings.scale} · ${settings.unit}`}
         className="studio-ai-floating-floorplan"
       />
@@ -1374,7 +1372,7 @@ export function Viewport(p: Props) {
   const [history, setHistory] = useState<Transform[]>([]);
   const [future, setFuture] = useState<Transform[]>([]);
   const [fullscreen, setFullscreen] = useState(false);
-  const [viewIndex, setViewIndex] = useState(0);
+  const [projectionMode, setProjectionMode] = useState<"Orthographic" | "Perspective">("Orthographic");
   const [chatMessages, setChatMessages] = useState<StudioChatMessage[]>([
     {
       id: "3d-welcome",
@@ -1540,9 +1538,7 @@ export function Viewport(p: Props) {
     });
 
   const focus = () => {
-    if (selected) {
-      setCamera((c) => ({ ...c, distance: 7, panX: 0, panY: 0 }));
-    }
+    setCamera((c) => ({ ...c, distance: 9, panX: 0, panY: 0 }));
   };
 
   const runCommand = () => {
@@ -1838,8 +1834,6 @@ export function Viewport(p: Props) {
     return <FloorPlanViewport p={p} isMobile={isMobile} />;
   }
 
-  const cameraViewNames = ["Perspective", "Front", "Right", "Top"];
-
   return (
     <section
       ref={canvasRef as React.RefObject<HTMLElement>}
@@ -1930,7 +1924,7 @@ export function Viewport(p: Props) {
             transform={p.transform}
           />
           <div className="studio-viewport-footer-bar pointer-events-none">
-            <span>RMB / MMB: Orbit · Shift + LMB: Pan · Ctrl + MMB: Dolly · Wheel: Zoom</span>
+            <span>RMB / MMB: Orbit · Shift + LMB: Pan · Wheel: Zoom</span>
             {selected && (
               <span className="studio-transform-readout">
                 X {p.transform.x.toFixed(1)} · Y {p.transform.y.toFixed(1)} · Rot{" "}
@@ -2079,78 +2073,101 @@ export function Viewport(p: Props) {
         </button>
       </div>
 
-      <div className="crystal-status-pill absolute left-1/2 top-4 z-20 -translate-x-1/2">
-        <Check size={12} />
-        {p.loading ? "Generating Casynus model..." : "Casynus workspace ready"}
-      </div>
-
-      {/* Viewport Axis Gizmo */}
-      <div
-        className="crystal-axis-gizmo absolute right-8 top-20 z-20 h-14 w-14"
-        aria-label="Viewport axis navigation"
-      >
-        <button
-          type="button"
-          onClick={() => setView("Front")}
-          title="View along Y axis (Front — Numpad 1)"
-          className="absolute left-7 top-0 grid h-5 w-5 place-items-center rounded-full bg-[#4A90D9] text-[9px] font-bold text-[#0b1728] shadow"
-          aria-label="View along Y axis"
+      {/* Reference Orientation Axis Gizmo + Orthographic / Perspective Pill */}
+      <div className="ref-viewport-gizmo-dock" aria-label="Viewport orientation and projection">
+        <div
+          className="crystal-axis-gizmo ref-axis-disc"
+          aria-label="Viewport axis navigation"
         >
-          Y
-        </button>
-        <button
-          type="button"
-          onClick={() => setView("Right")}
-          title="View along X axis (Right — Numpad 3)"
-          className="absolute right-0 top-7 grid h-5 w-5 place-items-center rounded-full bg-[#e05260] text-[9px] font-bold text-[#2b0c10] shadow"
-          aria-label="View along X axis"
-        >
-          X
-        </button>
-        <button
-          type="button"
-          onClick={() => setView("Top")}
-          title="View along Z axis (Top — Numpad 7)"
-          className="absolute bottom-0 left-0 grid h-5 w-5 place-items-center rounded-full bg-[#5ec269] text-[9px] font-bold text-[#0d2610] shadow"
-          aria-label="View along Z axis"
-        >
-          Z
-        </button>
-        <span className="absolute left-1/2 top-1/2 h-8 w-px -translate-x-1/2 -translate-y-1/2 rotate-45 bg-[#5ec269]/65" />
-        <span className="absolute left-1/2 top-1/2 h-8 w-px -translate-x-1/2 -translate-y-1/2 -rotate-45 bg-[#e05260]/65" />
-      </div>
-
-      <div className="crystal-viewport-tools absolute right-6 top-[168px] z-20 grid gap-2">
-        {[
-          { I: Lightbulb, l: "Lighting", a: lighting, f: () => setLighting((v) => !v) },
-          { I: Globe2, l: "World", a: world, f: () => setWorld((v) => !v) },
-          { I: Grid3X3, l: "Toggle grid", a: grid, f: () => setGrid((v) => !v) },
-          { I: CircleHelp, l: "Help", a: help, f: () => setHelp((v) => !v) },
-        ].map(({ I, l, a, f }) => (
           <button
             type="button"
-            key={l}
-            title={l}
-            onClick={f}
-            className={`grid h-9 w-9 place-items-center rounded-[8px] border transition-all ${
-              a
-                ? "border-[#1687f7] bg-[#1687f7] text-white"
-                : "border-white/[0.08] bg-[#15181e] text-zinc-300 hover:bg-[#1f242d]"
-            }`}
+            onClick={() => setView("Front")}
+            title="View along Y axis (Front — Numpad 1)"
+            className="ref-axis-node is-y"
+            aria-label="View along Y axis"
           >
-            <I size={17} />
+            Y
           </button>
-        ))}
+          <button
+            type="button"
+            onClick={() => setView("Right")}
+            title="View along X axis (Right — Numpad 3)"
+            className="ref-axis-node is-x"
+            aria-label="View along X axis"
+          >
+            X
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("Top")}
+            title="View along Z axis (Top — Numpad 7)"
+            className="ref-axis-node is-z"
+            aria-label="View along Z axis"
+          >
+            Z
+          </button>
+          <span className="ref-axis-line is-y" />
+          <span className="ref-axis-line is-x" />
+          <span className="ref-axis-line is-z" />
+        </div>
+
+        <div className="ref-projection-pill" role="group" aria-label="Camera projection">
+          <button
+            type="button"
+            aria-pressed={projectionMode === "Orthographic"}
+            onClick={() => {
+              setProjectionMode("Orthographic");
+              setView("Top");
+            }}
+            className={projectionMode === "Orthographic" ? "is-active" : ""}
+          >
+            Orthographic
+          </button>
+          <button
+            type="button"
+            aria-pressed={projectionMode === "Perspective"}
+            onClick={() => {
+              setProjectionMode("Perspective");
+              setView("Perspective");
+            }}
+            className={projectionMode === "Perspective" ? "is-active" : ""}
+          >
+            Perspective
+          </button>
+        </div>
       </div>
 
       {help && (
-        <div className="studio-floating-help absolute right-20 top-[168px] z-30 w-60 rounded-[10px] border border-white/10 bg-[#15181f] p-3.5 text-[11px] leading-relaxed text-zinc-300 shadow-2xl">
+        <div className="studio-floating-help absolute right-[280px] top-16 z-30 w-60 rounded-[10px] border border-white/10 bg-[#15181f] p-3.5 text-[11px] leading-relaxed text-zinc-300 shadow-2xl">
           <strong className="mb-1 block text-zinc-100">Viewport Navigation</strong>
           MMB / RMB orbits, Shift + LMB pans, wheel zooms. Keys Q/W/E/S switch tools; Numpad 1/3/7/0 switches camera presets.
         </div>
       )}
+      {(lighting || world) && (
+        <div className="studio-floating-help absolute right-[280px] top-16 z-30 w-56 rounded-[10px] border border-white/10 bg-[#15181f] p-3 text-[11px] leading-relaxed text-zinc-300 shadow-2xl">
+          <div className="mb-1.5 flex items-center justify-between">
+            <strong className="text-zinc-100">
+              {lighting ? "Scene Lighting" : "World Environment"}
+            </strong>
+            <button
+              type="button"
+              onClick={() => {
+                setLighting(false);
+                setWorld(false);
+              }}
+              className="text-zinc-400 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+          <p className="text-zinc-400">
+            Renderer: <span className="text-zinc-200">{p.renderer}</span> · Grid{" "}
+            <span className="text-zinc-200">{grid ? "Visible" : "Hidden"}</span>
+          </p>
+        </div>
+      )}
 
-      {/* Unified Studio AI Chat */}
+      {/* Unified Studio AI Chat at Bottom of Workspace */}
       <StudioAIChat
         studio="modeling"
         open={chat}
@@ -2182,47 +2199,28 @@ export function Viewport(p: Props) {
         }}
         onRemoveImage={() => setReferenceImage(null)}
         quickPrompts={MODELING_QUICK_PROMPTS}
-        placeholder={
-          selected
-            ? "Describe a 3D asset to generate, or transform active object (e.g. 'rotate 45')…"
-            : "Describe a 3D object or architectural component to generate…"
-        }
+        placeholder="Describe what you want to create or change…"
         statusLabel={p.selectedAsset ? p.selectedAsset.name : p.renderer}
       />
 
-      {/* Top 3D Modeling Toolbar */}
+      {/* Reference Top Floating Toolbar: + Shapes | Select (Blue) | Frame | 100% v | Export (Blue) | Play */}
       <div
-        className="crystal-modeling-tools studio-floating-toolbar"
+        className="crystal-modeling-tools studio-floating-toolbar ref-top-toolbar"
         role="toolbar"
         aria-label="3D modeling tools"
       >
         <div className="crystal-modeling-tool-group">
           <IconButton
-            icon={playing ? Pause : Play}
-            label={playing ? "Pause preview" : "Play preview"}
-            active={playing}
-            onClick={() => setPlaying((value) => !value)}
+            icon={Plus}
+            label="Add object to scene"
+            active={false}
+            onClick={p.onCreateObject}
           />
           <IconButton
-            icon={Maximize}
-            label={fullscreen ? "Exit fullscreen" : "Fullscreen"}
-            active={fullscreen}
-            onClick={() => {
-              if (document.fullscreenElement) void document.exitFullscreen();
-              else void canvasRef.current?.requestFullscreen();
-            }}
-          />
-        </div>
-        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
-        <div className="crystal-modeling-tool-group">
-          <IconButton
-            icon={MousePointer2}
-            label="Select tool (Q)"
-            active={p.activeTool === "select"}
-            onClick={() => {
-              p.onToolChange("select");
-              setSelected(false);
-            }}
+            icon={Box}
+            label="Add cube primitive"
+            active={p.activeTool === "model"}
+            onClick={() => p.onToolChange("model")}
           />
           <IconButton
             icon={Move3D}
@@ -2242,9 +2240,6 @@ export function Viewport(p: Props) {
             active={p.activeTool === "scale"}
             onClick={() => p.onToolChange("scale")}
           />
-        </div>
-        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
-        <div className="crystal-modeling-tool-group">
           <IconButton
             icon={Pencil}
             label="Pen annotation tool"
@@ -2252,50 +2247,74 @@ export function Viewport(p: Props) {
             onClick={() => p.onToolChange("brush")}
           />
           <IconButton
-            icon={Eraser}
-            label="Eraser tool"
-            active={p.activeTool === "erase"}
-            onClick={() => p.onToolChange("erase")}
-          />
-          <IconButton
-            icon={Box}
-            label="Add cube primitive"
-            active={p.activeTool === "model"}
-            onClick={() => p.onToolChange("model")}
-          />
-          <IconButton
             icon={Ruler}
             label="Measure distance"
             active={p.activeTool === "tools"}
             onClick={() => p.onToolChange("tools")}
           />
-          <IconButton
-            icon={Lightbulb}
-            label="Toggle scene lighting"
-            active={lighting}
-            onClick={() => setLighting((value) => !value)}
-          />
         </div>
+
         <span className="crystal-modeling-tool-divider" aria-hidden="true" />
+
+        <IconButton
+          icon={MousePointer2}
+          label="Select tool (Q)"
+          active={p.activeTool === "select" || p.activeTool === "orbit"}
+          onClick={() => {
+            p.onToolChange("select");
+            setSelected(false);
+          }}
+          className={
+            p.activeTool === "select" || p.activeTool === "orbit"
+              ? "ref-select-active-blue"
+              : ""
+          }
+        />
+
+        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
+
+        <IconButton
+          icon={Maximize}
+          label="Frame active object (F)"
+          active={fullscreen}
+          onClick={focus}
+        />
+
+        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
+
         <button
           type="button"
-          className="crystal-modeling-action"
+          title="Cycle camera zoom preset"
+          aria-label="Camera zoom percentage"
+          onClick={() => {
+            const distances = [16, 12, 9.6, 8];
+            const currentIdx = distances.findIndex((d) => Math.abs(d - camera.distance) < 1.2);
+            const nextDist = distances[(currentIdx + 1) % distances.length];
+            setCamera((c) => ({ ...c, distance: nextDist }));
+          }}
+          className="ref-zoom-readout-btn"
+        >
+          <span>{Math.round((12 / camera.distance) * 100)}%</span>
+          <span className="text-[9px] opacity-65">▾</span>
+        </button>
+
+        <button
+          type="button"
+          className="crystal-modeling-action ref-export-primary-btn"
           aria-label="Export viewport"
           title="Export viewport snapshot (PNG & JPEG)"
           onClick={p.onSnapshot}
         >
-          <Download size={14} />
           <span>Export</span>
         </button>
+
+        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
+
         <IconButton
-          icon={Compass}
-          label={`Cycle camera view (${cameraViewNames[viewIndex]})`}
-          active={false}
-          onClick={() => {
-            const next = (viewIndex + 1) % cameraViewNames.length;
-            setViewIndex(next);
-            setView(cameraViewNames[next]);
-          }}
+          icon={playing ? Pause : Play}
+          label={playing ? "Pause preview" : "Play preview"}
+          active={playing}
+          onClick={() => setPlaying((value) => !value)}
         />
       </div>
     </section>

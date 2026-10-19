@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  AlertTriangle,
   Armchair,
   ArrowLeft,
   Bike,
@@ -14,23 +13,28 @@ import {
   Eye,
   EyeOff,
   Focus,
+  Folder,
   Footprints,
   Gauge,
+  HelpCircle,
   Home,
   LampCeiling,
+  LayoutGrid,
   Lightbulb,
   Lock,
+  Menu,
   MousePointer2,
-  PanelLeftClose,
   PanelLeftOpen,
-  PanelRightClose,
   PanelRightOpen,
   ParkingSquare,
+  Play,
+  Plus,
   Redo2,
   Rotate3D,
   Route,
   Ruler,
   Search,
+  Settings,
   Signpost,
   Sun,
   TrafficCone,
@@ -38,6 +42,8 @@ import {
   TreePine,
   Undo2,
   Unlock,
+  Upload,
+  Video,
   Waves,
   X,
   Zap,
@@ -53,7 +59,11 @@ import {
   StudioAIChat,
   type StudioChatMessage,
 } from "@/components/crystal-studio/StudioAIChat";
-import { StudioModeNav } from "@/components/crystal-studio/ui";
+import {
+  BinaryToggle,
+  InspectorCollaboratorBar,
+  StudioModeNav,
+} from "@/components/crystal-studio/ui";
 import { InfrastructureViewport } from "./infrastructure-scene";
 import type {
   CameraPreset,
@@ -246,6 +256,15 @@ export default function InfrastructurePage() {
   const [chatOpen, setChatOpen] = useState(true);
   const [chatInput, setChatInput] = useState("");
   const [chatModel, setChatModel] = useState("Site Assistant");
+  const [treeGroupsOpen, setTreeGroupsOpen] = useState({
+    circulation: true,
+    buildings: true,
+    landscape: false,
+  });
+  const [addDrawerOpen, setAddDrawerOpen] = useState(true);
+  const [projectionMode, setProjectionMode] = useState<
+    "Orthographic" | "Perspective"
+  >("Perspective");
   const [messages, setMessages] = useState<StudioChatMessage[]>([
     {
       id: "infra-welcome",
@@ -698,131 +717,92 @@ export default function InfrastructurePage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   });
 
+  const circulationTypes: InfrastructureType[] = [
+    "road",
+    "roundabout",
+    "parking",
+    "crosswalk",
+    "barrier",
+    "sidewalk",
+    "bikeLane",
+    "busStop",
+    "trafficLight",
+    "roadSign",
+    "vehicle",
+  ];
+  const buildingTypes: InfrastructureType[] = ["building", "pavilion"];
+  const circulationObjects = filteredObjects.filter((obj) =>
+    circulationTypes.includes(obj.type),
+  );
+  const buildingObjects = filteredObjects.filter((obj) =>
+    buildingTypes.includes(obj.type),
+  );
+  const landscapeObjects = filteredObjects.filter(
+    (obj) =>
+      !circulationTypes.includes(obj.type) && !buildingTypes.includes(obj.type),
+  );
+
   return (
     <main
       className={`crystal-infrastructure-page ${roboto.className} fixed inset-0 z-20 h-screen w-full overflow-hidden bg-[#08090b] text-zinc-100`}
     >
-      {/* Left Sidebar: Site Tools, Studio Switcher, Assets & Hierarchy */}
+      {/* Left Sidebar: Reference Scene Hierarchy + Site Tools */}
       <aside
-        className={`infra-sidebar infra-left-panel studio-sidebar-shell flex shrink-0 flex-col ${
+        className={`infra-sidebar infra-left-panel studio-sidebar-shell ref-floating-sidebar flex shrink-0 flex-col ${
           libraryOpen ? "is-open" : ""
         } ${leftCollapsed ? "is-collapsed-desktop" : ""}`}
         aria-label="Infrastructure site tools"
       >
-        <div className="infra-panel-heading studio-sidebar-top">
-          <div className="infra-project-heading">
+        <div className="ref-sidebar-header">
+          <div className="flex min-w-0 items-center gap-2">
             <Link
               href="/project"
               aria-label="Back to projects"
               title="Back to projects"
-              className="studio-header-icon-btn"
+              className="ref-header-icon-btn"
             >
               <ArrowLeft size={14} />
             </Link>
-            <div className="studio-brand-stack">
-              <b>Site tools</b>
-              <p>Willow Creek District</p>
-            </div>
+            <span className="ref-sidebar-title truncate">
+              Willow Creek District
+            </span>
           </div>
-          <div className="infra-panel-heading-actions">
+          <div className="flex items-center gap-1">
             <ActionButton
               title="Undo (Ctrl+Z)"
               onClick={undo}
               disabled={!past.length}
             >
-              <Undo2 size={14} />
+              <Undo2 size={13} />
             </ActionButton>
             <ActionButton
               title="Redo (Ctrl+Y)"
               onClick={redo}
               disabled={!future.length}
             >
-              <Redo2 size={14} />
+              <Redo2 size={13} />
             </ActionButton>
             <button
               type="button"
               aria-label="Collapse site tools panel"
               title="Collapse sidebar"
               onClick={() => setLeftCollapsed(true)}
-              className="studio-header-icon-btn max-[700px]:hidden"
+              className="ref-header-icon-btn max-[700px]:hidden"
             >
-              <PanelLeftClose size={14} />
+              <Menu size={14} />
             </button>
           </div>
         </div>
 
         <StudioModeNav activeStudio="infrastructure" />
 
-        <div className="infra-section-label">TRANSFORM & MEASURE</div>
-        <div className="infra-transform-tools">
-          {toolButtons.map(({ id, title, icon: Icon }) => (
-            <ActionButton
-              key={id}
-              title={title}
-              active={tool === id}
-              onClick={() => setTool(id)}
-            >
-              <Icon size={15} />
-            </ActionButton>
-          ))}
-          <ActionButton
-            title="Delete object"
-            active={tool === "delete"}
-            onClick={() => setTool("delete")}
-          >
-            <Trash2 size={15} />
-          </ActionButton>
-        </div>
-
-        <div className="infra-section-label infra-assets-title">
-          ADD TO SCENE
-        </div>
-        <div className="infra-asset-categories">
-          {categories.map((category) => (
-            <details key={category.title} open>
-              <summary>
-                <span>{category.title}</span>
-                <ChevronDown size={13} />
-              </summary>
-              <div className="infra-asset-grid">
-                {category.items.map(({ type, label, icon: Icon }) => (
-                  <button
-                    type="button"
-                    key={type}
-                    title={`Add ${label.toLowerCase()} to the scene`}
-                    aria-pressed={tool === type}
-                    onClick={() => {
-                      setTool(tool === type ? "select" : type);
-                      setMeasurePoints([]);
-                      setRoadStart(null);
-                      setLibraryOpen(false);
-                    }}
-                    className={`infra-asset-button ${
-                      tool === type ? "is-active" : ""
-                    }`}
-                  >
-                    <Icon size={14} />
-                    <span>{label}</span>
-                  </button>
-                ))}
-              </div>
-            </details>
-          ))}
-        </div>
-
-        <div className="infra-hierarchy">
-          <div className="infra-section-label flex items-center justify-between">
-            <span>SCENE HIERARCHY</span>
-            <span className="font-normal normal-case tracking-normal text-zinc-400">
-              {visibleObjects.length} visible
-            </span>
-          </div>
-          <label className="crystal-reference-search mx-2.5 mb-1.5">
-            <Search size={12} />
+        <div className="px-3 pb-2 pt-1">
+          <label className="ref-search-box">
+            <Search size={13} className="shrink-0 text-zinc-500" />
             <input
               value={hierarchyQuery}
               onChange={(event) => setHierarchyQuery(event.target.value)}
-              placeholder="Filter site objects…"
+              placeholder="Search"
               aria-label="Filter site objects"
             />
             {hierarchyQuery && (
@@ -836,93 +816,468 @@ export default function InfrastructurePage() {
               </button>
             )}
           </label>
-          <div className="infra-hierarchy-list">
-            {filteredObjects.map((object) => (
-              <div
-                key={object.id}
-                className={`infra-tree-row ${
-                  object.id === selectedId ? "is-selected" : ""
-                } ${!object.visible ? "is-hidden" : ""}`}
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedId(object.id);
-                    setTool("select");
-                    setInspectorOpen(true);
-                    setLibraryOpen(false);
-                  }}
-                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
-                  title={object.name}
-                >
-                  <span className="infra-tree-dot" />
-                  <span className="min-w-0 flex-1 truncate">{object.name}</span>
-                </button>
-                <div className="infra-tree-row-actions">
-                  <button
-                    type="button"
-                    aria-label={
-                      object.locked
-                        ? `Unlock ${object.name}`
-                        : `Lock ${object.name}`
-                    }
-                    title={object.locked ? "Unlock" : "Lock"}
-                    onClick={() =>
-                      updateObject(object.id, { locked: !object.locked })
-                    }
-                  >
-                    {object.locked ? <Lock size={11} /> : <Unlock size={11} />}
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={
-                      object.visible
-                        ? `Hide ${object.name}`
-                        : `Show ${object.name}`
-                    }
-                    title={object.visible ? "Hide" : "Show"}
-                    onClick={() =>
-                      updateObject(object.id, { visible: !object.visible })
-                    }
-                  >
-                    {object.visible ? <Eye size={11} /> : <EyeOff size={11} />}
-                  </button>
-                </div>
+        </div>
+
+        {/* Hierarchical Scene Tree with Reference Connector Lines */}
+        <div className="ref-tree-container flex-1 overflow-y-auto px-2.5 py-1">
+          <button
+            type="button"
+            onClick={() => viewport.current?.fit()}
+            className="ref-tree-row"
+          >
+            <span className="ref-tree-spacer" />
+            <Video size={13} className="ref-tree-icon" />
+            <span className="ref-tree-label">Site Camera</span>
+            <span className="ml-auto text-[10px] text-zinc-500">
+              {visibleObjects.length} vis
+            </span>
+          </button>
+
+          {/* Group 1: Roads & Circulation */}
+          <div className="ref-tree-group">
+            <button
+              type="button"
+              onClick={() =>
+                setTreeGroupsOpen((curr) => ({
+                  ...curr,
+                  circulation: !curr.circulation,
+                }))
+              }
+              className="ref-tree-row"
+            >
+              <span className="ref-tree-branch">├</span>
+              <ChevronDown
+                size={12}
+                className={`ref-tree-chevron transition-transform ${
+                  treeGroupsOpen.circulation ? "" : "-rotate-90"
+                }`}
+              />
+              <Folder size={13} className="ref-tree-icon" />
+              <span className="ref-tree-label">
+                Roads & Circulation ({circulationObjects.length})
+              </span>
+            </button>
+            {treeGroupsOpen.circulation && (
+              <div className="ref-tree-children">
+                {circulationObjects.map((object, index) => {
+                  const isLast = index === circulationObjects.length - 1;
+                  return (
+                    <div
+                      key={object.id}
+                      className={`ref-tree-row is-nested group ${
+                        object.id === selectedId ? "is-selected" : ""
+                      } ${!object.visible ? "opacity-50" : ""}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedId(object.id);
+                          setTool("select");
+                          setInspectorOpen(true);
+                          setLibraryOpen(false);
+                        }}
+                        className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
+                        title={object.name}
+                      >
+                        <span className="ref-tree-guide">│</span>
+                        <span className="ref-tree-branch">
+                          {isLast ? "└" : "├"}
+                        </span>
+                        <Route size={12} className="ref-tree-icon" />
+                        <span className="ref-tree-label truncate">
+                          {object.name}
+                        </span>
+                      </button>
+                      <div className="infra-tree-row-actions">
+                        <button
+                          type="button"
+                          aria-label={
+                            object.locked
+                              ? `Unlock ${object.name}`
+                              : `Lock ${object.name}`
+                          }
+                          title={object.locked ? "Unlock" : "Lock"}
+                          onClick={() =>
+                            updateObject(object.id, { locked: !object.locked })
+                          }
+                        >
+                          {object.locked ? (
+                            <Lock size={11} />
+                          ) : (
+                            <Unlock size={11} />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          aria-label={
+                            object.visible
+                              ? `Hide ${object.name}`
+                              : `Show ${object.name}`
+                          }
+                          title={object.visible ? "Hide" : "Show"}
+                          onClick={() =>
+                            updateObject(object.id, {
+                              visible: !object.visible,
+                            })
+                          }
+                        >
+                          {object.visible ? (
+                            <Eye size={11} />
+                          ) : (
+                            <EyeOff size={11} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+            )}
+          </div>
+
+          {/* Group 2: Buildings & Structures */}
+          <div className="ref-tree-group">
+            <button
+              type="button"
+              onClick={() =>
+                setTreeGroupsOpen((curr) => ({
+                  ...curr,
+                  buildings: !curr.buildings,
+                }))
+              }
+              className="ref-tree-row"
+            >
+              <span className="ref-tree-branch">├</span>
+              <ChevronDown
+                size={12}
+                className={`ref-tree-chevron transition-transform ${
+                  treeGroupsOpen.buildings ? "" : "-rotate-90"
+                }`}
+              />
+              <Building2 size={13} className="ref-tree-icon" />
+              <span className="ref-tree-label">
+                Buildings ({buildingObjects.length})
+              </span>
+            </button>
+            {treeGroupsOpen.buildings && (
+              <div className="ref-tree-children">
+                {buildingObjects.map((object, index) => {
+                  const isLast = index === buildingObjects.length - 1;
+                  return (
+                    <div
+                      key={object.id}
+                      className={`ref-tree-row is-nested group ${
+                        object.id === selectedId ? "is-selected" : ""
+                      } ${!object.visible ? "opacity-50" : ""}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedId(object.id);
+                          setTool("select");
+                          setInspectorOpen(true);
+                          setLibraryOpen(false);
+                        }}
+                        className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
+                        title={object.name}
+                      >
+                        <span className="ref-tree-guide">│</span>
+                        <span className="ref-tree-branch">
+                          {isLast ? "└" : "├"}
+                        </span>
+                        <Building2 size={12} className="ref-tree-icon" />
+                        <span className="ref-tree-label truncate">
+                          {object.name}
+                        </span>
+                      </button>
+                      <div className="infra-tree-row-actions">
+                        <button
+                          type="button"
+                          aria-label={
+                            object.locked
+                              ? `Unlock ${object.name}`
+                              : `Lock ${object.name}`
+                          }
+                          title={object.locked ? "Unlock" : "Lock"}
+                          onClick={() =>
+                            updateObject(object.id, { locked: !object.locked })
+                          }
+                        >
+                          {object.locked ? (
+                            <Lock size={11} />
+                          ) : (
+                            <Unlock size={11} />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          aria-label={
+                            object.visible
+                              ? `Hide ${object.name}`
+                              : `Show ${object.name}`
+                          }
+                          title={object.visible ? "Hide" : "Show"}
+                          onClick={() =>
+                            updateObject(object.id, {
+                              visible: !object.visible,
+                            })
+                          }
+                        >
+                          {object.visible ? (
+                            <Eye size={11} />
+                          ) : (
+                            <EyeOff size={11} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Group 3: Landscape & Public Realm */}
+          <div className="ref-tree-group">
+            <button
+              type="button"
+              onClick={() =>
+                setTreeGroupsOpen((curr) => ({
+                  ...curr,
+                  landscape: !curr.landscape,
+                }))
+              }
+              className="ref-tree-row"
+            >
+              <span className="ref-tree-branch">└</span>
+              <ChevronDown
+                size={12}
+                className={`ref-tree-chevron transition-transform ${
+                  treeGroupsOpen.landscape ? "" : "-rotate-90"
+                }`}
+              />
+              <TreePine size={13} className="ref-tree-icon" />
+              <span className="ref-tree-label">
+                Landscape & Public ({landscapeObjects.length})
+              </span>
+            </button>
+            {treeGroupsOpen.landscape && (
+              <div className="ref-tree-children">
+                {landscapeObjects.map((object, index) => {
+                  const isLast = index === landscapeObjects.length - 1;
+                  return (
+                    <div
+                      key={object.id}
+                      className={`ref-tree-row is-nested group ${
+                        object.id === selectedId ? "is-selected" : ""
+                      } ${!object.visible ? "opacity-50" : ""}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedId(object.id);
+                          setTool("select");
+                          setInspectorOpen(true);
+                          setLibraryOpen(false);
+                        }}
+                        className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
+                        title={object.name}
+                      >
+                        <span className="ref-tree-guide"> </span>
+                        <span className="ref-tree-branch">
+                          {isLast ? "└" : "├"}
+                        </span>
+                        <TreePine size={12} className="ref-tree-icon" />
+                        <span className="ref-tree-label truncate">
+                          {object.name}
+                        </span>
+                      </button>
+                      <div className="infra-tree-row-actions">
+                        <button
+                          type="button"
+                          aria-label={
+                            object.locked
+                              ? `Unlock ${object.name}`
+                              : `Lock ${object.name}`
+                          }
+                          title={object.locked ? "Unlock" : "Lock"}
+                          onClick={() =>
+                            updateObject(object.id, { locked: !object.locked })
+                          }
+                        >
+                          {object.locked ? (
+                            <Lock size={11} />
+                          ) : (
+                            <Unlock size={11} />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          aria-label={
+                            object.visible
+                              ? `Hide ${object.name}`
+                              : `Show ${object.name}`
+                          }
+                          title={object.visible ? "Hide" : "Show"}
+                          onClick={() =>
+                            updateObject(object.id, {
+                              visible: !object.visible,
+                            })
+                          }
+                        >
+                          {object.visible ? (
+                            <Eye size={11} />
+                          ) : (
+                            <EyeOff size={11} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
-        <label className="infra-utility-toggle">
-          <span>
-            <Zap size={13} className="text-[#4A90D9]" />
-            Show underground utilities
-          </span>
-          <input
-            type="checkbox"
-            checked={undergroundUtilities}
-            onChange={(event) => setUndergroundUtilities(event.target.checked)}
-          />
-        </label>
-
-        <div className="infra-status" title={saveMessage}>
-          {saveMessage.startsWith("Saved") ||
-          saveMessage.startsWith("Site restored") ? (
-            <span className="infra-online-dot" />
-          ) : (
-            <span
-              className={`infra-save-dot ${
-                saveMessage.startsWith("Could not") ||
-                saveMessage.startsWith("Saved site")
-                  ? "has-error"
-                  : ""
+        {/* Collapsible Site Tools & Asset Catalog Drawer */}
+        <div className="ref-sidebar-drawer">
+          <button
+            type="button"
+            onClick={() => setAddDrawerOpen((open) => !open)}
+            className="ref-drawer-trigger"
+          >
+            <span className="flex items-center gap-2">
+              <Settings size={12} className="text-[#4A90D9]" />
+              <span>Add to Scene & Tools</span>
+            </span>
+            <ChevronDown
+              size={12}
+              className={`text-zinc-500 transition-transform ${
+                addDrawerOpen ? "rotate-180" : ""
               }`}
             />
+          </button>
+
+          {addDrawerOpen && (
+            <div className="max-h-[250px] overflow-y-auto px-2 pb-2 pt-1">
+              <div className="infra-section-label">TRANSFORM & MEASURE</div>
+              <div className="infra-transform-tools">
+                {toolButtons.map(({ id, title, icon: Icon }) => (
+                  <ActionButton
+                    key={id}
+                    title={title}
+                    active={tool === id}
+                    onClick={() => setTool(id)}
+                  >
+                    <Icon size={15} />
+                  </ActionButton>
+                ))}
+                <ActionButton
+                  title="Delete object"
+                  active={tool === "delete"}
+                  onClick={() => setTool("delete")}
+                >
+                  <Trash2 size={15} />
+                </ActionButton>
+              </div>
+
+              <div className="infra-section-label infra-assets-title">
+                ADD TO SCENE
+              </div>
+              <div className="infra-asset-categories">
+                {categories.map((category) => (
+                  <details key={category.title} open>
+                    <summary>
+                      <span>{category.title}</span>
+                      <ChevronDown size={13} />
+                    </summary>
+                    <div className="infra-asset-grid">
+                      {category.items.map(({ type, label, icon: Icon }) => (
+                        <button
+                          type="button"
+                          key={type}
+                          title={`Add ${label.toLowerCase()} to the scene`}
+                          aria-pressed={tool === type}
+                          onClick={() => {
+                            setTool(tool === type ? "select" : type);
+                            setMeasurePoints([]);
+                            setRoadStart(null);
+                            setLibraryOpen(false);
+                          }}
+                          className={`infra-asset-button ${
+                            tool === type ? "is-active" : ""
+                          }`}
+                        >
+                          <Icon size={14} />
+                          <span>{label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </details>
+                ))}
+              </div>
+
+              <label className="infra-utility-toggle mt-1">
+                <span>
+                  <Zap size={13} className="text-[#4A90D9]" />
+                  Show underground utilities
+                </span>
+                <input
+                  type="checkbox"
+                  checked={undergroundUtilities}
+                  onChange={(event) =>
+                    setUndergroundUtilities(event.target.checked)
+                  }
+                />
+              </label>
+
+              <div className="infra-status mt-1" title={saveMessage}>
+                {saveMessage.startsWith("Saved") ||
+                saveMessage.startsWith("Site restored") ? (
+                  <span className="infra-online-dot" />
+                ) : (
+                  <span
+                    className={`infra-save-dot ${
+                      saveMessage.startsWith("Could not") ||
+                      saveMessage.startsWith("Saved site")
+                        ? "has-error"
+                        : ""
+                    }`}
+                  />
+                )}
+                <span className="truncate">{saveMessage}</span>
+              </div>
+            </div>
           )}
-          <span className="truncate">{saveMessage}</span>
-          <span className="ml-auto font-mono text-[10px] text-zinc-500">
-            V / G / R / S
-          </span>
+        </div>
+
+        {/* Bottom Secondary Actions Footer matching Reference */}
+        <div className="ref-sidebar-footer">
+          <button
+            type="button"
+            onClick={() => setAddDrawerOpen((open) => !open)}
+            className="ref-footer-action"
+          >
+            <LayoutGrid size={13} />
+            <span>Library</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => exportLayout("GeoJSON")}
+            className="ref-footer-action"
+          >
+            <Upload size={13} />
+            <span>Import</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setChatOpen((open) => !open)}
+            className="ref-footer-action"
+          >
+            <HelpCircle size={13} />
+            <span>Help & Feedback</span>
+          </button>
         </div>
       </aside>
 
@@ -984,97 +1339,158 @@ export default function InfrastructurePage() {
             onTransform={(id, values) => updateObject(id, values)}
           />
 
+          {/* Top Floating Toolbar matching Reference Image */}
           <div
-            className="infra-floating-tools infra-transform-floating"
+            className="ref-top-toolbar"
+            role="toolbar"
             aria-label="Object tools"
           >
-            {toolButtons.map(({ id, title, icon: Icon }) => (
-              <ActionButton
-                key={id}
-                title={title}
-                active={tool === id}
-                onClick={() => setTool(id)}
-              >
-                <Icon size={15} />
-              </ActionButton>
-            ))}
-          </div>
-
-          <div className="infra-view-controls" aria-label="Camera controls">
-            <label className="sr-only" htmlFor="infra-camera-view">
-              Camera view
-            </label>
-            <select
-              id="infra-camera-view"
-              defaultValue="Perspective"
-              onChange={(event) =>
-                viewport.current?.preset(event.target.value as CameraPreset)
-              }
-            >
-              {cameraPresets.map((preset) => (
-                <option key={preset}>{preset}</option>
-              ))}
-            </select>
-            <ActionButton
-              title="Zoom in (+)"
-              onClick={() => viewport.current?.zoom(true)}
-            >
-              <ZoomIn size={15} />
-            </ActionButton>
-            <ActionButton
-              title="Zoom out (−)"
-              onClick={() => viewport.current?.zoom(false)}
-            >
-              <ZoomOut size={15} />
-            </ActionButton>
-            <ActionButton
-              title="Fit entire scene"
-              onClick={() => viewport.current?.fit()}
-            >
-              <Focus size={15} />
-            </ActionButton>
-            <ActionButton
-              title="Reset camera"
-              onClick={() => viewport.current?.reset()}
-            >
-              <Home size={15} />
-            </ActionButton>
-            {selected && (
-              <ActionButton
-                title="Focus selected object (F)"
-                onClick={() => viewport.current?.focus(selected)}
-                active
-              >
-                <Focus size={15} />
-              </ActionButton>
-            )}
-            <span className="infra-control-divider" />
-            <ActionButton
-              title="Export scene as GeoJSON"
-              onClick={() => exportLayout("GeoJSON")}
-            >
-              <Download size={14} />
-            </ActionButton>
-            <ActionButton
-              title="Export scene as CSV"
-              onClick={() => exportLayout("CSV")}
-            >
-              <span className="infra-csv-icon">CSV</span>
-            </ActionButton>
-          </div>
-
-          <div className="infra-lighting">
             <button
               type="button"
-              className="infra-lighting-trigger"
-              onClick={() => setLightingOpen((open) => !open)}
-              aria-expanded={lightingOpen}
+              title="Add Road segment"
+              onClick={() => setTool(tool === "road" ? "select" : "road")}
+              className={`ref-toolbar-icon-btn ${
+                tool === "road" ? "is-active" : ""
+              }`}
             >
-              <Sun size={14} className="text-[#4A90D9]" />
-              <span>{lighting.preset}</span>
-              <ChevronDown size={13} />
+              <Plus size={15} />
             </button>
-            {lightingOpen && (
+            <button
+              type="button"
+              title="Add Commercial building"
+              onClick={() =>
+                setTool(tool === "building" ? "select" : "building")
+              }
+              className={`ref-toolbar-icon-btn ${
+                tool === "building" ? "is-active" : ""
+              }`}
+            >
+              <Building2 size={14} />
+            </button>
+            <button
+              type="button"
+              title="Add Tree"
+              onClick={() => setTool(tool === "tree" ? "select" : "tree")}
+              className={`ref-toolbar-icon-btn ${
+                tool === "tree" ? "is-active" : ""
+              }`}
+            >
+              <TreePine size={14} />
+            </button>
+
+            <span className="ref-toolbar-divider" />
+
+            {toolButtons.map(({ id, title, icon: Icon }) => (
+              <button
+                key={id}
+                type="button"
+                title={title}
+                aria-label={title}
+                aria-pressed={tool === id}
+                onClick={() => setTool(id)}
+                className={`ref-toolbar-icon-btn ${
+                  tool === id ? "is-active" : ""
+                }`}
+              >
+                <Icon size={14} />
+              </button>
+            ))}
+
+            <button
+              type="button"
+              title="Fit entire scene"
+              aria-label="Fit entire scene"
+              onClick={() => viewport.current?.fit()}
+              className="ref-toolbar-icon-btn"
+            >
+              <Focus size={14} />
+            </button>
+            <button
+              type="button"
+              title="Reset camera"
+              aria-label="Reset camera"
+              onClick={() => viewport.current?.reset()}
+              className="ref-toolbar-icon-btn"
+            >
+              <Home size={14} />
+            </button>
+
+            <span className="ref-toolbar-divider" />
+
+            <div
+              className="flex items-center gap-1"
+              aria-label="Camera controls"
+            >
+              <label className="sr-only" htmlFor="infra-camera-view">
+                Camera view
+              </label>
+              <select
+                id="infra-camera-view"
+                defaultValue="Perspective"
+                onChange={(event) =>
+                  viewport.current?.preset(event.target.value as CameraPreset)
+                }
+                className="ref-toolbar-zoom-pill cursor-pointer bg-transparent"
+              >
+                {cameraPresets.map((preset) => (
+                  <option key={preset} value={preset} className="bg-[#151619]">
+                    {preset}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                title="Zoom in (+)"
+                aria-label="Zoom in (+)"
+                onClick={() => viewport.current?.zoom(true)}
+                className="ref-toolbar-icon-btn"
+              >
+                <ZoomIn size={14} />
+              </button>
+              <button
+                type="button"
+                title="Zoom out (−)"
+                aria-label="Zoom out (−)"
+                onClick={() => viewport.current?.zoom(false)}
+                className="ref-toolbar-icon-btn"
+              >
+                <ZoomOut size={14} />
+              </button>
+            </div>
+
+            <button
+              type="button"
+              title="Export scene as GeoJSON"
+              aria-label="Export scene as GeoJSON"
+              onClick={() => exportLayout("GeoJSON")}
+              className="ref-toolbar-export-btn"
+            >
+              Export
+            </button>
+            <button
+              type="button"
+              title="Export scene as CSV"
+              aria-label="Export scene as CSV"
+              onClick={() => exportLayout("CSV")}
+              className="ref-toolbar-icon-btn text-[10px] font-bold"
+            >
+              CSV
+            </button>
+            <button
+              type="button"
+              title="Lighting & sun settings"
+              aria-label="Lighting & sun settings"
+              onClick={() => setLightingOpen((open) => !open)}
+              className={`ref-toolbar-icon-btn ${
+                lightingOpen ? "is-active" : ""
+              }`}
+            >
+              <Play size={13} />
+            </button>
+          </div>
+
+          {lightingOpen && (
+            <div className="infra-lighting">
               <div className="infra-lighting-panel">
                 <div className="infra-lighting-title">
                   <span>
@@ -1188,8 +1604,8 @@ export default function InfrastructurePage() {
                   />
                 </label>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {selected && (
             <div className="infra-selection-pill">
@@ -1233,6 +1649,110 @@ export default function InfrastructurePage() {
             </div>
           )}
 
+          {/* Orientation Axis Gizmo + Orthographic / Perspective Switcher */}
+          <div className="ref-viewport-gizmo-dock max-[900px]:hidden">
+            <div
+              className="ref-axis-gizmo"
+              title="3D Viewport Orientation Axes (Click to reset view)"
+              onClick={() => viewport.current?.reset()}
+            >
+              <svg viewBox="0 0 72 72" className="h-14 w-14">
+                <circle
+                  cx="36"
+                  cy="36"
+                  r="31"
+                  fill="rgba(22, 24, 29, 0.85)"
+                  stroke="rgba(255,255,255,0.08)"
+                  strokeWidth="1"
+                />
+                <line
+                  x1="36"
+                  y1="36"
+                  x2="36"
+                  y2="13"
+                  stroke="#34d399"
+                  strokeWidth="2"
+                />
+                <circle cx="36" cy="12" r="5" fill="#34d399" />
+                <text
+                  x="36"
+                  y="14.5"
+                  textAnchor="middle"
+                  fontSize="7"
+                  fontWeight="700"
+                  fill="#06281e"
+                >
+                  Y
+                </text>
+                <line
+                  x1="36"
+                  y1="36"
+                  x2="57"
+                  y2="44"
+                  stroke="#f43f5e"
+                  strokeWidth="2"
+                />
+                <circle cx="58" cy="45" r="5" fill="#f43f5e" />
+                <text
+                  x="58"
+                  y="47.5"
+                  textAnchor="middle"
+                  fontSize="7"
+                  fontWeight="700"
+                  fill="#fff"
+                >
+                  X
+                </text>
+                <line
+                  x1="36"
+                  y1="36"
+                  x2="17"
+                  y2="47"
+                  stroke="#38bdf8"
+                  strokeWidth="2"
+                />
+                <circle cx="16" cy="48" r="5" fill="#38bdf8" />
+                <text
+                  x="16"
+                  y="50.5"
+                  textAnchor="middle"
+                  fontSize="7"
+                  fontWeight="700"
+                  fill="#062235"
+                >
+                  Z
+                </text>
+                <circle cx="36" cy="36" r="3" fill="#e4e4e7" />
+              </svg>
+            </div>
+            <div className="ref-projection-pill">
+              <button
+                type="button"
+                onClick={() => {
+                  setProjectionMode("Orthographic");
+                  viewport.current?.preset("Top");
+                }}
+                className={`ref-projection-btn ${
+                  projectionMode === "Orthographic" ? "is-active" : ""
+                }`}
+              >
+                Orthographic
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setProjectionMode("Perspective");
+                  viewport.current?.preset("Perspective");
+                }}
+                className={`ref-projection-btn ${
+                  projectionMode === "Perspective" ? "is-active" : ""
+                }`}
+              >
+                Perspective
+              </button>
+            </div>
+          </div>
+
           {/* Unified Studio AI Chat */}
           <StudioAIChat
             studio="infrastructure"
@@ -1250,148 +1770,252 @@ export default function InfrastructurePage() {
               setChatInput("");
             }}
             quickPrompts={INFRA_QUICK_PROMPTS}
-            placeholder="Ask about site access, road layout, creek buffer, or landscape…"
+            placeholder="Describe what you want to create or change…"
             statusLabel={`${objects.length} site objects`}
             className="infra-ai-chat studio-ai-floating-infra"
           />
         </div>
-
-        <footer className="infra-bottom-bar">
-          <div>
-            <span className="infra-online-dot" /> 3D viewport ready
-          </div>
-          <span>
-            {objects.length} objects ·{" "}
-            {saveMessage.startsWith("Saved") ? "saved locally" : "local draft"}
-          </span>
-          <span>Orbit: drag · Pan: right-click / two fingers · Zoom: scroll</span>
-          <button type="button" onClick={() => viewport.current?.fit()}>
-            Fit view
-          </button>
-        </footer>
       </section>
 
-      {/* Right Sidebar: Inspector, Planning Suggestions & Site Summary */}
+      {/* Right Sidebar: Reference Collaborator Header + Properties & Settings */}
       <aside
-        className={`infra-sidebar infra-inspector studio-sidebar-shell flex shrink-0 flex-col ${
+        className={`infra-sidebar infra-inspector studio-sidebar-shell ref-floating-sidebar flex shrink-0 flex-col ${
           inspectorOpen ? "is-open" : ""
         } ${rightCollapsed ? "is-collapsed-desktop" : ""}`}
         aria-label="Infrastructure inspector"
       >
-        <div className="infra-panel-heading studio-sidebar-top">
-          <div className="studio-brand-stack">
-            <b>Inspector</b>
-            <p>Site properties & scene</p>
-          </div>
-          <div className="infra-panel-heading-actions">
-            <button
-              type="button"
-              className="studio-header-icon-btn"
-              title="Lighting settings"
-              aria-label="Lighting settings"
-              onClick={() => setLightingOpen((open) => !open)}
-            >
-              <Sun size={14} />
-            </button>
-            <button
-              type="button"
-              className="studio-header-icon-btn max-[700px]:hidden"
-              title="Collapse inspector"
-              aria-label="Collapse inspector"
-              onClick={() => setRightCollapsed(true)}
-            >
-              <PanelRightClose size={14} />
-            </button>
-          </div>
-        </div>
+        <InspectorCollaboratorBar
+          onCollapse={() => setRightCollapsed(true)}
+          onAction={() => exportLayout("GeoJSON")}
+          actionLabel="Invite"
+        />
 
-        <div className="infra-ai-actions">
-          <div className="infra-ai-actions-title">
-            <span>
-              <Lightbulb size={13} className="text-[#4A90D9]" />
-              Planning suggestions
-            </span>
-            <small>local demo</small>
-          </div>
-          <div className="infra-ai-action-grid">
-            {[
-              ["auto-layout", "Auto layout"],
-              ["accessibility", "Accessibility"],
-              ["greenery", "Add greenery"],
-              ["transit", "Transit stop"],
-              ["optimize", "Cycle link"],
-            ].map(([action, label]) => (
-              <button
-                key={action}
-                type="button"
-                onClick={() => applySiteAction(action)}
-              >
-                <Check size={12} />
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {selected ? (
-          <div className="infra-inspector-scroll">
-            <div className="infra-object-title">
-              <span className="infra-object-icon">
-                <Building2 size={16} />
+        <div className="ref-inspector-scroll flex-1 overflow-y-auto">
+          {/* Camera Section */}
+          <div className="ref-inspector-section">
+            <div className="ref-inspector-section-header">
+              <span>Camera</span>
+              <span className="text-[11px] font-normal text-zinc-500">
+                {lighting.preset}
               </span>
-              <div className="min-w-0 flex-1">
-                <div className="infra-muted-label">
-                  {infrastructureLabels[selected.type]}
-                </div>
+            </div>
+            <div className="grid grid-cols-4 gap-1">
+              {(["Perspective", "Top", "Front", "Right"] as CameraPreset[]).map(
+                (preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => viewport.current?.preset(preset)}
+                    className="rounded-md bg-white/[0.04] px-2 py-1.5 text-[11px] font-medium text-zinc-300 transition hover:bg-white/[0.08] hover:text-white"
+                  >
+                    {preset}
+                  </button>
+                ),
+              )}
+            </div>
+          </div>
+
+          {/* Frame / Surface Color Section */}
+          <div className="ref-inspector-section">
+            <div className="ref-inspector-section-header">
+              <span>Frame</span>
+            </div>
+            <div className="ref-frame-color-row">
+              <label className="ref-color-swatch-box" title="Surface color">
                 <input
-                  aria-label="Object name"
-                  value={selected.name}
-                  onChange={(event) =>
-                    updateObject(selected.id, { name: event.target.value })
+                  type="color"
+                  value={selected?.color ?? "#3b82f6"}
+                  disabled={!selected}
+                  onChange={(event) => {
+                    if (selected) {
+                      updateObject(selected.id, { color: event.target.value });
+                    }
+                  }}
+                  className="sr-only"
+                />
+                <span
+                  className="ref-color-swatch-fill"
+                  style={{ backgroundColor: selected?.color ?? "#1D1D1D" }}
+                />
+              </label>
+              <span className="ref-color-hex">
+                {(selected?.color ?? "#1D1D1D").replace("#", "").toUpperCase()}
+              </span>
+              <span className="ref-color-opacity">100 %</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => viewport.current?.fit()}
+              className="ref-full-action-btn mt-2.5"
+            >
+              Edit Frame
+            </button>
+          </div>
+
+          {/* Global Settings with Reference Blue Yes/No & Show/Hide Pills */}
+          <div className="ref-inspector-section">
+            <div className="ref-inspector-section-header">
+              <span>Global Settings</span>
+            </div>
+            <div className="space-y-2.5">
+              <div className="ref-setting-row">
+                <span className="ref-setting-label">Cast Shadows</span>
+                <BinaryToggle
+                  value={lighting.shadows}
+                  onChange={(shadows) =>
+                    setLighting((current) => ({ ...current, shadows }))
                   }
+                  trueLabel="Yes"
+                  falseLabel="No"
+                />
+              </div>
+              <div className="ref-setting-row">
+                <span className="ref-setting-label">Utilities</span>
+                <BinaryToggle
+                  value={undergroundUtilities}
+                  onChange={setUndergroundUtilities}
+                  trueLabel="Show"
+                  falseLabel="Hide"
                 />
               </div>
             </div>
-            <div className="infra-inspector-actions">
-              <ActionButton
-                title={selected.visible ? "Hide object" : "Show object"}
-                active={!selected.visible}
+          </div>
+
+          {/* Post-Processing Section */}
+          <div className="ref-inspector-section">
+            <div className="ref-setting-row">
+              <span className="ref-inspector-section-title">
+                Post-Processing
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={lighting.shadowSoftness > 0}
                 onClick={() =>
-                  updateObject(selected.id, { visible: !selected.visible })
+                  setLighting((current) => ({
+                    ...current,
+                    shadowSoftness: current.shadowSoftness > 0 ? 0 : 3,
+                  }))
                 }
-              >
-                {selected.visible ? <Eye size={15} /> : <EyeOff size={15} />}
-              </ActionButton>
-              <ActionButton
-                title={selected.locked ? "Unlock object" : "Lock object"}
-                active={selected.locked}
-                onClick={() =>
-                  updateObject(selected.id, { locked: !selected.locked })
-                }
-              >
-                {selected.locked ? <Lock size={15} /> : <Unlock size={15} />}
-              </ActionButton>
-              <ActionButton
-                title="Duplicate selected object"
-                onClick={duplicateSelected}
-              >
-                <Copy size={15} />
-              </ActionButton>
-              <ActionButton
-                title="Reset selected transform"
-                onClick={resetSelectedTransform}
-              >
-                <Rotate3D size={15} />
-              </ActionButton>
-              <ActionButton
-                title="Delete selected object"
-                onClick={confirmDeleteSelected}
-                className="infra-danger"
-              >
-                <Trash2 size={15} />
-              </ActionButton>
+                className={`studio-switch ${
+                  lighting.shadowSoftness > 0 ? "is-on" : ""
+                }`}
+              />
             </div>
-            <div className="infra-inspector-section">
+          </div>
+
+          {/* Environment Section */}
+          <div className="ref-inspector-section">
+            <div className="ref-inspector-section-header">
+              <span>Environment</span>
+            </div>
+            <div className="space-y-2.5">
+              <div className="ref-setting-row">
+                <span className="ref-setting-label">Sun Light</span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setLightingOpen((open) => !open)}
+                    className="ref-mini-gear-btn"
+                    title="Open lighting sliders"
+                  >
+                    <Settings size={12} />
+                  </button>
+                  <BinaryToggle
+                    value={lighting.intensity >= 0.8}
+                    onChange={(bright) =>
+                      setLighting((current) => ({
+                        ...current,
+                        intensity: bright ? 1.1 : 0.45,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="ref-setting-row">
+                <span className="ref-setting-label">Daylight</span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setLightPreset(
+                        lighting.preset === "Day" ? "Golden hour" : "Day",
+                      )
+                    }
+                    className="ref-mini-gear-btn"
+                    title="Cycle daylight preset"
+                  >
+                    <Sun size={12} />
+                  </button>
+                  <BinaryToggle
+                    value={lighting.preset !== "Night"}
+                    onChange={(day) => setLightPreset(day ? "Day" : "Night")}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Selected Object Properties */}
+          {selected ? (
+            <div className="ref-inspector-section">
+              <div className="infra-object-title mb-2">
+                <span className="infra-object-icon">
+                  <Building2 size={15} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="infra-muted-label">
+                    {infrastructureLabels[selected.type]}
+                  </div>
+                  <input
+                    aria-label="Object name"
+                    value={selected.name}
+                    onChange={(event) =>
+                      updateObject(selected.id, { name: event.target.value })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="infra-inspector-actions mb-3">
+                <ActionButton
+                  title={selected.visible ? "Hide object" : "Show object"}
+                  active={!selected.visible}
+                  onClick={() =>
+                    updateObject(selected.id, { visible: !selected.visible })
+                  }
+                >
+                  {selected.visible ? <Eye size={14} /> : <EyeOff size={14} />}
+                </ActionButton>
+                <ActionButton
+                  title={selected.locked ? "Unlock object" : "Lock object"}
+                  active={selected.locked}
+                  onClick={() =>
+                    updateObject(selected.id, { locked: !selected.locked })
+                  }
+                >
+                  {selected.locked ? <Lock size={14} /> : <Unlock size={14} />}
+                </ActionButton>
+                <ActionButton
+                  title="Duplicate selected object"
+                  onClick={duplicateSelected}
+                >
+                  <Copy size={14} />
+                </ActionButton>
+                <ActionButton
+                  title="Reset selected transform"
+                  onClick={resetSelectedTransform}
+                >
+                  <Rotate3D size={14} />
+                </ActionButton>
+                <ActionButton
+                  title="Delete selected object"
+                  onClick={confirmDeleteSelected}
+                  className="infra-danger"
+                >
+                  <Trash2 size={14} />
+                </ActionButton>
+              </div>
+
               <div className="infra-inspector-section-title">
                 TRANSFORM{" "}
                 <button
@@ -1399,11 +2023,11 @@ export default function InfrastructurePage() {
                   title="Focus selected object (F)"
                   onClick={() => viewport.current?.focus(selected)}
                 >
-                  <Focus size={13} />
+                  <Focus size={12} />
                   Focus
                 </button>
               </div>
-              <div className="infra-field-grid">
+              <div className="infra-field-grid mb-3">
                 <NumericField
                   label="X"
                   value={selected.x}
@@ -1430,12 +2054,11 @@ export default function InfrastructurePage() {
                   }
                 />
               </div>
-            </div>
-            <div className="infra-inspector-section">
+
               <div className="infra-inspector-section-title">
                 DIMENSIONS <span>metres</span>
               </div>
-              <div className="infra-field-grid">
+              <div className="infra-field-grid mb-3">
                 <NumericField
                   label="Width"
                   value={selected.width}
@@ -1491,7 +2114,7 @@ export default function InfrastructurePage() {
                 )}
               </div>
               {selected.type === "building" && (
-                <label className="infra-field infra-style-field">
+                <label className="infra-field infra-style-field mb-3">
                   <span>Building style</span>
                   <select
                     value={selected.style ?? "commercial"}
@@ -1511,9 +2134,6 @@ export default function InfrastructurePage() {
                   </select>
                 </label>
               )}
-            </div>
-            <div className="infra-inspector-section">
-              <div className="infra-inspector-section-title">MATERIAL</div>
               <label className="infra-color-field">
                 <span>Surface color</span>
                 <input
@@ -1525,59 +2145,73 @@ export default function InfrastructurePage() {
                 />
               </label>
             </div>
-            <div className="infra-inspector-note">
-              {selected.type === "road"
-                ? "Road width and lane count regenerate the curved pavement and markings."
-                : selected.type === "building"
-                  ? "Footprint, facade and roof are generated from the editable building parameters."
-                  : "Geometry and proportions update with the dimensions above."}
+          ) : (
+            <div className="ref-inspector-section">
+              <div className="ref-inspector-section-header">
+                <span>Selected Element</span>
+              </div>
+              <p className="text-[11px] leading-relaxed text-zinc-400">
+                Choose a building, road, tree or site element in the hierarchy
+                or 3D viewport to edit its dimensions, materials, and transform.
+              </p>
             </div>
-          </div>
-        ) : (
-          <div className="infra-empty-inspector">
-            <span>
-              <MousePointer2 size={18} />
-            </span>
-            <b>Select an object</b>
-            <p>
-              Choose a building, road, tree or site element to edit its
-              dimensions, materials and transform.
-            </p>
-            <button type="button" onClick={() => viewport.current?.fit()}>
-              <Focus size={14} />
-              Fit entire scene
-            </button>
-          </div>
-        )}
+          )}
 
-        <div className="infra-site-summary">
-          <div className="infra-section-label">SITE OVERVIEW</div>
-          <div className="infra-summary-grid">
-            <div>
-              <b>{objects.length}</b>
-              <span>Objects</span>
+          {/* Planning Suggestions */}
+          <div className="ref-inspector-section">
+            <div className="ref-inspector-section-header">
+              <span>Planning Suggestions</span>
+              <span className="text-[10px] font-normal text-zinc-500">
+                local demo
+              </span>
             </div>
-            <div>
-              <b>{counts.road ?? 0}</b>
-              <span>Roads</span>
-            </div>
-            <div>
-              <b>{counts.building ?? 0}</b>
-              <span>Buildings</span>
-            </div>
-            <div>
-              <b>{counts.tree ?? 0}</b>
-              <span>Trees</span>
+            <div className="infra-ai-action-grid">
+              {[
+                ["auto-layout", "Auto layout"],
+                ["accessibility", "Accessibility"],
+                ["greenery", "Add greenery"],
+                ["transit", "Transit stop"],
+                ["optimize", "Cycle link"],
+              ].map(([action, label]) => (
+                <button
+                  key={action}
+                  type="button"
+                  onClick={() => applySiteAction(action)}
+                >
+                  <Check size={12} />
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
-          <div className="infra-saved-state">
-            <span className="infra-online-dot" /> Local concept · not connected
-            to a project API
+
+          {/* Export & Site Overview */}
+          <div className="ref-inspector-section border-b-0">
+            <div className="ref-inspector-section-header">
+              <span>Export</span>
+              <span className="text-[10px] font-normal text-zinc-500">
+                {objects.length} objects · {counts.road ?? 0} roads
+              </span>
+            </div>
+            <div className="flex gap-1.5">
+              <button
+                type="button"
+                onClick={() => exportLayout("GeoJSON")}
+                className="ref-full-action-btn flex-1"
+              >
+                <Download size={12} />
+                GeoJSON
+              </button>
+              <button
+                type="button"
+                onClick={() => exportLayout("CSV")}
+                className="ref-full-action-btn flex-1"
+              >
+                <Download size={12} />
+                CSV Schedule
+              </button>
+            </div>
           </div>
-        </div>
-        <div className="infra-shortcuts">
-          <AlertTriangle size={12} /> V select · G move · R rotate · S scale · F
-          focus · Del remove
         </div>
       </aside>
     </main>
