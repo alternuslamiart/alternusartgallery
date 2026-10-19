@@ -2,11 +2,11 @@
 
 ## Next concrete task
 
-- [ ] Verify the reference-based Casynus Studio Ecosystem UI (`/casynus`,
+- [ ] Verify the Soft Frosted Porcelain Casynus Studio Ecosystem UI (`/casynus`,
   `/interior`, `/casynus?mode=floor-plan`, and `/infrastructure`) in a browser
-  at desktop and mobile widths, including the floating rounded sidebars,
-  hierarchical scene tree connectors, top floating toolbar, `BinaryToggle`
-  pills, `StudioAIChat` composer/tools menu, and `/interior` 2D drafting canvas.
+  at desktop and mobile widths, including the daylight 3D/2D viewports,
+  floating frosted-porcelain sidebars, top pill toolbar, `BinaryToggle` pills,
+  and bottom `StudioAIChat` composer.
 - [ ] Verify homepage category-chip centering and wrapping at narrow and wide
   mobile viewport widths in a browser.
 - [ ] Design authenticated infrastructure-scene persistence within an

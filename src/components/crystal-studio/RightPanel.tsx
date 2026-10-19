@@ -90,7 +90,7 @@ function FloorLengthInput({
   const display = formatFloorLength(value, settings).replace(` ${settings.unit}`, "");
   return (
     <label className="studio-input-pill">
-      <span className="flex-1 capitalize text-zinc-400">{label}</span>
+      <span className="flex-1 capitalize text-slate-500">{label}</span>
       <input
         aria-label={label}
         type="text"
@@ -100,9 +100,9 @@ function FloorLengthInput({
           if (parsed !== null)
             onChange(roundFloorValue(Math.max(min, parsed), settings.precision));
         }}
-        className="w-16 rounded-[5px] border border-white/[0.08] bg-[#13161b] px-1.5 py-0.5 text-right text-zinc-100 outline-none focus:border-[#1a8cff]"
+        className="w-16 rounded-[6px] border border-slate-900/[0.08] bg-white px-1.5 py-0.5 text-right text-slate-900 outline-none focus:border-[#2563EB]"
       />
-      <span className="ml-1 text-[10px] text-zinc-500">{settings.unit}</span>
+      <span className="ml-1 text-[10px] text-slate-500">{settings.unit}</span>
     </label>
   );
 }
@@ -266,7 +266,7 @@ export function RightPanel(props: Props) {
                   <>
                     <div className="ref-prop-row">
                       <span className="ref-prop-label">Length</span>
-                      <strong className="text-[12px] font-semibold text-white">
+                      <strong className="text-[12px] font-semibold text-slate-900">
                         {formatFloorLength(
                           Math.hypot(
                             selected.end.x - selected.start.x,
@@ -286,7 +286,7 @@ export function RightPanel(props: Props) {
                     <div className="grid grid-cols-2 gap-1.5 pt-1">
                       {(["start", "end"] as const).map((point) => (
                         <div key={point} className="studio-coord-box">
-                          <span className="mb-1 block text-[10px] uppercase tracking-wider text-zinc-500">
+                          <span className="mb-1 block text-[10px] uppercase tracking-wider text-slate-500">
                             {point} (X / Y)
                           </span>
                           <div className="flex gap-1">
@@ -310,7 +310,7 @@ export function RightPanel(props: Props) {
                                     },
                                   });
                               }}
-                              className="w-full rounded-[5px] border border-white/[0.08] bg-[#13161b] px-1 py-1 text-center text-[11px] text-zinc-100 outline-none focus:border-[#1a8cff]"
+                              className="w-full rounded-[6px] border border-slate-900/[0.08] bg-white px-1 py-1 text-center text-[11px] text-slate-900 outline-none focus:border-[#2563EB]"
                             />
                             <input
                               aria-label={`${point} Y`}
@@ -332,7 +332,7 @@ export function RightPanel(props: Props) {
                                     },
                                   });
                               }}
-                              className="w-full rounded-[5px] border border-white/[0.08] bg-[#13161b] px-1 py-1 text-center text-[11px] text-zinc-100 outline-none focus:border-[#1a8cff]"
+                              className="w-full rounded-[6px] border border-slate-900/[0.08] bg-white px-1 py-1 text-center text-[11px] text-slate-900 outline-none focus:border-[#2563EB]"
                             />
                           </div>
                         </div>
@@ -344,11 +344,11 @@ export function RightPanel(props: Props) {
                 {selected.type === "room" && (
                   <>
                     <label className="studio-input-pill">
-                      <span className="flex-1 text-zinc-400">Room Label</span>
+                      <span className="flex-1 text-slate-500">Room Label</span>
                       <input
                         value={selected.label}
                         onChange={(e) => updateSelected({ label: e.target.value })}
-                        className="w-28 rounded-[5px] border border-white/[0.08] bg-[#13161b] px-2 py-0.5 text-right text-zinc-100 outline-none focus:border-[#1a8cff]"
+                        className="w-28 rounded-[6px] border border-slate-900/[0.08] bg-white px-2 py-0.5 text-right text-slate-900 outline-none focus:border-[#2563EB]"
                       />
                     </label>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -372,11 +372,11 @@ export function RightPanel(props: Props) {
 
                 {selected.type === "text" && (
                   <label className="studio-input-pill">
-                    <span className="flex-1 text-zinc-400">Annotation</span>
+                    <span className="flex-1 text-slate-500">Annotation</span>
                     <input
                       value={selected.text}
                       onChange={(e) => updateSelected({ text: e.target.value })}
-                      className="w-32 rounded-[5px] border border-white/[0.08] bg-[#13161b] px-2 py-0.5 text-right text-zinc-100 outline-none focus:border-[#1a8cff]"
+                      className="w-32 rounded-[6px] border border-slate-900/[0.08] bg-white px-2 py-0.5 text-right text-slate-900 outline-none focus:border-[#2563EB]"
                     />
                   </label>
                 )}
@@ -433,7 +433,7 @@ export function RightPanel(props: Props) {
                 {selected.type === "dimension" && (
                   <div className="ref-prop-row">
                     <span className="ref-prop-label">Measured Span</span>
-                    <strong className="text-[12px] font-semibold text-white">
+                    <strong className="text-[12px] font-semibold text-slate-900">
                       {formatFloorLength(
                         Math.hypot(
                           selected.end.x - selected.start.x,
@@ -447,7 +447,7 @@ export function RightPanel(props: Props) {
               </div>
             ) : (
               <div className="studio-empty-card">
-                <MousePointer2 size={15} className="text-zinc-500" />
+                <MousePointer2 size={15} className="text-slate-400" />
                 <p>Select any wall, room, door, window, or furniture item to inspect its dimensions.</p>
               </div>
             )}
@@ -463,7 +463,7 @@ export function RightPanel(props: Props) {
               <span className="ref-section-heading !mb-0">Global Settings</span>
               <ChevronDown
                 size={14}
-                className={`text-zinc-400 transition-transform ${
+                className={`text-slate-400 transition-transform ${
                   globalOpen ? "" : "-rotate-90"
                 }`}
               />
@@ -594,7 +594,7 @@ export function RightPanel(props: Props) {
                         Math.max(0, Math.min(100, Number(e.target.value))),
                       )
                     }
-                    className="w-7 bg-transparent text-right text-[11px] text-zinc-100 outline-none"
+                    className="w-7 bg-transparent text-right text-[11px] text-slate-900 outline-none"
                   />
                   <span>%</span>
                 </label>
@@ -626,10 +626,10 @@ export function RightPanel(props: Props) {
             </button>
 
             {frameEditOpen && (
-              <div className="mt-2.5 space-y-2 rounded-[10px] border border-white/[0.06] bg-[#191b20] p-2.5">
-                <div className="flex items-center justify-between text-[11px] text-zinc-400">
+              <div className="mt-2.5 space-y-2 rounded-[10px] border border-slate-900/[0.08] bg-[#F8F7F4] p-2.5">
+                <div className="flex items-center justify-between text-[11px] text-slate-500">
                   <span>Color Swatches</span>
-                  <label className="cursor-pointer text-[#1a8cff] hover:underline">
+                  <label className="cursor-pointer font-medium text-[#2563EB] hover:underline">
                     + Add
                     <input
                       type="color"
@@ -650,8 +650,8 @@ export function RightPanel(props: Props) {
                       onClick={() => props.onColorChange(swatch)}
                       className={`h-5 w-5 rounded-[5px] border ${
                         props.color.toLowerCase() === swatch.toLowerCase()
-                          ? "border-white ring-1 ring-[#1a8cff]"
-                          : "border-white/15"
+                          ? "border-slate-900 ring-1 ring-[#2563EB]"
+                          : "border-slate-900/15"
                       }`}
                       style={{ backgroundColor: swatch }}
                     />
@@ -686,7 +686,7 @@ export function RightPanel(props: Props) {
               <span className="ref-section-heading !mb-0">Global Settings</span>
               <ChevronDown
                 size={14}
-                className={`text-zinc-400 transition-transform ${
+                className={`text-slate-400 transition-transform ${
                   globalOpen ? "" : "-rotate-90"
                 }`}
               />
@@ -759,7 +759,7 @@ export function RightPanel(props: Props) {
             {postProcessing && (
               <div className="mt-2.5 space-y-2 text-[12px]">
                 <label className="studio-input-pill">
-                  <span className="flex-1 text-zinc-400">Resolution</span>
+                  <span className="flex-1 text-slate-500">Resolution</span>
                   <input
                     aria-label="Render resolution"
                     value={props.renderSettings.resolution}
@@ -769,11 +769,11 @@ export function RightPanel(props: Props) {
                         resolution: event.target.value,
                       })
                     }
-                    className="w-[100px] rounded-[5px] border border-white/[0.08] bg-[#13161b] px-2 py-0.5 text-right text-[11px] text-zinc-100 outline-none focus:border-[#1a8cff]"
+                    className="w-[100px] rounded-[6px] border border-slate-900/[0.08] bg-white px-2 py-0.5 text-right text-[11px] text-slate-900 outline-none focus:border-[#2563EB]"
                   />
                 </label>
                 <label className="studio-input-pill">
-                  <span className="flex-1 text-zinc-400">Sample Count</span>
+                  <span className="flex-1 text-slate-500">Sample Count</span>
                   <input
                     aria-label="Sample count"
                     type="number"
@@ -786,11 +786,11 @@ export function RightPanel(props: Props) {
                         sampleCount: Number(event.target.value),
                       })
                     }
-                    className="w-[90px] rounded-[5px] border border-white/[0.08] bg-[#13161b] px-2 py-0.5 text-right text-[11px] text-zinc-100 outline-none focus:border-[#1a8cff]"
+                    className="w-[90px] rounded-[6px] border border-slate-900/[0.08] bg-white px-2 py-0.5 text-right text-[11px] text-slate-900 outline-none focus:border-[#2563EB]"
                   />
                 </label>
                 <label className="studio-input-pill">
-                  <span className="flex-1 text-zinc-400">Exposure</span>
+                  <span className="flex-1 text-slate-500">Exposure</span>
                   <input
                     aria-label="Exposure"
                     type="number"
@@ -802,7 +802,7 @@ export function RightPanel(props: Props) {
                         exposure: Number(event.target.value),
                       })
                     }
-                    className="w-[80px] rounded-[5px] border border-white/[0.08] bg-[#13161b] px-2 py-0.5 text-right text-[11px] text-zinc-100 outline-none focus:border-[#1a8cff]"
+                    className="w-[80px] rounded-[6px] border border-slate-900/[0.08] bg-white px-2 py-0.5 text-right text-[11px] text-slate-900 outline-none focus:border-[#2563EB]"
                   />
                 </label>
               </div>
@@ -817,7 +817,7 @@ export function RightPanel(props: Props) {
                 type="button"
                 onClick={() => setHdriIndex((current) => (current + 1) % hdriPresets.length)}
                 title="Cycle HDRI environment preset"
-                className="text-[11px] text-zinc-400 transition hover:text-white"
+                className="text-[11px] font-medium text-slate-500 transition hover:text-slate-900"
               >
                 {hdriPresets[hdriIndex]}
               </button>
@@ -890,7 +890,7 @@ export function RightPanel(props: Props) {
               <span className="ref-section-heading !mb-0">Export & Scene Library</span>
               <ChevronDown
                 size={14}
-                className={`text-zinc-400 transition-transform ${
+                className={`text-slate-400 transition-transform ${
                   exportDeliverablesOpen ? "" : "-rotate-90"
                 }`}
               />
@@ -916,7 +916,7 @@ export function RightPanel(props: Props) {
                 <div>
                   <SectionTitle>
                     <span className="flex items-center gap-1.5">
-                      <Box size={12} className="text-[#1a8cff]" /> Scene Assets
+                      <Box size={12} className="text-[#2563EB]" /> Scene Assets
                     </span>
                   </SectionTitle>
                   <div className="grid grid-cols-2 gap-1.5">
@@ -930,17 +930,17 @@ export function RightPanel(props: Props) {
                             event.dataTransfer.setData("text/asset-id", asset.id)
                           }
                           onClick={() => props.onSelectAsset(asset.id)}
-                          className={`studio-asset-card group relative h-[86px] cursor-pointer overflow-hidden rounded-[8px] border bg-[#171a20] transition ${
+                          className={`studio-asset-card group relative h-[86px] cursor-pointer overflow-hidden rounded-[10px] border bg-[#F1F0EC] transition ${
                             isSelected
-                              ? "border-[#1a8cff] shadow-[0_0_0_1px_rgba(26,140,255,.4)]"
-                              : "border-white/[0.07] hover:border-white/[0.18]"
+                              ? "border-[#2563EB] shadow-[0_0_0_2px_rgba(37,99,235,.22)]"
+                              : "border-slate-900/[0.08] hover:border-slate-900/[0.18]"
                           }`}
                         >
                           <div
                             className={`absolute inset-0 bg-gradient-to-br ${asset.thumbnail} opacity-65`}
                           />
-                          <div className="crystal-mini-model absolute left-1/2 top-[40%] h-8 w-11 -translate-x-1/2 -translate-y-1/2 bg-zinc-200/75 shadow-lg" />
-                          <div className="absolute inset-x-0 bottom-0 flex items-center bg-black/65 px-2 py-1 text-[10px] text-white backdrop-blur-sm">
+                          <div className="crystal-mini-model absolute left-1/2 top-[40%] h-8 w-11 -translate-x-1/2 -translate-y-1/2 bg-white/85 shadow-md" />
+                          <div className="absolute inset-x-0 bottom-0 flex items-center bg-white/88 px-2 py-1 text-[10px] text-slate-800 backdrop-blur-sm">
                             <span className="truncate font-medium">{asset.name}</span>
                             <button
                               type="button"
@@ -950,7 +950,7 @@ export function RightPanel(props: Props) {
                                 event.stopPropagation();
                                 props.onExport("STL File");
                               }}
-                              className="ml-auto opacity-0 transition group-hover:opacity-100 hover:text-[#1a8cff]"
+                              className="ml-auto opacity-0 transition group-hover:opacity-100 hover:text-[#2563EB]"
                             >
                               <Download size={11} />
                             </button>
@@ -962,7 +962,7 @@ export function RightPanel(props: Props) {
                                 event.stopPropagation();
                                 props.onDeleteAsset(asset.id);
                               }}
-                              className="ml-1 opacity-0 transition group-hover:opacity-100 hover:text-red-400"
+                              className="ml-1 opacity-0 transition group-hover:opacity-100 hover:text-red-500"
                             >
                               <Trash2 size={11} />
                             </button>

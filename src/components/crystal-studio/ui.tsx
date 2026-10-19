@@ -30,13 +30,13 @@ export function IconButton({
       title={label}
       disabled={disabled}
       onClick={onClick}
-      className={`studio-icon-btn grid h-9 w-9 shrink-0 place-items-center rounded-[8px] border transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#1687f7] disabled:pointer-events-none disabled:opacity-40 ${
+      className={`studio-icon-btn ref-toolbar-icon-btn grid h-8 w-8 shrink-0 place-items-center rounded-[10px] border transition-all duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#2563EB] disabled:pointer-events-none disabled:opacity-40 ${
         active
-          ? "is-active border-[#1687f7]/60 bg-[#1687f7] text-white shadow-[0_2px_10px_rgba(22,135,247,.28)]"
-          : "border-transparent bg-transparent text-zinc-300 hover:border-white/[0.08] hover:bg-[#222730] hover:text-white active:bg-[#2a303b]"
+          ? "is-active border-[#2563EB] bg-[#2563EB] text-white shadow-[0_4px_12px_rgba(37,99,235,0.28)]"
+          : "border-transparent bg-transparent text-slate-600 hover:bg-slate-900/[0.06] hover:text-slate-900 active:bg-slate-900/[0.1]"
       } ${className}`}
     >
-      <Icon size={16} strokeWidth={1.9} />
+      <Icon size={15} strokeWidth={1.85} />
     </button>
   );
 }
@@ -49,17 +49,17 @@ export function SelectField({
 }: SelectHTMLAttributes<HTMLSelectElement> & { label: string }) {
   return (
     <label
-      className={`studio-select-field relative flex h-8 items-center overflow-hidden rounded-[8px] border border-white/[0.07] bg-[#181b21] text-[12px] transition hover:border-white/[0.14] focus-within:border-[#1687f7] ${className}`}
+      className={`studio-select-field relative flex h-8 items-center overflow-hidden rounded-[9px] border border-slate-900/[0.08] bg-[#F4F3EF] text-[12px] transition hover:border-slate-900/[0.15] focus-within:border-[#2563EB] ${className}`}
     >
-      <span className="pointer-events-none absolute left-3 z-10 text-zinc-300">{label}</span>
+      <span className="pointer-events-none absolute left-3 z-10 text-slate-600">{label}</span>
       <select
         aria-label={label}
         {...props}
-        className="h-full w-full appearance-none bg-transparent pl-[120px] pr-8 text-right text-zinc-100 outline-none"
+        className="h-full w-full appearance-none bg-transparent pl-[116px] pr-8 text-right font-medium text-slate-900 outline-none"
       >
         {children}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-2.5 text-zinc-400" size={14} />
+      <ChevronDown className="pointer-events-none absolute right-2.5 text-slate-500" size={14} />
     </label>
   );
 }
@@ -75,7 +75,7 @@ export function SectionTitle({
 }) {
   return (
     <div className={`studio-section-header mb-2.5 flex items-center justify-between ${className}`}>
-      <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-zinc-400">{children}</h2>
+      <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-slate-500">{children}</h2>
       {action}
     </div>
   );
@@ -95,7 +95,7 @@ export function StudioModeNav({
           type="button"
           aria-pressed={activeStudio === "modeling"}
           onClick={() => onStudioModeChange("modeling")}
-          title="3D Studio (/casynus)"
+          title="Architecture & 3D Studio (/casynus)"
           className={`studio-mode-pill ${activeStudio === "modeling" ? "is-active" : ""}`}
         >
           <Box size={13} />
@@ -104,7 +104,7 @@ export function StudioModeNav({
       ) : (
         <Link
           href="/casynus"
-          title="3D Studio (/casynus)"
+          title="Architecture & 3D Studio (/casynus)"
           className={`studio-mode-pill ${activeStudio === "modeling" ? "is-active" : ""}`}
         >
           <Box size={13} />
@@ -217,10 +217,10 @@ export function InspectorCollaboratorBar({
   onCollapse?: () => void;
 }) {
   const collaborators = [
-    { initial: "J", bg: "#e855a0", ring: "#ff72b6" },
-    { initial: "D", bg: "#5e43d8", ring: "#8b6eff" },
-    { initial: "G", bg: "#1c9c68", ring: "#34d399" },
-    { initial: "M", bg: "#1687f7", ring: "#60a5fa" },
+    { initial: "J", bg: "#e855a0", ring: "#f472b6" },
+    { initial: "D", bg: "#6366f1", ring: "#818cf8" },
+    { initial: "G", bg: "#10b981", ring: "#34d399" },
+    { initial: "M", bg: "#2563eb", ring: "#60a5fa" },
   ];
 
   return (
@@ -235,7 +235,7 @@ export function InspectorCollaboratorBar({
             className="ref-collab-avatar ref-avatar-pill"
             style={{
               backgroundColor: user.bg,
-              boxShadow: `0 0 0 2px #141518, 0 0 0 3.5px ${user.ring}`,
+              boxShadow: `0 0 0 2px #ffffff, 0 0 0 3px ${user.ring}`,
             }}
           >
             {user.initial}

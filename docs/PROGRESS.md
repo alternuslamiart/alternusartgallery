@@ -9,32 +9,32 @@ Last updated: 2026-10-19
   compatibility and updating `StudioModeNav` (`src/components/crystal-studio/ui.tsx`)
   and `UnifiedSidebar` (`src/components/unified-sidebar.tsx`) to link to
   `/interior`.
-- Redesigned `/casynus`, `/interior` (`/casynus?mode=floor-plan`), and
-  `/infrastructure` (`/infrastructur`) to match the reference 3D/CAD studio
-  layout (`src/app/globals.css`, `.ref-*` classes):
-  - Floating dark charcoal rounded side panels (`#141518`, `16px` radius) with
-    hierarchical scene trees, connector lines (`├`, `└`, `│`), disclosure
-    chevrons, inline visibility/lock controls, collapsible setup drawers, and
-    the bottom `Library` / `Import` / `Help & Feedback` footer.
-  - Compact top-center floating pill toolbar (`.ref-top-toolbar`) with `+` add
-    and shape/drawing tools, solid electric blue (`#1a8cff`) active selection
-    state, view framing, zoom percentage readout (`100% ▾`), solid blue
-    `Export` button, and preview/play trigger.
-  - Circular 3D Orientation Axis Gizmo (`X` / `Y` / `Z`) and
-    `Orthographic` | `Perspective` projection switcher on the 3D viewports,
-    while preserving a pure 2D drafting canvas on `/interior`.
-  - Right properties inspector with top collaborator avatar stack
-    (`InspectorCollaboratorBar` + `Invite`), `Camera`, `Frame` (color swatch,
-    hex, opacity, `Edit Frame`), `Global Settings` (`BinaryToggle` `Yes`/`No`
-    and `Show`/`Hide` blue pills), `Post-Processing` switch, `Environment`
-    (`Light`, `Ambient`, `Fog` gear icons + `Yes`/`No` pills), and `Export`.
-  - Bottom `StudioAIChat` (`src/components/crystal-studio/StudioAIChat.tsx`)
-    unified across `/casynus`, `/interior`, and `/infrastructure` as a sleek
-    single-card rainbow-bordered dark composer (`#0b0c10`, `18px` radius,
-    spectrum border + soft blue glow) with `"What do you want to create?"`
-    placeholder, bottom-left paperclip attachment button + `"Precision Mode"`
-    pill selector, and bottom-right solid blue (`#0d8bf2`) paper-plane send
-    button, expanding conversation messages only after user submission.
+- Fundamentally transformed the visual design of `/casynus` (Architecture 3D
+  Studio), `/interior` & `/casynus?mode=floor-plan` (Interior 2D Floor Plan
+  Studio), and `/infrastructure` & `/infrastructur` (Infrastructure Studio)
+  into a soft, clean, modern architectural daylight workspace (`src/app/globals.css`,
+  `src/components/crystal-studio/Viewport.tsx`, `src/components/crystal-studio/RightPanel.tsx`,
+  `src/components/crystal-studio/ui.tsx`, `src/app/infrastructure/page.tsx`,
+  `src/app/infrastructure/infrastructure-scene.tsx`):
+  - Replaced legacy `#0F0F0F !important` / `#111316 !important` dark-box
+    overrides with a warm alabaster/stone workspace backdrop (`#EEECE6`) and
+    floating frosted-porcelain sidebars (`rgba(255, 255, 255, 0.90)`, `22px`
+    radius, `backdrop-filter: blur(24px)`, soft ambient elevation shadows, and
+    crisp slate `#0F172A` typography).
+  - Updated the 3D Architecture viewport (`CanvasScene` in `Viewport.tsx`) to a
+    soft architectural studio daylight gradient (`#F6F5F1` → `#EFECE6` →
+    `#E5E2DA`), translucent porcelain ground plane with slate grid lines, and
+    ground contact shadow; updated the 3D Infrastructure Three.js scene
+    (`infrastructure-scene.tsx`) so `"Day"` (`#eeece6`) and `"Studio"`
+    (`#f5f4f0`) lighting presets render a clean architectural masterplan site
+    model (`#e3e5dd`).
+  - Styled the top-center floating pill toolbar (`.ref-top-toolbar`), bottom
+    3D orientation gizmo + `Orthographic` / `Perspective` switcher
+    (`.ref-viewport-gizmo-dock`), right inspector (`InspectorCollaboratorBar`,
+    `BinaryToggle` `Yes`/`No` and `Show`/`Hide` pills), and bottom
+    `StudioAIChat` composer (frosted porcelain card with subtle rainbow
+    architectural border and Cobalt Blue `#2563EB` accents) to match the unified
+    soft architectural aesthetic.
 - Focused ESLint on all modified studio files passed (0 errors), full-project
   typecheck (`NODE_OPTIONS="--max-old-space-size=4096" npm run typecheck`)
   passed, and `npm test` passed (8 tests). Browser rendering was not verified.

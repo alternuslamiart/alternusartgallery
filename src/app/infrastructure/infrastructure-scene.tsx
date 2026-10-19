@@ -811,18 +811,25 @@ function SceneContents(props: Props) {
     Math.sin(elevation) * 78,
     Math.cos(elevation) * Math.sin(azimuth) * 72,
   ];
-  const ambient = (lighting.preset === "Night" ? 0.56 : lighting.preset === "Studio" ? 0.8 : 0.68) * lighting.intensity;
-  const background = lighting.preset === "Night" ? "#101a2b" : lighting.preset === "Golden hour" ? "#d7a46c" : lighting.preset === "Studio" ? "#242932" : "#b8c9d0";
+  const ambient = (lighting.preset === "Night" ? 0.56 : lighting.preset === "Studio" ? 0.88 : 0.78) * lighting.intensity;
+  const background =
+    lighting.preset === "Night"
+      ? "#101a2b"
+      : lighting.preset === "Golden hour"
+        ? "#efe2d2"
+        : lighting.preset === "Studio"
+          ? "#f5f4f0"
+          : "#eeece6";
   return (
     <>
       <color attach="background" args={[new Color(background)]} />
-      {lighting.preset !== "Studio" && <fog attach="fog" args={[background, 105, 230]} />}
-      <hemisphereLight args={[isNight ? "#657da5" : "#dbeaff", "#758163", ambient]} />
-      <ambientLight intensity={ambient * 0.55} />
+      {lighting.preset !== "Studio" && <fog attach="fog" args={[background, 115, 240]} />}
+      <hemisphereLight args={[isNight ? "#657da5" : "#ffffff", isNight ? "#334155" : "#d6d3c9", ambient]} />
+      <ambientLight intensity={ambient * 0.6} />
       <directionalLight
         position={sunPosition}
-        intensity={(isNight ? 0.3 : lighting.preset === "Golden hour" ? 1.4 : lighting.preset === "Studio" ? 1.15 : 1.22) * lighting.intensity}
-        color={lighting.preset === "Golden hour" ? "#ffd19b" : isNight ? "#a8c8ff" : "#fff5e5"}
+        intensity={(isNight ? 0.3 : lighting.preset === "Golden hour" ? 1.4 : lighting.preset === "Studio" ? 1.18 : 1.25) * lighting.intensity}
+        color={lighting.preset === "Golden hour" ? "#ffd19b" : isNight ? "#a8c8ff" : "#fffaf0"}
         castShadow={lighting.shadows}
         shadow-mapSize-width={lighting.shadows ? 1536 : 512}
         shadow-mapSize-height={lighting.shadows ? 1536 : 512}
@@ -836,11 +843,11 @@ function SceneContents(props: Props) {
       <Grid
         args={[150, 150]}
         cellSize={2}
-        cellThickness={0.35}
-        cellColor="#77818a"
+        cellThickness={0.4}
+        cellColor={isNight ? "#475569" : "#cbd5e1"}
         sectionSize={10}
-        sectionThickness={0.65}
-        sectionColor="#63717a"
+        sectionThickness={0.7}
+        sectionColor={isNight ? "#64748b" : "#94a3b8"}
         fadeDistance={115}
         fadeStrength={1.4}
         infiniteGrid
@@ -848,7 +855,7 @@ function SceneContents(props: Props) {
       />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.24, 0]} receiveShadow onClick={(event) => onEmpty(event.point)}>
         <planeGeometry args={[180, 180]} />
-        <meshStandardMaterial color="#78926e" roughness={1} />
+        <meshStandardMaterial color={isNight ? "#1e293b" : "#e3e5dd"} roughness={0.96} />
       </mesh>
       {undergroundUtilities && (
         <group position={[0, -0.7, 0]}>

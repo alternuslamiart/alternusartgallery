@@ -172,7 +172,11 @@ function CanvasScene({
       node.width = rect.width * ratio;
       node.height = rect.height * ratio;
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-      ctx.fillStyle = "#0B0D10";
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, rect.height);
+      bgGrad.addColorStop(0, "#F6F5F1");
+      bgGrad.addColorStop(0.54, "#EFECE6");
+      bgGrad.addColorStop(1, "#E5E2DA");
+      ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, rect.width, rect.height);
       const line = (
         a: [number, number, number],
@@ -239,8 +243,11 @@ function CanvasScene({
           ctx.moveTo(corners[0].x, corners[0].y);
           corners.slice(1).forEach((corner) => ctx.lineTo(corner.x, corner.y));
           ctx.closePath();
-          ctx.fillStyle = "rgba(18, 21, 28, .92)";
+          ctx.fillStyle = "rgba(255, 255, 255, 0.68)";
           ctx.fill();
+          ctx.strokeStyle = "rgba(148, 163, 184, 0.32)";
+          ctx.lineWidth = 1;
+          ctx.stroke();
           ctx.clip();
         }
         for (let n = -extent; n <= extent; n += minorStep) {
@@ -249,20 +256,20 @@ function CanvasScene({
           const major =
             Math.abs(Math.round(rounded / majorStep) * majorStep - rounded) < 0.001;
           const stroke = axis
-            ? "#D84B58"
+            ? "rgba(225, 29, 72, 0.75)"
             : major
-              ? "rgba(91,108,132,.55)"
-              : "rgba(55,67,83,.42)";
-          const width = axis ? 1.5 : major ? 0.9 : 0.55;
+              ? "rgba(100, 116, 139, 0.36)"
+              : "rgba(148, 163, 184, 0.24)";
+          const width = axis ? 1.4 : major ? 0.9 : 0.55;
           line([rounded, 0, -extent], [rounded, 0, extent], stroke, width);
           line(
             [-extent, 0, rounded],
             [extent, 0, rounded],
             axis
-              ? "#4BBF78"
+              ? "rgba(16, 185, 129, 0.78)"
               : major
-                ? "rgba(91,108,132,.55)"
-                : "rgba(55,67,83,.42)",
+                ? "rgba(100, 116, 139, 0.36)"
+                : "rgba(148, 163, 184, 0.24)",
             width,
           );
         }
@@ -271,6 +278,31 @@ function CanvasScene({
       const radians = (transform.rotation * Math.PI) / 180;
       const c = Math.cos(radians);
       const s = Math.sin(radians);
+      const shadowFootprint: [number, number, number][] = [
+        [-0.58, 0, -0.58],
+        [0.58, 0, -0.58],
+        [0.58, 0, 0.58],
+        [-0.58, 0, 0.58],
+      ].map(([x, , z]) => {
+        const sx = x * transform.scale;
+        const sz = z * transform.scale;
+        return [
+          sx * c - sz * s + transform.x,
+          0,
+          sx * s + sz * c + (transform.z ?? 0),
+        ];
+      });
+      if (shadowFootprint.every((pt) => cameraDepth(pt, camera) > NEAR_PLANE)) {
+        const sPts = shadowFootprint.map((pt) => project(pt, camera, rect));
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(sPts[0].x, sPts[0].y);
+        sPts.slice(1).forEach((q) => ctx.lineTo(q.x, q.y));
+        ctx.closePath();
+        ctx.fillStyle = "rgba(15, 23, 42, 0.09)";
+        ctx.fill();
+        ctx.restore();
+      }
       const v: [number, number, number][] = [
         [-0.5, 0, -0.5],
         [0.5, 0, -0.5],
@@ -315,17 +347,17 @@ function CanvasScene({
           ctx.closePath();
           ctx.fillStyle =
             face === index
-              ? "rgba(22,135,247,.78)"
+              ? "rgba(37, 99, 235, 0.82)"
               : shade(
                   color,
-                  [0.62, 0.8, 1.04, 0.5, 1.15, 0.72][index] *
-                    (0.8 + metallic * 0.2) *
-                    (1 - roughness * 0.12),
+                  [0.74, 0.88, 1.06, 0.64, 1.16, 0.78][index] *
+                    (0.84 + metallic * 0.16) *
+                    (1 - roughness * 0.1),
                 );
           ctx.fill();
           ctx.strokeStyle = selected
-            ? "rgba(74,144,217,.95)"
-            : "rgba(235,242,250,.45)";
+            ? "#2563EB"
+            : "rgba(15, 23, 42, 0.24)";
           ctx.lineWidth = selected ? 2 : 1;
           ctx.stroke();
         });
@@ -2138,8 +2170,8 @@ export function Viewport(p: Props) {
       </div>
 
       {help && (
-        <div className="studio-floating-help absolute right-[280px] top-16 z-30 w-60 rounded-[10px] border border-white/10 bg-[#15181f] p-3.5 text-[11px] leading-relaxed text-zinc-300 shadow-2xl">
-          <strong className="mb-1 block text-zinc-100">Viewport Navigation</strong>
+        <div className="studio-floating-help absolute right-[296px] top-16 z-30 w-64 rounded-[14px] border border-slate-900/10 bg-white/95 p-3.5 text-[11.5px] leading-relaxed text-slate-600 shadow-xl backdrop-blur-xl">
+          <strong className="mb-1 block text-slate-900">Viewport Navigation</strong>
           MMB / RMB orbits, Shift + LMB pans, wheel zooms. Keys Q/W/E/S switch tools; Numpad 1/3/7/0 switches camera presets.
         </div>
       )}

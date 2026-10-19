@@ -1282,7 +1282,7 @@ export default function InfrastructurePage() {
       </aside>
 
       {/* Center 3D Infrastructure Workspace */}
-      <section className="infra-workspace relative flex min-w-0 flex-1 flex-col bg-[#0b0d10]">
+      <section className="infra-workspace relative flex min-w-0 flex-1 flex-col bg-[#EEECE6]">
         <div className="infra-viewport relative min-h-0 flex-1">
           {leftCollapsed && (
             <button
@@ -1433,7 +1433,7 @@ export default function InfrastructurePage() {
                 className="ref-toolbar-zoom-pill cursor-pointer bg-transparent"
               >
                 {cameraPresets.map((preset) => (
-                  <option key={preset} value={preset} className="bg-[#151619]">
+                  <option key={preset} value={preset} className="bg-white text-slate-900">
                     {preset}
                   </option>
                 ))}
@@ -1661,8 +1661,8 @@ export default function InfrastructurePage() {
                   cx="36"
                   cy="36"
                   r="31"
-                  fill="rgba(22, 24, 29, 0.85)"
-                  stroke="rgba(255,255,255,0.08)"
+                  fill="rgba(255, 255, 255, 0.92)"
+                  stroke="rgba(15, 23, 42, 0.1)"
                   strokeWidth="1"
                 />
                 <line
@@ -1670,17 +1670,17 @@ export default function InfrastructurePage() {
                   y1="36"
                   x2="36"
                   y2="13"
-                  stroke="#34d399"
+                  stroke="#10b981"
                   strokeWidth="2"
                 />
-                <circle cx="36" cy="12" r="5" fill="#34d399" />
+                <circle cx="36" cy="12" r="5" fill="#10b981" />
                 <text
                   x="36"
                   y="14.5"
                   textAnchor="middle"
                   fontSize="7"
                   fontWeight="700"
-                  fill="#06281e"
+                  fill="#ffffff"
                 >
                   Y
                 </text>
@@ -1708,21 +1708,21 @@ export default function InfrastructurePage() {
                   y1="36"
                   x2="17"
                   y2="47"
-                  stroke="#38bdf8"
+                  stroke="#2563eb"
                   strokeWidth="2"
                 />
-                <circle cx="16" cy="48" r="5" fill="#38bdf8" />
+                <circle cx="16" cy="48" r="5" fill="#2563eb" />
                 <text
                   x="16"
                   y="50.5"
                   textAnchor="middle"
                   fontSize="7"
                   fontWeight="700"
-                  fill="#062235"
+                  fill="#ffffff"
                 >
                   Z
                 </text>
-                <circle cx="36" cy="36" r="3" fill="#e4e4e7" />
+                <circle cx="36" cy="36" r="3" fill="#334155" />
               </svg>
             </div>
             <div className="ref-projection-pill">
@@ -1795,7 +1795,7 @@ export default function InfrastructurePage() {
           <div className="ref-inspector-section">
             <div className="ref-inspector-section-header">
               <span>Camera</span>
-              <span className="text-[11px] font-normal text-zinc-500">
+              <span className="text-[11px] font-normal text-slate-500">
                 {lighting.preset}
               </span>
             </div>
@@ -1806,7 +1806,7 @@ export default function InfrastructurePage() {
                     key={preset}
                     type="button"
                     onClick={() => viewport.current?.preset(preset)}
-                    className="rounded-md bg-white/[0.04] px-2 py-1.5 text-[11px] font-medium text-zinc-300 transition hover:bg-white/[0.08] hover:text-white"
+                    className="rounded-lg bg-[#F1F0EC] px-2 py-1.5 text-[11px] font-medium text-slate-700 transition hover:bg-[#E5E3DC] hover:text-slate-900"
                   >
                     {preset}
                   </button>
