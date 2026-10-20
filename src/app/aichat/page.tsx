@@ -35,9 +35,9 @@ import {
   Info,
   LogOut,
   X,
-  Moon,
-  Sun,
 } from "lucide-react";
+import { useCrystalTheme } from "@/lib/crystal-theme";
+import { CrystalThemeToggle } from "@/components/crystal-studio/CrystalThemeToggle";
 
 type Message = { id: number | string; role: "user" | "assistant"; content: string; citations?: { source: string }[] };
 
@@ -181,7 +181,8 @@ export default function AIChatPage() {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [hasPastedInput, setHasPastedInput] = useState(false);
-  const [isLight, setIsLight] = useState(false);
+  const { theme } = useCrystalTheme();
+  const isLight = theme === "light";
   const { data: session, status: sessionStatus } = useSession();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -209,7 +210,6 @@ export default function AIChatPage() {
   useEffect(() => {
     if (sessionStatus === "loading") return;
     setSessionsLoaded(false);
-    setIsLight(window.localStorage.getItem("Coreforge_auth_theme") === "light");
     const profileKey = session?.user?.email ?? session?.user?.name ?? null;
     if (!profileKey) {
       setChatSessions([]);
@@ -249,14 +249,6 @@ export default function AIChatPage() {
     if (chatSessions.length > 0) window.localStorage.setItem(storageKey, JSON.stringify(chatSessions));
     else window.localStorage.removeItem(storageKey);
   }, [chatSessions, session?.user?.email, session?.user?.name, sessionsLoaded]);
-
-  const toggleTheme = () => {
-    setIsLight((current) => {
-      const next = !current;
-      window.localStorage.setItem("Coreforge_auth_theme", next ? "light" : "dark");
-      return next;
-    });
-  };
 
   const scrollToSection = (id: string) => {
     sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -534,11 +526,9 @@ export default function AIChatPage() {
             </div>
             <Link href="/aicode" aria-label="Open AI Code" title="AI Code" className="hidden h-7 w-7 items-center justify-center rounded-md text-zinc-600 transition hover:bg-[#2a2a2a] hover:text-[#6ca5ff] md:flex"><Code2 size={15} strokeWidth={2.2} /></Link>
           </div>
-          <div className="hidden items-center gap-2 sm:flex">
-            <button type="button" onClick={toggleTheme} aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"} title={isLight ? "Dark mode" : "Light mode"} className="grid h-8 w-8 place-items-center rounded-lg border border-[#2a2a2a] text-zinc-400 transition hover:bg-[#2a2a2a] hover:text-white">
-              {isLight ? <Moon size={15} /> : <Sun size={15} />}
-            </button>
-            <Link href="/casynus" className="rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-zinc-400 transition hover:border-blue-500/50 hover:text-white">Go to Studio</Link>
+          <div className="flex items-center gap-2">
+            <CrystalThemeToggle />
+            <Link href="/casynus" className="hidden rounded-lg border border-[#2a2a2a] px-3 py-2 text-xs text-zinc-400 transition hover:border-blue-500/50 hover:text-white sm:block">Go to Studio</Link>
           </div>
         </header>
         <nav className="aichat-section-scroll absolute right-3 top-1/2 z-20 hidden -translate-y-1/2 flex-col items-center gap-3 lg:flex" aria-label="Chat sections">

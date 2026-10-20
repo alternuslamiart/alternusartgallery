@@ -11277,3 +11277,122 @@ div.ref-tree-branch {
 .ref-export-primary-btn:hover {
   background: #1d4ed8 !important;
 }
+
+/* Crystal workspace theme, shared by all three editors and AI chat. */
+.crystal-studio,
+.crystal-infrastructure-page {
+  --studio-bg-canvas: #f7f8fa;
+  --studio-bg-panel: #ffffff;
+  --studio-bg-panel-glass: rgba(255, 255, 255, .96);
+  --studio-bg-elevated: #f4f5f7;
+  --studio-bg-input: #f4f5f7;
+  --studio-bg-hover: #f0f3f8;
+  --studio-border: #e5e8ef;
+  --studio-border-strong: #cdd4df;
+  --studio-accent: #3568f5;
+  --studio-accent-soft: rgba(53, 104, 245, .1);
+  --studio-accent-border: rgba(53, 104, 245, .3);
+  --studio-text-primary: #171a22;
+  --studio-text-secondary: #667085;
+  --studio-text-muted: #667085;
+}
+
+:is(.crystal-studio[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-studio),
+:is(.crystal-infrastructure-page[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-infrastructure-page) {
+  --studio-bg-canvas: #101217;
+  --studio-bg-panel: #1d212a;
+  --studio-bg-panel-glass: rgba(29, 33, 42, .97);
+  --studio-bg-elevated: #282e39;
+  --studio-bg-input: #282e39;
+  --studio-bg-hover: #303744;
+  --studio-border: #303744;
+  --studio-border-strong: #465064;
+  --studio-accent: #7193ff;
+  --studio-accent-soft: rgba(113, 147, 255, .16);
+  --studio-accent-border: rgba(113, 147, 255, .42);
+  --studio-text-primary: #f3f5f9;
+  --studio-text-secondary: #a0a8b7;
+  --studio-text-muted: #a0a8b7;
+}
+
+.crystal-theme-toggle {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border: 1px solid var(--studio-border, #303744);
+  border-radius: 10px;
+  background: var(--studio-bg-elevated, #282e39);
+  color: var(--studio-text-primary, #f3f5f9);
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+.crystal-theme-toggle:hover { background: var(--studio-bg-hover, #303744); }
+.crystal-theme-toggle:focus-visible,
+.studio-ai-minimize:focus-visible { outline: 2px solid var(--studio-accent, #3568f5); outline-offset: 2px; }
+.aichat-page .crystal-theme-toggle { --studio-border: #303744; --studio-bg-elevated: #1d212a; --studio-bg-hover: #282e39; --studio-text-primary: #f3f5f9; }
+.aichat-page.aichat-light .crystal-theme-toggle { --studio-border: #e5e8ef; --studio-bg-elevated: #fff; --studio-bg-hover: #f0f3f8; --studio-text-primary: #171a22; }
+
+.studio-ai-panel { position: relative; }
+.studio-ai-minimize {
+  position: absolute;
+  right: 11px;
+  top: 10px;
+  z-index: 2;
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border: 1px solid var(--studio-border);
+  border-radius: 8px;
+  background: var(--studio-bg-elevated);
+  color: var(--studio-text-secondary);
+}
+.studio-ai-minimize:hover { background: var(--studio-bg-hover); color: var(--studio-text-primary); }
+.studio-ai-panel .studio-ai-composer { padding-right: 43px; }
+
+:is(.crystal-studio[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-studio),
+:is(.crystal-infrastructure-page[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-infrastructure-page) { background: var(--studio-bg-canvas) !important; color: var(--studio-text-primary) !important; }
+:is(.crystal-studio[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-studio) :is(.studio-sidebar-shell, .crystal-modeling-sidebar, .crystal-right-panel, .ref-top-toolbar, .studio-ai-panel),
+:is(.crystal-infrastructure-page[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-infrastructure-page) :is(.studio-sidebar-shell, .ref-top-toolbar, .studio-ai-panel) {
+  background: var(--studio-bg-panel-glass) !important;
+  border-color: var(--studio-border) !important;
+  color: var(--studio-text-primary) !important;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, .24) !important;
+}
+:is(.crystal-studio[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-studio) .studio-ai-panel,
+:is(.crystal-infrastructure-page[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-infrastructure-page) .studio-ai-panel {
+  background: linear-gradient(var(--studio-bg-panel), var(--studio-bg-panel)) padding-box,
+    linear-gradient(var(--studio-border), var(--studio-border)) border-box !important;
+}
+:is(.crystal-studio[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-studio) :is(.studio-mode-switcher, .studio-mode-pill.is-active, .studio-dropdown-menu, .studio-ai-message, .studio-ai-attachment, .studio-ai-mode-pill, .studio-ai-model-menu, .studio-ai-model-option:hover, .ref-search-box, .ref-projection-pill, .ref-inspector-section, .studio-segmented-group),
+:is(.crystal-infrastructure-page[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-infrastructure-page) :is(.studio-mode-switcher, .studio-mode-pill.is-active, .studio-dropdown-menu, .studio-ai-message, .studio-ai-attachment, .studio-ai-mode-pill, .studio-ai-model-menu, .studio-ai-model-option:hover, .ref-search-box, .ref-projection-pill, .ref-inspector-section, .studio-segmented-group) {
+  background: var(--studio-bg-elevated) !important;
+  border-color: var(--studio-border) !important;
+  color: var(--studio-text-primary) !important;
+}
+:is(.crystal-studio[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-studio) :is(.ref-sidebar-title, .ref-section-heading, .ref-inspector-section-header, .ref-inspector-section-title, .studio-ai-attachment-info span, .studio-ai-textarea, .studio-ai-model-option, .ref-tree-label, .studio-mode-pill.is-active),
+:is(.crystal-infrastructure-page[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-infrastructure-page) :is(.ref-sidebar-title, .ref-section-heading, .ref-inspector-section-header, .ref-inspector-section-title, .studio-ai-attachment-info span, .studio-ai-textarea, .studio-ai-model-option, .ref-tree-label, .studio-mode-pill.is-active) { color: var(--studio-text-primary) !important; }
+:is(.crystal-studio[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-studio) :is(.ref-header-icon-btn, .ref-setting-label, .ref-prop-label, .studio-ai-thread-bar, .studio-ai-message-meta),
+:is(.crystal-infrastructure-page[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-infrastructure-page) :is(.ref-header-icon-btn, .ref-setting-label, .ref-prop-label, .studio-ai-thread-bar, .studio-ai-message-meta) { color: var(--studio-text-secondary) !important; }
+
+:is(.crystal-studio[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-studio) :is(.crystal-topbar, .crystal-app-menu > div, .studio-dropdown-menu, .studio-ai-model-menu),
+:is(.crystal-infrastructure-page[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-infrastructure-page) :is(.studio-dropdown-menu, .studio-ai-model-menu) {
+  background: var(--studio-bg-panel) !important;
+  border-color: var(--studio-border) !important;
+  color: var(--studio-text-primary) !important;
+}
+:is(.crystal-studio[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-studio) :is(input:not([type="checkbox"]):not([type="color"]):not([type="range"]), textarea, select, .studio-select-field, .studio-input-pill),
+:is(.crystal-infrastructure-page[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-infrastructure-page) :is(input:not([type="checkbox"]):not([type="color"]):not([type="range"]), textarea, select, .studio-select-field, .studio-input-pill) {
+  background: var(--studio-bg-input) !important;
+  border-color: var(--studio-border) !important;
+  color: var(--studio-text-primary) !important;
+}
+:is(.crystal-studio[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-studio) :is(input, textarea)::placeholder,
+:is(.crystal-infrastructure-page[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-infrastructure-page) :is(input, textarea)::placeholder { color: var(--studio-text-muted) !important; }
+:is(.crystal-studio[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-studio) :is(button, a):focus-visible,
+:is(.crystal-infrastructure-page[data-crystal-studio-theme="dark"], html[data-crystal-theme="dark"] .crystal-infrastructure-page) :is(button, a):focus-visible { outline: 2px solid var(--studio-accent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .crystal-theme-toggle, .studio-ai-minimize { transition: none; }
+}

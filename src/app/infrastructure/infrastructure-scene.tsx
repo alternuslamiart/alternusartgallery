@@ -32,6 +32,7 @@ import type {
   InfrastructureType,
   LightingPreset,
 } from "./infrastructure-types";
+import { useCrystalTheme } from "@/lib/crystal-theme";
 
 export type CameraPreset = "Front" | "Back" | "Left" | "Right" | "Top" | "Bottom" | "Perspective";
 export type TransformMode = "select" | "move" | "rotate" | "scale" | "delete" | "measure" | InfrastructureType;
@@ -802,6 +803,8 @@ const CameraRig = forwardRef<ViewportApi>(function CameraRig(_props, ref) {
 });
 
 function SceneContents(props: Props) {
+  const { theme } = useCrystalTheme();
+  const darkEnvironment = theme === "dark";
   const { objects, selectedId, tool, lighting, undergroundUtilities, onSelect, onEmpty, onFocus, onTransform } = props;
   const isNight = lighting.preset === "Night";
   const azimuth = (lighting.azimuth * Math.PI) / 180;
@@ -818,8 +821,8 @@ function SceneContents(props: Props) {
       : lighting.preset === "Golden hour"
         ? "#efe2d2"
         : lighting.preset === "Studio"
-          ? "#f5f4f0"
-          : "#eeece6";
+          ? darkEnvironment ? "#171a21" : "#f5f4f0"
+        : darkEnvironment ? "#11151b" : "#eeece6";
   return (
     <>
       <color attach="background" args={[new Color(background)]} />
@@ -844,10 +847,10 @@ function SceneContents(props: Props) {
         args={[150, 150]}
         cellSize={2}
         cellThickness={0.4}
-        cellColor={isNight ? "#475569" : "#cbd5e1"}
+        cellColor={isNight || darkEnvironment ? "#475569" : "#cbd5e1"}
         sectionSize={10}
         sectionThickness={0.7}
-        sectionColor={isNight ? "#64748b" : "#94a3b8"}
+        sectionColor={isNight || darkEnvironment ? "#64748b" : "#94a3b8"}
         fadeDistance={115}
         fadeStrength={1.4}
         infiniteGrid
@@ -855,7 +858,7 @@ function SceneContents(props: Props) {
       />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.24, 0]} receiveShadow onClick={(event) => onEmpty(event.point)}>
         <planeGeometry args={[180, 180]} />
-        <meshStandardMaterial color={isNight ? "#1e293b" : "#e3e5dd"} roughness={0.96} />
+        <meshStandardMaterial color={isNight || darkEnvironment ? "#232b36" : "#e3e5dd"} roughness={0.96} />
       </mesh>
       {undergroundUtilities && (
         <group position={[0, -0.7, 0]}>

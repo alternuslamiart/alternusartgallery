@@ -19,6 +19,13 @@ requirements provide new evidence.
 
 ## P2 — Existing platform integration
 
+- [x] Share a persisted light/dark preference and theme toggle across the
+  three studios and `/aichat`; adapt viewport environment colors.
+- [ ] Complete visual QA and remove remaining hardcoded light/dark surfaces
+  in all studio controls at desktop and mobile widths.
+- [ ] Connect the shared studio AI dock to authenticated conversation storage
+  with studio context and validated scene-action tools.
+
 - [x] Rebrand user-facing product content, browser metadata, and email
   templates to Casynus while preserving the legacy route.
 - [x] Bring the `/casynus` modeling workspace into the dark Casynus UI kit with

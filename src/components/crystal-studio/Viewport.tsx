@@ -45,6 +45,7 @@ import type {
   Transform,
 } from "./types";
 import { IconButton } from "./ui";
+import { useCrystalTheme } from "@/lib/crystal-theme";
 
 type Props = {
   renderer: string;
@@ -160,6 +161,8 @@ function CanvasScene({
   measurement: { a: Point; b: Point } | null;
   transform: Transform;
 }) {
+  const { theme } = useCrystalTheme();
+  const darkEnvironment = theme === "dark";
   const canvas = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const node = canvas.current;
@@ -173,9 +176,9 @@ function CanvasScene({
       node.height = rect.height * ratio;
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       const bgGrad = ctx.createLinearGradient(0, 0, 0, rect.height);
-      bgGrad.addColorStop(0, "#F6F5F1");
-      bgGrad.addColorStop(0.54, "#EFECE6");
-      bgGrad.addColorStop(1, "#E5E2DA");
+      bgGrad.addColorStop(0, darkEnvironment ? "#171a21" : "#F6F5F1");
+      bgGrad.addColorStop(0.54, darkEnvironment ? "#11151b" : "#EFECE6");
+      bgGrad.addColorStop(1, darkEnvironment ? "#101217" : "#E5E2DA");
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, rect.width, rect.height);
       const line = (
@@ -243,9 +246,9 @@ function CanvasScene({
           ctx.moveTo(corners[0].x, corners[0].y);
           corners.slice(1).forEach((corner) => ctx.lineTo(corner.x, corner.y));
           ctx.closePath();
-          ctx.fillStyle = "rgba(255, 255, 255, 0.68)";
+          ctx.fillStyle = darkEnvironment ? "rgba(34, 41, 53, 0.72)" : "rgba(255, 255, 255, 0.68)";
           ctx.fill();
-          ctx.strokeStyle = "rgba(148, 163, 184, 0.32)";
+          ctx.strokeStyle = darkEnvironment ? "rgba(148, 163, 184, 0.38)" : "rgba(148, 163, 184, 0.32)";
           ctx.lineWidth = 1;
           ctx.stroke();
           ctx.clip();
@@ -406,6 +409,7 @@ function CanvasScene({
     drawings,
     measurement,
     transform,
+    darkEnvironment,
   ]);
   return (
     <canvas

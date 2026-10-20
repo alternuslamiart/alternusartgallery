@@ -15,6 +15,15 @@
   sidebar, viewport, and output panel are separate components; the viewport
   owns canvas interaction and toolbar controls, while shared modeling
   properties live in the workspace state.
+- `src/lib/crystal-theme.ts` owns the shared browser-persisted light/dark
+  preference for the three studios and `/aichat`. The root layout applies the
+  stored preference before hydration; `CrystalThemeToggle` is the shared
+  control. Studio palette tokens live in `src/app/globals.css`. The viewport
+  environment responds to theme separately from scene object data.
+- `StudioAIChat` is reused by the modeling, floor-plan, and infrastructure
+  editors. Each editor still owns its own prompt and message state; minimizing
+  the dock preserves that mounted state, but studio conversations are not yet
+  synchronized with the authenticated `/aichat` session tables.
 - The infrastructure viewport uses Three.js, React Three Fiber, and Drei.
   Procedural scene/object data is in
   `src/app/infrastructure/infrastructure-types.ts`, scene rendering and camera

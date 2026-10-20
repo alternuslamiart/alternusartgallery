@@ -112,7 +112,10 @@ export default function RootLayout({
  children: React.ReactNode;
 }>) {
  return (
- <html lang="en">
+ <html lang="en" suppressHydrationWarning>
+ <head>
+ <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('crystal_studio_theme')||localStorage.getItem('Coreforge_auth_theme');document.documentElement.dataset.crystalTheme=t==='dark'?'dark':'light'}catch(e){document.documentElement.dataset.crystalTheme='light'}` }} />
+ </head>
  <style
  id="cedium-dark-flat"
  dangerouslySetInnerHTML={{

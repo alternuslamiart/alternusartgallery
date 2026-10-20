@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, ArrowLeft, ArrowRight, BookOpen, ChevronDown, FilePlus2, Glasses, Globe2, Grid2X2, Home, Moon, PanelLeftOpen, Paperclip, Plus, Search, Settings, Share2, Sparkles, Sun, Wand2, Zap } from "lucide-react";
+import { Archive, ArrowLeft, ArrowRight, BookOpen, ChevronDown, FilePlus2, Glasses, Globe2, Grid2X2, Home, PanelLeftOpen, Paperclip, Plus, Search, Settings, Share2, Sparkles, Wand2, Zap } from "lucide-react";
 import NextImage from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,8 @@ import { floorPlanPaper, floorPlanSvg, svgToPdf } from "./floor-plan-export";
 import { Viewport } from "./Viewport";
 import { UnifiedSidebar } from "@/components/unified-sidebar";
 import { ModelingSidebar } from "./ModelingSidebar";
+import { CrystalThemeToggle } from "./CrystalThemeToggle";
+import { useCrystalTheme } from "@/lib/crystal-theme";
 
 function downloadFile(name: string, content: string, type = "text/plain") {
   const url = URL.createObjectURL(new Blob([content], { type }));
@@ -110,7 +112,7 @@ export function CrystalStudio({
   const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, rotation: -8, scale: 1 });
   const start = 0;
   const end = 300;
-  const [alternateTheme, setAlternateTheme] = useState(false);
+  const { theme } = useCrystalTheme();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [contextSubmenu, setContextSubmenu] = useState<"widget" | "plugins" | null>(null);
@@ -279,7 +281,7 @@ export function CrystalStudio({
   };
 
   return (
-    <div onClick={() => contextMenu && closeContextMenu()} onContextMenuCapture={handleContextMenu} className={`crystal-studio crystal-ui-kit crystal-studio-enter ${studioMode === "modeling" ? "crystal-modeling-mode" : ""} ${mobileHome ? "crystal-mobile-home-active" : ""} ${embedded ? "crystal-studio-embedded" : "fixed inset-0 z-[90]"} grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"} ${alternateTheme ? "crystal-alt-theme" : ""}`}>
+    <div data-crystal-studio-theme={theme} onClick={() => contextMenu && closeContextMenu()} onContextMenuCapture={handleContextMenu} className={`crystal-studio crystal-ui-kit crystal-studio-enter ${studioMode === "modeling" ? "crystal-modeling-mode" : ""} ${mobileHome ? "crystal-mobile-home-active" : ""} ${embedded ? "crystal-studio-embedded" : "fixed inset-0 z-[90]"} grid overflow-hidden bg-[#191919] text-zinc-100 ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"}`}>
       {mobileSplash && <div className="crystal-mobile-splash"><img src="/Logopng.png" alt="Casynus" /></div>}
       <input ref={sceneFileInput} type="file" accept="application/json,.json" className="sr-only" onChange={event => { const file = event.target.files?.[0]; if (file) openScene(file); event.currentTarget.value = ""; }} />
       <section className="crystal-mobile-home" aria-label="Casynus mobile home">
@@ -326,7 +328,7 @@ export function CrystalStudio({
             {["Nano Banana", "Casynus AI", "Claude", "OpenAI", "Gemini", "Grok", "Copilot"].map((model) => <button type="button" key={model} className={mobileModel === model ? "is-selected" : ""} onClick={() => { setMobileModel(model); setMobileModelSheet(false); }}><span><Sparkles size={17} />{model}</span>{mobileModel === model && <span>✓</span>}</button>)}
           </div>
         </div>}
-        <button type="button" className="crystal-mobile-theme-toggle" aria-label="Toggle light and dark mode" onClick={() => setAlternateTheme((value) => !value)}>{alternateTheme ? <Moon size={17} /> : <Sun size={17} />}</button>
+        <CrystalThemeToggle className="crystal-mobile-theme-toggle" />
       </section>
       <header className="crystal-topbar col-span-full flex h-16 items-center border-b border-[#292929] bg-[#0F0F0F] px-7">
         <div className="flex items-center gap-3"><img src="/Logopng.png" alt="Casynus" className="crystal-brand-logo"/><b className="text-[18px] tracking-[-0.02em] text-zinc-100">Casynus</b><span className="mx-1 h-5 w-px bg-[#303030]" aria-hidden="true"/><button aria-label={dedicated ? "Back to Casynus AI Chat" : "Back to projects"} onClick={() => router.push(dedicated ? "/aichat" : "/project")} className="crystal-home-button grid h-9 w-9 place-items-center rounded-[9px] text-zinc-300"><Home size={18}/></button><span className="hidden h-5 w-px bg-[#303030] sm:block" aria-hidden="true"/><span className="hidden text-[12px] font-semibold tracking-wide text-zinc-300 sm:block">3D Studio <span className="text-zinc-500">/ Modeling</span></span></div>
@@ -336,7 +338,7 @@ export function CrystalStudio({
           <button type="button" aria-pressed={studioMode === "modeling"} onClick={() => { switchStudioMode("modeling"); setOpenMenu(null); }} className={`h-8 rounded-full px-3 text-[11px] font-semibold transition ${studioMode === "modeling" ? "bg-[#3b3b3b] text-white" : "text-zinc-400 hover:text-white"}`}>Modeling Studio</button>
           <Link href="/infrastructure" className="h-8 rounded-full px-3 py-2 text-[11px] font-semibold text-zinc-400 transition hover:text-white">Infrastructure Studio</Link>
         </div>
-        <div className="ml-auto flex items-center gap-2.5"><button onClick={()=>setDialog("credits")} className="crystal-credit-button flex h-10 items-center gap-2 rounded-[11px] border border-[#666] px-3 text-[11px] text-zinc-200">Starter <Zap size={16}/>{credits}</button><Link href="/pricing" className="crystal-pro-button flex h-10 w-[124px] items-center justify-center gap-2 rounded-[10px] bg-[#1687f7] text-[12px] font-semibold text-white"><Zap size={18} fill="currentColor" />Go Pro</Link></div>
+        <div className="ml-auto flex items-center gap-2.5"><CrystalThemeToggle /><button onClick={()=>setDialog("credits")} className="crystal-credit-button flex h-10 items-center gap-2 rounded-[11px] border border-[#666] px-3 text-[11px] text-zinc-200">Starter <Zap size={16}/>{credits}</button><Link href="/pricing" className="crystal-pro-button flex h-10 w-[124px] items-center justify-center gap-2 rounded-[10px] bg-[#1687f7] text-[12px] font-semibold text-white"><Zap size={18} fill="currentColor" />Go Pro</Link></div>
       </header>
 
       {!leftOpen && !rightOpen && <div className="studio-restore-pill absolute left-4 top-4 z-50 flex items-center gap-1.5 rounded-[10px] border border-white/[0.08] bg-[#12151a]/95 p-1.5 shadow-[0_8px_24px_rgba(0,0,0,.35)] backdrop-blur-md"><button type="button" aria-label="Copy studio link" title="Copy studio link" onClick={() => void navigator.clipboard?.writeText(window.location.href)} className="grid h-8 w-8 place-items-center rounded-[7px] bg-[#1c2028] text-zinc-200 transition hover:bg-[#252a34]"><Share2 size={15} strokeWidth={2}/></button><button type="button" aria-label="Show studio panels" title="Show sidebars" onClick={() => { setLeftOpen(true); setRightOpen(true); }} className="grid h-8 w-8 place-items-center rounded-[7px] bg-[#1687f7] text-white shadow-[0_2px_10px_rgba(22,135,247,.3)] transition hover:bg-[#2d9bff]"><PanelLeftOpen size={15} strokeWidth={2} /></button></div>}

@@ -3,6 +3,7 @@
 import {
   Check,
   LoaderCircle,
+  Minus,
   Paperclip,
   Sparkles,
   Square,
@@ -161,6 +162,15 @@ export function StudioAIChat({
       role="region"
       aria-label={meta.title}
     >
+      <button
+        type="button"
+        className="studio-ai-minimize"
+        aria-label="Minimize AI assistant"
+        title="Minimize AI assistant"
+        onClick={() => onOpenChange(false)}
+      >
+        <Minus size={15} />
+      </button>
       {/* Conversation Thread (shown when user interacts or generation is active) */}
       {(showHistory && hasUserMessages) || loading ? (
         <div

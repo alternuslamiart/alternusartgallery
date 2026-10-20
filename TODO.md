@@ -2,6 +2,16 @@
 
 ## Next concrete task
 
+- [ ] Verify light and dark themes in `/casynus`, `/interior`,
+  `/infrastructure`, and `/aichat` at desktop and mobile widths. Check menus,
+  inspector inputs, chat collapse/reopen, and viewport contrast; fix any
+  remaining hardcoded surfaces found in the browser.
+- [ ] Design and implement authenticated conversation persistence for the
+  shared studio AI dock, reusing `AssistantConversation` and
+  `AssistantMessage` with explicit studio context and workspace ownership.
+- [ ] Select and configure an image-capable provider before exposing image
+  generation controls. You.com Answer is documented for cited answers only.
+
 - [ ] Configure `YOU_API_KEY` in local `.env.local` and Vercel environment
   settings, then verify a live cited You answer, follow-up, database reload
   after logout/login, and selector interaction at desktop and mobile widths.
@@ -27,6 +37,9 @@
   multi-instance serverless persistence alongside Edge middleware protection.
 
 ## Blockers
+
+- Browser automation crashed twice while opening the local studio on port
+  3002, so visual theme and responsive behavior remain unverified.
 
 - Gemini direct responses require billing to be enabled on the Google AI
   project: the configured key's API reports that the free tier is unavailable

@@ -59,6 +59,8 @@ import {
   StudioAIChat,
   type StudioChatMessage,
 } from "@/components/crystal-studio/StudioAIChat";
+import { CrystalThemeToggle } from "@/components/crystal-studio/CrystalThemeToggle";
+import { useCrystalTheme } from "@/lib/crystal-theme";
 import {
   BinaryToggle,
   InspectorCollaboratorBar,
@@ -234,6 +236,7 @@ function ActionButton({
 }
 
 export default function InfrastructurePage() {
+  const { theme } = useCrystalTheme();
   const [objects, setObjects] = useState<InfrastructureObject[]>(
     createInitialInfrastructure,
   );
@@ -744,6 +747,7 @@ export default function InfrastructurePage() {
 
   return (
     <main
+      data-crystal-studio-theme={theme}
       className={`crystal-infrastructure-page ${roboto.className} fixed inset-0 z-20 h-screen w-full overflow-hidden bg-[#08090b] text-zinc-100`}
     >
       {/* Left Sidebar: Reference Scene Hierarchy + Site Tools */}
@@ -768,6 +772,7 @@ export default function InfrastructurePage() {
             </span>
           </div>
           <div className="flex items-center gap-1">
+            <CrystalThemeToggle />
             <ActionButton
               title="Undo (Ctrl+Z)"
               onClick={undo}

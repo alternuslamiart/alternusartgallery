@@ -2,6 +2,30 @@
 
 Last updated: 2026-10-20
 
+## Shared Crystal studio theme and AI dock increment
+
+- Added one persisted light/dark setting for `/casynus`, `/interior`,
+  `/infrastructure`, and `/aichat`, with a shared Sun/Moon toggle. Existing
+  `/aichat` theme preferences are read when the new key is absent. An early
+  layout script applies the saved theme before hydration.
+- Centralized studio palette tokens and added dark surfaces for the shared
+  sidebars, toolbar, inspector, menus, and AI dock. Architecture and
+  Infrastructure viewport backgrounds, grids, and ground now adapt to the
+  selected theme without replacing scene objects or remounting the canvas.
+- Added a minimize control to the existing shared `StudioAIChat`. Its messages
+  remain in parent state when the dock closes and reopens.
+- Verified: `npm test` (17 passed), `npm run typecheck`, focused ESLint (0
+  errors; 15 existing image/hook warnings), `npm run build`, and
+  `git diff --check` passed. Browser verification is still open: the browser
+  automation process exited unexpectedly on two attempts to open the local
+  studio. The existing local server on port 3001 did not respond; a temporary
+  server on port 3002 started successfully and was then stopped.
+- This increment does not add authenticated studio chat persistence, new CAD
+  engines, or image generation. The You.com documentation currently lists
+  Search, Answer, Contents, Research, and Finance Research APIs, with no
+  documented image-generation endpoint; the existing You Answer integration
+  remains the supported capability.
+
 ## `/aichat` You.com Answer integration
 
 - Added You to the existing model selector and routed its requests through the
