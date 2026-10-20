@@ -32,8 +32,9 @@ requirements provide new evidence.
 
 ## Deferred provider integrations
 
-`/aichat` is integrated with the server-side Gemini and Groq provider route
-when credentials are configured. AI capabilities exposed through workspace
+`/aichat` is integrated with server-side Gemini, Groq, and You Answer API
+routes when credentials are configured. You provides a single cited answer per
+query with bounded prior context. AI capabilities exposed through workspace
 stub endpoints, along with CAD, Blender generation, rendering, and payment,
 remain deferred until their own providers are configured, secured, and
 covered by integration tests. Do not present stub output as a live provider

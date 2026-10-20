@@ -39,7 +39,7 @@ import {
   Sun,
 } from "lucide-react";
 
-type Message = { id: number; role: "user" | "assistant"; content: string };
+type Message = { id: number | string; role: "user" | "assistant"; content: string; citations?: { source: string }[] };
 
 const thinkingDots = [
   { cx: 12, cy: 3.2, color: "#47B3FF" },
@@ -131,7 +131,13 @@ function AssistantResponse({ content }: { content: string }) {
   );
 }
 
-const models = ["Gemini", "Groq"] as const;
+const models = ["Gemini", "Groq", "You"] as const;
+function sourceHost(source: string) {
+  try {
+    const url = new URL(source);
+    return url.protocol === "https:" || url.protocol === "http:" ? url.hostname : null;
+  } catch { return null; }
+}
 type ChatSession = { id: string; title: string; messages: Message[]; updatedAt: number };
 type ChatSection = { id: string; label: string };
 type SearchDestination = { label: string; description: string; href: string };
@@ -159,7 +165,7 @@ export default function AIChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [copiedId, setCopiedId] = useState<number | string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedModel, setSelectedModel] = useState("Gemini");
@@ -207,19 +213,33 @@ export default function AIChatPage() {
     const profileKey = session?.user?.email ?? session?.user?.name ?? null;
     if (!profileKey) {
       setChatSessions([]);
+      setMessages([]);
+      setActiveSessionId(null);
       setSessionsLoaded(true);
       return;
     }
     const storageKey = `crystal_ai_chat_sessions:${encodeURIComponent(profileKey)}`;
-    try {
-      const savedSessions = window.localStorage.getItem(storageKey);
-      if (savedSessions) setChatSessions(JSON.parse(savedSessions) as ChatSession[]);
-      else setChatSessions([]);
-    } catch {
-      setToast("Saved chats could not be loaded.");
-    } finally {
-      setSessionsLoaded(true);
-    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const savedSessions = window.localStorage.getItem(storageKey);
+        const localSessions = savedSessions ? JSON.parse(savedSessions) as ChatSession[] : [];
+        if (localSessions.length) {
+          const imported = await fetch("/api/ai-chat/sessions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessions: localSessions }) });
+          if (!imported.ok) throw new Error("Saved chats could not be synchronized.");
+        }
+        const response = await fetch("/api/ai-chat/sessions", { cache: "no-store" });
+        if (!response.ok) throw new Error("Saved chats could not be loaded.");
+        const data = await response.json() as { sessions: ChatSession[] };
+        if (!cancelled) setChatSessions(data.sessions);
+      } catch {
+        if (!cancelled) {
+          try { setChatSessions(JSON.parse(window.localStorage.getItem(storageKey) || "[]") as ChatSession[]); } catch { setChatSessions([]); }
+          setToast("Saved chats could not be synchronized.");
+        }
+      } finally { if (!cancelled) setSessionsLoaded(true); }
+    })();
+    return () => { cancelled = true; };
   }, [session?.user?.email, session?.user?.name, sessionStatus]);
 
   useEffect(() => {
@@ -282,7 +302,7 @@ export default function AIChatPage() {
     const message = input.trim();
     if (!message || isSending) return;
 
-    const sessionId = activeSessionId ?? `chat-${Date.now()}`;
+    const sessionId = activeSessionId ?? `chat-${crypto.randomUUID()}`;
     const userMessage: Message = { id: Date.now(), role: "user", content: message };
     const title = message.replace(/\s+/g, " ").slice(0, 42) || "New Chat";
     setActiveSessionId(sessionId);
@@ -302,13 +322,15 @@ export default function AIChatPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           provider: selectedModel.toLowerCase(),
+          conversationId: sessionId,
           messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
         }),
       });
       const result = (await response.json()) as {
         message?: string;
         error?: string;
-        provider?: "gemini" | "groq";
+        provider?: "gemini" | "groq" | "you";
+        citations?: { source: string }[];
       };
       if (!response.ok) {
         throw new Error(result.error || "Casynus could not answer right now. Please try again.");
@@ -318,11 +340,13 @@ export default function AIChatPage() {
       }
       if (result.provider === "gemini") setSelectedModel("Gemini");
       else if (result.provider === "groq") setSelectedModel("Groq");
+      else if (result.provider === "you") setSelectedModel("You");
 
       const assistantMessage: Message = {
         id: Date.now() + 1,
         role: "assistant",
         content: result.message.trim(),
+        citations: result.citations,
       };
       setMessages((current) => [...current, assistantMessage]);
       setChatSessions((current) => current.map((chat) => chat.id === sessionId
@@ -369,14 +393,20 @@ export default function AIChatPage() {
       setToast(`${item.title} marked as unread.`);
     } else if (action === "rename") {
       const nextName = window.prompt("Rename conversation", item.title)?.trim();
-      if (nextName && nextName !== item.title) setChatSessions((items) => items.map((current) => current.id === item.id ? { ...current, title: nextName } : current));
+      if (nextName && nextName !== item.title) {
+        const response = await fetch(`/api/assistant/conversations/${encodeURIComponent(item.id)}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: nextName }) });
+        if (response.ok) setChatSessions((items) => items.map((current) => current.id === item.id ? { ...current, title: nextName } : current));
+      }
     } else if (action === "share") {
       await navigator.clipboard?.writeText(window.location.href);
       setToast("Conversation link copied.");
     } else if (action === "delete") {
-      setChatSessions((items) => items.filter((current) => current.id !== item.id));
-      if (activeSessionId === item.id) startNewChat();
-      setToast(`${item.title} deleted.`);
+      const response = await fetch(`/api/assistant/conversations/${encodeURIComponent(item.id)}`, { method: "DELETE" });
+      if (response.ok) {
+        setChatSessions((items) => items.filter((current) => current.id !== item.id));
+        if (activeSessionId === item.id) startNewChat();
+        setToast(`${item.title} deleted.`);
+      } else setToast("Conversation could not be deleted.");
     }
     window.setTimeout(() => setToast(null), 1800);
   };
@@ -440,7 +470,7 @@ export default function AIChatPage() {
                   className={`flex w-full items-center gap-3 rounded-[6px] px-3 py-2 text-left text-[12px] transition-colors ${selectedModel === model ? "bg-[#1c1c1c] text-white" : "text-zinc-500 hover:rounded-[6px] hover:bg-[#181818] hover:text-zinc-200"}`}
                 >
                   <span className={`grid h-5 w-5 place-items-center rounded-md ${selectedModel === model ? "bg-blue-500/15 text-blue-400" : "bg-[#1a1a1a] text-zinc-500"}`}>
-                    <Bot size={13} />
+                    {model === "You" ? <img src="https://you.com/favicon.ico" alt="" className="h-3.5 w-3.5" /> : <Bot size={13} />}
                   </span>
                   {model}
                   {selectedModel === model && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#22c55e]" />}
@@ -542,7 +572,7 @@ export default function AIChatPage() {
                   className={`scroll-mt-6 group flex ${message.role === "user" ? "justify-end" : "justify-center"}`}
                 >
                   <div className={message.role === "user" ? "max-w-[85%] rounded-2xl bg-[#1c1c1c] px-4 py-3 text-sm leading-7 text-zinc-100" : "w-full max-w-2xl px-4 py-3 text-left"}>
-                    {message.role === "assistant" ? <AssistantResponse content={message.content} /> : <p className="whitespace-pre-wrap">{message.content}</p>}
+                    {message.role === "assistant" ? <><AssistantResponse content={message.content} />{Boolean(message.citations?.length) && <div className="mt-3 flex flex-wrap gap-2" aria-label="Sources">{message.citations?.map((citation, index) => sourceHost(citation.source) && <a key={`${citation.source}-${index}`} href={citation.source} target="_blank" rel="noopener noreferrer" className="max-w-full truncate rounded-lg border border-[#333] px-2 py-1 text-xs text-blue-400 hover:bg-[#242424]">[{index + 1}] {sourceHost(citation.source)}</a>)}</div>}</> : <p className="whitespace-pre-wrap">{message.content}</p>}
                     {message.role === "assistant" && <div className="mt-3 flex justify-start gap-1 opacity-60 transition group-hover:opacity-100"><button onClick={() => void copyMessage(message)} aria-label="Copy response" className="grid h-9 w-9 place-items-center rounded-[6px] p-0 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]">{copiedId === message.id ? <Check size={14} /> : <Copy size={14} />}</button><button aria-label="Share response" className="grid h-9 w-9 place-items-center rounded-[6px] p-0 text-zinc-500 transition hover:bg-[#242424] hover:text-[#3b82f6]"><Share2 size={14} /></button><Link href="/casynus" className="ml-1 rounded-[6px] px-2 py-1 text-[11px] text-[#3b82f6] transition hover:bg-blue-500/10">Go to Casynus</Link></div>}
                   </div>
                 </div>

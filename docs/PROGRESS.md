@@ -2,6 +2,28 @@
 
 Last updated: 2026-10-20
 
+## `/aichat` You.com Answer integration
+
+- Added You to the existing model selector and routed its requests through the
+  server-only You Answer API (`POST https://api.you.com/v1/answer`, `X-API-Key`).
+  Responses retain native cited answer text and clickable source URLs. The API
+  accepts a single query up to 400 characters, so recent conversation context
+  is folded into a bounded follow-up query; this is not a multi-turn You API.
+- Signed-in `/aichat` sessions now load from and save to the existing
+  `AssistantConversation` and `AssistantMessage` tables, scoped by workspace
+  and user. Existing browser-local sessions are imported on load. Gemini and
+  Groq keep their previous provider behavior and also save responses in these
+  tables when sent from the chat page.
+- Added explicit missing-key, authentication, billing, rate-limit, invalid
+  response, and timeout errors without exposing `YOU_API_KEY` to the browser.
+- `npm test` passed (17 tests), `npm run typecheck` passed, focused ESLint passed
+  with five existing image warnings, and `npm run build` completed. Live You
+  request, database round trip, browser/mobile interaction, and Vercel
+  deployment verification remain pending because no nonempty `YOU_API_KEY` or
+  database test session was available in this checkout. Browser automation
+  crashed twice while opening the local page, so visual interaction was not
+  verified.
+
 ## Soft Dark AI Platform Website (`/studio-ai`) & Complete Soft Dark UI Kit (`/ui-kit`)
 
 - Designed and implemented the **Soft Dark Generative AI Platform Website**

@@ -9,6 +9,10 @@ import {
  getSafeAIErrorMessage,
 } from "@/lib/ai-provider-config";
 import { sanitizeAndInspectPayload } from "@/lib/security/cyber-shield.mjs";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { askYou, YouAnswerError } from "@/lib/you-answer.mjs";
+import { isApiResponse, requirePlatformContext } from "@/lib/platform/api";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +33,7 @@ type RequestBody = {
  history?: unknown;
  conversationHistory?: unknown;
  provider?: unknown;
+ conversationId?: unknown;
 };
 
 type AIProvider = "gemini" | "groq" | "local";
@@ -366,6 +371,7 @@ export async function GET() {
  providers: {
  gemini: Boolean(getGeminiApiKey()),
  groq: Boolean(getGroqApiKey()),
+ you: Boolean(process.env.YOU_API_KEY?.trim()),
  },
  groqBaseUrl: getGroqBaseUrl(),
  });
@@ -412,6 +418,52 @@ export async function POST(request: NextRequest) {
  const history = requestMessages.length > 0
  ? requestMessages.slice(0, lastRequestMessage?.role === "user" ? -1 : undefined)
  : normalizeHistory(body.history ?? body.conversationHistory);
+ const requestedYou = body.provider === "you";
+ const signedIn = requestedYou || body.conversationId !== undefined ? await auth() : null;
+ if (requestedYou && !signedIn?.user?.id) {
+ return NextResponse.json({ error: "Sign in to use You and save your conversation.", code: "UNAUTHENTICATED" }, { status: 401 });
+ }
+ const conversationId = typeof body.conversationId === "string" && /^chat-[a-zA-Z0-9-]{1,80}$/.test(body.conversationId)
+ ? body.conversationId : null;
+ if (body.conversationId !== undefined && !conversationId) {
+ return NextResponse.json({ error: "Invalid conversation ID.", code: "INVALID_CONVERSATION" }, { status: 400 });
+ }
+ if (requestedYou && !conversationId) {
+ return NextResponse.json({ error: "Conversation ID is required for You.", code: "CONVERSATION_REQUIRED" }, { status: 400 });
+ }
+ let conversation: { id: string; title: string } | null = null;
+ let workspaceId: string | null = null;
+ if (signedIn?.user?.id && conversationId) {
+ const context = await requirePlatformContext();
+ if (isApiResponse(context)) return context;
+ workspaceId = context.workspaceId;
+ conversation = await prisma.assistantConversation.findFirst({ where: { id: conversationId, workspaceId, userId: signedIn.user.id, status: "ACTIVE" } });
+ if (!conversation) {
+ const collision = await prisma.assistantConversation.findUnique({ where: { id: conversationId } });
+ if (collision) return NextResponse.json({ error: "Conversation not found.", code: "CONVERSATION_NOT_FOUND" }, { status: 404 });
+ }
+ }
+ if (requestedYou) {
+ try {
+ const trustedHistory = conversation
+ ? (await prisma.assistantMessage.findMany({ where: { conversationId: conversation.id }, orderBy: { createdAt: "desc" }, take: 4 })).reverse().map((item) => ({ role: item.role === "ASSISTANT" ? "assistant" as const : "user" as const, content: item.content }))
+ : history;
+ const answer = await askYou(message, trustedHistory);
+ if (conversationId && workspaceId && signedIn?.user?.id) {
+ await prisma.$transaction(async (tx) => {
+ if (!conversation) await tx.assistantConversation.create({ data: { id: conversationId, workspaceId, userId: signedIn.user.id, title: message.slice(0, 80), status: "ACTIVE" } });
+ await tx.assistantMessage.create({ data: { conversationId, role: "USER", content: message } });
+ await tx.assistantMessage.create({ data: { conversationId, role: "ASSISTANT", content: answer.message, metadata: { provider: "you", citations: answer.citations } } });
+ await tx.assistantConversation.update({ where: { id: conversationId }, data: { lastMessageAt: new Date() } });
+ });
+ }
+ return NextResponse.json({ success: true, ...answer, provider: "you", model: "You Answer" });
+ } catch (error) {
+ if (error instanceof YouAnswerError) return NextResponse.json({ error: error.message, code: error.code, provider: "you" }, { status: error.status });
+ console.error("You chat persistence or request failed:", error);
+ return NextResponse.json({ error: "You response could not be saved. Please try again.", code: "YOU_SAVE_ERROR", provider: "you" }, { status: 500 });
+ }
+ }
  const provider = getPreferredProvider(body.provider);
  const model = provider === "groq"
  ? getGroqModel()
@@ -419,10 +471,7 @@ export async function POST(request: NextRequest) {
  ? getGeminiModel()
  : "local-fallback";
 
- console.info("[ai-chat] request received", {
- messageCount: requestMessages.length || 1,
- message,
- });
+ console.info("[ai-chat] request received", { messageCount: requestMessages.length || 1 });
  console.info("[ai-chat] selected provider", { provider, model });
 
  if (provider !== "local") {
@@ -432,6 +481,19 @@ export async function POST(request: NextRequest) {
  for (const providerAttempt of providerAttempts) {
  try {
  const answer = await askProvider(providerAttempt, message, history);
+ if (conversationId && workspaceId && signedIn?.user?.id) {
+ try {
+ await prisma.$transaction(async (tx) => {
+ if (!conversation) await tx.assistantConversation.create({ data: { id: conversationId, workspaceId, userId: signedIn.user.id, title: message.slice(0, 80), status: "ACTIVE" } });
+ await tx.assistantMessage.create({ data: { conversationId, role: "USER", content: message } });
+ await tx.assistantMessage.create({ data: { conversationId, role: "ASSISTANT", content: answer, metadata: { provider: providerAttempt } } });
+ await tx.assistantConversation.update({ where: { id: conversationId }, data: { lastMessageAt: new Date() } });
+ });
+ } catch (storageError) {
+ console.error("AI chat response could not be saved:", storageError);
+ return NextResponse.json({ error: "Response could not be saved. Please try again.", code: "CHAT_SAVE_ERROR", provider: providerAttempt }, { status: 500 });
+ }
+ }
  return NextResponse.json({
  success: true,
  message: answer,

@@ -2,6 +2,10 @@
 
 ## Next concrete task
 
+- [ ] Configure `YOU_API_KEY` in local `.env.local` and Vercel environment
+  settings, then verify a live cited You answer, follow-up, database reload
+  after logout/login, and selector interaction at desktop and mobile widths.
+
 - [ ] Verify the Soft Dark Generative AI Platform (`/studio-ai`) and Interactive
   Soft Dark UI Kit (`/ui-kit`) in a browser at desktop and mobile viewports,
   including the showcase filter tabs, interactive form controls, tooltips, toast

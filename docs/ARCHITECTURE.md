@@ -42,7 +42,12 @@
   use local stubs unless a route is explicitly integrated with a real provider.
 - `/aichat` lets the user select Gemini or Groq and submits conversations to
   `/api/ai-chat`; provider credentials are read only on the server, and the
-  other configured provider is tried if the selected one fails.
+  other configured provider is tried if the selected one fails. You is a
+  separate cited Answer API provider in `src/lib/you-answer.mjs`; it uses
+  `YOU_API_KEY` and does not fall back to a different provider. Signed-in chat
+  sessions are stored in `AssistantConversation` and `AssistantMessage`, loaded
+  through `/api/ai-chat/sessions`, and scoped to the authenticated user and
+  workspace. Browser-local sessions are imported when the page loads.
 - `src/lib/security/cyber-shield.mjs` and `src/middleware.ts` implement the
   application's Web Application Firewall (WAF), CSRF same-origin mutation guard,
   adaptive IP reputation and brute-force lockout tracker, Web Crypto HMAC-SHA256
