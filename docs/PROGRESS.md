@@ -2,6 +2,51 @@
 
 Last updated: 2026-10-20
 
+## Soft Dark AI Platform Website (`/studio-ai`) & Complete Soft Dark UI Kit (`/ui-kit`)
+
+- Designed and implemented the **Soft Dark Generative AI Platform Website**
+  (`src/app/studio-ai/page.tsx`, `src/app/studio-ai/showcase.tsx`) and a
+  complete interactive **Soft Dark UI Kit** (`src/app/ui-kit/page.tsx`), backed
+  by a scoped `.sui` Soft Dark design system (`src/components/soft-ui/soft-ui.css`,
+  `src/components/soft-ui/primitives.tsx`, `src/components/soft-ui/showcase-art.tsx`,
+  `src/components/soft-ui/site-chrome.tsx`):
+  - **Soft Dark Aesthetic & Tokens:** Near-black and deep charcoal canvas
+    hierarchy (`#0F0F0F`, `#161616`, `#1A1A1A`), generous `16px–32px` rounded
+    geometry, hairline soft borders, gentle glassmorphism (`backdrop-filter: blur(22px)`),
+    and calm studio accents (Soft Periwinkle `#A5B1FF`, Architectural Sage
+    `#A9CDBD`, Warm Sand `#E2C9A6`, semantic Success `#6ED3A5`, Warning `#EEBD6B`,
+    and Error `#F28C96`).
+  - **Platform Landing Page (`/studio-ai`):** Hero section with 3-column
+    Interactive Studio Preview Frame (left scene hierarchy, center 3D
+    architectural wireframe + floor plan + infrastructure preview with floating
+    AI prompt bar, and right parameter inspector), dedicated feature sections for
+    **3D Architecture Studio**, **Interior & Floor Planning**, and
+    **Infrastructure & Site Planning** with custom SVG concept illustrations,
+    6 soft floating tool cards, filterable generated-project showcase (`All`,
+    `Architecture`, `Interior`, `Infrastructure`), 3-step studio workflow, and
+    footer.
+  - **Interactive Soft Dark UI Kit (`/ui-kit`):** Live interactive showcase of
+    all 7 component families:
+    1. **Buttons** (`Primary`, `Secondary`, `Tertiary`, `Ghost`, `Destructive`,
+       `sm`/`md`/`lg` sizes, loading spinner, disabled, and icon-only states)
+    2. **Icons** (`1.6px` rounded line stroke, `sm`/`md`/`lg`/`xl` sizes, and
+       `default`/`hover`/`active`/`disabled` tile states)
+    3. **Cards & Frames** (`elevated`, `glass`, `interactive`, `subtle`, floating
+       panels, and soft gradient dividers)
+    4. **Form Elements** (text inputs with prefixes/suffixes, textareas, selects,
+       checkboxes, radio groups, animated switches, and gentle focus/valid/error
+       states)
+    5. **Navigation** (glassmorphic top header, pill tabs, vertical studio
+       sidebar nav, and pill breadcrumbs)
+    6. **Feedback Components** (status alerts, floating toasts, hover tooltips,
+       linear/circular progress indicators, loading spinners/dots, and a live
+       interactive modal dialog)
+    7. **Typography & Color System** (Display XL through Caption/Mono type scale
+       plus interactive copy-to-clipboard color token swatches).
+- Focused ESLint (`npx eslint src/components/soft-ui src/app/studio-ai src/app/ui-kit`),
+  full-project typecheck (`NODE_OPTIONS="--max-old-space-size=4096" npm run typecheck`),
+  and `npm test` passed. Browser rendering was not verified.
+
 ## Casynus Cyber-Shield Website Security System
 
 - Built and integrated the multi-layered **Casynus Cyber-Shield** security engine

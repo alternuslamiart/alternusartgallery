@@ -1,7 +1,11 @@
-# Next tasks (reviewed 2026-10-19)
+# Next tasks (reviewed 2026-10-20)
 
 ## Next concrete task
 
+- [ ] Verify the Soft Dark Generative AI Platform (`/studio-ai`) and Interactive
+  Soft Dark UI Kit (`/ui-kit`) in a browser at desktop and mobile viewports,
+  including the showcase filter tabs, interactive form controls, tooltips, toast
+  triggers, and modal dialog.
 - [ ] Verify the Soft Frosted Porcelain Casynus Studio Ecosystem UI (`/casynus`,
   `/interior`, `/casynus?mode=floor-plan`, and `/infrastructure`) in a browser
   at desktop and mobile widths, including the daylight 3D/2D viewports,

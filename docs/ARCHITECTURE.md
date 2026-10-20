@@ -21,6 +21,11 @@
   controls are in `infrastructure-scene.tsx`, and editor UI/state live in
   `page.tsx`. `infrastructure-storage.mjs` validates and stores browser-local
   snapshots; this is not authenticated cloud persistence.
+- `/studio-ai` (`src/app/studio-ai/page.tsx`) provides the Soft Dark Generative
+  AI Platform overview for Architecture, Interior Design, and Infrastructure
+  Planning, and `/ui-kit` (`src/app/ui-kit/page.tsx`) exposes the complete
+  interactive Soft Dark UI Kit (`#0F0F0F` / `#161616` / `#1A1A1A`) built on the
+  scoped `.sui` design system in `src/components/soft-ui/`.
 
 ## Server and data
 
