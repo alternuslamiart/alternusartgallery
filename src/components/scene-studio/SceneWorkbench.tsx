@@ -241,7 +241,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
           <button aria-label={`${o.visible ? "Hide" : "Show"} ${o.name}`} disabled={blocked} onClick={() => patch(o.id, { visible: !o.visible }, true)}>{o.visible ? <Eye size={12} /> : <EyeOff size={12} />}</button><button aria-label={`${o.locked ? "Unlock" : "Lock"} ${o.name}`} disabled={blocked} onClick={() => patch(o.id, { locked: !o.locked }, true)}>{o.locked ? <Lock size={12} /> : <Unlock size={12} />}</button>
         </div>;
       })}</section>
-      {studio !== "infrastructure" && <Link className="scene-classic-link" href={`${routes[studio]}?workspace=classic`} onClick={e => { e.preventDefault(); void leave(`${routes[studio]}?workspace=classic`); }}>{studio === "interior" ? "Open 2D drafting tools" : "Open previous modeling tools"}</Link>}
+      {studio === "interior" && <Link className="scene-classic-link" href={`${routes[studio]}?workspace=classic`} onClick={e => { e.preventDefault(); void leave(`${routes[studio]}?workspace=classic`); }}>Open 2D drafting tools</Link>}
     </StudioPanel>}
 
     <section className="scene-view" aria-label={`${names[studio]} 3D viewport`}>

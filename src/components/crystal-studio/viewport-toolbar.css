@@ -4,6 +4,8 @@
   padding:5px 8px!important; gap:4px!important; border-radius:12px!important;
   overflow-x:auto; overflow-y:hidden; flex-wrap:nowrap; pointer-events:auto;
 }
+.scene-workbench.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar { top:0!important; }
+.crystal-studio.interior-plan-restored .casynus-viewport-toolbar.ref-top-toolbar { top:12px!important; }
 .crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn {
   width:33px!important; min-width:33px!important; height:33px!important; min-height:33px!important;
   padding:0 7px!important; flex-shrink:0; border-radius:8px!important;

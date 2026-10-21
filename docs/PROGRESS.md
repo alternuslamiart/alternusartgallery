@@ -2,6 +2,26 @@
 
 Last updated: 2026-10-21
 
+## Studio overlay alignment and Interior sidebar
+
+- Toolbar tops and compact/minimized AI dock bottoms now align with the
+  existing 12px sidebar insets. Chat dimensions and engine logic are retained.
+- Removed Architecture's unused previous-modeling-tools footer.
+- `/interior` keeps its SVG architectural sketcher with a matching studio
+  header, navigation and project row followed only by the actual plan hierarchy.
+  Library/template/setup sections are omitted from this sidebar. Selection
+  updates the existing plan inspector; JSON/SVG/PDF actions use real exports.
+  Open accepts the exported plan's `objects` field as well as older snapshots.
+- Typecheck passed; focused Next lint passed with five existing image warnings;
+  `git diff --check` passed. Installed Chrome verified all three default routes
+  at 1440px/390px in dark/light mode with no runtime exceptions. Desktop checks
+  assert toolbar y=12 and compact/minimized chat bottom=888 at height 900;
+  Interior checks cover room creation/deletion, hierarchy selection and JSON
+  save/reopen. Script: `scripts/verify-studio-spacing.mjs`.
+- Production build was not repeated for this presentation change: the existing
+  Google Fonts certificate blocker remains, with less than 0.5GB disk free.
+  Live provider/cloud verification remains a separate pending deployment task.
+
 ## Real 3D provider frontend/backend integration
 
 - Added server-only Meshy v2 (preview + PBR refinement) and Tripo v3

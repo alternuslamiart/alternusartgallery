@@ -18,6 +18,11 @@
   remains separately addressable and uses the same snapshot/recovery system.
   Workbench application actions are inside the project-row menu, with no
   full-width top bar. The engine, APIs and scene schema are unchanged.
+- `InteriorSceneSidebar` presents the shared studio header/navigation/project
+  proportions over the original 2D editor, followed only by its actual plan
+  objects. Selection and file actions call the existing editor handlers;
+  the classic route retains its previous sidebar. Toolbars and AI docks align
+  with the same 12px panel edges using studio-scoped positioning rules.
 - The shared 3D canvas is an edge-to-edge background layer under the inset
   sidebars. The center section positions only toolbar/chat/feedback overlays;
   empty space passes pointer events through. Root drop handling retains import

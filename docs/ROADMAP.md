@@ -6,6 +6,9 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Align studio overlays with inset panels and give Interior the shared
+  sidebar presentation with only project navigation and its real plan tree.
+
 - [x] Connect real 3D provider jobs, progress/recovery, GLB import/preview/undo
   and server-only key discovery. Meshy/Tripo adapters and deployment setup
   are implemented; live paid-provider/database verification remains pending.

@@ -59,18 +59,43 @@ async function run() {
     assert.equal(await evaluate('document.querySelector(".casynus-toolbar-export").open'),true);
     await evaluate('[...document.querySelectorAll("button")].find(b=>b.getAttribute("aria-label")==="Close export").click()');
     if(width===1440){
-      const bar=await evaluate('(()=>{const r=document.querySelector(".casynus-viewport-toolbar").getBoundingClientRect();return {left:r.left,right:r.right,height:r.height}})()');
-      assert.equal(bar.height,46);assert.ok(bar.left>=280&&bar.right<=1148,'Toolbar stays between panels');
+      const bar=await evaluate('(()=>{const r=document.querySelector(".casynus-viewport-toolbar").getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,height:r.height}})()');
+      assert.equal(bar.height,46);assert.equal(bar.top,12,'Toolbar aligns with sidebar tops');assert.ok(bar.left>=280&&bar.right<=1148,'Toolbar stays between panels');
+      await evaluate(`document.querySelector('button[aria-label="Show AI chat"]')?.click()`);await wait(100);
+      assert.equal(await evaluate('document.querySelector(".studio-ai-panel").getBoundingClientRect().bottom'),888,'AI dock aligns with sidebar bottoms');
+      await evaluate(`document.querySelector('button[aria-label="Minimize AI assistant"]').click()`);await wait(100);
+      assert.equal(await evaluate('document.querySelector(".studio-ai-reopen-btn").getBoundingClientRect().bottom'),888,'Minimized AI aligns with sidebar bottoms');
+      await evaluate(`document.querySelector('button[aria-label="Show AI chat"]').click()`);
     }
-    if(route==='/infrastructure')assert.equal(await evaluate('Boolean(document.querySelector(".scene-classic-link"))'),false);
+    if(route!=='/interior')assert.equal(await evaluate('Boolean(document.querySelector(".scene-classic-link"))'),false);
     assert.equal(await evaluate('document.documentElement.dataset.crystalTheme'),theme);
     if(route==='/interior')assert.equal(state.svg,true);
     if(route==='/interior'&&width===1440) {
-      const before=await evaluate('document.querySelectorAll(".ref-tree-row").length');
+      assert.equal(await evaluate('document.querySelector(".interior-scene-sidebar .cs-header-title").textContent'),'Interior');
+      assert.equal(await evaluate('document.querySelectorAll(".interior-scene-sidebar .interior-scene-nav a").length'),3);
+      assert.equal(await evaluate('Boolean(document.querySelector(".interior-scene-sidebar").textContent.match(/Object library|Building levels|Add building|Add furnished room|Drafting setup/))'),false);
+      const before=await evaluate('document.querySelectorAll(".interior-scene-object").length');
       await evaluate('[...document.querySelectorAll("button")].find(b=>b.getAttribute("aria-label")==="Add room to floor plan").click()');await wait(150);
-      assert.ok(await evaluate('document.querySelectorAll(".ref-tree-row").length')>before,'Original drafting toolbar creates a room');
+      assert.ok(await evaluate('document.querySelectorAll(".interior-scene-object").length')>before,'Original drafting toolbar creates a room');
       await evaluate('[...document.querySelectorAll("button")].find(b=>b.getAttribute("aria-label")==="Delete selected element (Del)").click()');await wait(150);
-      assert.equal(await evaluate('document.querySelectorAll(".ref-tree-row").length'),before);
+      assert.equal(await evaluate('document.querySelectorAll(".interior-scene-object").length'),before);
+      await evaluate('document.querySelector(".interior-scene-object").click()');
+      assert.equal(await evaluate('document.querySelector(".interior-scene-object").getAttribute("aria-pressed")'),'true','Hierarchy selects actual plan objects');
+      if(theme==='dark') {
+        const saved=await evaluate(`(async()=>{
+          const original=URL.createObjectURL;let captured;
+          URL.createObjectURL=function(blob){captured=blob;return original.call(this,blob)};
+          try {
+            document.querySelector('.interior-project-actions').open=true;
+            [...document.querySelectorAll('.interior-project-actions button')].find(b=>b.textContent==='Save project JSON').click();
+            return JSON.parse(await captured.text());
+          } finally { URL.createObjectURL=original; }
+        })()`);
+        assert.equal(saved.objects.length,before);assert.equal(saved.name,'Untitled project');
+        await evaluate('[...document.querySelectorAll("button")].find(b=>b.getAttribute("aria-label")==="Add room to floor plan").click()');await wait(100);
+        await evaluate(`(()=>{const input=document.querySelector('input[type="file"][accept="application/json,.json"]');const transfer=new DataTransfer();transfer.items.add(new File([${JSON.stringify(JSON.stringify(saved))}],'plan.json',{type:'application/json'}));input.files=transfer.files;input.dispatchEvent(new Event('change',{bubbles:true}));})()`);await wait(150);
+        assert.equal(await evaluate('document.querySelectorAll(".interior-scene-object").length'),before,'Saved JSON reopens real plan geometry');
+      }
     }
     if(width===1440)for(const p of state.panels){assert.equal(p.y,12);assert.equal(p.height,876);assert.equal(p.radius,'12px');assert.ok(p.x>=12);assert.ok(p.x+p.width<=1428);}
     if(route!=='/interior'){

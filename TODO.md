@@ -2,6 +2,10 @@
 
 ## Next concrete task
 
+- [x] Align toolbar/AI dock to the 12px sidebar edges; simplify Interior's
+  sidebar to header/navigation/project and real plan hierarchy, preserving
+  architectural drafting. Remove Architecture's previous-tools footer.
+
 - [ ] After configuring Meshy/Tripo keys, credits and deployed workspace DB,
   verify one authenticated real generation per provider, refresh/resume,
   texture import, Apply/Undo and cloud save/reopen. Follow `docs/AI3D-SETUP.md`.
