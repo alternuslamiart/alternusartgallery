@@ -2,6 +2,37 @@
 
 Last updated: 2026-10-21
 
+## Studio spacing correction and original Interior drafting restoration
+
+- Audited `8d22f00` against pre-3D UI commit `a531c16`; created local checkpoint
+  branch `checkpoint/studio-ui-before-restore-8d22f00` and an ignored worktree
+  patch before editing. Unrelated deleted images and untracked scripts remain
+  untouched. The user's follow-up narrowed the UI request to padding and
+  removal of the new top strip, plus the original Interior plan sketcher.
+- Removed the full-width workbench menubar. Its real File/Edit/View/Tools/
+  Camera/Render/Export/Save handlers remain in the project-row actions menu.
+  Sidebars and viewport start at the top with 12px insets/gaps and 12px corners;
+  panel restore controls remain available when collapsed. Changes are scoped
+  to the scene workbench and the Interior drafting root.
+- `/interior` again mounts the original `CrystalStudio` floor-plan editor:
+  original SVG drafting, sidebars, toolbar and AI chat, with scoped 12px panel
+  geometry. `/interior?workspace=3d` retains the full new 3D editor; its stored
+  scenes are not migrated or deleted. The drafting 3D Studio control opens
+  the real `/casynus` engine instead of the previous simulated viewport.
+- Chrome's 3D workflow passed transformations, undo/redo, all seven exports,
+  IndexedDB recovery, templates and document-preserving 3D route switching,
+  with zero runtime exceptions. `npm test`: 55 passed; typecheck passed;
+  focused lint has no errors and five existing image warnings in CrystalStudio.
+- `scripts/verify-studio-spacing.mjs` passed all three routes at 1440/390px
+  in both actual themes: no top strip or horizontal overflow, desktop panel
+  bounds/corners exactly 12px, mobile 3D sidebar reopening at 12px, and original
+  Interior room creation/deletion. No runtime exceptions. Screenshots are in
+  ignored `.tmp/studio-spacing-1792611885922/`; 3D workflow artifacts are in
+  `.tmp/scene-workflow-1792611695125/`.
+- Production build retains the known local Google Fonts certificate blocker;
+  this session's dev compilation again reported `UNABLE_TO_VERIFY_LEAF_SIGNATURE`
+  and used fallback fonts. A production build is not claimed here.
+
 ## Shared real 3D modeling workflow
 
 - Added the default R3F/Three.js workbench to Architecture, Interior and

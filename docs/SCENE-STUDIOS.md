@@ -1,5 +1,13 @@
 # Shared 3D studios — engineering status
 
+## UI correction after the initial increment
+
+The user's clarified request restores `/interior` as the original 2D drafting
+editor; use `/interior?workspace=3d` for the new furnished-room 3D engine.
+Architecture and Infrastructure keep the engine, remove the full-width top
+strip, and use 12px insets/corners. All former strip actions remain in the
+sidebar project actions menu. No scene schema or persisted projects changed.
+
 ## Audit and delivered increment (2026-10-21)
 
 Architecture's previous modeling viewport used a 2D canvas. Interior retained

@@ -6,6 +6,9 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Remove the new workbench top strip, add 12px panel spacing/corners, and
+  restore Interior's original architectural plan sketcher while keeping 3D.
+
 - [x] Deliver a shared real 3D modeling workflow across all three studios:
   editable templates, genuine transforms, PBR, import/export, recovery,
   scoped snapshot API and validated AI preview. See `SCENE-STUDIOS.md`.

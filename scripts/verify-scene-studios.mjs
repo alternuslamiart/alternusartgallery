@@ -48,7 +48,7 @@ async function run() {
   const downloads=path.join(out,'downloads');fs.mkdirSync(downloads,{recursive:true});
   await send('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:downloads});
   const click=async label=>{await evaluate(`[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===${JSON.stringify(label)}).click()`);await wait(120);};
-  const menu=async label=>{await evaluate(`[...document.querySelectorAll('.scene-menu summary')].find(e=>e.textContent===${JSON.stringify(label)}).click()`);await wait(50);};
+  const menu=async label=>{await evaluate(`(()=>{const actions=document.querySelector('.scene-project-actions');if(actions&&!actions.open)actions.querySelector('summary').click();[...document.querySelectorAll('.scene-menu summary')].find(e=>e.textContent===${JSON.stringify(label)}).click()})()`);await wait(50);};
   const aria=async label=>{await evaluate(`[...document.querySelectorAll('button')].find(b=>b.getAttribute('aria-label')===${JSON.stringify(label)}).click()`);await wait(140);};
   const number=async(label,value)=>{await evaluate(`(()=>{const e=[...document.querySelectorAll('input')].find(i=>i.getAttribute('aria-label')===${JSON.stringify(label)});e.focus();e.value=${JSON.stringify(String(value))};e.blur()})()`);await wait(150);};
   const value=async label=>evaluate(`[...document.querySelectorAll('input')].find(i=>i.getAttribute('aria-label')===${JSON.stringify(label)}).value`);
@@ -66,7 +66,9 @@ async function run() {
   await send('Page.reload');await ready('.scene-canvas canvas');await wait(500);assert.equal(await evaluate("document.querySelector('.scene-canvas').dataset.objectCount"),'1');
   // The same recovered project must survive navigation through all three routes.
   for (const studio of ['Interior','Infra','Architecture']) {
-    await click(studio);await ready('.scene-canvas canvas');await wait(600);
+    if(studio==='Interior') await send('Page.navigate',{url:baseUrl+'/interior?workspace=3d&project='+json.id});
+    else await click(studio);
+    await ready('.scene-canvas canvas');await wait(600);
     assert.equal(await evaluate("document.querySelector('.scene-canvas').dataset.objectCount"),'1');
     const reopened=JSON.parse(fs.readFileSync(await exportFile('json'),'utf8'));
     assert.equal(reopened.id,json.id);assert.deepEqual(reopened.objects,json.objects);

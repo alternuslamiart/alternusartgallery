@@ -2,7 +2,7 @@
 
 ## Application
 
-- The default `/casynus`, `/interior`, `/infrastructure` routes now use
+- The default `/casynus`, `/infrastructure` and `/interior?workspace=3d` use
   `components/scene-studio/SceneWorkbench.tsx` and the real R3F viewport.
   `lib/scene/document.mjs` validates versioned metric documents and allowlisted
   AI operations; `geometry.mjs` owns real meshes, import/export and disposal.
@@ -13,6 +13,11 @@
   `/api/ai-scene` proposes native Gemini/Groq function calls; browser Apply is
   required. See `SCENE-STUDIOS.md` for actual capabilities and limitations.
   Previous editors remain available under `?workspace=classic`.
+- `/interior` defaults to the original SVG drafting workspace again.
+  Its `insetPanels` prop scopes the requested 12px panel geometry; the 3D mode
+  remains separately addressable and uses the same snapshot/recovery system.
+  Workbench application actions are inside the project-row menu, with no
+  full-width top bar. The engine, APIs and scene schema are unchanged.
 
 - The primary web application is Next.js 14 with the App Router, React 18,
   TypeScript, and Tailwind CSS.

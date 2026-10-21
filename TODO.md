@@ -2,6 +2,10 @@
 
 ## Next concrete task
 
+- [x] Apply the clarified studio spacing request and restore `/interior` to
+  the original 2D drafting workspace. Keep 3D at `/interior?workspace=3d` and
+  preserve workbench actions in the sidebar project menu.
+
 - [ ] Verify `/api/studio-projects` with a real signed-in staging account:
   save, reload, logout/login, two-tab conflict and foreign workspace access.
   Verify native Gemini/Groq scene proposals on the deployed models. Current

@@ -1,0 +1,13 @@
+/* Interior keeps the original drafting shell; scope the requested geometry. */
+.crystal-studio.interior-plan-restored :is(.crystal-left-panel, .crystal-right-panel) {
+  border-radius: 12px !important;
+}
+@media (min-width: 701px) {
+  .crystal-studio.interior-plan-restored :is(.crystal-left-panel, .crystal-right-panel) {
+    margin-top: 12px !important;
+    margin-bottom: 12px !important;
+    height: calc(100dvh - 24px) !important;
+  }
+  .crystal-studio.interior-plan-restored .crystal-left-panel { left: 0 !important; }
+  .crystal-studio.interior-plan-restored .crystal-right-panel { right: 0 !important; }
+}

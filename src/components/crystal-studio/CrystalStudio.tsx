@@ -33,11 +33,13 @@ export function CrystalStudio({
   embedded = false,
   dedicated = false,
   initialStudioMode = "modeling",
+  insetPanels = false,
 }: {
   initialDashboard?: boolean;
   embedded?: boolean;
   dedicated?: boolean;
   initialStudioMode?: StudioMode;
+  insetPanels?: boolean;
 } = {}) {
   // Opening /casynus or /interior should enter the active workspace immediately.
   // The project dashboard remains available from the Home control.
@@ -76,6 +78,7 @@ export function CrystalStudio({
     }
   }, []);
   const switchStudioMode = (nextMode: StudioMode) => {
+    if (insetPanels && nextMode === "modeling") { router.push("/casynus"); return; }
     setStudioMode(nextMode);
     if (typeof window !== "undefined") {
       if (nextMode === "floor-plan") {
@@ -281,7 +284,7 @@ export function CrystalStudio({
   };
 
   return (
-    <div data-crystal-studio-theme={theme} onClick={() => contextMenu && closeContextMenu()} onContextMenuCapture={handleContextMenu} className={`crystal-studio crystal-ui-kit crystal-studio-enter ${studioMode === "modeling" ? "crystal-modeling-mode" : ""} ${mobileHome ? "crystal-mobile-home-active" : ""} ${embedded ? "crystal-studio-embedded" : "fixed inset-0 z-[90]"} grid overflow-hidden bg-[var(--studio-bg-canvas)] text-[var(--studio-text-primary)] ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"}`}>
+    <div data-crystal-studio-theme={theme} onClick={() => contextMenu && closeContextMenu()} onContextMenuCapture={handleContextMenu} className={`crystal-studio crystal-ui-kit crystal-studio-enter ${insetPanels ? "interior-plan-restored" : ""} ${studioMode === "modeling" ? "crystal-modeling-mode" : ""} ${mobileHome ? "crystal-mobile-home-active" : ""} ${embedded ? "crystal-studio-embedded" : "fixed inset-0 z-[90]"} grid overflow-hidden bg-[var(--studio-bg-canvas)] text-[var(--studio-text-primary)] ${leftOpen ? "" : "crystal-left-closed"} ${rightOpen ? "" : "crystal-right-closed"}`}>
       {mobileSplash && <div className="crystal-mobile-splash"><img src="/Logopng.png" alt="Casynus" /></div>}
       <input ref={sceneFileInput} type="file" accept="application/json,.json" className="sr-only" onChange={event => { const file = event.target.files?.[0]; if (file) openScene(file); event.currentTarget.value = ""; }} />
       <section className="crystal-mobile-home" aria-label="Casynus mobile home">
