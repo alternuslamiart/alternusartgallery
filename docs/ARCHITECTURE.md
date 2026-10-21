@@ -7,6 +7,10 @@
 - `src/app/**` contains pages and route handlers. API endpoints use explicit
   HTTP method exports in `route.ts`.
 - `src/components/**` contains reusable UI and Casynus Studio surfaces.
+- `/login` keeps its existing NextAuth/OAuth, email-code, and age-collection
+  flow in `src/app/login/page.tsx`. Its responsive visual system is scoped to
+  `src/app/login/login.css`; the global sign-in popup is suppressed on auth
+  routes. This client UI does not replace server-side authentication checks.
 - `/infrastructure` is the canonical infrastructure editor route;
   `/infrastructur` currently re-exports the same page for compatibility.
 - `/casynus` renders the Casynus modeling workspace from

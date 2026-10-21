@@ -19,6 +19,9 @@ requirements provide new evidence.
 
 ## P2 — Existing platform integration
 
+- [x] Redesign `/login` with a responsive soft UI while retaining the existing
+  OAuth, email-code, and age-collection flows; verify local browser behavior.
+
 - [x] Share a persisted light/dark preference and theme toggle across the
   three studios and `/aichat`; adapt viewport environment colors.
 - [x] Complete the interrupted shared UI kit and tab-local conversation

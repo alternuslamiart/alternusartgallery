@@ -2,6 +2,10 @@
 
 ## Next concrete task
 
+- [ ] Verify the redesigned `/login` against real configured OAuth providers,
+  email-code delivery, age collection, and an authenticated callback in a
+  staging environment; local browser QA used a mocked code endpoint.
+
 - [x] Finish the interrupted shared studio UI kit and browser-session dock
   recovery. Verify both themes at 1440/390px, mobile editor entry and panel
   controls, inspector collapse, keyboard toolbar navigation, chat recovery,

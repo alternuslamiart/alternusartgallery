@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { X } from "lucide-react";
 
@@ -19,14 +20,16 @@ function CoreforgeMark() {
 }
 
 export function SignInPopup() {
+ const pathname = usePathname();
  const [visible, setVisible] = useState(false);
  const [email, setEmail] = useState("");
 
  useEffect(() => {
+ if (["/login", "/signup", "/reset-password"].includes(pathname)) { setVisible(false); return; }
  if (localStorage.getItem(POPUP_KEY)) return;
  const t = setTimeout(() => setVisible(true), 2500);
  return () => clearTimeout(t);
- }, []);
+ }, [pathname]);
 
  const dismiss = () => {
  localStorage.setItem(POPUP_KEY, "1");

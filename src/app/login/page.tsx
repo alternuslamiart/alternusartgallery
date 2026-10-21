@@ -6,11 +6,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
-import { ArrowLeft, ArrowRight, Box, CheckCircle2, KeyRound, Layers3, Lock, Mail, Moon, RefreshCw, ShieldCheck, Sparkles, Sun } from "lucide-react";
+import { Activity, ArrowLeft, ArrowRight, Bot, Check, CheckCircle2, KeyRound, Lock, Mail, Moon, RefreshCw, ShieldCheck, Sparkles, Sun, Workflow } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import "./login.css";
 
 const STUDIO_HOME = "/";
 const AUTH_THEME_KEY = "Coreforge_auth_theme";
@@ -55,12 +56,11 @@ const socialProviders: Array<{
 ];
 
 function useAuthTheme() {
- const [isLight, setIsLight] = useState(false);
+ const [isLight, setIsLight] = useState(true);
 
  useEffect(() => {
  const storedTheme = window.localStorage.getItem(AUTH_THEME_KEY);
- const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
- const nextIsLight = storedTheme ? storedTheme === "light" : prefersLight;
+ const nextIsLight = storedTheme ? storedTheme === "light" : true;
  setIsLight(nextIsLight);
  document.documentElement.style.colorScheme = nextIsLight ? "light" : "dark";
  }, []);
@@ -81,7 +81,7 @@ function Brand() {
  return (
  <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Casynus homepage" title="Go to homepage">
  <span className="auth-brand-mark inline-flex h-8 w-8 items-center justify-center rounded-lg">
- <img src="/Logopng.png" alt="Casynus homepage" className="h-8 w-8 object-contain" />
+ <Image src="/Logopng.png" alt="" width={32} height={32} className="h-8 w-8 object-contain" />
  </span>
  <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Casynus</span>
  </Link>
@@ -106,7 +106,8 @@ export default function LoginPage() {
  }, [searchParams]);
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [error, setError] = useState<string | null>(null);
- const callbackUrl = searchParams.get("callbackUrl") || STUDIO_HOME;
+ const requestedCallback = searchParams.get("callbackUrl");
+ const callbackUrl = requestedCallback?.startsWith("/") && !requestedCallback.startsWith("//") ? requestedCallback : STUDIO_HOME;
  const registered = searchParams.get("registered") === "1";
 
  useEffect(() => {
@@ -116,7 +117,7 @@ export default function LoginPage() {
  }, [resendSeconds]);
 
  const handleOAuthSignIn = (provider: OAuthProvider) => {
- signIn(provider, { callbackUrl: STUDIO_HOME });
+ signIn(provider, { callbackUrl });
  };
 
  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -125,6 +126,7 @@ export default function LoginPage() {
  setIsSubmitting(true);
 
  if (verificationStep === "credentials") {
+  try {
   const response = await fetch("/api/auth/request-login-code", {
    method: "POST",
    headers: { "Content-Type": "application/json" },
@@ -139,8 +141,14 @@ export default function LoginPage() {
   setVerificationStep("code");
   setResendSeconds(30);
   return;
+  } catch {
+   setIsSubmitting(false);
+   setError("Could not connect to the sign-in service. Please try again.");
+   return;
+  }
  }
 
+ try {
  const result = await signIn("credentials", { email, password, verificationCode, redirect: false });
 
  if (result?.error) {
@@ -174,6 +182,10 @@ export default function LoginPage() {
  setIsSubmitting(false);
  setError("Could not check your age. Enter it below to continue.");
  }
+ } catch {
+  setIsSubmitting(false);
+  setError("Could not complete sign-in. Please try again.");
+ }
  };
 
  const handleAgeSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -206,6 +218,7 @@ export default function LoginPage() {
   if (resendSeconds > 0 || isSubmitting) return;
   setError(null);
   setIsSubmitting(true);
+  try {
   const response = await fetch("/api/auth/request-login-code", {
    method: "POST",
    headers: { "Content-Type": "application/json" },
@@ -219,71 +232,34 @@ export default function LoginPage() {
   }
   setResendSeconds(30);
   setVerificationCode("");
+  } catch {
+   setIsSubmitting(false);
+   setError("Could not resend the code. Please try again.");
+  }
  };
 
  return (
- <div className={`auth-page auth-login-page ${isLight ? "auth-light" : "auth-dark"}`}>
- <div className="auth-glow pointer-events-none fixed inset-x-0 top-0 h-[520px]" />
- <header className="auth-login-header relative z-10 mx-auto flex h-[76px] w-full items-center justify-between px-5 sm:px-8">
- <Brand />
- <div className="flex items-center gap-3">
- <button
- type="button"
- onClick={toggleTheme}
- className={`auth-theme-toggle inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors ${isLight ? "is-light" : "is-dark"}`}
- aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
- aria-pressed={isLight}
- title={isLight ? "Switch to dark mode" : "Switch to light mode"}
- >
- {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
- </button>
- <span className="auth-login-header-label hidden text-[10px] font-semibold uppercase tracking-[0.18em] sm:block">AI design workspace</span>
- <Link href="/signup" className="auth-create-link text-xs font-semibold transition-colors">Create account <ArrowRight className="h-3.5 w-3.5" /></Link>
- </div>
+ <main className={`auth-page auth-login-page auth-soft ${isLight ? "auth-light" : "auth-dark"}`}>
+ <div className="auth-soft-shell">
+ <section className="auth-soft-form-side" aria-label="Sign in to Casynus">
+ <header className="auth-soft-header">
+  <Brand />
+  <div className="auth-soft-header-actions">
+   <button type="button" onClick={toggleTheme} className="auth-theme-toggle auth-soft-theme" aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"} aria-pressed={isLight} title={isLight ? "Switch to dark mode" : "Switch to light mode"}>
+    {isLight ? <Moon size={16} /> : <Sun size={16} />}
+   </button>
+   <Link href="/signup" className="auth-soft-header-link">Create account <ArrowRight size={14} /></Link>
+  </div>
  </header>
 
- <main className="auth-login-main relative z-10 mx-auto grid w-full max-w-[1440px] items-center gap-12 px-5 py-8 sm:px-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(390px,0.85fr)] lg:gap-16 lg:px-12 lg:py-10">
- <section className="auth-showcase relative hidden min-h-[650px] overflow-hidden rounded-[28px] lg:block" aria-label="Casynus AI architecture and CAD studio">
-  <Image src="/Section/architectresectionone.png" alt="Contemporary architectural design by Casynus Studio" fill priority sizes="(max-width: 1200px) 50vw, 58vw" className="auth-showcase-image object-cover" />
-  <div className="auth-showcase-shade absolute inset-0" />
-  <div className="auth-showcase-grid absolute inset-0" />
-  <div className="relative flex h-full flex-col justify-between p-9 xl:p-12">
-   <div className="flex items-center justify-between">
-    <span className="auth-showcase-badge inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[0.16em]"><Sparkles className="h-3.5 w-3.5" /> AI-powered design</span>
-    <span className="auth-showcase-index font-mono text-[11px] tracking-[0.18em]">CASYNUS / 01</span>
-   </div>
-   <div className="max-w-[560px]">
-    <p className="auth-showcase-kicker mb-4 text-[11px] font-semibold uppercase tracking-[0.24em]">Imagine it. Shape it. Build with clarity.</p>
-    <h2 className="auth-showcase-title text-4xl font-semibold leading-[1.04] tracking-[-0.045em] xl:text-[52px]">Your next great space starts with an idea.</h2>
-    <p className="auth-showcase-copy mt-5 max-w-[460px] text-sm leading-6">Bring architecture, interiors and CAD into one intelligent studio— from the first sketch to a detailed 3D vision.</p>
-    <div className="mt-8 flex flex-wrap gap-2.5">
-     <span className="auth-capability-chip"><Layers3 className="h-4 w-4" /> Architecture</span>
-     <span className="auth-capability-chip"><Sparkles className="h-4 w-4" /> AI design</span>
-     <span className="auth-capability-chip"><Box className="h-4 w-4" /> 3D & CAD</span>
-    </div>
-   </div>
-   <div className="auth-showcase-note flex items-center justify-between gap-4 border-t pt-5">
-    <span className="text-xs">A thoughtful workspace for your next project.</span>
-    <span className="font-mono text-[10px] tracking-[0.14em]">DESIGN / VISUALIZE / REFINE</span>
-   </div>
-  </div>
- </section>
-
- <section className="auth-login-form-wrap mx-auto w-full max-w-[460px]">
- <Card className="auth-card auth-login-card w-full rounded-[24px] border shadow-none backdrop-blur-xl">
- <CardHeader className="space-y-3 px-7 pb-6 pt-8 sm:px-9 sm:pt-10">
- <p className="auth-kicker flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em]"><span className="auth-status-dot" /> Casynus Studio / Secure access</p>
- <h1 className="auth-title text-[34px] font-semibold tracking-[-0.05em] sm:text-[38px]">
-  {verificationStep === "credentials" ? "Welcome back." : verificationStep === "code" ? "Check your inbox." : "One last detail."}
- </h1>
- <p className="auth-copy text-sm leading-6">
- {verificationStep === "credentials"
-  ? "Sign in to continue designing with AI, architecture and 3D tools."
-  : verificationStep === "code"
-   ? <>We sent a 6-digit verification code to <strong className="auth-title font-semibold">{email}</strong>.</>
-   : "Enter your age to finish setting up your Casynus Studio account."}
- </p>
- </CardHeader>
+ <div className="auth-soft-form-center">
+ <div className="auth-soft-intro">
+  <div className="auth-soft-intro-mark" aria-hidden="true"><Sparkles size={22} strokeWidth={1.8} /></div>
+  <p className="auth-soft-eyebrow">CASYNUS STUDIO</p>
+  <h1 className="auth-soft-page-title">{verificationStep === "credentials" ? "Welcome back" : verificationStep === "code" ? "Check your inbox" : "One last detail"}</h1>
+  <p className="auth-soft-subtitle">{verificationStep === "credentials" ? "Sign in to continue creating in your workspace." : verificationStep === "code" ? <>Enter the code sent to <strong>{email}</strong>.</> : "Complete your account setup to enter the studio."}</p>
+ </div>
+ <Card className="auth-card auth-login-card auth-soft-card">
  <CardContent className="space-y-5 px-7 pb-8 sm:px-9 sm:pb-10">
  {verificationStep === "code" ? (
   <div className="auth-verification-panel space-y-5">
@@ -302,7 +278,7 @@ export default function LoginPage() {
       <Input id="verificationCode" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={verificationCode} onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, ""))} placeholder="000000" autoComplete="one-time-code" required className="auth-input h-14 rounded-[10px] pl-9 text-center text-xl tracking-[0.35em] shadow-none focus-visible:ring-[#068fff]" />
      </div>
     </div>
-    {error ? <p className="rounded-[10px] border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p> : null}
+    {error ? <p role="alert" className="rounded-[10px] border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p> : null}
     <Button type="submit" disabled={isSubmitting || verificationCode.length !== 6} className="h-11 w-full rounded-[10px] bg-[#068fff] text-sm font-semibold text-white shadow-none hover:bg-[#1b9dff]">
      {isSubmitting ? "Verifying..." : "Verify and open Studio"} <ArrowRight className="h-4 w-4" />
     </Button>
@@ -333,7 +309,7 @@ export default function LoginPage() {
     />
    </div>
    {error ? (
-    <p className="rounded-[10px] border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p>
+    <p role="alert" className="rounded-[10px] border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p>
    ) : null}
    <Button
     type="submit"
@@ -412,12 +388,12 @@ export default function LoginPage() {
  </div>
 
  {error ? (
- <p className="rounded-[10px] border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+ <p role="alert" className="rounded-[10px] border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">
  {error}
  </p>
  ) : null}
  {registered ? (
-  <p className="rounded-[10px] border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+  <p role="status" className="rounded-[10px] border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
    Account created. Sign in to receive your email verification code.
   </p>
  ) : null}
@@ -442,9 +418,19 @@ export default function LoginPage() {
  </p>
  </CardContent>
  </Card>
- <p className="auth-login-privacy mt-5 text-center text-[11px] leading-5">Your projects and account details stay protected.</p>
- </section>
- </main>
+ <p className="auth-login-privacy">Protected access to your projects and account.</p>
  </div>
+ <footer className="auth-soft-footer"><span>© {new Date().getFullYear()} Casynus Studio</span><Link href="/privacy">Privacy</Link></footer>
+ </section>
+
+ <aside className="auth-soft-showcase" aria-label="Casynus Studio overview">
+  <div className="auth-soft-showcase-head"><span className="auth-soft-showcase-label"><span className="auth-soft-showcase-dot" /> THE CREATIVE WORKSPACE</span><Link href="/signup" className="auth-soft-showcase-link">Get started <ArrowRight size={15} /></Link></div>
+  <div className="auth-soft-showcase-copy"><span className="auth-soft-overline">IDEAS INTO BUILT FORM</span><h2>Design your next<br />great space.</h2><p>Bring architecture, interiors and 3D concepts together in one calm workspace. Shape an idea, explore options, and keep moving.</p></div>
+  <div className="auth-soft-art" aria-hidden="true"><div className="auth-soft-art-shadow" /><div className="auth-soft-art-tile"><div className="auth-soft-art-tile-inner"><Bot size={64} strokeWidth={1.35} /></div></div><div className="auth-soft-art-spark auth-soft-art-spark-one"><Sparkles size={15} /></div><div className="auth-soft-art-spark auth-soft-art-spark-two"><Sparkles size={11} /></div></div>
+  <div className="auth-soft-activity" aria-label="Studio capabilities"><div className="auth-soft-activity-row"><span className="auth-soft-activity-icon"><Workflow size={17} /></span><span><strong>Plan a space</strong><small>Move from concept to a working layout</small></span><Check size={16} /></div><div className="auth-soft-activity-row"><span className="auth-soft-activity-icon"><Sparkles size={17} /></span><span><strong>Explore ideas</strong><small>Develop architecture and interior concepts</small></span><Check size={16} /></div><div className="auth-soft-activity-row"><span className="auth-soft-activity-icon"><Activity size={17} /></span><span><strong>Refine the details</strong><small>Keep your creative work in one place</small></span><Check size={16} /></div></div>
+  <div className="auth-soft-showcase-foot"><span>ONE SPACE FOR WHAT’S NEXT</span><span>CASYNUS / STUDIO</span></div>
+ </aside>
+ </div>
+ </main>
  );
 }

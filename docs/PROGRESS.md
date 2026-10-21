@@ -2,6 +2,27 @@
 
 Last updated: 2026-10-21
 
+## Soft login redesign
+
+- Rebuilt `/login` around a light two-panel layout: centered sign-in form on a
+  quiet neutral surface and a blue gradient studio overview with a code-native
+  agent tile and capability cards. At 900px and below the overview yields to
+  the full-width form. The saved dark preference and toggle still work.
+- Preserved Google, GitHub, Discord, password plus email-code verification,
+  age collection, reset-password and signup links. OAuth now carries the safe
+  relative `callbackUrl`; request and sign-in network failures show inline
+  errors. The global sign-in popup stays hidden on auth routes.
+- Installed Chrome browser QA at 1440, 900, and 390 CSS pixels found no
+  horizontal overflow or runtime exceptions. Mocked the login-code endpoint
+  to verify API errors, code-step entry, the six-digit gate, back navigation,
+  and theme persistence. No real account, email delivery, or OAuth round trip
+  was attempted.
+- `npm test` passed (22 tests), `npm run typecheck` passed, focused ESLint on
+  both changed TSX files passed, `git diff --check` passed, and `npm run build`
+  passed (87 static pages). The build retains the existing `useSearchParams()`
+  client-rendering warnings for auth/account routes. Full-project `npm run
+  lint` still fails on pre-existing errors in unrelated files.
+
 ## Resumed studio UI kit and browser-session conversation increment
 
 - Recovered the interrupted work from the dirty tree after `fae23f2`, the
