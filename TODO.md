@@ -37,6 +37,8 @@
   and bottom `StudioAIChat` composer.
 - [x] Remove homepage category chips and redesign the three capability cards
   as inset image frames; verify desktop/tablet/mobile in both themes.
+- [x] Move capability headings onto the card backgrounds, use the supplied
+  wave images, enlarge descriptions to 24px, and align desktop frame edges.
 - [ ] Design authenticated infrastructure-scene persistence within an
   existing workspace/project API. Inspect Prisma project/asset models and
   ownership checks first; decide whether the scene belongs in a project

@@ -60,9 +60,9 @@ const surfaces = [
 ];
 
 const metrics = [
- { label: "Core focus", value: "3D", detail: "architecture, interiors, furniture, and intelligent homes", image: "/Section/architectresectionone.png" },
- { label: "Design areas", value: "05", detail: "architecture, interiors, furniture, visualization, and home robotics", image: "/Section/interior.jpg" },
- { label: "Design coverage", value: "All", detail: "floor plans, 3D models, materials, layouts, and documentation", image: "/Section/infrastruct.png" },
+ { label: "Core focus", value: "3D", detail: "architecture, interiors, furniture, and intelligent homes", image: "/Section/wave0.jpg" },
+ { label: "Design areas", value: "05", detail: "architecture, interiors, furniture, visualization, and home robotics", image: "/Section/wave1.webp" },
+ { label: "Design coverage", value: "All", detail: "floor plans, 3D models, materials, layouts, and documentation", image: "/Section/wave2.jpg" },
 ];
 
 const workflow = [
@@ -190,10 +190,10 @@ export default function HomePage() {
  key={metric.label}
  className="casynus-highlight-frame"
  >
+ <h2 className="casynus-highlight-heading"><strong>{metric.value}</strong><span>{metric.label}</span></h2>
  <div className="casynus-highlight-visual">
  <Image src={metric.image} alt="" fill sizes="(max-width: 700px) 100vw, 33vw" />
  <div className="casynus-highlight-content">
- <h2><strong>{metric.value}</strong><span>{metric.label}</span></h2>
  <p>{metric.detail}</p>
  </div>
  </div>

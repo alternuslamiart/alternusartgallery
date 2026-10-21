@@ -2,6 +2,28 @@
 
 Last updated: 2026-10-21
 
+## Homepage wave-card revision
+
+- Moved the three capability headings above their images onto the card
+  backgrounds, retained the original copy, and set descriptions to 24px.
+  Added the supplied `wave0.jpg`, `wave1.webp`, and `wave2.jpg` in order.
+  The desktop row now spans 1180px, aligned with the feature/CTA frame below.
+- Explicit image-panel widths prevent aspect-ratio/min-height sizing from
+  extending images outside mobile cards. Description and heading sizes
+  override the existing global mobile 12px rule within these cards only.
+- Initial typecheck raced Next dev's regeneration of `.next/types` and
+  reported TS6053 missing generated route files; final checks follow below.
+- Final `npm test` passed (22 tests), `npm run typecheck`, focused ESLint,
+  `git diff --check`, and `npm run build` passed (87 static pages). Existing
+  Browserslist/auth-route warnings remain; the full-project lint errors
+  documented above are outside this change.
+- Installed Chrome verified the final production build at 1440/768/390px
+  in both themes: loaded wave images, headings above images, computed 24px
+  descriptions, three visible cards, content contained by the card frames,
+  no horizontal page overflow, and no runtime exceptions. Visually inspected
+  desktop alignment and the corrected mobile screenshot. Artifacts remain
+  ignored under `.tmp/wave-browser/`.
+
 ## Homepage capability frames
 
 - Removed the five category chips below the homepage hero. Rebuilt Core focus,
