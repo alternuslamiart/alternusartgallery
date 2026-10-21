@@ -23,6 +23,9 @@
   objects. Selection and file actions call the existing editor handlers;
   the classic route retains its previous sidebar. Toolbars and AI docks align
   with the same 12px panel edges using studio-scoped positioning rules.
+- The restored Interior `RightPanel` uses `scenePresentation` to match the
+  3D inspector header and scoped input/section styles. Its original floor-plan
+  handlers and export pipeline remain in place; classic routes retain their UI.
 - The shared 3D canvas is an edge-to-edge background layer under the inset
   sidebars. The center section positions only toolbar/chat/feedback overlays;
   empty space passes pointer events through. Root drop handling retains import

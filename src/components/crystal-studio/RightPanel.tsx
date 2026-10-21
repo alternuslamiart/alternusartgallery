@@ -15,6 +15,7 @@ import {
   Layers3,
   Lightbulb,
   MousePointer2,
+  PanelRight,
   Settings,
   Trash2,
 } from "lucide-react";
@@ -51,6 +52,7 @@ type Props = {
   onExport: (format: string) => void;
   onCollapse: () => void;
   floorPlanMode?: boolean;
+  scenePresentation?: boolean;
   floorPlanSettings?: FloorPlanSettings;
   onFloorPlanSettingsChange?: (settings: FloorPlanSettings) => void;
   selectedFloorPlanObject?: FloorPlanObject;
@@ -165,11 +167,14 @@ export function RightPanel(props: Props) {
 
   return (
     <StudioPanel
-      className="crystal-right-panel studio-sidebar-shell ref-floating-sidebar min-h-0 overflow-y-auto scrollbar-hide"
+      className={`crystal-right-panel studio-sidebar-shell ref-floating-sidebar min-h-0 overflow-y-auto scrollbar-hide ${props.scenePresentation ? "interior-scene-inspector" : ""}`}
       aria-label={props.floorPlanMode ? "Floor plan inspector" : "Studio inspector"}
     >
       {/* Reference Top Collaborator / Invite Header */}
-      <InspectorCollaboratorBar onCollapse={props.onCollapse} />
+      {props.scenePresentation ? <header className="interior-inspector-header">
+        <strong>Properties</strong>
+        <button type="button" aria-label="Collapse inspector" title="Collapse inspector" onClick={props.onCollapse}><PanelRight size={17} /></button>
+      </header> : <InspectorCollaboratorBar onCollapse={props.onCollapse} />}
 
       {/* Hidden utility trigger buttons preserved for event/test compatibility */}
       <div className="crystal-utility-icons sr-only" role="group" aria-label="Viewport utilities">

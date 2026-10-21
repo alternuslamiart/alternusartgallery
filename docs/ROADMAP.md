@@ -6,6 +6,9 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Match Interior's right inspector presentation to the 3D workspaces
+  while preserving architectural plan property controls and exports.
+
 - [x] Align studio overlays with inset panels and give Interior the shared
   sidebar presentation with only project navigation and its real plan tree.
 

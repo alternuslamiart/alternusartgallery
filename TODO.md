@@ -2,6 +2,9 @@
 
 ## Next concrete task
 
+- [x] Match Interior's right inspector to the other studios, keeping actual
+  plan editing and exports; verify dimensions stay within the sidebar.
+
 - [x] Apply the horizontal 1181px reference design to Login and Signup;
   verify responsive themes and mocked form flows without changing auth APIs.
 

@@ -2,6 +2,26 @@
 
 Last updated: 2026-10-21
 
+## Interior right inspector styling
+
+- Interior's drafting inspector now matches the 3D studios' Properties header,
+  collapse icon, panel palette, section spacing, typography and input styling.
+  Removed the extra Copy link/header icon from this presentation. Dimensions
+  use contained vertical rows instead of overflowing paired input pills.
+- Existing plan controls, selection/edit/delete handlers and exports remain;
+  classic editor presentation is unchanged. Styles are scoped to the restored
+  Interior workspace and an explicit `scenePresentation` prop.
+- Typecheck passed; focused lint has no errors and five existing CrystalStudio
+  image warnings. Chrome passed `node scripts/verify-studio-spacing.mjs
+  --interior-only` for 1440/390px dark/light: panel geometry, room creation,
+  selection/deletion, contained room inputs, wall thickness change to 250mm,
+  real inspector JSON export and reopen. Zero runtime exceptions. Screenshots:
+  `.tmp/studio-spacing-1792618797433/`.
+- Earlier full browser runs hit CDP timeouts/resource exhaustion (including
+  PowerShell CoreCLR heap initialization failure); generated QA profiles were
+  removed to recover space and focused Interior checks passed. Production build
+  was not rerun; existing Google Fonts certificate/disk constraints remain.
+
 ## Horizontal Login and Signup reference layout
 
 - Both routes use `AuthShell`: abstract CSS visual panel on the left and
