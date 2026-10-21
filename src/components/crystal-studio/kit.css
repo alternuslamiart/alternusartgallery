@@ -48,8 +48,43 @@ html[data-crystal-theme="light"] :is(.crystal-studio, .crystal-infrastructure-pa
 .cs-button:focus-visible, .crystal-theme-toggle:focus-visible { outline: 2px solid var(--studio-accent); outline-offset: 2px; }
 .cs-button svg { flex-shrink: 0; }
 .cs-panel { display: flex; flex-direction: column; min-width: 0; min-height: 0; isolation: isolate; }
-.cs-header { gap: 4px; flex: 0 0 52px; padding: 8px 10px; border-bottom: 1px solid var(--studio-border); }
-.cs-header-title { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--studio-text-primary); }
+/* Keep the header independent of legacy sidebar typography and height rules. */
+.crystal-studio .cs-panel > .cs-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 72px;
+  height: 72px !important;
+  min-height: 72px;
+  padding: 16px !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+.crystal-studio .cs-header .cs-header-title {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--studio-font) !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  letter-spacing: normal !important;
+  line-height: 20px !important;
+  text-transform: none !important;
+  text-align: center;
+  color: var(--studio-text-primary);
+}
+.crystal-studio .cs-header :is(.cs-button, .crystal-theme-toggle) {
+  width: 36px;
+  height: 36px !important;
+  padding: 0 !important;
+  border: 0;
+  border-radius: 10px;
+  color: var(--studio-text-primary);
+}
+.crystal-studio .cs-header .crystal-theme-toggle { background: var(--studio-bg-elevated); }
+.crystal-studio .cs-header svg { width: 20px; height: 20px; }
 .cs-inspector-header { min-height: 52px; padding: 8px 12px; border-bottom: 1px solid var(--studio-border); }
 .cs-inspector-title { display: flex; align-items: center; gap: 8px; color: var(--studio-text-primary); font-size: 13px; font-weight: 600; }
 .cs-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }

@@ -39,6 +39,8 @@
   as inset image frames; verify desktop/tablet/mobile in both themes.
 - [x] Move capability headings onto the card backgrounds, use the supplied
   wave images, enlarge descriptions to 24px, and align desktop frame edges.
+- [x] Refine the studio sidebar header to the supplied Generative 3D design
+  with readable centered text and evenly sized back/theme/collapse controls.
 - [ ] Design authenticated infrastructure-scene persistence within an
   existing workspace/project API. Inspect Prisma project/asset models and
   ownership checks first; decide whether the scene belongs in a project

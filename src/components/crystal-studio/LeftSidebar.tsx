@@ -197,7 +197,7 @@ export function LeftSidebar(p: Props) {
       />
 
       {/* Reference Top Header */}
-      <StudioHeader title={p.floorPlanMode ? "Interior & Floor Plan" : "Generative 3D Studio"} onBack={p.onBack} onCollapse={p.onCollapse} />
+      <StudioHeader title={p.floorPlanMode ? "Interior & Floor Plan" : "Generative 3D"} onBack={p.onBack} onCollapse={p.onCollapse} />
 
       <StudioModeNav
         activeStudio={p.floorPlanMode ? "floor-plan" : "modeling"}

@@ -2,6 +2,27 @@
 
 Last updated: 2026-10-21
 
+## Studio sidebar header refinement
+
+- Rebuilt the shared modeling/floor-plan sidebar header to match the supplied
+  reference: 72px header, regular centered 14px title, 36px controls with
+  20px icons, a rounded theme button, and no divider under the header.
+  The default modeling title is now `Generative 3D`; selected asset names
+  still replace it. Long titles retain ellipsis and their full title tooltip.
+- Removed legacy reference classes from `StudioHeader` and explicitly scoped
+  its geometry/typography in `kit.css` to override old sidebar rules.
+- `npm test` passed (22 tests), focused ESLint on all three changed TSX files,
+  `npm run typecheck`, `git diff --check`, and `npm run build` passed
+  (87 static pages). Existing Browserslist/auth client-rendering warnings and
+  unrelated full-project lint errors remain as previously documented.
+- Chrome inspected `/casynus` and `/interior` at 1440/768px in both themes:
+  14px regular title, 72px header, contained 36px controls, no horizontal
+  overflow. The existing responsive layout hides these sidebars at 390px;
+  the initial mobile assertion expected a visible header and was corrected
+  to check that existing behavior. Screenshots: `.tmp/header-browser/`.
+- Header theme toggling, collapse, and back-to-project navigation passed;
+  the browser run reported no runtime exceptions.
+
 ## Homepage wave-card revision
 
 - Moved the three capability headings above their images onto the card

@@ -161,7 +161,7 @@ export function ModelingSidebar({
   ];
 
   const activeAssetName =
-    assets.find((a) => a.id === selectedAssetId)?.name ?? "Generative 3D Studio";
+    assets.find((a) => a.id === selectedAssetId)?.name ?? "Generative 3D";
 
   return (
     <StudioPanel

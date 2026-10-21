@@ -26,13 +26,13 @@ export function StudioPanel({ className = "", ...props }: HTMLAttributes<HTMLEle
 export function StudioHeader({ title, onBack, backHref, onCollapse, actions }: {
   title: string; onBack?: () => void; backHref?: string; onCollapse?: () => void; actions?: ReactNode;
 }) {
-  return <header className="ref-sidebar-header cs-header">
-    {backHref ? <Link href={backHref} className="cs-button" data-size="icon" data-variant="ghost" aria-label="Back to projects" title="Back to projects"><ArrowLeft size={15} /></Link>
-      : <StudioButton size="icon" variant="ghost" onClick={onBack} aria-label="Back to projects" title="Back to projects"><ArrowLeft size={15} /></StudioButton>}
-    <span className="ref-project-title cs-header-title" title={title}>{title}</span>
+  return <header className="cs-header">
+    {backHref ? <Link href={backHref} className="cs-button" data-size="icon" data-variant="ghost" aria-label="Back to projects" title="Back to projects"><ArrowLeft size={20} /></Link>
+      : <StudioButton size="icon" variant="ghost" onClick={onBack} aria-label="Back to projects" title="Back to projects"><ArrowLeft size={20} /></StudioButton>}
+    <span className="cs-header-title" title={title}>{title}</span>
     {actions}
     <CrystalThemeToggle />
-    {onCollapse && <StudioButton size="icon" variant="ghost" onClick={onCollapse} aria-label="Collapse panel" title="Collapse panel"><PanelLeftClose size={15} /></StudioButton>}
+    {onCollapse && <StudioButton size="icon" variant="ghost" onClick={onCollapse} aria-label="Collapse panel" title="Collapse panel"><PanelLeftClose size={20} /></StudioButton>}
   </header>;
 }
 
