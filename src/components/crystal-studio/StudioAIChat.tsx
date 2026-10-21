@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowUp, LoaderCircle, Maximize2, Minimize2, Minus, Paperclip, Plus, Sparkles, Square, Trash2, X } from "lucide-react";
+import { ArrowUp, LoaderCircle, Maximize2, Mic, MicOff, Minimize2, Minus, Paperclip, Plus, Radio, Sparkles, Square, Trash2, X } from "lucide-react";
 import { useEffect, useId, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { useSession } from "next-auth/react";
 import { requestStudioAnswer, STUDIO_AI_PROVIDERS } from "@/lib/studio-ai.mjs";
 import { StudioBadge, StudioButton } from "./kit";
 import { useStudioDock } from "./StudioConversation";
+import { useStudioVoice } from "./useStudioVoice";
 
 export type StudioChatMessage = {
   id: string;
@@ -89,7 +90,7 @@ export function StudioAIChat({
   }, [identity]);
 
   const submitPrompt = async (providerOverride?: string) => {
-    if (!prompt.trim() || loading || pendingRequest.current) return;
+    if (!promptRef.current.trim() || loading || pendingRequest.current) return;
     const selectedProvider = providerOverride && STUDIO_AI_PROVIDERS.includes(providerOverride) ? providerOverride : model;
     if (!STUDIO_AI_PROVIDERS.includes(selectedProvider) && !requestAnswer) { onSubmit(); return; }
     if (providerOverride) onModelChange(selectedProvider);
@@ -100,7 +101,7 @@ export function StudioAIChat({
     setRemoteLoading(true);
     setRemoteError(null);
     onClearError?.();
-    const message = prompt.trim();
+    const message = promptRef.current.trim();
     onMessagesChange(current => [...current, { id: crypto.randomUUID(), role: "user", text: message }]);
     onPromptChange("");
     try {
@@ -119,6 +120,12 @@ export function StudioAIChat({
     }
   };
 
+  const voice=useStudioVoice({identity,getDraft:()=>promptRef.current,
+    onDraft:text=>{const bounded=text.slice(0,model==="you"?400:12_000);promptRef.current=bounded;onPromptChange(bounded);},
+    onOpen:()=>{onOpenChange(true);requestAnimationFrame(()=>textareaRef.current?.focus());},
+    onSend:()=>{void submitPrompt();},
+  });
+
   useEffect(() => {
     const submitFromMobileHome = (event: Event) => { void submitPrompt((event as CustomEvent<string>).detail); };
     window.addEventListener("crystal:submit-ai-chat", submitFromMobileHome);
@@ -133,7 +140,7 @@ export function StudioAIChat({
 
   if (!open) return <button type="button" aria-label="Show AI chat" title="Open AI Assistant" aria-expanded={false}
     onClick={() => onOpenChange(true)} className={`crystal-ai-chat-toggle studio-ai-reopen-btn ${className}`}>
-    <Sparkles size={16} /><span>Casynus AI</span>{hasUserMessages && <StudioBadge>{messages.length}</StudioBadge>}
+    <Sparkles size={16} /><span>Casynus AI</span>{voice.mode!=="off"&&<Mic size={13} aria-label="Voice listening enabled" />}{hasUserMessages && <StudioBadge>{messages.length}</StudioBadge>}
   </button>;
 
   return <div id={panelId} className={`crystal-ai-prompt studio-ai-panel cs-chat-dock ${expanded ? "is-expanded" : "is-compact"} ${className}`}
@@ -176,6 +183,11 @@ export function StudioAIChat({
     {displayError && <div className="studio-ai-error" role="alert"><span>{displayError}</span>
       <StudioButton size="icon" variant="ghost" aria-label="Dismiss error" onClick={() => { setRemoteError(null); onClearError?.(); }}><X size={14} /></StudioButton>
     </div>}
+    {voice.error&&<div className="studio-ai-error" role="alert"><span>{voice.error}</span><StudioButton size="icon" variant="ghost" aria-label="Dismiss voice error" onClick={voice.stop}><X size={14} /></StudioButton></div>}
+    {voice.mode!=="off"&&<div className="cs-voice-status" role="status">
+      <Mic size={13} />{!voice.listening?'Starting microphone · allow access if prompted':voice.mode==="wake"?'Listening for “Hey, Casynus”':'Speak your task · say “Send” / “Dërgo”, or review and send'}
+      <StudioButton size="icon" variant="ghost" aria-label="Stop voice listening" title="Stop microphone (Esc)" onClick={voice.stop}><Square size={12} /></StudioButton>
+    </div>}
     <div className="studio-ai-composer">
       <textarea ref={textareaRef} aria-label={studio === "floor-plan" ? "AI floor-plan prompt" : studio === "infrastructure" ? "Message the site assistant" : "AI model prompt"}
         value={prompt} onChange={event => onPromptChange(event.target.value)} rows={2} placeholder={placeholder}
@@ -194,6 +206,9 @@ export function StudioAIChat({
                 event.currentTarget.value = "";
               }} />
           </label>
+          <StudioButton size="icon" variant="ghost" active={voice.mode==="dictation"} aria-label={voice.mode==="dictation"?"Stop voice dictation":"Start voice dictation"} aria-keyshortcuts="Control+Q" title="Voice command (Ctrl + Q)" onClick={voice.toggleDictation}>{voice.mode==="dictation"?<MicOff size={16}/>:<Mic size={16}/>}</StudioButton>
+          <StudioButton size="icon" variant="ghost" active={voice.wakeEnabled} aria-label="Enable Hey Casynus" aria-pressed={voice.wakeEnabled} title={voice.wakeEnabled?'Disable “Hey, Casynus” listening':'Enable “Hey, Casynus” · microphone permission required'} onClick={voice.toggleWake}><Radio size={16}/></StudioButton>
+          <select aria-label="Voice language" className="cs-voice-language" value={voice.language} onChange={event=>voice.changeLanguage(event.target.value)} title="Speech recognition language"><option value="sq-AL">SQ</option><option value="en-US">EN</option><option value="de-DE">DE</option></select>
           <select aria-label="AI mode" className="cs-chat-model" disabled={loading} value={activeModel?.id ?? ""} onChange={event => { setRemoteError(null); onModelChange(event.target.value); }}>
             {availableModels.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}
           </select>

@@ -1,6 +1,30 @@
 # Verified progress
 
-Last updated: 2026-10-21
+Last updated: 2026-10-22
+
+## Casynus AI voice commands
+
+- Added shared studio microphone dictation, opt-in Hey Casynus wake listening,
+  Ctrl + Q activation from minimized chat/input focus, and SQ/EN/DE selection.
+  Recognized text remains editable; a separate Send/Dërgo utterance submits
+  through existing AI/provider adapters. Existing 3D preview approval remains.
+- `studio-voice.mjs` owns recognition sessions, wake filtering, start/permission
+  status, explicit send/cancel, 30-second capture timeout and bounded restarts.
+  `useStudioVoice` binds keyboard/visibility lifecycle and cancels on identity
+  changes/unmount. Voice never starts automatically. Unsupported/browser-service
+  failures are reported without fake transcription. See `VOICE-COMMANDS.md`.
+- 13 focused voice/AI tests passed; typecheck passed; focused lint passed with
+  one existing image warning. Chrome passed all four studio routes: Ctrl + Q,
+  minimized wake, ambient filtering, transcript editing, exactly one voice
+  submission, real 3D proposal preview, permission error and background stop.
+  Also checked mobile Interior dictation/control bounds and unsupported browser.
+  Zero runtime exceptions. Speech/session/provider APIs were mocked; physical
+  microphone and live speech/provider services were not exercised. Artifacts:
+  `.tmp/studio-voice-1792619909808/`. Reproduce with
+  `node scripts/verify-studio-voice.mjs`.
+- Production build not rerun: existing Google Fonts certificate and limited disk
+  constraints persist. Next deployment check: physical microphone permission,
+  wake accuracy and Albanian/English/German recognition on the target browser.
 
 ## Interior right inspector styling
 

@@ -71,6 +71,12 @@
   and 1,000,000 characters. Account changes clear the visible conversation
   without remounting scenes. This is tab-local recovery, not a workspace
   authorization boundary or synchronization with `/aichat` session tables.
+- `lib/studio-voice.mjs` isolates browser speech sessions from AI execution;
+  `useStudioVoice` connects the shared studio dock to Ctrl + Q and opt-in wake
+  listening. Only transcripts enter the composer; explicit spoken Send uses
+  the existing submit adapter and scene validation/approval. Sessions stop on
+  account changes, unmount and document hiding. No audio API/database storage
+  or new provider keys are added. See `VOICE-COMMANDS.md` for browser limits.
 - The shared dock now sends Gemini/Groq/You text requests through
   `/api/ai-chat` using the client-only `src/lib/studio-ai.mjs` request helper.
   Gemini is the initial selection. Existing scene commands, floor-plan layout,

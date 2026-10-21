@@ -44,6 +44,9 @@ requirements provide new evidence.
 
 ## P2 — Existing platform integration
 
+- [x] Add browser voice dictation, opt-in Hey Casynus wake and Ctrl + Q to
+  studio AI docks. Physical microphone/browser-service verification is pending.
+
 - [x] Match Login and Signup to the horizontal reference with a shared
   1181px maximum frame, responsive stacking and preserved auth handlers.
 

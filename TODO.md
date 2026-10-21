@@ -1,6 +1,11 @@
-# Next tasks (reviewed 2026-10-21)
+# Next tasks (reviewed 2026-10-22)
 
 ## Next concrete task
+
+- [x] Add opt-in Hey Casynus voice commands and Ctrl + Q to the shared studio
+  AI dock, preserving provider submission and scene preview approval.
+- [ ] Verify physical microphone permission, wake accuracy and SQ/EN/DE
+  recognition in deployed target browsers; current voice tests inject results.
 
 - [x] Match Interior's right inspector to the other studios, keeping actual
   plan editing and exports; verify dimensions stay within the sidebar.
