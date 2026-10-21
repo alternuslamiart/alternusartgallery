@@ -2,6 +2,41 @@
 
 Last updated: 2026-10-21
 
+## Shared real 3D modeling workflow
+
+- Added the default R3F/Three.js workbench to Architecture, Interior and
+  Infrastructure, preserving previous editors under `?workspace=classic`.
+  Real meshes, transform gizmos, material/light inspectors, editable studio
+  templates, hierarchy, undo/redo, import/export and IndexedDB recovery work
+  through one validated scene document. See `docs/SCENE-STUDIOS.md` for scope.
+- Added authenticated workspace/user-scoped cloud snapshots with atomic
+  revisions and conflict handling; API tests use mocked Prisma/auth. Live
+  signed-in cloud save/reopen/logout/login remains unverified.
+- Gemini/Groq native tool proposals are independently validated on server and
+  browser, previewed before Apply, and committed as one undoable action. Native
+  request/response tests use mocked HTTP; You remains research text chat.
+- Final `npm test`: 55 passed, including group/ungroup world-transform and
+  ancestor-lock checks. TypeScript and focused ESLint passed. Real Chrome
+  verified object transformations, undo/redo, all seven downloaded formats,
+  refresh recovery, same-document studio switching, three generated templates,
+  correct viewport/inspector bounds and no mobile horizontal overflow; zero
+  JavaScript exceptions. `scripts/verify-scene-studios.mjs` reproduces this.
+- Advanced mesh editing, semantic CAD constraints, terrain/curved road editing,
+  path tracing/AO and full production acceptance remain unfinished; unavailable
+  menu tools are explicitly marked. This is the first working end-to-end 3D
+  increment, not completion of the entire master specification.
+- Build attempts encountered Google Fonts certificate verification in a
+  duplicate legacy font configuration (removed in favor of the root font),
+  then disk ENOSPC. Removed only generated QA Chrome profiles, freeing 300 MB.
+  `npm run build` then hit Prisma DLL `EPERM` during generation; an existing
+  process holds the client DLL. The first separate `npx next build` exhausted
+  Windows memory (`memory allocation of 49152 bytes failed`, exit 3221226505).
+  After removing only `.next/cache/webpack` (about 900 MB), geometry tests
+  passed. The final `npx next build` failed downloading root Roboto/Roboto Flex
+  with `UNABLE_TO_VERIFY_LEAF_SIGNATURE`. Production build is NOT verified;
+  restore a trusted Node certificate chain and rerun on a host with free disk
+  and an unlocked Prisma DLL. TLS verification was not disabled.
+
 ## Gemini, Groq and You chat connections
 
 - Production probes on the canonical `https://www.alternusart.com` origin

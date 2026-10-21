@@ -32,6 +32,7 @@ type StudioAIChatProps = {
   models?: StudioChatModelOption[];
   messages?: StudioChatMessage[];
   onMessagesChange?: Dispatch<SetStateAction<StudioChatMessage[]>>;
+  requestAnswer?: typeof requestStudioAnswer;
   onClearMessages?: () => void;
   onNewChat?: () => void;
   referenceImage?: string | null;
@@ -56,7 +57,7 @@ const STUDIO_NAMES = { modeling: "3D Studio", "floor-plan": "Interior", infrastr
 export function StudioAIChat({
   studio, open, onOpenChange, prompt, onPromptChange, onSubmit, onStop,
   loading: workspaceLoading = false, progress = 0, error, onClearError, model, onModelChange,
-  models, messages = [], onMessagesChange, referenceImage, onAttachImage, onRemoveImage, onNewChat, onClearMessages, statusLabel,
+  models, messages = [], onMessagesChange, requestAnswer, referenceImage, onAttachImage, onRemoveImage, onNewChat, onClearMessages, statusLabel,
   quickPrompts = [], onQuickPrompt, placeholder = "What do you want to create?", className = "",
 }: StudioAIChatProps) {
   const { expanded, setExpanded } = useStudioDock();
@@ -103,7 +104,7 @@ export function StudioAIChat({
     onMessagesChange(current => [...current, { id: crypto.randomUUID(), role: "user", text: message }]);
     onPromptChange("");
     try {
-      const result = await requestStudioAnswer({ provider: selectedProvider, message, messages, signal: controller.signal });
+      const result = await (requestAnswer ?? requestStudioAnswer)({ provider: selectedProvider, message, messages, signal: controller.signal });
       if (controller.signal.aborted || identityRef.current !== requestIdentity) return;
       const sources = result.citations?.length ? `\n\nSources:\n${result.citations.map(item => item.source).join("\n")}` : "";
       onMessagesChange(current => [...current, { id: crypto.randomUUID(), role: "assistant", text: result.message + sources, meta: `${result.provider} · ${result.model}` }]);

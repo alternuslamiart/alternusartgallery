@@ -2,6 +2,18 @@
 
 ## Application
 
+- The default `/casynus`, `/interior`, `/infrastructure` routes now use
+  `components/scene-studio/SceneWorkbench.tsx` and the real R3F viewport.
+  `lib/scene/document.mjs` validates versioned metric documents and allowlisted
+  AI operations; `geometry.mjs` owns real meshes, import/export and disposal.
+  `useSceneDocument.ts` coordinates undo, IndexedDB recovery and cloud autosave.
+  `/api/studio-projects` uses authenticated workspace/user scope and atomic
+  revisions; snapshots reuse `BlenderProject.settings` with a `casynus-scene`
+  discriminator plus a canonical CAD Project. No Blender job is invoked.
+  `/api/ai-scene` proposes native Gemini/Groq function calls; browser Apply is
+  required. See `SCENE-STUDIOS.md` for actual capabilities and limitations.
+  Previous editors remain available under `?workspace=classic`.
+
 - The primary web application is Next.js 14 with the App Router, React 18,
   TypeScript, and Tailwind CSS.
 - `src/app/**` contains pages and route handlers. API endpoints use explicit
@@ -13,7 +25,7 @@
   routes. This client UI does not replace server-side authentication checks.
 - `/infrastructure` is the canonical infrastructure editor route;
   `/infrastructur` currently re-exports the same page for compatibility.
-- `/casynus` renders the Casynus modeling workspace from
+- `/casynus?workspace=classic` renders the previous modeling workspace from
   `src/components/crystal-studio/CrystalStudio.tsx`; the legacy `/crystal`
   route redirects to `/casynus` while preserving query parameters. Its modeling
   sidebar, viewport, and output panel are separate components; the viewport

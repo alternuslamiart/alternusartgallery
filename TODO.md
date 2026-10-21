@@ -2,6 +2,14 @@
 
 ## Next concrete task
 
+- [ ] Verify `/api/studio-projects` with a real signed-in staging account:
+  save, reload, logout/login, two-tab conflict and foreign workspace access.
+  Verify native Gemini/Groq scene proposals on the deployed models. Current
+  route tests mock auth/database/providers; see `docs/SCENE-STUDIOS.md`.
+- [ ] Extend the shared scene editor with true mesh component operations,
+  architectural constraints and terrain/road editing; complete remaining
+  acceptance checks and performance profiling listed in that status document.
+
 - [ ] Verify the redesigned `/login` against real configured OAuth providers,
   email-code delivery, age collection, and an authenticated callback in a
   staging environment; local browser QA used a mocked code endpoint.

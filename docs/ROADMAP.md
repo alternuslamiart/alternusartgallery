@@ -6,10 +6,17 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Deliver a shared real 3D modeling workflow across all three studios:
+  editable templates, genuine transforms, PBR, import/export, recovery,
+  scoped snapshot API and validated AI preview. See `SCENE-STUDIOS.md`.
+- [ ] Verify live authenticated cloud scene save/reopen and native AI tools;
+  complete CAD mesh editing, semantic constraints and rendering optimization.
+
 - [x] Persist the Infrastructure Studio scene across browser reloads using
   versioned, validated browser-local autosave.
-- [ ] Add authenticated workspace/project persistence for Infrastructure Studio
-  after the project association and database representation are designed.
+- [x] Implement authenticated snapshots for the new shared Infrastructure
+  workbench. Legacy site-editor persistence remains browser-local; live cloud
+  deployment verification is pending.
 - [ ] Verify the Infrastructure Studio in a browser, including WebGL
   availability, responsive side panels, camera interaction, selection,
   transforms, lighting, and local autosave recovery.
