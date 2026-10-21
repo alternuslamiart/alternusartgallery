@@ -35,8 +35,8 @@
   at desktop and mobile widths, including the daylight 3D/2D viewports,
   floating frosted-porcelain sidebars, top pill toolbar, `BinaryToggle` pills,
   and bottom `StudioAIChat` composer.
-- [ ] Verify homepage category-chip centering and wrapping at narrow and wide
-  mobile viewport widths in a browser.
+- [x] Remove homepage category chips and redesign the three capability cards
+  as inset image frames; verify desktop/tablet/mobile in both themes.
 - [ ] Design authenticated infrastructure-scene persistence within an
   existing workspace/project API. Inspect Prisma project/asset models and
   ownership checks first; decide whether the scene belongs in a project

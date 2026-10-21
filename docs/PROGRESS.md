@@ -2,6 +2,31 @@
 
 Last updated: 2026-10-21
 
+## Homepage capability frames
+
+- Removed the five category chips below the homepage hero. Rebuilt Core focus,
+  Design areas, and Design coverage as rounded frames with inset architecture,
+  interior, and infrastructure images, overlay headings, and the original
+  values and descriptions. All three cards now remain visible on mobile.
+- Styles are scoped in `src/app/home-highlights.css`; light frames are pale
+  gray and dark frames charcoal. Existing local images are reused.
+- `npm test` passed (22 tests), `npm run typecheck`, focused ESLint on
+  `src/app/page.tsx`, and `git diff --check` passed. Full `npm run lint`
+  fails on existing unrelated unused-symbol/prefer-const errors.
+- Installed Chrome checked 1440, 768, and 390 CSS pixels in both themes:
+  three visible cards, loaded images, text inside frames, removed chips,
+  no horizontal overflow, and no runtime exceptions. Screenshots are under
+  ignored `.tmp/home-browser/`. Dev uses fallback fonts because Google Fonts
+  downloads report `UNABLE_TO_VERIFY_LEAF_SIGNATURE`.
+- After the final frame-color adjustment, visually inspected the desktop
+  light screenshot; a repeat browser sweep stopped on its second navigation
+  with `CDP timeout: Page.navigate`. The first full sweep passed; repeat the
+  sweep against a fresh local server if further browser changes are made.
+- `npm run build` passed (87 static pages). The first attempt failed with
+  Prisma `EPERM` renaming `query_engine-windows.dll.node`; stopping the
+  temporary port-3003 server released the lock and the retry passed. Existing
+  auth/account client-rendering and Browserslist warnings remain.
+
 ## Soft login redesign
 
 - Rebuilt `/login` around a light two-panel layout: centered sign-in form on a

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import "./home-highlights.css";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -59,9 +60,9 @@ const surfaces = [
 ];
 
 const metrics = [
- { label: "Core focus", value: "3D", detail: "architecture, interiors, furniture, and intelligent homes" },
- { label: "Design areas", value: "05", detail: "architecture, interiors, furniture, visualization, and home robotics" },
- { label: "Design coverage", value: "All", detail: "floor plans, 3D models, materials, layouts, and documentation" },
+ { label: "Core focus", value: "3D", detail: "architecture, interiors, furniture, and intelligent homes", image: "/Section/architectresectionone.png" },
+ { label: "Design areas", value: "05", detail: "architecture, interiors, furniture, visualization, and home robotics", image: "/Section/interior.jpg" },
+ { label: "Design coverage", value: "All", detail: "floor plans, 3D models, materials, layouts, and documentation", image: "/Section/infrastruct.png" },
 ];
 
 const workflow = [
@@ -180,37 +181,24 @@ export default function HomePage() {
    <span aria-hidden="true" className="crystal-intro-play-button"><Play size={76} fill="currentColor" strokeWidth={1} /></span>
   </button>
  </div></div>
- <div className="crystal-first-chips crystal-home-categories">{[tr.architecture, tr.interior, tr.furniture, tr.infrastructure, tr.visualization].map((item) => <span key={item}>{item}</span>)}</div>
  </section>
 
- <section data-crystal-reveal style={{ padding: "42px 0 92px" }}>
- <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 32px" }}>
- <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+ <section data-crystal-reveal className="casynus-home-highlights" aria-label="Casynus design capabilities">
+ <div className="casynus-highlight-grid">
  {metrics.map((metric) => (
  <article
  key={metric.label}
- className={`crystal-core-metric crystal-core-metric-${metric.value.toLowerCase()}`}
- style={{
- padding: 28,
- border: "0",
- borderRadius: 12,
- background: t.raised,
- minHeight: 210,
- display: "flex",
- flexDirection: "column",
- justifyContent: "space-between",
- }}
+ className="casynus-highlight-frame"
  >
- <div style={{ fontSize: 11, color: t.muted, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase" }}>{metric.label}</div>
- <div>
- <div style={{ fontSize: 76, fontWeight: 900, letterSpacing: "-0.06em", lineHeight: 0.9, color: COBALT, fontStretch: "82%" }}>
- {metric.value}
+ <div className="casynus-highlight-visual">
+ <Image src={metric.image} alt="" fill sizes="(max-width: 700px) 100vw, 33vw" />
+ <div className="casynus-highlight-content">
+ <h2><strong>{metric.value}</strong><span>{metric.label}</span></h2>
+ <p>{metric.detail}</p>
  </div>
- <p style={{ margin: "16px 0 0", fontSize: 14, color: t.muted, lineHeight: 1.55 }}>{metric.detail}</p>
  </div>
  </article>
  ))}
- </div>
  </div>
  </section>
 
