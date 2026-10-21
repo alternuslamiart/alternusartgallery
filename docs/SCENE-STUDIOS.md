@@ -1,5 +1,15 @@
 # Shared 3D studios — engineering status
 
+## Provider integration update
+
+Real Meshy/Tripo frontend/backend job adapters, authenticated persistence,
+progress/resume and GLB preview/apply are now implemented. Gemini/Groq scene
+mode executes validated transform/material/environment operations. See
+`AI3D-SETUP.md` for key names, routes, limits and deployment checks. Live paid
+provider/database verification is still pending; automated and browser tests
+use mocked upstream HTTP with real geometry. Existing advanced CAD limitations
+listed below still apply.
+
 ## UI correction after the initial increment
 
 The user's clarified request restores `/interior` as the original 2D drafting

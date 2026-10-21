@@ -2,6 +2,48 @@
 
 Last updated: 2026-10-21
 
+## Real 3D provider frontend/backend integration
+
+- Added server-only Meshy v2 (preview + PBR refinement) and Tripo v3
+  text-to-model adapters, following their official current API documentation.
+  Configured providers appear in the existing 3D assistant through
+  `/api/ai3d/providers`; no API keys reach the browser. Setup and exact
+  deployment steps are in `docs/AI3D-SETUP.md` and `.env.example`.
+- Authenticated job creation, status polling, listing/resume and a bounded
+  asset proxy use existing `AIProviderJob` storage. Every query scopes workspace
+  AND user; project ownership is checked. Requests persist before provider
+  submission; unique request IDs prevent duplicates. Atomic Meshy refinement
+  claims prevent concurrent polls from submitting a second texture task.
+  Ambiguous provider submissions are not automatically retried.
+- Frontend downloads and validates GLB, imports real editable meshes/materials,
+  previews without committing, and applies in one undoable operation. Generation
+  jobs can resume after interruption without another paid submission. CDN
+  downloads have a 20 MB bound; same-origin proxy has a 4 MB bound for Vercel.
+  Added only official provider asset domains to the existing CSP allowlist.
+- Gemini/Groq structured scene mode now starts enabled in 3D workspaces and
+  supports validated transforms, group material propagation, PBR properties,
+  template placement and sunlight/render settings. You remains research chat.
+  The original Interior 2D sketcher remains unchanged; 3D uses
+  `/interior?workspace=3d`.
+- `npm test`: 67 passed; typecheck passed; focused lint has zero errors and
+  one existing image warning. Tests exercise provider request contracts,
+  persistence/idempotency, refinement races, project scope, aborts, invalid
+  assets and real GLB import/apply/undo. Provider HTTP/database adapters are
+  mocked in these tests; no live paid Meshy/Tripo call is claimed.
+- Installed Chrome passed Architecture, Infrastructure and Interior 3D:
+  Meshy selection, job progress, real GLB preview, Apply, Undo, job resume with
+  no new POST, Discard and Gemini structured proposals. HTTP providers/jobs
+  were intercepted; genuine GLB parsing/Three.js rendering were exercised.
+  Zero runtime exceptions. Artifacts: `.tmp/ai3d-browser-1792615278282/`.
+  Reproducible script: `scripts/verify-ai3d-studios.mjs`.
+- Real local HTTP probes returned capabilities 200 and unauthenticated job
+  creation 401. Live signed-in database generation/save/reopen and actual
+  Meshy/Tripo model access remain deployment checks after keys/credits exist.
+- Google Fonts still fails local certificate validation
+  (`UNABLE_TO_VERIFY_LEAF_SIGNATURE`); dev uses fallback fonts. Disk capacity
+  also limited browser/build work; only generated QA profiles/cache were
+  cleaned. Production build was not rerun with these known environment blockers.
+
 ## Full-window design canvas behind inset panels
 
 - Moved the shared real 3D viewport out of the center controls section into

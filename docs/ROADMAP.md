@@ -6,6 +6,10 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Connect real 3D provider jobs, progress/recovery, GLB import/preview/undo
+  and server-only key discovery. Meshy/Tripo adapters and deployment setup
+  are implemented; live paid-provider/database verification remains pending.
+
 - [x] Extend the real design canvas behind inset sidebars and padding while
   keeping editor controls above it; remove the extra Infrastructure editor link.
 - [x] Share the original Infrastructure toolbar appearance across studios,

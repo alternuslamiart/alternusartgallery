@@ -91,7 +91,7 @@ export function StudioAIChat({
   const submitPrompt = async (providerOverride?: string) => {
     if (!prompt.trim() || loading || pendingRequest.current) return;
     const selectedProvider = providerOverride && STUDIO_AI_PROVIDERS.includes(providerOverride) ? providerOverride : model;
-    if (!STUDIO_AI_PROVIDERS.includes(selectedProvider)) { onSubmit(); return; }
+    if (!STUDIO_AI_PROVIDERS.includes(selectedProvider) && !requestAnswer) { onSubmit(); return; }
     if (providerOverride) onModelChange(selectedProvider);
     if (!onMessagesChange) { setRemoteError("This workspace cannot receive AI replies."); return; }
     const requestIdentity = identity;

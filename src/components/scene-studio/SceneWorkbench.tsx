@@ -11,9 +11,10 @@ import { StudioAIChat } from "@/components/crystal-studio/StudioAIChat";
 import { useStudioConversation, useStudioDock } from "@/components/crystal-studio/StudioConversation";
 import { applyCommands, createTemplate, makeDocument, makeObject, MATERIALS, validateDocument, type SceneCommand, type SceneDocument, type SceneObject, type Vec3 } from "@/lib/scene/document.mjs";
 import { duplicateObjects, exportScene, importModel, regroupObjects } from "@/lib/scene/geometry.mjs";
-import type { requestStudioAnswer } from "@/lib/studio-ai.mjs";
+import { requestStudioAnswer } from "@/lib/studio-ai.mjs";
 import { listRecovery } from "@/lib/scene/recovery";
 import { StudioViewportToolbar, downloadStudioCSV } from "@/components/crystal-studio/StudioViewportToolbar";
+import { generate3DModel, type Generation3DJob } from "@/lib/ai3d/client.mjs";
 import "./scene-studio.css";
 
 type Studio = "architecture" | "interior" | "infrastructure";
@@ -21,7 +22,7 @@ const routes = { architecture: "/casynus", interior: "/interior", infrastructure
 const names = { architecture: "Architecture", interior: "Interior Design", infrastructure: "Infrastructure" };
 const providers = [{ id: "gemini", label: "Gemini" }, { id: "groq", label: "Groq" }, { id: "you", label: "You" }];
 const catalog = ["Box", "Sphere", "Cylinder", "Wall", "Floor slab", "Ceiling", "Roof", "Column", "Beam", "Door", "Window", "Sofa", "Coffee table", "Cabinet", "Stairs", "Road", "Sidewalk", "Bridge", "Streetlight", "Tree", "Point light", "Spot light"];
-const fingerprint = (d: SceneDocument) => JSON.stringify([d.objects, d.environment]);
+const fingerprint = (d: SceneDocument) => JSON.stringify([d.id, d.objects, d.environment]);
 function download(blob: Blob, name: string) {
   const url = URL.createObjectURL(blob), link = document.createElement("a");
   link.href = url; link.download = name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -78,7 +79,12 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const [busy, setBusy] = useState(""), [error, setError] = useState<string | null>(null), [openProjects, setOpenProjects] = useState<Array<{ id: string; name: string; local?: boolean }> | null>(null);
   const [cameraView, setCameraView] = useState("Perspective");
   const [stories, setStories] = useState(2), [search, setSearch] = useState(""), [textureSlot, setTextureSlot] = useState("map");
-  const [prompt, setPrompt] = useState(""), [model, setModel] = useState("gemini"), [sceneAI, setSceneAI] = useState(false);
+  const [prompt, setPrompt] = useState(""), [model, setModel] = useState("gemini"), [sceneAI, setSceneAI] = useState(true);
+  const [meshProviders, setMeshProviders] = useState<Array<{ id: string; label: string }>>([]);
+  const [generationJobs, setGenerationJobs] = useState<Generation3DJob[] | null>(null);
+  const resumeController = useRef<AbortController | null>(null);
+  const meshProvider = model === "meshy" || model === "tripo";
+  useEffect(() => { const controller = new AbortController(); void fetch("/api/ai3d/providers", { signal: controller.signal, cache: "no-store" }).then(r => r.ok ? r.json() : null).then(data => { if (data && !controller.signal.aborted) setMeshProviders(data.providers.filter((p: { id: string }) => ["meshy", "tripo"].includes(p.id))); }).catch(() => {}); return () => { controller.abort(); resumeController.current?.abort(); }; }, []);
   const [pending, setPending] = useState<{ commands: SceneCommand[]; preview: SceneDocument; base: string } | null>(null);
   const [messages, setMessages] = useStudioConversation([]);
   const dock = useStudioDock();
@@ -142,10 +148,44 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     try { await store.recover(); store.replace(makeDocument(studio)); setSelected([]); setPending(null); }
     catch { setError("Recovery failed. Save or download this project before creating another."); }
   };
+  const listGenerationJobs = async () => {
+    try {
+      const response = await fetch(`/api/ai3d/jobs?project=${encodeURIComponent(doc.id)}`, { cache: "no-store" });
+      const data = await response.json(); if (!response.ok) throw new Error(typeof data.error === "string" ? data.error : data.error?.message || "Sign in to view generation jobs.");
+      setGenerationJobs(data.jobs);
+    } catch (caught) { setError(caught instanceof Error ? caught.message : "Jobs unavailable."); }
+  };
+  const prepareGeneratedModel = async (request: { provider?: string; message?: string; signal?: AbortSignal; resumeId?: string }) => {
+    const base = fingerprint(doc), projectId = doc.id;
+    if (pending) throw new Error("Apply or discard the current preview first.");
+    setError(null);
+    try {
+      const { job, buffer } = await generate3DModel({ provider: request.provider, prompt: request.message, projectId, studio, signal: request.signal, resumeId: request.resumeId, onProgress: job => { setBusy(job.status === "IMPORTING" ? "Importing generated GLB…" : `${job.provider} · ${Math.round(job.progress)}% · ${job.status.toLowerCase()}`); setGenerationJobs(current => current?.map(previous => previous.id === job.id ? job : previous) ?? null); } });
+      const objects = await importModel(buffer, "AI_generated.glb");
+      if (!objects.some(o => ["mesh", "box", "sphere", "cylinder"].includes(o.kind))) throw new Error("The generated GLB contains no editable mesh geometry.");
+      request.signal?.throwIfAborted();
+      if (fingerprint(docRef.current) !== base) throw new Error("Project changed during generation. Resume this result from AI generation jobs to preview it in the current scene.");
+      if (objects[0]) objects[0].name = `AI · ${job.prompt.slice(0, 90)}`;
+      const preview = validateDocument({ ...doc, objects: [...doc.objects, ...objects] });
+      setPending({ commands: [{ type: "create", kind: "mesh", name: `${job.provider} generated GLB` }], preview, base });
+      setGenerationJobs(null); requestAnimationFrame(() => viewport.current?.fit());
+      return { message: "The 3D provider generated a real GLB model. Review the editable preview, then choose Apply or Discard. Applying is undoable; the source remains available in AI generation jobs.", provider: job.provider, model: job.model };
+    } finally { setBusy(""); }
+  };
+  const resumeGeneration = async (id: string) => {
+    resumeController.current?.abort(); const controller = new AbortController(); resumeController.current = controller;
+    try { await prepareGeneratedModel({ resumeId: id, signal: controller.signal }); }
+    catch (caught) { if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : "Generation could not be resumed."); }
+    finally { if (resumeController.current === controller) resumeController.current = null; }
+  };
+
   const requestSceneAnswer: typeof requestStudioAnswer = async request => {
+    if (request.provider === "you") return await requestStudioAnswer(request);
+    if (["meshy", "tripo"].includes(request.provider)) return await prepareGeneratedModel(request);
     const base = fingerprint(doc);
     const response = await fetch("/api/ai-scene", { method: "POST", headers: { "Content-Type": "application/json" }, signal: request.signal, body: JSON.stringify({ provider: request.provider, prompt: request.message, document: doc, selected }) });
     const data = await response.json(); if (!response.ok) throw new Error(data.error || "Scene proposal failed.");
+    request.signal?.throwIfAborted();
     if (fingerprint(docRef.current) !== base) throw new Error("The scene changed while AI was planning. Request an updated proposal.");
     const preview = applyCommands(doc, data.commands); setPending({ commands: data.commands, preview, base });
     return { message: `Proposed ${data.commands.length} validated scene operations. Review the viewport preview and choose Apply or Discard. Nothing has been saved or applied yet.`, provider: data.provider, model: data.model };
@@ -180,7 +220,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       <nav className="scene-studio-nav" aria-label="Design studios">{(Object.keys(routes) as Studio[]).map(s => <button key={s} className={s === studio ? "is-active" : ""} onClick={() => void navigate(s)}>{s === "architecture" ? "Architecture" : s === "interior" ? "Interior" : "Infra"}</button>)}</nav>
       <div className="scene-project-row"><input aria-label="Project name" key={doc.id + doc.name} defaultValue={doc.name} maxLength={120} onBlur={e => { if (e.target.value.trim() !== doc.name) safely(() => change({ ...doc, name: e.target.value.trim() })); }} /><button aria-label="Open projects" onClick={() => void listProjects()}><FolderOpen size={16} /></button>
         <details className="scene-project-actions"><summary aria-label="Project actions" title="Project actions"><MoreHorizontal size={18} /></summary><div className="scene-project-actions-content" onClick={e => { if ((e.target as HTMLElement).closest("button:not(:disabled)")) e.currentTarget.parentElement?.removeAttribute("open"); }}>
-      <Menu name="File"><button onClick={() => void newProject()}>New project</button><button onClick={() => void listProjects()}>Open workspace project</button><button onClick={() => void store.save()}>Save · Ctrl S</button><button onClick={() => { store.saveCopy(); setPending(null); }}>Save as copy</button><button onClick={() => file.current?.click()}>Import model / JSON</button><button onClick={() => void exportFile("json")}>Download project JSON</button></Menu>
+      <Menu name="File"><button onClick={() => void newProject()}>New project</button><button onClick={() => void listProjects()}>Open workspace project</button><button onClick={() => void listGenerationJobs()}>AI generation jobs</button><button onClick={() => void store.save()}>Save · Ctrl S</button><button onClick={() => { store.saveCopy(); setPending(null); }}>Save as copy</button><button onClick={() => file.current?.click()}>Import model / JSON</button><button onClick={() => void exportFile("json")}>Download project JSON</button></Menu>
       <Menu name="Edit"><button disabled={blocked || !store.history.past.length} onClick={store.undo}>Undo · Ctrl Z</button><button disabled={blocked || !store.history.future.length} onClick={store.redo}>Redo · Ctrl Shift Z</button><button disabled={blocked || !selected.length} onClick={duplicate}>Duplicate · Ctrl D</button><button disabled={blocked || !selected.length} onClick={remove}>Delete selected</button><button disabled={blocked || selected.length < 2} onClick={() => group()}>Group selection</button><button disabled={blocked || primary?.kind !== "group"} onClick={() => group(true)}>Ungroup</button><button disabled={blocked || selected.length < 2} onClick={() => safely(() => { if (doc.objects.some(o => selected.includes(o.id) && locked(o))) throw new Error("Unlock objects and their parents first."); change({ ...doc, objects: doc.objects.map(o => selected.includes(o.id) ? { ...o, position: [primary!.position[0], o.position[1], o.position[2]] } : o) }); })}>Align selected local X</button></Menu>
       <Menu name="View"><button onClick={() => viewport.current?.fit()}>Frame all</button><button onClick={() => viewport.current?.focus()}>Focus selected · F</button><button onClick={() => setGrid(v => !v)}>{grid ? "Hide" : "Show"} grid</button><button onClick={() => store.setCamera({ ...doc.camera, projection: doc.camera.projection === "perspective" ? "orthographic" : "perspective" })}>{doc.camera.projection === "perspective" ? "Orthographic" : "Perspective"} projection</button></Menu>
       <Menu name="Tools">{(["select", "translate", "rotate", "scale", "measure"] as SceneTool[]).map(t => <button key={t} disabled={blocked} onClick={() => setTool(t)}>{t}</button>)}<button onClick={() => setSnap(v => !v)}>{snap ? "Disable" : "Enable"} grid snapping</button>{["Vertex / edge / face editing", "Extrude / inset / bevel", "Vertex / surface snapping"].map(t => <button key={t} disabled title="Unavailable in this release">{t} · unavailable</button>)}</Menu>
@@ -226,8 +266,8 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       {(error || store.failure) && <div className="scene-alert" role="alert"><span>{error || store.failure}</span>{store.conflict && <><button onClick={() => { if (window.confirm("Open the cloud revision and replace this browser recovery? Save a recovered copy first to retain both versions.")) window.location.href = `${routes[studio]}?project=${doc.id}&cloud=1`; }}>Open cloud copy</button><button onClick={store.saveCopy}>Save recovered copy</button></>}<button aria-label="Dismiss scene error" onClick={() => { setError(null); if (!store.conflict) store.setFailure(null); }}><X size={15} /></button></div>}
       {busy && <div className="scene-busy" role="status">{busy}</div>}
       {pending && <div className="scene-proposal" role="dialog" aria-label="Review AI scene proposal"><strong>Preview · changes are not applied</strong><ol>{pending.commands.map((c, i) => <li key={i}>{c.type} {c.template || c.name || c.id || c.kind || "lighting"}</li>)}</ol><div><button onClick={applyProposal}>Apply scene proposal</button><button onClick={() => setPending(null)}>Discard proposal</button></div></div>}
-      <div className="scene-chat-mode"><label><input type="checkbox" checked={sceneAI} disabled={model === "you" || Boolean(pending)} onChange={e => setSceneAI(e.target.checked)} />AI scene commands · preview first</label>{model === "you" && <small>You: research chat</small>}</div>
-      <StudioAIChat studio={studio === "architecture" ? "modeling" : studio === "interior" ? "floor-plan" : "infrastructure"} open={dock.open} onOpenChange={dock.setOpen} prompt={prompt} onPromptChange={setPrompt} onSubmit={() => {}} model={model} onModelChange={value => { setModel(value); if (value === "you") setSceneAI(false); }} models={providers} messages={messages} onMessagesChange={setMessages} onClearMessages={() => setMessages([])} onNewChat={() => { setMessages([]); setPrompt(""); }} requestAnswer={sceneAI ? requestSceneAnswer : undefined} statusLabel={sceneAI ? "Validated scene proposals · manual approval required" : `${doc.objects.length} objects · meters`} />
+      <div className="scene-chat-mode"><label><input type="checkbox" checked={meshProvider || sceneAI} disabled={model === "you" || meshProvider || Boolean(pending)} onChange={e => setSceneAI(e.target.checked)} />{meshProvider ? "AI model generation · preview first" : "AI scene commands · preview first"}</label>{model === "you" && <small>You: research chat</small>}</div>
+      <StudioAIChat studio={studio === "architecture" ? "modeling" : studio === "interior" ? "floor-plan" : "infrastructure"} open={dock.open} onOpenChange={dock.setOpen} prompt={prompt} onPromptChange={setPrompt} onSubmit={() => {}} model={model} onModelChange={value => { setModel(value); if (value === "you") setSceneAI(false); }} models={[...providers, ...meshProviders]} messages={messages} onMessagesChange={setMessages} onClearMessages={() => setMessages([])} onNewChat={() => { setMessages([]); setPrompt(""); }} requestAnswer={meshProvider || (sceneAI && model !== "you") ? requestSceneAnswer : undefined} statusLabel={meshProvider ? "Real 3D provider · review before applying" : sceneAI && model !== "you" ? "Validated scene proposals · manual approval required" : `${doc.objects.length} objects · meters`} />
       <div className="scene-navigation-hint">RMB orbit · MMB pan · wheel zoom · Shift click multi-select</div>
     </section>
 
@@ -246,6 +286,8 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     </StudioPanel>}
     <input ref={file} type="file" className="scene-file-input" aria-label="Import scene file" accept=".glb,.gltf,.obj,.stl,.json" onChange={e => { if (e.target.files?.[0]) void importFile(e.target.files[0]); e.target.value = ""; }} />
     <input ref={texture} type="file" className="scene-file-input" aria-label="Upload material texture" accept="image/png,image/jpeg,image/webp" onChange={e => { const image = e.target.files?.[0]; e.target.value = ""; if (!image || !primary) return; if (image.size > 1_500_000) { setError("Textures are limited to 1.5 MB."); return; } const reader = new FileReader(); reader.onload = () => { if (docRef.current.id !== doc.id) return; const target = docRef.current.objects.find(o => o.id === primary.id); if (target) patch(target.id, { material: { ...target.material, [textureSlot]: String(reader.result) } }); }; reader.onerror = () => setError("Texture could not be read."); reader.readAsDataURL(image); }} />
+    {generationJobs && <div className="scene-dialog-shade"><section className="scene-project-dialog" role="dialog" aria-modal="true" aria-label="AI generation jobs"><header><h2>AI generation jobs</h2><button aria-label="Close generation jobs" onClick={() => { resumeController.current?.abort(); setGenerationJobs(null); }}><X size={18} /></button></header>{generationJobs.length ? generationJobs.map(job => <div key={job.id} className="scene-generation-job"><strong>{job.provider} · {job.status} · {Math.round(job.progress)}%</strong><p>{job.prompt}</p>{job.error && <p role="alert">{job.error}</p>}<div><button disabled={Boolean(busy) || Boolean(pending) || ["FAILED", "CANCELED"].includes(job.status)} onClick={() => void resumeGeneration(job.id)}>Resume / preview</button>{job.modelURL && <a href={job.modelURL} target="_blank" rel="noopener noreferrer">Source GLB</a>}</div></div>) : <p>No 3D generations for this project. Choose a configured Meshy or Tripo provider in the assistant to generate a model.</p>}</section></div>}
+
     {openProjects && <div className="scene-dialog-shade"><section className="scene-project-dialog" role="dialog" aria-modal="true" aria-label="Open workspace project"><header><h2>Workspace projects</h2><button aria-label="Close project dialog" onClick={() => setOpenProjects(null)}><X size={18} /></button></header>{openProjects.length ? openProjects.map(project => <button key={project.id} onClick={() => { void store.recover().then(() => { setOpenProjects(null); router.push(`${routes[studio]}?project=${project.id}`); }).catch(() => setError("Recovery failed. Save or download before opening another project.")); }}>{project.name}</button>) : <p>No saved 3D projects in this workspace.</p>}</section></div>}
   </main>;
 }

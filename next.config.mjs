@@ -114,7 +114,7 @@ const nextConfig = {
               "img-src 'self' data: blob: https: http:",
               "font-src 'self' https://fonts.gstatic.com",
               "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com",
-              "connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://res.cloudinary.com https://pagead2.googlesyndication.com https://adservice.google.com",
+              "connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://res.cloudinary.com https://pagead2.googlesyndication.com https://adservice.google.com https://meshy.ai https://*.meshy.ai https://tripo3d.ai https://*.tripo3d.ai https://tripo3d.com https://*.tripo3d.com",
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",

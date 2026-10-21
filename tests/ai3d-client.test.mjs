@@ -1,0 +1,33 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { generate3DModel, readModelBytes } from "../src/lib/ai3d/client.mjs";
+import { exportScene, importModel } from "../src/lib/scene/geometry.mjs";
+import { makeDocument, makeObject, commitHistory, undoHistory } from "../src/lib/scene/document.mjs";
+globalThis.FileReader ??= class { readAsArrayBuffer(blob) { blob.arrayBuffer().then(value => { this.result = value; this.onloadend?.(); }); } readAsDataURL(blob) { blob.arrayBuffer().then(value => { this.result = `data:${blob.type};base64,${Buffer.from(value).toString("base64")}`; this.onloadend?.(); }); } };
+globalThis.ProgressEvent ??= class extends Event {};
+
+test("provider job → real GLB → editable scene preview → apply and undo", async () => {
+  const model = makeDocument(); model.objects = [makeObject("box", { dimensions: [2, 3, 1] })];
+  const glb = await (await exportScene(model, "glb")).arrayBuffer();
+  const doc = makeDocument(), calls = [], progress = [];
+  const job = { id: "job1", projectId: doc.id, provider: "tripo", model: "test-model", prompt: "chair", progress: 100, status: "SUCCEEDED", modelURL: "https://cdn.tripo3d.ai/model.glb", assetPath: "/api/ai3d/jobs/job1/asset" };
+  const result = await generate3DModel({ provider: "tripo", projectId: doc.id, studio: "interior", prompt: "chair", pollMs: 0, onProgress: value => progress.push(value.status), fetchImpl: async (url, init) => { calls.push({ url, init }); if (url === '/api/ai3d/jobs') return Response.json({ ...job, status: "RUNNING", progress: 20 }); if (url.startsWith('/api/ai3d/jobs/')) return Response.json(job); return new Response(glb); } });
+  assert.deepEqual(progress, ["RUNNING", "SUCCEEDED", "IMPORTING"]);
+  const objects = await importModel(result.buffer, "generated.glb");
+  assert.ok(objects.some(o => o.kind === "mesh")); assert.equal(doc.objects.length, 0);
+  const history = commitHistory({ past: [], present: doc, future: [] }, { ...doc, objects });
+  assert.ok(history.present.objects.length); assert.equal(undoHistory(history).present.objects.length, 0);
+  assert.equal(calls.filter(c => c.init?.method === 'POST').length, 1);
+});
+test("resume never submits another paid task, and foreign projects cannot be imported", async () => {
+  const calls = [];
+  await assert.rejects(generate3DModel({ resumeId: "saved-job", projectId: "current", studio: "architecture", fetchImpl: async (url, init) => { calls.push(init); return Response.json({ projectId: "other", status: "SUCCEEDED" }); } }), /different project/);
+  assert.equal(calls.length, 1); assert.ok(!calls.some(c => c.method === 'POST'));
+});
+test("cancelled, failed, oversized or non-GLB results never become scene data", async () => {
+  await assert.rejects(readModelBytes(Response.json({ fake: true })), /valid GLB/);
+  await assert.rejects(readModelBytes(new Response('x', { headers: { 'content-length': '9000000' } }), 4_000_000), /too large/);
+  const controller = new AbortController(); controller.abort();
+  await assert.rejects(generate3DModel({ projectId: "p", studio: "architecture", signal: controller.signal, fetchImpl: async () => Response.json({ projectId: "p", status: "RUNNING" }) }), { name: "AbortError" });
+  await assert.rejects(generate3DModel({ projectId: "p", studio: "architecture", fetchImpl: async () => Response.json({ projectId: "p", status: "FAILED", error: "No credits" }) }), /No credits/);
+});

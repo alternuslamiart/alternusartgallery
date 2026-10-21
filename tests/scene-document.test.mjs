@@ -2,6 +2,20 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { makeDocument, makeObject, validateDocument, createTemplate, applyCommands, commitHistory, undoHistory, redoHistory } from "../src/lib/scene/document.mjs";
 
+test("AI transforms and material edits execute on actual editable scene data", () => {
+  const doc = makeDocument(), group = makeObject("group"), mesh = makeObject("box", { parentId: group.id }); doc.objects = [group, mesh];
+  const result = applyCommands(doc, [{ type: "transform", id: mesh.id, rotation: [0, Math.PI / 2, 0], scale: [2, 1, 1], dimensions: [3, 2, 1] }, { type: "material", id: group.id, material: "marble", roughness: .15 }, { type: "environment", sunAzimuth: 120, sunIntensity: 4, quality: "ultra" }]);
+  assert.deepEqual(result.objects[1].scale, [2, 1, 1]); assert.equal(result.objects[1].material.roughness, .15); assert.equal(result.environment.sunIntensity, 4);
+  assert.deepEqual(doc.objects[1].scale, [1, 1, 1]);
+  assert.throws(() => applyCommands(doc, [{ type: "transform", id: group.id, dimensions: [5, 5, 5] }]), /scale/);
+  mesh.locked = true; assert.throws(() => applyCommands(doc, [{ type: "material", id: group.id, color: "#ffffff" }]), /locked/);
+});
+test("AI template placement is honored and invalid dimensions are transactional", () => {
+  const doc = makeDocument(); const result = applyCommands(doc, [{ type: "template", template: "room", position: [5, 0, -2] }]);
+  assert.deepEqual(result.objects[0].position, [5, 0, -2]);
+  assert.throws(() => applyCommands(result, [{ type: "transform", id: result.objects[1].id, scale: [-1, 1, 1] }]));
+});
+
 test("all studio templates create independent editable objects in a valid metric document", () => {
   for (const template of ["building", "room", "intersection"]) {
     const doc = makeDocument(); doc.objects = createTemplate(template);

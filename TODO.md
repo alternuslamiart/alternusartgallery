@@ -2,6 +2,12 @@
 
 ## Next concrete task
 
+- [ ] After configuring Meshy/Tripo keys, credits and deployed workspace DB,
+  verify one authenticated real generation per provider, refresh/resume,
+  texture import, Apply/Undo and cloud save/reopen. Follow `docs/AI3D-SETUP.md`.
+  Current automated/browser verification uses mocked provider/job adapters
+  with genuine GLB data. Recheck CDN CORS and Vercel proxy size limits live.
+
 - [x] Show the 3D scene through the sidebar padding and remove Infrastructure's
   additional detailed-editor footer link without changing stored scenes.
 - [x] Match the Infrastructure toolbar across studios with the appropriate

@@ -7,12 +7,15 @@ export const maxDuration = 60;
 const parameters = {
   type: "object", required: ["commands"], properties: {
     commands: { type: "array", items: { type: "object", required: ["type"], properties: {
-      type: { type: "string", enum: ["template", "create", "move", "material", "delete", "environment"] },
+      type: { type: "string", enum: ["template", "create", "move", "transform", "material", "delete", "environment"] },
       template: { type: "string", enum: ["building", "room", "intersection"] }, stories: { type: "integer" },
       kind: { type: "string", enum: ["box", "sphere", "cylinder", "pointLight", "spotLight"] },
       name: { type: "string" }, id: { type: "string" }, position: { type: "array", items: { type: "number" } }, dimensions: { type: "array", items: { type: "number" } },
+      rotation: { type: "array", items: { type: "number" } }, scale: { type: "array", items: { type: "number" } },
       material: { type: "string", enum: ["concrete", "wood", "marble", "ceramic", "glass", "metal", "fabric"] }, color: { type: "string" },
       sunElevation: { type: "number" }, exposure: { type: "number" }, shadows: { type: "boolean" },
+      sunAzimuth: { type: "number" }, sunIntensity: { type: "number" }, quality: { type: "string", enum: ["performance", "balanced", "ultra"] },
+      roughness: { type: "number" }, metalness: { type: "number" }, opacity: { type: "number" }, transmission: { type: "number" },
     } } },
   },
 };

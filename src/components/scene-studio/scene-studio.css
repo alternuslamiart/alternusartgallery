@@ -43,3 +43,7 @@ html[data-crystal-theme="light"] .scene-workbench.crystal-studio { background:#f
 .scene-workbench.crystal-studio>.scene-view { z-index:1; background:transparent!important; border:0!important; border-radius:0; overflow:visible; pointer-events:none; }
 .scene-workbench .scene-view>* { pointer-events:auto; }
 .scene-workbench>.scene-sidebar { z-index:45; }
+.scene-generation-job { padding:12px 0; border-bottom:1px solid var(--studio-border); font-size:12px; }
+.scene-generation-job p { margin:8px 0; overflow-wrap:anywhere; }
+.scene-generation-job>div { display:flex; align-items:center; gap:12px; }
+.scene-generation-job a { color:var(--studio-accent); }

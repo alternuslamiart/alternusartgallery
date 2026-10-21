@@ -82,6 +82,16 @@
 
 ## Server and data
 
+- `lib/ai3d/providers.mjs` contains real Meshy v2 and Tripo v3 adapters;
+  credentials/model settings are server environment variables. `/api/ai3d`
+  provider/job/asset routes and `lib/ai3d/jobs.ts` reuse `AIProviderJob` with
+  `MODEL_GENERATION` plus the `casynus-ai3d` discriminator. Jobs are user AND
+  workspace scoped, persisted before submission and resumed by ID. Meshy
+  preview-to-refine uses an atomic JSON-phase claim to avoid duplicate charges.
+  `lib/ai3d/client.mjs` polls bounded requests and validates downloaded GLB;
+  the scene editor imports into the same manual scene model and previews before
+  one undoable Apply. `AI3D-SETUP.md` records activation and actual limits.
+
 - `prisma/schema.prisma` is the source of truth for PostgreSQL data models.
 - `src/lib/prisma.ts` owns the shared Prisma client.
 - `src/lib/auth.ts` configures NextAuth.

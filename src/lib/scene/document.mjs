@@ -198,19 +198,28 @@ export function applyCommands(document, commands) {
   let next = validateDocument(document);
   for (const c of commands) {
     if (!c || typeof c !== "object") fail("Invalid scene command.");
-    if (c.type === "template") next = { ...next, objects: [...next.objects, ...createTemplate(c.template, c.stories ?? 2)] };
+    if (c.type === "template") { const objects = createTemplate(c.template, c.stories ?? 2); if (c.position) objects[0].position = vector(c.position); next = { ...next, objects: [...next.objects, ...objects] }; }
     else if (c.type === "create") {
       if (!["box", "sphere", "cylinder", "pointLight", "spotLight"].includes(c.kind)) fail("Unsupported primitive.");
-      next.objects.push(makeObject(c.kind, { name: c.name ?? c.kind, position: c.position ?? [0, .5, 0], dimensions: c.dimensions ?? [1, 1, 1], material: MATERIALS[c.material] ?? MATERIALS.concrete }));
-    } else if (["move", "material", "delete"].includes(c.type)) {
+      if (c.material && !MATERIALS[c.material]) fail("Unsupported material preset.");
+      next.objects.push(makeObject(c.kind, { name: c.name ?? c.kind, position: c.position ?? [0, .5, 0], dimensions: c.dimensions ?? [1, 1, 1], rotation: c.rotation ?? [0, 0, 0], scale: c.scale ?? [1, 1, 1], material: { ...(MATERIALS[c.material] ?? MATERIALS.concrete), ...(c.color ? { color: color(c.color) } : {}) } }));
+    } else if (["move", "transform", "material", "delete"].includes(c.type)) {
       const target = next.objects.find(o => o.id === c.id);
       if (!target || target.locked) fail("Object is missing or locked.");
       let parent = target.parentId;
       while (parent) { const node = next.objects.find(o => o.id === parent); if (node?.locked) fail("Parent group is locked."); parent = node?.parentId; }
       if (c.type === "move") target.position = vector(c.position);
+      if (c.type === "transform") {
+        if ((target.kind === "group" || target.kind.endsWith("Light")) && c.dimensions !== undefined) fail("Groups resize through scale; lights do not have mesh dimensions.");
+        if (!["position", "rotation", "scale", "dimensions"].some(key => c[key] !== undefined)) fail("Transform requires a position, rotation, scale or dimensions.");
+        Object.assign(target, validateObject({ ...target, ...Object.fromEntries(["position", "rotation", "scale", "dimensions"].filter(key => c[key] !== undefined).map(key => [key, c[key]])) }));
+      }
       if (c.type === "material") {
         if (c.material && !MATERIALS[c.material]) fail("Unsupported material preset.");
-        target.material = { ...(MATERIALS[c.material] ?? target.material), ...(c.color ? { color: color(c.color) } : {}) };
+        const ids = new Set([target.id]);
+        for (let i = 0; i < 32; i++) next.objects.forEach(o => { if (ids.has(o.parentId)) ids.add(o.id); });
+        if (next.objects.some(o => ids.has(o.id) && o.locked)) fail("A child object is locked.");
+        next.objects.forEach(o => { if (ids.has(o.id)) o.material = validateMaterial({ ...(MATERIALS[c.material] ?? o.material), ...Object.fromEntries(["color", "roughness", "metalness", "opacity", "transmission"].filter(key => c[key] !== undefined).map(key => [key, c[key]])) }); });
       }
       if (c.type === "delete") {
         const ids = new Set([target.id]);
@@ -219,7 +228,7 @@ export function applyCommands(document, commands) {
         next.objects = next.objects.filter(o => !ids.has(o.id));
       }
     } else if (c.type === "environment") {
-      next.environment = { ...next.environment, ...(c.sunElevation !== undefined ? { sunElevation: c.sunElevation } : {}), ...(c.exposure !== undefined ? { exposure: c.exposure } : {}), ...(c.shadows !== undefined ? { shadows: c.shadows } : {}) };
+      next.environment = { ...next.environment, ...Object.fromEntries(["sunElevation", "sunAzimuth", "sunIntensity", "exposure", "shadows", "quality"].filter(key => c[key] !== undefined).map(key => [key, c[key]])) };
     } else fail("Unsupported scene command. Generated code is never executed.");
     next = validateDocument(next);
   }
