@@ -6,6 +6,11 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Extend the real design canvas behind inset sidebars and padding while
+  keeping editor controls above it; remove the extra Infrastructure editor link.
+- [x] Share the original Infrastructure toolbar appearance across studios,
+  retaining studio-specific tools and actual camera/export actions.
+
 - [x] Remove the new workbench top strip, add 12px panel spacing/corners, and
   restore Interior's original architectural plan sketcher while keeping 3D.
 

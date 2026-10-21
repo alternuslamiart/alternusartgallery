@@ -2,6 +2,11 @@
 
 ## Next concrete task
 
+- [x] Show the 3D scene through the sidebar padding and remove Infrastructure's
+  additional detailed-editor footer link without changing stored scenes.
+- [x] Match the Infrastructure toolbar across studios with the appropriate
+  modeling or architectural drafting tools and functional camera/export controls.
+
 - [x] Apply the clarified studio spacing request and restore `/interior` to
   the original 2D drafting workspace. Keep 3D at `/interior?workspace=3d` and
   preserve workbench actions in the sidebar project menu.

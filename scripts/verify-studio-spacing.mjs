@@ -54,6 +54,15 @@ async function run() {
     }
     const state=await evaluate(`(()=>{const box=e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height,radius:getComputedStyle(e).borderRadius}};return{bar:!!document.querySelector('.scene-menubar'),overflow:document.documentElement.scrollWidth>innerWidth,svg:!!document.querySelector('.floor-plan-canvas svg'),panels:[...document.querySelectorAll('.scene-sidebar,.crystal-left-panel,.crystal-right-panel')].filter(e=>e.getBoundingClientRect().width&&getComputedStyle(e).display!=='none').map(box),canvas:document.querySelector('.scene-canvas')?box(document.querySelector('.scene-canvas')):null}})()`);
     assert.equal(state.bar,false);assert.equal(state.overflow,false);
+    assert.equal(await evaluate('document.querySelectorAll(".casynus-viewport-toolbar").length'),1);
+    await evaluate('[...document.querySelectorAll("button")].find(b=>b.getAttribute("aria-label")==="Export viewport").click()');
+    assert.equal(await evaluate('document.querySelector(".casynus-toolbar-export").open'),true);
+    await evaluate('[...document.querySelectorAll("button")].find(b=>b.getAttribute("aria-label")==="Close export").click()');
+    if(width===1440){
+      const bar=await evaluate('(()=>{const r=document.querySelector(".casynus-viewport-toolbar").getBoundingClientRect();return {left:r.left,right:r.right,height:r.height}})()');
+      assert.equal(bar.height,46);assert.ok(bar.left>=280&&bar.right<=1148,'Toolbar stays between panels');
+    }
+    if(route==='/infrastructure')assert.equal(await evaluate('Boolean(document.querySelector(".scene-classic-link"))'),false);
     assert.equal(await evaluate('document.documentElement.dataset.crystalTheme'),theme);
     if(route==='/interior')assert.equal(state.svg,true);
     if(route==='/interior'&&width===1440) {
@@ -64,7 +73,12 @@ async function run() {
       assert.equal(await evaluate('document.querySelectorAll(".ref-tree-row").length'),before);
     }
     if(width===1440)for(const p of state.panels){assert.equal(p.y,12);assert.equal(p.height,876);assert.equal(p.radius,'12px');assert.ok(p.x>=12);assert.ok(p.x+p.width<=1428);}
-    if(route!=='/interior'&&width===1440){assert.equal(state.panels.length,2);assert.equal(state.canvas.y,12);assert.equal(state.canvas.height,876);}
+    if(route!=='/interior'){
+      assert.equal(await evaluate('getComputedStyle(document.querySelector(".scene-view")).backgroundColor'),'rgba(0, 0, 0, 0)');
+      assert.equal(state.canvas.x,0);assert.equal(state.canvas.y,0);assert.equal(state.canvas.width,width);assert.equal(state.canvas.height,900);
+      assert.equal(await evaluate('document.elementFromPoint(6,450).tagName'),'CANVAS','The scene is visible and interactive through the panel padding');
+      if(width===1440){assert.equal(state.panels.length,2);assert.ok(await evaluate('Boolean(document.elementFromPoint(30,180).closest(".scene-sidebar"))'),'Panels stay above the canvas');}
+    }
     if(route!=='/interior'&&width===390){
       await evaluate('[...document.querySelectorAll("button")].find(b=>b.getAttribute("aria-label")==="Show scene sidebar").click()');await wait(100);
       assert.equal(await evaluate('document.querySelector(".scene-left").getBoundingClientRect().y'),12);

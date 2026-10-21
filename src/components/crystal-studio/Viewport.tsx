@@ -2,6 +2,7 @@
 import { useStudioConversation, useStudioDock } from "@/components/crystal-studio/StudioConversation";
 
 import { StudioToolbar } from "./kit";
+import { StudioViewportToolbar, downloadStudioCSV } from "./StudioViewportToolbar";
 
 import {
   Box,
@@ -1202,110 +1203,17 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         </g>
       </svg>
 
-      {/* Reference Top Floating Toolbar for Interior & 2D Floor Plan Studio */}
-      <StudioToolbar
-        className="crystal-modeling-tools studio-floating-toolbar ref-top-toolbar"
-        role="toolbar"
-        aria-label="Architectural drafting tools"
-      >
-        <div className="crystal-modeling-tool-group">
-          <IconButton
-            icon={Plus}
-            label="Add room to floor plan"
-            active={false}
-            onClick={() => {
-              const id = `room-${crypto.randomUUID().slice(0, 6)}`;
-              updateObjects([
-                ...objects,
-                {
-                  id,
-                  type: "room",
-                  x: 1.2,
-                  y: 1.2,
-                  width: 3.2,
-                  height: 2.6,
-                  label: `Room ${objects.filter((o) => o.type === "room").length + 1}`,
-                },
-              ]);
-              select(id);
-            }}
-          />
-          {tools
-            .filter(([id]) => id !== "select" && id !== "delete")
-            .map(([id, label, shortcut, Icon]) => (
-              <IconButton
-                key={id}
-                icon={Icon}
-                label={shortcut ? `${label} (${shortcut})` : label}
-                active={tool === id}
-                onClick={() => setTool(id)}
-              />
-            ))}
-        </div>
-
-        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
-
-        <IconButton
-          icon={MousePointer2}
-          label="Select & Move (V)"
-          active={tool === "select"}
-          onClick={() => setTool("select")}
-          className={tool === "select" ? "ref-select-active-blue" : ""}
-        />
-
-        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
-
-        <IconButton
-          icon={Maximize}
-          label="Fit drawing to view"
-          active={false}
-          onClick={() => setView({ zoom: 72, panX: 0, panY: 0 })}
-        />
-
-        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
-
-        <button
-          type="button"
-          title="Cycle drafting zoom level"
-          aria-label="Drafting zoom percentage"
-          onClick={() => {
-            const zoomSteps = [36, 54, 72, 90, 108, 144];
-            const currentIdx = zoomSteps.findIndex((z) => Math.abs(z - view.zoom) < 8);
-            const nextZoom = zoomSteps[(currentIdx + 1) % zoomSteps.length];
-            setView((current) => ({ ...current, zoom: nextZoom }));
-          }}
-          className="ref-zoom-readout-btn"
-        >
-          <span>{Math.round((view.zoom / 72) * 100)}%</span>
-          <span className="text-[9px] opacity-65">▾</span>
-        </button>
-
-        <button
-          type="button"
-          className="crystal-modeling-action ref-export-primary-btn"
-          aria-label="Export viewport"
-          title="Export floor plan sheet"
-          onClick={p.onSnapshot}
-        >
-          <span>Export</span>
-        </button>
-
-        <span className="crystal-modeling-tool-divider" aria-hidden="true" />
-
-        <IconButton
-          icon={Trash2}
-          label="Delete selected element (Del)"
-          active={tool === "delete"}
-          onClick={() => {
-            if (selectedId) {
-              updateObjects(objects.filter((item) => item.id !== selectedId));
-              select(null);
-            } else {
-              setTool("delete");
-            }
-          }}
-        />
-      </StudioToolbar>
+      <StudioViewportToolbar label="Architectural drafting tools"
+        leading={[{ label: "Add room to floor plan", icon: Plus, onClick: () => addObject({ id: `room-${crypto.randomUUID().slice(0, 6)}`, type: "room", x: 1.2, y: 1.2, width: 3.2, height: 2.6, label: `Room ${objects.filter(o => o.type === "room").length + 1}` }) }]}
+        tools={tools.map(([id, label, shortcut, icon]) => ({
+          label: id === "select" ? "Select & Move (V)" : id === "delete" ? "Delete selected element (Del)" : shortcut ? `${label} (${shortcut})` : label,
+          icon, active: tool === id, onClick: () => { if (id === "delete" && selectedId) { updateObjects(objects.filter(item => item.id !== selectedId)); select(null); } else setTool(id); },
+        }))}
+        onFit={() => setView({ zoom: 72, panX: 0, panY: 0 })} onReset={() => setView({ zoom: 72, panX: 0, panY: 0 })}
+        cameraViews={["Top 2D Drafting"]} cameraView="Top 2D Drafting" onCamera={() => setView({ zoom: 72, panX: 0, panY: 0 })}
+        onZoom={factor => setView(current => ({ ...current, zoom: Math.max(24, Math.min(180, current.zoom * factor)) }))}
+        exportFormats={["Floor plan sheet"]} onExport={() => p.onSnapshot()} onCSV={() => downloadStudioCSV("Floor_plan", objects.map(o => ({ ...o })))}
+        settingsLabel="Toggle grid snapping" onSettings={() => setSettings({ snapToGrid: !settings.snapToGrid })} />
 
       {/* Top Drafting Status HUD */}
       <div className="floor-plan-hud-bar" role="status">

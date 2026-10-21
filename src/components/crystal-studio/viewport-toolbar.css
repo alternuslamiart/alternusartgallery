@@ -1,0 +1,28 @@
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar {
+  top:16px!important; width:max-content!important; max-width:calc(100% - 24px)!important;
+  min-width:0!important; height:46px!important; min-height:46px!important;
+  padding:5px 8px!important; gap:4px!important; border-radius:12px!important;
+  overflow-x:auto; overflow-y:hidden; flex-wrap:nowrap; pointer-events:auto;
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn {
+  width:33px!important; min-width:33px!important; height:33px!important; min-height:33px!important;
+  padding:0 7px!important; flex-shrink:0; border-radius:8px!important;
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-export-btn {
+  width:auto!important; height:33px!important; min-height:33px!important; padding:0 14px!important; flex-shrink:0;
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active { background:var(--studio-accent)!important; color:var(--studio-on-accent)!important; }
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-zoom-pill { width:120px; height:33px; padding:0 10px; flex-shrink:0; border:0; background:transparent; margin:0; }
+.casynus-viewport-toolbar .ref-toolbar-zoom-pill option { background:var(--studio-bg-panel); color:var(--studio-text-primary); }
+.casynus-viewport-toolbar .ref-toolbar-divider { flex-shrink:0; }
+.casynus-toolbar-export { width:min(320px,calc(100vw - 32px)); padding:16px; border:1px solid var(--studio-border); border-radius:12px; background:var(--studio-bg-panel); color:var(--studio-text-primary); }
+.casynus-toolbar-export::backdrop { background:#0007; }
+.casynus-toolbar-export header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.casynus-toolbar-export button { display:block; padding:9px 12px; width:100%; text-align:left; border:0; border-radius:8px; background:transparent; color:inherit; cursor:pointer; }
+.casynus-toolbar-export header button { width:auto; }
+.casynus-toolbar-export button:hover { background:var(--studio-bg-hover); }
+@media(min-width:701px) {
+  .interior-plan-restored:not(.crystal-left-closed):not(.crystal-right-closed) .casynus-viewport-toolbar.ref-top-toolbar {
+    max-width:calc(100% - 596px)!important; left:calc(50% - 6px)!important;
+  }
+}

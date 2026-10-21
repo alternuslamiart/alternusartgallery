@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { Box, Copy, Eye, EyeOff, FolderOpen, Layers3, Lock, MousePointer2, Move3D, MoreHorizontal, PanelLeft, PanelRight, Redo2, RotateCw, Ruler, Save, Scaling, Scan, Trash2, Undo2, Unlock, X } from "lucide-react";
+import { Box, Building2, Eye, EyeOff, Focus, FolderOpen, Layers3, Lock, MoreHorizontal, MousePointer2, PanelLeft, PanelRight, Plus, Rotate3D, Route, Ruler, Save, TreePine, Unlock, X } from "lucide-react";
 import { SceneViewport, type SceneTool, type ViewportAPI } from "./SceneViewport";
 import { useSceneDocument } from "./useSceneDocument";
 import { StudioHeader, StudioPanel } from "@/components/crystal-studio/kit";
@@ -13,6 +13,7 @@ import { applyCommands, createTemplate, makeDocument, makeObject, MATERIALS, val
 import { duplicateObjects, exportScene, importModel, regroupObjects } from "@/lib/scene/geometry.mjs";
 import type { requestStudioAnswer } from "@/lib/studio-ai.mjs";
 import { listRecovery } from "@/lib/scene/recovery";
+import { StudioViewportToolbar, downloadStudioCSV } from "@/components/crystal-studio/StudioViewportToolbar";
 import "./scene-studio.css";
 
 type Studio = "architecture" | "interior" | "infrastructure";
@@ -75,6 +76,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const [selected, setSelected] = useState<string[]>([]), [tool, setTool] = useState<SceneTool>("select");
   const [left, setLeft] = useState(true), [right, setRight] = useState(true), [snap, setSnap] = useState(true), [grid, setGrid] = useState(true);
   const [busy, setBusy] = useState(""), [error, setError] = useState<string | null>(null), [openProjects, setOpenProjects] = useState<Array<{ id: string; name: string; local?: boolean }> | null>(null);
+  const [cameraView, setCameraView] = useState("Perspective");
   const [stories, setStories] = useState(2), [search, setSearch] = useState(""), [textureSlot, setTextureSlot] = useState("map");
   const [prompt, setPrompt] = useState(""), [model, setModel] = useState("gemini"), [sceneAI, setSceneAI] = useState(false);
   const [pending, setPending] = useState<{ commands: SceneCommand[]; preview: SceneDocument; base: string } | null>(null);
@@ -171,8 +173,8 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key);
   });
 
-  return <main className={`crystal-studio scene-workbench ${left ? "" : "scene-left-closed"} ${right ? "" : "scene-right-closed"}`}>
-
+  return <main className={`crystal-studio scene-workbench ${left ? "" : "scene-left-closed"} ${right ? "" : "scene-right-closed"}`} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files[0]) void importFile(e.dataTransfer.files[0]); else { const name = e.dataTransfer.getData("application/x-casynus-asset"); if (catalog.includes(name)) add(name, viewport.current?.point(e.clientX, e.clientY)); } }}>
+    {store.ready && <SceneViewport ref={viewport} document={pending?.preview ?? doc} selected={selected} tool={pending ? "select" : tool} snap={snap} grid={grid} onSelect={select} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
 
     {left && <StudioPanel className="scene-sidebar scene-left"><StudioHeader title={names[studio]} onBack={() => void leave("/project")} onCollapse={() => setLeft(false)} />
       <nav className="scene-studio-nav" aria-label="Design studios">{(Object.keys(routes) as Studio[]).map(s => <button key={s} className={s === studio ? "is-active" : ""} onClick={() => void navigate(s)}>{s === "architecture" ? "Architecture" : s === "interior" ? "Interior" : "Infra"}</button>)}</nav>
@@ -199,14 +201,28 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
           <button aria-label={`${o.visible ? "Hide" : "Show"} ${o.name}`} disabled={blocked} onClick={() => patch(o.id, { visible: !o.visible }, true)}>{o.visible ? <Eye size={12} /> : <EyeOff size={12} />}</button><button aria-label={`${o.locked ? "Unlock" : "Lock"} ${o.name}`} disabled={blocked} onClick={() => patch(o.id, { locked: !o.locked }, true)}>{o.locked ? <Lock size={12} /> : <Unlock size={12} />}</button>
         </div>;
       })}</section>
-      <Link className="scene-classic-link" href={`${routes[studio]}?workspace=classic`} onClick={e => { e.preventDefault(); void leave(`${routes[studio]}?workspace=classic`); }}>{studio === "interior" ? "Open 2D drafting tools" : studio === "infrastructure" ? "Open detailed site editor" : "Open previous modeling tools"}</Link>
+      {studio !== "infrastructure" && <Link className="scene-classic-link" href={`${routes[studio]}?workspace=classic`} onClick={e => { e.preventDefault(); void leave(`${routes[studio]}?workspace=classic`); }}>{studio === "interior" ? "Open 2D drafting tools" : "Open previous modeling tools"}</Link>}
     </StudioPanel>}
 
-    <section className="scene-view" aria-label={`${names[studio]} 3D viewport`} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files[0]) void importFile(e.dataTransfer.files[0]); else { const name = e.dataTransfer.getData("application/x-casynus-asset"); if (catalog.includes(name)) add(name, viewport.current?.point(e.clientX, e.clientY)); } }}>
-      {store.ready && <SceneViewport ref={viewport} document={pending?.preview ?? doc} selected={selected} tool={pending ? "select" : tool} snap={snap} grid={grid} onSelect={select} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
+    <section className="scene-view" aria-label={`${names[studio]} 3D viewport`}>
       {!store.ready && <div className="scene-opening">{store.failure ?? "Opening scene…"}<button onClick={() => { store.replace(makeDocument(studio)); }}>Create empty project</button></div>}
       {(!left || !right) && <div className="scene-panel-toggles">{!left && <button aria-label="Show scene sidebar" onClick={() => setLeft(true)}><PanelLeft size={18} /></button>}{!right && <button aria-label="Show inspector" onClick={() => setRight(true)}><PanelRight size={18} /></button>}</div>}
-      <div className="scene-transform-toolbar" role="toolbar" aria-label="Scene transformation tools">{([["select", MousePointer2, "Select · Q"], ["translate", Move3D, "Move · W"], ["rotate", RotateCw, "Rotate · E"], ["scale", Scaling, "Scale · R"], ["measure", Ruler, "Measure distance"]] as const).map(([id, Icon, label]) => <button key={id} aria-label={label} aria-pressed={tool === id} disabled={blocked} onClick={() => setTool(id)}><Icon size={18} /></button>)}<i /><button aria-label="Focus selected" onClick={() => viewport.current?.focus()}><Scan size={18} /></button><button aria-label="Duplicate selected" disabled={blocked || !selected.length} onClick={duplicate}><Copy size={17} /></button><button aria-label="Delete selected" disabled={blocked || !selected.length} onClick={remove}><Trash2 size={17} /></button><i /><button aria-label="Undo" disabled={blocked || !store.history.past.length} onClick={store.undo}><Undo2 size={18} /></button><button aria-label="Redo" disabled={blocked || !store.history.future.length} onClick={store.redo}><Redo2 size={18} /></button><button aria-pressed={snap} onClick={() => setSnap(v => !v)}>Snap</button></div>
+      <StudioViewportToolbar label="Scene transformation tools"
+        leading={[
+          { label: studio === "infrastructure" ? "Add Road segment" : studio === "interior" ? "Add furniture" : "Add geometry", icon: Plus, onClick: () => add(studio === "infrastructure" ? "Road" : studio === "interior" ? "Sofa" : "Box"), disabled: blocked },
+          { label: studio === "interior" ? "Add furnished room" : "Add building", icon: Building2, onClick: () => template(studio === "interior" ? "room" : "building"), disabled: blocked },
+          { label: "Add Tree", icon: TreePine, onClick: () => add("Tree"), disabled: blocked },
+        ]}
+        tools={([
+          ["select", MousePointer2, "Select · Q"], ["translate", Route, "Move · W"], ["rotate", Rotate3D, "Rotate · E"], ["scale", Focus, "Scale · R"], ["measure", Ruler, "Measure distance"],
+        ] as const).map(([id, icon, label]) => ({ label, icon, active: tool === id, disabled: blocked, onClick: () => setTool(id) }))}
+        onFit={() => viewport.current?.fit()} onReset={() => store.setCamera(makeDocument(studio).camera)}
+        cameraViews={["Perspective", "Orthographic", "Front", "Back", "Left", "Right", "Top"]} cameraView={cameraView}
+        onCamera={view => { setCameraView(view); store.setCamera({ ...(viewport.current?.camera() ?? doc.camera), projection: view === "Orthographic" ? "orthographic" : "perspective" }); if (view !== "Orthographic") requestAnimationFrame(() => viewport.current?.preset(view)); }}
+        onZoom={factor => viewport.current?.zoom(factor)} exportFormats={["glb", "gltf", "obj", "stl", "png", "jpeg", "json"]} onExport={format => void exportFile(format)}
+        onCSV={() => downloadStudioCSV(doc.name, doc.objects.map(o => ({ id: o.id, name: o.name, type: o.kind, parentId: o.parentId, position: o.position, rotation: o.rotation, scale: o.scale, dimensions: o.dimensions })))}
+        settingsLabel="Lighting & sun settings" onSettings={() => { setRight(true); requestAnimationFrame(() => globalThis.document.querySelector(".scene-environment")?.scrollIntoView({ block: "nearest" })); }} busy={Boolean(busy) || !store.ready} />
+
       {(error || store.failure) && <div className="scene-alert" role="alert"><span>{error || store.failure}</span>{store.conflict && <><button onClick={() => { if (window.confirm("Open the cloud revision and replace this browser recovery? Save a recovered copy first to retain both versions.")) window.location.href = `${routes[studio]}?project=${doc.id}&cloud=1`; }}>Open cloud copy</button><button onClick={store.saveCopy}>Save recovered copy</button></>}<button aria-label="Dismiss scene error" onClick={() => { setError(null); if (!store.conflict) store.setFailure(null); }}><X size={15} /></button></div>}
       {busy && <div className="scene-busy" role="status">{busy}</div>}
       {pending && <div className="scene-proposal" role="dialog" aria-label="Review AI scene proposal"><strong>Preview · changes are not applied</strong><ol>{pending.commands.map((c, i) => <li key={i}>{c.type} {c.template || c.name || c.id || c.kind || "lighting"}</li>)}</ol><div><button onClick={applyProposal}>Apply scene proposal</button><button onClick={() => setPending(null)}>Discard proposal</button></div></div>}

@@ -52,23 +52,26 @@ async function run() {
   const aria=async label=>{await evaluate(`[...document.querySelectorAll('button')].find(b=>b.getAttribute('aria-label')===${JSON.stringify(label)}).click()`);await wait(140);};
   const number=async(label,value)=>{await evaluate(`(()=>{const e=[...document.querySelectorAll('input')].find(i=>i.getAttribute('aria-label')===${JSON.stringify(label)});e.focus();e.value=${JSON.stringify(String(value))};e.blur()})()`);await wait(150);};
   const value=async label=>evaluate(`[...document.querySelectorAll('input')].find(i=>i.getAttribute('aria-label')===${JSON.stringify(label)}).value`);
-  const exportFile=async format=>{for(const f of fs.readdirSync(downloads).filter(f=>f.endsWith('.'+format)))fs.unlinkSync(path.join(downloads,f));await menu('Export');await click(format.toUpperCase());for(let i=0;i<100;i++){const file=fs.readdirSync(downloads).find(f=>f.endsWith('.'+format));if(file)return path.join(downloads,file);await wait(150)}throw Error('Export not downloaded: '+format)};
+  const exportFile=async format=>{for(const f of fs.readdirSync(downloads).filter(f=>f.endsWith('.'+format)))fs.unlinkSync(path.join(downloads,f));await menu('Export');await click(format.toUpperCase());for(let i=0;i<100;i++){const file=fs.readdirSync(downloads).find(f=>f.endsWith('.'+format));if(file)return path.join(downloads,file);await wait(150)}throw Error('Export not downloaded: '+format+' '+await evaluate('location.href+" "+document.body.innerText.slice(0,1600)'))};
   await send('Page.navigate',{url:baseUrl+'/casynus'});await ready('.scene-canvas canvas');await wait(1400);
   assert.ok(await evaluate("Boolean(document.querySelector('canvas[data-engine]'))"));
   await menu('File');await click('New project');await wait(250);await click('Box');await wait(400);
   await number('position X',3);await number('rotation Y',45);await number('scale X',2);
   assert.equal(await value('position X'),'3');assert.equal(await value('rotation Y'),'45');assert.equal(await value('scale X'),'2');
-  await aria('Undo');assert.equal(await value('scale X'),'1');await aria('Redo');assert.equal(await value('scale X'),'2');
-  await aria('Focus selected');await wait(300);
+  await menu('Edit');await click('Undo · Ctrl Z');assert.equal(await value('scale X'),'1');await menu('Edit');await click('Redo · Ctrl Shift Z');assert.equal(await value('scale X'),'2');
+  await menu('View');await click('Focus selected · F');await wait(300);
   const shot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(out+'/transformed-cube.png',Buffer.from(shot.data,'base64'));
   const json=JSON.parse(fs.readFileSync(await exportFile('json'),'utf8'));assert.deepEqual(json.objects[0].position,[3,.5,0]);assert.equal(json.objects[0].scale[0],2);
   for(const format of ['glb','gltf','obj','stl','png','jpeg']) {const file=await exportFile(format);assert.ok(fs.statSync(file).size>100);console.log('EXPORT',format,file)}
+  await aria('Export scene as CSV');for(let i=0;i<30&&!fs.readdirSync(downloads).some(f=>f.endsWith('.csv'));i++)await wait(100);
+  assert.ok(fs.readdirSync(downloads).some(f=>f.endsWith('.csv')),'Toolbar CSV exports actual object data');
   await send('Page.reload');await ready('.scene-canvas canvas');await wait(500);assert.equal(await evaluate("document.querySelector('.scene-canvas').dataset.objectCount"),'1');
   // The same recovered project must survive navigation through all three routes.
   for (const studio of ['Interior','Infra','Architecture']) {
+    console.log('SWITCH',studio);
     if(studio==='Interior') await send('Page.navigate',{url:baseUrl+'/interior?workspace=3d&project='+json.id});
     else await click(studio);
-    await ready('.scene-canvas canvas');await wait(600);
+    await wait(1000);await ready('.scene-canvas canvas');await wait(200);
     assert.equal(await evaluate("document.querySelector('.scene-canvas').dataset.objectCount"),'1');
     const reopened=JSON.parse(fs.readFileSync(await exportFile('json'),'utf8'));
     assert.equal(reopened.id,json.id);assert.deepEqual(reopened.objects,json.objects);

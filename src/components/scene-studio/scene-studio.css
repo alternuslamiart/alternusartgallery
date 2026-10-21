@@ -37,3 +37,9 @@ html[data-crystal-theme="light"] .scene-workbench.crystal-studio { background:#f
 .scene-workbench.scene-right-closed .scene-view { margin-left:12px; }
 .scene-workbench.scene-left-closed.scene-right-closed .scene-view { margin:0; }
 @media(max-width:760px) { .scene-workbench .scene-view { margin:0!important; } .scene-workbench.crystal-studio>.scene-sidebar { display:flex!important; grid-area:auto!important; margin:0!important; top:12px!important; bottom:12px!important; } }
+
+/* Render edge to edge; only editor controls and inset panels float above it. */
+.scene-workbench>.scene-canvas { position:absolute; inset:0; z-index:0; }
+.scene-workbench.crystal-studio>.scene-view { z-index:1; background:transparent!important; border:0!important; border-radius:0; overflow:visible; pointer-events:none; }
+.scene-workbench .scene-view>* { pointer-events:auto; }
+.scene-workbench>.scene-sidebar { z-index:45; }

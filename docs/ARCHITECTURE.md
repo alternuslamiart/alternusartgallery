@@ -18,6 +18,14 @@
   remains separately addressable and uses the same snapshot/recovery system.
   Workbench application actions are inside the project-row menu, with no
   full-width top bar. The engine, APIs and scene schema are unchanged.
+- The shared 3D canvas is an edge-to-edge background layer under the inset
+  sidebars. The center section positions only toolbar/chat/feedback overlays;
+  empty space passes pointer events through. Root drop handling retains import
+  and object-library drag/drop across the expanded canvas.
+- `crystal-studio/StudioViewportToolbar.tsx` shares the recovered Infrastructure
+  toolbar presentation. Studio adapters supply actual tool/camera/export
+  actions; the Interior SVG sketcher keeps its original geometry handlers.
+  Toolbar export choices use a native dialog; CSV serializes real scene data.
 
 - The primary web application is Next.js 14 with the App Router, React 18,
   TypeScript, and Tailwind CSS.

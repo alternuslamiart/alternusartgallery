@@ -2,6 +2,57 @@
 
 Last updated: 2026-10-21
 
+## Full-window design canvas behind inset panels
+
+- Moved the shared real 3D viewport out of the center controls section into
+  an absolute, edge-to-edge layer. Sidebars retain 12px insets/corners above
+  the scene; toolbar/chat stay in the center workspace. Transparent controls
+  pass pointer input through to the canvas, including the padding gaps.
+  Drag/drop handling moved to the workbench root to retain asset/file drops.
+- Removed the Infrastructure sidebar's `Open detailed site editor` footer
+  link as requested. Its existing classic route/source remain preserved.
+- Chrome spacing checks passed Architecture, Interior and Infrastructure at
+  1440/390px in both themes: full-window 3D canvas bounds, canvas hit-testing
+  in padding, panel hit-testing above it, 12px panel geometry, and no runtime
+  errors/overflow. Original Interior SVG drafting remains unchanged.
+  Screenshots: `.tmp/studio-spacing-1792612260879/`.
+- Typecheck and focused ESLint passed. The local production-build certificate
+  blocker documented below remains; no production-build success is claimed.
+
+## Shared Infrastructure-style viewport toolbar
+
+- Reused the original Infrastructure toolbar's order, icons and styling in
+  `StudioViewportToolbar`, shared by Architecture, Infrastructure and the
+  original Interior drafting viewport. Creation/modeling actions vary by
+  studio; Interior keeps wall/door/window/room/dimension/annotation/furniture
+  tools, selection and deletion. No drafting engine was replaced.
+- Added working camera view/zoom/reset/fit controls, a format-selection Export
+  dialog, actual scene-data CSV downloads and studio-specific settings actions.
+  Existing 3D undo/redo, duplicate, delete, snapping and focus remain available
+  in the sidebar action menus and keyboard shortcuts. Export formats and
+  scene storage are retained.
+- Corrected a legacy CSS background specificity conflict so the center
+  controls layer is truly transparent above the full-window canvas. Browser
+  screenshots were inspected: real geometry is visible centrally and through
+  padding, and the Infrastructure extra footer link is absent.
+- `npm test`: 55 passed; TypeScript passed; focused lint has no errors and four
+  pre-existing hook/image warnings in Viewport. Chrome theme/mobile/layout and
+  Interior add/delete tests passed at 1440/390px in both themes. Artifacts:
+  `.tmp/studio-spacing-1792612726710/`.
+- The repeated export/navigation run hit local `ENOSPC` in Next/Chrome writes.
+  Removed only generated QA profiles and webpack cache; production build is
+  still subject to the existing trusted-certificate blocker. Retry results
+  are recorded after the final run, not inferred from the earlier run.
+- After freeing disk, the full 3D workflow passed: transforms, undo/redo,
+  all seven exports plus toolbar CSV, refresh recovery, three studio switches
+  preserving document data and template creation; zero runtime exceptions.
+  Artifacts: `.tmp/scene-workflow-1792612990521/`.
+- Final layout/dialog sweep also passed all 12 route/theme/width combinations:
+  native Export dialog opens/closes, toolbars stay between desktop panels at
+  46px height, correct per-studio tools, full-window canvas and transparent
+  controls layer. No runtime exceptions. Final screenshots:
+  `.tmp/studio-spacing-1792613117435/`.
+
 ## Studio spacing correction and original Interior drafting restoration
 
 - Audited `8d22f00` against pre-3D UI commit `a531c16`; created local checkpoint
