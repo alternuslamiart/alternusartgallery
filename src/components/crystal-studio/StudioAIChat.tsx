@@ -1,7 +1,9 @@
 "use client";
 
 import { ArrowUp, LoaderCircle, Maximize2, Minimize2, Minus, Paperclip, Plus, Sparkles, Square, Trash2, X } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { useSession } from "next-auth/react";
+import { requestStudioAnswer, STUDIO_AI_PROVIDERS } from "@/lib/studio-ai.mjs";
 import { StudioBadge, StudioButton } from "./kit";
 import { useStudioDock } from "./StudioConversation";
 
@@ -29,6 +31,7 @@ type StudioAIChatProps = {
   onModelChange: (model: string) => void;
   models?: StudioChatModelOption[];
   messages?: StudioChatMessage[];
+  onMessagesChange?: Dispatch<SetStateAction<StudioChatMessage[]>>;
   onClearMessages?: () => void;
   onNewChat?: () => void;
   referenceImage?: string | null;
@@ -40,20 +43,34 @@ type StudioAIChatProps = {
   statusLabel?: string;
   className?: string;
 };
+const PROVIDER_MODELS: StudioChatModelOption[] = [
+  { id: "gemini", label: "Gemini" }, { id: "groq", label: "Groq" }, { id: "you", label: "You" },
+];
 const DEFAULT_MODELS: Record<StudioAIChatProps["studio"], StudioChatModelOption[]> = {
-  modeling: [{ id: "Precision Mode", label: "Precision Mode" }, { id: "Fast Concept", label: "Fast Concept" }],
-  "floor-plan": [{ id: "Precision Mode", label: "Precision Mode" }, { id: "Fast Concept", label: "Fast Concept" }],
-  infrastructure: [{ id: "Precision Mode", label: "Precision Mode" }, { id: "Site Assistant", label: "Site Assistant" }, { id: "Mobility Review", label: "Mobility Review" }],
+  modeling: [...PROVIDER_MODELS, { id: "Precision Mode", label: "Local scene commands" }, { id: "Fast Concept", label: "Local concept demo" }],
+  "floor-plan": [...PROVIDER_MODELS, { id: "Precision Mode", label: "Local floor-plan layout" }, { id: "Fast Concept", label: "Local concept layout" }],
+  infrastructure: [...PROVIDER_MODELS, { id: "Precision Mode", label: "Local site review" }, { id: "Site Assistant", label: "Local site assistant" }, { id: "Mobility Review", label: "Local mobility review" }],
 };
 const STUDIO_NAMES = { modeling: "3D Studio", "floor-plan": "Interior", infrastructure: "Infrastructure" };
 
 export function StudioAIChat({
   studio, open, onOpenChange, prompt, onPromptChange, onSubmit, onStop,
-  loading = false, progress = 0, error, onClearError, model, onModelChange,
-  models, messages = [], referenceImage, onAttachImage, onRemoveImage, onNewChat, onClearMessages, statusLabel,
+  loading: workspaceLoading = false, progress = 0, error, onClearError, model, onModelChange,
+  models, messages = [], onMessagesChange, referenceImage, onAttachImage, onRemoveImage, onNewChat, onClearMessages, statusLabel,
   quickPrompts = [], onQuickPrompt, placeholder = "What do you want to create?", className = "",
 }: StudioAIChatProps) {
   const { expanded, setExpanded } = useStudioDock();
+  const { data: session, status: sessionStatus } = useSession();
+  const identity = session?.user?.id ?? session?.user?.email ?? (sessionStatus === "loading" ? "loading" : "guest");
+  const identityRef = useRef(identity);
+  identityRef.current = identity;
+  const pendingRequest = useRef<AbortController | null>(null);
+  const promptRef = useRef(prompt);
+  promptRef.current = prompt;
+  const [remoteLoading, setRemoteLoading] = useState(false);
+  const [remoteError, setRemoteError] = useState<string | null>(null);
+  const loading = workspaceLoading || remoteLoading;
+  const displayError = remoteError || error;
   const [localImage, setLocalImage] = useState<string | null>(null);
   const threadRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -63,6 +80,49 @@ export function StudioAIChat({
   const activeImage = referenceImage ?? localImage;
   const hasUserMessages = messages.some(message => message.role === "user");
   const visibleMessages = expanded ? messages : hasUserMessages ? messages.slice(-2) : [];
+
+  useEffect(() => {
+    setRemoteLoading(false);
+    setRemoteError(null);
+    return () => { pendingRequest.current?.abort(); pendingRequest.current = null; };
+  }, [identity]);
+
+  const submitPrompt = async (providerOverride?: string) => {
+    if (!prompt.trim() || loading || pendingRequest.current) return;
+    const selectedProvider = providerOverride && STUDIO_AI_PROVIDERS.includes(providerOverride) ? providerOverride : model;
+    if (!STUDIO_AI_PROVIDERS.includes(selectedProvider)) { onSubmit(); return; }
+    if (providerOverride) onModelChange(selectedProvider);
+    if (!onMessagesChange) { setRemoteError("This workspace cannot receive AI replies."); return; }
+    const requestIdentity = identity;
+    const controller = new AbortController();
+    pendingRequest.current = controller;
+    setRemoteLoading(true);
+    setRemoteError(null);
+    onClearError?.();
+    const message = prompt.trim();
+    onMessagesChange(current => [...current, { id: crypto.randomUUID(), role: "user", text: message }]);
+    onPromptChange("");
+    try {
+      const result = await requestStudioAnswer({ provider: selectedProvider, message, messages, signal: controller.signal });
+      if (controller.signal.aborted || identityRef.current !== requestIdentity) return;
+      const sources = result.citations?.length ? `\n\nSources:\n${result.citations.map(item => item.source).join("\n")}` : "";
+      onMessagesChange(current => [...current, { id: crypto.randomUUID(), role: "assistant", text: result.message + sources, meta: `${result.provider} · ${result.model}` }]);
+      if (result.warning) setRemoteError(result.warning);
+    } catch (caught) {
+      if (!controller.signal.aborted && identityRef.current === requestIdentity) {
+        setRemoteError(caught instanceof Error ? caught.message : "The AI request failed.");
+        if (!promptRef.current.trim()) onPromptChange(message);
+      }
+    } finally {
+      if (pendingRequest.current === controller) { pendingRequest.current = null; setRemoteLoading(false); }
+    }
+  };
+
+  useEffect(() => {
+    const submitFromMobileHome = (event: Event) => { void submitPrompt((event as CustomEvent<string>).detail); };
+    window.addEventListener("crystal:submit-ai-chat", submitFromMobileHome);
+    return () => window.removeEventListener("crystal:submit-ai-chat", submitFromMobileHome);
+  });
 
   useEffect(() => {
     const thread = threadRef.current;
@@ -112,15 +172,15 @@ export function StudioAIChat({
       <StudioButton size="icon" variant="ghost" aria-label="Remove uploaded image" title="Remove attachment"
         onClick={() => { onRemoveImage?.(); setLocalImage(null); }}><X size={14} /></StudioButton>
     </div>}
-    {error && <div className="studio-ai-error" role="alert"><span>{error}</span>
-      {onClearError && <StudioButton size="icon" variant="ghost" aria-label="Dismiss error" onClick={onClearError}><X size={14} /></StudioButton>}
+    {displayError && <div className="studio-ai-error" role="alert"><span>{displayError}</span>
+      <StudioButton size="icon" variant="ghost" aria-label="Dismiss error" onClick={() => { setRemoteError(null); onClearError?.(); }}><X size={14} /></StudioButton>
     </div>}
     <div className="studio-ai-composer">
       <textarea ref={textareaRef} aria-label={studio === "floor-plan" ? "AI floor-plan prompt" : studio === "infrastructure" ? "Message the site assistant" : "AI model prompt"}
         value={prompt} onChange={event => onPromptChange(event.target.value)} rows={2} placeholder={placeholder}
-        className="studio-ai-textarea" maxLength={20_000} enterKeyHint="send" onKeyDown={event => {
+        className="studio-ai-textarea" maxLength={model === "you" ? 400 : 12_000} enterKeyHint="send" onKeyDown={event => {
           if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
-            event.preventDefault(); if (prompt.trim() && !loading) onSubmit();
+            event.preventDefault(); if (prompt.trim() && !loading) void submitPrompt();
           }
         }} />
       <div className="studio-ai-controls">
@@ -133,13 +193,13 @@ export function StudioAIChat({
                 event.currentTarget.value = "";
               }} />
           </label>
-          <select aria-label="AI mode" className="cs-chat-model" value={activeModel?.id ?? ""} onChange={event => onModelChange(event.target.value)}>
+          <select aria-label="AI mode" className="cs-chat-model" disabled={loading} value={activeModel?.id ?? ""} onChange={event => { setRemoteError(null); onModelChange(event.target.value); }}>
             {availableModels.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}
           </select>
         </div>
         {loading && onStop
           ? <StudioButton size="icon" variant="primary" onClick={onStop} aria-label="Stop generation" title="Stop generation"><Square size={13} fill="currentColor" /></StudioButton>
-          : <StudioButton size="icon" variant="primary" aria-label="Send AI request" title="Send prompt (Enter)" disabled={!prompt.trim() || loading} onClick={onSubmit}>
+          : <StudioButton size="icon" variant="primary" aria-label="Send AI request" title="Send prompt (Enter)" disabled={!prompt.trim() || loading} onClick={() => void submitPrompt()}>
             {loading ? <LoaderCircle size={16} className="cs-spin" /> : <ArrowUp size={17} />}
           </StudioButton>}
       </div>

@@ -233,7 +233,7 @@ export default function InfrastructurePage() {
   const [lightingOpen, setLightingOpen] = useState(false);
   const { open: chatOpen, setOpen: setChatOpen } = useStudioDock();
   const [chatInput, setChatInput] = useState("");
-  const [chatModel, setChatModel] = useState("Precision Mode");
+  const [chatModel, setChatModel] = useState("gemini");
   const [treeGroupsOpen, setTreeGroupsOpen] = useState({
     circulation: true,
     buildings: true,
@@ -1705,6 +1705,7 @@ export default function InfrastructurePage() {
             model={chatModel}
             onModelChange={setChatModel}
             messages={messages}
+            onMessagesChange={setMessages}
             onClearMessages={() => setMessages([])}
             onNewChat={() => {
               setMessages([]);

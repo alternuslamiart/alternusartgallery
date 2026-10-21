@@ -13,13 +13,16 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { askYou, YouAnswerError } from "@/lib/you-answer.mjs";
 import { isApiResponse, requirePlatformContext } from "@/lib/platform/api";
+import { persistAIResponse } from "@/lib/ai-response.mjs";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const MAX_HISTORY_MESSAGES = 16;
 const GEMINI_GENERATE_CONTENT_URL = "https://generativelanguage.googleapis.com/v1beta/models";
 
-const SYSTEM_PROMPT = `You are the Casynus Studio AI Assistant. Answer clearly, thoroughly, and helpfully. For coding, design, business, product, CAD, and engineering questions, give complete, practical, well-structured answers with examples and steps where useful. Make clear that AI-generated engineering output requires independent verification and licensed-engineer approval when used professionally. Respond in the user's language when clear.`;
+const SYSTEM_PROMPT = `You are the Casynus Studio AI Assistant. Answer clearly, thoroughly, and helpfully. For coding, design, business, product, CAD, and engineering questions, give complete, practical, well-structured answers with examples and steps where useful. Your text replies do not modify the scene or generate CAD files, meshes, or images; do not claim that they do. Make clear that AI-generated engineering output requires independent verification and licensed-engineer approval when used professionally. Respond in the user's language when clear.`;
 
 type ChatRole = "user" | "assistant";
 type ChatMessage = {
@@ -196,6 +199,8 @@ async function askGemini(message: string, history: ChatMessage[]) {
  let response: Response;
  try {
  response = await fetch(`${GEMINI_GENERATE_CONTENT_URL}/${encodeURIComponent(modelName)}:generateContent`, {
+ signal: AbortSignal.timeout(20_000),
+ cache: "no-store",
  method: "POST",
  headers: {
  "Content-Type": "application/json",
@@ -283,6 +288,8 @@ async function askOpenAICompatible({
  });
 
  const response = await fetch(endpoint, {
+ signal: AbortSignal.timeout(20_000),
+ cache: "no-store",
  method: "POST",
  headers: {
  Authorization: `Bearer ${apiKey}`,
@@ -326,7 +333,6 @@ async function askOpenAICompatible({
  provider: providerName,
  model: modelName,
  characterCount: answer.length,
- textPreview: answer.slice(0, 120),
  });
 
  return answer;
@@ -349,12 +355,13 @@ async function askProvider(provider: RemoteAIProvider, message: string, history:
 }
 
 export async function GET() {
- const provider = getPreferredProvider();
+ const youReady = Boolean(process.env.YOU_API_KEY?.trim() || process.env.YDC_API_KEY?.trim());
+ const provider = (getConfiguredAIProvider() === "you" || getPreferredProvider() === "local") && youReady ? "you" : getPreferredProvider();
  const configuredProvider = getConfiguredAIProvider();
  const configuredProviderReady =
  configuredProvider === "gemini" || configuredProvider === "groq"
  ? hasProviderKey(configuredProvider)
- : undefined;
+ : configuredProvider === "you" ? youReady : undefined;
 
  return NextResponse.json({
  ok: true,
@@ -366,12 +373,12 @@ export async function GET() {
  ? getGroqModel()
  : provider === "gemini"
  ? getGeminiModel()
- : null,
- configured: Boolean(getGeminiApiKey() || getGroqApiKey()),
+ : provider === "you" ? "You Answer" : null,
+ configured: Boolean(getGeminiApiKey() || getGroqApiKey() || process.env.YOU_API_KEY?.trim() || process.env.YDC_API_KEY?.trim()),
  providers: {
  gemini: Boolean(getGeminiApiKey()),
  groq: Boolean(getGroqApiKey()),
- you: Boolean(process.env.YOU_API_KEY?.trim()),
+ you: Boolean(process.env.YOU_API_KEY?.trim() || process.env.YDC_API_KEY?.trim()),
  },
  groqBaseUrl: getGroqBaseUrl(),
  });
@@ -418,22 +425,25 @@ export async function POST(request: NextRequest) {
  const history = requestMessages.length > 0
  ? requestMessages.slice(0, lastRequestMessage?.role === "user" ? -1 : undefined)
  : normalizeHistory(body.history ?? body.conversationHistory);
- const requestedYou = body.provider === "you";
+ const requestedYou = body.provider === "you" || (!body.provider &&
+ (getConfiguredAIProvider() === "you" || getPreferredProvider() === "local") &&
+ Boolean(process.env.YOU_API_KEY?.trim() || process.env.YDC_API_KEY?.trim()));
  const signedIn = requestedYou || body.conversationId !== undefined ? await auth() : null;
  if (requestedYou && !signedIn?.user?.id) {
- return NextResponse.json({ error: "Sign in to use You and save your conversation.", code: "UNAUTHENTICATED" }, { status: 401 });
+ return NextResponse.json({ error: "Sign in to use You.", code: "UNAUTHENTICATED" }, { status: 401 });
  }
  const conversationId = typeof body.conversationId === "string" && /^chat-[a-zA-Z0-9-]{1,80}$/.test(body.conversationId)
  ? body.conversationId : null;
  if (body.conversationId !== undefined && !conversationId) {
  return NextResponse.json({ error: "Invalid conversation ID.", code: "INVALID_CONVERSATION" }, { status: 400 });
  }
- if (requestedYou && !conversationId) {
- return NextResponse.json({ error: "Conversation ID is required for You.", code: "CONVERSATION_REQUIRED" }, { status: 400 });
- }
+ // Studio chat can use You as an authenticated, tab-local conversation.
+ // Cloud persistence is requested only when a conversationId is supplied.
+ let storageWarning: string | undefined;
  let conversation: { id: string; title: string } | null = null;
  let workspaceId: string | null = null;
  if (signedIn?.user?.id && conversationId) {
+ try {
  const context = await requirePlatformContext();
  if (isApiResponse(context)) return context;
  workspaceId = context.workspaceId;
@@ -442,22 +452,39 @@ export async function POST(request: NextRequest) {
  const collision = await prisma.assistantConversation.findUnique({ where: { id: conversationId } });
  if (collision) return NextResponse.json({ error: "Conversation not found.", code: "CONVERSATION_NOT_FOUND" }, { status: 404 });
  }
+ } catch {
+ // Do not read or write any conversation when workspace ownership cannot
+ // be resolved. Answer only from the caller's submitted message/history.
+ conversation = null;
+ workspaceId = null;
+ storageWarning = "Workspace storage is unavailable. This answer has not been saved to your workspace.";
+ }
  }
  if (requestedYou) {
  try {
- const trustedHistory = conversation
- ? (await prisma.assistantMessage.findMany({ where: { conversationId: conversation.id }, orderBy: { createdAt: "desc" }, take: 4 })).reverse().map((item) => ({ role: item.role === "ASSISTANT" ? "assistant" as const : "user" as const, content: item.content }))
- : history;
+ let trustedHistory = history;
+ if (conversation) {
+ try {
+ trustedHistory = (await prisma.assistantMessage.findMany({ where: { conversationId: conversation.id }, orderBy: { createdAt: "desc" }, take: 4 })).reverse().map((item) => ({ role: item.role === "ASSISTANT" ? "assistant" as const : "user" as const, content: item.content }));
+ } catch {
+ workspaceId = null;
+ storageWarning = "Workspace storage is unavailable. This answer has not been saved to your workspace.";
+ }
+ }
  const answer = await askYou(message, trustedHistory);
+ let saved = false;
  if (conversationId && workspaceId && signedIn?.user?.id) {
- await prisma.$transaction(async (tx) => {
- if (!conversation) await tx.assistantConversation.create({ data: { id: conversationId, workspaceId, userId: signedIn.user.id, title: message.slice(0, 80), status: "ACTIVE" } });
+ const scopedWorkspaceId = workspaceId;
+ const storage = await persistAIResponse(() => prisma.$transaction(async (tx) => {
+ if (!conversation) await tx.assistantConversation.create({ data: { id: conversationId, workspaceId: scopedWorkspaceId, userId: signedIn.user.id, title: message.slice(0, 80), status: "ACTIVE" } });
  await tx.assistantMessage.create({ data: { conversationId, role: "USER", content: message } });
  await tx.assistantMessage.create({ data: { conversationId, role: "ASSISTANT", content: answer.message, metadata: { provider: "you", citations: answer.citations } } });
  await tx.assistantConversation.update({ where: { id: conversationId }, data: { lastMessageAt: new Date() } });
- });
+ }));
+ saved = storage.saved;
+ storageWarning = storage.warning;
  }
- return NextResponse.json({ success: true, ...answer, provider: "you", model: "You Answer" });
+ return NextResponse.json({ success: true, ...answer, provider: "you", model: "You Answer", saved, warning: storageWarning });
  } catch (error) {
  if (error instanceof YouAnswerError) return NextResponse.json({ error: error.message, code: error.code, provider: "you" }, { status: error.status });
  console.error("You chat persistence or request failed:", error);
@@ -481,18 +508,17 @@ export async function POST(request: NextRequest) {
  for (const providerAttempt of providerAttempts) {
  try {
  const answer = await askProvider(providerAttempt, message, history);
+ let saved = false;
  if (conversationId && workspaceId && signedIn?.user?.id) {
- try {
- await prisma.$transaction(async (tx) => {
- if (!conversation) await tx.assistantConversation.create({ data: { id: conversationId, workspaceId, userId: signedIn.user.id, title: message.slice(0, 80), status: "ACTIVE" } });
+ const scopedWorkspaceId = workspaceId;
+ const storage = await persistAIResponse(() => prisma.$transaction(async (tx) => {
+ if (!conversation) await tx.assistantConversation.create({ data: { id: conversationId, workspaceId: scopedWorkspaceId, userId: signedIn.user.id, title: message.slice(0, 80), status: "ACTIVE" } });
  await tx.assistantMessage.create({ data: { conversationId, role: "USER", content: message } });
  await tx.assistantMessage.create({ data: { conversationId, role: "ASSISTANT", content: answer, metadata: { provider: providerAttempt } } });
  await tx.assistantConversation.update({ where: { id: conversationId }, data: { lastMessageAt: new Date() } });
- });
- } catch (storageError) {
- console.error("AI chat response could not be saved:", storageError);
- return NextResponse.json({ error: "Response could not be saved. Please try again.", code: "CHAT_SAVE_ERROR", provider: providerAttempt }, { status: 500 });
- }
+ }));
+ saved = storage.saved;
+ storageWarning = storage.warning;
  }
  return NextResponse.json({
  success: true,
@@ -501,6 +527,8 @@ export async function POST(request: NextRequest) {
  ? getGroqModel()
  : getGeminiModel(),
  provider: providerAttempt,
+ saved,
+ warning: storageWarning,
  });
  } catch (providerError) {
  const errorMessage = getSafeAIErrorMessage(providerError);

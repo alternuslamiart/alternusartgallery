@@ -36,6 +36,13 @@
   and 1,000,000 characters. Account changes clear the visible conversation
   without remounting scenes. This is tab-local recovery, not a workspace
   authorization boundary or synchronization with `/aichat` session tables.
+- The shared dock now sends Gemini/Groq/You text requests through
+  `/api/ai-chat` using the client-only `src/lib/studio-ai.mjs` request helper.
+  Gemini is the initial selection. Existing scene commands, floor-plan layout,
+  and site-review demos are explicit local modes; provider text replies do
+  not generate geometry or modify the scene. The mobile home composer routes
+  its selected provider to the mounted dock. Pending replies are cancelled
+  when account identity changes or the dock unmounts.
 - The infrastructure viewport uses Three.js, React Three Fiber, and Drei.
   Procedural scene/object data is in
   `src/app/infrastructure/infrastructure-types.ts`, scene rendering and camera
@@ -69,6 +76,13 @@
   sessions are stored in `AssistantConversation` and `AssistantMessage`, loaded
   through `/api/ai-chat/sessions`, and scoped to the authenticated user and
   workspace. Browser-local sessions are imported when the page loads.
+- `/api/ai-chat` also supports authenticated You requests without a cloud
+  conversation ID for the session-backed studio dock. `YOU_API_KEY` and the
+  official `YDC_API_KEY` alias are supported; You Answer selects its own model.
+  Gemini/Groq requests have 20-second provider deadlines and the route declares
+  a 60-second Vercel duration. Storage lookup/write failures return an answer
+  with `saved: false` and a visible warning; ownership conflicts still return
+  404. No conversation is read or written after an ownership lookup fails.
 - `src/lib/security/cyber-shield.mjs` and `src/middleware.ts` implement the
   application's Web Application Firewall (WAF), CSRF same-origin mutation guard,
   adaptive IP reputation and brute-force lockout tracker, Web Crypto HMAC-SHA256

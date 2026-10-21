@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { askYou } from '@/lib/you-answer.mjs';
 import {
  getGeminiApiKey,
  getGeminiModel,
@@ -11,6 +12,7 @@ import {
 } from '@/lib/ai-provider-config';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 type GeminiResponse = {
  candidates?: Array<{
@@ -39,7 +41,7 @@ async function testGemini() {
  },
  body: JSON.stringify({
  contents: [{ role: 'user', parts: [{ text: 'Say "ok"' }] }],
- generationConfig: { maxOutputTokens: 5 },
+ generationConfig: { maxOutputTokens: 512 },
  }),
  }
  );
@@ -108,6 +110,7 @@ export async function GET() {
  }
 
  const results: Record<string, string> = {
+ you_key_set: process.env.YOU_API_KEY?.trim() || process.env.YDC_API_KEY?.trim() ? 'Yes' : 'No',
  gemini_key_set: getGeminiApiKey() ? 'Yes' : 'No',
  gemini_model: getGeminiModel(),
  groq_key_set: getGroqApiKey() ? 'Yes' : 'No',
@@ -116,6 +119,13 @@ export async function GET() {
  openai_key_set: getOpenAIApiKey() ? 'Yes' : 'No',
  openai_model: getOpenAIModel(),
  };
+
+ if (process.env.YOU_API_KEY?.trim() || process.env.YDC_API_KEY?.trim()) {
+ try {
+ const answer = await askYou('What is 2 plus 2?');
+ results.you_test = answer.message ? 'WORKING' : 'No response';
+ } catch (error) { results.you_test = `FAILED: ${getSafeAIErrorMessage(error)}`; }
+ }
 
  if (getGeminiApiKey()) {
  try {

@@ -8,11 +8,11 @@ const SECRET_PATTERNS = [
  /AIza[0-9A-Za-z_-]+/g,
 ];
 
-export type AIProvider = "gemini" | "groq" | "openai";
+export type AIProvider = "gemini" | "groq" | "you" | "openai";
 
 export function getConfiguredAIProvider() {
  const provider = (process.env.AI_PROVIDER || process.env.AI_CHAT_PROVIDER || "").trim().toLowerCase();
- if (provider === "openai" || provider === "gemini" || provider === "groq") return provider;
+ if (provider === "openai" || provider === "gemini" || provider === "groq" || provider === "you") return provider;
  return null;
 }
 

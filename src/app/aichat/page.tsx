@@ -323,6 +323,7 @@ export default function AIChatPage() {
         error?: string;
         provider?: "gemini" | "groq" | "you";
         citations?: { source: string }[];
+        warning?: string;
       };
       if (!response.ok) {
         throw new Error(result.error || "Casynus could not answer right now. Please try again.");
@@ -344,6 +345,7 @@ export default function AIChatPage() {
       setChatSessions((current) => current.map((chat) => chat.id === sessionId
         ? { ...chat, messages: [...chat.messages, assistantMessage], updatedAt: Date.now() }
         : chat));
+      if (result.warning) setToast(result.warning);
     } catch (error) {
       setToast(error instanceof Error ? error.message : "Casynus could not answer right now. Please try again.");
       window.setTimeout(() => setToast(null), 3500);

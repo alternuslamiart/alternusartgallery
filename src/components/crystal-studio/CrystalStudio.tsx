@@ -123,7 +123,7 @@ export function CrystalStudio({
   const [mobileViewport, setMobileViewport] = useState(false);
   const [mobileModelSheet, setMobileModelSheet] = useState(false);
   const [mobileWorkspace, setMobileWorkspace] = useState<"floor-plan" | "modeling" | "images">("images");
-  const [mobileModel, setMobileModel] = useState("Nano Banana");
+  const [mobileModel, setMobileModel] = useState("Gemini");
   const [pricingPlan, setPricingPlan] = useState("Basic");
   const [mobileSplash, setMobileSplash] = useState(true);
   const uploadUrl = useRef<string | null>(null);
@@ -304,7 +304,7 @@ export function CrystalStudio({
           <div className="crystal-mobile-mark" aria-hidden="true"><NextImage src="/Logopng.png" alt="" width={72} height={72} /></div>
           <h1>What’s on your mind today?</h1>
         </div>
-        <form className="crystal-mobile-composer" onSubmit={(event) => { event.preventDefault(); if (!prompt.trim()) return; setDashboard(false); setMobileHome(false); void handleGenerate(); }}>
+        <form className="crystal-mobile-composer" onSubmit={(event) => { event.preventDefault(); if (!prompt.trim()) return; setDashboard(false); setMobileHome(false); window.dispatchEvent(new CustomEvent("crystal:submit-ai-chat", { detail: mobileModel.toLowerCase() })); }}>
           <button type="button" className="crystal-mobile-pro-banner" onClick={() => setMobilePricing(true)}><Zap size={15} fill="currentColor" /><span><b>Try Casynus Pro</b><small>Unlock faster generations</small></span><em>Pay Now</em></button>
           <label className="crystal-mobile-composer-label" htmlFor="mobile-crystal-prompt">What do you want to create?</label>
           <textarea id="mobile-crystal-prompt" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="Describe your next architectural idea..." rows={2} />
@@ -326,7 +326,7 @@ export function CrystalStudio({
         </nav>
         {mobileModelSheet && <div className="crystal-mobile-model-overlay" role="dialog" aria-modal="true" aria-label="Choose AI model" onClick={() => setMobileModelSheet(false)}>
           <div className="crystal-mobile-model-sheet" onClick={(event) => event.stopPropagation()}><div className="crystal-sheet-handle" /><div className="flex items-center justify-between"><div><b>AI model</b><small>Choose your creative partner</small></div><button type="button" aria-label="Close model selector" onClick={() => setMobileModelSheet(false)}>×</button></div>
-            {["Nano Banana", "Casynus AI", "Claude", "OpenAI", "Gemini", "Grok", "Copilot"].map((model) => <button type="button" key={model} className={mobileModel === model ? "is-selected" : ""} onClick={() => { setMobileModel(model); setMobileModelSheet(false); }}><span><Sparkles size={17} />{model}</span>{mobileModel === model && <span>✓</span>}</button>)}
+            {["Gemini", "Groq", "You"].map((model) => <button type="button" key={model} className={mobileModel === model ? "is-selected" : ""} onClick={() => { setMobileModel(model); setMobileModelSheet(false); }}><span><Sparkles size={17} />{model}</span>{mobileModel === model && <span>✓</span>}</button>)}
           </div>
         </div>}
         <CrystalThemeToggle className="crystal-mobile-theme-toggle" />

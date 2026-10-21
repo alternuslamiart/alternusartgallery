@@ -22,9 +22,13 @@
 - [ ] Select and configure an image-capable provider before exposing image
   generation controls. You.com Answer is documented for cited answers only.
 
-- [ ] Configure `YOU_API_KEY` in local `.env.local` and Vercel environment
-  settings, then verify a live cited You answer, follow-up, database reload
-  after logout/login, and selector interaction at desktop and mobile widths.
+- [x] Connect studio/mobile Gemini, Groq and You selections to the server,
+  separate answer generation from storage failures, and verify provider UI
+  routing plus account-change cancellation with mocked HTTP responses.
+- [ ] Verify a signed-in You answer and cloud conversation reload after the
+  new deployment in Vercel. Live Gemini/Groq calls on the production chat API
+  and a direct You call with the local configured key passed; the signed-in
+  deployed session/database path still needs an authenticated production run.
 
 - [ ] Verify the Soft Dark Generative AI Platform (`/studio-ai`) and Interactive
   Soft Dark UI Kit (`/ui-kit`) in a browser at desktop and mobile viewports,
@@ -60,9 +64,11 @@
   trusted certificate chain before installing browser tooling or validating
   downloaded Roboto fonts. Do not disable TLS verification.
 
-- Gemini direct responses require billing to be enabled on the Google AI
-  project: the configured key's API reports that the free tier is unavailable
-  in this country. Groq is working and serves as the automatic fallback.
+- The previous Gemini billing/location blocker did not reproduce on
+  2026-10-21: the deployed Gemini endpoint returned a real successful answer.
+  Vercel CLI access in this session is blocked by
+  `UNABLE_TO_VERIFY_LEAF_SIGNATURE` fetching its OpenID configuration;
+  deployment settings and authenticated production chat were not inspected.
 - Full-project lint has existing errors outside the recovered increment;
   focused lint passes. Final full typecheck and production build passed;
   stop local Next servers before regenerating Prisma on Windows

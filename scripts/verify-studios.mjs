@@ -100,6 +100,7 @@ async function run() {
   assert.notEqual(await evaluate(`document.activeElement.getAttribute('aria-label')`),firstTool,'Toolbar keyboard navigation moves focus');
   await click('.crystal-theme-toggle');
   const selectedTheme=await evaluate('document.documentElement.dataset.crystalTheme');
+  await evaluate(`(()=>{const e=document.querySelector('select[aria-label="AI mode"]');e.value='Precision Mode';e.dispatchEvent(new Event('change',{bubbles:true}));})()`);
   await evaluate(`(()=>{const e=document.querySelector('textarea[aria-label="AI floor-plan prompt"]');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(e,'9m x 7m house with kitchen and living room');e.dispatchEvent(new Event('input',{bubbles:true}));})()`);
   await click('button[aria-label="Send AI request"]');
   assert.ok(await evaluate(`document.querySelector('.studio-ai-thread').textContent.includes('9m x 7m house')`));

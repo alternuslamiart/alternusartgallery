@@ -22,7 +22,7 @@ export function buildYouQuery(message, history = []) {
   return `Previous conversation: ${prior.slice(-budget)}${suffix}`;
 }
 
-export async function askYou(message, history = [], { apiKey = process.env.YOU_API_KEY, fetchImpl = fetch } = {}) {
+export async function askYou(message, history = [], { apiKey = process.env.YOU_API_KEY?.trim() || process.env.YDC_API_KEY, fetchImpl = fetch } = {}) {
   if (!apiKey?.trim()) {
     throw new YouAnswerError("You is not configured on the server.", 503, "YOU_NOT_CONFIGURED");
   }

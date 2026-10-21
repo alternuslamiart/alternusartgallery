@@ -471,13 +471,13 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
     panY: number;
   } | null>(null);
   const { open: chat, setOpen: setChat } = useStudioDock();
-  const [aiModel, setAiModel] = useState("Precision Mode");
+  const [aiModel, setAiModel] = useState("gemini");
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useStudioConversation([
     {
       id: "fp-welcome",
       role: "assistant",
-      text: "Describe dimensions and rooms (e.g., '10m by 8m with living room, kitchen, bedroom') to generate a metric-aligned 2D floor plan.",
+      text: "Ask Gemini, Groq, or You for design guidance. Choose Local floor-plan layout to create editable rooms from dimensions and room names.",
       meta: "2D CAD",
     },
   ]);
@@ -1349,6 +1349,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         model={aiModel}
         onModelChange={setAiModel}
         messages={chatMessages}
+        onMessagesChange={setChatMessages}
         onClearMessages={() => setChatMessages([])}
         onNewChat={() => {
           setChatMessages([]);
@@ -1397,7 +1398,7 @@ export function Viewport(p: Props) {
   const [help, setHelp] = useState(false);
   const [lighting, setLighting] = useState(false);
   const [world, setWorld] = useState(false);
-  const [model, setModel] = useState("Precision Mode");
+  const [model, setModel] = useState("gemini");
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [selected, setSelected] = useState(Boolean(p.selectedAsset));
@@ -1417,7 +1418,7 @@ export function Viewport(p: Props) {
     {
       id: "3d-welcome",
       role: "assistant",
-      text: "Describe a 3D object to synthesize a new asset, or enter transform commands like 'rotate 45' or 'move right 2'.",
+      text: "Ask Gemini, Groq, or You for design guidance. Choose Local scene commands for transforms such as 'rotate 45' or 'move right 2'.",
       meta: "3D Studio",
     },
   ]);
@@ -1863,7 +1864,7 @@ export function Viewport(p: Props) {
       {
         id: crypto.randomUUID(),
         role: "assistant",
-        text: `Synthesized 3D model for "${rawPrompt}" (${model}) and added it to Studio Assets.`,
+        text: `Requested a local demo asset for "${rawPrompt}". This demo does not generate a mesh through an AI provider.`,
         meta: model,
       },
     ]);
@@ -2225,6 +2226,7 @@ export function Viewport(p: Props) {
         model={model}
         onModelChange={setModel}
         messages={chatMessages}
+        onMessagesChange={setChatMessages}
         onClearMessages={() => setChatMessages([])}
         onNewChat={() => {
           setChatMessages([]);

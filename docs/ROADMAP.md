@@ -19,6 +19,10 @@ requirements provide new evidence.
 
 ## P2 — Existing platform integration
 
+- [x] Connect the three studio AI docks and mobile composer to Gemini, Groq,
+  and authenticated You Answer requests; surface storage failures separately
+  from generated answers and retain explicit local editor modes.
+
 - [x] Redesign `/login` with a responsive soft UI while retaining the existing
   OAuth, email-code, and age-collection flows; verify local browser behavior.
 

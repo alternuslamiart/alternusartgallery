@@ -2,6 +2,48 @@
 
 Last updated: 2026-10-21
 
+## Gemini, Groq and You chat connections
+
+- Production probes on the canonical `https://www.alternusart.com` origin
+  returned real `OK` answers from Gemini and Groq. A direct You Answer call
+  using the local configured key returned HTTP 200 with an answer. You's
+  unauthenticated production chat request correctly returned 401. The
+  original apex-domain probe followed a www redirect with the wrong Origin
+  and received CSRF 403; the canonical-origin probes passed without changing
+  CSRF protections. No key values were logged or committed.
+- Found that studio docks used local parsers/demo replies rather than the
+  configured chat providers. Connected modeling, floor-plan and infrastructure
+  docks to `/api/ai-chat`, with Gemini/Groq/You selections and Gemini initially
+  selected. Mobile home now offers those same providers and sends its actual
+  selection to the dock. Local layout/scene/site modes remain explicitly local.
+  Text replies do not generate meshes, CAD files, images, or scene edits.
+- Studio requests carry bounded history, display provider replies and errors,
+  preserve prompts on failure, and cancel stale requests on account changes
+  and unmount. You remains authenticated, but no longer requires a cloud
+  conversation ID when used from a tab-local studio conversation.
+- Decoupled provider success from workspace persistence: lookup/write errors
+  now return the answer with `saved: false` and a visible storage warning.
+  Foreign conversation IDs still return 404, with no provider call or write.
+  Added `YDC_API_KEY` support, configured/default You detection, a 60-second
+  route duration, 20-second Gemini/Groq request deadlines, and You diagnostics.
+  Removed assistant text previews from server logs.
+- `npm test` passed (40 tests), including the actual route with mocked
+  auth/storage/HTTP adapters, provider request serialization, key aliasing,
+  storage failures, ownership conflicts, and authenticated/stateless You.
+  Focused ESLint passed with 15 existing image/hook warnings; typecheck and
+  production build passed (87 static pages, existing auth/Browserslist warnings).
+- Chrome verified all three provider selections and displayed replies across
+  `/casynus`, `/interior` and `/infrastructure`, provider error/prompt recovery,
+  mobile home Groq routing, and pending reply isolation after account changes.
+  This browser run mocked provider HTTP responses and client sessions; the
+  separate live probes above verified provider credentials. Artifacts remain
+  ignored under `.tmp/provider-browser/`. Updated the existing studio smoke
+  script to select the explicit local floor-plan mode for its layout test.
+- Authenticated deployed You/database reload remains unverified. Vercel CLI
+  `whoami` failed certificate validation (`UNABLE_TO_VERIFY_LEAF_SIGNATURE`)
+  while fetching OpenID configuration. No Vercel environment values were
+  downloaded or changed; TLS verification stayed enabled.
+
 ## Studio sidebar header refinement
 
 - Rebuilt the shared modeling/floor-plan sidebar header to match the supplied
