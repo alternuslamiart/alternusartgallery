@@ -2,16 +2,15 @@
 
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
-import { Activity, ArrowLeft, ArrowRight, Bot, Check, CheckCircle2, KeyRound, Lock, Mail, Moon, RefreshCw, ShieldCheck, Sparkles, Sun, Workflow } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, KeyRound, Lock, Mail, RefreshCw, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import "./login.css";
+import { AuthShell } from "@/components/auth-shell";
 
 const STUDIO_HOME = "/";
 const AUTH_THEME_KEY = "Coreforge_auth_theme";
@@ -56,11 +55,11 @@ const socialProviders: Array<{
 ];
 
 function useAuthTheme() {
- const [isLight, setIsLight] = useState(true);
+ const [isLight, setIsLight] = useState(false);
 
  useEffect(() => {
  const storedTheme = window.localStorage.getItem(AUTH_THEME_KEY);
- const nextIsLight = storedTheme ? storedTheme === "light" : true;
+ const nextIsLight = storedTheme ? storedTheme === "light" : false;
  setIsLight(nextIsLight);
  document.documentElement.style.colorScheme = nextIsLight ? "light" : "dark";
  }, []);
@@ -75,17 +74,6 @@ function useAuthTheme() {
  };
 
  return [isLight, toggleTheme] as const;
-}
-
-function Brand() {
- return (
- <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Casynus homepage" title="Go to homepage">
- <span className="auth-brand-mark inline-flex h-8 w-8 items-center justify-center rounded-lg">
- <Image src="/Logopng.png" alt="" width={32} height={32} className="h-8 w-8 object-contain" />
- </span>
- <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Casynus</span>
- </Link>
- );
 }
 
 export default function LoginPage() {
@@ -239,25 +227,11 @@ export default function LoginPage() {
  };
 
  return (
- <main className={`auth-page auth-login-page auth-soft ${isLight ? "auth-light" : "auth-dark"}`}>
- <div className="auth-soft-shell">
- <section className="auth-soft-form-side" aria-label="Sign in to Casynus">
- <header className="auth-soft-header">
-  <Brand />
-  <div className="auth-soft-header-actions">
-   <button type="button" onClick={toggleTheme} className="auth-theme-toggle auth-soft-theme" aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"} aria-pressed={isLight} title={isLight ? "Switch to dark mode" : "Switch to light mode"}>
-    {isLight ? <Moon size={16} /> : <Sun size={16} />}
-   </button>
-   <Link href="/signup" className="auth-soft-header-link">Create account <ArrowRight size={14} /></Link>
-  </div>
- </header>
-
+ <AuthShell isLight={isLight} onToggleTheme={toggleTheme}>
  <div className="auth-soft-form-center">
  <div className="auth-soft-intro">
-  <div className="auth-soft-intro-mark" aria-hidden="true"><Sparkles size={22} strokeWidth={1.8} /></div>
-  <p className="auth-soft-eyebrow">CASYNUS STUDIO</p>
-  <h1 className="auth-soft-page-title">{verificationStep === "credentials" ? "Welcome back" : verificationStep === "code" ? "Check your inbox" : "One last detail"}</h1>
-  <p className="auth-soft-subtitle">{verificationStep === "credentials" ? "Sign in to continue creating in your workspace." : verificationStep === "code" ? <>Enter the code sent to <strong>{email}</strong>.</> : "Complete your account setup to enter the studio."}</p>
+  <h1 className="auth-soft-page-title">{verificationStep === "credentials" ? "Login" : verificationStep === "code" ? "Check your inbox" : "One last detail"}</h1>
+  <p className="auth-soft-subtitle">{verificationStep === "credentials" ? "Enter your credentials to access your account." : verificationStep === "code" ? <>Enter the code sent to <strong>{email}</strong>.</> : "Complete your account setup to enter the studio."}</p>
  </div>
  <Card className="auth-card auth-login-card auth-soft-card">
  <CardContent className="space-y-5 px-7 pb-8 sm:px-9 sm:pb-10">
@@ -322,10 +296,12 @@ export default function LoginPage() {
   </form>
  ) : (
  <>
- <div className="grid gap-2.5">
+ <div className="auth-social-options grid gap-2.5">
  {socialProviders.map((provider) => (
  <Button
  key={provider.id}
+ aria-label={provider.label}
+ title={provider.label}
  type="button"
  variant="outline"
  onClick={() => handleOAuthSignIn(provider.id)}
@@ -403,7 +379,7 @@ export default function LoginPage() {
  disabled={isSubmitting}
  className="h-11 w-full rounded-[10px] bg-[#068fff] text-sm font-semibold text-white shadow-none hover:bg-[#1b9dff]"
  >
- {isSubmitting ? "Signing in..." : "Sign in to Studio"}
+ {isSubmitting ? "Signing in..." : "Login"}
  <ArrowRight className="h-4 w-4" />
  </Button>
  </form>
@@ -420,17 +396,6 @@ export default function LoginPage() {
  </Card>
  <p className="auth-login-privacy">Protected access to your projects and account.</p>
  </div>
- <footer className="auth-soft-footer"><span>© {new Date().getFullYear()} Casynus Studio</span><Link href="/privacy">Privacy</Link></footer>
- </section>
-
- <aside className="auth-soft-showcase" aria-label="Casynus Studio overview">
-  <div className="auth-soft-showcase-head"><span className="auth-soft-showcase-label"><span className="auth-soft-showcase-dot" /> THE CREATIVE WORKSPACE</span><Link href="/signup" className="auth-soft-showcase-link">Get started <ArrowRight size={15} /></Link></div>
-  <div className="auth-soft-showcase-copy"><span className="auth-soft-overline">IDEAS INTO BUILT FORM</span><h2>Design your next<br />great space.</h2><p>Bring architecture, interiors and 3D concepts together in one calm workspace. Shape an idea, explore options, and keep moving.</p></div>
-  <div className="auth-soft-art" aria-hidden="true"><div className="auth-soft-art-shadow" /><div className="auth-soft-art-tile"><div className="auth-soft-art-tile-inner"><Bot size={64} strokeWidth={1.35} /></div></div><div className="auth-soft-art-spark auth-soft-art-spark-one"><Sparkles size={15} /></div><div className="auth-soft-art-spark auth-soft-art-spark-two"><Sparkles size={11} /></div></div>
-  <div className="auth-soft-activity" aria-label="Studio capabilities"><div className="auth-soft-activity-row"><span className="auth-soft-activity-icon"><Workflow size={17} /></span><span><strong>Plan a space</strong><small>Move from concept to a working layout</small></span><Check size={16} /></div><div className="auth-soft-activity-row"><span className="auth-soft-activity-icon"><Sparkles size={17} /></span><span><strong>Explore ideas</strong><small>Develop architecture and interior concepts</small></span><Check size={16} /></div><div className="auth-soft-activity-row"><span className="auth-soft-activity-icon"><Activity size={17} /></span><span><strong>Refine the details</strong><small>Keep your creative work in one place</small></span><Check size={16} /></div></div>
-  <div className="auth-soft-showcase-foot"><span>ONE SPACE FOR WHAT’S NEXT</span><span>CASYNUS / STUDIO</span></div>
- </aside>
- </div>
- </main>
+ </AuthShell>
  );
 }

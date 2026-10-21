@@ -2,6 +2,9 @@
 
 ## Next concrete task
 
+- [x] Apply the horizontal 1181px reference design to Login and Signup;
+  verify responsive themes and mocked form flows without changing auth APIs.
+
 - [x] Align toolbar/AI dock to the 12px sidebar edges; simplify Interior's
   sidebar to header/navigation/project and real plan hierarchy, preserving
   architectural drafting. Remove Architecture's previous-tools footer.

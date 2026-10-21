@@ -2,6 +2,26 @@
 
 Last updated: 2026-10-21
 
+## Horizontal Login and Signup reference layout
+
+- Both routes use `AuthShell`: abstract CSS visual panel on the left and
+  account form on the right, rounded dark frame with a yellow action accent.
+  Width is capped at 1181px; height follows form content. At 640px and below,
+  the visual and form stack without horizontal scrolling. Dark is the initial
+  theme; existing persisted theme preference and toggle remain available.
+- Kept OAuth providers, login/email-code/age handlers, registration, callback
+  handling, reset-password and legal links. OAuth buttons retain accessible
+  provider names while presenting compact icons. No server auth changes.
+- Typecheck, focused lint (zero warnings/errors), and diff checks passed.
+  `node scripts/verify-auth-layout.mjs` passed both routes at 1440/900/390px
+  in both themes, checking the exact 1181px desktop cap, panel order, overflow,
+  fields and three provider buttons. It also passed mocked login/registration
+  API errors, login code/back flow, password validation and theme persistence.
+  Zero runtime exceptions; screenshots: `.tmp/auth-reference-1792617742067/`.
+  Paid/live OAuth, email delivery and authenticated age submission were not
+  exercised. Production build was not rerun: existing Google Fonts certificate
+  failures and low disk space remain local blockers.
+
 ## Studio overlay alignment and Interior sidebar
 
 - Toolbar tops and compact/minimized AI dock bottoms now align with the

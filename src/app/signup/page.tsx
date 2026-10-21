@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { ArrowRight, Lock, Mail, Moon, Sun, User } from "lucide-react";
+import { ArrowRight, Lock, Mail, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+import { AuthShell } from "@/components/auth-shell";
 
 const STUDIO_HOME = "/";
 const AUTH_THEME_KEY = "Coreforge_auth_theme";
@@ -58,8 +60,8 @@ function useAuthTheme() {
 
  useEffect(() => {
  const storedTheme = window.localStorage.getItem(AUTH_THEME_KEY);
- const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
- const nextIsLight = storedTheme ? storedTheme === "light" : prefersLight;
+
+ const nextIsLight = storedTheme ? storedTheme === "light" : false;
  setIsLight(nextIsLight);
  document.documentElement.style.colorScheme = nextIsLight ? "light" : "dark";
  }, []);
@@ -74,17 +76,6 @@ function useAuthTheme() {
  };
 
  return [isLight, toggleTheme] as const;
-}
-
-function Brand() {
- return (
- <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Casynus homepage" title="Go to homepage">
- <span className="auth-brand-mark inline-flex h-8 w-8 items-center justify-center rounded-lg">
- <img src="/Logopng.png" alt="Casynus homepage" className="h-8 w-8 object-contain" />
- </span>
- <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Casynus</span>
- </Link>
- );
 }
 
 export default function SignUpPage() {
@@ -136,39 +127,20 @@ export default function SignUpPage() {
  };
 
  return (
- <div className={`auth-page ${isLight ? "auth-light" : "auth-dark"}`}>
- <div className="auth-glow pointer-events-none fixed inset-x-0 top-0 h-[520px]" />
- <header className="relative z-10 mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
- <Brand />
- <div className="flex items-center gap-3">
- <button
- type="button"
- onClick={toggleTheme}
- className={`auth-theme-toggle inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors ${isLight ? "is-light" : "is-dark"}`}
- aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
- >
- {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
- </button>
- <Link href="/login" className="auth-top-link text-xs font-semibold transition-colors">
- Sign in
- </Link>
- </div>
- </header>
-
- <main className="relative z-10 flex min-h-[calc(100vh-80px)] items-center justify-center px-5 pb-16 pt-8">
+ <AuthShell isLight={isLight} onToggleTheme={toggleTheme}>
+ <div className="auth-soft-form-center">
  <Card className="auth-card w-full max-w-md rounded-[24px] border shadow-none backdrop-blur-xl">
- <CardHeader className="space-y-3 p-7 text-center">
- <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#8fccff]">Start Casynus Studio</p>
- <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">Create account</h1>
- <p className="auth-copy mx-auto max-w-xs text-sm leading-6">
- Create your Casynus workspace for AI-assisted architecture, floor plans, 3D modeling, infrastructure planning, image generation, and professional PDF documentation.
- </p>
- </CardHeader>
+ <div className="auth-soft-intro">
+ <h1 className="auth-soft-page-title">Create account</h1>
+ <p className="auth-soft-subtitle">Start creating with your Casynus workspace.</p>
+ </div>
  <CardContent className="space-y-5 p-7 pt-0">
- <div className="grid gap-2.5">
+ <div className="auth-social-options grid gap-2.5">
  {socialProviders.map((provider) => (
  <Button
  key={provider.id}
+ aria-label={provider.label}
+ title={provider.label}
  type="button"
  variant="outline"
  onClick={() => handleOAuthSignIn(provider.id)}
@@ -260,7 +232,7 @@ export default function SignUpPage() {
  </div>
 
  {error ? (
- <p className="rounded-[10px] border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+ <p role="alert" className="rounded-[10px] border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">
  {error}
  </p>
  ) : null}
@@ -286,9 +258,10 @@ export default function SignUpPage() {
  </Link>
  .
  </p>
+ <p className="auth-footer-copy text-center text-xs">Already have an account? <Link href="/login" className="auth-footer-link font-semibold">Login</Link></p>
  </CardContent>
  </Card>
- </main>
  </div>
+ </AuthShell>
  );
 }

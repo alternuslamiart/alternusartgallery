@@ -41,6 +41,9 @@ requirements provide new evidence.
 
 ## P2 — Existing platform integration
 
+- [x] Match Login and Signup to the horizontal reference with a shared
+  1181px maximum frame, responsive stacking and preserved auth handlers.
+
 - [x] Connect the three studio AI docks and mobile composer to Gemini, Groq,
   and authenticated You Answer requests; surface storage failures separately
   from generated answers and retain explicit local editor modes.
