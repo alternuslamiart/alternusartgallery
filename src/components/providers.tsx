@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState } from "react";
 import { SessionProvider } from "next-auth/react";
+import { StudioConversationProvider } from "./crystal-studio/StudioConversation";
 
 type AuthContextType = {
  isLoggedIn: boolean;
@@ -27,7 +28,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
- const login = (email: string, _password: string) => {
+ const login = (email: string) => {
  setUser({ name: email.split("@")[0], email });
  setIsLoggedIn(true);
  setIsLoginOpen(false);
@@ -41,7 +42,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
  return (
  <SessionProvider>
  <AuthContext.Provider value={{ isLoggedIn, user, login, logout, isLoginOpen, setIsLoginOpen }}>
- {children}
+ <StudioConversationProvider>{children}</StudioConversationProvider>
  </AuthContext.Provider>
  </SessionProvider>
  );

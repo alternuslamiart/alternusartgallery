@@ -1,7 +1,8 @@
 "use client";
 
+import { StudioPanel, StudioHeader } from "./kit";
+
 import {
-  ArrowLeft,
   Box,
   ChevronDown,
   ChevronRight,
@@ -17,7 +18,6 @@ import {
   LoaderCircle,
   Lock,
   LogOut,
-  Menu,
   Ruler,
   Search,
   SlidersHorizontal,
@@ -180,7 +180,7 @@ export function LeftSidebar(p: Props) {
   );
 
   return (
-    <aside
+    <StudioPanel
       aria-label="Scene and material controls"
       className="crystal-left-panel crystal-reference-left studio-sidebar-shell ref-floating-sidebar flex min-h-0 flex-col justify-between overflow-hidden"
     >
@@ -197,29 +197,7 @@ export function LeftSidebar(p: Props) {
       />
 
       {/* Reference Top Header */}
-      <header className="ref-sidebar-header">
-        <button
-          type="button"
-          aria-label="Back to projects"
-          title="Back to projects"
-          onClick={p.onBack}
-          className="ref-header-icon-btn"
-        >
-          <ArrowLeft size={15} />
-        </button>
-        <span className="ref-project-title">
-          {p.floorPlanMode ? "Interior & Floor Plan" : "Generative 3D Studio"}
-        </span>
-        <button
-          type="button"
-          aria-label="Collapse panels"
-          title="Collapse sidebars"
-          onClick={p.onCollapse}
-          className="ref-header-icon-btn"
-        >
-          <Menu size={15} />
-        </button>
-      </header>
+      <StudioHeader title={p.floorPlanMode ? "Interior & Floor Plan" : "Generative 3D Studio"} onBack={p.onBack} onCollapse={p.onCollapse} />
 
       <StudioModeNav
         activeStudio={p.floorPlanMode ? "floor-plan" : "modeling"}
@@ -228,7 +206,7 @@ export function LeftSidebar(p: Props) {
 
       {/* Reference Search Input */}
       <label className="ref-search-box">
-        <Search size={14} className="text-zinc-500" />
+        <Search size={14} className="text-[var(--studio-text-secondary)]" />
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -261,7 +239,7 @@ export function LeftSidebar(p: Props) {
                     onClick={() => p.onSelectFloorPlanObject?.(null)}
                     className="ref-tree-label-btn"
                   >
-                    <Video size={14} className="text-zinc-400" />
+                    <Video size={14} className="text-[var(--studio-text-secondary)]" />
                     <span>Top 2D Camera · 1:{settings?.scale ?? 100}</span>
                   </button>
                 </div>
@@ -284,7 +262,7 @@ export function LeftSidebar(p: Props) {
                     className="ref-tree-label-btn"
                   >
                     <Grid2X2 size={14} className="text-emerald-400" />
-                    <span className="font-medium text-zinc-100">Rooms & Zones ({rooms.length})</span>
+                    <span className="font-medium text-[var(--studio-text-primary)]">Rooms & Zones ({rooms.length})</span>
                   </button>
                 </div>
 
@@ -313,7 +291,7 @@ export function LeftSidebar(p: Props) {
                           >
                             <SquareDashed
                               size={13.5}
-                              className={isSelected ? "text-[#1a8cff]" : "text-zinc-400"}
+                              className={isSelected ? "text-[#1a8cff]" : "text-[var(--studio-text-secondary)]"}
                             />
                             <span className="truncate">{label}</span>
                           </button>
@@ -361,7 +339,7 @@ export function LeftSidebar(p: Props) {
                     className="ref-tree-label-btn"
                   >
                     <Layers3 size={14} className="text-[#1a8cff]" />
-                    <span className="font-medium text-zinc-100">
+                    <span className="font-medium text-[var(--studio-text-primary)]">
                       Structural Walls ({walls.length})
                     </span>
                   </button>
@@ -388,7 +366,7 @@ export function LeftSidebar(p: Props) {
                           >
                             <Box
                               size={13.5}
-                              className={isSelected ? "text-[#1a8cff]" : "text-zinc-400"}
+                              className={isSelected ? "text-[#1a8cff]" : "text-[var(--studio-text-secondary)]"}
                             />
                             <span className="truncate">{label}</span>
                           </button>
@@ -420,7 +398,7 @@ export function LeftSidebar(p: Props) {
                     className="ref-tree-label-btn"
                   >
                     <DoorOpen size={14} className="text-amber-400" />
-                    <span className="font-medium text-zinc-100">
+                    <span className="font-medium text-[var(--studio-text-primary)]">
                       Doors & Windows ({openings.length})
                     </span>
                   </button>
@@ -447,7 +425,7 @@ export function LeftSidebar(p: Props) {
                           >
                             <DoorOpen
                               size={13.5}
-                              className={isSelected ? "text-[#1a8cff]" : "text-zinc-400"}
+                              className={isSelected ? "text-[#1a8cff]" : "text-[var(--studio-text-secondary)]"}
                             />
                             <span className="truncate">{label}</span>
                           </button>
@@ -479,7 +457,7 @@ export function LeftSidebar(p: Props) {
                       onClick={() => toggleGroup("annotations")}
                       className="ref-tree-label-btn"
                     >
-                      <Ruler size={14} className="text-zinc-400" />
+                      <Ruler size={14} className="text-[var(--studio-text-secondary)]" />
                       <span>Annotations & Furniture ({annotations.length})</span>
                     </button>
                   </div>
@@ -504,7 +482,7 @@ export function LeftSidebar(p: Props) {
                             >
                               <Ruler
                                 size={13.5}
-                                className={isSelected ? "text-[#1a8cff]" : "text-zinc-400"}
+                                className={isSelected ? "text-[#1a8cff]" : "text-[var(--studio-text-secondary)]"}
                               />
                               <span className="truncate">{label}</span>
                             </button>
@@ -525,7 +503,7 @@ export function LeftSidebar(p: Props) {
                     onClick={() => updateSettings({ snapToGrid: !settings?.snapToGrid })}
                     className="ref-tree-label-btn"
                   >
-                    <Square size={14} className="text-zinc-400" />
+                    <Square size={14} className="text-[var(--studio-text-secondary)]" />
                     <span>
                       Drafting Grid ({settings?.gridStepMm ?? 100} mm)
                     </span>
@@ -552,10 +530,10 @@ export function LeftSidebar(p: Props) {
               className="ref-drawer-trigger"
             >
               <span className="flex items-center gap-2">
-                <SlidersHorizontal size={13} className="text-zinc-400" />
+                <SlidersHorizontal size={13} className="text-[var(--studio-text-secondary)]" />
                 <span>Drafting Setup & Scale</span>
               </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+              <span className="flex items-center gap-1.5 text-[11px] text-[var(--studio-text-secondary)]">
                 <span>
                   {settings?.unit ?? "m"} · 1:{settings?.scale ?? 100}
                 </span>
@@ -692,9 +670,9 @@ export function LeftSidebar(p: Props) {
             />
           </div>
           <div className="studio-render-card">
-            <div className="flex items-center justify-between text-[11px] text-zinc-300">
+            <div className="flex items-center justify-between text-[11px] text-[var(--studio-text-primary)]">
               <span>Est. {p.estimatedMinutes} min</span>
-              <span className="inline-flex items-center gap-1 font-semibold text-white">
+              <span className="inline-flex items-center gap-1 font-semibold text-[var(--studio-text-primary)]">
                 <Zap size={12} className="text-[#1a8cff]" />
                 {p.estimatedCost} credits
               </span>
@@ -750,7 +728,7 @@ export function LeftSidebar(p: Props) {
         >
           <LayoutGrid size={15} />
           <span>Library & Presets</span>
-          <em className="ml-auto text-[11px] not-italic text-zinc-500">{objects.length}</em>
+          <em className="ml-auto text-[11px] not-italic text-[var(--studio-text-secondary)]">{objects.length}</em>
         </button>
         <button
           type="button"
@@ -771,7 +749,7 @@ export function LeftSidebar(p: Props) {
               onClick={p.onProfile}
               aria-label="Account profile"
               title="Account profile"
-              className="grid h-6 w-6 place-items-center rounded-md text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
+              className="grid h-6 w-6 place-items-center rounded-md text-[var(--studio-text-secondary)] hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"
             >
               <User size={12} />
             </button>
@@ -780,13 +758,13 @@ export function LeftSidebar(p: Props) {
               onClick={p.onSignOut}
               aria-label="Sign out"
               title="Sign out"
-              className="grid h-6 w-6 place-items-center rounded-md text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200"
+              className="grid h-6 w-6 place-items-center rounded-md text-[var(--studio-text-secondary)] hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"
             >
               <LogOut size={12} />
             </button>
           </div>
         </div>
       </footer>
-    </aside>
+    </StudioPanel>
   );
 }

@@ -1,0 +1,97 @@
+/* One palette for workspace chrome, including portaled menus and dialogs. */
+:root {
+  --studio-bg-canvas: #0f0f0f;
+  --studio-bg-panel: #161616;
+  --studio-bg-panel-glass: var(--studio-bg-panel);
+  --studio-bg-elevated: #1d1d1d;
+  --studio-bg-input: #1d1d1d;
+  --studio-bg-hover: #282828;
+  --studio-bg-active: #242424;
+  --studio-border: #292929;
+  --studio-border-strong: #383838;
+  --studio-text-primary: #ffffff;
+  --studio-text-secondary: #ebebeb;
+  --studio-text-muted: #d7d7d7;
+  --studio-disabled-bg: #202020;
+  --studio-disabled-text: #666666;
+  --studio-accent: #3b6ff5;
+  --studio-accent-hover: #5283ff;
+  --studio-accent-soft: rgba(59,111,245,.12);
+  --studio-accent-border: rgba(59,111,245,.4);
+  --studio-on-accent: #ffffff;
+  --studio-danger: #f58c8c;
+  --studio-danger-soft: rgba(245,140,140,.1);
+  --studio-success: #82cfa4;
+  --studio-warning: #e6c17b;
+  --studio-overlay: rgba(0,0,0,.55);
+  --studio-shadow-panel: 0 4px 16px rgba(0,0,0,.14);
+  --studio-shadow-floating: 0 8px 24px rgba(0,0,0,.22);
+  --studio-radius-sm: 6px;
+  --studio-radius-control: 8px;
+  --studio-radius-menu: 10px;
+  --studio-radius-panel: 14px;
+  --studio-radius-chat: 16px;
+  --studio-control-height: 32px;
+  --studio-space-1: 4px;
+  --studio-space-2: 8px;
+  --studio-space-3: 12px;
+  --studio-space-4: 16px;
+  --studio-space-5: 20px;
+  --studio-space-6: 24px;
+  --studio-duration: 180ms;
+  --studio-viewport-top: #161616;
+  --studio-viewport-center: #111111;
+  --studio-viewport-bottom: #0f0f0f;
+  --studio-ground: #242424;
+  --studio-grid: #383838;
+  --studio-grid-major: #666666;
+  --studio-axis-x: #e25868;
+  --studio-axis-y: #50b985;
+  --studio-axis-z: #5389f5;
+  --studio-draft-paper: #17191d;
+  --studio-draft-room: #242a32;
+  --studio-draft-furniture: #343e4b;
+  --studio-draft-wall: #d4dbe5;
+  --studio-draft-selected: #253e64;
+}
+
+/* Next/font variables are applied to body, so resolve the font at that scope. */
+body { --studio-font: var(--font-geist-sans, system-ui), system-ui, sans-serif; }
+
+html[data-crystal-theme="light"] {
+  --studio-bg-canvas: #f7f7f8;
+  --studio-bg-panel: #ffffff;
+  --studio-bg-elevated: #f4f4f5;
+  --studio-bg-input: #f4f4f5;
+  --studio-bg-hover: #ebebed;
+  --studio-bg-active: #e8eaf0;
+  --studio-border: #e5e5e7;
+  --studio-border-strong: #d4d4d8;
+  --studio-text-primary: #171717;
+  --studio-text-secondary: #525252;
+  --studio-text-muted: #737373;
+  --studio-disabled-bg: #f0f0f1;
+  --studio-disabled-text: #a1a1aa;
+  --studio-accent: #3568f5;
+  --studio-accent-hover: #2857db;
+  --studio-accent-soft: rgba(53,104,245,.1);
+  --studio-accent-border: rgba(53,104,245,.32);
+  --studio-danger: #ba2929;
+  --studio-danger-soft: rgba(186,41,41,.07);
+  --studio-success: #23794a;
+  --studio-warning: #98620a;
+  --studio-overlay: rgba(23,23,23,.28);
+  --studio-shadow-panel: 0 4px 16px rgba(23,23,23,.04);
+  --studio-shadow-floating: 0 8px 24px rgba(23,23,23,.08);
+  --studio-viewport-top: #f7f7f8;
+  --studio-viewport-center: #f4f4f5;
+  --studio-viewport-bottom: #ebebed;
+  --studio-ground: #e8eaf0;
+  --studio-grid: #d4d4d8;
+  --studio-grid-major: #a1a1aa;
+  --studio-draft-paper: #fbfbfa;
+  --studio-draft-room: #edf2f6;
+  --studio-draft-furniture: #d7dee5;
+  --studio-draft-wall: #252930;
+  --studio-draft-selected: #dbeafe;
+}

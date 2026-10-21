@@ -3,6 +3,9 @@ import localFont from "next/font/local";
 import { Roboto, Roboto_Flex } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import "@/components/crystal-studio/tokens.css";
+import "@/components/crystal-studio/studio.css";
+import "@/components/crystal-studio/kit.css";
 import { Providers } from "@/components/providers";
 import { CookieModal } from "@/components/cookie-modal";
 import { LayoutShell } from "@/components/layout-shell";
@@ -114,8 +117,7 @@ export default function RootLayout({
  return (
  <html lang="en" suppressHydrationWarning>
  <head>
- <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('crystal_studio_theme')||localStorage.getItem('Coreforge_auth_theme');document.documentElement.dataset.crystalTheme=t==='dark'?'dark':'light'}catch(e){document.documentElement.dataset.crystalTheme='light'}` }} />
- </head>
+ <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('crystal_studio_theme')||localStorage.getItem('Coreforge_auth_theme');document.documentElement.dataset.crystalTheme=t==='light'?'light':'dark'}catch(e){document.documentElement.dataset.crystalTheme='dark'}` }} />
  <style
  id="cedium-dark-flat"
  dangerouslySetInnerHTML={{
@@ -263,6 +265,7 @@ export default function RootLayout({
  })
  }}
  />
+ </head>
  <body
  className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} ${robotoFlex.variable} antialiased min-h-screen flex flex-col`}
  >

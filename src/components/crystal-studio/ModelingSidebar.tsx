@@ -1,7 +1,8 @@
 "use client";
 
+import { StudioPanel, StudioHeader } from "./kit";
+
 import {
-  ArrowLeft,
   Box,
   ChevronDown,
   ChevronRight,
@@ -15,7 +16,6 @@ import {
   LayoutGrid,
   Lightbulb,
   Lock,
-  Menu,
   Plus,
   Search,
   SlidersHorizontal,
@@ -164,7 +164,7 @@ export function ModelingSidebar({
     assets.find((a) => a.id === selectedAssetId)?.name ?? "Generative 3D Studio";
 
   return (
-    <aside
+    <StudioPanel
       className="crystal-modeling-sidebar crystal-reference-left studio-sidebar-shell ref-floating-sidebar"
       aria-label="Objects panel"
     >
@@ -181,35 +181,13 @@ export function ModelingSidebar({
       />
 
       {/* Reference Top Header: Back arrow + project title + collapse menu button */}
-      <header className="ref-sidebar-header">
-        <button
-          type="button"
-          aria-label="Back to projects"
-          title="Back to projects"
-          onClick={onBack}
-          className="ref-header-icon-btn"
-        >
-          <ArrowLeft size={15} />
-        </button>
-        <span className="ref-project-title" title={activeAssetName}>
-          {activeAssetName}
-        </span>
-        <button
-          type="button"
-          aria-label="Collapse panels"
-          title="Collapse sidebars"
-          onClick={onCollapse}
-          className="ref-header-icon-btn"
-        >
-          <Menu size={15} />
-        </button>
-      </header>
+      <StudioHeader title={activeAssetName} onBack={onBack} onCollapse={onCollapse} />
 
       <StudioModeNav activeStudio="modeling" onStudioModeChange={onStudioModeChange} />
 
       {/* Reference Search Input */}
       <label className="ref-search-box">
-        <Search size={14} className="text-zinc-500" />
+        <Search size={14} className="text-[var(--studio-text-secondary)]" />
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -279,7 +257,7 @@ export function ModelingSidebar({
                       >
                         <Icon
                           size={14}
-                          className={item.accent ?? (isSelected ? "text-[#1a8cff]" : "text-zinc-400")}
+                          className={item.accent ?? (isSelected ? "text-[#1a8cff]" : "text-[var(--studio-text-secondary)]")}
                         />
                         <span>{item.label}</span>
                       </button>
@@ -331,7 +309,7 @@ export function ModelingSidebar({
                   className="ref-tree-label-btn"
                 >
                   <Grid2X2 size={14} className="text-emerald-400" />
-                  <span className="font-medium text-zinc-100">Scene Objects</span>
+                  <span className="font-medium text-[var(--studio-text-primary)]">Scene Objects</span>
                 </button>
                 <span className="ref-tree-actions">
                   <button
@@ -371,7 +349,7 @@ export function ModelingSidebar({
                         >
                           <Box
                             size={13.5}
-                            className={isSelected ? "text-[#1a8cff]" : "text-zinc-400"}
+                            className={isSelected ? "text-[#1a8cff]" : "text-[var(--studio-text-secondary)]"}
                           />
                           <span className="truncate">{asset.name}</span>
                         </button>
@@ -420,7 +398,7 @@ export function ModelingSidebar({
                       onClick={() => toggleGroup("subGroup")}
                       className="ref-tree-label-btn"
                     >
-                      <Layers size={13.5} className="text-zinc-400" />
+                      <Layers size={13.5} className="text-[var(--studio-text-secondary)]" />
                       <span>Group</span>
                     </button>
                   </div>
@@ -452,7 +430,7 @@ export function ModelingSidebar({
                       >
                         <Icon
                           size={14}
-                          className={isSelected ? "text-[#1a8cff]" : "text-zinc-400"}
+                          className={isSelected ? "text-[#1a8cff]" : "text-[var(--studio-text-secondary)]"}
                         />
                         <span>{item.label}</span>
                       </button>
@@ -495,7 +473,7 @@ export function ModelingSidebar({
       ) : (
         <div className="ref-hierarchy-scroll">
           <div className="mb-2 flex items-center justify-between px-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--studio-text-secondary)]">
               Asset Library ({filteredAssets.length})
             </span>
             <button
@@ -517,8 +495,8 @@ export function ModelingSidebar({
                 }`}
               >
                 <span className={`crystal-asset-dot bg-gradient-to-br ${asset.thumbnail}`} />
-                <span className="truncate text-[12px] text-zinc-200">{asset.name}</span>
-                <small className="ml-auto text-[10px] text-zinc-500">{asset.category}</small>
+                <span className="truncate text-[12px] text-[var(--studio-text-primary)]">{asset.name}</span>
+                <small className="ml-auto text-[10px] text-[var(--studio-text-secondary)]">{asset.category}</small>
               </button>
             ))}
           </div>
@@ -534,10 +512,10 @@ export function ModelingSidebar({
           className="ref-drawer-trigger"
         >
           <span className="flex items-center gap-2">
-            <SlidersHorizontal size={13} className="text-zinc-400" />
+            <SlidersHorizontal size={13} className="text-[var(--studio-text-secondary)]" />
             <span>Mesh & Render Setup</span>
           </span>
-          <span className="flex items-center gap-1.5 text-[11px] text-zinc-400">
+          <span className="flex items-center gap-1.5 text-[11px] text-[var(--studio-text-secondary)]">
             <span>{material}</span>
             <ChevronDown
               size={13}
@@ -613,10 +591,10 @@ export function ModelingSidebar({
               </button>
             ))}
 
-            <div className="mt-2.5 flex items-center justify-between rounded-[8px] border border-white/[0.06] bg-[#1b1d22] px-2.5 py-2">
-              <div className="text-[11px] text-zinc-300">
-                <strong className="font-semibold text-white">{estimatedMinutes} min</strong> ·{" "}
-                <span className="inline-flex items-center gap-0.5 text-zinc-400">
+            <div className="mt-2.5 flex items-center justify-between rounded-[8px] border border-[var(--studio-border)] bg-[var(--studio-bg-elevated)] px-2.5 py-2">
+              <div className="text-[11px] text-[var(--studio-text-primary)]">
+                <strong className="font-semibold text-[var(--studio-text-primary)]">{estimatedMinutes} min</strong> ·{" "}
+                <span className="inline-flex items-center gap-0.5 text-[var(--studio-text-secondary)]">
                   <Zap size={11} className="text-[#1a8cff]" />
                   {estimatedCost}
                 </span>
@@ -625,7 +603,7 @@ export function ModelingSidebar({
                 type="button"
                 onClick={onRender}
                 disabled={renderLoading}
-                className="h-7 rounded-[6px] bg-[#1a8cff] px-2.5 text-[11px] font-semibold text-white transition hover:bg-[#2d9bff] disabled:opacity-50"
+                className="h-7 rounded-[6px] bg-[#1a8cff] px-2.5 text-[11px] font-semibold text-[var(--studio-text-primary)] transition hover:bg-[var(--studio-accent-hover)] disabled:opacity-50"
               >
                 {renderLoading ? "Rendering…" : "Render Queue"}
               </button>
@@ -674,7 +652,7 @@ export function ModelingSidebar({
         >
           <LayoutGrid size={15} />
           <span>Library</span>
-          <em className="ml-auto text-[11px] not-italic text-zinc-500">{assets.length}</em>
+          <em className="ml-auto text-[11px] not-italic text-[var(--studio-text-secondary)]">{assets.length}</em>
         </button>
         <button
           type="button"
@@ -693,12 +671,12 @@ export function ModelingSidebar({
             type="button"
             onClick={onSignOut}
             title="Sign out"
-            className="px-2 py-1 text-[11px] text-zinc-500 transition hover:text-zinc-300"
+            className="px-2 py-1 text-[11px] text-[var(--studio-text-secondary)] transition hover:text-[var(--studio-text-primary)]"
           >
             Sign out
           </button>
         </div>
       </footer>
-    </aside>
+    </StudioPanel>
   );
 }

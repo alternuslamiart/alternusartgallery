@@ -18,12 +18,20 @@
 - `src/lib/crystal-theme.ts` owns the shared browser-persisted light/dark
   preference for the three studios and `/aichat`. The root layout applies the
   stored preference before hydration; `CrystalThemeToggle` is the shared
-  control. Studio palette tokens live in `src/app/globals.css`. The viewport
-  environment responds to theme separately from scene object data.
+  control. Studio palette tokens live in `src/components/crystal-studio/tokens.css`,
+  layout in `studio.css`, and shared component styling in `kit.css`, loaded
+  after legacy `globals.css`. `kit.tsx` supplies buttons, panels, headers,
+  keyboard-aware toolbars, inspector sections, and number/segmented controls.
+  `viewport-theme.ts` reads the CSS palette for canvas/WebGL presentation;
+  the floor-plan SVG uses theme variables. Theme changes do not change scene data.
 - `StudioAIChat` is reused by the modeling, floor-plan, and infrastructure
-  editors. Each editor still owns its own prompt and message state; minimizing
-  the dock preserves that mounted state, but studio conversations are not yet
-  synchronized with the authenticated `/aichat` session tables.
+  editors. Editors own prompts and scene actions; the root
+  `StudioConversationProvider` shares messages and open/expanded state across
+  editor navigation. Validated snapshots are recovered from per-identity
+  `sessionStorage` through `conversation-storage.mjs`, capped at 200 messages
+  and 1,000,000 characters. Account changes clear the visible conversation
+  without remounting scenes. This is tab-local recovery, not a workspace
+  authorization boundary or synchronization with `/aichat` session tables.
 - The infrastructure viewport uses Three.js, React Three Fiber, and Drei.
   Procedural scene/object data is in
   `src/app/infrastructure/infrastructure-types.ts`, scene rendering and camera
@@ -71,6 +79,12 @@
 - `npm run build` generates Prisma Client, then runs the Next.js production
   build. Prisma configuration requires `DATABASE_URL`; local builds may also
   be constrained by available memory.
+- `node scripts/verify-studios.mjs` is an opt-in local browser smoke test using
+  installed Chrome and Node 22 WebSocket/CDP. Start Next on port 3002 first;
+  `STUDIO_QA_URL` permits only localhost/127.0.0.1 and `CHROME_PATH` overrides
+  the Windows Chrome default. It uses an isolated profile, captures theme
+  screenshots, tests dock/keyboard/mobile behavior, and mocks client sessions
+  for account-switch isolation. Artifacts stay under ignored `.tmp/`.
 - The separate `altrenus-business-manager/` Python utility is not part of the
   Next.js test/build flow.
 

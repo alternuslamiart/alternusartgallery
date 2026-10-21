@@ -1,0 +1,155 @@
+/* Shared component contract. Geometry is identical in both themes. */
+:is(.crystal-studio, .crystal-infrastructure-page, .aichat-page) {
+  font-family: var(--studio-font) !important;
+  font-size: 13px;
+  color: var(--studio-text-primary);
+  background: var(--studio-bg-canvas);
+  color-scheme: dark;
+}
+html[data-crystal-theme="light"] :is(.crystal-studio, .crystal-infrastructure-page, .aichat-page) { color-scheme: light; }
+:is(.crystal-studio, .crystal-infrastructure-page, .aichat-page) :is(button, input, select, textarea) { font-family: inherit; }
+:is(.crystal-studio, .crystal-infrastructure-page, .aichat-page) :is(input, select, textarea) { accent-color: var(--studio-accent); }
+:is(.crystal-studio, .crystal-infrastructure-page, .aichat-page) :is(button, a, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--studio-accent);
+  outline-offset: 2px;
+}
+:is(.crystal-studio, .crystal-infrastructure-page, .aichat-page) :disabled { cursor: not-allowed; opacity: .45; }
+:is(.crystal-studio, .crystal-infrastructure-page) :is(input, textarea)::placeholder { color: var(--studio-text-muted); }
+:is(.crystal-studio, .crystal-infrastructure-page) * { scrollbar-width: thin; scrollbar-color: var(--studio-border-strong) transparent; }
+:is(.crystal-studio, .crystal-infrastructure-page) .scrollbar-hide { scrollbar-width: thin; }
+
+.cs-button, .crystal-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--studio-control-height);
+  padding: 0 10px;
+  flex-shrink: 0;
+  border: 1px solid var(--studio-border);
+  border-radius: var(--studio-radius-control);
+  background: var(--studio-bg-elevated);
+  color: var(--studio-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--studio-duration), color var(--studio-duration), border-color var(--studio-duration);
+}
+.cs-button[data-size="sm"] { height: 28px; padding: 0 8px; }
+.cs-button[data-size="icon"], .crystal-theme-toggle { width: 32px; padding: 0; }
+.cs-button[data-variant="ghost"] { border-color: transparent; background: transparent; }
+.cs-button:hover:not(:disabled), .crystal-theme-toggle:hover { background: var(--studio-bg-hover); color: var(--studio-text-primary); }
+.cs-button.is-active { color: var(--studio-accent); background: var(--studio-accent-soft); border-color: var(--studio-accent-border); }
+.cs-button[data-variant="primary"] { background: var(--studio-accent); border-color: var(--studio-accent); color: var(--studio-on-accent); }
+.cs-button[data-variant="primary"]:hover:not(:disabled) { background: var(--studio-accent-hover); }
+.cs-button[data-variant="danger"] { color: var(--studio-danger); }
+.cs-button:focus-visible, .crystal-theme-toggle:focus-visible { outline: 2px solid var(--studio-accent); outline-offset: 2px; }
+.cs-button svg { flex-shrink: 0; }
+.cs-panel { display: flex; flex-direction: column; min-width: 0; min-height: 0; isolation: isolate; }
+.cs-header { gap: 4px; flex: 0 0 52px; padding: 8px 10px; border-bottom: 1px solid var(--studio-border); }
+.cs-header-title { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--studio-text-primary); }
+.cs-inspector-header { min-height: 52px; padding: 8px 12px; border-bottom: 1px solid var(--studio-border); }
+.cs-inspector-title { display: flex; align-items: center; gap: 8px; color: var(--studio-text-primary); font-size: 13px; font-weight: 600; }
+.cs-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.cs-section-heading h2 { color: var(--studio-text-secondary); font-size: 12px; font-weight: 600; }
+.cs-toolbar { max-width: calc(100% - 24px); overflow-x: auto; scrollbar-width: none; }
+.cs-toolbar-group { display: flex; align-items: center; gap: 4px; padding-inline: 4px; border-right: 1px solid var(--studio-border); }
+.cs-toolbar-group:last-child { border: 0; }
+.cs-toolbar button { flex-shrink: 0; }
+.cs-select-field { position: relative; display: flex; align-items: center; min-height: 32px; gap: 8px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--studio-border); background: var(--studio-bg-input); }
+.cs-select-field > span { color: var(--studio-text-secondary); font-size: 12px; }
+.cs-select-field select { appearance: none; min-width: 0; flex: 1; padding-right: 12px; background: transparent; color: var(--studio-text-primary); text-align: right; outline: none; }
+.cs-select-field > svg { pointer-events: none; position: absolute; right: 8px; color: var(--studio-text-muted); }
+.cs-number-field { display: flex; align-items: center; min-height: 32px; min-width: 0; gap: 8px; padding: 0 8px; background: var(--studio-bg-input); border: 1px solid var(--studio-border); border-radius: 8px; }
+.cs-number-field span { color: var(--studio-text-muted); font-size: 12px; }
+.cs-number-field input { width: 100%; min-width: 0; background: transparent; color: var(--studio-text-primary); text-align: right; font-size: 12px; font-variant-numeric: tabular-nums; outline: none; }
+.cs-number-field:focus-within { border-color: var(--studio-accent); }
+.cs-segmented { display: inline-flex; align-items: center; padding: 2px; gap: 2px; border: 1px solid var(--studio-border); border-radius: 8px; background: var(--studio-bg-elevated); }
+.cs-segmented .cs-button { min-width: 34px; border-radius: 6px; }
+.cs-segmented .cs-button.is-active { background: var(--studio-bg-active); color: var(--studio-accent); border-color: var(--studio-border-strong); }
+.cs-property-row { display: flex; align-items: center; justify-content: space-between; min-height: 36px; gap: 12px; font-size: 12px; }
+.cs-property-row > span { color: var(--studio-text-secondary); }
+.cs-property-row > div { min-width: 0; }
+.cs-inspector-section { border-bottom: 1px solid var(--studio-border); }
+.cs-inspector-section > summary { display: flex; justify-content: space-between; align-items: center; list-style: none; padding: 14px 16px; cursor: pointer; color: var(--studio-text-primary); font-weight: 600; font-size: 12px; }
+.cs-inspector-section > summary::-webkit-details-marker { display: none; }
+.cs-inspector-section:not([open]) > summary svg { transform: rotate(-90deg); }
+.cs-section-content { padding: 0 16px 16px; }
+.cs-badge { display: inline-flex; align-items: center; padding: 3px 6px; border: 1px solid var(--studio-border); border-radius: 6px; color: var(--studio-text-muted); background: var(--studio-bg-elevated); font-size: 11px; line-height: 1.2; }
+.cs-spin { animation: cs-spin 1s linear infinite; }
+@keyframes cs-spin { to { transform: rotate(360deg); } }
+
+/* Shared AI dock; content stays mounted in its conversation owner. */
+.cs-chat-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px 0; }
+.cs-chat-identity { display: flex; align-items: center; gap: 8px; color: var(--studio-text-primary); font-size: 12px; font-weight: 600; }
+.cs-chat-identity svg { color: var(--studio-accent); }
+.cs-chat-actions { display: flex; gap: 4px; }
+.cs-chat-header small { color: var(--studio-text-muted); font-size: 11px; font-weight: 400; }
+.cs-chat-dock .studio-ai-thread { max-height: min(260px, 35vh); }
+.cs-chat-dock.is-expanded .studio-ai-thread { max-height: min(420px, 52vh); }
+.cs-chat-dock .studio-ai-composer { padding: 12px; gap: 8px; }
+.cs-chat-dock .studio-ai-textarea { min-height: 46px; font-size: 13px !important; line-height: 1.5; background: transparent !important; color: var(--studio-text-primary) !important; }
+.cs-chat-dock .studio-ai-message { font-size: 13px; line-height: 1.55; padding: 10px 12px; }
+.cs-chat-dock .studio-ai-message-body { white-space: pre-wrap; }
+.cs-chat-model { max-width: 170px; height: 32px; padding: 0 8px; border: 1px solid var(--studio-border); border-radius: 8px; background: var(--studio-bg-elevated); color: var(--studio-text-secondary); font-size: 12px; }
+.cs-chat-empty { padding: 20px 16px; color: var(--studio-text-muted); font-size: 13px; line-height: 1.5; }
+.cs-chat-suggestions { display: flex; gap: 6px; overflow-x: auto; padding: 8px 12px 0; }
+.cs-chat-suggestions button { white-space: nowrap; }
+.cs-chat-dock .studio-ai-attach-btn { width: 32px; height: 32px; border-radius: 8px; }
+.cs-chat-dock .studio-ai-attach-btn:focus-within { outline: 2px solid var(--studio-accent); outline-offset: 2px; }
+:is(.crystal-studio, .crystal-infrastructure-page) .studio-ai-panel.cs-chat-dock { width: min(460px, calc(100% - 24px)) !important; border: 1px solid var(--studio-border) !important; max-height: calc(100dvh - 100px); overflow-y: auto; }
+:is(.crystal-studio, .crystal-infrastructure-page) .studio-ai-panel.cs-chat-dock.is-expanded { width: min(600px, calc(100% - 24px)) !important; }
+.cs-chat-dock .studio-ai-thread { flex-shrink: 1; min-height: 0; }
+.cs-chat-status { padding: 0 12px 8px; color: var(--studio-text-muted); font-size: 12px; }
+.cs-chat-dock .studio-ai-thread { scrollbar-color: var(--studio-border-strong) transparent; }
+
+/* Semantic color utilities also serve /aichat and the existing property forms. */
+:is(.crystal-studio, .crystal-infrastructure-page, .aichat-page) [class~="bg-[var(--studio-accent)]"] { color: var(--studio-on-accent); }
+.aichat-page :is(aside, header, form, [role="dialog"]) { border-color: var(--studio-border); }
+.aichat-page aside { background: var(--studio-bg-panel); }
+.aichat-page main { background: var(--studio-bg-canvas); }
+.aichat-page { --studio-font: var(--font-roboto, Roboto), system-ui, sans-serif; }
+
+/* The mobile creation home shares the editor palette and keeps its existing layout. */
+@media (max-width: 700px) {
+  .crystal-studio .ref-top-toolbar { top: 84px !important; }
+  .crystal-infrastructure-page .ref-top-toolbar { top: 54px !important; }
+  .crystal-infrastructure-page .infra-mobile-actions { left: 12px; z-index: 65; }
+  .crystal-infrastructure-page .infra-mobile-actions button { background: var(--studio-bg-panel); color: var(--studio-text-primary); }
+  .crystal-infrastructure-page > aside.infra-sidebar.is-open { top: 50px !important; z-index: 60 !important; }
+  .crystal-studio .crystal-mobile-modebar,
+  .crystal-studio .crystal-mobile-menu-trigger,
+  .crystal-studio .crystal-mobile-incognito { background: var(--studio-bg-panel); color: var(--studio-text-primary); }
+  .crystal-studio .crystal-mobile-modebar button { color: var(--studio-text-secondary); }
+  .crystal-studio .crystal-mobile-modebar button.active { background: var(--studio-bg-active); color: var(--studio-text-primary); }
+  .crystal-studio .crystal-mobile-home { background: var(--studio-bg-canvas); color: var(--studio-text-primary); }
+  .crystal-studio .crystal-mobile-home-hero { position: relative; }
+  .crystal-studio .crystal-mobile-home-theme { position: absolute; right: 12px; top: 12px; background: var(--studio-bg-elevated); color: var(--studio-text-primary); }
+  .crystal-studio .crystal-mobile-home-header > button,
+  .crystal-studio .crystal-mobile-workspace-tabs,
+  .crystal-studio .crystal-mobile-composer,
+  .crystal-studio .crystal-mobile-bottom-nav > div,
+  .crystal-studio .crystal-mobile-bottom-nav > button,
+  .crystal-studio .crystal-mobile-model-sheet { background: var(--studio-bg-panel); color: var(--studio-text-primary); border-color: var(--studio-border); }
+  .crystal-studio .crystal-mobile-home-hero h1,
+  .crystal-studio .crystal-mobile-composer-label,
+  .crystal-studio .crystal-mobile-pro-banner small,
+  .crystal-studio .crystal-mobile-workspace-tabs button,
+  .crystal-studio .crystal-mobile-bottom-nav button { color: var(--studio-text-secondary); }
+  .crystal-studio .crystal-mobile-composer textarea { color: var(--studio-text-primary); }
+  .crystal-studio .crystal-mobile-pro-banner,
+  .crystal-studio .crystal-mobile-composer-actions > button { background: var(--studio-bg-elevated); color: var(--studio-text-primary); }
+  .crystal-studio .crystal-mobile-model-select { background: var(--studio-bg-elevated) !important; color: var(--studio-text-primary); }
+  .crystal-studio .crystal-mobile-workspace-tabs button[aria-selected="true"],
+  .crystal-studio .crystal-mobile-bottom-nav button[aria-current="page"],
+  .crystal-studio .crystal-mobile-model-sheet > button.is-selected { background: var(--studio-bg-active); color: var(--studio-text-primary); }
+  .crystal-studio .crystal-mobile-pro-banner em,
+  .crystal-studio .crystal-mobile-composer-actions > button:last-child { background: var(--studio-accent); color: var(--studio-on-accent); }
+  .crystal-studio .crystal-mobile-model-overlay { background: var(--studio-overlay); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.crystal-studio, .crystal-infrastructure-page, .aichat-page) *, .cs-button, .crystal-theme-toggle { transition-duration: 0ms !important; animation-duration: 0ms !important; }
+}

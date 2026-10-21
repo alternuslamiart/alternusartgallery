@@ -1,14 +1,20 @@
-# Next tasks (reviewed 2026-10-20)
+# Next tasks (reviewed 2026-10-21)
 
 ## Next concrete task
 
-- [ ] Verify light and dark themes in `/casynus`, `/interior`,
-  `/infrastructure`, and `/aichat` at desktop and mobile widths. Check menus,
-  inspector inputs, chat collapse/reopen, and viewport contrast; fix any
-  remaining hardcoded surfaces found in the browser.
+- [x] Finish the interrupted shared studio UI kit and browser-session dock
+  recovery. Verify both themes at 1440/390px, mobile editor entry and panel
+  controls, inspector collapse, keyboard toolbar navigation, chat recovery,
+  and mock-account isolation. See `docs/PROGRESS.md` for exact coverage.
 - [ ] Design and implement authenticated conversation persistence for the
   shared studio AI dock, reusing `AssistantConversation` and
   `AssistantMessage` with explicit studio context and workspace ownership.
+  Start by specifying conversation scope across studios and guest import;
+  the completed per-identity sessionStorage recovery is not cloud storage.
+- [ ] Extend browser coverage to inspector edits, secondary menus/dialogs,
+  camera/transform/lighting/export interactions, and autosave reload. Inspect
+  the infrastructure edge-line artifacts and initial floor-plan framing seen
+  in the screenshots before marking full viewport visual QA complete.
 - [ ] Select and configure an image-capable provider before exposing image
   generation controls. You.com Answer is documented for cited answers only.
 
@@ -38,17 +44,20 @@
 
 ## Blockers
 
-- Browser automation crashed twice while opening the local studio on port
-  3002, so visual theme and responsive behavior remain unverified.
+- Built-in browser automation is blocked by the Windows sandbox startup error
+  `helper_sandbox_lock_failed` (`SetNamedSecurityInfoW ... failed: 5`). The
+  installed-Chrome fallback `scripts/verify-studios.mjs` works and completed
+  theme/responsive/core-interaction verification. Node HTTPS downloads to npm
+  and Google Fonts failed certificate verification; fix the environment's
+  trusted certificate chain before installing browser tooling or validating
+  downloaded Roboto fonts. Do not disable TLS verification.
 
 - Gemini direct responses require billing to be enabled on the Google AI
   project: the configured key's API reports that the free tier is unavailable
   in this country. Groq is working and serves as the automatic fallback.
-- The production build exceeds the available Node heap during compilation in
-  this environment. The latest full-project typecheck passes; retry the
-  production build on a larger-memory runner.
-- Browser automation/WebGL verification is not configured in the current test
-  tooling. Use a browser-capable environment before claiming camera or
-  responsive interaction verification.
+- Full-project lint has existing errors outside the recovered increment;
+  focused lint passes. Final full typecheck and production build passed;
+  stop local Next servers before regenerating Prisma on Windows
+  to avoid an `EPERM` rename error on `query_engine-windows.dll.node`.
 - Workspace persistence needs an explicit project association and database
   representation; browser-local autosave is not a substitute.

@@ -1,4 +1,7 @@
 "use client";
+import { useStudioConversation, useStudioDock } from "@/components/crystal-studio/StudioConversation";
+
+import { StudioToolbar } from "./kit";
 
 import {
   Box,
@@ -34,7 +37,7 @@ import {
   parseFloorLength,
   roundFloorValue,
 } from "./floor-plan-geometry";
-import { StudioAIChat, type StudioChatMessage } from "./StudioAIChat";
+import { StudioAIChat } from "./StudioAIChat";
 import type {
   FloorPlanObject,
   FloorPlanPoint,
@@ -46,6 +49,7 @@ import type {
 } from "./types";
 import { IconButton } from "./ui";
 import { useCrystalTheme } from "@/lib/crystal-theme";
+import { readViewportTheme } from "./viewport-theme";
 
 type Props = {
   renderer: string;
@@ -162,7 +166,6 @@ function CanvasScene({
   transform: Transform;
 }) {
   const { theme } = useCrystalTheme();
-  const darkEnvironment = theme === "dark";
   const canvas = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const node = canvas.current;
@@ -176,9 +179,10 @@ function CanvasScene({
       node.height = rect.height * ratio;
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       const bgGrad = ctx.createLinearGradient(0, 0, 0, rect.height);
-      bgGrad.addColorStop(0, darkEnvironment ? "#171a21" : "#F6F5F1");
-      bgGrad.addColorStop(0.54, darkEnvironment ? "#11151b" : "#EFECE6");
-      bgGrad.addColorStop(1, darkEnvironment ? "#101217" : "#E5E2DA");
+      const palette = readViewportTheme();
+      bgGrad.addColorStop(0, palette.top);
+      bgGrad.addColorStop(0.54, palette.center);
+      bgGrad.addColorStop(1, palette.bottom);
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, rect.width, rect.height);
       const line = (
@@ -246,9 +250,9 @@ function CanvasScene({
           ctx.moveTo(corners[0].x, corners[0].y);
           corners.slice(1).forEach((corner) => ctx.lineTo(corner.x, corner.y));
           ctx.closePath();
-          ctx.fillStyle = darkEnvironment ? "rgba(34, 41, 53, 0.72)" : "rgba(255, 255, 255, 0.68)";
+          ctx.fillStyle = palette.ground;
           ctx.fill();
-          ctx.strokeStyle = darkEnvironment ? "rgba(148, 163, 184, 0.38)" : "rgba(148, 163, 184, 0.32)";
+          ctx.strokeStyle = palette.grid;
           ctx.lineWidth = 1;
           ctx.stroke();
           ctx.clip();
@@ -261,8 +265,8 @@ function CanvasScene({
           const stroke = axis
             ? "rgba(225, 29, 72, 0.75)"
             : major
-              ? "rgba(100, 116, 139, 0.36)"
-              : "rgba(148, 163, 184, 0.24)";
+              ? palette.gridMajor
+              : palette.grid;
           const width = axis ? 1.4 : major ? 0.9 : 0.55;
           line([rounded, 0, -extent], [rounded, 0, extent], stroke, width);
           line(
@@ -271,8 +275,8 @@ function CanvasScene({
             axis
               ? "rgba(16, 185, 129, 0.78)"
               : major
-                ? "rgba(100, 116, 139, 0.36)"
-                : "rgba(148, 163, 184, 0.24)",
+                ? palette.gridMajor
+                : palette.grid,
             width,
           );
         }
@@ -409,7 +413,7 @@ function CanvasScene({
     drawings,
     measurement,
     transform,
-    darkEnvironment,
+    theme,
   ]);
   return (
     <canvas
@@ -466,10 +470,10 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
     panX: number;
     panY: number;
   } | null>(null);
-  const [chat, setChat] = useState(true);
+  const { open: chat, setOpen: setChat } = useStudioDock();
   const [aiModel, setAiModel] = useState("Precision Mode");
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
-  const [chatMessages, setChatMessages] = useState<StudioChatMessage[]>([
+  const [chatMessages, setChatMessages] = useStudioConversation([
     {
       id: "fp-welcome",
       role: "assistant",
@@ -841,7 +845,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
 
   return (
     <section
-      className="floor-plan-canvas relative min-h-0 overflow-hidden bg-[#fbfbfa] text-zinc-800"
+      className="floor-plan-canvas relative min-h-0 overflow-hidden bg-[var(--studio-bg-elevated)] text-[var(--studio-text-secondary)]"
       aria-label="2D Floor Plan Drafting Workspace"
     >
       <div
@@ -914,11 +918,11 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
               cx="1.5"
               cy="1.5"
               r={view.zoom > 55 ? 1 : 0.7}
-              fill="#c5c9d1"
+              fill="var(--studio-grid)"
             />
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill="#fbfbfa" />
+        <rect width="100%" height="100%" fill="var(--studio-draft-paper)" />
         {!isMobile && <rect width="100%" height="100%" fill="url(#floor-dots)" />}
         <g
           transform={`translate(${size.width / 2 + view.panX} ${
@@ -943,7 +947,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                   y={room.y}
                   width={room.width}
                   height={room.height}
-                  fill={selectedId === room.id ? "#dbeafe" : "#edf2f6"}
+                  fill={selectedId === room.id ? "var(--studio-draft-selected)" : "var(--studio-draft-room)"}
                   stroke={selectedId === room.id ? "#1687f7" : "#b8c4ce"}
                   strokeWidth=".025"
                 />
@@ -953,7 +957,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                   textAnchor="middle"
                   fontSize=".22"
                   fontWeight="500"
-                  fill="#334155"
+                  fill="var(--studio-text-primary)"
                 >
                   {room.label}
                 </text>
@@ -962,7 +966,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                   y={room.y + room.height / 2 + 0.26}
                   textAnchor="middle"
                   fontSize=".14"
-                  fill="#64748b"
+                  fill="var(--studio-text-secondary)"
                 >
                   {(room.width * room.height).toFixed(1)} m²
                 </text>
@@ -977,7 +981,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                 y1={wall.start.y}
                 x2={wall.end.x}
                 y2={wall.end.y}
-                stroke={selectedId === wall.id ? "#1687f7" : "#252930"}
+                stroke={selectedId === wall.id ? "var(--studio-accent)" : "var(--studio-draft-wall)"}
                 strokeWidth={wall.thickness}
                 strokeLinecap="square"
                 onPointerDown={(event) => {
@@ -1012,7 +1016,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                   y={-opening.height / 2}
                   width={opening.width}
                   height={opening.height}
-                  fill="#fbfbfa"
+                  fill="var(--studio-draft-paper)"
                   stroke="none"
                 />
                 {opening.type === "door" ? (
@@ -1022,7 +1026,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                         opening.width
                       } 0 0 1 ${opening.width / 2} ${opening.width}`}
                       fill="none"
-                      stroke={selectedId === opening.id ? "#1687f7" : "#475569"}
+                      stroke={selectedId === opening.id ? "var(--studio-accent)" : "var(--studio-text-secondary)"}
                       strokeWidth=".025"
                     />
                     <line
@@ -1030,7 +1034,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                       y1="0"
                       x2={-opening.width / 2}
                       y2={opening.width}
-                      stroke={selectedId === opening.id ? "#1687f7" : "#252930"}
+                      stroke={selectedId === opening.id ? "var(--studio-accent)" : "var(--studio-draft-wall)"}
                       strokeWidth=".04"
                     />
                   </>
@@ -1077,7 +1081,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                   width={item.width}
                   height={item.height}
                   rx=".06"
-                  fill={selectedId === item.id ? "#bfdbfe" : "#d7dee5"}
+                  fill={selectedId === item.id ? "var(--studio-draft-selected)" : "var(--studio-draft-furniture)"}
                   stroke="#64748b"
                   strokeWidth=".025"
                 />
@@ -1086,7 +1090,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                   y={item.y + item.height / 2 + 0.06}
                   textAnchor="middle"
                   fontSize=".13"
-                  fill="#475569"
+                  fill="var(--studio-text-secondary)"
                 >
                   {item.label}
                 </text>
@@ -1121,7 +1125,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                   y={(item.start.y + item.end.y) / 2 - 0.1}
                   textAnchor="middle"
                   fontSize=".18"
-                  fill="#a16207"
+                  fill="var(--studio-warning)"
                 >
                   {item.label ??
                     formatFloorLength(floorDistance(item.start, item.end), settings)}
@@ -1136,7 +1140,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                 x={item.x}
                 y={item.y}
                 fontSize=".24"
-                fill={selectedId === item.id ? "#1687f7" : "#334155"}
+                fill={selectedId === item.id ? "var(--studio-accent)" : "var(--studio-text-primary)"}
                 onPointerDown={(event) => {
                   event.stopPropagation();
                   if (tool === "delete") {
@@ -1186,7 +1190,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                 x={(measure.start.x + measure.current.x) / 2}
                 y={(measure.start.y + measure.current.y) / 2 - 0.12}
                 fontSize=".2"
-                fill="#a16207"
+                fill="var(--studio-warning)"
               >
                 {formatFloorLength(
                   floorDistance(measure.start, measure.current),
@@ -1199,7 +1203,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
       </svg>
 
       {/* Reference Top Floating Toolbar for Interior & 2D Floor Plan Studio */}
-      <div
+      <StudioToolbar
         className="crystal-modeling-tools studio-floating-toolbar ref-top-toolbar"
         role="toolbar"
         aria-label="Architectural drafting tools"
@@ -1301,7 +1305,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
             }
           }}
         />
-      </div>
+      </StudioToolbar>
 
       {/* Top Drafting Status HUD */}
       <div className="floor-plan-hud-bar" role="status">
@@ -1317,7 +1321,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
           aria-pressed={settings.snapToGrid}
           onClick={() => setSettings({ snapToGrid: !settings.snapToGrid })}
           className={`rounded px-1.5 py-0.5 text-[10px] font-semibold transition ${
-            settings.snapToGrid ? "bg-[#1a8cff] text-white" : "text-zinc-400 hover:text-white"
+            settings.snapToGrid ? "bg-[#1a8cff] text-[var(--studio-text-primary)]" : "text-[var(--studio-text-secondary)] hover:text-[var(--studio-text-primary)]"
           }`}
         >
           Grid
@@ -1327,7 +1331,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
           aria-pressed={settings.orthogonal}
           onClick={() => setSettings({ orthogonal: !settings.orthogonal })}
           className={`rounded px-1.5 py-0.5 text-[10px] font-semibold transition ${
-            settings.orthogonal ? "bg-[#1a8cff] text-white" : "text-zinc-400 hover:text-white"
+            settings.orthogonal ? "bg-[#1a8cff] text-[var(--studio-text-primary)]" : "text-[var(--studio-text-secondary)] hover:text-[var(--studio-text-primary)]"
           }`}
         >
           Ortho 90°
@@ -1384,7 +1388,7 @@ export function Viewport(p: Props) {
   const [mode, setMode] = useState<"floor-plan" | "modeling" | "images">(
     "modeling",
   );
-  const [chat, setChat] = useState(true);
+  const { open: chat, setOpen: setChat } = useStudioDock();
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
   const [textureOpen, setTextureOpen] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(false);
@@ -1409,7 +1413,7 @@ export function Viewport(p: Props) {
   const [future, setFuture] = useState<Transform[]>([]);
   const [fullscreen, setFullscreen] = useState(false);
   const [projectionMode, setProjectionMode] = useState<"Orthographic" | "Perspective">("Orthographic");
-  const [chatMessages, setChatMessages] = useState<StudioChatMessage[]>([
+  const [chatMessages, setChatMessages] = useStudioConversation([
     {
       id: "3d-welcome",
       role: "assistant",
@@ -1430,7 +1434,7 @@ export function Viewport(p: Props) {
     const toggleChat = () => setChat((value) => !value);
     window.addEventListener("crystal:toggle-ai-chat", toggleChat);
     return () => window.removeEventListener("crystal:toggle-ai-chat", toggleChat);
-  }, []);
+  }, [setChat]);
 
   const selectMobileMode = (nextMode: "floor-plan" | "modeling" | "images") => {
     setMode(nextMode);
@@ -1873,7 +1877,7 @@ export function Viewport(p: Props) {
   return (
     <section
       ref={canvasRef as React.RefObject<HTMLElement>}
-      className={`crystal-3d-viewport relative min-h-0 overflow-hidden bg-[#0b0d10] ${
+      className={`crystal-3d-viewport relative min-h-0 overflow-hidden bg-[var(--studio-bg-canvas)] ${
         mobileToolsOpen ? "crystal-mobile-tools-open" : ""
       } ${
         toolMode === "object" || toolMode === "draw"
@@ -2174,15 +2178,15 @@ export function Viewport(p: Props) {
       </div>
 
       {help && (
-        <div className="studio-floating-help absolute right-[296px] top-16 z-30 w-64 rounded-[14px] border border-slate-900/10 bg-white/95 p-3.5 text-[11.5px] leading-relaxed text-slate-600 shadow-xl backdrop-blur-xl">
-          <strong className="mb-1 block text-slate-900">Viewport Navigation</strong>
+        <div className="studio-floating-help absolute right-[296px] top-16 z-30 w-64 rounded-[14px] border border-[var(--studio-border)] bg-[var(--studio-bg-panel)] p-3.5 text-[11.5px] leading-relaxed text-[var(--studio-text-secondary)] shadow-xl backdrop-blur-xl">
+          <strong className="mb-1 block text-[var(--studio-text-primary)]">Viewport Navigation</strong>
           MMB / RMB orbits, Shift + LMB pans, wheel zooms. Keys Q/W/E/S switch tools; Numpad 1/3/7/0 switches camera presets.
         </div>
       )}
       {(lighting || world) && (
-        <div className="studio-floating-help absolute right-[280px] top-16 z-30 w-56 rounded-[10px] border border-white/10 bg-[#15181f] p-3 text-[11px] leading-relaxed text-zinc-300 shadow-2xl">
+        <div className="studio-floating-help absolute right-[280px] top-16 z-30 w-56 rounded-[10px] border border-[var(--studio-border)] bg-[var(--studio-bg-elevated)] p-3 text-[11px] leading-relaxed text-[var(--studio-text-primary)] shadow-2xl">
           <div className="mb-1.5 flex items-center justify-between">
-            <strong className="text-zinc-100">
+            <strong className="text-[var(--studio-text-primary)]">
               {lighting ? "Scene Lighting" : "World Environment"}
             </strong>
             <button
@@ -2191,14 +2195,14 @@ export function Viewport(p: Props) {
                 setLighting(false);
                 setWorld(false);
               }}
-              className="text-zinc-400 hover:text-white"
+              className="text-[var(--studio-text-secondary)] hover:text-[var(--studio-text-primary)]"
             >
               ✕
             </button>
           </div>
-          <p className="text-zinc-400">
-            Renderer: <span className="text-zinc-200">{p.renderer}</span> · Grid{" "}
-            <span className="text-zinc-200">{grid ? "Visible" : "Hidden"}</span>
+          <p className="text-[var(--studio-text-secondary)]">
+            Renderer: <span className="text-[var(--studio-text-primary)]">{p.renderer}</span> · Grid{" "}
+            <span className="text-[var(--studio-text-primary)]">{grid ? "Visible" : "Hidden"}</span>
           </p>
         </div>
       )}
@@ -2240,7 +2244,7 @@ export function Viewport(p: Props) {
       />
 
       {/* Reference Top Floating Toolbar: + Shapes | Select (Blue) | Frame | 100% v | Export (Blue) | Play */}
-      <div
+      <StudioToolbar
         className="crystal-modeling-tools studio-floating-toolbar ref-top-toolbar"
         role="toolbar"
         aria-label="3D modeling tools"
@@ -2352,7 +2356,7 @@ export function Viewport(p: Props) {
           active={playing}
           onClick={() => setPlaying((value) => !value)}
         />
-      </div>
+      </StudioToolbar>
     </section>
   );
 }

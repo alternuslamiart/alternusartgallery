@@ -1,8 +1,10 @@
 "use client";
+import { useStudioConversation, useStudioDock } from "@/components/crystal-studio/StudioConversation";
+
+import { InspectorSection, StudioPanel, StudioToolbar, StudioHeader, StudioButton, NumberInput } from "@/components/crystal-studio/kit";
 
 import {
   Armchair,
-  ArrowLeft,
   Bike,
   Building2,
   BusFront,
@@ -22,7 +24,6 @@ import {
   LayoutGrid,
   Lightbulb,
   Lock,
-  Menu,
   MousePointer2,
   PanelLeftOpen,
   PanelRightOpen,
@@ -52,14 +53,11 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Roboto } from "next/font/google";
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import {
   StudioAIChat,
-  type StudioChatMessage,
 } from "@/components/crystal-studio/StudioAIChat";
-import { CrystalThemeToggle } from "@/components/crystal-studio/CrystalThemeToggle";
 import { useCrystalTheme } from "@/lib/crystal-theme";
 import {
   BinaryToggle,
@@ -189,20 +187,7 @@ function NumericField({
   step?: number;
   onChange: (value: number) => void;
 }) {
-  return (
-    <label className="infra-field">
-      <span>{label}</span>
-      <input
-        type="number"
-        value={Number(value.toFixed(2))}
-        step={step}
-        onChange={(event) => {
-          const next = event.currentTarget.valueAsNumber;
-          if (Number.isFinite(next)) onChange(next);
-        }}
-      />
-    </label>
-  );
+  return <NumberInput label={label} value={value} step={step} onValueChange={onChange} />;
 }
 
 function ActionButton({
@@ -221,17 +206,7 @@ function ActionButton({
   className?: string;
 }) {
   return (
-    <button
-      type="button"
-      title={title}
-      aria-label={title}
-      aria-pressed={active}
-      disabled={disabled}
-      onClick={onClick}
-      className={`infra-action ${active ? "is-active" : ""} ${className}`}
-    >
-      {children}
-    </button>
+    <StudioButton title={title} aria-label={title} active={active} disabled={disabled} onClick={onClick} variant="ghost" size="icon" className={`infra-action ${className}`}>{children}</StudioButton>
   );
 }
 
@@ -256,7 +231,7 @@ export default function InfrastructurePage() {
   const [lighting, setLighting] = useState<LightingSettings>(initialLighting);
   const [undergroundUtilities, setUndergroundUtilities] = useState(false);
   const [lightingOpen, setLightingOpen] = useState(false);
-  const [chatOpen, setChatOpen] = useState(true);
+  const { open: chatOpen, setOpen: setChatOpen } = useStudioDock();
   const [chatInput, setChatInput] = useState("");
   const [chatModel, setChatModel] = useState("Precision Mode");
   const [treeGroupsOpen, setTreeGroupsOpen] = useState({
@@ -268,7 +243,7 @@ export default function InfrastructurePage() {
   const [projectionMode, setProjectionMode] = useState<
     "Orthographic" | "Perspective"
   >("Perspective");
-  const [messages, setMessages] = useState<StudioChatMessage[]>([
+  const [messages, setMessages] = useStudioConversation([
     {
       id: "infra-welcome",
       role: "assistant",
@@ -748,62 +723,23 @@ export default function InfrastructurePage() {
   return (
     <main
       data-crystal-studio-theme={theme}
-      className={`crystal-infrastructure-page ${roboto.className} fixed inset-0 z-20 h-screen w-full overflow-hidden bg-[#08090b] text-zinc-100`}
+      className={`crystal-infrastructure-page ${roboto.className} fixed inset-0 z-20 h-screen w-full overflow-hidden bg-[var(--studio-bg-canvas)] text-[var(--studio-text-primary)]`}
     >
       {/* Left Sidebar: Reference Scene Hierarchy + Site Tools */}
-      <aside
+      <StudioPanel
         className={`infra-sidebar infra-left-panel studio-sidebar-shell ref-floating-sidebar flex shrink-0 flex-col ${
           libraryOpen ? "is-open" : ""
         } ${leftCollapsed ? "is-collapsed-desktop" : ""}`}
         aria-label="Infrastructure site tools"
       >
-        <div className="ref-sidebar-header">
-          <div className="flex min-w-0 items-center gap-2">
-            <Link
-              href="/project"
-              aria-label="Back to projects"
-              title="Back to projects"
-              className="ref-header-icon-btn"
-            >
-              <ArrowLeft size={14} />
-            </Link>
-            <span className="ref-sidebar-title truncate">
-              Willow Creek District
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <CrystalThemeToggle />
-            <ActionButton
-              title="Undo (Ctrl+Z)"
-              onClick={undo}
-              disabled={!past.length}
-            >
-              <Undo2 size={13} />
-            </ActionButton>
-            <ActionButton
-              title="Redo (Ctrl+Y)"
-              onClick={redo}
-              disabled={!future.length}
-            >
-              <Redo2 size={13} />
-            </ActionButton>
-            <button
-              type="button"
-              aria-label="Collapse site tools panel"
-              title="Collapse sidebar"
-              onClick={() => setLeftCollapsed(true)}
-              className="ref-header-icon-btn max-[700px]:hidden"
-            >
-              <Menu size={14} />
-            </button>
-          </div>
-        </div>
+        <StudioHeader title="Willow Creek District" backHref="/project" onCollapse={() => setLeftCollapsed(true)} actions={<><ActionButton title="Undo (Ctrl+Z)" onClick={undo} disabled={!past.length}><Undo2 size={13} /></ActionButton><ActionButton title="Redo (Ctrl+Y)" onClick={redo} disabled={!future.length}><Redo2 size={13} /></ActionButton></>} />
+
 
         <StudioModeNav activeStudio="infrastructure" />
 
         <div className="px-3 pb-2 pt-1">
           <label className="ref-search-box">
-            <Search size={13} className="shrink-0 text-zinc-500" />
+            <Search size={13} className="shrink-0 text-[var(--studio-text-secondary)]" />
             <input
               value={hierarchyQuery}
               onChange={(event) => setHierarchyQuery(event.target.value)}
@@ -833,7 +769,7 @@ export default function InfrastructurePage() {
             <span className="ref-tree-spacer" />
             <Video size={13} className="ref-tree-icon" />
             <span className="ref-tree-label">Site Camera</span>
-            <span className="ml-auto text-[10px] text-zinc-500">
+            <span className="ml-auto text-[10px] text-[var(--studio-text-secondary)]">
               {visibleObjects.length} vis
             </span>
           </button>
@@ -1158,7 +1094,7 @@ export default function InfrastructurePage() {
             </span>
             <ChevronDown
               size={12}
-              className={`text-zinc-500 transition-transform ${
+              className={`text-[var(--studio-text-secondary)] transition-transform ${
                 addDrawerOpen ? "rotate-180" : ""
               }`}
             />
@@ -1284,10 +1220,10 @@ export default function InfrastructurePage() {
             <span>Help & Feedback</span>
           </button>
         </div>
-      </aside>
+      </StudioPanel>
 
       {/* Center 3D Infrastructure Workspace */}
-      <section className="infra-workspace relative flex min-w-0 flex-1 flex-col bg-[#EEECE6]">
+      <section className="infra-workspace relative flex min-w-0 flex-1 flex-col bg-[var(--studio-bg-elevated)]">
         <div className="infra-viewport relative min-h-0 flex-1">
           {leftCollapsed && (
             <button
@@ -1345,7 +1281,7 @@ export default function InfrastructurePage() {
           />
 
           {/* Top Floating Toolbar matching Reference Image */}
-          <div
+          <StudioToolbar
             className="ref-top-toolbar"
             role="toolbar"
             aria-label="Object tools"
@@ -1438,7 +1374,7 @@ export default function InfrastructurePage() {
                 className="ref-toolbar-zoom-pill cursor-pointer bg-transparent"
               >
                 {cameraPresets.map((preset) => (
-                  <option key={preset} value={preset} className="bg-white text-slate-900">
+                  <option key={preset} value={preset} className="bg-[var(--studio-bg-panel)] text-[var(--studio-text-primary)]">
                     {preset}
                   </option>
                 ))}
@@ -1492,7 +1428,7 @@ export default function InfrastructurePage() {
             >
               <Play size={13} />
             </button>
-          </div>
+          </StudioToolbar>
 
           {lightingOpen && (
             <div className="infra-lighting">
@@ -1783,7 +1719,7 @@ export default function InfrastructurePage() {
       </section>
 
       {/* Right Sidebar: Reference Collaborator Header + Properties & Settings */}
-      <aside
+      <StudioPanel
         className={`infra-sidebar infra-inspector studio-sidebar-shell ref-floating-sidebar flex shrink-0 flex-col ${
           inspectorOpen ? "is-open" : ""
         } ${rightCollapsed ? "is-collapsed-desktop" : ""}`}
@@ -1792,18 +1728,18 @@ export default function InfrastructurePage() {
         <InspectorCollaboratorBar
           onCollapse={() => setRightCollapsed(true)}
           onAction={() => exportLayout("GeoJSON")}
-          actionLabel="Invite"
+          actionLabel="Export"
         />
 
         <div className="ref-inspector-scroll flex-1 overflow-y-auto">
           {/* Camera Section */}
-          <div className="ref-inspector-section">
-            <div className="ref-inspector-section-header">
+          <InspectorSection title={<>
               <span>Camera</span>
-              <span className="text-[11px] font-normal text-slate-500">
+              <span className="text-[11px] font-normal text-[var(--studio-text-secondary)]">
                 {lighting.preset}
               </span>
-            </div>
+            </>}>
+
             <div className="grid grid-cols-4 gap-1">
               {(["Perspective", "Top", "Front", "Right"] as CameraPreset[]).map(
                 (preset) => (
@@ -1811,20 +1747,20 @@ export default function InfrastructurePage() {
                     key={preset}
                     type="button"
                     onClick={() => viewport.current?.preset(preset)}
-                    className="rounded-lg bg-[#F1F0EC] px-2 py-1.5 text-[11px] font-medium text-slate-700 transition hover:bg-[#E5E3DC] hover:text-slate-900"
+                    className="rounded-lg bg-[var(--studio-bg-elevated)] px-2 py-1.5 text-[11px] font-medium text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"
                   >
                     {preset}
                   </button>
                 ),
               )}
             </div>
-          </div>
+          </InspectorSection>
 
           {/* Frame / Surface Color Section */}
-          <div className="ref-inspector-section">
-            <div className="ref-inspector-section-header">
+          <InspectorSection title={<>
               <span>Frame</span>
-            </div>
+            </>}>
+
             <div className="ref-frame-color-row">
               <label className="ref-color-swatch-box" title="Surface color">
                 <input
@@ -1855,13 +1791,13 @@ export default function InfrastructurePage() {
             >
               Edit Frame
             </button>
-          </div>
+          </InspectorSection>
 
           {/* Global Settings with Reference Blue Yes/No & Show/Hide Pills */}
-          <div className="ref-inspector-section">
-            <div className="ref-inspector-section-header">
+          <InspectorSection title={<>
               <span>Global Settings</span>
-            </div>
+            </>}>
+
             <div className="space-y-2.5">
               <div className="ref-setting-row">
                 <span className="ref-setting-label">Cast Shadows</span>
@@ -1884,7 +1820,7 @@ export default function InfrastructurePage() {
                 />
               </div>
             </div>
-          </div>
+          </InspectorSection>
 
           {/* Post-Processing Section */}
           <div className="ref-inspector-section">
@@ -1910,10 +1846,10 @@ export default function InfrastructurePage() {
           </div>
 
           {/* Environment Section */}
-          <div className="ref-inspector-section">
-            <div className="ref-inspector-section-header">
+          <InspectorSection title={<>
               <span>Environment</span>
-            </div>
+            </>}>
+
             <div className="space-y-2.5">
               <div className="ref-setting-row">
                 <span className="ref-setting-label">Sun Light</span>
@@ -1959,7 +1895,7 @@ export default function InfrastructurePage() {
                 </div>
               </div>
             </div>
-          </div>
+          </InspectorSection>
 
           {/* Selected Object Properties */}
           {selected ? (
@@ -2151,25 +2087,25 @@ export default function InfrastructurePage() {
               </label>
             </div>
           ) : (
-            <div className="ref-inspector-section">
-              <div className="ref-inspector-section-header">
+            <InspectorSection title={<>
                 <span>Selected Element</span>
-              </div>
-              <p className="text-[11px] leading-relaxed text-zinc-400">
+              </>}>
+
+              <p className="text-[11px] leading-relaxed text-[var(--studio-text-secondary)]">
                 Choose a building, road, tree or site element in the hierarchy
                 or 3D viewport to edit its dimensions, materials, and transform.
               </p>
-            </div>
+            </InspectorSection>
           )}
 
           {/* Planning Suggestions */}
-          <div className="ref-inspector-section">
-            <div className="ref-inspector-section-header">
+          <InspectorSection title={<>
               <span>Planning Suggestions</span>
-              <span className="text-[10px] font-normal text-zinc-500">
+              <span className="text-[10px] font-normal text-[var(--studio-text-secondary)]">
                 local demo
               </span>
-            </div>
+            </>}>
+
             <div className="infra-ai-action-grid">
               {[
                 ["auto-layout", "Auto layout"],
@@ -2188,13 +2124,13 @@ export default function InfrastructurePage() {
                 </button>
               ))}
             </div>
-          </div>
+          </InspectorSection>
 
           {/* Export & Site Overview */}
           <div className="ref-inspector-section border-b-0">
             <div className="ref-inspector-section-header">
               <span>Export</span>
-              <span className="text-[10px] font-normal text-zinc-500">
+              <span className="text-[10px] font-normal text-[var(--studio-text-secondary)]">
                 {objects.length} objects · {counts.road ?? 0} roads
               </span>
             </div>
@@ -2218,7 +2154,7 @@ export default function InfrastructurePage() {
             </div>
           </div>
         </div>
-      </aside>
+      </StudioPanel>
     </main>
   );
 }

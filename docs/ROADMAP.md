@@ -21,8 +21,10 @@ requirements provide new evidence.
 
 - [x] Share a persisted light/dark preference and theme toggle across the
   three studios and `/aichat`; adapt viewport environment colors.
+- [x] Complete the interrupted shared UI kit and tab-local conversation
+  recovery; verify desktop/mobile themes and core dock interactions in Chrome.
 - [ ] Complete visual QA and remove remaining hardcoded light/dark surfaces
-  in all studio controls at desktop and mobile widths.
+  in secondary dialogs and less-used controls beyond the verified baseline.
 - [ ] Connect the shared studio AI dock to authenticated conversation storage
   with studio context and validated scene-action tools.
 

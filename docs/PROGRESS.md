@@ -1,6 +1,61 @@
 # Verified progress
 
-Last updated: 2026-10-20
+Last updated: 2026-10-21
+
+## Resumed studio UI kit and browser-session conversation increment
+
+- Recovered the interrupted work from the dirty tree after `fae23f2`, the
+  handoff docs, and the three `.studio-*.cjs` migration scripts. The prior
+  conversation was not available in this session. Already implemented:
+  shared theme, You Answer integration, infrastructure local autosave, and
+  existing studio routes. Partly implemented at resume: extracted theme
+  styles, shared UI primitives, viewport palette, and session-backed AI dock.
+- Finished that existing increment without rerunning the migration scripts.
+  `tokens.css`, `studio.css`, and `kit.css` now provide the shared palette,
+  layout, and controls. Fixed font-token scope, mobile creation-home themes,
+  interior SVG canvas contrast, gizmo axis colors, active-button contrast,
+  expanded-chat sizing, and overlapping mobile toolbars/panel toggles.
+- Fixed a browser-discovered root hydration failure by keeping the global
+  style and scripts inside `<head>`. Restored accessible new/clear conversation
+  actions and the supplied dock status label.
+- `StudioConversationProvider` retains messages and dock state across studio
+  navigation and reload within a browser tab. Identity changes reset visible
+  chat before rendering another account and reject updates from stale account
+  callbacks without remounting the editor. Snapshots retain at most 200 recent
+  messages within the reader's 1,000,000-character limit. This is browser
+  session recovery, not authenticated workspace/cloud persistence.
+- Verified `npm test` (22 passed), `npm run typecheck`, focused ESLint across
+  changed implementation/tests (0 errors; 15 existing image/hook warnings),
+  and PostCSS parsing of all four affected stylesheets. Full `npm run lint`
+  still fails on existing unused-symbol/prefer-const errors in unrelated
+  routes, legacy editor components, email, and PayPal modules.
+- Headless installed Chrome verified `/casynus`, `/interior`, `/infrastructure`,
+  and `/aichat` at 1440 and 390 CSS pixels in both themes with no horizontal
+  page overflow or runtime exceptions. Verified mobile editor entry, mobile
+  infrastructure Library/Inspector access, inspector collapse, toolbar arrow
+  navigation, a local floor-plan prompt, chat expand/minimize/reopen, new chat,
+  reload/theme recovery, and cross-studio navigation. Mock-session account
+  switching/signout isolated chat without replacing the mounted editor. No
+  real account or database round trip was used. Infrastructure WebGL rendered;
+  exhaustive camera/transform/lighting/export checks remain separate.
+- Repeat browser checks with `node scripts/verify-studios.mjs` against a local
+  Next server on port 3002 (Node 22, installed Chrome; `CHROME_PATH` and
+  `STUDIO_QA_URL` can override defaults). Screenshots/results are under ignored
+  `.tmp/studio-browser/`. The CUA tool could not start due to
+  `helper_sandbox_lock_failed` / `SetNamedSecurityInfoW ... failed: 5`.
+  Installing isolated Playwright failed with `UNABLE_TO_VERIFY_LEAF_SIGNATURE`;
+  the saved harness instead uses installed Chrome through DevTools. Local dev
+  font downloads hit the same certificate error and used Next's font fallback.
+- Final `npm run build` passed: Prisma generated and all 87 static pages
+  completed. The first final attempt stopped at Prisma with `EPERM` renaming
+  `query_engine-windows.dll.node`; stopping the temporary QA server released
+  the lock and the retry passed. Existing Browserslist and client-rendering
+  warnings for `/login`, `/reset-password`, and `/account` remain. Builds skip
+  lint by existing configuration; the separate lint results above still apply.
+  Final `git diff --check` and browser-script syntax validation also passed.
+- Existing deleted infrastructure images, migration scripts, and crash reports
+  were preserved. Cloud studio chat/scene storage, configured image generation,
+  and live You/database/deployment verification remain pending.
 
 ## Shared Crystal studio theme and AI dock increment
 
