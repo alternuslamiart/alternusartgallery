@@ -2,6 +2,9 @@
 
 ## Next concrete task
 
+- [x] Restore the existing `/aichat` 8px frame visibility in light/dark by
+  removing only background overrides; verify desktop/mobile in Chrome.
+
 - [x] Replace profile Usage demos with real persisted workspace AI credits and
   Basic/Pro/Teams/Studio limits at 1x/4x/10x/20x; enforce before provider calls.
 - [x] Route Prisma schema operations through DIRECT_URL; verify production

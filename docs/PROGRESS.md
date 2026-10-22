@@ -2,6 +2,20 @@
 
 Last updated: 2026-10-22
 
+## Restore AI chat frame spacing in both themes
+
+- Removed only the two shared-kit background overrides for `/aichat` aside
+  and main. Existing JSX colors now apply again: canvas/sidebar background
+  around the panel, panel background inside the existing 8px margin/radius.
+  This makes the original spacing visible in light and dark. No chat markup,
+  handlers, content, dimensions or other studio styling changed.
+- Local Chrome checked 1920/390px in both themes using the actual theme button:
+  8px top/right/bottom and desktop sidebar gap, distinct panel/frame colors,
+  no horizontal overflow, retained welcome/composer and no runtime exceptions.
+  Auth HTTP was mocked as signed out. Desktop screenshots visually inspected;
+  artifacts `.tmp/aichat-frame-1792672738394/`. CSS parse and diff checks passed.
+  Production build/typecheck were not repeated for this two-rule CSS removal.
+
 ## Usage activation follow-up: Prisma routing, production build and browser QA
 
 - Prisma CLI now uses DIRECT_URL for schema operations, while DATABASE_URL

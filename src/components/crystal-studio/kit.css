@@ -149,8 +149,6 @@ html[data-crystal-theme="light"] :is(.crystal-studio, .crystal-infrastructure-pa
 /* Semantic color utilities also serve /aichat and the existing property forms. */
 :is(.crystal-studio, .crystal-infrastructure-page, .aichat-page) [class~="bg-[var(--studio-accent)]"] { color: var(--studio-on-accent); }
 .aichat-page :is(aside, header, form, [role="dialog"]) { border-color: var(--studio-border); }
-.aichat-page aside { background: var(--studio-bg-panel); }
-.aichat-page main { background: var(--studio-bg-canvas); }
 .aichat-page { --studio-font: var(--font-roboto, Roboto), system-ui, sans-serif; }
 
 /* The mobile creation home shares the editor palette and keeps its existing layout. */
