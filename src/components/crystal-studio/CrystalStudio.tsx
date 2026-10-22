@@ -2,7 +2,7 @@
 
 import { Archive, ArrowLeft, ArrowRight, BookOpen, ChevronDown, FilePlus2, Glasses, Globe2, Grid2X2, Home, PanelLeftOpen, Paperclip, Plus, Search, Settings, Share2, Sparkles, Wand2, Zap } from "lucide-react";
 import NextImage from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { generateModel } from "@/services/ai";
 import Link from "next/link";
@@ -12,7 +12,7 @@ import { InteriorSceneSidebar } from "./InteriorSceneSidebar";
 import { RightPanel } from "./RightPanel";
 import type { FloorPlanObject, MaterialName, RenderSettings, StudioAsset, StudioMode, StudioTool, Transform } from "./types";
 import type { FloorPlanSettings } from "./types";
-import { DEFAULT_FLOOR_PLAN_SETTINGS } from "./floor-plan-geometry";
+import { DEFAULT_FLOOR_PLAN_SETTINGS, floorPlanHistoryReducer } from "./floor-plan-geometry";
 import { floorPlanPaper, floorPlanSvg, svgToPdf } from "./floor-plan-export";
 import { Viewport } from "./Viewport";
 import { UnifiedSidebar } from "@/components/unified-sidebar";
@@ -89,7 +89,7 @@ export function CrystalStudio({
       }
     }
   };
-  const [floorPlanObjects, setFloorPlanObjects] = useState<FloorPlanObject[]>([
+  const [floorPlanHistory, dispatchFloorPlan] = useReducer(floorPlanHistoryReducer, { past: [], future: [], present: [
     { id: "wall-exterior-top", type: "wall", start: { x: 0, y: 0 }, end: { x: 8, y: 0 }, thickness: 0.18 },
     { id: "wall-exterior-right", type: "wall", start: { x: 8, y: 0 }, end: { x: 8, y: 6 }, thickness: 0.18 },
     { id: "wall-exterior-bottom", type: "wall", start: { x: 8, y: 6 }, end: { x: 0, y: 6 }, thickness: 0.18 },
@@ -97,9 +97,23 @@ export function CrystalStudio({
     { id: "room-living", type: "room", x: 0.35, y: 0.35, width: 4.2, height: 3.1, label: "Living room" },
     { id: "room-kitchen", type: "room", x: 4.55, y: 0.35, width: 3.1, height: 2.35, label: "Kitchen" },
     { id: "room-bedroom", type: "room", x: 4.55, y: 2.7, width: 3.1, height: 2.95, label: "Bedroom" },
-    { id: "door-entry", type: "door", x: 3.1, y: 6, width: 0.9, height: 0.12, rotation: 0 },
-    { id: "window-living", type: "window", x: 0, y: 1.45, width: 0.12, height: 1.4, rotation: 90 },
-  ]);
+    { id: "door-entry", type: "door", x: 3.1, y: 6, width: 0.9, height: 0.18, rotation: 180, side: "right", swing: "in" },
+    { id: "window-living", type: "window", x: 0, y: 1.45, width: 1.4, height: .18, rotation: 90, windowType: "double" },
+  ] });
+  const floorPlanObjects = floorPlanHistory.present;
+  const setFloorPlanObjects = (next: FloorPlanObject[] | ((previous: FloorPlanObject[]) => FloorPlanObject[])) => dispatchFloorPlan({ type: "commit", next });
+  useEffect(() => {
+    if (studioMode !== "floor-plan") return;
+    const handler = (event: KeyboardEvent) => {
+      if ((event.target as HTMLElement)?.closest("input,textarea,select,[contenteditable=true]")) return;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
+        event.preventDefault();
+        dispatchFloorPlan({ type: event.shiftKey ? "redo" : "undo" });
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [studioMode]);
   const [hoveredFloorPlanId,setHoveredFloorPlanId]=useState<string|null>(null);
   const [floorPlanName, setFloorPlanName] = useState("Untitled project");
   const [selectedFloorPlanId, setSelectedFloorPlanId] = useState<string | null>(null);

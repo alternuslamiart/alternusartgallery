@@ -6,6 +6,9 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Complete Interior pointer drag, handed door symbols, precision inputs,
+  repeated wall drawing and undoable drafting edits within the original UI.
+
 - [x] Center and fit Interior plan exports to the sheet with uniform scaling
   and small margins, sharing framing across vector and raster formats.
 

@@ -2,6 +2,11 @@
 
 ## Next concrete task
 
+- [x] Add Interior door handedness/swing, real object drag, reliable wall
+  creation over existing geometry, precision controls and document undo/redo.
+- [ ] Add explicit wall-host relationships and opening overlap validation before
+  claiming constrained wall edits that automatically reposition attached openings.
+
 - [x] Fit and center Interior plan exports on the sheet with small white
   margins, preserving proportions across SVG/PDF/raster output.
 - [ ] For dimensioned print workflows, add an explicit fixed-scale export

@@ -35,7 +35,7 @@
 
 /* Match the Architecture/Infrastructure inspector while keeping drafting controls. */
 .interior-plan-restored .interior-scene-inspector { background:var(--studio-bg-panel); color:var(--studio-text-primary); }
-.interior-scene-inspector .interior-inspector-header { display:flex; align-items:center; justify-content:space-between; min-height:54px; padding:12px 14px; border-bottom:1px solid var(--studio-border); }
+.interior-scene-inspector .interior-inspector-header { display:flex; flex-shrink:0; align-items:center; justify-content:space-between; min-height:58px; padding:12px 14px; border-bottom:1px solid var(--studio-border); }
 .interior-inspector-header strong { font-size:13px; font-weight:600; }
 .interior-scene-inspector button { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:30px; padding:7px 9px; border:1px solid transparent; border-radius:8px; background:transparent; color:inherit; cursor:pointer; }
 .interior-scene-inspector button:hover:not(:disabled) { background:var(--studio-bg-hover); }

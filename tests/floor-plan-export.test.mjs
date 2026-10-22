@@ -58,3 +58,12 @@ test('SVG and PDF share fit coordinates and explicitly label fitted output', () 
   assert.match(svg, /Fit to page/); assert.match(pdf, /Fit to page/);
   assert.doesNotMatch(svg, /Scale 1:100/); assert.doesNotMatch(pdf, /Scale 1:100/);
 });
+
+test('rotated door leaf and arc stay within fitted bounds and export with the chosen hand/swing', () => {
+  const door = { id: 'door', type: 'door', x: -2, y: 4, width: 1, height: .2, rotation: 90, side: 'left', swing: 'out' };
+  const paper = floorPlanPaper([door], settings), svg = floorPlanSvg([door], settings), pdf = svgToPdf([door], settings);
+  assert.ok(paper.bounds.maxX >= -1); assert.ok(paper.bounds.minY <= 3.5); assert.ok(paper.bounds.maxY >= 4.5);
+  assert.match(svg, /rotate\(90\)/); assert.match(svg, /polyline points=/);
+  assert.notEqual(svg, floorPlanSvg([{ ...door, side: 'right' }], settings));
+  assert.notEqual(pdf, svgToPdf([{ ...door, swing: 'in' }], settings));
+});

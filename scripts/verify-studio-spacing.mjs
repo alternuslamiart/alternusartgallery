@@ -90,7 +90,8 @@ async function run() {
       assert.equal(await evaluate('document.querySelector(".interior-scene-object").getAttribute("aria-pressed")'),'true','Hierarchy selects actual plan objects');
       if(theme==='dark') {
         await evaluate(`(()=>{const e=document.querySelector('.interior-scene-inspector input[aria-label="thickness"]');e.focus();e.select();})()`);
-        await send('Input.insertText',{text:'250'});await wait(100);
+        await send('Input.insertText',{text:'250'});
+        await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter'});await wait(100);
         const saved=await evaluate(`(async()=>{
           const original=URL.createObjectURL;let captured;
           URL.createObjectURL=function(blob){captured=blob;return original.call(this,blob)};

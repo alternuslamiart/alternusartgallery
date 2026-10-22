@@ -34,6 +34,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CubeFilled } from "./filled-icons";
 import {
   floorSnapPoint,
+  floorDoorSymbol,
+  floorPlaceOpening,
+  floorTranslateObject,
   formatFloorLength,
   parseFloorLength,
   roundFloorValue,
@@ -443,7 +446,10 @@ const MODELING_QUICK_PROMPTS = [
 ];
 
 function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
-  const objects = floorInitialObjects(p.floorPlanObjects);
+  const sourceObjects = floorInitialObjects(p.floorPlanObjects);
+  const [moving, setMoving] = useState<{ original: FloorPlanObject; start: FloorPlanPoint; preview: FloorPlanObject } | null>(null);
+  const objects = moving && moving.preview !== moving.original ? sourceObjects.map(object => object.id === moving.original.id ? moving.preview : object) : sourceObjects;
+  const [placementMessage, setPlacementMessage] = useState("");
   const [view, setView] = useState({ zoom: 72, panX: 0, panY: 0 });
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [tool, setTool] = useState<
@@ -508,13 +514,13 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
     return () => observer.disconnect();
   }, []);
 
-  const pointFromEvent = (event: React.PointerEvent<SVGSVGElement>) => {
+  const pointFromEvent = (event: React.PointerEvent<SVGSVGElement>, snap = true) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const raw = {
       x: (event.clientX - rect.left - rect.width / 2 - view.panX) / view.zoom,
       y: (event.clientY - rect.top - rect.height / 2 - view.panY) / view.zoom,
     };
-    return floorSnapPoint(raw, objects, settings, view.zoom);
+    return snap ? floorSnapPoint(raw, objects, settings, view.zoom) : raw;
   };
   const updateObjects = (next: FloorPlanObject[]) =>
     p.onFloorPlanObjectsChange?.(next);
@@ -523,39 +529,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
     updateObjects([...objects, object]);
     select(object.id);
   };
-  const nearestWall = (point: FloorPlanPoint) => {
-    let result: {
-      point: FloorPlanPoint;
-      rotation: number;
-      distance: number;
-    } | null = null;
-    const walls = objects.filter(
-      (item): item is Extract<FloorPlanObject, { type: "wall" }> =>
-        item.type === "wall",
-    );
-    for (const wall of walls) {
-      const dx = wall.end.x - wall.start.x;
-      const dy = wall.end.y - wall.start.y;
-      const length = Math.hypot(dx, dy) || 1;
-      const t = Math.max(
-        0,
-        Math.min(
-          1,
-          ((point.x - wall.start.x) * dx + (point.y - wall.start.y) * dy) /
-            (length * length),
-        ),
-      );
-      const candidate = { x: wall.start.x + dx * t, y: wall.start.y + dy * t };
-      const distance = floorDistance(point, candidate);
-      if (result === null || distance < result.distance)
-        result = {
-          point: candidate,
-          rotation: (Math.atan2(dy, dx) * 180) / Math.PI,
-          distance,
-        };
-    }
-    return result !== null && result.distance < 0.65 ? result : null;
-  };
+  const nearestWall = (point: FloorPlanPoint, width: number) => floorPlaceOpening(point, width, sourceObjects, view.zoom);
 
   const parsePrompt = () => {
     const rawPrompt = p.prompt.trim();
@@ -642,6 +616,12 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
   };
 
   const completeDrag = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    if (moving) {
+      if (moving.preview !== moving.original) updateObjects(sourceObjects.map(object => object.id === moving.original.id ? moving.preview : object));
+      setMoving(null);
+      return;
+    }
     if (panning) {
       setPanning(null);
       return;
@@ -673,7 +653,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         end: preciseEnd,
       });
     if (tool === "measure") setMeasure({ start, current: end });
-    if (tool === "room" && floorDistance(preciseStart, preciseEnd) > 0.001)
+    if (tool === "room" && Math.abs(preciseStart.x - preciseEnd.x) >= .05 && Math.abs(preciseStart.y - preciseEnd.y) >= .05)
       addObject({
         id: crypto.randomUUID(),
         type: "room",
@@ -702,6 +682,8 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
 
   const onDown = (event: React.PointerEvent<SVGSVGElement>) => {
     if ((event.target as Element).closest("button")) return;
+    event.preventDefault();
+    event.currentTarget.focus();
     const point = pointFromEvent(event);
     if (event.button === 1 || (event.button === 0 && event.shiftKey)) {
       setPanning({
@@ -713,12 +695,21 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
       event.currentTarget.setPointerCapture(event.pointerId);
       return;
     }
+    if (event.button !== 0) return;
+    setPlacementMessage("");
     if (tool === "select" || tool === "delete") {
-      select(null);
+      const id = (event.target as Element).closest('[data-floor-plan-object-id]')?.getAttribute('data-floor-plan-object-id');
+      const object = sourceObjects.find(item => item.id === id);
+      if (object && tool === "delete") { updateObjects(sourceObjects.filter(item => item.id !== id)); select(null); }
+      else if (object) {
+        select(object.id);
+        setMoving({ original: object, start: pointFromEvent(event, false), preview: object });
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } else select(null);
       return;
     }
     if (tool === "door") {
-      const wall = nearestWall(point);
+      const wall = nearestWall(point, .9);
       if (wall !== null)
         addObject({
           id: crypto.randomUUID(),
@@ -726,15 +717,16 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
           x: roundFloorValue(wall.point.x, settings.precision),
           y: roundFloorValue(wall.point.y, settings.precision),
           width: roundFloorValue(0.9, settings.precision),
-          height: roundFloorValue(0.12, settings.precision),
+          height: wall.thickness,
           rotation: wall.rotation,
           swing: "in",
           side: "right",
         });
+      else setPlacementMessage("Place the door on a wall at least 900 mm long.");
       return;
     }
     if (tool === "window") {
-      const wall = nearestWall(point);
+      const wall = nearestWall(point, 1.2);
       if (wall !== null)
         addObject({
           id: crypto.randomUUID(),
@@ -742,11 +734,12 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
           x: roundFloorValue(wall.point.x, settings.precision),
           y: roundFloorValue(wall.point.y, settings.precision),
           width: roundFloorValue(1.2, settings.precision),
-          height: roundFloorValue(0.12, settings.precision),
+          height: wall.thickness,
           rotation: wall.rotation,
           sillHeight: roundFloorValue(0.9, settings.precision),
           windowType: "double",
         });
+      else setPlacementMessage("Place the window on a wall at least 1200 mm long.");
       return;
     }
     if (tool === "text") {
@@ -763,8 +756,8 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
       addObject({
         id: crypto.randomUUID(),
         type: "furniture",
-        x: point.x - 0.45,
-        y: point.y - 0.3,
+        x: roundFloorValue(point.x, settings.precision),
+        y: roundFloorValue(point.y, settings.precision),
         width: 0.9,
         height: 0.6,
         label: "Furniture",
@@ -776,6 +769,17 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
   };
 
   const onMove = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (moving) {
+      const raw = pointFromEvent(event, false);
+      const original = moving.preview === moving.original ? sourceObjects.find(object => object.id === moving.original.id) ?? moving.original : moving.original;
+      if (Math.hypot(raw.x - moving.start.x, raw.y - moving.start.y) * view.zoom < 3) {
+        setMoving({ ...moving, original, preview: original });
+        return;
+      }
+      const preview = floorTranslateObject(original, { x: raw.x - moving.start.x, y: raw.y - moving.start.y }, sourceObjects, settings, view.zoom);
+      setMoving({ ...moving, original, preview });
+      return;
+    }
     if (panning) {
       setView((current) => ({
         ...current,
@@ -814,6 +818,10 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if ((event.target as HTMLElement)?.matches("input,textarea,select")) return;
+      if (event.ctrlKey || event.metaKey || event.altKey) {
+        if (event.key.toLowerCase() === "z") { setMoving(null); setDrag(null); }
+        return;
+      }
       const key = event.key.toLowerCase();
       const shortcuts: Record<string, typeof tool> = {
         v: "select",
@@ -826,6 +834,15 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         f: "furniture",
       };
       if (shortcuts[key]) setTool(shortcuts[key]);
+      const directions: Record<string, FloorPlanPoint> = { ArrowLeft: { x: -1, y: 0 }, ArrowRight: { x: 1, y: 0 }, ArrowUp: { x: 0, y: -1 }, ArrowDown: { x: 0, y: 1 } };
+      const selected = objects.find(object => object.id === p.selectedFloorPlanId);
+      if (directions[event.key] && selected && !moving) {
+        event.preventDefault();
+        const step = event.shiftKey ? settings.gridStepMm / 1000 : settings.precision / 1000;
+        const direction = directions[event.key];
+        const next = floorTranslateObject(selected, { x: direction.x * step, y: direction.y * step }, objects, { ...settings, snapToGrid: false, snapToPoints: false }, view.zoom);
+        updateObjects(objects.map(object => object.id === selected.id ? next : object));
+      }
       if (event.key === "Delete" || event.key === "Backspace") {
         const selectedId = p.selectedFloorPlanId;
         if (selectedId) {
@@ -834,6 +851,9 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         }
       }
       if (event.key === "Escape") {
+        setMoving(null);
+        setTool("select");
+        setPlacementMessage("");
         setDrag(null);
         setMeasure(null);
         select(null);
@@ -841,7 +861,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [objects, p.selectedFloorPlanId, tool]);
+  });
 
   const selectedId = p.selectedFloorPlanId;
 
@@ -889,6 +909,9 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
       {/* 2D Architectural Drafting SVG Canvas */}
       <svg
         ref={svgRef}
+        tabIndex={0}
+        aria-label="Interior plan canvas"
+        style={{ touchAction: "none" }}
         className="floor-plan-svg-surface absolute inset-0 h-full w-full cursor-crosshair"
         onPointerOver={event=>p.onHoverFloorPlanObject?.((event.target as Element).closest('[data-floor-plan-object-id]')?.getAttribute('data-floor-plan-object-id')??null)}
         onPointerLeave={()=>p.onHoverFloorPlanObject?.(null)}
@@ -896,11 +919,13 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         onPointerMove={onMove}
         onPointerUp={completeDrag}
         onPointerCancel={() => {
+          setMoving(null);
           setDrag(null);
           setPanning(null);
         }}
         onWheel={(event) => {
           event.preventDefault();
+          if (moving || drag) return;
           setView((current) => ({
             ...current,
             zoom: Math.max(
@@ -938,13 +963,6 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
             .map((room) => (
               <g
                 key={room.id} data-floor-plan-object-id={room.id}
-                onPointerDown={(event) => {
-                  event.stopPropagation();
-                  if (tool === "delete") {
-                    updateObjects(objects.filter((item) => item.id !== room.id));
-                    select(null);
-                  } else if (tool === "select") select(room.id);
-                }}
               >
                 <rect
                   x={room.x}
@@ -988,13 +1006,6 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                 stroke={selectedId === wall.id ? "var(--studio-accent)" : "var(--studio-draft-wall)"}
                 strokeWidth={wall.thickness}
                 strokeLinecap="square"
-                onPointerDown={(event) => {
-                  event.stopPropagation();
-                  if (tool === "delete") {
-                    updateObjects(objects.filter((item) => item.id !== wall.id));
-                    select(null);
-                  } else if (tool === "select") select(wall.id);
-                }}
               />
             ))}
           {objects
@@ -1005,15 +1016,6 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
               <g
                 key={opening.id} data-floor-plan-object-id={opening.id}
                 transform={`translate(${opening.x} ${opening.y}) rotate(${opening.rotation})`}
-                onPointerDown={(event) => {
-                  event.stopPropagation();
-                  if (tool === "delete") {
-                    updateObjects(
-                      objects.filter((item) => item.id !== opening.id),
-                    );
-                    select(null);
-                  } else if (tool === "select") select(opening.id);
-                }}
               >
                 <rect
                   x={-opening.width / 2}
@@ -1024,26 +1026,28 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                   stroke="none"
                 />
                 {opening.type === "door" ? (
-                  <>
+                  <g data-door-side={opening.side ?? "right"} data-door-swing={opening.swing ?? "in"}>
+                    {[-1, 1].map(side => <line key={side} x1={side * opening.width / 2} x2={side * opening.width / 2} y1={-opening.height / 2} y2={opening.height / 2} stroke="var(--studio-text-secondary)" strokeWidth=".035" />)}
                     <path
-                      d={`M ${-opening.width / 2} 0 A ${opening.width} ${
-                        opening.width
-                      } 0 0 1 ${opening.width / 2} ${opening.width}`}
+                      d={floorDoorSymbol(opening).arc}
                       fill="none"
                       stroke={selectedId === opening.id ? "var(--studio-accent)" : "var(--studio-text-secondary)"}
                       strokeWidth=".025"
                     />
                     <line
-                      x1={-opening.width / 2}
+                      x1={floorDoorSymbol(opening).hinge.x}
                       y1="0"
-                      x2={-opening.width / 2}
-                      y2={opening.width}
+                      x2={floorDoorSymbol(opening).open.x}
+                      y2={floorDoorSymbol(opening).open.y}
                       stroke={selectedId === opening.id ? "var(--studio-accent)" : "var(--studio-draft-wall)"}
                       strokeWidth=".04"
                     />
-                  </>
+                    <circle cx={floorDoorSymbol(opening).hinge.x} cy="0" r=".035" fill="var(--studio-text-secondary)" />
+                  </g>
                 ) : (
                   <>
+                    <line x1={-opening.width / 2} y1="0" x2={opening.width / 2} y2="0" stroke="#0891b2" strokeWidth=".02" />
+                    {opening.windowType !== "single" && <line x1="0" y1={-opening.height / 2} x2="0" y2={opening.height / 2} stroke="#0891b2" strokeWidth=".025" />}
                     <line
                       x1={-opening.width / 2}
                       y1={-opening.height / 2}
@@ -1069,15 +1073,6 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
             .map((item) => (
               <g
                 key={item.id} data-floor-plan-object-id={item.id}
-                onPointerDown={(event) => {
-                  event.stopPropagation();
-                  if (tool === "delete") {
-                    updateObjects(
-                      objects.filter((object) => object.id !== item.id),
-                    );
-                    select(null);
-                  } else if (tool === "select") select(item.id);
-                }}
               >
                 <rect
                   x={item.x}
@@ -1105,15 +1100,6 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
             .map((item) => (
               <g
                 key={item.id} data-floor-plan-object-id={item.id}
-                onPointerDown={(event) => {
-                  event.stopPropagation();
-                  if (tool === "delete") {
-                    updateObjects(
-                      objects.filter((object) => object.id !== item.id),
-                    );
-                    select(null);
-                  } else if (tool === "select") select(item.id);
-                }}
               >
                 <line
                   x1={item.start.x}
@@ -1145,15 +1131,6 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                 y={item.y}
                 fontSize=".24"
                 fill={selectedId === item.id ? "var(--studio-accent)" : "var(--studio-text-primary)"}
-                onPointerDown={(event) => {
-                  event.stopPropagation();
-                  if (tool === "delete") {
-                    updateObjects(
-                      objects.filter((object) => object.id !== item.id),
-                    );
-                    select(null);
-                  } else if (tool === "select") select(item.id);
-                }}
               >
                 {item.text}
               </text>
@@ -1219,6 +1196,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         settingsLabel="Toggle grid snapping" onSettings={() => setSettings({ snapToGrid: !settings.snapToGrid })} />
 
       {/* Top Drafting Status HUD */}
+      {placementMessage && <div role="alert" className="absolute left-1/2 top-20 z-10 -translate-x-1/2 rounded-lg bg-[var(--studio-bg-panel)] px-3 py-2 text-xs">{placementMessage}</div>}
       <div className="floor-plan-hud-bar" role="status">
         <span className="floor-plan-hud-badge">2D CAD</span>
         <span>Top view</span>
@@ -1276,7 +1254,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
       />
 
       <div className="floor-plan-shortcuts-hint pointer-events-none">
-        Wheel zoom · Shift-drag pan · W wall · D door · N window · R room · Delete remove
+        Drag to move · W wall · D door · N window · Arrows nudge · Shift-drag pan · Ctrl+Z undo · Esc cancel
       </div>
     </section>
   );

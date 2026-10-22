@@ -19,7 +19,7 @@ import {
   Settings,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   formatFloorLength,
   parseFloorLength,
@@ -84,29 +84,40 @@ function FloorLengthInput({
   settings,
   min = 0,
   onChange,
+  compact = false,
 }: {
   label: string;
   value: number;
   settings: FloorPlanSettings;
   min?: number;
   onChange: (value: number) => void;
+  compact?: boolean;
 }) {
   const display = formatFloorLength(value, settings).replace(` ${settings.unit}`, "");
+  const [draft, setDraft] = useState(display);
+  useEffect(() => setDraft(display), [display]);
+  const commit = () => {
+    const parsed = parseFloorLength(draft, settings.unit);
+    if (parsed === null) { setDraft(display); return; }
+    const next = roundFloorValue(Math.max(min, parsed), settings.precision);
+    onChange(next);
+    setDraft(formatFloorLength(next, settings).replace(` ${settings.unit}`, ""));
+  };
   return (
-    <label className="studio-input-pill">
-      <span className="flex-1 capitalize text-[var(--studio-text-secondary)]">{label}</span>
+    <label className={compact ? "min-w-0 flex-1" : "studio-input-pill"}>
+      <span className={compact ? "sr-only" : "flex-1 capitalize text-[var(--studio-text-secondary)]"}>{label}</span>
       <input
         aria-label={label}
+        title="Enter or click outside to apply; Esc to restore"
+        inputMode="decimal"
         type="text"
-        value={display}
-        onChange={(event) => {
-          const parsed = parseFloorLength(event.target.value, settings.unit);
-          if (parsed !== null)
-            onChange(roundFloorValue(Math.max(min, parsed), settings.precision));
-        }}
-        className="w-16 rounded-[6px] border border-[var(--studio-border)] bg-[var(--studio-bg-panel)] px-1.5 py-0.5 text-right text-[var(--studio-text-primary)] outline-none focus:border-[var(--studio-accent)]"
+        value={draft}
+        onChange={event => setDraft(event.target.value)}
+        onBlur={commit}
+        onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); event.currentTarget.blur(); } if (event.key === "Escape") { event.stopPropagation(); setDraft(display); } }}
+        className={`${compact ? "w-full min-w-0" : "w-16"} rounded-[6px] border border-[var(--studio-border)] bg-[var(--studio-bg-panel)] px-1.5 py-0.5 text-right text-[var(--studio-text-primary)] outline-none focus:border-[var(--studio-accent)]`}
       />
-      <span className="ml-1 text-[10px] text-[var(--studio-text-secondary)]">{settings.unit}</span>
+      {!compact && <span className="ml-1 text-[10px] text-[var(--studio-text-secondary)]">{settings.unit}</span>}
     </label>
   );
 }
@@ -271,18 +282,10 @@ export function RightPanel(props: Props) {
               <div className="space-y-2 text-[12px]">
                 {selected.type === "wall" && (
                   <>
-                    <div className="ref-prop-row">
-                      <span className="ref-prop-label">Length</span>
-                      <strong className="text-[12px] font-semibold text-[var(--studio-text-primary)]">
-                        {formatFloorLength(
-                          Math.hypot(
-                            selected.end.x - selected.start.x,
-                            selected.end.y - selected.start.y,
-                          ),
-                          floorSettings,
-                        )}
-                      </strong>
-                    </div>
+                    <FloorLengthInput label="length" value={Math.hypot(selected.end.x - selected.start.x, selected.end.y - selected.start.y)} settings={floorSettings} min={.05} onChange={length => {
+                      const dx = selected.end.x - selected.start.x, dy = selected.end.y - selected.start.y, current = Math.hypot(dx, dy);
+                      updateSelected({ end: { x: roundFloorValue(selected.start.x + (current ? dx / current : 1) * length, floorSettings.precision), y: roundFloorValue(selected.start.y + (current ? dy / current : 0) * length, floorSettings.precision) } });
+                    }} />
                     <FloorLengthInput
                       label="thickness"
                       value={selected.thickness}
@@ -297,50 +300,7 @@ export function RightPanel(props: Props) {
                             {point} (X / Y)
                           </span>
                           <div className="flex gap-1">
-                            <input
-                              aria-label={`${point} X`}
-                              type="text"
-                              value={formatFloorLength(
-                                selected[point].x,
-                                floorSettings,
-                              ).replace(` ${floorSettings.unit}`, "")}
-                              onChange={(e) => {
-                                const value = parseFloorLength(
-                                  e.target.value,
-                                  floorSettings.unit,
-                                );
-                                if (value !== null)
-                                  updateSelected({
-                                    [point]: {
-                                      ...selected[point],
-                                      x: roundFloorValue(value, floorSettings.precision),
-                                    },
-                                  });
-                              }}
-                              className="w-full rounded-[6px] border border-[var(--studio-border)] bg-[var(--studio-bg-panel)] px-1 py-1 text-center text-[11px] text-[var(--studio-text-primary)] outline-none focus:border-[var(--studio-accent)]"
-                            />
-                            <input
-                              aria-label={`${point} Y`}
-                              type="text"
-                              value={formatFloorLength(
-                                selected[point].y,
-                                floorSettings,
-                              ).replace(` ${floorSettings.unit}`, "")}
-                              onChange={(e) => {
-                                const value = parseFloorLength(
-                                  e.target.value,
-                                  floorSettings.unit,
-                                );
-                                if (value !== null)
-                                  updateSelected({
-                                    [point]: {
-                                      ...selected[point],
-                                      y: roundFloorValue(value, floorSettings.precision),
-                                    },
-                                  });
-                              }}
-                              className="w-full rounded-[6px] border border-[var(--studio-border)] bg-[var(--studio-bg-panel)] px-1 py-1 text-center text-[11px] text-[var(--studio-text-primary)] outline-none focus:border-[var(--studio-accent)]"
-                            />
+                            {(["x", "y"] as const).map(axis => <FloorLengthInput key={axis} compact label={`${point} ${axis.toUpperCase()}`} value={selected[point][axis]} settings={floorSettings} min={-Infinity} onChange={value => updateSelected({ [point]: { ...selected[point], [axis]: value } })} />)}
                           </div>
                         </div>
                       ))}
@@ -388,6 +348,16 @@ export function RightPanel(props: Props) {
                   </label>
                 )}
 
+                {"x" in selected && <div className="grid grid-cols-2 gap-1.5">
+                  <FloorLengthInput label="position X" value={selected.x} settings={floorSettings} min={-Infinity} onChange={x => updateSelected({ x })} />
+                  <FloorLengthInput label="position Y" value={selected.y} settings={floorSettings} min={-Infinity} onChange={y => updateSelected({ y })} />
+                </div>}
+
+                {(selected.type === "door" || selected.type === "window") && <label className="ref-prop-row">
+                  <span className="ref-prop-label">Rotation °</span>
+                  <input aria-label="Opening rotation" type="number" step="1" value={selected.rotation} onChange={event => { const rotation = Number(event.target.value); if (Number.isFinite(rotation)) updateSelected({ rotation }); }} className="ref-select-control w-20" />
+                </label>}
+
                 {(selected.type === "door" ||
                   selected.type === "window" ||
                   selected.type === "furniture") && (
@@ -411,6 +381,7 @@ export function RightPanel(props: Props) {
                         <div className="ref-prop-row">
                           <span className="ref-prop-label">Door Swing</span>
                           <select
+                            aria-label="Door swing"
                             value={selected.swing ?? "in"}
                             onChange={(e) =>
                               updateSelected({ swing: e.target.value as "in" | "out" })
@@ -421,10 +392,17 @@ export function RightPanel(props: Props) {
                             <option value="out">Outward Swing</option>
                           </select>
                         </div>
+                        <div className="ref-prop-row">
+                          <span className="ref-prop-label">Hinge side</span>
+                          <select aria-label="Door hinge side" value={selected.side ?? "right"} onChange={event => updateSelected({ side: event.target.value as "left" | "right" })} className="ref-select-control">
+                            <option value="left">Left</option><option value="right">Right</option>
+                          </select>
+                        </div>
                       </div>
                     )}
                     {selected.type === "window" && (
                       <div className="col-span-2">
+                        <label className="ref-prop-row"><span className="ref-prop-label">Window panes</span><select aria-label="Window panes" value={selected.windowType ?? "double"} onChange={event => updateSelected({ windowType: event.target.value as "single" | "double" })} className="ref-select-control"><option value="single">Single</option><option value="double">Double</option></select></label>
                         <FloorLengthInput
                           label="sill height"
                           value={selected.sillHeight ?? 0.9}
@@ -478,6 +456,8 @@ export function RightPanel(props: Props) {
 
             {globalOpen && (
               <div className="mt-2.5 space-y-2">
+                <label className="ref-prop-row"><span className="ref-prop-label">Grid step</span><select aria-label="Drafting grid step" className="ref-select-control" value={floorSettings.gridStepMm} onChange={event => updateFloorSettings({ gridStepMm: Number(event.target.value) })}>{[10, 50, 100, 250, 500, 1000].map(mm => <option key={mm} value={mm}>{mm} mm</option>)}</select></label>
+                <label className="ref-prop-row"><span className="ref-prop-label">Precision</span><select aria-label="Drafting precision" className="ref-select-control" value={floorSettings.precision} onChange={event => updateFloorSettings({ precision: Number(event.target.value) })}>{[1, 5, 10].map(mm => <option key={mm} value={mm}>{mm} mm</option>)}</select></label>
                 <BinaryToggle
                   label="Snapping"
                   value={floorSettings.snapToPoints}

@@ -2,6 +2,47 @@
 
 Last updated: 2026-10-22
 
+## Interior drafting interaction and precision
+
+- Select now supports real pointer-captured drag of rooms, walls, furniture,
+  openings and annotations. Preview stays local until release; Esc/pointer
+  cancellation discards it. A 3px threshold prevents clicks from moving objects.
+  Wall/dimension translation retains endpoint vectors and dimensions.
+- Removed child event blockers so Wall/Room tools work over existing geometry.
+  Wall stays active for repeated drawing. Degenerate rooms are rejected.
+  Door/window placement projects to the wall, uses its thickness/rotation and
+  clamps the complete opening within endpoints. Opening drag stays on valid
+  nearby walls. These are independent drafting objects, not full CAD constraints;
+  moving a wall does not automatically move previously placed openings.
+- Door inspector now exposes Left/Right hinge and Inward/Outward swing; actual
+  quarter-circle arc, leaf, hinge and jamb drawing follows all four combinations.
+  Windows include pane/mullion detail and Single/Double control. Shared export
+  segments preserve rotated opening symbols and include swing arcs in bounds.
+- Added precise X/Y, opening rotation and editable wall length, grid/precision
+  controls, 1mm arrow nudging (Shift uses the grid step), and bounded 100-step
+  document undo/redo with Ctrl+Z/Ctrl+Shift+Z. Dimensions commit with Enter/blur;
+  partial/negative input no longer jumps while typing. m/cm formatting preserves
+  the configured millimeter precision. Corrected the starter window proportions
+  and inward entry-door orientation. Inspector header cannot shrink as content grows.
+- Ten focused geometry/export/history tests and TypeScript passed. Focused lint
+  has no errors; existing legacy img/hook warnings remain. Chrome verified real
+  mouse selection/drag, cancel, undo/redo, repeated walls over room geometry,
+  door/window placement and movement, handedness/swing, 1mm nudging, incremental
+  negative typing, unit-suffixed wall length and JSON output in both themes:
+  `scripts/verify-floor-plan-editing.mjs` (also `--light`), artifacts
+  `.tmp/floor-plan-editing-1792635355795/` and `1792635363541/`.
+- An additional real mouse check confirmed that editing wall thickness and
+  immediately dragging the same wall commits the input without overwriting it;
+  `.tmp/floor-plan-editing-1792635595263/`.
+- SVG/PDF/PNG actual downloads still pass (`verify-floor-plan-export.mjs`);
+  Interior layout/save/reopen checks pass at 1440/390px in both themes
+  (`verify-studio-spacing.mjs --interior-only`, artifacts
+  `.tmp/studio-spacing-1792635443334/`). Initial checks found header shrink and
+  a test expecting per-keystroke commits; header sizing and Enter-commit test
+  were corrected, then rerun successfully. Zero runtime exceptions in passing QA.
+- Production build was not repeated; the previously recorded local Google
+  Fonts certificate blocker remains. No cloud/provider or full CAD claims.
+
 ## Interior floor-plan export framing
 
 - SVG, PDF and raster exports now share a centered, uniform fit to the sheet

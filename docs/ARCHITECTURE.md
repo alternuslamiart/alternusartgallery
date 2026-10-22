@@ -2,6 +2,14 @@
 
 ## Application
 
+- Interior `FloorPlanViewport` delegates SVG picking/drawing to one canvas
+  handler; captured drag previews are committed once on release. Geometry helpers
+  project openings to walls, preserve metric translations and produce shared
+  rotated door/window segments for export. `CrystalStudio` owns a pure bounded
+  plan-history reducer for both canvas and inspector edits. Input drafts commit
+  on Enter/blur; object schema remains compatible with existing JSON projects.
+  Openings do not yet have persistent wall-host constraints.
+
 - `crystal-studio/floor-plan-export.ts` shares a content-bound fit, page
   orientation and centered offsets across SVG, PDF and 300dpi raster exports.
   The 10mm minimum margin includes geometric wall/opening extents; output is
