@@ -2,6 +2,18 @@
 
 Last updated: 2026-10-22
 
+## Homepage marquee presentation follow-up
+
+- Removed the gray surface and pause control; centered the transparent strip
+  on the existing 1280px content alignment. Removed the reduced-motion two-row
+  fallback and hover pause per the explicit uninterrupted-scroll request.
+  All four brands remain in one continuous horizontal row, with no action icon.
+- Chrome passed at 1920/1440/768/390/320px: single row, transparent surface,
+  no buttons, movement/hover continuity, icon loading and no overflow/errors.
+  Also confirmed the row and animation remain active with reduced motion set.
+  Focused lint and diff checks passed; desktop screenshot inspected. Build and
+  typecheck were not repeated for this presentation/state-removal follow-up.
+
 ## Production audit and Homepage tools marquee
 
 - Audited 73 production URLs and opened 11 key routes in real signed-out Chrome.

@@ -1,8 +1,3 @@
-"use client";
-
-import { useState } from "react";
-import { Pause, Play } from "lucide-react";
-
 const tools = [
   { name: "Blender", icon: "blender" },
   { name: "Unreal Engine", icon: "unrealengine" },
@@ -11,11 +6,10 @@ const tools = [
 ];
 
 export function HomeToolMarquee() {
-  const [paused, setPaused] = useState(false);
   return (
     <section className="home-tools" aria-label="Design tools">
       <div className="home-tools-window">
-        <div className="home-tools-track" data-paused={paused}>
+        <div className="home-tools-track">
           {[0, 1].map((copy) => (
             <ul className="home-tools-list" key={copy} aria-hidden={copy === 1 ? true : undefined}>
               {tools.map((tool) => (
@@ -27,9 +21,6 @@ export function HomeToolMarquee() {
             </ul>
           ))}
         </div>
-        <button className="home-tools-pause" type="button" onClick={() => setPaused(!paused)} aria-label={paused ? "Resume scrolling tools" : "Pause scrolling tools"} aria-pressed={paused}>
-          {paused ? <Play size={16} /> : <Pause size={16} />}
-        </button>
       </div>
     </section>
   );

@@ -2,6 +2,9 @@
 
 ## Next concrete task
 
+- [x] Refine Homepage tools to one transparent, continuously scrolling row,
+  removing the pause icon and two-row fallback as requested.
+
 - [x] Audit public production routes and add the requested Homepage tools
   marquee with continuous movement, pause and reduced-motion support.
 - [ ] Resolve findings in `docs/SITE-AUDIT-2026-10-22.md`: configure/verify 3D
