@@ -2,6 +2,9 @@
 
 ## Next concrete task
 
+- [x] Align Homepage/nav to 1280px, retain sticky glass navigation and apply
+  8px button/24px image corners; verify responsive geometry and actual scroll.
+
 - [x] Redesign only the Homepage with isolated editorial layouts, preserved
   content/order/typography/blue and the existing glass navbar; verify six
   viewport widths in both themes and existing video/navigation interactions.

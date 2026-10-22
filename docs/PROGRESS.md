@@ -2,6 +2,18 @@
 
 Last updated: 2026-10-22
 
+## Homepage width, sticky navigation and corners
+
+- Matched navbar and section content to a 1280px maximum width with shared
+  responsive gutters. Made the Homepage navbar sticky in the existing main
+  scroll container by removing the intermediate overflow trap; glass remains.
+  Action buttons use 8px corners; hero/feature/capability images use 24px.
+- Chrome checks passed at all six existing widths in light/dark: navbar/hero
+  edges match, header stays at top after 600px scroll, exact corner values,
+  no overflow, unchanged text/links/typography and video/CTA interactions.
+  Desktop screenshot inspected; zero runtime exceptions. CSS parse and diff
+  checks passed. Build/typecheck were not repeated for this CSS-only change.
+
 ## Homepage editorial redesign, isolated to `/`
 
 - Added a Homepage-only wrapper and stylesheet for an open editorial hero,

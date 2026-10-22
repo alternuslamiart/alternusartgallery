@@ -7,8 +7,8 @@
   --home-surface: #f3f3f1;
   --home-raised: #eaeae7;
   --home-ink: #1f1f1f;
-  --home-gutter: clamp(20px, 4.5vw, 88px);
-  --home-width: 1440px;
+  --home-gutter: 24px;
+  --home-width: calc(1280px + 2 * var(--home-gutter));
 }
 [data-coreforge-theme="dark"] #alternus-home {
   --home-paper: #0a0a0a;
@@ -17,6 +17,9 @@
   --home-ink: #fff;
 }
 /* Navbar retains its existing glass treatment by request. */
+#alternus-home .coreforge-page { overflow: visible !important; }
+#alternus-home .coreforge-nav-shell { position: sticky; top: 0; }
+#alternus-home .coreforge-nav { width: 100%; max-width: 1280px; }
 #alternus-home .coreforge-page > section,
 #alternus-home .coreforge-footer,
 #alternus-home .coreforge-footer *,
@@ -47,7 +50,7 @@
 #alternus-home .coreforge-nav :is(button, a:not(.coreforge-nav-brand)),
 #alternus-home .coreforge-footer button {
   border: 0 !important;
-  border-radius: 6px !important;
+  border-radius: 8px !important;
   box-shadow: none !important;
   transform: none !important;
   filter: none !important;
@@ -79,9 +82,9 @@
 #alternus-home .crystal-first-card h1 { grid-row: 1 / 3; max-width: 630px; }
 #alternus-home .crystal-first-card p { max-width: 490px; margin: 0; }
 #alternus-home .crystal-first-card > div:first-child > div { align-items: start; align-self: end; }
-#alternus-home .crystal-first-image { width: 100%; height: clamp(340px, 38vw, 560px); min-height: 0; border-radius: 6px; order: initial !important; }
+#alternus-home .crystal-first-image { width: 100%; height: clamp(340px, 38vw, 560px); min-height: 0; border-radius: 24px; order: initial !important; }
 #alternus-home .crystal-first-image img { object-position: center 58%; }
-#alternus-home .crystal-intro-play-overlay { position: absolute; inset: auto 24px 24px auto; width: 64px; height: 64px; border-radius: 6px; background: var(--home-paper); color: #4284FF; }
+#alternus-home .crystal-intro-play-overlay { position: absolute; inset: auto 24px 24px auto; width: 64px; height: 64px; border-radius: 8px; background: var(--home-paper); color: #4284FF; }
 #alternus-home .crystal-intro-play-button { display: grid; place-items: center; width: 100%; height: 100%; background: transparent; }
 #alternus-home .crystal-intro-play-button svg { width: 26px; height: 26px; }
 #alternus-home .crystal-intro-play-overlay:hover { background: var(--home-raised); }
@@ -93,7 +96,7 @@
 #alternus-home .casynus-highlight-heading { margin: 0 0 24px; }
 #alternus-home .casynus-highlight-visual { display: flex; flex-direction: column; aspect-ratio: auto; min-height: 0; border-radius: 0; background: transparent; overflow: visible; }
 #alternus-home .casynus-highlight-visual::after { display: none; }
-#alternus-home .casynus-highlight-visual img { position: relative !important; height: 150px !important; border-radius: 4px; }
+#alternus-home .casynus-highlight-visual img { position: relative !important; height: 150px !important; border-radius: 24px; }
 #alternus-home .casynus-highlight-content { min-height: 0; padding: 24px 0 0; }
 #alternus-home .casynus-highlight-content p { color: var(--home-ink); }
 
@@ -102,7 +105,7 @@
   max-width: var(--home-width); margin: 0 auto; padding: 48px var(--home-gutter) 112px !important;
   display: grid; grid-template-columns: 1.3fr 1fr; gap: 8%; border-radius: 0; background: var(--home-paper) !important;
 }
-#alternus-home .crystal-feature-visual { width: 100%; aspect-ratio: auto; height: 550px; border-radius: 6px; order: initial !important; }
+#alternus-home .crystal-feature-visual { width: 100%; aspect-ratio: auto; height: 550px; border-radius: 24px; order: initial !important; }
 #alternus-home .crystal-feature-copy { padding: 0; align-self: center; }
 #alternus-home .crystal-feature-showcase.reverse { grid-template-columns: 1fr 1.3fr; padding-top: 112px !important; }
 #alternus-home .crystal-feature-showcase.reverse .crystal-feature-visual { order: 2 !important; }
@@ -143,10 +146,10 @@
 #alternus-home [role="dialog"] { background: #101010 !important; }
 #alternus-home [role="dialog"] > div,
 #alternus-home [role="dialog"] video { border-radius: 6px !important; }
-#alternus-home [role="dialog"] button { border-radius: 6px !important; background: #242424 !important; }
+#alternus-home [role="dialog"] button { border-radius: 8px !important; background: #242424 !important; }
 #alternus-home .home-downloads { background: var(--home-surface) !important; }
 #alternus-home .home-downloads .grid { gap: 16px; }
-#alternus-home .home-downloads .grid a { padding: 24px !important; border-radius: 6px !important; background: var(--home-paper) !important; }
+#alternus-home .home-downloads .grid a { padding: 24px !important; border-radius: 8px !important; background: var(--home-paper) !important; }
 #alternus-home .home-downloads .grid a:hover { background: var(--home-raised) !important; }
 #alternus-home .home-downloads .grid a > span:first-child { background: var(--home-surface) !important; border-radius: 4px !important; }
 #alternus-home .coreforge-footer { background: var(--home-paper) !important; padding: 80px 0 40px !important; }
@@ -168,7 +171,11 @@
   #alternus-home .home-desktop > div > div > div:last-child { max-width: 660px; width: 100%; }
   #alternus-home .coreforge-footer > div > div:last-child > div:nth-child(2) { flex-wrap: wrap; }
 }
+@media (max-width: 900px) {
+  #alternus-home { --home-gutter: 16px; }
+}
 @media (max-width: 700px) {
+  #alternus-home { --home-gutter: var(--crystal-mobile-gutter, 16px); }
   #alternus-home .coreforge-page > section { padding-block: 64px !important; }
   #alternus-home .coreforge-page > .crystal-first-sector { padding-top: 36px !important; }
   #alternus-home .crystal-first-sector > p { margin-bottom: 24px; }
