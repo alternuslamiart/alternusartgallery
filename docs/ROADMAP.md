@@ -56,6 +56,14 @@ requirements provide new evidence.
 
 ## P2 — Existing platform integration
 
+- [x] Implement durable AI usage, profile percentages/history and plan quotas:
+  Basic 200, Pro 800, Teams 2,000, Studio 4,000 monthly application credits.
+- [x] Verify the Usage UI against a local production build with mocked HTTP;
+  use DIRECT_URL for Prisma schema operations and add an opt-in DB verifier.
+- [ ] Apply plan enum SQL and verify deployed authenticated usage and real paid
+  plan assignment; local Supabase URLs/IPv6 reachability currently block this.
+  Connect verified payments separately. See `AI-USAGE.md`.
+
 - [x] Add browser voice dictation, opt-in Hey Casynus wake and Ctrl + Q to
   studio AI docks. Physical microphone/browser-service verification is pending.
 

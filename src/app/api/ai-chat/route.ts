@@ -14,6 +14,7 @@ import { prisma } from "@/lib/prisma";
 import { askYou, YouAnswerError } from "@/lib/you-answer.mjs";
 import { isApiResponse, requirePlatformContext } from "@/lib/platform/api";
 import { persistAIResponse } from "@/lib/ai-response.mjs";
+import { aiUsage, usageError, type UsageTicket } from "@/lib/platform/usage";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -385,6 +386,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+ let usageTicket: UsageTicket | undefined;
+ let generated = false;
  try {
  const rawBody = await request.json();
  let body: RequestBody;
@@ -428,15 +431,20 @@ export async function POST(request: NextRequest) {
  const requestedYou = body.provider === "you" || (!body.provider &&
  (getConfiguredAIProvider() === "you" || getPreferredProvider() === "local") &&
  Boolean(process.env.YOU_API_KEY?.trim() || process.env.YDC_API_KEY?.trim()));
- const signedIn = requestedYou || body.conversationId !== undefined ? await auth() : null;
- if (requestedYou && !signedIn?.user?.id) {
- return NextResponse.json({ error: "Sign in to use You.", code: "UNAUTHENTICATED" }, { status: 401 });
+ const signedIn = await auth();
+ if (!signedIn?.user?.id) {
+ return NextResponse.json({ error: "Sign in to use AI.", code: "UNAUTHENTICATED" }, { status: 401 });
  }
  const conversationId = typeof body.conversationId === "string" && /^chat-[a-zA-Z0-9-]{1,80}$/.test(body.conversationId)
  ? body.conversationId : null;
  if (body.conversationId !== undefined && !conversationId) {
  return NextResponse.json({ error: "Invalid conversation ID.", code: "INVALID_CONVERSATION" }, { status: 400 });
  }
+ try {
+ const usageContext = await requirePlatformContext();
+ if (isApiResponse(usageContext)) return usageContext;
+ usageTicket = await aiUsage.reserve(usageContext.workspaceId, "chat");
+ } catch (error) { return usageError(error); }
  // Studio chat can use You as an authenticated, tab-local conversation.
  // Cloud persistence is requested only when a conversationId is supplied.
  let storageWarning: string | undefined;
@@ -472,6 +480,7 @@ export async function POST(request: NextRequest) {
  }
  }
  const answer = await askYou(message, trustedHistory);
+ generated = true;
  let saved = false;
  if (conversationId && workspaceId && signedIn?.user?.id) {
  const scopedWorkspaceId = workspaceId;
@@ -508,6 +517,7 @@ export async function POST(request: NextRequest) {
  for (const providerAttempt of providerAttempts) {
  try {
  const answer = await askProvider(providerAttempt, message, history);
+ generated = true;
  let saved = false;
  if (conversationId && workspaceId && signedIn?.user?.id) {
  const scopedWorkspaceId = workspaceId;
@@ -568,5 +578,9 @@ export async function POST(request: NextRequest) {
  { error: providerError.error, code: providerError.code, provider },
  { status: providerError.status },
  );
+ } finally {
+ if (usageTicket && !generated) {
+ try { await aiUsage.refund(usageTicket); } catch (error) { console.error("AI usage refund failed", error); }
+ }
  }
 }

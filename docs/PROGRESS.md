@@ -2,6 +2,57 @@
 
 Last updated: 2026-10-22
 
+## Usage activation follow-up: Prisma routing, production build and browser QA
+
+- Prisma CLI now uses DIRECT_URL for schema operations, while DATABASE_URL
+  remains the runtime connection; a missing DIRECT_URL retains the old fallback.
+  Two focused config tests cover this routing. Added an opt-in live verifier:
+  `scripts/verify-ai-usage-database.mjs`, read-only by default, with explicit
+  flags for additive plan SQL and temporary workspace regression data/cleanup.
+- `npm test`: 105 passed; `npm run typecheck`: passed. Focused lint on the new
+  config/scripts passed without warnings; `git diff --check` passed.
+- `npm run build`: passed with NODE_EXTRA_CA_CERTS using exported Windows
+  trusted Root/CA certificates in ignored `.tmp/windows-trusted-cas.pem`. No TLS
+  bypass, global trust change or font source change. Existing client-rendering
+  warnings remain on account/login/reset-password.
+- Installed headless Chrome passed `node scripts/verify-account-usage.mjs`
+  against that local production build. Auth and Usage HTTP were mocked:
+  all four plan percentages, chart ranges, 80%/100% warnings, zero history,
+  503/error recovery and signed-out visibility. No runtime exceptions; light
+  desktop screenshot visually inspected. Artifacts:
+  `.tmp/account-usage-1792672172903/`. Local QA server stopped afterward.
+- Supabase activation is still blocked in this workspace: both .env URLs fail
+  parsing. Password encoding fixes their syntax in memory, but both Prisma
+  connections remain unreachable; DNS reports no IPv4 and one IPv6 address
+  for each direct host. Need the exact project's Session pooler URLs in local
+  .env (5432 for schema operations), with URL-encoded password. No credentials
+  were printed/changed, no SQL applied, no test/customer records written, and
+  no deployment or paid provider call was performed. See `docs/AI-USAGE.md`.
+
+## Real profile AI usage and differentiated plan limits
+
+- Replaced demo Usage/Limits/Subscriptions with authenticated workspace data:
+  actual consumed/remaining percentages, monthly UTC renewal, daily history
+  at 7/15/30/90 days, 80%/100% warnings and refresh/focus polling. Pricing and
+  subscription entitlements show Basic 200, Pro 800, Teams 2,000, Studio 4,000.
+- Added transactional durable monthly/daily counters using existing Prisma
+  RateLimitBucket storage. Chat and native scene proposals cost 1 application
+  credit; submitted 3D jobs cost 20 including refinement. Manual edits cost 0.
+  Auth/quota verification now precedes provider calls even without cloud chat
+  history. Exhausted allowance returns 429; unavailable quota storage returns
+  503. Failed chat/scene requests refund; submitted/ambiguous 3D stays charged.
+- Added BASIC/STUDIO enum values and additive deployment SQL. Existing TRIAL/
+  FREE subscriptions use Basic. Paid plan activation still requires a trusted
+  verified subscription; automatic billing remains unconfigured. Tracking starts
+  on deployment; no invented historic consumption. See `docs/AI-USAGE.md`.
+- `npm test`: 103 passed. `npm run typecheck`: passed, including after Prisma
+  regeneration. Focused ESLint passed with the existing account image warning;
+  `git diff --check` passed. Tests use mocked auth/database/provider adapters.
+- `npm run build`: Prisma generation passed; Next compilation failed fetching
+  Roboto/Roboto Flex due to `UNABLE_TO_VERIFY_LEAF_SIGNATURE` / `unable to verify
+  the first certificate`. Live SQL/database/provider behavior, browser UI and
+  production deployment were not verified. No TLS bypass or production changes.
+
 ## Interior drafting interaction and precision
 
 - Select now supports real pointer-captured drag of rooms, walls, furniture,

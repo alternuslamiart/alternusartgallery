@@ -24,6 +24,7 @@ const tiers: PricingTier[] = [
  d: "A focused workspace for exploring ideas, developing concepts, and organizing early-stage architectural work.",
  cta: "Start Basic",
  feat: [
+ "200 AI credits per month",
  "Claude AI assistant for architectural questions and project guidance",
  "Architectural metrics, area calculations, and project statistics",
  "AI-generated concept imagery and visual references",
@@ -39,6 +40,7 @@ const tiers: PricingTier[] = [
  featured: true,
  feat: [
  "Everything in Basic",
+ "800 AI credits per month · 4× Basic",
  "Claude AI for research, analysis, and design decision support",
  "OpenAI Codex for code generation, automation, and technical workflows",
  "Advanced architectural analysis, quantities, and project statistics",
@@ -53,6 +55,7 @@ const tiers: PricingTier[] = [
  cta: "Start Team trial",
  feat: [
  "Everything in Pro",
+ "2,000 AI credits per month · 10× Basic",
  "Claude AI and Codex access for every team workflow",
  "Shared Architecture Studio for coordinated design development",
  "Centralized project knowledge, files, and design references",
@@ -68,6 +71,7 @@ const tiers: PricingTier[] = [
  cta: "Upgrade to Studio",
  feat: [
  "Everything in Team",
+ "4,000 AI credits per month · 20× Basic",
  "Claude AI and OpenAI Codex for advanced professional workflows",
  "Studio-grade 3D modeling and design development",
  "Intelligent floor plan generation and spatial planning",

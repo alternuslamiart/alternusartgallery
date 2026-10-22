@@ -11,7 +11,7 @@ const compiled = ts.transpileModule(fs.readFileSync(new URL("../src/app/api/ai-c
 }).outputText;
 
 function routeHarness(options = {}) {
-  const calls = { provider: 0, writes: 0 };
+  const calls = { provider: 0, writes: 0, reserved: 0, refunded: 0 };
   class JsonResponse {
     constructor(body, init) { this.body = body; this.status = init?.status ?? 200; }
     static json(body, init) { return new JsonResponse(body, init); }
@@ -45,6 +45,13 @@ function routeHarness(options = {}) {
     "@/lib/security/cyber-shield.mjs": { sanitizeAndInspectPayload: body => body },
     "@/lib/auth": { auth: async () => options.guest ? null : { user: { id: "user-a" } } },
     "@/lib/prisma": { prisma },
+    "@/lib/platform/usage": {
+      aiUsage: {
+        reserve: async (workspaceId, feature) => { assert.equal(workspaceId, "workspace-a"); assert.equal(feature, "chat"); if (options.quota) throw new Error("quota"); calls.reserved++; return {}; },
+        refund: async () => { calls.refunded++; },
+      },
+      usageError: error => JsonResponse.json({ error: error.message }, { status: options.quota ? 429 : 503 }),
+    },
     "@/lib/platform/api": {
       requirePlatformContext: async () => {
         if (options.lookupFails) throw new Error("Database offline");
@@ -61,6 +68,7 @@ function routeHarness(options = {}) {
   const exports = {};
   const fetchProvider = async (url, init) => {
     calls.provider++;
+    if (options.providerFails) throw new Error("Provider offline");
     assert.ok(init.signal instanceof AbortSignal);
     const body = JSON.parse(init.body);
     if (url.includes("googleapis")) {
@@ -78,14 +86,11 @@ function routeHarness(options = {}) {
 }
 
 for (const provider of ["gemini", "groq", "you"]) {
-  test(`${provider}: workspace lookup failure does not discard a real answer`, async () => {
+  test(`${provider}: workspace lookup failure blocks unmetered provider calls`, async () => {
     const { send, calls } = routeHarness({ lookupFails: true });
     const response = await send({ provider, message: "Hello", conversationId: "chat-test" });
-    assert.equal(response.status, 200);
-    assert.equal(response.body.provider, provider);
-    assert.equal(response.body.saved, false);
-    assert.match(response.body.warning, /not been saved/);
-    assert.equal(calls.provider, 1);
+    assert.equal(response.status, 503);
+    assert.equal(calls.provider, 0);
     assert.equal(calls.writes, 0);
   });
 
@@ -97,6 +102,8 @@ for (const provider of ["gemini", "groq", "you"]) {
     assert.match(response.body.warning, /could not be saved/);
     assert.equal(calls.provider, 1);
     assert.equal(calls.writes, 1);
+    assert.equal(calls.reserved, 1);
+    assert.equal(calls.refunded, 0);
   });
 }
 
@@ -134,4 +141,19 @@ test("You can be the server default and reports its YDC key alias as configured"
   assert.equal(config.body.provider, "you");
   assert.equal(config.body.configuredProviderReady, true);
   assert.equal((await send({ message: "Hello" })).body.provider, "you");
+});
+
+for (const provider of ["gemini", "groq", "you"]) {
+  test(`${provider}: guests and exhausted plans cannot invoke providers`, async () => {
+    for (const options of [{ guest: true }, { quota: true }]) {
+      const { send, calls } = routeHarness(options);
+      assert.equal((await send({ provider, message: "Hello" })).status, options.guest ? 401 : 429);
+      assert.equal(calls.provider, 0);
+    }
+  });
+}
+test("failed providers refund one reservation even after failover", async () => {
+  const { send, calls } = routeHarness({ providerFails: true });
+  assert.ok((await send({ provider: "gemini", message: "Hello" })).status >= 400);
+  assert.equal(calls.reserved, 1); assert.equal(calls.refunded, 1);
 });

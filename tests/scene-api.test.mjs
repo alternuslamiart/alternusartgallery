@@ -78,6 +78,8 @@ for (const provider of ["gemini", "groq"]) {
     const commands = [{ type: "create", kind: "box", dimensions: [2, 1, 1] }];
     let malicious = false;
     const api = moduleRoute("../src/app/api/ai-scene/route.ts", {
+      "@/lib/platform/api": { requirePlatformContext: async () => ({ userId: "a", workspaceId: "a" }), isApiResponse: value => value instanceof JsonResponse },
+      "@/lib/platform/usage": { aiUsage: { reserve: async () => ({}), refund: async () => {} }, usageError: () => JsonResponse.json({ error: "limit" }, { status: 429 }) },
       "@/lib/scene/document.mjs": { applyCommands, MAX_SCENE_BYTES, validateDocument },
       "@/lib/ai-provider-config": { getGeminiApiKey: () => "fake", getGeminiModel: () => "gemini-2.5-flash", getGroqApiKey: () => "fake", getGroqModel: () => "openai/gpt-oss-20b", getGroqBaseUrl: () => "https://api.groq.com/openai/v1" },
     }, async (_url, init) => {
@@ -95,3 +97,17 @@ for (const provider of ["gemini", "groq"]) {
     assert.equal((await api.POST(request({ provider, prompt: "Create a box", document: doc }))).status, 400);
   });
 }
+
+test("scene quota and authentication failures cannot call an AI provider", async () => {
+  for (const guest of [true, false]) {
+    let providerCalls = 0;
+    const api = moduleRoute("../src/app/api/ai-scene/route.ts", {
+      "@/lib/scene/document.mjs": { applyCommands, MAX_SCENE_BYTES, validateDocument },
+      "@/lib/platform/api": { requirePlatformContext: async () => guest ? JsonResponse.json({ error: "Sign in" }, { status: 401 }) : { userId: "a", workspaceId: "a" }, isApiResponse: value => value instanceof JsonResponse },
+      "@/lib/platform/usage": { aiUsage: { reserve: async () => { throw Error("limit"); } }, usageError: () => JsonResponse.json({ error: "limit" }, { status: 429 }) },
+      "@/lib/ai-provider-config": { getGeminiApiKey: () => "fake", getGeminiModel: () => "gemini" },
+    }, async () => { providerCalls++; throw Error("unexpected"); });
+    assert.equal((await api.POST(request({ provider: "gemini", prompt: "Create box", document: makeDocument() }))).status, guest ? 401 : 429);
+    assert.equal(providerCalls, 0);
+  }
+});

@@ -127,6 +127,20 @@
 
 ## Server and data
 
+- `platform/ai-usage.mjs` meters authenticated chat/native scene/3D requests
+  using transactional monthly and daily feature counters in existing
+  RateLimitBucket rows, namespaced `ai-usage:v1:<workspaceId>:`. Conditional
+  increment reserves credits before external requests, rejecting over-limit
+  races; failed chat/scene requests refund. SubscriptionState is authoritative:
+  Basic 200, Pro 800, Team 2,000, Studio 4,000 per UTC calendar month; missing,
+  inactive and legacy FREE/TRIAL map to Basic. Submitted 3D uses 20 credits
+  including refinement; other metered requests use 1. Manual edits cost 0.
+  `/api/usage` and shared `AccountUsage` replace account demos with persisted
+  percentages/history, identity-safe refresh and quota warnings. New BASIC/
+  STUDIO enum values require additive SQL before activation. Billing remains
+  unconfigured; no client-selected upgrades. Retain usage rows for chart history
+  and reconcile reservations left by crashes/failed refunds. See `AI-USAGE.md`.
+
 - `lib/ai3d/providers.mjs` contains real Meshy v2 and Tripo v3 adapters;
   credentials/model settings are server environment variables. `/api/ai3d`
   provider/job/asset routes and `lib/ai3d/jobs.ts` reuse `AIProviderJob` with
@@ -138,6 +152,11 @@
   one undoable Apply. `AI3D-SETUP.md` records activation and actual limits.
 
 - `prisma/schema.prisma` is the source of truth for PostgreSQL data models.
+- `prisma.config.ts` keeps DATABASE_URL for runtime and supplies DIRECT_URL
+  for Prisma CLI schema operations, falling back to DATABASE_URL when absent.
+  IPv4-only local networks need the exact Supabase Session pooler endpoint for
+  schema access. `scripts/verify-ai-usage-database.mjs` provides read-only checks
+  and explicit opt-in additive SQL/temporary-data usage regressions.
 - `src/lib/prisma.ts` owns the shared Prisma client.
 - `src/lib/auth.ts` configures NextAuth.
 - `src/lib/platform/api.ts` provides authenticated workspace context and shared

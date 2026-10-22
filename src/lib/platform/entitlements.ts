@@ -1,11 +1,12 @@
 import type { WorkspacePlan } from "@prisma/client";
+import { AI_LIMITS } from "./ai-usage.mjs";
 
 export type BillingPlan = "BASIC" | "PRO" | "TEAM" | "STUDIO";
 
 export type WorkspaceEntitlements = {
  billingPlan: BillingPlan;
  workspaces: number | "unlimited";
- monthlyAgentRuns: number | "unlimited";
+ monthlyAgentRuns: number;
  knowledgeGb: number;
  voiceMode: boolean;
  codeStudio: "read-only" | "full" | "enhanced";
@@ -22,7 +23,7 @@ const ENTITLEMENTS: Record<BillingPlan, WorkspaceEntitlements> = {
  BASIC: {
  billingPlan: "BASIC",
  workspaces: 1,
- monthlyAgentRuns: 200,
+ monthlyAgentRuns: AI_LIMITS.BASIC,
  knowledgeGb: 5,
  voiceMode: false,
  codeStudio: "read-only",
@@ -37,7 +38,7 @@ const ENTITLEMENTS: Record<BillingPlan, WorkspaceEntitlements> = {
  PRO: {
  billingPlan: "PRO",
  workspaces: "unlimited",
- monthlyAgentRuns: "unlimited",
+ monthlyAgentRuns: AI_LIMITS.PRO,
  knowledgeGb: 100,
  voiceMode: true,
  codeStudio: "full",
@@ -52,7 +53,7 @@ const ENTITLEMENTS: Record<BillingPlan, WorkspaceEntitlements> = {
  TEAM: {
  billingPlan: "TEAM",
  workspaces: "unlimited",
- monthlyAgentRuns: "unlimited",
+ monthlyAgentRuns: AI_LIMITS.TEAM,
  knowledgeGb: 500,
  voiceMode: true,
  codeStudio: "full",
@@ -67,7 +68,7 @@ const ENTITLEMENTS: Record<BillingPlan, WorkspaceEntitlements> = {
  STUDIO: {
  billingPlan: "STUDIO",
  workspaces: "unlimited",
- monthlyAgentRuns: "unlimited",
+ monthlyAgentRuns: AI_LIMITS.STUDIO,
  knowledgeGb: 1024,
  voiceMode: true,
  codeStudio: "enhanced",
@@ -81,7 +82,8 @@ const ENTITLEMENTS: Record<BillingPlan, WorkspaceEntitlements> = {
  },
 };
 
-export function getEntitlements(plan: WorkspacePlan): WorkspaceEntitlements {
+export function getEntitlements(plan: WorkspacePlan | BillingPlan): WorkspaceEntitlements {
+ if (plan === "STUDIO") return ENTITLEMENTS.STUDIO;
  if (plan === "PRO") return ENTITLEMENTS.PRO;
  if (plan === "TEAM") return ENTITLEMENTS.TEAM;
  return ENTITLEMENTS.BASIC;

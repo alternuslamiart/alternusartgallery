@@ -437,8 +437,10 @@ model OsFile {
 enum WorkspacePlan {
   TRIAL
   FREE
+  BASIC
   PRO
   TEAM
+  STUDIO
 }
 
 enum WorkspaceRole {

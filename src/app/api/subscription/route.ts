@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { usagePlan } from "@/lib/platform/ai-usage.mjs";
 import { getEntitlements } from "@/lib/platform/entitlements";
 import { isApiResponse, mapUnknownError, ok, requirePlatformContext } from "@/lib/platform/api";
 
@@ -13,7 +14,7 @@ export async function GET() {
  where: { workspaceId: context.workspaceId },
  });
 
- return ok({ subscription, entitlements: getEntitlements(subscription?.plan ?? "TRIAL") });
+ return ok({ subscription, entitlements: getEntitlements(usagePlan(subscription)) });
  } catch (error) {
  return mapUnknownError(error);
  }

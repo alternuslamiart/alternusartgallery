@@ -2,6 +2,20 @@
 
 ## Next concrete task
 
+- [x] Replace profile Usage demos with real persisted workspace AI credits and
+  Basic/Pro/Teams/Studio limits at 1x/4x/10x/20x; enforce before provider calls.
+- [x] Route Prisma schema operations through DIRECT_URL; verify production
+  build with Windows trusted CA certificates and local Usage browser behavior.
+- [ ] Apply additive plan enum SQL, deploy, and verify authenticated usage,
+  429/refunds, cross-workspace access, UTC renewal and paid plan assignment on
+  staging/production. See `docs/AI-USAGE.md`. Automatic payment verification
+  remains unconfigured; process crashes/refund-write failures require operator
+  reconciliation. Live PostgreSQL concurrency remains pending; desktop browser
+  QA passed with mocked HTTP. Opt-in verifier:
+  `node scripts/verify-ai-usage-database.mjs --apply-plan-enum --write-test-data`.
+  Local .env URLs still need password URL encoding and reachable Supabase
+  Session pooler endpoints; current direct hosts only resolve to IPv6.
+
 - [x] Add Interior door handedness/swing, real object drag, reliable wall
   creation over existing geometry, precision controls and document undo/redo.
 - [ ] Add explicit wall-host relationships and opening overlap validation before
@@ -110,6 +124,15 @@
   multi-instance serverless persistence alongside Edge middleware protection.
 
 ## Blockers
+
+- Local Supabase DATABASE_URL/DIRECT_URL still fail URL parsing. In-memory
+  password encoding fixes syntax, but both direct hosts are unreachable from
+  this process and DNS exposes only IPv6. Need exact project's Session pooler
+  strings saved to this workspace's .env; do not send passwords in chat.
+- The production build now passes when NODE_EXTRA_CA_CERTS points at Windows
+  trusted Root/CA certificates exported under .tmp. The default Node trust
+  configuration is unchanged; prior Google Fonts certificate errors can recur
+  in processes that do not load this trusted CA bundle. TLS was not disabled.
 
 - Built-in browser automation is blocked by the Windows sandbox startup error
   `helper_sandbox_lock_failed` (`SetNamedSecurityInfoW ... failed: 5`). The

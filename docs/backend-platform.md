@@ -32,6 +32,8 @@ Shared:
 - `GET /api/workspace`
 - `PATCH /api/workspace`
 - `GET /api/subscription`
+- `GET /api/usage?days=7|15|30|90` — real workspace AI credits, quota and UTC
+  daily history; see `AI-USAGE.md` for plan ratios, costs and activation SQL.
 - `POST /api/subscription/upgrade-intent`
 - `GET /api/settings`
 - `PATCH /api/settings/user`

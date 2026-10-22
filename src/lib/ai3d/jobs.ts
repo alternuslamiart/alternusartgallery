@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { configured3DProviders, inspect3DTask, submit3DTask } from "./providers.mjs";
 import type { AIProviderJob, Prisma } from "@prisma/client";
 import type { PlatformContext } from "@/lib/platform/api";
+import { aiUsage, usageError } from "@/lib/platform/usage";
 
 type Input = { kind: "casynus-ai3d"; prompt: string; projectId: string; studio: string; model: string };
 type Output = { taskId?: string; phase?: string; progress?: number; modelURL?: string };
@@ -29,8 +30,14 @@ export async function create3DJob(context: PlatformContext, body: Record<string,
   // Persist the request before spending provider credits. A unique ID prevents
   // duplicate submissions; ambiguous/failed submissions are never auto-retried.
   let job: AIProviderJob;
+  let ticket;
+  try { ticket = await aiUsage.reserve(context.workspaceId, "model"); }
+  catch (error) { return usageError(error); }
   try { job = await prisma.aIProviderJob.create({ data: { ...context, id: body.requestId, provider: provider.id, type: "MODEL_GENERATION", status: "QUEUED", input: json({ kind: "casynus-ai3d", projectId: body.projectId, studio: body.studio, prompt: body.prompt.trim(), model: provider.model }) } }); }
-  catch { return fail3D("Generation request already exists or storage is unavailable. Open generation jobs before retrying.", 409); }
+  catch {
+    try { await aiUsage.refund(ticket); } catch (error) { console.error("3D usage refund failed", error); }
+    return fail3D("Generation request already exists or storage is unavailable. Open generation jobs before retrying.", 409);
+  }
   try {
     const taskId = await submit3DTask(provider.id, body.prompt.trim());
     job = await prisma.aIProviderJob.update({ where: { id: job.id }, data: { status: "RUNNING", startedAt: new Date(), output: json({ taskId, phase: provider.id === "meshy" ? "preview" : "model", progress: 0 }) } });
