@@ -6,6 +6,11 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Integrate MapLibre 6.15.0 World Map into Infrastructure with retained
+  3D editor state, geographic selection, markers and a server geocoding adapter.
+- [ ] Configure MapTiler credentials and licensed production map sources;
+  verify live country/city search before enabling production mapping.
+
 - [x] Separate shared 3D object picking from gizmo dragging and verify X/Y/Z
   axis movement with single-step Undo/Redo across all three scene studios.
 

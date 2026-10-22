@@ -2,6 +2,21 @@
 
 ## Application
 
+- Infrastructure alone adds a lazy, client-only `WorldMap` surface alongside
+  the mounted `SceneViewport`. Switching modes preserves the scene document,
+  selection, camera, undo/redo, pending previews and chat. Map camera/marker
+  state is separate, session-only and keyed by project; no schema changes.
+- MapLibre GL JS is pinned at 6.15.0. Its separate ESM worker is emitted with
+  `new URL(..., import.meta.url)` and registered through `setWorkerUrl`.
+  Infrastructure routes and the emitted worker asset receive scoped map CSP;
+  other studios retain their existing policy. The official globe demo is
+  development-only; production needs a licensed HTTPS style and source origins.
+- `/api/infrastructure/geocode` proxies explicit MapTiler searches with a
+  server-only key, bounded queries/results, deadline and in-process rate limit.
+  UI coordinate parsing uses latitude/longitude; MapLibre uses longitude/latitude.
+  Future geographic editing must add a project georeference before mapping
+  existing local-meter scene objects to WGS84 overlays. See `INFRASTRUCTURE-MAP.md`.
+
 - Interior `FloorPlanViewport` delegates SVG picking/drawing to one canvas
   handler; captured drag previews are committed once on release. Geometry helpers
   project openings to walls, preserve metric translations and produce shared

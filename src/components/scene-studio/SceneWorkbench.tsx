@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import type { WorldMapAPI } from "@/components/infrastructure/WorldMap";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { Box, Building2, Eye, EyeOff, Focus, FolderOpen, Layers3, Lock, MoreHorizontal, MousePointer2, PanelLeft, PanelRight, Rotate3D, Route, Ruler, Save, TreePine, Unlock, X } from "lucide-react";
+import { Box, Building2, Eye, EyeOff, Focus, FolderOpen, Globe2, Layers3, Lock, MoreHorizontal, MousePointer2, PanelLeft, PanelRight, Rotate3D, Route, Ruler, Save, TreePine, Unlock, X } from "lucide-react";
 import { SceneViewport, type SceneTool, type ViewportAPI } from "./SceneViewport";
 import { useSceneDocument } from "./useSceneDocument";
 import { StudioHeader, StudioPanel } from "@/components/crystal-studio/kit";
@@ -21,6 +23,7 @@ import {StudioSidebarFooter} from "@/components/crystal-studio/StudioSidebarFoot
 import "./scene-studio.css";
 
 type Studio = "architecture" | "interior" | "infrastructure";
+const WorldMap = dynamic(() => import("@/components/infrastructure/WorldMap"), { ssr: false });
 const routes = { architecture: "/casynus", interior: "/interior", infrastructure: "/infrastructure" };
 const names = { architecture: "Architecture", interior: "Interior Design", infrastructure: "Infrastructure" };
 const providers = [{ id: "gemini", label: "Gemini" }, { id: "groq", label: "Groq" }, { id: "you", label: "You" }];
@@ -83,6 +86,8 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const [left, setLeft] = useState(true), [right, setRight] = useState(true), [snap, setSnap] = useState(true), [grid, setGrid] = useState(true);
   const [busy, setBusy] = useState(""), [error, setError] = useState<string | null>(null), [openProjects, setOpenProjects] = useState<Array<{ id: string; name: string; local?: boolean }> | null>(null);
   const [cameraView, setCameraView] = useState("Perspective");
+  const [worldMap, setWorldMap] = useState(false), [mapOpened, setMapOpened] = useState(false), [mapView, setMapView] = useState("Globe");
+  const worldMapAPI = useRef<WorldMapAPI>(null);
   const [stories, setStories] = useState(2), [search, setSearch] = useState(""), [textureSlot, setTextureSlot] = useState("map");
   const [prompt, setPrompt] = useState(""), [model, setModel] = useState("gemini"), [sceneAI, setSceneAI] = useState(true);
   const [meshProviders, setMeshProviders] = useState<Array<{ id: string; label: string }>>([]);
@@ -210,6 +215,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   },[selected,hoveredId]);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
+      if (worldMap) return;
       if ((event.target as HTMLElement)?.closest("input,textarea,select,[contenteditable=true]") || globalThis.document.pointerLockElement) return;
       if (event.key === "Escape") { setPending(null); setTool("select"); setSelected([]); return; }
       const mod = event.ctrlKey || event.metaKey;
@@ -223,8 +229,9 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key);
   });
 
-  return <main className={`crystal-studio scene-workbench ${left ? "" : "scene-left-closed"} ${right ? "" : "scene-right-closed"}`} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files[0]) void importFile(e.dataTransfer.files[0]); else { const name = e.dataTransfer.getData("application/x-casynus-asset"); if (catalog.includes(name)) add(name, viewport.current?.point(e.clientX, e.clientY)); } }}>
+  return <main data-world-map={worldMap || undefined} className={`crystal-studio scene-workbench ${left ? "" : "scene-left-closed"} ${right ? "" : "scene-right-closed"}`} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (worldMap) return; if (e.dataTransfer.files[0]) void importFile(e.dataTransfer.files[0]); else { const name = e.dataTransfer.getData("application/x-casynus-asset"); if (catalog.includes(name)) add(name, viewport.current?.point(e.clientX, e.clientY)); } }}>
     {store.ready && <SceneViewport ref={viewport} document={pending?.preview ?? doc} selected={selected} tool={pending ? "select" : tool} snap={snap} grid={grid} onSelect={select} onHover={setHoveredId} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
+    {studio === "infrastructure" && mapOpened && <WorldMap key={doc.id} apiRef={worldMapAPI} active={worldMap} />}
 
     {left && <StudioPanel className="scene-sidebar scene-left"><StudioHeader title={names[studio]} onBack={() => void leave("/project")} onCollapse={() => setLeft(false)} />
       <nav className="scene-studio-nav" aria-label="Design studios">{(Object.keys(routes) as Studio[]).map(s => <button key={s} className={s === studio ? "is-active" : ""} onClick={() => void navigate(s)}>{s === "architecture" ? "Architecture" : s === "interior" ? "Interior" : "Infra"}</button>)}</nav>
@@ -265,16 +272,17 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       <StudioViewportToolbar label="Scene transformation tools"
         materialLibrary={{canApply:!blocked&&selected.length>0&&Boolean(primary&&!primary.kind.endsWith("Light")),activeMap:primary?.material.map,onApply:material=>safely(()=>change(applyLibraryMaterial(docRef.current,selectedRoots,material)))}}
         leading={[
+          ...(studio === "infrastructure" ? [{ label: worldMap ? "3D Editor" : "World Map", showLabel: true, icon: worldMap ? Box : Globe2, active: worldMap, onClick: () => { setMapOpened(true); setWorldMap(value => !value); } }] : []),
           { label: studio === "interior" ? "Add furnished room" : "Add building", icon: Building2, onClick: () => template(studio === "interior" ? "room" : "building"), disabled: blocked },
           { label: "Add Tree", icon: TreePine, onClick: () => add("Tree"), disabled: blocked },
         ]}
         tools={([
           ["select", MousePointer2, "Select · Q"], ["translate", Route, "Move · W"], ["rotate", Rotate3D, "Rotate · E"], ["scale", Focus, "Scale · R"], ["measure", Ruler, "Measure distance"],
         ] as const).map(([id, icon, label]) => ({ label, icon, active: tool === id, disabled: blocked, onClick: () => setTool(id) }))}
-        onFit={() => viewport.current?.fit()} onReset={() => store.setCamera(makeDocument(studio).camera)}
-        cameraViews={["Perspective", "Orthographic", "Front", "Back", "Left", "Right", "Top"]} cameraView={cameraView}
-        onCamera={view => { setCameraView(view); store.setCamera({ ...(viewport.current?.camera() ?? doc.camera), projection: view === "Orthographic" ? "orthographic" : "perspective" }); if (view !== "Orthographic") requestAnimationFrame(() => viewport.current?.preset(view)); }}
-        onZoom={factor => viewport.current?.zoom(factor)} exportFormats={["glb", "gltf", "obj", "stl", "png", "jpeg", "json"]} onExport={format => void exportFile(format)}
+        onFit={() => worldMap ? worldMapAPI.current?.reset() : viewport.current?.fit()} onReset={() => { if (worldMap) { worldMapAPI.current?.reset(); setMapView("Globe"); } else store.setCamera(makeDocument(studio).camera); }}
+        cameraViews={worldMap ? ["Globe", "Pitched"] : ["Perspective", "Orthographic", "Front", "Back", "Left", "Right", "Top"]} cameraView={worldMap ? mapView : cameraView}
+        onCamera={view => { if (worldMap) { setMapView(view); worldMapAPI.current?.view(view); return; } setCameraView(view); store.setCamera({ ...(viewport.current?.camera() ?? doc.camera), projection: view === "Orthographic" ? "orthographic" : "perspective" }); if (view !== "Orthographic") requestAnimationFrame(() => viewport.current?.preset(view)); }}
+        onZoom={factor => worldMap ? worldMapAPI.current?.zoom(factor) : viewport.current?.zoom(factor)} exportFormats={worldMap ? ["glb", "gltf", "obj", "stl", "json"] : ["glb", "gltf", "obj", "stl", "png", "jpeg", "json"]} onExport={format => void exportFile(format)}
         onCSV={() => downloadStudioCSV(doc.name, doc.objects.map(o => ({ id: o.id, name: o.name, type: o.kind, parentId: o.parentId, position: o.position, rotation: o.rotation, scale: o.scale, dimensions: o.dimensions })))}
         settingsLabel="Lighting & sun settings" onSettings={() => { setRight(true); requestAnimationFrame(() => globalThis.document.querySelector(".scene-environment")?.scrollIntoView({ block: "nearest" })); }} busy={Boolean(busy) || !store.ready} />
 
@@ -283,7 +291,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       {pending && <div className="scene-proposal" role="dialog" aria-label="Review AI scene proposal"><strong>Preview · changes are not applied</strong><ol>{pending.commands.map((c, i) => <li key={i}>{c.type} {c.template || c.name || c.id || c.kind || "lighting"}</li>)}</ol><div><button onClick={applyProposal}>Apply scene proposal</button><button onClick={() => setPending(null)}>Discard proposal</button></div></div>}
       <div className="scene-chat-mode"><label><input type="checkbox" checked={meshProvider || sceneAI} disabled={model === "you" || meshProvider || Boolean(pending)} onChange={e => setSceneAI(e.target.checked)} />{meshProvider ? "AI model generation · preview first" : "AI scene commands · preview first"}</label>{model === "you" && <small>You: research chat</small>}</div>
       <StudioAIChat studio={studio === "architecture" ? "modeling" : studio === "interior" ? "floor-plan" : "infrastructure"} open={dock.open} onOpenChange={dock.setOpen} prompt={prompt} onPromptChange={setPrompt} onSubmit={() => {}} model={model} onModelChange={value => { setModel(value); if (value === "you") setSceneAI(false); }} models={[...providers, ...meshProviders]} messages={messages} onMessagesChange={setMessages} onClearMessages={() => setMessages([])} onNewChat={() => { setMessages([]); setPrompt(""); }} requestAnswer={meshProvider || (sceneAI && model !== "you") ? requestSceneAnswer : undefined} statusLabel={meshProvider ? "Real 3D provider · review before applying" : sceneAI && model !== "you" ? "Validated scene proposals · manual approval required" : `${doc.objects.length} objects · meters`} />
-      <div className="scene-navigation-hint">RMB orbit · MMB pan · wheel zoom · Shift click multi-select</div>
+      <div className="scene-navigation-hint">{worldMap ? "Drag to pan · right-drag to rotate/pitch · wheel or pinch to zoom · click to select location" : "RMB orbit · MMB pan · wheel zoom · Shift click multi-select"}</div>
     </section>
 
     {right && <StudioPanel className="scene-sidebar scene-inspector"><header><strong>Properties</strong><button aria-label="Collapse inspector" onClick={() => setRight(false)}><PanelRight size={17} /></button></header>

@@ -1,6 +1,13 @@
-# Next tasks (reviewed 2026-10-22)
+# Next tasks (reviewed 2026-10-23)
 
 ## Next concrete task
+
+- [x] Integrate Infrastructure's MapLibre 6.15.0 globe, correct its separate
+  ESM worker/worker CSP, preserve mounted editor/history and verify interaction.
+- [ ] Configure `MAPTILER_API_KEY`, `NEXT_PUBLIC_INFRASTRUCTURE_MAP_STYLE` and
+  required `INFRASTRUCTURE_MAP_ORIGINS`; verify live geocoding and licensed
+  production tiles. Development globe and mocked geocoding UI are verified;
+  no production deployment is authorized. See `docs/INFRASTRUCTURE-MAP.md`.
 
 - [x] Fix shared studio surface picking and X/Y/Z gizmo drag selection;
   verify axis constraints, single-step Undo/Redo and light/dark multi-selection.

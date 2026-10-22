@@ -7,7 +7,7 @@ import {StudioMaterialLibrary,type MaterialLibraryOptions} from "./StudioMateria
 import type {MaterialAsset} from "./material-textures";
 import "./viewport-toolbar.css";
 
-export type ViewportAction = { label: string; icon: LucideIcon; onClick: () => void; active?: boolean; disabled?: boolean };
+export type ViewportAction = { label: string; icon: LucideIcon; onClick: () => void; active?: boolean; disabled?: boolean; showLabel?: boolean };
 type Props = {
   label: string; leading: ViewportAction[]; tools: ViewportAction[];
   onFit: () => void; onReset: () => void; cameraViews: string[]; cameraView: string; onCamera: (view: string) => void;
@@ -37,7 +37,7 @@ export function StudioViewportToolbar(p: Props) {
     if(!libraryOpen)return;const toolbar=document.getElementById(toolbarId);if(!toolbar)return;
     const resize=()=>setLibraryWidth(toolbar.getBoundingClientRect().width);resize();const observer=new ResizeObserver(resize);observer.observe(toolbar);return()=>observer.disconnect();
   },[libraryOpen,toolbarId]);
-  const action = (a: ViewportAction) => <button key={a.label} type="button" aria-label={a.label} title={a.label} disabled={a.disabled} aria-pressed={a.active} onClick={a.onClick} className={`ref-toolbar-icon-btn ${a.active ? "is-active" : ""}`}><a.icon size={14} /></button>;
+  const action = (a: ViewportAction) => <button key={a.label} type="button" aria-label={a.label} title={a.label} disabled={a.disabled} aria-pressed={a.active} onClick={a.onClick} className={`${a.showLabel ? "ref-toolbar-export-btn" : "ref-toolbar-icon-btn"} ${a.active ? "is-active" : ""}`}><a.icon size={14} />{a.showLabel && a.label}</button>;
   return <>
     <StudioToolbar id={toolbarId} className="ref-top-toolbar casynus-viewport-toolbar" aria-label={p.label}>
       <button type="button" className={`ref-toolbar-icon-btn ${libraryOpen?"is-active":""}`} aria-label="Texture material library" title="Texture material library" aria-expanded={libraryOpen} onClick={()=>setLibraryOpen(value=>!value)}><Plus size={14}/></button>

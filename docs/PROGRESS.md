@@ -1,6 +1,39 @@
 # Verified progress
 
-Last updated: 2026-10-22
+Last updated: 2026-10-23
+
+## Infrastructure MapLibre globe
+
+- Added World Map / 3D Editor in the existing Infrastructure toolbar, with
+  MapLibre GL JS pinned to 6.15.0. Both canvases stay mounted; model data,
+  selection, editor camera, history and chat retain their existing ownership.
+  Globe supports pan, zoom, rotation/pitch, coordinate search and selection
+  markers. Existing sidebars, chat, routes, auth and database are preserved.
+- Fixed v6's separate ESM worker URL under Next bundling, scoped page AND
+  worker response CSP for tiles/glyphs, and marker initialization order.
+  Earlier readiness failures included incomplete Next development chunks
+  under low disk space; clearing generated cache/profiles restored hydration.
+  The verifier now captures browser/network diagnostics. Fixed its selector
+  quoting, DOM serialization and ambiguous World Map button selector.
+- Chrome passed real globe initialization/tiles, zoom, pan, rotation, pitch,
+  coordinate markers, missing-key feedback, retained canvas identity, selected
+  model and Undo/Redo across mode switches, and 1440/390px resizing. City and
+  country result selection used mocked geocoding HTTP; session was mocked as
+  signed out. Screenshots inspected; mobile search now clears panel toggles.
+  Final browser artifacts: `.tmp/world-map-1792712107372/`; extended history
+  and search coverage also passed in `.tmp/world-map-1792712053798/`.
+- `npm test`: 118 passed. TypeScript, focused lint and diff checks passed.
+  Full-project lint retains 57 unrelated existing errors. `npm run build`
+  passed with the Windows trusted CA bundle after narrowly preserving the
+  already-minified ESM worker from Next 14's classic-script asset optimizer.
+  Production worker bytes match the installed 6.15.0 module exactly. Local
+  production Chrome passed Infrastructure rendering, retained model/canvas,
+  production style gating (no demo requests), and Architecture/Interior 3D
+  rendering with no World Map control. Existing Browserslist/auth client-render
+  warnings remain. No live MapTiler request or cloud save is
+  claimed: no geocoding key is configured in this checkout. Production mapping
+  requires a licensed style and source origins; demo tiles are blocked outside
+  development. See `INFRASTRUCTURE-MAP.md`. No deployment was performed.
 
 ## Studio object picking and axis movement
 

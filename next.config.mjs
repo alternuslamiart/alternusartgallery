@@ -1,6 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  webpack(config, { webpack }) {
+    // MapLibre v6's distributed worker is already minified ESM. Next 14's
+    // asset optimizer otherwise reparses it as a classic script and fails.
+    config.plugins.push({
+      apply(compiler) {
+        compiler.hooks.compilation.tap("MapLibrePreminifiedWorker", compilation => {
+          compilation.hooks.processAssets.tap({ name: "MapLibrePreminifiedWorker", stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL }, () => {
+            for (const asset of compilation.getAssets()) {
+              if (/^static\/media\/maplibre-gl-worker\.[a-f0-9]+\.mjs$/.test(asset.name)) {
+                compilation.updateAsset(asset.name, asset.source, { ...asset.info, minimized: true });
+              }
+            }
+          });
+        });
+      },
+    });
+    return config;
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -61,7 +79,7 @@ const nextConfig = {
   },
   // Security Headers
   async headers() {
-    return [
+    const rules = [
       {
         // Apply to all routes
         source: "/:path*",
@@ -129,6 +147,18 @@ const nextConfig = {
         ],
       },
     ];
+    // Only Infrastructure loads map tiles and MapLibre's bundled blob worker.
+    const mapOrigins = new Set(process.env.NODE_ENV === "development" ? ["https://demotiles.maplibre.org"] : []);
+    const mapURLs = [process.env.NEXT_PUBLIC_INFRASTRUCTURE_MAP_STYLE, ...(process.env.INFRASTRUCTURE_MAP_ORIGINS || "").split(",")];
+    for (const value of mapURLs.filter(Boolean)) {
+      const url = new URL(value.trim());
+      if (url.protocol !== "https:") throw new Error("Infrastructure map sources must use HTTPS.");
+      if (process.env.NODE_ENV !== "development" && url.hostname === "demotiles.maplibre.org") throw new Error("MapLibre demo sources are development-only.");
+      mapOrigins.add(url.origin);
+    }
+    const baseCSP = rules[0].headers.find(header => header.key === "Content-Security-Policy").value;
+    const mapCSP = baseCSP.replace(/connect-src ([^;]+)/, (_, sources) => `connect-src ${sources} ${[...mapOrigins].join(" ")}`) + "; worker-src 'self' blob:";
+    return [...rules, ...["/infrastructure", "/infrastructur", "/_next/static/media/maplibre-gl-worker.:asset*"].map(source => ({ source, headers: [{ key: "Content-Security-Policy", value: mapCSP }] }))];
   },
 };
 
