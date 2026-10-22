@@ -6,6 +6,9 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Complete visible multi-selection feedback and canvas/hierarchy hover
+  identification, retaining original Interior sketching interactions.
+
 - [x] Match Interior's right inspector presentation to the 3D workspaces
   while preserving architectural plan property controls and exports.
 

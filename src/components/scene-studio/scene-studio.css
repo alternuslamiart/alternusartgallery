@@ -49,4 +49,8 @@ html[data-crystal-theme="light"] .scene-workbench.crystal-studio { background:#f
 .scene-generation-job a { color:var(--studio-accent); }
 
 /* Match the inset panel edges without overriding the existing chat dimensions. */
+.scene-workbench .scene-tree-row[data-selection="primary"] { --scene-row-color:#4284ff; --scene-row-fill:#4284ff1a; color:#4284ff; background:var(--scene-row-fill); box-shadow:inset 3px 0 var(--scene-row-color); }
+.scene-workbench .scene-tree-row[data-selection="secondary"] { --scene-row-color:#22c55e; --scene-row-fill:#22c55e1a; color:#22c55e; background:var(--scene-row-fill); box-shadow:inset 3px 0 var(--scene-row-color); }
+.scene-workbench .scene-tree-row[data-selection]>.scene-tree-name { color:inherit; background:transparent; }
+.scene-workbench .scene-tree-row[data-hovered="true"] { outline:1px solid var(--scene-row-color,#22c55e); outline-offset:-1px; background:var(--scene-row-fill,var(--studio-bg-hover)); }
 .scene-workbench.crystal-studio .scene-view .crystal-ai-prompt.studio-ai-panel { bottom:0!important; }

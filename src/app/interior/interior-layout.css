@@ -30,6 +30,8 @@
 .interior-scene-hierarchy>.interior-scene-object { padding-left:28px; }
 .interior-scene-hierarchy button>span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11px; }
 .interior-scene-hierarchy svg { flex-shrink:0; }
+.interior-scene-hierarchy .interior-scene-object.is-selected { --scene-row-color:#4284ff; color:#4284ff; background:#4284ff1a; box-shadow:inset 3px 0 #4284ff; }
+.interior-scene-hierarchy .interior-scene-object[data-hovered="true"] { outline:1px solid var(--scene-row-color,#22c55e); outline-offset:-1px; background:var(--studio-bg-hover); }
 
 /* Match the Architecture/Infrastructure inspector while keeping drafting controls. */
 .interior-plan-restored .interior-scene-inspector { background:var(--studio-bg-panel); color:var(--studio-text-primary); }

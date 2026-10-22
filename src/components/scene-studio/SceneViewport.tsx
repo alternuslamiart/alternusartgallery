@@ -9,6 +9,7 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { buildScene, disposeScene } from "@/lib/scene/geometry.mjs";
 import type { SceneDocument, SceneObject, Vec3 } from "@/lib/scene/document.mjs";
 import { useCrystalTheme } from "@/lib/crystal-theme";
+import { createSelectionHelpers, disposeSelectionHelpers } from "@/lib/scene/selection.mjs";
 
 export type ViewportAPI = {
   fit: () => void; focus: () => void; preset: (name: string) => void; zoom: (factor: number) => void;
@@ -19,6 +20,7 @@ export type ViewportAPI = {
 export type SceneTool = "select" | "translate" | "rotate" | "scale" | "measure";
 type Props = { document: SceneDocument; selected: string[]; tool: SceneTool; snap: boolean; grid: boolean;
   onSelect: (id: string | null, additive?: boolean) => void; onTransform: (id: string, patch: Partial<SceneObject>) => void;
+  onHover?: (id: string | null) => void;
   onCameraChange?: (camera: SceneDocument["camera"]) => void };
 
 class RenderBoundary extends Component<{ children: ReactNode; retry: () => void }, { error: boolean }> {
@@ -33,7 +35,6 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
   const orbit = useRef<OrbitImpl>(null), walk = useRef<WalkImpl | null>(null);
   const keys = useRef(new Set<string>());
   const dragging = useRef(false);
-  const selectionBox = useRef<THREE.BoxHelper>(null);
   const [points, setPoints] = useState<THREE.Vector3[]>([]);
   const root = useMemo(() => buildScene(p.document, { helpers: true, onTextureLoad: invalidate }), [p.document.objects, invalidate]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => disposeScene(root), [root]);
@@ -42,6 +43,8 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
     root.traverse(o => { if (o.userData.sceneId === p.selected[0]) found = o; });
     return found;
   }, [root, p.selected]);
+  const selectionBoxes=useMemo(()=>createSelectionHelpers(root,p.selected),[root,p.selected]);
+  useEffect(()=>()=>disposeSelectionHelpers(selectionBoxes),[selectionBoxes]);
   let transformNode: THREE.Object3D | null | undefined = selected;
   let transformLocked = false;
   while (transformNode) { if (transformNode.userData.locked) transformLocked = true; transformNode = transformNode.parent; }
@@ -89,7 +92,7 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
     return () => { window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); window.removeEventListener("blur", blur); };
   }, []);
   useFrame((_, delta) => {
-    selectionBox.current?.update();
+    selectionBoxes.forEach(helper=>helper.update());
     if (!p.walking || !walk.current?.isLocked) return;
     const speed = Math.min(delta, .05) * (keys.current.has("ShiftLeft") ? 6 : 2.5);
     walk.current.moveForward((Number(keys.current.has("KeyW")) - Number(keys.current.has("KeyS"))) * speed);
@@ -147,8 +150,13 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
       <planeGeometry args={[500, 500]} /><meshStandardMaterial color={theme === "dark" ? "#373c43" : "#c9cdd2"} roughness={.95} />
     </mesh>
     {p.grid && <Grid position={[0, -.4, 0]} args={[200, 200]} cellSize={1} sectionSize={5} cellColor={theme === "dark" ? "#555b63" : "#a0a8b3"} sectionColor="#748396" fadeDistance={80} infiniteGrid />}
-    <primitive object={root} onPointerDown={pick} onDoubleClick={(event: ThreeEvent<MouseEvent>) => { pick(event); frame(event.object); }} />
-    {selected && selected.visible && <boxHelper ref={selectionBox} args={[selected, 0x4284ff]} />}
+    <primitive object={root} onPointerDown={pick} onDoubleClick={(event: ThreeEvent<MouseEvent>) => { pick(event); frame(event.object); }}
+      onPointerMove={(event:ThreeEvent<PointerEvent>)=>{
+        if(dragging.current||p.walking)return;event.stopPropagation();
+        let node:THREE.Object3D|null=event.object;while(node&&!node.userData.sceneId)node=node.parent;
+        p.onHover?.(node?.userData.sceneId??null);
+      }} onPointerOut={()=>p.onHover?.(null)} />
+    {selectionBoxes.map(helper=><primitive key={helper.userData.selectionId} object={helper} />)}
     {canTransform && ["translate", "rotate", "scale"].includes(p.tool) && <TransformControls object={selected} mode={p.tool as "translate" | "rotate" | "scale"} size={.8}
       translationSnap={p.snap ? .25 : null} rotationSnap={p.snap ? Math.PI / 12 : null} scaleSnap={p.snap ? .1 : null}
       onMouseDown={() => { dragging.current = true; }} onObjectChange={() => invalidate()}

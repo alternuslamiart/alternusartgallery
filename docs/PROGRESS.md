@@ -2,6 +2,32 @@
 
 Last updated: 2026-10-22
 
+## Multi-selection outlines and hierarchy identification
+
+- Shared 3D studios now draw a real bounding outline for every selected object:
+  first selected blue (#4284ff), additional selections green (#22c55e).
+  Shift/Ctrl/Cmd-click toggles selection in the canvas or hierarchy, preserving
+  order; removing the primary promotes the next selection to blue. Existing
+  primary-object gizmo and selection-dependent actions are retained.
+- Selection rows use matching colors/pressed states. Canvas hover identifies
+  the matching hierarchy row and scrolls it into view; selection also reveals
+  its row. Interior's original SVG sketcher gains hover/selection identification
+  in its hierarchy while retaining its existing single-selection interaction.
+- Non-pickable outline helpers update with geometry, respect hidden ancestors
+  and are disposed when replaced. They stay outside the editable/exported root;
+  scene schemas and materials are unchanged.
+- Nine selection/geometry tests passed, including GLB roundtrip and OBJ/STL
+  geometry checks. Typecheck passed; focused lint has no errors, with existing
+  image/hook warnings in legacy CrystalStudio/Viewport files.
+- Chrome passed real canvas picking/multi-click, primary promotion, deselection,
+  hierarchy modifier selection, hover/scroll identification and measured blue/
+  green WebGL pixels for Architecture, Infrastructure and Interior 3D in both
+  themes. Interior SVG hover/picking identifies its actual room hierarchy.
+  Zero runtime exceptions. Script: `scripts/verify-scene-selection.mjs`.
+  Screenshots: `.tmp/scene-selection-1792631083951/`.
+- Production build was not repeated for this focused renderer/interaction change;
+  the existing local Google Fonts certificate blocker remains unresolved.
+
 ## Casynus AI voice commands
 
 - Added shared studio microphone dictation, opt-in Hey Casynus wake listening,

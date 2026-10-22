@@ -15,6 +15,7 @@ import { requestStudioAnswer } from "@/lib/studio-ai.mjs";
 import { listRecovery } from "@/lib/scene/recovery";
 import { StudioViewportToolbar, downloadStudioCSV } from "@/components/crystal-studio/StudioViewportToolbar";
 import { generate3DModel, type Generation3DJob } from "@/lib/ai3d/client.mjs";
+import { nextSelection } from "@/lib/scene/selection.mjs";
 import "./scene-studio.css";
 
 type Studio = "architecture" | "interior" | "infrastructure";
@@ -75,6 +76,8 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const docRef = useRef(doc); docRef.current = doc;
   const viewport = useRef<ViewportAPI>(null), file = useRef<HTMLInputElement>(null), texture = useRef<HTMLInputElement>(null);
   const [selected, setSelected] = useState<string[]>([]), [tool, setTool] = useState<SceneTool>("select");
+  const [hoveredId,setHoveredId]=useState<string|null>(null);
+  const hierarchyRef=useRef<HTMLElement>(null);
   const [left, setLeft] = useState(true), [right, setRight] = useState(true), [snap, setSnap] = useState(true), [grid, setGrid] = useState(true);
   const [busy, setBusy] = useState(""), [error, setError] = useState<string | null>(null), [openProjects, setOpenProjects] = useState<Array<{ id: string; name: string; local?: boolean }> | null>(null);
   const [cameraView, setCameraView] = useState("Perspective");
@@ -103,7 +106,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     if (!allowLocked && scene.objects.some(o => ids.has(o.id) && locked(o))) throw new Error("Unlock the selected objects and their parents first.");
     change({ ...scene, objects: scene.objects.map(o => o.id === id ? { ...o, ...values } : values.material && ids.has(o.id) ? { ...o, material: values.material } : o) });
   });
-  const select = (id: string | null, additive = false) => { if (pending) return; setSelected(current => id ? additive ? current.includes(id) ? current.filter(i => i !== id) : [...current, id] : [id] : []); };
+  const select = (id: string | null, additive = false) => { if (pending) return; setSelected(current => nextSelection(current,id,additive)); };
   const add = (name: string, point?: Vec3 | null) => safely(() => {
     const objects = asset(name).map(o => !o.parentId && point ? { ...o, position: [o.position[0] + point[0], o.position[1], o.position[2] + point[2]] as Vec3 } : o);
     change({ ...doc, objects: [...doc.objects, ...objects] }); setSelected([objects[0].id]); setTool("translate");
@@ -197,7 +200,12 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
 
   useEffect(() => {
     setSelected(current => current.filter(id => doc.objects.some(o => o.id === id)));
+    setHoveredId(current=>doc.objects.some(o=>o.id===current)?current:null);
   }, [doc.objects]);
+  useEffect(()=>{
+    const id=hoveredId??selected.at(-1);if(!id)return;
+    hierarchyRef.current?.querySelector<HTMLElement>(`[data-scene-object-id="${CSS.escape(id)}"]`)?.scrollIntoView({block:"nearest",inline:"nearest"});
+  },[selected,hoveredId]);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
       if ((event.target as HTMLElement)?.closest("input,textarea,select,[contenteditable=true]") || globalThis.document.pointerLockElement) return;
@@ -214,7 +222,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   });
 
   return <main className={`crystal-studio scene-workbench ${left ? "" : "scene-left-closed"} ${right ? "" : "scene-right-closed"}`} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files[0]) void importFile(e.dataTransfer.files[0]); else { const name = e.dataTransfer.getData("application/x-casynus-asset"); if (catalog.includes(name)) add(name, viewport.current?.point(e.clientX, e.clientY)); } }}>
-    {store.ready && <SceneViewport ref={viewport} document={pending?.preview ?? doc} selected={selected} tool={pending ? "select" : tool} snap={snap} grid={grid} onSelect={select} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
+    {store.ready && <SceneViewport ref={viewport} document={pending?.preview ?? doc} selected={selected} tool={pending ? "select" : tool} snap={snap} grid={grid} onSelect={select} onHover={setHoveredId} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
 
     {left && <StudioPanel className="scene-sidebar scene-left"><StudioHeader title={names[studio]} onBack={() => void leave("/project")} onCollapse={() => setLeft(false)} />
       <nav className="scene-studio-nav" aria-label="Design studios">{(Object.keys(routes) as Studio[]).map(s => <button key={s} className={s === studio ? "is-active" : ""} onClick={() => void navigate(s)}>{s === "architecture" ? "Architecture" : s === "interior" ? "Interior" : "Infra"}</button>)}</nav>
@@ -234,10 +242,13 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
         <div className="scene-library-items">{catalog.filter(name => name.toLowerCase().includes(search.toLowerCase())).map(name => <button key={name} disabled={blocked} draggable={!blocked} onDragStart={e => e.dataTransfer.setData("application/x-casynus-asset", name)} onClick={() => add(name)}><Box size={13} />{name}</button>)}</div>
         <div className="scene-templates"><label>Building levels <input aria-label="Building levels" type="number" min={1} max={8} value={stories} onChange={e => setStories(Math.max(1, Math.min(8, Number(e.target.value) || 1)))} /></label>{[["building", "Add building"], ["room", "Add furnished room"], ["intersection", "Add intersection"]].map(([id, label]) => <button key={id} disabled={blocked} onClick={() => template(id)}>{label}</button>)}</div>
       </section>
-      <section className="scene-hierarchy"><h2><Layers3 size={14} />Scene hierarchy <span>{doc.objects.length}</span></h2>{doc.objects.map(o => {
+      <section className="scene-hierarchy" ref={hierarchyRef}><h2><Layers3 size={14} />Scene hierarchy <span>{doc.objects.length}</span></h2>{doc.objects.map(o => {
         let depth = 0, parent = o.parentId; while (parent && depth < 32) { depth++; parent = doc.objects.find(n => n.id === parent)?.parentId ?? null; }
-        return <div key={o.id} className={`scene-tree-row ${selected.includes(o.id) ? "is-selected" : ""}`}>
-          <button className="scene-tree-name" style={{ paddingLeft: 8 + depth * 10 }} onClick={e => select(o.id, e.shiftKey || e.ctrlKey || e.metaKey)} onDoubleClick={() => { setSelected([o.id]); requestAnimationFrame(() => viewport.current?.focus()); }} title={o.name}>{o.kind === "group" ? <Layers3 size={12} /> : <Box size={12} />}<span>{o.name}</span></button>
+        const selectedIndex=selected.indexOf(o.id);
+        return <div key={o.id} data-scene-object-id={o.id} data-selection={selectedIndex===0?"primary":selectedIndex>0?"secondary":undefined} data-hovered={hoveredId===o.id||undefined}
+          onPointerEnter={()=>setHoveredId(o.id)} onPointerLeave={()=>setHoveredId(current=>current===o.id?null:current)}
+          className={`scene-tree-row ${selectedIndex>=0 ? "is-selected" : ""}`}>
+          <button className="scene-tree-name" aria-pressed={selectedIndex>=0} style={{ paddingLeft: 8 + depth * 10 }} onClick={e => select(o.id, e.shiftKey || e.ctrlKey || e.metaKey)} onDoubleClick={() => { setSelected([o.id]); requestAnimationFrame(() => viewport.current?.focus()); }} title={`${o.name} · Shift/Ctrl-click to multi-select`}>{o.kind === "group" ? <Layers3 size={12} /> : <Box size={12} />}<span>{o.name}</span></button>
           <button aria-label={`${o.visible ? "Hide" : "Show"} ${o.name}`} disabled={blocked} onClick={() => patch(o.id, { visible: !o.visible }, true)}>{o.visible ? <Eye size={12} /> : <EyeOff size={12} />}</button><button aria-label={`${o.locked ? "Unlock" : "Lock"} ${o.name}`} disabled={blocked} onClick={() => patch(o.id, { locked: !o.locked }, true)}>{o.locked ? <Lock size={12} /> : <Unlock size={12} />}</button>
         </div>;
       })}</section>

@@ -2,12 +2,15 @@
 
 import { Box, FolderOpen, Layers3, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { StudioHeader, StudioPanel } from "./kit";
 import type { FloorPlanObject } from "./types";
 
 type Props = {
   objects: FloorPlanObject[];
   selectedId: string | null;
+  hoveredId?: string | null;
+  onHover?: (id:string|null)=>void;
   projectName: string;
   onProjectNameChange: (name: string) => void;
   onSelect: (id: string | null) => void;
@@ -24,6 +27,11 @@ function objectLabel(object: FloorPlanObject, index: number) {
 }
 
 export function InteriorSceneSidebar(p: Props) {
+  const hierarchyRef=useRef<HTMLElement>(null);
+  useEffect(()=>{
+    const id=p.hoveredId??p.selectedId;if(!id)return;
+    hierarchyRef.current?.querySelector<HTMLElement>(`[data-floor-plan-object-id="${CSS.escape(id)}"]`)?.scrollIntoView({block:"nearest",inline:"nearest"});
+  },[p.selectedId,p.hoveredId]);
   return <StudioPanel className="crystal-left-panel interior-scene-sidebar">
     <StudioHeader title="Interior" onBack={p.onBack} onCollapse={p.onCollapse} />
     <nav className="interior-scene-nav" aria-label="Studios">
@@ -44,10 +52,12 @@ export function InteriorSceneSidebar(p: Props) {
         </div>
       </details>
     </div>
-    <section className="interior-scene-hierarchy" aria-label="Floor plan hierarchy">
+    <section className="interior-scene-hierarchy" ref={hierarchyRef} aria-label="Floor plan hierarchy">
       <h2><Layers3 size={14} />Scene hierarchy <span>{p.objects.length}</span></h2>
       <button type="button" className="interior-scene-root" onClick={() => p.onSelect(null)}><Layers3 size={12} /><span>{p.projectName || "Untitled project"}</span></button>
       {p.objects.map((object, index) => <button type="button" key={object.id}
+        data-floor-plan-object-id={object.id} data-hovered={p.hoveredId===object.id||undefined}
+        onPointerEnter={()=>p.onHover?.(object.id)} onPointerLeave={()=>p.onHover?.(null)}
         className={`interior-scene-object ${object.id === p.selectedId ? "is-selected" : ""}`}
         aria-pressed={object.id === p.selectedId} onClick={() => p.onSelect(object.id)}>
         <Box size={12} /><span>{objectLabel(object, index)}</span>

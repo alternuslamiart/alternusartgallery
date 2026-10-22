@@ -2,6 +2,10 @@
 
 ## Next concrete task
 
+- [x] Show every 3D selection with blue-primary/green-additional outlines and
+  synchronize hover/selection identification with Scene hierarchy, including
+  Interior's original SVG plan hierarchy.
+
 - [x] Add opt-in Hey Casynus voice commands and Ctrl + Q to the shared studio
   AI dock, preserving provider submission and scene preview approval.
 - [ ] Verify physical microphone permission, wake accuracy and SQ/EN/DE

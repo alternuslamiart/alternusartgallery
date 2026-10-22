@@ -69,6 +69,7 @@ type Props = {
   onStudioModeChange?: (v: StudioMode) => void;
   floorPlanObjects?: FloorPlanObject[];
   selectedFloorPlanId?: string | null;
+  onHoverFloorPlanObject?: (id:string|null)=>void;
   floorPlanSettings?: FloorPlanSettings;
   onFloorPlanSettingsChange?: (settings: FloorPlanSettings) => void;
   onFloorPlanObjectsChange?: (objects: FloorPlanObject[]) => void;
@@ -889,6 +890,8 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
       <svg
         ref={svgRef}
         className="floor-plan-svg-surface absolute inset-0 h-full w-full cursor-crosshair"
+        onPointerOver={event=>p.onHoverFloorPlanObject?.((event.target as Element).closest('[data-floor-plan-object-id]')?.getAttribute('data-floor-plan-object-id')??null)}
+        onPointerLeave={()=>p.onHoverFloorPlanObject?.(null)}
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={completeDrag}
@@ -934,7 +937,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
             .filter((object) => object.type === "room")
             .map((room) => (
               <g
-                key={room.id}
+                key={room.id} data-floor-plan-object-id={room.id}
                 onPointerDown={(event) => {
                   event.stopPropagation();
                   if (tool === "delete") {
@@ -977,7 +980,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
             .filter((object) => object.type === "wall")
             .map((wall) => (
               <line
-                key={wall.id}
+                key={wall.id} data-floor-plan-object-id={wall.id}
                 x1={wall.start.x}
                 y1={wall.start.y}
                 x2={wall.end.x}
@@ -1000,7 +1003,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
             )
             .map((opening) => (
               <g
-                key={opening.id}
+                key={opening.id} data-floor-plan-object-id={opening.id}
                 transform={`translate(${opening.x} ${opening.y}) rotate(${opening.rotation})`}
                 onPointerDown={(event) => {
                   event.stopPropagation();
@@ -1065,7 +1068,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
             .filter((object) => object.type === "furniture")
             .map((item) => (
               <g
-                key={item.id}
+                key={item.id} data-floor-plan-object-id={item.id}
                 onPointerDown={(event) => {
                   event.stopPropagation();
                   if (tool === "delete") {
@@ -1101,7 +1104,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
             .filter((object) => object.type === "dimension")
             .map((item) => (
               <g
-                key={item.id}
+                key={item.id} data-floor-plan-object-id={item.id}
                 onPointerDown={(event) => {
                   event.stopPropagation();
                   if (tool === "delete") {
@@ -1137,7 +1140,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
             .filter((object) => object.type === "text")
             .map((item) => (
               <text
-                key={item.id}
+                key={item.id} data-floor-plan-object-id={item.id}
                 x={item.x}
                 y={item.y}
                 fontSize=".24"

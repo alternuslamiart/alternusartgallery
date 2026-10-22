@@ -2,6 +2,13 @@
 
 ## Application
 
+- `lib/scene/selection.mjs` preserves ordered multi-selection and creates
+  disposable, non-pickable 3D outline helpers outside the export root: blue for
+  the primary selection and green for additional objects. SceneWorkbench links
+  viewport hover/picking to hierarchy row state and scrolling. Interior's SVG
+  sketcher delegates object hover to its matching hierarchy without changing
+  its document schema or single-selection property editor.
+
 - The default `/casynus`, `/infrastructure` and `/interior?workspace=3d` use
   `components/scene-studio/SceneWorkbench.tsx` and the real R3F viewport.
   `lib/scene/document.mjs` validates versioned metric documents and allowlisted
