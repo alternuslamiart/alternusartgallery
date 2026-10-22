@@ -2,6 +2,32 @@
 
 Last updated: 2026-10-22
 
+## Homepage editorial redesign, isolated to `/`
+
+- Added a Homepage-only wrapper and stylesheet for an open editorial hero,
+  wide existing architectural image, capability image strips, alternating
+  feature spreads, horizontal service rows, open workflow/control layouts,
+  restrained desktop/download surfaces and spaced footer groups. Shared shell
+  source, studios, authentication, pricing logic and APIs are unchanged.
+- Preserved the existing navbar glass surface per the follow-up request;
+  refined its buttons only. Other Homepage surfaces render without gradients,
+  shadows or blur, with restrained corners and visible keyboard focus.
+- Local Chrome baseline comparison passed at 1920/1440/1280/768/390/320px in
+  both themes: all 10 sections in order, 105 text/link/button elements and
+  their typography properties unchanged; primary CTA remains #4284FF.
+  No horizontal overflow or runtime exceptions. Actual theme toggle, video
+  opening/Escape, focus and Download CTA navigation passed. Auth session was
+  mocked as signed out; no backend/provider changes or production verification.
+  Desktop/mobile section screenshots were visually inspected. Temporary QA
+  script and artifacts: `.tmp/home-qa.mjs`, `.tmp/home-redesign/`.
+- TypeScript and focused Homepage lint passed; full-project lint remains
+  blocked by pre-existing unused variables in aicode, archplan, API seed,
+  studio-shell, email and PayPal code, among other unrelated files.
+- Production build passed using the existing Windows trusted CA bundle via
+  NODE_EXTRA_CA_CERTS; existing client-rendering warnings remain. CSS parsing,
+  Homepage selector isolation and diff checks passed. QA server was stopped.
+
+
 ## Restore original Usage and Limits presentation with real AI quotas
 
 - Restored the original account section typography, blue eyebrows, 820px

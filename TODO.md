@@ -2,6 +2,10 @@
 
 ## Next concrete task
 
+- [x] Redesign only the Homepage with isolated editorial layouts, preserved
+  content/order/typography/blue and the existing glass navbar; verify six
+  viewport widths in both themes and existing video/navigation interactions.
+
 - [x] Restore original Usage triplet/chart and Limits row-card designs while
   keeping real plan quotas; add stable loading placeholders and timeout/Retry.
 

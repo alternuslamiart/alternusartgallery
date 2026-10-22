@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import "./home-highlights.css";
+import "./home-redesign.css";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -170,13 +171,13 @@ export default function HomePage() {
   };
  }, [isIntroVideoOpen]);
  return (
- <CoreforgePage>
+ <div id="alternus-home"><CoreforgePage>
  {(t) => (
  <>
  <section className="crystal-first-sector">
  <p>{tr.eyebrow}</p>
  <div className="crystal-first-card"><div><h1>{tr.hero}</h1><p>{tr.heroCopy}</p> <div><ActionLink href="/project">{tr.launch} <ArrowRight size={15} /></ActionLink><ActionLink href="/download" variant="secondary">{tr.download}</ActionLink></div></div><div className="crystal-first-image">
-  <Image src="/Section/architectresectionone.png" alt={tr.architecture} fill priority sizes="(max-width: 700px) 100vw, 55vw" />
+  <Image src="/Section/architectresectionone.png" alt={tr.architecture} fill priority sizes="(max-width: 1440px) 100vw, 1264px" />
   <button type="button" aria-label="Play Casynus Studio introduction video" onClick={() => void playIntroVideo()} className="crystal-intro-play-overlay">
    <span aria-hidden="true" className="crystal-intro-play-button"><Play size={76} fill="currentColor" strokeWidth={1} /></span>
   </button>
@@ -204,7 +205,7 @@ export default function HomePage() {
 
  <FeatureShowcase title={tr.planarch} image="/Section/interior.jpg" copy={tr.planarchCopy} />
 
- <section data-crystal-reveal style={{ padding: "94px 0", borderTop: `1px solid ${t.faint}`, borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
+ <section className="home-services" data-crystal-reveal style={{ padding: "94px 0", borderTop: `1px solid ${t.faint}`, borderBottom: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px" }}>
  <div style={{ display: "flex", alignItems: "end", justifyContent: "space-between", gap: 24, flexWrap: "wrap", marginBottom: 42 }}>
  <div>
@@ -272,7 +273,7 @@ export default function HomePage() {
 
  <FeatureShowcase reverse title={tr.infra} image="/Section/infrastruct.png" copy={tr.infraCopy} />
 
- <section data-crystal-reveal style={{ padding: "96px 0" }}>
+ <section className="home-workflow" data-crystal-reveal style={{ padding: "96px 0" }}>
  <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 20 }}>
  HOW IT WORKS
@@ -312,7 +313,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <section style={{ padding: "96px 0", borderTop: `1px solid ${t.faint}`, background: t.surface }}>
+ <section className="home-controls" style={{ padding: "96px 0", borderTop: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 32px" }}>
  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22 }}>
  <div
@@ -358,7 +359,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <section style={{ padding: "100px 0", borderTop: `1px solid ${t.faint}`, background: t.surface }}>
+ <section className="home-desktop" style={{ padding: "100px 0", borderTop: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 32px" }}>
  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 56, alignItems: "center" }}>
  <div>
@@ -392,7 +393,7 @@ export default function HomePage() {
  </div>
  </section>
 
- <section style={{ padding: "108px 0" }}>
+ <section className="home-start" style={{ padding: "108px 0" }}>
  <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 11, color: COBALT, fontWeight: 900, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 20 }}>
  <Sparkles size={15} /> Begin
@@ -487,7 +488,7 @@ export default function HomePage() {
   </div>
  </div>
 
- <section data-crystal-reveal style={{ padding: "92px 0 108px", borderTop: `1px solid ${t.faint}`, background: t.surface }}>
+ <section className="home-downloads" data-crystal-reveal style={{ padding: "92px 0 108px", borderTop: `1px solid ${t.faint}`, background: t.surface }}>
  <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
  <div style={{ fontSize: 10, letterSpacing: "0.24em", fontWeight: 800, color: COBALT, marginBottom: 18 }}>CASYNUS STUDIO / AVAILABLE EVERYWHERE</div>
  <h2 style={{ margin: 0, fontSize: "clamp(38px,6vw,72px)", fontWeight: 900, letterSpacing: "-0.05em", lineHeight: 0.94 }}>
@@ -512,6 +513,6 @@ export default function HomePage() {
  </section>
  </>
  )}
- </CoreforgePage>
+ </CoreforgePage></div>
  );
 }
