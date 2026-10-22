@@ -53,4 +53,7 @@ html[data-crystal-theme="light"] .scene-workbench.crystal-studio { background:#f
 .scene-workbench .scene-tree-row[data-selection="secondary"] { --scene-row-color:#22c55e; --scene-row-fill:#22c55e1a; color:#22c55e; background:var(--scene-row-fill); box-shadow:inset 3px 0 var(--scene-row-color); }
 .scene-workbench .scene-tree-row[data-selection]>.scene-tree-name { color:inherit; background:transparent; }
 .scene-workbench .scene-tree-row[data-hovered="true"] { outline:1px solid var(--scene-row-color,#22c55e); outline-offset:-1px; background:var(--scene-row-fill,var(--studio-bg-hover)); }
+.scene-sidebar-content { display:flex; flex-direction:column; flex:1; min-height:0; overflow-y:auto; }
+.scene-sidebar-content>.scene-library { flex-shrink:0; }
+.scene-sidebar-content>.scene-hierarchy { min-height:140px; }
 .scene-workbench.crystal-studio .scene-view .crystal-ai-prompt.studio-ai-panel { bottom:0!important; }

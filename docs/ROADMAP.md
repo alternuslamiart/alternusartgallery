@@ -6,6 +6,9 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Add the shared horizontal texture library and static sidebar footer,
+  reusing real 3D material editing and preserving Interior drafting.
+
 - [x] Complete visible multi-selection feedback and canvas/hierarchy hover
   identification, retaining original Interior sketching interactions.
 

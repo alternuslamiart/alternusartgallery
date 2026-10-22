@@ -2,6 +2,15 @@
 
 ## Application
 
+- `StudioViewportToolbar` owns the plus-toggle library and session-only uploaded
+  palette; `StudioMaterialLibrary` shows procedural canvas-generated PNG assets,
+  filters and bounded image upload. `lib/scene/material-library.mjs` validates
+  one immutable material edit across selected mesh/group descendants. Embedded
+  maps reuse the existing document and export pipeline. The 2D SVG editor offers
+  browsing plus a 3D workspace link rather than simulated PBR material editing.
+  `StudioSidebarFooter` remains outside scrolling content with actual settings
+  and account actions; no new navigation routes are introduced.
+
 - `lib/scene/selection.mjs` preserves ordered multi-selection and creates
   disposable, non-pickable 3D outline helpers outside the export root: blue for
   the primary selection and green for additional objects. SceneWorkbench links

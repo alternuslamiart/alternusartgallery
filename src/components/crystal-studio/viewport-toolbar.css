@@ -23,8 +23,24 @@
 .casynus-toolbar-export button { display:block; padding:9px 12px; width:100%; text-align:left; border:0; border-radius:8px; background:transparent; color:inherit; cursor:pointer; }
 .casynus-toolbar-export header button { width:auto; }
 .casynus-toolbar-export button:hover { background:var(--studio-bg-hover); }
+.casynus-material-library { position:absolute; top:70px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:12px; width:850px; max-width:calc(100% - 24px); min-width:0; height:90px; padding:12px; border:1px solid var(--studio-border); border-radius:12px; background:var(--studio-bg-panel); color:var(--studio-text-primary); z-index:32; box-shadow:var(--studio-shadow-floating); pointer-events:auto; }
+.scene-workbench .casynus-material-library { top:58px; }
+.cs-material-meta { flex:0 0 132px; min-width:0; }
+.cs-material-meta>div:first-child { display:flex; align-items:center; justify-content:space-between; gap:4px; }
+.cs-material-meta strong { font-size:12px; white-space:nowrap; }
+.cs-material-meta small { display:block; font-size:9px; color:var(--studio-accent); margin:2px 0 5px; }
+.crystal-studio .casynus-material-library .cs-material-meta button { display:inline-flex; align-items:center; justify-content:center; min-width:0; min-height:0; width:23px; height:23px; padding:3px; border:0; border-radius:5px; color:inherit; background:var(--studio-bg-elevated); cursor:pointer; }
+.cs-material-filters { display:flex; gap:7px; }
+.cs-material-assets { display:flex; align-items:center; gap:10px; min-width:0; flex:1; height:66px; overflow-x:auto; scrollbar-width:thin; }
+.crystal-studio .casynus-material-library .cs-material-tile { position:relative; flex:0 0 64px; width:64px; height:64px; min-height:64px; overflow:hidden; padding:0; border:1px solid var(--studio-border); border-radius:9px; background-color:var(--studio-bg-elevated); background-size:cover; cursor:pointer; }
+.crystal-studio .casynus-material-library .cs-material-tile[aria-pressed="true"] { border:2px solid var(--studio-accent); }
+.cs-material-tile>span { position:absolute; bottom:0; left:0; right:0; padding:9px 3px 4px; background:linear-gradient(transparent,#000b); color:#fff; font-size:8px; line-height:1.2; text-align:center; }
+.crystal-studio .casynus-material-library .cs-material-upload { display:flex; align-items:center; justify-content:center; flex:0 0 64px; width:64px; height:64px; padding:0; border:1px solid var(--studio-border); border-radius:9px; background:var(--studio-bg-elevated); color:var(--studio-text-secondary); cursor:pointer; }
+.cs-material-notice { position:absolute; top:calc(100% + 6px); left:0; max-width:100%; margin:0; padding:8px 12px; border:1px solid var(--studio-border); border-radius:8px; background:var(--studio-bg-panel); color:var(--studio-text-secondary); font-size:11px; text-decoration:none; }
+@media(max-width:640px) { .cs-material-meta { flex-basis:116px; }.casynus-material-library { gap:8px; padding:10px; }.crystal-studio .casynus-material-library .cs-material-upload { flex-basis:44px; width:44px; } }
 @media(min-width:701px) {
   .interior-plan-restored:not(.crystal-left-closed):not(.crystal-right-closed) .casynus-viewport-toolbar.ref-top-toolbar {
     max-width:calc(100% - 596px)!important; left:calc(50% - 6px)!important;
   }
+  .interior-plan-restored:not(.crystal-left-closed):not(.crystal-right-closed) .casynus-material-library { max-width:calc(100% - 596px); left:calc(50% - 6px); }
 }

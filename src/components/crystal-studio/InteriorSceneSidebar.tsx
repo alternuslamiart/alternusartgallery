@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { StudioHeader, StudioPanel } from "./kit";
 import type { FloorPlanObject } from "./types";
+import {StudioSidebarFooter} from "./StudioSidebarFooter";
 
 type Props = {
   objects: FloorPlanObject[];
@@ -18,6 +19,8 @@ type Props = {
   onExport: (format: string) => void;
   onBack: () => void;
   onCollapse: () => void;
+  onSettings:()=>void;
+  onProfile:()=>void;
 };
 
 function objectLabel(object: FloorPlanObject, index: number) {
@@ -63,5 +66,6 @@ export function InteriorSceneSidebar(p: Props) {
         <Box size={12} /><span>{objectLabel(object, index)}</span>
       </button>)}
     </section>
+    <StudioSidebarFooter onSettings={p.onSettings} onProfile={p.onProfile}/>
   </StudioPanel>;
 }

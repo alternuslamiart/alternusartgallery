@@ -1,4 +1,5 @@
 /* Shared component contract. Geometry is identical in both themes. */
+.cs-sidebar-footer { display:flex; align-items:center; justify-content:space-between; flex:0 0 50px; height:50px; min-height:50px; padding:6px 10px; border-top:1px solid var(--studio-border); background:var(--studio-bg-panel); }
 :is(.crystal-studio, .crystal-infrastructure-page, .aichat-page) {
   font-family: var(--studio-font) !important;
   font-size: 13px;

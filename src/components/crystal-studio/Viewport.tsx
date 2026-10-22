@@ -1207,7 +1207,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
       </svg>
 
       <StudioViewportToolbar label="Architectural drafting tools"
-        leading={[{ label: "Add room to floor plan", icon: Plus, onClick: () => addObject({ id: `room-${crypto.randomUUID().slice(0, 6)}`, type: "room", x: 1.2, y: 1.2, width: 3.2, height: 2.6, label: `Room ${objects.filter(o => o.type === "room").length + 1}` }) }]}
+        leading={[{ label: "Add room to floor plan", icon: SquareDashed, onClick: () => addObject({ id: `room-${crypto.randomUUID().slice(0, 6)}`, type: "room", x: 1.2, y: 1.2, width: 3.2, height: 2.6, label: `Room ${objects.filter(o => o.type === "room").length + 1}` }) }]}
         tools={tools.map(([id, label, shortcut, icon]) => ({
           label: id === "select" ? "Select & Move (V)" : id === "delete" ? "Delete selected element (Del)" : shortcut ? `${label} (${shortcut})` : label,
           icon, active: tool === id, onClick: () => { if (id === "delete" && selectedId) { updateObjects(objects.filter(item => item.id !== selectedId)); select(null); } else setTool(id); },

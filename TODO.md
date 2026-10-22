@@ -2,6 +2,9 @@
 
 ## Next concrete task
 
+- [x] Open a real texture/material asset library from toolbar +, with upload
+  and undoable multi-selection application; pin Settings/Profile sidebar footer.
+
 - [x] Show every 3D selection with blue-primary/green-additional outlines and
   synchronize hover/selection identification with Scene hierarchy, including
   Interior's original SVG plan hierarchy.

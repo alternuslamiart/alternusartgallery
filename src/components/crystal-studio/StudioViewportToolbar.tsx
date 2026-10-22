@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef } from "react";
-import { Focus, Home, Play, X, ZoomIn, ZoomOut, type LucideIcon } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { Focus, Home, Play, Plus, X, ZoomIn, ZoomOut, type LucideIcon } from "lucide-react";
 import { StudioToolbar } from "./kit";
+import {StudioMaterialLibrary,type MaterialLibraryOptions} from "./StudioMaterialLibrary";
+import type {MaterialAsset} from "./material-textures";
 import "./viewport-toolbar.css";
 
 export type ViewportAction = { label: string; icon: LucideIcon; onClick: () => void; active?: boolean; disabled?: boolean };
@@ -11,6 +13,7 @@ type Props = {
   onFit: () => void; onReset: () => void; cameraViews: string[]; cameraView: string; onCamera: (view: string) => void;
   onZoom: (factor: number) => void; exportFormats: string[]; onExport: (format: string) => void;
   onCSV: () => void; settingsLabel: string; onSettings: () => void; busy?: boolean;
+  materialLibrary?:MaterialLibraryOptions;
 };
 
 export function downloadStudioCSV(name: string, rows: Record<string, unknown>[]) {
@@ -28,9 +31,16 @@ export function downloadStudioCSV(name: string, rows: Record<string, unknown>[])
 
 export function StudioViewportToolbar(p: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const toolbarId=useId();const [libraryOpen,setLibraryOpen]=useState(false),[libraryWidth,setLibraryWidth]=useState(0);
+  const [uploadedAssets,setUploadedAssets]=useState<MaterialAsset[]>([]);
+  useEffect(()=>{
+    if(!libraryOpen)return;const toolbar=document.getElementById(toolbarId);if(!toolbar)return;
+    const resize=()=>setLibraryWidth(toolbar.getBoundingClientRect().width);resize();const observer=new ResizeObserver(resize);observer.observe(toolbar);return()=>observer.disconnect();
+  },[libraryOpen,toolbarId]);
   const action = (a: ViewportAction) => <button key={a.label} type="button" aria-label={a.label} title={a.label} disabled={a.disabled} aria-pressed={a.active} onClick={a.onClick} className={`ref-toolbar-icon-btn ${a.active ? "is-active" : ""}`}><a.icon size={14} /></button>;
   return <>
-    <StudioToolbar className="ref-top-toolbar casynus-viewport-toolbar" aria-label={p.label}>
+    <StudioToolbar id={toolbarId} className="ref-top-toolbar casynus-viewport-toolbar" aria-label={p.label}>
+      <button type="button" className={`ref-toolbar-icon-btn ${libraryOpen?"is-active":""}`} aria-label="Texture material library" title="Texture material library" aria-expanded={libraryOpen} onClick={()=>setLibraryOpen(value=>!value)}><Plus size={14}/></button>
       {p.leading.map(action)}<span className="ref-toolbar-divider" />{p.tools.map(action)}
       {action({ label: "Fit entire scene", icon: Focus, onClick: p.onFit })}
       {action({ label: "Reset camera", icon: Home, onClick: p.onReset })}
@@ -42,6 +52,7 @@ export function StudioViewportToolbar(p: Props) {
       <button type="button" className="ref-toolbar-icon-btn" aria-label="Export scene as CSV" onClick={p.onCSV} disabled={p.busy}>CSV</button>
       {action({ label: p.settingsLabel, icon: Play, onClick: p.onSettings })}
     </StudioToolbar>
+    {libraryOpen&&<StudioMaterialLibrary options={p.materialLibrary} uploadedAssets={uploadedAssets} onUploadAsset={asset=>setUploadedAssets(current=>[...current,asset])} onClose={()=>setLibraryOpen(false)} width={libraryWidth}/>}
     <dialog ref={dialog} className="casynus-toolbar-export" aria-label="Export scene"><header><strong>Export</strong><button aria-label="Close export" onClick={() => dialog.current?.close()}><X size={16} /></button></header>{p.exportFormats.map(format => <button key={format} onClick={() => { dialog.current?.close(); p.onExport(format); }}>{format.toUpperCase()}</button>)}</dialog>
   </>;
 }

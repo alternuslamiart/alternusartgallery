@@ -2,6 +2,33 @@
 
 Last updated: 2026-10-22
 
+## Toolbar texture library and static sidebar footer
+
+- The shared toolbar plus button toggles a horizontal Texture material library
+  12px below the toolbar, matching its width. Eight procedural PNG/PBR assets
+  cover concrete, wood, marble, ceramic, fabric, brick, metal and glass; category
+  filters, active material feedback and bounded PNG/JPEG/WebP upload work.
+  Uploaded palette assets survive closing/reopening within the current workspace
+  session; applied maps live in the existing scene document/recovery/export data.
+- 3D material application commits once for the complete selection/group geometry,
+  supports undo and validates locks, ancestors, stale IDs and embedded map rules.
+  The original Interior SVG sketcher shows the browse library and explicitly
+  links to Interior 3D for application; its Add room action remains available.
+- Added shared Settings/Profile footer outside the scrolling sidebar content.
+  3D Settings opens the existing lighting inspector; Profile recovers the scene
+  before navigating to `/account`. Interior Settings opens its inspector; Profile
+  opens `/account` in a new tab to preserve the current unsaved drafting state.
+- Focused material tests and typecheck passed; focused lint has no errors or
+  warnings in the new/shared components. Chrome verified all three 3D studios
+  in both themes: open/filter/apply to multi-select, one-step undo, image upload,
+  real embedded-map JSON export, palette reopen and unchanged footer position
+  during hierarchy scrolling. Interior browse/settings/profile callback and
+  mobile overflow checks passed. Zero runtime exceptions. Script:
+  `scripts/verify-material-library.mjs`; screenshots:
+  `.tmp/material-library-1792632451420/`.
+- No external texture service or authentication changes. Production build was
+  not repeated; the existing local Google Fonts certificate blocker remains.
+
 ## Multi-selection outlines and hierarchy identification
 
 - Shared 3D studios now draw a real bounding outline for every selected object:

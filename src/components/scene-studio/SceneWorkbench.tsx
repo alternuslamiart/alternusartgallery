@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { Box, Building2, Eye, EyeOff, Focus, FolderOpen, Layers3, Lock, MoreHorizontal, MousePointer2, PanelLeft, PanelRight, Plus, Rotate3D, Route, Ruler, Save, TreePine, Unlock, X } from "lucide-react";
+import { Box, Building2, Eye, EyeOff, Focus, FolderOpen, Layers3, Lock, MoreHorizontal, MousePointer2, PanelLeft, PanelRight, Rotate3D, Route, Ruler, Save, TreePine, Unlock, X } from "lucide-react";
 import { SceneViewport, type SceneTool, type ViewportAPI } from "./SceneViewport";
 import { useSceneDocument } from "./useSceneDocument";
 import { StudioHeader, StudioPanel } from "@/components/crystal-studio/kit";
@@ -16,6 +16,8 @@ import { listRecovery } from "@/lib/scene/recovery";
 import { StudioViewportToolbar, downloadStudioCSV } from "@/components/crystal-studio/StudioViewportToolbar";
 import { generate3DModel, type Generation3DJob } from "@/lib/ai3d/client.mjs";
 import { nextSelection } from "@/lib/scene/selection.mjs";
+import {applyLibraryMaterial} from "@/lib/scene/material-library.mjs";
+import {StudioSidebarFooter} from "@/components/crystal-studio/StudioSidebarFooter";
 import "./scene-studio.css";
 
 type Studio = "architecture" | "interior" | "infrastructure";
@@ -238,7 +240,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
 
           <button aria-label="Save project" onClick={() => void store.save()}><Save size={16} />Save project</button><span className="scene-save-state" role="status">{store.status}</span>
         </div></details></div>
-      <section className="scene-library"><h2>Object library <span>meters</span></h2><input aria-label="Search object library" placeholder="Search library…" value={search} onChange={e => setSearch(e.target.value)} />
+      <div className="scene-sidebar-content"><section className="scene-library"><h2>Object library <span>meters</span></h2><input aria-label="Search object library" placeholder="Search library…" value={search} onChange={e => setSearch(e.target.value)} />
         <div className="scene-library-items">{catalog.filter(name => name.toLowerCase().includes(search.toLowerCase())).map(name => <button key={name} disabled={blocked} draggable={!blocked} onDragStart={e => e.dataTransfer.setData("application/x-casynus-asset", name)} onClick={() => add(name)}><Box size={13} />{name}</button>)}</div>
         <div className="scene-templates"><label>Building levels <input aria-label="Building levels" type="number" min={1} max={8} value={stories} onChange={e => setStories(Math.max(1, Math.min(8, Number(e.target.value) || 1)))} /></label>{[["building", "Add building"], ["room", "Add furnished room"], ["intersection", "Add intersection"]].map(([id, label]) => <button key={id} disabled={blocked} onClick={() => template(id)}>{label}</button>)}</div>
       </section>
@@ -253,14 +255,16 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
         </div>;
       })}</section>
       {studio === "interior" && <Link className="scene-classic-link" href={`${routes[studio]}?workspace=classic`} onClick={e => { e.preventDefault(); void leave(`${routes[studio]}?workspace=classic`); }}>Open 2D drafting tools</Link>}
+      </div>
+      <StudioSidebarFooter onSettings={()=>{setRight(true);requestAnimationFrame(()=>globalThis.document.querySelector(".scene-environment")?.scrollIntoView({block:"nearest"}));}} onProfile={()=>void leave("/account")}/>
     </StudioPanel>}
 
     <section className="scene-view" aria-label={`${names[studio]} 3D viewport`}>
       {!store.ready && <div className="scene-opening">{store.failure ?? "Opening scene…"}<button onClick={() => { store.replace(makeDocument(studio)); }}>Create empty project</button></div>}
       {(!left || !right) && <div className="scene-panel-toggles">{!left && <button aria-label="Show scene sidebar" onClick={() => setLeft(true)}><PanelLeft size={18} /></button>}{!right && <button aria-label="Show inspector" onClick={() => setRight(true)}><PanelRight size={18} /></button>}</div>}
       <StudioViewportToolbar label="Scene transformation tools"
+        materialLibrary={{canApply:!blocked&&selected.length>0&&Boolean(primary&&!primary.kind.endsWith("Light")),activeMap:primary?.material.map,onApply:material=>safely(()=>change(applyLibraryMaterial(docRef.current,selectedRoots,material)))}}
         leading={[
-          { label: studio === "infrastructure" ? "Add Road segment" : studio === "interior" ? "Add furniture" : "Add geometry", icon: Plus, onClick: () => add(studio === "infrastructure" ? "Road" : studio === "interior" ? "Sofa" : "Box"), disabled: blocked },
           { label: studio === "interior" ? "Add furnished room" : "Add building", icon: Building2, onClick: () => template(studio === "interior" ? "room" : "building"), disabled: blocked },
           { label: "Add Tree", icon: TreePine, onClick: () => add("Tree"), disabled: blocked },
         ]}
