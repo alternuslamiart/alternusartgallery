@@ -37,7 +37,7 @@
 }
 #alternus-home [data-crystal-reveal] { opacity: 1; transition: none; }
 #alternus-home .coreforge-page > section { padding-block: 112px !important; }
-#alternus-home .coreforge-page > section > div:not(.crystal-first-card):not(.crystal-feature-visual):not(.crystal-feature-copy) {
+#alternus-home .coreforge-page > section > div:not(.crystal-first-card):not(.crystal-feature-visual):not(.crystal-feature-copy):not(.home-tools-window) {
   max-width: var(--home-width) !important;
   margin-inline: auto;
   padding-inline: var(--home-gutter) !important;
@@ -155,6 +155,43 @@
 #alternus-home .coreforge-footer { background: var(--home-paper) !important; padding: 80px 0 40px !important; }
 #alternus-home .coreforge-footer > div { max-width: var(--home-width) !important; padding-inline: var(--home-gutter) !important; }
 #alternus-home .coreforge-footer > div > div:last-child { padding-top: 24px !important; row-gap: 32px !important; }
+
+/* Two identical groups make a continuous loop without a visible reset. */
+#alternus-home .coreforge-page > .home-tools { padding-block: 40px 0 !important; }
+#alternus-home .coreforge-page > .home-tools > .home-tools-window {
+  position: relative;
+  width: calc(100% - 2 * var(--home-gutter));
+  max-width: 1280px !important;
+  padding: 0 !important;
+  overflow: hidden;
+  background: var(--home-surface);
+}
+#alternus-home .home-tools .home-tools-track {
+  display: flex;
+  width: max-content;
+  animation: home-tools-scroll 28s linear infinite !important;
+}
+#alternus-home .home-tools-list {
+  display: flex;
+  width: clamp(760px, calc(100vw - 2 * var(--home-gutter)), 1280px);
+  flex-shrink: 0;
+  list-style: none;
+  padding: 32px 0;
+  margin: 0;
+}
+#alternus-home .home-tools-list li { display: flex; align-items: center; justify-content: center; gap: 14px; width: 25%; padding: 0 18px; white-space: nowrap; color: var(--home-ink); font-size: 19px; font-weight: 600; }
+#alternus-home .home-tools-icon { display: block; width: 32px; height: 32px; flex-shrink: 0; background-color: currentColor; mask-size: contain; mask-repeat: no-repeat; mask-position: center; }
+#alternus-home .home-tools-pause { position: absolute; right: 8px; bottom: 8px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--home-paper); color: var(--home-ink); cursor: pointer; }
+#alternus-home .home-tools-track[data-paused="true"],
+#alternus-home .home-tools-window:hover .home-tools-track { animation-play-state: paused !important; }
+@keyframes home-tools-scroll { from { translate: 0 0; } to { translate: -50% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  #alternus-home .home-tools .home-tools-track { animation: none !important; width: 100%; }
+  #alternus-home .home-tools-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; gap: 24px 0; }
+  #alternus-home .home-tools-list li { width: 100%; }
+  #alternus-home .home-tools-list[aria-hidden="true"],
+  #alternus-home .home-tools-pause { display: none; }
+}
 
 @media (max-width: 1100px) {
   #alternus-home .coreforge-page > section { padding-block: 80px !important; }

@@ -2,6 +2,12 @@
 
 ## Next concrete task
 
+- [x] Audit public production routes and add the requested Homepage tools
+  marquee with continuous movement, pause and reduced-motion support.
+- [ ] Resolve findings in `docs/SITE-AUDIT-2026-10-22.md`: configure/verify 3D
+  and payments, fix code-workspace hydration, implement Help Center, clear
+  lint and verify signed-in storage/Usage/quotas with a reachable database.
+
 - [x] Align Homepage/nav to 1280px, retain sticky glass navigation and apply
   8px button/24px image corners; verify responsive geometry and actual scroll.
 

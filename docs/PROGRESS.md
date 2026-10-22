@@ -2,6 +2,25 @@
 
 Last updated: 2026-10-22
 
+## Production audit and Homepage tools marquee
+
+- Audited 73 production URLs and opened 11 key routes in real signed-out Chrome.
+  108 local tests, TypeScript and baseline build passed. Full lint has 57
+  existing errors. Found Help Center 404, reproduced React #418/#423 and broken
+  code highlighting in `/workspace/code`, and confirmed an empty live 3D
+  provider registry. Local DB verification still fails URL parsing; payment
+  helpers remain stubs. See `SITE-AUDIT-2026-10-22.md` for scope and limitations.
+- Added Blender, Unreal Engine, Unity and Autodesk icon/text marquee directly
+  after Hero. Two repeated groups scroll continuously; duplicate content is
+  hidden from assistive technology. Pause/resume and reduced motion supported.
+  Local Simple Icons assets do not imply verified integrations or endorsement.
+- Local Chrome passed at 1920/1440/768/390/320px: order, continuous movement,
+  pause/resume, reduced motion, four icons, no overflow/runtime exceptions.
+  Desktop screenshot inspected; focused lint and TypeScript passed. Final
+  build initially hit ENOSPC; QA-created Chrome profiles were cleaned up.
+- Final build then passed with the Windows trusted CA bundle. Diff checks
+  passed; no application routes outside Homepage were modified in this work.
+
 ## Homepage width, sticky navigation and corners
 
 - Matched navbar and section content to a 1280px maximum width with shared

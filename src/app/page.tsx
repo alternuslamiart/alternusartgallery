@@ -3,6 +3,7 @@
 import Image from "next/image";
 import "./home-highlights.css";
 import "./home-redesign.css";
+import { HomeToolMarquee } from "@/components/home-tool-marquee";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -183,6 +184,8 @@ export default function HomePage() {
   </button>
  </div></div>
  </section>
+
+ <HomeToolMarquee />
 
  <section data-crystal-reveal className="casynus-home-highlights" aria-label="Casynus design capabilities">
  <div className="casynus-highlight-grid">
