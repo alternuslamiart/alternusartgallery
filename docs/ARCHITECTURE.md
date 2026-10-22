@@ -141,6 +141,12 @@
   unconfigured; no client-selected upgrades. Retain usage rows for chart history
   and reconcile reservations left by crashes/failed refunds. See `AI-USAGE.md`.
 
+- `AccountUsage` keeps the original account triplet/hover-chart presentation
+  and a separate Limits row variant over the same authenticated data. Client
+  `account-usage-request.mjs` aborts stale fetches and enforces a 15-second
+  deadline; loading/error cards use unknown-value placeholders rather than
+  fabricated consumption. No database/provider policy changes are involved.
+
 - `lib/ai3d/providers.mjs` contains real Meshy v2 and Tripo v3 adapters;
   credentials/model settings are server environment variables. `/api/ai3d`
   provider/job/asset routes and `lib/ai3d/jobs.ts` reuse `AIProviderJob` with

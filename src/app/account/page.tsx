@@ -780,7 +780,7 @@ function APIKeys({ t }: { t: Tokens }) {
 
 function Usage({ t }: { t: Tokens }) { return <AccountUsage t={t} />; }
 
-function Limits({ t }: { t: Tokens }) { return <AccountUsage t={t} />; }
+function Limits({ t }: { t: Tokens }) { return <AccountUsage t={t} view="limits" />; }
 
 function Workspaces({ t }: { t: Tokens }) {
  type Workspace = { id: string; n: string; m: number; s: string; u: string };

@@ -2,6 +2,9 @@
 
 ## Next concrete task
 
+- [x] Restore original Usage triplet/chart and Limits row-card designs while
+  keeping real plan quotas; add stable loading placeholders and timeout/Retry.
+
 - [x] Restore the existing `/aichat` 8px frame visibility in light/dark by
   removing only background overrides; verify desktop/mobile in Chrome.
 

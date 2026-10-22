@@ -56,10 +56,13 @@ billing ledger or automatic crash reconciliation.
 `GET /api/usage?days=7|15|30|90` returns the authenticated workspace's plan,
 monthly used/limit/remaining/percent, UTC renewal date and daily history with
 private/no-store cache headers. `/account` Usage, Limits and Subscriptions use
-the same real data. The UI refreshes on window focus, every 30 seconds, and on
-Refresh; it cancels stale requests and hides another identity's result. Empty
-history shows zero, never generated demo values. Warnings appear at 80% and
-100%. Pricing displays each plan's monthly allowance.
+the same real data. Usage retains the original three statistic cards and hover
+chart; Limits retains its separate row-card layout for actual quotas/costs.
+The UI refreshes on window focus, every 30 seconds, and on Refresh; it cancels
+stale requests and hides another identity's result. Requests time out after
+15 seconds with Retry, while cards remain visible with unknown-value placeholders.
+Empty loaded history shows zero, never generated demo values. Warnings appear
+at 80% and 100%. Pricing displays each plan's monthly allowance.
 
 ## Activation
 
@@ -86,7 +89,8 @@ history shows zero, never generated demo values. Warnings appear at 80% and
 
 ## Verification
 
-- `npm test`: 105 passed, including Prisma direct/runtime connection routing,
+- `npm test`: 108 passed, including request timeout/cancellation/error handling,
+  Prisma direct/runtime connection routing,
   reservation arithmetic, weighted 3D,
   concurrent claims using a serialized fake transaction, workspace isolation,
   refunds, UTC rollover/history, auth/quota gating in the actual provider

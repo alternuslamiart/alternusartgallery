@@ -2,6 +2,32 @@
 
 Last updated: 2026-10-22
 
+## Restore original Usage and Limits presentation with real AI quotas
+
+- Restored the original account section typography, blue eyebrows, 820px
+  card width, three statistic cards, thin meters and daily bar chart with
+  hover values, peak/average and 7/15/30/90-day controls. Cards show actual
+  consumed credits, current plan/allowance and remaining credits. No demo
+  knowledge/voice metrics or unlimited quotas were reintroduced.
+- Limits now has its own original row-card presentation with actual monthly
+  allowance, consumption, remaining credits, shared 1/1/20 request costs and
+  UTC renewal. It reuses the authenticated usage API and plan ratios. Loading
+  and errors retain the card layout with unknown-value placeholders.
+- Added a cancellable 15-second usage fetch deadline and Retry, so an
+  unresponsive backend cannot leave the screen loading indefinitely. This is
+  a client reliability change; it does not resolve the existing Supabase
+  connection blocker or invent usage when the backend is unavailable.
+- `npm test`: 108 passed; TypeScript passed. Focused lint passed with only the
+  existing account image warning; diff checks passed. Chrome checked both
+  Usage and Limits in light/dark, all plans/ranges, real hover behavior,
+  warning/cap/empty/error cases, loading placeholders, an actual 15-second
+  stalled request followed by Retry, and signed-out visibility. Auth and API
+  HTTP were mocked. Zero runtime exceptions. Screenshots visually inspected;
+  artifacts `.tmp/account-usage-1792674108599/`. QA server stopped for build.
+- `npm run build`: passed with the Windows trusted CA bundle loaded through
+  NODE_EXTRA_CA_CERTS; existing client-rendering warnings remain. No database
+  schema changes, production database writes or live-provider calls were made.
+
 ## Restore AI chat frame spacing in both themes
 
 - Removed only the two shared-kit background overrides for `/aichat` aside

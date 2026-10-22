@@ -18,7 +18,7 @@ try {
   assert.ok(tabs?.length, "Chrome debugger started");
   socket = new WebSocket(tabs.find(tab => tab.type === "page").webSocketDebuggerUrl);
   await new Promise((resolve, reject) => { socket.addEventListener("open", resolve, { once: true }); socket.addEventListener("error", reject, { once: true }); });
-  let id = 0, guest = false, failure = false, plan = "BASIC", limit = 200, used = 40;
+  let id = 0, guest = false, failure = false, stalled = false, plan = "BASIC", limit = 200, used = 40;
   const pending = new Map(), runtimeErrors = [], requests = [];
   const send = (method, params = {}) => new Promise((resolve, reject) => {
     const n = ++id, timer = setTimeout(() => { pending.delete(n); reject(Error(`CDP timeout: ${method}`)); }, 20_000);
@@ -31,6 +31,7 @@ try {
     if (message.method === "Fetch.requestPaused") {
       const { request, requestId } = message.params;
       const url = new URL(request.url);
+      if (stalled && url.pathname === "/api/usage") return;
       let body, status = 200;
       if (url.pathname === "/api/auth/session") body = guest ? null : { user: { id: "usage-browser-test", name: "Usage Test", email: "usage@example.test" }, expires: "2099-01-01T00:00:00Z" };
       else {
@@ -42,7 +43,7 @@ try {
     }
   });
   const evaluate = async expression => { const result = await send("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true }); if (result.exceptionDetails) throw Error(result.exceptionDetails.text); return result.result.value; };
-  const until = async expression => { for (let i = 0; i < 80; i++) { if (await evaluate(expression)) return; await wait(200); } throw Error(`Browser condition failed: ${expression}`); };
+  const until = async expression => { for (let i = 0; i < 120; i++) { if (await evaluate(expression)) return; await wait(200); } throw Error(`Browser condition failed: ${expression}`); };
   const click = label => evaluate(`[...document.querySelectorAll('button')].find(button => button.textContent.trim() === ${JSON.stringify(label)})?.click()`);
   const screenshot = async name => { const result = await send("Page.captureScreenshot", { format: "png" }); fs.writeFileSync(path.join(out, `${name}.png`), Buffer.from(result.data, "base64")); };
   await send("Page.enable"); await send("Runtime.enable");
@@ -50,7 +51,15 @@ try {
   await send("Page.addScriptToEvaluateOnNewDocument", { source: "localStorage.setItem('cookiePreference','necessary');localStorage.setItem('cedium_signin_popup_dismissed','1');" });
   await send("Page.navigate", { url: `${base}/account?section=usage` });
   await until("document.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow') === '20'");
+  assert.equal(await evaluate("document.querySelector('.account-usage-stats').children.length"), 3);
+  assert.equal(await evaluate("document.querySelector('main h1').textContent"), "Usage this period.");
   await screenshot("basic-20-percent");
+  const target = await evaluate("(()=>{const r=document.querySelector('[aria-label=\"Daily AI credit history\"] > div:last-child').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
+  await send("Input.dispatchMouseEvent", { type: "mouseMoved", ...target });
+  await until("document.querySelector('[role=tooltip]')?.textContent.includes('40 credits')");
+  await evaluate("document.querySelector('header button').click()");
+  await until("document.documentElement.getAttribute('data-coreforge-theme') === 'dark'");
+  await screenshot("usage-dark");
   for (const days of [7, 30, 90]) {
     await click(`${days}d`);
     await until(`document.querySelector('[aria-label="Daily AI credit history"]')?.children.length === ${days}`);
@@ -72,10 +81,28 @@ try {
   assert.equal(await evaluate("document.querySelector('[role=progressbar]') === null"), true);
   failure = false; await click("Retry");
   await until("document.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow') === '0'");
+  await click("Limits");
+  await until("document.querySelector('main h1')?.textContent === 'Rate limits.' && document.querySelector('[role=progressbar]') !== null");
+  assert.equal(await evaluate("document.querySelectorAll('.account-limit-row').length"), 7);
+  assert.equal(await evaluate("document.querySelector('[aria-label=\"Daily AI credit history\"]') === null"), true);
+  assert.match(await evaluate("document.querySelector('.account-limit-row').textContent"), /200/);
+  assert.match(await evaluate("[...document.querySelectorAll('.account-limit-row')].find(row => row.textContent.includes('3D generation')).textContent"), /20 credits/);
+  await screenshot("limits-dark");
+  await evaluate("document.querySelector('header button').click()");
+  await until("document.documentElement.getAttribute('data-coreforge-theme') === 'light'");
+  await screenshot("limits-light");
+  stalled = true;
+  await send("Page.navigate", { url: `${base}/account?section=limits` });
+  await until("document.querySelectorAll('.account-limit-row').length === 7 && document.querySelector('[aria-busy=true]') !== null");
+  assert.equal(await evaluate("document.querySelector('[role=progressbar]') === null"), true);
+  await until("document.querySelector('[role=alert]')?.textContent.includes('taking too long')");
+  await screenshot("limits-timeout");
+  stalled = false; await click("Retry");
+  await until("document.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow') === '0'");
   guest = true;
   await send("Page.reload");
   await until("document.querySelector('main')?.textContent.includes('Sign in to view your AI usage')");
   assert.equal(await evaluate("document.querySelector('[role=progressbar]') === null"), true);
   assert.deepEqual(runtimeErrors, []);
-  console.log(JSON.stringify({ passed: true, scenarios: ["Basic/Pro/Teams/Studio percentages", "7/15/30/90-day charts", "80% warning", "100% cap", "empty history", "503 clears stale data and Retry restores", "signed-out visibility"], runtimeErrors, artifacts: out }));
+  console.log(JSON.stringify({ passed: true, scenarios: ["original Usage triplet and hover chart", "Basic/Pro/Teams/Studio percentages", "7/15/30/90-day charts", "80% warning", "100% cap", "empty history", "503 clears stale data and Retry restores", "original Limits rows with real plan/costs", "light and dark presentation", "loading shell and 15-second timeout/Retry", "signed-out visibility"], runtimeErrors, artifacts: out }));
 } finally { socket?.close(); chrome.kill(); }
