@@ -2,6 +2,25 @@
 
 Last updated: 2026-10-22
 
+## Interior floor-plan export framing
+
+- SVG, PDF and raster exports now share a centered, uniform fit to the sheet
+  with a 10mm minimum white margin. Portrait plans use portrait paper; small
+  and large plans fill the available area independently of viewport pan/zoom.
+  Wall thickness and centered opening extents are included in the fit.
+- Output is labeled `Fit to page` instead of claiming the editor's fixed print
+  scale. Model coordinates, dimensions and JSON project data are unchanged.
+  PDF wall widths and opening origins now match the shared geometry framing.
+- Four focused tests passed (including negative coordinates and empty plans),
+  TypeScript passed and focused lint passed. Chrome downloaded real SVG/PDF/PNG;
+  PNG geometry covered x=77..922, y=34..672 on a 1000x707 sample, with clear
+  borders. Opened SVG was visually inspected. No runtime exceptions.
+  Reproduce with `node scripts/verify-floor-plan-export.mjs`; artifacts:
+  `.tmp/floor-plan-export-1792633729876/`.
+- Production build was not repeated; the existing Google Fonts certificate
+  blocker remains. PDF download/content coordinates were checked; no separate
+  PDF renderer was used for visual verification.
+
 ## Toolbar texture library and static sidebar footer
 
 - The shared toolbar plus button toggles a horizontal Texture material library

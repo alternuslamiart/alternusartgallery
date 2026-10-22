@@ -2,6 +2,11 @@
 
 ## Application
 
+- `crystal-studio/floor-plan-export.ts` shares a content-bound fit, page
+  orientation and centered offsets across SVG, PDF and 300dpi raster exports.
+  The 10mm minimum margin includes geometric wall/opening extents; output is
+  labeled Fit to page. Editor scale/settings and JSON coordinates stay intact.
+
 - `StudioViewportToolbar` owns the plus-toggle library and session-only uploaded
   palette; `StudioMaterialLibrary` shows procedural canvas-generated PNG assets,
   filters and bounded image upload. `lib/scene/material-library.mjs` validates

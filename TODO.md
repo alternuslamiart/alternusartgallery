@@ -2,6 +2,11 @@
 
 ## Next concrete task
 
+- [x] Fit and center Interior plan exports on the sheet with small white
+  margins, preserving proportions across SVG/PDF/raster output.
+- [ ] For dimensioned print workflows, add an explicit fixed-scale export
+  option alongside the requested fit-to-page default.
+
 - [x] Open a real texture/material asset library from toolbar +, with upload
   and undoable multi-selection application; pin Settings/Profile sidebar footer.
 

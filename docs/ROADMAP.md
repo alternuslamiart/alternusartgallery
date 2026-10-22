@@ -6,6 +6,9 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Center and fit Interior plan exports to the sheet with uniform scaling
+  and small margins, sharing framing across vector and raster formats.
+
 - [x] Add the shared horizontal texture library and static sidebar footer,
   reusing real 3D material editing and preserving Interior drafting.
 
