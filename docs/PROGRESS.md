@@ -2,6 +2,24 @@
 
 Last updated: 2026-10-22
 
+## Studio object picking and axis movement
+
+- Shared Architecture, Infrastructure and Interior 3D selection now runs on
+  click/release, with a 5px gesture threshold and thin-surface picking tolerance.
+  Exact surface hits take priority; hidden/locked ancestors are respected.
+- Transform gizmos are larger (1.2), retain selection during dragging and
+  capture the pointer. Camera orbit is disabled during transforms. Only changed
+  transforms create an undo entry; hidden-parent objects cannot show a gizmo.
+- Chrome verified all three X/Y/Z drags, unchanged other axes, retained selection,
+  single-step Undo and Redo in all three studios. Existing multi-selection and
+  hover checks passed in light/dark, plus original Interior sketch selection.
+  Corrected the existing test's empty-space coordinate, which was on a cube.
+- `npm test`: 111 passed. TypeScript and focused ESLint passed. Browser artifacts:
+  `.tmp/scene-transform-1792691732083` and `.tmp/scene-selection-1792691672015`.
+  These are local editor checks with a mocked signed-out session, not cloud-save
+  or production verification. `npm run build` passed with the Windows trusted-CA
+  bundle; existing Browserslist and auth-page client-render warnings remain.
+
 ## Homepage marquee presentation follow-up
 
 - Removed the gray surface and pause control; centered the transparent strip

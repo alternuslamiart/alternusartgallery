@@ -1,6 +1,6 @@
 "use client";
 import { Component, forwardRef, Suspense, useEffect, useImperativeHandle, useMemo, useRef, useState, type ReactNode } from "react";
-import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Grid, Html, Line, OrbitControls, OrthographicCamera, PerspectiveCamera, TransformControls } from "@react-three/drei";
 import { PointerLockControls as WalkImpl } from "three-stdlib";
 import type { OrbitControls as OrbitImpl } from "three-stdlib";
@@ -10,6 +10,7 @@ import { buildScene, disposeScene } from "@/lib/scene/geometry.mjs";
 import type { SceneDocument, SceneObject, Vec3 } from "@/lib/scene/document.mjs";
 import { useCrystalTheme } from "@/lib/crystal-theme";
 import { createSelectionHelpers, disposeSelectionHelpers } from "@/lib/scene/selection.mjs";
+import { isSelectionClick, pickScene } from "@/lib/scene/picking.mjs";
 
 export type ViewportAPI = {
   fit: () => void; focus: () => void; preset: (name: string) => void; zoom: (factor: number) => void;
@@ -35,6 +36,8 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
   const orbit = useRef<OrbitImpl>(null), walk = useRef<WalkImpl | null>(null);
   const keys = useRef(new Set<string>());
   const dragging = useRef(false);
+  const gesture = useRef<{ button: number; clientX: number; clientY: number; pointerId: number } | null>(null);
+  const transformed = useRef(false);
   const [points, setPoints] = useState<THREE.Vector3[]>([]);
   const root = useMemo(() => buildScene(p.document, { helpers: true, onTextureLoad: invalidate }), [p.document.objects, invalidate]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => disposeScene(root), [root]);
@@ -47,7 +50,7 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
   useEffect(()=>()=>disposeSelectionHelpers(selectionBoxes),[selectionBoxes]);
   let transformNode: THREE.Object3D | null | undefined = selected;
   let transformLocked = false;
-  while (transformNode) { if (transformNode.userData.locked) transformLocked = true; transformNode = transformNode.parent; }
+  while (transformNode) { if (transformNode.userData.locked || !transformNode.visible) transformLocked = true; transformNode = transformNode.parent; }
   const canTransform = selected && selected.visible && !transformLocked && !p.walking;
   const e = p.document.environment;
   const az = THREE.MathUtils.degToRad(e.sunAzimuth), el = THREE.MathUtils.degToRad(e.sunElevation);
@@ -128,44 +131,79 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
       return point ? point.toArray() as Vec3 : null;
     },
   }));
-  const pick = (event: ThreeEvent<PointerEvent | MouseEvent>) => {
-    if (event.button !== 0 || dragging.current || p.walking) return;
-    event.stopPropagation();
-    if (p.tool === "measure") { setPoints(current => current.length === 2 ? [event.point.clone()] : [...current, event.point.clone()]); return; }
-    let node: THREE.Object3D | null = event.object;
-    while (node && !node.userData.sceneId) node = node.parent;
-    if (node) {
-      let parent: THREE.Object3D | null = node;
-      while (parent) { if (parent.userData.locked) return; parent = parent.parent; }
-      p.onSelect(node.userData.sceneId, event.shiftKey || event.ctrlKey || event.metaKey);
-    }
-  };
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const down = (event: PointerEvent) => {
+      gesture.current = { button: event.button, clientX: event.clientX, clientY: event.clientY, pointerId: event.pointerId };
+      transformed.current = false;
+    };
+    const hitAt = (event: MouseEvent, tolerance = 5) => pickScene(root, camera, canvas.getBoundingClientRect(), event.clientX, event.clientY, tolerance);
+    const click = (event: MouseEvent) => {
+      if (p.walking || dragging.current || !isSelectionClick(gesture.current, event, transformed.current)) return;
+      const hit = hitAt(event);
+      if (p.tool === "measure") {
+        let point = hit?.point;
+        if (!point) {
+          const bounds = canvas.getBoundingClientRect(), ray = new THREE.Raycaster();
+          ray.setFromCamera(new THREE.Vector2((event.clientX - bounds.left) / bounds.width * 2 - 1, -(event.clientY - bounds.top) / bounds.height * 2 + 1), camera);
+          point = ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), .42), new THREE.Vector3()) ?? undefined;
+        }
+        if (point) { const value = point.clone(); setPoints(current => current.length === 2 ? [value] : [...current, value]); }
+        return;
+      }
+      p.onSelect(hit?.node.userData.sceneId ?? null, event.shiftKey || event.ctrlKey || event.metaKey);
+    };
+    const doubleClick = (event: MouseEvent) => {
+      if (event.button !== 0 || transformed.current || p.walking || p.tool === "measure") return;
+      const hit = hitAt(event); if (hit) frame(hit.node);
+    };
+    const hover = (event: PointerEvent) => {
+      if (!dragging.current && !p.walking && !event.buttons) p.onHover?.(hitAt(event, 0)?.node.userData.sceneId ?? null);
+    };
+    const leave = () => p.onHover?.(null);
+    // Capture records the gesture before TransformControls' native handlers.
+    // Selection happens after release, never during a gizmo's pointer-down.
+    canvas.addEventListener("pointerdown", down, true);
+    canvas.addEventListener("click", click);
+    canvas.addEventListener("dblclick", doubleClick);
+    canvas.addEventListener("pointermove", hover);
+    canvas.addEventListener("pointerleave", leave);
+    return () => {
+      canvas.removeEventListener("pointerdown", down, true);
+      canvas.removeEventListener("click", click);
+      canvas.removeEventListener("dblclick", doubleClick);
+      canvas.removeEventListener("pointermove", hover);
+      canvas.removeEventListener("pointerleave", leave);
+    };
+  });
   return <>
     {p.document.camera.projection === "orthographic" ? <OrthographicCamera makeDefault position={p.document.camera.position} zoom={35} near={.01} far={20000} /> : <PerspectiveCamera makeDefault position={p.document.camera.position} fov={45} near={.05} far={20000} />}
     <color attach="background" args={[theme === "dark" ? "#191c21" : "#e9edf1"]} />
     <hemisphereLight args={["#e6efff", "#9a8d78", .7]} />
     <directionalLight position={sun} color={e.sunElevation < 25 ? "#ffce94" : "#fff6e6"} intensity={e.sunIntensity} castShadow={e.shadows}
       shadow-mapSize={[shadowSize, shadowSize]} shadow-camera-left={-35} shadow-camera-right={35} shadow-camera-top={35} shadow-camera-bottom={-35} shadow-camera-near={.1} shadow-camera-far={150} shadow-bias={-.00015} shadow-normalBias={.02} />
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -.42, 0]} receiveShadow onPointerDown={event => { if (p.tool === "measure") pick(event); else if (event.button === 0 && !dragging.current) p.onSelect(null); }}>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -.42, 0]} receiveShadow>
       <planeGeometry args={[500, 500]} /><meshStandardMaterial color={theme === "dark" ? "#373c43" : "#c9cdd2"} roughness={.95} />
     </mesh>
     {p.grid && <Grid position={[0, -.4, 0]} args={[200, 200]} cellSize={1} sectionSize={5} cellColor={theme === "dark" ? "#555b63" : "#a0a8b3"} sectionColor="#748396" fadeDistance={80} infiniteGrid />}
-    <primitive object={root} onPointerDown={pick} onDoubleClick={(event: ThreeEvent<MouseEvent>) => { pick(event); frame(event.object); }}
-      onPointerMove={(event:ThreeEvent<PointerEvent>)=>{
-        if(dragging.current||p.walking)return;event.stopPropagation();
-        let node:THREE.Object3D|null=event.object;while(node&&!node.userData.sceneId)node=node.parent;
-        p.onHover?.(node?.userData.sceneId??null);
-      }} onPointerOut={()=>p.onHover?.(null)} />
+    <primitive object={root} />
     {selectionBoxes.map(helper=><primitive key={helper.userData.selectionId} object={helper} />)}
-    {canTransform && ["translate", "rotate", "scale"].includes(p.tool) && <TransformControls object={selected} mode={p.tool as "translate" | "rotate" | "scale"} size={.8}
+    {canTransform && ["translate", "rotate", "scale"].includes(p.tool) && <TransformControls object={selected} mode={p.tool as "translate" | "rotate" | "scale"} size={1.2} space="world"
       translationSnap={p.snap ? .25 : null} rotationSnap={p.snap ? Math.PI / 12 : null} scaleSnap={p.snap ? .1 : null}
-      onMouseDown={() => { dragging.current = true; }} onObjectChange={() => invalidate()}
+      onMouseDown={() => {
+        dragging.current = true; transformed.current = true;
+        if (orbit.current) orbit.current.enabled = false;
+        if (gesture.current) gl.domElement.setPointerCapture(gesture.current.pointerId);
+        p.onHover?.(null);
+      }} onObjectChange={() => invalidate()}
       onMouseUp={() => {
         dragging.current = false;
+        if (orbit.current) orbit.current.enabled = !p.walking;
+        if (gesture.current && gl.domElement.hasPointerCapture(gesture.current.pointerId)) gl.domElement.releasePointerCapture(gesture.current.pointerId);
         if (selected) {
           const original = p.document.objects.find(o => o.id === p.selected[0]);
           const patch = { position: selected.position.toArray() as Vec3, rotation: [selected.rotation.x, selected.rotation.y, selected.rotation.z] as Vec3, scale: selected.scale.toArray().map(v => Math.max(.001, v)) as Vec3 };
-          p.onTransform(p.selected[0], patch);
+          if (original && (["position", "rotation", "scale"] as const).some(key => patch[key].some((value, index) => Math.abs(value - original[key][index]) > 1e-7))) p.onTransform(p.selected[0], patch);
           if (original) { selected.position.fromArray(original.position); selected.rotation.fromArray([...original.rotation, "XYZ"]); selected.scale.fromArray(original.scale); }
         }
       }} />}

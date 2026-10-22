@@ -6,6 +6,9 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Separate shared 3D object picking from gizmo dragging and verify X/Y/Z
+  axis movement with single-step Undo/Redo across all three scene studios.
+
 - [x] Complete Interior pointer drag, handed door symbols, precision inputs,
   repeated wall drawing and undoable drafting edits within the original UI.
 

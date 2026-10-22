@@ -211,6 +211,17 @@
 - The separate `altrenus-business-manager/` Python utility is not part of the
   Next.js test/build flow.
 
+## Shared 3D picking and transform interaction
+
+- `scene/picking.mjs` raycasts document surfaces, filters hidden/locked ancestors
+  and adds a small pixel tolerance for thin geometry after exact-hit testing.
+- `SceneViewport` records pointer-down coordinates but selects only on click
+  after release. A transform gesture suppresses selection, captures the pointer
+  and disables orbit until release. Changed transforms commit once to history.
+- `scripts/verify-scene-transform.mjs` uses local Chrome/CDP to drag each axis
+  in Architecture, Infrastructure and Interior 3D and verify Undo/Redo. It accepts
+  the same localhost-only `STUDIO_QA_URL` as the selection regression script.
+
 ## Current persistence boundary
 
 The infrastructure demo scene is initialized in client code and autosaved to

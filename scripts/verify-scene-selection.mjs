@@ -77,7 +77,7 @@ async function run() {
     const shot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(out+'/'+route.replaceAll(/[^a-z0-9]/gi,'_')+'-'+theme+'.png',Buffer.from(shot.data,'base64'));
     await clickPoint(a,2);assert.equal(await evaluate('document.querySelectorAll("[data-selection=secondary]").length'),0);assert.equal(await evaluate('document.querySelector("[data-selection=primary]").dataset.sceneObjectId'),second);
     const promoted=await pixels();assert.ok(promoted.blue>30);assert.equal(promoted.green,0,'Removing primary promotes remaining selection to blue');
-    await clickPoint({x:1080,y:700});assert.equal(await evaluate('document.querySelectorAll("[data-selection]").length'),0);
+    await clickPoint({x:720,y:700});assert.equal(await evaluate('document.querySelectorAll("[data-selection]").length'),0);
     await evaluate(`document.querySelector('[data-scene-object-id="${first}"] .scene-tree-name').click()`);
     await evaluate(`document.querySelector('[data-scene-object-id="${second}"] .scene-tree-name').dispatchEvent(new MouseEvent('click',{bubbles:true,ctrlKey:true}))`);await wait(100);
     assert.equal(await evaluate('document.querySelectorAll(".scene-tree-name[aria-pressed=true]").length'),2,'Hierarchy also supports additive selection');

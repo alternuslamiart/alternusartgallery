@@ -2,6 +2,11 @@
 
 ## Next concrete task
 
+- [x] Fix shared studio surface picking and X/Y/Z gizmo drag selection;
+  verify axis constraints, single-step Undo/Redo and light/dark multi-selection.
+- [ ] Extend transform browser coverage to rotated parent groups, rotate/scale
+  handles and touch/pointer cancellation; current drag coverage is mouse X/Y/Z.
+
 - [x] Refine Homepage tools to one transparent, continuously scrolling row,
   removing the pause icon and two-row fallback as requested.
 
