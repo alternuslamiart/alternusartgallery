@@ -8,8 +8,11 @@ requirements provide new evidence.
 
 - [x] Integrate MapLibre 6.15.0 World Map into Infrastructure with retained
   3D editor state, geographic selection, markers and a server geocoding adapter.
-- [ ] Configure MapTiler credentials and licensed production map sources;
-  verify live country/city search before enabling production mapping.
+- [x] Add key-free OpenFreeMap production tiles, rendered-feature selection,
+  fit/fullscreen and source-height building/flat-land import with geographic
+  provenance, existing transforms, history and persistence.
+- [ ] Verify deployed address/city search with valid MapTiler credentials;
+  add complete-feature retrieval, geographic road drawing and terrain data.
 
 - [x] Separate shared 3D object picking from gizmo dragging and verify X/Y/Z
   axis movement with single-step Undo/Redo across all three scene studios.

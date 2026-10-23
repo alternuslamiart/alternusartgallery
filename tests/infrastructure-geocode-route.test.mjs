@@ -22,6 +22,7 @@ test('geocoding route validates input and configured credentials before HTTP',as
 test('geocoding uses server key, bounded explicit searches and normalized coordinates',async()=>{
   const h=harness();const r=await h.get('Berlin');assert.equal(r.status,200);assert.equal(r.body.places[0].latitude,52);
   assert.equal(h.calls[0].url.hostname,'api.maptiler.com');assert.equal(h.calls[0].url.searchParams.get('key'),'test-secret');assert.equal(h.calls[0].url.searchParams.get('autocomplete'),'false');assert.ok(!JSON.stringify(r).includes('test-secret'));
+  assert.ok(h.calls[0].url.searchParams.get('types').split(',').includes('address'));
 });
 test('rate limit, provider failures and timeouts return safe errors',async()=>{
   assert.equal((await harness({allowed:false}).get('Berlin')).status,429);

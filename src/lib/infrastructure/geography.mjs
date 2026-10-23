@@ -23,6 +23,5 @@ export function mapStyle(environment, configured) {
     if (environment !== 'development' && url.hostname === 'demotiles.maplibre.org') throw new Error('Demo tiles are development-only. Configure a production map style.');
     return url.href;
   }
-  if (environment === 'development') return 'https://demotiles.maplibre.org/globe.json';
-  throw new Error('World Map needs NEXT_PUBLIC_INFRASTRUCTURE_MAP_STYLE configured for this environment.');
+  return 'https://tiles.openfreemap.org/styles/liberty';
 }

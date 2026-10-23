@@ -2,6 +2,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import type { WorldMapAPI } from "@/components/infrastructure/WorldMap";
+import { importGeographicFeature } from "@/lib/infrastructure/map-import.mjs";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
@@ -231,7 +232,12 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
 
   return <main data-world-map={worldMap || undefined} className={`crystal-studio scene-workbench ${left ? "" : "scene-left-closed"} ${right ? "" : "scene-right-closed"}`} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (worldMap) return; if (e.dataTransfer.files[0]) void importFile(e.dataTransfer.files[0]); else { const name = e.dataTransfer.getData("application/x-casynus-asset"); if (catalog.includes(name)) add(name, viewport.current?.point(e.clientX, e.clientY)); } }}>
     {store.ready && <SceneViewport ref={viewport} document={pending?.preview ?? doc} selected={selected} tool={pending ? "select" : tool} snap={snap} grid={grid} onSelect={select} onHover={setHoveredId} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
-    {studio === "infrastructure" && mapOpened && <WorldMap key={doc.id} apiRef={worldMapAPI} active={worldMap} />}
+    {studio === "infrastructure" && mapOpened && <WorldMap key={doc.id} apiRef={worldMapAPI} active={worldMap} onViewChange={setMapView} importDisabled={blocked} onImport={feature => safely(() => {
+      const scene = docRef.current;
+      const objects = importGeographicFeature(feature, scene.objects.find(object => object.geographic)?.geographic?.origin);
+      change(validateDocument({ ...scene, objects: [...scene.objects, ...objects] })); setSelected(objects.map(object => object.id)); setWorldMap(false); setTool("translate");
+      requestAnimationFrame(() => viewport.current?.fit());
+    })} />}
 
     {left && <StudioPanel className="scene-sidebar scene-left"><StudioHeader title={names[studio]} onBack={() => void leave("/project")} onCollapse={() => setLeft(false)} />
       <nav className="scene-studio-nav" aria-label="Design studios">{(Object.keys(routes) as Studio[]).map(s => <button key={s} className={s === studio ? "is-active" : ""} onClick={() => void navigate(s)}>{s === "architecture" ? "Architecture" : s === "interior" ? "Interior" : "Infra"}</button>)}</nav>

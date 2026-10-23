@@ -17,8 +17,8 @@ test('provider places reject invalid geometry and retain country framing', () =>
   assert.throws(() => normalizePlaces({}));
 });
 test('official globe demo cannot be used in production', () => {
-  assert.equal(mapStyle('development'),'https://demotiles.maplibre.org/globe.json');
-  assert.throws(() => mapStyle('production'));
+  assert.equal(mapStyle('development'),'https://tiles.openfreemap.org/styles/liberty');
+  assert.equal(mapStyle('production'),'https://tiles.openfreemap.org/styles/liberty');
   assert.throws(() => mapStyle('production','https://demotiles.maplibre.org/globe.json'));
   assert.throws(() => mapStyle('production','http://tiles.example/style.json'));
   assert.equal(mapStyle('production','https://tiles.example/style.json'),'https://tiles.example/style.json');

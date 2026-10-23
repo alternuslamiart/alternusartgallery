@@ -148,7 +148,7 @@ const nextConfig = {
       },
     ];
     // Only Infrastructure loads map tiles and MapLibre's bundled blob worker.
-    const mapOrigins = new Set(process.env.NODE_ENV === "development" ? ["https://demotiles.maplibre.org"] : []);
+    const mapOrigins = new Set(["https://tiles.openfreemap.org", ...(process.env.NODE_ENV === "development" ? ["https://demotiles.maplibre.org"] : [])]);
     const mapURLs = [process.env.NEXT_PUBLIC_INFRASTRUCTURE_MAP_STYLE, ...(process.env.INFRASTRUCTURE_MAP_ORIGINS || "").split(",")];
     for (const value of mapURLs.filter(Boolean)) {
       const url = new URL(value.trim());

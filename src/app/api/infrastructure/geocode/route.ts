@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   if (!rateLimit(`infrastructure-geocode:${getClientIP(request)}`, { limit: 20, windowSeconds: 60 }).success) return NextResponse.json({ error: "Too many searches. Try again in a minute." }, { status: 429, headers: { "Retry-After": "60" } });
   const url = new URL(`https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json`);
   url.searchParams.set("key", key); url.searchParams.set("limit", "5"); url.searchParams.set("autocomplete", "false");
-  url.searchParams.set("types", "country,region,subregion,municipality,municipal_district,locality");
+  url.searchParams.set("types", "country,region,subregion,municipality,municipal_district,locality,address");
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(10000), cache: "no-store" });
     if (!response.ok) return NextResponse.json({ error: response.status === 429 ? "Search provider is busy. Try again shortly." : "Place search provider is unavailable. Check the server configuration." }, { status: response.status === 429 ? 429 : 502 });

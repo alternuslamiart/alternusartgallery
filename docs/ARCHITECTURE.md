@@ -10,12 +10,19 @@
   `new URL(..., import.meta.url)` and registered through `setWorkerUrl`.
   Infrastructure routes and the emitted worker asset receive scoped map CSP;
   other studios retain their existing policy. The official globe demo is
-  development-only; production needs a licensed HTTPS style and source origins.
+  development-only; production uses OpenFreeMap or a licensed custom HTTPS style.
 - `/api/infrastructure/geocode` proxies explicit MapTiler searches with a
   server-only key, bounded queries/results, deadline and in-process rate limit.
   UI coordinate parsing uses latitude/longitude; MapLibre uses longitude/latitude.
-  Future geographic editing must add a project georeference before mapping
-  existing local-meter scene objects to WGS84 overlays. See `INFRASTRUCTURE-MAP.md`.
+  OpenFreeMap Liberty is the key-free production/development default, allowed
+  only in the scoped map CSP. Custom HTTPS styles remain configurable.
+- `infrastructure/map-features.mjs` bounds and validates picked GeoJSON and
+  WGS84 provenance. `map-import.mjs` triangulates land footprints or extrudes
+  buildings with source heights into local-meter meshes, preserving holes.
+  Optional validated object `geographic` metadata survives existing scene JSON,
+  history, recovery and workspace snapshots; imports share the first object's
+  origin and are limited to 2 km. See `INFRASTRUCTURE-MAP.md` for projection,
+  datum and clipped tile limitations. Base-map features remain read-only.
 
 - Interior `FloorPlanViewport` delegates SVG picking/drawing to one canvas
   handler; captured drag previews are committed once on release. Geometry helpers

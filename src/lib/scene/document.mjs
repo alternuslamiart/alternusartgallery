@@ -1,3 +1,4 @@
+import { validateGeographic } from '../infrastructure/map-features.mjs';
 export const SCENE_VERSION = 1;
 export const MAX_SCENE_BYTES = 8_000_000;
 export const KINDS = ["box", "sphere", "cylinder", "mesh", "group", "pointLight", "spotLight"];
@@ -59,6 +60,7 @@ export function validateObject(value) {
       result.geometry.indices = g.indices.map(n => Number.isInteger(n) ? number(n, 0, g.positions.length / 3 - 1) : fail("Invalid vertex index."));
     } else if (g.positions.length % 9) fail("Non-indexed meshes must contain triangles.");
   }
+  if (value.geographic !== undefined) result.geographic = validateGeographic(value.geographic);
   return result;
 }
 

@@ -6,10 +6,14 @@
   longer overflows the viewport toolbar (verified at 1440px).
 - [x] Integrate Infrastructure's MapLibre 6.15.0 globe, correct its separate
   ESM worker/worker CSP, preserve mounted editor/history and verify interaction.
-- [ ] Configure `MAPTILER_API_KEY`, `NEXT_PUBLIC_INFRASTRUCTURE_MAP_STYLE` and
-  required `INFRASTRUCTURE_MAP_ORIGINS`; verify live geocoding and licensed
-  production tiles. Development globe and mocked geocoding UI are verified;
-  no production deployment is authorized. See `docs/INFRASTRUCTURE-MAP.md`.
+- [x] Default to OpenFreeMap production vector tiles and connect feature
+  selection/highlight, fullscreen, fit, perspective buildings and import of
+  source-height buildings/flat land into the existing editable scene/history.
+- [ ] Verify deployed MapTiler address/city search with valid server credentials.
+  Remove any placeholder map-style override to use the OpenFreeMap default.
+  Add complete-feature retrieval across tile boundaries before surveyed/CAD
+  claims; road drawing, geometry snapping and terrain mesh import remain future
+  work. See `docs/INFRASTRUCTURE-MAP.md`. User authorized main/production push.
 
 - [x] Fix shared studio surface picking and X/Y/Z gizmo drag selection;
   verify axis constraints, single-step Undo/Redo and light/dark multi-selection.

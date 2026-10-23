@@ -11,6 +11,7 @@ test('map CSP permissions are scoped to Infrastructure and reject unsafe origins
     for(const source of ['/infrastructure','/infrastructur','/_next/static/media/maplibre-gl-worker.:asset*']) {
       const csp=rules.find(r=>r.source===source).headers[0].value;
       assert.ok(csp.includes('https://demotiles.maplibre.org'));assert.ok(csp.includes("worker-src 'self' blob:"));
+      assert.ok(csp.includes('https://tiles.openfreemap.org'));
     }
     process.env.NODE_ENV='production';process.env.NEXT_PUBLIC_INFRASTRUCTURE_MAP_STYLE='https://maps.example/style.json';process.env.INFRASTRUCTURE_MAP_ORIGINS='https://tiles.example';
     const production=(await config.headers()).find(r=>r.source==='/infrastructure').headers[0].value;

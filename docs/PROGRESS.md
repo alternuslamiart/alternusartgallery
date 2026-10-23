@@ -2,6 +2,44 @@
 
 Last updated: 2026-10-23
 
+## Infrastructure geographic selection and scene import
+
+- Extended the existing map/toolbar/viewport without replacing sidebars, chat,
+  theme controls or scene editing. OpenFreeMap Liberty is now the default in
+  development and production, with scoped CSP and native attribution; custom
+  HTTPS styles remain supported. Added address searches to the server adapter.
+- Rendered-feature picking highlights bounded GeoJSON and exposes actual
+  metadata; fit selection, fullscreen, north/level and 2D/3D controls use the
+  retained map. Building fill layers can extrude source heights. Missing
+  building/terrain data is reported rather than fabricated.
+- Polygon/MultiPolygon import creates real editable building meshes only with
+  valid source height, or flat land footprints, preserving courtyard holes.
+  WGS84 ellipsoid -> ECEF -> local east/up/south coordinates use the first
+  imported object's origin, a 2 km bound and ±85° latitude limit. Validated
+  source GeoJSON/origin persist through existing scene snapshots, recovery and
+  history. One import is one undo entry. Base maps remain read-only.
+- `npm test`: 122 passed. Final focused map/import tests: 11 passed after WGS84
+  refinement. TypeScript, focused ESLint and diff checks passed. Production
+  build passed with the existing Windows trusted CA bundle; existing
+  Browserslist and client-render warnings remain. Full-project lint's recorded
+  unrelated baseline was not repaired by this scoped map change.
+- Development Chrome passed real OpenFreeMap tiles/navigation and retained
+  scene/map canvases, then deterministic GeoJSON rendering/picking/highlight,
+  graphics retry, building import and atomic undo/redo, plus 1440/390px resize.
+  Artifacts: `.tmp/world-map-1792758999974/`. Screenshot review identified
+  overlapping mobile metadata/navigation controls; CSS now reserves control
+  space and bounds metadata scrolling. Final production Chrome also passed
+  real tiles, wheel zoom, fullscreen/exit, fit selection, pitch, retained state,
+  retry, mesh import/undo/redo and mobile control separation. Artifacts:
+  `.tmp/world-map-1792759508416/`; final mobile screenshot inspected.
+- Initial local browser attempts failed because this checkout has a MapTiler
+  style placeholder returning HTTP 403. QA/build override only the process
+  environment with OpenFreeMap; no private environment file was changed.
+  Remove placeholder style overrides in deployment to use the default. Address
+  search still needs a valid MapTiler key; live geocoding and authenticated
+  cloud persistence are not claimed. Full road/lane drawing, geometry snapping,
+  merged un-clipped feature retrieval and terrain meshes remain future work.
+
 ## Infrastructure MapLibre globe
 
 - Fixed the World Map toggle overflowing the Infrastructure viewport toolbar:

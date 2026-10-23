@@ -16,9 +16,20 @@
 .infrastructure-map-selection { display:flex; gap:8px; align-items:center; margin-top:8px; }
 .infrastructure-map-selection output { flex:1; overflow-wrap:anywhere; }
 .infrastructure-map-marker { width:14px; height:14px; border-radius:50%; background:#4284ff; }
+.infrastructure-map-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+.infrastructure-map-actions button, .infrastructure-map-feature button { padding:6px 8px; }
+.infrastructure-map-actions button[aria-pressed="true"] { color:var(--studio-accent,#4284ff); }
+.infrastructure-map-feature { margin-top:8px; }
+.infrastructure-map-feature dl { max-height:100px; overflow:auto; margin:6px 0; }
+.infrastructure-map-feature dl div { display:flex; gap:8px; overflow-wrap:anywhere; }
+.infrastructure-map-feature dt { min-width:100px; }
+.infrastructure-map-feature dd { margin:0; }
+.infrastructure-world-map:fullscreen { background:var(--studio-bg-panel); }
+.infrastructure-world-map:fullscreen .infrastructure-map-search { left:16px; right:64px; top:16px; }
+.infrastructure-world-map:fullscreen .maplibregl-ctrl-top-right { right:16px; top:16px; }
 .infrastructure-world-map .maplibregl-ctrl-top-right { top:225px; right:calc(var(--scene-right) + 24px); }
 .infrastructure-world-map .maplibregl-ctrl-bottom-right { right:calc(var(--scene-right) + 16px); }
 .infrastructure-world-map .maplibregl-ctrl-bottom-left { left:calc(var(--scene-left) + 16px); bottom:20px; }
 .infrastructure-world-map .maplibregl-ctrl-group { box-shadow:none; border:0; }
 .infrastructure-world-map .maplibregl-ctrl button { border:0; border-radius:0; padding:0; }
-@media(max-width:760px) { .infrastructure-map-search { left:12px; right:12px; top:132px; } .infrastructure-world-map .maplibregl-ctrl-top-right { right:12px; top:280px; } .infrastructure-world-map .maplibregl-ctrl-bottom-right { right:0; } .infrastructure-world-map .maplibregl-ctrl-bottom-left { left:12px; } }
+@media(max-width:760px) { .infrastructure-map-search { left:12px; right:64px; top:132px; max-height:calc(100% - 220px); overflow:auto; } .infrastructure-world-map .maplibregl-ctrl-top-right { right:12px; top:280px; } .infrastructure-world-map .maplibregl-ctrl-bottom-right { right:0; } .infrastructure-world-map .maplibregl-ctrl-bottom-left { left:12px; } }
