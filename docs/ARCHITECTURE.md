@@ -138,7 +138,9 @@
   the existing submit adapter and scene validation/approval. Sessions stop on
   account changes, unmount and document hiding. `studio-microphone.mjs` owns one
   explicit audio stream, analyser level meter, bounded recorder and track/context
-  cleanup. Studio response policies permit same-origin microphone only; browser
+  cleanup. All app document policies permit same-origin microphone so Next client
+  navigation from homepage/login retains a usable microphone policy; capture
+  still requires explicit Start and browser consent. Browser
   speech-service refusal is distinct from device permission denial.
 - `/api/studio-voice/transcribe` provides authenticated, rate-limited Groq Whisper
   fallback with bounded multipart uploads, a server-only existing Groq key and no

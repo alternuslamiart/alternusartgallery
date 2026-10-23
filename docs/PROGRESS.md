@@ -2,6 +2,32 @@
 
 Last updated: 2026-10-23
 
+## Microphone policy after client navigation
+
+- Reproduced the missing case with a failing entry-document policy regression:
+  homepage/login used `microphone=()` and Next client navigation into a studio
+  retained that original document policy. Direct studio-load tests missed it.
+- The shared document policy now allows only `microphone=(self)`, still requires
+  browser/OS consent and explicit Start, and keeps camera disabled. Removed
+  redundant studio-only overrides. Cross-origin parent restrictions still apply.
+- The browser verifier now enters Architecture through the actual homepage link,
+  asserts that client navigation retained the same document and checks its real
+  microphone policy before the existing audio capture/cleanup regressions.
+- Correct build-time map override is `NEXT_PUBLIC_INFRASTRUCTURE_MAP_STYLE`;
+  the earlier continuation TODO incorrectly used a `_URL` suffix.
+- Verification: 140 tests passed, TypeScript and focused config lint passed;
+  production build passed using the existing Windows trusted CA bundle and the
+  build-time OpenFreeMap override. Actual homepage/Interior HTTP responses both
+  returned `microphone=(self)`. Initial server start on 3003 failed with
+  `EADDRINUSE`; the fresh verification server uses 3013 instead.
+- Full Chrome verifier passed from homepage client navigation: retained-document
+  microphone permission policy, real synthetic capture/analyser/recorder cleanup,
+  both voice buttons, 3D/2D commands/history/saves/reloads, map controls and mobile
+  modal geometry. Artifacts: `.tmp/studio-actions-1792784350441/`. Recognition,
+  playback and provider HTTP remain injected; physical acoustic/audible speech
+  and deployed HTTPS checks still require a real device/session. After deployment,
+  reload existing tabs to replace the old document's blocking policy.
+
 ## Voice Speech continuation verification
 
 - Resumed the pending compact microphone/Voice frame and studio command work for

@@ -2,10 +2,11 @@
 
 ## Next concrete task
 
-- [ ] Rerun the full studio-command browser verifier after building with
-  `NEXT_PUBLIC_INFRASTRUCTURE_MAP_STYLE_URL=https://tiles.openfreemap.org/styles/liberty`.
-  The continuation run passed voice/3D checks, then stopped at the checkout's
-  compiled MapTiler placeholder returning HTTP 403; subsequent checks did not run.
+- [x] Rerun the full studio-command browser verifier after building with
+  `NEXT_PUBLIC_INFRASTRUCTURE_MAP_STYLE=https://tiles.openfreemap.org/styles/liberty`.
+  Full run passed, including homepage client navigation with real synthetic
+  microphone capture, map controls and 2D checks. Reload existing deployed tabs
+  after the document-policy update; physical-device production checks remain.
 
 - [x] Share the compact Voice Speech modal and real bilingual studio command
   registry between microphone, Voice and typed chat without replacing studio UI.

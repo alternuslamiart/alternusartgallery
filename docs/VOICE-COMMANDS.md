@@ -10,9 +10,11 @@ Text AI provider authentication, keys and quotas still apply.
 ## Root cause repaired
 
 The original global response header explicitly set `microphone=()`, blocking the
-page even when site permissions were Allow. Studio documents and aliases now
-override only that directive to `microphone=(self)`; other documents and camera
-restrictions remain unchanged. Cross-origin embeds need an appropriate parent
+page even when site permissions were Allow. All app documents now use
+`microphone=(self)` because Next client navigation into a studio retains the
+entry document's policy, including when entering from the homepage or login.
+Browser/OS consent is still required, camera stays disabled, and microphone
+capture still starts only after Start. Cross-origin embeds need an appropriate parent
 policy and iframe allow attribute; the app cannot override a restricting parent.
 The old controller also mislabeled browser recognition `not-allowed` as microphone
 permission denial. Device access now uses explicit `getUserMedia({ audio: true })`;

@@ -117,10 +117,11 @@ const nextConfig = {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
           },
-          // Permissions policy (disable unnecessary features)
+          // Document policy survives Next client navigation into a voice studio.
+          // Allow same-origin requests; getUserMedia still requires user consent.
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=(self), interest-cohort=()",
+            value: "camera=(), microphone=(self), geolocation=(self), interest-cohort=()",
           },
           // Content Security Policy
           {
@@ -158,8 +159,7 @@ const nextConfig = {
     }
     const baseCSP = rules[0].headers.find(header => header.key === "Content-Security-Policy").value;
     const mapCSP = baseCSP.replace(/connect-src ([^;]+)/, (_, sources) => `connect-src ${sources} ${[...mapOrigins].join(" ")}`) + "; worker-src 'self' blob:";
-    const voiceRules = ["/casynus", "/crystal", "/interior", "/infrastructure", "/infrastructur"].map(source => ({ source, headers: [{ key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=(self), interest-cohort=()" }] }));
-    return [...rules, ...["/infrastructure", "/infrastructur", "/_next/static/media/maplibre-gl-worker.:asset*"].map(source => ({ source, headers: [{ key: "Content-Security-Policy", value: mapCSP }] })), ...voiceRules];
+    return [...rules, ...["/infrastructure", "/infrastructur", "/_next/static/media/maplibre-gl-worker.:asset*"].map(source => ({ source, headers: [{ key: "Content-Security-Policy", value: mapCSP }] }))];
   },
 };
 

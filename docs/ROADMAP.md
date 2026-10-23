@@ -6,6 +6,9 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Permit same-origin microphone on entry documents as well as studios so
+  client navigation from homepage/login does not retain a blocking voice policy.
+
 - [x] Connect the shared 271×138 Voice Speech modal and validated bilingual
   command registry to actual 3D/2D editing, MapLibre navigation, history, panels,
   exports, route navigation and confirmed persistence; protect destructive edits.

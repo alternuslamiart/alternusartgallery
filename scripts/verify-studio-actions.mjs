@@ -87,7 +87,13 @@ async function run() {
   const tracksEnded=()=>evaluate(`window.__streams.every(s=>s.getTracks().every(t=>t.readyState==='ended'))`);
   const shot=async name=>{const r=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(out+'/'+name+'.png',Buffer.from(r.data,'base64'));};
   await send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
-  await send('Page.navigate',{url:baseUrl+'/casynus'});await ready('.scene-canvas canvas');await ready('.studio-ai-controls');await wait(1000);
+  await send('Page.navigate',{url:baseUrl+'/'});await ready('a[href="/casynus"]');
+  await until(`Object.keys(document.querySelector('a[href="/casynus"]')).some(k=>k.startsWith('__reactProps'))`,'Homepage hydration');
+  await wait(1000);
+  await evaluate(`window.__voiceEntryDocument=true;document.querySelector('a[href="/casynus"]').click()`);
+  await ready('.scene-canvas canvas');await ready('.studio-ai-controls');await wait(1000);
+  assert.equal(await evaluate('window.__voiceEntryDocument'),true,'Studio entry uses client navigation and retains the homepage document');
+  assert.equal(await evaluate(`(document.permissionsPolicy??document.featurePolicy).allowsFeature('microphone')`),true,'Homepage policy must allow studio microphone after client navigation');
   const fixture={version:1,id:'voice-command-fixture',name:'Voice command fixture',units:'m',objects:[],environment:{quality:'balanced',exposure:1,sunIntensity:3,sunAzimuth:40,sunElevation:45,shadows:true},camera:{position:[14,11,14],target:[0,1,0],projection:'perspective'}};
   await evaluate(`(()=>{const input=document.querySelector('[aria-label="Import scene file"]'),d=new DataTransfer();d.items.add(new File([${JSON.stringify(JSON.stringify(fixture))}],'commands.json',{type:'application/json'}));input.files=d.files;input.dispatchEvent(new Event('change',{bubbles:true}));})()`);
   await until(`Number(document.querySelector('.scene-canvas')?.dataset.objectCount)===0`);
