@@ -101,7 +101,7 @@
 - `src/app/**` contains pages and route handlers. API endpoints use explicit
   HTTP method exports in `route.ts`.
 - `src/components/**` contains reusable UI and Casynus Studio surfaces.
-- `/login` and `/signup` share `src/components/auth-shell.tsx`, a horizontal
+- `/login`, `/signup` and both `/reset-password` modes share `src/components/auth-shell.tsx`, a horizontal
   frame capped at 1181px with CSS artwork and a responsive account form.
   Styles in `src/app/login/login.css` are scoped to `.auth-reference`.
   Login keeps NextAuth/OAuth, email-code and age-collection handlers; Signup

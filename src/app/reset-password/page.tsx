@@ -4,11 +4,12 @@ import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowLeft, ArrowRight, Check, CheckCircle2, Info, Lock, Mail, Moon, Sun } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, CheckCircle2, Info, Lock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AuthShell } from "@/components/auth-shell";
 
 const AUTH_THEME_KEY = "Coreforge_auth_theme";
 
@@ -17,8 +18,7 @@ function useAuthTheme() {
 
  useEffect(() => {
   const storedTheme = window.localStorage.getItem(AUTH_THEME_KEY);
-  const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
-  const nextIsLight = storedTheme ? storedTheme === "light" : prefersLight;
+  const nextIsLight = storedTheme ? storedTheme === "light" : false;
   setIsLight(nextIsLight);
   document.documentElement.style.colorScheme = nextIsLight ? "light" : "dark";
  }, []);
@@ -35,20 +35,9 @@ function useAuthTheme() {
  return [isLight, toggleTheme] as const;
 }
 
-function Brand() {
- return (
-  <Link href="/" className="auth-brand-link inline-flex items-center gap-2.5" aria-label="Go to Casynus homepage">
-   <span className="auth-brand-mark inline-flex h-8 w-8 items-center justify-center rounded-lg">
-    <img src="/Logopng.png" alt="Casynus homepage" className="h-8 w-8 object-contain" />
-   </span>
-   <span className="auth-brand text-[1.35rem] font-semibold tracking-[-0.03em]">Casynus</span>
-  </Link>
- );
-}
-
 function Message({ children, success = false }: { children: React.ReactNode; success?: boolean }) {
  return (
-  <p className={`rounded-[10px] border px-3 py-2 text-sm ${success
+  <p role={success ? "status" : "alert"} className={`rounded-[10px] border px-3 py-2 text-sm ${success
    ? "border-emerald-400/20 bg-emerald-500/10 text-emerald-200"
    : "border-red-400/20 bg-red-500/10 text-red-200"}`}>
    {children}
@@ -117,34 +106,22 @@ export default function ResetPasswordPage() {
 
  const isResetForm = Boolean(token);
  return (
-  <div className={`auth-page ${isLight ? "auth-light" : "auth-dark"}`}>
-   <div className="auth-glow pointer-events-none fixed inset-x-0 top-0 h-[520px]" />
-   <header className="absolute inset-x-0 top-0 z-10 mx-auto flex h-20 w-full items-center justify-between px-5 sm:px-8 lg:px-10">
-    <Brand />
-    <div className="flex items-center gap-3">
-     <button type="button" onClick={toggleTheme} className={`auth-theme-toggle inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors ${isLight ? "is-light" : "is-dark"}`} aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}>
-      {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-     </button>
-     <Link href="/login" className="auth-top-link text-xs font-semibold">Back to sign in</Link>
-    </div>
-   </header>
-
-   <main className="relative z-10 flex min-h-screen w-full items-center justify-center overflow-y-auto px-5 pb-8 pt-24">
-    <Card className="auth-card w-full max-w-md rounded-[24px] border shadow-none backdrop-blur-xl">
-     <CardHeader className="space-y-3 p-7 text-center">
-      <p className="auth-kicker text-[11px] font-semibold uppercase tracking-[0.2em]">Casynus Studio workspace</p>
-      <h1 className="auth-title text-4xl font-semibold tracking-[-0.05em]">{success ? "You're all set" : isResetForm ? "Create new password" : "Forgot password?"}</h1>
-      <p className="auth-copy mx-auto max-w-xs text-sm leading-6">
+  <AuthShell isLight={isLight} onToggleTheme={toggleTheme}>
+   <div className="auth-soft-form-center">
+     <div className="auth-soft-intro" aria-live="polite">
+      <h1 className="auth-soft-page-title">{success ? "You're all set" : isResetForm ? "Create new password" : "Forgot password?"}</h1>
+      <p className="auth-soft-subtitle">
        {success
         ? isResetForm ? "Your password has been updated. You can now sign in with your new password." : "If an account exists for that email, you will receive a password reset link shortly."
         : isResetForm ? "Choose a strong password to secure your Casynus workspace." : "Enter your email and we’ll send you a secure link to reset your password."}
       </p>
-     </CardHeader>
-     <CardContent className="space-y-5 p-7 pt-0">
+     </div>
+    <Card className="auth-card">
+     <CardContent className="space-y-5">
       {success ? (
        <div className="space-y-5 text-center">
         <div className="auth-verification-icon mx-auto flex h-14 w-14 items-center justify-center rounded-2xl"><CheckCircle2 className="h-7 w-7" /></div>
-        <Button asChild className="h-11 w-full rounded-[10px] bg-[#068fff] text-sm font-semibold text-white shadow-none hover:bg-[#1b9dff]"><Link href="/login">Back to sign in <ArrowRight className="h-4 w-4" /></Link></Button>
+        <Button asChild className="auth-reset-return h-11 w-full rounded-lg text-sm font-semibold shadow-none"><Link href="/login">Back to sign in <ArrowRight className="h-4 w-4" /></Link></Button>
        </div>
       ) : (
        <form onSubmit={isResetForm ? handleReset : handleRequest} className="space-y-4">
@@ -173,10 +150,10 @@ export default function ResetPasswordPage() {
        </form>
       )}
       {!success && !isResetForm ? <p className="auth-copy flex items-center justify-center gap-1.5 text-center text-xs"><Check className="h-3.5 w-3.5 text-[#35b8ff]" /> Your account stays protected.</p> : null}
-      <p className="auth-footer-copy text-center text-xs"><Link href="/login" className="auth-footer-link inline-flex items-center gap-1.5 font-semibold"><ArrowLeft className="h-3.5 w-3.5" /> Back to sign in</Link></p>
+      {!success && <p className="auth-footer-copy text-center text-xs"><Link href="/login" className="auth-footer-link inline-flex items-center gap-1.5 font-semibold"><ArrowLeft className="h-3.5 w-3.5" /> Back to sign in</Link></p>}
      </CardContent>
     </Card>
-   </main>
-  </div>
+   </div>
+  </AuthShell>
  );
 }

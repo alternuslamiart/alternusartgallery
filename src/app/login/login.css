@@ -1,4 +1,4 @@
-/* Shared Login / Signup frame. All rules stay inside these two auth routes. */
+/* Shared Login / Signup / Reset Password frame, scoped to AuthShell. */
 .auth-page.auth-reference {
   --auth-bg:#080808; --auth-text:#f7f7f7; --auth-muted:#969696;
   --auth-field:#1c1c1c; --auth-border:#2b2b2b; --auth-accent:#ffc000;
@@ -37,8 +37,8 @@
 .auth-reference .auth-input-icon { color:var(--auth-muted); }
 .auth-reference .auth-divider-line { background:var(--auth-border); }
 .auth-reference .auth-divider-label { color:var(--auth-muted); font-size:9px; letter-spacing:.14em; }
-.auth-reference .auth-card button[type="submit"] { height:44px; border-radius:8px; color:#151000; background:var(--auth-accent); font-weight:650; font-size:13px; }
-.auth-reference .auth-card button[type="submit"]:hover { background:#ffd044; }
+.auth-reference .auth-card :is(button[type="submit"],.auth-reset-return) { height:44px; border-radius:8px; color:#151000; background:var(--auth-accent); font-weight:650; font-size:13px; }
+.auth-reference .auth-card :is(button[type="submit"],.auth-reset-return):hover { background:#ffd044; }
 .auth-reference .auth-card button[type="submit"]:disabled { opacity:.5; }
 .auth-reference :is(.auth-footer-copy,.auth-copy,.auth-login-privacy) { color:var(--auth-muted); }
 .auth-reference :is(.auth-footer-link,.auth-accent-link) { color:var(--auth-accent); text-decoration:none; }

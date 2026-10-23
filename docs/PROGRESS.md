@@ -2,6 +2,28 @@
 
 Last updated: 2026-10-23
 
+## Reset Password shared auth design
+
+- Both email-link request and token password forms now use the exact shared
+  Login/Signup AuthShell, artwork, 1181px horizontal frame, responsive stacking,
+  yellow action buttons, fields, footer and stored light/dark preference.
+  Success returns to login with the same action styling; errors use accessible
+  alerts and theme-aware colors. Existing API endpoints/payloads and password
+  length/matching validation are retained.
+- Extended the auth browser verifier to both reset modes at 1440/900/390px in
+  both themes, plus request/reset errors, password validation and success states.
+  It accepts a localhost-only `AUTH_QA_URL` to avoid reusing a stale server.
+- Production build, focused lint and final TypeScript passed. The first standalone
+  typecheck raced build regeneration of `.next/types` and reported TS6053 missing
+  generated files; rerunning after build completion passed. Diff checks passed.
+- Chrome against the local production server passed all 24 route/width/theme
+  combinations, shared shell alignment/no horizontal overflow, existing login
+  code/back and signup validation, stored theme reload, reset request errors/
+  success and token password length/mismatch/API-error/success flows. Actual email
+  delivery/token consumption was not invoked; auth HTTP responses were fixtures.
+  Artifacts: `.tmp/auth-reference-1792784683495/`; desktop dark request and mobile
+  light token screenshots visually inspected.
+
 ## Microphone policy after client navigation
 
 - Reproduced the missing case with a failing entry-document policy regression:

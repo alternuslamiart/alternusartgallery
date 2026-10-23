@@ -77,6 +77,9 @@ requirements provide new evidence.
 
 ## P2 — Existing platform integration
 
+- [x] Match password reset request/token/success screens to the shared Login and
+  Signup frame, themes and responsive styling while retaining the existing APIs.
+
 - [x] Implement durable AI usage, profile percentages/history and plan quotas:
   Basic 200, Pro 800, Teams 2,000, Studio 4,000 monthly application credits.
 - [x] Verify the Usage UI against a local production build with mocked HTTP;

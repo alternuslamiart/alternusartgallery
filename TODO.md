@@ -2,6 +2,10 @@
 
 ## Next concrete task
 
+- [x] Align `/reset-password` with Login/Signup using the shared AuthShell.
+- [ ] Verify real reset email delivery and a valid expiring reset link in the
+  deployed environment; local UI verification uses intercepted API responses.
+
 - [x] Rerun the full studio-command browser verifier after building with
   `NEXT_PUBLIC_INFRASTRUCTURE_MAP_STYLE=https://tiles.openfreemap.org/styles/liberty`.
   Full run passed, including homepage client navigation with real synthetic
