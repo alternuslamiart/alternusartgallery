@@ -4,6 +4,11 @@ Last updated: 2026-10-23
 
 ## Infrastructure MapLibre globe
 
+- Fixed the World Map toggle overflowing the Infrastructure viewport toolbar:
+  the 113px labelled accent button pushed CSV/Lighting out of view
+  (scrollWidth 874 > clientWidth 802 at 1440px). It is now a 33px Globe/Box
+  icon button with the same "World Map"/"3D Editor" aria-label and tooltip.
+  Headless Chrome at 1440px: toolbar 792/792, no overflow; `tsc --noEmit` passed.
 - Added World Map / 3D Editor in the existing Infrastructure toolbar, with
   MapLibre GL JS pinned to 6.15.0. Both canvases stay mounted; model data,
   selection, editor camera, history and chat retain their existing ownership.

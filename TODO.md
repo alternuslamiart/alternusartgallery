@@ -2,6 +2,8 @@
 
 ## Next concrete task
 
+- [x] Make the Infrastructure World Map toggle a compact icon button so it no
+  longer overflows the viewport toolbar (verified at 1440px).
 - [x] Integrate Infrastructure's MapLibre 6.15.0 globe, correct its separate
   ESM worker/worker CSP, preserve mounted editor/history and verify interaction.
 - [ ] Configure `MAPTILER_API_KEY`, `NEXT_PUBLIC_INFRASTRUCTURE_MAP_STYLE` and

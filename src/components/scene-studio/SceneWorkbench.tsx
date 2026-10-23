@@ -272,7 +272,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       <StudioViewportToolbar label="Scene transformation tools"
         materialLibrary={{canApply:!blocked&&selected.length>0&&Boolean(primary&&!primary.kind.endsWith("Light")),activeMap:primary?.material.map,onApply:material=>safely(()=>change(applyLibraryMaterial(docRef.current,selectedRoots,material)))}}
         leading={[
-          ...(studio === "infrastructure" ? [{ label: worldMap ? "3D Editor" : "World Map", showLabel: true, icon: worldMap ? Box : Globe2, active: worldMap, onClick: () => { setMapOpened(true); setWorldMap(value => !value); } }] : []),
+          ...(studio === "infrastructure" ? [{ label: worldMap ? "3D Editor" : "World Map", icon: worldMap ? Box : Globe2, active: worldMap, onClick: () => { setMapOpened(true); setWorldMap(value => !value); } }] : []),
           { label: studio === "interior" ? "Add furnished room" : "Add building", icon: Building2, onClick: () => template(studio === "interior" ? "room" : "building"), disabled: blocked },
           { label: "Add Tree", icon: TreePine, onClick: () => add("Tree"), disabled: blocked },
         ]}
