@@ -106,14 +106,21 @@ export function useSceneDocument(studio: string, identity: string, authenticated
     window.addEventListener("beforeunload", guard); return () => window.removeEventListener("beforeunload", guard);
   }, [ready]);
 
-  const commit = useCallback((document: SceneDocument) => { setHistory(h => commitHistory(h, document)); }, []);
+  const commit = useCallback((document: SceneDocument) => { const parsed=validateDocument(document);setHistory(h => commitHistory(h, parsed)); }, []);
+  const saveVerified=async()=>{
+    const document=current.current,hash=JSON.stringify(document);
+    await save();
+    if(!mounted.current||current.current.id!==document.id)throw new Error('Project changed before save was confirmed.');
+    if((authenticated?cloudHash.current:localHash.current)!==hash)throw new Error(authenticated?'Workspace save was not confirmed. Check the save error or revision conflict.':'Browser recovery could not be saved. Download JSON before leaving.');
+    return authenticated?'Saved to your authenticated workspace.':'Saved in this browser. Sign in for cloud storage.';
+  };
   const replace = (document: SceneDocument) => {
     const parsed = validateDocument(document);
     revision.current = 0; cloudHash.current = ""; localHash.current = ""; blocked.current = false;
     setConflict(false); setFailure(null); setReady(true); setStatus("Unsaved project"); setHistory({ past: [], present: parsed, future: [] }); remember(parsed);
   };
   const saveCopy = () => replace({ ...current.current, id: crypto.randomUUID(), name: `${current.current.name.slice(0, 110)} copy` });
-  return { document: history.present, history, ready, status, failure, conflict, commit, replace, saveCopy, save, recover,
+  return { document: history.present, history, ready, status, failure, conflict, commit, replace, saveCopy, save, saveVerified, recover,
     setCamera: (camera: SceneDocument["camera"]) => setHistory(h => ({ ...h, present: { ...h.present, camera } })),
     undo: () => setHistory(undoHistory), redo: () => setHistory(redoHistory), setFailure };
 }

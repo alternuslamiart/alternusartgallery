@@ -7,6 +7,9 @@ import { requestStudioAnswer, STUDIO_AI_PROVIDERS } from "@/lib/studio-ai.mjs";
 import { StudioBadge, StudioButton } from "./kit";
 import { useStudioDock } from "./StudioConversation";
 import { useStudioVoice } from "./useStudioVoice";
+import { useStudioActions } from "./StudioActions";
+import { VoiceSpeechModal } from "./VoiceSpeechModal";
+import { parseStudioCommand } from "@/lib/studio-actions.mjs";
 
 export type StudioChatMessage = {
   id: string;
@@ -62,6 +65,7 @@ export function StudioAIChat({
   quickPrompts = [], onQuickPrompt, placeholder = "What do you want to create?", className = "",
 }: StudioAIChatProps) {
   const { expanded, setExpanded } = useStudioDock();
+  const actions=useStudioActions();
   const { data: session, status: sessionStatus } = useSession();
   const identity = session?.user?.id ?? session?.user?.email ?? (sessionStatus === "loading" ? "loading" : "guest");
   const identityRef = useRef(identity);
@@ -90,11 +94,12 @@ export function StudioAIChat({
     return () => { pendingRequest.current?.abort(); pendingRequest.current = null; };
   }, [identity]);
 
-  const submitPrompt = async (providerOverride?: string, fromVoice = false) => {
-    if (!promptRef.current.trim() || loading || pendingRequest.current) return;
+  const submitPrompt = async (providerOverride?: string, fromVoice = false, spokenCommand?:string) => {
+    if (!(spokenCommand??promptRef.current).trim() || loading || pendingRequest.current) return;
     if (!fromVoice) voiceControl.current?.stop();
     const selectedProvider = providerOverride && STUDIO_AI_PROVIDERS.includes(providerOverride) ? providerOverride : model;
-    if (!STUDIO_AI_PROVIDERS.includes(selectedProvider) && !requestAnswer) { onSubmit(); return; }
+    let localCommand=false;try{localCommand=Boolean(parseStudioCommand(spokenCommand??promptRef.current));}catch{localCommand=true;}
+    if(!localCommand&&!STUDIO_AI_PROVIDERS.includes(selectedProvider)&&!requestAnswer){onSubmit();return;}
     if (providerOverride) onModelChange(selectedProvider);
     if (!onMessagesChange) { setRemoteError("This workspace cannot receive AI replies."); return; }
     const requestIdentity = identity;
@@ -103,10 +108,18 @@ export function StudioAIChat({
     setRemoteLoading(true);
     setRemoteError(null);
     onClearError?.();
-    const message = promptRef.current.trim();
+    const message = (spokenCommand??promptRef.current).trim();
     onMessagesChange(current => [...current, { id: crypto.randomUUID(), role: "user", text: message }]);
-    onPromptChange("");
+    if(!spokenCommand)onPromptChange("");
     try {
+      const command=await actions.run(message,controller.signal);
+      if(command){
+        if(command.status==='error')throw new Error(command.message);
+        if(controller.signal.aborted||identityRef.current!==requestIdentity)return;
+        onMessagesChange(current=>[...current,{id:crypto.randomUUID(),role:'assistant',text:command.message,meta:command.status==='confirmation'?'Confirmation required':'Studio action confirmed'}]);
+        return command.message;
+      }
+      if (!STUDIO_AI_PROVIDERS.includes(selectedProvider) && !requestAnswer) { if(!spokenCommand)onPromptChange(message);onSubmit();return; }
       const result = await (requestAnswer ?? requestStudioAnswer)({ provider: selectedProvider, message, messages, signal: controller.signal });
       if (controller.signal.aborted || identityRef.current !== requestIdentity) return;
       const sources = result.citations?.length ? `\n\nSources:\n${result.citations.map(item => item.source).join("\n")}` : "";
@@ -116,8 +129,9 @@ export function StudioAIChat({
     } catch (caught) {
       if (!controller.signal.aborted && identityRef.current === requestIdentity) {
         setRemoteError(caught instanceof Error ? caught.message : "The AI request failed.");
-        if (!promptRef.current.trim()) onPromptChange(message);
+        if (!spokenCommand&&!promptRef.current.trim()) onPromptChange(message);
       }
+      if(fromVoice)throw caught;
     } finally {
       if (pendingRequest.current === controller) { pendingRequest.current = null; setRemoteLoading(false); }
     }
@@ -126,11 +140,12 @@ export function StudioAIChat({
   const voice=useStudioVoice({identity,getDraft:()=>promptRef.current,
     onDraft:text=>{const bounded=text.slice(0,model==="you"?400:12_000);promptRef.current=bounded;onPromptChange(bounded);},
     onOpen:()=>{onOpenChange(true);requestAnimationFrame(()=>textareaRef.current?.focus());},
-    onSend:()=>submitPrompt(undefined,true),
+    onSend:command=>submitPrompt(undefined,true,command),
     onCancel:()=>pendingRequest.current?.abort(),
     canConverse:STUDIO_AI_PROVIDERS.includes(model)||Boolean(requestAnswer),
   });
   voiceControl.current=voice;
+  const voiceModal=<VoiceSpeechModal open={voice.modalOpen} listening={voice.listening} busy={['preparing','requesting','transcribing','processing','executing','speaking'].includes(voice.phase)} level={voice.level} phase={voice.phase} feedback={voice.backend==='server'&&voice.listening?'Recording · server transcription':voice.feedback} error={voice.error} onStart={voice.start} onStop={voice.finish} onClose={voice.closeModal}/>;
 
   useEffect(() => {
     const submitFromMobileHome = (event: Event) => { void submitPrompt((event as CustomEvent<string>).detail); };
@@ -144,10 +159,10 @@ export function StudioAIChat({
   }, [messages, loading, expanded, open]);
   useEffect(() => () => { if (localImage) URL.revokeObjectURL(localImage); }, [localImage]);
 
-  if (!open) return <button type="button" aria-label="Show AI chat" title="Open AI Assistant" aria-expanded={false}
+  if (!open) return <><button type="button" aria-label="Show AI chat" title="Open AI Assistant" aria-expanded={false}
     onClick={() => onOpenChange(true)} className={`crystal-ai-chat-toggle studio-ai-reopen-btn ${className}`}>
     <Sparkles size={16} /><span>Casynus AI</span>{voice.mode!=="off"&&<Mic size={13} aria-label="Voice listening enabled" />}{hasUserMessages && <StudioBadge>{messages.length}</StudioBadge>}
-  </button>;
+  </button>{voiceModal}</>;
 
   return <div id={panelId} className={`crystal-ai-prompt studio-ai-panel cs-chat-dock ${expanded ? "is-expanded" : "is-compact"} ${className}`}
     role="region" aria-label="Casynus AI assistant" data-state={expanded ? "expanded" : "compact"}>
@@ -190,7 +205,7 @@ export function StudioAIChat({
       <StudioButton size="icon" variant="ghost" aria-label="Dismiss error" onClick={() => { setRemoteError(null); onClearError?.(); }}><X size={14} /></StudioButton>
     </div>}
     {voice.error&&<div className="studio-ai-error" role="alert"><span>{voice.error}</span><StudioButton size="icon" variant="ghost" aria-label="Dismiss voice error" onClick={voice.stop}><X size={14} /></StudioButton></div>}
-    {(voice.mode!=="off"||voice.conversation)&&<div className="cs-voice-status" role="status">
+    {!voice.modalOpen&&(voice.mode!=="off"||voice.conversation)&&<div className="cs-voice-status" role="status">
       <Mic size={13} />{voice.phase==='processing'?'Voice session · processing':voice.phase==='speaking'?'Voice session · speaking':voice.phase==='transcribing'?'Transcribing audio…':voice.phase==='preparing'?'Preparing server transcription…':!voice.listening?'Starting microphone · allow access if prompted':voice.backend==='server'?'Recording · audio will be sent for transcription':voice.conversation?'Voice session · speak your request':voice.mode==="wake"?'Listening for “Hey, Casynus”':'Recording dictation · review text before sending'}
       {voice.listening&&<meter className="cs-voice-level" aria-label="Microphone activity" min={0} max={1} value={voice.level} />}
       {voice.interim&&<span className="cs-voice-interim" aria-label="Interim transcription">{voice.interim}</span>}
@@ -230,5 +245,6 @@ export function StudioAIChat({
       </div>
     </div>
     {statusLabel && <div className="cs-chat-status">{statusLabel}</div>}
+    {voiceModal}
   </div>;
 }

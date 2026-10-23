@@ -114,7 +114,8 @@ export function floorTranslateObject(object: FloorPlanObject, delta: FloorPlanPo
 }
 
 export type FloorPlanHistory = { past: FloorPlanObject[][]; present: FloorPlanObject[]; future: FloorPlanObject[][] };
-export function floorPlanHistoryReducer(state: FloorPlanHistory, action: { type: "undo" } | { type: "redo" } | { type: "commit"; next: FloorPlanObject[] | ((previous: FloorPlanObject[]) => FloorPlanObject[]) }): FloorPlanHistory {
+export function floorPlanHistoryReducer(state: FloorPlanHistory, action: { type: "undo" } | { type: "redo" } | {type:"replace";next:FloorPlanObject[]} | { type: "commit"; next: FloorPlanObject[] | ((previous: FloorPlanObject[]) => FloorPlanObject[]) }): FloorPlanHistory {
+  if(action.type==='replace')return{past:[],future:[],present:action.next};
   if (action.type === "undo") {
     if (!state.past.length) return state;
     return { past: state.past.slice(0, -1), present: state.past[state.past.length - 1], future: [state.present, ...state.future].slice(0, 100) };

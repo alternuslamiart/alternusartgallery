@@ -4,11 +4,18 @@ import { useEffect, useImperativeHandle, useRef, useState, type Ref } from "reac
 import { Map as LibreMap, Marker, NavigationControl, ScaleControl, FullscreenControl, setWorkerUrl, type GeoJSONSource } from "maplibre-gl";
 import type { Feature, Geometry } from "geojson";
 import { geographicFeature, featureBounds } from "@/lib/infrastructure/map-features.mjs";
+import type { StudioAction } from "@/lib/studio-actions.mjs";
 import { mapStyle, parseCoordinates, type GeographicLocation } from "@/lib/infrastructure/geography.mjs";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./world-map.css";
 
-export type WorldMapAPI = { zoom: (factor: number) => void; reset: () => void; view: (view: string) => void };
+export type WorldMapAPI = { zoom: (factor: number) => void; reset: () => void; view: (view: string) => void;ready:()=>boolean;command:(action:StudioAction,signal:AbortSignal)=>Promise<string> };
+async function searchMapPlaces(query:string,signal:AbortSignal):Promise<GeographicLocation[]>{
+  const coordinates=parseCoordinates(query);if(coordinates)return[coordinates];
+  if(query.trim().length<2)throw new Error('Enter a city, country, address, or latitude, longitude.');
+  const response=await fetch(`/api/infrastructure/geocode?q=${encodeURIComponent(query.trim())}`,{signal:AbortSignal.any([signal,AbortSignal.timeout(12000)])});
+  const data=await response.json();if(!response.ok)throw new Error(data.error||'Location search failed.');return data.places;
+}
 
 export default function WorldMap({ active, apiRef, onImport, importDisabled, onViewChange }: { active: boolean; apiRef: Ref<WorldMapAPI>; onImport: (feature: Feature<Geometry>) => void; importDisabled: boolean; onViewChange: (view: string) => void }) {
   const host = useRef<HTMLDivElement>(null), map = useRef<LibreMap | null>(null), marker = useRef<Marker | null>(null);
@@ -18,6 +25,7 @@ export default function WorldMap({ active, apiRef, onImport, importDisabled, onV
   const [results, setResults] = useState<GeographicLocation[]>([]), [location, setLocation] = useState<GeographicLocation | null>(null);
   const [feature, setFeature] = useState<Feature<Geometry> | null>(null), [pitched, setPitched] = useState(false), [buildingLayers, setBuildingLayers] = useState(false);
   const selectedFeature = useRef<Feature<Geometry> | null>(null);
+  const readyRef=useRef(ready);readyRef.current=ready;
   const viewChanged = useRef(onViewChange); viewChanged.current = onViewChange;
   const fitSelection = () => {
     const current = selectedFeature.current;
@@ -27,6 +35,42 @@ export default function WorldMap({ active, apiRef, onImport, importDisabled, onV
   };
 
   useImperativeHandle(apiRef, () => ({
+    ready:()=>readyRef.current,
+    command:async(action,signal)=>{
+      const current=map.current;if(!current||!readyRef.current)throw new Error('The map is not ready. Check its loading error and retry.');
+      signal.throwIfAborted();
+      const move=async(options:Parameters<LibreMap['easeTo']>[0])=>{
+        await new Promise<void>((resolve,reject)=>{
+          const cleanup=()=>{clearTimeout(timer);current.off('moveend',done);signal.removeEventListener('abort',cancel);};
+          const done=()=>{cleanup();resolve();},cancel=()=>{cleanup();current.stop();reject(new Error('Map navigation canceled.'));};
+          const timer=setTimeout(()=>{cleanup();reject(new Error('Map camera did not confirm movement.'));},2500);
+          current.once('moveend',done);signal.addEventListener('abort',cancel,{once:true});current.easeTo({...options,duration:350});
+        });
+      };
+      if(action.intent==='map.search'){
+        const places=await searchMapPlaces(action.parameters.query,signal);signal.throwIfAborted();
+        setQuery(action.parameters.query);setSearchError('');setResults(places);
+        if(!places.length)throw new Error('No matching locations were found. Try a more specific city or address.');
+        if(places.length>1)return `Found ${places.length} places. Choose the intended location in the existing map search results.`;
+        const place=places[0];selectedFeature.current=null;setFeature(null);(current.getSource('casynus-selection') as GeoJSONSource).setData({type:'FeatureCollection',features:[]});setLocation(place);setResults([]);await move({center:[place.longitude,place.latitude],zoom:place.zoom??11});return `Map centered on ${place.label}.`;
+      }
+      if(action.intent==='viewport.zoom')await move({zoom:current.getZoom()+(action.parameters.direction==='in'?1:-1)*Math.log2(1.25)*action.parameters.amount});
+      else if(action.intent==='viewport.reset')await move({center:[0,20],zoom:1,bearing:0,pitch:0});
+      else if(action.intent==='viewport.view'){
+        if(!['2D','3D','Perspective','Top'].includes(action.parameters.view))throw new Error('The map supports 2D or 3D perspective, not that studio camera preset.');
+        await move({pitch:['3D','Perspective'].includes(action.parameters.view)?60:0});
+      }else if(action.intent==='viewport.rotate')await move({bearing:current.getBearing()+action.parameters.degrees});
+      else if(action.intent==='viewport.pan'){
+        const d=action.parameters.direction,center=current.getCenter(),step=360/2**(current.getZoom()+2);
+        await move({center:[center.lng+(['east','right'].includes(d)?step:['west','left'].includes(d)?-step:0),Math.max(-80,Math.min(80,center.lat+(['north','up'].includes(d)?step:['south','down'].includes(d)?-step:0)))]});
+      }else if(action.intent==='viewport.focus'){
+        if(action.parameters.scope==='all'){await move({center:[0,20],zoom:1});return 'World map fitted.';}
+        if(!selectedFeature.current)throw new Error('Select a geographic feature before focusing it.');
+        const [w,s,e,n]=featureBounds(selectedFeature.current),camera=current.cameraForBounds([[w,s],[e,n]],{padding:100,maxZoom:18});
+        if(!camera)throw new Error('The selected geographic bounds cannot be fitted.');await move(camera);
+      }else throw new Error('This command is unavailable in World Map. Switch to 3D Studio to edit project objects.');
+      return 'Map camera updated.';
+    },
     zoom: factor => { if (map.current) map.current.easeTo({ zoom: map.current.getZoom() + Math.log2(factor) }); },
     reset: () => { map.current?.easeTo({ center: [0, 20], zoom: 1, pitch: 0, bearing: 0 }); setPitched(false); },
     view: view => { const pitch = view === "Pitched"; setPitched(pitch); map.current?.easeTo({ pitch: pitch ? 60 : 0, bearing: 0 }); },
@@ -123,10 +167,8 @@ export default function WorldMap({ active, apiRef, onImport, importDisabled, onV
       setSearching(true);
       const timeout = setTimeout(() => controller.abort(), 12000);
       try {
-        const response = await fetch(`/api/infrastructure/geocode?q=${encodeURIComponent(query.trim())}`, { signal: controller.signal });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Location search failed.");
-        if (!controller.signal.aborted) { setResults(data.places); if (!data.places.length) setSearchError("No places found. Try a country or city name."); }
+        const places=await searchMapPlaces(query.trim(),controller.signal);
+        if (!controller.signal.aborted) { setResults(places); if (!places.length) setSearchError("No places found. Try a country or city name."); }
       } finally { clearTimeout(timeout); }
     } catch (caught) {
       if (request.current === controller) setSearchError(controller.signal.aborted ? "Search canceled or timed out. Try again." : caught instanceof Error ? caught.message : "Location search failed.");

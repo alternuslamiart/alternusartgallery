@@ -6,6 +6,13 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Connect the shared 271×138 Voice Speech modal and validated bilingual
+  command registry to actual 3D/2D editing, MapLibre navigation, history, panels,
+  exports, route navigation and confirmed persistence; protect destructive edits.
+- [ ] Verify acoustic English/Albanian commands, installed TTS voices and signed-in
+  cloud save with real production providers; broaden finite intent synonyms and
+  compound-command clarification using the existing validated AI proposal flow.
+
 - [x] Integrate MapLibre 6.15.0 World Map into Infrastructure with retained
   3D editor state, geographic selection, markers and a server geocoding adapter.
 - [x] Add key-free OpenFreeMap production tiles, rendered-feature selection,

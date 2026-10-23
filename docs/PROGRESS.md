@@ -2,6 +2,67 @@
 
 Last updated: 2026-10-23
 
+## Voice Speech continuation verification
+
+- Resumed the pending compact microphone/Voice frame and studio command work for
+  commit/push. Fresh `npm test` passed all 140 tests; `npm run typecheck` and
+  `npm run build` passed (build used `.tmp/windows-trusted-cas.pem`). Focused
+  Next lint passed with existing image/hook warnings; diff checks passed.
+- Fresh `node scripts/verify-studio-actions.mjs` passed exact modal/audio,
+  3D actions/history/confirmation and browser save, then exited 1 at map readiness:
+  the compiled MapTiler placeholder style returned HTTP 403. The remainder of
+  this fresh browser run did not execute. Rebuild with the OpenFreeMap style
+  override set at build time before rerunning the complete verifier; a runtime
+  NEXT_PUBLIC override cannot replace the compiled client setting.
+- Unrelated deleted Section images, temporary migration scripts and Node crash
+  reports are excluded from the voice commit. Physical microphones, installed
+  voices and authenticated production provider/save checks remain pending.
+
+## Context-aware studio commands and compact voice modal
+
+- Both existing voice icons and Ctrl+Q open the same 271×138 Voice Speech modal,
+  matching the supplied #222 / #3e3e3e / #579bff reference and exact button sizes.
+  Opening is idle; Start acquires audio, real analyser levels drive listening
+  bars, Stop finishes transcription and Close/Esc releases capture/playback.
+- Added a strict typed finite English/Albanian action schema and shared registry
+  for typed chat and voice. Current 3D and 2D adapters call existing geometry,
+  template, viewport, toolbar, map, history and persistence functions. Ambiguous
+  targets and unsupported capabilities produce clear errors. Bulk deletion/new
+  project replacement require a separate, expiring state-bound confirmation.
+- Known microphone commands preserve unrelated typed drafts. Voice entry can
+  speak confirmed replies using browser TTS; each subsequent turn requires Start.
+  Complex geometry requests retain the existing configured AI proposal/approval
+  flow. No arbitrary provider-generated JavaScript or fake action results.
+- Added identity-scoped validated floor-plan browser recovery before command
+  navigation, reload restoration with cleared prior-identity undo history and
+  actual read-back confirmation. 3D save results verify workspace/recovery hashes.
+  Camera commands now retain actual perspective camera updates in saved scenes.
+- Found and fixed a document-CSP issue during real navigation: Next client routing
+  from Architecture retained its tile-blocking policy in Infrastructure. Entering
+  or leaving Infrastructure now loads the appropriate document after recovery;
+  global source permissions remain scoped rather than broadening every route.
+- `npm test`: 140 passed. TypeScript and production build passed with the existing
+  Windows trusted CA bundle. Focused lint passed with only existing image and
+  legacy viewport hook warnings; diff checks passed. Existing full-project lint
+  baseline outside this increment was not repaired.
+- Chrome against the local production build passed exact modal/button geometry,
+  idle/static and real synthetic-device audio-responsive waveform, both icons,
+  keyboard opening, capture/close cleanup and actual MediaRecorder fallback.
+  It verified cube/building creation, numeric transforms, material, duplicate,
+  undo/redo, bulk/stale confirmation, selection clarification, tools/panels,
+  export choices and actual IndexedDB save/reload/camera retention.
+- The same run passed real policy-correct route navigation, MapLibre external
+  tiles, zoom/pan/bearing/pitch/search/focus-error/close, 2D wall edits/history,
+  unavailable 3D-in-2D errors, localStorage save/reload, Interior/Floor Plan routes,
+  390/1440px modal sizing and returning to the original 3D project. No configured
+  text/scene AI endpoint was invoked by known local commands. Browser artifact:
+  `.tmp/studio-actions-1792774832164/`; mobile screenshot visually inspected.
+- Speech recognition, TTS playback, provider HTTP and geocoding were injected in
+  browser QA; microphone/analyser/recorder, studio actions, map engine, tiles and
+  local persistence were real. Physical acoustic accuracy, installed SQ/EN voices,
+  real geocoding credentials and authenticated cloud/database/provider workflows
+  remain external checks. See `STUDIO-ACTIONS.md` for capabilities and limitations.
+
 ## Studio microphone and voice repair
 
 - Confirmed root cause in source and the hosted HTTPS `/interior` response:

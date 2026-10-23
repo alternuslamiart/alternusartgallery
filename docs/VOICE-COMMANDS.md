@@ -21,27 +21,30 @@ speech-service errors are classified separately and can use server transcription
 ## Use
 
 1. Open a studio over HTTPS (localhost also works for development).
-2. Click the microphone or press **Ctrl + Q** to open the dock and dictate.
+2. Click the microphone, Voice icon, or **Ctrl + Q** to open the shared compact
+   **Voice Speech** modal. Click **Start** to capture; opening alone never records.
    Allow microphone access if your browser prompts. The shortcut also works
    while the dock is minimized or an editor input has focus.
-3. Review native dictation in the composer. Supported interim text appears only
+3. Review ordinary native dictation in the composer. Known studio commands execute
+   through the validated registry and preserve unrelated typed notes. Supported interim text appears only
    in the recording status and is not committed until final recognition. A small
-   live level meter indicates actual input activity; it is never a fake animation.
+   waveform indicates actual input activity; it is never a fake animation.
 4. Click Send or say **Send** / **Dërgo** as a
-   separate utterance. Recognition alone does not automatically submit a task.
+   separate utterance. Ordinary non-command dictation is not automatically sent;
+   recognized local studio commands execute through the shared registry.
    Generated 3D changes still use the existing preview and Apply/Discard flow.
 5. Use **SQ**, **EN**, or **DE** for Albanian, English, or German recognition.
    Changing language stops the current microphone session; start it again.
-6. **Esc**, the Stop control, or saying **Stop**, **Cancel**, **Ndalo**, or
-   **Anulo** stops listening. Ctrl + Q also stops an active dictation session.
+6. Close or **Esc** cancels and releases resources. **Stop** finishes the current
+   recording for transcription. Ctrl + Q also stops an active dictation session.
    Existing draft text remains editable.
 
 7. The existing radio/Voice icon starts a **voice conversation** with a selected
    text provider. Each finalized utterance is sent once, the response is spoken,
-   and listening resumes only while that explicitly enabled session remains active.
+   then Start can begin another turn. Listening never automatically restarts.
    Capture stops before AI processing/playback to avoid transcribing the reply.
-   End the session with the same Voice icon, Stop or Esc. Local scene tools remain
-   available through ordinary dictation; Voice conversation requires a text model.
+   Close or Esc ends the session. Local studio commands work independently of the
+   text model; conversational answers require a configured provider.
    The controller retains its legacy wake-mode behavior, but the Voice icon now
    directly starts conversation rather than requiring a wake phrase.
 
@@ -57,10 +60,10 @@ or service; multilingual server transcription accepts sq/en/de language codes.
 If native recognition is absent or refuses access despite a successfully opened
 microphone, the client checks `/api/studio-voice/transcribe` availability. Sign-in,
 configured Groq credentials and browser MediaRecorder support are required.
-The existing status shows recording and indicates that audio will be uploaded.
-Click Finish (or the active microphone/Ctrl+Q), or wait for the 30-second limit.
-Dictation transcription appends to the editable draft and never auto-submits;
-an opted-in conversation submits the resulting turn. Stop/Esc cancels and discards
+The modal indicates recording for server transcription when fallback is active.
+Click Stop in Voice Speech (or use Ctrl+Q), or wait for the 30-second limit.
+Ordinary dictation appends to the editable draft; local commands execute through
+the registry, and an opted-in conversation submits the resulting turn. Close/Esc cancels and discards
 audio. Fallback cannot recover audio spoken before recording actually started.
 
 Only fallback captures a bounded in-memory audio blob, capped at 3 MB. The

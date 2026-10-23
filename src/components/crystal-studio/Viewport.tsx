@@ -54,8 +54,13 @@ import type {
 import { IconButton } from "./ui";
 import { useCrystalTheme } from "@/lib/crystal-theme";
 import { readViewportTheme } from "./viewport-theme";
+import { useStudioActionAdapter, verifyStudioState } from "./StudioActions";
+import { normalizeCommand, STUDIO_ROUTES, type StudioAction } from "@/lib/studio-actions.mjs";
+import type { StudioToolbarAPI } from "./StudioViewportToolbar";
 
 type Props = {
+  onStudioAction?:(action:StudioAction,signal:AbortSignal)=>Promise<string>;
+  actionScope?:string;
   renderer: string;
   selectedAsset?: StudioAsset;
   activeTool: StudioTool;
@@ -529,6 +534,68 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
     updateObjects([...objects, object]);
     select(object.id);
   };
+  const planRef=useRef(p);planRef.current=p;
+  const toolbarAPI=useRef<StudioToolbarAPI>(null);
+  const addDefaultRoom=()=>addObject({id:`room-${crypto.randomUUID().slice(0,6)}`,type:'room',x:1.2,y:1.2,width:3.2,height:2.6,label:`Room ${objects.filter(o=>o.type==='room').length+1}`});
+  const activateDraftTool=(id:typeof tool)=>{if(id==='delete'&&p.selectedFloorPlanId){updateObjects(sourceObjects.filter(o=>o.id!==p.selectedFloorPlanId));select(null);}else setTool(id);};
+  useStudioActionAdapter({name:`floor-plan:${p.actionScope??'guest'}`,
+    confirmation:action=>action.intent==='project.new'?{key:JSON.stringify(sourceObjects),message:'Start a new floor plan and replace the current drawing?'}:action.intent==='scene.delete'&&action.parameters.scope==='all'&&sourceObjects.length>1?{key:JSON.stringify(sourceObjects),message:`Delete all ${sourceObjects.length} floor-plan objects?`}:null,
+    execute:async(action,signal)=>{
+      signal.throwIfAborted();
+      if(p.actionScope==='loading')throw new Error('Wait for your studio session to finish loading.');
+      const before=JSON.stringify(sourceObjects),selected=sourceObjects.find(o=>o.id===p.selectedFloorPlanId);
+      if(action.intent==='viewport.zoom'){setView(v=>({...v,zoom:Math.max(24,Math.min(180,v.zoom*(action.parameters.direction==='in'?1.25:.8)**action.parameters.amount))}));await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));return 'Floor-plan zoom updated.';}
+      if(action.intent==='viewport.reset'||action.intent==='viewport.focus'){if(action.intent==='viewport.focus'&&action.parameters.scope==='selected'&&!selected)throw new Error('Select a floor-plan element first.');const point=selected?('start'in selected?selected.start:{x:selected.x,y:selected.y}):{x:0,y:0};setView({zoom:72,panX:-point.x*72,panY:-point.y*72});await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));return 'Floor-plan view updated.';}
+      if(action.intent==='viewport.pan'){const d=action.parameters.direction;setView(v=>({...v,panX:v.panX+(['left','west'].includes(d)?72:['right','east'].includes(d)?-72:0),panY:v.panY+(['up','north'].includes(d)?72:['down','south'].includes(d)?-72:0)}));await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));return 'Floor-plan view panned.';}
+      if(action.intent==='viewport.view'){if(!['2D','Top','Orthographic'].includes(action.parameters.view))throw new Error('This is a 2D drawing. Open Architecture Studio or Interior 3D for perspective cameras.');setView({zoom:72,panX:0,panY:0});return 'Top 2D drafting view activated.';}
+      if(action.intent==='toolbar.activate'){
+        const t=action.parameters.tool==='translate'?'select':action.parameters.tool;
+        if(!['select','wall','door','window','room','dimension','measure','text','furniture','delete'].includes(t))throw new Error('That transform tool is unavailable in 2D. Select an element and use its supported properties, or open a 3D studio.');
+        activateDraftTool(t as typeof tool);
+        if(t==='delete'&&selected){await verifyStudioState(()=>!planRef.current.floorPlanObjects?.some(o=>o.id===selected.id),signal);return 'Selected floor-plan element deleted.';}
+        await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));return `${t} drafting tool activated.`;
+      }
+      if(action.intent==='ui.library'){toolbarAPI.current?.openLibrary();await verifyStudioState(()=>Boolean(document.querySelector('.casynus-material-library')),signal);return 'Material library opened. Applying mesh materials requires a 3D studio.';}
+      if(action.intent==='ui.grid'||action.intent==='ui.snap'){const current=action.intent==='ui.grid'?settings.snapToGrid:settings.snapToPoints;const enabled=action.parameters.mode==='toggle'?!current:action.parameters.mode==='on';setSettings(action.intent==='ui.grid'?{snapToGrid:enabled}:{snapToPoints:enabled});await verifyStudioState(()=>(action.intent==='ui.grid'?planRef.current.floorPlanSettings?.snapToGrid:planRef.current.floorPlanSettings?.snapToPoints)===enabled,signal);return `Drafting snapping ${enabled?'enabled':'disabled'}.`;}
+      if(action.intent==='ui.fullscreen'){await document.documentElement.requestFullscreen();return 'Fullscreen activated.';}
+      if(action.intent==='project.export'&&action.parameters.format==='open'){toolbarAPI.current?.openExport();await verifyStudioState(()=>Boolean(document.querySelector('dialog[aria-label="Export scene"][open]')),signal);return 'Floor-plan export options opened.';}
+      if(action.intent==='project.export'&&action.parameters.format==='csv'){toolbarAPI.current?.csv();return 'Floor-plan CSV download requested.';}
+      if(action.intent==='selection.clear'){select(null);await verifyStudioState(()=>!planRef.current.selectedFloorPlanId,signal);return 'Selection cleared.';}
+      if(action.intent==='selection.select'){
+        const name=normalizeCommand(action.parameters.name),matches=sourceObjects.filter((o,i)=>!name||normalizeCommand(o.id)===name||normalizeCommand('label'in o&&o.label?o.label:`${o.type} ${i+1}`)===name);
+        if(matches.length!==1)throw new Error('Specify one unique floor-plan element name from Scene hierarchy.');select(matches[0].id);await verifyStudioState(()=>planRef.current.selectedFloorPlanId===matches[0].id,signal);return 'Floor-plan element selected.';
+      }
+      if(action.intent==='scene.create'){
+        const id=crypto.randomUUID(),kind=action.parameters.kind;
+        if(kind==='room'){addDefaultRoom();}
+        else if(kind==='Wall')addObject({id,type:'wall',start:{x:0,y:0},end:{x:4,y:0},thickness:.18});
+        else if(kind==='Door'||kind==='Window'){
+          if(selected?.type!=='wall')throw new Error('Select the host wall before adding a door or window.');
+          const point={x:(selected.start.x+selected.end.x)/2,y:(selected.start.y+selected.end.y)/2},opening=floorPlaceOpening(point,kind==='Door'?.9:1.4,[selected],view.zoom);
+          if(!opening)throw new Error('The selected wall cannot host this opening.');
+          addObject({id,type:kind==='Door'?'door':'window',x:opening.point.x,y:opening.point.y,width:kind==='Door'?.9:1.4,height:selected.thickness,rotation:opening.rotation});
+        }else throw new Error('This 2D editor can add rooms, walls, doors and windows. Open a 3D studio for meshes or buildings.');
+      }else if(action.intent==='scene.delete'){if(action.parameters.scope==='all')updateObjects([]);else{if(!selected)throw new Error('Select a floor-plan element first.');updateObjects(sourceObjects.filter(o=>o.id!==selected.id));}select(null);}
+      else if(action.intent==='scene.duplicate'){if(!selected)throw new Error('Select a floor-plan element first.');addObject({...floorTranslateObject(selected,{x:1,y:1},sourceObjects,settings,view.zoom),id:crypto.randomUUID()});}
+      else if(action.intent==='scene.transform'){
+        if(!selected)throw new Error('Select a floor-plan element first.');const q=action.parameters;
+        let updated:FloorPlanObject;
+        if(q.property==='position'){updated=floorTranslateObject(selected,{x:q.axis==='x'?q.value:0,y:q.axis==='y'?-q.value:q.axis==='z'?q.value:0},sourceObjects,settings,view.zoom);}
+        else if(q.property==='rotation'){
+          if(selected.type==='wall'||selected.type==='dimension'){const radians=q.value*Math.PI/180,dx=selected.end.x-selected.start.x,dy=selected.end.y-selected.start.y;updated={...selected,end:{x:selected.start.x+dx*Math.cos(radians)-dy*Math.sin(radians),y:selected.start.y+dx*Math.sin(radians)+dy*Math.cos(radians)}};}
+          else if('rotation'in selected)updated={...selected,rotation:selected.rotation+q.value};else throw new Error('This floor-plan object has no editable rotation.');
+        }else throw new Error('This is a 2D drawing, not a vertical building model. Use the existing dimension inspector or open a 3D studio.');
+        updateObjects(sourceObjects.map(o=>o.id===selected.id?updated:o));
+      }else{
+        if(!p.onStudioAction)throw new Error('This action is unavailable in the current workspace.');
+        const result=await p.onStudioAction(action,signal);
+        if(action.intent==='studio.navigate'){const target=new URL(STUDIO_ROUTES[action.parameters.studio],location.origin);await verifyStudioState(()=>location.pathname===target.pathname&&new URL(location.href).searchParams.get('mode')===target.searchParams.get('mode'),signal);return `${action.parameters.studio} studio opened.`;}
+        if(action.intent==='panel.open')await verifyStudioState(()=>Boolean(document.querySelector(action.parameters.panel==='sidebar'?'.interior-scene-sidebar,.crystal-left-panel,.modeling-sidebar':'.crystal-right-panel')),signal);
+        if(!['history.undo','history.redo','project.new'].includes(action.intent))return result;
+      }
+      await verifyStudioState(()=>JSON.stringify(planRef.current.floorPlanObjects)!==before,signal);return 'Floor-plan change confirmed. Undo is available for drawing edits.';
+    }
+  });
   const nearestWall = (point: FloorPlanPoint, width: number) => floorPlaceOpening(point, width, sourceObjects, view.zoom);
 
   const parsePrompt = () => {
@@ -1184,10 +1251,11 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
       </svg>
 
       <StudioViewportToolbar label="Architectural drafting tools"
-        leading={[{ label: "Add room to floor plan", icon: SquareDashed, onClick: () => addObject({ id: `room-${crypto.randomUUID().slice(0, 6)}`, type: "room", x: 1.2, y: 1.2, width: 3.2, height: 2.6, label: `Room ${objects.filter(o => o.type === "room").length + 1}` }) }]}
+        apiRef={toolbarAPI}
+        leading={[{ label: "Add room to floor plan", icon: SquareDashed, onClick: addDefaultRoom }]}
         tools={tools.map(([id, label, shortcut, icon]) => ({
           label: id === "select" ? "Select & Move (V)" : id === "delete" ? "Delete selected element (Del)" : shortcut ? `${label} (${shortcut})` : label,
-          icon, active: tool === id, onClick: () => { if (id === "delete" && selectedId) { updateObjects(objects.filter(item => item.id !== selectedId)); select(null); } else setTool(id); },
+          icon, active: tool === id, onClick: () => activateDraftTool(id),
         }))}
         onFit={() => setView({ zoom: 72, panX: 0, panY: 0 })} onReset={() => setView({ zoom: 72, panX: 0, panY: 0 })}
         cameraViews={["Top 2D Drafting"]} cameraView="Top 2D Drafting" onCamera={() => setView({ zoom: 72, panX: 0, panY: 0 })}

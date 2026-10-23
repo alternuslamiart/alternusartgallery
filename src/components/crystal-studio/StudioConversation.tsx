@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type Dispa
 import { useSession } from "next-auth/react";
 import type { StudioChatMessage } from "./StudioAIChat";
 import { parseStudioConversation, serializeStudioConversation } from "./conversation-storage.mjs";
+import { StudioActionsProvider } from "./StudioActions";
 
 type ConversationContext = {
   messages: StudioChatMessage[];
@@ -63,7 +64,7 @@ function ConversationStore({ identity, children }: { identity: string; children:
 export function StudioConversationProvider({ children }: { children: ReactNode }) {
   const { data: session, status } = useSession();
   const identity = session?.user?.id ?? session?.user?.email ?? (status === "loading" ? "loading" : "guest");
-  return <ConversationStore identity={identity}>{children}</ConversationStore>;
+  return <ConversationStore identity={identity}><StudioActionsProvider>{children}</StudioActionsProvider></ConversationStore>;
 }
 
 export function useStudioDock() {

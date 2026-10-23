@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useImperativeHandle, useRef, useState, type Ref } from "react";
 import { Focus, Home, Play, Plus, X, ZoomIn, ZoomOut, type LucideIcon } from "lucide-react";
 import { StudioToolbar } from "./kit";
 import {StudioMaterialLibrary,type MaterialLibraryOptions} from "./StudioMaterialLibrary";
@@ -9,12 +9,14 @@ import "./viewport-toolbar.css";
 
 export type ViewportAction = { label: string; icon: LucideIcon; onClick: () => void; active?: boolean; disabled?: boolean; showLabel?: boolean };
 type Props = {
+  apiRef?:Ref<StudioToolbarAPI>;
   label: string; leading: ViewportAction[]; tools: ViewportAction[];
   onFit: () => void; onReset: () => void; cameraViews: string[]; cameraView: string; onCamera: (view: string) => void;
   onZoom: (factor: number) => void; exportFormats: string[]; onExport: (format: string) => void;
   onCSV: () => void; settingsLabel: string; onSettings: () => void; busy?: boolean;
   materialLibrary?:MaterialLibraryOptions;
 };
+export type StudioToolbarAPI={openExport:()=>void;openLibrary:()=>void;csv:()=>void;settings:()=>void};
 
 export function downloadStudioCSV(name: string, rows: Record<string, unknown>[]) {
   const fields = Array.from(new Set(rows.flatMap(row => Object.keys(row))));
@@ -33,6 +35,7 @@ export function StudioViewportToolbar(p: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const toolbarId=useId();const [libraryOpen,setLibraryOpen]=useState(false),[libraryWidth,setLibraryWidth]=useState(0);
   const [uploadedAssets,setUploadedAssets]=useState<MaterialAsset[]>([]);
+  useImperativeHandle(p.apiRef,()=>({openExport:()=>{if(p.busy)throw new Error('The toolbar is busy.');dialog.current?.showModal();},openLibrary:()=>setLibraryOpen(true),csv:()=>{if(p.busy)throw new Error('The toolbar is busy.');p.onCSV();},settings:p.onSettings}));
   useEffect(()=>{
     if(!libraryOpen)return;const toolbar=document.getElementById(toolbarId);if(!toolbar)return;
     const resize=()=>setLibraryWidth(toolbar.getBoundingClientRect().width);resize();const observer=new ResizeObserver(resize);observer.observe(toolbar);return()=>observer.disconnect();

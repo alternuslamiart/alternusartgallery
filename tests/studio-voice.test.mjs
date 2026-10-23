@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createStudioVoice } from '../src/lib/studio-voice.mjs';
+import { parseStudioCommand } from '../src/lib/studio-actions.mjs';
 
 class Recognition {
   static instances=[];
@@ -9,6 +10,18 @@ class Recognition {
   abort(){this.aborted=true;this.onend?.();}
   result(text,final=true){this.onresult?.({resultIndex:0,results:[Object.assign([{transcript:text}],{isFinal:final})]});}
 }
+test('known voice commands execute as isolated turns and preserve unrelated typed drafts',()=>{
+ let draft='Unsaved design notes',command;const states=[];
+ const voice=createStudioVoice({Recognition,getDraft:()=>draft,onDraft:text=>draft=text,onOpen:()=>{},onSend:text=>command=text,onState:s=>states.push(s),isCommand:text=>Boolean(parseStudioCommand(text))});
+ voice.start('dictation','en-US');Recognition.instances.at(-1).result('Add a cube');
+ assert.equal(draft,'Unsaved design notes');assert.equal(command,'Add a cube');assert.equal(states.at(-1).phase,'processing');voice.destroy();
+});
+test('Stop finishes browser recognition while Close/cancel aborts without committing interim speech',async()=>{
+ class FinishingRecognition extends Recognition {stop(){this.result('final dictated text');this.onend?.();}}
+ let draft='';const voice=createStudioVoice({Recognition:FinishingRecognition,getDraft:()=>draft,onDraft:t=>draft=t,onOpen:()=>{},onSend:()=>{},onState:()=>{}});
+ voice.start('dictation');await voice.finish();assert.equal(draft,'final dictated text');
+ voice.start('dictation');const r=Recognition.instances.at(-1);r.result('unfinished',false);voice.stop();assert.equal(draft,'final dictated text');assert.equal(r.aborted,true);voice.destroy();
+});
 function setup(ctor=Recognition){
   let draft='Existing idea';let opened=0,sent=0;const states=[];
   const voice=createStudioVoice({Recognition:ctor,getDraft:()=>draft,onDraft:value=>{draft=value;},onOpen:()=>opened++,onSend:()=>sent++,onState:s=>states.push(s)});

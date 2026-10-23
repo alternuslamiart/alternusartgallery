@@ -17,6 +17,7 @@ export type ViewportAPI = {
   camera: () => SceneDocument["camera"]; screenshot: (format: "png" | "jpeg") => Promise<Blob>;
   walk: () => void;
   point: (x: number, y: number) => Vec3 | null;
+  pan:(direction:string)=>void;rotate:(degrees:number)=>void;
 };
 export type SceneTool = "select" | "translate" | "rotate" | "scale" | "measure";
 type Props = { document: SceneDocument; selected: string[]; tool: SceneTool; snap: boolean; grid: boolean;
@@ -112,6 +113,8 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
     invalidate();
   };
   useImperativeHandle(ref, () => ({
+    pan:direction=>{const delta=new THREE.Vector3(direction==='left'||direction==='west'?-1:direction==='right'||direction==='east'?1:0,direction==='up'?1:direction==='down'?-1:0,direction==='north'?-1:direction==='south'?1:0);const step=Math.max(.1,camera.position.distanceTo(orbit.current?.target??new THREE.Vector3())*.1);delta.multiplyScalar(step);camera.position.add(delta);orbit.current?.target.add(delta);orbit.current?.update();invalidate();},
+    rotate:degrees=>{const target=orbit.current?.target??new THREE.Vector3();camera.position.sub(target).applyAxisAngle(new THREE.Vector3(0,1,0),degrees*Math.PI/180).add(target);camera.lookAt(target);orbit.current?.update();invalidate();},
     fit: () => frame(root), focus: () => frame(selected ?? root),
     preset: name => {
       const directions: Record<string, Vec3> = { Front: [0, 0, 1], Back: [0, 0, -1], Left: [-1, 0, 0], Right: [1, 0, 0], Top: [0, 1, .0001], Perspective: [1, .75, 1] };

@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createStudioVoice, type VoiceRecognition, type VoiceState } from "@/lib/studio-voice.mjs";
 import { openStudioMicrophone } from "@/lib/studio-microphone.mjs";
+import { parseStudioCommand } from "@/lib/studio-actions.mjs";
 
-type Options={identity:string;getDraft:()=>string;onDraft:(text:string)=>void;onOpen:()=>void;onSend:()=>Promise<string|void>;onCancel:()=>void;canConverse:boolean};
+type Options={identity:string;getDraft:()=>string;onDraft:(text:string)=>void;onOpen:()=>void;onSend:(command?:string)=>Promise<string|void>;onCancel:()=>void;canConverse:boolean};
 const OFF:VoiceState={mode:"off",wakeEnabled:false,listening:false,error:null,phase:"idle",backend:"browser",interim:""};
 
 export function useStudioVoice(options:Options) {
@@ -12,6 +13,8 @@ export function useStudioVoice(options:Options) {
   const controller=useRef<ReturnType<typeof createStudioVoice>|null>(null);
   const [state,setState]=useState<VoiceState>(OFF), [level,setLevel]=useState(0), [conversation,setConversation]=useState(false);
   const [language,setLanguage]=useState("sq-AL");
+  const [modalOpen,setModalOpen]=useState(false),[feedback,setFeedback]=useState<string|null>(null);
+  const entry=useRef<'dictation'|'conversation'>('dictation');
   const stateRef=useRef(state);stateRef.current=state;
   const languageRef=useRef(language);languageRef.current=language;
   const session=useRef(0), conversationRef=useRef(false), cancelSpeech=useRef<(()=>void)|null>(null), stopSession=useRef<()=>void>(()=>{});
@@ -24,7 +27,7 @@ export function useStudioVoice(options:Options) {
     const speechWindow=window as typeof window & {SpeechRecognition?:new()=>VoiceRecognition;webkitSpeechRecognition?:new()=>VoiceRecognition};
     const stop=()=>{
       session.current++;conversationRef.current=false;setConversation(false);
-      if(stateRef.current.phase==="processing")callbacks.current.onCancel();
+      if(stateRef.current.phase==="processing"||stateRef.current.phase==='executing')callbacks.current.onCancel();
       clearTimeout(sendTimer);cancelSpeech.current?.();cancelSpeech.current=null;
       controller.current?.stop();setLevel(0);
     };
@@ -43,6 +46,7 @@ export function useStudioVoice(options:Options) {
     });
     const voice=createStudioVoice({
       Recognition:speechWindow.SpeechRecognition??speechWindow.webkitSpeechRecognition??null,
+      isCommand:text=>{try{return Boolean(parseStudioCommand(text));}catch{return true;}},
       openMicrophone:()=>openStudioMicrophone({onLevel:value=>{if(valid())setLevel(value);},onFailure:message=>{if(valid()){stop();update({...OFF,error:message});}}}),
       checkTranscription:async signal=>{
         const response=await fetch('/api/studio-voice/transcribe',{signal:AbortSignal.any([signal,AbortSignal.timeout(10_000)]),cache:'no-store'});
@@ -57,18 +61,21 @@ export function useStudioVoice(options:Options) {
       getDraft:()=>valid()?callbacks.current.getDraft():"",
       onDraft:text=>{if(valid())callbacks.current.onDraft(text);},
       onOpen:()=>{if(valid())callbacks.current.onOpen();},
-      onSend:()=>{
+      onSend:command=>{
         clearTimeout(sendTimer);const token=session.current;
         sendTimer=setTimeout(()=>{void(async()=>{
           if(!valid()||session.current!==token)return;
           const conversational=conversationRef.current;
-          if(conversational)update({...OFF,mode:'conversation',phase:'processing'});
+          update({...OFF,mode:conversational?'conversation':'dictation',phase:command?'executing':'processing'});
+          setFeedback(command?`Executing: ${command}`:null);
           try {
-            const response=await callbacks.current.onSend();
-            if(!valid()||session.current!==token||!conversational)return;
+            const response=await callbacks.current.onSend(command);
+            if(!valid()||session.current!==token)return;
+            if(!conversational){update(OFF);setFeedback(response??'Transcription ready. Review the chat input.');return;}
             if(!response){stop();return;}
-            update({...OFF,mode:'conversation',phase:'speaking'});await speak(response);
-            if(valid()&&session.current===token&&conversationRef.current)voice.start('conversation',languageRef.current);
+            setFeedback(response);update({...OFF,mode:'conversation',phase:'speaking'});await speak(response);
+            // A command is one turn. Another capture always requires Start.
+            if(valid()&&session.current===token&&conversationRef.current)stop();
           }catch(error){if(valid()&&session.current===token){stop();update({...OFF,error:error instanceof Error?error.message:'Voice conversation failed. Try again.'});}}
         })();},0);
       },
@@ -84,9 +91,9 @@ export function useStudioVoice(options:Options) {
         event.preventDefault();event.stopImmediatePropagation();if(event.repeat||document.hidden)return;
         callbacks.current.onOpen();
         if(stateRef.current.mode!=="off"||conversationRef.current){if(stateRef.current.backend==='server'&&stateRef.current.phase==='recording')void voice.finish();else stop();}
-        else voice.start("dictation",languageRef.current);
+        else{entry.current='dictation';setFeedback(null);setModalOpen(true);}
       }else if(event.key==="Escape"&&(stateRef.current.mode!=="off"||conversationRef.current)){
-        event.preventDefault();event.stopImmediatePropagation();stop();
+        event.preventDefault();event.stopImmediatePropagation();stop();setModalOpen(false);
       }
     };
     window.addEventListener("keydown",key,true);document.addEventListener("visibilitychange",visibility);
@@ -94,18 +101,19 @@ export function useStudioVoice(options:Options) {
   },[options.identity]);
 
   const toggleDictation=useCallback(()=>{
-    if(stateRef.current.backend==='server'&&stateRef.current.phase==='recording'){void controller.current?.finish();return;}
-    if(stateRef.current.mode!=="off"||conversationRef.current)stopSession.current();
-    else controller.current?.start("dictation",languageRef.current);
+    stopSession.current();entry.current='dictation';setFeedback(null);setModalOpen(true);
   },[]);
   const toggleConversation=useCallback(()=>{
-    if(conversationRef.current){stopSession.current();return;}
-    if(!callbacks.current.canConverse){setState({...OFF,error:'Select an AI text provider such as Gemini, Groq, or You for voice conversation. Local scene tools remain available through dictation.'});return;}
-    if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){setState({...OFF,error:'Voice conversation needs browser speech playback. You can still use microphone dictation.'});return;}
-    stopSession.current();conversationRef.current=true;setConversation(true);controller.current?.start('conversation',languageRef.current);
+    stopSession.current();entry.current='conversation';setFeedback(null);setModalOpen(true);
   },[]);
+  const start=useCallback(()=>{
+    stopSession.current();setFeedback(null);
+    if(entry.current==='conversation'){conversationRef.current=true;setConversation(true);}
+    controller.current?.start(entry.current,languageRef.current);
+  },[]);
+  const closeModal=useCallback(()=>{stopSession.current();setModalOpen(false);setFeedback(null);},[]);
   const stop=useCallback(()=>stopSession.current(),[]);
   const finish=useCallback(()=>{void controller.current?.finish();},[]);
   const changeLanguage=useCallback((value:string)=>{stopSession.current();setLanguage(value);},[]);
-  return {...state,level,conversation,language,changeLanguage,toggleDictation,toggleConversation,stop,finish};
+  return {...state,level,conversation,language,changeLanguage,toggleDictation,toggleConversation,stop,finish,modalOpen,start,closeModal,feedback};
 }

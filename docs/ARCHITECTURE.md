@@ -2,6 +2,16 @@
 
 ## Application
 
+- `StudioActionsProvider` adds a finite typed command registry beside the shared
+  conversation store. SceneWorkbench and FloorPlanViewport register context-owned
+  adapters that reuse real editor handlers. English/Albanian text and voice use
+  the same schema/parser, state acknowledgments and fingerprint-bound destructive
+  confirmations. Complex native AI proposals still require existing approval.
+- Both voice icons now open the same compact client `VoiceSpeechModal`; Start
+  acquires audio, analyser levels drive listening bars, and Close cancels resources.
+  Scoped validated floor-plan recovery preserves drawings on command navigation;
+  3D saves verify actual workspace/recovery hashes. See `STUDIO-ACTIONS.md`.
+
 - Infrastructure alone adds a lazy, client-only `WorldMap` surface alongside
   the mounted `SceneViewport`. Switching modes preserves the scene document,
   selection, camera, undo/redo, pending previews and chat. Map camera/marker

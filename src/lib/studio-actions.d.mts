@@ -1,0 +1,21 @@
+export type StudioActionParameters = {
+ 'studio.navigate':{studio:'architecture'|'interior'|'infrastructure'|'floor-plan'};
+ 'toolbar.activate':{tool:'select'|'translate'|'rotate'|'scale'|'measure'|'wall'|'door'|'window'|'room'|'dimension'|'text'|'furniture'|'delete'};
+ 'panel.open':{panel:'properties'|'sidebar'|'lighting'};
+ 'viewport.zoom':{direction:'in'|'out';amount:number}; 'viewport.view':{view:'Perspective'|'Orthographic'|'Front'|'Back'|'Left'|'Right'|'Top'|'2D'|'3D'};
+ 'viewport.pan':{direction:'left'|'right'|'up'|'down'|'north'|'south'|'east'|'west'}; 'viewport.rotate':{degrees:number}; 'viewport.focus':{scope:'selected'|'all'};
+ 'viewport.reset':Record<string,never>; 'map.open':Record<string,never>; 'map.close':Record<string,never>; 'map.search':{query:string};
+ 'scene.create':{kind:string}; 'selection.select':{name:string}; 'selection.all':Record<string,never>; 'selection.clear':Record<string,never>;
+ 'scene.delete':{scope:'selected'|'all'}; 'scene.duplicate':Record<string,never>;
+ 'scene.transform':{property:'position'|'rotation'|'dimensions'|'scale';axis:'x'|'y'|'z';value:number;relative:boolean}; 'scene.material':{material:string};
+ 'history.undo':Record<string,never>; 'history.redo':Record<string,never>; 'project.save':Record<string,never>; 'project.new':Record<string,never>; 'project.open':Record<string,never>;
+ 'project.export':{format:string}; 'ui.library':Record<string,never>; 'ui.grid':{mode:'on'|'off'|'toggle'}; 'ui.snap':{mode:'on'|'off'|'toggle'}; 'ui.fullscreen':Record<string,never>;
+ 'command.confirm':Record<string,never>; 'command.cancel':Record<string,never>;
+};
+export type StudioAction = {[K in keyof StudioActionParameters]:{intent:K;parameters:StudioActionParameters[K]}}[keyof StudioActionParameters];
+export type ActionResult={message:string;status:'completed'|'confirmation'|'error'};
+export const STUDIO_ROUTES: Record<StudioActionParameters['studio.navigate']['studio'],string>;
+export const ACTION_SCHEMA: Record<keyof StudioActionParameters,unknown>;
+export function validateStudioAction(input:unknown):StudioAction;
+export function parseStudioCommand(input:string):StudioAction|null;
+export function normalizeCommand(input:string):string;

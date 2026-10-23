@@ -6,6 +6,12 @@ const exports = {};
 new Function('exports', ts.transpileModule(fs.readFileSync('src/components/crystal-studio/floor-plan-geometry.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText)(exports);
 const { floorDoorSymbol, floorPlaceOpening, floorTranslateObject, DEFAULT_FLOOR_PLAN_SETTINGS: settings } = exports;
 const wall = { id: 'wall', type: 'wall', start: { x: 0, y: 0 }, end: { x: 8, y: 0 }, thickness: .24 };
+test('restoring another identity or drawing clears the previous undo history',()=>{
+ const previous={past:[[wall]],present:[wall],future:[[wall]]};
+ const replaced=exports.floorPlanHistoryReducer(previous,{type:'replace',next:[]});
+ assert.deepEqual(replaced,{past:[],present:[],future:[]});
+ assert.deepEqual(exports.floorPlanHistoryReducer(replaced,{type:'undo'}).present,[]);
+});
 
 test('unit formatting retains millimeter precision in meters and centimeters', () => {
   assert.equal(exports.formatFloorLength(1.001, { ...settings, unit: 'm' }), '1.001 m');

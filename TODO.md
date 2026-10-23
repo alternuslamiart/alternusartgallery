@@ -2,6 +2,17 @@
 
 ## Next concrete task
 
+- [ ] Rerun the full studio-command browser verifier after building with
+  `NEXT_PUBLIC_INFRASTRUCTURE_MAP_STYLE_URL=https://tiles.openfreemap.org/styles/liberty`.
+  The continuation run passed voice/3D checks, then stopped at the checkout's
+  compiled MapTiler placeholder returning HTTP 403; subsequent checks did not run.
+
+- [x] Share the compact Voice Speech modal and real bilingual studio command
+  registry between microphone, Voice and typed chat without replacing studio UI.
+- [ ] Complete physical-device voice-command and authenticated production-save
+  verification. Keep unsupported 2D mesh/height/lighting and read-only map actions
+  explicit; see `docs/STUDIO-ACTIONS.md` for actual capabilities and dependencies.
+
 - [x] Fix studio microphone policy/refused speech-service classification and
   implement real capture/meter, transcription fallback and spoken conversation.
 - [ ] Verify physical microphones, English/Albanian recognition and audible TTS

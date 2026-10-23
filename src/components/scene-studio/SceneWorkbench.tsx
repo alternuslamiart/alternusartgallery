@@ -21,6 +21,9 @@ import { generate3DModel, type Generation3DJob } from "@/lib/ai3d/client.mjs";
 import { nextSelection } from "@/lib/scene/selection.mjs";
 import {applyLibraryMaterial} from "@/lib/scene/material-library.mjs";
 import {StudioSidebarFooter} from "@/components/crystal-studio/StudioSidebarFooter";
+import { useStudioActionAdapter, verifyStudioState, navigateStudioRoute } from "@/components/crystal-studio/StudioActions";
+import { STUDIO_ROUTES, normalizeCommand } from "@/lib/studio-actions.mjs";
+import type { StudioToolbarAPI } from "@/components/crystal-studio/StudioViewportToolbar";
 import "./scene-studio.css";
 
 type Studio = "architecture" | "interior" | "infrastructure";
@@ -89,6 +92,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const [cameraView, setCameraView] = useState("Perspective");
   const [worldMap, setWorldMap] = useState(false), [mapOpened, setMapOpened] = useState(false), [mapView, setMapView] = useState("Globe");
   const worldMapAPI = useRef<WorldMapAPI>(null);
+  const toolbarAPI=useRef<StudioToolbarAPI>(null);
   const [stories, setStories] = useState(2), [search, setSearch] = useState(""), [textureSlot, setTextureSlot] = useState("map");
   const [prompt, setPrompt] = useState(""), [model, setModel] = useState("gemini"), [sceneAI, setSceneAI] = useState(true);
   const [meshProviders, setMeshProviders] = useState<Array<{ id: string; label: string }>>([]);
@@ -103,7 +107,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const primary = doc.objects.find(o => o.id === selected[0]);
   const blocked = !store.ready || Boolean(pending);
   const selectedRoots = selected.filter(id => { let parent = doc.objects.find(o => o.id === id)?.parentId; while (parent) { if (selected.includes(parent)) return false; parent = doc.objects.find(o => o.id === parent)?.parentId; } return true; });
-  const safely = useCallback((operation: () => void) => { try { setError(null); operation(); } catch (caught) { setError(caught instanceof Error ? caught.message : "Operation failed."); } }, []);
+  const safely = useCallback((operation: () => void,strict=false) => { try { setError(null); operation(); } catch (caught) { setError(caught instanceof Error ? caught.message : "Operation failed.");if(strict)throw caught; } }, []);
   const change = (next: SceneDocument) => { if (blocked) throw new Error("Apply or dismiss the scene proposal before editing."); store.commit(next); };
   const locked = (object: SceneObject) => { let node: SceneObject | undefined = object; while (node) { if (node.locked) return true; node = docRef.current.objects.find(o => o.id === node?.parentId); } return false; };
   const patch = (id: string, values: Partial<SceneObject>, allowLocked = false) => safely(() => {
@@ -115,22 +119,22 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     change({ ...scene, objects: scene.objects.map(o => o.id === id ? { ...o, ...values } : values.material && ids.has(o.id) ? { ...o, material: values.material } : o) });
   });
   const select = (id: string | null, additive = false) => { if (pending) return; setSelected(current => nextSelection(current,id,additive)); };
-  const add = (name: string, point?: Vec3 | null) => safely(() => {
+  const add = (name: string, point?: Vec3 | null,strict=false) => safely(() => {
     const objects = asset(name).map(o => !o.parentId && point ? { ...o, position: [o.position[0] + point[0], o.position[1], o.position[2] + point[2]] as Vec3 } : o);
     change({ ...doc, objects: [...doc.objects, ...objects] }); setSelected([objects[0].id]); setTool("translate");
-  });
-  const template = (name: string) => safely(() => { const objects = createTemplate(name, stories); change({ ...doc, objects: [...doc.objects, ...objects] }); setSelected([objects[0].id]); requestAnimationFrame(() => viewport.current?.fit()); });
-  const remove = () => safely(() => { change(applyCommands(doc, selectedRoots.map(id => ({ type: "delete", id })))); setSelected([]); });
-  const duplicate = () => safely(() => { if (selected.some(id => locked(doc.objects.find(o => o.id === id)!))) throw new Error("Unlock objects first."); const result = duplicateObjects(doc, selectedRoots); change(result.document); setSelected(result.ids); });
+  },strict);
+  const template = (name: string,strict=false) => safely(() => { const objects = createTemplate(name, stories); change({ ...doc, objects: [...doc.objects, ...objects] }); setSelected([objects[0].id]); requestAnimationFrame(() => viewport.current?.fit()); },strict);
+  const remove = (strict=false) => safely(() => { change(applyCommands(doc, selectedRoots.map(id => ({ type: "delete", id })))); setSelected([]); },strict);
+  const duplicate = (strict=false) => safely(() => { if (selected.some(id => locked(doc.objects.find(o => o.id === id)!))) throw new Error("Unlock objects first."); const result = duplicateObjects(doc, selectedRoots); change(result.document); setSelected(result.ids); },strict);
   const group = (ungroup = false) => safely(() => { change(regroupObjects(doc, selectedRoots, ungroup)); setSelected([]); });
-  const leave = async (href: string) => { try { await store.recover(); router.push(href); } catch { setError("Recovery failed. Save or download JSON before leaving."); } };
-  const navigate = async (target: Studio) => { try { await store.recover(); router.push(`${routes[target]}?project=${doc.id}`); } catch { setError("Recovery failed. Save to cloud or download JSON before switching studios."); } };
-  const exportFile = async (format: string) => {
+  const leave = async (href: string) => { try { await store.recover(); navigateStudioRoute(href,router.push); } catch { setError("Recovery failed. Save or download JSON before leaving."); } };
+  const navigate = async (target: Studio) => { try { await store.recover(); navigateStudioRoute(`${routes[target]}?project=${doc.id}`,router.push); } catch { setError("Recovery failed. Save to cloud or download JSON before switching studios."); } };
+  const exportFile = async (format: string,strict=false) => {
     setBusy(`Exporting ${format.toUpperCase()}…`); setError(null);
     try {
       const blob = format === "json" ? new Blob([JSON.stringify(doc, null, 2)], { type: "application/json" }) : ["png", "jpeg"].includes(format) ? await viewport.current!.screenshot(format as "png" | "jpeg") : await exportScene(doc, format);
       download(blob, `${doc.name.replace(/[^a-z0-9_-]/gi, "_")}.${format}`);
-    } catch (caught) { setError(caught instanceof Error ? caught.message : "Export failed."); }
+    } catch (caught) { setError(caught instanceof Error ? caught.message : "Export failed.");if(strict)throw caught; }
     finally { setBusy(""); }
   };
   const importFile = async (source: File) => {
@@ -205,6 +209,92 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     if (!pending || pending.base !== fingerprint(doc)) throw new Error("The scene changed after this proposal. Discard it and request an updated proposal.");
     store.commit({ ...pending.preview, name: doc.name, camera: doc.camera }); setPending(null); requestAnimationFrame(() => viewport.current?.fit());
   });
+  useStudioActionAdapter({name:`${identity}:${studio}:${doc.id}`,
+    confirmation:action=>{
+      if(action.intent==='project.new')return{key:fingerprint(doc),message:'Replace the current editor with a new project? The current project will first be retained in browser recovery.'};
+      if(action.intent==='scene.delete'){
+        const ids=new Set(action.parameters.scope==='all'?doc.objects.map(o=>o.id):selected);
+        for(let i=0;i<32;i++)doc.objects.forEach(o=>{if(o.parentId&&ids.has(o.parentId))ids.add(o.id);});
+        if(ids.size>1)return{key:JSON.stringify([fingerprint(doc),Array.from(ids)]),message:`Delete ${ids.size} project objects?`};
+      }
+      return null;
+    },
+    execute:async(action,signal)=>{
+      if(!store.ready)throw new Error('The project is not ready. Resolve the opening error first.');
+      signal.throwIfAborted();
+      if(action.intent==='studio.navigate'){
+        await store.recover();signal.throwIfAborted();const href=STUDIO_ROUTES[action.parameters.studio];
+        const target=new URL(href,location.origin);navigateStudioRoute(href,router.push);
+        await verifyStudioState(()=>location.pathname===target.pathname&&new URL(location.href).searchParams.get('mode')===target.searchParams.get('mode'),signal);
+        return `${action.parameters.studio} studio opened. The prior scene is retained in browser recovery.`;
+      }
+      if(action.intent==='project.save')return await store.saveVerified();
+      if(action.intent==='project.open'){await listProjects();return 'Project browser opened. Choose a project to continue.';}
+      if(action.intent==='project.new'){await store.recover();signal.throwIfAborted();store.replace(makeDocument(studio));setSelected([]);setPending(null);await verifyStudioState(()=>docRef.current.id!==doc.id,signal);return 'New project opened; previous project retained in browser recovery.';}
+      if(action.intent==='map.open'||action.intent==='map.close'){
+        if(studio!=='infrastructure')throw new Error('World Map is available only in Infrastructure Studio. Open Infrastructure first.');
+        setMapOpened(true);setWorldMap(action.intent==='map.open');
+        if(action.intent==='map.open')await verifyStudioState(()=>Boolean(worldMapAPI.current?.ready()),signal,15000);else await verifyStudioState(()=>!globalThis.document.querySelector('.scene-workbench[data-world-map="true"]'),signal);
+        return action.intent==='map.open'?'World Map activated.':'3D Studio activated; map and scene state retained.';
+      }
+      if(action.intent==='map.search'){if(!worldMap)throw new Error('Activate World Map before searching a location.');return await worldMapAPI.current!.command(action,signal);}
+      if(action.intent.startsWith('viewport.')){
+        if(worldMap)return await worldMapAPI.current!.command(action,signal);
+        const camera=viewport.current;if(!camera)throw new Error('The 3D viewport is not available.');
+        if(action.intent==='viewport.zoom')camera.zoom((action.parameters.direction==='in'?1.25:.8)**action.parameters.amount);
+        else if(action.intent==='viewport.pan')camera.pan(action.parameters.direction);
+        else if(action.intent==='viewport.rotate')camera.rotate(action.parameters.degrees);
+        else if(action.intent==='viewport.focus'){if(action.parameters.scope==='selected'&&!selected.length)throw new Error('Select an object before focusing it.');if(action.parameters.scope==='selected')camera.focus();else camera.fit();}
+        else if(action.intent==='viewport.reset')store.setCamera(makeDocument(studio).camera);
+        else if(action.intent==='viewport.view'){const view=action.parameters.view==='3D'?'Perspective':action.parameters.view==='2D'?'Top':action.parameters.view;setCameraView(view);store.setCamera({...camera.camera(),projection:view==='Orthographic'?'orthographic':'perspective'});await new Promise<void>(resolve=>requestAnimationFrame(()=>{if(view!=='Orthographic')viewport.current?.preset(view);resolve();}));}
+        await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));if(action.intent!=='viewport.reset'&&viewport.current)store.setCamera(viewport.current.camera());await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));return 'Viewport camera updated.';
+      }
+      if(action.intent==='panel.open'){
+        if(action.parameters.panel==='sidebar')setLeft(true);else{setRight(true);if(action.parameters.panel==='lighting')requestAnimationFrame(()=>globalThis.document.querySelector('.scene-environment')?.scrollIntoView({block:'nearest'}));}
+        await verifyStudioState(()=>Boolean(globalThis.document.querySelector(action.parameters.panel==='sidebar'?'.scene-library':'.scene-inspector')),signal);return `${action.parameters.panel} panel opened.`;
+      }
+      if(action.intent==='ui.library'){toolbarAPI.current?.openLibrary();await verifyStudioState(()=>Boolean(globalThis.document.querySelector('.casynus-material-library')),signal);return 'Material library opened.';}
+      if(action.intent==='ui.fullscreen'){if(!globalThis.document.fullscreenEnabled)throw new Error('Fullscreen is unavailable in this browser.');await globalThis.document.documentElement.requestFullscreen();return 'Fullscreen activated.';}
+      if(action.intent==='ui.grid'||action.intent==='ui.snap'){const value=action.parameters.mode==='toggle'?! (action.intent==='ui.grid'?grid:snap):action.parameters.mode==='on';if(action.intent==='ui.grid')setGrid(value);else setSnap(value);await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));return `${action.intent==='ui.grid'?'Grid':'Snapping'} ${value?'enabled':'disabled'}.`;}
+      if(action.intent==='project.export'){
+        if(action.parameters.format==='open'){toolbarAPI.current?.openExport();await verifyStudioState(()=>Boolean(globalThis.document.querySelector('dialog[aria-label="Export scene"][open]')),signal);return 'Export choices opened.';}
+        if(action.parameters.format==='csv'){toolbarAPI.current?.csv();return 'CSV download requested.';}
+        if(!['glb','gltf','obj','stl','json','png','jpeg'].includes(action.parameters.format))throw new Error('That export format is unavailable in this 3D studio.');
+        await exportFile(action.parameters.format,true);return 'Export finished; the browser download was requested.';
+      }
+      if(worldMap)throw new Error('Base map features are read-only. Close World Map to edit project objects.');
+      if(blocked)throw new Error('Apply or discard the pending scene proposal before changing the project.');
+      if(action.intent==='toolbar.activate'){
+        if(!['select','translate','rotate','scale','measure'].includes(action.parameters.tool))throw new Error('That drafting tool is only available in the 2D Floor Plan editor.');
+        setTool(action.parameters.tool as SceneTool);await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));return `${action.parameters.tool} tool activated.`;
+      }
+      if(action.intent==='selection.clear'){setSelected([]);await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));return 'Selection cleared.';}
+      if(action.intent==='selection.all'){setSelected(doc.objects.filter(o=>!o.parentId&&o.visible&&!locked(o)).map(o=>o.id));await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));return 'Visible unlocked root objects selected.';}
+      if(action.intent==='selection.select'){
+        const target=normalizeCommand(action.parameters.name),matches=doc.objects.filter(o=>o.visible&&!locked(o)&&(!target||normalizeCommand(o.name)===target||o.id===target));
+        if(matches.length!==1)throw new Error(matches.length?'Which object? Specify its unique name from Scene hierarchy.':'No selectable object has that name. Use an exact hierarchy name.');
+        setSelected([matches[0].id]);await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));return `${matches[0].name} selected.`;
+      }
+      const before=fingerprint(doc);
+      if(action.intent==='scene.create'){if(['building','room','intersection'].includes(action.parameters.kind))template(action.parameters.kind,true);else add(action.parameters.kind,undefined,true);}
+      else if(action.intent==='history.undo'){if(!store.history.past.length)throw new Error('There is nothing to undo.');store.undo();}
+      else if(action.intent==='history.redo'){if(!store.history.future.length)throw new Error('There is nothing to redo.');store.redo();}
+      else{
+        const ids=action.intent==='scene.delete'&&action.parameters.scope==='all'?doc.objects.filter(o=>!o.parentId).map(o=>o.id):selectedRoots;
+        if(!ids.length)throw new Error('Select the target object first.');
+        if(ids.some(id=>locked(doc.objects.find(o=>o.id===id)!)))throw new Error('Unlock the target objects and parents first.');
+        if(action.intent==='scene.delete'){if(action.parameters.scope==='selected')remove(true);else change(applyCommands(doc,ids.map(id=>({type:'delete',id}))));setSelected([]);}
+        else if(action.intent==='scene.duplicate')duplicate(true);
+        else if(action.intent==='scene.material')change(applyCommands(doc,ids.map(id=>({type:'material',id,material:action.parameters.material}))));
+        else if(action.intent==='scene.transform'){
+          const p=action.parameters,index={x:0,y:1,z:2}[p.axis];
+          change(applyCommands(doc,ids.map(id=>{const object=doc.objects.find(o=>o.id===id)!,vector=[...object[p.property]] as Vec3;vector[index]=(p.relative?vector[index]:0)+p.value*(p.property==='rotation'?Math.PI/180:1);return{type:'transform',id,[p.property]:vector};})));
+        }else throw new Error('This action is not enabled in the current studio.');
+      }
+      await verifyStudioState(()=>fingerprint(docRef.current)!==before,signal);
+      return action.intent==='scene.create'?`${action.parameters.kind} added to the editable scene.`:'Scene change confirmed. Undo is available.';
+    }
+  });
 
   useEffect(() => {
     setSelected(current => current.filter(id => doc.objects.some(o => o.id === id)));
@@ -244,7 +334,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       <div className="scene-project-row"><input aria-label="Project name" key={doc.id + doc.name} defaultValue={doc.name} maxLength={120} onBlur={e => { if (e.target.value.trim() !== doc.name) safely(() => change({ ...doc, name: e.target.value.trim() })); }} /><button aria-label="Open projects" onClick={() => void listProjects()}><FolderOpen size={16} /></button>
         <details className="scene-project-actions"><summary aria-label="Project actions" title="Project actions"><MoreHorizontal size={18} /></summary><div className="scene-project-actions-content" onClick={e => { if ((e.target as HTMLElement).closest("button:not(:disabled)")) e.currentTarget.parentElement?.removeAttribute("open"); }}>
       <Menu name="File"><button onClick={() => void newProject()}>New project</button><button onClick={() => void listProjects()}>Open workspace project</button><button onClick={() => void listGenerationJobs()}>AI generation jobs</button><button onClick={() => void store.save()}>Save · Ctrl S</button><button onClick={() => { store.saveCopy(); setPending(null); }}>Save as copy</button><button onClick={() => file.current?.click()}>Import model / JSON</button><button onClick={() => void exportFile("json")}>Download project JSON</button></Menu>
-      <Menu name="Edit"><button disabled={blocked || !store.history.past.length} onClick={store.undo}>Undo · Ctrl Z</button><button disabled={blocked || !store.history.future.length} onClick={store.redo}>Redo · Ctrl Shift Z</button><button disabled={blocked || !selected.length} onClick={duplicate}>Duplicate · Ctrl D</button><button disabled={blocked || !selected.length} onClick={remove}>Delete selected</button><button disabled={blocked || selected.length < 2} onClick={() => group()}>Group selection</button><button disabled={blocked || primary?.kind !== "group"} onClick={() => group(true)}>Ungroup</button><button disabled={blocked || selected.length < 2} onClick={() => safely(() => { if (doc.objects.some(o => selected.includes(o.id) && locked(o))) throw new Error("Unlock objects and their parents first."); change({ ...doc, objects: doc.objects.map(o => selected.includes(o.id) ? { ...o, position: [primary!.position[0], o.position[1], o.position[2]] } : o) }); })}>Align selected local X</button></Menu>
+      <Menu name="Edit"><button disabled={blocked || !store.history.past.length} onClick={store.undo}>Undo · Ctrl Z</button><button disabled={blocked || !store.history.future.length} onClick={store.redo}>Redo · Ctrl Shift Z</button><button disabled={blocked || !selected.length} onClick={()=>duplicate()}>Duplicate · Ctrl D</button><button disabled={blocked || !selected.length} onClick={()=>remove()}>Delete selected</button><button disabled={blocked || selected.length < 2} onClick={() => group()}>Group selection</button><button disabled={blocked || primary?.kind !== "group"} onClick={() => group(true)}>Ungroup</button><button disabled={blocked || selected.length < 2} onClick={() => safely(() => { if (doc.objects.some(o => selected.includes(o.id) && locked(o))) throw new Error("Unlock objects and their parents first."); change({ ...doc, objects: doc.objects.map(o => selected.includes(o.id) ? { ...o, position: [primary!.position[0], o.position[1], o.position[2]] } : o) }); })}>Align selected local X</button></Menu>
       <Menu name="View"><button onClick={() => viewport.current?.fit()}>Frame all</button><button onClick={() => viewport.current?.focus()}>Focus selected · F</button><button onClick={() => setGrid(v => !v)}>{grid ? "Hide" : "Show"} grid</button><button onClick={() => store.setCamera({ ...doc.camera, projection: doc.camera.projection === "perspective" ? "orthographic" : "perspective" })}>{doc.camera.projection === "perspective" ? "Orthographic" : "Perspective"} projection</button></Menu>
       <Menu name="Tools">{(["select", "translate", "rotate", "scale", "measure"] as SceneTool[]).map(t => <button key={t} disabled={blocked} onClick={() => setTool(t)}>{t}</button>)}<button onClick={() => setSnap(v => !v)}>{snap ? "Disable" : "Enable"} grid snapping</button>{["Vertex / edge / face editing", "Extrude / inset / bevel", "Vertex / surface snapping"].map(t => <button key={t} disabled title="Unavailable in this release">{t} · unavailable</button>)}</Menu>
       <Menu name="Camera">{["Perspective", "Front", "Back", "Left", "Right", "Top"].map(name => <button key={name} onClick={() => viewport.current?.preset(name)}>{name}</button>)}<button onClick={() => viewport.current?.zoom(1.25)}>Zoom in</button><button onClick={() => viewport.current?.zoom(.8)}>Zoom out</button><button onClick={() => store.setCamera(makeDocument(studio).camera)}>Reset camera</button><button onClick={() => safely(() => viewport.current?.walk())}>Walkthrough · WASD / Esc</button></Menu>
@@ -276,6 +366,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       {!store.ready && <div className="scene-opening">{store.failure ?? "Opening scene…"}<button onClick={() => { store.replace(makeDocument(studio)); }}>Create empty project</button></div>}
       {(!left || !right) && <div className="scene-panel-toggles">{!left && <button aria-label="Show scene sidebar" onClick={() => setLeft(true)}><PanelLeft size={18} /></button>}{!right && <button aria-label="Show inspector" onClick={() => setRight(true)}><PanelRight size={18} /></button>}</div>}
       <StudioViewportToolbar label="Scene transformation tools"
+        apiRef={toolbarAPI}
         materialLibrary={{canApply:!blocked&&selected.length>0&&Boolean(primary&&!primary.kind.endsWith("Light")),activeMap:primary?.material.map,onApply:material=>safely(()=>change(applyLibraryMaterial(docRef.current,selectedRoots,material)))}}
         leading={[
           ...(studio === "infrastructure" ? [{ label: worldMap ? "3D Editor" : "World Map", icon: worldMap ? Box : Globe2, active: worldMap, onClick: () => { setMapOpened(true); setWorldMap(value => !value); } }] : []),

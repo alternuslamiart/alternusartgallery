@@ -11,7 +11,7 @@ const ERRORS={
   'language-not-supported':'This voice language is unavailable. Choose another language and try again.',
 };
 
-export function createStudioVoice({Recognition,getDraft,onDraft,onOpen,onSend,onState,openMicrophone,checkTranscription,transcribe}) {
+export function createStudioVoice({Recognition,getDraft,onDraft,onOpen,onSend,onState,openMicrophone,checkTranscription,transcribe,isCommand}) {
   let current=null,epoch=0,destroyed=false,wake=false,capturing=false,restarts=0,listening=false;
   let captureTimer=null,restartTimer=null,language='sq-AL';
   let microphone=null,phase='idle',backend='browser',conversation=false,fallbackUsed=false,upload=null,interim='';
@@ -29,6 +29,7 @@ export function createStudioVoice({Recognition,getDraft,onDraft,onOpen,onSend,on
   }
   function capture(text){
     const task=text.trim();if(!task)return;
+    if(isCommand?.(task)){stop(null,true);onSend(task);return;}
     if(CANCEL.test(task)){stop();return;}
     if(SEND.test(task)){
       const send=Boolean(getDraft().trim());
@@ -55,6 +56,12 @@ export function createStudioVoice({Recognition,getDraft,onDraft,onOpen,onSend,on
     }catch(error){if(epoch===token)stop(`${reason} ${error instanceof Error?error.message:'Server transcription is unavailable.'}`);}
   }
   async function finish() {
+    if(backend==='browser'&&current&&phase==='recording'){
+      const recognition=current,token=epoch;clearTimers();listening=false;phase='transcribing';emit(conversation?'conversation':'dictation');
+      try{if(typeof recognition.stop==='function')recognition.stop();else stop();microphone?.close();microphone=null;if(token===epoch&&current===recognition)captureTimer=setTimeout(()=>stop(),3000);}
+      catch{stop('Speech recognition could not finish this recording. Your finalized text remains in the composer.');}
+      return;
+    }
     if(backend!=='server'||!microphone||phase!=='recording'){stop();return;}
     const token=epoch,session=microphone,send=conversation;clearTimers();listening=false;phase='transcribing';emit(send?'conversation':'dictation');
     try {
@@ -64,6 +71,7 @@ export function createStudioVoice({Recognition,getDraft,onDraft,onOpen,onSend,on
       microphone=null;
       const text=await transcribe(blob,language,upload.signal);
       if(epoch!==token||destroyed)return;
+      if(isCommand?.(text)){stop(null,true);onSend(text);return;}
       onDraft([getDraft().trim(),text.trim()].filter(Boolean).join(' ').slice(0,12_000));
       stop(null,send&&Boolean(text.trim()));if(send&&text.trim())onSend();
     }catch(error){if(epoch===token)stop(error instanceof Error?error.message:'Audio transcription failed. Retry recording.');}
