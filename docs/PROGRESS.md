@@ -2,6 +2,49 @@
 
 Last updated: 2026-10-23
 
+## Studio microphone and voice repair
+
+- Confirmed root cause in source and the hosted HTTPS `/interior` response:
+  `Permissions-Policy: microphone=()` blocked access despite browser Allow.
+  Studio documents/aliases now permit only same-origin microphone while keeping
+  camera and other routes restricted. Browser recognition `not-allowed` is no
+  longer reported as proof of denied device permission.
+- Added explicit audio-only getUserMedia capture, actual analyser level meter,
+  supported MediaRecorder fallback, precise device/security errors, retry and
+  cleanup for tracks, audio contexts, timers, disconnects and late callbacks.
+  Native recognition receives the captured audio track where supported; final
+  dictation appends to the editable draft, with transient interim status.
+- The existing Voice/radio icon now enables a separate opt-in conversation:
+  one final utterance -> existing AI adapter -> browser speech playback, then
+  resume listening. Capture stops before processing/playback. Stop, spoken
+  cancel, Esc, hiding, unmount and identity changes end resources; canceled
+  sessions cannot resume through a late reply. Scene preview approval remains.
+- Added authenticated `/api/studio-voice/transcribe`: existing server-only Groq
+  key, multilingual Whisper, 3 MB audio/3.1 MB multipart bound, safe errors,
+  no-store responses, 20-second provider deadline and existing persistent
+  per-user 10/15-minute limit. No audio storage. Browser-native failure can use
+  recorded transcription; unavailable auth/key/DB produces actionable feedback.
+- Full suite: 133 tests passed. Final focused voice/API/policy checks: 20 passed.
+  TypeScript and production build passed with the existing trusted CA bundle.
+  Focused lint passed with only the existing StudioAIChat image warning; full
+  project lint's recorded unrelated baseline remains. No auth/schema redesign.
+- Chrome against a local production build passed real synthetic-device
+  getUserMedia, MediaRecorder and AudioContext, actual document policy, all
+  Architecture/Interior/Infrastructure routes, dictation, permission-denial
+  retry, service-refusal fallback, track cleanup, voice submit/TTS wiring,
+  unsupported recognition, refresh and 390px Interior controls. First passing
+  artifacts: `.tmp/studio-voice-1792763664205/`. Final production run also passed
+  spoken cancellation/session teardown in every studio:
+  `.tmp/studio-voice-1792763926181/`; mobile screenshot inspected.
+- Earlier dev-browser attempts failed when generated `.next` layout chunks
+  could not be opened under low disk space. Removed only verified generated
+  current-session QA profiles and build cache, preserving screenshots/source;
+  production rebuilding restored hydration and successful browser checks.
+- Recognition, AI/transcription HTTP and speech playback were injected in
+  browser checks; physical audio accuracy, real Groq transcription/limiter DB,
+  installed Albanian/English voices, audible output and post-deploy HTTPS
+  microphone interaction remain explicit external/device checks.
+
 ## Infrastructure geographic selection and scene import
 
 - Extended the existing map/toolbar/viewport without replacing sidebars, chat,

@@ -158,7 +158,8 @@ const nextConfig = {
     }
     const baseCSP = rules[0].headers.find(header => header.key === "Content-Security-Policy").value;
     const mapCSP = baseCSP.replace(/connect-src ([^;]+)/, (_, sources) => `connect-src ${sources} ${[...mapOrigins].join(" ")}`) + "; worker-src 'self' blob:";
-    return [...rules, ...["/infrastructure", "/infrastructur", "/_next/static/media/maplibre-gl-worker.:asset*"].map(source => ({ source, headers: [{ key: "Content-Security-Policy", value: mapCSP }] }))];
+    const voiceRules = ["/casynus", "/crystal", "/interior", "/infrastructure", "/infrastructur"].map(source => ({ source, headers: [{ key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=(self), interest-cohort=()" }] }));
+    return [...rules, ...["/infrastructure", "/infrastructur", "/_next/static/media/maplibre-gl-worker.:asset*"].map(source => ({ source, headers: [{ key: "Content-Security-Policy", value: mapCSP }] })), ...voiceRules];
   },
 };
 

@@ -2,6 +2,12 @@
 
 ## Next concrete task
 
+- [x] Fix studio microphone policy/refused speech-service classification and
+  implement real capture/meter, transcription fallback and spoken conversation.
+- [ ] Verify physical microphones, English/Albanian recognition and audible TTS
+  in deployed HTTPS target browsers. Verify one signed-in Groq transcription
+  with a reachable limiter database and provider quota. See `docs/VOICE-COMMANDS.md`.
+
 - [x] Make the Infrastructure World Map toggle a compact icon button so it no
   longer overflows the viewport toolbar (verified at 1440px).
 - [x] Integrate Infrastructure's MapLibre 6.15.0 globe, correct its separate

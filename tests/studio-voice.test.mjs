@@ -45,7 +45,7 @@ test('late recognition results cannot cross stopped sessions or destroyed accoun
 });
 test('a new capture aborts the old microphone and synchronous start failures are surfaced',()=>{
   const s=setup();s.voice.start('wake','en-US');const old=s.recognition;s.voice.start('dictation','sq-AL');assert.equal(old.aborted,true);assert.equal(s.recognition.lang,'sq-AL');s.voice.destroy();
-  const broken=setup(class extends Recognition {start(){throw new Error('Microphone unavailable');}});broken.voice.start('dictation','en-US');assert.equal(broken.states.at(-1).mode,'off');assert.match(broken.states.at(-1).error,/Microphone unavailable/);
+  const broken=setup(class extends Recognition {start(){throw new Error('Microphone unavailable');}});broken.voice.start('dictation','en-US');assert.equal(broken.states.at(-1).mode,'off');assert.match(broken.states.at(-1).error,/Speech recognition could not initialize/);
 });
 test('dictation times out and wake sessions return to wake-only listening without submitting',t=>{
   t.mock.timers.enable({apis:['setTimeout']});

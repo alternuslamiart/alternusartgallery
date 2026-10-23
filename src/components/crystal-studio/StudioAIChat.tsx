@@ -71,6 +71,7 @@ export function StudioAIChat({
   promptRef.current = prompt;
   const [remoteLoading, setRemoteLoading] = useState(false);
   const [remoteError, setRemoteError] = useState<string | null>(null);
+  const voiceControl = useRef<{ stop: () => void } | null>(null);
   const loading = workspaceLoading || remoteLoading;
   const displayError = remoteError || error;
   const [localImage, setLocalImage] = useState<string | null>(null);
@@ -89,8 +90,9 @@ export function StudioAIChat({
     return () => { pendingRequest.current?.abort(); pendingRequest.current = null; };
   }, [identity]);
 
-  const submitPrompt = async (providerOverride?: string) => {
+  const submitPrompt = async (providerOverride?: string, fromVoice = false) => {
     if (!promptRef.current.trim() || loading || pendingRequest.current) return;
+    if (!fromVoice) voiceControl.current?.stop();
     const selectedProvider = providerOverride && STUDIO_AI_PROVIDERS.includes(providerOverride) ? providerOverride : model;
     if (!STUDIO_AI_PROVIDERS.includes(selectedProvider) && !requestAnswer) { onSubmit(); return; }
     if (providerOverride) onModelChange(selectedProvider);
@@ -110,6 +112,7 @@ export function StudioAIChat({
       const sources = result.citations?.length ? `\n\nSources:\n${result.citations.map(item => item.source).join("\n")}` : "";
       onMessagesChange(current => [...current, { id: crypto.randomUUID(), role: "assistant", text: result.message + sources, meta: `${result.provider} · ${result.model}` }]);
       if (result.warning) setRemoteError(result.warning);
+      return result.message;
     } catch (caught) {
       if (!controller.signal.aborted && identityRef.current === requestIdentity) {
         setRemoteError(caught instanceof Error ? caught.message : "The AI request failed.");
@@ -123,8 +126,11 @@ export function StudioAIChat({
   const voice=useStudioVoice({identity,getDraft:()=>promptRef.current,
     onDraft:text=>{const bounded=text.slice(0,model==="you"?400:12_000);promptRef.current=bounded;onPromptChange(bounded);},
     onOpen:()=>{onOpenChange(true);requestAnimationFrame(()=>textareaRef.current?.focus());},
-    onSend:()=>{void submitPrompt();},
+    onSend:()=>submitPrompt(undefined,true),
+    onCancel:()=>pendingRequest.current?.abort(),
+    canConverse:STUDIO_AI_PROVIDERS.includes(model)||Boolean(requestAnswer),
   });
+  voiceControl.current=voice;
 
   useEffect(() => {
     const submitFromMobileHome = (event: Event) => { void submitPrompt((event as CustomEvent<string>).detail); };
@@ -184,8 +190,11 @@ export function StudioAIChat({
       <StudioButton size="icon" variant="ghost" aria-label="Dismiss error" onClick={() => { setRemoteError(null); onClearError?.(); }}><X size={14} /></StudioButton>
     </div>}
     {voice.error&&<div className="studio-ai-error" role="alert"><span>{voice.error}</span><StudioButton size="icon" variant="ghost" aria-label="Dismiss voice error" onClick={voice.stop}><X size={14} /></StudioButton></div>}
-    {voice.mode!=="off"&&<div className="cs-voice-status" role="status">
-      <Mic size={13} />{!voice.listening?'Starting microphone · allow access if prompted':voice.mode==="wake"?'Listening for “Hey, Casynus”':'Speak your task · say “Send” / “Dërgo”, or review and send'}
+    {(voice.mode!=="off"||voice.conversation)&&<div className="cs-voice-status" role="status">
+      <Mic size={13} />{voice.phase==='processing'?'Voice session · processing':voice.phase==='speaking'?'Voice session · speaking':voice.phase==='transcribing'?'Transcribing audio…':voice.phase==='preparing'?'Preparing server transcription…':!voice.listening?'Starting microphone · allow access if prompted':voice.backend==='server'?'Recording · audio will be sent for transcription':voice.conversation?'Voice session · speak your request':voice.mode==="wake"?'Listening for “Hey, Casynus”':'Recording dictation · review text before sending'}
+      {voice.listening&&<meter className="cs-voice-level" aria-label="Microphone activity" min={0} max={1} value={voice.level} />}
+      {voice.interim&&<span className="cs-voice-interim" aria-label="Interim transcription">{voice.interim}</span>}
+      {voice.backend==='server'&&voice.phase==='recording'&&<StudioButton size="sm" variant="ghost" onClick={voice.finish} aria-label="Finish voice recording">Finish</StudioButton>}
       <StudioButton size="icon" variant="ghost" aria-label="Stop voice listening" title="Stop microphone (Esc)" onClick={voice.stop}><Square size={12} /></StudioButton>
     </div>}
     <div className="studio-ai-composer">
@@ -207,7 +216,7 @@ export function StudioAIChat({
               }} />
           </label>
           <StudioButton size="icon" variant="ghost" active={voice.mode==="dictation"} aria-label={voice.mode==="dictation"?"Stop voice dictation":"Start voice dictation"} aria-keyshortcuts="Control+Q" title="Voice command (Ctrl + Q)" onClick={voice.toggleDictation}>{voice.mode==="dictation"?<MicOff size={16}/>:<Mic size={16}/>}</StudioButton>
-          <StudioButton size="icon" variant="ghost" active={voice.wakeEnabled} aria-label="Enable Hey Casynus" aria-pressed={voice.wakeEnabled} title={voice.wakeEnabled?'Disable “Hey, Casynus” listening':'Enable “Hey, Casynus” · microphone permission required'} onClick={voice.toggleWake}><Radio size={16}/></StudioButton>
+          <StudioButton size="icon" variant="ghost" active={voice.conversation} aria-label={voice.conversation?"End voice conversation":"Start voice conversation"} aria-pressed={voice.conversation} title={voice.conversation?'End voice conversation':'Voice conversation · speech is sent to the selected AI provider; replies are spoken'} onClick={voice.toggleConversation}><Radio size={16}/></StudioButton>
           <select aria-label="Voice language" className="cs-voice-language" value={voice.language} onChange={event=>voice.changeLanguage(event.target.value)} title="Speech recognition language"><option value="sq-AL">SQ</option><option value="en-US">EN</option><option value="de-DE">DE</option></select>
           <select aria-label="AI mode" className="cs-chat-model" disabled={loading} value={activeModel?.id ?? ""} onChange={event => { setRemoteError(null); onModelChange(event.target.value); }}>
             {availableModels.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}

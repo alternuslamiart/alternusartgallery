@@ -126,8 +126,15 @@
   `useStudioVoice` connects the shared studio dock to Ctrl + Q and opt-in wake
   listening. Only transcripts enter the composer; explicit spoken Send uses
   the existing submit adapter and scene validation/approval. Sessions stop on
-  account changes, unmount and document hiding. No audio API/database storage
-  or new provider keys are added. See `VOICE-COMMANDS.md` for browser limits.
+  account changes, unmount and document hiding. `studio-microphone.mjs` owns one
+  explicit audio stream, analyser level meter, bounded recorder and track/context
+  cleanup. Studio response policies permit same-origin microphone only; browser
+  speech-service refusal is distinct from device permission denial.
+- `/api/studio-voice/transcribe` provides authenticated, rate-limited Groq Whisper
+  fallback with bounded multipart uploads, a server-only existing Groq key and no
+  audio storage. The Voice icon uses a separate opt-in conversation session with
+  the selected text AI provider and browser TTS; capture pauses during processing
+  and playback. Ordinary dictation remains editable. See `VOICE-COMMANDS.md`.
 - The shared dock now sends Gemini/Groq/You text requests through
   `/api/ai-chat` using the client-only `src/lib/studio-ai.mjs` request helper.
   Gemini is the initial selection. Existing scene commands, floor-plan layout,

@@ -77,6 +77,12 @@ requirements provide new evidence.
 
 - [x] Add browser voice dictation, opt-in Hey Casynus wake and Ctrl + Q to
   studio AI docks. Physical microphone/browser-service verification is pending.
+- [x] Repair studio microphone Permissions Policy and error classification; add
+  explicit capture/meter, bounded authenticated transcription fallback and opt-in
+  voice conversation using existing text providers plus browser speech playback.
+- [ ] Verify physical-device speech accuracy, installed Albanian/English voices
+  and deployed HTTPS behavior; server fallback needs Groq credits and a reachable
+  persistent limiter database.
 
 - [x] Match Login and Signup to the horizontal reference with a shared
   1181px maximum frame, responsive stacking and preserved auth handlers.

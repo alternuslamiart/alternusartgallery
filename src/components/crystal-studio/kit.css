@@ -120,6 +120,8 @@ html[data-crystal-theme="light"] :is(.crystal-studio, .crystal-infrastructure-pa
 /* Shared AI dock; content stays mounted in its conversation owner. */
 .cs-chat-dock .cs-voice-status { display:flex; align-items:center; gap:7px; padding:8px 12px 0; font-size:11px; color:var(--studio-text-secondary); }
 .cs-voice-status>svg { flex-shrink:0; color:var(--studio-accent); }
+.cs-voice-status .cs-voice-level { width:36px; min-width:24px; height:8px; accent-color:var(--studio-accent); }
+.cs-voice-status .cs-voice-interim { max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .cs-voice-status>.cs-button { margin-left:auto; flex-shrink:0; }
 .cs-chat-dock .cs-voice-language { width:52px; min-width:44px; height:32px; padding:4px; font-size:11px; border:1px solid var(--studio-border); border-radius:8px; background:var(--studio-bg-input); color:var(--studio-text-primary); }
 .cs-chat-dock .studio-ai-controls-left { flex-wrap:wrap; min-width:0; }

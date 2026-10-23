@@ -1,8 +1,22 @@
-# Casynus studio voice commands
+# Casynus studio dictation and voice conversation
 
-The shared Casynus AI dock supports browser speech recognition in Architecture,
-Interior drafting/3D and Infrastructure, without a separate speech API key.
-AI provider authentication, keys, quotas and scene proposal approval still apply.
+The shared dock supports microphone dictation and opt-in spoken conversations in
+Architecture, Interior drafting/3D and Infrastructure. Browser-native recognition
+is tried first, independently of the selected AI text model. Server transcription
+is an authenticated fallback using the existing server-only `GROQ_API_KEY` and
+multilingual `whisper-large-v3`; native recognition needs no application speech key.
+Text AI provider authentication, keys and quotas still apply.
+
+## Root cause repaired
+
+The original global response header explicitly set `microphone=()`, blocking the
+page even when site permissions were Allow. Studio documents and aliases now
+override only that directive to `microphone=(self)`; other documents and camera
+restrictions remain unchanged. Cross-origin embeds need an appropriate parent
+policy and iframe allow attribute; the app cannot override a restricting parent.
+The old controller also mislabeled browser recognition `not-allowed` as microphone
+permission denial. Device access now uses explicit `getUserMedia({ audio: true })`;
+speech-service errors are classified separately and can use server transcription.
 
 ## Use
 
@@ -10,10 +24,10 @@ AI provider authentication, keys, quotas and scene proposal approval still apply
 2. Click the microphone or press **Ctrl + Q** to open the dock and dictate.
    Allow microphone access if your browser prompts. The shortcut also works
    while the dock is minimized or an editor input has focus.
-3. For wake activation, enable the adjacent radio/wake button, then say
-   **Hey, Casynus** followed by the task, or pause and speak the task afterwards.
-   Background speech before the wake phrase is ignored by the composer.
-4. Review the recognized text. Click Send or say **Send** / **Dërgo** as a
+3. Review native dictation in the composer. Supported interim text appears only
+   in the recording status and is not committed until final recognition. A small
+   live level meter indicates actual input activity; it is never a fake animation.
+4. Click Send or say **Send** / **Dërgo** as a
    separate utterance. Recognition alone does not automatically submit a task.
    Generated 3D changes still use the existing preview and Apply/Discard flow.
 5. Use **SQ**, **EN**, or **DE** for Albanian, English, or German recognition.
@@ -22,24 +36,56 @@ AI provider authentication, keys, quotas and scene proposal approval still apply
    **Anulo** stops listening. Ctrl + Q also stops an active dictation session.
    Existing draft text remains editable.
 
-Wake listening starts only after explicit activation, never on load or refresh.
-The minimized dock indicates an enabled voice session. Microphone sessions stop
-when the document is hidden, the editor unmounts, or the account changes.
-Dictation idles out after 30 seconds; an enabled wake session returns to listening
-for the wake phrase. Repeated speech-service termination has bounded retries.
+7. The existing radio/Voice icon starts a **voice conversation** with a selected
+   text provider. Each finalized utterance is sent once, the response is spoken,
+   and listening resumes only while that explicitly enabled session remains active.
+   Capture stops before AI processing/playback to avoid transcribing the reply.
+   End the session with the same Voice icon, Stop or Esc. Local scene tools remain
+   available through ordinary dictation; Voice conversation requires a text model.
+   The controller retains its legacy wake-mode behavior, but the Voice icon now
+   directly starts conversation rather than requiring a wake phrase.
+
+Nothing records on load/refresh. Capture, timers, pending uploads, speech playback
+and voice-owned AI requests stop when canceled, hidden, unmounted or on account
+change. Dictation idles out after 30 seconds. Browser-installed speech voices
+provide TTS; unavailable language voices produce a clear error while retaining
+the text response. Albanian recognition/TTS availability depends on the browser
+or service; multilingual server transcription accepts sq/en/de language codes.
+
+## Recording fallback and privacy
+
+If native recognition is absent or refuses access despite a successfully opened
+microphone, the client checks `/api/studio-voice/transcribe` availability. Sign-in,
+configured Groq credentials and browser MediaRecorder support are required.
+The existing status shows recording and indicates that audio will be uploaded.
+Click Finish (or the active microphone/Ctrl+Q), or wait for the 30-second limit.
+Dictation transcription appends to the editable draft and never auto-submits;
+an opted-in conversation submits the resulting turn. Stop/Esc cancels and discards
+audio. Fallback cannot recover audio spoken before recording actually started.
+
+Only fallback captures a bounded in-memory audio blob, capped at 3 MB. The
+authenticated server bounds multipart bytes even without Content-Length, checks
+format/language, limits each user to 10 recordings per 15 minutes through the
+existing persistent limiter, and calls Groq with a 20-second deadline. Responses
+use no-store; the application writes no audio to storage or logs. Provider billing
+and data-processing terms still apply. A reachable limiter database is required;
+no unmetered fallback is enabled when it fails. No additional browser secret or
+transcription dependency package is introduced.
 
 ## Browser support and data flow
 
 The implementation detects `SpeechRecognition` / `webkitSpeechRecognition`.
 Availability, language support and the recognition service depend on the browser.
 Permission denial, missing microphones, unsupported languages, service/network
-errors and unsupported browsers are shown in the dock. Typed input remains usable.
+errors and unsupported browsers are shown separately in the dock. Typed input remains usable.
 The shortcut can only be handled when the browser delivers it to the page.
 
 Speech recognition may use a browser-operated remote service; this is not an
 offline/local-only speech guarantee. The application receives transcripts and
-sends submitted text through the existing AI adapters; it does not add a server
-audio upload/storage endpoint. Only sent prompts enter conversation history.
+sends submitted text through the existing AI adapters. The fallback uploads audio
+only as needed for transcription and does not persist it. Only sent prompts enter
+conversation history. Browser speech playback may also use the device/vendor's
+speech service; availability and audible output need target-device verification.
 
 API reference: [MDN: Using the Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API).
 
@@ -48,10 +94,17 @@ API reference: [MDN: Using the Web Speech API](https://developer.mozilla.org/en-
 - `node --test tests/studio-voice.test.mjs tests/studio-ai.test.mjs`: controller
   transitions, wake filtering, phonetic spellings, explicit send/cancel, stale
   callbacks, permission/language/network failures, timeouts and bounded retries.
-- With Next running on port 3003: `node scripts/verify-studio-voice.mjs` verifies
-  keyboard opening, minimized wake activation, dictation, a single submitted
-  request through each studio adapter, 3D preview, permission errors, tab hiding,
-  unsupported browsers and the mobile Interior workspace controls.
+- `tests/studio-microphone.test.mjs`: capture constraints, permission retry,
+  policy/security/device errors, actual chunk handling, cancellation, late streams,
+  speech-service refusal after mic grant and one-turn conversation submission.
+- `tests/studio-transcription-route.test.mjs`: actual route with isolated auth,
+  quota/provider adapters, multilingual uploads, limits and safe failures.
+- `tests/studio-voice-policy.test.mjs`: route-scoped microphone response policy.
+- With Next running on port 3003: `node scripts/verify-studio-voice.mjs` uses a
+  real Chrome synthetic microphone, getUserMedia, MediaRecorder and AudioContext.
+  Recognition, transcription/AI HTTP and TTS output are injected; checks cover
+  all studios, text/voice submission, recording fallback, permission recovery,
+  background cleanup, unsupported recognition, refresh and mobile controls.
 
 Automated/browser checks inject speech results and mock AI HTTP responses.
 They do not verify a physical microphone, real acoustic wake accuracy, vendor
