@@ -1,6 +1,40 @@
 # Verified progress
 
-Last updated: 2026-10-23
+Last updated: 2026-10-24
+
+## Contextual 3D selection and automatic reversible editing
+
+- Added selected hierarchy-path context to the existing floating dock and wired
+  contextual roof/wall/material/building-height edits into actual validated scene
+  transactions. Native Gemini/Groq commands now auto-apply reversible edits;
+  all chat deletions require confirmation. Provider-returned targets are scoped
+  to selection/descendants, with stale-document, locked-object and schema checks.
+- Added real segmented wall openings/glazing, parametric flat roof conversion,
+  one-step history, rendered-document acknowledgment and failed-render rollback.
+  Added a non-pickable transparent GPU blue checker/scan overlay scoped to affected
+  meshes with completion fade and shader cleanup. Removed the approval footer and
+  retained scene-mode controls inside the bottom-aligned existing chat panel.
+- Focused geometry/API/selection tests and TypeScript passed after fixing the
+  extended route test dependency and requested outline color expectations. Full
+  suite passed 145 tests. Initial build hit Prisma Windows DLL `EPERM` rename;
+  stopped only the verified earlier QA servers and retried. See
+  `CONTEXTUAL-SCENE-EDITING.md` for capability and verification boundaries.
+- Continuation verification on 2026-10-24: all 145 tests, focused Next lint,
+  standalone TypeScript and production build passed. Build used the existing
+  Windows trusted CA bundle and OpenFreeMap build-time override. Focused lint
+  retains the existing chat image warning; build retains client-render warnings.
+- Real Chrome against the fresh local production build passed component raycast
+  selection/context, roof/material/window/group-height edits, GPU lifecycle,
+  Enter and keyboard Undo/Redo, IndexedDB reload, deletion confirmation and
+  actual unauthenticated native-planner failure without geometry changes. No HTTP
+  interception was used. Desktop chat/sidebar alignment passed. Live signed-in
+  Gemini/Groq and cloud save/reopen remain unverified external checks.
+- Corrected the browser verifier's mobile inspector-collapse selector and added
+  an assertion that both panels close before capturing the mobile screenshot.
+  Final artifacts: `.tmp/scene-editing-1792852690124/`; desktop and mobile
+  screenshots were visually inspected.
+  Unrelated Section image deletions, migration helpers and crash reports remain
+  outside this increment.
 
 ## Reset Password shared auth design
 

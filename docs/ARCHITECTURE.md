@@ -6,7 +6,8 @@
   conversation store. SceneWorkbench and FloorPlanViewport register context-owned
   adapters that reuse real editor handlers. English/Albanian text and voice use
   the same schema/parser, state acknowledgments and fingerprint-bound destructive
-  confirmations. Complex native AI proposals still require existing approval.
+  confirmations. Native AI scene edits execute as validated undoable transactions;
+  deletion requires confirmation and generated GLB imports retain preview/Apply.
 - Both voice icons now open the same compact client `VoiceSpeechModal`; Start
   acquires audio, analyser levels drive listening bars, and Close cancels resources.
   Scoped validated floor-plan recovery preserves drawings on command navigation;
@@ -67,12 +68,16 @@
   `components/scene-studio/SceneWorkbench.tsx` and the real R3F viewport.
   `lib/scene/document.mjs` validates versioned metric documents and allowlisted
   AI operations; `geometry.mjs` owns real meshes, import/export and disposal.
+  `scene/editing.mjs` provides selected-object context, finite contextual plans
+  and selection-scoped validation. `edit-overlay.mjs` owns transient GPU feedback
+  outside the editable/exported root. See `CONTEXTUAL-SCENE-EDITING.md`.
   `useSceneDocument.ts` coordinates undo, IndexedDB recovery and cloud autosave.
   `/api/studio-projects` uses authenticated workspace/user scope and atomic
   revisions; snapshots reuse `BlenderProject.settings` with a `casynus-scene`
   discriminator plus a canonical CAD Project. No Blender job is invoked.
-  `/api/ai-scene` proposes native Gemini/Groq function calls; browser Apply is
-  required. See `SCENE-STUDIOS.md` for actual capabilities and limitations.
+  `/api/ai-scene` proposes native Gemini/Groq function calls; reversible operations
+  auto-commit after validation, while deletes require state-bound confirmation.
+  Generated-provider GLB imports retain preview/Apply. See `SCENE-STUDIOS.md`.
   Previous editors remain available under `?workspace=classic`.
 - `/interior` defaults to the original SVG drafting workspace again.
   Its `insetPanels` prop scopes the requested 12px panel geometry; the 3D mode

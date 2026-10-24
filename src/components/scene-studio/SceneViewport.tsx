@@ -11,6 +11,7 @@ import type { SceneDocument, SceneObject, Vec3 } from "@/lib/scene/document.mjs"
 import { useCrystalTheme } from "@/lib/crystal-theme";
 import { createSelectionHelpers, disposeSelectionHelpers } from "@/lib/scene/selection.mjs";
 import { isSelectionClick, pickScene } from "@/lib/scene/picking.mjs";
+import {createEditOverlay,disposeEditOverlay} from "@/lib/scene/edit-overlay.mjs";
 
 export type ViewportAPI = {
   fit: () => void; focus: () => void; preset: (name: string) => void; zoom: (factor: number) => void;
@@ -18,9 +19,11 @@ export type ViewportAPI = {
   walk: () => void;
   point: (x: number, y: number) => Vec3 | null;
   pan:(direction:string)=>void;rotate:(degrees:number)=>void;
+  rendered:()=>string;
 };
 export type SceneTool = "select" | "translate" | "rotate" | "scale" | "measure";
 type Props = { document: SceneDocument; selected: string[]; tool: SceneTool; snap: boolean; grid: boolean;
+  editing?:{ids:string[];phase:'processing'|'updating'|'completed'}|null;
   onSelect: (id: string | null, additive?: boolean) => void; onTransform: (id: string, patch: Partial<SceneObject>) => void;
   onHover?: (id: string | null) => void;
   onCameraChange?: (camera: SceneDocument["camera"]) => void };
@@ -39,8 +42,10 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
   const dragging = useRef(false);
   const gesture = useRef<{ button: number; clientX: number; clientY: number; pointerId: number } | null>(null);
   const transformed = useRef(false);
+  const rendered=useRef('');
   const [points, setPoints] = useState<THREE.Vector3[]>([]);
   const root = useMemo(() => buildScene(p.document, { helpers: true, onTextureLoad: invalidate }), [p.document.objects, invalidate]); // eslint-disable-line react-hooks/exhaustive-deps
+  const renderToken=useMemo(()=>JSON.stringify([p.document.id,p.document.objects,p.document.environment]),[p.document.id,p.document.objects,p.document.environment]);
   useEffect(() => () => disposeScene(root), [root]);
   const selected = useMemo(() => {
     let found: THREE.Object3D | undefined;
@@ -49,6 +54,10 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
   }, [root, p.selected]);
   const selectionBoxes=useMemo(()=>createSelectionHelpers(root,p.selected),[root,p.selected]);
   useEffect(()=>()=>disposeSelectionHelpers(selectionBoxes),[selectionBoxes]);
+  const overlay=useMemo(()=>createEditOverlay(root,p.editing?.ids??[]),[root,p.editing?.ids]);
+  const fade=useRef(1);
+  useEffect(()=>{fade.current=1;invalidate();},[overlay,p.editing?.phase,invalidate]);
+  useEffect(()=>()=>disposeEditOverlay(overlay),[overlay]);
   let transformNode: THREE.Object3D | null | undefined = selected;
   let transformLocked = false;
   while (transformNode) { if (transformNode.userData.locked || !transformNode.visible) transformLocked = true; transformNode = transformNode.parent; }
@@ -96,6 +105,12 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
     return () => { window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); window.removeEventListener("blur", blur); };
   }, []);
   useFrame((_, delta) => {
+    rendered.current=renderToken;
+    if(p.editing){
+      if(p.editing.phase==='completed')fade.current=Math.max(0,fade.current-delta*3);
+      overlay.traverse(node=>{if(node instanceof THREE.Mesh&&node.material instanceof THREE.ShaderMaterial){node.material.uniforms.time.value+=Math.min(delta,.1);node.material.uniforms.fade.value=fade.current;}});
+      if(p.editing.phase!=='completed'||fade.current>0)invalidate();
+    }
     selectionBoxes.forEach(helper=>helper.update());
     if (!p.walking || !walk.current?.isLocked) return;
     const speed = Math.min(delta, .05) * (keys.current.has("ShiftLeft") ? 6 : 2.5);
@@ -110,9 +125,11 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
     camera.position.copy(center).add(new THREE.Vector3(1, .75, 1).normalize().multiplyScalar(radius * 2));
     camera.lookAt(center); orbit.current?.target.copy(center); orbit.current?.update();
     if (camera instanceof THREE.OrthographicCamera) { camera.zoom = Math.min(size.width, size.height) / (radius * 2.2); camera.updateProjectionMatrix(); }
+    p.onCameraChange?.({position:camera.position.toArray() as Vec3,target:center.toArray() as Vec3,projection:p.document.camera.projection});
     invalidate();
   };
   useImperativeHandle(ref, () => ({
+    rendered:()=>gl.getContext().isContextLost()?'':rendered.current,
     pan:direction=>{const delta=new THREE.Vector3(direction==='left'||direction==='west'?-1:direction==='right'||direction==='east'?1:0,direction==='up'?1:direction==='down'?-1:0,direction==='north'?-1:direction==='south'?1:0);const step=Math.max(.1,camera.position.distanceTo(orbit.current?.target??new THREE.Vector3())*.1);delta.multiplyScalar(step);camera.position.add(delta);orbit.current?.target.add(delta);orbit.current?.update();invalidate();},
     rotate:degrees=>{const target=orbit.current?.target??new THREE.Vector3();camera.position.sub(target).applyAxisAngle(new THREE.Vector3(0,1,0),degrees*Math.PI/180).add(target);camera.lookAt(target);orbit.current?.update();invalidate();},
     fit: () => frame(root), focus: () => frame(selected ?? root),
@@ -190,6 +207,7 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
     </mesh>
     {p.grid && <Grid position={[0, -.4, 0]} args={[200, 200]} cellSize={1} sectionSize={5} cellColor={theme === "dark" ? "#555b63" : "#a0a8b3"} sectionColor="#748396" fadeDistance={80} infiniteGrid />}
     <primitive object={root} />
+    <primitive object={overlay}/>
     {selectionBoxes.map(helper=><primitive key={helper.userData.selectionId} object={helper} />)}
     {canTransform && ["translate", "rotate", "scale"].includes(p.tool) && <TransformControls object={selected} mode={p.tool as "translate" | "rotate" | "scale"} size={1.2} space="world"
       translationSnap={p.snap ? .25 : null} rotationSnap={p.snap ? Math.PI / 12 : null} scaleSnap={p.snap ? .1 : null}
@@ -220,7 +238,7 @@ export const SceneViewport = forwardRef<ViewportAPI, Props>(function SceneViewpo
   const [generation, setGeneration] = useState(0), [walking, setWalking] = useState(false), [contextLost, setContextLost] = useState(false);
   const e = p.document.environment;
   const maxDpr = e.quality === "performance" ? 1 : e.quality === "ultra" ? 2 : 1.5;
-  return <div className="scene-canvas" data-object-count={p.document.objects.length}>
+  return <div className="scene-canvas" data-object-count={p.document.objects.length} data-edit-phase={p.editing?.phase} data-edit-targets={p.editing?.ids.join(',')}>
     <RenderBoundary key={generation} retry={() => { setContextLost(false); setGeneration(g => g + 1); }}>
       <Canvas frameloop={walking ? "always" : "demand"} shadows={e.shadows} dpr={[1, maxDpr]} gl={{ antialias: true, preserveDrawingBuffer: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => { gl.domElement.addEventListener("webglcontextlost", event => { event.preventDefault(); setContextLost(true); }, { once: true }); }}

@@ -6,6 +6,11 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Add exact selected-component chat context, validated reversible scene
+  execution, real wall openings/roof edits and target-only GPU editing feedback.
+- [ ] Verify native scene planning and authenticated save/reopen with a live
+  signed-in workspace; extend constrained architectural/mesh topology editing.
+
 - [x] Permit same-origin microphone on entry documents as well as studios so
   client navigation from homepage/login does not retain a blocking voice policy.
 

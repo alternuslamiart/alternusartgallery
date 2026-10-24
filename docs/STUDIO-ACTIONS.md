@@ -28,7 +28,8 @@ the browser retains the original document's CSP across Next.js client navigation
 This preserves map-only tile permissions without broadening every studio's policy.
 Both typed submissions and recognized voice commands use the same registry.
 Complex requests continue through the existing configured text/native scene AI
-adapter; generated scene proposals retain their existing Apply/Discard approval.
+adapter; reversible native scene operations auto-apply after validation and
+destructive commands require confirmation. Generated model imports retain review.
 This does not create an unrestricted autonomous agent or a new AI provider.
 
 Bulk deletion and new-project replacement require a separate Confirm within 30

@@ -34,7 +34,8 @@ speech-service errors are classified separately and can use server transcription
 4. Click Send or say **Send** / **Dërgo** as a
    separate utterance. Ordinary non-command dictation is not automatically sent;
    recognized local studio commands execute through the shared registry.
-   Generated 3D changes still use the existing preview and Apply/Discard flow.
+   Reversible native 3D edits auto-apply after validation; deletion requires
+   confirmation. Generated model imports retain preview and Apply/Discard.
 5. Use **SQ**, **EN**, or **DE** for Albanian, English, or German recognition.
    Changing language stops the current microphone session; start it again.
 6. Close or **Esc** cancels and releases resources. **Stop** finishes the current

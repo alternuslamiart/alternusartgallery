@@ -21,8 +21,9 @@ import { generate3DModel, type Generation3DJob } from "@/lib/ai3d/client.mjs";
 import { nextSelection } from "@/lib/scene/selection.mjs";
 import {applyLibraryMaterial} from "@/lib/scene/material-library.mjs";
 import {StudioSidebarFooter} from "@/components/crystal-studio/StudioSidebarFooter";
-import { useStudioActionAdapter, verifyStudioState, navigateStudioRoute } from "@/components/crystal-studio/StudioActions";
+import { useStudioActionAdapter, verifyStudioState, navigateStudioRoute, nextStudioFrame } from "@/components/crystal-studio/StudioActions";
 import { STUDIO_ROUTES, normalizeCommand } from "@/lib/studio-actions.mjs";
+import {selectionContext,planContextEdit,validateEditScope,editTargets} from "@/lib/scene/editing.mjs";
 import type { StudioToolbarAPI } from "@/components/crystal-studio/StudioViewportToolbar";
 import "./scene-studio.css";
 
@@ -100,12 +101,26 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const resumeController = useRef<AbortController | null>(null);
   const meshProvider = model === "meshy" || model === "tripo";
   useEffect(() => { const controller = new AbortController(); void fetch("/api/ai3d/providers", { signal: controller.signal, cache: "no-store" }).then(r => r.ok ? r.json() : null).then(data => { if (data && !controller.signal.aborted) setMeshProviders(data.providers.filter((p: { id: string }) => ["meshy", "tripo"].includes(p.id))); }).catch(() => {}); return () => { controller.abort(); resumeController.current?.abort(); }; }, []);
-  const [pending, setPending] = useState<{ commands: SceneCommand[]; preview: SceneDocument; base: string } | null>(null);
+  const [pending, setPending] = useState<{ commands: SceneCommand[]; preview: SceneDocument; base: string; destructive?:boolean; expires?:number } | null>(null);
+  const [editing,setEditing]=useState<{ids:string[];phase:'processing'|'updating'|'completed'}|null>(null);
+  const [planning,setPlanning]=useState(false);
+  const editTimer=useRef<ReturnType<typeof setTimeout>>();
+  const editEpoch=useRef(0);
+  const editBase=useRef('');
+  useEffect(()=>()=>{editEpoch.current++;clearTimeout(editTimer.current);},[]);
   const [messages, setMessages] = useStudioConversation([]);
   const dock = useStudioDock();
   useEffect(() => { if (window.matchMedia("(max-width:760px)").matches) { setLeft(false); setRight(false); } }, []);
   const primary = doc.objects.find(o => o.id === selected[0]);
-  const blocked = !store.ready || Boolean(pending);
+  const blocked = !store.ready || Boolean(pending) || planning;
+  const context=selectionContext(doc,selected);
+  const executionChange=(active:boolean)=>{
+    if(active){clearTimeout(editTimer.current);editBase.current=fingerprint(docRef.current);editEpoch.current++;setEditing({ids:editTargets(docRef.current,selected),phase:'processing'});}
+    else if(editBase.current!==fingerprint(docRef.current)){
+      setEditing(current=>current?{...current,phase:'completed'}:null);
+      editTimer.current=setTimeout(()=>setEditing(null),450);
+    }else setEditing(null);
+  };
   const selectedRoots = selected.filter(id => { let parent = doc.objects.find(o => o.id === id)?.parentId; while (parent) { if (selected.includes(parent)) return false; parent = doc.objects.find(o => o.id === parent)?.parentId; } return true; });
   const safely = useCallback((operation: () => void,strict=false) => { try { setError(null); operation(); } catch (caught) { setError(caught instanceof Error ? caught.message : "Operation failed.");if(strict)throw caught; } }, []);
   const change = (next: SceneDocument) => { if (blocked) throw new Error("Apply or dismiss the scene proposal before editing."); store.commit(next); };
@@ -118,7 +133,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     if (!allowLocked && scene.objects.some(o => ids.has(o.id) && locked(o))) throw new Error("Unlock the selected objects and their parents first.");
     change({ ...scene, objects: scene.objects.map(o => o.id === id ? { ...o, ...values } : values.material && ids.has(o.id) ? { ...o, material: values.material } : o) });
   });
-  const select = (id: string | null, additive = false) => { if (pending) return; setSelected(current => nextSelection(current,id,additive)); };
+  const select = (id: string | null, additive = false) => { if (pending||planning) return; setSelected(current => nextSelection(current,id,additive)); };
   const add = (name: string, point?: Vec3 | null,strict=false) => safely(() => {
     const objects = asset(name).map(o => !o.parentId && point ? { ...o, position: [o.position[0] + point[0], o.position[1], o.position[2] + point[2]] as Vec3 } : o);
     change({ ...doc, objects: [...doc.objects, ...objects] }); setSelected([objects[0].id]); setTool("translate");
@@ -197,17 +212,40 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const requestSceneAnswer: typeof requestStudioAnswer = async request => {
     if (request.provider === "you") return await requestStudioAnswer(request);
     if (["meshy", "tripo"].includes(request.provider)) return await prepareGeneratedModel(request);
-    const base = fingerprint(doc);
-    const response = await fetch("/api/ai-scene", { method: "POST", headers: { "Content-Type": "application/json" }, signal: request.signal, body: JSON.stringify({ provider: request.provider, prompt: request.message, document: doc, selected }) });
-    const data = await response.json(); if (!response.ok) throw new Error(data.error || "Scene proposal failed.");
-    request.signal?.throwIfAborted();
-    if (fingerprint(docRef.current) !== base) throw new Error("The scene changed while AI was planning. Request an updated proposal.");
-    const preview = applyCommands(doc, data.commands); setPending({ commands: data.commands, preview, base });
-    return { message: `Proposed ${data.commands.length} validated scene operations. Review the viewport preview and choose Apply or Discard. Nothing has been saved or applied yet.`, provider: data.provider, model: data.model };
+    if(blocked)throw new Error('Finish the current operation first.');
+    const source=docRef.current,targets=[...selected],base=fingerprint(source),epoch=editEpoch.current;
+    let committed:string|null=null;
+    setPlanning(true);setError(null);
+    try{
+      // Yield to the existing renderer before synchronous geometry work.
+      await nextStudioFrame();request.signal?.throwIfAborted();
+      if(targets.length!==1&&/\b(this|that|selected) (object|wall|roof|building|mesh)\b|\bit\b/i.test(request.message))throw new Error('Select one object or component to edit first.');
+      let commands=planContextEdit(source,targets,request.message),provider='local',model='validated scene command';
+      if(!commands){
+        const response=await fetch('/api/ai-scene',{method:'POST',headers:{'Content-Type':'application/json'},signal:request.signal,body:JSON.stringify({provider:request.provider,prompt:request.message,document:source,selected:targets})});
+        const data=await response.json();if(!response.ok)throw new Error((typeof data.error==='string'?data.error:data.error?.message)||'Scene editing failed.');commands=data.commands;provider=data.provider;model=data.model;
+      }
+      request.signal?.throwIfAborted();
+      if(epoch!==editEpoch.current||fingerprint(docRef.current)!==base)throw new Error('The scene changed while planning. Retry with the current object.');
+      const next=validateEditScope(source,targets,commands!);
+      if(fingerprint(next)===base){setEditing(null);return{message:'The selected scene already matches this operation. No changes were needed.',provider,model};}
+      if(commands!.some(c=>c.type==='delete')){
+        setPending({commands:commands!,preview:next,base,destructive:true,expires:Date.now()+30_000});setEditing(null);
+        return{message:'This operation deletes existing geometry. Confirm the deletion below within 30 seconds, or cancel. No changes have been applied.',provider,model};
+      }
+      const affected=Array.from(new Set([...targets,...commands!.flatMap(c=>c.id?[c.id]:[]),...next.objects.filter(o=>!source.objects.some(old=>old.id===o.id)).map(o=>o.id)]));
+      setEditing({ids:affected,phase:'updating'});store.commit({...next,camera:viewport.current?.camera()??docRef.current.camera});
+      committed=fingerprint(next);
+      await verifyStudioState(()=>fingerprint(docRef.current)===fingerprint(next)&&viewport.current?.rendered()===fingerprint(next),request.signal??new AbortController().signal,5000);
+      setEditing({ids:affected,phase:'completed'});
+      editTimer.current=setTimeout(()=>setEditing(null),450);
+      return{message:`Applied ${commands!.length} validated scene operation${commands!.length===1?'':'s'}${context.label?` to ${context.label}`:''}. Undo is available.`,provider,model};
+    }catch(error){if(committed)store.rollback(committed);setEditing(null);throw error;}finally{setPlanning(false);}
   };
   const applyProposal = () => safely(() => {
-    if (!pending || pending.base !== fingerprint(doc)) throw new Error("The scene changed after this proposal. Discard it and request an updated proposal.");
+    if (!pending || pending.base !== fingerprint(doc) || (pending.expires&&pending.expires<Date.now())) throw new Error("The scene changed or confirmation expired. Cancel and repeat the request.");
     store.commit({ ...pending.preview, name: doc.name, camera: doc.camera }); setPending(null); requestAnimationFrame(() => viewport.current?.fit());
+    setSelected(ids=>ids.filter(id=>pending.preview.objects.some(o=>o.id===id)));
   });
   useStudioActionAdapter({name:`${identity}:${studio}:${doc.id}`,
     confirmation:action=>{
@@ -215,7 +253,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       if(action.intent==='scene.delete'){
         const ids=new Set(action.parameters.scope==='all'?doc.objects.map(o=>o.id):selected);
         for(let i=0;i<32;i++)doc.objects.forEach(o=>{if(o.parentId&&ids.has(o.parentId))ids.add(o.id);});
-        if(ids.size>1)return{key:JSON.stringify([fingerprint(doc),Array.from(ids)]),message:`Delete ${ids.size} project objects?`};
+        if(ids.size>0)return{key:JSON.stringify([fingerprint(doc),Array.from(ids)]),message:`Delete ${ids.size} project objects?`};
       }
       return null;
     },
@@ -321,7 +359,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   });
 
   return <main data-world-map={worldMap || undefined} className={`crystal-studio scene-workbench ${left ? "" : "scene-left-closed"} ${right ? "" : "scene-right-closed"}`} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (worldMap) return; if (e.dataTransfer.files[0]) void importFile(e.dataTransfer.files[0]); else { const name = e.dataTransfer.getData("application/x-casynus-asset"); if (catalog.includes(name)) add(name, viewport.current?.point(e.clientX, e.clientY)); } }}>
-    {store.ready && <SceneViewport ref={viewport} document={pending?.preview ?? doc} selected={selected} tool={pending ? "select" : tool} snap={snap} grid={grid} onSelect={select} onHover={setHoveredId} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
+    {store.ready && <SceneViewport ref={viewport} document={pending&&!pending.destructive?pending.preview:doc} editing={editing} selected={selected} tool={pending||planning ? "select" : tool} snap={snap} grid={grid} onSelect={select} onHover={setHoveredId} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
     {studio === "infrastructure" && mapOpened && <WorldMap key={doc.id} apiRef={worldMapAPI} active={worldMap} onViewChange={setMapView} importDisabled={blocked} onImport={feature => safely(() => {
       const scene = docRef.current;
       const objects = importGeographicFeature(feature, scene.objects.find(object => object.geographic)?.geographic?.origin);
@@ -385,9 +423,10 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
 
       {(error || store.failure) && <div className="scene-alert" role="alert"><span>{error || store.failure}</span>{store.conflict && <><button onClick={() => { if (window.confirm("Open the cloud revision and replace this browser recovery? Save a recovered copy first to retain both versions.")) window.location.href = `${routes[studio]}?project=${doc.id}&cloud=1`; }}>Open cloud copy</button><button onClick={store.saveCopy}>Save recovered copy</button></>}<button aria-label="Dismiss scene error" onClick={() => { setError(null); if (!store.conflict) store.setFailure(null); }}><X size={15} /></button></div>}
       {busy && <div className="scene-busy" role="status">{busy}</div>}
-      {pending && <div className="scene-proposal" role="dialog" aria-label="Review AI scene proposal"><strong>Preview · changes are not applied</strong><ol>{pending.commands.map((c, i) => <li key={i}>{c.type} {c.template || c.name || c.id || c.kind || "lighting"}</li>)}</ol><div><button onClick={applyProposal}>Apply scene proposal</button><button onClick={() => setPending(null)}>Discard proposal</button></div></div>}
-      <div className="scene-chat-mode"><label><input type="checkbox" checked={meshProvider || sceneAI} disabled={model === "you" || meshProvider || Boolean(pending)} onChange={e => setSceneAI(e.target.checked)} />{meshProvider ? "AI model generation · preview first" : "AI scene commands · preview first"}</label>{model === "you" && <small>You: research chat</small>}</div>
-      <StudioAIChat studio={studio === "architecture" ? "modeling" : studio === "interior" ? "floor-plan" : "infrastructure"} open={dock.open} onOpenChange={dock.setOpen} prompt={prompt} onPromptChange={setPrompt} onSubmit={() => {}} model={model} onModelChange={value => { setModel(value); if (value === "you") setSceneAI(false); }} models={[...providers, ...meshProviders]} messages={messages} onMessagesChange={setMessages} onClearMessages={() => setMessages([])} onNewChat={() => { setMessages([]); setPrompt(""); }} requestAnswer={meshProvider || (sceneAI && model !== "you") ? requestSceneAnswer : undefined} statusLabel={meshProvider ? "Real 3D provider · review before applying" : sceneAI && model !== "you" ? "Validated scene proposals · manual approval required" : `${doc.objects.length} objects · meters`} />
+      {pending && <div className="scene-proposal" role="dialog" aria-label={pending.destructive?'Confirm destructive scene edit':'Review AI scene proposal'}><strong>{pending.destructive?'Confirm deletion · scene unchanged':'Preview · changes are not applied'}</strong><ol>{pending.commands.map((c, i) => <li key={i}>{c.type} {c.template || c.name || c.id || c.kind || "lighting"}</li>)}</ol><div><button onClick={applyProposal}>{pending.destructive?'Confirm deletion':'Apply scene proposal'}</button><button onClick={() => setPending(null)}>{pending.destructive?'Cancel deletion':'Discard proposal'}</button></div></div>}
+      <StudioAIChat studio={studio === "architecture" ? "modeling" : studio === "interior" ? "floor-plan" : "infrastructure"} open={dock.open} onOpenChange={dock.setOpen} prompt={prompt} onPromptChange={setPrompt} onSubmit={() => {}} model={model} onModelChange={value => { setModel(value); setSceneAI(value !== "you"); }} models={[...providers, ...meshProviders]} messages={messages} onMessagesChange={setMessages} onClearMessages={() => setMessages([])} onNewChat={() => { setMessages([]); setPrompt(""); }} requestAnswer={meshProvider || (sceneAI && model !== "you") ? requestSceneAnswer : undefined} selectedContext={context.label} onExecutionChange={executionChange}
+        onHistoryRequest={redo=>{if(!blocked){if(redo)store.redo();else store.undo();}}}
+        contextControls={<div className="scene-chat-mode"><label><input type="checkbox" checked={meshProvider||sceneAI} disabled={model==='you'||meshProvider||Boolean(pending)||planning} onChange={e=>setSceneAI(e.target.checked)}/>{meshProvider?'AI model generation · preview first':'AI scene editing'}</label>{model==='you'&&<small>You: research chat</small>}</div>}/>
       <div className="scene-navigation-hint">{worldMap ? "Drag to pan · right-drag to rotate/pitch · wheel or pinch to zoom · click to select location" : "RMB orbit · MMB pan · wheel zoom · Shift click multi-select"}</div>
     </section>
 

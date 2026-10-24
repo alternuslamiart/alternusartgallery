@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowUp, LoaderCircle, Maximize2, Mic, MicOff, Minimize2, Minus, Paperclip, Plus, Radio, Sparkles, Square, Trash2, X } from "lucide-react";
-import { useEffect, useId, useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useId, useRef, useState, type Dispatch, type SetStateAction, type ReactNode } from "react";
 import { useSession } from "next-auth/react";
 import { requestStudioAnswer, STUDIO_AI_PROVIDERS } from "@/lib/studio-ai.mjs";
 import { StudioBadge, StudioButton } from "./kit";
@@ -46,6 +46,10 @@ type StudioAIChatProps = {
   onQuickPrompt?: (prompt: string) => void;
   placeholder?: string;
   statusLabel?: string;
+  selectedContext?: string;
+  contextControls?:ReactNode;
+  onHistoryRequest?:(redo:boolean)=>void;
+  onExecutionChange?: (active:boolean)=>void;
   className?: string;
 };
 const PROVIDER_MODELS: StudioChatModelOption[] = [
@@ -61,7 +65,7 @@ const STUDIO_NAMES = { modeling: "3D Studio", "floor-plan": "Interior", infrastr
 export function StudioAIChat({
   studio, open, onOpenChange, prompt, onPromptChange, onSubmit, onStop,
   loading: workspaceLoading = false, progress = 0, error, onClearError, model, onModelChange,
-  models, messages = [], onMessagesChange, requestAnswer, referenceImage, onAttachImage, onRemoveImage, onNewChat, onClearMessages, statusLabel,
+  models, messages = [], onMessagesChange, requestAnswer, referenceImage, onAttachImage, onRemoveImage, onNewChat, onClearMessages, statusLabel, selectedContext, onExecutionChange,contextControls,onHistoryRequest,
   quickPrompts = [], onQuickPrompt, placeholder = "What do you want to create?", className = "",
 }: StudioAIChatProps) {
   const { expanded, setExpanded } = useStudioDock();
@@ -106,6 +110,7 @@ export function StudioAIChat({
     const controller = new AbortController();
     pendingRequest.current = controller;
     setRemoteLoading(true);
+    onExecutionChange?.(true);
     setRemoteError(null);
     onClearError?.();
     const message = (spokenCommand??promptRef.current).trim();
@@ -133,7 +138,7 @@ export function StudioAIChat({
       }
       if(fromVoice)throw caught;
     } finally {
-      if (pendingRequest.current === controller) { pendingRequest.current = null; setRemoteLoading(false); }
+      if (pendingRequest.current === controller) { pendingRequest.current = null; setRemoteLoading(false); onExecutionChange?.(false); }
     }
   };
 
@@ -178,6 +183,8 @@ export function StudioAIChat({
           onClick={() => onOpenChange(false)}><Minus size={16} /></StudioButton>
       </div>
     </div>
+    {selectedContext&&<div className="cs-chat-selection" aria-label="Selected object context" title={selectedContext}>Selected: {selectedContext}</div>}
+    {contextControls}
     {(visibleMessages.length > 0 || expanded || loading) && <div id={panelId + "-thread"} className="studio-ai-thread" role="log" aria-live="polite" ref={threadRef}>
       {!visibleMessages.length && !loading && <p className="cs-chat-empty">Describe your idea or choose a suggestion to start.</p>}
       {visibleMessages.map(message => <div key={message.id} className={`studio-ai-message is-${message.role}`}>
@@ -216,6 +223,7 @@ export function StudioAIChat({
       <textarea ref={textareaRef} aria-label={studio === "floor-plan" ? "AI floor-plan prompt" : studio === "infrastructure" ? "Message the site assistant" : "AI model prompt"}
         value={prompt} onChange={event => onPromptChange(event.target.value)} rows={2} placeholder={placeholder}
         className="studio-ai-textarea" maxLength={model === "you" ? 400 : 12_000} enterKeyHint="send" onKeyDown={event => {
+          if(onHistoryRequest&&!prompt.trim()&&!loading&&(event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='z'){event.preventDefault();onHistoryRequest(event.shiftKey);return;}
           if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
             event.preventDefault(); if (prompt.trim() && !loading) void submitPrompt();
           }

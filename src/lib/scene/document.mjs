@@ -200,18 +200,42 @@ export function applyCommands(document, commands) {
   let next = validateDocument(document);
   for (const c of commands) {
     if (!c || typeof c !== "object") fail("Invalid scene command.");
+    const fields={template:['template','stories','position'],create:['kind','name','position','dimensions','rotation','scale','material','color'],move:['id','position'],transform:['id','position','rotation','scale','dimensions'],material:['id','material','color','roughness','metalness','opacity','transmission'],delete:['id'],environment:['sunElevation','sunAzimuth','sunIntensity','exposure','shadows','quality'],roof:['id','style'],windows:['id','count']};
+    if(!fields[c.type]||Object.keys(c).some(key=>key!=='type'&&!fields[c.type].includes(key)))fail('Unsupported scene command field.');
     if (c.type === "template") { const objects = createTemplate(c.template, c.stories ?? 2); if (c.position) objects[0].position = vector(c.position); next = { ...next, objects: [...next.objects, ...objects] }; }
     else if (c.type === "create") {
       if (!["box", "sphere", "cylinder", "pointLight", "spotLight"].includes(c.kind)) fail("Unsupported primitive.");
       if (c.material && !MATERIALS[c.material]) fail("Unsupported material preset.");
       next.objects.push(makeObject(c.kind, { name: c.name ?? c.kind, position: c.position ?? [0, .5, 0], dimensions: c.dimensions ?? [1, 1, 1], rotation: c.rotation ?? [0, 0, 0], scale: c.scale ?? [1, 1, 1], material: { ...(MATERIALS[c.material] ?? MATERIALS.concrete), ...(c.color ? { color: color(c.color) } : {}) } }));
-    } else if (["move", "transform", "material", "delete"].includes(c.type)) {
+    } else if (["move", "transform", "material", "delete", "roof", "windows"].includes(c.type)) {
       const target = next.objects.find(o => o.id === c.id);
       if (!target || target.locked) fail("Object is missing or locked.");
       let parent = target.parentId;
       while (parent) { const node = next.objects.find(o => o.id === parent); if (node?.locked) fail("Parent group is locked."); parent = node?.parentId; }
+      if(c.type==='roof'){
+        if(c.style!=='flat'||target.kind!=='box'||! /roof/i.test(target.name))fail('Flat roof replacement requires a selected parametric roof slab. Imported mesh topology needs a dedicated mesh operation.');
+        if(target.geographic)fail('Geographic source geometry cannot be replaced by a roof operation.');
+        target.kind='box';delete target.geometry;target.dimensions[1]=.25;
+      }
+      if(c.type==='windows'){
+        if(target.kind!=='box'||! /wall/i.test(target.name)||target.geographic)fail('Window openings require an unmodified rectangular wall.');
+        const count=number(c.count,1,8);if(!Number.isInteger(count))fail('Window count must be an integer.');
+        const axis=target.dimensions[0]>=target.dimensions[2]?0:2,thin=axis===0?2:0;
+        const width=target.dimensions[axis],height=target.dimensions[1],thickness=target.dimensions[thin];
+        if(thickness>1||width/(count*1.4)<.5||height<1.5)fail('The wall is too small or thick for these window openings.');
+        const opening=width/(count*1.4),gap=(width-count*opening)/(count+1),sill=height*.22,openingHeight=height*.58;
+        const wallMaterial=target.material;target.kind='group';
+        const part=(name,x,y,w,h,material,depth=thickness)=>{const dimensions=[depth,h,depth],position=[0,y,0];dimensions[axis]=w;position[axis]=x;return makeObject('box',{name,parentId:target.id,position,dimensions,material});};
+        next.objects.push(part('Wall sill',0,-height/2+sill/2,width,sill,wallMaterial),part('Wall lintel',0,height/2-(height-sill-openingHeight)/2,width,height-sill-openingHeight,wallMaterial));
+        for(let i=0;i<=count;i++)next.objects.push(part('Wall pier',-width/2+gap/2+i*(gap+opening),-height/2+sill+openingHeight/2,gap,openingHeight,wallMaterial));
+        for(let i=0;i<count;i++)next.objects.push(part(`Window glass ${i+1}`,-width/2+gap+opening/2+i*(gap+opening),-height/2+sill+openingHeight/2,opening,openingHeight,MATERIALS.glass,Math.min(.06,thickness)));
+      }
       if (c.type === "move") target.position = vector(c.position);
       if (c.type === "transform") {
+        if(target.kind==='group'){
+          const descendants=new Set([target.id]);for(let i=0;i<32;i++)for(const o of next.objects)if(descendants.has(o.parentId))descendants.add(o.id);
+          if(next.objects.some(o=>descendants.has(o.id)&&o.locked))fail('A child object is locked.');
+        }
         if ((target.kind === "group" || target.kind.endsWith("Light")) && c.dimensions !== undefined) fail("Groups resize through scale; lights do not have mesh dimensions.");
         if (!["position", "rotation", "scale", "dimensions"].some(key => c[key] !== undefined)) fail("Transform requires a position, rotation, scale or dimensions.");
         Object.assign(target, validateObject({ ...target, ...Object.fromEntries(["position", "rotation", "scale", "dimensions"].filter(key => c[key] !== undefined).map(key => [key, c[key]])) }));
@@ -220,6 +244,8 @@ export function applyCommands(document, commands) {
         if (c.material && !MATERIALS[c.material]) fail("Unsupported material preset.");
         const ids = new Set([target.id]);
         for (let i = 0; i < 32; i++) next.objects.forEach(o => { if (ids.has(o.parentId)) ids.add(o.id); });
+        // A segmented wall's glazing remains its own editable component.
+        if(target.kind==='group'&&/wall/i.test(target.name))next.objects.forEach(o=>{if(o.id!==target.id&&/^Window glass \d+$/.test(o.name))ids.delete(o.id);});
         if (next.objects.some(o => ids.has(o.id) && o.locked)) fail("A child object is locked.");
         next.objects.forEach(o => { if (ids.has(o.id)) o.material = validateMaterial({ ...(MATERIALS[c.material] ?? o.material), ...Object.fromEntries(["color", "roughness", "metalness", "opacity", "transmission"].filter(key => c[key] !== undefined).map(key => [key, c[key]])) }); });
       }

@@ -75,8 +75,10 @@ editor and one versioned, metric scene document. Existing editors remain at
   allowlisted template/create/move/material/delete/environment operations.
   Server and browser validate the whole transaction, reject invalid IDs,
   locked objects and unsupported operations, and never execute generated code.
-- Viewport preview requires Apply or Discard. Apply is one undoable action;
-  editing while a proposal is pending is blocked. Stale responses are rejected.
+- Reversible native commands now execute automatically as one undoable action
+  after complete transaction and selection-scope validation. Delete commands
+  require expiring, state-bound confirmation. Stale responses are rejected;
+  Meshy/Tripo model import retains preview/Apply. See `CONTEXTUAL-SCENE-EDITING.md`.
 - You remains research chat; it is not presented as a scene command provider.
   Existing provider text chat remains available with scene mode off.
 - Protocol references: [Gemini function calling](https://ai.google.dev/gemini-api/docs/function-calling),

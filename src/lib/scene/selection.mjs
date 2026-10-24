@@ -12,7 +12,7 @@ export function createSelectionHelpers(root,ids) {
     const node=nodes.get(id);if(!node)return [];
     for(let parent=node;parent;parent=parent.parent)if(!parent.visible)return [];
     if(new Box3().setFromObject(node).isEmpty())return [];
-    const helper=new BoxHelper(node,index===0?0x4284ff:0x22c55e);
+    const helper=new BoxHelper(node,index===0?0x3b82f6:0x22c55e);
     helper.material.depthTest=false;helper.material.depthWrite=false;helper.material.toneMapped=false;
     helper.renderOrder=1000;helper.raycast=()=>{};
     helper.userData.selectionId=id;

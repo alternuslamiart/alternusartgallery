@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getGeminiApiKey, getGeminiModel, getGroqApiKey, getGroqBaseUrl, getGroqModel } from "@/lib/ai-provider-config";
-import { applyCommands, MAX_SCENE_BYTES, validateDocument } from "@/lib/scene/document.mjs";
+import { MAX_SCENE_BYTES, validateDocument } from "@/lib/scene/document.mjs";
 import { isApiResponse, requirePlatformContext } from "@/lib/platform/api";
 import { aiUsage, usageError, type UsageTicket } from "@/lib/platform/usage";
+import {selectionContext,validateEditScope,editTargets} from "@/lib/scene/editing.mjs";
+import type {SceneCommand} from "@/lib/scene/document.mjs";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 const parameters = {
   type: "object", required: ["commands"], properties: {
     commands: { type: "array", items: { type: "object", required: ["type"], properties: {
-      type: { type: "string", enum: ["template", "create", "move", "transform", "material", "delete", "environment"] },
+      type: { type: "string", enum: ["template", "create", "move", "transform", "material", "delete", "environment", "roof", "windows"] },
+      style:{type:"string",enum:["flat"]},count:{type:"integer",minimum:1,maximum:8},
       template: { type: "string", enum: ["building", "room", "intersection"] }, stories: { type: "integer" },
       kind: { type: "string", enum: ["box", "sphere", "cylinder", "pointLight", "spotLight"] },
       name: { type: "string" }, id: { type: "string" }, position: { type: "array", items: { type: "number" } }, dimensions: { type: "array", items: { type: "number" } },
@@ -21,7 +24,7 @@ const parameters = {
     } } },
   },
 };
-const declaration = { name: "propose_scene_commands", description: "Propose editable metric scene operations. The user must review and apply them. Never generate executable code.", parameters };
+const declaration = { name: "propose_scene_commands", description: "Return validated metric scene operations for transactional editing. Reversible changes execute automatically; deletion requires confirmation. Never generate executable code.", parameters };
 export async function POST(request: NextRequest) {
   let ticket: UsageTicket | undefined;
   let generated = false;
@@ -33,8 +36,10 @@ export async function POST(request: NextRequest) {
     const doc = validateDocument(body.document);
     if (typeof body.prompt !== "string" || !body.prompt.trim() || body.prompt.length > 4000) return NextResponse.json({ error: "Use a prompt between 1 and 4000 characters." }, { status: 400 });
     const selected = Array.isArray(body.selected) ? body.selected.filter((id: unknown) => typeof id === "string" && doc.objects.some(o => o.id === id)) : [];
-    const context = [...doc.objects.filter(o => selected.includes(o.id)), ...doc.objects.filter(o => !selected.includes(o.id))].slice(0, 60).map(o => ({ id: o.id, name: o.name, kind: o.kind, position: o.position, dimensions: o.dimensions, locked: o.locked }));
-    const instruction = `You are a Casynus CAD scene planner. Call propose_scene_commands with at most 30 commands. Units are meters; rotations in the existing scene are radians. Use building, room or intersection templates for complete environments; building stories may be 1 to 8. "move" uses absolute local coordinates, so add the requested delta to the current position. Reference only the supplied IDs; never change locked objects. Materials are named presets. The user reviews every proposal before it is applied. No code or external resources. Selected IDs: ${JSON.stringify(selected)}. Current objects: ${JSON.stringify(context)}.`;
+    if(selected.length!==1&&/\b(this|that|selected) (object|wall|roof|building|mesh)\b|\bit\b/i.test(body.prompt))return NextResponse.json({error:'Select one object or component to edit first.'},{status:400});
+    const targets=new Set(editTargets(doc,selected));
+    const context = [...doc.objects.filter(o => targets.has(o.id)), ...doc.objects.filter(o => !targets.has(o.id))].slice(0, 120).map(o => ({ id: o.id, parentId:o.parentId, name: o.name, kind: o.kind, position: o.position, rotation:o.rotation, scale:o.scale, dimensions: o.dimensions,material:{...o.material,map:o.material.map?'embedded texture':undefined,normalMap:undefined,roughnessMap:undefined,metalnessMap:undefined,aoMap:undefined}, geometry:o.geometry?{vertices:o.geometry.positions.length/3}:undefined, locked: o.locked }));
+    const instruction = `You are a Casynus CAD scene planner. Call propose_scene_commands with at most 30 commands. Units are meters; rotations are radians. Reversible operations execute automatically in one undoable transaction; delete requires confirmation. Only include fields relevant to each command type. Use building, room or intersection templates for complete environments, stories 1 to 8. Move uses absolute local coordinates. Reference only supplied IDs. With selection, edit only the selected objects or descendants, never siblings or ancestors. 'this roof/wall/object' refers to exact selected component. Groups resize through scale, preserving child relationships. roof with style flat replaces a named roof mesh with a .25m flat slab, maintaining its ID. windows with count 1 to 8 cuts real openings in an existing rectangular named box wall and adds glass; do not place windows as decals or floating boxes. Use material for PBR preset/color changes, environment for sun/shadow/exposure. Do not invent unsupported booleans, terrain, mesh topology or remote textures. Never change locked objects or children of locked groups. No code or external resources. Selected context: ${JSON.stringify(selectionContext(doc,selected))}. Current objects: ${JSON.stringify(context)}.`;
     let commands: unknown;
     let model: string;
     if (body.provider === "gemini" ? !getGeminiApiKey() : !getGroqApiKey()) return NextResponse.json({ error: "The selected AI provider is not configured." }, { status: 503 });
@@ -65,7 +70,7 @@ export async function POST(request: NextRequest) {
       commands = call ? JSON.parse(call.function.arguments).commands : undefined;
     }
     // Validate the complete transaction on the server; no scene is saved here.
-    applyCommands(doc, commands);
+    validateEditScope(doc, selected, commands as SceneCommand[]);
     generated = true;
     return NextResponse.json({ commands, provider: body.provider, model });
   } catch (caught) {

@@ -3,6 +3,7 @@ import test from "node:test";
 import fs from "node:fs";
 import ts from "typescript";
 import { applyCommands, makeDocument, MAX_SCENE_BYTES, validateDocument } from "../src/lib/scene/document.mjs";
+import * as editing from '../src/lib/scene/editing.mjs';
 
 class JsonResponse {
   constructor(body, init) { this.body = body; this.status = init?.status ?? 200; }
@@ -13,6 +14,7 @@ function moduleRoute(path, modules, fetchImpl) {
   const exports = {};
   new Function("require", "exports", "fetch", code)(id => {
     if (id === "next/server") return { NextResponse: JsonResponse };
+    if (id === '@/lib/scene/editing.mjs') return editing;
     assert.ok(id in modules, `Unexpected dependency ${id}`); return modules[id];
   }, exports, fetchImpl);
   return exports;

@@ -57,3 +57,5 @@ html[data-crystal-theme="light"] .scene-workbench.crystal-studio { background:#f
 .scene-sidebar-content>.scene-library { flex-shrink:0; }
 .scene-sidebar-content>.scene-hierarchy { min-height:140px; }
 .scene-workbench.crystal-studio .scene-view .crystal-ai-prompt.studio-ai-panel { bottom:0!important; }
+.scene-workbench .cs-chat-selection{margin:0 12px;padding:6px 0;color:#60a5fa;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid var(--studio-border);}
+.scene-workbench .cs-chat-dock .scene-chat-mode{position:static;margin:0 12px;padding:4px 0;}

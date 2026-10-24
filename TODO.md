@@ -1,6 +1,11 @@
-# Next tasks (reviewed 2026-10-23)
+# Next tasks (reviewed 2026-10-24)
 
 ## Next concrete task
+
+- [ ] Verify live signed-in Gemini/Groq contextual editing and cloud save/reopen;
+  local finite editing is independent of provider availability. Expand semantic
+  mesh/CAD constraints beyond parametric roof slabs and rectangular window hosts.
+  See `docs/CONTEXTUAL-SCENE-EDITING.md`.
 
 - [x] Align `/reset-password` with Login/Signup using the shared AuthShell.
 - [ ] Verify real reset email delivery and a valid expiring reset link in the

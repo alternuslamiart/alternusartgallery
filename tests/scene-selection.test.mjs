@@ -14,7 +14,7 @@ test('modifier selection keeps the first object primary and toggles later object
 test('every selected object gets a real non-pickable outline: blue first, green additional',()=>{
   const doc=makeDocument();doc.objects=[makeObject('box',{position:[-3,1,0]}),makeObject('sphere',{position:[3,1,0]})];
   const root=buildScene(doc);const helpers=createSelectionHelpers(root,doc.objects.map(o=>o.id));
-  assert.equal(helpers.length,2);assert.equal(helpers[0].material.color.getHexString(),'4284ff');assert.equal(helpers[1].material.color.getHexString(),'22c55e');
+  assert.equal(helpers.length,2);assert.equal(helpers[0].material.color.getHexString(),'3b82f6');assert.equal(helpers[1].material.color.getHexString(),'22c55e');
   for(const h of helpers){assert.equal(h.material.depthTest,false);assert.equal(h.material.toneMapped,false);const hits=[];h.raycast(null,hits);assert.equal(hits.length,0);assert.ok(h.geometry.getAttribute('position').count>0);}
   const before=new Box3().setFromBufferAttribute(helpers[1].geometry.getAttribute('position')).getCenter(new Vector3());
   root.children[1].position.x+=2;root.updateMatrixWorld(true);helpers[1].update();
@@ -26,5 +26,5 @@ test('hidden parents and missing IDs do not show outlines; remaining primary fol
   const doc=makeDocument();const group=makeObject('group',{visible:false});const child=makeObject('box',{parentId:group.id});const other=makeObject('box');doc.objects=[group,child,other];
   const root=buildScene(doc);const helpers=createSelectionHelpers(root,[child.id,'missing',other.id]);
   assert.equal(helpers.length,1);assert.equal(helpers[0].material.color.getHexString(),'22c55e');disposeSelectionHelpers(helpers);
-  const primary=createSelectionHelpers(root,[other.id]);assert.equal(primary[0].material.color.getHexString(),'4284ff');disposeSelectionHelpers(primary);disposeScene(root);
+  const primary=createSelectionHelpers(root,[other.id]);assert.equal(primary[0].material.color.getHexString(),'3b82f6');disposeSelectionHelpers(primary);disposeScene(root);
 });

@@ -121,6 +121,7 @@ export function useSceneDocument(studio: string, identity: string, authenticated
   };
   const saveCopy = () => replace({ ...current.current, id: crypto.randomUUID(), name: `${current.current.name.slice(0, 110)} copy` });
   return { document: history.present, history, ready, status, failure, conflict, commit, replace, saveCopy, save, saveVerified, recover,
+    rollback:(expected:string)=>setHistory(h=>JSON.stringify([h.present.id,h.present.objects,h.present.environment])===expected&&h.past.length?{past:h.past.slice(0,-1),present:h.past[h.past.length-1],future:[]}:h),
     setCamera: (camera: SceneDocument["camera"]) => setHistory(h => ({ ...h, present: { ...h.present, camera } })),
     undo: () => setHistory(undoHistory), redo: () => setHistory(redoHistory), setFailure };
 }
