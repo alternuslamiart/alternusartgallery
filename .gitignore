@@ -39,3 +39,9 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# Local GPU installation, checkpoints and persistent generated assets
+/ai-services/Hunyuan3D-2.1/
+/storage/
+__pycache__/
+*.pyc

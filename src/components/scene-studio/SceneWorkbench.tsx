@@ -18,6 +18,7 @@ import { requestStudioAnswer } from "@/lib/studio-ai.mjs";
 import { listRecovery } from "@/lib/scene/recovery";
 import { StudioViewportToolbar, downloadStudioCSV } from "@/components/crystal-studio/StudioViewportToolbar";
 import { generate3DModel, type Generation3DJob } from "@/lib/ai3d/client.mjs";
+import {cacheGeneratedAsset,clearGeneratedAssets} from '@/lib/scene/generated-assets.mjs';
 import { nextSelection } from "@/lib/scene/selection.mjs";
 import {applyLibraryMaterial} from "@/lib/scene/material-library.mjs";
 import {StudioSidebarFooter} from "@/components/crystal-studio/StudioSidebarFooter";
@@ -99,8 +100,9 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const [meshProviders, setMeshProviders] = useState<Array<{ id: string; label: string }>>([]);
   const [generationJobs, setGenerationJobs] = useState<Generation3DJob[] | null>(null);
   const resumeController = useRef<AbortController | null>(null);
-  const meshProvider = model === "meshy" || model === "tripo";
-  useEffect(() => { const controller = new AbortController(); void fetch("/api/ai3d/providers", { signal: controller.signal, cache: "no-store" }).then(r => r.ok ? r.json() : null).then(data => { if (data && !controller.signal.aborted) setMeshProviders(data.providers.filter((p: { id: string }) => ["meshy", "tripo"].includes(p.id))); }).catch(() => {}); return () => { controller.abort(); resumeController.current?.abort(); }; }, []);
+  const meshProvider = model === "meshy" || model === "tripo" || model === 'hunyuan';
+  useEffect(()=>()=>clearGeneratedAssets(),[]);
+  useEffect(() => { const controller = new AbortController(); void fetch("/api/ai3d/providers", { signal: controller.signal, cache: "no-store" }).then(r => r.ok ? r.json() : null).then(data => { if (data && !controller.signal.aborted) setMeshProviders(data.providers.filter((p: { id: string }) => ["meshy", "tripo", "hunyuan"].includes(p.id))); }).catch(() => {}); return () => { controller.abort(); resumeController.current?.abort(); }; }, []);
   const [pending, setPending] = useState<{ commands: SceneCommand[]; preview: SceneDocument; base: string; destructive?:boolean; expires?:number } | null>(null);
   const [editing,setEditing]=useState<{ids:string[];phase:'processing'|'updating'|'completed'}|null>(null);
   const [planning,setPlanning]=useState(false);
@@ -185,12 +187,22 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       setGenerationJobs(data.jobs);
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Jobs unavailable."); }
   };
-  const prepareGeneratedModel = async (request: { provider?: string; message?: string; signal?: AbortSignal; resumeId?: string }) => {
+  const prepareGeneratedModel = async (request: { provider?: string; message?: string; image?:string; signal?: AbortSignal; resumeId?: string },insert=false) => {
     const base = fingerprint(doc), projectId = doc.id;
     if (pending) throw new Error("Apply or discard the current preview first.");
     setError(null);
     try {
-      const { job, buffer } = await generate3DModel({ provider: request.provider, prompt: request.message, projectId, studio, signal: request.signal, resumeId: request.resumeId, onProgress: job => { setBusy(job.status === "IMPORTING" ? "Importing generated GLB…" : `${job.provider} · ${Math.round(job.progress)}% · ${job.status.toLowerCase()}`); setGenerationJobs(current => current?.map(previous => previous.id === job.id ? job : previous) ?? null); } });
+      if(request.provider==='hunyuan')await store.saveVerified();
+      const { job, buffer } = await generate3DModel({ provider: request.provider, prompt: request.message, image:request.image, projectId, studio, signal: request.signal, resumeId: request.resumeId, onProgress: job => { setBusy(job.status === "IMPORTING" ? "Importing generated GLB…" : `${job.provider} · ${Math.round(job.progress)}% · ${job.status.toLowerCase()}`); setGenerationJobs(current => current?.map(previous => previous.id === job.id ? job : previous) ?? null); } });
+      if(job.provider==='hunyuan'){
+        const asset=await cacheGeneratedAsset(buffer,job.id);request.signal?.throwIfAborted();
+        if(docRef.current.id!==projectId)throw new Error('Project changed. Open this generation from its originating project.');
+        if(insert){
+          const object=makeObject('model',{name:`Hunyuan · ${job.prompt.slice(0,90)}`,asset:{jobId:job.id,provider:'hunyuan'},dimensions:asset.dimensions,position:[0,asset.dimensions[1]/2,0]});
+          store.commit({...docRef.current,objects:[...docRef.current.objects,object]});setSelected([object.id]);setTool('translate');requestAnimationFrame(()=>viewport.current?.fit());
+        }
+        return{message:insert?'Inserted the generated GLB. Move, rotate, scale, duplicate and Undo are available.':'Hunyuan generated a real shape GLB. Choose Insert into Studio to add it to this project.',provider:job.provider,model:job.model,assetJobId:job.id};
+      }
       const objects = await importModel(buffer, "AI_generated.glb");
       if (!objects.some(o => ["mesh", "box", "sphere", "cylinder"].includes(o.kind))) throw new Error("The generated GLB contains no editable mesh geometry.");
       request.signal?.throwIfAborted();
@@ -204,14 +216,14 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   };
   const resumeGeneration = async (id: string) => {
     resumeController.current?.abort(); const controller = new AbortController(); resumeController.current = controller;
-    try { await prepareGeneratedModel({ resumeId: id, signal: controller.signal }); }
+    try { await prepareGeneratedModel({ resumeId: id, signal: controller.signal },true); }
     catch (caught) { if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : "Generation could not be resumed."); }
     finally { if (resumeController.current === controller) resumeController.current = null; }
   };
 
   const requestSceneAnswer: typeof requestStudioAnswer = async request => {
     if (request.provider === "you") return await requestStudioAnswer(request);
-    if (["meshy", "tripo"].includes(request.provider)) return await prepareGeneratedModel(request);
+    if (["meshy", "tripo", "hunyuan"].includes(request.provider)) return await prepareGeneratedModel(request);
     if(blocked)throw new Error('Finish the current operation first.');
     const source=docRef.current,targets=[...selected],base=fingerprint(source),epoch=editEpoch.current;
     let committed:string|null=null;
@@ -425,8 +437,9 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       {busy && <div className="scene-busy" role="status">{busy}</div>}
       {pending && <div className="scene-proposal" role="dialog" aria-label={pending.destructive?'Confirm destructive scene edit':'Review AI scene proposal'}><strong>{pending.destructive?'Confirm deletion · scene unchanged':'Preview · changes are not applied'}</strong><ol>{pending.commands.map((c, i) => <li key={i}>{c.type} {c.template || c.name || c.id || c.kind || "lighting"}</li>)}</ol><div><button onClick={applyProposal}>{pending.destructive?'Confirm deletion':'Apply scene proposal'}</button><button onClick={() => setPending(null)}>{pending.destructive?'Cancel deletion':'Discard proposal'}</button></div></div>}
       <StudioAIChat studio={studio === "architecture" ? "modeling" : studio === "interior" ? "floor-plan" : "infrastructure"} open={dock.open} onOpenChange={dock.setOpen} prompt={prompt} onPromptChange={setPrompt} onSubmit={() => {}} model={model} onModelChange={value => { setModel(value); setSceneAI(value !== "you"); }} models={[...providers, ...meshProviders]} messages={messages} onMessagesChange={setMessages} onClearMessages={() => setMessages([])} onNewChat={() => { setMessages([]); setPrompt(""); }} requestAnswer={meshProvider || (sceneAI && model !== "you") ? requestSceneAnswer : undefined} selectedContext={context.label} onExecutionChange={executionChange}
+        onInsertGeneratedModel={async id=>{if(blocked)throw new Error('Finish the current scene operation first.');resumeController.current?.abort();const controller=new AbortController();resumeController.current=controller;try{await prepareGeneratedModel({resumeId:id,signal:controller.signal},true);}finally{if(resumeController.current===controller)resumeController.current=null;}}}
         onHistoryRequest={redo=>{if(!blocked){if(redo)store.redo();else store.undo();}}}
-        contextControls={<div className="scene-chat-mode"><label><input type="checkbox" checked={meshProvider||sceneAI} disabled={model==='you'||meshProvider||Boolean(pending)||planning} onChange={e=>setSceneAI(e.target.checked)}/>{meshProvider?'AI model generation · preview first':'AI scene editing'}</label>{model==='you'&&<small>You: research chat</small>}</div>}/>
+        contextControls={<div className="scene-chat-mode"><label><input type="checkbox" checked={meshProvider||sceneAI} disabled={model==='you'||meshProvider||Boolean(pending)||planning} onChange={e=>setSceneAI(e.target.checked)}/>{model==='hunyuan'?'Image to 3D · shape only':meshProvider?'AI model generation · preview first':'AI scene editing'}</label>{model==='you'&&<small>You: research chat</small>}</div>}/>
       <div className="scene-navigation-hint">{worldMap ? "Drag to pan · right-drag to rotate/pitch · wheel or pinch to zoom · click to select location" : "RMB orbit · MMB pan · wheel zoom · Shift click multi-select"}</div>
     </section>
 

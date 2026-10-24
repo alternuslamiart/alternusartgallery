@@ -15,9 +15,9 @@ const pause = (ms, signal) => new Promise((resolve, reject) => {
   const timer = setTimeout(() => { signal?.removeEventListener("abort", abort); resolve(); }, ms);
   if (signal?.aborted) abort(); else signal?.addEventListener("abort", abort, { once: true });
 });
-export async function generate3DModel({ provider, prompt, projectId, studio, signal, resumeId, onProgress = () => {}, fetchImpl = fetch, pollMs = 3000, timeoutMs = 600_000 }) {
+export async function generate3DModel({ provider, prompt, image, projectId, studio, signal, resumeId, onProgress = () => {}, fetchImpl = fetch, pollMs = 3000, timeoutMs = 1800_000 }) {
   const parse = async response => { const data = await response.json(); if (!response.ok) throw new Error(message(data)); return data; };
-  let job = resumeId ? await parse(await fetchImpl(`/api/ai3d/jobs/${encodeURIComponent(resumeId)}?refresh=1`, { signal, cache: "no-store" })) : await parse(await fetchImpl("/api/ai3d/jobs", { method: "POST", headers: { "Content-Type": "application/json" }, signal, body: JSON.stringify({ requestId: crypto.randomUUID(), provider, prompt, projectId, studio }) }));
+  let job = resumeId ? await parse(await fetchImpl(`/api/ai3d/jobs/${encodeURIComponent(resumeId)}?refresh=1`, { signal, cache: "no-store" })) : await parse(await fetchImpl("/api/ai3d/jobs", { method: "POST", headers: { "Content-Type": "application/json" }, signal, body: JSON.stringify({ requestId: crypto.randomUUID(), provider, prompt, image, projectId, studio }) }));
   if (job.projectId !== projectId) throw new Error("This generation belongs to a different project.");
   const started = Date.now();
   while (true) {
@@ -31,7 +31,7 @@ export async function generate3DModel({ provider, prompt, projectId, studio, sig
   }
   onProgress({ ...job, status: "IMPORTING" });
   let response;
-  try { response = await fetchImpl(job.modelURL, { signal, credentials: "omit" }); }
+  try { if(job.modelURL) response = await fetchImpl(job.modelURL, { signal, credentials: "omit" }); }
   catch (error) { if (!(error instanceof TypeError)) throw error; }
   // Use the same-origin bounded proxy if the provider CDN does not allow CORS.
   if (!response || !response.ok) response = await fetchImpl(job.assetPath, { signal, cache: "no-store" });

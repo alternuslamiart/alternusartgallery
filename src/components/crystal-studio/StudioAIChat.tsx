@@ -17,6 +17,7 @@ export type StudioChatMessage = {
   text: string;
   timestamp?: string;
   meta?: string;
+  assetJobId?: string;
 };
 export type StudioChatModelOption = { id: string; label: string; badge?: string; description?: string };
 type StudioAIChatProps = {
@@ -42,6 +43,7 @@ type StudioAIChatProps = {
   referenceImage?: string | null;
   onAttachImage?: (file: File) => void;
   onRemoveImage?: () => void;
+  onInsertGeneratedModel?: (id:string) => Promise<void>;
   quickPrompts?: Array<{ label: string; prompt: string }>;
   onQuickPrompt?: (prompt: string) => void;
   placeholder?: string;
@@ -65,7 +67,7 @@ const STUDIO_NAMES = { modeling: "3D Studio", "floor-plan": "Interior", infrastr
 export function StudioAIChat({
   studio, open, onOpenChange, prompt, onPromptChange, onSubmit, onStop,
   loading: workspaceLoading = false, progress = 0, error, onClearError, model, onModelChange,
-  models, messages = [], onMessagesChange, requestAnswer, referenceImage, onAttachImage, onRemoveImage, onNewChat, onClearMessages, statusLabel, selectedContext, onExecutionChange,contextControls,onHistoryRequest,
+  models, messages = [], onMessagesChange, requestAnswer, referenceImage, onAttachImage, onRemoveImage, onInsertGeneratedModel, onNewChat, onClearMessages, statusLabel, selectedContext, onExecutionChange,contextControls,onHistoryRequest,
   quickPrompts = [], onQuickPrompt, placeholder = "What do you want to create?", className = "",
 }: StudioAIChatProps) {
   const { expanded, setExpanded } = useStudioDock();
@@ -83,6 +85,7 @@ export function StudioAIChat({
   const loading = workspaceLoading || remoteLoading;
   const displayError = remoteError || error;
   const [localImage, setLocalImage] = useState<string | null>(null);
+  const [imageFile,setImageFile]=useState<File|null>(null);
   const threadRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const panelId = useId();
@@ -95,11 +98,12 @@ export function StudioAIChat({
   useEffect(() => {
     setRemoteLoading(false);
     setRemoteError(null);
+    setImageFile(null);setLocalImage(null);
     return () => { pendingRequest.current?.abort(); pendingRequest.current = null; };
   }, [identity]);
 
   const submitPrompt = async (providerOverride?: string, fromVoice = false, spokenCommand?:string) => {
-    if (!(spokenCommand??promptRef.current).trim() || loading || pendingRequest.current) return;
+    if ((!(spokenCommand??promptRef.current).trim() && !(model==='hunyuan'&&imageFile)) || loading || pendingRequest.current) return;
     if (!fromVoice) voiceControl.current?.stop();
     const selectedProvider = providerOverride && STUDIO_AI_PROVIDERS.includes(providerOverride) ? providerOverride : model;
     let localCommand=false;try{localCommand=Boolean(parseStudioCommand(spokenCommand??promptRef.current));}catch{localCommand=true;}
@@ -113,11 +117,11 @@ export function StudioAIChat({
     onExecutionChange?.(true);
     setRemoteError(null);
     onClearError?.();
-    const message = (spokenCommand??promptRef.current).trim();
+    const message = (spokenCommand??promptRef.current).trim() || 'Generate 3D from reference image';
     onMessagesChange(current => [...current, { id: crypto.randomUUID(), role: "user", text: message }]);
     if(!spokenCommand)onPromptChange("");
     try {
-      const command=await actions.run(message,controller.signal);
+      const command=selectedProvider==='hunyuan'?null:await actions.run(message,controller.signal);
       if(command){
         if(command.status==='error')throw new Error(command.message);
         if(controller.signal.aborted||identityRef.current!==requestIdentity)return;
@@ -125,10 +129,15 @@ export function StudioAIChat({
         return command.message;
       }
       if (!STUDIO_AI_PROVIDERS.includes(selectedProvider) && !requestAnswer) { if(!spokenCommand)onPromptChange(message);onSubmit();return; }
-      const result = await (requestAnswer ?? requestStudioAnswer)({ provider: selectedProvider, message, messages, signal: controller.signal });
+      let image:string|undefined;
+      if(selectedProvider==='hunyuan'){
+        if(!imageFile)throw new Error('Attach a reference image first. Hunyuan Shape supports Image to 3D.');
+        image=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=()=>reject(new Error('Image could not be read.'));reader.readAsDataURL(imageFile);});
+      }
+      const result = await (requestAnswer ?? requestStudioAnswer)({ provider: selectedProvider, message, image, messages, signal: controller.signal });
       if (controller.signal.aborted || identityRef.current !== requestIdentity) return;
       const sources = result.citations?.length ? `\n\nSources:\n${result.citations.map(item => item.source).join("\n")}` : "";
-      onMessagesChange(current => [...current, { id: crypto.randomUUID(), role: "assistant", text: result.message + sources, meta: `${result.provider} · ${result.model}` }]);
+      onMessagesChange(current => [...current, { id: crypto.randomUUID(), role: "assistant", text: result.message + sources, meta: `${result.provider} · ${result.model}`, ...(result.assetJobId?{assetJobId:result.assetJobId}:{}) }]);
       if (result.warning) setRemoteError(result.warning);
       return result.message;
     } catch (caught) {
@@ -190,6 +199,7 @@ export function StudioAIChat({
       {visibleMessages.map(message => <div key={message.id} className={`studio-ai-message is-${message.role}`}>
         <div className="studio-ai-message-meta"><span>{message.role === "user" ? "You" : message.role === "system" ? "Workspace" : "Casynus"}</span>{message.meta && <small>{message.meta}</small>}</div>
         <div className="studio-ai-message-body">{message.text}</div>
+        {message.assetJobId&&onInsertGeneratedModel&&<StudioButton size="sm" disabled={loading} onClick={()=>{setRemoteLoading(true);void onInsertGeneratedModel(message.assetJobId!).catch(error=>setRemoteError(error instanceof Error?error.message:'Model insertion failed.')).finally(()=>setRemoteLoading(false));}}>Insert into Studio</StudioButton>}
       </div>)}
       {loading && <div className="studio-ai-message is-assistant" aria-busy="true">
         <div className="studio-ai-progress-row"><LoaderCircle size={14} className="cs-spin" /><span>Processing your request{progress > 0 ? ` · ${progress}%` : "…"}</span></div>
@@ -206,7 +216,7 @@ export function StudioAIChat({
       <img src={activeImage} alt="Attached design reference" />
       <div className="studio-ai-attachment-info"><span>Reference image</span><small>Attached to this workspace</small></div>
       <StudioButton size="icon" variant="ghost" aria-label="Remove uploaded image" title="Remove attachment"
-        onClick={() => { onRemoveImage?.(); setLocalImage(null); }}><X size={14} /></StudioButton>
+        onClick={() => { onRemoveImage?.(); setLocalImage(null);setImageFile(null); }}><X size={14} /></StudioButton>
     </div>}
     {displayError && <div className="studio-ai-error" role="alert"><span>{displayError}</span>
       <StudioButton size="icon" variant="ghost" aria-label="Dismiss error" onClick={() => { setRemoteError(null); onClearError?.(); }}><X size={14} /></StudioButton>
@@ -225,17 +235,23 @@ export function StudioAIChat({
         className="studio-ai-textarea" maxLength={model === "you" ? 400 : 12_000} enterKeyHint="send" onKeyDown={event => {
           if(onHistoryRequest&&!prompt.trim()&&!loading&&(event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='z'){event.preventDefault();onHistoryRequest(event.shiftKey);return;}
           if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
-            event.preventDefault(); if (prompt.trim() && !loading) void submitPrompt();
+            event.preventDefault(); if ((prompt.trim() || (model==='hunyuan'&&imageFile)) && !loading) void submitPrompt();
           }
         }} />
       <div className="studio-ai-controls">
         <div className="studio-ai-controls-left">
           <label className="studio-ai-attach-btn" title="Attach reference image">
             <Paperclip size={16} /><input type="file" aria-label="Attach reference image" accept="image/png,image/jpeg,image/webp" className="sr-only"
-              onChange={event => {
+              onChange={async event => {
                 const file = event.target.files?.[0];
-                if (file) { if (onAttachImage) onAttachImage(file); else setLocalImage(URL.createObjectURL(file)); }
                 event.currentTarget.value = "";
+                if(!file)return;
+                try{
+                  if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>3_000_000)throw new Error('Use PNG, JPEG or WebP, at most 3 MB.');
+                  const bitmap=await createImageBitmap(file);const valid=[bitmap.width,bitmap.height].every(n=>n>=32&&n<=4096);bitmap.close();
+                  if(!valid)throw new Error('Image dimensions must be 32–4096 pixels.');
+                  setImageFile(file);if(onAttachImage)onAttachImage(file);else setLocalImage(URL.createObjectURL(file));setRemoteError(null);
+                }catch(error){setRemoteError(error instanceof Error?error.message:'Invalid image.');}
               }} />
           </label>
           <StudioButton size="icon" variant="ghost" active={voice.mode==="dictation"} aria-label={voice.mode==="dictation"?"Stop voice dictation":"Start voice dictation"} aria-keyshortcuts="Control+Q" title="Voice command (Ctrl + Q)" onClick={voice.toggleDictation}>{voice.mode==="dictation"?<MicOff size={16}/>:<Mic size={16}/>}</StudioButton>
@@ -247,7 +263,7 @@ export function StudioAIChat({
         </div>
         {loading && onStop
           ? <StudioButton size="icon" variant="primary" onClick={onStop} aria-label="Stop generation" title="Stop generation"><Square size={13} fill="currentColor" /></StudioButton>
-          : <StudioButton size="icon" variant="primary" aria-label="Send AI request" title="Send prompt (Enter)" disabled={!prompt.trim() || loading} onClick={() => void submitPrompt()}>
+          : <StudioButton size="icon" variant="primary" aria-label="Send AI request" title={model==='hunyuan'?'Generate 3D from attached image':'Send prompt (Enter)'} disabled={(!prompt.trim()&&!(model==='hunyuan'&&imageFile)) || loading} onClick={() => void submitPrompt()}>
             {loading ? <LoaderCircle size={16} className="cs-spin" /> : <ArrowUp size={17} />}
           </StudioButton>}
       </div>

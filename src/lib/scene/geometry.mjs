@@ -1,5 +1,19 @@
 import * as THREE from "three";
 import { makeObject, validateDocument } from "./document.mjs";
+import { generatedAsset, loadGeneratedAssets } from './generated-assets.mjs';
+
+function applyTextures(material,m,enabled,onTextureLoad){
+  if(!enabled)return;
+  for(const key of ['map','normalMap','roughnessMap','metalnessMap','aoMap'])if(m[key]){
+    let ready,failed;
+    const loaded=new Promise((resolve,reject)=>{ready=resolve;failed=reject;});
+    const texture=new THREE.TextureLoader().load(m[key],()=>{onTextureLoad?.();ready();},undefined,failed);
+    texture.userData.loaded=loaded;loaded.catch(()=>{});
+    if(key==='map')texture.colorSpace=THREE.SRGBColorSpace;
+    texture.flipY=m.flipY??true;texture.wrapS=texture.wrapT=THREE.RepeatWrapping;
+    texture.repeat.fromArray(m.uvScale??[1,1]);material[key]=texture;
+  }
+}
 
 export function buildScene(document, { textures = typeof window !== "undefined", helpers = false, onTextureLoad } = {}) {
   const root = new THREE.Group();
@@ -9,6 +23,14 @@ export function buildScene(document, { textures = typeof window !== "undefined",
   for (const o of document.objects) {
     let node;
     if (o.kind === "group") node = new THREE.Group();
+    else if (o.kind === 'model') {
+      node=new THREE.Group();
+      const asset=generatedAsset(o.asset.jobId);
+      if(asset){
+        const content=asset.source.clone(true),wrapper=new THREE.Group();wrapper.scale.fromArray(o.dimensions);wrapper.add(content);node.add(wrapper);
+        content.traverse(child=>{child.userData={};if(child.isMesh){child.geometry=child.geometry.clone();child.material=new THREE.MeshPhysicalMaterial({color:o.material.color,roughness:o.material.roughness,metalness:o.material.metalness,opacity:o.material.opacity,transparent:o.material.opacity<1,transmission:o.material.transmission});applyTextures(child.material,o.material,textures,onTextureLoad);child.castShadow=true;child.receiveShadow=true;}});
+      }
+    }
     else if (o.kind.endsWith("Light")) {
       node = o.kind === "spotLight" ? new THREE.SpotLight(o.material.color, o.intensity, 50, Math.PI / 4, .5) : new THREE.PointLight(o.material.color, o.intensity, 40, 2);
       if (node.isSpotLight) { node.target.position.set(0, -1, 0); node.add(node.target); }
@@ -35,20 +57,7 @@ export function buildScene(document, { textures = typeof window !== "undefined",
       const m = o.material;
       const material = new THREE.MeshPhysicalMaterial({ color: m.color, roughness: m.roughness, metalness: m.metalness,
         opacity: m.opacity, transparent: m.opacity < 1, transmission: m.transmission, thickness: .05, ior: 1.5 });
-      if (textures) {
-        for (const key of ["map", "normalMap", "roughnessMap", "metalnessMap", "aoMap"]) if (m[key]) {
-          let ready, failed;
-          const loaded = new Promise((resolve, reject) => { ready = resolve; failed = reject; });
-          const texture = new THREE.TextureLoader().load(m[key], () => { onTextureLoad?.(); ready(); }, undefined, failed);
-          texture.userData.loaded = loaded;
-          loaded.catch(() => {}); // Export awaits this same promise and reports errors.
-          if (key === "map") texture.colorSpace = THREE.SRGBColorSpace;
-          texture.flipY = m.flipY ?? true;
-          texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-          texture.repeat.fromArray(m.uvScale ?? [1, 1]);
-          material[key] = texture;
-        }
-      }
+      applyTextures(material,m,textures,onTextureLoad);
       node = new THREE.Mesh(geometry, material);
       node.castShadow = true; node.receiveShadow = true;
     }
@@ -74,6 +83,7 @@ export function disposeScene(root) {
 }
 
 export async function exportScene(document, format) {
+  await loadGeneratedAssets(document);
   const root = buildScene(document);
   try {
     const textures = new Set();

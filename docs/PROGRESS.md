@@ -2,6 +2,60 @@
 
 Last updated: 2026-10-24
 
+## Hunyuan3D local shape generation
+
+- Extended existing studio chat/provider/job/import flows without changing any
+  stylesheet or replacing studios/providers/auth. Reference images use the
+  existing paperclip and AI mode selector; completed results offer Insert into
+  Studio. The authenticated project saves before a job is submitted.
+- Added a loopback-only Python queue using the verified existing Conda/CUDA
+  pipeline and cached shape checkpoint. No paint/rembg/Blender/DeepSpeed model
+  imports, driver/PyTorch changes or duplicate downloads. One inference thread,
+  four queued jobs, bounded staging, explicit OOM/failure/restart handling.
+- Next validates bytes/type/dimensions/size and existing user/workspace/project
+  ownership. Images are hashed for idempotency, never stored in PostgreSQL.
+  Completed GLBs are copied atomically to private local asset storage before
+  SUCCEEDED. Worker paths/URLs/tokens never appear in client job DTOs.
+- Native `model` scene references preserve full geometry outside the database,
+  existing transforms/materials/picking/selection/history/export and project
+  snapshots. The original 344,854-vertex demo exceeds embedded-mesh limits, so
+  those budgets remain unchanged. Source caches are bounded and identity changes
+  reject late downloads. No database migration was needed.
+- Real worker startup/health, malformed image rejection, job submission and
+  processing→completed CUDA inference passed. Downloaded a fresh valid GLB of
+  12,146,620 bytes. Both demo and new output passed full-vertex scene loading,
+  selection, transforms, duplicate, history and reference restoration tests.
+- Final verification: all 151 Node tests and three worker validation/auth tests
+  passed, including private asset copying/authorization, offline completed-job
+  resume and late-identity download rejection. Standalone TypeScript, production
+  build and focused lint passed (existing chat image warning only).
+- Installed Chrome against the final local production build passed all three
+  3D routes: image attachment, chat result, explicit insertion, selection,
+  move/rotate/scale, duplicate/delete, Undo/Redo and snapshot/reopen restoration.
+  Auth/database/job HTTP were isolated test adapters; source geometry was the
+  fresh real CUDA GLB. Screenshots in `.tmp/hunyuan-browser-1792869418361/`;
+  Architecture dark and Interior light were visually inspected with framed,
+  selected generated meshes. No UI stylesheet changed. The preferred browser
+  runtime crashed during initialization; the installed-Chrome fallback worked.
+- Worker restart/health and completed-job metadata recovery also passed after
+  the final worker restart. Corrected Pillow JPEG's
+  optional `n_frames` attribute. Type checking and production build passed;
+  initial Prisma generation hit EPERM from the old port-3033 Next server's DLL
+  lock, then passed after that identified server was stopped. Full lint retains
+  pre-existing unrelated unused-code errors.
+- Left the final worker on 127.0.0.1:8081 and the configured development app on
+  127.0.0.1:3000. Real Next provider discovery includes Hunyuan and an actual
+  unauthenticated generation request returns 401. `.env.local` contains only the
+  added worker URL; existing credential settings were preserved.
+- Read-only database verification reproduced `DATABASE_URL: INVALID_URL; check
+  password URL encoding`. Live authenticated generation/cloud reopen remains
+  blocked; no authentication bypass was added. Remote production storage/GPU
+  infrastructure is unprovisioned. Inspected territorial, commercial and
+  redistribution conditions; EU/UK/South Korea are excluded by the installed
+  license. No public GPU exposure or deployment was performed.
+- See `HUNYUAN3D-LOCAL.md` for startup commands, API contracts, file inventory,
+  resource limits, production architecture and verification boundaries.
+
 ## Contextual 3D selection and automatic reversible editing
 
 - Added selected hierarchy-path context to the existing floating dock and wired

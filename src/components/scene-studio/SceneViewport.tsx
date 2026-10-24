@@ -12,6 +12,7 @@ import { useCrystalTheme } from "@/lib/crystal-theme";
 import { createSelectionHelpers, disposeSelectionHelpers } from "@/lib/scene/selection.mjs";
 import { isSelectionClick, pickScene } from "@/lib/scene/picking.mjs";
 import {createEditOverlay,disposeEditOverlay} from "@/lib/scene/edit-overlay.mjs";
+import {generatedAsset,loadGeneratedAssets} from '@/lib/scene/generated-assets.mjs';
 
 export type ViewportAPI = {
   fit: () => void; focus: () => void; preset: (name: string) => void; zoom: (factor: number) => void;
@@ -44,7 +45,9 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
   const transformed = useRef(false);
   const rendered=useRef('');
   const [points, setPoints] = useState<THREE.Vector3[]>([]);
-  const root = useMemo(() => buildScene(p.document, { helpers: true, onTextureLoad: invalidate }), [p.document.objects, invalidate]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [assetVersion,setAssetVersion]=useState(0),[assetError,setAssetError]=useState('');
+  useEffect(()=>{let active=true;setAssetError('');if(p.document.objects.some(o=>o.kind==='model'&&!generatedAsset(o.asset!.jobId)))void loadGeneratedAssets(p.document).then(()=>{if(active){setAssetVersion(v=>v+1);invalidate();}}).catch(error=>{if(active)setAssetError(error instanceof Error?error.message:'Generated model could not be restored.');});return()=>{active=false;};},[p.document.objects,invalidate]); // eslint-disable-line react-hooks/exhaustive-deps
+  const root = useMemo(() => buildScene(p.document, { helpers: true, onTextureLoad: invalidate }), [p.document.objects, invalidate,assetVersion]); // eslint-disable-line react-hooks/exhaustive-deps
   const renderToken=useMemo(()=>JSON.stringify([p.document.id,p.document.objects,p.document.environment]),[p.document.id,p.document.objects,p.document.environment]);
   useEffect(() => () => disposeScene(root), [root]);
   const selected = useMemo(() => {
@@ -207,6 +210,7 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
     </mesh>
     {p.grid && <Grid position={[0, -.4, 0]} args={[200, 200]} cellSize={1} sectionSize={5} cellColor={theme === "dark" ? "#555b63" : "#a0a8b3"} sectionColor="#748396" fadeDistance={80} infiniteGrid />}
     <primitive object={root} />
+    {assetError&&<Html center><div role="alert" className="scene-render-error">{assetError}</div></Html>}
     <primitive object={overlay}/>
     {selectionBoxes.map(helper=><primitive key={helper.userData.selectionId} object={helper} />)}
     {canTransform && ["translate", "rotate", "scale"].includes(p.tool) && <TransformControls object={selected} mode={p.tool as "translate" | "rotate" | "scale"} size={1.2} space="world"

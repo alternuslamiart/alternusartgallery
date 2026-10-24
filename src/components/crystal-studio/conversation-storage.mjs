@@ -9,6 +9,7 @@ export function parseStudioConversation(raw) {
       if (!message || typeof message.id !== "string" || !message.id || message.id.length > 100 || ids.has(message.id) ||
         !["user", "assistant", "system"].includes(message.role) || typeof message.text !== "string" || message.text.length > 20_000 ||
         (message.meta !== undefined && (typeof message.meta !== "string" || message.meta.length > 1000)) ||
+        (message.assetJobId !== undefined && (typeof message.assetJobId !== 'string' || !/^[0-9a-f-]{36}$/i.test(message.assetJobId))) ||
         (message.timestamp !== undefined && (typeof message.timestamp !== "string" || message.timestamp.length > 100))) return null;
       ids.add(message.id);
     }

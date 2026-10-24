@@ -173,6 +173,18 @@
 
 ## Server and data
 
+- Hunyuan3D extends the existing `ai3d` provider/job routes and shared 3D chat.
+  `ai-services/hunyuan_shape_service.py` is a loopback-only, shape-only single-GPU
+  queue using the verified cached pipeline, without paint/Blender imports.
+  Next validates images, authenticates and checks saved-project ownership;
+  completed GLBs are copied into private local asset storage before success.
+  New scene `model` references retain job IDs, dimensions and transforms rather
+  than expanding GLB geometry into PostgreSQL. A bounded per-editor native GLB
+  cache feeds existing rendering/picking/history/export and clears on unmount.
+  Local database configuration currently blocks live authenticated acceptance.
+  Production still needs remote GPU/private object storage and license review;
+  see `HUNYUAN3D-LOCAL.md`. No schema migration or UI stylesheet changes.
+
 - `platform/ai-usage.mjs` meters authenticated chat/native scene/3D requests
   using transactional monthly and daily feature counters in existing
   RateLimitBucket rows, namespaced `ai-usage:v1:<workspaceId>:`. Conditional

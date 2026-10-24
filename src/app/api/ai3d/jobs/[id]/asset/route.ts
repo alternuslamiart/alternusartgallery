@@ -4,6 +4,7 @@ import { isApiResponse, requirePlatformContext } from "@/lib/platform/api";
 import { fail3D, owned3D } from "@/lib/ai3d/jobs";
 import { safeModelURL } from "@/lib/ai3d/providers.mjs";
 import { readModelBytes } from "@/lib/ai3d/client.mjs";
+import { readStoredFile } from '@/lib/platform/storage';
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -12,7 +13,14 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
     const context = await requirePlatformContext(); if (isApiResponse(context)) return context;
     const job = await prisma.aIProviderJob.findFirst({ where: owned3D(context, params.id) });
     if (!job || job.status !== "SUCCEEDED") return fail3D("Generated model not found.", 404);
-    const output = job.output as { modelURL?: string } | null;
+    const output = job.output as { modelURL?: string; storageKey?: string } | null;
+    if(job.provider==='hunyuan') {
+      if(!output?.storageKey)return fail3D('Generated model is not persisted yet.',409);
+      try{
+        const bytes=await readStoredFile(output.storageKey);
+        return new NextResponse(new Uint8Array(bytes),{headers:{'Content-Type':'model/gltf-binary','Cache-Control':'private, no-store','Content-Disposition':'attachment; filename="Casynus_Hunyuan.glb"'}});
+      }catch{return fail3D('The saved Hunyuan GLB is unavailable. Restore the private asset volume from backup.',503);}
+    }
     const url = safeModelURL(output?.modelURL);
     // Never forward API credentials to a CDN or follow its redirects. Keep the
     // proxy below Vercel's response limit; larger assets use the CDN directly.

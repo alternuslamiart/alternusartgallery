@@ -2,6 +2,14 @@
 
 ## Next concrete task
 
+- [ ] Complete live authenticated Hunyuan acceptance after correcting the local
+  `DATABASE_URL: INVALID_URL; check password URL encoding`: upload a reference
+  through existing 3D studio chat, generate, insert, save, logout/login and reopen.
+  Real worker CUDA output and native GLB import are verified independently.
+  Production requires a secured remote GPU worker, private object storage/signed
+  downloads and applicable Tencent license authorization; do not enable local
+  filesystem/localhost architecture on Vercel. See `docs/HUNYUAN3D-LOCAL.md`.
+
 - [ ] Verify live signed-in Gemini/Groq contextual editing and cloud save/reopen;
   local finite editing is independent of provider availability. Expand semantic
   mesh/CAD constraints beyond parametric roof slabs and rectangular window hosts.

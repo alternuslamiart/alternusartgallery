@@ -6,6 +6,14 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Add Hunyuan3D 2.1 image-based shape generation to existing studio chat,
+  private GLB persistence and lossless native scene asset references. Verify an
+  actual local CUDA generation and full-vertex scene import.
+- [ ] Fix local DATABASE_URL/DIRECT_URL and verify signed-in image→generation→
+  insertion→logout/login→project reopen. Prepare private object storage and a
+  secured remote GPU worker before production; resolve territorial licensing.
+  See `HUNYUAN3D-LOCAL.md` for actual scope and verification boundaries.
+
 - [x] Add exact selected-component chat context, validated reversible scene
   execution, real wall openings/roof edits and target-only GPU editing feedback.
 - [ ] Verify native scene planning and authenticated save/reopen with a live

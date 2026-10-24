@@ -1,7 +1,7 @@
 import { validateGeographic } from '../infrastructure/map-features.mjs';
 export const SCENE_VERSION = 1;
 export const MAX_SCENE_BYTES = 8_000_000;
-export const KINDS = ["box", "sphere", "cylinder", "mesh", "group", "pointLight", "spotLight"];
+export const KINDS = ["box", "sphere", "cylinder", "mesh", "model", "group", "pointLight", "spotLight"];
 export const MATERIALS = {
   concrete: { color: "#c9c6bf", roughness: .85, metalness: 0, opacity: 1, transmission: 0 },
   wood: { color: "#966642", roughness: .55, metalness: 0, opacity: 1, transmission: 0 },
@@ -45,6 +45,10 @@ export function validateObject(value) {
     visible: bool(value.visible), locked: bool(value.locked),
   };
   if (value.kind.endsWith("Light")) result.intensity = number(value.intensity ?? 50, 0, 10000);
+  if (value.kind === 'model') {
+    if (!value.asset || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value.asset.jobId) || value.asset.provider !== 'hunyuan') fail('Invalid generated asset reference.');
+    result.asset = {jobId:value.asset.jobId,provider:'hunyuan'};
+  }
   if (value.kind === "mesh") {
     const g = value.geometry;
     if (!g || !Array.isArray(g.positions) || !g.positions.length || g.positions.length % 3 || g.positions.length > 300_000) fail("Invalid or oversized mesh geometry.");
@@ -69,6 +73,7 @@ export function validateDocument(value) {
   if (JSON.stringify(value).length > MAX_SCENE_BYTES) fail("Project exceeds the 8 MB document limit.");
   if (!Array.isArray(value.objects) || value.objects.length > 1000) fail("A project supports up to 1000 objects.");
   const objects = value.objects.map(validateObject);
+  if(new Set(objects.filter(o=>o.kind==='model').map(o=>o.asset.jobId)).size>8)fail('A project supports at most eight generated source models.');
   const nodes = new Map(objects.map(o => [o.id, o]));
   if (nodes.size !== objects.length) fail("Duplicate object IDs.");
   let vertexCount = 0;

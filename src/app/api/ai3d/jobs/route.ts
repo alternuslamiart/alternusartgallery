@@ -8,7 +8,10 @@ export const maxDuration = 60;
 export async function POST(request: NextRequest) {
   try {
     const context = await requirePlatformContext(); if (isApiResponse(context)) return context;
-    const raw = await request.text(); if (raw.length > 4000) return fail3D("Generation request is too large.", 413);
+    if (Number(request.headers.get('content-length')) > 4_002_000) return fail3D('Generation request is too large.',413);
+    const reader=request.body?.getReader(); const chunks:Uint8Array[]=[];let size=0;
+    if(reader)while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>4_002_000){await reader.cancel();return fail3D('Generation request is too large.',413);}chunks.push(value);}
+    const raw = Buffer.concat(chunks).toString('utf8');
     let body; try { body = JSON.parse(raw); if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error(); } catch { return fail3D("Invalid generation request.", 400); }
     return await create3DJob(context, body);
   } catch { return fail3D("Generation storage is unavailable. No generation is confirmed; check your jobs before retrying.", 503); }
