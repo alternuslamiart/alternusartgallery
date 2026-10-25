@@ -9,13 +9,13 @@ import { persistHunyuanAsset } from './hunyuan-assets';
 import {createHash} from 'crypto';
 
 type Input = { kind: "casynus-ai3d"; prompt: string; projectId: string; studio: string; model: string; imageHash?:string };
-type Output = { taskId?: string; phase?: string; progress?: number; modelURL?: string; storageKey?: string };
+type Output = { taskId?: string; phase?: string; stage?:string; samplingStep?:number; samplingSteps?:number; progress?: number; modelURL?: string; storageKey?: string };
 const json = (value: unknown) => JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
 export const fail3D = (error: string, status: number) => NextResponse.json({ error }, { status });
 export const owned3D = (context: PlatformContext, id?: string) => ({ ...context, ...(id ? { id } : {}), type: "MODEL_GENERATION" as const, provider: { in: ["meshy", "tripo", "hunyuan"] }, input: { path: ["kind"], equals: "casynus-ai3d" } });
 export function jobDTO(job: AIProviderJob) {
   const input = job.input as unknown as Input, output = job.output as Output | null;
-  return { id: job.id, provider: job.provider, model: input.model, projectId: input.projectId, prompt: input.prompt, status: job.status, progress: output?.progress ?? 0, ...(job.status === "SUCCEEDED" && (output?.modelURL || output?.storageKey) ? { ...(job.provider !== 'hunyuan' ? {modelURL:output?.modelURL}:{}), assetPath: `/api/ai3d/jobs/${job.id}/asset` } : {}), error: job.error, createdAt: job.createdAt };
+  return { id: job.id, provider: job.provider, model: input.model, projectId: input.projectId, prompt: input.prompt, status: job.status, progress: output?.progress ?? 0, ...(job.provider==='hunyuan'?{stage:job.status==='SUCCEEDED'?'completed':job.status==='FAILED'?'failed':output?.stage,samplingStep:output?.samplingStep,samplingSteps:output?.samplingSteps}:{}), ...(job.status === "SUCCEEDED" && (output?.modelURL || output?.storageKey) ? { ...(job.provider !== 'hunyuan' ? {modelURL:output?.modelURL}:{}), assetPath: `/api/ai3d/jobs/${job.id}/asset` } : {}), error: job.error, createdAt: job.createdAt };
 }
 export async function create3DJob(context: PlatformContext, body: Record<string, unknown>) {
   if (typeof body.requestId !== "string" || !/^[0-9a-f-]{36}$/i.test(body.requestId) || typeof body.projectId !== "string" || !/^[0-9a-f-]{36}$/i.test(body.projectId)) return fail3D("A valid project ID and request ID are required.", 400);
@@ -49,7 +49,7 @@ export async function create3DJob(context: PlatformContext, body: Record<string,
   }
   try {
     const taskId = await submit3DTask(provider.id, body.prompt.trim(), {image});
-    job = await prisma.aIProviderJob.update({ where: { id: job.id }, data: { status: "RUNNING", startedAt: new Date(), output: json({ taskId, phase: provider.id === "meshy" ? "preview" : "model", progress: 0 }) } });
+    job = await prisma.aIProviderJob.update({ where: { id: job.id }, data: { status: provider.id==='hunyuan'?'QUEUED':"RUNNING", startedAt: new Date(), output: json({ taskId, ...(provider.id==='hunyuan'?{stage:'queued'}:{}), phase: provider.id === "meshy" ? "preview" : "model", progress: 0 }) } });
   } catch (caught) {
     const error = caught instanceof Error && /configured|credits|permissions|quota|rejected|GPU|Hunyuan|development-only/.test(caught.message) ? caught.message : "Provider submission could not be confirmed. Check the provider dashboard before starting another paid generation.";
     job = await prisma.aIProviderJob.update({ where: { id: job.id }, data: { status: "FAILED", error, completedAt: new Date() } });
@@ -79,7 +79,7 @@ export async function refresh3DJob(context: PlatformContext, id: string, force =
     }
   } else {
     const progress = job.provider === "meshy" ? (output.phase === "preview" ? result.progress / 2 : 50 + result.progress / 2) : result.progress;
-    await prisma.aIProviderJob.updateMany({ where: { ...owned3D(context, id), status: { in: ["QUEUED", "RUNNING", "SUCCEEDED"] }, output: { path: ["taskId"], equals: output.taskId } }, data: { status: result.status, output: json({ ...output, progress, ...(storageKey ? {storageKey}:{}), ...(result.modelURL ? { modelURL: result.modelURL } : {}) }), ...(result.status === "FAILED" ? { error: result.error || "The 3D provider failed or cancelled this generation.", completedAt: new Date() } : result.status === "SUCCEEDED" ? { completedAt: new Date() } : {}) } });
+    await prisma.aIProviderJob.updateMany({ where: { ...owned3D(context, id), status: { in: ["QUEUED", "RUNNING", "SUCCEEDED"] }, output: { path: ["taskId"], equals: output.taskId } }, data: { status: result.status, output: json({ ...output, progress, ...(result.stage?{stage:result.stage,samplingStep:result.samplingStep,samplingSteps:result.samplingSteps}:{}), ...(storageKey ? {storageKey}:{}), ...(result.modelURL ? { modelURL: result.modelURL } : {}) }), ...(result.status === "FAILED" ? { error: result.error || "The 3D provider failed or cancelled this generation.", completedAt: new Date() } : result.status === "SUCCEEDED" ? { completedAt: new Date() } : {}) } });
   }
   job = await prisma.aIProviderJob.findFirst({ where: owned3D(context, id) });
   return job ? NextResponse.json(jobDTO(job)) : fail3D("Generation not found.", 404);

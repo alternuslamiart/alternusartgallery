@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+import uuid
+from types import SimpleNamespace
 
 temp = tempfile.TemporaryDirectory()
 os.environ["HUNYUAN_DATA_DIR"] = temp.name
@@ -47,6 +49,32 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(self.client.get("/status/unknown", headers=self.headers).status_code, 404)
         self.assertEqual(self.client.get("/asset/unknown", headers=self.headers).status_code, 404)
         self.assertEqual(service.pending.qsize(), 0)
+
+    def test_phases_follow_actual_diffusion_callbacks(self):
+        job={"uid":str(uuid.uuid4()),"status":"processing","phase":"loading_model","created":0}
+        callback=service.sampling_callback(job)
+        callback(0,None,None)
+        self.assertEqual(job["phase"],"generating_geometry")
+        self.assertEqual(job["sampling_step"],1)
+        callback(service.INFERENCE_STEPS-1,None,None)
+        self.assertEqual(job["phase"],"processing_mesh")
+        self.assertEqual(job["sampling_step"],50)
+        self.assertNotIn("progress",job)
+
+    def test_checkpoint_mapping_is_scoped_and_restored(self):
+        checkpoint=Path(temp.name)/"cached.ckpt"
+        checkpoint.write_bytes(b"PK\x03\x04")
+        calls=[]
+        def original(file,**kwargs):
+            calls.append(kwargs)
+        dtypes=["float32"]
+        torch=SimpleNamespace(load=original,float16="float16",get_default_dtype=lambda:dtypes[-1],set_default_dtype=lambda value:dtypes.append(value))
+        with service.mapped_checkpoint_loading(torch):
+            torch.load(checkpoint,weights_only=True,map_location="cpu")
+        self.assertIs(torch.load,original)
+        self.assertTrue(calls[0]["mmap"])
+        self.assertTrue(calls[0]["weights_only"])
+        self.assertEqual(dtypes,["float32","float16","float32"])
 
 
 if __name__ == "__main__":

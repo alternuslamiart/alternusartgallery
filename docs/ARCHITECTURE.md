@@ -177,12 +177,18 @@
   `ai-services/hunyuan_shape_service.py` is a loopback-only, shape-only single-GPU
   queue using the verified cached pipeline, without paint/Blender imports.
   Next validates images, authenticates and checks saved-project ownership;
-  completed GLBs are copied into private local asset storage before success.
+  completed GLBs are copied into private local asset storage or configured
+  private Supabase Storage before success. Ownership-authorized asset requests
+  redirect cloud downloads to 120-second signed URLs; both upload and signing
+  verify the bucket is private. Remote production requires storage credentials.
+  Studio CSP permits only the configured HTTPS storage origin for these assets.
   New scene `model` references retain job IDs, dimensions and transforms rather
   than expanding GLB geometry into PostgreSQL. A bounded per-editor native GLB
   cache feeds existing rendering/picking/history/export and clears on unmount.
-  Local database configuration currently blocks live authenticated acceptance.
-  Production still needs remote GPU/private object storage and license review;
+  Worker stages and actual diffusion callbacks drive progress; GLB previews
+  remain outside persisted scenes until explicit insertion. Local database
+  connectivity passed on 2026-10-25; live authenticated acceptance is pending.
+  Production still needs remote GPU/storage provisioning and license review;
   see `HUNYUAN3D-LOCAL.md`. No schema migration or UI stylesheet changes.
 
 - `platform/ai-usage.mjs` meters authenticated chat/native scene/3D requests

@@ -37,7 +37,9 @@ export async function inspect3DTask(provider, taskId, { env = process.env, fetch
     catch(error){if(error.status===404)return{status:'FAILED',progress:0,error:'GPU job expired or is unavailable. Submit a new image job.'};throw error;}
     const status = {queued:'QUEUED',processing:'RUNNING',completed:'SUCCEEDED',failed:'FAILED'}[data.status];
     if (!status) throw new Error('GPU worker returned an unknown job state.');
-    return {status,progress:status==='SUCCEEDED'?100:0,error:typeof data.error==='string'?data.error:undefined};
+    const stage=['queued','loading_model','generating_geometry','processing_mesh','completed','failed'].includes(data.phase)?data.phase:undefined;
+    const sampling=Number.isInteger(data.sampling_step)&&Number.isInteger(data.sampling_steps)&&data.sampling_step>=1&&data.sampling_step<=data.sampling_steps&&data.sampling_steps<=1000?{samplingStep:data.sampling_step,samplingSteps:data.sampling_steps}:{};
+    return {status,stage,...sampling,progress:status==='SUCCEEDED'?100:0,error:typeof data.error==='string'?data.error:undefined};
   }
   const c = config(provider, env), meshy = provider === "meshy";
   if (!/^[a-zA-Z0-9_-]{1,128}$/.test(taskId)) throw new Error("Invalid provider task ID.");

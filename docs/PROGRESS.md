@@ -1,6 +1,42 @@
 # Verified progress
 
-Last updated: 2026-10-24
+Last updated: 2026-10-25
+
+## Hunyuan generation workflow continuation
+
+- Added the toolbar generation toggle, explicit image generation action, actual
+  worker stages/diffusion step counts, reconnecting polling, and GLB preview,
+  insertion and download actions. Preview remains uncommitted until insertion.
+  Recovery initialization disables edits until its latest lookup finishes.
+- Worker checkpoint loading temporarily uses mapped ZIP checkpoint reads and
+  fp16 initialization, restoring Torch globals afterward. CPU contract tests
+  cover callbacks and restoration; this continuation did not run CUDA inference.
+- Added optional private Supabase Storage uploads and 120-second signed downloads
+  behind the existing authenticated ownership check, with scoped studio CSP.
+  Uploads and signing both reject public buckets. Remote production generation
+  requires storage configuration; no bucket or remote GPU was provisioned.
+- Added secret-safe read-only environment verification and opt-in localhost
+  authenticated browser QA using an isolated test principal.
+- Read-only `node scripts/verify-hunyuan-environment.mjs` now passes SELECT 1
+  through both configured Supavisor transaction/runtime and session/direct URLs.
+  This supersedes the earlier invalid local URL blocker. The shell has a stale
+  inherited database override; the verifier reports and checks file values.
+- Verification: 155 Node tests, five CPU worker tests, standalone TypeScript,
+  and focused Next lint passed (existing chat image warning). The added public
+  download regression failed before the signing fix and passed afterward.
+  Initial `npm run build` hit Prisma DLL EPERM; the identified repository dev
+  server was stopped and the retry passed using the existing trusted CA bundle
+  and OpenFreeMap build override. Existing client-render warnings remain.
+  npm-forwarded lint dropped file flags;
+  direct `node node_modules/next/dist/bin/next lint --file ...` passed.
+- Fresh Chrome verification against the production build passed Architecture,
+  Infrastructure and Interior 3D: toolbar toggle, reference upload, uncommitted
+  native GLB preview, explicit insertion, selection, transforms, duplicate,
+  deletion, Undo/Redo and snapshot/reopen with light/dark screenshots. Auth,
+  database and job HTTP were mocked; source GLB geometry was real. Artifacts:
+  `.tmp/hunyuan-browser-1792891360390/`. Final post-build TypeScript and staged
+  diff checks passed. Live authenticated GPU acceptance remains pending.
+
 
 ## Hunyuan3D local shape generation
 

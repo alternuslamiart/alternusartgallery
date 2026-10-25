@@ -6,6 +6,7 @@ export function hunyuanConfig(env = process.env) {
   if (url.username || url.password || url.search || url.hash || url.pathname !== "/" || (!local && url.protocol !== "https:") || (local && !["http:", "https:"].includes(url.protocol))) throw new Error("Invalid HUNYUAN_API_URL.");
   if (env.NODE_ENV === "production" && local && env.HUNYUAN_LOCAL_DEVELOPMENT !== "1") throw new Error("Local Hunyuan is development-only. Configure a secured remote GPU worker for production.");
   if ((!local || env.NODE_ENV === "production") && !env.HUNYUAN_API_TOKEN) throw new Error("Remote Hunyuan requires server worker authentication.");
+  if(env.NODE_ENV==='production'&&!local&&(!env.SUPABASE_URL||!env.SUPABASE_SERVICE_ROLE_KEY||!env.HUNYUAN_STORAGE_BUCKET))throw new Error('Hunyuan production requires private object storage.');
   return { url: url.origin, headers: env.HUNYUAN_API_TOKEN ? { Authorization: `Bearer ${env.HUNYUAN_API_TOKEN}` } : {} };
 }
 export async function hunyuanRequest(path, { env = process.env, fetchImpl = fetch, ...init } = {}) {

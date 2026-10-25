@@ -4,9 +4,18 @@ import { randomUUID } from 'crypto';
 import { resolveStorageKey, readStoredFile } from '@/lib/platform/storage';
 import { hunyuanRequest, workerTaskId } from './hunyuan.mjs';
 import { readModelBytes } from './client.mjs';
+import {hunyuanObjectStorage,putHunyuanObject,signedHunyuanAsset} from './hunyuan-object-storage';
 
 export async function persistHunyuanAsset(workspaceId: string, jobId: string, taskId: string) {
   const storageKey = `${workspaceId}/hunyuan/${workerTaskId(jobId)}.glb`;
+  const cloud=hunyuanObjectStorage();
+  if(cloud){
+    const reference=`supabase://${cloud.bucket}/${storageKey}`;
+    try{await signedHunyuanAsset(reference);return reference;}catch{ /* First upload; upload verifies the private bucket. */ }
+    const bytes=await readModelBytes(await hunyuanRequest(`/asset/${workerTaskId(taskId)}`));
+    return putHunyuanObject(storageKey,bytes);
+  }
+  if(process.env.NODE_ENV==='production'&&process.env.HUNYUAN_LOCAL_DEVELOPMENT!=='1')throw new Error('Hunyuan production requires private object storage.');
   // Deterministic destination makes concurrent status polls idempotent.
   try { const existing = await readStoredFile(storageKey); if (existing.length) return storageKey; } catch { /* first copy */ }
   const bytes = await readModelBytes(await hunyuanRequest(`/asset/${workerTaskId(taskId)}`));

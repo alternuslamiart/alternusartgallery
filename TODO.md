@@ -1,9 +1,9 @@
-# Next tasks (reviewed 2026-10-24)
+# Next tasks (reviewed 2026-10-25)
 
 ## Next concrete task
 
-- [ ] Complete live authenticated Hunyuan acceptance after correcting the local
-  `DATABASE_URL: INVALID_URL; check password URL encoding`: upload a reference
+- [ ] Complete live authenticated Hunyuan acceptance; both local database URLs
+  passed read-only connection checks on 2026-10-25. Upload a reference
   through existing 3D studio chat, generate, insert, save, logout/login and reopen.
   Real worker CUDA output and native GLB import are verified independently.
   Production requires a secured remote GPU worker, private object storage/signed
@@ -200,10 +200,10 @@
 
 ## Blockers
 
-- Local Supabase DATABASE_URL/DIRECT_URL still fail URL parsing. In-memory
-  password encoding fixes syntax, but both direct hosts are unreachable from
-  this process and DNS exposes only IPv6. Need exact project's Session pooler
-  strings saved to this workspace's .env; do not send passwords in chat.
+- Local Supabase DATABASE_URL/DIRECT_URL now pass read-only SELECT 1 through
+  configured transaction/session poolers (2026-10-25). A stale inherited shell
+  DATABASE_URL override remains; start QA with the intended file environment.
+  Live authenticated generation/save/reopen is still an outstanding check.
 - The production build now passes when NODE_EXTRA_CA_CERTS points at Windows
   trusted Root/CA certificates exported under .tmp. The default Node trust
   configuration is unchanged; prior Google Fonts certificate errors can recur

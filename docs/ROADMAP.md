@@ -9,8 +9,11 @@ requirements provide new evidence.
 - [x] Add Hunyuan3D 2.1 image-based shape generation to existing studio chat,
   private GLB persistence and lossless native scene asset references. Verify an
   actual local CUDA generation and full-vertex scene import.
-- [ ] Fix local DATABASE_URL/DIRECT_URL and verify signed-in image→generation→
-  insertion→logout/login→project reopen. Prepare private object storage and a
+- [x] Verify local DATABASE_URL/DIRECT_URL connectivity via read-only queries.
+- [x] Add generation stages, uncommitted GLB preview/insert/download and an
+  optional private Supabase Storage adapter with short-lived signed downloads.
+- [ ] Verify signed-in image→generation→insertion→logout/login→project reopen.
+  Provision private object storage and a
   secured remote GPU worker before production; resolve territorial licensing.
   See `HUNYUAN3D-LOCAL.md` for actual scope and verification boundaries.
 

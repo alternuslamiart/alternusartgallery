@@ -18,7 +18,7 @@ function harness({ foreign = false, offline = false, quota = false, hunyuan=fals
   if(hunyuan)modules['./providers.mjs'].configured3DProviders=()=>[{id:'hunyuan',model:'shape'}];
   modules.crypto=cryptoModule;
   modules['./hunyuan.mjs']={validateImageData:value=>{if(typeof value!=='string'||!value.startsWith('data:image/'))throw Error('Image required');return value;}};
-  modules['./hunyuan-assets']={persistHunyuanAsset:async(workspaceId,jobId)=>{assert.equal(workspaceId,context.workspaceId);assert.equal(records.get(jobId).status,'RUNNING');return `${workspaceId}/hunyuan/${jobId}.glb`;}};
+  modules['./hunyuan-assets']={persistHunyuanAsset:async(workspaceId,jobId)=>{assert.equal(workspaceId,context.workspaceId);assert.ok(['QUEUED','RUNNING'].includes(records.get(jobId).status));return `${workspaceId}/hunyuan/${jobId}.glb`;}};
   const exports = {}; const code = ts.transpileModule(fs.readFileSync('src/lib/ai3d/jobs.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
   new Function('require', 'exports', code)(id => { assert.ok(modules[id], id); return modules[id]; }, exports);
   return { ...exports, context, records, submissions: () => submissions };
@@ -51,7 +51,7 @@ test('Hunyuan requires a saved owned project and image; completion persists a pr
   const body={...request(),provider:'hunyuan',image:'data:image/png;base64,test'};
   for(const options of [{missingProject:true},{foreign:true}]){const api=harness({hunyuan:true,...options});assert.ok((await api.create3DJob(api.context,body)).status>=400);assert.equal(api.submissions(),0);}
   const api=harness({hunyuan:true});assert.equal((await api.create3DJob(api.context,{...body,image:undefined})).status,400);
-  assert.equal((await api.create3DJob(api.context,body)).body.status,'RUNNING');
+  assert.equal((await api.create3DJob(api.context,body)).body.status,'QUEUED');
   assert.equal((await api.create3DJob(api.context,{...body,image:body.image+'changed'})).status,409);
   const result=await api.refresh3DJob(api.context,body.requestId);assert.equal(result.body.status,'SUCCEEDED');assert.equal(result.body.modelURL,undefined);assert.match(result.body.assetPath,/\/asset$/);
   assert.ok(api.records.get(body.requestId).output.storageKey);assert.equal(api.records.get(body.requestId).input.image,undefined);

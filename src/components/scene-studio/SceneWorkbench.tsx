@@ -6,7 +6,7 @@ import { importGeographicFeature } from "@/lib/infrastructure/map-import.mjs";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { Box, Building2, Eye, EyeOff, Focus, FolderOpen, Globe2, Layers3, Lock, MoreHorizontal, MousePointer2, PanelLeft, PanelRight, Rotate3D, Route, Ruler, Save, TreePine, Unlock, X } from "lucide-react";
+import { Box, Building2, Eye, EyeOff, Focus, FolderOpen, Globe2, Layers3, Lock, MoreHorizontal, MousePointer2, PanelLeft, PanelRight, Rotate3D, Route, Ruler, Save, Sparkles, TreePine, Unlock, X } from "lucide-react";
 import { SceneViewport, type SceneTool, type ViewportAPI } from "./SceneViewport";
 import { useSceneDocument } from "./useSceneDocument";
 import { StudioHeader, StudioPanel } from "@/components/crystal-studio/kit";
@@ -17,7 +17,7 @@ import { duplicateObjects, exportScene, importModel, regroupObjects } from "@/li
 import { requestStudioAnswer } from "@/lib/studio-ai.mjs";
 import { listRecovery } from "@/lib/scene/recovery";
 import { StudioViewportToolbar, downloadStudioCSV } from "@/components/crystal-studio/StudioViewportToolbar";
-import { generate3DModel, type Generation3DJob } from "@/lib/ai3d/client.mjs";
+import { generate3DModel, generationLabel, readModelBytes, type Generation3DJob } from "@/lib/ai3d/client.mjs";
 import {cacheGeneratedAsset,clearGeneratedAssets} from '@/lib/scene/generated-assets.mjs';
 import { nextSelection } from "@/lib/scene/selection.mjs";
 import {applyLibraryMaterial} from "@/lib/scene/material-library.mjs";
@@ -99,11 +99,13 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const [prompt, setPrompt] = useState(""), [model, setModel] = useState("gemini"), [sceneAI, setSceneAI] = useState(true);
   const [meshProviders, setMeshProviders] = useState<Array<{ id: string; label: string }>>([]);
   const [generationJobs, setGenerationJobs] = useState<Generation3DJob[] | null>(null);
+  const [generationStatus,setGenerationStatus]=useState<string|null>(null);
+  const normalProvider=useRef('gemini');
   const resumeController = useRef<AbortController | null>(null);
   const meshProvider = model === "meshy" || model === "tripo" || model === 'hunyuan';
   useEffect(()=>()=>clearGeneratedAssets(),[]);
   useEffect(() => { const controller = new AbortController(); void fetch("/api/ai3d/providers", { signal: controller.signal, cache: "no-store" }).then(r => r.ok ? r.json() : null).then(data => { if (data && !controller.signal.aborted) setMeshProviders(data.providers.filter((p: { id: string }) => ["meshy", "tripo", "hunyuan"].includes(p.id))); }).catch(() => {}); return () => { controller.abort(); resumeController.current?.abort(); }; }, []);
-  const [pending, setPending] = useState<{ commands: SceneCommand[]; preview: SceneDocument; base: string; destructive?:boolean; expires?:number } | null>(null);
+  const [pending, setPending] = useState<{ commands: SceneCommand[]; preview: SceneDocument; base: string; generatedJobId?:string; destructive?:boolean; expires?:number } | null>(null);
   const [editing,setEditing]=useState<{ids:string[];phase:'processing'|'updating'|'completed'}|null>(null);
   const [planning,setPlanning]=useState(false);
   const editTimer=useRef<ReturnType<typeof setTimeout>>();
@@ -115,7 +117,17 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   useEffect(() => { if (window.matchMedia("(max-width:760px)").matches) { setLeft(false); setRight(false); } }, []);
   const primary = doc.objects.find(o => o.id === selected[0]);
   const blocked = !store.ready || Boolean(pending) || planning;
-  const context=selectionContext(doc,selected);
+  const context=selectionContext(pending?.generatedJobId?pending.preview:doc,selected);
+  const changeChatModel=(value:string)=>{
+    if(value!=='hunyuan'&&pending?.generatedJobId){setPending(null);setSelected(ids=>ids.filter(id=>doc.objects.some(o=>o.id===id)));}
+    if(['gemini','groq','you'].includes(value))normalProvider.current=value;
+    setModel(value);setSceneAI(value!=='you');
+  };
+  const activate3DGeneration=()=>{
+    if(model==='hunyuan'){changeChatModel(normalProvider.current);return;}
+    changeChatModel('hunyuan');dock.setOpen(true);
+    if(!meshProviders.some(p=>p.id==='hunyuan'))setError('Hunyuan3D generation is unavailable on this server. A configured local worker or authenticated remote GPU service is required.');
+  };
   const executionChange=(active:boolean)=>{
     if(active){clearTimeout(editTimer.current);editBase.current=fingerprint(docRef.current);editEpoch.current++;setEditing({ids:editTargets(docRef.current,selected),phase:'processing'});}
     else if(editBase.current!==fingerprint(docRef.current)){
@@ -189,19 +201,24 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   };
   const prepareGeneratedModel = async (request: { provider?: string; message?: string; image?:string; signal?: AbortSignal; resumeId?: string },insert=false) => {
     const base = fingerprint(doc), projectId = doc.id;
-    if (pending) throw new Error("Apply or discard the current preview first.");
+    if (pending&&!pending.generatedJobId) throw new Error("Apply or discard the current preview first.");
     setError(null);
     try {
+      if(request.resumeId){setGenerationStatus('Reading generation status');setBusy('Reading generation status…');}
+      if(request.provider==='hunyuan')setGenerationStatus('Submitting generation');
       if(request.provider==='hunyuan')await store.saveVerified();
-      const { job, buffer } = await generate3DModel({ provider: request.provider, prompt: request.message, image:request.image, projectId, studio, signal: request.signal, resumeId: request.resumeId, onProgress: job => { setBusy(job.status === "IMPORTING" ? "Importing generated GLB…" : `${job.provider} · ${Math.round(job.progress)}% · ${job.status.toLowerCase()}`); setGenerationJobs(current => current?.map(previous => previous.id === job.id ? job : previous) ?? null); } });
+      const { job, buffer } = await generate3DModel({ provider: request.provider, prompt: request.message, image:request.image, projectId, studio, signal: request.signal, resumeId: request.resumeId, onProgress: job => { if(job.provider==='hunyuan'){setGenerationStatus(generationLabel(job));setBusy(`Hunyuan3D · ${generationLabel(job)}`);}else setBusy(job.status === "IMPORTING" ? "Importing generated GLB…" : `${job.provider} · ${Math.round(job.progress)}% · ${job.status.toLowerCase()}`); setGenerationJobs(current => current?.map(previous => previous.id === job.id ? job : previous) ?? null); } });
       if(job.provider==='hunyuan'){
         const asset=await cacheGeneratedAsset(buffer,job.id);request.signal?.throwIfAborted();
         if(docRef.current.id!==projectId)throw new Error('Project changed. Open this generation from its originating project.');
-        if(insert){
-          const object=makeObject('model',{name:`Hunyuan · ${job.prompt.slice(0,90)}`,asset:{jobId:job.id,provider:'hunyuan'},dimensions:asset.dimensions,position:[0,asset.dimensions[1]/2,0]});
-          store.commit({...docRef.current,objects:[...docRef.current.objects,object]});setSelected([object.id]);setTool('translate');requestAnimationFrame(()=>viewport.current?.fit());
-        }
-        return{message:insert?'Inserted the generated GLB. Move, rotate, scale, duplicate and Undo are available.':'Hunyuan generated a real shape GLB. Choose Insert into Studio to add it to this project.',provider:job.provider,model:job.model,assetJobId:job.id};
+        const scene=docRef.current;
+        const target=viewport.current?.camera().target??scene.camera.target;
+        const object=makeObject('model',{name:`Hunyuan · ${job.prompt.slice(0,90)}`,asset:{jobId:job.id,provider:'hunyuan'},dimensions:asset.dimensions,position:[target[0],asset.dimensions[1]/2,target[2]]});
+        const preview=validateDocument({...scene,objects:[...scene.objects,object]});
+        if(insert){store.commit(preview);setPending(null);setTool('translate');}
+        else setPending({commands:[],preview,base:fingerprint(scene),generatedJobId:job.id});
+        setSelected([object.id]);setGenerationJobs(null);requestAnimationFrame(()=>viewport.current?.fit());
+        return{message:insert?'Inserted the generated GLB. Move, rotate, scale, duplicate and Undo are available.':'Completed. Inspect the interactive GLB preview in the existing viewport, then choose Insert into Studio. Download GLB keeps the original file.',provider:job.provider,model:job.model,assetJobId:job.id};
       }
       const objects = await importModel(buffer, "AI_generated.glb");
       if (!objects.some(o => ["mesh", "box", "sphere", "cylinder"].includes(o.kind))) throw new Error("The generated GLB contains no editable mesh geometry.");
@@ -212,11 +229,11 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       setPending({ commands: [{ type: "create", kind: "mesh", name: `${job.provider} generated GLB` }], preview, base });
       setGenerationJobs(null); requestAnimationFrame(() => viewport.current?.fit());
       return { message: "The 3D provider generated a real GLB model. Review the editable preview, then choose Apply or Discard. Applying is undoable; the source remains available in AI generation jobs.", provider: job.provider, model: job.model };
-    } finally { setBusy(""); }
+    } finally { setBusy("");setGenerationStatus(null); }
   };
   const resumeGeneration = async (id: string) => {
     resumeController.current?.abort(); const controller = new AbortController(); resumeController.current = controller;
-    try { await prepareGeneratedModel({ resumeId: id, signal: controller.signal },true); }
+    try { const result=await prepareGeneratedModel({ resumeId: id, signal: controller.signal });if(result.assetJobId)setMessages(current=>[...current,{id:crypto.randomUUID(),role:'assistant',text:result.message,meta:`${result.provider} · ${result.model}`,assetJobId:result.assetJobId}]); }
     catch (caught) { if (!controller.signal.aborted) setError(caught instanceof Error ? caught.message : "Generation could not be resumed."); }
     finally { if (resumeController.current === controller) resumeController.current = null; }
   };
@@ -371,7 +388,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   });
 
   return <main data-world-map={worldMap || undefined} className={`crystal-studio scene-workbench ${left ? "" : "scene-left-closed"} ${right ? "" : "scene-right-closed"}`} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (worldMap) return; if (e.dataTransfer.files[0]) void importFile(e.dataTransfer.files[0]); else { const name = e.dataTransfer.getData("application/x-casynus-asset"); if (catalog.includes(name)) add(name, viewport.current?.point(e.clientX, e.clientY)); } }}>
-    {store.ready && <SceneViewport ref={viewport} document={pending&&!pending.destructive?pending.preview:doc} editing={editing} selected={selected} tool={pending||planning ? "select" : tool} snap={snap} grid={grid} onSelect={select} onHover={setHoveredId} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
+    {store.ready && <SceneViewport ref={viewport} document={pending&&!pending.destructive?pending.preview:doc} previewJob={pending?.generatedJobId} editing={editing} selected={selected} tool={pending||planning ? "select" : tool} snap={snap} grid={grid} onSelect={select} onHover={setHoveredId} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
     {studio === "infrastructure" && mapOpened && <WorldMap key={doc.id} apiRef={worldMapAPI} active={worldMap} onViewChange={setMapView} importDisabled={blocked} onImport={feature => safely(() => {
       const scene = docRef.current;
       const objects = importGeographicFeature(feature, scene.objects.find(object => object.geographic)?.geographic?.origin);
@@ -422,6 +439,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
           ...(studio === "infrastructure" ? [{ label: worldMap ? "3D Editor" : "World Map", icon: worldMap ? Box : Globe2, active: worldMap, onClick: () => { setMapOpened(true); setWorldMap(value => !value); } }] : []),
           { label: studio === "interior" ? "Add furnished room" : "Add building", icon: Building2, onClick: () => template(studio === "interior" ? "room" : "building"), disabled: blocked },
           { label: "Add Tree", icon: TreePine, onClick: () => add("Tree"), disabled: blocked },
+          { label: 'AI 3D Generate', icon: Sparkles, active:model==='hunyuan', onClick:activate3DGeneration, disabled:planning||Boolean(busy)||Boolean(pending&&!pending.generatedJobId) },
         ]}
         tools={([
           ["select", MousePointer2, "Select · Q"], ["translate", Route, "Move · W"], ["rotate", Rotate3D, "Rotate · E"], ["scale", Focus, "Scale · R"], ["measure", Ruler, "Measure distance"],
@@ -435,10 +453,13 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
 
       {(error || store.failure) && <div className="scene-alert" role="alert"><span>{error || store.failure}</span>{store.conflict && <><button onClick={() => { if (window.confirm("Open the cloud revision and replace this browser recovery? Save a recovered copy first to retain both versions.")) window.location.href = `${routes[studio]}?project=${doc.id}&cloud=1`; }}>Open cloud copy</button><button onClick={store.saveCopy}>Save recovered copy</button></>}<button aria-label="Dismiss scene error" onClick={() => { setError(null); if (!store.conflict) store.setFailure(null); }}><X size={15} /></button></div>}
       {busy && <div className="scene-busy" role="status">{busy}</div>}
-      {pending && <div className="scene-proposal" role="dialog" aria-label={pending.destructive?'Confirm destructive scene edit':'Review AI scene proposal'}><strong>{pending.destructive?'Confirm deletion · scene unchanged':'Preview · changes are not applied'}</strong><ol>{pending.commands.map((c, i) => <li key={i}>{c.type} {c.template || c.name || c.id || c.kind || "lighting"}</li>)}</ol><div><button onClick={applyProposal}>{pending.destructive?'Confirm deletion':'Apply scene proposal'}</button><button onClick={() => setPending(null)}>{pending.destructive?'Cancel deletion':'Discard proposal'}</button></div></div>}
-      <StudioAIChat studio={studio === "architecture" ? "modeling" : studio === "interior" ? "floor-plan" : "infrastructure"} open={dock.open} onOpenChange={dock.setOpen} prompt={prompt} onPromptChange={setPrompt} onSubmit={() => {}} model={model} onModelChange={value => { setModel(value); setSceneAI(value !== "you"); }} models={[...providers, ...meshProviders]} messages={messages} onMessagesChange={setMessages} onClearMessages={() => setMessages([])} onNewChat={() => { setMessages([]); setPrompt(""); }} requestAnswer={meshProvider || (sceneAI && model !== "you") ? requestSceneAnswer : undefined} selectedContext={context.label} onExecutionChange={executionChange}
-        onInsertGeneratedModel={async id=>{if(blocked)throw new Error('Finish the current scene operation first.');resumeController.current?.abort();const controller=new AbortController();resumeController.current=controller;try{await prepareGeneratedModel({resumeId:id,signal:controller.signal},true);}finally{if(resumeController.current===controller)resumeController.current=null;}}}
+      {pending && !pending.generatedJobId && <div className="scene-proposal" role="dialog" aria-label={pending.destructive?'Confirm destructive scene edit':'Review AI scene proposal'}><strong>{pending.destructive?'Confirm deletion · scene unchanged':'Preview · changes are not applied'}</strong><ol>{pending.commands.map((c, i) => <li key={i}>{c.type} {c.template || c.name || c.id || c.kind || "lighting"}</li>)}</ol><div><button onClick={applyProposal}>{pending.destructive?'Confirm deletion':'Apply scene proposal'}</button><button onClick={() => setPending(null)}>{pending.destructive?'Cancel deletion':'Discard proposal'}</button></div></div>}
+      <StudioAIChat studio={studio === "architecture" ? "modeling" : studio === "interior" ? "floor-plan" : "infrastructure"} open={dock.open} onOpenChange={dock.setOpen} prompt={prompt} onPromptChange={setPrompt} onSubmit={() => {}} model={model} onModelChange={changeChatModel} models={[...providers, ...meshProviders.filter(p=>p.id!=='hunyuan'),{id:'hunyuan',label:'Hunyuan3D 2.1'}]} messages={messages} onMessagesChange={setMessages} onClearMessages={() => setMessages([])} onNewChat={() => { setMessages([]); setPrompt("");if(pending?.generatedJobId){setPending(null);setSelected([]);} }} requestAnswer={meshProvider || (sceneAI && model !== "you") ? requestSceneAnswer : undefined} selectedContext={context.label} onExecutionChange={model==='hunyuan'?undefined:executionChange} generationStatus={generationStatus}
+        onInsertGeneratedModel={async id=>{if(pending?.generatedJobId===id){applyProposal();setTool('translate');return;}if(blocked)throw new Error('Finish the current scene operation first.');resumeController.current?.abort();const controller=new AbortController();resumeController.current=controller;try{await prepareGeneratedModel({resumeId:id,signal:controller.signal},true);}finally{if(resumeController.current===controller)resumeController.current=null;}}}
+        onPreviewGeneratedModel={async id=>{if(pending?.generatedJobId===id){viewport.current?.focus();return;}await prepareGeneratedModel({resumeId:id});}}
+        onDownloadGeneratedModel={async id=>{const buffer=await readModelBytes(await fetch(`/api/ai3d/jobs/${encodeURIComponent(id)}/asset`,{cache:'no-store'}));download(new Blob([buffer],{type:'model/gltf-binary'}),'Casynus_Hunyuan.glb');}}
         onHistoryRequest={redo=>{if(!blocked){if(redo)store.redo();else store.undo();}}}
+        loading={Boolean(generationStatus)} onStop={()=>resumeController.current?.abort()}
         contextControls={<div className="scene-chat-mode"><label><input type="checkbox" checked={meshProvider||sceneAI} disabled={model==='you'||meshProvider||Boolean(pending)||planning} onChange={e=>setSceneAI(e.target.checked)}/>{model==='hunyuan'?'Image to 3D · shape only':meshProvider?'AI model generation · preview first':'AI scene editing'}</label>{model==='you'&&<small>You: research chat</small>}</div>}/>
       <div className="scene-navigation-hint">{worldMap ? "Drag to pan · right-drag to rotate/pitch · wheel or pinch to zoom · click to select location" : "RMB orbit · MMB pan · wheel zoom · Shift click multi-select"}</div>
     </section>

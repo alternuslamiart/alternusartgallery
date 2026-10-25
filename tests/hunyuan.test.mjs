@@ -8,7 +8,23 @@ import {cacheGeneratedAsset,clearGeneratedAssets,loadGeneratedAssets,generatedAs
 import {makeDocument,makeObject,validateDocument,commitHistory,undoHistory,redoHistory} from '../src/lib/scene/document.mjs';
 import {buildScene,disposeScene,duplicateObjects} from '../src/lib/scene/geometry.mjs';
 import {pickScene} from '../src/lib/scene/picking.mjs';
+import {generationLabel} from '../src/lib/ai3d/client.mjs';
+import {encodedDatabaseURL} from '../scripts/hunyuan-database-urls.mjs';
 const id='a0000000-0000-4000-8000-000000000001';
+test('generation labels use real stages and sampling counts without invented overall percentages',()=>{
+  const job={status:'RUNNING',progress:0};
+  assert.equal(generationLabel({...job,stage:'loading_model'}),'Loading model');
+  assert.equal(generationLabel({...job,stage:'generating_geometry',samplingStep:3,samplingSteps:50}),'Generating geometry · step 3/50');
+  assert.equal(generationLabel({...job,stage:'processing_mesh'}),'Processing mesh');
+  assert.equal(generationLabel({...job,status:'SUCCEEDED'}),'Completed');
+  assert.equal(generationLabel({...job,status:'FAILED'}),'Failed');
+});
+test('database password encoding preserves credentials and the configured host',()=>{
+  const fixed=new URL(encodedDatabaseURL('postgresql://postgres.example:a#b@pooler.supabase.com:6543/postgres'));
+  assert.equal(decodeURIComponent(fixed.password),'a#b');assert.equal(fixed.hostname,'pooler.supabase.com');assert.equal(fixed.port,'6543');
+  assert.equal(encodedDatabaseURL(fixed.href),fixed.href);
+  assert.throws(()=>encodedDatabaseURL('invalid'));
+});
 test('Hunyuan config prevents production localhost and unauthenticated remote workers',()=>{
   assert.throws(()=>hunyuanConfig({NODE_ENV:'production',HUNYUAN_API_URL:'http://127.0.0.1:8081'}),/development-only/);
   assert.throws(()=>hunyuanConfig({HUNYUAN_API_URL:'https://gpu.example.test'}),/authentication/);

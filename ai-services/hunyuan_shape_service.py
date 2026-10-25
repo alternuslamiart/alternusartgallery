@@ -15,6 +15,7 @@ import sys
 import threading
 import time
 import uuid
+from contextlib import contextmanager
 
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
@@ -29,6 +30,7 @@ DATA.mkdir(parents=True, exist_ok=True)
 TOKEN = os.getenv("HUNYUAN_API_TOKEN", "")
 MAX_IMAGE = 3_000_000
 MAX_OUTPUT = 20_000_000
+INFERENCE_STEPS = 50  # The installed pipeline's verified default; not an estimate.
 Image.MAX_IMAGE_PIXELS = 4096 * 4096
 jobs = {}
 lock = threading.RLock()
@@ -42,6 +44,49 @@ def save(job):
     temp = target.with_suffix(".tmp")
     temp.write_text(json.dumps(job), encoding="utf-8")
     temp.replace(target)
+
+
+def phase(job, value, **details):
+    with lock:
+        job.update(phase=value, **details)
+        save(job)
+
+
+def sampling_callback(job):
+    def callback(step, _timestep, _outputs):
+        # Official pipeline callback runs after an actual diffusion step. Its
+        # final invocation precedes _export(), VAE decoding and mesh extraction.
+        completed = min(INFERENCE_STEPS, int(step) + 1)
+        phase(job, "processing_mesh" if completed == INFERENCE_STEPS else "generating_geometry",
+              sampling_step=completed, sampling_steps=INFERENCE_STEPS)
+    return callback
+
+
+@contextmanager
+def mapped_checkpoint_loading(torch):
+    """Keep the upstream pipeline/config while avoiding a full RAM copy of weights.
+
+    PyTorch 2.5 supports mmap on the cached ZIP checkpoint. The temporary wrapper
+    is used only by the single pipeline-loading thread and restored in finally.
+    Initialize parameters in the pipeline's existing fp16 dtype as well, rather
+    than allocating full fp32 CPU modules before converting them to fp16.
+    No upstream files, weights, final model dtype or inference settings change.
+    """
+    original = torch.load
+    original_dtype = torch.get_default_dtype()
+    torch.set_default_dtype(torch.float16)
+    def load(file, *args, **kwargs):
+        if isinstance(file, (str, os.PathLike)) and str(file).endswith(".ckpt"):
+            with open(file, "rb") as checkpoint:
+                if checkpoint.read(4) == b"PK\x03\x04":
+                    kwargs["mmap"] = True
+        return original(file, *args, **kwargs)
+    torch.load = load
+    try:
+        yield
+    finally:
+        torch.load = original
+        torch.set_default_dtype(original_dtype)
 
 
 def prune():
@@ -114,25 +159,29 @@ def run():
             if not torch.cuda.is_available():
                 raise RuntimeError("CUDA is unavailable.")
             if pipeline is None:
+                phase(job, "loading_model")
                 sys.path.insert(0, str(REPO / "hy3dshape"))
                 from hy3dshape.pipelines import Hunyuan3DDiTFlowMatchingPipeline
-                pipeline = Hunyuan3DDiTFlowMatchingPipeline.from_pretrained(
-                    "tencent/Hunyuan3D-2.1", subfolder="hunyuan3d-dit-v2-1")
+                with mapped_checkpoint_loading(torch):
+                    pipeline = Hunyuan3DDiTFlowMatchingPipeline.from_pretrained(
+                        "tencent/Hunyuan3D-2.1", subfolder="hunyuan3d-dit-v2-1")
             with Image.open(DATA / f"{uid}.png") as image, torch.inference_mode():
                 # Intentionally use the exact successful test_shape.py defaults.
-                mesh = pipeline(image=image.copy())[0]
+                phase(job, "generating_geometry")
+                mesh = pipeline(image=image.copy(), callback=sampling_callback(job), callback_steps=1)[0]
+                phase(job, "processing_mesh")
                 target = DATA / f"{uid}.glb"
                 mesh.export(str(target))
                 del mesh
             if not 12 <= target.stat().st_size <= MAX_OUTPUT:
                 target.unlink(missing_ok=True)
                 raise RuntimeError("Generated GLB exceeds the 20 MB import limit.")
-            job.update(status="completed")
+            job.update(status="completed", phase="completed")
         except Exception as error:
             import traceback
             traceback.print_exc()
             oom = "out of memory" in str(error).lower()
-            job.update(status="failed", error="CUDA out of memory. Close other GPU applications and retry." if oom else "Shape inference failed. Inspect the GPU service log.")
+            job.update(status="failed", phase="failed", error="CUDA out of memory. Close other GPU applications and retry." if oom else "Shape inference failed. Inspect the GPU service log.")
             (DATA / f"{uid}.glb").unlink(missing_ok=True)
         finally:
             (DATA / f"{uid}.png").unlink(missing_ok=True)
@@ -176,7 +225,7 @@ async def send(request: Request):
             raise HTTPException(429, "Worker capacity reached; retry after pending jobs finish or staged outputs expire.")
         uid = str(uuid.uuid4())
         image.save(DATA / f"{uid}.png")
-        job = {"uid": uid, "status": "queued", "created": time.time()}
+        job = {"uid": uid, "status": "queued", "phase": "queued", "created": time.time()}
         jobs[uid] = job
         save(job)
         pending.put_nowait(uid)

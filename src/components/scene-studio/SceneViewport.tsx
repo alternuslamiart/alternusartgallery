@@ -24,6 +24,7 @@ export type ViewportAPI = {
 };
 export type SceneTool = "select" | "translate" | "rotate" | "scale" | "measure";
 type Props = { document: SceneDocument; selected: string[]; tool: SceneTool; snap: boolean; grid: boolean;
+  previewJob?:string;
   editing?:{ids:string[];phase:'processing'|'updating'|'completed'}|null;
   onSelect: (id: string | null, additive?: boolean) => void; onTransform: (id: string, patch: Partial<SceneObject>) => void;
   onHover?: (id: string | null) => void;
@@ -242,7 +243,7 @@ export const SceneViewport = forwardRef<ViewportAPI, Props>(function SceneViewpo
   const [generation, setGeneration] = useState(0), [walking, setWalking] = useState(false), [contextLost, setContextLost] = useState(false);
   const e = p.document.environment;
   const maxDpr = e.quality === "performance" ? 1 : e.quality === "ultra" ? 2 : 1.5;
-  return <div className="scene-canvas" data-object-count={p.document.objects.length} data-edit-phase={p.editing?.phase} data-edit-targets={p.editing?.ids.join(',')}>
+  return <div className="scene-canvas" data-object-count={p.document.objects.length} data-preview-job={p.previewJob} data-edit-phase={p.editing?.phase} data-edit-targets={p.editing?.ids.join(',')}>
     <RenderBoundary key={generation} retry={() => { setContextLost(false); setGeneration(g => g + 1); }}>
       <Canvas frameloop={walking ? "always" : "demand"} shadows={e.shadows} dpr={[1, maxDpr]} gl={{ antialias: true, preserveDrawingBuffer: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => { gl.domElement.addEventListener("webglcontextlost", event => { event.preventDefault(); setContextLost(true); }, { once: true }); }}

@@ -23,6 +23,10 @@ export function useSceneDocument(studio: string, identity: string, authenticated
   };
   useEffect(() => {
     mounted.current = true;
+    // StrictMode replays initialization. Keep editing disabled until the latest
+    // asynchronous recovery/cloud lookup finishes, so it cannot replace a newly
+    // created project while its first authenticated save is in flight.
+    setReady(false);
     const controller = new AbortController();
     let cancelled = false;
     void (async () => {

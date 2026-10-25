@@ -10,16 +10,36 @@ export async function readModelBytes(response, limit = 20_000_000) {
   return bytes.buffer;
 }
 const message = data => typeof data?.error === "string" ? data.error : data?.error?.message || "3D generation request failed.";
+export function generationLabel(job) {
+  if(job.pollWarning)return 'Worker status unavailable · reconnecting';
+  if(job.status==='FAILED'||job.status==='CANCELED')return 'Failed';
+  if(job.status==='IMPORTING')return 'Loading GLB preview';
+  if(job.status==='SUCCEEDED')return 'Completed';
+  const label={queued:'Queued',loading_model:'Loading model',generating_geometry:'Generating geometry',processing_mesh:'Processing mesh'}[job.stage]||(job.status==='QUEUED'?'Queued':'Processing');
+  return job.stage==='generating_geometry'&&job.samplingStep&&job.samplingSteps?`${label} · step ${job.samplingStep}/${job.samplingSteps}`:label;
+}
 const pause = (ms, signal) => new Promise((resolve, reject) => {
   const abort = () => { clearTimeout(timer); reject(new DOMException("Generation monitoring stopped. Resume it from generation jobs.", "AbortError")); };
   const timer = setTimeout(() => { signal?.removeEventListener("abort", abort); resolve(); }, ms);
   if (signal?.aborted) abort(); else signal?.addEventListener("abort", abort, { once: true });
 });
 export async function generate3DModel({ provider, prompt, image, projectId, studio, signal, resumeId, onProgress = () => {}, fetchImpl = fetch, pollMs = 3000, timeoutMs = 1800_000 }) {
-  const parse = async response => { const data = await response.json(); if (!response.ok) throw new Error(message(data)); return data; };
-  let job = resumeId ? await parse(await fetchImpl(`/api/ai3d/jobs/${encodeURIComponent(resumeId)}?refresh=1`, { signal, cache: "no-store" })) : await parse(await fetchImpl("/api/ai3d/jobs", { method: "POST", headers: { "Content-Type": "application/json" }, signal, body: JSON.stringify({ requestId: crypto.randomUUID(), provider, prompt, image, projectId, studio }) }));
-  if (job.projectId !== projectId) throw new Error("This generation belongs to a different project.");
+  const parse = async response => { const data = await response.json(); if (!response.ok) throw Object.assign(new Error(message(data)),{status:response.status}); return data; };
   const started = Date.now();
+  const inspect = async (url,known) => {
+    while(true){
+      try{return await parse(await fetchImpl(url,{signal:signal?AbortSignal.any([signal,AbortSignal.timeout(60_000)]):AbortSignal.timeout(60_000),cache:'no-store'}));}
+      catch(error){
+        signal?.throwIfAborted();
+        const temporary=[502,503,504].includes(error.status)||error instanceof TypeError||error.name==='TimeoutError';
+        if(!temporary||Date.now()-started>timeoutMs)throw error;
+        if(known)onProgress({...known,pollWarning:true});
+        await pause(Math.max(10,pollMs),signal);
+      }
+    }
+  };
+  let job = resumeId ? await inspect(`/api/ai3d/jobs/${encodeURIComponent(resumeId)}?refresh=1`) : await parse(await fetchImpl("/api/ai3d/jobs", { method: "POST", headers: { "Content-Type": "application/json" }, signal, body: JSON.stringify({ requestId: crypto.randomUUID(), provider, prompt, image, projectId, studio }) }));
+  if (job.projectId !== projectId) throw new Error("This generation belongs to a different project.");
   while (true) {
     if (job.projectId !== projectId) throw new Error("This generation belongs to a different project.");
     signal?.throwIfAborted(); onProgress(job);
@@ -27,7 +47,7 @@ export async function generate3DModel({ provider, prompt, image, projectId, stud
     if (["FAILED", "CANCELED"].includes(job.status)) throw new Error(job.error || "The 3D generation did not succeed.");
     if (Date.now() - started > timeoutMs) throw new Error("Generation is still processing. Resume it later from generation jobs.");
     await pause(pollMs, signal);
-    job = await parse(await fetchImpl(`/api/ai3d/jobs/${encodeURIComponent(job.id)}`, { signal, cache: "no-store" }));
+    job = await inspect(`/api/ai3d/jobs/${encodeURIComponent(job.id)}`,job);
   }
   onProgress({ ...job, status: "IMPORTING" });
   let response;

@@ -5,6 +5,7 @@ import { fail3D, owned3D } from "@/lib/ai3d/jobs";
 import { safeModelURL } from "@/lib/ai3d/providers.mjs";
 import { readModelBytes } from "@/lib/ai3d/client.mjs";
 import { readStoredFile } from '@/lib/platform/storage';
+import {signedHunyuanAsset} from '@/lib/ai3d/hunyuan-object-storage';
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -17,6 +18,8 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
     if(job.provider==='hunyuan') {
       if(!output?.storageKey)return fail3D('Generated model is not persisted yet.',409);
       try{
+        const signed=await signedHunyuanAsset(output.storageKey);
+        if(signed)return new NextResponse(null,{status:307,headers:{Location:signed,'Cache-Control':'private, no-store'}});
         const bytes=await readStoredFile(output.storageKey);
         return new NextResponse(new Uint8Array(bytes),{headers:{'Content-Type':'model/gltf-binary','Cache-Control':'private, no-store','Content-Disposition':'attachment; filename="Casynus_Hunyuan.glb"'}});
       }catch{return fail3D('The saved Hunyuan GLB is unavailable. Restore the private asset volume from backup.',503);}

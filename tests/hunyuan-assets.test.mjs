@@ -17,6 +17,7 @@ test('GPU completion copies GLB to deterministic private storage once and does n
     '@/lib/platform/storage':{resolveStorageKey:key=>path.join(root,key),readStoredFile:key=>fsp.readFile(path.join(root,key))},
     './hunyuan.mjs':{workerTaskId:value=>value,hunyuanRequest:async url=>{assert.equal(url,`/asset/${task}`);downloads++;return new Response(glb());}},
     './client.mjs':{readModelBytes},
+    './hunyuan-object-storage':{hunyuanObjectStorage:()=>null},
   });
   const key=await api.persistHunyuanAsset('workspace',id,task);assert.equal(key,`workspace/hunyuan/${id}.glb`);assert.deepEqual(new Uint8Array(await fsp.readFile(path.join(root,key))),glb());
   assert.equal(await api.persistHunyuanAsset('workspace',id,task),key);assert.equal(downloads,1);
@@ -25,7 +26,7 @@ test('GPU completion copies GLB to deterministic private storage once and does n
 
 test('private Hunyuan asset route checks auth and user/workspace ownership before reading stored bytes',async()=>{
   class NextResponse extends Response {static json(data,init){return Response.json(data,init);}}
-  const context={userId:'owner',workspaceId:'workspace'};let authenticated=true,visible=true,reads=0,missingFile=false;
+  const context={userId:'owner',workspaceId:'workspace'};let authenticated=true,visible=true,reads=0,missingFile=false,signed=null;
   const api=load('src/app/api/ai3d/jobs/[id]/asset/route.ts',{
     'next/server':{NextResponse},'@/lib/prisma':{prisma:{aIProviderJob:{findFirst:async({where})=>{assert.equal(where.userId,context.userId);assert.equal(where.workspaceId,context.workspaceId);return visible?{provider:'hunyuan',status:'SUCCEEDED',output:{storageKey:'private/key.glb'}}:null;}}}},
     '@/lib/platform/api':{requirePlatformContext:async()=>authenticated?context:Response.json({error:'Sign in'},{status:401}),isApiResponse:value=>value instanceof Response},
@@ -33,10 +34,25 @@ test('private Hunyuan asset route checks auth and user/workspace ownership befor
     '@/lib/ai3d/providers.mjs':{safeModelURL:()=>{throw Error('Private assets must not use external worker URLs');}},
     '@/lib/ai3d/client.mjs':{readModelBytes},
     '@/lib/platform/storage':{readStoredFile:async key=>{assert.equal(key,'private/key.glb');reads++;if(missingFile)throw Error('missing');return glb();}},
+    '@/lib/ai3d/hunyuan-object-storage':{signedHunyuanAsset:async()=>signed},
   });
   const request=new Request('http://localhost/api/ai3d/jobs/job/asset'),params={params:{id:'job'}};
   authenticated=false;assert.equal((await api.GET(request,params)).status,401);assert.equal(reads,0);
   authenticated=true;visible=false;assert.equal((await api.GET(request,params)).status,404);assert.equal(reads,0);
   visible=true;const response=await api.GET(request,params);assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'private, no-store');assert.equal((await response.arrayBuffer()).byteLength,12);assert.equal(reads,1);
   missingFile=true;const missing=await api.GET(request,params);assert.equal(missing.status,503);assert.match((await missing.json()).error,/private asset volume/);
+  signed='https://private-storage.example.test/signed-model';const cloud=await api.GET(request,params);assert.equal(cloud.status,307);assert.equal(cloud.headers.get('location'),signed);assert.equal(cloud.headers.get('cache-control'),'private, no-store');
+});
+
+test('private object storage refuses public buckets and keeps service credentials server-side',async()=>{
+  const before={SUPABASE_URL:process.env.SUPABASE_URL,SUPABASE_SERVICE_ROLE_KEY:process.env.SUPABASE_SERVICE_ROLE_KEY,HUNYUAN_STORAGE_BUCKET:process.env.HUNYUAN_STORAGE_BUCKET};
+  Object.assign(process.env,{SUPABASE_URL:'https://test.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'server-test-secret',HUNYUAN_STORAGE_BUCKET:'private-models'});
+  let publicBucket=false,uploads=0;
+  try{
+    const api=load('src/lib/ai3d/hunyuan-object-storage.ts',{'@supabase/supabase-js':{createClient:(url,key)=>{assert.equal(url,'https://test.supabase.co');assert.equal(key,'server-test-secret');return{storage:{getBucket:async()=>({data:{public:publicBucket}}),from:bucket=>{assert.equal(bucket,'private-models');return{upload:async(key,bytes)=>{assert.equal(key,'workspace/model.glb');assert.equal(bytes.byteLength,12);uploads++;return{};},createSignedUrl:async(key,ttl)=>{assert.equal(ttl,120);assert.equal(key,'workspace/model.glb');return{data:{signedUrl:'https://test.supabase.co/private-signed'}};}}}}};}}});
+    assert.equal(await api.putHunyuanObject('workspace/model.glb',glb().buffer),'supabase://private-models/workspace/model.glb');assert.equal(uploads,1);
+    assert.equal(await api.signedHunyuanAsset('supabase://private-models/workspace/model.glb'),'https://test.supabase.co/private-signed');
+    await assert.rejects(api.signedHunyuanAsset('supabase://another-bucket/workspace/model.glb'),/reference/);
+    publicBucket=true;await assert.rejects(api.signedHunyuanAsset('supabase://private-models/workspace/model.glb'),/private/);await assert.rejects(api.putHunyuanObject('workspace/model.glb',glb().buffer),/private/);assert.equal(uploads,1);
+  }finally{for(const[key,value]of Object.entries(before)){if(value===undefined)delete process.env[key];else process.env[key]=value;}}
 });

@@ -31,3 +31,15 @@ test("cancelled, failed, oversized or non-GLB results never become scene data", 
   await assert.rejects(generate3DModel({ projectId: "p", studio: "architecture", signal: controller.signal, fetchImpl: async () => Response.json({ projectId: "p", status: "RUNNING" }) }), { name: "AbortError" });
   await assert.rejects(generate3DModel({ projectId: "p", studio: "architecture", fetchImpl: async () => Response.json({ projectId: "p", status: "FAILED", error: "No credits" }) }), /No credits/);
 });
+
+test('transient job-status failures reconnect without submitting another inference job',async()=>{
+  const source=makeDocument();source.objects=[makeObject('box')];const glb=await(await exportScene(source,'glb')).arrayBuffer();
+  const job={id:'retry-job',projectId:source.id,provider:'hunyuan',status:'SUCCEEDED',progress:100,assetPath:'/api/ai3d/jobs/retry-job/asset'};
+  let submits=0,polls=0;const updates=[];
+  const result=await generate3DModel({provider:'hunyuan',projectId:source.id,studio:'architecture',pollMs:0,timeoutMs:1000,onProgress:value=>updates.push(value),fetchImpl:async(url,init)=>{
+    if(init?.method==='POST'){submits++;return Response.json({...job,status:'QUEUED',stage:'queued'});}
+    if(url.endsWith('/asset'))return new Response(glb);
+    if(++polls===1)return Response.json({error:'Temporarily unavailable'},{status:502});return Response.json(job);
+  }});
+  assert.equal(submits,1);assert.equal(polls,2);assert.ok(updates.some(j=>j.pollWarning));assert.equal(result.buffer.byteLength,glb.byteLength);
+});

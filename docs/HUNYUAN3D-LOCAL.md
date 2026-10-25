@@ -125,8 +125,11 @@ required `HUNYUAN_API_TOKEN` and disabled redirects. A production worker should
 remain behind an authenticated TLS gateway, with durable jobs and private object
 storage. Vercel cannot reach this computer's loopback address and its ephemeral
 filesystem is unsuitable for these stored GLBs or 12 MB asset responses. Before
-public use, implement persistent object storage with signed downloads (e.g.
-private Supabase Storage/S3), point the existing asset route at it, provision the
+public use, configure the optional private Supabase Storage adapter with
+`SUPABASE_URL`, server-only `SUPABASE_SERVICE_ROLE_KEY` and
+`HUNYUAN_STORAGE_BUCKET` naming an existing private bucket. Upload and signing
+reject public buckets; ownership-authorized downloads use 120-second signed URLs.
+Remote production configuration requires these storage values. Provision the
 remote GPU worker, and complete deployment/auth/license review. Merely setting
 a remote URL does not supply that infrastructure.
 
@@ -177,12 +180,24 @@ Type checking and a production build passed; the first build hit a Prisma DLL
 lock held by an earlier Next server, then passed after that server was stopped.
 Full lint still reports pre-existing unused-code errors in unrelated files.
 
-Live signed-in generation/project persistence is blocked by the existing
-`DATABASE_URL: INVALID_URL; check password URL encoding`, reproduced with
-`node scripts/verify-ai-usage-database.mjs`. Authentication has not been bypassed.
-Fix local database configuration and verify one signed-in image→generation→insert
+On 2026-10-25, `node scripts/verify-hunyuan-environment.mjs` passed read-only
+SELECT 1 on both configured pooler URLs, superseding the invalid URL blocker.
+Authentication has not been bypassed. Verify one signed-in image→generation→insert
 and logout/login→project reopen before declaring the primary acceptance fully
 verified. Browser and final check results are recorded in `PROGRESS.md`.
+
+The toolbar AI 3D Generate toggle selects image generation and restores the
+previous text provider when toggled off. Worker phases and actual diffusion
+callbacks drive status; temporary polling failures reconnect without resubmitting.
+Completed geometry previews in the existing viewport before Insert into Studio
+commits it. Chat also offers Preview 3D and Download GLB. Stop monitoring leaves
+the worker job running and resumable.
+
+`node scripts/verify-hunyuan-studios.mjs --live` opts into real local database
+writes, credentials sign-in, GPU submission and an isolated QA principal; it does
+not test email delivery. `--resume-live` resumes a recent isolated QA job. Active
+jobs retain QA records for resumption; completed runs clean their owned records.
+The default browser verifier continues to use mocked auth/database/job HTTP.
 
 ## Changed implementation files
 
