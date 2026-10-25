@@ -9,3 +9,33 @@ export async function readWorkspaceSave(response,id,expectedRevision){
   }
   return {revision:expectedRevision};
 }
+
+// A PUT can commit even when its response is lost. Read the server before
+// retrying so a successful write is not mistaken for a revision conflict.
+export async function saveWorkspaceDocument(fetcher,document,revision,options={}){
+  const expectedRevision=revision+1;
+  const hash=JSON.stringify(document);
+  let lastError;
+  for(let attempt=0;attempt<3;attempt++){
+    if(attempt) await (options.wait??(ms=>new Promise(resolve=>setTimeout(resolve,ms))))(250*2**(attempt-1));
+    let response;
+    try{
+      response=await fetcher('/api/studio-projects',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({document,revision}),signal:AbortSignal.timeout(20_000)});
+      return await readWorkspaceSave(response,document.id,expectedRevision);
+    }catch(error){
+      lastError=error;
+      const status=error?.status??response?.status;
+      if(status===401||status===403||status===400||status===413) throw error;
+      try{
+        const check=await fetcher(`/api/studio-projects?id=${encodeURIComponent(document.id)}`,{cache:'no-store',signal:AbortSignal.timeout(10_000)});
+        if(check.ok){
+          const cloud=await check.json();
+          if(cloud.revision===expectedRevision&&JSON.stringify(cloud.document)===hash)return {revision:expectedRevision};
+          if(cloud.revision!==revision)throw Object.assign(new Error('A newer cloud revision exists. Recovery is preserved. Open the cloud copy or save this recovery as a new project.'),{status:409});
+        }
+      }catch(checkError){if(checkError?.status===409)throw checkError;}
+      if(status===409||attempt===2)throw error;
+    }
+  }
+  throw lastError;
+}

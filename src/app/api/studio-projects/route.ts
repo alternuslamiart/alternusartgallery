@@ -8,6 +8,12 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 const kind = "casynus-scene";
 const error = (message: string, status: number) => NextResponse.json({ error: message }, { status });
+function logStorageFailure(operation: string, caught: unknown) {
+  // Prisma codes identify connection/pool failures without logging documents,
+  // account identifiers, URLs, or credentials.
+  const code = caught instanceof Prisma.PrismaClientKnownRequestError ? caught.code : caught instanceof Prisma.PrismaClientInitializationError ? caught.errorCode : "UNKNOWN";
+  console.error("studio-project-storage", { operation, code });
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
     const projects = await prisma.blenderProject.findMany({ where: { ...scope, settings: { path: ["kind"], equals: kind } }, orderBy: { updatedAt: "desc" }, take: 100, select: { id: true, name: true, updatedAt: true } });
     return NextResponse.json({ projects });
-  } catch { return error("Project storage is unavailable. Your browser recovery copy has not been uploaded.", 503); }
+  } catch (caught) { logStorageFailure("read", caught); return error("Project storage is unavailable. Your browser recovery copy has not been uploaded.", 503); }
 }
 
 class SceneConflict extends Error {}
@@ -31,7 +37,7 @@ class SceneConflict extends Error {}
 export async function PUT(request: NextRequest) {
   let context;
   try { context = await requirePlatformContext(); }
-  catch { return error("Workspace storage is unavailable. Keep your recovery copy or download JSON.", 503); }
+  catch (caught) { logStorageFailure("context", caught); return error("Workspace storage is unavailable. Keep your recovery copy or download JSON.", 503); }
   if (isApiResponse(context)) return context;
   let document;
   let revision: number;
@@ -68,6 +74,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ id: document.id, revision: revision + 1, saved: true });
   } catch (caught) {
     if (caught instanceof SceneConflict || (caught instanceof Prisma.PrismaClientKnownRequestError && caught.code === "P2002")) return error("A newer version or another project already uses this ID. Reopen the cloud version or save a copy.", 409);
+    logStorageFailure("write", caught);
     return error("Project could not be saved. Keep the browser recovery copy or download JSON.", 503);
   }
 }

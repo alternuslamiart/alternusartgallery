@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readWorkspaceSave} from '../src/lib/scene/workspace-save.mjs';
+import {readWorkspaceSave,saveWorkspaceDocument} from '../src/lib/scene/workspace-save.mjs';
 import {createHunyuanLiveContext} from '../scripts/hunyuan-live-test-context.mjs';
 
 test('storage acceptance refuses arbitrary remote origins and requires production opt-in',async()=>{
@@ -21,4 +21,22 @@ test('workspace save confirms only the expected persisted project and revision',
     await assert.rejects(readWorkspaceSave(Response.json(data),'project',2),/not confirmed/);
   }
   await assert.rejects(readWorkspaceSave(new Response('Unavailable',{status:503}),'project',2),caught=>caught.status===503&&/recovery/.test(caught.message));
+});
+
+test('lost save response is reconciled against the exact cloud document',async()=>{
+  const document={id:'project',name:'Edited'};
+  const calls=[];
+  const fetcher=async(url)=>{calls.push(url);if(calls.length===1)throw new TypeError('network lost');return Response.json({document,revision:2});};
+  assert.deepEqual(await saveWorkspaceDocument(fetcher,document,1),{revision:2});
+  assert.equal(calls.length,2);
+});
+
+test('temporary storage outage retries and never overwrites a newer revision',async()=>{
+  const document={id:'project',name:'Edited'};
+  let puts=0;
+  const fetcher=async(url)=>url.includes('?id=')?Response.json({document:{id:'project',name:'Old'},revision:1}):(puts++<2?Response.json({error:'Unavailable'},{status:503}):Response.json({saved:true,id:'project',revision:2}));
+  assert.deepEqual(await saveWorkspaceDocument(fetcher,document,1,{wait:async()=>{}}),{revision:2});
+  assert.equal(puts,3);
+  const stale=async(url)=>url.includes('?id=')?Response.json({document:{id:'project',name:'Newer'},revision:3}):Response.json({error:'Conflict'},{status:409});
+  await assert.rejects(saveWorkspaceDocument(stale,document,1),error=>error.status===409);
 });

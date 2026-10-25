@@ -6,6 +6,13 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Make initial workspace creation atomic, coalesce existing defaults, and
+  add bounded scene-save retries with exact cloud reconciliation after lost
+  responses. Retain local recovery and guard revision conflicts.
+- [ ] Confirm the affected production account's 503 code and browser recovery
+  after deployment; production remote GPU and private asset storage still need
+  configuration for live Hunyuan generation.
+
 - [x] Add Hunyuan3D 2.1 image-based shape generation to existing studio chat,
   private GLB persistence and lossless native scene asset references. Verify an
   actual local CUDA generation and full-vertex scene import.

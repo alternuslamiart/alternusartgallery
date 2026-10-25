@@ -41,55 +41,46 @@ export async function requirePlatformContext(): Promise<PlatformContext | NextRe
  });
 
  if (workspace) {
- await ensureWorkspaceDefaults(userId, workspace.id);
+ await ensureWorkspaceDefaultsOnce(userId, workspace.id, workspace.trialEndsAt, workspace.plan);
  return { userId, workspaceId: workspace.id };
  }
 
- const trialEndsAt = new Date(Date.now() + 12 * 24 * 60 * 60 * 1000);
- const created = await prisma.workspace.create({
- data: {
- ownerId: userId,
- name: "Personal",
- plan: "TRIAL",
- trialEndsAt,
- },
- });
-
- await Promise.all([
- prisma.workspaceMember.create({
- data: { workspaceId: created.id, userId, role: "OWNER" },
- }),
- prisma.subscriptionState.create({
- data: {
- workspaceId: created.id,
- plan: "TRIAL",
- status: "TRIALING",
- trialEndsAt,
- usageLimits: defaultUsageLimits(),
- },
- }),
- prisma.workspaceSettings.create({
- data: { workspaceId: created.id, allowedAssetTypes: defaultAllowedAssetTypes() },
- }),
- prisma.userSettings.upsert({
- where: { userId },
- update: {},
- create: { userId },
- }),
- ]);
-
- return { userId, workspaceId: created.id };
+ // The read and creation must share a serializable transaction. Otherwise two
+ // first requests can create two personal workspaces for the same owner.
+ for (let attempt = 0; attempt < 3; attempt++) {
+  try {
+   const workspaceId = await prisma.$transaction(async tx => {
+    const existing = await tx.workspace.findFirst({ where: { ownerId: userId }, orderBy: { createdAt: "asc" } });
+    if (existing) return existing.id;
+    const trialEndsAt = new Date(Date.now() + 12 * 24 * 60 * 60 * 1000);
+    const created = await tx.workspace.create({ data: { ownerId: userId, name: "Personal", plan: "TRIAL", trialEndsAt } });
+    await tx.workspaceMember.create({ data: { workspaceId: created.id, userId, role: "OWNER" } });
+    await tx.subscriptionState.create({ data: { workspaceId: created.id, plan: "TRIAL", status: "TRIALING", trialEndsAt, usageLimits: defaultUsageLimits() } });
+    await tx.workspaceSettings.create({ data: { workspaceId: created.id, allowedAssetTypes: defaultAllowedAssetTypes() } });
+    await tx.userSettings.upsert({ where: { userId }, update: {}, create: { userId } });
+    return created.id;
+   }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+   return { userId, workspaceId };
+  } catch (error) {
+   if (!(error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2034") || attempt === 2) throw error;
+   await new Promise(resolve => setTimeout(resolve, 40 * 2 ** attempt));
+  }
+ }
+ throw new Error("Workspace initialization failed.");
 }
 
 export function isApiResponse(value: PlatformContext | NextResponse): value is NextResponse {
  return value instanceof NextResponse;
 }
 
-async function ensureWorkspaceDefaults(userId: string, workspaceId: string) {
- const workspace = await prisma.workspace.findUnique({ where: { id: workspaceId } });
- const trialEndsAt = workspace?.trialEndsAt ?? new Date(Date.now() + 12 * 24 * 60 * 60 * 1000);
+const initializedWorkspaces = new Map<string, Promise<void>>();
 
- await Promise.all([
+async function ensureWorkspaceDefaultsOnce(userId: string, workspaceId: string, existingTrialEndsAt: Date | null, plan: Prisma.WorkspaceCreateInput["plan"]) {
+ const key = `${userId}:${workspaceId}`;
+ let pending = initializedWorkspaces.get(key);
+ if (!pending) {
+  const trialEndsAt = existingTrialEndsAt ?? new Date(Date.now() + 12 * 24 * 60 * 60 * 1000);
+  pending = Promise.all([
  prisma.workspaceMember.upsert({
  where: { workspaceId_userId: { workspaceId, userId } },
  update: {},
@@ -100,7 +91,7 @@ async function ensureWorkspaceDefaults(userId: string, workspaceId: string) {
  update: {},
  create: {
  workspaceId,
- plan: workspace?.plan ?? "TRIAL",
+ plan: plan ?? "TRIAL",
  status: "TRIALING",
  trialEndsAt,
  usageLimits: defaultUsageLimits(),
@@ -116,7 +107,12 @@ async function ensureWorkspaceDefaults(userId: string, workspaceId: string) {
  update: {},
  create: { userId },
  }),
- ]);
+  ]).then(() => undefined);
+  initializedWorkspaces.set(key, pending);
+  if (initializedWorkspaces.size > 256) initializedWorkspaces.delete(initializedWorkspaces.keys().next().value!);
+  void pending.catch(() => { if (initializedWorkspaces.get(key) === pending) initializedWorkspaces.delete(key); });
+ }
+ await pending;
 }
 
 export function defaultUsageLimits(): Prisma.InputJsonObject {

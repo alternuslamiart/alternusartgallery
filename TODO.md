@@ -2,6 +2,11 @@
 
 ## Next concrete task
 
+- [ ] Reproduce the affected user's workspace request after this deployment and
+  inspect the sanitized `studio-project-storage` operation/Prisma code if a 503
+  remains. Verify browser autosave recovery after a real transient outage and
+  two-account ownership with an isolated test account.
+
 - [x] Correct production DATABASE_URL/DIRECT_URL to verified poolers for the same
   database/credentials and preserve actual workspace save errors in generation.
 - [x] Verify real authenticated production save/read, concurrent revision

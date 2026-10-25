@@ -2,6 +2,29 @@
 
 Last updated: 2026-10-25
 
+## Workspace recovery follow-up (2026-10-25)
+
+- The screenshot's exact `PUT /api/studio-projects` 503 occurs while resolving
+  `requirePlatformContext`, before the scene transaction. Production and Preview
+  database URLs passed read-only connections through transaction/session poolers;
+  required workspace tables, RLS flags and service-role CRUD privileges were
+  present. Recent production logs had no matching 503, so the specific failing
+  Prisma code for the user's request remains unobserved. The route now logs only
+  operation and safe Prisma code for future diagnosis, never secrets or scenes.
+- Existing workspace lookup previously executed four default upserts on every
+  request. Defaults now initialize once per warm process and coalesce parallel
+  requests; first workspace creation and defaults run in one serializable
+  transaction with bounded serialization retry. No migration or data deletion.
+- Client scene saves now retry transient failures, reconcile a lost PUT response
+  against the exact cloud document and revision, and keep browser recovery when
+  cloud storage fails. Automatic retries and the browser `online` event resync
+  pending edits, while revision conflicts continue to block stale overwrites.
+- Verified 162 Node tests, TypeScript and production build. Repository-wide lint
+  still fails on existing unused variables/imports outside this increment.
+  Live production acceptance after this follow-up deployment and the user's
+  affected account/session remain to be checked; mocked tests are not a live
+  Hunyuan production run.
+
 ## Workspace save configuration and confirmation
 
 - Reproduced the screenshot's failing boundary: its top alert is emitted when

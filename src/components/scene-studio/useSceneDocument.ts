@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { commitHistory, createTemplate, makeDocument, redoHistory, undoHistory, validateDocument, type SceneDocument, type SceneHistory } from "@/lib/scene/document.mjs";
 import { readRecovery, writeRecovery } from "@/lib/scene/recovery";
-import {readWorkspaceSave} from '@/lib/scene/workspace-save.mjs';
+import {saveWorkspaceDocument} from '@/lib/scene/workspace-save.mjs';
 
 export function useSceneDocument(studio: string, identity: string, authenticated: boolean, requestedId?: string) {
   const [history, setHistory] = useState<SceneHistory>(() => {
@@ -16,6 +16,7 @@ export function useSceneDocument(studio: string, identity: string, authenticated
   const saveFailure=useRef<{id:string;error:Error}|null>(null);
   const current = useRef(history.present); current.current = history.present;
   const mounted = useRef(true), blocked = useRef(false), queue = useRef(Promise.resolve());
+  const retryTimer=useRef<ReturnType<typeof setTimeout>|null>(null),retryCount=useRef(0);
   const scope = `casynus:scene-active:${identity}`;
   const remember = (document: SceneDocument) => {
     try { sessionStorage.setItem(scope, document.id); } catch { /* Optional pointer, not scene storage. */ }
@@ -66,7 +67,7 @@ export function useSceneDocument(studio: string, identity: string, authenticated
       remember(document); setReady(true);
       setStatus(loadedCloud ? "Cloud project opened" : authenticated ? "Ready to save" : "Browser recovery · sign in for cloud storage");
     })();
-    return () => { cancelled = true; mounted.current = false; controller.abort(); };
+    return () => { cancelled = true; mounted.current = false; controller.abort(); if(retryTimer.current)clearTimeout(retryTimer.current); retryTimer.current=null; };
   }, [identity, authenticated, requestedId, scope]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const recover = useCallback(async () => {
@@ -85,20 +86,19 @@ export function useSceneDocument(studio: string, identity: string, authenticated
       if (JSON.stringify(document) === cloudHash.current) return;
       if (mounted.current) setStatus("Saving to workspace…");
       try {
-        const expectedRevision=revision.current+1;
-        const response = await fetch("/api/studio-projects", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ document, revision: revision.current }), signal: AbortSignal.timeout(20_000) });
+        const data=await saveWorkspaceDocument(fetch,document,revision.current);
         if (!mounted.current || current.current.id !== document.id) return;
-        if (response.status === 409) { blocked.current = true; setConflict(true); }
-        const data=await readWorkspaceSave(response,document.id,expectedRevision);
         // A new/open project must never inherit a reply from the previous ID.
         if (!mounted.current || current.current.id !== document.id) return;
         revision.current = data.revision; cloudHash.current = JSON.stringify(document);
+        retryCount.current=0;if(retryTimer.current)clearTimeout(retryTimer.current);retryTimer.current=null;
         saveFailure.current=null;
         await recover(); setStatus(`Saved to workspace · revision ${data.revision}`); setFailure(null);
-      } catch (caught) { if (mounted.current && current.current.id === document.id) { const error=caught instanceof Error?caught:new Error('Cloud save failed.');saveFailure.current={id:document.id,error};setStatus("Not saved to workspace"); setFailure(error.message); } }
+      } catch (caught) { if (mounted.current && current.current.id === document.id) { const error=caught instanceof Error?caught:new Error('Cloud save failed.');saveFailure.current={id:document.id,error};setStatus("Not saved to workspace"); setFailure(error.message);if((error as Error & {status?:number}).status===409){blocked.current=true;setConflict(true);}else if(![400,401,403,413].includes((error as Error & {status?:number}).status??0)&&retryCount.current<5){const delay=Math.min(30_000,2000*2**retryCount.current++);if(retryTimer.current)clearTimeout(retryTimer.current);retryTimer.current=setTimeout(()=>{retryTimer.current=null;void save();},delay);} } }
     });
     return queue.current;
   }, [authenticated, recover]);
+  useEffect(()=>{const onOnline=()=>{if(ready&&authenticated&&!blocked.current&&JSON.stringify(current.current)!==cloudHash.current){retryCount.current=0;void save();}};window.addEventListener('online',onOnline);return()=>window.removeEventListener('online',onOnline);},[ready,authenticated,save]);
 
   useEffect(() => {
     if (!ready) return;
@@ -125,6 +125,7 @@ export function useSceneDocument(studio: string, identity: string, authenticated
   const replace = (document: SceneDocument) => {
     const parsed = validateDocument(document);
     revision.current = 0; cloudHash.current = ""; localHash.current = ""; blocked.current = false;
+    if(retryTimer.current)clearTimeout(retryTimer.current);retryTimer.current=null;retryCount.current=0;
     saveFailure.current=null;
     setConflict(false); setFailure(null); setReady(true); setStatus("Unsaved project"); setHistory({ past: [], present: parsed, future: [] }); remember(parsed);
   };

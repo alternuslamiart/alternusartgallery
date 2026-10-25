@@ -2,6 +2,13 @@
 
 ## Application
 
+- Authenticated scene writes resolve the owner's workspace through
+  `requirePlatformContext`. First workspace creation/defaults use a serializable
+  transaction; warm-instance default initialization is coalesced. Browser scene
+  recovery remains keyed to user/project. Cloud saves reconcile uncertain PUT
+  results by reading the exact document/revision before retry, and leave
+  conflicting recovery data intact. No new database or schema was added.
+
 - `StudioActionsProvider` adds a finite typed command registry beside the shared
   conversation store. SceneWorkbench and FloorPlanViewport register context-owned
   adapters that reuse real editor handlers. English/Albanian text and voice use
