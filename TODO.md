@@ -2,6 +2,12 @@
 
 ## Next concrete task
 
+- [x] Correct production DATABASE_URL/DIRECT_URL to verified poolers for the same
+  database/credentials and preserve actual workspace save errors in generation.
+- [ ] Verify authenticated save/reopen on the deployed studio after the new
+  deployment activates the corrected production settings. Remote Hunyuan still
+  requires its separate secured GPU and private storage configuration.
+
 - [x] Correct premature Hunyuan unavailable alerts and add session preflight plus
   an actionable Sign in link before guest generation. Local provider/worker are
   available; the public deployment still needs its own remote GPU/storage setup.

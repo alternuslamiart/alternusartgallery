@@ -10,6 +10,8 @@ requirements provide new evidence.
   private GLB persistence and lossless native scene asset references. Verify an
   actual local CUDA generation and full-vertex scene import.
 - [x] Verify local DATABASE_URL/DIRECT_URL connectivity via read-only queries.
+- [x] Correct malformed production database URLs to verified poolers and reject
+  unconfirmed workspace-save replies while preserving actual storage errors.
 - [x] Add generation stages, uncommitted GLB preview/insert/download and an
   optional private Supabase Storage adapter with short-lived signed downloads.
 - [ ] Verify signed-in image→generation→insertion→logout/login→project reopen.

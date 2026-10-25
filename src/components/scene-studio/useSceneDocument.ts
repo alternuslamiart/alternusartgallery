@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { commitHistory, createTemplate, makeDocument, redoHistory, undoHistory, validateDocument, type SceneDocument, type SceneHistory } from "@/lib/scene/document.mjs";
 import { readRecovery, writeRecovery } from "@/lib/scene/recovery";
+import {readWorkspaceSave} from '@/lib/scene/workspace-save.mjs';
 
 export function useSceneDocument(studio: string, identity: string, authenticated: boolean, requestedId?: string) {
   const [history, setHistory] = useState<SceneHistory>(() => {
@@ -12,6 +13,7 @@ export function useSceneDocument(studio: string, identity: string, authenticated
   const [ready, setReady] = useState(false), [status, setStatus] = useState("Opening project…"), [conflict, setConflict] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const revision = useRef(0), cloudHash = useRef(""), localHash = useRef("");
+  const saveFailure=useRef<{id:string;error:Error}|null>(null);
   const current = useRef(history.present); current.current = history.present;
   const mounted = useRef(true), blocked = useRef(false), queue = useRef(Promise.resolve());
   const scope = `casynus:scene-active:${identity}`;
@@ -83,18 +85,17 @@ export function useSceneDocument(studio: string, identity: string, authenticated
       if (JSON.stringify(document) === cloudHash.current) return;
       if (mounted.current) setStatus("Saving to workspace…");
       try {
+        const expectedRevision=revision.current+1;
         const response = await fetch("/api/studio-projects", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ document, revision: revision.current }), signal: AbortSignal.timeout(20_000) });
-        const data = await response.json();
         if (!mounted.current || current.current.id !== document.id) return;
-        if (!response.ok) {
-          if (response.status === 409) { blocked.current = true; if (mounted.current) setConflict(true); }
-          throw new Error(data.error || "Cloud save failed.");
-        }
+        if (response.status === 409) { blocked.current = true; setConflict(true); }
+        const data=await readWorkspaceSave(response,document.id,expectedRevision);
         // A new/open project must never inherit a reply from the previous ID.
         if (!mounted.current || current.current.id !== document.id) return;
         revision.current = data.revision; cloudHash.current = JSON.stringify(document);
+        saveFailure.current=null;
         await recover(); setStatus(`Saved to workspace · revision ${data.revision}`); setFailure(null);
-      } catch (caught) { if (mounted.current && current.current.id === document.id) { setStatus("Not saved to workspace"); setFailure(caught instanceof Error ? caught.message : "Cloud save failed."); } }
+      } catch (caught) { if (mounted.current && current.current.id === document.id) { const error=caught instanceof Error?caught:new Error('Cloud save failed.');saveFailure.current={id:document.id,error};setStatus("Not saved to workspace"); setFailure(error.message); } }
     });
     return queue.current;
   }, [authenticated, recover]);
@@ -115,12 +116,16 @@ export function useSceneDocument(studio: string, identity: string, authenticated
     const document=current.current,hash=JSON.stringify(document);
     await save();
     if(!mounted.current||current.current.id!==document.id)throw new Error('Project changed before save was confirmed.');
-    if((authenticated?cloudHash.current:localHash.current)!==hash)throw new Error(authenticated?'Workspace save was not confirmed. Check the save error or revision conflict.':'Browser recovery could not be saved. Download JSON before leaving.');
+    if((authenticated?cloudHash.current:localHash.current)!==hash){
+      if(authenticated&&saveFailure.current?.id===document.id)throw saveFailure.current.error;
+      throw new Error(authenticated?'Workspace save was not confirmed. Check the save error or revision conflict.':'Browser recovery could not be saved. Download JSON before leaving.');
+    }
     return authenticated?'Saved to your authenticated workspace.':'Saved in this browser. Sign in for cloud storage.';
   };
   const replace = (document: SceneDocument) => {
     const parsed = validateDocument(document);
     revision.current = 0; cloudHash.current = ""; localHash.current = ""; blocked.current = false;
+    saveFailure.current=null;
     setConflict(false); setFailure(null); setReady(true); setStatus("Unsaved project"); setHistory({ past: [], present: parsed, future: [] }); remember(parsed);
   };
   const saveCopy = () => replace({ ...current.current, id: crypto.randomUUID(), name: `${current.current.name.slice(0, 110)} copy` });

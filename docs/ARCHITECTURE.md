@@ -72,6 +72,8 @@
   and selection-scoped validation. `edit-overlay.mjs` owns transient GPU feedback
   outside the editable/exported root. See `CONTEXTUAL-SCENE-EDITING.md`.
   `useSceneDocument.ts` coordinates undo, IndexedDB recovery and cloud autosave.
+  `scene/workspace-save.mjs` validates exact project/revision acknowledgments;
+  queued failures retain their server message/status for verified-save callers.
   `/api/studio-projects` uses authenticated workspace/user scope and atomic
   revisions; snapshots reuse `BlenderProject.settings` with a `casynus-scene`
   discriminator plus a canonical CAD Project. No Blender job is invoked.

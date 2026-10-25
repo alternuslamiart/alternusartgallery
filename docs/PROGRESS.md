@@ -2,6 +2,45 @@
 
 Last updated: 2026-10-25
 
+## Workspace save configuration and confirmation
+
+- Reproduced the screenshot's failing boundary: its top alert is emitted when
+  authenticated workspace initialization throws, before scene persistence.
+  An actual local Credentials sign-in, workspace initialization and first save
+  returned 200/revision 1 using an isolated QA principal, then cleaned its data.
+- Downloaded the current Vercel production configuration into ignored storage:
+  both DATABASE_URL and DIRECT_URL failed URL parsing. Verified the working local
+  poolers identify the same database project, database name and password before
+  updating only those two production settings using private CLI stdin. Pulled
+  the updated settings again; both now pass read-only SELECT 1. A new deployment
+  is required to activate those settings in running functions. No credentials
+  were printed or committed; no customer records or subscriptions were changed.
+- Save confirmation now requires `saved: true`, the expected project ID and
+  next revision. Save failures retain their actual server message/status for
+  generation and voice callers rather than replacing them with a generic
+  confirmation error. Failed saves still prevent GPU submission.
+- Added an opt-in localhost `node scripts/verify-studio-storage.mjs` acceptance
+  using actual Credentials auth and database persistence; no email or GPU call.
+  `--production` explicitly permits the verified project production alias only;
+  other remote origins and remote tests without that flag are rejected before
+  creating records. It uses an isolated synthetic QA account, not a customer.
+- Verification so far: 159 Node tests, TypeScript and focused lint passed.
+- Real single-account HTTP/database acceptance passed initialization, first
+  save/read, two concurrent saves (200/409), sign-out denial and sign-in/reopen;
+  fresh QA records were cleaned. An initial expanded run stopped during a second
+  isolated account's sign-in (reported `Error`), so live foreign-account checking
+  remains pending; existing mocked route ownership regressions passed.
+- Installed Chrome against the development server passed exact 503-message
+  propagation into chat, zero GPU submissions on failed save, recovery/retry,
+  and the existing preview/insertion/transforms/history/reopen flow in all three
+  3D studios. Auth/database/job HTTP in this browser regression were mocked;
+  real storage acceptance is recorded separately above. Artifacts:
+  `.tmp/hunyuan-browser-1792892717008/`.
+- Production build passed with the existing Windows trusted CA bundle and
+  OpenFreeMap build override; existing client-render warnings remain. Focused
+  save-response/origin-guard tests and changed-file lint passed afterward.
+
+
 ## Hunyuan availability and sign-in errors
 
 - Replaced the toolbar's synchronous check of an initially empty provider list

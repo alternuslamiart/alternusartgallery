@@ -23,7 +23,7 @@ async function run(){
   assert.ok(tabs?.length,'Chrome started');
   socket=new WebSocket(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);
   await new Promise((resolve,reject)=>{socket.addEventListener('open',resolve,{once:true});socket.addEventListener('error',reject,{once:true});});
-  let sequence=0,submissions=0,downloads=0,guest=false,providersMissing=false;const pending=new Map(),errors=[],jobs=new Map(),projects=new Map(),canceledRequests=new Set();
+  let sequence=0,submissions=0,downloads=0,guest=false,providersMissing=false,storageDown=false;const pending=new Map(),errors=[],jobs=new Map(),projects=new Map(),canceledRequests=new Set();
   const send=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence,timer=setTimeout(()=>{pending.delete(id);reject(Error('CDP timeout: '+method));},60_000);pending.set(id,{resolve,reject,timer});socket.send(JSON.stringify({id,method,params}));});
   socket.addEventListener('message',event=>{const message=JSON.parse(event.data);
     if(message.id){const p=pending.get(message.id);if(p){pending.delete(message.id);clearTimeout(p.timer);if(message.error)p.reject(Error(JSON.stringify(message.error)));else p.resolve(message.result);}}
@@ -37,10 +37,10 @@ async function run(){
     });
   });
   async function intercept({requestId,request}){
-    const url=new URL(request.url);let body,mime='application/json';
+    const url=new URL(request.url);let body,mime='application/json',responseCode=200;
     if(url.pathname==='/api/auth/session')body=guest?{}:{user:{id:'hunyuan-browser-user',email:'qa@example.invalid',name:'Local UI test'},expires:'2099-01-01T00:00:00.000Z'};
     else if(url.pathname==='/api/studio-projects'){
-      if(request.method==='PUT'){const input=JSON.parse(request.postData);projects.set(input.document.id,{document:input.document,revision:input.revision+1});body={id:input.document.id,revision:input.revision+1,saved:true};}
+      if(request.method==='PUT'){if(storageDown){responseCode=503;body={error:'Workspace storage is unavailable. Keep your recovery copy or download JSON.'};}else{const input=JSON.parse(request.postData);projects.set(input.document.id,{document:input.document,revision:input.revision+1});body={id:input.document.id,revision:input.revision+1,saved:true};}}
       else body=url.searchParams.has('id')?projects.get(url.searchParams.get('id')):{projects:[]};
     }else if(url.pathname.endsWith('/providers')){await wait(500);body={providers:providersMissing?[]:[{id:'hunyuan',label:'Hunyuan3D · Image to 3D',model:'Hunyuan3D-2.1 shape'}]};}
     else if(url.pathname.endsWith('/asset')){downloads++;mime='model/gltf-binary';body=glb;}
@@ -49,7 +49,7 @@ async function run(){
       body={id:input.requestId,projectId:input.projectId,provider:'hunyuan',model:'Hunyuan3D-2.1 shape',prompt:input.prompt,status:'RUNNING',progress:0};jobs.set(body.id,body);
     }else if(url.pathname==='/api/ai3d/jobs')body={jobs:[...jobs.values()]};
     else {const job=jobs.get(url.pathname.split('/').at(-1));assert.ok(job,'Known job');body={...job,status:'SUCCEEDED',progress:100,assetPath:`/api/ai3d/jobs/${job.id}/asset`};jobs.set(job.id,body);}
-    await send('Fetch.fulfillRequest',{requestId,responseCode:body?200:404,responseHeaders:[{name:'Content-Type',value:mime}],body:Buffer.isBuffer(body)?body.toString('base64'):Buffer.from(JSON.stringify(body||{error:'Project not found'})).toString('base64')});
+    await send('Fetch.fulfillRequest',{requestId,responseCode:body?responseCode:404,responseHeaders:[{name:'Content-Type',value:mime}],body:Buffer.isBuffer(body)?body.toString('base64'):Buffer.from(JSON.stringify(body||{error:'Project not found'})).toString('base64')});
   }
   const evaluate=async expression=>{const r=await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description||r.exceptionDetails.text);return r.result.value;};
   const until=async(expression,label)=>{let last='';for(let i=0;i<(live&&label==='Generated asset in chat'?9000:300);i++){if(await evaluate(expression))return;if(live&&label==='Generated asset in chat'&&i%25===0){const stage=await evaluate("document.querySelector('.studio-ai-progress-row')?.textContent||document.querySelector('.studio-ai-error')?.textContent||document.querySelector('.scene-alert')?.textContent||''");if(stage!==last){console.log('LIVE',stage);last=stage;}if(await evaluate("Boolean(document.querySelector('.studio-ai-error')||document.querySelector('.scene-alert'))"))throw Error(stage);}await wait(200);}throw Error(label+': '+await evaluate('document.body.innerText.slice(-1600)'));};
@@ -107,7 +107,14 @@ async function run(){
     assert.equal(await evaluate("document.querySelector('[aria-label=\"AI 3D Generate\"]').getAttribute('aria-pressed')"),'true');
     await ready('button[aria-label="Generate 3D"]');
     if(liveContext?.resumeJob){await menu('File');await button('AI generation jobs');await ready('[aria-label="AI generation jobs"]');await button('Resume / preview');}
-    else{const dom=await send('DOM.getDocument'),file=await send('DOM.querySelector',{nodeId:dom.root.nodeId,selector:'input[aria-label="Attach reference image"]'});await send('DOM.setFileInputFiles',{nodeId:file.nodeId,files:[image]});await ready('.studio-ai-attachment');await button('Generate 3D');}
+    else{const dom=await send('DOM.getDocument'),file=await send('DOM.querySelector',{nodeId:dom.root.nodeId,selector:'input[aria-label="Attach reference image"]'});await send('DOM.setFileInputFiles',{nodeId:file.nodeId,files:[image]});await ready('.studio-ai-attachment');
+      if(!live&&submissions===0){
+        storageDown=true;await menu('File');await button('New project');await button('Generate 3D');
+        await until("document.querySelector('.studio-ai-error')?.textContent.includes('Workspace storage is unavailable.')",'Exact storage failure reaches chat');
+        assert.equal(submissions,0,'Failed save cannot submit GPU work');storageDown=false;
+        console.log('PASS save failure preserves its actual cause and prevents GPU submission; retry after storage recovery');
+      }
+      await button('Generate 3D');}
     await until("[...document.querySelectorAll('button')].some(b=>b.textContent==='Insert into Studio'&&!b.disabled)",'Generated asset in chat');
     assert.equal(await count(),1,'Real GLB is visible in the existing viewport as an uncommitted preview');
     assert.ok(await evaluate("Boolean(document.querySelector('.scene-canvas').dataset.previewJob)"));

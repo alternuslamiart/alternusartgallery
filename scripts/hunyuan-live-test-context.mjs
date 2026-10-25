@@ -1,4 +1,6 @@
-// Explicit local-only integration-test principal. Never impersonates a customer,
+// Explicit isolated integration-test principal. Remote storage acceptance is
+// opt-in and restricted to this project's verified production alias.
+// Never impersonates a customer,
 // sends email, changes subscriptions or bypasses the existing Credentials handler.
 import fs from 'node:fs';
 import dotenv from 'dotenv';
@@ -6,8 +8,10 @@ import {randomUUID,randomBytes,randomInt} from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import {PrismaClient} from '@prisma/client';
 
-export async function createHunyuanLiveContext(base,resume=false){
-  const root=new URL(base);if(!['127.0.0.1','localhost'].includes(root.hostname))throw Error('Live test must target localhost.');
+export async function createHunyuanLiveContext(base,resume=false,{allowProduction=false}={}){
+  const root=new URL(base),local=['127.0.0.1','localhost'].includes(root.hostname);
+  const production=allowProduction&&root.origin==='https://alternusartgallery.vercel.app';
+  if((!local&&!production)||root.username||root.password||root.pathname!=='/'||root.search||root.hash)throw Error('Live test must target localhost or the explicitly opted-in production alias.');
   const env={...dotenv.parse(fs.readFileSync('.env')),...dotenv.parse(fs.readFileSync('.env.local'))};
   const db=new PrismaClient({datasourceUrl:env.DATABASE_URL,log:[]});
   let id=randomUUID(),email=`hunyuan-qa-${id}@example.invalid`,resumeJob;
