@@ -1,3 +1,16 @@
+export async function require3DSession({signal,fetchImpl=fetch}={}) {
+  const response=await fetchImpl('/api/auth/session',{signal,cache:'no-store',credentials:'same-origin'});
+  if(response.status===401)throw Object.assign(new Error('Sign in to your account before generating 3D models.'),{status:401});
+  if(!response.ok)throw new Error('Your session could not be checked. Retry in a moment.');
+  const session=await response.json();
+  if(!session?.user?.id)throw Object.assign(new Error('Sign in to your account before generating 3D models.'),{status:401});
+}
+export async function discover3DProviders({signal,fetchImpl=fetch}={}) {
+  const response=await fetchImpl('/api/ai3d/providers',{signal,cache:'no-store'});
+  const data=await response.json().catch(()=>null);
+  if(!response.ok||!Array.isArray(data?.providers))throw new Error('3D generation availability could not be checked. Please retry.');
+  return data.providers.filter(provider=>provider&&['meshy','tripo','hunyuan'].includes(provider.id));
+}
 export async function readModelBytes(response, limit = 20_000_000) {
   if (!response.ok) throw new Error(`Generated model download failed (${response.status}).`);
   if (Number(response.headers.get("content-length")) > limit) throw new Error("Generated model is too large for this editor. Download the source GLB from generation jobs.");

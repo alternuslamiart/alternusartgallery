@@ -2,6 +2,35 @@
 
 Last updated: 2026-10-25
 
+## Hunyuan availability and sign-in errors
+
+- Replaced the toolbar's synchronous check of an initially empty provider list
+  with a fresh awaited discovery request. A failed discovery is distinct from a
+  server without Hunyuan configuration; retry rechecks instead of selecting an
+  unavailable mode. The toggle is disabled while checking.
+- Guest image generation now shows Sign in before submission, preserves the
+  attached image in the current tab, and links to login with a studio return URL.
+  Generation/resume also checks the server session before saving or requesting
+  jobs; expired sessions receive the same action. Existing API authentication,
+  user/workspace ownership and production-worker restrictions remain enforced.
+- Actual local HTTP checks: provider discovery lists Hunyuan; worker health is
+  healthy with its pipeline loaded. This does not configure a public deployment.
+- Verification: 157 Node tests, TypeScript and focused lint passed (existing chat
+  image warning). Browser regression now includes delayed discovery, missing
+  configuration/retry and guest sign-in without GPU submission. No user account
+  was signed in by automation. Computer Use initialization crashed; browser QA
+  uses the existing isolated installed-Chrome verifier.
+- Production build and post-build TypeScript passed. Port 3033 was occupied;
+  final production QA uses 3047. The initial dev-server verifier completed the
+  scene interactions but failed its final error assertion on canceled delayed
+  CDP interceptions; it now ignores that specific protocol error only when
+  Network.loadingFailed confirms the request was canceled.
+- Final production Chrome run passed delayed discovery/missing-provider retry,
+  guest sign-in guidance with retained attachment/no GPU submission, and full
+  GLB preview/insertion/transforms/history/save/reopen in all three 3D studios.
+  Auth/database/job HTTP remained mocked. Artifacts:
+  `.tmp/hunyuan-browser-1792892076071/`.
+
 ## Hunyuan generation workflow continuation
 
 - Added the toolbar generation toggle, explicit image generation action, actual

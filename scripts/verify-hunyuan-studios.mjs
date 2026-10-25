@@ -23,21 +23,26 @@ async function run(){
   assert.ok(tabs?.length,'Chrome started');
   socket=new WebSocket(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);
   await new Promise((resolve,reject)=>{socket.addEventListener('open',resolve,{once:true});socket.addEventListener('error',reject,{once:true});});
-  let sequence=0,submissions=0,downloads=0;const pending=new Map(),errors=[],jobs=new Map(),projects=new Map();
+  let sequence=0,submissions=0,downloads=0,guest=false,providersMissing=false;const pending=new Map(),errors=[],jobs=new Map(),projects=new Map(),canceledRequests=new Set();
   const send=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence,timer=setTimeout(()=>{pending.delete(id);reject(Error('CDP timeout: '+method));},60_000);pending.set(id,{resolve,reject,timer});socket.send(JSON.stringify({id,method,params}));});
   socket.addEventListener('message',event=>{const message=JSON.parse(event.data);
     if(message.id){const p=pending.get(message.id);if(p){pending.delete(message.id);clearTimeout(p.timer);if(message.error)p.reject(Error(JSON.stringify(message.error)));else p.resolve(message.result);}}
     if(message.method==='Runtime.exceptionThrown')errors.push(message.params.exceptionDetails.exception?.description||message.params.exceptionDetails.text);
     if(live&&message.method==='Network.requestWillBeSent'){const r=message.params.request,u=new URL(r.url);if(u.pathname==='/api/ai3d/jobs'&&r.method==='POST')submissions++;if(u.pathname.endsWith('/asset'))downloads++;}
-    if(message.method==='Fetch.requestPaused')void intercept(message.params).catch(error=>errors.push(error.message));
+    if(message.method==='Network.loadingFailed'&&message.params.canceled)canceledRequests.add(message.params.requestId);
+    if(message.method==='Fetch.requestPaused')void intercept(message.params).catch(error=>{
+      // StrictMode/unmount can abort a paused, intentionally delayed discovery.
+      if(canceledRequests.has(message.params.networkId)&&error.message.includes('Invalid InterceptionId'))return;
+      errors.push(error.message);
+    });
   });
   async function intercept({requestId,request}){
     const url=new URL(request.url);let body,mime='application/json';
-    if(url.pathname==='/api/auth/session')body={user:{id:'hunyuan-browser-user',email:'qa@example.invalid',name:'Local UI test'},expires:'2099-01-01T00:00:00.000Z'};
+    if(url.pathname==='/api/auth/session')body=guest?{}:{user:{id:'hunyuan-browser-user',email:'qa@example.invalid',name:'Local UI test'},expires:'2099-01-01T00:00:00.000Z'};
     else if(url.pathname==='/api/studio-projects'){
       if(request.method==='PUT'){const input=JSON.parse(request.postData);projects.set(input.document.id,{document:input.document,revision:input.revision+1});body={id:input.document.id,revision:input.revision+1,saved:true};}
       else body=url.searchParams.has('id')?projects.get(url.searchParams.get('id')):{projects:[]};
-    }else if(url.pathname.endsWith('/providers'))body={providers:[{id:'hunyuan',label:'Hunyuan3D · Image to 3D',model:'Hunyuan3D-2.1 shape'}]};
+    }else if(url.pathname.endsWith('/providers')){await wait(500);body={providers:providersMissing?[]:[{id:'hunyuan',label:'Hunyuan3D · Image to 3D',model:'Hunyuan3D-2.1 shape'}]};}
     else if(url.pathname.endsWith('/asset')){downloads++;mime='model/gltf-binary';body=glb;}
     else if(url.pathname==='/api/ai3d/jobs'&&request.method==='POST'){
       const input=JSON.parse(request.postData);assert.equal(input.provider,'hunyuan');assert.ok(input.image.startsWith('data:image/png;base64,'));assert.ok(projects.has(input.projectId),'Project saved before generation');submissions++;
@@ -72,6 +77,24 @@ async function run(){
     }
     fs.writeFileSync(path.join(out,'metrics.json'),JSON.stringify(metrics,null,2));console.log('BASELINE',out);await send('Browser.close');return;
   }
+  if(!live){
+    guest=true;providersMissing=true;
+    await send('Page.navigate',{url:base+'/casynus'});await ready('.scene-canvas canvas');
+    await button('AI 3D Generate');await until("document.querySelector('.scene-alert')?.textContent.includes('not configured')",'Missing provider reported after discovery');
+    assert.match(await evaluate("document.querySelector('.scene-alert').textContent"),/not configured/);
+    assert.equal(await evaluate("document.querySelector('select[aria-label=\"AI mode\"]').value"),'gemini');
+    providersMissing=false;await button('AI 3D Generate');
+    await until("document.querySelector('select[aria-label=\"AI mode\"]').value==='hunyuan'",'Delayed discovery succeeds');
+    assert.equal(await evaluate("document.querySelector('.scene-alert')?.textContent.includes('not configured')||false"),false);
+    const dom=await send('DOM.getDocument'),file=await send('DOM.querySelector',{nodeId:dom.root.nodeId,selector:'input[aria-label="Attach reference image"]'});
+    await send('DOM.setFileInputFiles',{nodeId:file.nodeId,files:[image]});await ready('.studio-ai-attachment');
+    await button('Generate 3D');await ready('.studio-ai-error a');
+    assert.match(await evaluate("document.querySelector('.studio-ai-error').textContent"),/Sign in/);
+    assert.equal(await evaluate("new URL(document.querySelector('.studio-ai-error a').href).searchParams.get('callbackUrl')"),'/casynus');
+    assert.ok(await evaluate("Boolean(document.querySelector('.studio-ai-attachment img'))"),'Guest retains reference image');
+    assert.equal(submissions,0,'Guest cannot submit a GPU job');guest=false;
+    console.log('PASS missing-provider retry, delayed discovery, guest sign-in action and no GPU submission');
+  }
   for(const route of live?['/casynus']:['/casynus','/infrastructure','/interior?workspace=3d']){
     await send('Page.navigate',{url:base+route+(liveContext?.resumeJob?'?project='+liveContext.resumeJob.projectId:'')});await ready('.scene-canvas canvas');
     if(await evaluate("Boolean(document.querySelector('[aria-label=\"Show AI chat\"]'))"))await button('Show AI chat');
@@ -79,6 +102,7 @@ async function run(){
     if(!liveContext?.resumeJob){await menu('File');await button('New project');await until("document.querySelector('.scene-canvas').dataset.objectCount==='0'",'Empty new project');}
     await button('New studio conversation');
     await button('AI 3D Generate');
+    await until("document.querySelector('select[aria-label=\"AI mode\"]').value==='hunyuan'",'Provider checked before activation');
     assert.equal(await evaluate("document.querySelector('select[aria-label=\"AI mode\"]').value"),'hunyuan');
     assert.equal(await evaluate("document.querySelector('[aria-label=\"AI 3D Generate\"]').getAttribute('aria-pressed')"),'true');
     await ready('button[aria-label="Generate 3D"]');

@@ -185,7 +185,10 @@
   New scene `model` references retain job IDs, dimensions and transforms rather
   than expanding GLB geometry into PostgreSQL. A bounded per-editor native GLB
   cache feeds existing rendering/picking/history/export and clears on unmount.
-  Worker stages and actual diffusion callbacks drive progress; GLB previews
+  Worker stages and actual diffusion callbacks drive progress. The toolbar
+  awaits fresh provider discovery on activation. Session preflight before
+  generation/resume and a guest Sign in action precede workspace/GPU requests.
+  Existing server authentication remains authoritative. GLB previews
   remain outside persisted scenes until explicit insertion. Local database
   connectivity passed on 2026-10-25; live authenticated acceptance is pending.
   Production still needs remote GPU/storage provisioning and license review;

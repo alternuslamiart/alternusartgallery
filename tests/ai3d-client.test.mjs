@@ -1,10 +1,28 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { generate3DModel, readModelBytes } from "../src/lib/ai3d/client.mjs";
+import { generate3DModel, readModelBytes, require3DSession, discover3DProviders } from "../src/lib/ai3d/client.mjs";
 import { exportScene, importModel } from "../src/lib/scene/geometry.mjs";
 import { makeDocument, makeObject, commitHistory, undoHistory } from "../src/lib/scene/document.mjs";
 globalThis.FileReader ??= class { readAsArrayBuffer(blob) { blob.arrayBuffer().then(value => { this.result = value; this.onloadend?.(); }); } readAsDataURL(blob) { blob.arrayBuffer().then(value => { this.result = `data:${blob.type};base64,${Buffer.from(value).toString("base64")}`; this.onloadend?.(); }); } };
 globalThis.ProgressEvent ??= class extends Event {};
+
+test('generation preflight requires a server-recognized user ID and keeps authentication errors actionable', async () => {
+  for (const data of [{}, {user:{email:'guest@example.invalid'}}]) {
+    await assert.rejects(require3DSession({fetchImpl:async()=>Response.json(data)}), error=>error.status===401&&/Sign in/.test(error.message));
+  }
+  await require3DSession({fetchImpl:async(url,init)=>{assert.equal(url,'/api/auth/session');assert.equal(init.cache,'no-store');return Response.json({user:{id:'owner'}});}});
+  await assert.rejects(require3DSession({fetchImpl:async()=>Response.json({},{status:401})}),error=>error.status===401);
+  await assert.rejects(require3DSession({fetchImpl:async()=>new Response('Unavailable',{status:503})}), /session could not be checked/);
+});
+
+test('provider discovery waits for the server and distinguishes discovery failure from missing configuration', async () => {
+  const available=await discover3DProviders({fetchImpl:async()=>{await new Promise(resolve=>setTimeout(resolve,15));return Response.json({providers:[{id:'hunyuan',label:'Hunyuan',model:'shape'}]});}});
+  assert.equal(available[0].id,'hunyuan');
+  assert.deepEqual(await discover3DProviders({fetchImpl:async()=>Response.json({providers:[]})}),[]);
+  for(const response of [new Response('Unavailable',{status:503}),Response.json({providers:null})]) {
+    await assert.rejects(discover3DProviders({fetchImpl:async()=>response}),/availability could not be checked/);
+  }
+});
 
 test("provider job → real GLB → editable scene preview → apply and undo", async () => {
   const model = makeDocument(); model.objects = [makeObject("box", { dimensions: [2, 3, 1] })];

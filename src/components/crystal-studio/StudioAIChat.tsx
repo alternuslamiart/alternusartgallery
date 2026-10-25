@@ -84,9 +84,12 @@ export function StudioAIChat({
   promptRef.current = prompt;
   const [remoteLoading, setRemoteLoading] = useState(false);
   const [remoteError, setRemoteError] = useState<string | null>(null);
+  const [sessionExpired,setSessionExpired]=useState(false);
   const voiceControl = useRef<{ stop: () => void } | null>(null);
   const loading = workspaceLoading || remoteLoading;
-  const displayError = remoteError || error;
+  const signInRequired=sessionExpired||(model==='hunyuan'&&sessionStatus!=='loading'&&!session?.user?.id);
+  const displayError = remoteError || error || (signInRequired?'Sign in to your account before generating 3D models.':null);
+  const signInHref=`/login?callbackUrl=${encodeURIComponent(studio==='modeling'?'/casynus':studio==='infrastructure'?'/infrastructure':'/interior?workspace=3d')}`;
   const [localImage, setLocalImage] = useState<string | null>(null);
   const [imageFile,setImageFile]=useState<File|null>(null);
   const [imageStage,setImageStage]=useState('');
@@ -102,6 +105,7 @@ export function StudioAIChat({
   useEffect(() => {
     setRemoteLoading(false);
     setRemoteError(null);
+    setSessionExpired(false);
     setImageFile(null);setLocalImage(null);
     return () => { pendingRequest.current?.abort(); pendingRequest.current = null; };
   }, [identity]);
@@ -110,6 +114,7 @@ export function StudioAIChat({
     if ((!(spokenCommand??promptRef.current).trim() && !(model==='hunyuan'&&imageFile)) || loading || pendingRequest.current) return;
     if (!fromVoice) voiceControl.current?.stop();
     const selectedProvider = providerOverride && STUDIO_AI_PROVIDERS.includes(providerOverride) ? providerOverride : model;
+    if(selectedProvider==='hunyuan'&&!session?.user?.id){setSessionExpired(true);setRemoteError('Sign in to your account before generating 3D models.');return;}
     let localCommand=false;try{localCommand=Boolean(parseStudioCommand(spokenCommand??promptRef.current));}catch{localCommand=true;}
     if(!localCommand&&!STUDIO_AI_PROVIDERS.includes(selectedProvider)&&!requestAnswer){onSubmit();return;}
     if (providerOverride) onModelChange(selectedProvider);
@@ -149,6 +154,7 @@ export function StudioAIChat({
     } catch (caught) {
       if (!controller.signal.aborted && identityRef.current === requestIdentity) {
         setRemoteError(caught instanceof Error ? caught.message : "The AI request failed.");
+        if(caught&&typeof caught==='object'&&'status' in caught&&caught.status===401)setSessionExpired(true);
         if (!spokenCommand&&!promptRef.current.trim()) onPromptChange(message);
       }
       if(fromVoice)throw caught;
@@ -228,6 +234,7 @@ export function StudioAIChat({
         onClick={() => { onRemoveImage?.(); setLocalImage(null);setImageFile(null); }}><X size={14} /></StudioButton>
     </div>}
     {displayError && <div className="studio-ai-error" role="alert"><span>{displayError}</span>
+      {signInRequired&&<a href={signInHref}>Sign in</a>}
       <StudioButton size="icon" variant="ghost" aria-label="Dismiss error" onClick={() => { setRemoteError(null); onClearError?.(); }}><X size={14} /></StudioButton>
     </div>}
     {voice.error&&<div className="studio-ai-error" role="alert"><span>{voice.error}</span><StudioButton size="icon" variant="ghost" aria-label="Dismiss voice error" onClick={voice.stop}><X size={14} /></StudioButton></div>}

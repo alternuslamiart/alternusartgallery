@@ -2,6 +2,10 @@
 
 ## Next concrete task
 
+- [x] Correct premature Hunyuan unavailable alerts and add session preflight plus
+  an actionable Sign in link before guest generation. Local provider/worker are
+  available; the public deployment still needs its own remote GPU/storage setup.
+
 - [ ] Complete live authenticated Hunyuan acceptance; both local database URLs
   passed read-only connection checks on 2026-10-25. Upload a reference
   through existing 3D studio chat, generate, insert, save, logout/login and reopen.

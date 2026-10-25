@@ -17,7 +17,7 @@ import { duplicateObjects, exportScene, importModel, regroupObjects } from "@/li
 import { requestStudioAnswer } from "@/lib/studio-ai.mjs";
 import { listRecovery } from "@/lib/scene/recovery";
 import { StudioViewportToolbar, downloadStudioCSV } from "@/components/crystal-studio/StudioViewportToolbar";
-import { generate3DModel, generationLabel, readModelBytes, type Generation3DJob } from "@/lib/ai3d/client.mjs";
+import { generate3DModel, generationLabel, readModelBytes, require3DSession, discover3DProviders, type Generation3DJob } from "@/lib/ai3d/client.mjs";
 import {cacheGeneratedAsset,clearGeneratedAssets} from '@/lib/scene/generated-assets.mjs';
 import { nextSelection } from "@/lib/scene/selection.mjs";
 import {applyLibraryMaterial} from "@/lib/scene/material-library.mjs";
@@ -100,11 +100,13 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const [meshProviders, setMeshProviders] = useState<Array<{ id: string; label: string }>>([]);
   const [generationJobs, setGenerationJobs] = useState<Generation3DJob[] | null>(null);
   const [generationStatus,setGenerationStatus]=useState<string|null>(null);
+  const [checkingGeneration,setCheckingGeneration]=useState(false);
+  const providerCheck=useRef<AbortController|null>(null);
   const normalProvider=useRef('gemini');
   const resumeController = useRef<AbortController | null>(null);
   const meshProvider = model === "meshy" || model === "tripo" || model === 'hunyuan';
   useEffect(()=>()=>clearGeneratedAssets(),[]);
-  useEffect(() => { const controller = new AbortController(); void fetch("/api/ai3d/providers", { signal: controller.signal, cache: "no-store" }).then(r => r.ok ? r.json() : null).then(data => { if (data && !controller.signal.aborted) setMeshProviders(data.providers.filter((p: { id: string }) => ["meshy", "tripo", "hunyuan"].includes(p.id))); }).catch(() => {}); return () => { controller.abort(); resumeController.current?.abort(); }; }, []);
+  useEffect(() => { const controller = new AbortController(); void discover3DProviders({signal:controller.signal}).then(providers=>{if(!controller.signal.aborted)setMeshProviders(providers);}).catch(() => {}); return () => { controller.abort();providerCheck.current?.abort(); resumeController.current?.abort(); }; }, []);
   const [pending, setPending] = useState<{ commands: SceneCommand[]; preview: SceneDocument; base: string; generatedJobId?:string; destructive?:boolean; expires?:number } | null>(null);
   const [editing,setEditing]=useState<{ids:string[];phase:'processing'|'updating'|'completed'}|null>(null);
   const [planning,setPlanning]=useState(false);
@@ -123,10 +125,18 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     if(['gemini','groq','you'].includes(value))normalProvider.current=value;
     setModel(value);setSceneAI(value!=='you');
   };
-  const activate3DGeneration=()=>{
+  const activate3DGeneration=async()=>{
     if(model==='hunyuan'){changeChatModel(normalProvider.current);return;}
-    changeChatModel('hunyuan');dock.setOpen(true);
-    if(!meshProviders.some(p=>p.id==='hunyuan'))setError('Hunyuan3D generation is unavailable on this server. A configured local worker or authenticated remote GPU service is required.');
+    providerCheck.current?.abort();const controller=new AbortController();providerCheck.current=controller;
+    setCheckingGeneration(true);setError(null);
+    try{
+      const providers=await discover3DProviders({signal:controller.signal});
+      if(controller.signal.aborted)return;
+      setMeshProviders(providers);
+      if(!providers.some(p=>p.id==='hunyuan'))throw new Error('Hunyuan3D is not configured on this server. Use the configured local studio, or connect an authenticated GPU worker and private storage to this deployment.');
+      changeChatModel('hunyuan');dock.setOpen(true);
+    }catch(error){if(!controller.signal.aborted)setError(error instanceof Error?error.message:'3D generation availability could not be checked. Please retry.');}
+    finally{if(providerCheck.current===controller){providerCheck.current=null;setCheckingGeneration(false);}}
   };
   const executionChange=(active:boolean)=>{
     if(active){clearTimeout(editTimer.current);editBase.current=fingerprint(docRef.current);editEpoch.current++;setEditing({ids:editTargets(docRef.current,selected),phase:'processing'});}
@@ -204,6 +214,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     if (pending&&!pending.generatedJobId) throw new Error("Apply or discard the current preview first.");
     setError(null);
     try {
+      await require3DSession({signal:request.signal});
       if(request.resumeId){setGenerationStatus('Reading generation status');setBusy('Reading generation status…');}
       if(request.provider==='hunyuan')setGenerationStatus('Submitting generation');
       if(request.provider==='hunyuan')await store.saveVerified();
@@ -439,7 +450,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
           ...(studio === "infrastructure" ? [{ label: worldMap ? "3D Editor" : "World Map", icon: worldMap ? Box : Globe2, active: worldMap, onClick: () => { setMapOpened(true); setWorldMap(value => !value); } }] : []),
           { label: studio === "interior" ? "Add furnished room" : "Add building", icon: Building2, onClick: () => template(studio === "interior" ? "room" : "building"), disabled: blocked },
           { label: "Add Tree", icon: TreePine, onClick: () => add("Tree"), disabled: blocked },
-          { label: 'AI 3D Generate', icon: Sparkles, active:model==='hunyuan', onClick:activate3DGeneration, disabled:planning||Boolean(busy)||Boolean(pending&&!pending.generatedJobId) },
+          { label: 'AI 3D Generate', icon: Sparkles, active:model==='hunyuan', onClick:()=>void activate3DGeneration(), disabled:checkingGeneration||planning||Boolean(busy)||Boolean(pending&&!pending.generatedJobId) },
         ]}
         tools={([
           ["select", MousePointer2, "Select · Q"], ["translate", Route, "Move · W"], ["rotate", Rotate3D, "Rotate · E"], ["scale", Focus, "Scale · R"], ["measure", Ruler, "Measure distance"],
