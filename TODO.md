@@ -4,9 +4,10 @@
 
 - [x] Correct production DATABASE_URL/DIRECT_URL to verified poolers for the same
   database/credentials and preserve actual workspace save errors in generation.
-- [ ] Verify authenticated save/reopen on the deployed studio after the new
-  deployment activates the corrected production settings. Remote Hunyuan still
-  requires its separate secured GPU and private storage configuration.
+- [x] Verify real authenticated production save/read, concurrent revision
+  conflict, sign-out denial and login/reopen after activating corrected settings.
+- [ ] Configure the separate secured remote GPU worker and private asset storage
+  before production Hunyuan image generation; both remain unprovisioned.
 
 - [x] Correct premature Hunyuan unavailable alerts and add session preflight plus
   an actionable Sign in link before guest generation. Local provider/worker are

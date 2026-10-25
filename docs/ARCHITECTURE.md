@@ -192,7 +192,8 @@
   generation/resume and a guest Sign in action precede workspace/GPU requests.
   Existing server authentication remains authoritative. GLB previews
   remain outside persisted scenes until explicit insertion. Local database
-  connectivity passed on 2026-10-25; live authenticated acceptance is pending.
+  connectivity and real authenticated production snapshot save/reopen passed on
+  2026-10-25; live Hunyuan GPU-generation acceptance is pending.
   Production still needs remote GPU/storage provisioning and license review;
   see `HUNYUAN3D-LOCAL.md`. No schema migration or UI stylesheet changes.
 

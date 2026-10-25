@@ -12,8 +12,8 @@ Last updated: 2026-10-25
   both DATABASE_URL and DIRECT_URL failed URL parsing. Verified the working local
   poolers identify the same database project, database name and password before
   updating only those two production settings using private CLI stdin. Pulled
-  the updated settings again; both now pass read-only SELECT 1. A new deployment
-  is required to activate those settings in running functions. No credentials
+  the updated settings again; both now pass read-only SELECT 1. Deployment
+  `f7c5d90` activated those settings in running production functions. No credentials
   were printed or committed; no customer records or subscriptions were changed.
 - Save confirmation now requires `saved: true`, the expected project ID and
   next revision. Save failures retain their actual server message/status for
@@ -39,6 +39,14 @@ Last updated: 2026-10-25
 - Production build passed with the existing Windows trusted CA bundle and
   OpenFreeMap build override; existing client-render warnings remain. Focused
   save-response/origin-guard tests and changed-file lint passed afterward.
+- Final full suite passed all 160 tests; post-build TypeScript passed. Commit
+  `f7c5d90` was pushed and its Vercel production deployment reached Ready.
+  `node scripts/verify-studio-storage.mjs --production` then passed actual
+  Credentials sign-in, workspace initialization, save/read, concurrent 200/409,
+  signed-out 401 and sign-in/reopen at `https://alternusartgallery.vercel.app`.
+  QA records were cleaned; no customer account, email or GPU request was used.
+  This verifies deployed workspace persistence, not remote Hunyuan generation:
+  production still has no configured GPU worker or private asset bucket.
 
 
 ## Hunyuan availability and sign-in errors
