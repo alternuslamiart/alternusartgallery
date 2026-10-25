@@ -18,5 +18,5 @@ try{
   await qa.logout();assert.equal((await qa.request('/api/studio-projects?id='+document.id)).status,401);
   await qa.login();assert.deepEqual(await qa.json('/api/studio-projects?id='+document.id),persisted);
   console.log('PASS real workspace initialization, save/read, concurrent conflict and sign-out/sign-in/reopen; no GPU submissions');
-}catch(error){console.error('Storage acceptance failed:',error instanceof assert.AssertionError||/^(Live API |Credentials sign-in failed|Real NextAuth)/.test(error.message)?error.message:error.code||error.name);process.exitCode=1;}
+}catch(error){console.error('Storage acceptance failed:',error instanceof assert.AssertionError||/^(Live API |Credentials sign-in failed|Real NextAuth)/.test(error.message)?error.message:`${error.name}: ${error.message} (${error.cause?.code||error.code||'no code'})`);process.exitCode=1;}
 finally{await qa?.cleanup();}

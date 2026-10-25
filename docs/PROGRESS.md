@@ -21,9 +21,11 @@ Last updated: 2026-10-25
   pending edits, while revision conflicts continue to block stale overwrites.
 - Verified 162 Node tests, TypeScript and production build. Repository-wide lint
   still fails on existing unused variables/imports outside this increment.
-  Live production acceptance after this follow-up deployment and the user's
-  affected account/session remain to be checked; mocked tests are not a live
-  Hunyuan production run.
+  Deployment `f20cd06` reached Vercel Production Ready. Live acceptance after
+  deployment could not start: both Node fetch and curl to the production alias
+  timed out before HTTP (`UND_ERR_CONNECT_TIMEOUT` / curl 28). The isolated QA
+  principal created by each attempted test was cleaned. The user's affected
+  account/session remains unverified; mocked tests are not live Hunyuan runs.
 
 ## Workspace save configuration and confirmation
 

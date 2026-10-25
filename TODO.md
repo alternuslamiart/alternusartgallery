@@ -5,7 +5,9 @@
 - [ ] Reproduce the affected user's workspace request after this deployment and
   inspect the sanitized `studio-project-storage` operation/Prisma code if a 503
   remains. Verify browser autosave recovery after a real transient outage and
-  two-account ownership with an isolated test account.
+  two-account ownership with an isolated test account. Production QA from this
+  machine currently stops before HTTP with `UND_ERR_CONNECT_TIMEOUT`; retry
+  when the alias is reachable.
 
 - [x] Correct production DATABASE_URL/DIRECT_URL to verified poolers for the same
   database/credentials and preserve actual workspace save errors in generation.
