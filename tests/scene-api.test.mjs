@@ -41,7 +41,7 @@ function storageHarness({ guest = false, unavailable = false, foreign = false } 
     },
   };
   const routes = moduleRoute("../src/app/api/studio-projects/route.ts", {
-    "@prisma/client": { Prisma: { PrismaClientKnownRequestError: class extends Error {} } },
+    "@prisma/client": { Prisma: { PrismaClientKnownRequestError: class extends Error {}, PrismaClientInitializationError: class extends Error {} } },
     "@/lib/prisma": { prisma: { ...tx, $transaction: async callback => { if (unavailable) throw new Error("DB offline"); return callback(tx); } } },
     "@/lib/platform/api": { requirePlatformContext: async () => guest ? JsonResponse.json({ error: "Unauthorized" }, { status: 401 }) : { workspaceId: "workspace-a", userId: "user-a" }, isApiResponse: value => value instanceof JsonResponse },
     "@/lib/scene/document.mjs": { MAX_SCENE_BYTES, validateDocument },

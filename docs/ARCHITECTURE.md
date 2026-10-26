@@ -2,6 +2,18 @@
 
 ## Application
 
+- Save reconciliation compares JSON object content independently of database
+  key ordering while preserving array order and exact revisions. Scene hook
+  callbacks are identity/studio scoped; pagehide, visibility hiding and effect
+  cleanup also preserve the rendered document in IndexedDB before navigation.
+  No UI, Prisma schema or credential exposure changes are involved.
+
+- Active 3D project tab pointers include identity and studio. IndexedDB recovery
+  records optionally carry studio metadata for latest-valid recovery lookup when
+  no tab pointer exists; legacy records remain accessible by ID/Open. Cloud GET
+  uses bounded deadlines, transient retry and caller cancellation. No schema or
+  visual layout changes accompany this recovery update.
+
 - Authenticated scene writes resolve the owner's workspace through
   `requirePlatformContext`. First workspace creation/defaults use a serializable
   transaction; warm-instance default initialization is coalesced. Browser scene

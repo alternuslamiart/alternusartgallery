@@ -1,4 +1,10 @@
-# Next tasks (reviewed 2026-10-25)
+# Next tasks (reviewed 2026-10-26)
+
+- [ ] Capture the affected account's actual failing context/Prisma code if the
+  alert recurs. Today's isolated production save/read and single-account
+  logout/login passed; expanded three-studio/two-account assertions passed,
+  but final re-login encountered auth 429 then a connection timeout. Re-run
+  paced expanded acceptance when production auth connectivity is stable.
 
 ## Next concrete task
 
@@ -6,8 +12,8 @@
   inspect the sanitized `studio-project-storage` operation/Prisma code if a 503
   remains. Verify browser autosave recovery after a real transient outage and
   two-account ownership with an isolated test account. Production QA from this
-  machine currently stops before HTTP with `UND_ERR_CONNECT_TIMEOUT`; retry
-  when the alias is reachable.
+  machine now passes real production storage acceptance with the Windows trusted
+  CA bundle. Affected-account browser recovery and real AI insertion remain pending.
 
 - [x] Correct production DATABASE_URL/DIRECT_URL to verified poolers for the same
   database/credentials and preserve actual workspace save errors in generation.

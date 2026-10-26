@@ -1,3 +1,24 @@
+// JSONB may reorder object keys. Arrays (geometry, hierarchy and transforms)
+// must keep their order when checking whether an uncertain write committed.
+function documentJSON(value){
+  return JSON.stringify(value,(_key,item)=>item&&typeof item==='object'&&!Array.isArray(item)
+    ?Object.fromEntries(Object.keys(item).sort().map(key=>[key,item[key]])):item);
+}
+
+export async function loadWorkspaceDocument(fetcher,id,options={}){
+  for(let attempt=0;attempt<3;attempt++){
+    try{
+      const response=await fetcher(`/api/studio-projects?id=${encodeURIComponent(id)}`,{cache:'no-store',signal:options.signal?AbortSignal.any([options.signal,AbortSignal.timeout(10_000)]):AbortSignal.timeout(10_000)});
+      const data=await response.json();
+      if(!response.ok)throw Object.assign(new Error(typeof data.error==='string'?data.error:data.error?.message||'Could not open cloud project.'),{status:response.status});
+      return data;
+    }catch(error){
+      if(options.signal?.aborted||attempt===2||(error.status>=400&&error.status<500&&error.status!==429))throw error;
+      await (options.wait??(ms=>new Promise(resolve=>setTimeout(resolve,ms))))(250*2**attempt);
+    }
+  }
+}
+
 export async function readWorkspaceSave(response,id,expectedRevision){
   const data=await response.json().catch(()=>null);
   if(!response.ok){
@@ -14,7 +35,7 @@ export async function readWorkspaceSave(response,id,expectedRevision){
 // retrying so a successful write is not mistaken for a revision conflict.
 export async function saveWorkspaceDocument(fetcher,document,revision,options={}){
   const expectedRevision=revision+1;
-  const hash=JSON.stringify(document);
+  const hash=documentJSON(document);
   let lastError;
   for(let attempt=0;attempt<3;attempt++){
     if(attempt) await (options.wait??(ms=>new Promise(resolve=>setTimeout(resolve,ms))))(250*2**(attempt-1));
@@ -30,7 +51,7 @@ export async function saveWorkspaceDocument(fetcher,document,revision,options={}
         const check=await fetcher(`/api/studio-projects?id=${encodeURIComponent(document.id)}`,{cache:'no-store',signal:AbortSignal.timeout(10_000)});
         if(check.ok){
           const cloud=await check.json();
-          if(cloud.revision===expectedRevision&&JSON.stringify(cloud.document)===hash)return {revision:expectedRevision};
+          if(cloud.revision===expectedRevision&&documentJSON(cloud.document)===hash)return {revision:expectedRevision};
           if(cloud.revision!==revision)throw Object.assign(new Error('A newer cloud revision exists. Recovery is preserved. Open the cloud copy or save this recovery as a new project.'),{status:409});
         }
       }catch(checkError){if(checkError?.status===409)throw checkError;}

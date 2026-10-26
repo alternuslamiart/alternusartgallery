@@ -6,6 +6,13 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Protect navigation/account-transition recovery and reconcile lost save
+  responses independently of JSON object key order; verify production
+  three-studio storage and two-account isolation with fresh QA records.
+
+- [x] Recheck real production save/login reopening and isolate active project
+  recovery by studio; bound cloud opening retries and timeouts.
+
 - [x] Make initial workspace creation atomic, coalesce existing defaults, and
   add bounded scene-save retries with exact cloud reconciliation after lost
   responses. Retain local recovery and guard revision conflicts.

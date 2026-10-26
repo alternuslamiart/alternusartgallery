@@ -1,7 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readWorkspaceSave,saveWorkspaceDocument} from '../src/lib/scene/workspace-save.mjs';
+import {loadWorkspaceDocument,readWorkspaceSave,saveWorkspaceDocument} from '../src/lib/scene/workspace-save.mjs';
 import {createHunyuanLiveContext} from '../scripts/hunyuan-live-test-context.mjs';
+
+test('cloud opening retries transient outages and preserves authentication/not-found errors',async()=>{
+  let calls=0;
+  const document={id:'project'};
+  assert.deepEqual(await loadWorkspaceDocument(async()=>++calls<3?Response.json({error:'Unavailable'},{status:503}):Response.json({document,revision:2}),'project',{wait:async()=>{}}),{document,revision:2});
+  assert.equal(calls,3);
+  for(const status of [401,403,404]){
+    calls=0;
+    await assert.rejects(loadWorkspaceDocument(async()=>{calls++;return Response.json({error:{message:'Cannot open'}},{status});},'project'),error=>error.status===status&&error.message==='Cannot open');
+    assert.equal(calls,1);
+  }
+});
+
+test('cloud opening propagates cancellation without retrying',async()=>{
+  const controller=new AbortController();controller.abort();
+  let calls=0;
+  await assert.rejects(loadWorkspaceDocument(async(_url,options)=>{calls++;options.signal.throwIfAborted();},'project',{signal:controller.signal}),{name:'AbortError'});
+  assert.equal(calls,1);
+});
 
 test('storage acceptance refuses arbitrary remote origins and requires production opt-in',async()=>{
   await assert.rejects(createHunyuanLiveContext('https://alternusartgallery.vercel.app'),/explicitly opted-in/);
@@ -39,4 +58,15 @@ test('temporary storage outage retries and never overwrites a newer revision',as
   assert.equal(puts,3);
   const stale=async(url)=>url.includes('?id=')?Response.json({document:{id:'project',name:'Newer'},revision:3}):Response.json({error:'Conflict'},{status:409});
   await assert.rejects(saveWorkspaceDocument(stale,document,1),error=>error.status===409);
+});
+
+test('lost response reconciliation tolerates PostgreSQL JSON object key ordering',async()=>{
+  const document={id:'project',camera:{position:[1,2,3],target:[0,0,0]},objects:[{id:'box',material:{color:'#ffffff',roughness:0.5}}]};
+  const cloud={objects:[{material:{roughness:0.5,color:'#ffffff'},id:'box'}],camera:{target:[0,0,0],position:[1,2,3]},id:'project'};
+  let puts=0;
+  const fetcher=async url=>{if(url.includes('?id='))return Response.json({document:cloud,revision:2});puts++;throw new TypeError('Response lost');};
+  assert.deepEqual(await saveWorkspaceDocument(fetcher,document,1,{wait:async()=>{}}),{revision:2});
+  assert.equal(puts,1);
+  cloud.camera.position.reverse();
+  await assert.rejects(saveWorkspaceDocument(fetcher,document,1,{wait:async()=>{}}),error=>error.status===409);
 });

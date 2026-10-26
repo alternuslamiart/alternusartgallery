@@ -1,6 +1,79 @@
 # Verified progress
 
-Last updated: 2026-10-25
+Last updated: 2026-10-26
+
+## Workspace persistence follow-up (2026-10-26)
+
+- The exact workspace alert originates in PUT context initialization, before
+  scene writes. The previously documented production URL repair remains effective:
+  fresh real production Credentials login, save/read, concurrent 200/409,
+  signed-out 401 and logout/login reopening passed today. No new database outage
+  was reproduced for an isolated account; the affected customer's request and
+  sanitized Prisma error remain unobserved.
+- Read-only local schema reads passed for all seven workspace/project models.
+  Stored production/preview configurations connected and confirmed required
+  tables, enabled RLS and server CRUD privileges. The older audit script's
+  select-id probe reports Prisma validation errors for three models without an
+  id column; the full local model reads pass. No migration or record reset.
+- Fixed false lost-response conflicts when PostgreSQL JSON object key order
+  differs; array order and exact revision/document content remain protected.
+  The new regression failed before the fix and passed afterward.
+- Preserve pending rendered scenes on navigation, pagehide and page hiding,
+  scoped to their original identity/studio. Reject stale-scope save/recovery
+  callbacks and avoid inheriting the prior identity's rendered scene during
+  authentication transitions. Existing debounced autosave, validated versioned
+  JSON, IndexedDB recovery and UI presentation are retained.
+- Expanded live acceptance to three studios, material/texture-reference,
+  hierarchy/light/camera round-trips and two-account read/list/write isolation.
+  These assertions passed before final re-login: first expanded run hit auth
+  HTTP 429; the paced rerun hit UND_ERR_CONNECT_TIMEOUT on final auth HTTP.
+  Both runs cleaned only their isolated QA data. Earlier single-account
+  logout/login acceptance passed. Neither failure establishes a storage outage.
+- Full Node suite passed all 167 tests, including navigation and recovery
+  scope regression; TypeScript passed. Production build passed with the
+  existing trusted CA bundle and OpenFreeMap override, including the final
+  rebuild. Focused lint passed without warnings. Full lint still fails on
+  existing unused imports/variables in unrelated app pages, legacy studio
+  panels, email and PayPal modules (full output `.tmp/storage-lint.log`).
+  No live GPU generation or affected-account verification is claimed.
+- `STUDIO_QA_URL=http://127.0.0.1:3035 node scripts/verify-hunyuan-studios.mjs`
+  passed all three studio image/chat asset insertion, transforms/history,
+  save/reopen and light/dark WebGL checks. Storage 503 error propagation,
+  preserved recovery and retry passed; HTTP auth/database/jobs were mocked,
+  and GLB data was real. Artifacts: `.tmp/hunyuan-browser-1793023764501/`.
+  The first attempt ran before the local server was ready and failed with
+  ERR_CONNECTION_REFUSED; rerun passed. Dev Google Fonts downloads used fallback
+  fonts because that server lacked the trusted CA environment; no CSS changed.
+- JSON scene validation and geometry export/import round-trips are covered by
+  the Node suite; full browser JSON download/reimport and a live generated
+  asset/logout/login round-trip were not run in this increment. Recovery remains
+  IndexedDB-backed (8 MB validated scene budget); Hunyuan models use private
+  asset references. Production GPU/storage provisioning remains outstanding.
+
+
+## Workspace persistence recheck and recovery isolation
+
+- Re-ran `node scripts/verify-studio-storage.mjs --production` with the existing
+  Windows trusted CA bundle: real Credentials login, workspace initialization,
+  save/read, concurrent 200/409, signed-out 401 and login/reopen passed. Only the
+  fresh isolated QA records were cleaned. Initial invocation failed before HTTP
+  with `UNABLE_TO_VERIFY_LEAF_SIGNATURE`; TLS verification was never disabled.
+- The screenshot message is emitted by the PUT route's context initialization
+  catch, before scene writes. Prior malformed production URL correction remains
+  effective for this isolated account; the affected user's exact Prisma failure
+  still requires sanitized production logs. No new database migration is needed.
+- Fixed the shared active-project pointer across studios. New recovery writes
+  carry optional studio metadata; without a tab pointer the latest valid recovery
+  for that identity/studio is restored. Legacy records remain readable by project
+  ID and through Open; no records are deleted or guessed into a studio.
+- Cloud opening now has bounded request deadlines, transient retries and
+  cancellation. Authentication/not-found errors are preserved without retries.
+  Save confirmation, revision protection and existing visual components remain.
+- Corrected an incomplete Prisma error-class mock uncovered by the full suite.
+  Added load retry/cancellation and recovery identity/studio/corruption coverage.
+- No new live GPU generation or affected-account browser interaction was run.
+  Production Hunyuan still needs its separate remote worker/private asset setup.
+
 
 ## Workspace recovery follow-up (2026-10-25)
 

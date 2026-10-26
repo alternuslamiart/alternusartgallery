@@ -1,8 +1,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { commitHistory, createTemplate, makeDocument, redoHistory, undoHistory, validateDocument, type SceneDocument, type SceneHistory } from "@/lib/scene/document.mjs";
-import { readRecovery, writeRecovery } from "@/lib/scene/recovery";
-import {saveWorkspaceDocument} from '@/lib/scene/workspace-save.mjs';
+import { latestRecovery, readRecovery, writeRecovery } from "@/lib/scene/recovery";
+import {loadWorkspaceDocument,saveWorkspaceDocument} from '@/lib/scene/workspace-save.mjs';
 
 export function useSceneDocument(studio: string, identity: string, authenticated: boolean, requestedId?: string) {
   const [history, setHistory] = useState<SceneHistory>(() => {
@@ -17,7 +17,9 @@ export function useSceneDocument(studio: string, identity: string, authenticated
   const current = useRef(history.present); current.current = history.present;
   const mounted = useRef(true), blocked = useRef(false), queue = useRef(Promise.resolve());
   const retryTimer=useRef<ReturnType<typeof setTimeout>|null>(null),retryCount=useRef(0);
-  const scope = `casynus:scene-active:${identity}`;
+  const scope = `casynus:scene-active:${identity}:${studio}`;
+  const activeScope = useRef(scope); activeScope.current = scope;
+  const openedScope = useRef<string | null>(null);
   const remember = (document: SceneDocument) => {
     try { sessionStorage.setItem(scope, document.id); } catch { /* Optional pointer, not scene storage. */ }
     const url = new URL(window.location.href); url.searchParams.set("project", document.id);
@@ -30,6 +32,9 @@ export function useSceneDocument(studio: string, identity: string, authenticated
     // asynchronous recovery/cloud lookup finishes, so it cannot replace a newly
     // created project while its first authenticated save is in flight.
     setReady(false);
+    openedScope.current = null;
+    blocked.current = false; setConflict(false);
+    cloudHash.current = ""; localHash.current = ""; saveFailure.current = null;
     const controller = new AbortController();
     let cancelled = false;
     void (async () => {
@@ -38,15 +43,22 @@ export function useSceneDocument(studio: string, identity: string, authenticated
       if (!id) { try { id = sessionStorage.getItem(scope) ?? undefined; } catch {} }
       let recovered = null;
       if (id) { try { recovered = await readRecovery(identity, id); } catch { if (!cancelled) setFailure("Browser recovery is unavailable. Download JSON before leaving if cloud saving fails."); } }
-      let document = recovered?.document ?? current.current;
+      if (!id) {
+        try { recovered = await latestRecovery(identity, studio); id = recovered?.document.id; }
+        catch { if (!cancelled) setFailure("Browser recovery is unavailable. Download JSON before leaving if cloud saving fails."); }
+      }
+      if (cancelled) return;
+      // A different signed-in identity must never inherit the previous user's
+      // rendered scene when it has no recovery record of its own.
+      let document = recovered?.document ?? makeDocument(studio);
+      if (!recovered) document.objects = createTemplate(studio === "architecture" ? "building" : studio === "interior" ? "room" : "intersection");
       revision.current = recovered?.revision ?? 0;
       let loadedCloud = false;
       if (authenticated && id) {
         try {
-          const response = await fetch(`/api/studio-projects?id=${encodeURIComponent(id)}`, { signal: controller.signal, cache: "no-store" });
-          const data = await response.json();
-          if (!response.ok) { if (response.status !== 404 || !recovered) throw new Error(data.error || "Could not open cloud project."); }
-          else {
+          const data = await loadWorkspaceDocument(fetch, id, { signal: controller.signal });
+          if (cancelled) return;
+          {
             const cloud = validateDocument(data.document);
             cloudHash.current = JSON.stringify(cloud); loadedCloud = true;
             if (!preferCloud && recovered?.dirty && JSON.stringify(recovered.document) !== JSON.stringify(cloud) && recovered.revision !== data.revision) {
@@ -64,6 +76,7 @@ export function useSceneDocument(studio: string, identity: string, authenticated
       }
       if (cancelled) return;
       setHistory({ past: [], present: document, future: [] });
+      openedScope.current = scope;
       remember(document); setReady(true);
       setStatus(loadedCloud ? "Cloud project opened" : authenticated ? "Ready to save" : "Browser recovery · sign in for cloud storage");
     })();
@@ -71,41 +84,58 @@ export function useSceneDocument(studio: string, identity: string, authenticated
   }, [identity, authenticated, requestedId, scope]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const recover = useCallback(async () => {
+    if (activeScope.current !== scope || openedScope.current !== scope) return;
     const document = current.current;
-    await writeRecovery(identity, { document, revision: revision.current, dirty: JSON.stringify(document) !== cloudHash.current, updatedAt: Date.now() });
+    await writeRecovery(identity, { document, revision: revision.current, dirty: JSON.stringify(document) !== cloudHash.current, updatedAt: Date.now(), studio });
     localHash.current = JSON.stringify(document);
-  }, [identity]);
+  }, [identity, studio, scope]);
 
   const save = useCallback(() => {
     queue.current = queue.current.catch(() => {}).then(async () => {
-      if (!mounted.current || blocked.current) return;
+      if (!mounted.current || blocked.current || activeScope.current !== scope || openedScope.current !== scope) return;
       const document = current.current;
       try { await recover(); } catch { if (mounted.current) setFailure("Browser recovery failed. Save to cloud or download JSON before leaving."); }
-      if (!mounted.current || current.current.id !== document.id) return;
+      if (!mounted.current || activeScope.current !== scope || current.current.id !== document.id) return;
       if (!authenticated) { if (mounted.current) setStatus("Browser recovery · sign in for cloud storage"); return; }
       if (JSON.stringify(document) === cloudHash.current) return;
       if (mounted.current) setStatus("Saving to workspace…");
       try {
         const data=await saveWorkspaceDocument(fetch,document,revision.current);
-        if (!mounted.current || current.current.id !== document.id) return;
-        // A new/open project must never inherit a reply from the previous ID.
-        if (!mounted.current || current.current.id !== document.id) return;
+        if (!mounted.current || activeScope.current !== scope || current.current.id !== document.id) return;
         revision.current = data.revision; cloudHash.current = JSON.stringify(document);
         retryCount.current=0;if(retryTimer.current)clearTimeout(retryTimer.current);retryTimer.current=null;
         saveFailure.current=null;
         await recover(); setStatus(`Saved to workspace · revision ${data.revision}`); setFailure(null);
-      } catch (caught) { if (mounted.current && current.current.id === document.id) { const error=caught instanceof Error?caught:new Error('Cloud save failed.');saveFailure.current={id:document.id,error};setStatus("Not saved to workspace"); setFailure(error.message);if((error as Error & {status?:number}).status===409){blocked.current=true;setConflict(true);}else if(![400,401,403,413].includes((error as Error & {status?:number}).status??0)&&retryCount.current<5){const delay=Math.min(30_000,2000*2**retryCount.current++);if(retryTimer.current)clearTimeout(retryTimer.current);retryTimer.current=setTimeout(()=>{retryTimer.current=null;void save();},delay);} } }
+      } catch (caught) { if (mounted.current && activeScope.current === scope && current.current.id === document.id) { const error=caught instanceof Error?caught:new Error('Cloud save failed.');saveFailure.current={id:document.id,error};setStatus("Not saved to workspace"); setFailure(error.message);if((error as Error & {status?:number}).status===409){blocked.current=true;setConflict(true);}else if(![400,401,403,413].includes((error as Error & {status?:number}).status??0)&&retryCount.current<5){const delay=Math.min(30_000,2000*2**retryCount.current++);if(retryTimer.current)clearTimeout(retryTimer.current);retryTimer.current=setTimeout(()=>{retryTimer.current=null;void save();},delay);} } }
     });
     return queue.current;
-  }, [authenticated, recover]);
+  }, [authenticated, recover, scope]);
   useEffect(()=>{const onOnline=()=>{if(ready&&authenticated&&!blocked.current&&JSON.stringify(current.current)!==cloudHash.current){retryCount.current=0;void save();}};window.addEventListener('online',onOnline);return()=>window.removeEventListener('online',onOnline);},[ready,authenticated,save]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || openedScope.current !== scope) return;
     const localTimer = setTimeout(() => { void recover().catch(() => setFailure("Browser recovery failed. Save or download JSON before leaving.")); }, 250);
     const cloudTimer = setTimeout(() => { void save(); }, 1800);
     return () => { clearTimeout(localTimer); clearTimeout(cloudTimer); };
-  }, [history.present, ready, save, recover]);
+  }, [history.present, ready, save, recover, scope]);
+  useEffect(() => {
+    if (!ready || openedScope.current !== scope) return;
+    // Capture this identity/project before navigation unmounts the editor or
+    // changes its scope. Never depend on the next render's mutable current ref.
+    const document = history.present;
+    const preserve = () => {
+      const snapshot = { document, revision: revision.current, dirty: JSON.stringify(document) !== cloudHash.current, updatedAt: Date.now(), studio };
+      void writeRecovery(identity, snapshot).catch(() => {});
+    };
+    const onHidden = () => { if (window.document.visibilityState === 'hidden') preserve(); };
+    window.addEventListener('pagehide', preserve);
+    window.document.addEventListener('visibilitychange', onHidden);
+    return () => {
+      window.removeEventListener('pagehide', preserve);
+      window.document.removeEventListener('visibilitychange', onHidden);
+      preserve();
+    };
+  }, [history.present, identity, studio, ready, scope]);
   useEffect(() => {
     const guard = (event: BeforeUnloadEvent) => { if (ready && JSON.stringify(current.current) !== localHash.current) { event.preventDefault(); event.returnValue = ""; } };
     window.addEventListener("beforeunload", guard); return () => window.removeEventListener("beforeunload", guard);
