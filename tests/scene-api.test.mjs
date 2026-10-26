@@ -46,7 +46,7 @@ function storageHarness({ guest = false, unavailable = false, foreign = false } 
     "@/lib/platform/api": { requirePlatformContext: async () => guest ? JsonResponse.json({ error: "Unauthorized" }, { status: 401 }) : { workspaceId: "workspace-a", userId: "user-a" }, isApiResponse: value => value instanceof JsonResponse },
     "@/lib/scene/document.mjs": { MAX_SCENE_BYTES, validateDocument },
   });
-  return { ...routes, writes: () => writes };
+  return { ...routes, writes: () => writes, setStoredSettings: settings => { record.settings = settings; } };
 }
 
 test("scene projects require auth and cannot overwrite another user's project ID", async () => {
@@ -72,6 +72,24 @@ test("storage failures never claim a project was saved", async () => {
   const api = storageHarness({ unavailable: true });
   const response = await api.PUT(request({ document: makeDocument(), revision: 0 }));
   assert.equal(response.status, 503); assert.equal(response.body.saved, undefined);
+});
+
+test("cloud reads reject guests, missing projects and corrupt stored scenes separately", async () => {
+  const doc = makeDocument(), req = { nextUrl: new URL(`http://localhost/api/studio-projects?id=${doc.id}`) };
+  assert.equal((await storageHarness({ guest: true }).GET(req)).status, 401);
+  assert.equal((await storageHarness().GET(req)).status, 404);
+  const api = storageHarness();
+  await api.PUT(request({ document: doc, revision: 0 }));
+  for (const settings of [
+    { revision: 1, document: {} },
+    { revision: -1, document: doc },
+    { revision: 1, document: { ...doc, id: 'wrong-project' } },
+  ]) {
+    api.setStoredSettings(settings);
+    const result = await api.GET(req);
+    assert.equal(result.status, 422); assert.equal(result.body.code, 'INVALID_PROJECT_DATA');
+    assert.equal(api.writes(), 2);
+  }
 });
 
 for (const provider of ["gemini", "groq"]) {

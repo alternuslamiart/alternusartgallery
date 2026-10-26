@@ -10,6 +10,12 @@
 
 ## Next concrete task
 
+- [x] Repair generic cloud-loading fallback, first-upload 404 handling and
+  recovery upload gating; preserve dirty recovery when choosing the cloud copy.
+- [ ] Match the affected project's URL/GET response to production telemetry if
+  the issue recurs. Current production QA and database checks pass; no failing
+  customer request was captured. Do not infer database failure from fallback UI.
+
 - [ ] Reproduce the affected user's workspace request after this deployment and
   inspect the sanitized `studio-project-storage` operation/Prisma code if a 503
   remains. Verify browser autosave recovery after a real transient outage and

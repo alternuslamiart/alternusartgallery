@@ -2,6 +2,65 @@
 
 Last updated: 2026-10-26
 
+## Cloud project loading and safe recovery synchronization
+
+- Confirmed client defects: recovery fallback replaced every GET error with one
+  generic warning; a never-uploaded revision-zero project's expected 404 looked
+  like a cloud outage; autosave could PUT recovery before a verified GET; a clean
+  cached hash could falsely satisfy verified-save after a failed reload. Stored
+  scene corruption was also incorrectly reported by GET as database 503.
+- Preserve actual API messages/status (including non-JSON HTTP errors), validate
+  document identity/revision/scene before opening, and return 422 plus
+  INVALID_PROJECT_DATA for invalid stored scenes without changing the record.
+- Existing recovery requires a successful cloud read before uploads. Reconnect
+  adopts an unmodified clean recovery's current cloud state, saves edits only
+  against its verified revision, and exposes the existing conflict choices for
+  divergent edits. No PUT is sent after auth, permission, missing-saved-project,
+  corrupt-data or transient GET failures. Authenticated 404 permits first upload
+  only at local revision zero; server foreign-ID/revision checks remain intact.
+- Keep edits made during a pending reload. Explicit Open cloud copy first
+  archives dirty recovery as an independently openable local project. IndexedDB
+  records are never deleted. Browser online events retry unopened cloud loads
+  and pending recovery verification. Existing JSON backup and visual UI remain.
+- Current Vercel Production environment was pulled into ignored private storage:
+  both database URLs parse and pass read-only SELECT 1. Runtime uses a Supabase
+  pooler, pgbouncer=true and connection_limit=3. Read-only local model reads pass;
+  production stored-scene audit found no invalid documents/revisions, ID mismatch
+  or non-default workspace association. No database/environment changes needed.
+- Production storage log query (last 24h, studio-project-storage) returned no
+  matching entries. Real production isolated QA acceptance passed three-studio
+  save/read, hierarchy/material/texture/light/camera round-trip, two-account
+  read/list/write isolation, concurrent 200/409 and logout/login reopening.
+  Only fresh QA records were cleaned. The affected customer's failing request
+  is still unobserved; these results do not prove its exact underlying HTTP cause.
+- New loader regressions first failed on accepted invalid data and lost HTTP
+  status for non-JSON errors. Those now pass. Final full suite passed 181 tests,
+  including first-upload-after-outage and transient-network loader regression.
+  TypeScript, focused lint, whitespace checks and final production rebuild
+  passed. Build uses the existing Windows trusted CA bundle/OpenFreeMap override;
+  existing CSR deoptimization warnings remain. Full-repository lint was not
+  rerun; its unrelated unused-variable errors remain documented above/below.
+  No new configuration, migration, database or UI design is introduced.
+- Initial generation browser regression passed Architecture/Infrastructure but
+  stopped at Interior's Opening screen during a tool-host interruption. The
+  dedicated cloud browser run then passed all per-studio fresh-load, refresh
+  outage, no-PUT, reconnect, conflict and archive assertions, but final harness
+  validation failed on two CDP Invalid InterceptionId cancellation races. Waiting
+  for Network.loadingFailed alone did not resolve those; the verifier now also
+  identifies requests from a superseded navigation. Final `--cloud-loading`
+  browser acceptance passed all three studios, with mocked HTTP, against the
+  local production build. Artifacts: `.tmp/hunyuan-browser-1793030110278/`.
+  The final revision-zero first-upload-after-outage addition is unit-tested;
+  it was made after that browser build. Live GPU generation is not claimed.
+- Final-build `STUDIO_QA_URL=http://127.0.0.1:3036 node
+  scripts/verify-hunyuan-studios.mjs` passed all three studios: real GLB preview,
+  insertion, object transforms/history, autosave/reopen and light/dark WebGL.
+  Auth/database/provider HTTP was mocked; no actual GPU was called. Artifacts:
+  `.tmp/hunyuan-browser-1793030330995/`. An attempted server restart on 3035 hit
+  EADDRINUSE from the leftover task server; that stale run was canceled, the
+  identified server stopped, and the final build started fresh on 3036.
+
+
 ## Studio chat language selector removal
 
 - Removed the SQ/EN/DE voice-language dropdown from the shared studio AI chat

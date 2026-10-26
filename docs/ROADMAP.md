@@ -6,6 +6,9 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Distinguish cloud load errors and corrupt scenes, validate project identity
+  and revisions, and require safe cloud-read reconciliation before recovery PUT.
+
 - [x] Protect navigation/account-transition recovery and reconcile lost save
   responses independently of JSON object key order; verify production
   three-studio storage and two-account isolation with fresh QA records.

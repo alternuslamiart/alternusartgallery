@@ -2,6 +2,14 @@
 
 ## Application
 
+- Cloud scene GET responses are validated for matching project ID, positive
+  integer revision and full versioned scene data; corrupt records return 422
+  INVALID_PROJECT_DATA, independently of database/auth failures. Existing
+  recovery cannot upload until a cloud GET verifies its base revision; conflicts
+  retain both versions and explicit cloud selection archives dirty local data.
+  Revision-zero local projects can first-upload after authenticated 404. The
+  existing workspace/user-scoped database model and UI remain unchanged.
+
 - Save reconciliation compares JSON object content independently of database
   key ordering while preserving array order and exact revisions. Scene hook
   callbacks are identity/studio scoped; pagehide, visibility hiding and effect

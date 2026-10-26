@@ -1,3 +1,5 @@
+import {validateDocument} from './document.mjs';
+
 // JSONB may reorder object keys. Arrays (geometry, hierarchy and transforms)
 // must keep their order when checking whether an uncertain write committed.
 function documentJSON(value){
@@ -9,9 +11,18 @@ export async function loadWorkspaceDocument(fetcher,id,options={}){
   for(let attempt=0;attempt<3;attempt++){
     try{
       const response=await fetcher(`/api/studio-projects?id=${encodeURIComponent(id)}`,{cache:'no-store',signal:options.signal?AbortSignal.any([options.signal,AbortSignal.timeout(10_000)]):AbortSignal.timeout(10_000)});
-      const data=await response.json();
-      if(!response.ok)throw Object.assign(new Error(typeof data.error==='string'?data.error:data.error?.message||'Could not open cloud project.'),{status:response.status});
-      return data;
+      const data=await response.json().catch(()=>null);
+      if(!response.ok){
+        const fallback=response.status===401?'Sign in again to open this cloud project.':response.status===403?'You do not have permission to open this project.':response.status===404?'Cloud project not found for this account.':response.status===422?'The saved cloud project contains invalid scene data.':'Cloud project storage is temporarily unavailable.';
+        throw Object.assign(new Error(typeof data?.error==='string'?data.error:data?.error?.message||fallback),{status:response.status,code:data?.code});
+      }
+      try{
+        const document=validateDocument(data?.document);
+        if(document.id!==id||!Number.isSafeInteger(data.revision)||data.revision<1)throw new Error('Invalid project identity or revision.');
+        return {document,revision:data.revision};
+      }catch{
+        throw Object.assign(new Error('Cloud project data is invalid. The browser recovery copy is preserved.'),{status:422,code:'INVALID_PROJECT_DATA'});
+      }
     }catch(error){
       if(options.signal?.aborted||attempt===2||(error.status>=400&&error.status<500&&error.status!==429))throw error;
       await (options.wait??(ms=>new Promise(resolve=>setTimeout(resolve,ms))))(250*2**attempt);

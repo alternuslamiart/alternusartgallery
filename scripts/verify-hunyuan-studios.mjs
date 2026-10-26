@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {createHunyuanLiveContext} from './hunyuan-live-test-context.mjs';
+import {makeDocument,makeObject} from '../src/lib/scene/document.mjs';
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const base=process.env.STUDIO_QA_URL||'http://localhost:3033';
 assert.ok(['localhost','127.0.0.1'].includes(new URL(base).hostname));
@@ -24,23 +25,28 @@ async function run(){
   socket=new WebSocket(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);
   await new Promise((resolve,reject)=>{socket.addEventListener('open',resolve,{once:true});socket.addEventListener('error',reject,{once:true});});
   let sequence=0,submissions=0,downloads=0,guest=false,providersMissing=false,storageDown=false;const pending=new Map(),errors=[],jobs=new Map(),projects=new Map(),canceledRequests=new Set();
-  const send=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence,timer=setTimeout(()=>{pending.delete(id);reject(Error('CDP timeout: '+method));},60_000);pending.set(id,{resolve,reject,timer});socket.send(JSON.stringify({id,method,params}));});
+  let cloudLoadDown=false,cloudPuts=0;
+  let navigation=0;
+  const send=(method,params={})=>new Promise((resolve,reject)=>{if(method==='Page.navigate')navigation++;const id=++sequence,timer=setTimeout(()=>{pending.delete(id);reject(Error('CDP timeout: '+method));},60_000);pending.set(id,{resolve,reject,timer});socket.send(JSON.stringify({id,method,params}));});
   socket.addEventListener('message',event=>{const message=JSON.parse(event.data);
     if(message.id){const p=pending.get(message.id);if(p){pending.delete(message.id);clearTimeout(p.timer);if(message.error)p.reject(Error(JSON.stringify(message.error)));else p.resolve(message.result);}}
     if(message.method==='Runtime.exceptionThrown')errors.push(message.params.exceptionDetails.exception?.description||message.params.exceptionDetails.text);
     if(live&&message.method==='Network.requestWillBeSent'){const r=message.params.request,u=new URL(r.url);if(u.pathname==='/api/ai3d/jobs'&&r.method==='POST')submissions++;if(u.pathname.endsWith('/asset'))downloads++;}
     if(message.method==='Network.loadingFailed'&&message.params.canceled)canceledRequests.add(message.params.requestId);
-    if(message.method==='Fetch.requestPaused')void intercept(message.params).catch(error=>{
+    if(message.method==='Fetch.requestPaused'){const requestNavigation=navigation;void intercept(message.params).catch(async error=>{
       // StrictMode/unmount can abort a paused, intentionally delayed discovery.
-      if(canceledRequests.has(message.params.networkId)&&error.message.includes('Invalid InterceptionId'))return;
-      errors.push(error.message);
-    });
+      // CDP may report Invalid InterceptionId before Network.loadingFailed.
+      if(error.message.includes('Invalid InterceptionId'))await wait(100);
+      if(error.message.includes('Invalid InterceptionId')&&(requestNavigation!==navigation||canceledRequests.has(message.params.networkId)))return;
+      errors.push(error.message+' '+new URL(message.params.request.url).pathname);
+    });}
   });
   async function intercept({requestId,request}){
     const url=new URL(request.url);let body,mime='application/json',responseCode=200;
     if(url.pathname==='/api/auth/session')body=guest?{}:{user:{id:'hunyuan-browser-user',email:'qa@example.invalid',name:'Local UI test'},expires:'2099-01-01T00:00:00.000Z'};
     else if(url.pathname==='/api/studio-projects'){
-      if(request.method==='PUT'){if(storageDown){responseCode=503;body={error:'Workspace storage is unavailable. Keep your recovery copy or download JSON.'};}else{const input=JSON.parse(request.postData);projects.set(input.document.id,{document:input.document,revision:input.revision+1});body={id:input.document.id,revision:input.revision+1,saved:true};}}
+      if(request.method==='PUT'){cloudPuts++;if(storageDown){responseCode=503;body={error:'Workspace storage is unavailable. Keep your recovery copy or download JSON.'};}else{const input=JSON.parse(request.postData);projects.set(input.document.id,{document:input.document,revision:input.revision+1});body={id:input.document.id,revision:input.revision+1,saved:true};}}
+      else if(cloudLoadDown){responseCode=503;body={error:'Cloud read temporarily unavailable.'};}
       else body=url.searchParams.has('id')?projects.get(url.searchParams.get('id')):{projects:[]};
     }else if(url.pathname.endsWith('/providers')){await wait(500);body={providers:providersMissing?[]:[{id:'hunyuan',label:'Hunyuan3D · Image to 3D',model:'Hunyuan3D-2.1 shape'}]};}
     else if(url.pathname.endsWith('/asset')){downloads++;mime='model/gltf-binary';body=glb;}
@@ -65,6 +71,37 @@ async function run(){
   await send('Emulation.setFocusEmulationEnabled',{enabled:true});
   await send('Page.addScriptToEvaluateOnNewDocument',{source:"localStorage.setItem('cookiePreference','necessary');localStorage.setItem('cedium_signin_popup_dismissed','1');"});
   if(!live)await send('Fetch.enable',{patterns:[{urlPattern:'*/api/auth/session'},{urlPattern:'*/api/studio-projects*'},{urlPattern:'*/api/ai3d/*'}]});
+  if(process.argv.includes('--cloud-loading')){
+    assert.equal(live,false,'Cloud failure injection is localhost/mock-only');
+    for(const route of ['/casynus','/infrastructure','/interior?workspace=3d']){
+      const document=makeDocument();document.name='Cloud recovery acceptance';document.objects=[makeObject('box',{name:'Cloud recovery box'})];
+      projects.set(document.id,{document,revision:1});
+      const url=base+route+(route.includes('?')?'&':'?')+'project='+document.id;
+      await send('Page.navigate',{url});await ready('.scene-canvas canvas');
+      await until("document.querySelector('.scene-save-state')?.textContent.includes('Cloud project opened')",'Fresh device cloud load');await wait(400);
+      cloudLoadDown=true;const before=cloudPuts;
+      await send('Page.navigate',{url});
+      await until("document.querySelector('.scene-alert')?.textContent.includes('Cloud read temporarily unavailable.')",'Real load error retained');
+      await evaluate("[...document.querySelectorAll('.scene-tree-name')].find(b=>b.textContent.includes('Cloud recovery box')).click()");
+      await field('position X',2);await wait(2800);
+      assert.equal(cloudPuts,before,'No PUT while cloud GET is failing');
+      cloudLoadDown=false;await evaluate("window.dispatchEvent(new Event('online'))");
+      await until("document.querySelector('.scene-save-state')?.textContent.includes('Saved to workspace')&&!document.querySelector('.scene-alert')",'Reconnect and save verified edits');
+      assert.equal(projects.get(document.id).document.objects[0].position[0],2);await wait(400);
+      cloudLoadDown=true;await send('Page.navigate',{url});
+      await until("document.querySelector('.scene-alert')?.textContent.includes('Cloud read temporarily unavailable.')",'Recovery reopened');
+      await evaluate("[...document.querySelectorAll('.scene-tree-name')].find(b=>b.textContent.includes('Cloud recovery box')).click()");await field('position X',3);await wait(350);
+      const cloud=projects.get(document.id);projects.set(document.id,{document:{...cloud.document,name:'Other device version'},revision:cloud.revision+1});
+      const beforeConflict=cloudPuts;cloudLoadDown=false;await evaluate("window.dispatchEvent(new Event('online'))");
+      await until("document.querySelector('.scene-alert')?.textContent.includes('newer cloud revision')",'Conflict remains visible');
+      assert.equal(cloudPuts,beforeConflict);assert.equal(projects.get(document.id).document.objects[0].position[0],2);
+      await send('Page.navigate',{url:url+'&cloud=1'});
+      await until("document.querySelector('.scene-save-state')?.textContent.includes('Cloud project opened')&&!document.querySelector('.scene-alert')",'Explicit cloud choice verified');
+      assert.ok(await evaluate("new Promise((resolve,reject)=>{const r=indexedDB.open('casynus-scene-recovery',1);r.onerror=()=>reject(r.error);r.onsuccess=()=>{const db=r.result,q=db.transaction('documents').objectStore('documents').getAll();q.onsuccess=()=>{resolve(q.result.some(v=>v.document.name.endsWith(' recovery')&&v.document.objects[0]?.position[0]===3));db.close();};q.onerror=()=>reject(q.error);};})"),'Dirty recovery archived before cloud choice');
+      console.log('PASS',route,'fresh cloud load, refresh outage, no unsafe PUT, reconnect, conflict and preserved recovery on cloud choice');
+    }
+    assert.deepEqual(errors,[]);console.log('PASS cloud loading browser regression (mocked HTTP), artifacts:',out);await send('Browser.close');return;
+  }
   if(process.argv.includes('--baseline')){
     const metrics={};
     for(const width of [1440,390])for(const theme of ['dark','light'])for(const route of ['/casynus','/infrastructure','/interior?workspace=3d']){

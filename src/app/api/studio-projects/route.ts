@@ -25,7 +25,14 @@ export async function GET(request: NextRequest) {
       const row = await prisma.blenderProject.findFirst({ where: { ...scope, id, settings: { path: ["kind"], equals: kind } } });
       if (!row) return error("Project not found.", 404);
       const settings = row.settings as { revision: number; document: unknown };
-      return NextResponse.json({ document: validateDocument(settings.document), revision: settings.revision });
+      try {
+        const document = validateDocument(settings.document);
+        if (document.id !== id || !Number.isSafeInteger(settings.revision) || settings.revision < 1) throw new Error("Invalid stored identity or revision.");
+        return NextResponse.json({ document, revision: settings.revision });
+      } catch {
+        console.error("studio-project-storage", { operation: "deserialize", code: "INVALID_PROJECT_DATA" });
+        return NextResponse.json({ error: "The saved cloud scene is invalid. Keep your browser recovery copy or export JSON; the cloud record has not been changed.", code: "INVALID_PROJECT_DATA" }, { status: 422 });
+      }
     }
     const projects = await prisma.blenderProject.findMany({ where: { ...scope, settings: { path: ["kind"], equals: kind } }, orderBy: { updatedAt: "desc" }, take: 100, select: { id: true, name: true, updatedAt: true } });
     return NextResponse.json({ projects });
