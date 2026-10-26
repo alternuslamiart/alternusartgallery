@@ -4,6 +4,15 @@ Last updated: 2026-10-26
 
 ## Cloud project loading and safe recovery synchronization
 
+- Fix commit `5270a8c` was pushed to main and its exact Vercel deployment reached
+  Ready with the production alias. Post-deployment `node
+  scripts/verify-studio-storage.mjs --production` passed real three-studio
+  save/read, hierarchy/material/light/camera round-trip, concurrent 200/409,
+  two-account read/list/write isolation, signed-out denial and logout/login
+  reopening. Both isolated QA accounts were cleaned; no customer project or
+  GPU job was modified. No deployment or database configuration blocker remains
+  for this acceptance; the affected customer's original request is unobserved.
+
 - Confirmed client defects: recovery fallback replaced every GET error with one
   generic warning; a never-uploaded revision-zero project's expected 404 looked
   like a cloud outage; autosave could PUT recovery before a verified GET; a clean

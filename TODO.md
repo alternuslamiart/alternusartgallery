@@ -3,10 +3,9 @@
 - [x] Remove the unnecessary SQ/EN/DE dropdown from the studio AI chat composer.
 
 - [ ] Capture the affected account's actual failing context/Prisma code if the
-  alert recurs. Today's isolated production save/read and single-account
-  logout/login passed; expanded three-studio/two-account assertions passed,
-  but final re-login encountered auth 429 then a connection timeout. Re-run
-  paced expanded acceptance when production auth connectivity is stable.
+  alert recurs. Paced post-deployment production acceptance now passes all three
+  studios, two-account isolation and logout/login; prior auth 429/connection
+  timeout blockers did not recur. The original customer request is unobserved.
 
 ## Next concrete task
 
@@ -16,12 +15,11 @@
   the issue recurs. Current production QA and database checks pass; no failing
   customer request was captured. Do not infer database failure from fallback UI.
 
-- [ ] Reproduce the affected user's workspace request after this deployment and
-  inspect the sanitized `studio-project-storage` operation/Prisma code if a 503
-  remains. Verify browser autosave recovery after a real transient outage and
-  two-account ownership with an isolated test account. Production QA from this
-  machine now passes real production storage acceptance with the Windows trusted
-  CA bundle. Affected-account browser recovery and real AI insertion remain pending.
+- [ ] Reproduce the affected user's request if a failure remains and inspect its
+  actual HTTP response plus sanitized storage telemetry. Two-account ownership
+  and production logout/login are now verified. Three-studio browser recovery
+  passes injected HTTP outages/conflicts; affected-account recovery during a
+  real outage and live GPU insertion remain unverified.
 
 - [x] Correct production DATABASE_URL/DIRECT_URL to verified poolers for the same
   database/credentials and preserve actual workspace save errors in generation.
