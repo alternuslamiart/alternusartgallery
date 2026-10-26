@@ -9,7 +9,8 @@ Last updated: 2026-10-26
 - Direct live Groq and You Answer probes returned HTTP 200 with answer text.
   Gemini returned HTTP 400 FAILED_PRECONDITION: free tier unavailable in this
   country; Google AI Studio project billing must be enabled. Existing Gemini
-  to Groq failover remains available. Deployment activation is pending this push.
+  to Groq failover remains available. Commit d8fd008 reached Vercel Production
+  Ready; the public `/api/ai-chat` reports all three provider keys configured.
 - Added actionable Gemini billing error handling and a regression that failed
   before the fix. All 182 tests, TypeScript, focused route lint and production
   build passed (existing CSR/deprecation warnings remain).
