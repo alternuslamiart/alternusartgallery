@@ -1,5 +1,7 @@
 # Next tasks (reviewed 2026-10-26)
 
+- [x] Remove the unnecessary SQ/EN/DE dropdown from the studio AI chat composer.
+
 - [ ] Capture the affected account's actual failing context/Prisma code if the
   alert recurs. Today's isolated production save/read and single-account
   logout/login passed; expanded three-studio/two-account assertions passed,

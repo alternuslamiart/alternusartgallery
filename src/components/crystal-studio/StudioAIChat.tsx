@@ -272,7 +272,6 @@ export function StudioAIChat({
           </label>
           <StudioButton size="icon" variant="ghost" active={voice.mode==="dictation"} aria-label={voice.mode==="dictation"?"Stop voice dictation":"Start voice dictation"} aria-keyshortcuts="Control+Q" title="Voice command (Ctrl + Q)" onClick={voice.toggleDictation}>{voice.mode==="dictation"?<MicOff size={16}/>:<Mic size={16}/>}</StudioButton>
           <StudioButton size="icon" variant="ghost" active={voice.conversation} aria-label={voice.conversation?"End voice conversation":"Start voice conversation"} aria-pressed={voice.conversation} title={voice.conversation?'End voice conversation':'Voice conversation · speech is sent to the selected AI provider; replies are spoken'} onClick={voice.toggleConversation}><Radio size={16}/></StudioButton>
-          <select aria-label="Voice language" className="cs-voice-language" value={voice.language} onChange={event=>voice.changeLanguage(event.target.value)} title="Speech recognition language"><option value="sq-AL">SQ</option><option value="en-US">EN</option><option value="de-DE">DE</option></select>
           <select aria-label="AI mode" className="cs-chat-model" disabled={loading} value={activeModel?.id ?? ""} onChange={event => { setRemoteError(null); onModelChange(event.target.value); }}>
             {availableModels.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}
           </select>

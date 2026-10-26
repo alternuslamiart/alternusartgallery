@@ -2,6 +2,15 @@
 
 Last updated: 2026-10-26
 
+## Studio chat language selector removal
+
+- Removed the SQ/EN/DE voice-language dropdown from the shared studio AI chat
+  composer as requested. Existing speech settings and all other chat controls
+  remain unchanged. No style or persistence changes.
+- TypeScript and whitespace checks passed; focused lint passed with the existing
+  image-element warning. Browser verification and a rebuild were not run for
+  this single-control removal.
+
 ## Workspace persistence follow-up (2026-10-26)
 
 - The exact workspace alert originates in PUT context initialization, before
