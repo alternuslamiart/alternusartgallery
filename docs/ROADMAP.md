@@ -114,6 +114,10 @@ requirements provide new evidence.
 
 ## P2 — Existing platform integration
 
+- [x] Configure Gemini, Groq and You Production secrets; verify direct Groq/You
+  answers and expose Gemini billing restrictions as actionable errors.
+- [ ] Enable Gemini project billing and verify signed-in deployed AI chat.
+
 - [x] Match password reset request/token/success screens to the shared Login and
   Signup frame, themes and responsive styling while retaining the existing APIs.
 

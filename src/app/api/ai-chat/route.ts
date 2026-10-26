@@ -160,6 +160,14 @@ function getProviderError(error: unknown, provider: RemoteAIProvider) {
  const lower = message.toLowerCase();
  const name = provider === "groq" ? "Groq" : "Gemini";
 
+ if (provider === "gemini" && (lower.includes("enable billing") || lower.includes("free tier is not available"))) {
+ return {
+ status: 503,
+ error: "Gemini requires billing enabled for this project in Google AI Studio. Choose Groq or You while the server configuration is updated.",
+ code: "GEMINI_BILLING_REQUIRED",
+ };
+ }
+
  if (lower.includes("quota") || lower.includes("rate") || lower.includes("429")) {
  return {
  status: 429,

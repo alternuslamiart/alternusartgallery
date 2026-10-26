@@ -1,5 +1,10 @@
 # Repository architecture
 
+- AI chat provider keys are server-only sensitive Production environment
+  variables. Gemini billing/country restrictions surface as
+  `GEMINI_BILLING_REQUIRED` (503) after existing Gemini/Groq failover is exhausted;
+  a configured key alone does not establish provider availability.
+
 ## Application
 
 - Cloud scene GET responses are validated for matching project ID, positive

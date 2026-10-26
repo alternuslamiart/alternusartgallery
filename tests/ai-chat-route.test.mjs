@@ -68,7 +68,7 @@ function routeHarness(options = {}) {
   const exports = {};
   const fetchProvider = async (url, init) => {
     calls.provider++;
-    if (options.providerFails) throw new Error("Provider offline");
+    if (options.providerFails) throw new Error(options.providerError ?? "Provider offline");
     assert.ok(init.signal instanceof AbortSignal);
     const body = JSON.parse(init.body);
     if (url.includes("googleapis")) {
@@ -156,4 +156,13 @@ test("failed providers refund one reservation even after failover", async () => 
   const { send, calls } = routeHarness({ providerFails: true });
   assert.ok((await send({ provider: "gemini", message: "Hello" })).status >= 400);
   assert.equal(calls.reserved, 1); assert.equal(calls.refunded, 1);
+});
+
+test("Gemini billing restrictions return an actionable configuration error", async () => {
+  const { send, calls } = routeHarness({ providerFails: true, providerError: "Gemini 400: Gemini API free tier is not available in your country. Please enable billing on your project in Google AI Studio." });
+  const response = await send({ provider: "gemini", message: "Hello" });
+  assert.equal(response.status, 503);
+  assert.equal(response.body.code, "GEMINI_BILLING_REQUIRED");
+  assert.match(response.body.error, /billing.*Google AI Studio/i);
+  assert.equal(calls.refunded, 1);
 });

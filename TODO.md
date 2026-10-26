@@ -1,5 +1,11 @@
 # Next tasks (reviewed 2026-10-26)
 
+- [ ] Enable billing on the Gemini Google AI Studio project: the existing key
+  returns country/free-tier FAILED_PRECONDITION. Groq and You direct live calls
+  pass. Confirm all three readiness flags after deployment and perform signed-in
+  `/aichat` conversation/save/reload acceptance; keys are sensitive Production
+  variables and must never be committed.
+
 - [x] Remove the unnecessary SQ/EN/DE dropdown from the studio AI chat composer.
 
 - [ ] Capture the affected account's actual failing context/Prisma code if the

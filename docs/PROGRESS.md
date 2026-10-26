@@ -2,6 +2,20 @@
 
 Last updated: 2026-10-26
 
+## AI chat production provider configuration (2026-10-26)
+
+- Configured GEMINI_API_KEY, GROQ_API_KEY and YOU_API_KEY as sensitive Vercel
+  Production variables using existing local credentials; no secrets enter Git.
+- Direct live Groq and You Answer probes returned HTTP 200 with answer text.
+  Gemini returned HTTP 400 FAILED_PRECONDITION: free tier unavailable in this
+  country; Google AI Studio project billing must be enabled. Existing Gemini
+  to Groq failover remains available. Deployment activation is pending this push.
+- Added actionable Gemini billing error handling and a regression that failed
+  before the fix. All 182 tests, TypeScript, focused route lint and production
+  build passed (existing CSR/deprecation warnings remain).
+  No authenticated production conversation or browser acceptance is claimed.
+
+
 ## Cloud project loading and safe recovery synchronization
 
 - Fix commit `5270a8c` was pushed to main and its exact Vercel deployment reached
