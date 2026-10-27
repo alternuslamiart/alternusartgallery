@@ -36,6 +36,13 @@ Last updated: 2026-10-27
   recovery and authenticated `/api/sketch-projects` workspace persistence with
   JSONB key-order-safe revision reconciliation and fresh-browser cloud project
   adoption on login.
+- Added the shared HSV color wheel + saturation/value square + HEX input +
+  opacity slider + 10 color swatches + custom color palette (`SceneColorField` /
+  `.scene-color-panel` in `SceneWorkbench.tsx` and `scene-studio.css`) to `Base color`
+  and `Light color` in the Architecture (`/casynus`), Infrastructure
+  (`/infrastructure`) and 3D Sketch (`/interior?workspace=3d`) Properties
+  inspectors while preserving `[aria-label="Base color"]` and
+  `[aria-label="Light color"]` compatibility.
 - Verification: all 201 Node tests (`npm test`), standalone TypeScript
   (`npm run typecheck`), focused Next.js lint and production build passed.
   Real installed-Chrome live acceptance (`node scripts/verify-sketch.mjs --live`)

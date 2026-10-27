@@ -5,8 +5,9 @@ import type { WorldMapAPI } from "@/components/infrastructure/WorldMap";
 import { importGeographicFeature } from "@/lib/infrastructure/map-import.mjs";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { Box, Building2, Eye, EyeOff, Focus, FolderOpen, Globe2, Layers3, Lock, MoreHorizontal, MousePointer2, PanelLeft, PanelRight, Rotate3D, Route, Ruler, Save, Sparkles, TreePine, Unlock, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { Box, Building2, ChevronDown, Eye, EyeOff, Focus, FolderOpen, Globe2, Layers3, Lock, MoreHorizontal, MousePointer2, PanelLeft, PanelRight, Rotate3D, Route, Ruler, Save, Sparkles, TreePine, Unlock, X } from "lucide-react";
+import { hexToHsv, hsvToHex } from "@/lib/sketch.mjs";
 import { SceneViewport, type SceneTool, type ViewportAPI } from "./SceneViewport";
 import { useSceneDocument } from "./useSceneDocument";
 import { StudioHeader, StudioPanel } from "@/components/crystal-studio/kit";
@@ -38,6 +39,43 @@ const fingerprint = (d: SceneDocument) => JSON.stringify([d.id, d.objects, d.env
 function download(blob: Blob, name: string) {
   const url = URL.createObjectURL(blob), link = document.createElement("a");
   link.href = url; link.download = name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+const paletteSwatches = ["#141414", "#ffffff", "#ff6b6b", "#f59e0b", "#facc15", "#22c55e", "#06b6d4", "#4284ff", "#a855f7", "#ec4899"];
+function SceneColorField({ label, value, opacity, onChange, onOpacity }: { label: string; value: string; opacity?: number; onChange: (color: string) => void; onOpacity?: (opacity: number) => void }) {
+  const [open, setOpen] = useState(true), [collapsed, setCollapsed] = useState(false), [hex, setHex] = useState(value);
+  const [h, s, v] = hexToHsv(value);
+  useEffect(() => setHex(value), [value]);
+  const chooseHue = (event: ReactPointerEvent<HTMLDivElement>) => { const r = event.currentTarget.getBoundingClientRect(), angle = Math.atan2(event.clientY - r.top - r.height / 2, event.clientX - r.left - r.width / 2) * 180 / Math.PI + 90; onChange(hsvToHex(angle, s || 1, v || 1)); };
+  const chooseSquare = (event: ReactPointerEvent<HTMLDivElement>) => { const r = event.currentTarget.getBoundingClientRect(); onChange(hsvToHex(h, Math.max(0, Math.min(1, (event.clientX - r.left) / r.width)), 1 - Math.max(0, Math.min(1, (event.clientY - r.top) / r.height)))); };
+  return <div className="scene-color-field">
+    <div className="scene-color">
+      <span>{label}</span>
+      <button type="button" className="scene-color-trigger" aria-label={`Toggle ${label} palette`} aria-expanded={open} onClick={() => setOpen(x => !x)}>
+        <span className="sketch-color-preview" style={{ background: value }} />
+        <span>{value}</span>
+      </button>
+      {(!open || collapsed) && <input aria-label={label} type="color" className="sr-only" value={value} onChange={e => onChange(e.target.value)} />}
+    </div>
+    {open && <section className="scene-color-panel" aria-label={`${label} palette`}>
+      <header>
+        <strong>Color</strong>
+        <button type="button" aria-label="Collapse color picker" onClick={() => setCollapsed(x => !x)}><ChevronDown size={16} /></button>
+        <button type="button" aria-label="Close color picker" onClick={() => setOpen(false)}><X size={16} /></button>
+      </header>
+      {!collapsed && <>
+        <div className="sketch-hue" role="slider" tabIndex={0} aria-label="Hue" aria-valuemin={0} aria-valuemax={360} aria-valuenow={Math.round(h)} onKeyDown={e => { if (["ArrowLeft", "ArrowDown", "ArrowRight", "ArrowUp"].includes(e.key)) { e.preventDefault(); onChange(hsvToHex(h + (["ArrowLeft", "ArrowDown"].includes(e.key) ? -2 : 2), s, v)); } }} onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); chooseHue(e); }} onPointerMove={e => { if (e.currentTarget.hasPointerCapture(e.pointerId)) chooseHue(e); }}>
+          <span className="sketch-hue-thumb" style={{ transform: `rotate(${h}deg) translateY(-83px)` }} />
+          <div className="sketch-saturation" style={{ backgroundColor: hsvToHex(h, 1, 1) }} onPointerDown={e => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); chooseSquare(e); }} onPointerMove={e => { e.stopPropagation(); if (e.currentTarget.hasPointerCapture(e.pointerId)) chooseSquare(e); }}>
+            <span style={{ left: `${s * 100}%`, top: `${(1 - v) * 100}%` }} />
+          </div>
+        </div>
+        <label>HEX<input aria-label="HEX color" value={hex} maxLength={7} onChange={e => { setHex(e.target.value); if (/^#[0-9a-f]{6}$/i.test(e.target.value)) onChange(e.target.value); }} onBlur={() => setHex(value)} /><span className="sketch-color-preview" style={{ background: value }} /></label>
+        {onOpacity && <label>Opacity<output>{Math.round((opacity ?? 1) * 100)}%</output><input aria-label="Color opacity" type="range" min="0" max="100" value={Math.round((opacity ?? 1) * 100)} onChange={e => onOpacity(Number(e.target.value) / 100)} /></label>}
+        <div className="sketch-swatches">{paletteSwatches.map(c => <button key={c} type="button" aria-label={`Choose ${c}`} title={c} style={{ background: c }} onClick={() => onChange(c)} />)}</div>
+        <label>Custom color<input aria-label={label} type="color" value={value} onChange={e => onChange(e.target.value)} /></label>
+      </>}
+    </section>}
+  </div>;
 }
 function Menu({ name, children }: { name: string; children: ReactNode }) { return <details className="scene-menu"><summary>{name}</summary><div onClick={e => { if ((e.target as HTMLElement).closest("button:not(:disabled)")) e.currentTarget.parentElement?.removeAttribute("open"); }}>{children}</div></details>; }
 function NumberField({ label, value, onChange, min = -10000, max = 10000 }: { label: string; value: number; onChange: (v: number) => void; min?: number; max?: number }) {
@@ -479,9 +517,9 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       <fieldset disabled={blocked || Boolean(primary && locked(primary))}>
         {primary ? <><h2>{selected.length > 1 ? `${selected.length} selected · primary object` : primary.name}</h2><label className="scene-text-field">Name<input aria-label="Object name" key={primary.id + primary.name} defaultValue={primary.name} maxLength={120} onBlur={e => { if (e.target.value.trim() && e.target.value !== primary.name) patch(primary.id, { name: e.target.value.trim() }); }} /></label>
           {(["position", "rotation", "scale", "dimensions"] as const).filter(property => property !== "dimensions" || (primary.kind !== "group" && !primary.kind.endsWith("Light"))).map(property => <section key={property}><h3>{property === "rotation" ? "Rotation · degrees" : property === "dimensions" ? "Dimensions · meters" : property}</h3><div className="scene-number-grid">{["X", "Y", "Z"].map((axis, index) => <NumberField key={axis} label={`${property} ${axis}`} value={primary[property][index] * (property === "rotation" ? 180 / Math.PI : 1)} min={property === "scale" || property === "dimensions" ? .001 : -10000} max={property === "scale" || property === "dimensions" ? 1000 : 10000} onChange={value => { const next = [...primary[property]] as Vec3; next[index] = value * (property === "rotation" ? Math.PI / 180 : 1); patch(primary.id, { [property]: next }); }} />)}</div></section>)}
-          {!primary.kind.endsWith("Light") && <section><h3>Physical material</h3><select aria-label="Material preset" defaultValue="" key={primary.id} onChange={e => { if (MATERIALS[e.target.value]) patch(primary.id, { material: { ...MATERIALS[e.target.value] } }); }}><option value="">Choose preset</option>{Object.keys(MATERIALS).map(m => <option key={m}>{m}</option>)}</select><label className="scene-color">Base color <input type="color" aria-label="Base color" value={primary.material.color} onChange={e => patch(primary.id, { material: { ...primary.material, color: e.target.value } })} /></label>{(["roughness", "metalness", "opacity", "transmission"] as const).map(key => <NumberField key={key} label={key} value={primary.material[key]} min={0} max={1} onChange={value => patch(primary.id, { material: { ...primary.material, [key]: value } })} />)}
+          {!primary.kind.endsWith("Light") && <section><h3>Physical material</h3><select aria-label="Material preset" defaultValue="" key={primary.id} onChange={e => { if (MATERIALS[e.target.value]) patch(primary.id, { material: { ...MATERIALS[e.target.value] } }); }}><option value="">Choose preset</option>{Object.keys(MATERIALS).map(m => <option key={m}>{m}</option>)}</select><SceneColorField label="Base color" value={primary.material.color} opacity={primary.material.opacity} onChange={color => patch(primary.id, { material: { ...primary.material, color } })} onOpacity={opacity => patch(primary.id, { material: { ...primary.material, opacity } })} />{(["roughness", "metalness", "opacity", "transmission"] as const).map(key => <NumberField key={key} label={key} value={primary.material[key]} min={0} max={1} onChange={value => patch(primary.id, { material: { ...primary.material, [key]: value } })} />)}
             <select aria-label="Texture map slot" value={textureSlot} onChange={e => setTextureSlot(e.target.value)}>{["map", "normalMap", "roughnessMap", "metalnessMap", "aoMap"].map(slot => <option key={slot}>{slot}</option>)}</select><button onClick={() => texture.current?.click()}>Upload texture</button><NumberField label="UV repeat" min={.01} max={1000} value={primary.material.uvScale?.[0] ?? 1} onChange={value => patch(primary.id, { material: { ...primary.material, uvScale: [value, value] } })} /></section>}
-          {primary.kind.endsWith("Light") && <label className="scene-color">Light color <input type="color" aria-label="Light color" value={primary.material.color} onChange={e => patch(primary.id, { material: { ...primary.material, color: e.target.value } })} /></label>}
+          {primary.kind.endsWith("Light") && <SceneColorField label="Light color" value={primary.material.color} onChange={color => patch(primary.id, { material: { ...primary.material, color } })} />}
           {primary.kind.endsWith("Light") && <NumberField label="Light intensity · candela" value={primary.intensity ?? 50} min={0} max={10000} onChange={intensity => patch(primary.id, { intensity })} />}
         </> : <p className="scene-muted">Select an object in the viewport or hierarchy to edit it.</p>}
       </fieldset>
