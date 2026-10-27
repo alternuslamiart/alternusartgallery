@@ -52,6 +52,12 @@ async function run(){
   // Top-left Profile & Settings buttons and bottom-centered AI Chat.
   assert.equal(await evaluate(`Boolean(document.querySelector('.sketch-top-left-bar [aria-label="Your profile"]'))`),true,'Top-left Profile button visible');
   assert.equal(await evaluate(`Boolean(document.querySelector('.sketch-top-left-bar [aria-label="Studio settings"]'))`),true,'Top-left Settings button visible');
+  await click('Your profile');
+  assert.equal(await evaluate(`Boolean(document.querySelector('[role="menu"][aria-label="Profile menu"]'))`),true,'Profile menu opened');
+  for(const label of ['Open profile','Upgrade plan','Appearance mode','Billing and subscription','Open studio settings','Log out'])assert.equal(await evaluate(`Boolean(document.querySelector('[aria-label="${label}"]'))`),true,`Profile menu item ${label}`);
+  await click('Open studio settings');
+  assert.equal(await evaluate(`Boolean(document.querySelector('[role="dialog"][aria-label="Casynus AI Studio settings"]'))`),true,'Casynus AI Studio settings frame opened');
+  await click('Close studio settings');
   await click('Show AI chat');
   assert.equal(await evaluate(`Boolean(document.querySelector('.studio-ai-floating-floorplan.studio-ai-panel'))`),true,'Bottom AI Chat panel opened');
   assert.equal(await evaluate(`Boolean(document.querySelector('.interior-scene-sidebar'))`),false,'No permanent sidebar introduced by AI Chat');

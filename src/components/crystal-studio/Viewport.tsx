@@ -523,7 +523,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
   const setSettings = (patch: Partial<FloorPlanSettings>) =>
     p.onFloorPlanSettingsChange?.({ ...settings, ...patch });
   const chatBeforePencil=useRef(true);
-  const sketch=useSketchEditor({doc:p.sketch??emptySketch,onChange:next=>p.onSketchChange?.(next),undo:()=>p.onSketchUndo?.(),redo:()=>p.onSketchRedo?.(),canUndo:Boolean(p.sketchCanUndo),canRedo:Boolean(p.sketchCanRedo),worldRef,objects:sourceObjects,settings,view,setView,project:p.sketchProject,onExport:p.onFloorExport,onActivate:()=>p.onSelectFloorPlanObject?.(null),onOpenFile:p.onOpenFloorFile,onActiveChange:active=>{p.onPencilModeChange?.(active);if(active){chatBeforePencil.current=chat;setChat(false);}else setChat(chatBeforePencil.current);}});
+  const sketch=useSketchEditor({doc:p.sketch??emptySketch,onChange:next=>p.onSketchChange?.(next),undo:()=>p.onSketchUndo?.(),redo:()=>p.onSketchRedo?.(),canUndo:Boolean(p.sketchCanUndo),canRedo:Boolean(p.sketchCanRedo),worldRef,objects:sourceObjects,settings,onSettingsChange:setSettings,aiModel,onAiModelChange:setAiModel,onOpenPricing:p.onOpenPricing,view,setView,project:p.sketchProject,onExport:p.onFloorExport,onActivate:()=>p.onSelectFloorPlanObject?.(null),onOpenFile:p.onOpenFloorFile,onActiveChange:active=>{p.onPencilModeChange?.(active);if(active){chatBeforePencil.current=chat;setChat(false);}else setChat(chatBeforePencil.current);}});
   const fitRef=useRef(sketch.fit);fitRef.current=sketch.fit;
   const fittedProject=useRef('');
   useEffect(()=>{if(size.width&&p.sketchProject?.ready&&p.sketchProject.id!==fittedProject.current){fittedProject.current=p.sketchProject.id;fitRef.current();}},[size.width,p.sketchProject?.ready,p.sketchProject?.id]);

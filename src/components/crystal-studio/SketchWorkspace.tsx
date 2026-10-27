@@ -4,12 +4,13 @@ import {Pencil,Paintbrush,Eraser,MousePointer2,Type,PaintBucket,ZoomIn,Minus,Rec
 import {createSketch,sketchSvg,hitSketchItem,translateItem,itemBounds,inPolygon,floodRegion,hexToHsv,hsvToHex,type SketchDocument,type SketchItem,type SketchKind,type SketchLayer,type SketchPoint} from '@/lib/sketch.mjs';
 import {rasterSketch,sketchSheetSvg} from './sketch-export';
 import type {FloorPlanObject,FloorPlanSettings} from './types';
+import {StudioProfileMenu,StudioSettingsFrame} from './StudioSidebarFooter';
 import './sketch.css';
 type Tool=SketchKind|'select'|'lasso'|'picker'|'zoom';
 type View={zoom:number;panX:number;panY:number};
 type Preset='A4'|'A3'|'Square'|'Custom';
 type Projects={ready:boolean;id:string;status:string;error:string;projects:{id:string;name:string}[];save:()=>Promise<string>;open:(id:string)=>Promise<void>;create:(copy?:boolean)=>void;reload:()=>Promise<void>};
-type Props={doc:SketchDocument;onChange:(doc:SketchDocument)=>void;undo:()=>void;redo:()=>void;canUndo:boolean;canRedo:boolean;worldRef:RefObject<SVGGElement>;objects:FloorPlanObject[];settings:FloorPlanSettings;view:View;setView:(view:View|((view:View)=>View))=>void;project?:Projects;onExport?:(format:string)=>void;onActivate?:()=>void;onActiveChange?:(active:boolean)=>void;onOpenFile?:()=>void};
+type Props={doc:SketchDocument;onChange:(doc:SketchDocument)=>void;undo:()=>void;redo:()=>void;canUndo:boolean;canRedo:boolean;worldRef:RefObject<SVGGElement>;objects:FloorPlanObject[];settings:FloorPlanSettings;onSettingsChange?:(patch:Partial<FloorPlanSettings>)=>void;aiModel?:string;onAiModelChange?:(model:string)=>void;onOpenPricing?:()=>void;view:View;setView:(view:View|((view:View)=>View))=>void;project?:Projects;onExport?:(format:string)=>void;onActivate?:()=>void;onActiveChange?:(active:boolean)=>void;onOpenFile?:()=>void};
 type Gesture={pointerId:number;start:SketchPoint;moved?:boolean;item?:SketchItem;move?:{ids:string[];original:SketchDocument};lasso?:SketchPoint[]};
 const topTools:[Tool,string,LucideIcon][]=[
   ['select','Select / Move sketch',MousePointer2],['pencil','Pencil',Pencil],['brush','Brush',Paintbrush],['eraser','Eraser',Eraser],
@@ -19,7 +20,7 @@ const topTools:[Tool,string,LucideIcon][]=[
 const presets:Record<Exclude<Preset,'Custom'>,[number,number]>={A4:[11.9,8.4],A3:[16.8,11.9],Square:[10,10]};
 const colors=['#141414','#ffffff','#ff6b6b','#f59e0b','#facc15','#22c55e','#06b6d4','#4284ff','#a855f7','#ec4899'];
 export function useSketchEditor(p:Props){
-  const [active,setActiveState]=useState(false),[tool,setTool]=useState<Tool>('pencil'),[color,setColor]=useState('#141414'),[width,setWidth]=useState(3),[opacity,setOpacity]=useState(1),[colorOpen,setColorOpen]=useState(false),[layersOpen,setLayersOpen]=useState(false),[controlsOpen,setControlsOpen]=useState(false),[projectsOpen,setProjectsOpen]=useState(false),[exportOpen,setExportOpen]=useState(false),[canvasDialogOpen,setCanvasDialogOpen]=useState(false),[preset,setPreset]=useState<Preset>('A4'),[orientation,setOrientation]=useState<'landscape'|'portrait'>('landscape'),[draftWidth,setDraftWidth]=useState(11.9),[draftHeight,setDraftHeight]=useState(8.4),[draftBg,setDraftBg]=useState('#ffffff'),[grid,setGrid]=useState(true),[rotation,setRotation]=useState(0),[snap,setSnap]=useState(false),[selected,setSelected]=useState<string[]>([]),[preview,setPreview]=useState<SketchDocument|null>(null),[message,setMessage]=useState(''),[fillBusy,setFillBusy]=useState(false),[offsets,setOffsets]=useState({left:12,right:12,bottom:160});
+  const [active,setActiveState]=useState(false),[tool,setTool]=useState<Tool>('pencil'),[color,setColor]=useState('#141414'),[width,setWidth]=useState(3),[opacity,setOpacity]=useState(1),[colorOpen,setColorOpen]=useState(false),[layersOpen,setLayersOpen]=useState(false),[controlsOpen,setControlsOpen]=useState(false),[projectsOpen,setProjectsOpen]=useState(false),[exportOpen,setExportOpen]=useState(false),[canvasDialogOpen,setCanvasDialogOpen]=useState(false),[profileOpen,setProfileOpen]=useState(false),[studioSettingsOpen,setStudioSettingsOpen]=useState(false),[preset,setPreset]=useState<Preset>('A4'),[orientation,setOrientation]=useState<'landscape'|'portrait'>('landscape'),[draftWidth,setDraftWidth]=useState(11.9),[draftHeight,setDraftHeight]=useState(8.4),[draftBg,setDraftBg]=useState('#ffffff'),[grid,setGrid]=useState(true),[rotation,setRotation]=useState(0),[snap,setSnap]=useState(false),[selected,setSelected]=useState<string[]>([]),[preview,setPreview]=useState<SketchDocument|null>(null),[message,setMessage]=useState(''),[fillBusy,setFillBusy]=useState(false),[offsets,setOffsets]=useState({left:12,right:12,bottom:160});
   const gesture=useRef<Gesture|null>(null),frame=useRef(0),previewRef=useRef<SketchDocument|null>(null),current=useRef(p);current.current=p;
   const setActive=(next:boolean|((prev:boolean)=>boolean))=>{setActiveState(prev=>{const resolved=typeof next==='function'?next(prev):next;if(resolved!==prev)current.current.onActiveChange?.(resolved);return resolved;});};
   const doc=p.doc,layer=doc.layers.find(l=>l.id===doc.activeLayerId)!,sheet=doc.sheet;
@@ -124,14 +125,16 @@ export function useSketchEditor(p:Props){
   const changeLayer=(next:SketchLayer[])=>{commit({...doc,layers:next,activeLayerId:next.some(l=>l.id===layer.id)?layer.id:next.at(-1)!.id});setSelected([]);};
   const shiftLayer=(direction:number)=>{const index=doc.layers.indexOf(layer),next=[...doc.layers],target=index+direction;if(target<0||target>=next.length)return;[next[index],next[target]]=[next[target],next[index]];changeLayer(next);};
   const selectedItem=layer.items.find(item=>selected.includes(item.id));
-  const exitPencilMode=()=>{cancel();setCanvasDialogOpen(false);setExportOpen(false);setProjectsOpen(false);setActive(false);};
+  const exitPencilMode=()=>{cancel();setCanvasDialogOpen(false);setExportOpen(false);setProjectsOpen(false);setProfileOpen(false);setStudioSettingsOpen(false);setActive(false);};
   const panels=<div className={`sketch-ui ${active?'is-pencil-studio':'is-cad-studio'}`} style={{left:offsets.left,right:offsets.right,bottom:offsets.bottom}}>
     <div className="sketch-project-strip sr-only" role="status">{p.project?.status||'Sketch Studio'}</div>
     {active&&<>
       <div role="toolbar" aria-label="Profile and settings" className="sketch-top-left-bar">
-        {toolButton('profile','Your profile',CircleUserRound,false,()=>window.open('/account','_blank','noopener,noreferrer'))}
-        {toolButton('settings','Studio settings',Settings,controlsOpen||canvasDialogOpen,()=>{if(hasCanvas)setControlsOpen(v=>!v);else openCanvasSetup();})}
+        {toolButton('profile','Your profile',CircleUserRound,profileOpen,()=>{setProfileOpen(v=>!v);setStudioSettingsOpen(false);})}
+        {toolButton('settings','Studio settings',Settings,studioSettingsOpen,()=>{setStudioSettingsOpen(v=>!v);setProfileOpen(false);})}
       </div>
+      <StudioProfileMenu open={profileOpen} placement="top-left" onClose={()=>setProfileOpen(false)} onOpenSettings={()=>{setProfileOpen(false);setStudioSettingsOpen(true);}} onOpenUpgrade={p.onOpenPricing?()=>{setProfileOpen(false);p.onOpenPricing?.();}:undefined}/>
+      <StudioSettingsFrame open={studioSettingsOpen} placement="top-left" onClose={()=>setStudioSettingsOpen(false)} aiModel={p.aiModel} onAiModelChange={p.onAiModelChange} grid={grid} onGridChange={setGrid} snap={snap} onSnapChange={next=>{setSnap(next);p.onSettingsChange?.({snapToGrid:next,snapToPoints:next});}} unit={p.settings.unit} onUnitChange={unit=>p.onSettingsChange?.({unit})} scale={p.settings.scale} onScaleChange={scale=>p.onSettingsChange?.({scale})} onOpenCanvasSetup={openCanvasSetup} onSaveProject={()=>attempt(()=>p.project?.save())} projectStatus={p.project?.status}/>
       <div role="toolbar" aria-label="Sketch drawing tools" className="sketch-top-toolbar sketch-primary">
         {toolButton('exit','Exit Pencil mode',ArrowLeft,false,exitPencilMode)}
         <i className="sketch-toolbar-divider" aria-hidden="true"/>

@@ -81,8 +81,8 @@ async function run() {
   }
   await send('Page.navigate',{url:baseUrl+'/interior'});await ready('.floor-plan-canvas svg');await wait(500);await click('Texture material library');await ready('.cs-material-tile');assert.equal(await evaluate('document.querySelector(".cs-material-tile").disabled'),true);assert.equal(await evaluate('document.querySelector(".cs-material-notice").getAttribute("href")'),'/interior?workspace=3d');
   const before=await footer();await evaluate(`document.querySelector('.interior-scene-hierarchy').scrollTop=10000`);assert.deepEqual(await footer(),before);
-  await click('Studio settings');assert.ok(await evaluate('Boolean(document.querySelector(".interior-scene-inspector"))'));
-  await evaluate('window.open=(url)=>{window.__profileURL=url;return null}');await click('Your profile');assert.equal(await evaluate('window.__profileURL'),'/account');
+  await click('Studio settings');assert.ok(await evaluate('Boolean(document.querySelector(".interior-scene-inspector"))'));assert.ok(await evaluate('Boolean(document.querySelector(\'[role="dialog"][aria-label="Casynus AI Studio settings"]\'))'));
+  await evaluate('window.open=(url)=>{window.__profileURL=url;return null}');await click('Your profile');await click('Open profile');assert.equal(await evaluate('window.__profileURL'),'/account');
   await send('Emulation.setDeviceMetricsOverride',{width:390,height:900,deviceScaleFactor:1,mobile:true});await wait(100);await evaluate(`[...document.querySelectorAll('.crystal-mobile-workspace-tabs button')].find(b=>b.textContent==='Interior').click()`);await wait(100);assert.equal(await evaluate('document.documentElement.scrollWidth>innerWidth'),false);
   console.log('PASS Interior browse/footer/profile and mobile bounds');assert.equal(errors.length,0,JSON.stringify(errors));console.log('Artifacts',out);await send('Browser.close');
 }
