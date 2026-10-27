@@ -3,10 +3,10 @@ import {floorPlanSvg,floorPlanPaper} from './floor-plan-export';
 import {sketchSvg,type SketchDocument} from '@/lib/sketch.mjs';
 
 export function sketchSheetSvg(objects:FloorPlanObject[],settings:FloorPlanSettings,sketch:SketchDocument){
-  const cad=floorPlanSvg(objects,settings),paper=floorPlanPaper(objects,settings),s=sketch.sheet,k=paper.scale/1000;
+  const cad=floorPlanSvg(objects,settings),paper=floorPlanPaper(objects,settings),s=sketch.sheet,k=paper.scale/1000,bg=s.background||'#ffffff';
   // Invert the established CAD sheet transform into the common meter coordinates.
   const content=cad.slice(cad.indexOf('>')+1,cad.lastIndexOf('</svg>')).replace(/<rect width="100%" height="100%"[^>]*\/>/,'').replace(/<text x="[^"]*" y="[^"]*" style="text-anchor:end;font-size:2.5px">Fit to page[^<]*<\/text>/,'');
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${s.width*1000/settings.scale}mm" height="${s.height*1000/settings.scale}mm" viewBox="${s.x} ${s.y} ${s.width} ${s.height}"><rect x="${s.x}" y="${s.y}" width="${s.width}" height="${s.height}" fill="white"/><g transform="translate(${paper.bounds.minX-paper.offsetX*k} ${paper.bounds.minY-paper.offsetY*k}) scale(${k})">${content}</g><g style="isolation:isolate">${sketchSvg(sketch,'export')}</g></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${s.width*1000/settings.scale}mm" height="${s.height*1000/settings.scale}mm" viewBox="${s.x} ${s.y} ${s.width} ${s.height}"><rect x="${s.x}" y="${s.y}" width="${s.width}" height="${s.height}" fill="${bg}"/><g transform="translate(${paper.bounds.minX-paper.offsetX*k} ${paper.bounds.minY-paper.offsetY*k}) scale(${k})">${content}</g><g style="isolation:isolate">${sketchSvg(sketch,'export')}</g></svg>`;
 }
 export async function rasterSketch(svg:string,width:number,height:number){
   const image=new Image(),url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));

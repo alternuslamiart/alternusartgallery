@@ -2,17 +2,21 @@
 
 - Sketch Studio (`/interior`) renames the user-facing Interior label to Sketch
   while keeping `/interior`, `/interior?workspace=3d`, CAD floor-plan objects,
-  Scene hierarchy and the Properties inspector intact. `SketchWorkspace.tsx` and
-  `src/lib/sketch.mjs` add a `#404040` workspace around a separate customizable
-  white sheet with an independent multi-layer SVG drawing overlay above CAD
-  geometry, 54×54px (40×40px inner surface) left floating tool frames, HSV/HEX
-  color picker, chronological SVG mask erasing, scanline flood fill, layer
-  blend/opacity/locking and bottom-right navigation. `useSketchProject.ts` and
-  `/api/sketch-projects` persist versioned CAD+sketch documents in
-  `BlenderProject.settings` (`kind: "casynus-sketch"`) with revision checks,
-  JSONB key-order-independent reconciliation (`sketch-project.mjs`) and per-user
-  `localStorage` recovery. `sketch-export.ts` exports combined CAD and visible
-  sketch layers to PNG, SVG, PDF and editable JSON Scene.
+  Scene hierarchy and the Properties inspector intact when Pencil mode is
+  inactive. Clicking the top-toolbar Pencil button enters a dedicated,
+  sidebar-free Pencil Studio (`SketchWorkspace.tsx`, `src/lib/sketch.mjs`) with a
+  `#404040` workspace, an initial `New Canvas` dialog (`sheet.created`,
+  `sheet.background`, A4/A3/Square presets, Portrait/Landscape orientation), a
+  horizontal top toolbar of 54×54px (40×40px inner surface) tool frames, a
+  right-side dock for expandable Brush/Opacity/Color/Layers panels, a 54×256px
+  bottom-left AI Chat toggle (`.pencil-studio-ai`) connected to `StudioAIChat`,
+  chronological SVG mask erasing, scanline flood fill and bottom-right canvas
+  navigation. `useSketchProject.ts` and `/api/sketch-projects` persist versioned
+  CAD+sketch documents in `BlenderProject.settings` (`kind: "casynus-sketch"`)
+  with revision checks, JSONB key-order-independent reconciliation
+  (`sketch-project.mjs`) and per-user `localStorage` recovery. `sketch-export.ts`
+  exports combined CAD and visible sketch layers to PNG, SVG, PDF and editable
+  JSON Scene.
 
 - `/aichat` stores pinned/unread/project association on AssistantConversation;
   apply `prisma/ai-chat-sidebar.sql` before deploying the regenerated Prisma

@@ -3,10 +3,11 @@ export type SketchKind='pencil'|'brush'|'eraser'|'highlighter'|'line'|'rectangle
 export type SketchRun={x:number;y:number;width:number;height:number};
 export type SketchItem={id:string;kind:SketchKind;points:SketchPoint[];color:string;width:number;opacity:number;text?:string;runs?:SketchRun[]};
 export type SketchLayer={id:string;name:string;visible:boolean;locked:boolean;opacity:number;blend:'normal'|'multiply'|'screen'|'overlay'|'darken'|'lighten';items:SketchItem[]};
-export type SketchDocument={version:1;sheet:{x:number;y:number;width:number;height:number};activeLayerId:string;layers:SketchLayer[]};
+export type SketchSheet={x:number;y:number;width:number;height:number;background?:string;created?:boolean};
+export type SketchDocument={version:1;sheet:SketchSheet;activeLayerId:string;layers:SketchLayer[]};
 export type SketchHistory={past:SketchDocument[];present:SketchDocument;future:SketchDocument[]};
 export const MAX_SKETCH_BYTES:number;
-export function createSketch():SketchDocument;
+export function createSketch(created?:boolean):SketchDocument;
 export function normalizeSketch(doc:SketchDocument):SketchDocument;
 export function validateSketch(doc:unknown):SketchDocument;
 export function sketchHistory(state:SketchHistory,action:{type:'undo'|'redo'}|{type:'replace'|'commit';next:SketchDocument}):SketchHistory;

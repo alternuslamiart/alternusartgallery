@@ -8,10 +8,12 @@ requirements provide new evidence.
 
 - [x] Rename Interior Studio to Sketch Studio across navigation, headers and AI
   chat while preserving `/interior`, 2D CAD drafting, 3D workspace and projects.
-- [x] Add Sketch Drawing & Paint over the 2D floor plan with a `#404040`
-  workspace, separate white sheet, 54×54px (40×40px inner) floating toolbars,
-  freehand/paint/shape/fill/eraser tools, HSV color picker, layers, bottom-right
-  navigation, `/api/sketch-projects` persistence and PNG/SVG/PDF/JSON exports.
+- [x] Add a dedicated sidebar-free Pencil Drawing Studio inside Sketch Studio
+  with a `#404040` workspace, initial `New Canvas` setup dialog (A4/A3/Square,
+  Portrait/Landscape, background color), top 54×54px (40×40px inner) horizontal
+  toolbar, right-side expandable Brush/Opacity/Color/Layers panels, 54×256px
+  bottom-left AI Chat button, `/api/sketch-projects` persistence and
+  PNG/SVG/PDF/JSON exports while preserving CAD floor-plan drafting when inactive.
 - [ ] Verify Sketch Studio persistence and exports on the production deployment
   after Vercel build completion.
 

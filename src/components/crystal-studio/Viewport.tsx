@@ -70,6 +70,8 @@ type Props = {
   sketchCanRedo?:boolean;
   sketchProject?:ReturnType<typeof useSketchProject>;
   onFloorExport?:(format:string)=>void;
+  onPencilModeChange?:(active:boolean)=>void;
+  onOpenFloorFile?:()=>void;
   onStudioAction?:(action:StudioAction,signal:AbortSignal)=>Promise<string>;
   actionScope?:string;
   renderer: string;
@@ -461,7 +463,7 @@ const MODELING_QUICK_PROMPTS = [
   { label: "Move +2m X", prompt: "move right 2" },
 ];
 
-function FloorPlanViewport({ p }: { p: Props; isMobile: boolean }) {
+function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
   const sourceObjects = floorInitialObjects(p.floorPlanObjects);
   const [moving, setMoving] = useState<{ original: FloorPlanObject; start: FloorPlanPoint; preview: FloorPlanObject } | null>(null);
   const objects = moving && moving.preview !== moving.original ? sourceObjects.map(object => object.id === moving.original.id ? moving.preview : object) : sourceObjects;
@@ -520,7 +522,8 @@ function FloorPlanViewport({ p }: { p: Props; isMobile: boolean }) {
   };
   const setSettings = (patch: Partial<FloorPlanSettings>) =>
     p.onFloorPlanSettingsChange?.({ ...settings, ...patch });
-  const sketch=useSketchEditor({doc:p.sketch??emptySketch,onChange:next=>p.onSketchChange?.(next),undo:()=>p.onSketchUndo?.(),redo:()=>p.onSketchRedo?.(),canUndo:Boolean(p.sketchCanUndo),canRedo:Boolean(p.sketchCanRedo),worldRef,objects:sourceObjects,settings,view,setView,project:p.sketchProject,onExport:p.onFloorExport,onActivate:()=>p.onSelectFloorPlanObject?.(null)});
+  const chatBeforePencil=useRef(true);
+  const sketch=useSketchEditor({doc:p.sketch??emptySketch,onChange:next=>p.onSketchChange?.(next),undo:()=>p.onSketchUndo?.(),redo:()=>p.onSketchRedo?.(),canUndo:Boolean(p.sketchCanUndo),canRedo:Boolean(p.sketchCanRedo),worldRef,objects:sourceObjects,settings,view,setView,project:p.sketchProject,onExport:p.onFloorExport,onActivate:()=>p.onSelectFloorPlanObject?.(null),onOpenFile:p.onOpenFloorFile,onActiveChange:active=>{p.onPencilModeChange?.(active);if(active){chatBeforePencil.current=chat;setChat(false);}else setChat(chatBeforePencil.current);}});
   const fitRef=useRef(sketch.fit);fitRef.current=sketch.fit;
   const fittedProject=useRef('');
   useEffect(()=>{if(size.width&&p.sketchProject?.ready&&p.sketchProject.id!==fittedProject.current){fittedProject.current=p.sketchProject.id;fitRef.current();}},[size.width,p.sketchProject?.ready,p.sketchProject?.id]);
@@ -951,7 +954,7 @@ function FloorPlanViewport({ p }: { p: Props; isMobile: boolean }) {
 
   return (
     <section
-      className="floor-plan-canvas sketch-workspace relative min-h-0 overflow-hidden bg-[var(--studio-bg-elevated)] text-[var(--studio-text-secondary)]"
+      className={`floor-plan-canvas sketch-workspace ${sketch.active ? "is-pencil-mode" : ""} relative min-h-0 overflow-hidden bg-[var(--studio-bg-elevated)] text-[var(--studio-text-secondary)]`}
       aria-label="2D Floor Plan Drafting Workspace"
     >
       <div
@@ -1035,7 +1038,8 @@ function FloorPlanViewport({ p }: { p: Props; isMobile: boolean }) {
             />
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill="#404040" />
+        <rect width="100%" height="100%" fill={sketch.active ? "#404040" : "var(--studio-draft-paper)"} />
+        {!sketch.active && !isMobile && <rect width="100%" height="100%" fill="url(#floor-dots)" />}
         <defs><clipPath id="sketch-sheet-clip"><rect {...(p.sketch??emptySketch).sheet}/></clipPath><pattern id="sketch-world-grid" width={settings.gridStepMm/1000} height={settings.gridStepMm/1000} patternUnits="userSpaceOnUse"><circle cx="0" cy="0" r={.8/view.zoom} fill="#888" opacity=".5"/></pattern></defs>
         <g
           ref={worldRef}
@@ -1043,9 +1047,9 @@ function FloorPlanViewport({ p }: { p: Props; isMobile: boolean }) {
             size.height / 2 + view.panY
           }) rotate(${sketch.rotation}) scale(${view.zoom})`}
         >
-          <rect {...(p.sketch??emptySketch).sheet} fill="white"/>
-          {sketch.grid&&<rect {...(p.sketch??emptySketch).sheet} fill="url(#sketch-world-grid)" pointerEvents="none"/>}
-          <g clipPath="url(#sketch-sheet-clip)">
+          {sketch.active&&sketch.hasCanvas&&<rect data-sketch-sheet="true" {...(p.sketch??emptySketch).sheet} fill={(p.sketch??emptySketch).sheet.background||'#ffffff'}/>}
+          {sketch.active&&sketch.hasCanvas&&sketch.grid&&<rect {...(p.sketch??emptySketch).sheet} fill="url(#sketch-world-grid)" pointerEvents="none"/>}
+          {(!sketch.active||sketch.hasCanvas)&&<g clipPath={sketch.active?"url(#sketch-sheet-clip)":undefined}>
           {objects
             .filter((object) => object.type === "room")
             .map((room) => (
@@ -1269,12 +1273,12 @@ function FloorPlanViewport({ p }: { p: Props; isMobile: boolean }) {
             </>
           )}
           {sketch.overlay}
-          </g>
+          </g>}
         </g>
       </svg>
       {sketch.panels}
 
-      <StudioViewportToolbar label="Architectural drafting tools"
+      {!sketch.active&&<StudioViewportToolbar label="Architectural drafting tools"
         apiRef={toolbarAPI}
         leading={[{label:'Sketch Drawing & Paint',icon:Pencil,onClick:sketch.toggle,active:sketch.active,frame:true},{ label: "Add room to floor plan", icon: SquareDashed, onClick:()=>{sketch.deactivate();addDefaultRoom();} }]}
         tools={tools.map(([id, label, shortcut, icon]) => ({
@@ -1285,11 +1289,11 @@ function FloorPlanViewport({ p }: { p: Props; isMobile: boolean }) {
         cameraViews={["Top 2D Drafting"]} cameraView="Top 2D Drafting" onCamera={() => setView({ zoom: 72, panX: 0, panY: 0 })}
         onZoom={factor => setView(current => ({ ...current, zoom: Math.max(24, Math.min(180, current.zoom * factor)) }))}
         exportFormats={["PNG","SVG","PDF","JSON Scene","JPEG"]} onExport={format=>p.onFloorExport?.(format)} onCSV={() => downloadStudioCSV("Floor_plan", objects.map(o => ({ ...o })))}
-        settingsLabel="Toggle grid snapping" onSettings={() => setSettings({ snapToGrid: !settings.snapToGrid })} />
+        settingsLabel="Toggle grid snapping" onSettings={() => setSettings({ snapToGrid: !settings.snapToGrid })} />}
 
       {/* Top Drafting Status HUD */}
-      {placementMessage && <div role="alert" className="absolute left-1/2 top-20 z-10 -translate-x-1/2 rounded-lg bg-[var(--studio-bg-panel)] px-3 py-2 text-xs">{placementMessage}</div>}
-      <div className="floor-plan-hud-bar" role="status">
+      {!sketch.active&&placementMessage && <div role="alert" className="absolute left-1/2 top-20 z-10 -translate-x-1/2 rounded-lg bg-[var(--studio-bg-panel)] px-3 py-2 text-xs">{placementMessage}</div>}
+      {!sketch.active&&<div className="floor-plan-hud-bar" role="status">
         <span className="floor-plan-hud-badge">2D CAD</span>
         <span>Top view</span>
         <i />
@@ -1317,7 +1321,7 @@ function FloorPlanViewport({ p }: { p: Props; isMobile: boolean }) {
         >
           Ortho 90°
         </button>
-      </div>
+      </div>}
 
       {/* Unified Studio AI Chat at Bottom of Workspace */}
       <StudioAIChat
@@ -1342,12 +1346,12 @@ function FloorPlanViewport({ p }: { p: Props; isMobile: boolean }) {
         quickPrompts={FLOOR_PLAN_QUICK_PROMPTS}
         placeholder="What do you want to create?"
         statusLabel={`1:${settings.scale} · ${settings.unit}`}
-        className="studio-ai-floating-floorplan"
+        className={`studio-ai-floating-floorplan ${sketch.active ? "pencil-studio-ai" : ""}`}
       />
 
-      <div className="floor-plan-shortcuts-hint pointer-events-none">
+      {!sketch.active&&<div className="floor-plan-shortcuts-hint pointer-events-none">
         Drag to move · W wall · D door · N window · Arrows nudge · Shift-drag pan · Ctrl+Z undo · Esc cancel
-      </div>
+      </div>}
     </section>
   );
 }

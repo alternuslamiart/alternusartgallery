@@ -5,10 +5,10 @@ const number = n => typeof n === 'number' && Number.isFinite(n) && Math.abs(n) <
 const unit = n => number(n) && n >= 0 && n <= 1;
 const color = c => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c);
 const id = s => typeof s === 'string' && /^[a-zA-Z0-9_-]{1,100}$/.test(s);
-export function createSketch() { return {version:1,sheet:{x:-1,y:-1,width:10,height:8},activeLayerId:'layer-1',layers:[{id:'layer-1',name:'Sketch 1',visible:true,locked:false,opacity:1,blend:'normal',items:[]}]}; }
+export function createSketch(created = false) { return {version:1,sheet:{x:-1,y:-1,width:10,height:8,background:'#ffffff',created:Boolean(created)},activeLayerId:'layer-1',layers:[{id:'layer-1',name:'Sketch 1',visible:true,locked:false,opacity:1,blend:'normal',items:[]}]}; }
 export function normalizeSketch(doc){validateSketch(doc);return JSON.parse(JSON.stringify(doc,(_key,value)=>typeof value==='number'?Number(value.toFixed(8)):value));}
 export function validateSketch(doc) {
-  if (!doc || doc.version !== 1 || !doc.sheet || ![doc.sheet.x,doc.sheet.y,doc.sheet.width,doc.sheet.height].every(n=>typeof n==='number'&&Number.isFinite(n)&&Math.abs(n)<=50000) || doc.sheet.width<.1 || doc.sheet.height<.1 || !Array.isArray(doc.layers) || !doc.layers.length || doc.layers.length>32) throw Error('Invalid sketch canvas or layers.');
+  if (!doc || doc.version !== 1 || !doc.sheet || ![doc.sheet.x,doc.sheet.y,doc.sheet.width,doc.sheet.height].every(n=>typeof n==='number'&&Number.isFinite(n)&&Math.abs(n)<=50000) || doc.sheet.width<.1 || doc.sheet.height<.1 || (doc.sheet.background!==undefined&&!color(doc.sheet.background)) || (doc.sheet.created!==undefined&&typeof doc.sheet.created!=='boolean') || !Array.isArray(doc.layers) || !doc.layers.length || doc.layers.length>32) throw Error('Invalid sketch canvas or layers.');
   const ids=new Set();let points=0,items=0;
   for(const layer of doc.layers){
     if(!id(layer.id)||ids.has(layer.id)||typeof layer.name!=='string'||!layer.name.trim()||layer.name.length>120||typeof layer.visible!=='boolean'||typeof layer.locked!=='boolean'||!unit(layer.opacity)||!blends.includes(layer.blend)||!Array.isArray(layer.items))throw Error('Invalid sketch layer.');ids.add(layer.id);

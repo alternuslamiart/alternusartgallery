@@ -9,36 +9,46 @@ Last updated: 2026-10-27
   `SceneWorkbench`, `CrystalStudio` and `unified-sidebar` while preserving the
   `/interior` and `/interior?workspace=3d` routes, CAD floor-plan drafting,
   Scene hierarchy, Properties inspector and AI Chat dock.
-- Added the top-toolbar Pencil entry (`Sketch Drawing & Paint`, 54×54px outer /
-  40×40px inner surface) and implemented `SketchWorkspace.tsx`, `sketch.css`,
-  `src/lib/sketch.mjs`, `src/lib/sketch-project.mjs`, `useSketchProject.ts`,
-  `sketch-export.ts` and `/api/sketch-projects`.
-- Changed the Sketch Studio workspace background to `#404040` with a separate
-  customizable white drawing sheet (`sheet.width`/`sheet.height`), left floating
-  54px primary and secondary toolbars (Select/Move, Pencil, Brush, Eraser, Shape
-  tools, Text, Fill/Paint Bucket, Zoom, Line, Rectangle, Ellipse, Color Picker,
-  Highlighter, Freehand Selection), movable/collapsible HSV+HEX floating color
-  picker, right-aligned Layers panel (add, delete, rename, show/hide, lock/unlock,
-  order, opacity, blend modes) and 54px bottom-right canvas navigation (zoom %,
-  slider, reset, 15° rotate, grid toggle, fit, zoom in).
+- Preserved the original architectural floor-plan drafting workspace (`#0f0f0f` /
+  `var(--studio-draft-paper)`, `InteriorSceneSidebar`, `RightPanel`, CAD HUD and
+  shortcuts hint) when Pencil mode is inactive, and implemented a dedicated,
+  sidebar-free Pencil Drawing Studio when the top-toolbar Pencil button
+  (`Sketch Drawing & Paint`, 54×54px outer / 40×40px inner surface) is clicked.
+- Added the `#404040` empty-state screen (`New Canvas` + `Open Existing Project`)
+  when entering Pencil Studio without an existing canvas (`!sheet.created` and no
+  strokes), plus the `Canvas Setup Dialog` (`role="dialog"`, width/height, A4/A3/Square
+  presets, Portrait/Landscape orientation and background color defaulting to
+  `#ffffff`) and `Exit Pencil mode` to return to CAD drafting without losing work.
+- Organized the primary drawing tools in a horizontal top toolbar
+  (`.sketch-top-toolbar` with 54×54px frames and 40×40px hover/active surfaces:
+  Exit Pencil mode, Select/Move, Pencil, Brush, Eraser, Line, Rectangle, Ellipse,
+  Freehand Selection, Color Picker, Fill/Paint Bucket, Highlighter, Text,
+  Undo/Redo, Zoom/Pan, Fit to Canvas, Canvas setup, Save, Projects, Clear and
+  Export), placed expandable secondary panels (Drawing controls, HSV+HEX Color
+  Picker and Layers) in a compact right-side dock (`.sketch-right-dock`) above
+  the 54px bottom-right navigation bar, and styled the bottom-left AI Chat
+  collapsed toggle to exact `54 × 256px` outer dimensions (`.pencil-studio-ai`)
+  that expands the existing floating `StudioAIChat` panel when clicked.
 - Implemented pointer-captured mouse/pen/touch freehand drawing with quadratic
   smoothing, chronological SVG mask erasing, scanline flood-fill regions, stroke
   selection/translation/duplication/deletion, independent drawing undo/redo,
   combined CAD+sketch exports (PNG, SVG, PDF, JSON Scene), per-identity browser
   recovery and authenticated `/api/sketch-projects` workspace persistence with
-  JSONB key-order-safe revision reconciliation.
+  JSONB key-order-safe revision reconciliation and fresh-browser cloud project
+  adoption on login.
 - Verification: all 201 Node tests (`npm test`), standalone TypeScript
   (`npm run typecheck`), focused Next.js lint and production build passed.
   Real installed-Chrome live acceptance (`node scripts/verify-sketch.mjs --live`)
-  passed 54×54px/40×40px toolbar geometry, mouse/pen/touch strokes, brush,
-  rectangle, paint bucket fill, eraser mask, undo/redo, layer CRUD/blend/opacity,
+  passed CAD workspace preservation, sidebar-free Pencil Studio transition,
+  initial `#404040` `New Canvas` dialog (A4/A3/Square, Portrait/Landscape),
+  54×54px/40×40px top toolbar and right dock geometry, 54×256px bottom-left AI
+  Chat toggle expand/collapse, mouse/pen/touch strokes, brush, rectangle, paint
+  bucket fill, eraser mask, undo/redo, layer CRUD/blend/opacity,
   line/ellipse/highlighter/text/lasso/color picker, zoom/pan/15° rotation with
   preserved CAD geometry, real Credentials login, delayed cloud save
   reconciliation, page reload, PNG/SVG/PDF/JSON downloads, logout/login cloud
   restoration, CAD return, light mode and 390px mobile layout (artifacts in
-  `.tmp/sketch-qa-1793132281762/`). Added a 61s pre-logout wait in
-  `scripts/verify-sketch.mjs` to respect the 8-req/60s `/api/auth` middleware
-  rate limit during single-IP local live runs.
+  `.tmp/sketch-qa-1793137975371/`).
 
 ## AI chat sidebar and authenticated chat acceptance (2026-10-27)
 

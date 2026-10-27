@@ -1,11 +1,13 @@
 # Next tasks (reviewed 2026-10-27)
 
 - [x] Rename Interior to Sketch across studio navigation, headers and AI chat;
-  implement Sketch Drawing & Paint (`SketchWorkspace.tsx`, `src/lib/sketch.mjs`,
-  `sketch-export.ts`, `useSketchProject.ts`, `/api/sketch-projects`) with
-  `#404040` workspace, separate white sheet, 54×54px/40×40px left toolbars,
-  HSV color picker, layers panel, bottom-right navigation, CAD+sketch persistence
-  and PNG/SVG/PDF/JSON exports. Verified with unit tests and live Chrome QA.
+  implement the dedicated sidebar-free Pencil Studio (`SketchWorkspace.tsx`,
+  `src/lib/sketch.mjs`, `sketch-export.ts`, `useSketchProject.ts`,
+  `/api/sketch-projects`) with `#404040` workspace, `New Canvas` setup dialog,
+  top 54×54px/40×40px horizontal toolbar, right-side expandable panels, 54×256px
+  bottom-left AI Chat button, CAD+sketch persistence and PNG/SVG/PDF/JSON
+  exports while preserving CAD drafting when inactive. Verified with unit tests
+  and live Chrome QA.
 - [ ] Verify deployed `/interior` Sketch Studio cloud save/reopen and exports in
   production after pushing to `main`.
 

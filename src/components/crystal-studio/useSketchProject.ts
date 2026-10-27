@@ -10,7 +10,7 @@ const hash=canonicalSketch;
 const freshId=()=>`sketch-${crypto.randomUUID()}`;
 const clean=(value:SketchProject):Snapshot=>{
   const sketch=value.sketch?normalizeSketch(value.sketch):createSketch();
-  if(!value.sketch){const b=floorPlanPaper(value.objects,value.settings).bounds,x=Math.min(-1,b.minX-.5),y=Math.min(-1,b.minY-.5);sketch.sheet={x,y,width:Math.max(10,b.maxX+.5-x),height:Math.max(8,b.maxY+.5-y)};}
+  if(!value.sketch){const b=floorPlanPaper(value.objects,value.settings).bounds,x=Math.min(-1,b.minX-.5),y=Math.min(-1,b.minY-.5);sketch.sheet={x,y,width:Math.max(10,b.maxX+.5-x),height:Math.max(8,b.maxY+.5-y),background:'#ffffff',created:false};}
   return{version:1,id:value.id||freshId(),name:value.name,objects:value.objects,settings:value.settings,sketch};
 };
 async function request(path:string,init?:RequestInit){const response=await fetch(path,{cache:'no-store',...init});const body=await response.json();if(!response.ok)throw Object.assign(Error(typeof body.error==='string'?body.error:body.error?.message||'Sketch request failed.'),{status:response.status});return body;}
@@ -66,8 +66,9 @@ export function useSketchProject(identity:string,enabled:boolean,signedIn:boolea
     if(!enabled||identity==='loading')return;loaded.current='';setReady(false);setError('');setProjects([]);safe.current=false;controller.current?.abort();controller.current=new AbortController();let cancelled=false;
     const run=async()=>{
       try{
-        const raw=localStorage.getItem(key),stored=raw?JSON.parse(raw):null,doc=clean(raw?parseFloorPlanRecovery(raw):initial.current);
-        if(cancelled)return;loaded.current=identity;revision.current=Number.isSafeInteger(stored?.revision)&&stored.revision>=0?stored.revision:0;cloudHash.current=typeof stored?.cloudHash==='string'?stored.cloudHash:'';
+        const raw=localStorage.getItem(key),stored=raw?JSON.parse(raw):null;let doc=clean(raw?parseFloorPlanRecovery(raw):initial.current),freshCloud=false;
+        if(!raw&&signedIn){try{const data=await request('/api/sketch-projects',{signal:controller.current?.signal});if(data.projects?.length){doc={...doc,id:data.projects[0].id};freshCloud=true;}}catch{/* Offline fallback uses a fresh local id. */}}
+        if(cancelled)return;loaded.current=identity;revision.current=Number.isSafeInteger(stored?.revision)&&stored.revision>=0?stored.revision:0;cloudHash.current=typeof stored?.cloudHash==='string'?stored.cloudHash:freshCloud?hash(doc):'';
         adopt(doc,revision.current,cloudHash.current);setReady(true);setStatus('Browser recovery restored');
         if(signedIn){try{await verify();if(!cancelled)setStatus('Workspace connected');}catch(caught){if(!cancelled)setError(caught instanceof Error?caught.message:'Cloud read failed.');}}
         if(!cancelled)void list();

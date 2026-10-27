@@ -4,8 +4,9 @@ import { createSketch, normalizeSketch, validateSketch, sketchSvg, sketchPath, f
 import {canonicalSketch,reconcileSketch} from '../src/lib/sketch-project.mjs';
 const item = { id:'stroke', kind:'pencil', points:[{x:0,y:0},{x:1,y:1}], color:'#ff0000', width:.03, opacity:.6 };
 test('sketch documents preserve editable layers and reject corrupt or unsafe payloads', () => {
-  const doc=createSketch();doc.layers[0].items.push(item);assert.deepEqual(validateSketch(JSON.parse(JSON.stringify(doc))),doc);
-  for(const change of [d=>d.layers[0].items[0].color='url(javascript:bad)',d=>d.layers[0].opacity=2,d=>d.sheet.width=-1,d=>d.layers[0].items[0].points[0].x=NaN,d=>d.layers.push({...d.layers[0]})]){const d=structuredClone(doc);change(d);assert.throws(()=>validateSketch(d));}
+  const doc=createSketch();assert.equal(doc.sheet.created,false);assert.equal(doc.sheet.background,'#ffffff');doc.layers[0].items.push(item);assert.deepEqual(validateSketch(JSON.parse(JSON.stringify(doc))),doc);
+  const created=createSketch(true);assert.equal(created.sheet.created,true);
+  for(const change of [d=>d.layers[0].items[0].color='url(javascript:bad)',d=>d.layers[0].opacity=2,d=>d.sheet.width=-1,d=>d.sheet.background='javascript:bad',d=>d.sheet.created='yes',d=>d.layers[0].items[0].points[0].x=NaN,d=>d.layers.push({...d.layers[0]})]){const d=structuredClone(doc);change(d);assert.throws(()=>validateSketch(d));}
 });
 test('SVG retains colors, opacity, layer order, text escaping and chronological non-destructive erasing', () => {
   const d=createSketch();d.layers[0].items=[item,{...item,id:'erase',kind:'eraser'},{...item,id:'after',kind:'text',text:'<hello & world>'}];

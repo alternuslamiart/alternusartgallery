@@ -31,57 +31,104 @@ async function run(){
   await send('Page.enable');await send('Runtime.enable');await send('Network.enable');await send('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:out,eventsEnabled:true});
   if(live){let delayed=false;socket.addEventListener('message',event=>{const message=JSON.parse(event.data);if(message.method!=='Fetch.requestPaused')return;const {requestId,request}=message.params;if(request.method==='PUT'&&!delayed){delayed=true;void evaluate('window.__sketchSlowSave=true');setTimeout(()=>void send('Fetch.continueRequest',{requestId}).catch(()=>{}),18000);}else void send('Fetch.continueRequest',{requestId}).catch(()=>{});});await send('Fetch.enable',{patterns:[{urlPattern:'*/api/sketch-projects',requestStage:'Request'}]});}
   await send('Emulation.setDeviceMetricsOverride',{width:1680,height:1080,deviceScaleFactor:1,mobile:false});
-  await send('Page.addScriptToEvaluateOnNewDocument',{source:`localStorage.setItem('cookiePreference','necessary');localStorage.setItem('cedium_signin_popup_dismissed','1');window.__sketchQaIdentity=${JSON.stringify(qa?.id||'guest')};`});if(qa)await setCookies();
+  await send('Page.addScriptToEvaluateOnNewDocument',{source:`try{localStorage.setItem('cookiePreference','necessary');localStorage.setItem('cedium_signin_popup_dismissed','1');}catch{}window.__sketchQaIdentity=${JSON.stringify(qa?.id||'guest')};`});if(qa)await setCookies();
+  // 1. Opening Sketch Studio preserves the existing floor-plan drafting interface.
   await send('Page.navigate',{url:base+'/interior'});await until(`Boolean(document.querySelector('[aria-label="Sketch Drawing & Paint"]'))`,'Sketch Studio');await until(`Boolean(localStorage.getItem('casynus:floor-plan-recovery:'+(window.__sketchQaIdentity||'guest')))`,'initial recovery');await wait(400);
   assert.equal(await evaluate(`document.querySelector('.interior-scene-sidebar .cs-header').textContent.includes('Sketch')`),true);
+  assert.equal(await evaluate(`Boolean(document.querySelector('.interior-scene-inspector'))`),true,'CAD Properties sidebar visible');
+  assert.equal(await evaluate(`Boolean(document.querySelector('.floor-plan-hud-bar'))`),true,'CAD HUD visible');
+  assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-sheet]'))`),false,'No white sheet in CAD mode');
   const original=(await snapshot()).objects;
-  await click('Sketch Drawing & Paint');await click('Fit Sketch canvas');
-  const sizes=await evaluate(`[...document.querySelectorAll('.sketch-tool')].map(e=>({outer:[e.getBoundingClientRect().width,e.getBoundingClientRect().height],inner:[e.firstElementChild.getBoundingClientRect().width,e.firstElementChild.getBoundingClientRect().height]}))`);assert.ok(sizes.length>=8);assert.ok(sizes.every(s=>s.outer[0]===54&&s.outer[1]===54&&s.inner[0]===40&&s.inner[1]===40));
-  // Hide expanded controls while drawing so tests hit the actual SVG, not panels.
-  await click('Collapse drawing controls');
+  // 2. Clicking the Pencil icon opens the dedicated sidebar-free Pencil Studio.
+  await click('Sketch Drawing & Paint');
+  assert.equal(await evaluate(`Boolean(document.querySelector('.interior-scene-sidebar'))`),false,'Left sidebar hidden in Pencil mode');
+  assert.equal(await evaluate(`Boolean(document.querySelector('.interior-scene-inspector'))`),false,'Right Properties sidebar hidden in Pencil mode');
+  assert.equal(await evaluate(`Boolean(document.querySelector('.floor-plan-hud-bar'))`),false,'CAD HUD hidden in Pencil mode');
+  // 3. The initial Pencil workspace shows #404040 background and New Canvas button, NOT a white sheet.
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('.sketch-workspace')).backgroundColor`),'rgb(64, 64, 64)');
+  assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-sheet]'))`),false,'No automatic white sheet on initial Pencil open');
+  assert.equal(await evaluate(`Boolean(document.querySelector('[aria-label="New Canvas"]'))`),true,'New Canvas button visible');
+  assert.equal(await evaluate(`Boolean(document.querySelector('[aria-label="Open Existing Project"]'))`),true,'Open Existing Project button visible');
+  // 8 & 9. Bottom-left AI Chat button has exact 54 x 256 px outer dimensions and opens floating AI Chat.
+  const aiRect=await evaluate(`(()=>{const b=document.querySelector('.pencil-studio-ai.crystal-ai-chat-toggle'),r=b.getBoundingClientRect();return{w:r.width,h:r.height,left:r.left,bottom:window.innerHeight-r.bottom,bg:getComputedStyle(b).backgroundColor};})()`);
+  assert.equal(aiRect.w,54);assert.equal(aiRect.h,256);assert.equal(aiRect.left,12);assert.equal(aiRect.bottom,12);assert.equal(aiRect.bg,'rgb(22, 22, 22)');
+  await click('Show AI chat');
+  assert.equal(await evaluate(`Boolean(document.querySelector('.pencil-studio-ai.studio-ai-panel'))`),true,'Floating AI Chat panel opened');
+  assert.equal(await evaluate(`Boolean(document.querySelector('.interior-scene-sidebar'))`),false,'No permanent sidebar introduced by AI Chat');
+  await click('Minimize AI assistant');
+  assert.equal(await evaluate(`document.querySelector('.pencil-studio-ai.crystal-ai-chat-toggle').getBoundingClientRect().height`),256,'Returned to 54 x 256 px button');
+  // 4 & 5. Clicking New Canvas opens the canvas setup dialog; confirming Create Canvas displays the sheet.
+  await click('New Canvas');
+  assert.equal(await evaluate(`Boolean(document.querySelector('[role="dialog"][aria-label="Canvas setup"]'))`),true,'Canvas setup dialog opened');
+  await click('A3 preset');await click('Portrait orientation');await click('Landscape orientation');await click('A4 preset');
+  await click('Create Canvas');
+  assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-sheet]'))`),true,'White drawing sheet created after confirmation');
+  assert.equal(await evaluate(`document.querySelector('[data-sketch-sheet]').getAttribute('fill')`),'#ffffff');
+  // 6. Drawing tools appear in the top toolbar with 54 x 54 outer and 40 x 40 inner dimensions.
+  const sizes=await evaluate(`[...document.querySelectorAll('.sketch-top-toolbar .sketch-tool')].map(e=>({outer:[e.getBoundingClientRect().width,e.getBoundingClientRect().height],inner:[e.firstElementChild.getBoundingClientRect().width,e.firstElementChild.getBoundingClientRect().height]}))`);
+  assert.ok(sizes.length>=16);assert.ok(sizes.every(s=>s.outer[0]===54&&s.outer[1]===54&&s.inner[0]===40&&s.inner[1]===40));
+  // 7. Right-side tools and panels open on the right side without resizing the canvas.
+  const rightSizes=await evaluate(`[...document.querySelectorAll('.sketch-right-dock .sketch-tool')].map(e=>({outer:[e.getBoundingClientRect().width,e.getBoundingClientRect().height],inner:[e.firstElementChild.getBoundingClientRect().width,e.firstElementChild.getBoundingClientRect().height]}))`);
+  assert.equal(rightSizes.length,3);assert.ok(rightSizes.every(s=>s.outer[0]===54&&s.outer[1]===54&&s.inner[0]===40&&s.inner[1]===40));
+  await click('Fit Sketch canvas');
   await stroke([[3.1,3.7],[3.3,3.85],[3.55,3.8],[3.8,4.05]]);assert.equal(allItems(await snapshot()).length,1);assert.deepEqual((await snapshot()).objects,original);
   if(live)await until('window.__sketchSlowSave===true','delayed initial cloud save');
-  await click('Expand drawing controls');await change('Brush size',9);await click('Open color selection');await change('HEX color','#ff0000');await click('Close color picker');await click('Collapse drawing controls');
+  await click('Expand drawing controls');
+  const settingsRight=await evaluate(`(()=>{const r=document.querySelector('.sketch-settings').getBoundingClientRect();return r.left>window.innerWidth/2;})()`);
+  assert.equal(settingsRight,true,'Drawing controls open on the right side');
+  await change('Brush size',9);await click('Open color selection');await change('HEX color','#ff0000');await click('Close color picker');await click('Collapse drawing controls');
   await click('Brush');await stroke([[3.1,4.3],[3.3,4.4],[3.5,4.25],[3.8,4.5]],{pointerType:'pen'});const brush=allItems(await snapshot()).at(-1);assert.equal(brush.kind,'brush');assert.equal(brush.color,'#ff0000');assert.ok(brush.width>.03);
-  await click('Shape tools');await click('Sketch rectangle');await stroke([[3,4.8],[4.1,5.55]]);assert.equal(allItems(await snapshot()).at(-1).kind,'rectangle');
+  await click('Sketch rectangle');await stroke([[3,4.8],[4.1,5.55]]);assert.equal(allItems(await snapshot()).at(-1).kind,'rectangle');
   await click('Fill / Paint bucket');await stroke([[3.5,5.1]]);await until(`!document.body.textContent.includes('Processing drawing…')`,'paint bucket');assert.equal(allItems(await snapshot()).at(-1).kind,'fill');assert.ok(allItems(await snapshot()).at(-1).runs.length);
   await click('Eraser');await stroke([[3.3,5],[3.8,5.3]]);assert.equal(allItems(await snapshot()).at(-1).kind,'eraser');assert.ok(await evaluate(`document.querySelector('[data-sketch-overlay] mask')!==null`));
-  await click('Expand drawing controls');const before=allItems(await snapshot()).length;await click('Undo drawing');assert.equal(allItems(await snapshot()).length,before-1);await click('Redo drawing');assert.equal(allItems(await snapshot()).length,before);
+  const before=allItems(await snapshot()).length;await click('Undo drawing');assert.equal(allItems(await snapshot()).length,before-1);await click('Redo drawing');assert.equal(allItems(await snapshot()).length,before);
   await click('Sketch layers');await click('Add sketch layer');assert.equal((await snapshot()).sketch.layers.length,2);await change('Layer name','Paint layer');await change('Layer opacity',65);await change('Layer blend mode','multiply','select');await click('Lock Paint layer');await click('Unlock Paint layer');await click('Hide Paint layer');assert.equal((await snapshot()).sketch.layers.at(-1).visible,false);await click('Show Paint layer');await click('Move layer down');await click('Move layer up');await click('Close layers');
-  await click('Collapse drawing controls');
   await click('Sketch line');await stroke([[3,3.6],[4,3.6]]);assert.equal(allItems(await snapshot()).at(-1).kind,'line');
   await click('Sketch ellipse');await stroke([[3.1,3.1],[4,3.5]]);assert.equal(allItems(await snapshot()).at(-1).kind,'ellipse');
   await click('Highlighter');await stroke([[3,4.1],[3.5,4.2],[4,4.1]]);assert.equal(allItems(await snapshot()).at(-1).kind,'highlighter');
   await click('Sketch text');await stroke([[3.1,3.25]]);assert.equal(allItems(await snapshot()).at(-1).text,'Sketch note');
   await click('Freehand selection');await stroke([[2.8,2.8],[4.3,2.8],[4.3,4.6],[2.8,4.6],[2.8,2.8]]);await click('Expand drawing controls');assert.ok(await evaluate(`Boolean(document.querySelector('.sketch-selection-controls'))`));await click('Duplicate selected strokes');await click('Delete selected strokes');await click('Collapse drawing controls');
-  await click('Color Picker');await stroke([[3.5,5.15]]);await click('Close color picker');await click('Shape tools');await click('Pencil');
+  await click('Color Picker');await stroke([[3.5,5.15]]);await click('Close color picker');await click('Pencil');
   await change('Sketch zoom',110);await stroke([[3.7,3.7],[3.9,3.9],[4.1,3.7]],{shift:true}); // shared CAD pan gesture
   await stroke([[3.6,3.6],[3.8,3.7],[4,3.6]],{touch:true});const touch=allItems(await snapshot()).at(-1);assert.ok(Math.abs(touch.points[0].x-3.6)<.03);assert.ok(Math.abs(touch.points[0].y-3.6)<.03);
   await click('Rotate canvas 15 degrees');await stroke([[3.3,3.2],[3.5,3.35],[3.7,3.2]]);const rotated=allItems(await snapshot()).at(-1);assert.ok(Math.abs(rotated.points[0].x-3.3)<.03);assert.deepEqual((await snapshot()).objects,original);
   await click('Fit Sketch canvas');await click('Expand drawing controls');await click('Sketch layers');
   fs.writeFileSync(path.join(out,'desktop.png'),Buffer.from((await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data,'base64'));
-  await click('Close layers');await click('Save Sketch project');await wait(150);
+  await click('Close layers');await click('Collapse drawing controls');await click('Save Sketch project');await wait(150);
   if(live)await until(`(()=>{const value=JSON.parse(localStorage.getItem('casynus:floor-plan-recovery:'+window.__sketchQaIdentity)||'null');if(!value)return false;return value.revision>0&&(${canonicalSketch.toString()})(value)===value.cloudHash;})()`,'confirmed latest cloud save');
   const saved=await snapshot();
-  await send('Page.reload');await until(`Boolean(document.querySelector('[aria-label="Sketch Drawing & Paint"]'))`,'restored studio');await until(`Boolean(localStorage.getItem('casynus:floor-plan-recovery:'+(window.__sketchQaIdentity||'guest')))`,'restored recovery');await wait(700);assert.deepEqual((await snapshot()).sketch,saved.sketch);assert.deepEqual((await snapshot()).objects,original);
-  for(const format of ['PNG','SVG','PDF','JSON SCENE']){await click('Export viewport');await evaluate(`[...document.querySelectorAll('dialog[aria-label="Export scene"] button')].find(e=>e.textContent===${JSON.stringify(format)}).click()`);await wait(500);}
+  for(const format of ['PNG','SVG','PDF','JSON SCENE']){await click('Export viewport');await evaluate(`[...document.querySelectorAll('dialog[aria-label="Export scene"][open] button')].find(e=>e.textContent===${JSON.stringify(format)}).click()`);await wait(500);}
   for(let i=0;i<100&&downloads.length<4;i++)await wait(150);assert.equal(downloads.length,4,'four real exports downloaded');
   const files=fs.readdirSync(out),json=files.find(f=>f.endsWith('.json')),svg=files.find(f=>f.endsWith('.svg')),pdf=files.find(f=>f.endsWith('.pdf')),png=files.find(f=>f.endsWith('.png')&&f!=='desktop.png');assert.ok(json&&svg&&pdf&&png);assert.deepEqual(JSON.parse(fs.readFileSync(path.join(out,json),'utf8')).sketch,saved.sketch);assert.match(fs.readFileSync(path.join(out,svg),'utf8'),/#ff0000/);assert.ok(fs.readFileSync(path.join(out,pdf)).subarray(0,8).toString().startsWith('%PDF-1.4'));assert.equal(fs.readFileSync(path.join(out,png)).subarray(1,4).toString(),'PNG');
+  // 10. Exiting Pencil mode returns to the previous Sketch Studio state without losing work.
+  await click('Exit Pencil mode');
+  assert.equal(await evaluate(`Boolean(document.querySelector('.interior-scene-sidebar'))`),true,'Left sidebar restored on exit');
+  assert.equal(await evaluate(`Boolean(document.querySelector('.interior-scene-inspector'))`),true,'Right Properties sidebar restored on exit');
+  assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-input]'))`),false,'CAD mode restored');
+  assert.deepEqual((await snapshot()).sketch,saved.sketch);assert.deepEqual((await snapshot()).objects,original);
+  await click('Sketch Drawing & Paint');await wait(200);
+  assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-sheet]'))`),true,'Existing canvas reopened directly without duplicate');
+  await click('Exit Pencil mode');
+  // Page reload and logout/login recovery
+  await send('Page.reload');await until(`Boolean(document.querySelector('[aria-label="Sketch Drawing & Paint"]'))`,'restored studio');await until(`Boolean(localStorage.getItem('casynus:floor-plan-recovery:'+(window.__sketchQaIdentity||'guest')))`,'restored recovery');await wait(700);assert.deepEqual((await snapshot()).sketch,saved.sketch);assert.deepEqual((await snapshot()).objects,original);
   if(qa){
     const cloud=await qa.json('/api/sketch-projects?id='+saved.id);assert.deepEqual(cloud.document.sketch,saved.sketch);
-    await wait(61000);
-    await qa.logout();await send('Network.clearBrowserCookies');await send('Page.reload');await wait(1000);assert.equal(await evaluate(`document.body.textContent.includes('Paint layer')`),false);await qa.login();await setCookies();await send('Page.reload');await until(`Boolean(document.querySelector('[aria-label="Save Sketch project"]:not(:disabled)'))`,'signed-in recovery');await wait(1000);assert.deepEqual((await snapshot()).sketch,saved.sketch);
+    await evaluate(`localStorage.clear();localStorage.setItem('cookiePreference','necessary');localStorage.setItem('cedium_signin_popup_dismissed','1');`);
+    await send('Network.clearBrowserCookies');await send('Page.navigate',{url:base+'/robots.txt'});await wait(61000);
+    await qa.logout();await qa.login();await setCookies();await send('Page.navigate',{url:base+'/interior'});
+    await until(`Boolean(document.querySelector('.sketch-project-strip')?.textContent?.includes('Workspace connected'))`,'signed-in cloud recovery');await wait(500);assert.deepEqual((await snapshot()).sketch,saved.sketch);
   }
-  await click('Sketch Drawing & Paint');await click('Fit Sketch canvas');await click('Brush');await stroke([[3.6,3.7],[3.8,3.9]]);await click('Sketch Drawing & Paint');
+  await click('Sketch Drawing & Paint');await wait(200);
+  assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-sheet]'))`),true,'Existing canvas reopened after login');
+  await click('Fit Sketch canvas');await click('Brush');await stroke([[3.6,3.7],[3.8,3.9]]);await click('Exit Pencil mode');
   assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-input]'))`),false,'CAD mode restored');
   await click('Switch to light mode');await click('Sketch Drawing & Paint');
-  assert.equal(await evaluate(`getComputedStyle(document.querySelector('.sketch-primary')).backgroundColor`),'rgb(255, 255, 255)');
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('.sketch-top-toolbar')).backgroundColor`),'rgb(255, 255, 255)');
   fs.writeFileSync(path.join(out,'light.png'),Buffer.from((await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data,'base64'));
   await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});await wait(500);
-  assert.ok(await evaluate(`document.querySelector('[aria-label="Sketch Drawing & Paint"]').getBoundingClientRect().width>0`),'mobile Pencil remains accessible');
-  const mobileTools=await evaluate(`[...document.querySelectorAll('.sketch-tool')].map(e=>e.getBoundingClientRect().width)`);assert.ok(mobileTools.every(width=>width===54));
+  const mobileTools=await evaluate(`[...document.querySelectorAll('.sketch-top-toolbar .sketch-tool')].map(e=>e.getBoundingClientRect().width)`);assert.ok(mobileTools.every(width=>width===54));
   fs.writeFileSync(path.join(out,'mobile.png'),Buffer.from((await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data,'base64'));
-  assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({passed:true,live,artifacts:files,items:allItems(saved).length},null,2));console.log('PASS Sketch toolbar dimensions, mouse/pen/touch drawing, paint/fill/erase, layers, color, undo/redo, zoom/pan/rotate, CAD preservation, save/refresh and four exports',live?'with authenticated logout/login':'with local recovery');console.log('Artifacts:',out);
+  assert.equal(errors.length,0,errors.join('\n'));fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({passed:true,live,artifacts:files,items:allItems(saved).length},null,2));console.log('PASS Dedicated sidebar-free Pencil Studio, New Canvas dialog, top 54x54 toolbar, right-side panels, 54x256 bottom-left AI Chat button, CAD preservation, save/refresh and four exports',live?'with authenticated logout/login':'with local recovery');console.log('Artifacts:',out);
 }
 try{await run();}catch(error){console.error(error.stack);process.exitCode=1;}finally{
   if(socket?.readyState===WebSocket.OPEN){try{await send('Browser.close');}catch{}socket.close();}chrome?.kill();for(const task of pending.values())clearTimeout(task.timer);
