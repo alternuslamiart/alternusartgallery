@@ -4,10 +4,10 @@
   implement the dedicated sidebar-free Pencil Studio (`SketchWorkspace.tsx`,
   `src/lib/sketch.mjs`, `sketch-export.ts`, `useSketchProject.ts`,
   `/api/sketch-projects`) with `#404040` workspace, `New Canvas` setup dialog,
-  top 54×54px/40×40px horizontal toolbar, right-side expandable panels, 54×256px
-  bottom-left AI Chat button, CAD+sketch persistence and PNG/SVG/PDF/JSON
-  exports while preserving CAD drafting when inactive. Verified with unit tests
-  and live Chrome QA.
+  top-left Profile & Settings buttons, top 54×54px/40×40px horizontal toolbar,
+  right-side expandable panels, bottom-centered AI Chat, CAD+sketch persistence
+  and PNG/SVG/PDF/JSON exports while keeping CAD drafting clean when inactive.
+  Verified with unit tests and live Chrome QA.
 - [ ] Verify deployed `/interior` Sketch Studio cloud save/reopen and exports in
   production after pushing to `main`.
 

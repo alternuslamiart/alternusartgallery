@@ -26,7 +26,7 @@ Last updated: 2026-10-27
   Undo/Redo, Zoom/Pan, Fit to Canvas, Canvas setup, Save, Projects, Clear and
   Export), placed expandable secondary panels (Drawing controls, HSV+HEX Color
   Picker and Layers) in a compact right-side dock (`.sketch-right-dock`) above
-  the 54px bottom-right navigation bar, and styled the bottom-left AI Chat
+  the 54px bottom-right navigation bar, added the top-left `.sketch-top-left-bar` with Profile (`Your profile`) and Settings (`Studio settings`) buttons in Pencil mode, and kept `StudioAIChat` centered at the bottom like Architecture and Infrastructure.
   collapsed toggle to exact `54 × 256px` outer dimensions (`.pencil-studio-ai`)
   that expands the existing floating `StudioAIChat` panel when clicked.
 - Implemented pointer-captured mouse/pen/touch freehand drawing with quadratic

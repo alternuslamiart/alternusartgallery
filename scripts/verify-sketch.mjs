@@ -49,14 +49,13 @@ async function run(){
   assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-sheet]'))`),false,'No automatic white sheet on initial Pencil open');
   assert.equal(await evaluate(`Boolean(document.querySelector('[aria-label="New Canvas"]'))`),true,'New Canvas button visible');
   assert.equal(await evaluate(`Boolean(document.querySelector('[aria-label="Open Existing Project"]'))`),true,'Open Existing Project button visible');
-  // 8 & 9. Bottom-left AI Chat button has exact 54 x 256 px outer dimensions and opens floating AI Chat.
-  const aiRect=await evaluate(`(()=>{const b=document.querySelector('.pencil-studio-ai.crystal-ai-chat-toggle'),r=b.getBoundingClientRect();return{w:r.width,h:r.height,left:r.left,bottom:window.innerHeight-r.bottom,bg:getComputedStyle(b).backgroundColor};})()`);
-  assert.equal(aiRect.w,54);assert.equal(aiRect.h,256);assert.equal(aiRect.left,12);assert.equal(aiRect.bottom,12);assert.equal(aiRect.bg,'rgb(22, 22, 22)');
+  // Top-left Profile & Settings buttons and bottom-centered AI Chat.
+  assert.equal(await evaluate(`Boolean(document.querySelector('.sketch-top-left-bar [aria-label="Your profile"]'))`),true,'Top-left Profile button visible');
+  assert.equal(await evaluate(`Boolean(document.querySelector('.sketch-top-left-bar [aria-label="Studio settings"]'))`),true,'Top-left Settings button visible');
   await click('Show AI chat');
-  assert.equal(await evaluate(`Boolean(document.querySelector('.pencil-studio-ai.studio-ai-panel'))`),true,'Floating AI Chat panel opened');
+  assert.equal(await evaluate(`Boolean(document.querySelector('.studio-ai-floating-floorplan.studio-ai-panel'))`),true,'Bottom AI Chat panel opened');
   assert.equal(await evaluate(`Boolean(document.querySelector('.interior-scene-sidebar'))`),false,'No permanent sidebar introduced by AI Chat');
   await click('Minimize AI assistant');
-  assert.equal(await evaluate(`document.querySelector('.pencil-studio-ai.crystal-ai-chat-toggle').getBoundingClientRect().height`),256,'Returned to 54 x 256 px button');
   // 4 & 5. Clicking New Canvas opens the canvas setup dialog; confirming Create Canvas displays the sheet.
   await click('New Canvas');
   assert.equal(await evaluate(`Boolean(document.querySelector('[role="dialog"][aria-label="Canvas setup"]'))`),true,'Canvas setup dialog opened');
@@ -105,6 +104,8 @@ async function run(){
   assert.equal(await evaluate(`Boolean(document.querySelector('.interior-scene-sidebar'))`),true,'Left sidebar restored on exit');
   assert.equal(await evaluate(`Boolean(document.querySelector('.interior-scene-inspector'))`),true,'Right Properties sidebar restored on exit');
   assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-input]'))`),false,'CAD mode restored');
+  assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-overlay]'))`),false,'No Pencil overlay in CAD mode');
+  assert.equal(await evaluate(`Boolean(document.querySelector('.sketch-navigation'))`),false,'No Pencil navigation bar in CAD mode');
   assert.deepEqual((await snapshot()).sketch,saved.sketch);assert.deepEqual((await snapshot()).objects,original);
   await click('Sketch Drawing & Paint');await wait(200);
   assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-sheet]'))`),true,'Existing canvas reopened directly without duplicate');
@@ -122,6 +123,8 @@ async function run(){
   assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-sheet]'))`),true,'Existing canvas reopened after login');
   await click('Fit Sketch canvas');await click('Brush');await stroke([[3.6,3.7],[3.8,3.9]]);await click('Exit Pencil mode');
   assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-input]'))`),false,'CAD mode restored');
+  assert.equal(await evaluate(`Boolean(document.querySelector('[data-sketch-overlay]'))`),false,'No Pencil overlay in CAD mode');
+  assert.equal(await evaluate(`Boolean(document.querySelector('.sketch-navigation'))`),false,'No Pencil navigation bar in CAD mode');
   await click('Switch to light mode');await click('Sketch Drawing & Paint');
   assert.equal(await evaluate(`getComputedStyle(document.querySelector('.sketch-top-toolbar')).backgroundColor`),'rgb(255, 255, 255)');
   fs.writeFileSync(path.join(out,'light.png'),Buffer.from((await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false})).data,'base64'));

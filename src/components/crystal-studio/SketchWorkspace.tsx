@@ -1,6 +1,6 @@
 "use client";
 import {useEffect,useMemo,useRef,useState,type RefObject,type PointerEvent as ReactPointerEvent} from 'react';
-import {Pencil,Paintbrush,Eraser,MousePointer2,Type,PaintBucket,ZoomIn,Minus,RectangleHorizontal,Circle,Palette,Highlighter,Lasso,Undo2,Redo2,Trash2,Plus,Eye,EyeOff,Lock,Unlock,ArrowUp,ArrowDown,Layers,RotateCw,Grid2X2,Focus,Home,Save,FolderOpen,Copy,X,ChevronDown,ChevronUp,FilePlus2,Download,SlidersHorizontal,ArrowLeft,type LucideIcon} from 'lucide-react';
+import {Pencil,Paintbrush,Eraser,MousePointer2,Type,PaintBucket,ZoomIn,Minus,RectangleHorizontal,Circle,Palette,Highlighter,Lasso,Undo2,Redo2,Trash2,Plus,Eye,EyeOff,Lock,Unlock,ArrowUp,ArrowDown,Layers,RotateCw,Grid2X2,Focus,Home,Save,FolderOpen,Copy,X,ChevronDown,ChevronUp,FilePlus2,Download,SlidersHorizontal,ArrowLeft,CircleUserRound,Settings,type LucideIcon} from 'lucide-react';
 import {createSketch,sketchSvg,hitSketchItem,translateItem,itemBounds,inPolygon,floodRegion,hexToHsv,hsvToHex,type SketchDocument,type SketchItem,type SketchKind,type SketchLayer,type SketchPoint} from '@/lib/sketch.mjs';
 import {rasterSketch,sketchSheetSvg} from './sketch-export';
 import type {FloorPlanObject,FloorPlanSettings} from './types';
@@ -126,14 +126,12 @@ export function useSketchEditor(p:Props){
   const selectedItem=layer.items.find(item=>selected.includes(item.id));
   const exitPencilMode=()=>{cancel();setCanvasDialogOpen(false);setExportOpen(false);setProjectsOpen(false);setActive(false);};
   const panels=<div className={`sketch-ui ${active?'is-pencil-studio':'is-cad-studio'}`} style={{left:offsets.left,right:offsets.right,bottom:offsets.bottom}}>
-    {!active&&<div className="sketch-project-strip">
-      {iconButton('Save Sketch project',Save,()=>attempt(()=>p.project?.save()),!p.project?.ready)}
-      {iconButton('Sketch projects',FolderOpen,()=>setProjectsOpen(v=>!v))}
-      <span role="status">{p.project?.status||'Sketch Studio'}</span>
-      {p.project?.error&&<details><summary>Save needs attention</summary><p role="alert">{p.project.error}</p><button onClick={()=>attempt(()=>p.project?.save())}>Retry save</button><button onClick={()=>attempt(()=>p.project?.reload())}>Reload cloud</button><button onClick={()=>attempt(()=>p.project?.create(true))}>Save a copy</button></details>}
-      {projectsOpen&&<section className="sketch-project-menu" aria-label="Sketch projects"><button onClick={()=>attempt(()=>{p.project?.create();setProjectsOpen(false);})}>New sketch project</button><button onClick={()=>attempt(()=>{p.project?.create(true);setProjectsOpen(false);})}>Save a copy</button>{p.project?.projects.map(project=><button key={project.id} onClick={()=>attempt(async()=>{await p.project?.open(project.id);setProjectsOpen(false);})}>{project.name}{project.id===p.project?.id?' ✓':''}</button>)}</section>}
-    </div>}
+    <div className="sketch-project-strip sr-only" role="status">{p.project?.status||'Sketch Studio'}</div>
     {active&&<>
+      <div role="toolbar" aria-label="Profile and settings" className="sketch-top-left-bar">
+        {toolButton('profile','Your profile',CircleUserRound,false,()=>window.open('/account','_blank','noopener,noreferrer'))}
+        {toolButton('settings','Studio settings',Settings,controlsOpen||canvasDialogOpen,()=>{if(hasCanvas)setControlsOpen(v=>!v);else openCanvasSetup();})}
+      </div>
       <div role="toolbar" aria-label="Sketch drawing tools" className="sketch-top-toolbar sketch-primary">
         {toolButton('exit','Exit Pencil mode',ArrowLeft,false,exitPencilMode)}
         <i className="sketch-toolbar-divider" aria-hidden="true"/>
@@ -213,7 +211,6 @@ export function useSketchEditor(p:Props){
         <section className="sketch-navigation sketch-panel" aria-label="Sketch canvas navigation"><output>{Math.round(p.view.zoom/72*100)}%</output><input aria-label="Sketch zoom" type="range" min="4" max="400" value={p.view.zoom} onChange={e=>p.setView(v=>({...v,zoom:Number(e.target.value)}))}/>{iconButton('Reset Sketch view',Home,()=>{p.setView({zoom:72,panX:0,panY:0});setRotation(0);})}{iconButton('Rotate canvas 15 degrees',RotateCw,()=>setRotation(v=>(v+15)%360))}{iconButton('Toggle Sketch grid',Grid2X2,()=>setGrid(v=>!v))}{iconButton('Fit Sketch canvas',Focus,()=>fit())}<button onClick={()=>p.setView(v=>({...v,zoom:Math.min(600,v.zoom*1.25)}))} title="Zoom in" aria-label="Sketch zoom in"><ZoomIn size={18}/></button></section>
       </>}
     </>}
-    {!active&&<section className="sketch-navigation sketch-panel" aria-label="Sketch canvas navigation"><output>{Math.round(p.view.zoom/72*100)}%</output><input aria-label="Sketch zoom" type="range" min="4" max="400" value={p.view.zoom} onChange={e=>p.setView(v=>({...v,zoom:Number(e.target.value)}))}/>{iconButton('Reset Sketch view',Home,()=>{p.setView({zoom:72,panX:0,panY:0});setRotation(0);})}{iconButton('Rotate canvas 15 degrees',RotateCw,()=>setRotation(v=>(v+15)%360))}{iconButton('Toggle Sketch grid',Grid2X2,()=>setGrid(v=>!v))}{iconButton('Fit Sketch canvas',Focus,()=>fit())}<button onClick={()=>p.setView(v=>({...v,zoom:Math.min(600,v.zoom*1.25)}))} title="Zoom in" aria-label="Sketch zoom in"><ZoomIn size={18}/></button></section>}
     {(message||fillBusy)&&<div role="status" className="sketch-message">{fillBusy?'Processing drawing…':message}{message&&<button aria-label="Dismiss drawing message" onClick={()=>setMessage('')}>×</button>}</div>}
   </div>;
   return{active,hasCanvas,toggle,deactivate:exitPencilMode,overlay,panels,grid,rotation,fit,drawing:Boolean(gesture.current)};

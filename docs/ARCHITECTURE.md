@@ -8,7 +8,7 @@
   `#404040` workspace, an initial `New Canvas` dialog (`sheet.created`,
   `sheet.background`, A4/A3/Square presets, Portrait/Landscape orientation), a
   horizontal top toolbar of 54×54px (40×40px inner surface) tool frames, a
-  right-side dock for expandable Brush/Opacity/Color/Layers panels, a 54×256px
+  right-side dock for expandable Brush/Opacity/Color/Layers panels, top-left Profile & Settings buttons (`.sketch-top-left-bar`), bottom-centered `StudioAIChat` matching Architecture and Infrastructure,
   bottom-left AI Chat toggle (`.pencil-studio-ai`) connected to `StudioAIChat`,
   chronological SVG mask erasing, scanline flood fill and bottom-right canvas
   navigation. `useSketchProject.ts` and `/api/sketch-projects` persist versioned

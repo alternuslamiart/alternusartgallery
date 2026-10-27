@@ -1272,7 +1272,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
               </text>
             </>
           )}
-          {sketch.overlay}
+          {sketch.active&&sketch.overlay}
           </g>}
         </g>
       </svg>
@@ -1346,7 +1346,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         quickPrompts={FLOOR_PLAN_QUICK_PROMPTS}
         placeholder="What do you want to create?"
         statusLabel={`1:${settings.scale} · ${settings.unit}`}
-        className={`studio-ai-floating-floorplan ${sketch.active ? "pencil-studio-ai" : ""}`}
+        className="studio-ai-floating-floorplan"
       />
 
       {!sketch.active&&<div className="floor-plan-shortcuts-hint pointer-events-none">

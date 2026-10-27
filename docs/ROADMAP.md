@@ -10,10 +10,11 @@ requirements provide new evidence.
   chat while preserving `/interior`, 2D CAD drafting, 3D workspace and projects.
 - [x] Add a dedicated sidebar-free Pencil Drawing Studio inside Sketch Studio
   with a `#404040` workspace, initial `New Canvas` setup dialog (A4/A3/Square,
-  Portrait/Landscape, background color), top 54×54px (40×40px inner) horizontal
-  toolbar, right-side expandable Brush/Opacity/Color/Layers panels, 54×256px
-  bottom-left AI Chat button, `/api/sketch-projects` persistence and
-  PNG/SVG/PDF/JSON exports while preserving CAD floor-plan drafting when inactive.
+  Portrait/Landscape, background color), top-left Profile & Settings buttons,
+  top 54×54px (40×40px inner) horizontal toolbar, right-side expandable
+  Brush/Opacity/Color/Layers panels, bottom-centered AI Chat,
+  `/api/sketch-projects` persistence and PNG/SVG/PDF/JSON exports while keeping
+  2D CAD floor-plan drafting clean when Pencil mode is inactive.
 - [ ] Verify Sketch Studio persistence and exports on the production deployment
   after Vercel build completion.
 
