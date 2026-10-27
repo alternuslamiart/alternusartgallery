@@ -1,6 +1,6 @@
 "use client";
 import {useEffect,useMemo,useRef,useState,type RefObject,type PointerEvent as ReactPointerEvent} from 'react';
-import {Pencil,Paintbrush,Eraser,MousePointer2,Type,PaintBucket,ZoomIn,Minus,RectangleHorizontal,Circle,Palette,Highlighter,Lasso,Undo2,Redo2,Trash2,Plus,Eye,EyeOff,Lock,Unlock,ArrowUp,ArrowDown,Layers,RotateCw,Grid2X2,Focus,Home,Save,FolderOpen,Copy,X,ChevronDown,ChevronUp,FilePlus2,Download,SlidersHorizontal,ArrowLeft,CircleUserRound,Settings,type LucideIcon} from 'lucide-react';
+import {Pencil,Paintbrush,Eraser,MousePointer2,Type,PaintBucket,ZoomIn,Minus,RectangleHorizontal,Circle,Palette,Highlighter,Lasso,Undo2,Redo2,Trash2,Plus,Eye,EyeOff,Lock,Unlock,ArrowUp,ArrowDown,Layers,RotateCw,Grid2X2,Focus,Home,Save,FolderOpen,Copy,X,ChevronDown,ChevronUp,FilePlus2,Download,SlidersHorizontal,ArrowLeft,CircleUserRound,Settings,Play,type LucideIcon} from 'lucide-react';
 import {createSketch,sketchSvg,hitSketchItem,translateItem,itemBounds,inPolygon,floodRegion,hexToHsv,hsvToHex,type SketchDocument,type SketchItem,type SketchKind,type SketchLayer,type SketchPoint} from '@/lib/sketch.mjs';
 import {rasterSketch,sketchSheetSvg} from './sketch-export';
 import type {FloorPlanObject,FloorPlanSettings} from './types';
@@ -20,7 +20,7 @@ const topTools:[Tool,string,LucideIcon][]=[
 const presets:Record<Exclude<Preset,'Custom'>,[number,number]>={A4:[11.9,8.4],A3:[16.8,11.9],Square:[10,10]};
 const colors=['#141414','#ffffff','#ff6b6b','#f59e0b','#facc15','#22c55e','#06b6d4','#4284ff','#a855f7','#ec4899'];
 export function useSketchEditor(p:Props){
-  const [active,setActiveState]=useState(false),[tool,setTool]=useState<Tool>('pencil'),[color,setColor]=useState('#141414'),[width,setWidth]=useState(3),[opacity,setOpacity]=useState(1),[colorOpen,setColorOpen]=useState(false),[layersOpen,setLayersOpen]=useState(false),[controlsOpen,setControlsOpen]=useState(false),[projectsOpen,setProjectsOpen]=useState(false),[exportOpen,setExportOpen]=useState(false),[canvasDialogOpen,setCanvasDialogOpen]=useState(false),[profileOpen,setProfileOpen]=useState(false),[studioSettingsOpen,setStudioSettingsOpen]=useState(false),[preset,setPreset]=useState<Preset>('A4'),[orientation,setOrientation]=useState<'landscape'|'portrait'>('landscape'),[draftWidth,setDraftWidth]=useState(11.9),[draftHeight,setDraftHeight]=useState(8.4),[draftBg,setDraftBg]=useState('#ffffff'),[grid,setGrid]=useState(true),[rotation,setRotation]=useState(0),[snap,setSnap]=useState(false),[selected,setSelected]=useState<string[]>([]),[preview,setPreview]=useState<SketchDocument|null>(null),[message,setMessage]=useState(''),[fillBusy,setFillBusy]=useState(false),[offsets,setOffsets]=useState({left:12,right:12,bottom:160});
+  const [active,setActiveState]=useState(false),[tool,setTool]=useState<Tool>('pencil'),[color,setColor]=useState('#141414'),[width,setWidth]=useState(3),[opacity,setOpacity]=useState(1),[colorOpen,setColorOpen]=useState(false),[layersOpen,setLayersOpen]=useState(false),[controlsOpen,setControlsOpen]=useState(false),[projectsOpen,setProjectsOpen]=useState(false),[exportOpen,setExportOpen]=useState(false),[canvasDialogOpen,setCanvasDialogOpen]=useState(false),[profileOpen,setProfileOpen]=useState(false),[studioSettingsOpen,setStudioSettingsOpen]=useState(false),[preset,setPreset]=useState<Preset>('A4'),[orientation,setOrientation]=useState<'landscape'|'portrait'>('landscape'),[draftWidth,setDraftWidth]=useState(11.9),[draftHeight,setDraftHeight]=useState(8.4),[draftBg,setDraftBg]=useState('#ffffff'),[grid,setGrid]=useState(true),[rotation,setRotation]=useState(0),[autoRotate,setAutoRotate]=useState(false),[snap,setSnap]=useState(false),[selected,setSelected]=useState<string[]>([]),[preview,setPreview]=useState<SketchDocument|null>(null),[message,setMessage]=useState(''),[fillBusy,setFillBusy]=useState(false),[offsets,setOffsets]=useState({left:12,right:12,bottom:160});
   const gesture=useRef<Gesture|null>(null),frame=useRef(0),previewRef=useRef<SketchDocument|null>(null),current=useRef(p);current.current=p;
   const setActive=(next:boolean|((prev:boolean)=>boolean))=>{setActiveState(prev=>{const resolved=typeof next==='function'?next(prev):next;if(resolved!==prev)current.current.onActiveChange?.(resolved);return resolved;});};
   const doc=p.doc,layer=doc.layers.find(l=>l.id===doc.activeLayerId)!,sheet=doc.sheet;
@@ -28,6 +28,13 @@ export function useSketchEditor(p:Props){
   const layerEditable=layer.visible&&!layer.locked;
   useEffect(()=>{setSelected([]);setPreview(null);gesture.current=null;},[p.project?.id]);
   useEffect(()=>()=>cancelAnimationFrame(frame.current),[]);
+  useEffect(()=>{
+    if(!autoRotate)return;
+    let raf=0,last=performance.now();
+    const tick=(now:number)=>{const dt=Math.min(.05,(now-last)/1000);last=now;setRotation(r=>Number(((r+dt*24)%360).toFixed(2)));raf=requestAnimationFrame(tick);};
+    raf=requestAnimationFrame(tick);
+    return()=>cancelAnimationFrame(raf);
+  },[autoRotate]);
   useEffect(()=>{
     const root=p.worldRef.current?.closest('.crystal-studio'),workspace=p.worldRef.current?.closest('section');if(!root||!workspace)return;
     const update=()=>{if(active){setOffsets({left:12,right:12,bottom:12});return;}const r=workspace.getBoundingClientRect(),left=root.querySelector('.crystal-left-panel')?.getBoundingClientRect(),right=root.querySelector('.crystal-right-panel')?.getBoundingClientRect(),chat=root.querySelector('.studio-ai-floating-floorplan')?.getBoundingClientRect();setOffsets({left:left&&left.width>0?Math.max(12,left.right-r.left+12):12,right:right&&right.width>0?Math.max(12,r.right-right.left+12):12,bottom:chat&&chat.height>60?Math.max(70,r.bottom-chat.top+12):70});};
@@ -149,6 +156,7 @@ export function useSketchEditor(p:Props){
         {toolButton('projects','Sketch projects',FolderOpen,projectsOpen,()=>setProjectsOpen(v=>!v))}
         {toolButton('clear','Clear drawing',Trash2,false,()=>{if(window.confirm('Clear drawing from all unlocked sketch layers? CAD geometry will be preserved.')){commit({...doc,layers:doc.layers.map(l=>l.locked?l:{...l,items:[]})});setSelected([]);}},!doc.layers.some(l=>!l.locked&&l.items.length>0))}
         {toolButton('export','Export viewport',Download,exportOpen,()=>setExportOpen(v=>!v))}
+        {toolButton('auto-rotate',autoRotate?'Stop slow object rotation':'Slowly rotate object',Play,autoRotate,()=>setAutoRotate(v=>!v))}
       </div>
       {projectsOpen&&<section className="sketch-project-menu is-top-menu" aria-label="Sketch projects"><span role="status" className="sketch-project-status">{p.project?.status||'Sketch Studio'}</span><button onClick={()=>attempt(()=>{p.project?.create();setProjectsOpen(false);})}>New sketch project</button><button onClick={()=>attempt(()=>{p.project?.create(true);setProjectsOpen(false);})}>Save a copy</button>{p.onOpenFile&&<button onClick={()=>{p.onOpenFile?.();setProjectsOpen(false);}}>Import JSON file…</button>}{p.project?.projects.map(project=><button key={project.id} onClick={()=>attempt(async()=>{await p.project?.open(project.id);setProjectsOpen(false);})}>{project.name}{project.id===p.project?.id?' ✓':''}</button>)}</section>}
       <dialog open={exportOpen} aria-label="Export scene" className="sketch-export-dialog sketch-panel">
@@ -216,7 +224,7 @@ export function useSketchEditor(p:Props){
     </>}
     {(message||fillBusy)&&<div role="status" className="sketch-message">{fillBusy?'Processing drawing…':message}{message&&<button aria-label="Dismiss drawing message" onClick={()=>setMessage('')}>×</button>}</div>}
   </div>;
-  return{active,hasCanvas,toggle,deactivate:exitPencilMode,overlay,panels,grid,rotation,fit,drawing:Boolean(gesture.current)};
+  return{active,hasCanvas,toggle,deactivate:exitPencilMode,overlay,panels,grid,rotation,autoRotate,toggleAutoRotate:()=>setAutoRotate(v=>!v),resetRotation:()=>{setAutoRotate(false);setRotation(0);},fit,drawing:Boolean(gesture.current)};
 }
 
 function SketchColorPicker({value,opacity,onChange,onOpacity,onClose}:{value:string;opacity:number;onChange:(color:string)=>void;onOpacity:(value:number)=>void;onClose:()=>void}){

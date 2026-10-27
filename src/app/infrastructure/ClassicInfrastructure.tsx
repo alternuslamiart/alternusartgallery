@@ -224,6 +224,20 @@ export default function ClassicInfrastructurePage() {
   const [lighting, setLighting] = useState<LightingSettings>(initialLighting);
   const [undergroundUtilities, setUndergroundUtilities] = useState(false);
   const [lightingOpen, setLightingOpen] = useState(false);
+  const [autoRotate, setAutoRotate] = useState(false);
+  useEffect(() => {
+    if (!autoRotate) return;
+    const timer = window.setInterval(() => {
+      setObjects((current) =>
+        current.map((object) =>
+          selectedId !== null && object.id !== selectedId
+            ? object
+            : { ...object, rotation: Number(((object.rotation + 1.2) % 360).toFixed(2)) },
+        ),
+      );
+    }, 50);
+    return () => window.clearInterval(timer);
+  }, [autoRotate, selectedId]);
   const { open: chatOpen, setOpen: setChatOpen } = useStudioDock();
   const [chatInput, setChatInput] = useState("");
   const [chatModel, setChatModel] = useState("gemini");
@@ -1412,11 +1426,12 @@ export default function ClassicInfrastructurePage() {
             </button>
             <button
               type="button"
-              title="Lighting & sun settings"
-              aria-label="Lighting & sun settings"
-              onClick={() => setLightingOpen((open) => !open)}
+              title={autoRotate ? "Stop slow object rotation" : "Slowly rotate object"}
+              aria-label={autoRotate ? "Stop slow object rotation" : "Slowly rotate object"}
+              aria-pressed={autoRotate}
+              onClick={() => setAutoRotate((value) => !value)}
               className={`ref-toolbar-icon-btn ${
-                lightingOpen ? "is-active" : ""
+                autoRotate ? "is-active" : ""
               }`}
             >
               <Play size={13} />

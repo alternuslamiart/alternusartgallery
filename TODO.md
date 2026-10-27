@@ -7,7 +7,8 @@
   top-left Profile & Settings buttons, top 54×54px/40×40px horizontal toolbar,
   right-side expandable panels, bottom-centered AI Chat, CAD+sketch persistence,
   PNG/SVG/PDF/JSON exports, unified 54×54px/40×40px `StudioViewportToolbar` across
-  Architecture/Infrastructure/Sketch CAD, floating Profile menu + Casynus AI
+  Architecture/Infrastructure/Sketch CAD, toggleable slow object rotation on the
+  toolbar triangle (`Play`) button across all studios, floating Profile menu + Casynus AI
   Studio Settings frame (`StudioSidebarFooter.tsx`), and PgBouncer pooler/transaction fix
   for `/api/studio-projects`. Verified with unit tests and live Chrome QA.
 - [ ] Verify deployed `/interior` Sketch Studio cloud save/reopen and exports in

@@ -149,6 +149,12 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const [pending, setPending] = useState<{ commands: SceneCommand[]; preview: SceneDocument; base: string; generatedJobId?:string; destructive?:boolean; expires?:number } | null>(null);
   const [editing,setEditing]=useState<{ids:string[];phase:'processing'|'updating'|'completed'}|null>(null);
   const [planning,setPlanning]=useState(false);
+  const [autoRotate,setAutoRotate]=useState(false);
+  useEffect(()=>{
+    if(!autoRotate||!worldMap)return;
+    const timer=window.setInterval(()=>{void worldMapAPI.current?.command({intent:'viewport.rotate',parameters:{degrees:1.2}},new AbortController().signal).catch(()=>{});},50);
+    return()=>window.clearInterval(timer);
+  },[autoRotate,worldMap]);
   const editTimer=useRef<ReturnType<typeof setTimeout>>();
   const editEpoch=useRef(0);
   const editBase=useRef('');
@@ -438,7 +444,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   });
 
   return <main data-world-map={worldMap || undefined} className={`crystal-studio scene-workbench ${left ? "" : "scene-left-closed"} ${right ? "" : "scene-right-closed"}`} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (worldMap) return; if (e.dataTransfer.files[0]) void importFile(e.dataTransfer.files[0]); else { const name = e.dataTransfer.getData("application/x-casynus-asset"); if (catalog.includes(name)) add(name, viewport.current?.point(e.clientX, e.clientY)); } }}>
-    {store.ready && <SceneViewport ref={viewport} document={pending&&!pending.destructive?pending.preview:doc} previewJob={pending?.generatedJobId} editing={editing} selected={selected} tool={pending||planning ? "select" : tool} snap={snap} grid={grid} onSelect={select} onHover={setHoveredId} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
+    {store.ready && <SceneViewport ref={viewport} document={pending&&!pending.destructive?pending.preview:doc} previewJob={pending?.generatedJobId} editing={editing} selected={selected} tool={pending||planning ? "select" : tool} snap={snap} grid={grid} autoRotate={autoRotate && !worldMap && !blocked} onSelect={select} onHover={setHoveredId} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
     {studio === "infrastructure" && mapOpened && <WorldMap key={doc.id} apiRef={worldMapAPI} active={worldMap} onViewChange={setMapView} importDisabled={blocked} onImport={feature => safely(() => {
       const scene = docRef.current;
       const objects = importGeographicFeature(feature, scene.objects.find(object => object.geographic)?.geographic?.origin);
@@ -499,7 +505,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
         onCamera={view => { if (worldMap) { setMapView(view); worldMapAPI.current?.view(view); return; } setCameraView(view); store.setCamera({ ...(viewport.current?.camera() ?? doc.camera), projection: view === "Orthographic" ? "orthographic" : "perspective" }); if (view !== "Orthographic") requestAnimationFrame(() => viewport.current?.preset(view)); }}
         onZoom={factor => worldMap ? worldMapAPI.current?.zoom(factor) : viewport.current?.zoom(factor)} exportFormats={worldMap ? ["glb", "gltf", "obj", "stl", "json"] : ["glb", "gltf", "obj", "stl", "png", "jpeg", "json"]} onExport={format => void exportFile(format)}
         onCSV={() => downloadStudioCSV(doc.name, doc.objects.map(o => ({ id: o.id, name: o.name, type: o.kind, parentId: o.parentId, position: o.position, rotation: o.rotation, scale: o.scale, dimensions: o.dimensions })))}
-        settingsLabel="Lighting & sun settings" onSettings={() => { setRight(true); requestAnimationFrame(() => globalThis.document.querySelector(".scene-environment")?.scrollIntoView({ block: "nearest" })); }} busy={Boolean(busy) || !store.ready} />
+        settingsLabel={autoRotate ? "Stop slow object rotation" : "Slowly rotate object"} settingsActive={autoRotate} onSettings={() => setAutoRotate(v => !v)} busy={Boolean(busy) || !store.ready} />
 
       {(error || store.failure) && <div className="scene-alert" role="alert"><span>{error || store.failure}</span>{store.conflict && <><button onClick={() => { if (window.confirm("Open the cloud revision and replace this browser recovery? Save a recovered copy first to retain both versions.")) window.location.href = `${routes[studio]}?project=${doc.id}&cloud=1`; }}>Open cloud copy</button><button onClick={store.saveCopy}>Save recovered copy</button></>}<button aria-label="Dismiss scene error" onClick={() => { setError(null); if (!store.conflict) store.setFailure(null); }}><X size={15} /></button></div>}
       {busy && <div className="scene-busy" role="status">{busy}</div>}

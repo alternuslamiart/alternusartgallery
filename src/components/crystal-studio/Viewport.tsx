@@ -1285,11 +1285,11 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
           label: id === "select" ? "Select & Move (V)" : id === "delete" ? "Delete selected element (Del)" : shortcut ? `${label} (${shortcut})` : label,
           icon, active: !sketch.active&&tool === id, onClick: () => {sketch.deactivate();activateDraftTool(id);},
         }))}
-        onFit={sketch.fit} onReset={() => setView({ zoom: 72, panX: 0, panY: 0 })}
+        onFit={sketch.fit} onReset={() => { sketch.resetRotation(); setView({ zoom: 72, panX: 0, panY: 0 }); }}
         cameraViews={["Top 2D Drafting"]} cameraView="Top 2D Drafting" onCamera={() => setView({ zoom: 72, panX: 0, panY: 0 })}
         onZoom={factor => setView(current => ({ ...current, zoom: Math.max(24, Math.min(180, current.zoom * factor)) }))}
         exportFormats={["PNG","SVG","PDF","JSON Scene","JPEG"]} onExport={format=>p.onFloorExport?.(format)} onCSV={() => downloadStudioCSV("Floor_plan", objects.map(o => ({ ...o })))}
-        settingsLabel="Toggle grid snapping" onSettings={() => setSettings({ snapToGrid: !settings.snapToGrid })} />}
+        settingsLabel={sketch.autoRotate ? "Stop slow object rotation" : "Slowly rotate object"} settingsActive={sketch.autoRotate} onSettings={sketch.toggleAutoRotate} />}
 
       {/* Top Drafting Status HUD */}
       {!sketch.active&&placementMessage && <div role="alert" className="absolute left-1/2 top-20 z-10 -translate-x-1/2 rounded-lg bg-[var(--studio-bg-panel)] px-3 py-2 text-xs">{placementMessage}</div>}

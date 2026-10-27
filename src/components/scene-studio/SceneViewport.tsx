@@ -24,6 +24,7 @@ export type ViewportAPI = {
 };
 export type SceneTool = "select" | "translate" | "rotate" | "scale" | "measure";
 type Props = { document: SceneDocument; selected: string[]; tool: SceneTool; snap: boolean; grid: boolean;
+  autoRotate?: boolean;
   previewJob?:string;
   editing?:{ids:string[];phase:'processing'|'updating'|'completed'}|null;
   onSelect: (id: string | null, additive?: boolean) => void; onTransform: (id: string, patch: Partial<SceneObject>) => void;
@@ -44,11 +45,11 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
   const dragging = useRef(false);
   const gesture = useRef<{ button: number; clientX: number; clientY: number; pointerId: number } | null>(null);
   const transformed = useRef(false);
-  const rendered=useRef('');
+  const rendered=useRef(''), sceneRotationY=useRef(0), wasRotating=useRef<{active:boolean;id:string|null}>({active:false,id:null});
   const [points, setPoints] = useState<THREE.Vector3[]>([]);
   const [assetVersion,setAssetVersion]=useState(0),[assetError,setAssetError]=useState('');
   useEffect(()=>{let active=true;setAssetError('');if(p.document.objects.some(o=>o.kind==='model'&&!generatedAsset(o.asset!.jobId)))void loadGeneratedAssets(p.document).then(()=>{if(active){setAssetVersion(v=>v+1);invalidate();}}).catch(error=>{if(active)setAssetError(error instanceof Error?error.message:'Generated model could not be restored.');});return()=>{active=false;};},[p.document.objects,invalidate]); // eslint-disable-line react-hooks/exhaustive-deps
-  const root = useMemo(() => buildScene(p.document, { helpers: true, onTextureLoad: invalidate }), [p.document.objects, invalidate,assetVersion]); // eslint-disable-line react-hooks/exhaustive-deps
+  const root = useMemo(() => { const r = buildScene(p.document, { helpers: true, onTextureLoad: invalidate }); r.rotation.y = sceneRotationY.current; return r; }, [p.document.objects, invalidate,assetVersion]); // eslint-disable-line react-hooks/exhaustive-deps
   const renderToken=useMemo(()=>JSON.stringify([p.document.id,p.document.objects,p.document.environment]),[p.document.id,p.document.objects,p.document.environment]);
   useEffect(() => () => disposeScene(root), [root]);
   const selected = useMemo(() => {
@@ -102,6 +103,20 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
   }, [camera, gl]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (p.tool !== "measure") setPoints([]); }, [p.tool]);
   useEffect(() => {
+    if (p.autoRotate) return;
+    const last = wasRotating.current;
+    if (!last.active) return;
+    wasRotating.current = { active: false, id: null };
+    if (last.id && selected && p.selected[0] === last.id && !transformLocked) {
+      const original = p.document.objects.find(o => o.id === last.id);
+      const nextRot: Vec3 = [selected.rotation.x, selected.rotation.y, selected.rotation.z];
+      if (original && nextRot.some((v, i) => Math.abs(v - original.rotation[i]) > 1e-5)) {
+        p.onTransform(last.id, { rotation: nextRot });
+      }
+    }
+    invalidate();
+  }, [p.autoRotate]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
     const down = (event: KeyboardEvent) => { if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement)) keys.current.add(event.code); };
     const up = (event: KeyboardEvent) => keys.current.delete(event.code);
     const blur = () => keys.current.clear();
@@ -114,6 +129,18 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
       if(p.editing.phase==='completed')fade.current=Math.max(0,fade.current-delta*3);
       overlay.traverse(node=>{if(node instanceof THREE.Mesh&&node.material instanceof THREE.ShaderMaterial){node.material.uniforms.time.value+=Math.min(delta,.1);node.material.uniforms.fade.value=fade.current;}});
       if(p.editing.phase!=='completed'||fade.current>0)invalidate();
+    }
+    if(p.autoRotate&&!dragging.current&&!p.walking){
+      const step=Math.min(delta,.05)*.55;
+      if(selected&&!transformLocked&&p.selected[0]){
+        selected.rotation.y=(selected.rotation.y+step)%(Math.PI*2);
+        wasRotating.current={active:true,id:p.selected[0]};
+      }else{
+        sceneRotationY.current=(sceneRotationY.current+step)%(Math.PI*2);
+        root.rotation.y=sceneRotationY.current;
+        wasRotating.current={active:true,id:null};
+      }
+      invalidate();
     }
     selectionBoxes.forEach(helper=>helper.update());
     if (!p.walking || !walk.current?.isLocked) return;
@@ -245,7 +272,7 @@ export const SceneViewport = forwardRef<ViewportAPI, Props>(function SceneViewpo
   const maxDpr = e.quality === "performance" ? 1 : e.quality === "ultra" ? 2 : 1.5;
   return <div className="scene-canvas" data-object-count={p.document.objects.length} data-preview-job={p.previewJob} data-edit-phase={p.editing?.phase} data-edit-targets={p.editing?.ids.join(',')}>
     <RenderBoundary key={generation} retry={() => { setContextLost(false); setGeneration(g => g + 1); }}>
-      <Canvas frameloop={walking ? "always" : "demand"} shadows={e.shadows} dpr={[1, maxDpr]} gl={{ antialias: true, preserveDrawingBuffer: true, powerPreference: "high-performance" }}
+      <Canvas frameloop={walking || p.autoRotate ? "always" : "demand"} shadows={e.shadows} dpr={[1, maxDpr]} gl={{ antialias: true, preserveDrawingBuffer: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => { gl.domElement.addEventListener("webglcontextlost", event => { event.preventDefault(); setContextLost(true); }, { once: true }); }}
         fallback={<div role="alert" className="scene-render-error">WebGL 2 is unavailable. Enable hardware acceleration; your scene document remains accessible.</div>}>
         <Suspense fallback={null}><Contents {...p} ref={ref} walking={walking} setWalking={setWalking} /></Suspense>
