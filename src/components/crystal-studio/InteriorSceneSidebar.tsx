@@ -36,10 +36,10 @@ export function InteriorSceneSidebar(p: Props) {
     hierarchyRef.current?.querySelector<HTMLElement>(`[data-floor-plan-object-id="${CSS.escape(id)}"]`)?.scrollIntoView({block:"nearest",inline:"nearest"});
   },[p.selectedId,p.hoveredId]);
   return <StudioPanel className="crystal-left-panel interior-scene-sidebar">
-    <StudioHeader title="Interior" onBack={p.onBack} onCollapse={p.onCollapse} />
+    <StudioHeader title="Sketch" onBack={p.onBack} onCollapse={p.onCollapse} />
     <nav className="interior-scene-nav" aria-label="Studios">
       <Link href="/casynus">Architecture</Link>
-      <Link href="/interior" aria-current="page">Interior</Link>
+      <Link href="/interior" aria-current="page">Sketch</Link>
       <Link href="/infrastructure">Infra</Link>
     </nav>
     <div className="interior-project-row">

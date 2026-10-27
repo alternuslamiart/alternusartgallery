@@ -1,5 +1,6 @@
+import {validateSketch,MAX_SKETCH_BYTES} from './sketch.mjs';
 export function parseFloorPlanRecovery(raw){
-  if(typeof raw!=='string'||raw.length>1_000_000)throw new Error('Floor-plan recovery is invalid or too large.');
+  if(typeof raw!=='string'||raw.length>MAX_SKETCH_BYTES+500_000)throw new Error('Floor-plan recovery is invalid or too large.');
   const value=JSON.parse(raw),validNumber=n=>typeof n==='number'&&Number.isFinite(n)&&Math.abs(n)<=10000;
   if(value?.version!==1||typeof value.name!=='string'||value.name.length>120||!Array.isArray(value.objects)||value.objects.length>1000)throw new Error('Invalid floor-plan recovery.');
   const ids=new Set();
@@ -12,5 +13,7 @@ export function parseFloorPlanRecovery(raw){
   }
   const s=value.settings;
   if(!s||!['mm','cm','m'].includes(s.unit)||![s.scale,s.precision,s.gridStepMm].every(n=>validNumber(n)&&n>0)||!['snapToGrid','snapToPoints','orthogonal'].every(k=>typeof s[k]==='boolean'))throw new Error('Invalid floor-plan settings.');
+  if(value.sketch!==undefined)validateSketch(value.sketch);
+  if(value.id!==undefined&&(typeof value.id!=='string'||!/^sketch-[a-zA-Z0-9-]{1,80}$/.test(value.id)))throw new Error('Invalid sketch project identity.');
   return value;
 }

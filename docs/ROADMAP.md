@@ -6,6 +6,15 @@ requirements provide new evidence.
 
 ## P1 — Persistence and workflow reliability
 
+- [x] Rename Interior Studio to Sketch Studio across navigation, headers and AI
+  chat while preserving `/interior`, 2D CAD drafting, 3D workspace and projects.
+- [x] Add Sketch Drawing & Paint over the 2D floor plan with a `#404040`
+  workspace, separate white sheet, 54×54px (40×40px inner) floating toolbars,
+  freehand/paint/shape/fill/eraser tools, HSV color picker, layers, bottom-right
+  navigation, `/api/sketch-projects` persistence and PNG/SVG/PDF/JSON exports.
+- [ ] Verify Sketch Studio persistence and exports on the production deployment
+  after Vercel build completion.
+
 - [x] Distinguish cloud load errors and corrupt scenes, validate project identity
   and revisions, and require safe cloud-read reconciliation before recovery PUT.
 

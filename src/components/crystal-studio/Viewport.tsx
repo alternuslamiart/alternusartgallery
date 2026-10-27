@@ -57,8 +57,19 @@ import { readViewportTheme } from "./viewport-theme";
 import { useStudioActionAdapter, verifyStudioState } from "./StudioActions";
 import { normalizeCommand, STUDIO_ROUTES, type StudioAction } from "@/lib/studio-actions.mjs";
 import type { StudioToolbarAPI } from "./StudioViewportToolbar";
+import {useSketchEditor} from './SketchWorkspace';
+import {createSketch,type SketchDocument} from '@/lib/sketch.mjs';
+import type {useSketchProject} from './useSketchProject';
 
 type Props = {
+  sketch?:SketchDocument;
+  onSketchChange?:(doc:SketchDocument)=>void;
+  onSketchUndo?:()=>void;
+  onSketchRedo?:()=>void;
+  sketchCanUndo?:boolean;
+  sketchCanRedo?:boolean;
+  sketchProject?:ReturnType<typeof useSketchProject>;
+  onFloorExport?:(format:string)=>void;
   onStudioAction?:(action:StudioAction,signal:AbortSignal)=>Promise<string>;
   actionScope?:string;
   renderer: string;
@@ -450,7 +461,7 @@ const MODELING_QUICK_PROMPTS = [
   { label: "Move +2m X", prompt: "move right 2" },
 ];
 
-function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
+function FloorPlanViewport({ p }: { p: Props; isMobile: boolean }) {
   const sourceObjects = floorInitialObjects(p.floorPlanObjects);
   const [moving, setMoving] = useState<{ original: FloorPlanObject; start: FloorPlanPoint; preview: FloorPlanObject } | null>(null);
   const objects = moving && moving.preview !== moving.original ? sourceObjects.map(object => object.id === moving.original.id ? moving.preview : object) : sourceObjects;
@@ -496,6 +507,8 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
   ]);
 
   const svgRef = useRef<SVGSVGElement>(null);
+  const worldRef=useRef<SVGGElement>(null);
+  const emptySketch=useMemo(()=>createSketch(),[]);
   const settings = p.floorPlanSettings ?? {
     unit: "mm",
     scale: 100,
@@ -507,6 +520,10 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
   };
   const setSettings = (patch: Partial<FloorPlanSettings>) =>
     p.onFloorPlanSettingsChange?.({ ...settings, ...patch });
+  const sketch=useSketchEditor({doc:p.sketch??emptySketch,onChange:next=>p.onSketchChange?.(next),undo:()=>p.onSketchUndo?.(),redo:()=>p.onSketchRedo?.(),canUndo:Boolean(p.sketchCanUndo),canRedo:Boolean(p.sketchCanRedo),worldRef,objects:sourceObjects,settings,view,setView,project:p.sketchProject,onExport:p.onFloorExport,onActivate:()=>p.onSelectFloorPlanObject?.(null)});
+  const fitRef=useRef(sketch.fit);fitRef.current=sketch.fit;
+  const fittedProject=useRef('');
+  useEffect(()=>{if(size.width&&p.sketchProject?.ready&&p.sketchProject.id!==fittedProject.current){fittedProject.current=p.sketchProject.id;fitRef.current();}},[size.width,p.sketchProject?.ready,p.sketchProject?.id]);
 
   useEffect(() => {
     const node = svgRef.current;
@@ -520,11 +537,9 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
   }, []);
 
   const pointFromEvent = (event: React.PointerEvent<SVGSVGElement>, snap = true) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const raw = {
-      x: (event.clientX - rect.left - rect.width / 2 - view.panX) / view.zoom,
-      y: (event.clientY - rect.top - rect.height / 2 - view.panY) / view.zoom,
-    };
+    const matrix=worldRef.current?.getScreenCTM();
+    const point=matrix?new DOMPoint(event.clientX,event.clientY).matrixTransform(matrix.inverse()):new DOMPoint();
+    const raw={x:point.x,y:point.y};
     return snap ? floorSnapPoint(raw, objects, settings, view.zoom) : raw;
   };
   const updateObjects = (next: FloorPlanObject[]) =>
@@ -751,6 +766,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
     if ((event.target as Element).closest("button")) return;
     event.preventDefault();
     event.currentTarget.focus();
+    if(sketch.active&&event.button===0&&!event.shiftKey)return;
     const point = pointFromEvent(event);
     if (event.button === 1 || (event.button === 0 && event.shiftKey)) {
       setPanning({
@@ -884,6 +900,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
+      if(sketch.active||event.defaultPrevented)return;
       if ((event.target as HTMLElement)?.matches("input,textarea,select")) return;
       if (event.ctrlKey || event.metaKey || event.altKey) {
         if (event.key.toLowerCase() === "z") { setMoving(null); setDrag(null); }
@@ -934,7 +951,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
 
   return (
     <section
-      className="floor-plan-canvas relative min-h-0 overflow-hidden bg-[var(--studio-bg-elevated)] text-[var(--studio-text-secondary)]"
+      className="floor-plan-canvas sketch-workspace relative min-h-0 overflow-hidden bg-[var(--studio-bg-elevated)] text-[var(--studio-text-secondary)]"
       aria-label="2D Floor Plan Drafting Workspace"
     >
       <div
@@ -977,7 +994,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
       <svg
         ref={svgRef}
         tabIndex={0}
-        aria-label="Interior plan canvas"
+        aria-label="Sketch plan canvas"
         style={{ touchAction: "none" }}
         className="floor-plan-svg-surface absolute inset-0 h-full w-full cursor-crosshair"
         onPointerOver={event=>p.onHoverFloorPlanObject?.((event.target as Element).closest('[data-floor-plan-object-id]')?.getAttribute('data-floor-plan-object-id')??null)}
@@ -992,12 +1009,12 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         }}
         onWheel={(event) => {
           event.preventDefault();
-          if (moving || drag) return;
+          if (moving || drag || sketch.drawing) return;
           setView((current) => ({
             ...current,
             zoom: Math.max(
-              24,
-              Math.min(180, current.zoom * Math.exp(-event.deltaY * 0.001)),
+              4,
+              Math.min(600, current.zoom * Math.exp(-event.deltaY * 0.001)),
             ),
           }));
         }}
@@ -1018,13 +1035,17 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
             />
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill="var(--studio-draft-paper)" />
-        {!isMobile && <rect width="100%" height="100%" fill="url(#floor-dots)" />}
+        <rect width="100%" height="100%" fill="#404040" />
+        <defs><clipPath id="sketch-sheet-clip"><rect {...(p.sketch??emptySketch).sheet}/></clipPath><pattern id="sketch-world-grid" width={settings.gridStepMm/1000} height={settings.gridStepMm/1000} patternUnits="userSpaceOnUse"><circle cx="0" cy="0" r={.8/view.zoom} fill="#888" opacity=".5"/></pattern></defs>
         <g
+          ref={worldRef}
           transform={`translate(${size.width / 2 + view.panX} ${
             size.height / 2 + view.panY
-          }) scale(${view.zoom})`}
+          }) rotate(${sketch.rotation}) scale(${view.zoom})`}
         >
+          <rect {...(p.sketch??emptySketch).sheet} fill="white"/>
+          {sketch.grid&&<rect {...(p.sketch??emptySketch).sheet} fill="url(#sketch-world-grid)" pointerEvents="none"/>}
+          <g clipPath="url(#sketch-sheet-clip)">
           {objects
             .filter((object) => object.type === "room")
             .map((room) => (
@@ -1247,20 +1268,23 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
               </text>
             </>
           )}
+          {sketch.overlay}
+          </g>
         </g>
       </svg>
+      {sketch.panels}
 
       <StudioViewportToolbar label="Architectural drafting tools"
         apiRef={toolbarAPI}
-        leading={[{ label: "Add room to floor plan", icon: SquareDashed, onClick: addDefaultRoom }]}
+        leading={[{label:'Sketch Drawing & Paint',icon:Pencil,onClick:sketch.toggle,active:sketch.active,frame:true},{ label: "Add room to floor plan", icon: SquareDashed, onClick:()=>{sketch.deactivate();addDefaultRoom();} }]}
         tools={tools.map(([id, label, shortcut, icon]) => ({
           label: id === "select" ? "Select & Move (V)" : id === "delete" ? "Delete selected element (Del)" : shortcut ? `${label} (${shortcut})` : label,
-          icon, active: tool === id, onClick: () => activateDraftTool(id),
+          icon, active: !sketch.active&&tool === id, onClick: () => {sketch.deactivate();activateDraftTool(id);},
         }))}
-        onFit={() => setView({ zoom: 72, panX: 0, panY: 0 })} onReset={() => setView({ zoom: 72, panX: 0, panY: 0 })}
+        onFit={sketch.fit} onReset={() => setView({ zoom: 72, panX: 0, panY: 0 })}
         cameraViews={["Top 2D Drafting"]} cameraView="Top 2D Drafting" onCamera={() => setView({ zoom: 72, panX: 0, panY: 0 })}
         onZoom={factor => setView(current => ({ ...current, zoom: Math.max(24, Math.min(180, current.zoom * factor)) }))}
-        exportFormats={["Floor plan sheet"]} onExport={() => p.onSnapshot()} onCSV={() => downloadStudioCSV("Floor_plan", objects.map(o => ({ ...o })))}
+        exportFormats={["PNG","SVG","PDF","JSON Scene","JPEG"]} onExport={format=>p.onFloorExport?.(format)} onCSV={() => downloadStudioCSV("Floor_plan", objects.map(o => ({ ...o })))}
         settingsLabel="Toggle grid snapping" onSettings={() => setSettings({ snapToGrid: !settings.snapToGrid })} />
 
       {/* Top Drafting Status HUD */}

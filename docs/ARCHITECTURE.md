@@ -1,5 +1,19 @@
 # Repository architecture
 
+- Sketch Studio (`/interior`) renames the user-facing Interior label to Sketch
+  while keeping `/interior`, `/interior?workspace=3d`, CAD floor-plan objects,
+  Scene hierarchy and the Properties inspector intact. `SketchWorkspace.tsx` and
+  `src/lib/sketch.mjs` add a `#404040` workspace around a separate customizable
+  white sheet with an independent multi-layer SVG drawing overlay above CAD
+  geometry, 54×54px (40×40px inner surface) left floating tool frames, HSV/HEX
+  color picker, chronological SVG mask erasing, scanline flood fill, layer
+  blend/opacity/locking and bottom-right navigation. `useSketchProject.ts` and
+  `/api/sketch-projects` persist versioned CAD+sketch documents in
+  `BlenderProject.settings` (`kind: "casynus-sketch"`) with revision checks,
+  JSONB key-order-independent reconciliation (`sketch-project.mjs`) and per-user
+  `localStorage` recovery. `sketch-export.ts` exports combined CAD and visible
+  sketch layers to PNG, SVG, PDF and editable JSON Scene.
+
 - `/aichat` stores pinned/unread/project association on AssistantConversation;
   apply `prisma/ai-chat-sidebar.sql` before deploying the regenerated Prisma
   client. Conversation mutations and reads enforce user plus workspace ownership,

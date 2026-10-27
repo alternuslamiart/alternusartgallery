@@ -31,7 +31,7 @@ import "./scene-studio.css";
 type Studio = "architecture" | "interior" | "infrastructure";
 const WorldMap = dynamic(() => import("@/components/infrastructure/WorldMap"), { ssr: false });
 const routes = { architecture: "/casynus", interior: "/interior", infrastructure: "/infrastructure" };
-const names = { architecture: "Architecture", interior: "Interior Design", infrastructure: "Infrastructure" };
+const names = { architecture: "Architecture", interior: "Sketch", infrastructure: "Infrastructure" };
 const providers = [{ id: "gemini", label: "Gemini" }, { id: "groq", label: "Groq" }, { id: "you", label: "You" }];
 const catalog = ["Box", "Sphere", "Cylinder", "Wall", "Floor slab", "Ceiling", "Roof", "Column", "Beam", "Door", "Window", "Sofa", "Coffee table", "Cabinet", "Stairs", "Road", "Sidewalk", "Bridge", "Streetlight", "Tree", "Point light", "Spot light"];
 const fingerprint = (d: SceneDocument) => JSON.stringify([d.id, d.objects, d.environment]);
@@ -408,7 +408,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     })} />}
 
     {left && <StudioPanel className="scene-sidebar scene-left"><StudioHeader title={names[studio]} onBack={() => void leave("/project")} onCollapse={() => setLeft(false)} />
-      <nav className="scene-studio-nav" aria-label="Design studios">{(Object.keys(routes) as Studio[]).map(s => <button key={s} className={s === studio ? "is-active" : ""} onClick={() => void navigate(s)}>{s === "architecture" ? "Architecture" : s === "interior" ? "Interior" : "Infra"}</button>)}</nav>
+      <nav className="scene-studio-nav" aria-label="Design studios">{(Object.keys(routes) as Studio[]).map(s => <button key={s} className={s === studio ? "is-active" : ""} onClick={() => void navigate(s)}>{s === "architecture" ? "Architecture" : s === "interior" ? "Sketch" : "Infra"}</button>)}</nav>
       <div className="scene-project-row"><input aria-label="Project name" key={doc.id + doc.name} defaultValue={doc.name} maxLength={120} onBlur={e => { if (e.target.value.trim() !== doc.name) safely(() => change({ ...doc, name: e.target.value.trim() })); }} /><button aria-label="Open projects" onClick={() => void listProjects()}><FolderOpen size={16} /></button>
         <details className="scene-project-actions"><summary aria-label="Project actions" title="Project actions"><MoreHorizontal size={18} /></summary><div className="scene-project-actions-content" onClick={e => { if ((e.target as HTMLElement).closest("button:not(:disabled)")) e.currentTarget.parentElement?.removeAttribute("open"); }}>
       <Menu name="File"><button onClick={() => void newProject()}>New project</button><button onClick={() => void listProjects()}>Open workspace project</button><button onClick={() => void listGenerationJobs()}>AI generation jobs</button><button onClick={() => void store.save()}>Save · Ctrl S</button><button onClick={() => { store.saveCopy(); setPending(null); }}>Save as copy</button><button onClick={() => file.current?.click()}>Import model / JSON</button><button onClick={() => void exportFile("json")}>Download project JSON</button></Menu>

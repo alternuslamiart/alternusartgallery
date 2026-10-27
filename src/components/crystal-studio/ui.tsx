@@ -30,7 +30,7 @@ export function StudioModeNav({ activeStudio, onStudioModeChange }: {
 }) {
   const modes = [
     { id: "modeling", name: "3D Studio", href: "/casynus", icon: Box },
-    { id: "floor-plan", name: "Interior", href: "/interior", icon: Layers3 },
+    { id: "floor-plan", name: "Sketch", href: "/interior", icon: Layers3 },
     { id: "infrastructure", name: "Infra", href: "/infrastructure", icon: Compass },
   ] as const;
   return <nav className="studio-mode-switcher" aria-label="Switch Casynus studio">

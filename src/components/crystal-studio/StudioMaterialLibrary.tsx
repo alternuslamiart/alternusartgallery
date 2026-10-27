@@ -33,7 +33,7 @@ export function StudioMaterialLibrary({options,onClose,width,uploadedAssets,onUp
       disabled={!options?.canApply} aria-pressed={options?.activeMap===asset.material.map} style={{backgroundImage:`url("${asset.thumbnail}")`}} onClick={()=>options?.onApply(asset.material)}><span>{asset.name}</span></button>)}</div>
     <button type="button" className="cs-material-upload" aria-label="Upload texture asset" title="Upload PNG / JPEG / WebP texture" onClick={()=>input.current?.click()}><Plus size={26}/></button>
     <input ref={input} type="file" className="sr-only" aria-label="Texture asset file" accept="image/png,image/jpeg,image/webp" onChange={event=>{const file=event.target.files?.[0];if(file)upload(file);event.currentTarget.value="";}}/>
-    {!options&&<Link href="/interior?workspace=3d" className="cs-material-notice">Apply textures in Interior 3D ↗</Link>}
+    {!options&&<Link href="/interior?workspace=3d" className="cs-material-notice">Apply textures in Sketch 3D ↗</Link>}
     {error&&<p role="alert" className="cs-material-notice">{error}</p>}
   </section>;
 }

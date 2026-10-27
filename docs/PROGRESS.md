@@ -2,6 +2,44 @@
 
 Last updated: 2026-10-27
 
+## Casynus Sketch Studio, UI layout, toolbars and persistence (2026-10-27)
+
+- Renamed user-facing Interior labels to Sketch across `InteriorSceneSidebar`,
+  `LeftSidebar`, `StudioAIChat`, `StudioMaterialLibrary`, `ui.tsx`,
+  `SceneWorkbench`, `CrystalStudio` and `unified-sidebar` while preserving the
+  `/interior` and `/interior?workspace=3d` routes, CAD floor-plan drafting,
+  Scene hierarchy, Properties inspector and AI Chat dock.
+- Added the top-toolbar Pencil entry (`Sketch Drawing & Paint`, 54×54px outer /
+  40×40px inner surface) and implemented `SketchWorkspace.tsx`, `sketch.css`,
+  `src/lib/sketch.mjs`, `src/lib/sketch-project.mjs`, `useSketchProject.ts`,
+  `sketch-export.ts` and `/api/sketch-projects`.
+- Changed the Sketch Studio workspace background to `#404040` with a separate
+  customizable white drawing sheet (`sheet.width`/`sheet.height`), left floating
+  54px primary and secondary toolbars (Select/Move, Pencil, Brush, Eraser, Shape
+  tools, Text, Fill/Paint Bucket, Zoom, Line, Rectangle, Ellipse, Color Picker,
+  Highlighter, Freehand Selection), movable/collapsible HSV+HEX floating color
+  picker, right-aligned Layers panel (add, delete, rename, show/hide, lock/unlock,
+  order, opacity, blend modes) and 54px bottom-right canvas navigation (zoom %,
+  slider, reset, 15° rotate, grid toggle, fit, zoom in).
+- Implemented pointer-captured mouse/pen/touch freehand drawing with quadratic
+  smoothing, chronological SVG mask erasing, scanline flood-fill regions, stroke
+  selection/translation/duplication/deletion, independent drawing undo/redo,
+  combined CAD+sketch exports (PNG, SVG, PDF, JSON Scene), per-identity browser
+  recovery and authenticated `/api/sketch-projects` workspace persistence with
+  JSONB key-order-safe revision reconciliation.
+- Verification: all 201 Node tests (`npm test`), standalone TypeScript
+  (`npm run typecheck`), focused Next.js lint and production build passed.
+  Real installed-Chrome live acceptance (`node scripts/verify-sketch.mjs --live`)
+  passed 54×54px/40×40px toolbar geometry, mouse/pen/touch strokes, brush,
+  rectangle, paint bucket fill, eraser mask, undo/redo, layer CRUD/blend/opacity,
+  line/ellipse/highlighter/text/lasso/color picker, zoom/pan/15° rotation with
+  preserved CAD geometry, real Credentials login, delayed cloud save
+  reconciliation, page reload, PNG/SVG/PDF/JSON downloads, logout/login cloud
+  restoration, CAD return, light mode and 390px mobile layout (artifacts in
+  `.tmp/sketch-qa-1793132281762/`). Added a 61s pre-logout wait in
+  `scripts/verify-sketch.mjs` to respect the 8-req/60s `/api/auth` middleware
+  rate limit during single-IP local live runs.
+
 ## AI chat sidebar and authenticated chat acceptance (2026-10-27)
 
 - Replaced notification-only Pin, Mark as unread and Add to project with

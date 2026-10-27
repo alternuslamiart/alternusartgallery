@@ -65,7 +65,7 @@ const DEFAULT_MODELS: Record<StudioAIChatProps["studio"], StudioChatModelOption[
   "floor-plan": [...PROVIDER_MODELS, { id: "Precision Mode", label: "Local floor-plan layout" }, { id: "Fast Concept", label: "Local concept layout" }],
   infrastructure: [...PROVIDER_MODELS, { id: "Precision Mode", label: "Local site review" }, { id: "Site Assistant", label: "Local site assistant" }, { id: "Mobility Review", label: "Local mobility review" }],
 };
-const STUDIO_NAMES = { modeling: "3D Studio", "floor-plan": "Interior", infrastructure: "Infrastructure" };
+const STUDIO_NAMES = { modeling: "3D Studio", "floor-plan": "Sketch", infrastructure: "Infrastructure" };
 
 export function StudioAIChat({
   studio, open, onOpenChange, prompt, onPromptChange, onSubmit, onStop,

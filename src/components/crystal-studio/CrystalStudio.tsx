@@ -13,7 +13,9 @@ import { RightPanel } from "./RightPanel";
 import type { FloorPlanObject, MaterialName, RenderSettings, StudioAsset, StudioMode, StudioTool, Transform } from "./types";
 import type { FloorPlanSettings } from "./types";
 import { DEFAULT_FLOOR_PLAN_SETTINGS, floorPlanHistoryReducer } from "./floor-plan-geometry";
-import { floorPlanPaper, floorPlanSvg, svgToPdf } from "./floor-plan-export";
+import {exportSketch} from './sketch-export';
+import {createSketch,sketchHistory,normalizeSketch} from '@/lib/sketch.mjs';
+import {useSketchProject} from './useSketchProject';
 import { Viewport } from "./Viewport";
 import { UnifiedSidebar } from "@/components/unified-sidebar";
 import { ModelingSidebar } from "./ModelingSidebar";
@@ -53,8 +55,6 @@ export function CrystalStudio({
   const router = useRouter();
   const {data:session,status:sessionStatus}=useSession();
   const recoveryIdentity=session?.user?.id??session?.user?.email??(sessionStatus==='loading'?'loading':'guest');
-  const recoveryKey=`casynus:floor-plan-recovery:${recoveryIdentity}`;
-  const [recoveredIdentity,setRecoveredIdentity]=useState('');
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -113,6 +113,7 @@ export function CrystalStudio({
   useEffect(() => {
     if (studioMode !== "floor-plan") return;
     const handler = (event: KeyboardEvent) => {
+      if(event.defaultPrevented)return;
       if ((event.target as HTMLElement)?.closest("input,textarea,select,[contenteditable=true]")) return;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
         event.preventDefault();
@@ -126,14 +127,12 @@ export function CrystalStudio({
   const [floorPlanName, setFloorPlanName] = useState("Untitled project");
   const [selectedFloorPlanId, setSelectedFloorPlanId] = useState<string | null>(null);
   const [floorPlanSettings, setFloorPlanSettings] = useState<FloorPlanSettings>(DEFAULT_FLOOR_PLAN_SETTINGS);
-  const initialPlan=useRef(floorPlanObjects);
-  useEffect(()=>{
-    if(recoveryIdentity==='loading')return;
-    try{const raw=localStorage.getItem(recoveryKey);const saved=raw?parseFloorPlanRecovery(raw):null;dispatchFloorPlan({type:'replace',next:saved?.objects??initialPlan.current});setFloorPlanName(saved?.name??'Untitled project');setFloorPlanSettings(saved?.settings??DEFAULT_FLOOR_PLAN_SETTINGS);}
-    catch{dispatchFloorPlan({type:'replace',next:initialPlan.current});setFloorPlanName('Untitled project');setFloorPlanSettings(DEFAULT_FLOOR_PLAN_SETTINGS);setError('Floor-plan recovery is invalid. The stored copy was left untouched; the starter drawing is shown.');}
-    setSelectedFloorPlanId(null);
-    setRecoveredIdentity(recoveryIdentity);
-  },[recoveryIdentity,recoveryKey]);
+  const [drawingHistory,dispatchDrawing]=useReducer(sketchHistory,{past:[],present:createSketch(),future:[]});
+  const sketch=drawingHistory.present;
+  const planSnapshot=useMemo(()=>({version:1 as const,name:floorPlanName,objects:floorPlanObjects,settings:floorPlanSettings,sketch}),[floorPlanName,floorPlanObjects,floorPlanSettings,sketch]);
+  const sketchProject=useSketchProject(recoveryIdentity,studioMode==='floor-plan',sessionStatus==='authenticated',planSnapshot,saved=>{
+    dispatchFloorPlan({type:'replace',next:saved.objects});setFloorPlanName(saved.name);setFloorPlanSettings(saved.settings);dispatchDrawing({type:'replace',next:saved.sketch??createSketch()});setSelectedFloorPlanId(null);
+  });
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -155,7 +154,7 @@ export function CrystalStudio({
   const [mobileMenu, setMobileMenu] = useState(false);
   const [mobileProfile, setMobileProfile] = useState(false);
   const [mobilePricing, setMobilePricing] = useState(false);
-  const [mobileHome, setMobileHome] = useState(true);
+  const [mobileHome, setMobileHome] = useState(initialStudioMode!=='floor-plan');
   const [mobileViewport, setMobileViewport] = useState(false);
   const [mobileModelSheet, setMobileModelSheet] = useState(false);
   const [mobileWorkspace, setMobileWorkspace] = useState<"floor-plan" | "modeling" | "images">("images");
@@ -223,39 +222,13 @@ export function CrystalStudio({
 
   const handleExport = async (format: string) => {
     if (studioMode === "floor-plan") {
-      const slug = "crystal-floor-plan";
-      const scene = { version: 2, name: floorPlanName, units: floorPlanSettings.unit, scale: `1:${floorPlanSettings.scale}`, precision: floorPlanSettings.precision, settings: floorPlanSettings, objects: floorPlanObjects, exportedAt: new Date().toISOString() };
-      if (format === "JSON Scene") downloadFile(`${slug}.json`, JSON.stringify(scene, null, 2), "application/json");
-      else {
-        const svg = floorPlanSvg(floorPlanObjects, floorPlanSettings);
-        const paper = floorPlanPaper(floorPlanObjects, floorPlanSettings);
-        if (format === "SVG") downloadFile(`${slug}.svg`, svg, "image/svg+xml");
-        else if (format === "PDF") downloadFile(`${slug}.pdf`, svgToPdf(floorPlanObjects, floorPlanSettings), "application/pdf");
-        else {
-          const image = new Image();
-          image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-          await new Promise<void>((resolve, reject) => { image.onload = () => resolve(); image.onerror = () => reject(new Error("Floor plan rasterization failed.")); });
-          const dpi = 300;
-          const canvas = document.createElement("canvas");
-          canvas.width = Math.round(paper.width / 25.4 * dpi);
-          canvas.height = Math.round(paper.height / 25.4 * dpi);
-          const context = canvas.getContext("2d");
-          if (!context) throw new Error("Floor plan canvas unavailable.");
-          context.fillStyle = "#fafaf7";
-          context.fillRect(0, 0, canvas.width, canvas.height);
-          context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          const mime = format === "PNG" ? "image/png" : "image/jpeg";
-          const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, mime, .95));
-          if (!blob) throw new Error("Floor plan raster export failed.");
-          const url = URL.createObjectURL(blob);
-          const anchor = document.createElement("a");
-          anchor.href = url;
-          anchor.download = `${slug}.${format === "PNG" ? "png" : "jpg"}`;
-          anchor.click();
-          URL.revokeObjectURL(url);
-        }
-      }
-      setToast(`${format} export ready.`);
+      setExporting(format);
+      try{
+        const slug=floorPlanName.replace(/[^a-z0-9_-]/gi,'_')||'Sketch';
+        if(format==='JSON Scene')downloadFile(`${slug}.json`,JSON.stringify({...planSnapshot,id:sketchProject.id},null,2),'application/json');
+        else{const output=await exportSketch(format==='JPEG & PNG'?'PNG':format,floorPlanObjects,floorPlanSettings,sketch),url=URL.createObjectURL(output),link=document.createElement('a');link.href=url;link.download=`${slug}.${format==='JPEG'?'jpg':format==='JPEG & PNG'?'png':format.toLowerCase()}`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+        setToast(`${format} export ready.`);
+      }catch(caught){setError(caught instanceof Error?caught.message:'Sketch export failed.');}finally{setExporting(null);}
       return;
     }
     if (!selectedAsset) { setToast("Add or select an asset before exporting."); return; }
@@ -284,17 +257,13 @@ export function CrystalStudio({
     try{setRenderJobs(j=>j.map(x=>x.id===id?{...x,status:"Rendering"}:x)); const response=await fetch("/api/render",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({asset:selectedAsset.name,...renderSettings})}); if(!response.ok)throw new Error(); setCredits(c=>c-renderEstimate.cost); setRenderJobs(j=>j.map(x=>x.id===id?{...x,status:"Done"}:x)); setToast("Render completed and added to the queue.");}catch{setRenderJobs(j=>j.map(x=>x.id===id?{...x,status:"Failed"}:x));setToast("Render failed. Please try again.");}finally{setRenderLoading(false)}
   };
   const menuItems:Record<string,string[]>={File:["New Scene","Open","Save","Save As","Export","Import","Recent Files"],Edit:["Undo  Ctrl+Z","Redo  Ctrl+Y","Cut","Copy","Paste","Duplicate","Delete","Select All","Preferences"],Tools:["Move","Rotate","Scale","Measure","Snap"],Help:["Documentation","Keyboard Shortcuts","Report a Bug","About"],View:["Toggle Grid","Toggle Axis Gizmo","Wireframe Mode","Front Camera","Top Camera","Side Camera","Perspective","Fullscreen"]};
-  const openScene = (file: File) => { void file.text().then(raw => { const saved = JSON.parse(raw) as Partial<{ name: string; objects: FloorPlanObject[]; assets: StudioAsset[]; material: MaterialName; roughness: number; metallic: number; renderSettings: RenderSettings; floorPlanObjects: FloorPlanObject[]; floorPlanSettings: FloorPlanSettings; settings: FloorPlanSettings; units: FloorPlanSettings["unit"]; scale: string; precision: number }>; if (saved.assets) setAssets(saved.assets); if (saved.material) setMaterial(saved.material); if (typeof saved.roughness === "number") setRoughness(saved.roughness); if (typeof saved.metallic === "number") setMetallic(saved.metallic); if (saved.renderSettings) setRenderSettings(saved.renderSettings); if (saved.floorPlanObjects ?? saved.objects) setFloorPlanObjects((saved.floorPlanObjects ?? saved.objects)!); if (typeof saved.name === "string") setFloorPlanName(saved.name); const settings = saved.floorPlanSettings ?? saved.settings ?? { ...DEFAULT_FLOOR_PLAN_SETTINGS, unit: saved.units ?? DEFAULT_FLOOR_PLAN_SETTINGS.unit, scale: Number(saved.scale?.split(":").pop()) || DEFAULT_FLOOR_PLAN_SETTINGS.scale, precision: saved.precision ?? DEFAULT_FLOOR_PLAN_SETTINGS.precision }; setFloorPlanSettings({ ...DEFAULT_FLOOR_PLAN_SETTINGS, ...settings }); setToast("Scene opened."); }).catch(() => setToast("Could not open scene.")); };
-  const runMenuAction=(raw:string)=>{const action=raw.split("  ")[0];setOpenMenu(null);if(action==="New Scene"){setAssets(initialAssets);setSelectedAssetId(null);setToast("New scene created.")}else if(action==="Open"){sceneFileInput.current?.click()}else if(action==="Save"||action==="Save As"){localStorage.setItem("crystal-studio-state",JSON.stringify({assets,material,roughness,metallic,renderSettings,floorPlanObjects,floorPlanSettings}));setToast("Scene saved locally.")}else if(action==="Delete"&&selectedAssetId){setAssets(x=>x.filter(a=>a.id!==selectedAssetId));setSelectedAssetId(null);setToast("Asset deleted.")}else if(action==="Duplicate"&&selectedAsset){setAssets(x=>[{...selectedAsset,id:crypto.randomUUID(),name:`${selectedAsset.name} Copy`},...x]);setToast("Asset duplicated.")}else if(["Move","Rotate","Scale"].includes(action)){setActiveTool(action.toLowerCase() as StudioTool);setToast(`${action} tool active.`)}else if(action==="Fullscreen"){document.documentElement.requestFullscreen?.();}else if(action==="Export"){handleExport("glTF 2.0")}else setToast(`${action} selected.`)};
-  const persistPlan=()=>{
-    if(recoveredIdentity!==recoveryIdentity)throw new Error('Wait for floor-plan recovery before saving or navigating.');
-    const raw=JSON.stringify({version:1,name:floorPlanName,objects:floorPlanObjects,settings:floorPlanSettings});parseFloorPlanRecovery(raw);localStorage.setItem(recoveryKey,raw);
-    if(localStorage.getItem(recoveryKey)!==raw)throw new Error('Browser save was not confirmed. Download JSON before leaving.');
-  };
+  const openScene = (file: File) => { if(studioMode==='floor-plan'){void file.text().then(raw=>{const saved=JSON.parse(raw);const document=parseFloorPlanRecovery(JSON.stringify({version:1,name:saved.name??'Imported project',objects:saved.objects??saved.floorPlanObjects??[],settings:saved.settings??saved.floorPlanSettings??DEFAULT_FLOOR_PLAN_SETTINGS,sketch:saved.sketch}));sketchProject.importProject(document);setToast('Sketch project imported as a new editable copy.');}).catch(()=>setToast('Could not import this Sketch project. The current drawing was preserved.'));return;} void file.text().then(raw => { const saved = JSON.parse(raw) as Partial<{ name: string; objects: FloorPlanObject[]; assets: StudioAsset[]; material: MaterialName; roughness: number; metallic: number; renderSettings: RenderSettings; floorPlanObjects: FloorPlanObject[]; floorPlanSettings: FloorPlanSettings; settings: FloorPlanSettings; units: FloorPlanSettings["unit"]; scale: string; precision: number }>; if (saved.assets) setAssets(saved.assets); if (saved.material) setMaterial(saved.material); if (typeof saved.roughness === "number") setRoughness(saved.roughness); if (typeof saved.metallic === "number") setMetallic(saved.metallic); if (saved.renderSettings) setRenderSettings(saved.renderSettings); if (saved.floorPlanObjects ?? saved.objects) setFloorPlanObjects((saved.floorPlanObjects ?? saved.objects)!); if (typeof saved.name === "string") setFloorPlanName(saved.name); const settings = saved.floorPlanSettings ?? saved.settings ?? { ...DEFAULT_FLOOR_PLAN_SETTINGS, unit: saved.units ?? DEFAULT_FLOOR_PLAN_SETTINGS.unit, scale: Number(saved.scale?.split(":").pop()) || DEFAULT_FLOOR_PLAN_SETTINGS.scale, precision: saved.precision ?? DEFAULT_FLOOR_PLAN_SETTINGS.precision }; setFloorPlanSettings({ ...DEFAULT_FLOOR_PLAN_SETTINGS, ...settings }); setToast("Scene opened."); }).catch(() => setToast("Could not open scene.")); };
+  const runMenuAction=(raw:string)=>{const action=raw.split("  ")[0];setOpenMenu(null);if(studioMode==='floor-plan'){if(action==='Save'||action==='Save As'){void sketchProject.save().then(setToast).catch((error:Error)=>setError(error.message));return;}if(action==='New Scene'){if(window.confirm('Create a new Sketch project? The current drawing will remain in project recovery.'))sketchProject.create();return;}if(action==='Export'){void handleExport('JSON Scene');return;}}if(action==="New Scene"){setAssets(initialAssets);setSelectedAssetId(null);setToast("New scene created.")}else if(action==="Open"){sceneFileInput.current?.click()}else if(action==="Save"||action==="Save As"){localStorage.setItem("crystal-studio-state",JSON.stringify({assets,material,roughness,metallic,renderSettings,floorPlanObjects,floorPlanSettings}));setToast("Scene saved locally.")}else if(action==="Delete"&&selectedAssetId){setAssets(x=>x.filter(a=>a.id!==selectedAssetId));setSelectedAssetId(null);setToast("Asset deleted.")}else if(action==="Duplicate"&&selectedAsset){setAssets(x=>[{...selectedAsset,id:crypto.randomUUID(),name:`${selectedAsset.name} Copy`},...x]);setToast("Asset duplicated.")}else if(["Move","Rotate","Scale"].includes(action)){setActiveTool(action.toLowerCase() as StudioTool);setToast(`${action} tool active.`)}else if(action==="Fullscreen"){document.documentElement.requestFullscreen?.();}else if(action==="Export"){handleExport("glTF 2.0")}else setToast(`${action} selected.`)};
+  const persistPlan=()=>sketchProject.persist();
   const studioAction=async(action:StudioAction,signal:AbortSignal):Promise<string>=>{
     signal.throwIfAborted();
     if(action.intent==='studio.navigate'){persistPlan();navigateStudioRoute(STUDIO_ROUTES[action.parameters.studio],router.push);return 'Navigation requested; floor plan retained in browser recovery.';}
-    if(action.intent==='project.save'){persistPlan();return 'Floor plan saved in this browser. This drawing is not a cloud project.';}
+    if(action.intent==='project.save')return sketchProject.save();
     if(action.intent==='history.undo'){if(!floorPlanHistory.past.length)throw new Error('There is nothing to undo.');dispatchFloorPlan({type:'undo'});return 'Floor-plan undo confirmed.';}
     if(action.intent==='history.redo'){if(!floorPlanHistory.future.length)throw new Error('There is nothing to redo.');dispatchFloorPlan({type:'redo'});return 'Floor-plan redo confirmed.';}
     if(action.intent==='panel.open'){if(action.parameters.panel==='lighting')throw new Error('The 2D drawing has no 3D lighting controls.');if(action.parameters.panel==='sidebar')setLeftOpen(true);else setRightOpen(true);return 'Panel opened.';}
@@ -302,7 +271,7 @@ export function CrystalStudio({
       const formats:Record<string,string>={json:'JSON Scene',pdf:'PDF',svg:'SVG',png:'PNG',jpeg:'JPEG'};
       if(!formats[action.parameters.format])throw new Error('The 2D drawing supports JSON, SVG, PDF, PNG or JPEG export.');await handleExport(formats[action.parameters.format]);return 'Floor-plan export finished; browser download requested.';
     }
-    if(action.intent==='project.new'){persistPlan();const previous=localStorage.getItem(recoveryKey);if(previous)localStorage.setItem(`${recoveryKey}:previous`,previous);dispatchFloorPlan({type:'replace',next:[]});setSelectedFloorPlanId(null);setFloorPlanName('Untitled project');return 'New empty floor plan opened; previous drawing retained in browser recovery.';}
+    if(action.intent==='project.new'){sketchProject.create();return 'New Sketch project opened; previous drawing retained in project recovery.';}
     if(action.intent==='project.open')throw new Error('Use the existing Open menu to choose a floor-plan JSON file. Voice input cannot silently choose files from your device.');
     throw new Error('This command is unavailable in the 2D Floor Plan editor. Open a 3D studio for mesh operations.');
   };
@@ -350,7 +319,7 @@ export function CrystalStudio({
                 setDashboard(false);
                 setStudioMode(workspace);
                 setMobileHome(workspace === "images");
-              }}>{workspace === "floor-plan" ? "Interior" : workspace === "modeling" ? "Modeling" : "Images"}</button>
+              }}>{workspace === "floor-plan" ? "Sketch" : workspace === "modeling" ? "Modeling" : "Images"}</button>
             ))}
           </div>
           <button type="button" aria-label={incognito ? "Disable incognito mode" : "Enable incognito mode"} aria-pressed={incognito} onClick={() => setIncognito((value) => !value)}><Glasses size={21} /></button>
@@ -400,7 +369,7 @@ export function CrystalStudio({
 
       {!leftOpen && !rightOpen && <div className="studio-restore-pill absolute left-4 top-4 z-50 flex items-center gap-1.5 rounded-[10px] border border-[var(--studio-border)] bg-[var(--studio-bg-elevated)] p-1.5 shadow-[0_8px_24px_rgba(0,0,0,.35)] backdrop-blur-md"><button type="button" aria-label="Copy studio link" title="Copy studio link" onClick={() => void navigator.clipboard?.writeText(window.location.href)} className="grid h-8 w-8 place-items-center rounded-[7px] bg-[var(--studio-bg-elevated)] text-[var(--studio-text-primary)] transition hover:bg-[var(--studio-bg-hover)]"><Share2 size={15} strokeWidth={2}/></button><button type="button" aria-label="Show studio panels" title="Show sidebars" onClick={() => { setLeftOpen(true); setRightOpen(true); }} className="grid h-8 w-8 place-items-center rounded-[7px] bg-[var(--studio-accent)] text-[var(--studio-text-primary)] shadow-[0_2px_10px_rgba(22,135,247,.3)] transition hover:bg-[var(--studio-accent-hover)]"><PanelLeftOpen size={15} strokeWidth={2} /></button></div>}
       {leftOpen && (studioMode === "modeling" ? <ModelingSidebar quality={quality} topology={topology} texture={texture} material={material} prompt={prompt} loading={loading} separateParts={separateParts} imageEnhancement={imageEnhancement} codeExecution={codeExecution} renderLoading={renderLoading} estimatedMinutes={renderEstimate.minutes} estimatedCost={renderEstimate.cost} assets={assets} selectedAssetId={selectedAssetId} uploadedImage={uploadedImage} onPromptChange={setPrompt} onGenerate={handleGenerate} onUpload={handleUpload} onQualityChange={setQuality} onTopologyChange={setTopology} onTextureChange={setTexture} onSeparatePartsChange={setSeparateParts} onImageEnhancementChange={setImageEnhancement} onCodeExecutionChange={setCodeExecution} onMaterialChange={setMaterial} onRender={handleRender} onSignOut={() => setDialog("signout")} onBack={() => router.push("/project")} onStudioModeChange={switchStudioMode} onAddObject={() => { const source = selectedAsset ?? initialAssets[0]; const id = crypto.randomUUID(); setAssets(items => [{ ...source, id, name: `${source.name} ${items.length + 1}`, createdAt: new Date().toISOString() }, ...items]); setSelectedAssetId(id); }} onSelectAsset={id => { setSelectedAssetId(id); setTransform({ x: 0, y: 0, rotation: -8, scale: 1 }); }} onCollapse={() => { setLeftOpen(false); setRightOpen(false); }} /> : insetPanels ? <InteriorSceneSidebar onSettings={()=>{setRightOpen(true);requestAnimationFrame(()=>globalThis.document.querySelector(".interior-scene-inspector")?.scrollTo({top:0}));}} onProfile={()=>{window.open("/account","_blank","noopener,noreferrer");}} hoveredId={hoveredFloorPlanId} onHover={setHoveredFloorPlanId} objects={floorPlanObjects} selectedId={selectedFloorPlanId} projectName={floorPlanName} onProjectNameChange={setFloorPlanName} onSelect={setSelectedFloorPlanId} onOpen={() => sceneFileInput.current?.click()} onExport={format => void handleExport(format)} onBack={() => router.push("/project")} onCollapse={() => { setLeftOpen(false); setRightOpen(false); }} /> : <LeftSidebar floorPlanMode floorPlanSettings={floorPlanSettings} onFloorPlanSettingsChange={setFloorPlanSettings} floorPlanObjects={floorPlanObjects} selectedFloorPlanId={selectedFloorPlanId} onSelectFloorPlanObject={setSelectedFloorPlanId} onStudioModeChange={switchStudioMode} onBack={() => router.push("/project")} material={material} roughness={roughness} metallic={metallic} renderer={renderer} quality={quality} topology={topology} texture={texture} separateParts={separateParts} imageEnhancement={imageEnhancement} codeExecution={codeExecution} estimatedMinutes={renderEstimate.minutes} estimatedCost={renderEstimate.cost} credits={credits} renderLoading={renderLoading} uploadedImage={uploadedImage} prompt={prompt} loading={loading} onPromptChange={setPrompt} onGenerate={handleGenerate} settingsOpen={settingsOpen} onMaterialChange={setMaterial} onRoughnessChange={setRoughness} onMetallicChange={setMetallic} onRendererChange={setRenderer} onQualityChange={setQuality} onTopologyChange={setTopology} onTextureChange={setTexture} onSeparatePartsChange={setSeparateParts} onImageEnhancementChange={setImageEnhancement} onCodeExecutionChange={setCodeExecution} onRender={handleRender} onProfile={()=>setDialog("profile")} onSignOut={()=>setDialog("signout")} onUpload={handleUpload} onRemoveImage={() => setUploadedImage(null)} onToggleSettings={() => setSettingsOpen((value) => !value)} onCollapse={() => { setLeftOpen(false); setRightOpen(false); }} />)}
-      <Viewport actionScope={recoveryIdentity} onStudioAction={studioAction} onHoverFloorPlanObject={setHoveredFloorPlanId} renderer={renderer} selectedAsset={selectedAsset} activeTool={activeTool} prompt={prompt} loading={loading} progress={progress} error={error} transform={transform} color={color} roughness={roughness} metallic={metallic} incognito={incognito} studioMode={studioMode} onStudioModeChange={switchStudioMode} floorPlanObjects={floorPlanObjects} selectedFloorPlanId={selectedFloorPlanId} floorPlanSettings={floorPlanSettings} onFloorPlanSettingsChange={setFloorPlanSettings} onFloorPlanObjectsChange={setFloorPlanObjects} onSelectFloorPlanObject={setSelectedFloorPlanId} onToolChange={setActiveTool} onPromptChange={setPrompt} onGenerate={handleGenerate} onTransformChange={setTransform} onClearError={() => setError(null)} onSelectAsset={(id) => setSelectedAssetId(id || null)} onCreateObject={() => { const source = selectedAsset ?? initialAssets[0]; const id = crypto.randomUUID(); setAssets((items) => [{ ...source, id, name: `${source.name} ${items.length + 1}`, createdAt: new Date().toISOString() }, ...items]); setSelectedAssetId(id); }} onAssetDrop={(id) => { setSelectedAssetId(id || null); if (id) setTransform({ x: 0, y: 0, rotation: -8, scale: 1 }); }} onColorChange={setColor} onOpenPricing={() => setMobilePricing(true)} onSnapshot={()=>handleExport("JPEG & PNG")} />
+      <Viewport sketch={sketch} onSketchChange={next=>{dispatchDrawing({type:'commit',next:normalizeSketch(next)});}} onSketchUndo={()=>dispatchDrawing({type:'undo'})} onSketchRedo={()=>dispatchDrawing({type:'redo'})} sketchCanUndo={drawingHistory.past.length>0} sketchCanRedo={drawingHistory.future.length>0} sketchProject={sketchProject} onFloorExport={format=>void handleExport(format)} actionScope={recoveryIdentity} onStudioAction={studioAction} onHoverFloorPlanObject={setHoveredFloorPlanId} renderer={renderer} selectedAsset={selectedAsset} activeTool={activeTool} prompt={prompt} loading={loading} progress={progress} error={error} transform={transform} color={color} roughness={roughness} metallic={metallic} incognito={incognito} studioMode={studioMode} onStudioModeChange={switchStudioMode} floorPlanObjects={floorPlanObjects} selectedFloorPlanId={selectedFloorPlanId} floorPlanSettings={floorPlanSettings} onFloorPlanSettingsChange={setFloorPlanSettings} onFloorPlanObjectsChange={setFloorPlanObjects} onSelectFloorPlanObject={setSelectedFloorPlanId} onToolChange={setActiveTool} onPromptChange={setPrompt} onGenerate={handleGenerate} onTransformChange={setTransform} onClearError={() => setError(null)} onSelectAsset={(id) => setSelectedAssetId(id || null)} onCreateObject={() => { const source = selectedAsset ?? initialAssets[0]; const id = crypto.randomUUID(); setAssets((items) => [{ ...source, id, name: `${source.name} ${items.length + 1}`, createdAt: new Date().toISOString() }, ...items]); setSelectedAssetId(id); }} onAssetDrop={(id) => { setSelectedAssetId(id || null); if (id) setTransform({ x: 0, y: 0, rotation: -8, scale: 1 }); }} onColorChange={setColor} onOpenPricing={() => setMobilePricing(true)} onSnapshot={()=>handleExport("JPEG & PNG")} />
       {rightOpen && <RightPanel scenePresentation={insetPanels} resolution={resolution} frameRate={frameRate} color={color} opacity={opacity} renderSettings={renderSettings} assets={assets} selectedAssetId={selectedAssetId} exporting={exporting} floorPlanMode={studioMode === "floor-plan"} floorPlanSettings={floorPlanSettings} onFloorPlanSettingsChange={setFloorPlanSettings} selectedFloorPlanObject={floorPlanObjects.find((object) => object.id === selectedFloorPlanId)} onUpdateFloorPlanObject={(updated) => setFloorPlanObjects((objects) => objects.map((object) => object.id === updated.id ? updated : object))} onDeleteFloorPlanObject={(id) => { setFloorPlanObjects((objects) => objects.filter((object) => object.id !== id)); setSelectedFloorPlanId(null); }} onResolutionChange={setResolution} onFrameRateChange={setFrameRate} onColorChange={setColor} onOpacityChange={setOpacity} onRenderChange={setRenderSettings} onSelectAsset={(id) => { setSelectedAssetId(id); setTransform({ x: 0, y: 0, rotation: -8, scale: 1 }); }} onDeleteAsset={(id) => { setAssets((items) => items.filter((item) => item.id !== id)); if (selectedAssetId === id) setSelectedAssetId(null); }} onExport={handleExport} onCollapse={() => { setLeftOpen(false); setRightOpen(false); }} />}
       <button aria-label="Mobile menu" onClick={() => { setMobileMenu(true); setMobileProfile(false); }} className="crystal-mobile-menu-trigger absolute left-3 top-3 hidden h-10 w-10 place-items-center rounded-full bg-[var(--studio-bg-elevated)] max-[700px]:grid"><Grid2X2 size={21} /></button>
       <button type="button" aria-label="Toggle Incognito mode" aria-pressed={incognito} title={incognito ? "Incognito mode active" : "Enable Incognito mode"} onClick={() => setIncognito(value => !value)} className={`crystal-mobile-incognito absolute right-3 top-3 hidden h-10 w-10 place-items-center rounded-full bg-[var(--studio-bg-elevated)] max-[700px]:grid ${incognito ? "is-active" : ""}`}><Glasses size={22} /></button>
