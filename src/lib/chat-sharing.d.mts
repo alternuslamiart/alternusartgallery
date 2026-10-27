@@ -1,0 +1,1 @@
+export function shareConversation(conversation: { title: string; messages: { role: string; content: string; citations?: { source: string }[] }[] }, platform?: Pick<Navigator, "share" | "clipboard">): Promise<"shared" | "copied">;

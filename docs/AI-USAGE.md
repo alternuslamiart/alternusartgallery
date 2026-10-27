@@ -1,5 +1,14 @@
 # Real AI usage and plan limits
 
+2026-10-26 follow-up: live production database verification now passes all four
+plan limits, concurrent cap, history, workspace isolation, upgrade continuity,
+refund and UTC rollover using temporary records cleaned after the run. This
+required fixing first-use empty-upsert races (P2002) and increasing reservation
+and refund transaction budgets to 15 seconds (P2028). No schema update was needed;
+all plan enum values already exist. Deploying this source fix and authenticated
+browser/provider acceptance remain pending. Historical verification below
+describes the original implementation checks.
+
 Implemented locally on 2026-10-22; not yet deployed or verified against a live
 authenticated database/provider session.
 

@@ -1,6 +1,61 @@
 # Verified progress
 
-Last updated: 2026-10-26
+Last updated: 2026-10-27
+
+## AI chat sidebar and authenticated chat acceptance (2026-10-27)
+
+- Replaced notification-only Pin, Mark as unread and Add to project with
+  persisted conversation fields and a workspace project picker. Rename and
+  archive/delete now surface actual API failures; pinned ordering survives
+  reload, and opening unread conversations marks them read. Conversation
+  GET/PATCH/DELETE also require the authenticated user, not only workspace.
+- Share now sends the selected transcript/citations through native sharing,
+  with a clipboard transcript fallback. It does not create a public URL.
+  Cancelled sharing never silently copies private content.
+- Cancel pending chat responses when changing accounts/conversations. Restore
+  failed prompts for retry, retain actionable server errors, and guard local
+  recovery writes against account changes and unavailable browser storage.
+- Added `prisma/ai-chat-sidebar.sql` (idempotent additive columns), regenerated
+  Prisma and applied the SQL to the configured database. Temporary-record live
+  checks passed sidebar persistence and usage reserve/refund. Local and stored
+  cloud DB configuration match the same project/database; no secrets logged.
+- Real local production-server acceptance passed Credentials sign-in,
+  Groq/You answers and cloud message persistence, Gemini-to-Groq failover,
+  pin/unpin, rename, unread/read, project assignment, archive/delete and
+  logout/login persistence. Fresh QA data was cleaned. Native Gemini returned
+  FAILED_PRECONDITION/billing required; Google AI Studio billing remains an
+  external prerequisite. No authenticated production or browser-click acceptance
+  is claimed. Reusable opt-in verifier: `scripts/verify-ai-chat.mjs --live`.
+- Initial live probe used the legacy `.env` URL and failed with invalid port;
+  merging `.env.local` resolved it. The first SQL probe split a comment at its
+  semicolon (42601), corrected before successful application. Initial local
+  server provider calls failed TLS trust; restarting QA with the existing
+  Windows CA bundle resolved them without disabling TLS verification.
+- Final validation: all 189 tests passed; focused lint completed with existing
+  image/accessibility warnings; TypeScript and final production build passed.
+  The first final-build attempt hit Windows Prisma DLL EPERM while the QA server
+  was running; stopping that identified QA process resolved it. Whitespace check
+  passed. Existing CSR/Browserslist/punycode build warnings remain. Unrelated
+  dirty files and asset deletions were preserved. No deployment was performed.
+
+
+## AI usage reservation reliability (2026-10-26)
+
+- Reproduced live reservation failures with isolated temporary workspaces:
+  Prisma P2002 first-month upsert races and P2028 transaction failures.
+  Replaced the empty monthly upsert update with an idempotent resetAt update
+  to enable native PostgreSQL conflict handling. Reservation/refund transactions
+  now have bounded 15-second acquisition and execution budgets.
+- Live production-database verifier now passes four plan limits, 12 concurrent
+  reservations with exact cap enforcement, history, workspace isolation,
+  upgrade continuity, refund and UTC rollover. All temporary records cleaned.
+  No customer plans or provider calls changed. The verifier now reports sanitized
+  storage error codes before quota assertions.
+- New regression failed before the fix; all 183 tests, TypeScript and focused
+  lint pass. Production build and whitespace checks pass; existing CSR and
+  deprecation warnings remain. Build used the existing Windows trusted CA file.
+  Deployment and authenticated browser acceptance remain pending.
+
 
 ## AI chat production provider configuration (2026-10-26)
 

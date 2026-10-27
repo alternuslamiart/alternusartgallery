@@ -1,5 +1,19 @@
 # Repository architecture
 
+- `/aichat` stores pinned/unread/project association on AssistantConversation;
+  apply `prisma/ai-chat-sidebar.sql` before deploying the regenerated Prisma
+  client. Conversation mutations and reads enforce user plus workspace ownership,
+  and project assignment validates an active project in the same workspace.
+  Delete archives existing conversations. Sharing uses an explicit native share
+  sheet or copies transcript/citations; no unauthenticated public read is added.
+  Pending chat responses are cancelled across conversation/account changes;
+  local recovery only writes after the matching identity has finished loading.
+
+- AI usage monthly counters use a nonempty idempotent upsert update to permit
+  PostgreSQL native conflict handling on concurrent first requests. Reservation
+  and refund transactions use bounded 15-second acquisition/execution budgets
+  for remote database poolers; quota checks still fail closed on storage failure.
+
 - AI chat provider keys are server-only sensitive Production environment
   variables. Gemini billing/country restrictions surface as
   `GEMINI_BILLING_REQUIRED` (503) after existing Gemini/Groq failover is exhausted;

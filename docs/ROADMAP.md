@@ -114,6 +114,15 @@ requirements provide new evidence.
 
 ## P2 — Existing platform integration
 
+- [x] Implement durable `/aichat` pin/unread/project actions and real transcript
+  sharing; verify signed-in local provider calls, persistence and logout/login.
+- [ ] Deploy sidebar/usage changes and verify production browser interactions;
+  enable Gemini billing before claiming native Gemini availability.
+
+- [x] Fix first-use AI usage upsert races and short transaction budgets; verify
+  live database concurrency, refunds, plan limits and isolation with temporary data.
+- [ ] Deploy the reservation fix and verify signed-in studio AI chat.
+
 - [x] Configure Gemini, Groq and You Production secrets; verify direct Groq/You
   answers and expose Gemini billing restrictions as actionable errors.
 - [ ] Enable Gemini project billing and verify signed-in deployed AI chat.

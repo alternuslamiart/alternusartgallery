@@ -1,4 +1,18 @@
-# Next tasks (reviewed 2026-10-26)
+# Next tasks (reviewed 2026-10-27)
+
+- [x] Persist `/aichat` sidebar pin/unread/project actions, surface rename/delete
+  failures and share actual conversation content. Verify real local signed-in
+  chat persistence and logout/login with Groq/You and Gemini-to-Groq failover.
+- [ ] Deploy the chat sidebar and existing usage reservation fixes, then verify
+  authenticated production `/aichat` and browser interactions. The additive
+  `prisma/ai-chat-sidebar.sql` is already applied to the configured database.
+  Native Gemini still requires Google AI Studio billing; real Groq and You pass.
+
+- [x] Repair AI usage reservation P2002/P2028 failures and verify live database
+  concurrency, refunds, plan limits and workspace isolation with temporary data.
+- [ ] Deploy the usage transaction fix and verify a signed-in studio chat request
+  on the deployment; local source/live-database verification alone does not
+  update the deployed application.
 
 - [ ] Enable billing on the Gemini Google AI Studio project: the existing key
   returns country/free-tier FAILED_PRECONDITION. Groq and You direct live calls

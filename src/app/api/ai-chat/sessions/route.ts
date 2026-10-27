@@ -10,7 +10,7 @@ export async function GET() {
     if (isApiResponse(context)) return context;
     const conversations = await prisma.assistantConversation.findMany({
       where: { workspaceId: context.workspaceId, userId: context.userId, status: "ACTIVE", id: { startsWith: "chat-" } },
-      orderBy: { updatedAt: "desc" }, take: 100,
+      orderBy: [{ pinned: "desc" }, { updatedAt: "desc" }], take: 100,
     });
     const messages = await prisma.assistantMessage.findMany({
       where: { conversationId: { in: conversations.map((item) => item.id) } },
@@ -18,6 +18,7 @@ export async function GET() {
     });
     return NextResponse.json({ sessions: conversations.map((item) => ({
       id: item.id, title: item.title, updatedAt: item.updatedAt.getTime(),
+      pinned: item.pinned, unread: item.unread, projectId: item.projectId,
       messages: messages.filter((message) => message.conversationId === item.id).map((message) => ({
         id: message.id, role: message.role === "ASSISTANT" ? "assistant" : "user", content: message.content,
         citations: message.metadata && typeof message.metadata === "object" && !Array.isArray(message.metadata)

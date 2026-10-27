@@ -43,6 +43,8 @@ async function checkUsage(client) {
     }
     const [basic, pro] = workspaceIds;
     const outcomes = await Promise.allSettled(Array.from({ length: 12 }, () => usage.reserve(basic, "model", now)));
+    const storageFailures = outcomes.filter(result => result.status === "rejected" && !(result.reason instanceof UsageLimitError));
+    assert.equal(storageFailures.length, 0, `Reservation storage failures: ${storageFailures.map(result => result.reason.code || result.reason.name).join(", ")}`);
     assert.equal(outcomes.filter(result => result.status === "fulfilled").length, 10, "Exactly 10 concurrent model requests fit Basic");
     assert.ok(outcomes.filter(result => result.status === "rejected").every(result => result.reason instanceof UsageLimitError), "Only quota exhaustion may reject a concurrent reservation");
     const exhausted = await usage.summary(basic, 15, now);

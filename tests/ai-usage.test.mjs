@@ -20,6 +20,24 @@ function harness(plan = "BASIC") {
   return createUsageService(db);
 }
 const now = new Date("2026-10-22T12:00:00Z");
+test("reservation uses an atomic monthly upsert and bounded remote transaction budgets", async () => {
+  const db = {
+    $transaction: async (callback, options) => {
+      assert.ok(options.maxWait >= 15000);
+      assert.ok(options.timeout >= 15000);
+      await callback({
+        subscriptionState: { findUnique: async () => null },
+        rateLimitBucket: {
+          upsert: async ({ create, update }) => {
+            if (create.count === 0) assert.deepEqual(update, { resetAt: create.resetAt });
+          },
+          updateMany: async () => ({ count: 1 }),
+        },
+      });
+    },
+  };
+  await createUsageService(db).reserve("remote", "chat", now);
+});
 test("plans have 1x/4x/10x/20x capacity; inactive and legacy plans use Basic", () => {
   assert.deepEqual(Object.values(AI_LIMITS), [200, 800, 2000, 4000]);
   for (const plan of ["TRIAL", "FREE", "unknown"]) assert.equal(usagePlan({ plan, status: "ACTIVE" }), "BASIC");

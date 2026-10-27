@@ -787,6 +787,9 @@ model AssistantConversation {
   workspaceId   String                      @map("workspace_id")
   userId        String                      @map("user_id")
   title         String
+  pinned        Boolean                     @default(false)
+  unread        Boolean                     @default(false)
+  projectId     String?                     @map("project_id")
   status        AssistantConversationStatus @default(ACTIVE)
   lastMessageAt DateTime?                   @map("last_message_at")
   createdAt     DateTime                    @default(now()) @map("created_at")

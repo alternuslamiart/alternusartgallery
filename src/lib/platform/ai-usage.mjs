@@ -15,6 +15,8 @@ export class UsageLimitError extends Error {
   constructor(resetAt) { super("Monthly AI limit reached. Upgrade your plan or wait for the next UTC month."); this.resetAt = resetAt; }
 }
 const prefix = workspaceId => `ai-usage:v1:${workspaceId}:`;
+// Remote poolers need more than Prisma's 2s acquisition/5s execution defaults.
+const transactionOptions = { maxWait: 15000, timeout: 15000 };
 
 export function createUsageService(db) {
   async function reserve(workspaceId, feature, now = new Date()) {
@@ -26,13 +28,15 @@ export function createUsageService(db) {
     await db.$transaction(async tx => {
       const subscription = await tx.subscriptionState.findUnique({ where: { workspaceId } });
       const limit = AI_LIMITS[usagePlan(subscription)];
-      await tx.rateLimitBucket.upsert({ where: { id: monthId }, create: { id: monthId, count: 0, resetAt: period.end }, update: {} });
+      // A nonempty update allows Prisma's native INSERT ... ON CONFLICT path;
+      // an empty update can race on first use and fail with P2002.
+      await tx.rateLimitBucket.upsert({ where: { id: monthId }, create: { id: monthId, count: 0, resetAt: period.end }, update: { resetAt: period.end } });
       // Conditional increment is serialized by PostgreSQL's row lock, including
       // requests arriving on different server instances. Both counters commit together.
       const claim = await tx.rateLimitBucket.updateMany({ where: { id: monthId, count: { lte: limit - units } }, data: { count: { increment: units } } });
       if (claim.count !== 1) throw new UsageLimitError(period.end);
       await tx.rateLimitBucket.upsert({ where: { id: dayId }, create: { id: dayId, count: units, resetAt: period.end }, update: { count: { increment: units } } });
-    });
+    }, transactionOptions);
     return { monthId, dayId, units };
   }
   async function refund(ticket) {
@@ -40,7 +44,7 @@ export function createUsageService(db) {
       for (const id of [ticket.monthId, ticket.dayId]) {
         await tx.rateLimitBucket.updateMany({ where: { id, count: { gte: ticket.units } }, data: { count: { decrement: ticket.units } } });
       }
-    });
+    }, transactionOptions);
   }
   async function summary(workspaceId, days = 15, now = new Date()) {
     const period = usagePeriod(now);
