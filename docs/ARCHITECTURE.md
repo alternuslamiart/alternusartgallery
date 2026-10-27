@@ -16,7 +16,7 @@
   with revision checks, JSONB key-order-independent reconciliation
   (`sketch-project.mjs`) and per-user `localStorage` recovery. `sketch-export.ts`
   exports combined CAD and visible sketch layers to PNG, SVG, PDF and editable
-  JSON Scene. `SceneWorkbench.tsx` and `scene-studio.css` also reuse the HSV color wheel, saturation/value square, HEX input, opacity slider, swatches and custom color input (`SceneColorField`) for `Base color` and `Light color` in Architecture (`/casynus`) and Infrastructure (`/infrastructure`).
+  JSON Scene. `SceneWorkbench.tsx` and `scene-studio.css` also reuse the HSV color wheel, saturation/value square, HEX input, opacity slider, swatches and custom color input (`SceneColorField`, opening as a floating panel to the left of the right sidebar when clicked) for `Base color` and `Light color` in Architecture (`/casynus`) and Infrastructure (`/infrastructure`).
 
 - `/aichat` stores pinned/unread/project association on AssistantConversation;
   apply `prisma/ai-chat-sidebar.sql` before deploying the regenerated Prisma

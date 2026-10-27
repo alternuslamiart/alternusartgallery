@@ -42,7 +42,8 @@ function download(blob: Blob, name: string) {
 }
 const paletteSwatches = ["#141414", "#ffffff", "#ff6b6b", "#f59e0b", "#facc15", "#22c55e", "#06b6d4", "#4284ff", "#a855f7", "#ec4899"];
 function SceneColorField({ label, value, opacity, onChange, onOpacity }: { label: string; value: string; opacity?: number; onChange: (color: string) => void; onOpacity?: (opacity: number) => void }) {
-  const [open, setOpen] = useState(true), [collapsed, setCollapsed] = useState(false), [hex, setHex] = useState(value);
+  const [open, setOpen] = useState(false), [collapsed, setCollapsed] = useState(false), [hex, setHex] = useState(value), [position, setPosition] = useState({ x: 0, y: 0 });
+  const drag = useRef<{ x: number; y: number; startX: number; startY: number } | null>(null);
   const [h, s, v] = hexToHsv(value);
   useEffect(() => setHex(value), [value]);
   const chooseHue = (event: ReactPointerEvent<HTMLDivElement>) => { const r = event.currentTarget.getBoundingClientRect(), angle = Math.atan2(event.clientY - r.top - r.height / 2, event.clientX - r.left - r.width / 2) * 180 / Math.PI + 90; onChange(hsvToHex(angle, s || 1, v || 1)); };
@@ -56,8 +57,8 @@ function SceneColorField({ label, value, opacity, onChange, onOpacity }: { label
       </button>
       {(!open || collapsed) && <input aria-label={label} type="color" className="sr-only" value={value} onChange={e => onChange(e.target.value)} />}
     </div>
-    {open && <section className="scene-color-panel" aria-label={`${label} palette`}>
-      <header>
+    {open && <section className="scene-color-panel" aria-label={`${label} palette`} style={{ transform: `translate(${position.x}px,${position.y}px)` }}>
+      <header onPointerDown={e => { if ((e.target as HTMLElement).closest("button")) return; drag.current = { x: e.clientX, y: e.clientY, startX: position.x, startY: position.y }; e.currentTarget.setPointerCapture(e.pointerId); }} onPointerMove={e => { if (drag.current) setPosition({ x: Math.max(-420, Math.min(200, drag.current.startX + e.clientX - drag.current.x)), y: Math.max(-60, Math.min(360, drag.current.startY + e.clientY - drag.current.y)) }); }} onPointerUp={() => { drag.current = null; }}>
         <strong>Color</strong>
         <button type="button" aria-label="Collapse color picker" onClick={() => setCollapsed(x => !x)}><ChevronDown size={16} /></button>
         <button type="button" aria-label="Close color picker" onClick={() => setOpen(false)}><X size={16} /></button>
