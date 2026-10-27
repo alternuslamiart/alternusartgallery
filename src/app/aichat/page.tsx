@@ -29,14 +29,10 @@ import {
   EyeOff,
   Pencil,
   Trash2,
-  UserRound,
-  Settings2,
-  CircleHelp,
-  Info,
-  LogOut,
   X,
 } from "lucide-react";
 import { useCrystalTheme } from "@/lib/crystal-theme";
+import { StudioProfileMenu } from "@/components/crystal-studio/StudioSidebarFooter";
 import { CrystalThemeToggle } from "@/components/crystal-studio/CrystalThemeToggle";
 import { shareConversation } from "@/lib/chat-sharing.mjs";
 
@@ -552,17 +548,19 @@ export default function AIChatPage() {
             </div>
           </div>
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-[var(--studio-border)] bg-[var(--studio-bg-elevated)] p-2.5">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[var(--studio-text-secondary)]">AL</span>
-            <Link href="/account" className="min-w-0 flex-1"><span className="block truncate text-xs text-[var(--studio-text-primary)]">Casynus User</span><span className="block truncate text-[10px] text-[var(--studio-text-secondary)]">you@alternusart.com</span></Link>
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#4284ff] text-[12px] font-semibold text-white">{(session?.user?.name?.trim() || session?.user?.email?.trim() || "C").charAt(0).toUpperCase()}</span>
+            <Link href="/account" className="min-w-0 flex-1"><span className="block truncate text-xs text-[var(--studio-text-primary)]">{session?.user?.name || "Casynus Creator"}</span><span className="block truncate text-[10px] text-[var(--studio-text-secondary)]">{session?.user?.email || "Workspace account"}</span></Link>
             <div data-account-menu className="relative">
               <button aria-label="Account menu" title="Account menu" onClick={() => setAccountMenuOpen((value) => !value)} className="rounded-lg p-1 text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><MoreHorizontal size={16} /></button>
-              {accountMenuOpen && <AccountMenu onAction={(action) => {
-                setAccountMenuOpen(false);
-                if (action === "profile") window.location.href = "/account";
-                else if (action === "logout") window.location.href = "/login";
-                else setToast(`${action} selected.`);
-                window.setTimeout(() => setToast(null), 1800);
-              }} />}
+              <StudioProfileMenu
+                open={accountMenuOpen}
+                placement="bottom-right"
+                onClose={() => setAccountMenuOpen(false)}
+                onOpenProfile={() => { window.location.href = "/account?section=organization"; }}
+                onOpenUpgrade={() => { window.location.href = "/pricing"; }}
+                onOpenBilling={() => { window.location.href = "/account?section=billing"; }}
+                onOpenSettings={() => { window.location.href = "/account?section=privacy"; }}
+              />
             </div>
           </div>
           <Link href="/pricing" className="mt-3 flex h-[46px] w-full shrink-0 items-center justify-center rounded-xl bg-[var(--studio-bg-panel)] text-sm font-semibold text-[var(--studio-text-primary)] transition hover:bg-[var(--studio-bg-hover)]">Upgrade Now</Link>
@@ -579,7 +577,7 @@ export default function AIChatPage() {
               <button type="button" onClick={() => setSearchOpen(true)} aria-label="Search" title="Search" className="grid h-8 w-8 place-items-center rounded-lg text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><Search size={16} /></button>
             </nav>
             <div className="mt-auto flex flex-col items-center gap-3">
-              <Link href="/account" aria-label="Open account" className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[var(--studio-text-secondary)]">AL</Link>
+              <Link href="/account" aria-label="Open account" className="grid h-8 w-8 place-items-center rounded-full bg-[#4284ff] text-[12px] font-semibold text-white">{(session?.user?.name?.trim() || session?.user?.email?.trim() || "C").charAt(0).toUpperCase()}</Link>
               <span aria-hidden="true" className="grid h-8 w-8 place-items-center"><img src="/Logopng.png" alt="" className={`h-4 w-4 object-contain brightness-0 ${isLight ? "opacity-50" : "invert"}`} /></span>
             </div>
           </div>
@@ -715,26 +713,5 @@ function ConversationMenu({ onAction: handleAction, pinned, disabled }: { onActi
   ];
   return <div data-conversation-menu role="menu" onClick={(event) => event.stopPropagation()} className="absolute right-0 top-10 z-[80] flex h-[218px] w-[195px] flex-col items-center justify-between overflow-hidden rounded-[16px] border-0 bg-[var(--studio-bg-panel)] p-[6px] shadow-2xl">
     {items.map(({ action, label, icon: Icon, arrow, danger }) => <button key={action} role="menuitem" onClick={() => onAction(action)} className={`flex h-8 min-h-8 w-[182px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left text-sm font-medium transition hover:bg-[var(--studio-bg-hover)] ${danger ? "text-[#FF6B6B]" : "text-[var(--studio-text-primary)]"}`}><Icon size={20} strokeWidth={2} /><span className="flex-1">{label}</span>{arrow && <span className="text-lg leading-none">›</span>}</button>)}
-  </div>;
-}
-
-function AccountMenu({ onAction }: { onAction: (action: string) => void }) {
-  const items = [
-    { action: "profile", label: "Profile", icon: UserRound },
-    { action: "settings", label: "Settings", icon: Settings2 },
-    { action: "upgrade", label: "Upgrade plan", icon: Sparkles },
-    { action: "apps", label: "Get apps and extensions", icon: LogOut },
-    { action: "help", label: "Get help", icon: CircleHelp, arrow: true },
-    { action: "learn", label: "Learn more", icon: Info },
-    { action: "logout", label: "Log out", icon: LogOut },
-  ];
-  return <div role="menu" onClick={(event) => event.stopPropagation()} className="absolute bottom-11 right-0 z-[90] flex h-[327px] w-[248px] flex-col items-center justify-start overflow-hidden rounded-[12px] bg-[var(--studio-bg-panel)] p-[9px] shadow-2xl">
-    <div className="flex h-[58px] w-[229px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[8px] bg-[var(--studio-bg-elevated)] text-[var(--studio-text-primary)]"><UserRound size={22} strokeWidth={1.8} /></span>
-      <div className="min-w-0 flex-1"><div className="truncate text-sm font-semibold text-[var(--studio-text-primary)]">Lam</div><div className="text-xs text-[var(--studio-text-secondary)]">Free Plan</div></div>
-      <span className="text-2xl leading-none text-[var(--studio-text-primary)]">›</span>
-    </div>
-    <div className="h-px w-[229px] bg-[var(--studio-bg-elevated)]" />
-    {items.map(({ action, label, icon: Icon, arrow }) => <button key={action} role="menuitem" onClick={() => onAction(action)} className="flex h-9 min-h-9 w-[229px] shrink-0 items-center gap-3 rounded-[9px] px-3 text-left text-xs text-[var(--studio-text-primary)] transition-colors hover:rounded-[9px] hover:bg-[var(--studio-bg-hover)]"><Icon size={18} strokeWidth={1.8} /><span className="flex-1">{label}</span>{arrow && <span className="text-lg leading-none">›</span>}</button>)}
   </div>;
 }

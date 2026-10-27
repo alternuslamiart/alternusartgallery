@@ -60,17 +60,23 @@ function readPersistedSettings(): PersistedStudioSettings {
 export function StudioProfileMenu({
   open,
   placement = "top-left",
+  themeMode,
+  onThemeChange,
   onClose,
   onOpenSettings,
   onOpenProfile,
   onOpenUpgrade,
+  onOpenBilling,
 }: {
   open: boolean;
-  placement?: "top-left" | "bottom-left";
+  placement?: "top-left" | "bottom-left" | "top-right" | "bottom-right";
+  themeMode?: "dark" | "light";
+  onThemeChange?: (mode: "dark" | "light") => void;
   onClose: () => void;
-  onOpenSettings: () => void;
+  onOpenSettings?: () => void;
   onOpenProfile?: () => void;
   onOpenUpgrade?: () => void;
+  onOpenBilling?: () => void;
 }) {
   const { data: session } = useSession();
   const { theme, setTheme } = useCrystalTheme();
@@ -82,7 +88,13 @@ export function StudioProfileMenu({
       const target = event.target as HTMLElement | null;
       if (!target) return;
       if (menuRef.current?.contains(target)) return;
-      if (target.closest('[aria-label="Your profile"]')) return;
+      if (
+        target.closest(
+          '[aria-label="Your profile"], [aria-label="Open profile menu"], [aria-label="Account menu"]',
+        )
+      ) {
+        return;
+      }
       onClose();
     };
     const onKeyDown = (event: KeyboardEvent) => {
@@ -98,9 +110,15 @@ export function StudioProfileMenu({
 
   if (!open) return null;
 
+  const activeTheme = themeMode ?? theme;
   const userName = session?.user?.name?.trim() || "Casynus Creator";
   const userEmail = session?.user?.email?.trim() || "Workspace account";
   const initial = (userName || userEmail || "C").charAt(0).toUpperCase();
+
+  const handleThemeSelect = (next: "dark" | "light") => {
+    setTheme(next);
+    onThemeChange?.(next);
+  };
 
   const handleProfile = () => {
     onClose();
@@ -116,7 +134,14 @@ export function StudioProfileMenu({
 
   const handleBilling = () => {
     onClose();
-    window.open("/pricing", "_blank", "noopener,noreferrer");
+    if (onOpenBilling) onOpenBilling();
+    else window.open("/pricing", "_blank", "noopener,noreferrer");
+  };
+
+  const handleSettings = () => {
+    onClose();
+    if (onOpenSettings) onOpenSettings();
+    else window.location.href = "/account?section=privacy";
   };
 
   const handleLogout = () => {
@@ -177,25 +202,25 @@ export function StudioProfileMenu({
           aria-label="Appearance mode"
         >
           <span className="cs-profile-appearance-label">
-            {theme === "dark" ? <Moon size={15} /> : <Sun size={15} />}
+            {activeTheme === "dark" ? <Moon size={15} /> : <Sun size={15} />}
             <span>Appearance</span>
           </span>
           <div className="cs-profile-theme-pills">
             <button
               type="button"
               aria-label="Dark mode"
-              aria-pressed={theme === "dark"}
-              className={theme === "dark" ? "is-active" : ""}
-              onClick={() => setTheme("dark")}
+              aria-pressed={activeTheme === "dark"}
+              className={activeTheme === "dark" ? "is-active" : ""}
+              onClick={() => handleThemeSelect("dark")}
             >
               Dark
             </button>
             <button
               type="button"
               aria-label="Light mode"
-              aria-pressed={theme === "light"}
-              className={theme === "light" ? "is-active" : ""}
-              onClick={() => setTheme("light")}
+              aria-pressed={activeTheme === "light"}
+              className={activeTheme === "light" ? "is-active" : ""}
+              onClick={() => handleThemeSelect("light")}
             >
               Light
             </button>
@@ -218,10 +243,7 @@ export function StudioProfileMenu({
           role="menuitem"
           aria-label="Open studio settings"
           className="cs-profile-item"
-          onClick={() => {
-            onClose();
-            onOpenSettings();
-          }}
+          onClick={handleSettings}
         >
           <Settings size={15} />
           <span>Settings</span>

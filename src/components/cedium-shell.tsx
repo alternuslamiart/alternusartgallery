@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { StudioProfileMenu } from "@/components/crystal-studio/StudioSidebarFooter";
 import { createContext, Dispatch, ReactNode, SetStateAction, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 export const COBALT = "#4284FF";
@@ -104,7 +105,7 @@ export function useCoreforgeTheme() {
  return { isDark, setIsDark, scrolled, bg, fg, muted, faint, surface, raised };
 }
 
-export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: ReturnType<typeof useCoreforgeTheme>) {
+export function CoreforgeNav({ isDark, setIsDark, fg, muted, faint }: ReturnType<typeof useCoreforgeTheme>) {
  const pathname = usePathname();
  const { data: session, status } = useSession();
  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -163,31 +164,29 @@ export function CoreforgeNav({ isDark, setIsDark, scrolled, fg, muted, faint }: 
    className="coreforge-profile-trigger"
    style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 36, padding: "0 11px", fontSize: 13, fontWeight: 600, color: fg, background: "transparent", cursor: "pointer", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}
   >
-   <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: "50%", background: `${COBALT}22`, color: COBALT, fontSize: 11, fontWeight: 800 }}>{profileLabel}</span>
+   <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: "50%", background: COBALT, color: "#FFFFFF", fontSize: 11, fontWeight: 700 }}>{profileLabel}</span>
    <span className="coreforge-nav-profile-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg></span>
    <span className="coreforge-nav-profile-label">Profile</span>
    <span className="coreforge-nav-profile-chevron" style={{ fontSize: 11, opacity: 0.7 }}>⌄</span>
   </button>
-  {profileMenuOpen && <div role="menu" className="coreforge-profile-menu" style={{ position: "absolute", top: 36, right: 0, zIndex: 100, width: 238, padding: 8, border: `1px solid ${faint}`, borderRadius: 12, background: isDark ? "#242424" : "#fff", color: fg, boxShadow: "0 18px 42px rgba(0,0,0,.28)" }}>
-   <div style={{ padding: "9px 10px 11px", borderBottom: `1px solid ${faint}` }}>
-    <div style={{ fontSize: 13, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{session.user?.name || "Casynus user"}</div>
-    <div style={{ marginTop: 3, color: muted, fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{session.user?.email}</div>
-   </div>
-   {[
-    ["Profile", "organization"],
-    ["Usage", "usage"],
-    ["Billing", "billing"],
-    ["Settings", "privacy"],
-   ].map(([label, section]) => (
-    <Link key={section} role="menuitem" href={`/account?section=${section}`} onClick={() => setProfileMenuOpen(false)} className={`transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`} style={{ display: "flex", alignItems: "center", height: 34, padding: "0 10px", borderRadius: 8, color: fg, fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
-     {label}
-    </Link>
-   ))}
-   <div style={{ margin: "5px 0", borderTop: `1px solid ${faint}` }} />
-   <button type="button" role="menuitem" onClick={() => signOut({ callbackUrl: "/" })} className={`transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`} style={{ display: "flex", alignItems: "center", width: "100%", height: 34, padding: "0 10px", border: 0, borderRadius: 8, color: fg, cursor: "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: 600, textAlign: "left" }}>
-    Log out
-   </button>
-  </div>}
+  <StudioProfileMenu
+   open={profileMenuOpen}
+   placement="top-right"
+   onClose={() => setProfileMenuOpen(false)}
+   onThemeChange={(mode) => setIsDark(mode === "dark")}
+   onOpenProfile={() => {
+    window.location.href = "/account?section=organization";
+   }}
+   onOpenUpgrade={() => {
+    window.location.href = "/pricing";
+   }}
+   onOpenBilling={() => {
+    window.location.href = "/account?section=billing";
+   }}
+   onOpenSettings={() => {
+    window.location.href = "/account?section=privacy";
+   }}
+  />
  </div>
  ) : (
   <Link href="/login" aria-label="Open profile" className="coreforge-nav-login coreforge-nav-profile-guest hover:!border-[#4284FF]" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 14px", fontSize: 13, fontWeight: 600, color: fg, textDecoration: "none", letterSpacing: "-0.01em", borderRadius: 8, border: `1px solid ${faint}` }}>
