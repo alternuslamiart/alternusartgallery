@@ -31,6 +31,7 @@ requirements provide new evidence.
 - [x] Make initial workspace creation atomic, coalesce existing defaults, and
   add bounded scene-save retries with exact cloud reconciliation after lost
   responses. Retain local recovery and guard revision conflicts.
+- [x] Fix PgBouncer connection-pool starvation (`P2024` across 4 parallel default upserts on `connection_limit=3`), normalize runtime `DATABASE_URL` pooler parameters in `src/lib/prisma.ts`, and unify studio top toolbars to `54×54px` frames with `40×40px` hover/active inner surfaces.
 - [ ] Confirm the affected production account's 503 code and browser recovery
   after deployment; production remote GPU and private asset storage still need
   configuration for live Hunyuan generation.

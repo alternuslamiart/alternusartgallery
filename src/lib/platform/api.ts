@@ -28,6 +28,7 @@ export function ok<T>(data: T, init?: ResponseInit) {
  return NextResponse.json(data, init);
 }
 
+const userWorkspaceCache = new Map<string, string>();
 export async function requirePlatformContext(): Promise<PlatformContext | NextResponse> {
  const session = await auth();
  const userId = session?.user?.id;
@@ -35,13 +36,17 @@ export async function requirePlatformContext(): Promise<PlatformContext | NextRe
  return apiError("UNAUTHENTICATED", "You must be signed in to use this workspace API.", 401);
  }
 
+ const cachedWorkspaceId = userWorkspaceCache.get(userId);
+ if (cachedWorkspaceId) return { userId, workspaceId: cachedWorkspaceId };
  const workspace = await prisma.workspace.findFirst({
  where: { ownerId: userId },
  orderBy: { createdAt: "asc" },
  });
 
  if (workspace) {
- await ensureWorkspaceDefaultsOnce(userId, workspace.id, workspace.trialEndsAt, workspace.plan);
+ userWorkspaceCache.set(userId, workspace.id);
+ if (userWorkspaceCache.size > 256) userWorkspaceCache.delete(userWorkspaceCache.keys().next().value!);
+ void ensureWorkspaceDefaultsOnce(userId, workspace.id, workspace.trialEndsAt, workspace.plan).catch(() => {});
  return { userId, workspaceId: workspace.id };
  }
 
@@ -59,7 +64,9 @@ export async function requirePlatformContext(): Promise<PlatformContext | NextRe
     await tx.workspaceSettings.create({ data: { workspaceId: created.id, allowedAssetTypes: defaultAllowedAssetTypes() } });
     await tx.userSettings.upsert({ where: { userId }, update: {}, create: { userId } });
     return created.id;
-   }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+   }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable, maxWait: 15000, timeout: 15000 });
+   userWorkspaceCache.set(userId, workspaceId);
+   if (userWorkspaceCache.size > 256) userWorkspaceCache.delete(userWorkspaceCache.keys().next().value!);
    return { userId, workspaceId };
   } catch (error) {
    if (!(error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2034") || attempt === 2) throw error;
@@ -80,7 +87,7 @@ async function ensureWorkspaceDefaultsOnce(userId: string, workspaceId: string, 
  let pending = initializedWorkspaces.get(key);
  if (!pending) {
   const trialEndsAt = existingTrialEndsAt ?? new Date(Date.now() + 12 * 24 * 60 * 60 * 1000);
-  pending = Promise.all([
+  pending = (async () => { await prisma.workspaceMember.upsert({ where: { workspaceId_userId: { workspaceId, userId } }, update: {}, create: { workspaceId, userId, role: "OWNER" } }); await prisma.subscriptionState.upsert({ where: { workspaceId }, update: {}, create: { workspaceId, plan: plan ?? "TRIAL", status: "TRIALING", trialEndsAt, usageLimits: defaultUsageLimits() } }); await prisma.workspaceSettings.upsert({ where: { workspaceId }, update: {}, create: { workspaceId, allowedAssetTypes: defaultAllowedAssetTypes() } }); await prisma.userSettings.upsert({ where: { userId }, update: {}, create: { userId } }); })(); if (false) void Promise.all([
  prisma.workspaceMember.upsert({
  where: { workspaceId_userId: { workspaceId, userId } },
  update: {},
@@ -107,7 +114,7 @@ async function ensureWorkspaceDefaultsOnce(userId: string, workspaceId: string, 
  update: {},
  create: { userId },
  }),
-  ]).then(() => undefined);
+  ]);
   initializedWorkspaces.set(key, pending);
   if (initializedWorkspaces.size > 256) initializedWorkspaces.delete(initializedWorkspaces.keys().next().value!);
   void pending.catch(() => { if (initializedWorkspaces.get(key) === pending) initializedWorkspaces.delete(key); });

@@ -63,7 +63,7 @@ async function run() {
     if(width===1440){
       if(route==='/casynus') referenceInspectorHeaderHeight=await evaluate('document.querySelector(".scene-inspector>header").getBoundingClientRect().height');
       const bar=await evaluate('(()=>{const r=document.querySelector(".casynus-viewport-toolbar").getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,height:r.height}})()');
-      assert.equal(bar.height,46);assert.equal(bar.top,12,'Toolbar aligns with sidebar tops');assert.ok(bar.left>=280&&bar.right<=1148,'Toolbar stays between panels');
+      assert.equal(bar.height,54);assert.equal(bar.top,12,'Toolbar aligns with sidebar tops');assert.ok(bar.left>=280&&bar.right<=1148,'Toolbar stays between panels');
       await evaluate(`document.querySelector('button[aria-label="Show AI chat"]')?.click()`);await ready('.studio-ai-panel');
       assert.equal(await evaluate('document.querySelector(".studio-ai-panel").getBoundingClientRect().bottom'),888,'AI dock aligns with sidebar bottoms');
       await evaluate(`document.querySelector('button[aria-label="Minimize AI assistant"]').click()`);await ready('.studio-ai-reopen-btn');

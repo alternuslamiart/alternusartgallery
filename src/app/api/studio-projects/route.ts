@@ -77,7 +77,7 @@ export async function PUT(request: NextRequest) {
         // Reuse the existing JSON-capable scene container, not a Blender job.
         await tx.blenderProject.create({ data: { id: document.id, projectId: document.id, workspaceId: context.workspaceId, userId: context.userId, name: document.name, settings } });
       }
-    });
+    }, { maxWait: 15000, timeout: 15000 });
     return NextResponse.json({ id: document.id, revision: revision + 1, saved: true });
   } catch (caught) {
     if (caught instanceof SceneConflict || (caught instanceof Prisma.PrismaClientKnownRequestError && caught.code === "P2002")) return error("A newer version or another project already uses this ID. Reopen the cloud version or save a copy.", 409);

@@ -5,9 +5,10 @@
   `src/lib/sketch.mjs`, `sketch-export.ts`, `useSketchProject.ts`,
   `/api/sketch-projects`) with `#404040` workspace, `New Canvas` setup dialog,
   top-left Profile & Settings buttons, top 54×54px/40×40px horizontal toolbar,
-  right-side expandable panels, bottom-centered AI Chat, CAD+sketch persistence
-  and PNG/SVG/PDF/JSON exports while keeping CAD drafting clean when inactive.
-  Verified with unit tests and live Chrome QA.
+  right-side expandable panels, bottom-centered AI Chat, CAD+sketch persistence,
+  PNG/SVG/PDF/JSON exports, unified 54×54px/40×40px `StudioViewportToolbar` across
+  Architecture/Infrastructure/Sketch CAD, and PgBouncer pooler/transaction fix
+  for `/api/studio-projects`. Verified with unit tests and live Chrome QA.
 - [ ] Verify deployed `/interior` Sketch Studio cloud save/reopen and exports in
   production after pushing to `main`.
 

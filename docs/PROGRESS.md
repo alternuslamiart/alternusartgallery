@@ -39,7 +39,9 @@ Last updated: 2026-10-27
 - Added the shared HSV color wheel + saturation/value square + HEX input +
   opacity slider + 10 color swatches + custom color palette (`SceneColorField` /
   `.scene-color-panel` in `SceneWorkbench.tsx` and `scene-studio.css`) to `Base color` and `Light color` in the Architecture (`/casynus`), Infrastructure (`/infrastructure`) and 3D Sketch (`/interior?workspace=3d`) Properties inspectors, opening as a floating panel to the left of the right sidebar only when the color button is clicked while preserving `[aria-label="Base color"]` and `[aria-label="Light color"]` compatibility.
-- Verification: all 201 Node tests (`npm test`), standalone TypeScript
+- Unified `StudioViewportToolbar` (`StudioViewportToolbar.tsx`, `viewport-toolbar.css`, `sketch.css`) across Architecture (`/casynus`), Infrastructure (`/infrastructure`) and Sketch 2D CAD (`/interior`) to use the `54px` toolbar height (`border-radius: 14px`, `#161616` panel surface) with `54 × 54px` tool button frames and `40 × 40px` (`border-radius: 10px`) inner hover (`#282828`) and active (`#4284ff`) surfaces.
+- Fixed the `"Project storage is unavailable. Your browser recovery copy has not been uploaded."` 503 error on `/api/studio-projects`: normalized `DATABASE_URL` in `src/lib/prisma.ts` (percent-encoding unescaped password characters before `@` and raising narrow `connection_limit=3` pooler caps to `connection_limit=10`, `pool_timeout=20`, `connect_timeout=15` with `pgbouncer=true`), cached verified `userId -> workspaceId` lookups and serialized `ensureWorkspaceDefaultsOnce` upserts in `src/lib/platform/api.ts` so concurrent `.upsert()` transactions no longer starve a 3-connection pool (`P2024`) during studio load, and added `{ maxWait: 15000, timeout: 15000 }` to `prisma.$transaction` in `src/app/api/studio-projects/route.ts` and `src/lib/platform/api.ts`.
+- Verification: all 202 Node tests (`npm test`), standalone TypeScript
   (`npm run typecheck`), focused Next.js lint and production build passed.
   Real installed-Chrome live acceptance (`node scripts/verify-sketch.mjs --live`)
   passed CAD workspace preservation, sidebar-free Pencil Studio transition,

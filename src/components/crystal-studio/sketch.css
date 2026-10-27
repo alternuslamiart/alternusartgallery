@@ -1,8 +1,9 @@
 .crystal-studio .floor-plan-canvas.sketch-workspace.is-pencil-mode{background:#404040!important}
 .sketch-workspace.is-pencil-mode .floor-plan-svg-surface{--studio-text-primary:#26313b;--studio-text-secondary:#64748b;--studio-draft-wall:#26313b;--studio-draft-room:#eef2f0;--studio-draft-paper:#fff;--studio-draft-selected:#dbeafe}
-.sketch-workspace .casynus-viewport-toolbar.ref-top-toolbar{height:54px!important;min-height:54px!important;padding:0 8px!important}
+.sketch-workspace .casynus-viewport-toolbar.ref-top-toolbar{height:54px!important;min-height:54px!important;padding:0!important}
 .crystal-studio .sketch-workspace .casynus-viewport-toolbar.ref-top-toolbar .sketch-entry{width:54px!important;min-width:54px!important;height:54px!important;min-height:54px!important;padding:7px!important;background:transparent!important}
-.sketch-entry>span{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:var(--studio-bg-hover)}
+.sketch-entry>span{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:transparent}
+.sketch-entry:hover>span{background:var(--studio-bg-hover)}
 .sketch-entry.is-active>span{background:var(--studio-accent);color:var(--studio-on-accent)}
 .sketch-ui{position:absolute;top:76px;z-index:24;pointer-events:none;color:var(--studio-text-primary);font-size:11px;--sketch-panel:var(--studio-bg-panel,#161616);--sketch-hover:var(--studio-bg-hover,#282828)}
 .sketch-ui.is-pencil-studio{top:12px}

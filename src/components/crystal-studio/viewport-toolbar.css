@@ -1,30 +1,59 @@
 .crystal-studio .casynus-viewport-toolbar.ref-top-toolbar {
   top:16px!important; width:max-content!important; max-width:calc(100% - 24px)!important;
-  min-width:0!important; height:46px!important; min-height:46px!important;
-  padding:5px 8px!important; gap:4px!important; border-radius:12px!important;
-  overflow-x:auto; overflow-y:hidden; flex-wrap:nowrap; pointer-events:auto;
+  min-width:0!important; height:54px!important; min-height:54px!important;
+  padding:0!important; gap:0!important; border:0!important; border-radius:14px!important;
+  background:var(--studio-bg-panel,#161616)!important; box-shadow:none!important;
+  overflow-x:auto; overflow-y:hidden; flex-wrap:nowrap; pointer-events:auto; scrollbar-width:none;
 }
 .scene-workbench.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar { top:0!important; }
 .crystal-studio.interior-plan-restored .casynus-viewport-toolbar.ref-top-toolbar { top:12px!important; }
 .crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn {
-  width:33px!important; min-width:33px!important; height:33px!important; min-height:33px!important;
-  padding:0 7px!important; flex-shrink:0; border-radius:8px!important;
+  width:54px!important; min-width:54px!important; height:54px!important; min-height:54px!important;
+  padding:7px!important; flex-shrink:0; border:0!important; border-radius:0!important;
+  background:transparent!important; box-shadow:none!important;
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn>span {
+  display:flex; align-items:center; justify-content:center; width:40px; height:40px; flex-shrink:0;
+  border-radius:10px; background:transparent; color:var(--studio-text-secondary);
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn:hover:not(:disabled) {
+  background:transparent!important;
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn:hover:not(:disabled)>span {
+  background:var(--studio-bg-hover,#282828)!important; color:var(--studio-text-primary)!important;
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"] {
+  background:transparent!important; box-shadow:none!important;
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span {
+  background:var(--studio-accent,#4284ff)!important; color:var(--studio-on-accent,#fff)!important;
 }
 .crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-export-btn {
-  width:auto!important; height:33px!important; min-height:33px!important; padding:0 14px!important; flex-shrink:0;
+  width:auto!important; height:54px!important; min-height:54px!important; padding:7px 4px!important;
+  flex-shrink:0; border:0!important; border-radius:0!important; background:transparent!important;
+  box-shadow:none!important; margin:0!important;
 }
-.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active { background:var(--studio-accent)!important; color:var(--studio-on-accent)!important; }
-.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-zoom-pill { width:120px; height:33px; padding:0 10px; flex-shrink:0; border:0; background:transparent; margin:0; }
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-export-btn>span {
+  display:inline-flex; align-items:center; justify-content:center; gap:6px; height:40px; padding:0 14px;
+  border-radius:10px; background:var(--studio-accent,#4284ff); color:var(--studio-on-accent,#fff);
+  font-size:12px; font-weight:600;
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-zoom-pill {
+  width:120px; height:40px; padding:0 10px; flex-shrink:0; border:0; border-radius:10px; background:transparent; margin:7px 4px;
+}
 .casynus-viewport-toolbar .ref-toolbar-zoom-pill option { background:var(--studio-bg-panel); color:var(--studio-text-primary); }
-.casynus-viewport-toolbar .ref-toolbar-divider { flex-shrink:0; }
+.casynus-viewport-toolbar .ref-toolbar-divider { width:1px; height:26px; margin:0 2px; background:var(--studio-bg-hover,#282828); flex-shrink:0; }
 .casynus-toolbar-export { width:min(320px,calc(100vw - 32px)); padding:16px; border:1px solid var(--studio-border); border-radius:12px; background:var(--studio-bg-panel); color:var(--studio-text-primary); }
 .casynus-toolbar-export::backdrop { background:#0007; }
 .casynus-toolbar-export header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
 .casynus-toolbar-export button { display:block; padding:9px 12px; width:100%; text-align:left; border:0; border-radius:8px; background:transparent; color:inherit; cursor:pointer; }
 .casynus-toolbar-export header button { width:auto; }
 .casynus-toolbar-export button:hover { background:var(--studio-bg-hover); }
-.casynus-material-library { position:absolute; top:70px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:12px; width:850px; max-width:calc(100% - 24px); min-width:0; height:90px; padding:12px; border:1px solid var(--studio-border); border-radius:12px; background:var(--studio-bg-panel); color:var(--studio-text-primary); z-index:32; box-shadow:var(--studio-shadow-floating); pointer-events:auto; }
-.scene-workbench .casynus-material-library { top:58px; }
+.casynus-material-library { position:absolute; top:82px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:12px; width:850px; max-width:calc(100% - 24px); min-width:0; height:90px; padding:12px; border:1px solid var(--studio-border); border-radius:12px; background:var(--studio-bg-panel); color:var(--studio-text-primary); z-index:32; box-shadow:var(--studio-shadow-floating); pointer-events:auto; }
+.scene-workbench .casynus-material-library { top:66px; }
+.interior-plan-restored .casynus-material-library { top:78px; }
 .cs-material-meta { flex:0 0 132px; min-width:0; }
 .cs-material-meta>div:first-child { display:flex; align-items:center; justify-content:space-between; gap:4px; }
 .cs-material-meta strong { font-size:12px; white-space:nowrap; }
