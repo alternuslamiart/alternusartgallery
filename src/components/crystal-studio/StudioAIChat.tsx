@@ -204,7 +204,7 @@ export function StudioAIChat({
     <StudioGenerationLoader
       open={showLoadingFrame}
       prompt={loadingPrompt}
-      durationSeconds={12}
+      durationSeconds={20}
       onClose={() => setShowLoadingFrame(false)}
       onComplete={() => setShowLoadingFrame(false)}
     />

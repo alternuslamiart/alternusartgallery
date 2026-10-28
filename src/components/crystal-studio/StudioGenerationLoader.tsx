@@ -15,13 +15,14 @@ interface StudioGenerationLoaderProps {
 export function StudioGenerationLoader({
   open,
   prompt,
-  durationSeconds = 12,
+  durationSeconds = 20,
   onComplete,
   onClose,
 }: StudioGenerationLoaderProps) {
   const [progress, setProgress] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(durationSeconds);
   const [mounted, setMounted] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -31,9 +32,11 @@ export function StudioGenerationLoader({
     if (!open) {
       setProgress(0);
       setSecondsLeft(durationSeconds);
+      setIsFadingOut(false);
       return;
     }
 
+    setIsFadingOut(false);
     const totalMs = durationSeconds * 1000;
     const intervalMs = 50;
     const startTime = Date.now();
@@ -46,8 +49,12 @@ export function StudioGenerationLoader({
       setProgress(currentProgress);
       setSecondsLeft(remaining);
 
+      // Once filled after 20 seconds, fade out smoothly and close
       if (elapsed >= totalMs) {
         clearInterval(interval);
+        setProgress(100);
+        setSecondsLeft(0);
+        setIsFadingOut(true);
         setTimeout(() => {
           onComplete?.();
           onClose?.();
@@ -72,8 +79,7 @@ export function StudioGenerationLoader({
 
   const formattedTimer = `End: 00 min ${String(secondsLeft).padStart(2, "0")}sec`;
 
-  // Render directly into document.body to ensure it appears in the true center of the screen
-  // with ZERO blur or dimming on the studio background
+  // Render directly into document.body in the center of the screen without blurring studio background
   return createPortal(
     <div
       className="studio-generation-loader-overlay hidden md:flex fixed inset-0 z-[999999] items-center justify-center pointer-events-none"
@@ -85,11 +91,13 @@ export function StudioGenerationLoader({
       aria-live="polite"
       role="status"
     >
-      {/* 712x140px Exact Frame, centered in screen without blurring studio background */}
+      {/* 712x140px Exact Frame with color: #161616 */}
       <div
-        className="pointer-events-auto relative w-[712px] h-[140px] rounded-[24px] px-[27.5px] py-6 flex flex-col justify-between shadow-2xl transition-all select-none"
+        className={`pointer-events-auto relative w-[712px] h-[140px] rounded-[24px] px-[27.5px] py-6 flex flex-col justify-between shadow-2xl transition-all duration-300 select-none ${
+          isFadingOut ? "opacity-0 scale-95" : "opacity-100 scale-100"
+        }`}
         style={{
-          backgroundColor: "#222222",
+          backgroundColor: "#161616",
           fontFamily: "Roboto, var(--font-roboto-flex), sans-serif",
           boxShadow: "0 24px 60px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08)",
         }}
