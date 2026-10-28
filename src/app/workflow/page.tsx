@@ -36,9 +36,9 @@ const navItems = [
   { label: "Agents", icon: Grid2X2, href: "/casynus" },
   { label: "Workflows", icon: Globe2, href: "/workflow" },
   { label: "Plugins", icon: Archive, href: "/casynus" },
-  { label: "Architecture", icon: Layers3, href: "/archplan" },
+  { label: "Architecture", icon: Layers3, href: "/interior" },
   { label: "Interior Design...", icon: WorkflowIcon, href: "/design-studio" },
-  { label: "Urban Planning", icon: Grid2X2, href: "/archplan" },
+  { label: "Urban Planning", icon: Grid2X2, href: "/infrastructure" },
   { label: "Community", icon: Globe2, href: "/workflow" },
   { label: "Archive...", icon: Archive, href: "/workflow" },
 ];
@@ -157,7 +157,7 @@ export default function WorkflowPage() {
               {workflowSteps.length > 0 && <span className="text-[10px] text-[#a8a8a8]">{workflowStatus}</span>}
               {workflowSteps.length > 0 && <button type="button" onClick={saveWorkflow} className="h-[35px] rounded-[10px] bg-[#333] px-3 text-[11px] hover:bg-[#3a3a3a]">Save</button>}
               {workflowSteps.length > 0 && <button type="button" onClick={runWorkflow} disabled={workflowStatus === "Running"} className="h-[35px] rounded-[10px] bg-[#168bef] px-3 text-[11px] disabled:opacity-50">{workflowStatus === "Running" ? "Running..." : "Run"}</button>}
-              <Link href="/archplan" className="flex h-[35px] w-[111px] items-center justify-center gap-2 rounded-[10px] bg-[#168bef] text-[11px] font-medium text-white transition hover:bg-[#2a98f3]">New Project <Plus size={14} /></Link>
+              <Link href="/project" className="flex h-[35px] w-[111px] items-center justify-center gap-2 rounded-[10px] bg-[#168bef] text-[11px] font-medium text-white transition hover:bg-[#2a98f3]">New Project <Plus size={14} /></Link>
             </div>
           </div>
         </div>

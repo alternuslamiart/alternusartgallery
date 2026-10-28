@@ -1,5 +1,6 @@
 # Next tasks (reviewed 2026-10-28)
 
+- [x] Delete legacy pages /aicode and /archplan; clean up all references across navigation, AI chat search destinations, unified workflow links, and studio project cards.
 - [x] Redesign studio toolbar icons to be clearly identifiable for their operations
   (Move: 4-way `Move` cross arrows replacing `Route`, Scale: diagonal `Maximize2`
   replacing `Focus`, Wall: `BrickWall`, Window: `AppWindow`, Room: `LayoutGrid`,

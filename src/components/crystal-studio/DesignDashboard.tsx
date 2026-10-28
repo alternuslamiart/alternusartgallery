@@ -105,7 +105,7 @@ export function DesignDashboard({ onOpenStudio }: { onOpenStudio: () => void }) 
                   onClick={() => {
                     setActiveTab(tab);
                     if (tab === "Service") router.push("/workflow");
-                    if (tab === "Apartment") router.push("/archplan");
+                    if (tab === "Apartment") router.push("/interior");
                   }}
                   className={`rounded-full px-4 py-2.5 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A90D9] ${
                     activeTab === tab ? "bg-[#171717] font-semibold text-white" : "text-zinc-500 hover:text-zinc-300"

@@ -1908,3 +1908,13 @@ in the worktree and are unrelated; they have not been restored or included.
 - `git diff --check`: passed.
 - Browser/WebGL interaction and reload testing remain unverified because no
   browser automation run was available.
+
+
+## Remove legacy /aicode and /archplan pages and clean navigation links
+
+- Deleted `src/app/aicode` and `src/app/archplan` page routes per user request.
+- Cleaned up dangling references in `src/app/aichat/page.tsx` (removed unused Code2 icon, search destinations, and redirected New Project link to `/project`).
+- Updated `src/app/workflow/page.tsx`, `src/components/crystal-studio/CrystalStudio.tsx`, and `src/components/crystal-studio/DesignDashboard.tsx` to link to `/interior`, `/infrastructure`, and `/casynus` instead of `/archplan`.
+- Cleared cached Next.js types in `.next/types/app/aicode` and `.next/types/app/archplan`.
+- `npx tsc --noEmit`: passed with 0 errors.
+- `npm run test`: 202 tests passed, 0 failures.

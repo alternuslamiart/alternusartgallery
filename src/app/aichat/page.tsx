@@ -8,7 +8,6 @@ import {
   ArrowUp,
   Bot,
   Check,
-  Code2,
   Copy,
   ChevronDown,
   FolderPlus,
@@ -143,9 +142,7 @@ const searchDestinations: SearchDestination[] = [
   { label: "AI Chat", description: "Start a conversation with Casynus", href: "/aichat" },
   { label: "Casynus Studio", description: "Open the 3D design workspace", href: "/casynus" },
   { label: "Infrastructure Studio", description: "Plan roads, utilities, and public spaces", href: "/infrastructure" },
-  { label: "Architecture plans", description: "Create and organize floor plans", href: "/archplan" },
   { label: "Design Studio", description: "Explore visual design tools", href: "/design-studio" },
-  { label: "AI Code", description: "Build with the AI code workspace", href: "/aicode" },
   { label: "Projects", description: "Browse your workspace projects", href: "/project" },
 ];
 const getGeneratedSection = (content: string, index: number): string => {
@@ -496,7 +493,7 @@ export default function AIChatPage() {
           </button>
 
           <nav className="mt-5 space-y-1">
-            <Link href="/archplan" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-[var(--studio-text-primary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><FolderPlus size={16} className="text-[var(--studio-text-secondary)]" /> New Project</Link>
+            <Link href="/project" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-[var(--studio-text-primary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><FolderPlus size={16} className="text-[var(--studio-text-secondary)]" /> New Project</Link>
             <button onClick={startNewChat} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] text-[var(--studio-text-primary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><Plus size={16} className="text-[var(--studio-text-secondary)]" /> New Chat</button>
             <Link href="/design-studio" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-[var(--studio-text-primary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><Image size={16} className="text-[var(--studio-text-secondary)]" /> Image</Link>
             <Link href="/platform/bridges" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] text-[var(--studio-text-primary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><Plug size={16} className="text-[var(--studio-text-secondary)]" /> Plugin</Link>
@@ -568,7 +565,7 @@ export default function AIChatPage() {
         {sidebarCollapsed && (
           <div className="flex min-h-0 flex-1 flex-col items-center">
             <nav className="mt-5 flex flex-col items-center gap-2" aria-label="Collapsed AI chat navigation">
-              <Link href="/archplan" aria-label="New Project" title="New Project" className="grid h-8 w-8 place-items-center rounded-lg text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><FolderPlus size={16} /></Link>
+              <Link href="/project" aria-label="New Project" title="New Project" className="grid h-8 w-8 place-items-center rounded-lg text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><FolderPlus size={16} /></Link>
               <button type="button" onClick={startNewChat} aria-label="New Chat" title="New Chat" className="grid h-8 w-8 place-items-center rounded-lg text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><Plus size={17} /></button>
               <Link href="/design-studio" aria-label="Image" title="Image" className="grid h-8 w-8 place-items-center rounded-lg text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><Image size={16} /></Link>
               <Link href="/platform/bridges" aria-label="Plugin" title="Plugin" className="grid h-8 w-8 place-items-center rounded-lg text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><Plug size={16} /></Link>
@@ -592,7 +589,6 @@ export default function AIChatPage() {
               <button onClick={() => setMode("chat")} className={`flex items-center gap-2 rounded-full px-5 py-2 text-xs font-medium transition-all ${mode === "chat" ? "bg-[var(--studio-accent)] text-[var(--studio-text-primary)] shadow-md shadow-blue-500/20" : "text-[var(--studio-text-secondary)] hover:text-[var(--studio-text-primary)]"}`}><Sparkles size={14} /> Chat</button>
               <button onClick={() => setMode("workflow")} className={`flex items-center gap-2 rounded-full px-5 py-2 text-xs font-medium transition-all ${mode === "workflow" ? "bg-[var(--studio-accent)] text-[var(--studio-text-primary)] shadow-md shadow-blue-500/20" : "text-[var(--studio-text-secondary)] hover:text-[var(--studio-text-primary)]"}`}><GitBranch size={14} /> Workflow</button>
             </div>
-            <Link href="/aicode" aria-label="Open AI Code" title="AI Code" className="hidden h-7 w-7 items-center justify-center rounded-md text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-accent)] md:flex"><Code2 size={15} strokeWidth={2.2} /></Link>
           </div>
           <div className="flex items-center gap-2">
             <CrystalThemeToggle />
