@@ -2,6 +2,14 @@
 
 Last updated: 2026-10-28
 
+## 3D AI Texturing Pipeline & Shader Configuration Specification (2026-10-28)
+
+- Created exhaustive technical director and 3D texture artist specification in `docs/AI-3D-TEXTURING-GUIDE.md`:
+  - Normal Map (Tangent Space): Mathematical vector mapping, OpenGL vs. DirectX green-channel handling, vector length normalization, height-to-normal pipeline, and generation prompts.
+  - Albedo Map (Base Color / Diffuse): De-lighting techniques, dielectric PBR ranges (30-240 sRGB), metallic reflectance specifications, and shadowless diffusion prompts.
+  - MatCap (Material Capture): Mathematical view-space projection ($UV = 0.5 \cdot N_{view} + 0.5$), 2D sphere texture AI prompts, and Blender Eevee/Cycles custom shader nodes.
+  - Solid with Cavity (Clay / Crevice Render): Ambient occlusion and pointiness/curvature integration, warm grey clay color ramp parameters, and procedural edge/crevice highlighting.
+
 ## Blender 3D Object Import into Casynus Studio (2026-10-28)
 
 - Implemented dedicated import and interactive placement for 3D models designed in Blender into Casynus (`/casynus`, `src/components/scene-studio/SceneWorkbench.tsx`):

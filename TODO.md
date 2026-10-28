@@ -1,5 +1,11 @@
 # Next tasks (reviewed 2026-10-28)
 
+- [x] Complete 3D AI Texturing Guide & Shader Pipeline Specification:
+  - Added comprehensive technical director specification in `docs/AI-3D-TEXTURING-GUIDE.md` covering 4 production texture styles:
+    1. Tangent Space Normal Map: Vector channels (R/G/B), OpenGL vs. DirectX inversion (+Y), normalization math, height-to-normal diffusion, and AI prompt sets.
+    2. Albedo / Base Color Map: De-lighting strategies, sRGB 30-240 dielectric ranges, metallic reflectance values, and shadowless diffusion prompts.
+    3. MatCap (Material Capture): Camera-space normal UV mapping formulas ($U = 0.5 \cdot N_x + 0.5$), 2D sphere generation prompts, and Blender shader tree.
+    4. Solid with Cavity (Clay / Crevice Render): Ambient occlusion + pointiness/curvature mixing, matte clay PBR parameters, and edge accentuation.
 - [x] Blender 3D Object Import into Casynus Studio:
   - Added dedicated Blender 3D object import support across standard formats (`.glb`, `.gltf`, `.fbx`, `.obj`, `.stl`).
   - Added Three.js `FBXLoader` support in `src/lib/scene/geometry.mjs` for Blender-exported FBX files with meshes, materials, and hierarchy.
