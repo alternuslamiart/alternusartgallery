@@ -1,6 +1,6 @@
-import NextImage from "next/image";
 "use client";
 
+import NextImage from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
