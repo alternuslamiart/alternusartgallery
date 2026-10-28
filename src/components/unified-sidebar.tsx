@@ -72,7 +72,7 @@ export function UnifiedSidebar({
   if (isCollapsed) {
     return (
       <aside
-        className={`workspace-sidebar flex h-full w-[60px] min-w-[60px] flex-col items-center overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] py-3 ${className}`}
+        className={`workspace-sidebar flex h-full w-[60px] min-w-[60px] flex-col items-center overflow-hidden rounded-[10px] border border-[#333333] bg-[#161616] py-3 ${className}`}
       >
         <button
           type="button"
@@ -127,7 +127,7 @@ export function UnifiedSidebar({
             type="button"
             aria-label="Open profile menu"
             onClick={() => setProfileOpen((open) => !open)}
-            className="grid h-8 w-8 place-items-center rounded-full bg-[#4284ff] text-[12px] font-semibold text-white transition hover:ring-2 hover:ring-[#4284ff]/40"
+            className="grid h-8 w-8 place-items-center rounded-xl bg-[#2B2B2B] border border-[#383838] text-[12px] font-semibold text-white transition hover:bg-[#2B2B2B]"
           >
             {initial}
           </button>
@@ -194,7 +194,7 @@ export function UnifiedSidebar({
 
   return (
     <aside
-      className={`workspace-sidebar flex h-full w-[234px] min-w-0 shrink-0 flex-col overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] px-[14px] py-[12px] text-[#f4f4f5] shadow-[0_8px_24px_rgba(0,0,0,0.16)] ${className}`}
+      className={`workspace-sidebar flex h-full w-[234px] min-w-0 shrink-0 flex-col overflow-hidden rounded-[10px] border border-[#333333] bg-[#161616] px-[14px] py-[12px] text-[#f4f4f5] shadow-[0_8px_24px_rgba(0,0,0,0.16)] ${className}`}
     >
       <div className="flex items-center gap-2 px-1">
         <button
@@ -249,7 +249,7 @@ export function UnifiedSidebar({
             aria-label="Open profile menu"
             aria-expanded={profileOpen}
             onClick={() => setProfileOpen((open) => !open)}
-            className="flex w-full items-center gap-2.5 rounded-xl border border-[#333333] bg-[#202124] p-2 text-left transition hover:border-[#4a4a4a] hover:bg-[#26272b]"
+            className="flex w-full items-center gap-2.5 rounded-xl border border-[#383838] bg-[#2B2B2B] p-2 text-left transition hover:border-[#4a4a4a] hover:bg-[#2B2B2B]"
           >
             <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#4284ff] text-[12px] font-semibold text-white">
               {initial}

@@ -1931,3 +1931,13 @@ in the worktree and are unrelated; they have not been restored or included.
 - Added `wave0.jpg`, `wave1.webp`, and `wave2.jpg` backgrounds for the recent project cards.
 - `npx tsc --noEmit`: passed with 0 errors.
 - `npm run test`: passed 202/202 tests.
+
+
+## Set #161616 project background, #2B2B2B header and profile frame, and full-frame card images
+
+- Updated `/project` dashboard background to `#161616` across desktop and responsive styles.
+- Styled top header and home button to `#2B2B2B` with matching hover state.
+- Updated project cards so wave thumbnail images span the entire card frame (`position: absolute; inset: 0; width: 100%; height: 100%`) with frosted-glass caption overlay.
+- Styled sidebar profile trigger button with `#2B2B2B` background and matching hover.
+- `npx tsc --noEmit`: passed with 0 errors.
+- `npm run test`: passed 202/202 tests.
