@@ -14,13 +14,25 @@
 }
 .crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn>span {
   display:flex; align-items:center; justify-content:center; width:40px; height:40px; flex-shrink:0;
-  border-radius:10px; background:transparent; color:var(--studio-text-secondary);
+  border-radius:10px; background:transparent; color:var(--studio-text-secondary,#cbd5e1);
+  transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn:not(.is-active):not([aria-pressed="true"])>span {
+  color: var(--studio-text-secondary, #cbd5e1);
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn>span svg {
+  width:18px; height:18px; stroke:currentColor; stroke-width:1.65px; fill:none;
+  shape-rendering:geometricPrecision;
+  transition: stroke-width .15s ease, fill .15s ease, filter .15s ease, transform .15s ease;
 }
 .crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn:hover:not(:disabled) {
   background:transparent!important;
 }
 .crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn:hover:not(:disabled)>span {
-  background:var(--studio-bg-hover,#282828)!important; color:var(--studio-text-primary)!important;
+  background:var(--studio-bg-hover,#282828)!important; color:var(--studio-text-primary,#fff)!important;
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn:hover:not(:disabled)>span svg {
+  stroke-width:1.85px;
 }
 .crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active,
 .crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"] {
@@ -29,6 +41,43 @@
 .crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span,
 .crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span {
   background:var(--studio-accent,#4284ff)!important; color:var(--studio-on-accent,#fff)!important;
+  box-shadow:0 2px 8px rgba(66,132,255,.4)!important;
+}
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg {
+  stroke-width:2.35px;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.25));
+}
+/* Active fill-bold silhouettes */
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-mouse-pointer2,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-mouse-pointer2,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-pointer,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-pointer,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-play,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-play,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-home,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-home,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-house,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-house,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-tree-pine path,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-tree-pine path,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-sparkles path,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-sparkles path,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-pencil,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-pencil,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-door-open path,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-door-open path,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-focus circle,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-focus circle,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-layout-grid rect,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-layout-grid rect,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-trash2,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-trash2,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-sofa,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-sofa,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn.is-active>span svg.lucide-armchair,
+.crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-icon-btn[aria-pressed="true"]>span svg.lucide-armchair {
+  fill: currentColor;
 }
 .crystal-studio .casynus-viewport-toolbar.ref-top-toolbar .ref-toolbar-export-btn {
   width:auto!important; height:54px!important; min-height:54px!important; padding:7px 4px!important;

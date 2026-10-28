@@ -1,5 +1,13 @@
-# Next tasks (reviewed 2026-10-27)
+# Next tasks (reviewed 2026-10-28)
 
+- [x] Redesign studio toolbar icons to be clearly identifiable for their operations
+  (Move: 4-way `Move` cross arrows replacing `Route`, Scale: diagonal `Maximize2`
+  replacing `Focus`, Wall: `BrickWall`, Window: `AppWindow`, Room: `LayoutGrid`,
+  Dimension: `RulerDimensionLine`, Text: `Type`), render clicked/active icons as
+  fill-bold (`fill: currentColor` on closed silhouettes, `stroke-width: 2.35px`
+  and subtle depth shadow), and render unclicked icons thinner (`stroke-width: 1.65px`)
+  with crisp geometric definition (`color: #cbd5e1` / `var(--studio-text-secondary)`)
+  across Architecture, Infrastructure, and Sketch Studio.
 - [x] Rename Interior to Sketch across studio navigation, headers and AI chat;
   implement the dedicated sidebar-free Pencil Studio (`SketchWorkspace.tsx`,
   `src/lib/sketch.mjs`, `sketch-export.ts`, `useSketchProject.ts`,

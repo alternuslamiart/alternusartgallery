@@ -6,7 +6,7 @@ import { importGeographicFeature } from "@/lib/infrastructure/map-import.mjs";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
-import { Box, Building2, ChevronDown, Eye, EyeOff, Focus, FolderOpen, Globe2, Layers3, Lock, MoreHorizontal, MousePointer2, PanelLeft, PanelRight, Rotate3D, Route, Ruler, Save, Sparkles, TreePine, Unlock, X } from "lucide-react";
+import { Box, Building2, ChevronDown, Eye, EyeOff, Focus, FolderOpen, Globe2, Layers3, Lock, Maximize2, MoreHorizontal, MousePointer2, Move, PanelLeft, PanelRight, Rotate3D, Ruler, Save, Sparkles, TreePine, Unlock, X } from "lucide-react";
 import { hexToHsv, hsvToHex } from "@/lib/sketch.mjs";
 import { SceneViewport, type SceneTool, type ViewportAPI } from "./SceneViewport";
 import { useSceneDocument } from "./useSceneDocument";
@@ -498,7 +498,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
           { label: 'AI 3D Generate', icon: Sparkles, active:model==='hunyuan', onClick:()=>void activate3DGeneration(), disabled:checkingGeneration||planning||Boolean(busy)||Boolean(pending&&!pending.generatedJobId) },
         ]}
         tools={([
-          ["select", MousePointer2, "Select · Q"], ["translate", Route, "Move · W"], ["rotate", Rotate3D, "Rotate · E"], ["scale", Focus, "Scale · R"], ["measure", Ruler, "Measure distance"],
+          ["select", MousePointer2, "Select · Q"], ["translate", Move, "Move · W"], ["rotate", Rotate3D, "Rotate · E"], ["scale", Maximize2, "Scale · R"], ["measure", Ruler, "Measure distance"],
         ] as const).map(([id, icon, label]) => ({ label, icon, active: tool === id, disabled: blocked, onClick: () => setTool(id) }))}
         onFit={() => worldMap ? worldMapAPI.current?.reset() : viewport.current?.fit()} onReset={() => { if (worldMap) { worldMapAPI.current?.reset(); setMapView("Globe"); } else store.setCamera(makeDocument(studio).camera); }}
         cameraViews={worldMap ? ["Globe", "Pitched"] : ["Perspective", "Orthographic", "Front", "Back", "Left", "Right", "Top"]} cameraView={worldMap ? mapView : cameraView}

@@ -24,7 +24,9 @@ import {
   LayoutGrid,
   Lightbulb,
   Lock,
+  Maximize2,
   MousePointer2,
+  Move,
   PanelLeftOpen,
   PanelRightOpen,
   ParkingSquare,
@@ -148,9 +150,9 @@ const toolButtons: Array<{
   icon: LucideIcon;
 }> = [
   { id: "select", title: "Select (V)", icon: MousePointer2 },
-  { id: "move", title: "Move (G)", icon: Route },
+  { id: "move", title: "Move (G)", icon: Move },
   { id: "rotate", title: "Rotate (R)", icon: Rotate3D },
-  { id: "scale", title: "Scale (S)", icon: Focus },
+  { id: "scale", title: "Scale (S)", icon: Maximize2 },
   { id: "measure", title: "Measure distance", icon: Ruler },
 ];
 

@@ -1,6 +1,38 @@
 # Verified progress
 
-Last updated: 2026-10-27
+Last updated: 2026-10-28
+
+## Studio toolbar icon redesign and fill-bold active states (2026-10-28)
+
+- Redesigned studio top toolbar icons across Architecture (`/casynus`), Infrastructure
+  (`/infrastructure`), 3D Sketch (`/interior?workspace=3d`), 2D CAD drafting (`/interior`),
+  and Pencil Studio (`SketchWorkspace.tsx`) to be immediately recognizable for the
+  actions they perform:
+  - Replaced ambiguous `Route` (two nodes on a curvy line) with standard 4-way `Move`
+    cross arrows for 3D Move/Translate (`SceneWorkbench.tsx`, `ClassicInfrastructure.tsx`).
+  - Replaced ambiguous duplicate `Focus` (corners with center circle) with diagonal
+    `Maximize2` scale arrows for Scale/Resize (`SceneWorkbench.tsx`, `ClassicInfrastructure.tsx`),
+    preserving `Focus` for Fit entire scene.
+  - Replaced identical `SquareDashed` placeholders in 2D CAD drafting (`Viewport.tsx`)
+    with dedicated architectural icons: `BrickWall` for Wall, `AppWindow` for Window,
+    and `LayoutGrid` for Room and Add room.
+  - Replaced duplicate `Ruler` for Dimension with `RulerDimensionLine`, and replaced
+    `TextCursorInput` with `Type`.
+- Implemented fill-bold active icon styling (`.is-active`, `[aria-pressed="true"]`)
+  in `viewport-toolbar.css` and `sketch.css`:
+  - Active icons render with solid `fill: currentColor` on closed silhouettes
+    (`lucide-mouse-pointer2`, `lucide-pointer`, `lucide-play`, `lucide-home`,
+    `lucide-house`, `lucide-sparkles`, `lucide-tree-pine`, `lucide-pencil`,
+    `lucide-door-open`, `lucide-focus circle`, `lucide-layout-grid rect`,
+    `lucide-trash2`, `lucide-sofa`, `lucide-armchair`), a heavier `stroke-width: 2.35px`,
+    and a subtle depth shadow (`filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25))`).
+  - Inactive / unclicked icons render slightly thinner (`stroke-width: 1.65px`) with
+    high-contrast geometric definition (`color: var(--studio-text-secondary, #cbd5e1)`,
+    `shape-rendering: geometricPrecision`), transitioning smoothly to `1.85px` on hover.
+  - Synchronized React icon properties (`size={18}`, `strokeWidth={a.active ? 2.35 : 1.65}`)
+    in `StudioViewportToolbar.tsx` to match CSS rules and eliminate rendering jitter.
+- Verification: all 202 Node tests (`npm test`) and full TypeScript check
+  (`npm run typecheck`) passed with 0 errors.
 
 ## Casynus Sketch Studio, UI layout, toolbars and persistence (2026-10-27)
 

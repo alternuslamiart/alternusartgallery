@@ -5,7 +5,9 @@ import { StudioToolbar } from "./kit";
 import { StudioViewportToolbar, downloadStudioCSV } from "./StudioViewportToolbar";
 
 import {
+  AppWindow,
   Box,
+  BrickWall,
   Camera,
   CircleHelp,
   Download,
@@ -13,6 +15,7 @@ import {
   EyeOff,
   FolderOpen,
   Glasses,
+  LayoutGrid,
   Lightbulb,
   Maximize,
   MousePointer2,
@@ -23,12 +26,14 @@ import {
   Plus,
   Rotate3D,
   Ruler,
+  RulerDimensionLine,
   Scaling,
   Share2,
   Sofa,
   SquareDashed,
   TextCursorInput,
   Trash2,
+  Type,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CubeFilled } from "./filled-icons";
@@ -890,13 +895,13 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
 
   const tools = [
     ["select", "Select", "V", MousePointer2],
-    ["wall", "Wall", "W", SquareDashed],
+    ["wall", "Wall", "W", BrickWall],
     ["door", "Door", "D", DoorOpen],
-    ["window", "Window", "N", SquareDashed],
-    ["room", "Room", "R", SquareDashed],
-    ["dimension", "Dimension", "", Ruler],
+    ["window", "Window", "N", AppWindow],
+    ["room", "Room", "R", LayoutGrid],
+    ["dimension", "Dimension", "", RulerDimensionLine],
     ["measure", "Measure", "M", Ruler],
-    ["text", "Text", "T", TextCursorInput],
+    ["text", "Text", "T", Type],
     ["furniture", "Furniture", "F", Sofa],
     ["delete", "Delete", "Del", Trash2],
   ] as const;
@@ -1280,7 +1285,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
 
       {!sketch.active&&<StudioViewportToolbar label="Architectural drafting tools"
         apiRef={toolbarAPI}
-        leading={[{label:'Sketch Drawing & Paint',icon:Pencil,onClick:sketch.toggle,active:sketch.active,frame:true},{ label: "Add room to floor plan", icon: SquareDashed, onClick:()=>{sketch.deactivate();addDefaultRoom();} }]}
+        leading={[{label:'Sketch Drawing & Paint',icon:Pencil,onClick:sketch.toggle,active:sketch.active,frame:true},{ label: "Add room to floor plan", icon: LayoutGrid, onClick:()=>{sketch.deactivate();addDefaultRoom();} }]}
         tools={tools.map(([id, label, shortcut, icon]) => ({
           label: id === "select" ? "Select & Move (V)" : id === "delete" ? "Delete selected element (Del)" : shortcut ? `${label} (${shortcut})` : label,
           icon, active: !sketch.active&&tool === id, onClick: () => {sketch.deactivate();activateDraftTool(id);},
