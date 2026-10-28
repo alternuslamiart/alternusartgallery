@@ -2,6 +2,20 @@
 
 Last updated: 2026-10-28
 
+## Mobile and desktop frame isolation across /casynus, /infrastructure, /architecture, /sketch, and /aichat (2026-10-28)
+
+- Strictly isolated mobile frames (< 430px) from desktop frames (> 430px) to prevent mixed layouts:
+  - On /casynus, /infrastructure, /architecture, and /sketch: mobile viewport directly loads the mobile studio interface (CrystalStudio) in matching mode (modeling for Casynus/Infrastructure/Architecture, floor-plan for Sketch/Interior) without rendering desktop panels or 404 errors.
+  - Added dedicated route wrappers for /architecture and /sketch preserving full desktop workbench vs mobile studio routing.
+  - Desktop studio frames in CrystalStudio.tsx (header.crystal-topbar, studio-restore-pill, LeftSidebar, RightPanel, Viewport) are strictly guarded with !mobileViewport, guaranteeing zero desktop frames appear on mobile devices.
+  - On /aichat, implemented the exact UI from {CD7C1D34-2BAC-49C7-A72D-BED9DA9D91C8}.png:
+    - Top header: 40×40px circular Grid2X2 menu button, "Arch.." workspace title, and 40×40px circular Glasses incognito button.
+    - Hero state: Casynus diamond logo with "What's on your mind today?".
+    - AI input area: 362 × 197 px container with "Try Casynus Pro" promotional bar (333 × 49 px) with blue Zap icon and "Pay Now" button (75 × 36 px), "What do you want to create?" label, textarea prompt input, 40×40px attach button, 171×40px "Nano Banana" dropdown with Zap icon and chevron, and 40×40px blue circular send button with exact 325px distance between attach and send.
+    - Bottom navbar: 292 × 58 px pill containing 5 icon buttons (Home, Book, FilePlus2, Wand2, Settings) and 58 × 58 px circular Search button.
+  - Mobile and desktop layouts in /aichat are strictly separated via aichat-desktop-layout (hidden min-[431px]:flex) and aichat-mobile-layout (flex min-[431px]:hidden) alongside scoped CSS media queries.
+- Verification: npx tsc --noEmit passed with 0 errors; all 202 Node tests passed (npm run test).
+
 ## iPhone 17 mobile UI and pixel-perfect responsive layout (2026-10-28)
 
 - Implemented iPhone 17 mobile-first responsive design strictly scoped to `@media (max-width: 430px)`, guaranteeing zero regression or override to the desktop application.

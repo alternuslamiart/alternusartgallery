@@ -7797,3 +7797,409 @@ textarea {
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
   }
 }
+
+
+/* ==========================================================================
+   STRICT SEPARATION: DESKTOP VS MOBILE (iPhone 17 standard max-width: 430px)
+   Prevents any desktop frames from showing or mixing on mobile, and vice versa.
+   ========================================================================== */
+
+/* ON DESKTOP (> 430px): Completely hide all mobile layouts and mobile frames */
+@media (min-width: 431px) {
+  .aichat-mobile-layout,
+  .crystal-mobile-home,
+  .crystal-mobile-bottom-nav,
+  .crystal-mobile-menu-trigger,
+  .crystal-mobile-incognito,
+  .crystal-mobile-sheet,
+  .crystal-mobile-profile,
+  .crystal-mobile-pricing,
+  .crystal-mobile-modebar,
+  .crystal-mobile-model-tools,
+  .crystal-mobile-texture-panel,
+  .crystal-mobile-splash {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+
+/* ON MOBILE (<= 430px): Completely hide all desktop frames and show mobile UI */
+@media (max-width: 430px) {
+  /* Hide desktop frames from leaking or mixing onto mobile */
+  .aichat-desktop-layout,
+  .aichat-page aside,
+  .aichat-page main,
+  .aichat-page > aside,
+  .aichat-page > main,
+  .aichat-page form:not(.aichat-mobile-composer),
+  .crystal-topbar,
+  .crystal-modeling-sidebar,
+  .crystal-modeling-inspector,
+  .studio-restore-pill,
+  .interior-scene-sidebar,
+  .interior-scene-inspector,
+  .ref-viewport-gizmo-dock,
+  .studio-viewport-toolbar,
+  .scene-workbench-root,
+  .scene-topbar,
+  .scene-sidebar-panel,
+  .scene-inspector-panel,
+  .scene-tools-strip,
+  .crystal-left-closed,
+  .crystal-right-closed,
+  .crystal-studio > header.crystal-topbar,
+  .crystal-studio > aside,
+  .crystal-studio > .studio-restore-pill {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Make sure composer label is displayed */
+  .crystal-mobile-home-active .crystal-mobile-composer-label,
+  .aichat-mobile-composer-label {
+    display: block !important;
+    align-self: flex-start !important;
+    padding-left: 6px !important;
+    font-size: 13px !important;
+    color: #666 !important;
+    margin: 2px 0 0 !important;
+  }
+
+  /* AI CHAT MOBILE FRAME: matching screenshot {CD7C1D34-2BAC-49C7-A72D-BED9DA9D91C8}.png */
+  .aichat-mobile-layout {
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100vw !important;
+    max-width: 430px !important;
+    height: 100dvh !important;
+    padding: max(16px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom)) !important;
+    background: #0a0a0a !important;
+    color: #e5e5e5 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    position: relative !important;
+    margin: 0 auto !important;
+  }
+
+  .aichat-mobile-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    max-width: 382px !important;
+    height: 40px !important;
+    margin: 0 0 10px !important;
+  }
+
+  .aichat-mobile-header > button {
+    display: grid !important;
+    place-items: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    background: #1a1a1a !important;
+    color: #e5e5e5 !important;
+    transition: background-color 160ms ease, color 160ms ease !important;
+  }
+
+  .aichat-mobile-header > button.active {
+    background: #168df1 !important;
+    color: #fff !important;
+  }
+
+  .aichat-mobile-workspace-title {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .aichat-mobile-body {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 362px !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+  }
+
+  .aichat-mobile-hero {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 20px 0 !important;
+  }
+
+  .aichat-mobile-mark {
+    display: grid !important;
+    place-items: center !important;
+    margin: 0 0 16px !important;
+  }
+
+  .aichat-mobile-mark img {
+    width: 68px !important;
+    height: 68px !important;
+    object-fit: contain !important;
+  }
+
+  .aichat-mobile-hero-title {
+    color: #666666 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.01em !important;
+    margin: 0 !important;
+  }
+
+  .aichat-mobile-messages {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 10px 0 !important;
+    overflow-y: auto !important;
+  }
+
+  .aichat-mobile-msg.user {
+    align-self: flex-end !important;
+    max-width: 85% !important;
+    padding: 10px 14px !important;
+    background: #1e1e1e !important;
+    border-radius: 18px 18px 4px 18px !important;
+    color: #f1f1f1 !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+
+  .aichat-mobile-msg.assistant {
+    align-self: flex-start !important;
+    max-width: 95% !important;
+    padding: 6px 10px !important;
+    color: #ddd !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Exact sizing: AI Chat input area (bottom input section) */
+  /* Container: 362 × 197 px */
+  .aichat-mobile-composer {
+    box-sizing: border-box !important;
+    width: 362px !important;
+    height: 197px !important;
+    max-width: calc(100vw - 24px) !important;
+    padding: 10px 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 28px !important;
+    background: #171717 !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+  }
+
+  /* “Try Casynus Pro” button: 333 × 49 px */
+  .aichat-mobile-pro-banner {
+    box-sizing: border-box !important;
+    width: 333px !important;
+    height: 49px !important;
+    min-height: 49px !important;
+    padding: 0 8px 0 14px !important;
+    border-radius: 14px !important;
+    background: #1e1e1e !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin: 0 auto !important;
+    color: #1597ff !important;
+    cursor: pointer !important;
+  }
+
+  .aichat-mobile-pro-banner b {
+    display: block !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #1597ff !important;
+    line-height: 1.2 !important;
+  }
+
+  /* “Pay Now” button: 75 × 36 px */
+  .aichat-mobile-pro-banner em {
+    box-sizing: border-box !important;
+    width: 75px !important;
+    height: 36px !important;
+    display: grid !important;
+    place-items: center !important;
+    border-radius: 999px !important;
+    background: #168df1 !important;
+    color: #ffffff !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    font-style: normal !important;
+    white-space: nowrap !important;
+    box-shadow: 0 2px 8px rgba(22, 141, 241, 0.35) !important;
+  }
+
+  .aichat-mobile-composer textarea {
+    box-sizing: border-box !important;
+    width: 325px !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    padding: 2px 4px !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: #eee !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    resize: none !important;
+  }
+
+  .aichat-mobile-composer textarea::placeholder {
+    color: #555 !important;
+  }
+
+  /* Actions container - distance between Attach button and Blue Enter button: exactly 325 px */
+  .aichat-mobile-composer-actions {
+    box-sizing: border-box !important;
+    width: 325px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin: 0 auto !important;
+    gap: 0 !important;
+  }
+
+  /* Attach button: 40 × 40 px */
+  .aichat-mobile-composer-actions > button:first-child {
+    box-sizing: border-box !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    border-radius: 50% !important;
+    background: #222 !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    display: grid !important;
+    place-items: center !important;
+    color: #aaa !important;
+    transition: all 160ms ease !important;
+  }
+
+  /* Nano Banana selector: 171 × 40 px */
+  .aichat-mobile-model-select {
+    box-sizing: border-box !important;
+    width: 171px !important;
+    height: 40px !important;
+    min-width: 171px !important;
+    max-width: 171px !important;
+    border-radius: 999px !important;
+    background: #222 !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    color: #e5e5e5 !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    padding: 0 14px !important;
+    transition: all 160ms ease !important;
+  }
+
+  /* Blue circular Enter/Send button: 40 × 40 px */
+  .aichat-mobile-composer-actions > button:last-child {
+    box-sizing: border-box !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    border-radius: 50% !important;
+    background: #168df1 !important;
+    border: none !important;
+    display: grid !important;
+    place-items: center !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 10px rgba(22, 141, 241, 0.38) !important;
+    transition: transform 160ms ease, background-color 160ms ease !important;
+  }
+
+  /* Bottom Navbar (mobile): Total size: 292 × 58 px + Search button: 58 × 58 px */
+  .aichat-mobile-bottom-nav {
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: 362px !important;
+    margin: 10px auto 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .aichat-mobile-nav-pill {
+    box-sizing: border-box !important;
+    width: 292px !important;
+    height: 58px !important;
+    min-width: 292px !important;
+    border-radius: 999px !important;
+    background: #171717 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    padding: 0 6px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+  }
+
+  .aichat-mobile-nav-pill a,
+  .aichat-mobile-nav-pill button {
+    box-sizing: border-box !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    border-radius: 50% !important;
+    display: grid !important;
+    place-items: center !important;
+    color: #686868 !important;
+    background: transparent !important;
+    border: none !important;
+    text-decoration: none !important;
+    transition: all 160ms ease !important;
+  }
+
+  .aichat-mobile-nav-pill a.active,
+  .aichat-mobile-nav-pill button.active {
+    color: #f7f7f7 !important;
+    background: #202020 !important;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+  }
+
+  .aichat-mobile-search-btn {
+    box-sizing: border-box !important;
+    width: 58px !important;
+    height: 58px !important;
+    min-width: 58px !important;
+    border-radius: 50% !important;
+    display: grid !important;
+    place-items: center !important;
+    background: #1b1b1b !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #eee !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+    transition: all 160ms ease !important;
+  }
+}

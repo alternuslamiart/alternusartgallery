@@ -1,5 +1,10 @@
 # Next tasks (reviewed 2026-10-28)
 
+- [x] Strictly isolate mobile (< 430px) and desktop (> 430px) frames:
+  - Route /casynus, /infrastructure, /architecture, and /sketch on mobile to mobile CrystalStudio (preventing desktop SceneWorkbench / 404s).
+  - Guard desktop studio elements in CrystalStudio.tsx (!mobileViewport) so zero desktop frames render on mobile.
+  - Implement mobile UI on /aichat from {CD7C1D34-2BAC-49C7-A72D-BED9DA9D91C8}.png with Arch.. header, Casynus hero, 362x197px composer, 333x49px Try Casynus Pro bar, Nano Banana dropdown, 40x40px attach/send with 325px gap, and 292x58px bottom navbar.
+  - Separate desktop and mobile layouts in /aichat with explicit hidden min-[431px]:flex and flex min-[431px]:hidden.
 - [x] Implement iPhone 17 mobile-first responsive UI (max-width: 430px) strictly isolated from desktop:
   - Scoped via @media (max-width: 430px) so desktop styles remain completely unaffected.
   - Dark theme (#0a0a0a near black background).

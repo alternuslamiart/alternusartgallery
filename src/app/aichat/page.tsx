@@ -1,3 +1,4 @@
+import NextImage from "next/image";
 "use client";
 
 import Link from "next/link";
@@ -6,12 +7,17 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   ArrowUp,
+  BookOpen,
   Bot,
   Check,
   Copy,
   ChevronDown,
+  FilePlus2,
   FolderPlus,
   GitBranch,
+  Glasses,
+  Grid2X2,
+  Home,
   Image,
   Menu,
   Mic,
@@ -22,13 +28,16 @@ import {
   Paperclip,
   Plug,
   Search,
+  Settings,
   Share2,
   Sparkles,
   Target,
   EyeOff,
   Pencil,
   Trash2,
+  Wand2,
   X,
+  Zap,
 } from "lucide-react";
 import { useCrystalTheme } from "@/lib/crystal-theme";
 import { StudioProfileMenu } from "@/components/crystal-studio/StudioSidebarFooter";
@@ -127,7 +136,7 @@ function AssistantResponse({ content }: { content: string }) {
   );
 }
 
-const models = ["Gemini", "Groq", "You"] as const;
+const models = ["Nano Banana", "Gemini", "Groq", "You"] as const;
 function sourceHost(source: string) {
   try {
     const url = new URL(source);
@@ -162,7 +171,9 @@ export default function AIChatPage() {
   const [copiedId, setCopiedId] = useState<number | string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("Gemini");
+  const [selectedModel, setSelectedModel] = useState("Nano Banana");
+  const [incognito, setIncognito] = useState(false);
+  const [mobileModelSheet, setMobileModelSheet] = useState(false);
   const [modelsOpen, setModelsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -329,7 +340,7 @@ export default function AIChatPage() {
         signal: controller.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          provider: selectedModel.toLowerCase(),
+          provider: selectedModel === "Nano Banana" ? "gemini" : selectedModel.toLowerCase(),
           conversationId: sessionId,
           messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
         }),
@@ -474,6 +485,7 @@ export default function AIChatPage() {
       }}
       className={`aichat-page flex min-h-screen w-full overflow-hidden bg-[var(--studio-bg-canvas)] font-roboto text-[var(--studio-text-primary)] ${isLight ? "aichat-light" : ""}`}
     >
+      <div className="aichat-desktop-layout hidden min-[431px]:flex min-h-screen w-full overflow-hidden">
       {sidebarOpen && <button aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} className="fixed inset-0 z-30 bg-[var(--studio-bg-elevated)] lg:hidden" />}
       <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 flex ${sidebarCollapsed ? "w-[60px]" : "w-[284px]"} shrink-0 flex-col bg-[var(--studio-bg-canvas)] p-3 transition-[width,transform] duration-300 lg:inset-y-auto lg:static lg:h-screen lg:translate-x-0`}>
         <div className={`relative flex items-center rounded-xl px-2 py-2 ${sidebarCollapsed ? "justify-center" : "justify-between"}`}>
@@ -643,6 +655,145 @@ export default function AIChatPage() {
           <button type="submit" aria-label="Send message" disabled={!input.trim() || isSending} className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[var(--studio-accent)] text-[var(--studio-text-primary)] shadow-lg shadow-blue-500/20 transition-all hover:scale-105 hover:bg-[var(--studio-accent-hover)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"><ArrowUp size={20} /></button>
         </form>
       </main>
+      </div>
+      {/* Mobile Frame (< 430px) matching screenshot {CD7C1D34-2BAC-49C7-A72D-BED9DA9D91C8}.png */}
+      <div className="aichat-mobile-layout flex min-[431px]:hidden">
+        <header className="aichat-mobile-header">
+          <button type="button" aria-label="Open menu" onClick={() => setSidebarOpen(true)}>
+            <Grid2X2 size={19} />
+          </button>
+          <div className="aichat-mobile-workspace-title">
+            <span>Arch..</span>
+          </div>
+          <button
+            type="button"
+            aria-label="Toggle incognito mode"
+            className={incognito ? "active" : ""}
+            onClick={() => setIncognito((v) => !v)}
+          >
+            <Glasses size={21} />
+          </button>
+        </header>
+
+        <div className="aichat-mobile-body">
+          {messages.length === 0 ? (
+            <div className="aichat-mobile-hero">
+              <div className="aichat-mobile-mark" aria-hidden="true">
+                <NextImage src="/Logopng.png" alt="Casynus" width={68} height={68} />
+              </div>
+              <p className="aichat-mobile-hero-title">What&apos;s on your mind today?</p>
+            </div>
+          ) : (
+            <div className="aichat-mobile-messages">
+              {messages.map((message) => (
+                <div key={message.id} className={`aichat-mobile-msg ${message.role}`}>
+                  {message.role === "assistant" ? (
+                    <AssistantResponse content={message.content} />
+                  ) : (
+                    <p>{message.content}</p>
+                  )}
+                </div>
+              ))}
+              {isSending && <ThinkingIndicator />}
+            </div>
+          )}
+        </div>
+
+        <form className="aichat-mobile-composer" onSubmit={sendMessage}>
+          <button type="button" className="aichat-mobile-pro-banner" onClick={() => { window.location.href = "/pricing"; }}>
+            <div className="flex items-center gap-2">
+              <Zap size={16} fill="#1597ff" color="#1597ff" />
+              <b>Try Casynus Pro</b>
+            </div>
+            <em>Pay Now</em>
+          </button>
+
+          <label htmlFor="aichat-mobile-prompt" className="aichat-mobile-composer-label">
+            What do you want to create?
+          </label>
+
+          <textarea
+            id="aichat-mobile-prompt"
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                void sendMessage();
+              }
+            }}
+            placeholder="Describe your next architectural idea..."
+            rows={2}
+          />
+
+          <div className="aichat-mobile-composer-actions">
+            <button type="button" aria-label="Attach file" onClick={() => { setToast("File attachments available in chat."); window.setTimeout(() => setToast(null), 1800); }}>
+              <Paperclip size={18} />
+            </button>
+            <button type="button" className="aichat-mobile-model-select" onClick={() => setMobileModelSheet(true)}>
+              <Zap size={14} fill="#1597ff" color="#1597ff" />
+              <span>{selectedModel}</span>
+              <ChevronDown size={14} />
+            </button>
+            <button type="submit" aria-label="Send message" disabled={!input.trim() || isSending}>
+              <ArrowRight size={20} />
+            </button>
+          </div>
+        </form>
+
+        <nav className="aichat-mobile-bottom-nav" aria-label="Mobile navigation">
+          <div className="aichat-mobile-nav-pill">
+            <Link href="/project" aria-label="Home" className="active">
+              <Home size={20} fill="currentColor" />
+            </Link>
+            <Link href="/sketch" aria-label="Sketch">
+              <BookOpen size={20} />
+            </Link>
+            <button type="button" aria-label="New chat" onClick={startNewChat}>
+              <FilePlus2 size={20} />
+            </button>
+            <button type="button" aria-label="Focus prompt" onClick={() => document.getElementById("aichat-mobile-prompt")?.focus()}>
+              <Wand2 size={20} />
+            </button>
+            <Link href="/account" aria-label="Settings">
+              <Settings size={20} />
+            </Link>
+          </div>
+          <button type="button" aria-label="Search" className="aichat-mobile-search-btn" onClick={() => setSearchOpen(true)}>
+            <Search size={22} />
+          </button>
+        </nav>
+
+        {mobileModelSheet && (
+          <div className="crystal-mobile-model-overlay" role="dialog" aria-modal="true" aria-label="Choose AI model" onClick={() => setMobileModelSheet(false)}>
+            <div className="crystal-mobile-model-sheet" onClick={(event) => event.stopPropagation()}>
+              <div className="crystal-sheet-handle" />
+              <div className="flex items-center justify-between">
+                <div>
+                  <b>AI model</b>
+                  <small>Choose your creative partner</small>
+                </div>
+                <button type="button" aria-label="Close model selector" onClick={() => setMobileModelSheet(false)}>×</button>
+              </div>
+              {models.map((model) => (
+                <button
+                  type="button"
+                  key={model}
+                  className={selectedModel === model ? "is-selected" : ""}
+                  onClick={() => {
+                    setSelectedModel(model);
+                    setMobileModelSheet(false);
+                  }}
+                >
+                  <span><Sparkles size={17} />{model}</span>
+                  {selectedModel === model && <span>✓</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       {searchOpen && <div className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-[var(--studio-bg-elevated)] px-4 pb-8 pt-[min(12vh,88px)] backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) setSearchOpen(false); }}>
         <section role="dialog" aria-modal="true" aria-label="Search Casynus" className={`w-full max-w-[720px] overflow-hidden rounded-[20px] border shadow-[0_32px_100px_rgba(0,0,0,.55)] ${isLight ? "border-[var(--studio-border)] bg-[var(--studio-bg-panel)] text-[var(--studio-text-secondary)]" : "border-[var(--studio-border)] bg-[var(--studio-bg-panel)] text-[var(--studio-text-secondary)]"}`}>
           <div className={`flex h-[68px] items-center gap-3 border-b px-5 ${isLight ? "border-[var(--studio-border)]" : "border-[var(--studio-border)]"}`}>
