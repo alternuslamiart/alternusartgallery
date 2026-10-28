@@ -210,6 +210,7 @@ export function CrystalStudio({
 
   const handleGenerate = async () => {
     if (!prompt.trim() || loading) return;
+    window.dispatchEvent(new CustomEvent("crystal:studio-generation-start", { detail: prompt }));
     setLoading(true); setProgress(8); setError(null);
     const timer = window.setInterval(() => setProgress((value) => Math.min(92, value + 7)), 120);
     try {

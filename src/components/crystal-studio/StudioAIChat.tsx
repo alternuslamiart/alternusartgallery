@@ -10,6 +10,7 @@ import { useStudioVoice } from "./useStudioVoice";
 import { useStudioActions } from "./StudioActions";
 import { VoiceSpeechModal } from "./VoiceSpeechModal";
 import { parseStudioCommand } from "@/lib/studio-actions.mjs";
+import { StudioGenerationLoader } from "./StudioGenerationLoader";
 
 export type StudioChatMessage = {
   id: string;
@@ -85,6 +86,8 @@ export function StudioAIChat({
   const [remoteLoading, setRemoteLoading] = useState(false);
   const [remoteError, setRemoteError] = useState<string | null>(null);
   const [sessionExpired,setSessionExpired]=useState(false);
+  const [showLoadingFrame, setShowLoadingFrame] = useState(false);
+  const [loadingPrompt, setLoadingPrompt] = useState("");
   const voiceControl = useRef<{ stop: () => void } | null>(null);
   const loading = workspaceLoading || remoteLoading;
   const signInRequired=sessionExpired||(model==='hunyuan'&&sessionStatus!=='loading'&&!session?.user?.id);
@@ -127,6 +130,8 @@ export function StudioAIChat({
     setRemoteError(null);
     onClearError?.();
     const message = (spokenCommand??promptRef.current).trim() || 'Generate 3D from reference image';
+    setLoadingPrompt(message);
+    setShowLoadingFrame(true);
     onMessagesChange(current => [...current, { id: crypto.randomUUID(), role: "user", text: message }]);
     if(!spokenCommand)onPromptChange("");
     try {
@@ -185,10 +190,30 @@ export function StudioAIChat({
   }, [messages, loading, expanded, open]);
   useEffect(() => () => { if (localImage) URL.revokeObjectURL(localImage); }, [localImage]);
 
+  useEffect(() => {
+    const handleStudioGen = (event: Event) => {
+      const p = (event as CustomEvent<string>).detail;
+      setLoadingPrompt(p || promptRef.current || "Generate house modeling 3D...");
+      setShowLoadingFrame(true);
+    };
+    window.addEventListener("crystal:studio-generation-start", handleStudioGen);
+    return () => window.removeEventListener("crystal:studio-generation-start", handleStudioGen);
+  }, []);
+
+  const loaderModal = (
+    <StudioGenerationLoader
+      open={showLoadingFrame}
+      prompt={loadingPrompt}
+      durationSeconds={12}
+      onClose={() => setShowLoadingFrame(false)}
+      onComplete={() => setShowLoadingFrame(false)}
+    />
+  );
+
   if (!open) return <><button type="button" aria-label="Show AI chat" title="Open AI Assistant" aria-expanded={false}
     onClick={() => onOpenChange(true)} className={`crystal-ai-chat-toggle studio-ai-reopen-btn ${className}`}>
     <Sparkles size={16} /><span>Casynus AI</span>{voice.mode!=="off"&&<Mic size={13} aria-label="Voice listening enabled" />}{hasUserMessages && <StudioBadge>{messages.length}</StudioBadge>}
-  </button>{voiceModal}</>;
+  </button>{voiceModal}{loaderModal}</>;
 
   return <div id={panelId} className={`crystal-ai-prompt studio-ai-panel cs-chat-dock ${expanded ? "is-expanded" : "is-compact"} ${className}`}
     role="region" aria-label="Casynus AI assistant" data-state={expanded ? "expanded" : "compact"}>
@@ -285,5 +310,6 @@ export function StudioAIChat({
     </div>
     {statusLabel && <div className="cs-chat-status">{statusLabel}</div>}
     {voiceModal}
+    {loaderModal}
   </div>;
 }

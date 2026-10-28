@@ -2,6 +2,20 @@
 
 Last updated: 2026-10-28
 
+## Desktop Studio AI Chat Generation Loader Frame (2026-10-28)
+
+- Implemented centered generation progress frame for Studio AI Chat prompt submission, strictly scoped to Desktop only (hidden on mobile <= 700px):
+  - Trigger: Upon typing a prompt in the Studio AI Chat (StudioAIChat / Studio generation) and pressing Enter or clicking send.
+  - Size: 712 × 140 px with rounded-3xl (24px) corners, positioned in the center of the screen with subtle background backdrop.
+  - Frame background color: #222222 with subtle depth shadow (0 24px 60px rgba(0,0,0,0.7)).
+  - Headline 1: 24px semibold in Roboto font ("Generate house modeling 3D..." or current prompt).
+  - Subtitle: 12px medium ("Lorem ipsum dolor sit amet consectetur. Feugiat posuere eleifend mi felis ut risus nibh habitant. Quisque adipiscing sodales felis sed enim.").
+  - Timer: Stopwatch icon with dynamic countdown (e.g. End: 00 min 12sec down to 00sec).
+  - Loading frame: 657 × 12 px rounded-full progress bar with track color #4C4C4C and gradient fill #0C8CE9 to #074F83.
+  - Progress: fills slowly and smoothly over 12 seconds ("mbushet ngadal: per test deri ne 12second").
+  - Desktop-only isolation: strictly hidden on mobile devices (< 700px) so mobile layout remains unaffected.
+- Verification: npx tsc --noEmit passed with 0 errors; all 202 Node tests passed (npm run test); next build passed with 0 errors.
+
 ## Mobile Account page pixel-perfect implementation and dark/light mode palette (2026-10-28)
 
 - Implemented pixel-perfect mobile Account interface strictly scoped to mobile (max-width: 430px) according to {87F9376B-EFED-4BF4-A703-5E680F412341}.png and color palette {8B7B8C3A-7147-4A06-8D53-7A4B961399CE}.png:

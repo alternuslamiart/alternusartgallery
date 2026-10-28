@@ -1,5 +1,11 @@
 # Next tasks (reviewed 2026-10-28)
 
+- [x] Implement Desktop-only 712x140px Studio AI Chat generation loader frame:
+  - Appears in center of screen upon Enter/Send in Studio AI chat prompt.
+  - Size 712x140px, frame color #222222, 24px semibold headline ("Generate house modeling 3D..."), 12px medium subtitle.
+  - 657x12px loading frame with #4C4C4C track and #0C8CE9 to #074F83 gradient fill.
+  - Dynamic 12-second slow fill with countdown timer ("End: 00 min 12sec").
+  - Strictly scoped to Desktop only (hidden on mobile <= 700px).
 - [x] Implement pixel-perfect mobile Account page from {87F9376B-EFED-4BF4-A703-5E680F412341}.png:
   - Strict desktop isolation: no desktop frames/buttons (Launch Studio, administration sidebar, tables) on mobile.
   - Exact 48×48px circular frames: avatar, help, bell notification with red dot, AM badge, cashback badge.
