@@ -2,6 +2,35 @@
 
 Last updated: 2026-10-28
 
+## Mobile Account page pixel-perfect implementation and dark/light mode palette (2026-10-28)
+
+- Implemented pixel-perfect mobile Account interface strictly scoped to mobile (max-width: 430px) according to {87F9376B-EFED-4BF4-A703-5E680F412341}.png and color palette {8B7B8C3A-7147-4A06-8D53-7A4B961399CE}.png:
+  - Exact colors:
+    - Dark mode: Background #121212, Frame #161616, Hover #2B2B2B.
+    - Light mode: Background #F5F6F8, Frame #FFFFFF, Hover #ECEEF2.
+  - Perfect 48×48px circular frames (w-12 h-12 rounded-full):
+    - Profile avatar (48×48px).
+    - Top header theme toggle (Sun/Moon) and Help icon button (48×48px).
+    - Notification Bell button (48×48px) with red notification badge.
+    - Transaction "AM" circle badge (48×48px).
+    - Transaction "Cashback" return arrow circle badge (48×48px).
+  - Currency balance cards row (120px height cards):
+    - US Dollar card (259.12, US Dollar with US flag).
+    - British Pound card (2,012.60, British Pound with UK flag).
+    - New Account card with + button.
+  - Big VISA credit/debit card (304 × 208 px):
+    - Rich violet/purple wave gradient background with decorative wave SVG layers.
+    - VISA logo, metallic gold smart chip circuitry, card number (`•••• •••• •••• 2345`), Card Holder name (John Doe), Expiry Date (02/30).
+    - Carousel pagination indicator (40px active pill + 2 dots).
+  - Transactions list:
+    - Amazon (AM circle, Card payment - Today, - $12.12).
+    - Cashback (RotateCcw circle, Received, + 21.00).
+  - Sticky bottom navigation bar:
+    - 4 tabs: Dashboard (Home), Investing (TrendingUp), Explore (Search), Hub (LayoutGrid).
+  - Zero desktop elements on mobile:
+    - Guaranteed via .account-desktop-wrapper (hidden min-[431px]:flex) and .account-mobile-wrapper (block min-[431px]:hidden) alongside CSS media queries. Desktop layout is completely unaffected.
+- Verification: npx tsc --noEmit passed with 0 errors; all 202 Node tests passed (npm run test); next build passed with 0 errors.
+
 ## Mobile and desktop frame isolation across /casynus, /infrastructure, /architecture, /sketch, and /aichat (2026-10-28)
 
 - Strictly isolated mobile frames (< 430px) from desktop frames (> 430px) to prevent mixed layouts:

@@ -1,5 +1,13 @@
 # Next tasks (reviewed 2026-10-28)
 
+- [x] Implement pixel-perfect mobile Account page from {87F9376B-EFED-4BF4-A703-5E680F412341}.png:
+  - Strict desktop isolation: no desktop frames/buttons (Launch Studio, administration sidebar, tables) on mobile.
+  - Exact 48×48px circular frames: avatar, help, bell notification with red dot, AM badge, cashback badge.
+  - Light and dark mode support with exact palette from {8B7B8C3A-7147-4A06-8D53-7A4B961399CE}.png (Dark: Background #121212, Frame #161616, Hover #2B2B2B).
+  - Currency balance cards (120px height) for US Dollar (259.12), British Pound (2,012.60), and + New Account.
+  - Big VISA card (304x208px) with gold chip, card number 2345, John Doe, 02/30, and 40px carousel pill indicator.
+  - Transactions list with Amazon (-$12.12) and Cashback (+21.00).
+  - Sticky bottom navbar with Dashboard, Investing, Explore, Hub tabs.
 - [x] Strictly isolate mobile (< 430px) and desktop (> 430px) frames:
   - Route /casynus, /infrastructure, /architecture, and /sketch on mobile to mobile CrystalStudio (preventing desktop SceneWorkbench / 404s).
   - Guard desktop studio elements in CrystalStudio.tsx (!mobileViewport) so zero desktop frames render on mobile.

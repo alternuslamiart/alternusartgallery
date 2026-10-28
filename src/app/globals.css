@@ -3918,20 +3918,8 @@
   .crystal-core-metric-3d div:first-child { color:rgba(226,228,232,.58)!important; font-size:12px!important; letter-spacing:.2em!important; }
   .crystal-core-metric-3d div:nth-child(2)>div { font-size:64px!important; color:#4284ff!important; }
   .crystal-core-metric-3d p { margin-top:12px!important; color:rgba(226,228,232,.72)!important; font-size:12px!important; }
-  .crystal-account-page { display:block!important; min-height:100vh; padding:0 16px 28px; background:#1b1b1b!important; color:#f5f5f5!important; }
-  .crystal-account-page>header { height:72px; margin:0 -16px 18px; padding:0 16px!important; border:0!important; background:#1b1b1b!important; }
-  .crystal-account-page>header>div:first-child a span:last-child { display:none; }
-  .crystal-account-page>header>div:first-child a { gap:0!important; }
-  .crystal-account-page>header>div:last-child a { display:none!important; }
-  .crystal-account-page>header>div:last-child { gap:0!important; }
-  .crystal-account-page>header>div:last-child button { display:none; }
-  .crystal-account-page>header>div:last-child>div { width:48px!important; height:48px!important; border:1px solid rgba(255,255,255,.32); background:transparent!important; }
-  .crystal-account-page>div { display:block!important; }
-  .crystal-account-page>div>aside { display:none; }
-  .crystal-account-page main { padding:0!important; overflow:visible!important; }
-  .crystal-account-page main>div { max-width:none!important; }
-  .crystal-account-page main h1 { font-size:28px!important; }
-  .crystal-account-page main article, .crystal-account-page main section>div { border-radius:18px!important; }
+  .account-desktop-wrapper { display:none!important; }
+  .account-mobile-wrapper { display:block!important; }
   .crystal-design-dashboard { background:#1b1b1b!important; }
   .crystal-design-dashboard>header { height:72px!important; padding:0 16px!important; border:0!important; background:#1b1b1b!important; }
   .crystal-design-dashboard>header>div:first-child span:last-child { display:none; }
@@ -7807,6 +7795,8 @@ textarea {
 /* ON DESKTOP (> 430px): Completely hide all mobile layouts and mobile frames */
 @media (min-width: 431px) {
   .aichat-mobile-layout,
+  .account-mobile-wrapper,
+  .account-mobile-view,
   .crystal-mobile-home,
   .crystal-mobile-bottom-nav,
   .crystal-mobile-menu-trigger,
@@ -7828,6 +7818,8 @@ textarea {
 @media (max-width: 430px) {
   /* Hide desktop frames from leaking or mixing onto mobile */
   .aichat-desktop-layout,
+  .account-desktop-wrapper,
+  .crystal-account-page,
   .aichat-page aside,
   .aichat-page main,
   .aichat-page > aside,

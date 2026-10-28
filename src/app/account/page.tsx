@@ -3,6 +3,7 @@
 import Link from "next/link";
 import AccountUsage from "@/components/account-usage";
 import { StudioProfileMenu } from "@/components/crystal-studio/StudioSidebarFooter";
+import { AccountMobileView } from "./AccountMobileView";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -89,8 +90,22 @@ export default function Account() {
  const cardShadow = isDark ? "none" : "0 1px 4px rgba(5,8,15,0.04)";
  const baseCard: React.CSSProperties = { background: raised, border: `1px solid ${faintBorder}`, borderRadius: 12, boxShadow: cardShadow };
 
- return (
- <div className="crystal-account-page" style={{ minHeight: "100vh", background: bg, color: fg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", display: "flex", flexDirection: "column" }}>
+   return (
+    <>
+      {/* Mobile Layout (<= 430px) matching screenshot {87F9376B-EFED-4BF4-A703-5E680F412341}.png */}
+      <div className="account-mobile-wrapper block min-[431px]:hidden w-full">
+        <AccountMobileView
+          isDark={isDark}
+          onToggleTheme={() => setIsDark(!isDark)}
+          accountName={accountName}
+          accountEmail={accountEmail}
+          accountInitials={accountInitials}
+          userImage={session?.user?.image}
+        />
+      </div>
+
+      {/* Desktop Layout (> 430px) */}
+      <div className="account-desktop-wrapper hidden min-[431px]:flex crystal-account-page" style={{ minHeight: "100vh", background: bg, color: fg, fontFamily: "var(--font-roboto-flex),-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif", display: "flex", flexDirection: "column" }}>
 
  {/* Slim top bar */}
  <header style={{ padding: "16px 24px", borderBottom: `1px solid ${faintBorder}`, display: "flex", alignItems: "center", justifyContent: "space-between", background: raised }}>
@@ -181,9 +196,10 @@ export default function Account() {
   accountInitials={accountInitials}
  />
  </main>
- </div>
- </div>
- );
+       </div>
+    </div>
+    </>
+  );
 }
 
 type Tokens = {
