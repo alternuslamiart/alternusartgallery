@@ -2,6 +2,26 @@
 
 Last updated: 2026-10-28
 
+## Blender 3D Object Import into Casynus Studio (2026-10-28)
+
+- Implemented dedicated import and interactive placement for 3D models designed in Blender into Casynus (`/casynus`, `src/components/scene-studio/SceneWorkbench.tsx`):
+  - Supported standard Blender export formats: `.glb` / `.gltf`, `.fbx`, `.obj`, `.stl`.
+  - Added Three.js `FBXLoader` integration in `src/lib/scene/geometry.mjs` for Blender-exported FBX files with mesh geometry, physical materials, and hierarchical transforms.
+  - Added explicit handling and actionable feedback for `.blend` project files: alerts the user that raw `.blend` files are project archives and advises exporting to glTF 2.0 (`.glb`) or `.fbx`, automatically launching the Blender export guide modal.
+  - Smart placement & auto-framing:
+    - Automatically lands the root object on the ground plane (`Y >= 0`) at cursor drop coordinates or camera focus target.
+    - Automatically selects the newly imported model and activates the translate gizmo (`W` key) for immediate mouse manipulation in the 3D viewport.
+  - User Interface:
+    - Added dedicated "Blender 3D" import card in the Left Sidebar under "Object library" with direct "Import Blender" button and "Guide" shortcut.
+    - Added "Import Blender Object" action with dedicated Blender box icon in the viewport top toolbar (`StudioViewportToolbar`).
+    - Added File Menu options: "Import Blender / 3D model" and "Blender export guide".
+    - Interactive "Blender Import Guide" modal explaining the 1-click export steps from Blender (`File -> Export -> glTF 2.0 / FBX / OBJ`) with a direct file picker trigger.
+  - Verification:
+    - Added unit test in `tests/scene-geometry.test.mjs`: `blender .blend files advise exporting to supported 3D formats`.
+    - Type check passed: `npx tsc --noEmit` exited 0 with 0 errors.
+    - Test suite passed: `npm run test` (all 203 unit/integration tests passed).
+    - Production build passed: `npm run build` compiled cleanly.
+
 ## Sketch Studio Architectural Drafting: Arch Walls, Room Dragging, Wall Mouse Editing & Tool Removal (2026-10-28)
 
 - Implemented Arch / Curved Wall (`arch-wall`) drafting in Sketch Studio (`Viewport.tsx`, `types.ts`, `floor-plan-export.ts`, `floor-plan-geometry.ts`):

@@ -78,3 +78,165 @@ html[data-crystal-theme="light"] .scene-workbench.crystal-studio { background:#f
 .scene-workbench .scene-color-panel .sketch-swatches{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
 .scene-workbench .scene-color-panel .sketch-swatches button{width:27px;height:27px;min-width:27px;min-height:27px;padding:0;border-radius:50%;border:0;}
 @media(max-width:760px){.scene-workbench .scene-color-panel{right:16px;}}
+
+/* Blender 3D import card and modal */
+.scene-blender-card {
+  margin: 10px 0 12px;
+  padding: 10px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #1d2127 0%, #15181c 100%);
+  border: 1px solid #2a3342;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.scene-blender-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.scene-blender-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #ff8533;
+  letter-spacing: 0.02em;
+}
+.scene-blender-sub {
+  font-size: 10px;
+  color: var(--studio-text-muted, #888);
+}
+.scene-blender-card-actions {
+  display: flex;
+  gap: 6px;
+}
+.scene-blender-card-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 10px;
+  font-size: 11px!important;
+  font-weight: 500;
+  border-radius: 6px;
+  background: #ea7600;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.scene-blender-card-btn:hover {
+  background: #ff851b;
+}
+.scene-blender-card-btn.scene-ghost-btn {
+  flex: 0 0 auto;
+  background: transparent;
+  color: var(--studio-text-secondary, #b3b3b3);
+  border: 1px solid var(--studio-border, #333);
+}
+.scene-blender-card-btn.scene-ghost-btn:hover {
+  background: var(--studio-bg-hover, #222);
+  color: #fff;
+}
+.scene-blender-modal {
+  width: min(540px, 94vw);
+  background: #161616;
+  border: 1px solid #333;
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+  padding: 20px;
+}
+.scene-blender-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.scene-blender-modal-title h2 {
+  font-size: 15px!important;
+  font-weight: 600;
+  color: #fff;
+}
+.scene-blender-tag {
+  background: #ea760026;
+  color: #ff8533;
+  border: 1px solid #ea760055;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.scene-blender-modal-body {
+  margin: 14px 0 18px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #ccc;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.scene-blender-steps {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.scene-blender-steps li {
+  color: #ddd;
+}
+.scene-blender-steps strong {
+  display: block;
+  color: #fff;
+  font-size: 12px;
+}
+.scene-blender-steps span {
+  font-size: 11px;
+  color: #999;
+}
+.scene-blender-steps code {
+  background: #242424;
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: #60a5fa;
+  font-size: 11px;
+}
+.scene-blender-tip {
+  background: #202020;
+  border-left: 3px solid #ff8533;
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  font-size: 11px;
+  color: #bbb;
+}
+.scene-blender-tip code {
+  background: #2a2a2a;
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: #fca5a5;
+}
+.scene-blender-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid #282828;
+}
+.scene-blender-action-btn {
+  background: #ea7600;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.scene-blender-action-btn:hover {
+  background: #ff851b;
+}

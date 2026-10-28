@@ -130,6 +130,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const hierarchyRef=useRef<HTMLElement>(null);
   const [left, setLeft] = useState(true), [right, setRight] = useState(true), [snap, setSnap] = useState(true), [grid, setGrid] = useState(true);
   const [busy, setBusy] = useState(""), [error, setError] = useState<string | null>(null), [openProjects, setOpenProjects] = useState<Array<{ id: string; name: string; local?: boolean }> | null>(null);
+  const [blenderGuideOpen, setBlenderGuideOpen] = useState(false);
   const [cameraView, setCameraView] = useState("Perspective");
   const [worldMap, setWorldMap] = useState(false), [mapOpened, setMapOpened] = useState(false), [mapView, setMapView] = useState("Globe");
   const worldMapAPI = useRef<WorldMapAPI>(null);
@@ -221,7 +222,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Export failed.");if(strict)throw caught; }
     finally { setBusy(""); }
   };
-  const importFile = async (source: File) => {
+  const importFile = async (source: File, targetPoint?: Vec3 | null) => {
     setBusy("Validating imported geometry…"); setError(null);
     try {
       if (source.size > 20_000_000) throw new Error("Import is limited to 20 MB.");
@@ -231,10 +232,25 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       } else {
         const objects = await importModel(await source.arrayBuffer(), source.name);
         if (docRef.current.id !== doc.id) throw new Error("Project changed during import. Import the file again in the current project.");
-        change({ ...docRef.current, objects: [...docRef.current.objects, ...objects] }); setSelected([objects[0].id]);
+        let positionedObjects = objects;
+        if (objects.length > 0) {
+          const rootObj = objects[0];
+          const target = targetPoint ?? viewport.current?.camera().target ?? [0, 0, 0];
+          const dx = target[0] - rootObj.position[0], dz = target[2] - rootObj.position[2], dy = target[1] - rootObj.position[1];
+          if (dx !== 0 || dy !== 0 || dz !== 0) {
+            positionedObjects = objects.map(o => !o.parentId ? { ...o, position: [o.position[0] + dx, Math.max(0, o.position[1] + dy), o.position[2] + dz] as Vec3 } : o);
+          }
+        }
+        change({ ...docRef.current, objects: [...docRef.current.objects, ...positionedObjects] });
+        setSelected([positionedObjects[0].id]);
+        setTool("translate");
       }
       requestAnimationFrame(() => viewport.current?.fit());
-    } catch (caught) { setError(caught instanceof Error ? caught.message : "Import failed."); }
+    } catch (caught) {
+      const msg = caught instanceof Error ? caught.message : "Import failed.";
+      setError(msg);
+      if (source.name.toLowerCase().endsWith(".blend")) setBlenderGuideOpen(true);
+    }
     finally { setBusy(""); }
   };
   const listProjects = async () => {
@@ -443,7 +459,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     window.addEventListener("keydown", key); return () => window.removeEventListener("keydown", key);
   });
 
-  return <main data-world-map={worldMap || undefined} className={`crystal-studio scene-workbench ${left ? "" : "scene-left-closed"} ${right ? "" : "scene-right-closed"}`} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (worldMap) return; if (e.dataTransfer.files[0]) void importFile(e.dataTransfer.files[0]); else { const name = e.dataTransfer.getData("application/x-casynus-asset"); if (catalog.includes(name)) add(name, viewport.current?.point(e.clientX, e.clientY)); } }}>
+  return <main data-world-map={worldMap || undefined} className={`crystal-studio scene-workbench ${left ? "" : "scene-left-closed"} ${right ? "" : "scene-right-closed"}`} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (worldMap) return; if (e.dataTransfer.files[0]) void importFile(e.dataTransfer.files[0], viewport.current?.point(e.clientX, e.clientY)); else { const name = e.dataTransfer.getData("application/x-casynus-asset"); if (catalog.includes(name)) add(name, viewport.current?.point(e.clientX, e.clientY)); } }}>
     {store.ready && <SceneViewport ref={viewport} document={pending&&!pending.destructive?pending.preview:doc} previewJob={pending?.generatedJobId} editing={editing} selected={selected} tool={pending||planning ? "select" : tool} snap={snap} grid={grid} autoRotate={autoRotate && !worldMap && !blocked} onSelect={select} onHover={setHoveredId} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
     {studio === "infrastructure" && mapOpened && <WorldMap key={doc.id} apiRef={worldMapAPI} active={worldMap} onViewChange={setMapView} importDisabled={blocked} onImport={feature => safely(() => {
       const scene = docRef.current;
@@ -456,7 +472,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       <nav className="scene-studio-nav" aria-label="Design studios">{(Object.keys(routes) as Studio[]).map(s => <button key={s} className={s === studio ? "is-active" : ""} onClick={() => void navigate(s)}>{s === "architecture" ? "Architecture" : s === "interior" ? "Sketch" : "Infra"}</button>)}</nav>
       <div className="scene-project-row"><input aria-label="Project name" key={doc.id + doc.name} defaultValue={doc.name} maxLength={120} onBlur={e => { if (e.target.value.trim() !== doc.name) safely(() => change({ ...doc, name: e.target.value.trim() })); }} /><button aria-label="Open projects" onClick={() => void listProjects()}><FolderOpen size={16} /></button>
         <details className="scene-project-actions"><summary aria-label="Project actions" title="Project actions"><MoreHorizontal size={18} /></summary><div className="scene-project-actions-content" onClick={e => { if ((e.target as HTMLElement).closest("button:not(:disabled)")) e.currentTarget.parentElement?.removeAttribute("open"); }}>
-      <Menu name="File"><button onClick={() => void newProject()}>New project</button><button onClick={() => void listProjects()}>Open workspace project</button><button onClick={() => void listGenerationJobs()}>AI generation jobs</button><button onClick={() => void store.save()}>Save · Ctrl S</button><button onClick={() => { store.saveCopy(); setPending(null); }}>Save as copy</button><button onClick={() => file.current?.click()}>Import model / JSON</button><button onClick={() => void exportFile("json")}>Download project JSON</button></Menu>
+      <Menu name="File"><button onClick={() => void newProject()}>New project</button><button onClick={() => void listProjects()}>Open workspace project</button><button onClick={() => void listGenerationJobs()}>AI generation jobs</button><button onClick={() => void store.save()}>Save · Ctrl S</button><button onClick={() => { store.saveCopy(); setPending(null); }}>Save as copy</button><button onClick={() => file.current?.click()}>Import Blender / 3D model</button><button onClick={() => setBlenderGuideOpen(true)}>Blender export guide</button><button onClick={() => void exportFile("json")}>Download project JSON</button></Menu>
       <Menu name="Edit"><button disabled={blocked || !store.history.past.length} onClick={store.undo}>Undo · Ctrl Z</button><button disabled={blocked || !store.history.future.length} onClick={store.redo}>Redo · Ctrl Shift Z</button><button disabled={blocked || !selected.length} onClick={()=>duplicate()}>Duplicate · Ctrl D</button><button disabled={blocked || !selected.length} onClick={()=>remove()}>Delete selected</button><button disabled={blocked || selected.length < 2} onClick={() => group()}>Group selection</button><button disabled={blocked || primary?.kind !== "group"} onClick={() => group(true)}>Ungroup</button><button disabled={blocked || selected.length < 2} onClick={() => safely(() => { if (doc.objects.some(o => selected.includes(o.id) && locked(o))) throw new Error("Unlock objects and their parents first."); change({ ...doc, objects: doc.objects.map(o => selected.includes(o.id) ? { ...o, position: [primary!.position[0], o.position[1], o.position[2]] } : o) }); })}>Align selected local X</button></Menu>
       <Menu name="View"><button onClick={() => viewport.current?.fit()}>Frame all</button><button onClick={() => viewport.current?.focus()}>Focus selected · F</button><button onClick={() => setGrid(v => !v)}>{grid ? "Hide" : "Show"} grid</button><button onClick={() => store.setCamera({ ...doc.camera, projection: doc.camera.projection === "perspective" ? "orthographic" : "perspective" })}>{doc.camera.projection === "perspective" ? "Orthographic" : "Perspective"} projection</button></Menu>
       <Menu name="Tools">{(["select", "translate", "rotate", "scale", "measure"] as SceneTool[]).map(t => <button key={t} disabled={blocked} onClick={() => setTool(t)}>{t}</button>)}<button onClick={() => setSnap(v => !v)}>{snap ? "Disable" : "Enable"} grid snapping</button>{["Vertex / edge / face editing", "Extrude / inset / bevel", "Vertex / surface snapping"].map(t => <button key={t} disabled title="Unavailable in this release">{t} · unavailable</button>)}</Menu>
@@ -467,6 +483,33 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
           <button aria-label="Save project" onClick={() => void store.save()}><Save size={16} />Save project</button><span className="scene-save-state" role="status">{store.status}</span>
         </div></details></div>
       <div className="scene-sidebar-content"><section className="scene-library"><h2>Object library <span>meters</span></h2><input aria-label="Search object library" placeholder="Search library…" value={search} onChange={e => setSearch(e.target.value)} />
+        <div className="scene-blender-import-card">
+          <div className="scene-blender-import-info">
+            <span className="scene-blender-badge">Blender 3D</span>
+            <strong>Import Blender Object</strong>
+            <p>.glb · .fbx · .obj · .stl</p>
+          </div>
+          <div className="scene-blender-import-actions">
+            <button
+              type="button"
+              className="scene-blender-btn"
+              disabled={blocked}
+              onClick={() => file.current?.click()}
+              title="Import 3D object from Blender (.glb, .fbx, .obj, .stl)"
+            >
+              <FolderOpen size={13} />
+              <span>Import</span>
+            </button>
+            <button
+              type="button"
+              className="scene-blender-guide-btn"
+              onClick={() => setBlenderGuideOpen(true)}
+              title="How to export from Blender to Casynus"
+            >
+              Guide
+            </button>
+          </div>
+        </div>
         <div className="scene-library-items">{catalog.filter(name => name.toLowerCase().includes(search.toLowerCase())).map(name => <button key={name} disabled={blocked} draggable={!blocked} onDragStart={e => e.dataTransfer.setData("application/x-casynus-asset", name)} onClick={() => add(name)}><Box size={13} />{name}</button>)}</div>
         <div className="scene-templates"><label>Building levels <input aria-label="Building levels" type="number" min={1} max={8} value={stories} onChange={e => setStories(Math.max(1, Math.min(8, Number(e.target.value) || 1)))} /></label>{[["building", "Add building"], ["room", "Add furnished room"], ["intersection", "Add intersection"]].map(([id, label]) => <button key={id} disabled={blocked} onClick={() => template(id)}>{label}</button>)}</div>
       </section>
@@ -495,6 +538,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
           ...(studio === "infrastructure" ? [{ label: worldMap ? "3D Editor" : "World Map", icon: worldMap ? Box : Globe2, active: worldMap, onClick: () => { setMapOpened(true); setWorldMap(value => !value); } }] : []),
           { label: studio === "interior" ? "Add furnished room" : "Add building", icon: Building2, onClick: () => template(studio === "interior" ? "room" : "building"), disabled: blocked },
           { label: "Add Tree", icon: TreePine, onClick: () => add("Tree"), disabled: blocked },
+          { label: "Import Blender Object", icon: Box, onClick: () => file.current?.click(), disabled: blocked },
           { label: 'AI 3D Generate', icon: Sparkles, active:model==='hunyuan', onClick:()=>void activate3DGeneration(), disabled:checkingGeneration||planning||Boolean(busy)||Boolean(pending&&!pending.generatedJobId) },
         ]}
         tools={([
@@ -533,10 +577,51 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       <section className="scene-environment"><h2>Lighting & environment</h2><select aria-label="Rendering quality" value={doc.environment.quality} disabled={blocked} onChange={e => safely(() => change({ ...doc, environment: { ...doc.environment, quality: e.target.value as SceneDocument["environment"]["quality"] } }))}><option value="performance">Performance</option><option value="balanced">Balanced</option><option value="ultra">Ultra raster</option></select>{(["exposure", "sunIntensity", "sunAzimuth", "sunElevation"] as const).map(key => <NumberField key={key} label={key} value={doc.environment[key]} min={key === "exposure" ? .1 : key === "sunAzimuth" ? -360 : key === "sunElevation" ? -5 : 0} max={key === "exposure" ? 4 : key === "sunIntensity" ? 10 : key === "sunElevation" ? 90 : 360} onChange={value => safely(() => change({ ...doc, environment: { ...doc.environment, [key]: value } }))} />)}<label><input type="checkbox" checked={doc.environment.shadows} disabled={blocked} onChange={e => safely(() => change({ ...doc, environment: { ...doc.environment, shadows: e.target.checked } }))} />Sun shadows</label><p className="scene-muted">Studio image-based reflections · PBR · ACES tone mapping</p></section>
       <p className="scene-format-note">GLB/glTF preserve compatible materials and hierarchy. OBJ/STL export geometry; use project JSON for editor state.</p>
     </StudioPanel>}
-    <input ref={file} type="file" className="scene-file-input" aria-label="Import scene file" accept=".glb,.gltf,.obj,.stl,.json" onChange={e => { if (e.target.files?.[0]) void importFile(e.target.files[0]); e.target.value = ""; }} />
+    <input ref={file} type="file" className="scene-file-input" aria-label="Import scene file" accept=".glb,.gltf,.obj,.fbx,.stl,.blend,.json" onChange={e => { if (e.target.files?.[0]) void importFile(e.target.files[0]); e.target.value = ""; }} />
     <input ref={texture} type="file" className="scene-file-input" aria-label="Upload material texture" accept="image/png,image/jpeg,image/webp" onChange={e => { const image = e.target.files?.[0]; e.target.value = ""; if (!image || !primary) return; if (image.size > 1_500_000) { setError("Textures are limited to 1.5 MB."); return; } const reader = new FileReader(); reader.onload = () => { if (docRef.current.id !== doc.id) return; const target = docRef.current.objects.find(o => o.id === primary.id); if (target) patch(target.id, { material: { ...target.material, [textureSlot]: String(reader.result) } }); }; reader.onerror = () => setError("Texture could not be read."); reader.readAsDataURL(image); }} />
     {generationJobs && <div className="scene-dialog-shade"><section className="scene-project-dialog" role="dialog" aria-modal="true" aria-label="AI generation jobs"><header><h2>AI generation jobs</h2><button aria-label="Close generation jobs" onClick={() => { resumeController.current?.abort(); setGenerationJobs(null); }}><X size={18} /></button></header>{generationJobs.length ? generationJobs.map(job => <div key={job.id} className="scene-generation-job"><strong>{job.provider} · {job.status} · {Math.round(job.progress)}%</strong><p>{job.prompt}</p>{job.error && <p role="alert">{job.error}</p>}<div><button disabled={Boolean(busy) || Boolean(pending) || ["FAILED", "CANCELED"].includes(job.status)} onClick={() => void resumeGeneration(job.id)}>Resume / preview</button>{job.modelURL && <a href={job.modelURL} target="_blank" rel="noopener noreferrer">Source GLB</a>}</div></div>) : <p>No 3D generations for this project. Choose a configured Meshy or Tripo provider in the assistant to generate a model.</p>}</section></div>}
 
     {openProjects && <div className="scene-dialog-shade"><section className="scene-project-dialog" role="dialog" aria-modal="true" aria-label="Open workspace project"><header><h2>Workspace projects</h2><button aria-label="Close project dialog" onClick={() => setOpenProjects(null)}><X size={18} /></button></header>{openProjects.length ? openProjects.map(project => <button key={project.id} onClick={() => { void store.recover().then(() => { setOpenProjects(null); router.push(`${routes[studio]}?project=${project.id}`); }).catch(() => setError("Recovery failed. Save or download before opening another project.")); }}>{project.name}</button>) : <p>No saved 3D projects in this workspace.</p>}</section></div>}
+    {blenderGuideOpen && (
+      <div className="scene-dialog-shade" onClick={() => setBlenderGuideOpen(false)}>
+        <section className="scene-project-dialog scene-blender-modal" role="dialog" aria-modal="true" aria-label="Blender import guide" onClick={e => e.stopPropagation()}>
+          <header>
+            <div className="scene-blender-modal-title">
+              <span className="scene-blender-tag">Blender 3D</span>
+              <h2>Import Blender Objects into Casynus</h2>
+            </div>
+            <button aria-label="Close Blender guide" onClick={() => setBlenderGuideOpen(false)}><X size={18} /></button>
+          </header>
+          <div className="scene-blender-modal-body">
+            <p>
+              Casynus supports interactive 3D placement for objects designed in Blender. To bring your models into the scene with full geometry and textures, export from Blender using one of these standard formats:
+            </p>
+            <ol className="scene-blender-steps">
+              <li>
+                <strong>glTF 2.0 (.glb) &mdash; Recommended</strong>
+                <span>In Blender: <code>File &rarr; Export &rarr; glTF 2.0 (.glb)</code>. Embeds meshes, materials, UVs, and textures in a single compact file.</span>
+              </li>
+              <li>
+                <strong>FBX (.fbx)</strong>
+                <span>In Blender: <code>File &rarr; Export &rarr; FBX (.fbx)</code>. Great for complex multi-part hierarchies and architectural models.</span>
+              </li>
+              <li>
+                <strong>Wavefront OBJ (.obj)</strong>
+                <span>In Blender: <code>File &rarr; Export &rarr; Wavefront (.obj)</code>. Universal format for static architectural elements.</span>
+              </li>
+            </ol>
+            <div className="scene-blender-tip">
+              💡 <em>Tip: Raw <code>.blend</code> files are Blender project databases. Exporting to <code>.glb</code> or <code>.fbx</code> ensures your models render with hardware acceleration in any browser.</em>
+            </div>
+          </div>
+          <div className="scene-blender-modal-actions">
+            <button className="scene-blender-action-btn" onClick={() => { setBlenderGuideOpen(false); file.current?.click(); }}>
+              Select Blender Model (.glb / .fbx / .obj)
+            </button>
+            <button className="scene-ghost" onClick={() => setBlenderGuideOpen(false)}>Close</button>
+          </div>
+        </section>
+      </div>
+    )}
   </main>;
 }

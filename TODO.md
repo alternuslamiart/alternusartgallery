@@ -1,5 +1,15 @@
 # Next tasks (reviewed 2026-10-28)
 
+- [x] Blender 3D Object Import into Casynus Studio:
+  - Added dedicated Blender 3D object import support across standard formats (`.glb`, `.gltf`, `.fbx`, `.obj`, `.stl`).
+  - Added Three.js `FBXLoader` support in `src/lib/scene/geometry.mjs` for Blender-exported FBX files with meshes, materials, and hierarchy.
+  - Added explicit `.blend` format handling with an explanatory error and guidance modal advising export to glTF 2.0 (`.glb`) or `.fbx`.
+  - Automatic model placement on ground plane (`Y >= 0`) at cursor drop location or camera target point, with auto-selection and translation gizmo (`W`).
+  - Added "Blender 3D Object" card in Left Sidebar under "Object library" with direct "Import Blender" and "Guide" actions.
+  - Added "Import Blender Object" button in `StudioViewportToolbar` and File Menu item with guide modal.
+  - Interactive "Blender Import Guide" modal explaining 1-click export steps from Blender (`File -> Export -> glTF 2.0 / FBX / OBJ`).
+  - Added unit test in `tests/scene-geometry.test.mjs` verifying `.blend` rejection and guidance. All 203 tests pass.
+
 - [x] Sketch Studio 2D architectural drafting enhancements and tool clean-up:
   - Add Arch / Curved Wall (`arch-wall`) tool with dedicated icon (`Spline`, shortcut `A`):
     - 180° outward semicircle (protruding balcony / bow bay connecting with apartment).

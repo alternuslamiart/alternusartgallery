@@ -152,7 +152,12 @@ export async function importModel(buffer, filename) {
   } else if (extension === "stl") {
     const { STLLoader } = await import("three/addons/loaders/STLLoader.js");
     source = new THREE.Mesh(new STLLoader().parse(buffer), new THREE.MeshStandardMaterial());
-  } else throw new Error("Choose GLB, embedded glTF, OBJ or STL.");
+  } else if (extension === "fbx") {
+    const { FBXLoader } = await import("three/addons/loaders/FBXLoader.js");
+    source = new FBXLoader().parse(buffer, "");
+  } else if (extension === "blend") {
+    throw new Error("Blender .blend files need to be exported before importing. In Blender: File > Export > glTF 2.0 (.glb) or FBX (.fbx) or Wavefront (.obj), then import here.");
+  } else throw new Error("Choose GLB, embedded glTF, OBJ, FBX or STL.");
   const output = [];
   const walk = (node, parentId = null) => {
     if (node.isSkinnedMesh || node.morphTargetInfluences?.length) throw new Error("Skinned and morph-target meshes are not supported.");

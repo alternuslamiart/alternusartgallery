@@ -54,6 +54,11 @@ test("imports cannot fetch external resources", async () => {
   await assert.rejects(importModel(data.buffer, "external.gltf"), /External URLs/);
 });
 
+test("blender .blend files advise exporting to supported 3D formats", async () => {
+  const dummy = new Uint8Array([66, 76, 69, 78, 68, 69, 82]); // "BLENDER"
+  await assert.rejects(importModel(dummy.buffer, "project.blend"), /Blender \.blend files need to be exported/);
+});
+
 test("duplicating groups remaps child IDs without changing originals", () => {
   const doc = makeDocument(); doc.objects = createTemplate("building");
   const result = duplicateObjects(doc, [doc.objects[0].id]);
