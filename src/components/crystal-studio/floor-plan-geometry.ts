@@ -41,7 +41,7 @@ export function floorSnapPoint(point: FloorPlanPoint, objects: FloorPlanObject[]
     candidates.push({ point: { x: Math.round(point.x / grid) * grid, y: Math.round(point.y / grid) * grid }, priority: 4 });
   }
   if (settings.snapToPoints) {
-    const walls = objects.filter((item): item is Extract<FloorPlanObject, { type: "wall" }> => item.type === "wall");
+    const walls = objects.filter((item): item is Extract<FloorPlanObject, { type: "wall" | "arc-wall" }> => item.type === "wall" || item.type === "arc-wall");
     walls.forEach((wall) => {
       candidates.push({ point: wall.start, priority: 0 }, { point: wall.end, priority: 0 });
       candidates.push({ point: { x: (wall.start.x + wall.end.x) / 2, y: (wall.start.y + wall.end.y) / 2 }, priority: 1 });

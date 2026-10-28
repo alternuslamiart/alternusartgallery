@@ -1,5 +1,21 @@
 # Next tasks (reviewed 2026-10-28)
 
+- [x] Sketch Studio 2D architectural drafting enhancements and tool clean-up:
+  - Add Arch / Curved Wall (`arch-wall`) tool with dedicated icon (`Spline`, shortcut `A`):
+    - 180° outward semicircle (protruding balcony / bow bay connecting with apartment).
+    - 180° inward semicircle (curved cutout / alcove into room / apartment).
+    - Full circle wall (`mur rrethor`).
+    - Real-time drag preview with span length, chord line, and Space shortcut to flip inward/outward.
+    - SVG, PDF, and PNG export support with exact circular arc geometry.
+  - Interactive room creation by dragging mouse:
+    - Real-time room drag preview with width, height, dynamic dimensions, and calculated m² area badge.
+    - On mouse release, creates room entity and 4 enclosing bounding walls that integrate seamlessly with apartment layout.
+  - Wall editing with mouse drag:
+    - Interactive endpoint handles (`start` and `end`) on selected walls and arc-walls to stretch, lengthen, shorten, and angle with grid/ortho snapping.
+    - Midpoint/apex handle to toggle arc curvature between 180° inward and outward.
+    - Wall line drag translates entire wall.
+  - Removed `Play` (slow rotate triangle) and `+` (Plus / material library) buttons strictly in Sketch Studio (`hidePlus` & `hidePlay` in `StudioViewportToolbar`), preserving them in Architecture and Infrastructure.
+
 - [x] Implement Desktop-only 712x140px Studio AI Chat generation loader frame:
   - Appears in center of screen upon Enter/Send in Studio AI chat prompt.
   - Size 712x140px, frame color #161616, 24px semibold headline ("Generate house modeling 3D..."), 12px medium subtitle.

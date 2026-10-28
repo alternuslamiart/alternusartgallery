@@ -26,6 +26,7 @@ type Props = {
 function objectLabel(object: FloorPlanObject, index: number) {
   if ("label" in object && object.label) return object.label;
   if (object.type === "text") return object.text || "Text";
+  if (object.type === "arc-wall") return object.isCircle ? `Circular Wall ${index + 1}` : `Arch Wall ${index + 1}`;
   return `${object.type.charAt(0).toUpperCase()}${object.type.slice(1)} ${index + 1}`;
 }
 

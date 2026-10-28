@@ -9,6 +9,8 @@ import "./viewport-toolbar.css";
 
 export type ViewportAction = { label: string; icon: LucideIcon; onClick: () => void; active?: boolean; disabled?: boolean; showLabel?: boolean;frame?:boolean };
 type Props = {
+  hidePlus?: boolean;
+  hidePlay?: boolean;
   apiRef?:Ref<StudioToolbarAPI>;
   label: string; leading: ViewportAction[]; tools: ViewportAction[];
   onFit: () => void; onReset: () => void; cameraViews: string[]; cameraView: string; onCamera: (view: string) => void;
@@ -43,7 +45,7 @@ export function StudioViewportToolbar(p: Props) {
   const action = (a: ViewportAction) => <button key={a.label} type="button" aria-label={a.label} title={a.label} disabled={a.disabled} aria-pressed={a.active} onClick={a.onClick} className={`${a.frame?'sketch-entry ':''}${a.showLabel ? "ref-toolbar-export-btn" : "ref-toolbar-icon-btn"} ${a.active ? "is-active" : ""}`}><span><a.icon size={18} strokeWidth={a.active ? 2.35 : 1.65} />{a.showLabel && a.label}</span></button>;
   return <>
     <StudioToolbar id={toolbarId} className="ref-top-toolbar casynus-viewport-toolbar" aria-label={p.label}>
-      <button type="button" className={`ref-toolbar-icon-btn ${libraryOpen?"is-active":""}`} aria-label="Texture material library" title="Texture material library" aria-expanded={libraryOpen} onClick={()=>setLibraryOpen(value=>!value)}><span><Plus size={18} strokeWidth={libraryOpen ? 2.35 : 1.65} /></span></button>
+      {!p.hidePlus && <button type="button" className={`ref-toolbar-icon-btn ${libraryOpen?"is-active":""}`} aria-label="Texture material library" title="Texture material library" aria-expanded={libraryOpen} onClick={()=>setLibraryOpen(value=>!value)}><span><Plus size={18} strokeWidth={libraryOpen ? 2.35 : 1.65} /></span></button>}
       {p.leading.map(action)}<span className="ref-toolbar-divider" />{p.tools.map(action)}
       {action({ label: "Fit entire scene", icon: Focus, onClick: p.onFit })}
       {action({ label: "Reset camera", icon: Home, onClick: p.onReset })}
@@ -53,7 +55,7 @@ export function StudioViewportToolbar(p: Props) {
       {action({ label: "Zoom out (−)", icon: ZoomOut, onClick: () => p.onZoom(.8) })}
       <button type="button" className="ref-toolbar-export-btn" aria-label="Export viewport" disabled={p.busy} onClick={() => dialog.current?.showModal()}><span>Export</span></button>
       <button type="button" className="ref-toolbar-icon-btn" aria-label="Export scene as CSV" onClick={p.onCSV} disabled={p.busy}><span>CSV</span></button>
-      {action({ label: p.settingsLabel, icon: Play, active: p.settingsActive, onClick: p.onSettings })}
+      {!p.hidePlay && action({ label: p.settingsLabel, icon: Play, active: p.settingsActive, onClick: p.onSettings })}
     </StudioToolbar>
     {libraryOpen&&<StudioMaterialLibrary options={p.materialLibrary} uploadedAssets={uploadedAssets} onUploadAsset={asset=>setUploadedAssets(current=>[...current,asset])} onClose={()=>setLibraryOpen(false)} width={libraryWidth}/>}
     <dialog ref={dialog} className="casynus-toolbar-export" aria-label="Export scene"><header><strong>Export</strong><button aria-label="Close export" onClick={() => dialog.current?.close()}><X size={16} /></button></header>{p.exportFormats.map(format => <button key={format} onClick={() => { dialog.current?.close(); p.onExport(format); }}>{format.toUpperCase()}</button>)}</dialog>

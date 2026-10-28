@@ -8,8 +8,8 @@ const paperSizes: Record<number, [number, number]> = { 20: [297, 210], 50: [297,
 function boundsOf(objects: FloorPlanObject[]): Bounds {
   const points: Array<{ x: number; y: number }> = [];
   objects.forEach(object => {
-    if (object.type === "wall" || object.type === "dimension") {
-      const radius = object.type === "wall" ? object.thickness / 2 : 0;
+    if (object.type === "wall" || object.type === "arc-wall" || object.type === "dimension") {
+      const radius = "thickness" in object ? object.thickness / 2 : 0;
       for (const p of [object.start, object.end]) points.push({ x: p.x - radius, y: p.y - radius }, { x: p.x + radius, y: p.y + radius });
     }
     else if (object.type === "door" || object.type === "window") points.push(...floorOpeningSegments(object).flat());
@@ -44,6 +44,14 @@ export function floorPlanSvg(objects: FloorPlanObject[], settings: FloorPlanSett
   const line = (content: string, className = "secondary") => `<g class="${className}">${content}</g>`;
   const content = objects.map(object => {
     if (object.type === "wall") return line(`<line x1="${sx(object.start.x)}" y1="${sy(object.start.y)}" x2="${sx(object.end.x)}" y2="${sy(object.end.y)}" stroke-width="${Math.max(.15, object.thickness * 1000 / paper.scale)}"/>`, object.exterior ? "primary" : "wall");
+    if (object.type === "arc-wall") {
+      const r = object.radius * 1000 / paper.scale, strokeW = Math.max(.15, object.thickness * 1000 / paper.scale);
+      if (object.isCircle) {
+        const cx = sx((object.start.x + object.end.x) / 2), cy = sy((object.start.y + object.end.y) / 2);
+        return line(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke-width="${strokeW}"/>`, object.exterior ? "primary" : "wall");
+      }
+      return line(`<path d="M ${sx(object.start.x)} ${sy(object.start.y)} A ${r} ${r} 0 0 ${object.sweep} ${sx(object.end.x)} ${sy(object.end.y)}" fill="none" stroke-width="${strokeW}"/>`, object.exterior ? "primary" : "wall");
+    }
     if (object.type === "room") return line(`<rect x="${sx(object.x)}" y="${sy(object.y)}" width="${object.width * 1000 / paper.scale}" height="${object.height * 1000 / paper.scale}"/><text x="${sx(object.x + object.width / 2)}" y="${sy(object.y + object.height / 2)}">${escapeXml(object.label)}</text>`, "room");
     if (object.type === "door" || object.type === "window") return `<rect x="${-object.width * 500 / paper.scale}" y="${-object.height * 500 / paper.scale}" width="${object.width * 1000 / paper.scale}" height="${object.height * 1000 / paper.scale}" fill="#fafaf7" transform="translate(${sx(object.x)} ${sy(object.y)}) rotate(${object.rotation})"/>${line(floorOpeningSegments(object).map(segment => `<polyline points="${segment.map(point => `${sx(point.x)},${sy(point.y)}`).join(" ")}" fill="none"/>`).join(""), object.type)}`;
     if (object.type === "furniture" || object.type === "column") return line(`<rect x="${sx(object.x)}" y="${sy(object.y)}" width="${object.width * 1000 / paper.scale}" height="${object.height * 1000 / paper.scale}"/>${object.type === "furniture" ? `<text x="${sx(object.x + object.width / 2)}" y="${sy(object.y + object.height / 2)}">${escapeXml(object.label)}</text>` : ""}`, object.type);
@@ -62,6 +70,17 @@ export function svgToPdf(objects: FloorPlanObject[], settings: FloorPlanSettings
   const sy = (value: number) => paper.height - paper.offsetY - (value - paper.bounds.minY) * 1000 / paper.scale;
   const commands = objects.map(object => {
     if (object.type === "wall" || object.type === "dimension") return `${object.type === "wall" ? Math.max(.15, object.thickness * 1000 / paper.scale) * 2.83465 : .8} w ${sx(object.start.x) * 2.83465} ${sy(object.start.y) * 2.83465} m ${sx(object.end.x) * 2.83465} ${sy(object.end.y) * 2.83465} l S`;
+    if (object.type === "arc-wall") {
+      const steps = 16, pts: Array<{ x: number; y: number }> = [];
+      const cx = (object.start.x + object.end.x) / 2, cy = (object.start.y + object.end.y) / 2, r = object.radius;
+      if (object.isCircle) {
+        for (let i = 0; i <= steps; i++) { const a = (i / steps) * 2 * Math.PI; pts.push({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }); }
+      } else {
+        const base = Math.atan2(object.end.y - object.start.y, object.end.x - object.start.x), sign = object.sweep === 1 ? 1 : -1;
+        for (let i = 0; i <= steps; i++) { const a = base + sign * Math.PI * (1 - i / steps); pts.push({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }); }
+      }
+      return `${Math.max(.15, object.thickness * 1000 / paper.scale) * 2.83465} w ` + pts.map((p, i) => `${sx(p.x) * 2.83465} ${sy(p.y) * 2.83465} ${i === 0 ? "m" : "l"}`).join(" ") + " S";
+    }
     if (object.type === "door" || object.type === "window") {
       const radians = object.rotation * Math.PI / 180, c = Math.cos(radians), s = Math.sin(radians);
       const corners = [[-.5, -.5], [.5, -.5], [.5, .5], [-.5, .5]].map(([x, y]) => ({ x: object.x + x * object.width * c - y * object.height * s, y: object.y + x * object.width * s + y * object.height * c }));

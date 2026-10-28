@@ -308,6 +308,77 @@ export function RightPanel(props: Props) {
                   </>
                 )}
 
+                {selected.type === "arc-wall" && (
+                  <>
+                    <div className="flex items-center justify-between text-[11px] text-[var(--studio-text-secondary)]">
+                      <span>Wall Type</span>
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          className={`rounded px-2 py-0.5 text-[11px] font-medium transition ${!selected.isCircle && selected.sweep === 1 ? "bg-[var(--studio-accent)] text-white" : "bg-[var(--studio-bg-panel)] text-[var(--studio-text-secondary)]"}`}
+                          onClick={() => updateSelected({ isCircle: false, sweep: 1 })}
+                        >
+                          180° Out
+                        </button>
+                        <button
+                          type="button"
+                          className={`rounded px-2 py-0.5 text-[11px] font-medium transition ${!selected.isCircle && selected.sweep === 0 ? "bg-[var(--studio-accent)] text-white" : "bg-[var(--studio-bg-panel)] text-[var(--studio-text-secondary)]"}`}
+                          onClick={() => updateSelected({ isCircle: false, sweep: 0 })}
+                        >
+                          180° In
+                        </button>
+                        <button
+                          type="button"
+                          className={`rounded px-2 py-0.5 text-[11px] font-medium transition ${selected.isCircle ? "bg-[var(--studio-accent)] text-white" : "bg-[var(--studio-bg-panel)] text-[var(--studio-text-secondary)]"}`}
+                          onClick={() => updateSelected({ isCircle: true })}
+                        >
+                          Circle
+                        </button>
+                      </div>
+                    </div>
+                    <FloorLengthInput
+                      label="diameter"
+                      value={selected.radius * 2}
+                      settings={floorSettings}
+                      min={0.1}
+                      onChange={diam => updateSelected({ radius: roundFloorValue(diam / 2, floorSettings.precision) })}
+                    />
+                    <FloorLengthInput
+                      label="radius"
+                      value={selected.radius}
+                      settings={floorSettings}
+                      min={0.05}
+                      onChange={radius => updateSelected({ radius })}
+                    />
+                    <FloorLengthInput
+                      label="thickness"
+                      value={selected.thickness}
+                      settings={floorSettings}
+                      min={0.05}
+                      onChange={(thickness) => updateSelected({ thickness })}
+                    />
+                    <button
+                      type="button"
+                      className="w-full rounded-[6px] border border-[var(--studio-border)] bg-[var(--studio-bg-panel)] py-1 text-[11px] font-medium text-[var(--studio-text-primary)] hover:border-[var(--studio-accent)] transition"
+                      onClick={() => updateSelected({ sweep: selected.sweep === 1 ? 0 : 1 })}
+                    >
+                      Flip 180° Inward / Outward
+                    </button>
+                    <div className="grid grid-cols-2 gap-1.5 pt-1">
+                      {(["start", "end"] as const).map((point) => (
+                        <div key={point} className="studio-coord-box">
+                          <span className="mb-1 block text-[10px] uppercase tracking-wider text-[var(--studio-text-secondary)]">
+                            {point} (X / Y)
+                          </span>
+                          <div className="flex gap-1">
+                            {(["x", "y"] as const).map(axis => <FloorLengthInput key={axis} compact label={`${point} ${axis.toUpperCase()}`} value={selected[point][axis]} settings={floorSettings} min={-Infinity} onChange={value => updateSelected({ [point]: { ...selected[point], [axis]: value } })} />)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
                 {selected.type === "room" && (
                   <>
                     <label className="studio-input-pill">

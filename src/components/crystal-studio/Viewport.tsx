@@ -31,6 +31,7 @@ import {
   Share2,
   Sofa,
   Sparkles,
+  Spline,
   SquareDashed,
   Sun,
   TextCursorInput,
@@ -480,6 +481,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
   const [tool, setTool] = useState<
     | "select"
     | "wall"
+    | "arch"
     | "door"
     | "window"
     | "room"
@@ -489,6 +491,8 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
     | "furniture"
     | "delete"
   >("select");
+  const [archSweep, setArchSweep] = useState<0 | 1>(1);
+  const [handleDrag, setHandleDrag] = useState<{ id: string; handle: "start" | "end" | "apex"; original: FloorPlanObject } | null>(null);
   const [drag, setDrag] = useState<{
     start: FloorPlanPoint;
     current: FloorPlanPoint;
@@ -709,6 +713,10 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
 
   const completeDrag = (event: React.PointerEvent<SVGSVGElement>) => {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    if (handleDrag) {
+      setHandleDrag(null);
+      return;
+    }
     if (moving) {
       if (moving.preview !== moving.original) updateObjects(sourceObjects.map(object => object.id === moving.original.id ? moving.preview : object));
       setMoving(null);
@@ -737,6 +745,19 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         end: preciseEnd,
         thickness: roundFloorValue(0.18, settings.precision),
       });
+    if (tool === "arch" && floorDistance(preciseStart, preciseEnd) > 0.05) {
+      const dist = floorDistance(preciseStart, preciseEnd);
+      addObject({
+        id: crypto.randomUUID(),
+        type: "arc-wall",
+        start: preciseStart,
+        end: preciseEnd,
+        radius: roundFloorValue(dist / 2, settings.precision),
+        sweep: archSweep,
+        is180: true,
+        thickness: roundFloorValue(0.18, settings.precision),
+      });
+    }
     if (tool === "dimension" && floorDistance(preciseStart, preciseEnd) > 0.001)
       addObject({
         id: crypto.randomUUID(),
@@ -745,28 +766,54 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         end: preciseEnd,
       });
     if (tool === "measure") setMeasure({ start, current: end });
-    if (tool === "room" && Math.abs(preciseStart.x - preciseEnd.x) >= .05 && Math.abs(preciseStart.y - preciseEnd.y) >= .05)
-      addObject({
-        id: crypto.randomUUID(),
+    if (tool === "room" && Math.abs(preciseStart.x - preciseEnd.x) >= .05 && Math.abs(preciseStart.y - preciseEnd.y) >= .05) {
+      const rx = roundFloorValue(Math.min(preciseStart.x, preciseEnd.x), settings.precision);
+      const ry = roundFloorValue(Math.min(preciseStart.y, preciseEnd.y), settings.precision);
+      const rw = roundFloorValue(Math.abs(preciseEnd.x - preciseStart.x), settings.precision);
+      const rh = roundFloorValue(Math.abs(preciseEnd.y - preciseStart.y), settings.precision);
+      const roomNum = objects.filter(o => o.type === "room").length + 1;
+      const roomId = crypto.randomUUID();
+      const wallThick = roundFloorValue(0.18, settings.precision);
+      const newRoom: FloorPlanObject = {
+        id: roomId,
         type: "room",
-        x: roundFloorValue(
-          Math.min(preciseStart.x, preciseEnd.x),
-          settings.precision,
-        ),
-        y: roundFloorValue(
-          Math.min(preciseStart.y, preciseEnd.y),
-          settings.precision,
-        ),
-        width: roundFloorValue(
-          Math.abs(preciseEnd.x - preciseStart.x),
-          settings.precision,
-        ),
-        height: roundFloorValue(
-          Math.abs(preciseEnd.y - preciseStart.y),
-          settings.precision,
-        ),
-        label: "New room",
-      });
+        x: rx,
+        y: ry,
+        width: rw,
+        height: rh,
+        label: `Room ${roomNum}`,
+      };
+      const wallTop: FloorPlanObject = {
+        id: crypto.randomUUID(),
+        type: "wall",
+        start: { x: rx, y: ry },
+        end: { x: roundFloorValue(rx + rw, settings.precision), y: ry },
+        thickness: wallThick,
+      };
+      const wallRight: FloorPlanObject = {
+        id: crypto.randomUUID(),
+        type: "wall",
+        start: { x: roundFloorValue(rx + rw, settings.precision), y: ry },
+        end: { x: roundFloorValue(rx + rw, settings.precision), y: roundFloorValue(ry + rh, settings.precision) },
+        thickness: wallThick,
+      };
+      const wallBottom: FloorPlanObject = {
+        id: crypto.randomUUID(),
+        type: "wall",
+        start: { x: roundFloorValue(rx + rw, settings.precision), y: roundFloorValue(ry + rh, settings.precision) },
+        end: { x: rx, y: roundFloorValue(ry + rh, settings.precision) },
+        thickness: wallThick,
+      };
+      const wallLeft: FloorPlanObject = {
+        id: crypto.randomUUID(),
+        type: "wall",
+        start: { x: rx, y: roundFloorValue(ry + rh, settings.precision) },
+        end: { x: rx, y: ry },
+        thickness: wallThick,
+      };
+      updateObjects([...sourceObjects, newRoom, wallTop, wallRight, wallBottom, wallLeft]);
+      select(roomId);
+    }
     setDrag(null);
     if (event.currentTarget.hasPointerCapture(event.pointerId))
       event.currentTarget.releasePointerCapture(event.pointerId);
@@ -791,6 +838,22 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
     if (event.button !== 0) return;
     setPlacementMessage("");
     if (tool === "select" || tool === "delete") {
+      const handleEl = (event.target as Element).closest('[data-wall-handle]');
+      if (handleEl && tool === "select") {
+        const wallId = handleEl.getAttribute('data-wall-id');
+        const handleType = handleEl.getAttribute('data-wall-handle') as "start" | "end" | "apex";
+        const object = sourceObjects.find(item => item.id === wallId);
+        if (object && (object.type === "wall" || object.type === "arc-wall")) {
+          if (handleType === "apex" && object.type === "arc-wall") {
+            updateObjects(sourceObjects.map(o => o.id === object.id && o.type === "arc-wall" ? { ...o, sweep: o.sweep === 1 ? 0 : 1 } : o));
+            return;
+          }
+          select(object.id);
+          setHandleDrag({ id: wallId!, handle: handleType, original: object });
+          event.currentTarget.setPointerCapture(event.pointerId);
+          return;
+        }
+      }
       const id = (event.target as Element).closest('[data-floor-plan-object-id]')?.getAttribute('data-floor-plan-object-id');
       const object = sourceObjects.find(item => item.id === id);
       if (object && tool === "delete") { updateObjects(sourceObjects.filter(item => item.id !== id)); select(null); }
@@ -862,6 +925,29 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
   };
 
   const onMove = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (handleDrag) {
+      const raw = pointFromEvent(event);
+      const snapped = floorSnapPoint(raw, sourceObjects.filter(o => o.id !== handleDrag.id), settings, view.zoom);
+      const px = roundFloorValue(snapped.x, settings.precision);
+      const py = roundFloorValue(snapped.y, settings.precision);
+      const obj = sourceObjects.find(o => o.id === handleDrag.id);
+      if (obj && obj.type === "wall") {
+        if (handleDrag.handle === "start") {
+          updateObjects(sourceObjects.map(o => o.id === obj.id ? { ...obj, start: { x: px, y: py } } : o));
+        } else if (handleDrag.handle === "end") {
+          updateObjects(sourceObjects.map(o => o.id === obj.id ? { ...obj, end: { x: px, y: py } } : o));
+        }
+      } else if (obj && obj.type === "arc-wall") {
+        if (handleDrag.handle === "start") {
+          const d = floorDistance({ x: px, y: py }, obj.end);
+          updateObjects(sourceObjects.map(o => o.id === obj.id ? { ...obj, start: { x: px, y: py }, radius: roundFloorValue(d / 2, settings.precision) } : o));
+        } else if (handleDrag.handle === "end") {
+          const d = floorDistance(obj.start, { x: px, y: py });
+          updateObjects(sourceObjects.map(o => o.id === obj.id ? { ...obj, end: { x: px, y: py }, radius: roundFloorValue(d / 2, settings.precision) } : o));
+        }
+      }
+      return;
+    }
     if (moving) {
       const raw = pointFromEvent(event, false);
       const original = moving.preview === moving.original ? sourceObjects.find(object => object.id === moving.original.id) ?? moving.original : moving.original;
@@ -883,7 +969,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
     }
     if (drag) {
       let current = pointFromEvent(event);
-      if (settings.orthogonal && tool === "wall") {
+      if (settings.orthogonal && (tool === "wall" || tool === "arch")) {
         const dx = Math.abs(current.x - drag.start.x);
         const dy = Math.abs(current.y - drag.start.y);
         current =
@@ -898,6 +984,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
   const tools = [
     ["select", "Select", "V", MousePointer2],
     ["wall", "Wall", "W", BrickWall],
+    ["arch", "Arch Wall (180° / Circle)", "A", Spline],
     ["door", "Door", "D", DoorOpen],
     ["window", "Window", "N", AppWindow],
     ["room", "Room", "R", LayoutGrid],
@@ -916,10 +1003,24 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         if (event.key.toLowerCase() === "z") { setMoving(null); setDrag(null); }
         return;
       }
+      if (event.code === "Space" && !event.repeat) {
+        if (tool === "arch") {
+          event.preventDefault();
+          setArchSweep(prev => (prev === 1 ? 0 : 1));
+          return;
+        }
+        const selected = objects.find(object => object.id === p.selectedFloorPlanId);
+        if (selected && selected.type === "arc-wall") {
+          event.preventDefault();
+          updateObjects(objects.map(o => o.id === selected.id && o.type === "arc-wall" ? { ...o, sweep: o.sweep === 1 ? 0 : 1 } : o));
+          return;
+        }
+      }
       const key = event.key.toLowerCase();
       const shortcuts: Record<string, typeof tool> = {
         v: "select",
         w: "wall",
+        a: "arch",
         d: "door",
         n: "window",
         r: "room",
@@ -1108,6 +1209,39 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
               />
             ))}
           {objects
+            .filter((object): object is Extract<FloorPlanObject, { type: "arc-wall" }> => object.type === "arc-wall")
+            .map((arcWall) => {
+              const isSelected = selectedId === arcWall.id;
+              if (arcWall.isCircle) {
+                const cx = (arcWall.start.x + arcWall.end.x) / 2;
+                const cy = (arcWall.start.y + arcWall.end.y) / 2;
+                return (
+                  <circle
+                    key={arcWall.id}
+                    data-floor-plan-object-id={arcWall.id}
+                    cx={cx}
+                    cy={cy}
+                    r={arcWall.radius}
+                    fill="none"
+                    stroke={isSelected ? "var(--studio-accent)" : "var(--studio-draft-wall)"}
+                    strokeWidth={arcWall.thickness}
+                  />
+                );
+              }
+              const d = `M ${arcWall.start.x} ${arcWall.start.y} A ${arcWall.radius} ${arcWall.radius} 0 0 ${arcWall.sweep} ${arcWall.end.x} ${arcWall.end.y}`;
+              return (
+                <path
+                  key={arcWall.id}
+                  data-floor-plan-object-id={arcWall.id}
+                  d={d}
+                  fill="none"
+                  stroke={isSelected ? "var(--studio-accent)" : "var(--studio-draft-wall)"}
+                  strokeWidth={arcWall.thickness}
+                  strokeLinecap="round"
+                />
+              );
+            })}
+          {objects
             .filter(
               (object) => object.type === "door" || object.type === "window",
             )
@@ -1234,7 +1368,151 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
                 {item.text}
               </text>
             ))}
-          {drag && (
+          {/* Interactive Wall & Arc-Wall endpoint editing handles */}
+          {objects
+            .filter((o): o is Extract<FloorPlanObject, { type: "wall" | "arc-wall" }> => (o.type === "wall" || o.type === "arc-wall") && o.id === selectedId)
+            .map((wall) => {
+              const isArc = wall.type === "arc-wall";
+              const mid = { x: (wall.start.x + wall.end.x) / 2, y: (wall.start.y + wall.end.y) / 2 };
+              return (
+                <g key={`handles-${wall.id}`} className="wall-edit-handles">
+                  <circle
+                    data-wall-handle="start"
+                    data-wall-id={wall.id}
+                    cx={wall.start.x}
+                    cy={wall.start.y}
+                    r={0.11}
+                    fill="#1687f7"
+                    stroke="#ffffff"
+                    strokeWidth="0.025"
+                    style={{ cursor: "crosshair" }}
+                  />
+                  <circle
+                    data-wall-handle="end"
+                    data-wall-id={wall.id}
+                    cx={wall.end.x}
+                    cy={wall.end.y}
+                    r={0.11}
+                    fill="#1687f7"
+                    stroke="#ffffff"
+                    strokeWidth="0.025"
+                    style={{ cursor: "crosshair" }}
+                  />
+                  {isArc && !wall.isCircle && (
+                    <circle
+                      data-wall-handle="apex"
+                      data-wall-id={wall.id}
+                      cx={mid.x}
+                      cy={mid.y}
+                      r={0.10}
+                      fill="#38bdf8"
+                      stroke="#ffffff"
+                      strokeWidth="0.025"
+                      style={{ cursor: "pointer" }}
+                    />
+                  )}
+                </g>
+              );
+            })}
+          {drag && tool === "room" && (() => {
+            const rx = Math.min(drag.start.x, drag.current.x);
+            const ry = Math.min(drag.start.y, drag.current.y);
+            const rw = Math.abs(drag.current.x - drag.start.x);
+            const rh = Math.abs(drag.current.y - drag.start.y);
+            const area = (rw * rh).toFixed(1);
+            return (
+              <g pointerEvents="none">
+                <rect
+                  x={rx}
+                  y={ry}
+                  width={rw}
+                  height={rh}
+                  fill="rgba(22, 135, 247, 0.18)"
+                  stroke="#1687f7"
+                  strokeWidth="0.035"
+                  strokeDasharray=".12 .08"
+                />
+                <text
+                  x={rx + rw / 2}
+                  y={ry - 0.12}
+                  textAnchor="middle"
+                  fontSize=".2"
+                  fontWeight="600"
+                  fill="#1687f7"
+                >
+                  {formatFloorLength(rw, settings)}
+                </text>
+                <text
+                  x={rx + rw + 0.15}
+                  y={ry + rh / 2}
+                  textAnchor="start"
+                  dominantBaseline="middle"
+                  fontSize=".2"
+                  fontWeight="600"
+                  fill="#1687f7"
+                >
+                  {formatFloorLength(rh, settings)}
+                </text>
+                <text
+                  x={rx + rw / 2}
+                  y={ry + rh / 2 + 0.08}
+                  textAnchor="middle"
+                  fontSize=".2"
+                  fontWeight="600"
+                  fill="#ffffff"
+                >
+                  {`${area} m²`}
+                </text>
+              </g>
+            );
+          })()}
+          {drag && tool === "arch" && (() => {
+            const d = floorDistance(drag.start, drag.current);
+            const r = d / 2;
+            const pathD = `M ${drag.start.x} ${drag.start.y} A ${r} ${r} 0 0 ${archSweep} ${drag.current.x} ${drag.current.y}`;
+            const mid = { x: (drag.start.x + drag.current.x) / 2, y: (drag.start.y + drag.current.y) / 2 };
+            return (
+              <g pointerEvents="none">
+                <path
+                  d={pathD}
+                  fill="none"
+                  stroke="#1687f7"
+                  strokeWidth="0.18"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1={drag.start.x}
+                  y1={drag.start.y}
+                  x2={drag.current.x}
+                  y2={drag.current.y}
+                  stroke="#1687f7"
+                  strokeWidth="0.02"
+                  strokeDasharray=".12 .08"
+                  opacity="0.6"
+                />
+                <text
+                  x={mid.x}
+                  y={mid.y - 0.15}
+                  textAnchor="middle"
+                  fontSize=".2"
+                  fontWeight="600"
+                  fill="#1687f7"
+                >
+                  {`180° Arch · Span: ${formatFloorLength(d, settings)}`}
+                </text>
+                <text
+                  x={mid.x}
+                  y={mid.y + 0.22}
+                  textAnchor="middle"
+                  fontSize=".13"
+                  fill="var(--studio-text-secondary)"
+                >
+                  {archSweep === 1 ? "180° Outward (Space to flip)" : "180° Inward (Space to flip)"}
+                </text>
+              </g>
+            );
+          })()}
+          {drag && tool !== "room" && tool !== "arch" && (
             <>
               <line
                 x1={drag.start.x}
@@ -1286,6 +1564,8 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
       {sketch.panels}
 
       {!sketch.active&&<StudioViewportToolbar label="Architectural drafting tools"
+        hidePlus
+        hidePlay
         apiRef={toolbarAPI}
         leading={[{label:'Sketch Drawing & Paint',icon:Pencil,onClick:sketch.toggle,active:sketch.active,frame:true},{ label: "Add room to floor plan", icon: LayoutGrid, onClick:()=>{sketch.deactivate();addDefaultRoom();} }]}
         tools={tools.map(([id, label, shortcut, icon]) => ({
@@ -1328,6 +1608,25 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
         >
           Ortho 90°
         </button>
+        {(tool === "arch" || objects.some(o => o.type === "arc-wall" && o.id === selectedId)) && (
+          <>
+            <i />
+            <button
+              type="button"
+              onClick={() => {
+                const nextSweep = archSweep === 1 ? 0 : 1;
+                setArchSweep(nextSweep);
+                if (selectedId) {
+                  updateObjects(objects.map(o => o.id === selectedId && o.type === "arc-wall" ? { ...o, sweep: nextSweep } : o));
+                }
+              }}
+              className="rounded bg-[#1a8cff] px-2 py-0.5 text-[10px] font-semibold text-white transition hover:bg-[#1570cc]"
+              title="Flip 180° Inward / Outward (Space)"
+            >
+              {archSweep === 1 ? "180° Outward" : "180° Inward"}
+            </button>
+          </>
+        )}
       </div>}
 
       {/* Unified Studio AI Chat at Bottom of Workspace */}
@@ -1357,7 +1656,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
       />
 
       {!sketch.active&&<div className="floor-plan-shortcuts-hint pointer-events-none">
-        Drag to move · W wall · D door · N window · Arrows nudge · Shift-drag pan · Ctrl+Z undo · Esc cancel
+        Drag to move · W wall · A arch · D door · N window · R room · Space flip arc · Arrows nudge · Shift-drag pan · Ctrl+Z undo · Esc cancel
       </div>}
     </section>
   );

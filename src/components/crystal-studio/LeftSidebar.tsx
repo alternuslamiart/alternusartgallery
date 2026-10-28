@@ -165,6 +165,7 @@ export function LeftSidebar(p: Props) {
   const getObjectLabel = (obj: FloorPlanObject, index: number) => {
     if (obj.type === "room") return obj.label || `Room ${index + 1}`;
     if (obj.type === "wall") return `Structural Wall ${index + 1}`;
+    if (obj.type === "arc-wall") return obj.isCircle ? `Circular Wall ${index + 1}` : `Arch Wall ${index + 1}`;
     if (obj.type === "door") return `Door Opening ${index + 1}`;
     if (obj.type === "window") return `Window Glazing ${index + 1}`;
     if (obj.type === "dimension") return `Dimension ${index + 1}`;
@@ -173,7 +174,7 @@ export function LeftSidebar(p: Props) {
   };
 
   const rooms = objects.filter((o) => o.type === "room");
-  const walls = objects.filter((o) => o.type === "wall");
+  const walls = objects.filter((o) => o.type === "wall" || o.type === "arc-wall");
   const openings = objects.filter((o) => o.type === "door" || o.type === "window");
   const annotations = objects.filter(
     (o) => o.type === "dimension" || o.type === "text" || o.type === "furniture",

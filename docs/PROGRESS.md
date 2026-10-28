@@ -2,6 +2,26 @@
 
 Last updated: 2026-10-28
 
+## Sketch Studio Architectural Drafting: Arch Walls, Room Dragging, Wall Mouse Editing & Tool Removal (2026-10-28)
+
+- Implemented Arch / Curved Wall (`arch-wall`) drafting in Sketch Studio (`Viewport.tsx`, `types.ts`, `floor-plan-export.ts`, `floor-plan-geometry.ts`):
+  - Added dedicated Arch tool (`Arch Wall (180° / Circle)`) with `Spline` icon and `A` shortcut.
+  - Supports 180° outward semicircle (protruding balcony / bay connecting to apartment walls), 180° inward semicircle (concave cutout / alcove), and full circular wall (`isCircle`).
+  - Interactive drag preview showing 180° arc with wall thickness, diameter/span dimension, chord line, and Space shortcut / HUD button to flip between outward and inward.
+  - Integrated into SVG and PDF export with exact circular arc and circle path geometries.
+- Implemented dynamic room creation with mouse drag ("aq sa deshiron klienti"):
+  - Live interactive drag preview displaying translucent room rectangle, perimeter wall outlines, dynamic width/height dimensions, and real-time calculated area (m²).
+  - On mouse release, creates the room entity along with 4 enclosing bounding walls (top, right, bottom, left) with standard 180 mm thickness that snap and connect seamlessly to the apartment layout.
+- Implemented mouse drag wall editing:
+  - Interactive endpoint drag handles (`start` and `end`) rendered on selected walls and arc-walls.
+  - Dragging an endpoint handle resizes, lengthens, shortens, and angles the wall with precision grid and ortho snapping.
+  - Midpoint handle on arc-walls allows clicking to flip 180° curvature between inward and outward.
+  - Dragging the wall line itself translates the entire wall with snapping.
+- Removed Play (`{16360169-6FE6-4C51-AA27-D792824C69EA}.png`) and Plus (`{8A9A1042-6AA8-4EC3-B20F-7AE4E1391CA9}.png`) tools strictly in Sketch:
+  - Added `hidePlus` and `hidePlay` props to `StudioViewportToolbar.tsx`.
+  - Passed `hidePlus` and `hidePlay` to `StudioViewportToolbar` in `Viewport.tsx` (Sketch 2D CAD drafting) and cleaned up Pencil mode toolbar, ensuring both buttons are hidden only in Sketch while remaining available in Architecture and Infrastructure workbenches.
+- Verification: `npx tsc --noEmit` passed with 0 errors; all 202 unit/integration tests passed (`npm run test`); production build passed (`npm run build`).
+
 ## Desktop Studio AI Chat Generation Loader Frame (2026-10-28)
 
 - Implemented centered generation progress frame for Studio AI Chat prompt submission, strictly scoped to Desktop only (hidden on mobile <= 700px):

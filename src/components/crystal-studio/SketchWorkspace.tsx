@@ -156,7 +156,6 @@ export function useSketchEditor(p:Props){
         {toolButton('projects','Sketch projects',FolderOpen,projectsOpen,()=>setProjectsOpen(v=>!v))}
         {toolButton('clear','Clear drawing',Trash2,false,()=>{if(window.confirm('Clear drawing from all unlocked sketch layers? CAD geometry will be preserved.')){commit({...doc,layers:doc.layers.map(l=>l.locked?l:{...l,items:[]})});setSelected([]);}},!doc.layers.some(l=>!l.locked&&l.items.length>0))}
         {toolButton('export','Export viewport',Download,exportOpen,()=>setExportOpen(v=>!v))}
-        {toolButton('auto-rotate',autoRotate?'Stop slow object rotation':'Slowly rotate object',Play,autoRotate,()=>setAutoRotate(v=>!v))}
       </div>
       {projectsOpen&&<section className="sketch-project-menu is-top-menu" aria-label="Sketch projects"><span role="status" className="sketch-project-status">{p.project?.status||'Sketch Studio'}</span><button onClick={()=>attempt(()=>{p.project?.create();setProjectsOpen(false);})}>New sketch project</button><button onClick={()=>attempt(()=>{p.project?.create(true);setProjectsOpen(false);})}>Save a copy</button>{p.onOpenFile&&<button onClick={()=>{p.onOpenFile?.();setProjectsOpen(false);}}>Import JSON file…</button>}{p.project?.projects.map(project=><button key={project.id} onClick={()=>attempt(async()=>{await p.project?.open(project.id);setProjectsOpen(false);})}>{project.name}{project.id===p.project?.id?' ✓':''}</button>)}</section>}
       <dialog open={exportOpen} aria-label="Export scene" className="sketch-export-dialog sketch-panel">
