@@ -1,5 +1,14 @@
 # Next tasks (reviewed 2026-10-28)
 
+- [x] Implement iPhone 17 mobile-first responsive UI (max-width: 430px) strictly isolated from desktop:
+  - Scoped via @media (max-width: 430px) so desktop styles remain completely unaffected.
+  - Dark theme (#0a0a0a near black background).
+  - Exact sizes: AI Chat composer 362x197px, Try Crystal Pro button 333x49px, Pay Now button 75x36px, circular 40x40px attach and blue send buttons with exact 325px distance between them, 171x40px Nano Banana AI model switcher, 292x58px bottom navbar with 48x48px icon buttons and 58x58px search button.
+  - Top tab bar with icons + text (Animate, Modeling, Images) flanked by grid and glasses buttons.
+  - Central AI logo + "What’s on your mind today?".
+  - 3D house / farm isometric preview cards.
+  - Floating action toolbar in Viewport with record, cube, sparkle, folder, camera, sun, and help.
+  - Texture modeling panel with 6 spherical material previews.
 - [x] Apply #161616 project page background, #2B2B2B top header and hover color, full-frame image coverage on project cards, and #2B2B2B profile frame background in UnifiedSidebar.
 - [x] Refine /project dashboard: clean UnifiedSidebar to show only active Casynus studio items, align search bar to standard aichat size, integrate unified StudioProfileMenu with user session, rename Launch Studio to New Project (opening /casynus), apply dark grey background, make header straight without rounded corners, and set wave0/wave1/wave2 card backgrounds.
 - [x] Delete legacy pages /aicode and /archplan; clean up all references across navigation, AI chat search destinations, unified workflow links, and studio project cards.

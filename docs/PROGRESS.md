@@ -2,6 +2,26 @@
 
 Last updated: 2026-10-28
 
+## iPhone 17 mobile UI and pixel-perfect responsive layout (2026-10-28)
+
+- Implemented iPhone 17 mobile-first responsive design strictly scoped to `@media (max-width: 430px)`, guaranteeing zero regression or override to the desktop application.
+- Applied dark theme (#0a0a0a near-black background) for mobile studio home.
+- Verified exact component dimensions:
+  - Bottom input section container: 362 × 197 px.
+  - "Try Crystal Pro" promotional bar: 333 × 49 px.
+  - "Pay Now" button: 75 × 36 px.
+  - Blue circular send button: 40 × 40 px.
+  - Attach button: 40 × 40 px.
+  - Distance between Attach and Blue Send button: exactly 325 px across the actions row.
+  - AI model switcher: 171 × 40 px with "Nano Banana" as the active selection, supported by bottom sheet model choices.
+  - Bottom navigation bar: 292 × 58 px pill containing 5 shortcut buttons (48 × 48 px each).
+  - Search floating button: 58 × 58 px.
+- Top tab bar styled with icons and text (Animate, Modeling, Images) flanked by 40×40px circle grid and glasses buttons.
+- Added 3D house / farm isometric models preview cards slider with quick prompt selection.
+- Updated Viewport floating action toolbar on mobile: record, cube, sparkle (Sparkles), folder (FolderOpen), camera (Camera), sun (Sun), and help (CircleHelp).
+- Retained Texture Modeling panel with 6 spherical material previews (chrome-black, chrome-white, stone, ocean, violet, purple).
+- Verification: `npx tsc --noEmit` passed with 0 errors; all 202 Node tests passed (`npm run test`).
+
 ## Studio toolbar icon redesign and fill-bold active states (2026-10-28)
 
 - Redesigned studio top toolbar icons across Architecture (`/casynus`), Infrastructure

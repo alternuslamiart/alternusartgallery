@@ -30,7 +30,9 @@ import {
   Scaling,
   Share2,
   Sofa,
+  Sparkles,
   SquareDashed,
+  Sun,
   TextCursorInput,
   Trash2,
   Type,
@@ -2061,8 +2063,8 @@ export function Viewport(p: Props) {
         </button>
         <button
           type="button"
-          aria-label="Toggle object visibility"
-          className={!selected ? "active" : ""}
+          aria-label="AI Sparkles"
+          className={selected ? "active" : ""}
           onClick={() => {
             setSelected((value) => !value);
             p.onAssetDrop(
@@ -2070,7 +2072,7 @@ export function Viewport(p: Props) {
             );
           }}
         >
-          <EyeOff size={20} />
+          <Sparkles size={18} />
         </button>
         <button
           type="button"
@@ -2092,7 +2094,7 @@ export function Viewport(p: Props) {
           className={lighting ? "active" : ""}
           onClick={() => setLighting((value) => !value)}
         >
-          <Lightbulb size={20} />
+          <Sun size={20} />
         </button>
         <button
           type="button"
