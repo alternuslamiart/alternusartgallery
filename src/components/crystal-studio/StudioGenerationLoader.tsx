@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Clock } from "lucide-react";
+import { createPortal } from "react-dom";
+import { Clock, X } from "lucide-react";
 
 interface StudioGenerationLoaderProps {
   open: boolean;
@@ -20,6 +21,11 @@ export function StudioGenerationLoader({
 }: StudioGenerationLoaderProps) {
   const [progress, setProgress] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(durationSeconds);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!open) {
@@ -45,14 +51,14 @@ export function StudioGenerationLoader({
         setTimeout(() => {
           onComplete?.();
           onClose?.();
-        }, 400);
+        }, 350);
       }
     }, intervalMs);
 
     return () => clearInterval(interval);
   }, [open, durationSeconds, onComplete, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
   // Format headline: e.g. "Generate house modeling 3D..."
   const trimmed = prompt?.trim();
@@ -66,27 +72,42 @@ export function StudioGenerationLoader({
 
   const formattedTimer = `End: 00 min ${String(secondsLeft).padStart(2, "0")}sec`;
 
-  return (
-    /* Strictly Desktop only: hidden on screens <= 700px (max-width: 700px / mobile) */
+  // Render directly into document.body to ensure it appears in the true center of the screen
+  // with ZERO blur or dimming on the studio background
+  return createPortal(
     <div
-      className="studio-generation-loader-overlay hidden md:flex fixed inset-0 z-[99999] items-center justify-center p-4 bg-black/50 backdrop-blur-[2px] transition-opacity duration-300"
-      onClick={onClose}
+      className="studio-generation-loader-overlay hidden md:flex fixed inset-0 z-[999999] items-center justify-center pointer-events-none"
+      style={{
+        background: "transparent",
+        backdropFilter: "none",
+        WebkitBackdropFilter: "none",
+      }}
+      aria-live="polite"
+      role="status"
     >
-      {/* 712x140px Exact Frame */}
+      {/* 712x140px Exact Frame, centered in screen without blurring studio background */}
       <div
-        className="relative w-[712px] h-[140px] rounded-[24px] px-[27.5px] py-6 flex flex-col justify-between shadow-2xl transition-all select-none"
+        className="pointer-events-auto relative w-[712px] h-[140px] rounded-[24px] px-[27.5px] py-6 flex flex-col justify-between shadow-2xl transition-all select-none"
         style={{
           backgroundColor: "#222222",
           fontFamily: "Roboto, var(--font-roboto-flex), sans-serif",
-          boxShadow: "0 24px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08)",
+          boxShadow: "0 24px 60px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08)",
         }}
         onClick={(event) => event.stopPropagation()}
       >
-        {/* Top: Headline 1 (24px semibold) */}
+        {/* Top: Headline 1 (24px semibold) & Close Button */}
         <div className="flex items-center justify-between">
           <h2 className="text-[24px] font-semibold tracking-[-0.01em] text-white truncate max-w-[620px] leading-none">
             {headline}
           </h2>
+          <button
+            type="button"
+            aria-label="Close generation overlay"
+            onClick={onClose}
+            className="w-7 h-7 -mr-2 -mt-2 rounded-full grid place-items-center text-white/50 hover:text-white hover:bg-white/10 transition"
+          >
+            <X size={16} />
+          </button>
         </div>
 
         {/* Subtitle & Timer row */}
@@ -114,6 +135,7 @@ export function StudioGenerationLoader({
           />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
