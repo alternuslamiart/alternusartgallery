@@ -1,52 +1,36 @@
 "use client";
 
 import {
-  BadgeCheck,
-  BriefcaseBusiness,
   Box,
-  ChevronDown,
-  CirclePlus,
-  ClipboardList,
-  FileText,
-  FolderKanban,
-  Grid2X2,
-  LayoutGrid,
-  LayoutDashboard,
   Globe2,
+  LayoutDashboard,
+  LayoutGrid,
   PanelLeftClose,
   Search,
-  Settings2,
   Sparkles,
-  Users,
   Workflow,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { StudioProfileMenu } from "@/components/crystal-studio/StudioSidebarFooter";
 
-type SidebarItem = { label: string; href: string; icon: LucideIcon; badge?: string; onClick?: () => void };
+export type SidebarItem = {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  badge?: string;
+  onClick?: () => void;
+};
 
 const primary: SidebarItem[] = [
   { label: "Dashboard", href: "/project", icon: LayoutDashboard },
-  { label: "Sketch", href: "/interior", icon: LayoutGrid },
   { label: "Modeling", href: "/casynus", icon: Box },
-  { label: "Notes", href: "/workspace/knowledge", icon: FileText },
+  { label: "Sketch", href: "/interior", icon: LayoutGrid },
   { label: "Infrastructure", href: "/infrastructure", icon: Globe2 },
-  { label: "Reports", href: "/exports", icon: ClipboardList },
-  { label: "Automations", href: "/workflow", icon: Settings2, badge: "✦" },
-  { label: "Workflows", href: "/workflow", icon: Workflow, badge: "✦" },
-];
-
-const favorites: SidebarItem[] = [
-  { label: "Key Accounts", href: "/projects", icon: BriefcaseBusiness },
-  { label: "Strategic Initiatives", href: "/projects", icon: FolderKanban },
-  { label: "Focus Areas", href: "/projects", icon: Grid2X2 },
-  { label: "Starred Items", href: "/projects", icon: BadgeCheck },
-];
-
-const records: SidebarItem[] = [
-  { label: "Companies", href: "/projects", icon: BriefcaseBusiness },
-  { label: "People", href: "/account", icon: Users },
+  { label: "Workflows", href: "/workflow", icon: Workflow },
+  { label: "AI Chat", href: "/aichat", icon: Sparkles },
 ];
 
 export function UnifiedSidebar({
@@ -68,99 +52,237 @@ export function UnifiedSidebar({
   searchValue?: string;
   onSearch?: (value: string) => void;
 }) {
+  const { data: session } = useSession();
+  const [profileOpen, setProfileOpen] = useState(false);
   const [localCollapsed, setLocalCollapsed] = useState(false);
   const isCollapsed = onCollapse ? collapsed : localCollapsed;
   const toggleCollapse = () => {
     if (onCollapse) onCollapse();
     else setLocalCollapsed((value) => !value);
   };
-  const compactItems = [...items, ...(items === primary ? [...favorites, ...records] : [])];
+
+  const initial = (
+    session?.user?.name?.trim() ||
+    session?.user?.email?.trim() ||
+    "C"
+  )
+    .charAt(0)
+    .toUpperCase();
 
   if (isCollapsed) {
     return (
-      <aside className={`workspace-sidebar flex h-full w-[60px] min-w-[60px] flex-col items-center overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] py-3 ${className}`}>
-        <button type="button" onClick={toggleCollapse} aria-label="Expand sidebar" className="grid h-9 w-9 place-items-center rounded-[8px] bg-[#242424] text-white hover:bg-[#303030]">
+      <aside
+        className={`workspace-sidebar flex h-full w-[60px] min-w-[60px] flex-col items-center overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] py-3 ${className}`}
+      >
+        <button
+          type="button"
+          onClick={toggleCollapse}
+          aria-label="Expand sidebar"
+          className="grid h-9 w-9 place-items-center rounded-[8px] bg-[#242424] text-white hover:bg-[#303030]"
+        >
           <Sparkles size={16} />
         </button>
-        <button type="button" onClick={toggleCollapse} aria-label="Expand sidebar" className="mt-4 grid h-9 w-9 place-items-center rounded-[7px] border border-[#333333] bg-[#242424] text-[#a4a6ab] hover:bg-[#303030]">
+        <button
+          type="button"
+          onClick={toggleCollapse}
+          aria-label="Search"
+          className="mt-4 grid h-9 w-9 place-items-center rounded-xl border border-[#333333] bg-[#202124] text-[#94969d] hover:bg-[#2a2b2f]"
+        >
           <Search size={14} />
         </button>
-        <nav className="mt-3 flex flex-col items-center gap-1" aria-label="Collapsed workspace navigation">
-          {compactItems.map(({ label, href, icon: Icon, badge, onClick }) => (
-            <Link key={label} href={href} onClick={onClick} aria-label={label} title={label} className={`relative grid h-8 w-9 place-items-center rounded-[6px] ${activePath === href ? "bg-[#2b2b2b] text-white" : "text-[#898c93] hover:bg-[#242424] hover:text-white"}`}>
-              <Icon size={14} strokeWidth={1.8} />
-              {badge === "✦" && <span className="absolute -right-0.5 -top-0.5 text-[9px] text-[#b86dff]">✦</span>}
-            </Link>
-          ))}
+        <nav
+          className="mt-3 flex flex-col items-center gap-1"
+          aria-label="Collapsed workspace navigation"
+        >
+          {items.map(({ label, href, icon: Icon, badge, onClick }) => {
+            const active =
+              activePath === href ||
+              (href.includes("?") &&
+                activePath?.startsWith(href.split("?")[0] ?? "") === true);
+            return (
+              <Link
+                key={label}
+                href={href}
+                onClick={onClick}
+                aria-label={label}
+                title={label}
+                className={`relative grid h-8 w-9 place-items-center rounded-[6px] ${
+                  active
+                    ? "bg-[#2b2b2b] text-white"
+                    : "text-[#898c93] hover:bg-[#242424] hover:text-white"
+                }`}
+              >
+                <Icon size={14} strokeWidth={1.8} />
+                {badge === "✦" && (
+                  <span className="absolute -right-0.5 -top-0.5 text-[9px] text-[#b86dff]">
+                    ✦
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </nav>
-        <div className="mt-auto">
-          <Link href="/account" aria-label="Open profile" className="grid h-8 w-8 place-items-center rounded-full bg-[#d99e72] text-[10px] font-bold text-[#27211c]">LS</Link>
+        <div className="relative mt-auto">
+          <button
+            type="button"
+            aria-label="Open profile menu"
+            onClick={() => setProfileOpen((open) => !open)}
+            className="grid h-8 w-8 place-items-center rounded-full bg-[#4284ff] text-[12px] font-semibold text-white transition hover:ring-2 hover:ring-[#4284ff]/40"
+          >
+            {initial}
+          </button>
+          <StudioProfileMenu
+            open={profileOpen}
+            placement="bottom-left"
+            onClose={() => setProfileOpen(false)}
+            onOpenProfile={() => {
+              window.location.href = "/account?section=organization";
+            }}
+            onOpenUpgrade={() => {
+              window.location.href = "/pricing";
+            }}
+            onOpenBilling={() => {
+              window.location.href = "/account?section=billing";
+            }}
+            onOpenSettings={() => {
+              window.location.href = "/account?section=privacy";
+            }}
+          />
         </div>
       </aside>
     );
   }
 
-  const renderItems = (items: SidebarItem[]) => items.map(({ label, href, icon: Icon, badge, onClick }) => {
-    const active = activePath === href || (href.includes("?") && activePath?.startsWith(href.split("?")[0] ?? "") === true);
-    return (
-      <Link key={label} href={href} onClick={onClick} aria-current={active ? "page" : undefined} className={`group flex h-8 items-center gap-2 rounded-[6px] px-2 text-[13px] transition ${active ? "bg-[#2b2b2b] text-[#f4f4f5]" : "text-[#c2c3c6] hover:bg-[#242424] hover:text-white"}`}>
-        <Icon size={14} strokeWidth={1.8} className="shrink-0 text-[#8d9097] group-hover:text-[#c8cbd2]" />
-        <span className="min-w-0 flex-1 truncate">{label}</span>
-        {badge && <span className={`text-[10px] ${badge === "✦" ? "text-[#b86dff]" : "rounded bg-[#535458] px-1 text-[#e4e4e5]"}`}>{badge}</span>}
-      </Link>
-    );
-  });
+  const renderItems = (itemList: SidebarItem[]) =>
+    itemList.map(({ label, href, icon: Icon, badge, onClick }) => {
+      const active =
+        activePath === href ||
+        (href.includes("?") &&
+          activePath?.startsWith(href.split("?")[0] ?? "") === true);
+      return (
+        <Link
+          key={label}
+          href={href}
+          onClick={onClick}
+          aria-current={active ? "page" : undefined}
+          className={`group flex h-8 items-center gap-2 rounded-[6px] px-2 text-[13px] transition ${
+            active
+              ? "bg-[#2b2b2b] text-[#f4f4f5]"
+              : "text-[#c2c3c6] hover:bg-[#242424] hover:text-white"
+          }`}
+        >
+          <Icon
+            size={14}
+            strokeWidth={1.8}
+            className="shrink-0 text-[#8d9097] group-hover:text-[#c8cbd2]"
+          />
+          <span className="min-w-0 flex-1 truncate">{label}</span>
+          {badge && (
+            <span
+              className={`text-[10px] ${
+                badge === "✦"
+                  ? "text-[#b86dff]"
+                  : "rounded bg-[#535458] px-1 text-[#e4e4e5]"
+              }`}
+            >
+              {badge}
+            </span>
+          )}
+        </Link>
+      );
+    });
 
   return (
-    <aside className={`workspace-sidebar flex h-full w-[234px] min-w-0 shrink-0 flex-col overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] px-[14px] py-[12px] text-[#f4f4f5] shadow-[0_8px_24px_rgba(0,0,0,0.16)] ${className}`}>
+    <aside
+      className={`workspace-sidebar flex h-full w-[234px] min-w-0 shrink-0 flex-col overflow-hidden rounded-[10px] border border-[#333333] bg-[#171717] px-[14px] py-[12px] text-[#f4f4f5] shadow-[0_8px_24px_rgba(0,0,0,0.16)] ${className}`}
+    >
       <div className="flex items-center gap-2 px-1">
-        <button type="button" onClick={toggleCollapse} aria-label="Collapse sidebar" title="Collapse sidebar" className="grid h-8 w-8 place-items-center rounded-[9px] bg-[#242424] text-white transition hover:bg-[#242424]"><Sparkles size={17} /></button>
+        <button
+          type="button"
+          onClick={toggleCollapse}
+          aria-label="Collapse sidebar"
+          title="Collapse sidebar"
+          className="grid h-8 w-8 place-items-center rounded-[9px] bg-[#242424] text-white transition hover:bg-[#242424]"
+        >
+          <Sparkles size={17} />
+        </button>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-medium leading-4">DesignHub</p>
           <p className="text-[10px] text-[#9b9da3]">● 21 members</p>
         </div>
-        <button type="button" onClick={toggleCollapse} aria-label="Collapse sidebar" className="rounded-md p-1.5 text-[#b6b8bd] hover:bg-[#242424]">
+        <button
+          type="button"
+          onClick={toggleCollapse}
+          aria-label="Collapse sidebar"
+          className="rounded-md p-1.5 text-[#b6b8bd] hover:bg-[#242424]"
+        >
           <PanelLeftClose size={15} />
         </button>
       </div>
 
-      <label className="group mt-4 flex h-9 items-center gap-2 rounded-[7px] border border-[#333333] bg-[#242424] px-2.5 text-left text-[11px] text-[#94969d] transition hover:border-[#4a4a4a] hover:bg-[#292929]">
-        <Search size={14} />
-        <input value={searchValue ?? ""} onChange={(event) => onSearch?.(event.target.value)} placeholder="Search" className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-[#94969d]" />
-        <kbd className="rounded border border-[#4b4d52] px-1 text-[9px]">⌘K</kbd>
+      <label className="group mt-4 flex h-9 w-full items-center gap-2 rounded-xl border border-[#333333] bg-[#202124] px-3 text-left text-xs text-[#94969d] transition hover:border-[#4a4a4a] hover:bg-[#26272b] focus-within:border-[#4284ff]">
+        <Search size={14} className="shrink-0 text-[#94969d]" />
+        <input
+          value={searchValue ?? ""}
+          onChange={(event) => onSearch?.(event.target.value)}
+          placeholder="Search chats, tools, pages..."
+          className="min-w-0 flex-1 bg-transparent text-xs text-[#f4f4f5] outline-none placeholder:text-[#94969d]"
+        />
+        <kbd className="rounded border border-[#4b4d52] px-1.5 py-0.5 text-[9px] text-[#94969d]">
+          ⌘K
+        </kbd>
       </label>
 
       <nav className="mt-3 space-y-0.5" aria-label="Workspace navigation">
-        {sectionTitle && <div className="mb-2 px-2 text-[11px] font-medium text-[#e8e8e8]">{sectionTitle}</div>}
+        {sectionTitle && (
+          <div className="mb-2 px-2 text-[11px] font-medium text-[#e8e8e8]">
+            {sectionTitle}
+          </div>
+        )}
         {renderItems(items)}
       </nav>
 
-      {items === primary && <><SidebarSection title="Favorites" items={favorites} renderItems={renderItems} /><SidebarSection title="Records" items={records} renderItems={renderItems} /></>}
-
-      <div className="mt-auto space-y-2 pt-3">
-        <div className="rounded-[7px] border border-[#333333] bg-[#171717] p-3 transition hover:border-[#4a4a4a] hover:bg-[#242424]">
-          <p className="text-[12px] font-semibold">New version available</p>
-          <p className="mt-2 text-[10px] leading-[14px] text-[#a5a6aa]">An improved version of App is available. Please restart now to upgrade.</p>
-          <Link href="/download" className="mt-2 inline-flex rounded px-1 text-[11px] font-medium text-white transition hover:bg-[#242424] hover:text-[#c18bff]">Update →</Link>
+      <div className="mt-auto pt-3">
+        <div className="relative">
+          <button
+            type="button"
+            aria-label="Open profile menu"
+            aria-expanded={profileOpen}
+            onClick={() => setProfileOpen((open) => !open)}
+            className="flex w-full items-center gap-2.5 rounded-xl border border-[#333333] bg-[#202124] p-2 text-left transition hover:border-[#4a4a4a] hover:bg-[#26272b]"
+          >
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#4284ff] text-[12px] font-semibold text-white">
+              {initial}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-xs font-medium text-[#f4f4f5]">
+                {session?.user?.name || "Casynus Creator"}
+              </span>
+              <span className="block truncate text-[10px] text-[#9b9da3]">
+                {session?.user?.email || "Workspace account"}
+              </span>
+            </span>
+            <span className="text-xs text-[#9b9da3]">⌄</span>
+          </button>
+          <StudioProfileMenu
+            open={profileOpen}
+            placement="top-left"
+            onClose={() => setProfileOpen(false)}
+            onOpenProfile={() => {
+              window.location.href = "/account?section=organization";
+            }}
+            onOpenUpgrade={() => {
+              window.location.href = "/pricing";
+            }}
+            onOpenBilling={() => {
+              window.location.href = "/account?section=billing";
+            }}
+            onOpenSettings={() => {
+              window.location.href = "/account?section=privacy";
+            }}
+          />
         </div>
-        <Link href="/account" className="flex items-center gap-2 rounded-[7px] px-1 py-1.5 hover:bg-[#242424]">
-          <span className="grid h-7 w-7 place-items-center rounded-full bg-[#d99e72] text-[11px] font-bold text-[#27211c]">LS</span>
-          <span className="min-w-0 flex-1"><span className="block text-[12px]">Liam Smith⌄</span><span className="block truncate text-[10px] text-[#999ba0]">smith@example.com</span></span>
-          <span className="text-[#a7a9ae]">•••</span>
-        </Link>
       </div>
     </aside>
-  );
-}
-
-function SidebarSection({ title, items, renderItems }: { title: string; items: SidebarItem[]; renderItems: (items: SidebarItem[]) => React.ReactNode }) {
-  return (
-    <section className="mt-4">
-      <div className="mb-1 flex items-center justify-between rounded px-2 py-0.5 text-[11px] text-[#999ba1] transition hover:bg-[#242424] hover:text-[#c2c3c6]">
-        <span className="flex items-center gap-1"><ChevronDown size={11} />{title}</span>
-        <CirclePlus size={14} />
-      </div>
-      <div className="space-y-0.5">{renderItems(items)}</div>
-    </section>
   );
 }

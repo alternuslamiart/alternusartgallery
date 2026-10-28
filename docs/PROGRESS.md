@@ -1918,3 +1918,16 @@ in the worktree and are unrelated; they have not been restored or included.
 - Cleared cached Next.js types in `.next/types/app/aicode` and `.next/types/app/archplan`.
 - `npx tsc --noEmit`: passed with 0 errors.
 - `npm run test`: 202 tests passed, 0 failures.
+
+
+## Refine /project dashboard, UnifiedSidebar, search, profile menu, and wave backgrounds
+
+- Cleaned `UnifiedSidebar` items to include only functional Casynus routes (`Dashboard`, `Modeling`, `Sketch`, `Infrastructure`, `Workflows`, `AI Chat`), removing placeholder sections (`Favorites`, `Records`) and fake upgrade banner.
+- Standardized search bar styling to `h-9 rounded-xl` matching `/aichat`.
+- Connected user session and integrated `StudioProfileMenu` across expanded and collapsed sidebar states, matching the architecture studio and homepage.
+- Renamed `Launch Studio` to `New Project` routing to `/casynus`.
+- Set dark grey background (`#202124`) on `/project` dashboard and main container.
+- Removed rounded corners on the dashboard top header (`border-radius: 0 !important`, flat straight edges).
+- Added `wave0.jpg`, `wave1.webp`, and `wave2.jpg` backgrounds for the recent project cards.
+- `npx tsc --noEmit`: passed with 0 errors.
+- `npm run test`: passed 202/202 tests.

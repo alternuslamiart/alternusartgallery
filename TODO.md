@@ -1,5 +1,6 @@
 # Next tasks (reviewed 2026-10-28)
 
+- [x] Refine /project dashboard: clean UnifiedSidebar to show only active Casynus studio items, align search bar to standard aichat size, integrate unified StudioProfileMenu with user session, rename Launch Studio to New Project (opening /casynus), apply dark grey background, make header straight without rounded corners, and set wave0/wave1/wave2 card backgrounds.
 - [x] Delete legacy pages /aicode and /archplan; clean up all references across navigation, AI chat search destinations, unified workflow links, and studio project cards.
 - [x] Redesign studio toolbar icons to be clearly identifiable for their operations
   (Move: 4-way `Move` cross arrows replacing `Route`, Scale: diagonal `Maximize2`
