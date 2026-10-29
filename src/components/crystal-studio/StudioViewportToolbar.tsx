@@ -8,12 +8,14 @@ import type {MaterialAsset} from "./material-textures";
 import "./viewport-toolbar.css";
 
 export type ViewportAction = { label: string; icon: LucideIcon; onClick: () => void; active?: boolean; disabled?: boolean; showLabel?: boolean;frame?:boolean };
+export type StudioShadingMode = "pbr" | "normal" | "albedo" | "matcap" | "clay";
 type Props = {
   hidePlus?: boolean;
   hidePlay?: boolean;
   apiRef?:Ref<StudioToolbarAPI>;
   label: string; leading: ViewportAction[]; tools: ViewportAction[];
   onFit: () => void; onReset: () => void; cameraViews: string[]; cameraView: string; onCamera: (view: string) => void;
+  shadingMode?: StudioShadingMode; onShadingMode?: (mode: StudioShadingMode) => void;
   onZoom: (factor: number) => void; exportFormats: string[]; onExport: (format: string) => void;
   onCSV: () => void; settingsLabel: string; onSettings: () => void; settingsActive?: boolean; busy?: boolean;
   materialLibrary?:MaterialLibraryOptions;
@@ -51,6 +53,21 @@ export function StudioViewportToolbar(p: Props) {
       {action({ label: "Reset camera", icon: Home, onClick: p.onReset })}
       <span className="ref-toolbar-divider" />
       <select aria-label="Camera view" value={p.cameraView} onChange={e => p.onCamera(e.target.value)} className="ref-toolbar-zoom-pill">{p.cameraViews.map(view => <option key={view}>{view}</option>)}</select>
+      {p.shadingMode && p.onShadingMode && (
+        <select
+          aria-label="Viewport shading style"
+          value={p.shadingMode}
+          onChange={e => p.onShadingMode?.(e.target.value as StudioShadingMode)}
+          className="ref-toolbar-zoom-pill casynus-shading-select"
+          title="Viewport shading: PBR Material, Tangent Normal Map, Pure Albedo, MatCap Clay or Solid Cavity"
+        >
+          <option value="pbr">Shading: PBR</option>
+          <option value="normal">Normal Map</option>
+          <option value="albedo">Albedo Map</option>
+          <option value="matcap">MatCap</option>
+          <option value="clay">Solid Cavity</option>
+        </select>
+      )}
       {action({ label: "Zoom in (+)", icon: ZoomIn, onClick: () => p.onZoom(1.25) })}
       {action({ label: "Zoom out (−)", icon: ZoomOut, onClick: () => p.onZoom(.8) })}
       <button type="button" className="ref-toolbar-export-btn" aria-label="Export viewport" disabled={p.busy} onClick={() => dialog.current?.showModal()}><span>Export</span></button>

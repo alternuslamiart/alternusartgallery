@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { Box, Building2, ChevronDown, Eye, EyeOff, Focus, FolderOpen, Globe2, Layers3, Lock, Maximize2, MoreHorizontal, MousePointer2, Move, PanelLeft, PanelRight, Rotate3D, Ruler, Save, Sparkles, TreePine, Unlock, X } from "lucide-react";
 import { hexToHsv, hsvToHex } from "@/lib/sketch.mjs";
-import { SceneViewport, type SceneTool, type ViewportAPI } from "./SceneViewport";
+import { SceneViewport, type SceneTool, type ViewportAPI, type ShadingMode } from "./SceneViewport";
 import { useSceneDocument } from "./useSceneDocument";
 import { StudioHeader, StudioPanel } from "@/components/crystal-studio/kit";
 import { StudioAIChat } from "@/components/crystal-studio/StudioAIChat";
@@ -131,6 +131,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   const [left, setLeft] = useState(true), [right, setRight] = useState(true), [snap, setSnap] = useState(true), [grid, setGrid] = useState(true);
   const [busy, setBusy] = useState(""), [error, setError] = useState<string | null>(null), [openProjects, setOpenProjects] = useState<Array<{ id: string; name: string; local?: boolean }> | null>(null);
   const [blenderGuideOpen, setBlenderGuideOpen] = useState(false);
+  const [shadingMode, setShadingMode] = useState<ShadingMode>("pbr");
   const [cameraView, setCameraView] = useState("Perspective");
   const [worldMap, setWorldMap] = useState(false), [mapOpened, setMapOpened] = useState(false), [mapView, setMapView] = useState("Globe");
   const worldMapAPI = useRef<WorldMapAPI>(null);
@@ -460,7 +461,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
   });
 
   return <main data-world-map={worldMap || undefined} className={`crystal-studio scene-workbench ${left ? "" : "scene-left-closed"} ${right ? "" : "scene-right-closed"}`} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (worldMap) return; if (e.dataTransfer.files[0]) void importFile(e.dataTransfer.files[0], viewport.current?.point(e.clientX, e.clientY)); else { const name = e.dataTransfer.getData("application/x-casynus-asset"); if (catalog.includes(name)) add(name, viewport.current?.point(e.clientX, e.clientY)); } }}>
-    {store.ready && <SceneViewport ref={viewport} document={pending&&!pending.destructive?pending.preview:doc} previewJob={pending?.generatedJobId} editing={editing} selected={selected} tool={pending||planning ? "select" : tool} snap={snap} grid={grid} autoRotate={autoRotate && !worldMap && !blocked} onSelect={select} onHover={setHoveredId} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
+    {store.ready && <SceneViewport ref={viewport} document={pending&&!pending.destructive?pending.preview:doc} previewJob={pending?.generatedJobId} editing={editing} selected={selected} tool={pending||planning ? "select" : tool} snap={snap} grid={grid} shadingMode={shadingMode} autoRotate={autoRotate && !worldMap && !blocked} onSelect={select} onHover={setHoveredId} onTransform={(id, values) => patch(id, values)} onCameraChange={store.setCamera} />}
     {studio === "infrastructure" && mapOpened && <WorldMap key={doc.id} apiRef={worldMapAPI} active={worldMap} onViewChange={setMapView} importDisabled={blocked} onImport={feature => safely(() => {
       const scene = docRef.current;
       const objects = importGeographicFeature(feature, scene.objects.find(object => object.geographic)?.geographic?.origin);
@@ -546,6 +547,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
         ] as const).map(([id, icon, label]) => ({ label, icon, active: tool === id, disabled: blocked, onClick: () => setTool(id) }))}
         onFit={() => worldMap ? worldMapAPI.current?.reset() : viewport.current?.fit()} onReset={() => { if (worldMap) { worldMapAPI.current?.reset(); setMapView("Globe"); } else store.setCamera(makeDocument(studio).camera); }}
         cameraViews={worldMap ? ["Globe", "Pitched"] : ["Perspective", "Orthographic", "Front", "Back", "Left", "Right", "Top"]} cameraView={worldMap ? mapView : cameraView}
+        shadingMode={shadingMode} onShadingMode={setShadingMode}
         onCamera={view => { if (worldMap) { setMapView(view); worldMapAPI.current?.view(view); return; } setCameraView(view); store.setCamera({ ...(viewport.current?.camera() ?? doc.camera), projection: view === "Orthographic" ? "orthographic" : "perspective" }); if (view !== "Orthographic") requestAnimationFrame(() => viewport.current?.preset(view)); }}
         onZoom={factor => worldMap ? worldMapAPI.current?.zoom(factor) : viewport.current?.zoom(factor)} exportFormats={worldMap ? ["glb", "gltf", "obj", "stl", "json"] : ["glb", "gltf", "obj", "stl", "png", "jpeg", "json"]} onExport={format => void exportFile(format)}
         onCSV={() => downloadStudioCSV(doc.name, doc.objects.map(o => ({ id: o.id, name: o.name, type: o.kind, parentId: o.parentId, position: o.position, rotation: o.rotation, scale: o.scale, dimensions: o.dimensions })))}
@@ -568,7 +570,23 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
       <fieldset disabled={blocked || Boolean(primary && locked(primary))}>
         {primary ? <><h2>{selected.length > 1 ? `${selected.length} selected · primary object` : primary.name}</h2><label className="scene-text-field">Name<input aria-label="Object name" key={primary.id + primary.name} defaultValue={primary.name} maxLength={120} onBlur={e => { if (e.target.value.trim() && e.target.value !== primary.name) patch(primary.id, { name: e.target.value.trim() }); }} /></label>
           {(["position", "rotation", "scale", "dimensions"] as const).filter(property => property !== "dimensions" || (primary.kind !== "group" && !primary.kind.endsWith("Light"))).map(property => <section key={property}><h3>{property === "rotation" ? "Rotation · degrees" : property === "dimensions" ? "Dimensions · meters" : property}</h3><div className="scene-number-grid">{["X", "Y", "Z"].map((axis, index) => <NumberField key={axis} label={`${property} ${axis}`} value={primary[property][index] * (property === "rotation" ? 180 / Math.PI : 1)} min={property === "scale" || property === "dimensions" ? .001 : -10000} max={property === "scale" || property === "dimensions" ? 1000 : 10000} onChange={value => { const next = [...primary[property]] as Vec3; next[index] = value * (property === "rotation" ? Math.PI / 180 : 1); patch(primary.id, { [property]: next }); }} />)}</div></section>)}
-          {!primary.kind.endsWith("Light") && <section><h3>Physical material</h3><select aria-label="Material preset" defaultValue="" key={primary.id} onChange={e => { if (MATERIALS[e.target.value]) patch(primary.id, { material: { ...MATERIALS[e.target.value] } }); }}><option value="">Choose preset</option>{Object.keys(MATERIALS).map(m => <option key={m}>{m}</option>)}</select><SceneColorField label="Base color" value={primary.material.color} opacity={primary.material.opacity} onChange={color => patch(primary.id, { material: { ...primary.material, color } })} onOpacity={opacity => patch(primary.id, { material: { ...primary.material, opacity } })} />{(["roughness", "metalness", "opacity", "transmission"] as const).map(key => <NumberField key={key} label={key} value={primary.material[key]} min={0} max={1} onChange={value => patch(primary.id, { material: { ...primary.material, [key]: value } })} />)}
+          {!primary.kind.endsWith("Light") && <section><h3>Physical material</h3>
+            <div className="scene-shading-quick-toggles" aria-label="Quick shading preview">
+              <span className="scene-shading-label">Preview style:</span>
+              {(["pbr", "normal", "albedo", "matcap", "clay"] as ShadingMode[]).map(mode => (
+                <button
+                  key={mode}
+                  type="button"
+                  aria-pressed={shadingMode === mode}
+                  className={`scene-shading-chip ${shadingMode === mode ? "is-active" : ""}`}
+                  onClick={() => setShadingMode(mode)}
+                  title={`Switch viewport to ${mode.toUpperCase()} shading`}
+                >
+                  {mode === "pbr" ? "PBR" : mode === "normal" ? "Normal" : mode === "albedo" ? "Albedo" : mode === "matcap" ? "MatCap" : "Solid Cavity"}
+                </button>
+              ))}
+            </div>
+            <select aria-label="Material preset" defaultValue="" key={primary.id} onChange={e => { if (MATERIALS[e.target.value]) patch(primary.id, { material: { ...MATERIALS[e.target.value] } }); }}><option value="">Choose preset</option>{Object.keys(MATERIALS).map(m => <option key={m}>{m}</option>)}</select><SceneColorField label="Base color" value={primary.material.color} opacity={primary.material.opacity} onChange={color => patch(primary.id, { material: { ...primary.material, color } })} onOpacity={opacity => patch(primary.id, { material: { ...primary.material, opacity } })} />{(["roughness", "metalness", "opacity", "transmission"] as const).map(key => <NumberField key={key} label={key} value={primary.material[key]} min={0} max={1} onChange={value => patch(primary.id, { material: { ...primary.material, [key]: value } })} />)}
             <select aria-label="Texture map slot" value={textureSlot} onChange={e => setTextureSlot(e.target.value)}>{["map", "normalMap", "roughnessMap", "metalnessMap", "aoMap"].map(slot => <option key={slot}>{slot}</option>)}</select><button onClick={() => texture.current?.click()}>Upload texture</button><NumberField label="UV repeat" min={.01} max={1000} value={primary.material.uvScale?.[0] ?? 1} onChange={value => patch(primary.id, { material: { ...primary.material, uvScale: [value, value] } })} /></section>}
           {primary.kind.endsWith("Light") && <SceneColorField label="Light color" value={primary.material.color} onChange={color => patch(primary.id, { material: { ...primary.material, color } })} />}
           {primary.kind.endsWith("Light") && <NumberField label="Light intensity · candela" value={primary.intensity ?? 50} min={0} max={10000} onChange={intensity => patch(primary.id, { intensity })} />}

@@ -13,6 +13,7 @@ import { createSelectionHelpers, disposeSelectionHelpers } from "@/lib/scene/sel
 import { isSelectionClick, pickScene } from "@/lib/scene/picking.mjs";
 import {createEditOverlay,disposeEditOverlay} from "@/lib/scene/edit-overlay.mjs";
 import {generatedAsset,loadGeneratedAssets} from '@/lib/scene/generated-assets.mjs';
+import { applyShadingMode, type ShadingMode } from "@/lib/scene/shading-modes";
 
 export type ViewportAPI = {
   fit: () => void; focus: () => void; preset: (name: string) => void; zoom: (factor: number) => void;
@@ -23,7 +24,9 @@ export type ViewportAPI = {
   rendered:()=>string;
 };
 export type SceneTool = "select" | "translate" | "rotate" | "scale" | "measure";
+export type { ShadingMode };
 type Props = { document: SceneDocument; selected: string[]; tool: SceneTool; snap: boolean; grid: boolean;
+  shadingMode?: ShadingMode;
   autoRotate?: boolean;
   previewJob?:string;
   editing?:{ids:string[];phase:'processing'|'updating'|'completed'}|null;
@@ -50,7 +53,11 @@ const Contents = forwardRef<ViewportAPI, Props & { walking: boolean; setWalking:
   const [assetVersion,setAssetVersion]=useState(0),[assetError,setAssetError]=useState('');
   useEffect(()=>{let active=true;setAssetError('');if(p.document.objects.some(o=>o.kind==='model'&&!generatedAsset(o.asset!.jobId)))void loadGeneratedAssets(p.document).then(()=>{if(active){setAssetVersion(v=>v+1);invalidate();}}).catch(error=>{if(active)setAssetError(error instanceof Error?error.message:'Generated model could not be restored.');});return()=>{active=false;};},[p.document.objects,invalidate]); // eslint-disable-line react-hooks/exhaustive-deps
   const root = useMemo(() => { const r = buildScene(p.document, { helpers: true, onTextureLoad: invalidate }); r.rotation.y = sceneRotationY.current; return r; }, [p.document.objects, invalidate,assetVersion]); // eslint-disable-line react-hooks/exhaustive-deps
-  const renderToken=useMemo(()=>JSON.stringify([p.document.id,p.document.objects,p.document.environment]),[p.document.id,p.document.objects,p.document.environment]);
+  const renderToken=useMemo(()=>JSON.stringify([p.document.id,p.document.objects,p.document.environment,p.shadingMode]),[p.document.id,p.document.objects,p.document.environment,p.shadingMode]);
+  useEffect(() => {
+    applyShadingMode(root, p.shadingMode ?? "pbr");
+    invalidate();
+  }, [root, p.shadingMode, invalidate]);
   useEffect(() => () => disposeScene(root), [root]);
   const selected = useMemo(() => {
     let found: THREE.Object3D | undefined;
@@ -270,7 +277,7 @@ export const SceneViewport = forwardRef<ViewportAPI, Props>(function SceneViewpo
   const [generation, setGeneration] = useState(0), [walking, setWalking] = useState(false), [contextLost, setContextLost] = useState(false);
   const e = p.document.environment;
   const maxDpr = e.quality === "performance" ? 1 : e.quality === "ultra" ? 2 : 1.5;
-  return <div className="scene-canvas" data-object-count={p.document.objects.length} data-preview-job={p.previewJob} data-edit-phase={p.editing?.phase} data-edit-targets={p.editing?.ids.join(',')}>
+  return <div className="scene-canvas" data-shading-mode={p.shadingMode ?? "pbr"} data-object-count={p.document.objects.length} data-preview-job={p.previewJob} data-edit-phase={p.editing?.phase} data-edit-targets={p.editing?.ids.join(',')}>
     <RenderBoundary key={generation} retry={() => { setContextLost(false); setGeneration(g => g + 1); }}>
       <Canvas frameloop={walking || p.autoRotate ? "always" : "demand"} shadows={e.shadows} dpr={[1, maxDpr]} gl={{ antialias: true, preserveDrawingBuffer: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => { gl.domElement.addEventListener("webglcontextlost", event => { event.preventDefault(); setContextLost(true); }, { once: true }); }}

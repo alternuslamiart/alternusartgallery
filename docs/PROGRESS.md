@@ -1,6 +1,18 @@
 # Verified progress
 
-Last updated: 2026-10-28
+Last updated: 2026-10-29
+
+## Viewport Shading Styles in Casynus Studio: Normal Map, Albedo Map, MatCap, Solid Cavity (2026-10-29)
+
+- Implemented real-time viewport shading style selector in Casynus Studio (/casynus):
+  1. PBR (Default): Full physically-based rendering.
+  2. Normal Map: Tangent/view-space surface normal orientation.
+  3. Albedo Map (Diffuse): Pure unlit base color map.
+  4. MatCap (Material Capture): High-contrast spherical wax/clay material capture.
+  5. Solid with Cavity: Neutral matte clay plaster with crevice and ambient edge darkening.
+- UI controls added in Top Viewport Toolbar and Inspector Properties Panel.
+- Preserves original materials via non-destructive userData.__origMaterial caching.
+- Verification: tsc (0 errors), npm run test (203 passing), npm run build (0 errors).
 
 ## 3D AI Texturing Pipeline & Shader Configuration Specification (2026-10-28)
 
