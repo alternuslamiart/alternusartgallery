@@ -2,6 +2,23 @@
 
 Last updated: 2026-10-29
 
+## Full-Stack Platform Hardening: Account Deletion, Workspace Settings, and Studio Project Lifecycle (2026-10-29)
+
+- Implemented and hardened persistent backend endpoints and client contracts:
+  - Account Deletion & Deactivation:
+    - Added `DELETE /api/me` with atomic transaction deactivating user (`isActive: false`), soft-deleting workspace projects (`status: DELETED`), and revoking active sessions.
+    - Updated `src/app/account/page.tsx` Privacy section with two-step deletion confirmation dialog, error states, and automatic redirect on completion.
+  - User Settings & Profile API:
+    - Added `GET /api/settings/user` returning user identity and settings.
+    - Enhanced `PATCH /api/settings/user` supporting profile attributes (`firstName`, `lastName`, `phone`, `avatarUrl`) and application preferences.
+  - Workspace Settings & Members API:
+    - Added `GET /api/settings/workspace` returning workspace organization data, settings, and enriched member identities.
+    - Connected `src/app/account/page.tsx` Organization and Members sections to load and persist workspace details via the API.
+  - Studio & Sketch Project Deletion:
+    - Added `DELETE /api/studio-projects` and `DELETE /api/sketch-projects` verifying project ownership and soft-deleting both `blenderProject` and `project` records.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 unit tests passed), `npm run build` (Next.js production build passed with 0 errors).
+
+
 ## Search Modal Translucent Backdrop Blur Over /aichat (2026-10-29)
 
 - Configured the Casynus Search modal (`searchOpen`) in `/aichat` (`src/app/aichat/page.tsx`):

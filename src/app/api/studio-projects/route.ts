@@ -85,3 +85,32 @@ export async function PUT(request: NextRequest) {
     return error("Project could not be saved. Keep the browser recovery copy or download JSON.", 503);
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const context = await requirePlatformContext();
+    if (isApiResponse(context)) return context;
+    const id = request.nextUrl.searchParams.get("id");
+    if (!id) return error("Project ID is required.", 400);
+
+    const scope = { workspaceId: context.workspaceId, userId: context.userId, deletedAt: null };
+    const existing = await prisma.blenderProject.findFirst({ where: { ...scope, id, settings: { path: ["kind"], equals: kind } } });
+    if (!existing) return error("Project not found.", 404);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.blenderProject.updateMany({
+        where: { ...scope, id },
+        data: { deletedAt: new Date() },
+      });
+      await tx.project.updateMany({
+        where: { ...scope, id },
+        data: { status: "DELETED", deletedAt: new Date() },
+      });
+    }, { maxWait: 15000, timeout: 15000 });
+
+    return NextResponse.json({ id, deleted: true });
+  } catch (caught) {
+    logStorageFailure("delete", caught);
+    return error("Could not delete project.", 503);
+  }
+}

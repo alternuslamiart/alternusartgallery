@@ -298,8 +298,18 @@ function Organization({ t }: { t: Tokens }) {
  });
  const [savedAt, setSavedAt] = useState("2 days ago");
  const [saveMessage, setSaveMessage] = useState("");
+ const [isSaving, setIsSaving] = useState(false);
 
  useEffect(() => {
+  fetch("/api/settings/workspace")
+    .then((res) => (res.ok ? res.json() : null))
+    .then((json) => {
+      if (json?.data?.workspace?.name) {
+        setForm((prev) => ({ ...prev, name: json.data.workspace.name }));
+      }
+    })
+    .catch(() => {});
+
   const saved = window.localStorage.getItem("crystal-organization-settings");
   if (!saved) return;
   try {
@@ -316,7 +326,16 @@ function Organization({ t }: { t: Tokens }) {
   setSaveMessage("");
  };
 
- const saveChanges = () => {
+ const saveChanges = async () => {
+  setIsSaving(true);
+  try {
+    await fetch("/api/settings/workspace", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: form.name }),
+    });
+  } catch {}
+  setIsSaving(false);
   const savedAtValue = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date());
   window.localStorage.setItem("crystal-organization-settings", JSON.stringify({ ...form, savedAt: savedAtValue }));
   setSavedAt(savedAtValue);
@@ -448,6 +467,27 @@ function Members({ t, accountName, accountEmail, accountInitials }: { t: Tokens 
  const [draft, setDraft] = useState<Member | null>(null);
 
  useEffect(() => {
+  fetch("/api/settings/workspace")
+    .then((res) => (res.ok ? res.json() : null))
+    .then((json) => {
+      if (json?.data?.members && Array.isArray(json.data.members) && json.data.members.length > 0) {
+        const dbMembers = json.data.members.map((m: any) => ({
+          n: m.name || m.email,
+          e: m.email,
+          r: m.role === "OWNER" ? "Owner" : m.role === "ADMIN" ? "Admin" : "Member",
+          c: (m.name || m.email || "NM")
+            .split(/\s+/)
+            .map((p: string) => p[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase(),
+        }));
+        setPeople(dbMembers);
+        return;
+      }
+    })
+    .catch(() => {});
+
   const saved = window.localStorage.getItem("crystal-members");
   if (!saved) return;
   try {
@@ -873,6 +913,30 @@ function Workspaces({ t }: { t: Tokens }) {
 }
 
 function Privacy({ t }: { t: Tokens }) {
+ const [deleteConfirm, setDeleteConfirm] = useState(false);
+ const [deleting, setDeleting] = useState(false);
+ const [deleteError, setDeleteError] = useState("");
+
+ const handleDeleteAccount = async () => {
+   if (!deleteConfirm) {
+     setDeleteConfirm(true);
+     return;
+   }
+   setDeleting(true);
+   setDeleteError("");
+   try {
+     const res = await fetch("/api/me", { method: "DELETE" });
+     if (!res.ok) {
+       const data = await res.json().catch(() => ({}));
+       throw new Error(data?.error?.message || "Failed to delete account");
+     }
+     window.location.href = "/";
+   } catch (err: any) {
+     setDeleteError(err.message || "Failed to delete account");
+     setDeleting(false);
+   }
+ };
+
  return (
  <>
  <SectionHeading eyebrow="§ PRIVACY" title="Privacy controls." desc="Decide what the agent remembers, what it logs, and who can see what." t={t} />
@@ -889,8 +953,16 @@ function Privacy({ t }: { t: Tokens }) {
  <div style={{ fontSize: 12, color: t.muted, marginTop: 4, maxWidth: 500 }}>
  Deletes your workspace, knowledge layer, and all memory. Cannot be undone.
  </div>
+ {deleteError && <div style={{ fontSize: 12, color: "#EF4444", marginTop: 6, fontWeight: 700 }}>{deleteError}</div>}
  </div>
- <button style={{ height: 38, padding: "0 18px", background: "transparent", color: "#EF4444", fontSize: 12.5, fontWeight: 700, border: "1px solid rgba(239,68,68,0.4)", borderRadius: 8, cursor: "pointer", whiteSpace: "nowrap" }}>Delete account</button>
+ <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+ {deleteConfirm && (
+   <button type="button" onClick={() => setDeleteConfirm(false)} disabled={deleting} style={{ height: 38, padding: "0 14px", background: "transparent", color: t.muted, fontSize: 12, fontWeight: 700, border: `1px solid ${t.faintBorder}`, borderRadius: 8, cursor: "pointer" }}>Cancel</button>
+ )}
+ <button type="button" onClick={handleDeleteAccount} disabled={deleting} style={{ height: 38, padding: "0 18px", background: deleteConfirm ? "#EF4444" : "transparent", color: deleteConfirm ? "#fff" : "#EF4444", fontSize: 12.5, fontWeight: 700, border: "1px solid rgba(239,68,68,0.4)", borderRadius: 8, cursor: "pointer", whiteSpace: "nowrap" }}>
+   {deleting ? "Deleting…" : deleteConfirm ? "Confirm Delete Account" : "Delete account"}
+ </button>
+ </div>
  </div>
  </>
  );

@@ -46,3 +46,16 @@ export async function PUT(request:NextRequest){
     },{maxWait:15000,timeout:15000});return NextResponse.json({saved:true,id,revision:revision+1});
   }catch(error){if(error instanceof Conflict||(error instanceof Prisma.PrismaClientKnownRequestError&&error.code==='P2002'))return fail('A newer sketch exists. Reload the cloud copy or save your drawing as a new project.',409);return fail('Sketch could not be saved. Keep your recovery copy or export JSON.',503);}
 }
+export async function DELETE(request:NextRequest){
+  try{
+    const context=await requirePlatformContext();if(isApiResponse(context))return context;
+    const id=request.nextUrl.searchParams.get('id');if(!id)return fail('Sketch project ID is required.',400);
+    const scope={workspaceId:context.workspaceId,userId:context.userId,deletedAt:null};
+    const existing=await prisma.blenderProject.findFirst({where:{...scope,id,settings:{path:['kind'],equals:kind}}});if(!existing)return fail('Sketch project not found.',404);
+    await prisma.$transaction(async tx=>{
+      await tx.blenderProject.updateMany({where:{...scope,id},data:{deletedAt:new Date()}});
+      await tx.project.updateMany({where:{...scope,id},data:{status:'DELETED',deletedAt:new Date()}});
+    },{maxWait:15000,timeout:15000});
+    return NextResponse.json({id,deleted:true});
+  }catch{return fail('Could not delete sketch project.',503);}
+}

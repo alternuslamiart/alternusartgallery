@@ -1,5 +1,14 @@
 # Next tasks (reviewed 2026-10-29)
 
+- [x] Full-Stack Platform Hardening: Account Deletion, Workspace Settings, and Studio Project Lifecycle:
+  - Added `DELETE /api/me` transactionally deactivating user profiles, soft-deleting workspace projects, and revoking active sessions.
+  - Connected `src/app/account/page.tsx` Privacy panel to trigger account deactivation with two-step confirmation.
+  - Added `GET /api/settings/user` and enhanced `PATCH /api/settings/user` with profile and preference fields.
+  - Added `GET /api/settings/workspace` returning workspace data and enriched team members; connected `Organization` and `Members` panels in `/account`.
+  - Added `DELETE /api/studio-projects` and `DELETE /api/sketch-projects` verifying project ownership and soft-deleting blender projects.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 unit tests passed), `npm run build` (0 errors).
+
+
 - [x] Search Modal Translucent Backdrop Blur Over /aichat:
   - Updated search overlay backdrop to `bg-black/50 backdrop-blur-md` allowing `/aichat` to remain visible underneath with smooth blur.
   - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 tests passed), `npm run build` (0 errors).
