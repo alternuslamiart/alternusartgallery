@@ -2,10 +2,32 @@ import { validateDocument, type SceneDocument } from "./document.mjs";
 export type Recovery = { document: SceneDocument; revision: number; dirty: boolean; updatedAt: number; studio?: string };
 async function database() {
   return new Promise<IDBDatabase>((resolve, reject) => {
-    const request = indexedDB.open("casynus-scene-recovery", 1);
-    request.onupgradeneeded = () => request.result.createObjectStore("documents");
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    if (typeof indexedDB === "undefined") {
+      reject(new Error("IndexedDB is not supported"));
+      return;
+    }
+    const timer = setTimeout(() => {
+      reject(new Error("IndexedDB connection timeout"));
+    }, 1500);
+    try {
+      const request = indexedDB.open("casynus-scene-recovery", 1);
+      request.onupgradeneeded = () => request.result.createObjectStore("documents");
+      request.onsuccess = () => {
+        clearTimeout(timer);
+        resolve(request.result);
+      };
+      request.onerror = () => {
+        clearTimeout(timer);
+        reject(request.error);
+      };
+      request.onblocked = () => {
+        clearTimeout(timer);
+        reject(new Error("IndexedDB blocked"));
+      };
+    } catch (error) {
+      clearTimeout(timer);
+      reject(error);
+    }
   });
 }
 export async function readRecovery(identity: string, id: string): Promise<Recovery | null> {

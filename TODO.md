@@ -1,5 +1,13 @@
 # Next tasks (reviewed 2026-10-29)
 
+- [x] Instant Studio Scene Opening & Viewport Blocking Elimination:
+  - Eliminated the blocking "Opening scene… Create empty project" black overlay upon studio entry.
+  - Initialized `ready = true` by default in `useSceneDocument` when opening fresh studio sessions so the 3D scene and hierarchy display immediately.
+  - Eliminated full-page blocking during NextAuth session resolution in `SceneWorkbench` and decoupled `Editor` remounts from session loading transitions.
+  - Added timeout (1500ms) and `onblocked` handler in `database()` in `src/lib/scene/recovery.ts` so IndexedDB operations cannot hang indefinitely.
+  - Configured missing project / 404 lookups to cleanly open a fresh studio template document immediately instead of getting stuck on an unrecoverable error state.
+  - Added unit test in `tests/scene-cloud-loading.test.mjs` ensuring studio readiness without requestedId and graceful fallback on missing projects.
+
 - [x] Unify 712x140 Desktop Generation Loader Frame with Studio Sidebar Palette (Ash Gray / Ngjyrë Hiri):
   - Updated `StudioGenerationLoader.tsx` to match studio sidebars (`scene-sidebar`, `ref-floating-sidebar`, `cs-chat-dock`):
     - Background: `var(--studio-bg-panel, #161616)` matching panel chrome.

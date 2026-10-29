@@ -95,3 +95,20 @@ test('edits made during reconnection are never replaced by the delayed cloud res
   finish({document:local.document,revision:2});await pending;
   assert.deepEqual(h.render().document,edited);assert.equal(h.puts.length,0);
 });
+
+test('studio opens immediately without requestedId and falls back to template on missing project',async()=>{
+  const local=recovery();
+  const h=harness({recovery:local,load:()=>{throw Object.assign(new Error('Project not found.'),{status:404});}});
+  // Without requestedId, ready is true immediately
+  let stateIndex=0,refIndex=0;
+  const exports={};
+  new Function('require','exports','window','sessionStorage','fetch','setTimeout','clearTimeout',code)(id=>({
+    react:{useState:initial=>[typeof initial==='function'?initial():initial,()=>{}],useRef:val=>({current:val}),useEffect:()=>{},useCallback:fn=>fn},
+    '@/lib/scene/document.mjs':scene,
+    '@/lib/scene/recovery':{readRecovery:async()=>null,writeRecovery:async()=>{}},
+    '@/lib/scene/workspace-save.mjs':{}
+  }[id]),exports,{location:{href:'http://localhost/casynus'},history:{replaceState(){}},addEventListener(){},removeEventListener(){}},{getItem:()=>null,setItem(){}},()=>{},()=>1,()=>{});
+  const unconstrainedStore=exports.useSceneDocument('architecture','guest',false,undefined);
+  assert.equal(unconstrainedStore.ready,true);
+  assert.ok(unconstrainedStore.document.objects.length>0);
+});

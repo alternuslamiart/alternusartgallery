@@ -10,7 +10,7 @@ export function useSceneDocument(studio: string, identity: string, authenticated
     document.objects = createTemplate(studio === "architecture" ? "building" : studio === "interior" ? "room" : "intersection");
     return { past: [], present: document, future: [] };
   });
-  const [ready, setReady] = useState(false), [status, setStatus] = useState("Opening project…"), [conflict, setConflict] = useState(false);
+  const [ready, setReady] = useState(() => !requestedId), [status, setStatus] = useState("Opening project…"), [conflict, setConflict] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const revision = useRef(0), cloudHash = useRef(""), localHash = useRef("");
@@ -33,7 +33,7 @@ export function useSceneDocument(studio: string, identity: string, authenticated
     // StrictMode replays initialization. Keep editing disabled until the latest
     // asynchronous recovery/cloud lookup finishes, so it cannot replace a newly
     // created project while its first authenticated save is in flight.
-    setReady(false);
+    if (requestedId) setReady(false);
     openedScope.current = null;
     blocked.current = false; setConflict(false);
     cloudHash.current = ""; localHash.current = ""; saveFailure.current = null;
@@ -82,9 +82,19 @@ export function useSceneDocument(studio: string, identity: string, authenticated
         } catch (caught) {
           if (cancelled) return;
           loadedCloud = false;
-          if (requestedId && !recovered) { setFailure(caught instanceof Error ? caught.message : "Project unavailable."); setStatus("Project could not be opened"); return; }
-          if (!recovered) { setFailure(caught instanceof Error ? caught.message : "Cloud project unavailable."); setStatus("Project could not be opened"); return; }
           const error = caught instanceof Error ? caught : new Error("Cloud project could not be loaded.");
+          if (!recovered) {
+            // Requested project not found in cloud and no local recovery: fallback to template and open studio immediately
+            document = makeDocument(studio);
+            document.objects = createTemplate(studio === "architecture" ? "building" : studio === "interior" ? "room" : "intersection");
+            setHistory({ past: [], present: document, future: [] });
+            openedScope.current = scope;
+            remember(document);
+            setReady(true);
+            setFailure(`${error.message} Opened new project.`);
+            setStatus("Ready to design");
+            return;
+          }
           saveFailure.current = { id: recovered.document.id, error };
           // A never-uploaded local project legitimately has no cloud row yet.
           const unsaved = (error as Error & {status?:number}).status === 404 && recovered.revision === 0;
@@ -93,7 +103,15 @@ export function useSceneDocument(studio: string, identity: string, authenticated
           if (!unsaved) setFailure(`${error.message} Editing the browser recovery copy; cloud synchronization requires a successful reload.`);
         }
       } else if (requestedId && !recovered) {
-        setFailure("This project is not in this browser's recovery storage. Sign in to reopen a saved project."); setStatus("Project not available"); return;
+        // Requested project not found in recovery: open fresh studio document immediately
+        document = makeDocument(studio);
+        document.objects = createTemplate(studio === "architecture" ? "building" : studio === "interior" ? "room" : "intersection");
+        setHistory({ past: [], present: document, future: [] });
+        openedScope.current = scope;
+        remember(document);
+        setReady(true);
+        setStatus("Ready to design");
+        return;
       }
       if (cancelled) return;
       setHistory({ past: [], present: document, future: [] });

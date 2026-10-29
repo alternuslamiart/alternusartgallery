@@ -2,6 +2,16 @@
 
 Last updated: 2026-10-29
 
+## Instant Studio Scene Opening & Viewport Blocking Elimination (2026-10-29)
+
+- Resolved the blocking "Opening scene… Create empty project" viewport overlay on studio entry:
+  - Immediate studio readiness: Configured `useSceneDocument` to initialize `ready = true` by default when no specific `requestedId` is requested, rendering the full 3D viewport and scene hierarchy immediately without delay or blocking overlays.
+  - Seamless NextAuth session transition: Removed full-viewport unmounting and blocking on `status === "loading"` in `SceneWorkbench.tsx`, and decoupled editor remounting from session identity resolution (`key={projectId ?? "active"}`) to prevent 3D canvas teardown upon identity updates.
+  - Robust IndexedDB recovery connection timeout: Added safety timeout (1500ms) and `onblocked` event handler to `database()` in `src/lib/scene/recovery.ts`, preventing unhandled storage hangs from blocking studio initialization.
+  - Graceful fallback on missing projects: Configured missing recovery or cloud 404 lookups to cleanly initialize a fresh studio template and set `ready = true`, ensuring users never get stranded on a black error screen.
+  - Viewport overlay clean-up: Updated `SceneWorkbench.tsx` line 533 so that `.scene-opening` only renders when an actionable failure occurs, eliminating the unsolicited "Create empty project" button during normal studio loading.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 tests passed including new instant studio open test), `npm run build` (compiled and exported cleanly with 0 errors).
+
 ## Desktop Generation Loader Frame Sidebar Palette Harmonization (2026-10-29)
 
 - Harmonized the desktop 712x140px Studio AI generation loader frame with studio sidebars (Casynus, Architecture, Sketch, Infrastructure):

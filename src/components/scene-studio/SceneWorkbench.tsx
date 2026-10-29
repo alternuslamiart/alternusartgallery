@@ -115,9 +115,9 @@ function asset(name: string): SceneObject[] {
 
 export default function SceneWorkbench({ studio, projectId }: { studio: Studio; projectId?: string }) {
   const { data: session, status } = useSession();
-  if (status === "loading") return <div className="scene-opening">Opening Casynus 3D…</div>;
+  
   const identity = session?.user?.id ?? session?.user?.email ?? "guest";
-  return <Editor key={`${identity}:${projectId ?? "active"}`} studio={studio} identity={identity} authenticated={status === "authenticated"} projectId={projectId} />;
+  return <Editor key={projectId ?? "active"} studio={studio} identity={identity} authenticated={status === "authenticated"} projectId={projectId} />;
 }
 
 function Editor({ studio, identity, authenticated, projectId }: { studio: Studio; identity: string; authenticated: boolean; projectId?: string }) {
@@ -530,7 +530,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     </StudioPanel>}
 
     <section className="scene-view" aria-label={`${names[studio]} 3D viewport`}>
-      {!store.ready && <div className="scene-opening">{store.failure ?? "Opening scene…"}<button onClick={() => { store.replace(makeDocument(studio)); }}>Create empty project</button></div>}
+      {!store.ready && store.failure && <div className="scene-opening"><span>{store.failure}</span><button onClick={() => { store.replace(makeDocument(studio)); }}>Create empty project</button></div>}
       {(!left || !right) && <div className="scene-panel-toggles">{!left && <button aria-label="Show scene sidebar" onClick={() => setLeft(true)}><PanelLeft size={18} /></button>}{!right && <button aria-label="Show inspector" onClick={() => setRight(true)}><PanelRight size={18} /></button>}</div>}
       <StudioViewportToolbar label="Scene transformation tools"
         apiRef={toolbarAPI}
