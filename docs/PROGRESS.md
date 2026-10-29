@@ -2,6 +2,16 @@
 
 Last updated: 2026-10-29
 
+## Desktop Generation Loader Frame Sidebar Palette Harmonization (2026-10-29)
+
+- Harmonized the desktop 712x140px Studio AI generation loader frame with studio sidebars (Casynus, Architecture, Sketch, Infrastructure):
+  - Background: Configured with studio panel background variable (`var(--studio-bg-panel, #161616)`).
+  - Border: Swapped isolated translucent white outline for standard ash-gray sidebar border (`1px solid var(--studio-border, #292929)`).
+  - Border radius: Softened from 24px to studio panel standard (`var(--studio-radius-panel, 16px)`).
+  - Shadow: Aligned with floating sidebar depth (`var(--studio-shadow-floating, 0 8px 24px rgba(0, 0, 0, 0.22))`) eliminating harsh disconnected drop shadow so the frame integrates naturally without standing out ("te mos jet e dalluar").
+  - Progress bar track frame: Styled with ash-gray elevated tone (`var(--studio-bg-hover, #282828)`) and border (`var(--studio-border, #292929)`).
+  - Verification: tsc (0 errors), npm run test (203 tests passed), npm run build (0 errors).
+
 ## Viewport Shading Styles in Casynus Studio: Normal Map, Albedo Map, MatCap, Solid Cavity (2026-10-29)
 
 - Implemented real-time viewport shading style selector in Casynus Studio (/casynus):

@@ -1,5 +1,14 @@
 # Next tasks (reviewed 2026-10-29)
 
+- [x] Unify 712x140 Desktop Generation Loader Frame with Studio Sidebar Palette (Ash Gray / Ngjyrë Hiri):
+  - Updated `StudioGenerationLoader.tsx` to match studio sidebars (`scene-sidebar`, `ref-floating-sidebar`, `cs-chat-dock`):
+    - Background: `var(--studio-bg-panel, #161616)` matching panel chrome.
+    - Border: `1px solid var(--studio-border, #292929)` (ash-gray border) eliminating any bright/disconnected white halo rings.
+    - Border radius: `var(--studio-radius-panel, 16px)` matching studio floating panels.
+    - Shadow: `var(--studio-shadow-floating, 0 8px 24px rgba(0, 0, 0, 0.22))` removing the harsh black shadow to blend harmoniously without standing out ("te mos jet e dalluar").
+    - Progress track frame: `var(--studio-bg-hover, #282828)` with `1px solid var(--studio-border, #292929)` matching sidebar input/control wells.
+    - Typography: Inheriting `var(--studio-text-primary)` and `var(--studio-text-secondary)`.
+
 - [x] Viewport Shading Styles in Casynus Studio (Normal Map, Albedo Map, MatCap, Solid Cavity):
   - Added real-time viewport shading style switcher in Casynus Studio (`/casynus`):
     1. PBR (Standard physical material with full lighting, roughness, metalness, and environment reflection).

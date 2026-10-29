@@ -91,28 +91,30 @@ export function StudioGenerationLoader({
       aria-live="polite"
       role="status"
     >
-      {/* 712x140px Exact Frame with color: #161616 */}
+      {/* 712x140px Exact Frame matching sidebar colors (ash gray palette) */}
       <div
-        className={`pointer-events-auto relative w-[712px] h-[140px] rounded-[24px] px-[27.5px] py-6 flex flex-col justify-between shadow-2xl transition-all duration-300 select-none ${
+        className={`pointer-events-auto relative w-[712px] h-[140px] px-[27.5px] py-6 flex flex-col justify-between transition-all duration-300 select-none ${
           isFadingOut ? "opacity-0 scale-95" : "opacity-100 scale-100"
         }`}
         style={{
-          backgroundColor: "#161616",
+          backgroundColor: "var(--studio-bg-panel, #161616)",
+          border: "1px solid var(--studio-border, #292929)",
+          borderRadius: "var(--studio-radius-panel, 16px)",
+          boxShadow: "var(--studio-shadow-floating, 0 8px 24px rgba(0, 0, 0, 0.22))",
           fontFamily: "Roboto, var(--font-roboto-flex), sans-serif",
-          boxShadow: "0 24px 60px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.08)",
         }}
         onClick={(event) => event.stopPropagation()}
       >
         {/* Top: Headline 1 (24px semibold) & Close Button */}
         <div className="flex items-center justify-between">
-          <h2 className="text-[24px] font-semibold tracking-[-0.01em] text-white truncate max-w-[620px] leading-none">
+          <h2 className="text-[24px] font-semibold tracking-[-0.01em] text-[var(--studio-text-primary,#ffffff)] truncate max-w-[620px] leading-none">
             {headline}
           </h2>
           <button
             type="button"
             aria-label="Close generation overlay"
             onClick={onClose}
-            className="w-7 h-7 -mr-2 -mt-2 rounded-full grid place-items-center text-white/50 hover:text-white hover:bg-white/10 transition"
+            className="w-7 h-7 -mr-2 -mt-2 rounded-full grid place-items-center text-[var(--studio-text-muted,#78818c)] hover:text-[var(--studio-text-primary,#ffffff)] hover:bg-[var(--studio-bg-hover,#282828)] transition"
           >
             <X size={16} />
           </button>
@@ -120,19 +122,22 @@ export function StudioGenerationLoader({
 
         {/* Subtitle & Timer row */}
         <div className="flex items-center justify-between gap-4">
-          <p className="text-[12px] font-medium text-[#A0A0A0] leading-snug line-clamp-1 max-w-[480px]">
+          <p className="text-[12px] font-medium text-[var(--studio-text-secondary,#a4aab3)] leading-snug line-clamp-1 max-w-[480px]">
             Lorem ipsum dolor sit amet consectetur. Feugiat posuere eleifend mi felis ut risus nibh habitant. Quisque adipiscing sodales felis sed enim.
           </p>
-          <div className="flex items-center gap-1.5 text-[12px] font-medium text-[#A0A0A0] shrink-0">
+          <div className="flex items-center gap-1.5 text-[12px] font-medium text-[var(--studio-text-muted,#78818c)] shrink-0">
             <Clock size={13} className="opacity-80" />
             <span>{formattedTimer}</span>
           </div>
         </div>
 
-        {/* Loading frame: 657x12px with track #4C4C4C and gradient #0C8CE9, #074F83 */}
+        {/* Loading frame: 657x12px with ash gray track matching sidebar inputs/controls and blue gradient */}
         <div
           className="w-[657px] h-[12px] rounded-full overflow-hidden"
-          style={{ backgroundColor: "#4C4C4C" }}
+          style={{
+            backgroundColor: "var(--studio-bg-hover, #282828)",
+            border: "1px solid var(--studio-border, #292929)",
+          }}
         >
           <div
             className="h-full rounded-full transition-[width] duration-75 ease-linear"
