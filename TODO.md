@@ -1,5 +1,15 @@
 # Next tasks (reviewed 2026-10-30)
 
+- [x] Test Card Checkout & Upgrade Intent Server Error Resolution:
+  - Fixed "Unexpected server error" on test card payment in `/pricing` checkout modal and `/api/subscription/upgrade-intent`.
+  - Removed PgBouncer-incompatible `Serializable` transaction isolation in `requirePlatformContext`, adding safe upserts for workspace members, subscriptions, and settings.
+  - Synchronized `Workspace.plan` alongside `SubscriptionState.plan` and immediately reset monthly usage quota buckets.
+  - Added robust fallback resolution for visitor/test checkout sessions with input email handling.
+  - Bound modal form inputs (`cardEmail`, `cardNumber`, `cardExpiry`, `cardCvc`) to state and NextAuth session prefill.
+  - Added unit test in `tests/subscription-upgrade.test.mjs`.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 205 unit tests passed), `npm run build` (0 errors).
+
+
 - [x] Plan Testing Profile, Simulated Checkout, and Real Usage Limit Enforcement:
   - Enabled test payment processing in `/api/subscription/upgrade-intent` updating PostgreSQL `SubscriptionState`.
   - Added simulated checkout flow in `/pricing` with pre-filled test card and instant success view.

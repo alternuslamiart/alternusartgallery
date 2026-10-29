@@ -59,12 +59,12 @@ export async function requirePlatformContext(): Promise<PlatformContext | NextRe
     if (existing) return existing.id;
     const trialEndsAt = new Date(Date.now() + 12 * 24 * 60 * 60 * 1000);
     const created = await tx.workspace.create({ data: { ownerId: userId, name: "Personal", plan: "TRIAL", trialEndsAt } });
-    await tx.workspaceMember.create({ data: { workspaceId: created.id, userId, role: "OWNER" } });
-    await tx.subscriptionState.create({ data: { workspaceId: created.id, plan: "TRIAL", status: "TRIALING", trialEndsAt, usageLimits: defaultUsageLimits() } });
-    await tx.workspaceSettings.create({ data: { workspaceId: created.id, allowedAssetTypes: defaultAllowedAssetTypes() } });
+    await tx.workspaceMember.upsert({ where: { workspaceId_userId: { workspaceId: created.id, userId } }, update: {}, create: { workspaceId: created.id, userId, role: "OWNER" } });
+    await tx.subscriptionState.upsert({ where: { workspaceId: created.id }, update: {}, create: { workspaceId: created.id, plan: "TRIAL", status: "TRIALING", trialEndsAt, usageLimits: defaultUsageLimits() } });
+    await tx.workspaceSettings.upsert({ where: { workspaceId: created.id }, update: {}, create: { workspaceId: created.id, allowedAssetTypes: defaultAllowedAssetTypes() } });
     await tx.userSettings.upsert({ where: { userId }, update: {}, create: { userId } });
     return created.id;
-   }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable, maxWait: 15000, timeout: 15000 });
+   }, { maxWait: 15000, timeout: 15000 });
    userWorkspaceCache.set(userId, workspaceId);
    if (userWorkspaceCache.size > 256) userWorkspaceCache.delete(userWorkspaceCache.keys().next().value!);
    return { userId, workspaceId };

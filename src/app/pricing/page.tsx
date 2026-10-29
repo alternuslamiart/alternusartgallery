@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { CoreforgePage, COBALT } from "@/components/cedium-shell";
 
 type PricingTier = {
@@ -160,7 +161,18 @@ const faq = [
 ];
 
 export default function Pricing() {
- const [yearly, setYearly] = useState(true);
+  const { data: session } = useSession();
+  const [yearly, setYearly] = useState(true);
+  const [cardEmail, setCardEmail] = useState("user@company.com");
+  const [cardNumber, setCardNumber] = useState("4242 4242 4242 4242");
+  const [cardExpiry, setCardExpiry] = useState("12 / 28");
+  const [cardCvc, setCardCvc] = useState("123");
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      setCardEmail(session.user.email);
+    }
+  }, [session?.user?.email]);
  const [openFaq, setOpenFaq] = useState<number | null>(0);
  const [checkoutTier, setCheckoutTier] = useState<PricingTier | null>(null);
  const [paymentStatus, setPaymentStatus] = useState("");
@@ -173,7 +185,8 @@ export default function Pricing() {
  setPaymentStatus("");
  setIsSuccess(false);
  setSuccessData(null);
- };
+    if (session?.user?.email) setCardEmail(session.user.email);
+  };
 
  const requestPlan = async () => {
  if (!checkoutTier) return;
@@ -740,7 +753,8 @@ export default function Pricing() {
  <input
  required
  type="email"
- defaultValue="user@company.com"
+ value={cardEmail}
+ onChange={(e) => setCardEmail(e.target.value)}
  placeholder="you@company.com"
  style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: t.surface, color: t.fg, padding: "0 14px", outline: "none" }}
  />
@@ -750,7 +764,8 @@ export default function Pricing() {
  <input
  required
  inputMode="numeric"
- defaultValue="4242 4242 4242 4242"
+ value={cardNumber}
+ onChange={(e) => setCardNumber(e.target.value)}
  placeholder="4242 4242 4242 4242"
  style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: t.surface, color: t.fg, padding: "0 14px", outline: "none" }}
  />
@@ -760,7 +775,8 @@ export default function Pricing() {
  Expiry
  <input
  required
- defaultValue="12 / 28"
+ value={cardExpiry}
+ onChange={(e) => setCardExpiry(e.target.value)}
  placeholder="MM / YY"
  style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: t.surface, color: t.fg, padding: "0 14px", outline: "none" }}
  />
@@ -770,7 +786,8 @@ export default function Pricing() {
  <input
  required
  inputMode="numeric"
- defaultValue="123"
+ value={cardCvc}
+ onChange={(e) => setCardCvc(e.target.value)}
  placeholder="123"
  style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: t.surface, color: t.fg, padding: "0 14px", outline: "none" }}
  />

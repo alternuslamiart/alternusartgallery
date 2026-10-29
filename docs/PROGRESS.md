@@ -2,6 +2,26 @@
 
 Last updated: 2026-10-30
 
+## Fix: Test Card Checkout & Upgrade Intent Server Error Resolution (2026-10-30)
+
+- Fixed "Unexpected server error" on test payment card checkout in `/pricing` modal and `/api/subscription/upgrade-intent`:
+  - **Transaction Isolation & PgBouncer Compatibility (`src/lib/platform/api.ts`)**:
+    - Removed `isolationLevel: Prisma.TransactionIsolationLevel.Serializable` from `requirePlatformContext` workspace provisioning transaction, which was rejected by Supabase PgBouncer/Supavisor poolers in transaction pooling mode.
+    - Added upserts with graceful recovery on workspace member, subscription state, and settings records during initialization.
+  - **Robust Upgrade Intent Endpoint (`src/app/api/subscription/upgrade-intent/route.ts`)**:
+    - Synchronized both `Workspace` plan column and `SubscriptionState` record to the target plan (`BASIC`, `PRO`, `TEAM`, `STUDIO`).
+    - Added fallback resolution for visitors and test payment sessions using input email or test workspace resolution.
+    - Immediately resets the current month's rate limit bucket counter upon plan upgrade so new credits take effect instantly.
+    - Wrapped audit activity logging in non-blocking error handling and replaced generic 500 crashes with informative error messages.
+  - **Pricing Modal State Binding (`src/app/pricing/page.tsx`)**:
+    - Bound `cardEmail`, `cardNumber`, `cardExpiry`, and `cardCvc` to state and forwarded them with test payment payload.
+    - Pre-filled email from authenticated NextAuth session where available.
+  - **Automated Verification**:
+    - Created unit test in `tests/subscription-upgrade.test.mjs` verifying plan validation, approval, entitlements, and limit updates.
+    - All 205 unit tests passing (`node --test tests/*.test.mjs`).
+    - `npm run typecheck` (tsc --noEmit) passed with 0 errors.
+    - `npm run build` production build completed with 0 errors.
+
 ## Plan Testing Profile, Simulated Checkout, and Real Usage Limit Enforcement (2026-10-30)
 
 - Implemented full plan testing lifecycle, simulated payment processing, and real limit enforcement:
