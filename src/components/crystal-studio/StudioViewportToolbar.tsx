@@ -53,21 +53,6 @@ export function StudioViewportToolbar(p: Props) {
       {action({ label: "Reset camera", icon: Home, onClick: p.onReset })}
       <span className="ref-toolbar-divider" />
       <select aria-label="Camera view" value={p.cameraView} onChange={e => p.onCamera(e.target.value)} className="ref-toolbar-zoom-pill">{p.cameraViews.map(view => <option key={view}>{view}</option>)}</select>
-      {p.shadingMode && p.onShadingMode && (
-        <select
-          aria-label="Viewport shading style"
-          value={p.shadingMode}
-          onChange={e => p.onShadingMode?.(e.target.value as StudioShadingMode)}
-          className="ref-toolbar-zoom-pill casynus-shading-select"
-          title="Viewport shading: PBR Material, Tangent Normal Map, Pure Albedo, MatCap Clay or Solid Cavity"
-        >
-          <option value="pbr">Shading: PBR</option>
-          <option value="normal">Normal Map</option>
-          <option value="albedo">Albedo Map</option>
-          <option value="matcap">MatCap</option>
-          <option value="clay">Solid Cavity</option>
-        </select>
-      )}
       {action({ label: "Zoom in (+)", icon: ZoomIn, onClick: () => p.onZoom(1.25) })}
       {action({ label: "Zoom out (−)", icon: ZoomOut, onClick: () => p.onZoom(.8) })}
       <button type="button" className="ref-toolbar-export-btn" aria-label="Export viewport" disabled={p.busy} onClick={() => dialog.current?.showModal()}><span>Export</span></button>

@@ -2,6 +2,14 @@
 
 Last updated: 2026-10-29
 
+## Viewport Shading Dropdown Migration to Physical Material & Top Toolbar Clean-up (2026-10-29)
+
+- Migrated Viewport Shading style selector to a clean `<select>` dropdown inside Properties Inspector (`SceneWorkbench.tsx`):
+  - Converted the 5 chip buttons under "Physical material" into a standard full-width dropdown matching the `Choose preset` style (PBR, Normal, Albedo, MatCap, Solid Cavity).
+  - Removed the shading mode select dropdown from the top viewport toolbar (`StudioViewportToolbar.tsx`), streamlining the top bar across 3D studios.
+  - Fully eliminated any remaining `.scene-opening` overlay on line 533 so project storage or connection issues surface strictly as non-blocking `scene-alert` notifications.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 tests passed).
+
 ## Instant Studio Scene Opening & Viewport Blocking Elimination (2026-10-29)
 
 - Resolved the blocking "Opening scene… Create empty project" viewport overlay on studio entry:

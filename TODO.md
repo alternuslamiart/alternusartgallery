@@ -1,5 +1,10 @@
 # Next tasks (reviewed 2026-10-29)
 
+- [x] Viewport Shading Dropdown Migration to Physical Material & Top Toolbar Clean-up:
+  - Removed the Shading Style dropdown from the top viewport toolbar (`StudioViewportToolbar.tsx`).
+  - Converted the Preview Style chip buttons under "Physical material" into a clean `<select>` dropdown menu matching the `Choose preset` style in the Properties Inspector.
+  - Removed all remaining viewport-blocking `.scene-opening` overlays from `SceneWorkbench.tsx`.
+
 - [x] Instant Studio Scene Opening & Viewport Blocking Elimination:
   - Eliminated the blocking "Opening scene… Create empty project" black overlay upon studio entry.
   - Initialized `ready = true` by default in `useSceneDocument` when opening fresh studio sessions so the 3D scene and hierarchy display immediately.
