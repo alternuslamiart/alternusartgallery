@@ -2,6 +2,13 @@
 
 Last updated: 2026-10-29
 
+## Search Modal Translucent Backdrop Blur Over /aichat (2026-10-29)
+
+- Configured the Casynus Search modal (`searchOpen`) in `/aichat` (`src/app/aichat/page.tsx`):
+  - Replaced opaque background (`bg-[var(--studio-bg-elevated)]`) with a translucent blurred backdrop (`bg-black/50 backdrop-blur-md`).
+  - Allows `/aichat` (chat history, cards, sidebar, and prompt bar) to stay visible directly underneath with a frosted glass blur.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 unit tests passed), `npm run build` (Next.js production build passed with 0 errors).
+
 ## AI Chat Generated Image Response Frame 6px Gap Border (2026-10-29)
 
 - Added 6px surrounding gap around generated image response card in `/aichat` (`src/app/globals.css`):

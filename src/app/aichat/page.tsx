@@ -1297,7 +1297,7 @@ export default function AIChatPage() {
         )}
       </div>
 
-      {searchOpen && <div className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-[var(--studio-bg-elevated)] px-4 pb-8 pt-[min(12vh,88px)] backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) setSearchOpen(false); }}>
+      {searchOpen && <div className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-black/50 px-4 pb-8 pt-[min(12vh,88px)] backdrop-blur-md transition-all" onMouseDown={(event) => { if (event.target === event.currentTarget) setSearchOpen(false); }}>
         <section role="dialog" aria-modal="true" aria-label="Search Casynus" className={`w-full max-w-[720px] overflow-hidden rounded-[20px] border shadow-[0_32px_100px_rgba(0,0,0,.55)] ${isLight ? "border-[var(--studio-border)] bg-[var(--studio-bg-panel)] text-[var(--studio-text-secondary)]" : "border-[var(--studio-border)] bg-[var(--studio-bg-panel)] text-[var(--studio-text-secondary)]"}`}>
           <div className={`flex h-[68px] items-center gap-3 border-b px-5 ${isLight ? "border-[var(--studio-border)]" : "border-[var(--studio-border)]"}`}>
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[var(--studio-accent)] text-[var(--studio-accent)]"><Search size={18} /></span>

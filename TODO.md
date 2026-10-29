@@ -1,5 +1,9 @@
 # Next tasks (reviewed 2026-10-29)
 
+- [x] Search Modal Translucent Backdrop Blur Over /aichat:
+  - Updated search overlay backdrop to `bg-black/50 backdrop-blur-md` allowing `/aichat` to remain visible underneath with smooth blur.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 tests passed), `npm run build` (0 errors).
+
 - [x] AI Chat Generated Image Response Frame 6px Gap:
   - Added 6px surrounding gap and rounded corners (`border-radius: 12px`) around the image inside the `#161616` frame.
   - Seamlessly unified the frame and action bar without separator line.
