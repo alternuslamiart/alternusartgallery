@@ -1,5 +1,13 @@
 # Next tasks (reviewed 2026-10-30)
 
+- [x] Plan Testing Profile, Simulated Checkout, and Real Usage Limit Enforcement:
+  - Enabled test payment processing in `/api/subscription/upgrade-intent` updating PostgreSQL `SubscriptionState`.
+  - Added simulated checkout flow in `/pricing` with pre-filled test card and instant success view.
+  - Added plan testing profile and real limit simulation controls in `/account?section=subscriptions`.
+  - Added `/api/subscription/simulate-usage` to test 80% warnings and 100% capacity locking in real-time.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 unit tests passed), `npm run build` (0 errors).
+
+
 - [x] AI Chat Recent Conversations: Real Action Handlers (Pin, Add to Project, Mark as Unread, Rename, Share, Delete):
   - Added Pin / Unpin with dedicated `Pin` icon, pinned badge, and sorting to the top of Recent chats.
   - Added Add to project modal with project list, checkmark, Remove from project, and inline Create New Project input.

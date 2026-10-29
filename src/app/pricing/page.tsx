@@ -164,25 +164,49 @@ export default function Pricing() {
  const [openFaq, setOpenFaq] = useState<number | null>(0);
  const [checkoutTier, setCheckoutTier] = useState<PricingTier | null>(null);
  const [paymentStatus, setPaymentStatus] = useState("");
+ const [isSuccess, setIsSuccess] = useState(false);
+ const [successData, setSuccessData] = useState<{ plan: string; credits: number } | null>(null);
+ const [isProcessing, setIsProcessing] = useState(false);
 
  const openCheckout = (tier: PricingTier) => {
  setCheckoutTier(tier);
  setPaymentStatus("");
+ setIsSuccess(false);
+ setSuccessData(null);
  };
 
  const requestPlan = async () => {
  if (!checkoutTier) return;
- setPaymentStatus("Saving your plan request...");
- const response = await fetch("/api/subscription/upgrade-intent", {
- method: "POST",
- headers: { "Content-Type": "application/json" },
- body: JSON.stringify({
- plan: checkoutTier.n === "Basic Plan" ? "BASIC" : checkoutTier.n.toUpperCase(),
- billingCycle: yearly ? "yearly" : "monthly",
- }),
- });
- const result = await response.json() as { message?: string; error?: { message?: string } };
- setPaymentStatus(response.ok ? "Your plan request was saved. Billing will be connected when payments are enabled." : result.error?.message ?? "Unable to save your plan request.");
+ setIsProcessing(true);
+ setPaymentStatus("Processing test payment...");
+ try {
+  const planName = checkoutTier.n === "Basic Plan" ? "BASIC" : checkoutTier.n.toUpperCase();
+  const response = await fetch("/api/subscription/upgrade-intent", {
+   method: "POST",
+   headers: { "Content-Type": "application/json" },
+   body: JSON.stringify({
+    plan: planName,
+    billingCycle: yearly ? "yearly" : "monthly",
+    testPayment: true,
+   }),
+  });
+  const result = await response.json() as { success?: boolean; plan?: string; monthlyCredits?: number; message?: string; data?: { success?: boolean; plan?: string; monthlyCredits?: number; message?: string }; error?: { message?: string } };
+  const data = result.data || result;
+  if (response.ok && data.success) {
+   setIsSuccess(true);
+   setSuccessData({
+    plan: data.plan || planName,
+    credits: data.monthlyCredits || 800,
+   });
+   setPaymentStatus(data.message || `Test payment approved! Workspace upgraded to ${data.plan || planName}.`);
+  } else {
+   setPaymentStatus(result.error?.message ?? "Unable to complete test payment.");
+  }
+ } catch {
+  setPaymentStatus("Test payment connection failed. Please try again.");
+ } finally {
+  setIsProcessing(false);
+ }
  };
 
  return (
@@ -689,6 +713,20 @@ export default function Pricing() {
  </p>
  </aside>
 
+ {isSuccess ? (
+ <div style={{ padding: "40px 28px", textAlign: "center" }}>
+  <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(34,197,94,0.12)", color: "#22C55E", display: "grid", placeItems: "center", margin: "0 auto 18px", fontSize: 28, fontWeight: 900 }}>✓</div>
+  <div style={{ fontSize: 24, fontWeight: 900, color: t.fg, letterSpacing: "-0.03em" }}>Test Payment Approved</div>
+  <p style={{ fontSize: 14, color: t.muted, margin: "10px auto 26px", maxWidth: 420, lineHeight: 1.6 }}>
+   Your workspace is now active on the <strong style={{ color: t.fg }}>{successData?.plan}</strong> plan with <strong style={{ color: COBALT }}>{successData?.credits.toLocaleString()} AI credits</strong> per month. Real usage limits are now enforced.
+  </p>
+  <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 300, margin: "0 auto" }}>
+   <Link href="/account?section=usage" style={{ height: 46, borderRadius: 12, background: COBALT, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, textDecoration: "none" }}>View Usage & Limits →</Link>
+   <Link href="/casynus" style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: "transparent", color: t.fg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>Launch Studio</Link>
+   <button type="button" onClick={() => { setCheckoutTier(null); setIsSuccess(false); }} style={{ height: 38, border: "none", background: "transparent", color: t.muted, fontSize: 12, cursor: "pointer", marginTop: 4 }}>Close</button>
+  </div>
+ </div>
+ ) : (
  <form
  onSubmit={(event) => {
  event.preventDefault();
@@ -702,15 +740,17 @@ export default function Pricing() {
  <input
  required
  type="email"
+ defaultValue="user@company.com"
  placeholder="you@company.com"
  style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: t.surface, color: t.fg, padding: "0 14px", outline: "none" }}
  />
  </label>
  <label style={{ display: "grid", gap: 8, fontSize: 12, fontWeight: 800, color: t.fg }}>
- Card number
+ Card number (Test Mode)
  <input
  required
  inputMode="numeric"
+ defaultValue="4242 4242 4242 4242"
  placeholder="4242 4242 4242 4242"
  style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: t.surface, color: t.fg, padding: "0 14px", outline: "none" }}
  />
@@ -720,6 +760,7 @@ export default function Pricing() {
  Expiry
  <input
  required
+ defaultValue="12 / 28"
  placeholder="MM / YY"
  style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: t.surface, color: t.fg, padding: "0 14px", outline: "none" }}
  />
@@ -729,6 +770,7 @@ export default function Pricing() {
  <input
  required
  inputMode="numeric"
+ defaultValue="123"
  placeholder="123"
  style={{ height: 46, borderRadius: 12, border: `1px solid ${t.faint}`, background: t.surface, color: t.fg, padding: "0 14px", outline: "none" }}
  />
@@ -738,6 +780,7 @@ export default function Pricing() {
 
  <button
  type="submit"
+ disabled={isProcessing}
  style={{
  marginTop: 20,
  width: "100%",
@@ -748,21 +791,24 @@ export default function Pricing() {
  color: "#fff",
  fontSize: 14,
  fontWeight: 900,
- cursor: "pointer",
+ cursor: isProcessing ? "not-allowed" : "pointer",
+ opacity: isProcessing ? 0.7 : 1,
  boxShadow: `0 18px 36px ${COBALT}30`,
  }}
  >
- {checkoutTier.n === "Team" ? "Start trial with payment method" : "Continue payment"}
+ {isProcessing ? "Processing test payment…" : checkoutTier.n === "Team" ? "Start Team Trial (Test Mode)" : `Pay ${yearly ? checkoutTier.py : checkoutTier.pm} (Test Payment)`}
  </button>
+ <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 8, background: `${COBALT}10`, color: COBALT, fontSize: 11, fontWeight: 700 }}>
+  <span>🔒 TEST PAYMENT GATEWAY</span>
+  <span style={{ opacity: 0.7 }}>· Simulated card charge activates real plan limits</span>
+ </div>
  {paymentStatus ? (
  <div style={{ marginTop: 14, borderRadius: 12, background: `${COBALT}12`, color: COBALT, padding: "12px 14px", fontSize: 12, fontWeight: 700, lineHeight: 1.5 }}>
  {paymentStatus}
  </div>
  ) : null}
- <p style={{ margin: "14px 0 0", fontSize: 11.5, color: t.muted, lineHeight: 1.6 }}>
- Demo checkout frame. Live charging requires connecting a billing provider endpoint.
- </p>
  </form>
+ )}
  </div>
  </div>
  </div>

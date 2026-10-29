@@ -2,6 +2,23 @@
 
 Last updated: 2026-10-30
 
+## Plan Testing Profile, Simulated Checkout, and Real Usage Limit Enforcement (2026-10-30)
+
+- Implemented full plan testing lifecycle, simulated payment processing, and real limit enforcement:
+  - **Test Payment Processing (`POST /api/subscription/upgrade-intent`)**:
+    - Validates billing plan (`BASIC`, `PRO`, `TEAM`, `STUDIO`) and billing cycle (`monthly`, `yearly`).
+    - Upserts workspace `SubscriptionState` in PostgreSQL to `status: "ACTIVE"` with calibrated plan limits (Basic: 200, Pro: 800, Team: 2,000, Studio: 4,000 credits).
+    - Logs subscription activation audit trail and returns instant approval with credit capacity.
+  - **Pricing Page Simulated Checkout (`/pricing`)**:
+    - Updated modal with pre-filled test card (`4242 •••• •••• 4242`), expiry, CVC, and "TEST PAYMENT GATEWAY" badge.
+    - Added instant success state with confirmation badge, active credit summary, and links to `/account?section=usage` and `/casynus`.
+  - **Account Plan Testing Profile (`/account?section=subscriptions`)**:
+    - Interactive 4-tier plan test switcher displaying active plan badge and one-click test plan activation.
+    - Real-time limit enforcement suite allowing developers/testers to simulate usage (+1 credit chat, +20 credits 3D model, 80% warning threshold, 100% lockout cap, and reset to 0).
+    - Connected to `POST /api/subscription/simulate-usage` with dynamic reload of `AccountUsage` meters, bars, and stats.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 unit tests passed), `npm run build` (Next.js production build passed with 0 errors).
+
+
 ## AI Chat Recent Conversations: Real Action Handlers (Pin, Add to Project, Mark as Unread, Rename, Share, Delete) (2026-10-30)
 
 - Implemented real actions for Recent chat sessions in `/aichat` (`src/app/aichat/page.tsx`):

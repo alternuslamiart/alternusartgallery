@@ -594,7 +594,158 @@ function Members({ t, accountName, accountEmail, accountInitials }: { t: Tokens 
  );
 }
 
-function Subscriptions({ t }: { t: Tokens }) { return <><AccountUsage t={t} /><p style={{ color: t.muted, marginTop: 16 }}>Plan changes require a verified subscription. Automatic billing is not configured.</p></>; }
+function Subscriptions({ t }: { t: Tokens }) {
+ const [activePlan, setActivePlan] = useState<string>("BASIC");
+ const [changingPlan, setChangingPlan] = useState<string | null>(null);
+ const [simulating, setSimulating] = useState(false);
+ const [feedback, setFeedback] = useState<string>("");
+ const [refreshKey, setRefreshKey] = useState(0);
+
+ useEffect(() => {
+  fetch("/api/subscription")
+   .then((res) => (res.ok ? res.json() : null))
+   .then((data) => {
+    if (data?.data?.subscription?.plan) {
+     setActivePlan(data.data.subscription.plan);
+    }
+   })
+   .catch(() => {});
+ }, [refreshKey]);
+
+ const activatePlan = async (plan: string) => {
+  setChangingPlan(plan);
+  setFeedback("");
+  try {
+   const res = await fetch("/api/subscription/upgrade-intent", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ plan, billingCycle: "monthly", testPayment: true }),
+   });
+   const json = await res.json();
+   if (!res.ok) throw new Error(json?.error?.message || "Failed to activate plan");
+   setActivePlan(plan);
+   setRefreshKey((k) => k + 1);
+   setFeedback(`✓ Test payment approved! Plan upgraded to ${plan}. Real usage limit is now active.`);
+  } catch (err: any) {
+   setFeedback(`Error: ${err.message || "Failed to switch plan"}`);
+  } finally {
+   setChangingPlan(null);
+  }
+ };
+
+ const simulateUsage = async (action: "add" | "set_percent" | "reset", val?: number) => {
+  setSimulating(true);
+  try {
+   const res = await fetch("/api/subscription/simulate-usage", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+     action,
+     units: action === "add" ? val : undefined,
+     percent: action === "set_percent" ? val : undefined,
+    }),
+   });
+   const json = await res.json();
+   if (res.ok) {
+    setRefreshKey((k) => k + 1);
+    setFeedback(json?.data?.message || "Usage simulation applied.");
+   }
+  } catch {}
+  setSimulating(false);
+ };
+
+ const tiers = [
+  { id: "BASIC", name: "Basic Plan", credits: "200", price: "$5/mo", desc: "Claude AI assistant, metrics, 200 monthly AI credits" },
+  { id: "PRO", name: "Pro", credits: "800", price: "$48/mo", desc: "Advanced reasoning, 3D modeling, voice mode, 800 monthly AI credits (4× Basic)" },
+  { id: "TEAM", name: "Team", credits: "2,000", price: "$124/mo", desc: "Team collaboration, shared knowledge, 2,000 monthly AI credits (10× Basic)" },
+  { id: "STUDIO", name: "Studio", credits: "4,000", price: "$248/mo", desc: "Studio-grade 3D & infrastructure, priority synthesis, 4,000 credits (20× Basic)" },
+ ];
+
+ return (
+  <div style={{ maxWidth: 820 }}>
+   <AccountUsage key={refreshKey} t={t} />
+
+   {feedback && (
+    <div role="status" style={{ marginTop: 18, marginBottom: 18, padding: "12px 18px", borderRadius: 10, background: feedback.startsWith("Error") ? "rgba(239,68,68,0.12)" : "rgba(34,197,94,0.12)", color: feedback.startsWith("Error") ? "#EF4444" : "#16A34A", fontSize: 13, fontWeight: 700, border: `1px solid ${feedback.startsWith("Error") ? "rgba(239,68,68,0.25)" : "rgba(34,197,94,0.25)"}` }}>
+     {feedback}
+    </div>
+   )}
+
+   {/* Plan Testing Profile */}
+   <div style={{ ...t.baseCard, padding: 26, marginTop: 24 }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+     <div>
+      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.16em", color: COBALT, textTransform: "uppercase" }}>TEST PROFILE · PLANS</div>
+      <h3 style={{ margin: "4px 0 0", fontSize: 18, fontWeight: 800, color: t.fg, letterSpacing: "-0.02em" }}>Active Plan & Test Checkout</h3>
+     </div>
+     <span style={{ fontSize: 10, fontWeight: 800, padding: "4px 8px", borderRadius: 6, background: `${COBALT}14`, color: COBALT, letterSpacing: "0.08em" }}>TEST MODE ENABLED</span>
+    </div>
+    <p style={{ fontSize: 13, color: t.muted, margin: "0 0 18px", lineHeight: 1.55 }}>
+     Select any plan below to simulate test payment checkout and immediately enforce real AI credit caps on your workspace.
+    </p>
+
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+     {tiers.map((tier) => {
+      const isCurrent = activePlan === tier.id;
+      return (
+       <div key={tier.id} style={{ border: `1px solid ${isCurrent ? COBALT : t.faintBorder}`, borderRadius: 12, padding: 16, background: isCurrent ? `${COBALT}08` : t.softFill, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <div>
+         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: t.fg }}>{tier.name}</span>
+          {isCurrent && <span style={{ fontSize: 9, fontWeight: 800, color: "#16A34A", background: "rgba(34,197,94,0.12)", padding: "2px 6px", borderRadius: 4 }}>ACTIVE</span>}
+         </div>
+         <div style={{ fontSize: 16, fontWeight: 900, color: COBALT, margin: "4px 0" }}>{tier.price}</div>
+         <div style={{ fontSize: 11, fontWeight: 700, color: t.fg, marginBottom: 6 }}>{tier.credits} AI credits/mo</div>
+         <p style={{ fontSize: 11, color: t.muted, margin: 0, lineHeight: 1.45 }}>{tier.desc}</p>
+        </div>
+        <button
+         type="button"
+         disabled={isCurrent || changingPlan === tier.id}
+         onClick={() => activatePlan(tier.id)}
+         style={{
+          marginTop: 14,
+          height: 34,
+          borderRadius: 8,
+          border: isCurrent ? `1px solid ${COBALT}` : "none",
+          background: isCurrent ? "transparent" : COBALT,
+          color: isCurrent ? COBALT : "#fff",
+          fontSize: 11.5,
+          fontWeight: 700,
+          cursor: isCurrent ? "default" : "pointer",
+          opacity: isCurrent ? 0.8 : 1,
+         }}
+        >
+         {isCurrent ? "Current Plan" : changingPlan === tier.id ? "Activating…" : "Activate (Test)"}
+        </button>
+       </div>
+      );
+     })}
+    </div>
+   </div>
+
+   {/* Limit & Usage Simulation Suite */}
+   <div style={{ ...t.baseCard, padding: 26, marginTop: 20 }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+     <div>
+      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.16em", color: COBALT, textTransform: "uppercase" }}>USAGE ENFORCEMENT</div>
+      <h3 style={{ margin: "4px 0 0", fontSize: 18, fontWeight: 800, color: t.fg, letterSpacing: "-0.02em" }}>Simulate Real Usage & Rate Limits</h3>
+     </div>
+    </div>
+    <p style={{ fontSize: 13, color: t.muted, margin: "0 0 16px", lineHeight: 1.55 }}>
+     Test how the application enforces plan limits, triggers the 80% warning threshold, and halts execution upon reaching the 100% monthly limit cap.
+    </p>
+
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+     <button type="button" disabled={simulating} onClick={() => simulateUsage("add", 1)} style={{ height: 34, padding: "0 14px", borderRadius: 8, border: `1px solid ${t.faintBorder}`, background: "transparent", color: t.fg, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>+1 Credit (Chat/Scene)</button>
+     <button type="button" disabled={simulating} onClick={() => simulateUsage("add", 20)} style={{ height: 34, padding: "0 14px", borderRadius: 8, border: `1px solid ${t.faintBorder}`, background: "transparent", color: t.fg, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>+20 Credits (3D Model)</button>
+     <button type="button" disabled={simulating} onClick={() => simulateUsage("set_percent", 80)} style={{ height: 34, padding: "0 14px", borderRadius: 8, border: "1px solid #D97706", background: "rgba(217,119,6,0.08)", color: "#D97706", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Simulate 80% (Warning)</button>
+     <button type="button" disabled={simulating} onClick={() => simulateUsage("set_percent", 100)} style={{ height: 34, padding: "0 14px", borderRadius: 8, border: "1px solid #EF4444", background: "rgba(239,68,68,0.08)", color: "#EF4444", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Simulate 100% (Cap Reached)</button>
+     <button type="button" disabled={simulating} onClick={() => simulateUsage("reset")} style={{ height: 34, padding: "0 14px", borderRadius: 8, border: `1px solid ${t.faintBorder}`, background: "transparent", color: t.muted, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Reset to 0</button>
+    </div>
+   </div>
+  </div>
+ );
+}
 
 function Billing({ t }: { t: Tokens }) {
  const invoices = [
