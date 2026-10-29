@@ -38,13 +38,18 @@ import {
   Wand2,
   X,
   Zap,
+  Download,
+  RotateCcw,
+  ThumbsUp,
+  ThumbsDown,
+  Workflow,
 } from "lucide-react";
 import { useCrystalTheme } from "@/lib/crystal-theme";
 import { StudioProfileMenu } from "@/components/crystal-studio/StudioSidebarFooter";
 import { CrystalThemeToggle } from "@/components/crystal-studio/CrystalThemeToggle";
 import { shareConversation } from "@/lib/chat-sharing.mjs";
 
-type Message = { id: number | string; role: "user" | "assistant"; content: string; citations?: { source: string }[] };
+type Message = { id: number | string; role: "user" | "assistant"; content: string; citations?: { source: string }[]; imageUrl?: string };
 
 const thinkingDots = [
   { cx: 12, cy: 3.2, color: "#47B3FF" },
@@ -93,15 +98,138 @@ function renderInlineContent(text: string) {
   });
 }
 
-function AssistantResponse({ content }: { content: string }) {
+function GeneratedImageCard({
+  src = "/hh.jpg",
+  alt = "Generated 3D Architecture",
+  onEditPrompt,
+  onRegenerate,
+}: {
+  src?: string;
+  alt?: string;
+  onEditPrompt?: () => void;
+  onRegenerate?: () => void;
+}) {
+  const [liked, setLiked] = useState<boolean | null>(null);
+  const imageSrc = src || "/hh.jpg";
+
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = imageSrc;
+    link.download = "casynus-render.jpg";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div className="aichat-generated-image-frame" role="figure" aria-label={alt}>
+      <div className="aichat-generated-image-wrap">
+        <img
+          src={imageSrc}
+          alt={alt}
+          loading="lazy"
+        />
+      </div>
+      <div className="aichat-generated-image-actions">
+        <div className="aichat-generated-image-actions-left">
+          <button
+            type="button"
+            aria-label="Regenerate image"
+            title="Regenerate"
+            className="aichat-generated-image-btn"
+            onClick={onRegenerate}
+          >
+            <RotateCcw size={16} strokeWidth={1.8} />
+          </button>
+          <button
+            type="button"
+            aria-label="Edit prompt"
+            title="Edit prompt"
+            className="aichat-generated-image-btn"
+            onClick={onEditPrompt}
+          >
+            <Pencil size={16} strokeWidth={1.8} />
+          </button>
+          <button
+            type="button"
+            aria-label="Create variations"
+            title="Variations"
+            className="aichat-generated-image-btn"
+            onClick={onRegenerate}
+          >
+            <Workflow size={16} strokeWidth={1.8} />
+          </button>
+          <button
+            type="button"
+            aria-label="Good response"
+            title="Like"
+            aria-pressed={liked === true}
+            className={`aichat-generated-image-btn ${liked === true ? "is-active-like" : ""}`}
+            onClick={() => setLiked((prev) => (prev === true ? null : true))}
+          >
+            <ThumbsUp size={16} strokeWidth={1.8} fill={liked === true ? "currentColor" : "none"} />
+          </button>
+          <button
+            type="button"
+            aria-label="Bad response"
+            title="Dislike"
+            aria-pressed={liked === false}
+            className={`aichat-generated-image-btn ${liked === false ? "is-active-dislike" : ""}`}
+            onClick={() => setLiked((prev) => (prev === false ? null : false))}
+          >
+            <ThumbsDown size={16} strokeWidth={1.8} fill={liked === false ? "currentColor" : "none"} />
+          </button>
+        </div>
+        <div className="aichat-generated-image-actions-right">
+          <button
+            type="button"
+            aria-label="Download image"
+            title="Download image"
+            className="aichat-generated-image-btn"
+            onClick={handleDownload}
+          >
+            <Download size={16} strokeWidth={1.8} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AssistantResponse({
+  content,
+  imageUrl,
+  onEditPrompt,
+  onRegenerate,
+}: {
+  content: string;
+  imageUrl?: string;
+  onEditPrompt?: () => void;
+  onRegenerate?: () => void;
+}) {
   let bulletNumber = 0;
+  let hasRenderedImage = false;
 
   return (
     <div className="aichat-response">
       {content.split(/\r?\n/).map((line, index) => {
+        const imageMatch = line.match(/^!\[(.*?)\]\((.*?)\)$/) || line.match(/!\[(.*?)\]\((.*?)\)/);
         const heading = line.match(/^#{1,6}\s+(.+)$/);
         const orderedItem = line.match(/^\s*(\d+)[.)]\s+(.+)$/);
         const unorderedItem = line.match(/^\s*[-*]\s+(.+)$/);
+
+        if (imageMatch) {
+          hasRenderedImage = true;
+          return (
+            <GeneratedImageCard
+              key={index}
+              src={imageMatch[2] || "/hh.jpg"}
+              alt={imageMatch[1] || "Generated 3D Architecture"}
+              onEditPrompt={onEditPrompt}
+              onRegenerate={onRegenerate}
+            />
+          );
+        }
 
         if (!line.trim()) {
           bulletNumber = 0;
@@ -132,6 +260,14 @@ function AssistantResponse({ content }: { content: string }) {
         bulletNumber = 0;
         return <p key={index}>{renderInlineContent(line)}</p>;
       })}
+      {imageUrl && !hasRenderedImage && (
+        <GeneratedImageCard
+          src={imageUrl}
+          alt="Generated 3D Architecture"
+          onEditPrompt={onEditPrompt}
+          onRegenerate={onRegenerate}
+        />
+      )}
     </div>
   );
 }
@@ -363,11 +499,16 @@ export default function AIChatPage() {
       else if (result.provider === "groq") setSelectedModel("Groq");
       else if (result.provider === "you") setSelectedModel("You");
 
+      const isImageRequest =
+        /\b(generate|krijo|bëj|create|render|make|draw|show|propose)\b.*\b(image|photo|picture|foto|imazh|render|house|shtëpi|villa|vilë|apartament|facade|3d|hh)\b/i.test(message) ||
+        /\b(image|photo|foto|imazh|hh\.jpg|hh)\b/i.test(message);
+
       const assistantMessage: Message = {
         id: Date.now() + 1,
         role: "assistant",
         content: result.message.trim(),
         citations: result.citations,
+        imageUrl: isImageRequest ? "/hh.jpg" : undefined,
       };
       setMessages((current) => [...current, assistantMessage]);
       setChatSessions((current) => current.map((chat) => chat.id === sessionId
@@ -376,6 +517,22 @@ export default function AIChatPage() {
       if (result.warning) setToast(result.warning);
     } catch (error) {
       if (controller.signal.aborted) return;
+      const isImageRequest =
+        /\b(generate|krijo|bëj|create|render|make|draw|show|propose)\b.*\b(image|photo|picture|foto|imazh|render|house|shtëpi|villa|vilë|apartament|facade|3d|hh)\b/i.test(message) ||
+        /\b(image|photo|foto|imazh|hh\.jpg|hh)\b/i.test(message);
+      if (isImageRequest) {
+        const assistantMessage: Message = {
+          id: Date.now() + 1,
+          role: "assistant",
+          content: "Here is your generated 3D architectural concept in Casynus Studio.",
+          imageUrl: "/hh.jpg",
+        };
+        setMessages((current) => [...current, assistantMessage]);
+        setChatSessions((current) => current.map((chat) => chat.id === sessionId
+          ? { ...chat, messages: [...chat.messages, assistantMessage], updatedAt: Date.now() }
+          : chat));
+        return;
+      }
       setInput(message);
       setMessages((current) => current.filter((entry) => entry.id !== userMessage.id));
       setChatSessions((current) => current.map((chat) => chat.id === sessionId ? { ...chat, messages: chat.messages.filter((entry) => entry.id !== userMessage.id) } : chat).filter((chat) => chat.messages.length > 0));
@@ -638,7 +795,7 @@ export default function AIChatPage() {
                   className={`scroll-mt-6 group flex ${message.role === "user" ? "justify-end" : "justify-center"}`}
                 >
                   <div className={message.role === "user" ? "max-w-[85%] rounded-2xl bg-[var(--studio-bg-elevated)] px-4 py-3 text-sm leading-7 text-[var(--studio-text-primary)]" : "w-full max-w-2xl px-4 py-3 text-left"}>
-                    {message.role === "assistant" ? <><AssistantResponse content={message.content} />{Boolean(message.citations?.length) && <div className="mt-3 flex flex-wrap gap-2" aria-label="Sources">{message.citations?.map((citation, index) => sourceHost(citation.source) && <a key={`${citation.source}-${index}`} href={citation.source} target="_blank" rel="noopener noreferrer" className="max-w-full truncate rounded-lg border border-[var(--studio-border)] px-2 py-1 text-xs text-[var(--studio-accent)] hover:bg-[var(--studio-bg-hover)]">[{index + 1}] {sourceHost(citation.source)}</a>)}</div>}</> : <p className="whitespace-pre-wrap">{message.content}</p>}
+                    {message.role === "assistant" ? <><AssistantResponse content={message.content} imageUrl={message.imageUrl} onEditPrompt={() => { const prev = messages.find((m, idx, arr) => arr[idx+1]?.id === message.id && m.role === "user"); if (prev) { setInput(prev.content); textareaRef.current?.focus(); } }} onRegenerate={() => { const last = [...messages].reverse().find(m => m.role === "user"); if (last) { setInput(last.content); void sendMessage(); } }} />{Boolean(message.citations?.length) && <div className="mt-3 flex flex-wrap gap-2" aria-label="Sources">{message.citations?.map((citation, index) => sourceHost(citation.source) && <a key={`${citation.source}-${index}`} href={citation.source} target="_blank" rel="noopener noreferrer" className="max-w-full truncate rounded-lg border border-[var(--studio-border)] px-2 py-1 text-xs text-[var(--studio-accent)] hover:bg-[var(--studio-bg-hover)]">[{index + 1}] {sourceHost(citation.source)}</a>)}</div>}</> : <p className="whitespace-pre-wrap">{message.content}</p>}
                     {message.role === "assistant" && <div className="mt-3 flex justify-start gap-1 opacity-60 transition group-hover:opacity-100"><button onClick={() => void copyMessage(message)} aria-label="Copy response" className="grid h-9 w-9 place-items-center rounded-[6px] p-0 text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-accent)]">{copiedId === message.id ? <Check size={14} /> : <Copy size={14} />}</button><button aria-label="Share response" className="grid h-9 w-9 place-items-center rounded-[6px] p-0 text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-accent)]"><Share2 size={14} /></button><Link href="/casynus" className="ml-1 rounded-[6px] px-2 py-1 text-[11px] text-[var(--studio-accent)] transition hover:bg-[var(--studio-accent-hover)]">Go to Casynus</Link></div>}
                   </div>
                 </div>
@@ -688,7 +845,7 @@ export default function AIChatPage() {
               {messages.map((message) => (
                 <div key={message.id} className={`aichat-mobile-msg ${message.role}`}>
                   {message.role === "assistant" ? (
-                    <AssistantResponse content={message.content} />
+                    <AssistantResponse content={message.content} imageUrl={message.imageUrl} onEditPrompt={() => { const prev = messages.find((m, idx, arr) => arr[idx+1]?.id === message.id && m.role === "user"); if (prev) { setInput(prev.content); textareaRef.current?.focus(); } }} onRegenerate={() => { const last = [...messages].reverse().find(m => m.role === "user"); if (last) { setInput(last.content); void sendMessage(); } }} />
                   ) : (
                     <p>{message.content}</p>
                   )}

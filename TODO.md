@@ -1,5 +1,13 @@
 # Next tasks (reviewed 2026-10-29)
 
+- [x] AI Chat Generated Image Response Frame (638x484px, #161616 Frame & Action Bar):
+  - Created custom Figma-spec response card in `/aichat` for generated images:
+    - Frame color: `#161616`.
+    - Dimensions: 638px width, 484px total height, 410px image height, 48px action bar height, 16px corner radius.
+    - Default/preview image: `public/hh.jpg` (`/hh.jpg`).
+    - Action bar buttons: Regenerate, Edit prompt, Variations/Workflow, Like, Dislike, and Download.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 tests passed), `npm run build` (0 errors).
+
 - [x] Viewport Shading Dropdown Migration to Physical Material & Top Toolbar Clean-up:
   - Removed the Shading Style dropdown from the top viewport toolbar (`StudioViewportToolbar.tsx`).
   - Converted the Preview Style chip buttons under "Physical material" into a clean `<select>` dropdown menu matching the `Choose preset` style in the Properties Inspector.

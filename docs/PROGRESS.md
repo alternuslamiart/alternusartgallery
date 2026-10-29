@@ -2,6 +2,24 @@
 
 Last updated: 2026-10-29
 
+## AI Chat Generated Image Response Frame (638x484px, #161616 Frame & Action Bar) (2026-10-29)
+
+- Implemented Figma-annotated generated image response card in `/aichat` (`src/app/aichat/page.tsx` & `src/app/globals.css`):
+  - Fixed dimensions & palette:
+    - Basic frame background: `#161616` (`.aichat-generated-image-frame`).
+    - Outer frame size: `638px` width (responsive up to 100% on mobile screens), `484px` height.
+    - Outer corner radius: `16px` (`rounded-[16px]`).
+    - Top image viewport: `410px` height with `object-fit: cover` and top 16px corner radius.
+    - Top image source: `public/hh.jpg` (`/hh.jpg`).
+    - Bottom action bar: `48px` height with `#161616` background and 16px bottom corner radius.
+  - Interactive action bar controls:
+    - Left actions: 1) Regenerate (`RotateCcw`), 2) Edit prompt (`Pencil`), 3) Workflow/Variations (`Workflow`), 4) Like toggle (`ThumbsUp`), 5) Dislike toggle (`ThumbsDown`).
+    - Right action: Download button (`Download`) directly downloading the generated image (`hh.jpg`).
+  - Integration:
+    - Updated markdown image parser in `AssistantResponse` to automatically render generated images inside the styled frame.
+    - Attached `imageUrl: "/hh.jpg"` upon image-related requests with seamless fallback handling.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 tests passed), `npm run build` (Next.js production build passed with 0 errors).
+
 ## Viewport Shading Dropdown Migration to Physical Material & Top Toolbar Clean-up (2026-10-29)
 
 - Migrated Viewport Shading style selector to a clean `<select>` dropdown inside Properties Inspector (`SceneWorkbench.tsx`):
