@@ -43,13 +43,97 @@ import {
   ThumbsUp,
   ThumbsDown,
   Workflow,
+  FileText,
 } from "lucide-react";
 import { useCrystalTheme } from "@/lib/crystal-theme";
 import { StudioProfileMenu } from "@/components/crystal-studio/StudioSidebarFooter";
 import { CrystalThemeToggle } from "@/components/crystal-studio/CrystalThemeToggle";
 import { shareConversation } from "@/lib/chat-sharing.mjs";
 
-type Message = { id: number | string; role: "user" | "assistant"; content: string; citations?: { source: string }[]; imageUrl?: string };
+export type Attachment = {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  url: string;
+  previewUrl?: string;
+  isImage: boolean;
+};
+
+type Message = {
+  id: number | string;
+  role: "user" | "assistant";
+  content: string;
+  citations?: { source: string }[];
+  imageUrl?: string;
+  attachments?: Attachment[];
+};
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+function createThumbnail(dataUrl: string, maxDim: number = 400): Promise<string> {
+  return new Promise((resolve) => {
+    if (typeof window === "undefined" || !dataUrl.startsWith("data:image/")) {
+      resolve(dataUrl);
+      return;
+    }
+    const img = new window.Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width <= maxDim && height <= maxDim) {
+        resolve(dataUrl);
+        return;
+      }
+      if (width > height) {
+        height = Math.round((height * maxDim) / width);
+        width = maxDim;
+      } else {
+        width = Math.round((width * maxDim) / height);
+        height = maxDim;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        resolve(dataUrl);
+        return;
+      }
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL("image/jpeg", 0.8));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+async function createAttachment(file: File): Promise<Attachment> {
+  const isImage = file.type.startsWith("image/");
+  const dataUrl = await readFileAsDataUrl(file);
+  const previewUrl = isImage ? await createThumbnail(dataUrl, 400) : undefined;
+  return {
+    id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    name: file.name,
+    size: file.size,
+    type: file.type || "application/octet-stream",
+    url: dataUrl,
+    previewUrl,
+    isImage,
+  };
+}
 
 const thinkingDots = [
   { cx: 12, cy: 3.2, color: "#47B3FF" },
@@ -324,6 +408,36 @@ export default function AIChatPage() {
   const [projectConversation, setProjectConversation] = useState<ChatSession | null>(null);
   const [projects, setProjects] = useState<{ id: string; name: string }[]>([]);
   const [actionBusy, setActionBusy] = useState(false);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [previewImage, setPreviewImage] = useState<{ src: string; alt: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const mobileFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFiles = async (files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    if (!fileArray.length) return;
+    const newAttachments: Attachment[] = [];
+    for (const file of fileArray) {
+      if (file.size > 20 * 1024 * 1024) {
+        setToast(`"${file.name}" exceeds the 20MB limit.`);
+        continue;
+      }
+      try {
+        const att = await createAttachment(file);
+        newAttachments.push(att);
+      } catch {
+        setToast(`Could not load "${file.name}".`);
+      }
+    }
+    if (newAttachments.length) {
+      setAttachments((prev) => [...prev, ...newAttachments]);
+    }
+  };
+
+  const removeAttachment = (id: string) => {
+    setAttachments((prev) => prev.filter((a) => a.id !== id));
+  };
   const requestRef = useRef<AbortController | null>(null);
   const [hasPastedInput, setHasPastedInput] = useState(false);
   const { theme } = useCrystalTheme();
@@ -450,13 +564,20 @@ export default function AIChatPage() {
   const sendMessage = async (event?: FormEvent) => {
     event?.preventDefault();
     const message = input.trim();
-    if (!message || isSending) return;
+    if ((!message && attachments.length === 0) || isSending) return;
     if (sessionStatus !== "authenticated") { setToast("Sign in to use AI chat."); return; }
     if (!sessionsLoaded) { setToast("Please wait for saved conversations to load."); return; }
 
+    const currentAttachments = [...attachments];
+    const displayContent = message || (currentAttachments.some(a => a.isImage) ? "Attached photo" : "Attached file");
     const sessionId = activeSessionId ?? `chat-${crypto.randomUUID()}`;
-    const userMessage: Message = { id: Date.now(), role: "user", content: message };
-    const title = message.replace(/\s+/g, " ").slice(0, 42) || "New Chat";
+    const userMessage: Message = {
+      id: Date.now(),
+      role: "user",
+      content: displayContent,
+      attachments: currentAttachments.length > 0 ? currentAttachments : undefined,
+    };
+    const title = (message || displayContent).replace(/\s+/g, " ").slice(0, 42) || "New Chat";
     setActiveSessionId(sessionId);
     setMessages((current) => [...current, userMessage]);
     setChatSessions((current) => {
@@ -465,10 +586,19 @@ export default function AIChatPage() {
       return [{ id: sessionId, title, messages: [userMessage], updatedAt: Date.now() }, ...current];
     });
     setInput("");
+    setAttachments([]);
     setHasPastedInput(false);
     setIsSending(true);
     const controller = new AbortController();
     requestRef.current = controller;
+
+    let messageForAI = message;
+    if (currentAttachments.length > 0) {
+      const summary = currentAttachments
+        .map(a => a.isImage ? `[Attached Photo: ${a.name}]` : `[Attached File: ${a.name} (${formatFileSize(a.size)})]`)
+        .join("\n");
+      messageForAI = message ? `${message}\n\n${summary}` : `Please inspect and review the attached file(s):\n${summary}`;
+    }
 
     try {
       const response = await fetch("/api/ai-chat", {
@@ -478,7 +608,7 @@ export default function AIChatPage() {
         body: JSON.stringify({
           provider: selectedModel === "Nano Banana" ? "gemini" : selectedModel.toLowerCase(),
           conversationId: sessionId,
-          messages: [...messages, userMessage].map(({ role, content }) => ({ role, content })),
+          messages: [...messages, { role: "user", content: messageForAI }].map(({ role, content }) => ({ role, content })),
         }),
       });
       const result = (await response.json()) as {
@@ -500,6 +630,7 @@ export default function AIChatPage() {
       else if (result.provider === "you") setSelectedModel("You");
 
       const isImageRequest =
+        currentAttachments.some(a => a.isImage) ||
         /\b(generate|krijo|bëj|create|render|make|draw|show|propose)\b.*\b(image|photo|picture|foto|imazh|render|house|shtëpi|villa|vilë|apartament|facade|3d|hh)\b/i.test(message) ||
         /\b(image|photo|foto|imazh|hh\.jpg|hh)\b/i.test(message);
 
@@ -518,6 +649,7 @@ export default function AIChatPage() {
     } catch (error) {
       if (controller.signal.aborted) return;
       const isImageRequest =
+        currentAttachments.some(a => a.isImage) ||
         /\b(generate|krijo|bëj|create|render|make|draw|show|propose)\b.*\b(image|photo|picture|foto|imazh|render|house|shtëpi|villa|vilë|apartament|facade|3d|hh)\b/i.test(message) ||
         /\b(image|photo|foto|imazh|hh\.jpg|hh)\b/i.test(message);
       if (isImageRequest) {
@@ -534,6 +666,7 @@ export default function AIChatPage() {
         return;
       }
       setInput(message);
+      setAttachments(currentAttachments);
       setMessages((current) => current.filter((entry) => entry.id !== userMessage.id));
       setChatSessions((current) => current.map((chat) => chat.id === sessionId ? { ...chat, messages: chat.messages.filter((entry) => entry.id !== userMessage.id) } : chat).filter((chat) => chat.messages.length > 0));
       setToast(error instanceof Error ? error.message : "Casynus could not answer right now. Please try again.");
@@ -795,7 +928,43 @@ export default function AIChatPage() {
                   className={`scroll-mt-6 group flex ${message.role === "user" ? "justify-end" : "justify-center"}`}
                 >
                   <div className={message.role === "user" ? "max-w-[85%] rounded-2xl bg-[var(--studio-bg-elevated)] px-4 py-3 text-sm leading-7 text-[var(--studio-text-primary)]" : "w-full max-w-2xl px-4 py-3 text-left"}>
-                    {message.role === "assistant" ? <><AssistantResponse content={message.content} imageUrl={message.imageUrl} onEditPrompt={() => { const prev = messages.find((m, idx, arr) => arr[idx+1]?.id === message.id && m.role === "user"); if (prev) { setInput(prev.content); textareaRef.current?.focus(); } }} onRegenerate={() => { const last = [...messages].reverse().find(m => m.role === "user"); if (last) { setInput(last.content); void sendMessage(); } }} />{Boolean(message.citations?.length) && <div className="mt-3 flex flex-wrap gap-2" aria-label="Sources">{message.citations?.map((citation, index) => sourceHost(citation.source) && <a key={`${citation.source}-${index}`} href={citation.source} target="_blank" rel="noopener noreferrer" className="max-w-full truncate rounded-lg border border-[var(--studio-border)] px-2 py-1 text-xs text-[var(--studio-accent)] hover:bg-[var(--studio-bg-hover)]">[{index + 1}] {sourceHost(citation.source)}</a>)}</div>}</> : <p className="whitespace-pre-wrap">{message.content}</p>}
+                    {message.role === "assistant" ? <><AssistantResponse content={message.content} imageUrl={message.imageUrl} onEditPrompt={() => { const prev = messages.find((m, idx, arr) => arr[idx+1]?.id === message.id && m.role === "user"); if (prev) { setInput(prev.content); textareaRef.current?.focus(); } }} onRegenerate={() => { const last = [...messages].reverse().find(m => m.role === "user"); if (last) { setInput(last.content); void sendMessage(); } }} />{Boolean(message.citations?.length) && <div className="mt-3 flex flex-wrap gap-2" aria-label="Sources">{message.citations?.map((citation, index) => sourceHost(citation.source) && <a key={`${citation.source}-${index}`} href={citation.source} target="_blank" rel="noopener noreferrer" className="max-w-full truncate rounded-lg border border-[var(--studio-border)] px-2 py-1 text-xs text-[var(--studio-accent)] hover:bg-[var(--studio-bg-hover)]">[{index + 1}] {sourceHost(citation.source)}</a>)}</div>}</> : <div className="space-y-2">
+                      {message.attachments && message.attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {message.attachments.map((att) =>
+                            att.isImage ? (
+                              <button
+                                key={att.id}
+                                type="button"
+                                onClick={() => setPreviewImage({ src: att.url, alt: att.name })}
+                                className="group relative overflow-hidden rounded-xl border border-[var(--studio-border)] bg-black/40 transition hover:border-[var(--studio-accent)]"
+                              >
+                                <img
+                                  src={att.previewUrl || att.url}
+                                  alt={att.name}
+                                  className="max-h-48 max-w-[260px] rounded-xl object-cover transition group-hover:scale-105"
+                                />
+                              </button>
+                            ) : (
+                              <a
+                                key={att.id}
+                                href={att.url}
+                                download={att.name}
+                                className="flex items-center gap-2 rounded-xl border border-[var(--studio-border)] bg-[var(--studio-bg-hover)] px-3 py-2 text-xs text-[var(--studio-text-primary)] transition hover:border-[var(--studio-accent)]"
+                              >
+                                <FileText size={16} className="text-[var(--studio-accent)] shrink-0" />
+                                <div className="min-w-0 max-w-[160px]">
+                                  <div className="truncate font-medium">{att.name}</div>
+                                  <div className="text-[10px] text-[var(--studio-text-secondary)]">{formatFileSize(att.size)}</div>
+                                </div>
+                                <Download size={14} className="ml-1 text-[var(--studio-text-secondary)] shrink-0" />
+                              </a>
+                            )
+                          )}
+                        </div>
+                      )}
+                      {message.content && <p className="whitespace-pre-wrap">{message.content}</p>}
+                    </div>}
                     {message.role === "assistant" && <div className="mt-3 flex justify-start gap-1 opacity-60 transition group-hover:opacity-100"><button onClick={() => void copyMessage(message)} aria-label="Copy response" className="grid h-9 w-9 place-items-center rounded-[6px] p-0 text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-accent)]">{copiedId === message.id ? <Check size={14} /> : <Copy size={14} />}</button><button aria-label="Share response" className="grid h-9 w-9 place-items-center rounded-[6px] p-0 text-[var(--studio-text-secondary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-accent)]"><Share2 size={14} /></button><Link href="/casynus" className="ml-1 rounded-[6px] px-2 py-1 text-[11px] text-[var(--studio-accent)] transition hover:bg-[var(--studio-accent-hover)]">Go to Casynus</Link></div>}
                   </div>
                 </div>
@@ -805,11 +974,121 @@ export default function AIChatPage() {
           )}
         </section>
 
-        <form onSubmit={sendMessage} className={`absolute bottom-6 left-1/2 flex w-[calc(100%-32px)] max-w-[640px] -translate-x-1/2 ${hasPastedInput ? "items-end h-[240px]" : "items-center h-12"} gap-2 rounded-2xl border border-[var(--studio-border)] bg-[var(--studio-bg-elevated)] p-2 shadow-2xl transition`}>
-          <button type="button" aria-label="Attach file" onClick={() => { setToast("File attachments are available in chat."); window.setTimeout(() => setToast(null), 1800); }} className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[var(--studio-bg-elevated)] text-[var(--studio-text-primary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)] active:scale-95"><Paperclip size={20} /></button>
-          <textarea ref={textareaRef} value={input} onChange={(event) => { setInput(event.target.value); if (!event.target.value) setHasPastedInput(false); }} onPaste={(event) => { if (event.clipboardData.getData("text")) setHasPastedInput(true); }} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); void sendMessage(); } }} rows={1} placeholder="Ask Casynus anything..." className={`min-h-8 flex-1 resize-none bg-transparent px-2 py-1 text-sm font-normal leading-[21px] text-[var(--studio-text-primary)] outline-none placeholder:text-[var(--studio-text-secondary)] ${hasPastedInput ? "max-h-[208px] overflow-y-auto" : "max-h-40 overflow-y-hidden"}`} />
-          <button type="button" aria-label="Use microphone" className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[var(--studio-bg-elevated)] text-[var(--studio-text-primary)] transition hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)] active:scale-95"><Mic size={20} /></button>
-          <button type="submit" aria-label="Send message" disabled={!input.trim() || isSending} className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[var(--studio-accent)] text-[var(--studio-text-primary)] shadow-lg shadow-blue-500/20 transition-all hover:scale-105 hover:bg-[var(--studio-accent-hover)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"><ArrowUp size={20} /></button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*, .pdf, .txt, .md, .doc, .docx, .json, .csv, .glb, .gltf, .obj, .fbx, .stl, application/*"
+          className="hidden"
+          onChange={(e) => {
+            if (e.target.files) void handleFiles(e.target.files);
+            e.target.value = "";
+          }}
+        />
+        <form
+          onSubmit={sendMessage}
+          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+          onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsDragging(false);
+            if (e.dataTransfer.files?.length) {
+              void handleFiles(e.dataTransfer.files);
+            }
+          }}
+          className={`absolute bottom-6 left-1/2 flex flex-col w-[calc(100%-32px)] max-w-[640px] -translate-x-1/2 rounded-2xl border ${
+            isDragging ? "border-[var(--studio-accent)] ring-2 ring-[var(--studio-accent)]/30" : "border-[var(--studio-border)]"
+          } bg-[var(--studio-bg-elevated)] p-2 shadow-2xl transition`}
+        >
+          {attachments.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 px-1 pt-1 pb-2 border-b border-[var(--studio-border)] mb-1">
+              {attachments.map((att) => (
+                <div key={att.id} className="relative group flex items-center gap-2 rounded-xl border border-[var(--studio-border)] bg-[var(--studio-bg-hover)] p-1.5 pr-2.5">
+                  {att.isImage ? (
+                    <img src={att.previewUrl || att.url} alt={att.name} className="h-10 w-10 rounded-lg object-cover border border-[var(--studio-border)]" />
+                  ) : (
+                    <div className="grid h-10 w-10 place-items-center rounded-lg bg-[var(--studio-bg-elevated)] border border-[var(--studio-border)] text-[var(--studio-accent)]">
+                      <FileText size={18} />
+                    </div>
+                  )}
+                  <div className="min-w-0 max-w-[130px]">
+                    <div className="truncate text-xs font-medium text-[var(--studio-text-primary)]">{att.name}</div>
+                    <div className="text-[10px] text-[var(--studio-text-secondary)]">{formatFileSize(att.size)}</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeAttachment(att.id)}
+                    aria-label={`Remove ${att.name}`}
+                    className="grid h-5 w-5 place-items-center rounded-full bg-[var(--studio-bg-elevated)] text-[var(--studio-text-secondary)] hover:bg-red-500 hover:text-white transition"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                aria-label="Add more files"
+                className="flex items-center gap-1 rounded-xl border border-dashed border-[var(--studio-border)] px-2.5 py-2 text-xs text-[var(--studio-text-secondary)] hover:border-[var(--studio-accent)] hover:text-[var(--studio-text-primary)] transition"
+              >
+                <Plus size={14} />
+                <span>Add</span>
+              </button>
+            </div>
+          )}
+          <div className="flex w-full items-center gap-2">
+            <button
+              type="button"
+              aria-label="Attach file or photo"
+              title="Attach file or photo"
+              onClick={() => fileInputRef.current?.click()}
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[var(--studio-bg-elevated)] text-[var(--studio-text-primary)] transition hover:bg-[var(--studio-bg-hover)] active:scale-95"
+            >
+              <Paperclip size={20} />
+            </button>
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(event) => {
+                setInput(event.target.value);
+                if (!event.target.value) setHasPastedInput(false);
+              }}
+              onPaste={(event) => {
+                if (event.clipboardData.files && event.clipboardData.files.length > 0) {
+                  event.preventDefault();
+                  void handleFiles(event.clipboardData.files);
+                  return;
+                }
+                if (event.clipboardData.getData("text")) setHasPastedInput(true);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  void sendMessage();
+                }
+              }}
+              rows={1}
+              placeholder="Ask Casynus anything..."
+              className={`min-h-8 flex-1 resize-none bg-transparent px-2 py-1 text-sm font-normal leading-[21px] text-[var(--studio-text-primary)] outline-none placeholder:text-[var(--studio-text-secondary)] ${
+                hasPastedInput ? "max-h-[208px] overflow-y-auto" : "max-h-40 overflow-y-hidden"
+              }`}
+            />
+            <button
+              type="button"
+              aria-label="Use microphone"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[var(--studio-bg-elevated)] text-[var(--studio-text-primary)] transition hover:bg-[var(--studio-bg-hover)] active:scale-95"
+            >
+              <Mic size={20} />
+            </button>
+            <button
+              type="submit"
+              aria-label="Send message"
+              disabled={(!input.trim() && attachments.length === 0) || isSending}
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-[var(--studio-accent)] text-[var(--studio-text-primary)] shadow-lg shadow-blue-500/20 transition-all hover:scale-105 hover:bg-[var(--studio-accent-hover)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ArrowUp size={20} />
+            </button>
+          </div>
         </form>
       </main>
       </div>
@@ -847,7 +1126,39 @@ export default function AIChatPage() {
                   {message.role === "assistant" ? (
                     <AssistantResponse content={message.content} imageUrl={message.imageUrl} onEditPrompt={() => { const prev = messages.find((m, idx, arr) => arr[idx+1]?.id === message.id && m.role === "user"); if (prev) { setInput(prev.content); textareaRef.current?.focus(); } }} onRegenerate={() => { const last = [...messages].reverse().find(m => m.role === "user"); if (last) { setInput(last.content); void sendMessage(); } }} />
                   ) : (
-                    <p>{message.content}</p>
+                    <div className="space-y-2">
+                      {message.attachments && message.attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {message.attachments.map((att) =>
+                            att.isImage ? (
+                              <button
+                                key={att.id}
+                                type="button"
+                                onClick={() => setPreviewImage({ src: att.url, alt: att.name })}
+                                className="overflow-hidden rounded-xl border border-[var(--studio-border)]"
+                              >
+                                <img
+                                  src={att.previewUrl || att.url}
+                                  alt={att.name}
+                                  className="max-h-36 max-w-[200px] rounded-xl object-cover"
+                                />
+                              </button>
+                            ) : (
+                              <a
+                                key={att.id}
+                                href={att.url}
+                                download={att.name}
+                                className="flex items-center gap-2 rounded-xl border border-[var(--studio-border)] bg-[var(--studio-bg-hover)] px-3 py-1.5 text-xs text-[var(--studio-text-primary)]"
+                              >
+                                <FileText size={16} className="text-[var(--studio-accent)] shrink-0" />
+                                <span className="truncate max-w-[130px] font-medium">{att.name}</span>
+                              </a>
+                            )
+                          )}
+                        </div>
+                      )}
+                      {message.content && <p>{message.content}</p>}
+                    </div>
                   )}
                 </div>
               ))}
@@ -856,6 +1167,17 @@ export default function AIChatPage() {
           )}
         </div>
 
+        <input
+          ref={mobileFileInputRef}
+          type="file"
+          multiple
+          accept="image/*, .pdf, .txt, .md, .doc, .docx, .json, .csv, .glb, .gltf, .obj, .fbx, .stl, application/*"
+          className="hidden"
+          onChange={(e) => {
+            if (e.target.files) void handleFiles(e.target.files);
+            e.target.value = "";
+          }}
+        />
         <form className="aichat-mobile-composer" onSubmit={sendMessage}>
           <button type="button" className="aichat-mobile-pro-banner" onClick={() => { window.location.href = "/pricing"; }}>
             <div className="flex items-center gap-2">
@@ -869,10 +1191,34 @@ export default function AIChatPage() {
             What do you want to create?
           </label>
 
+          {attachments.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 px-2 py-1.5 border border-[var(--studio-border)] rounded-xl bg-[var(--studio-bg-hover)] mb-2 max-h-24 overflow-y-auto">
+              {attachments.map((att) => (
+                <div key={att.id} className="relative flex items-center gap-1.5 rounded-lg bg-[var(--studio-bg-elevated)] px-2 py-1 text-xs">
+                  {att.isImage ? (
+                    <img src={att.previewUrl || att.url} alt={att.name} className="h-6 w-6 rounded object-cover" />
+                  ) : (
+                    <FileText size={14} className="text-[var(--studio-accent)]" />
+                  )}
+                  <span className="max-w-[100px] truncate text-[11px]">{att.name}</span>
+                  <button type="button" onClick={() => removeAttachment(att.id)} className="text-[var(--studio-text-secondary)] hover:text-red-400">
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <textarea
             id="aichat-mobile-prompt"
             value={input}
             onChange={(event) => setInput(event.target.value)}
+            onPaste={(event) => {
+              if (event.clipboardData.files && event.clipboardData.files.length > 0) {
+                event.preventDefault();
+                void handleFiles(event.clipboardData.files);
+              }
+            }}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
@@ -884,7 +1230,7 @@ export default function AIChatPage() {
           />
 
           <div className="aichat-mobile-composer-actions">
-            <button type="button" aria-label="Attach file" onClick={() => { setToast("File attachments available in chat."); window.setTimeout(() => setToast(null), 1800); }}>
+            <button type="button" aria-label="Attach file or photo" onClick={() => mobileFileInputRef.current?.click()}>
               <Paperclip size={18} />
             </button>
             <button type="button" className="aichat-mobile-model-select" onClick={() => setMobileModelSheet(true)}>
@@ -892,7 +1238,7 @@ export default function AIChatPage() {
               <span>{selectedModel}</span>
               <ChevronDown size={14} />
             </button>
-            <button type="submit" aria-label="Send message" disabled={!input.trim() || isSending}>
+            <button type="submit" aria-label="Send message" disabled={(!input.trim() && attachments.length === 0) || isSending}>
               <ArrowRight size={20} />
             </button>
           </div>
@@ -1001,6 +1347,36 @@ export default function AIChatPage() {
         </section>
       </div>}
       {toast && <div role="status" className="fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 rounded-lg border border-[var(--studio-border)] bg-[var(--studio-bg-panel)] px-4 py-2 text-xs text-[var(--studio-text-primary)] shadow-xl">{toast}<button aria-label="Dismiss notification" onClick={() => setToast(null)} className="ml-3">×</button></div>}
+      {previewImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div
+            className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-2xl border border-[var(--studio-border)] bg-[#161616] p-2 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-2 px-2">
+              <span className="text-xs text-[var(--studio-text-secondary)] truncate max-w-[300px]">
+                {previewImage.alt}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPreviewImage(null)}
+                aria-label="Close image preview"
+                className="grid h-7 w-7 place-items-center rounded-lg text-[var(--studio-text-secondary)] hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)] transition"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <img
+              src={previewImage.src}
+              alt={previewImage.alt}
+              className="max-h-[80vh] max-w-[85vw] rounded-xl object-contain"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

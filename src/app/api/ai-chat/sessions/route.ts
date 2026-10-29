@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { isApiResponse, requirePlatformContext } from "@/lib/platform/api";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +24,10 @@ export async function GET() {
         id: message.id, role: message.role === "ASSISTANT" ? "assistant" : "user", content: message.content,
         citations: message.metadata && typeof message.metadata === "object" && !Array.isArray(message.metadata)
           ? (message.metadata as Record<string, unknown>).citations : undefined,
+        attachments: message.metadata && typeof message.metadata === "object" && !Array.isArray(message.metadata)
+          ? (message.metadata as Record<string, unknown>).attachments : undefined,
+        imageUrl: message.metadata && typeof message.metadata === "object" && !Array.isArray(message.metadata)
+          ? (message.metadata as Record<string, unknown>).imageUrl : undefined,
       })),
     })) });
   } catch {
@@ -50,7 +55,15 @@ export async function POST(request: NextRequest) {
         if (!rawMessage || typeof rawMessage !== "object") return [];
         const message = rawMessage as Record<string, unknown>;
         if ((message.role !== "user" && message.role !== "assistant") || typeof message.content !== "string" || message.content.length > 20_000) return [];
-        return [{ role: message.role === "user" ? "USER" as const : "ASSISTANT" as const, content: message.content }];
+        const metadata: Record<string, unknown> = {};
+        if (message.attachments) metadata.attachments = message.attachments;
+        if (message.imageUrl) metadata.imageUrl = message.imageUrl;
+        if (message.citations) metadata.citations = message.citations;
+        return [{
+          role: message.role === "user" ? "USER" as const : "ASSISTANT" as const,
+          content: message.content,
+          metadata: (Object.keys(metadata).length ? (metadata as unknown as Prisma.InputJsonValue) : undefined),
+        }];
       });
       await prisma.$transaction(async (tx) => {
         await tx.assistantConversation.create({ data: { id: item.id as string, workspaceId: context.workspaceId, userId: context.userId, title: item.title as string, status: "ACTIVE", lastMessageAt: new Date() } });

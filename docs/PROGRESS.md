@@ -2,6 +2,18 @@
 
 Last updated: 2026-10-29
 
+## File and Photo Attachment Support in /aichat (2026-10-29)
+
+- Enabled file and photo attachments in `/aichat` across desktop and mobile layouts:
+  - Paperclip attachment action: Clicking the Paperclip button opens the native file selector (`image/*`, `.pdf`, `.txt`, `.md`, `.doc`, `.docx`, `.json`, `.csv`, `.glb`, `.gltf`, `.obj`, `.fbx`, `.stl`, `application/*`).
+  - Drag & Drop & Paste: Added drag & drop on the input form with highlighted boundary, as well as clipboard image/file paste detection (`onPaste`).
+  - Pre-send preview: Added live attachment chips above the input bar with thumbnails for photos, file icons/names/sizes for documents, and remove buttons (`X`).
+  - Lightbox preview: Clicking attached image thumbnails in chat opens a centered full-screen lightbox modal with backdrop blur.
+  - Chat bubbles: Render attached images and downloadable file chips directly inside the user's message bubble.
+  - AI prompt integration: Includes structured summaries of attached files/photos when querying AI providers, with automatic fallback and image concept detection.
+  - Session persistence: Updated `/api/ai-chat/sessions` to store and restore `attachments` and `imageUrl` in conversation metadata.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 unit tests passed), `npm run build` (Next.js production build passed with 0 errors).
+
 ## AI Chat Generated Image Response Frame (638x484px, #161616 Frame & Action Bar) (2026-10-29)
 
 - Implemented Figma-annotated generated image response card in `/aichat` (`src/app/aichat/page.tsx` & `src/app/globals.css`):

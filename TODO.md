@@ -1,5 +1,14 @@
 # Next tasks (reviewed 2026-10-29)
 
+- [x] File and Photo Attachment Support in /aichat:
+  - Enabled file attachment via Paperclip button on desktop and mobile.
+  - Added drag & drop and clipboard image pasting support.
+  - Added attachment preview bar with image thumbnails, file details, and remove controls.
+  - Added in-message attachment rendering (clickable photo previews and downloadable file cards).
+  - Integrated full-screen lightbox for reviewing attached photos.
+  - Preserved attachments in session metadata across database and local storage.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 tests passed), `npm run build` (0 errors).
+
 - [x] AI Chat Generated Image Response Frame (638x484px, #161616 Frame & Action Bar):
   - Created custom Figma-spec response card in `/aichat` for generated images:
     - Frame color: `#161616`.
