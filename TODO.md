@@ -1,4 +1,14 @@
-# Next tasks (reviewed 2026-10-29)
+# Next tasks (reviewed 2026-10-30)
+
+- [x] AI Chat Recent Conversations: Real Action Handlers (Pin, Add to Project, Mark as Unread, Rename, Share, Delete):
+  - Added Pin / Unpin with dedicated `Pin` icon, pinned badge, and sorting to the top of Recent chats.
+  - Added Add to project modal with project list, checkmark, Remove from project, and inline Create New Project input.
+  - Added Mark as unread / Mark as read toggle with unread indicator dot and automatic read on chat open.
+  - Added styled in-app Rename modal with auto-focus and instant title persistence.
+  - Added Share action supporting native Web Share API and formatted clipboard transcript fallback.
+  - Added Delete confirmation modal with server archiving and local storage clean-up.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 unit tests passed), `npm run build` (0 errors).
+
 
 - [x] Full-Stack Platform Hardening: Account Deletion, Workspace Settings, and Studio Project Lifecycle:
   - Added `DELETE /api/me` transactionally deactivating user profiles, soft-deleting workspace projects, and revoking active sessions.

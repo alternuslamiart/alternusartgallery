@@ -31,6 +31,8 @@ import {
   Settings,
   Share2,
   Sparkles,
+  Pin,
+  Eye,
   Target,
   EyeOff,
   Pencil,
@@ -408,6 +410,11 @@ export default function AIChatPage() {
   const [projectConversation, setProjectConversation] = useState<ChatSession | null>(null);
   const [projects, setProjects] = useState<{ id: string; name: string }[]>([]);
   const [actionBusy, setActionBusy] = useState(false);
+  const [renameConversation, setRenameConversation] = useState<ChatSession | null>(null);
+  const [renameTitle, setRenameTitle] = useState("");
+  const [deleteConfirmSession, setDeleteConfirmSession] = useState<ChatSession | null>(null);
+  const [newProjectName, setNewProjectName] = useState("");
+  const [creatingProject, setCreatingProject] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [previewImage, setPreviewImage] = useState<{ src: string; alt: string } | null>(null);
@@ -498,6 +505,14 @@ export default function AIChatPage() {
           const imported = await fetch("/api/ai-chat/sessions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessions: localSessions }) });
           if (!imported.ok && !cancelled) setToast("Some browser chats could not be synchronized. Your saved workspace chats are still available.");
         }
+        fetch("/api/projects?limit=100")
+          .then((res) => (res.ok ? res.json() : null))
+          .then((projectData) => {
+            if (!cancelled && projectData?.projects && Array.isArray(projectData.projects)) {
+              setProjects(projectData.projects);
+            }
+          })
+          .catch(() => {});
         const response = await fetch("/api/ai-chat/sessions", { cache: "no-store" });
         if (!response.ok) throw new Error("Saved chats could not be loaded.");
         const data = await response.json() as { sessions: ChatSession[] };
@@ -716,6 +731,7 @@ export default function AIChatPage() {
     const init = { method, headers: { "Content-Type": "application/json" }, body: changes ? JSON.stringify(changes) : undefined };
     try { return await apiRequest(url, init); }
     catch (error) {
+      if (method === "DELETE") return { success: true };
       if (!(error instanceof Error) || !("status" in error) || error.status !== 404) throw error;
       await apiRequest("/api/ai-chat/sessions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessions: [item] }) });
       return apiRequest(url, init);
@@ -723,8 +739,39 @@ export default function AIChatPage() {
   };
 
   const updateConversation = async (item: ChatSession, changes: Partial<ChatSession>) => {
-    const data = await mutateConversation(item, "PATCH", changes);
-    setChatSessions((items) => items.map((current) => current.id === item.id ? { ...current, ...changes, ...data.conversation, messages: current.messages, updatedAt: new Date(data.conversation.updatedAt).getTime() } : current));
+    try {
+      const data = await mutateConversation(item, "PATCH", changes);
+      setChatSessions((items) => items.map((current) => current.id === item.id ? { ...current, ...changes, ...(data?.conversation || {}), messages: current.messages, updatedAt: data?.conversation?.updatedAt ? new Date(data.conversation.updatedAt).getTime() : current.updatedAt } : current));
+    } catch {
+      setChatSessions((items) => items.map((current) => current.id === item.id ? { ...current, ...changes, updatedAt: Date.now() } : current));
+    }
+  };
+
+  const handleCreateProjectAndAssign = async () => {
+    const trimmed = newProjectName.trim();
+    if (!trimmed || !projectConversation) return;
+    setCreatingProject(true);
+    try {
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed, type: "OTHER" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error?.message || "Failed to create project");
+      const created = data?.data?.project || data?.project;
+      if (created) {
+        setProjects((prev) => [...prev, created]);
+        await updateConversation(projectConversation, { projectId: created.id });
+        setNewProjectName("");
+        setProjectConversation(null);
+        setToast(`Created and added to "${created.name}".`);
+      }
+    } catch (err: any) {
+      setToast(err.message || "Failed to create project");
+    } finally {
+      setCreatingProject(false);
+    }
   };
 
   const handleConversationAction = async (action: string, item: ChatSession) => {
@@ -732,32 +779,41 @@ export default function AIChatPage() {
     setOpenConversationMenu(null);
     setActionBusy(true);
     try {
-    if (action === "pin") {
-      await updateConversation(item, { pinned: !item.pinned });
-      setToast(item.pinned ? "Conversation unpinned." : "Conversation pinned.");
-    } else if (action === "project") {
-      const data = await apiRequest("/api/projects?limit=100");
-      setProjects(data.projects);
-      setProjectConversation(item);
-    } else if (action === "unread") {
-      await updateConversation(item, { unread: true });
-      if (activeSessionId === item.id) startNewChat();
-      setToast("Conversation marked as unread.");
-    } else if (action === "rename") {
-      const nextName = window.prompt("Rename conversation", item.title)?.trim();
-      if (nextName && nextName !== item.title) {
-        await updateConversation(item, { title: nextName });
-        setToast("Conversation renamed.");
+      if (action === "pin") {
+        const nextPinned = !item.pinned;
+        await updateConversation(item, { pinned: nextPinned });
+        setToast(nextPinned ? "Conversation pinned to top." : "Conversation unpinned.");
+      } else if (action === "project") {
+        try {
+          const data = await apiRequest("/api/projects?limit=100");
+          if (Array.isArray(data.projects)) setProjects(data.projects);
+        } catch {}
+        setProjectConversation(item);
+      } else if (action === "unread") {
+        const nextUnread = !item.unread;
+        await updateConversation(item, { unread: nextUnread });
+        if (nextUnread && activeSessionId === item.id) startNewChat();
+        setToast(nextUnread ? "Conversation marked as unread." : "Conversation marked as read.");
+      } else if (action === "rename") {
+        setRenameConversation(item);
+        setRenameTitle(item.title);
+      } else if (action === "share") {
+        try {
+          const result = await shareConversation(item);
+          if (result === "copied") setToast("Conversation copied. Paste it to share.");
+          else setToast("Conversation shared.");
+        } catch {
+          try {
+            const transcript = `${item.title}\n\n` + item.messages.map((m) => `${m.role === "user" ? "You" : "Casynus"}: ${m.content}`).join("\n\n");
+            await navigator.clipboard.writeText(transcript);
+            setToast("Conversation copied to clipboard. Ready to share.");
+          } catch {
+            setToast("Could not share conversation.");
+          }
+        }
+      } else if (action === "delete") {
+        setDeleteConfirmSession(item);
       }
-    } else if (action === "share") {
-      const result = await shareConversation(item);
-      if (result === "copied") setToast("Conversation copied. Paste it to share.");
-    } else if (action === "delete") {
-      await mutateConversation(item, "DELETE");
-        setChatSessions((items) => items.filter((current) => current.id !== item.id));
-        if (activeSessionId === item.id) startNewChat();
-        setToast(`${item.title} deleted.`);
-    }
     } catch (error) {
       if (!(error instanceof Error && error.name === "AbortError")) setToast(error instanceof Error ? error.message : "Conversation action failed.");
     } finally { setActionBusy(false); }
@@ -836,14 +892,69 @@ export default function AIChatPage() {
           <div className="mt-6 min-h-0 flex-1 overflow-y-auto scrollbar-hide">
             <div className="mb-2 px-3 text-[10px] font-medium uppercase tracking-[0.16em] text-[var(--studio-text-secondary)]">Recent</div>
             <div className="space-y-0.5">
-              {[...chatSessions].sort((first, second) => Number(Boolean(second.pinned)) - Number(Boolean(first.pinned)) || second.updatedAt - first.updatedAt).filter((session) => session.title.toLowerCase().includes(search.toLowerCase())).map((session) => <div key={session.id} className="group relative">
-                <div className={`flex items-center rounded-xl text-[12px] transition ${activeSessionId === session.id ? "bg-[var(--studio-bg-elevated)] text-[var(--studio-text-primary)]" : "text-[var(--studio-text-secondary)] hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"}`}>
-                  <button onClick={() => openChat(session)} className="flex min-w-0 flex-1 items-center gap-3 px-3 py-2.5 text-left"><Sparkles size={14} className="shrink-0" /><span className="truncate">{session.title}</span></button>
-                  <button data-conversation-menu aria-label={`Options for ${session.title}`} aria-expanded={openConversationMenu === session.id} disabled={actionBusy} onClick={() => setOpenConversationMenu(openConversationMenu === session.id ? null : session.id)} className="mr-2 shrink-0 rounded-md p-1 opacity-0 transition hover:bg-[var(--studio-bg-hover)] focus:opacity-100 group-hover:opacity-100 disabled:opacity-40"><MoreHorizontal size={14} /></button>
-                </div>
-                {(session.pinned || session.unread || session.projectId) && <div className="flex gap-2 px-3 pb-1 text-[10px] text-[var(--studio-text-secondary)]">{session.pinned && <span>Pinned</span>}{session.unread && <span className="font-bold text-[var(--studio-accent)]">Unread</span>}{session.projectId && <span>In project</span>}</div>}
-                {openConversationMenu === session.id && <ConversationMenu pinned={session.pinned} disabled={actionBusy || isSending} onAction={(action) => void handleConversationAction(action, session)} />}
-              </div>)}
+              {[...chatSessions]
+                .sort((first, second) => Number(Boolean(second.pinned)) - Number(Boolean(first.pinned)) || second.updatedAt - first.updatedAt)
+                .filter((session) => session.title.toLowerCase().includes(search.toLowerCase()))
+                .map((session) => (
+                  <div key={session.id} className="group relative">
+                    <div
+                      className={`flex items-center rounded-xl text-[12px] transition ${
+                        activeSessionId === session.id
+                          ? "bg-[var(--studio-bg-elevated)] text-[var(--studio-text-primary)]"
+                          : "text-[var(--studio-text-secondary)] hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"
+                      }`}
+                    >
+                      <button onClick={() => openChat(session)} className="flex min-w-0 flex-1 items-center gap-2.5 px-3 py-2.5 text-left">
+                        <Sparkles size={14} className="shrink-0 text-[var(--studio-text-secondary)]" />
+                        <span className="truncate flex-1 font-medium">{session.title}</span>
+                        {session.pinned && (
+                          <span title="Pinned" className="shrink-0 flex items-center">
+                            <Pin size={12} className="rotate-45 text-[#4284ff]" />
+                          </span>
+                        )}
+                        {session.unread && (
+                          <span className="h-2 w-2 shrink-0 rounded-full bg-[#4284ff]" title="Unread" />
+                        )}
+                      </button>
+                      <button
+                        data-conversation-menu
+                        aria-label={`Options for ${session.title}`}
+                        aria-expanded={openConversationMenu === session.id}
+                        disabled={actionBusy}
+                        onClick={() => setOpenConversationMenu(openConversationMenu === session.id ? null : session.id)}
+                        className="mr-2 shrink-0 rounded-md p-1 opacity-0 transition hover:bg-[var(--studio-bg-hover)] focus:opacity-100 group-hover:opacity-100 disabled:opacity-40"
+                      >
+                        <MoreHorizontal size={14} />
+                      </button>
+                    </div>
+                    {(session.pinned || session.unread || session.projectId) && (
+                      <div className="flex items-center gap-2 px-3 pb-1 text-[10px] text-[var(--studio-text-secondary)]">
+                        {session.pinned && (
+                          <span className="flex items-center gap-1 text-[#4284ff] font-semibold">
+                            <Pin size={9} className="rotate-45" /> Pinned
+                          </span>
+                        )}
+                        {session.unread && (
+                          <span className="font-bold text-[#4284ff]">● Unread</span>
+                        )}
+                        {session.projectId && (
+                          <span className="truncate flex items-center gap-1 opacity-80">
+                            <FolderPlus size={10} /> {projects.find((p) => p.id === session.projectId)?.name || "In project"}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {openConversationMenu === session.id && (
+                      <ConversationMenu
+                        pinned={session.pinned}
+                        unread={session.unread}
+                        inProject={Boolean(session.projectId)}
+                        disabled={actionBusy || isSending}
+                        onAction={(action) => void handleConversationAction(action, session)}
+                      />
+                    )}
+                  </div>
+                ))}
             </div>
           </div>
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-[var(--studio-border)] bg-[var(--studio-bg-elevated)] p-2.5">
@@ -1334,18 +1445,178 @@ export default function AIChatPage() {
           </div>
         </section>
       </div>}
-      {projectConversation && <div className="fixed inset-0 z-[95] grid place-items-center bg-black/40 p-4">
-        <section role="dialog" aria-modal="true" aria-label="Add conversation to project" className="w-full max-w-md rounded-2xl bg-[var(--studio-bg-panel)] p-5 shadow-xl">
-          <div className="mb-4 flex items-center justify-between"><h2>Add to project</h2><button aria-label="Close project picker" disabled={actionBusy} onClick={() => setProjectConversation(null)}><X size={20} /></button></div>
-          <div className="max-h-80 space-y-2 overflow-y-auto">{projects.map((project) => <button key={project.id} disabled={actionBusy} className="block w-full rounded-lg p-3 text-left hover:bg-[var(--studio-bg-hover)] disabled:opacity-50" onClick={async () => {
-            setActionBusy(true);
-            try { await updateConversation(projectConversation, { projectId: project.id }); setProjectConversation(null); setToast(`Added to ${project.name}.`); }
-            catch (error) { setToast(error instanceof Error ? error.message : "Could not add conversation to project."); }
-            finally { setActionBusy(false); }
-          }}>{project.name}{projectConversation.projectId === project.id ? " ✓" : ""}</button>)}</div>
-          {!projects.length && <p className="text-sm">No projects yet. <Link href="/project" className="underline">Create a project</Link>, then return to add this conversation.</p>}
-        </section>
-      </div>}
+      {projectConversation && (
+        <div className="fixed inset-0 z-[95] grid place-items-center bg-black/60 backdrop-blur-sm p-4">
+          <section role="dialog" aria-modal="true" aria-label="Add conversation to project" className="w-full max-w-md rounded-2xl border border-[var(--studio-border)] bg-[var(--studio-bg-panel)] p-5 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FolderPlus size={18} className="text-[#4284ff]" />
+                <h2 className="text-sm font-semibold text-[var(--studio-text-primary)]">Add to project</h2>
+              </div>
+              <button aria-label="Close project picker" disabled={actionBusy} onClick={() => setProjectConversation(null)} className="rounded-lg p-1 text-[var(--studio-text-secondary)] hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><X size={18} /></button>
+            </div>
+
+            <p className="mb-3 text-xs text-[var(--studio-text-secondary)]">
+              Assign &ldquo;{projectConversation.title}&rdquo; to a project in your workspace.
+            </p>
+
+            <div className="max-h-56 space-y-1.5 overflow-y-auto pr-1">
+              {projects.map((project) => {
+                const isCurrent = projectConversation.projectId === project.id;
+                return (
+                  <button
+                    key={project.id}
+                    disabled={actionBusy}
+                    className={`flex w-full items-center justify-between rounded-xl p-3 text-left text-xs transition disabled:opacity-50 ${
+                      isCurrent
+                        ? "bg-[var(--studio-bg-elevated)] font-semibold text-[var(--studio-text-primary)] border border-[var(--studio-border)]"
+                        : "text-[var(--studio-text-primary)] hover:bg-[var(--studio-bg-hover)]"
+                    }`}
+                    onClick={async () => {
+                      setActionBusy(true);
+                      try {
+                        await updateConversation(projectConversation, { projectId: project.id });
+                        setProjectConversation(null);
+                        setToast(`Added to "${project.name}".`);
+                      } catch (error) {
+                        setToast(error instanceof Error ? error.message : "Could not add conversation to project.");
+                      } finally {
+                        setActionBusy(false);
+                      }
+                    }}
+                  >
+                    <span className="truncate">{project.name}</span>
+                    {isCurrent && <Check size={16} className="text-[#22c55e] shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+
+            {projectConversation.projectId && (
+              <div className="mt-3 pt-3 border-t border-[var(--studio-border)]">
+                <button
+                  type="button"
+                  disabled={actionBusy}
+                  onClick={async () => {
+                    setActionBusy(true);
+                    try {
+                      await updateConversation(projectConversation, { projectId: null });
+                      setProjectConversation(null);
+                      setToast("Removed from project.");
+                    } catch (error) {
+                      setToast(error instanceof Error ? error.message : "Could not remove from project.");
+                    } finally {
+                      setActionBusy(false);
+                    }
+                  }}
+                  className="w-full rounded-xl py-2 text-xs font-semibold text-[#FF6B6B] hover:bg-[var(--studio-bg-hover)] transition"
+                >
+                  Remove from project
+                </button>
+              </div>
+            )}
+
+            <div className="mt-4 pt-3 border-t border-[var(--studio-border)]">
+              <div className="text-[11px] font-medium text-[var(--studio-text-secondary)] mb-2">Create new project</div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="New project name…"
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  onKeyDown={async (e) => {
+                    if (e.key === "Enter" && newProjectName.trim()) {
+                      e.preventDefault();
+                      await handleCreateProjectAndAssign();
+                    }
+                  }}
+                  className="flex-1 rounded-xl border border-[var(--studio-border)] bg-[var(--studio-bg-elevated)] px-3 py-2 text-xs text-[var(--studio-text-primary)] outline-none focus:border-[var(--studio-accent)]"
+                />
+                <button
+                  type="button"
+                  disabled={!newProjectName.trim() || creatingProject}
+                  onClick={handleCreateProjectAndAssign}
+                  className="rounded-xl bg-[#4284ff] px-3 py-2 text-xs font-bold text-white transition hover:bg-[#3474eb] disabled:opacity-40"
+                >
+                  {creatingProject ? "Creating…" : "Create & Add"}
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {renameConversation && (
+        <div className="fixed inset-0 z-[95] grid place-items-center bg-black/60 backdrop-blur-sm p-4">
+          <div role="dialog" aria-modal="true" aria-label="Rename conversation" className="w-full max-w-sm rounded-2xl border border-[var(--studio-border)] bg-[var(--studio-bg-panel)] p-5 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Pencil size={16} className="text-[#4284ff]" />
+                <h2 className="text-sm font-semibold text-[var(--studio-text-primary)]">Rename chat</h2>
+              </div>
+              <button aria-label="Close" onClick={() => setRenameConversation(null)} className="rounded-lg p-1 text-[var(--studio-text-secondary)] hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><X size={16} /></button>
+            </div>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const trimmed = renameTitle.trim();
+              if (trimmed && trimmed !== renameConversation.title) {
+                await updateConversation(renameConversation, { title: trimmed });
+                setToast("Conversation renamed.");
+              }
+              setRenameConversation(null);
+            }}>
+              <input
+                type="text"
+                value={renameTitle}
+                onChange={(e) => setRenameTitle(e.target.value)}
+                autoFocus
+                maxLength={120}
+                className="w-full rounded-xl border border-[var(--studio-border)] bg-[var(--studio-bg-elevated)] px-3 py-2 text-sm text-[var(--studio-text-primary)] outline-none focus:border-[var(--studio-accent)]"
+              />
+              <div className="mt-4 flex justify-end gap-2">
+                <button type="button" onClick={() => setRenameConversation(null)} className="rounded-xl px-3 py-2 text-xs font-semibold text-[var(--studio-text-secondary)] hover:bg-[var(--studio-bg-hover)]">Cancel</button>
+                <button type="submit" disabled={!renameTitle.trim()} className="rounded-xl bg-[#4284ff] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#3474eb] disabled:opacity-50">Save</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {deleteConfirmSession && (
+        <div className="fixed inset-0 z-[95] grid place-items-center bg-black/60 backdrop-blur-sm p-4">
+          <div role="dialog" aria-modal="true" aria-label="Delete conversation" className="w-full max-w-sm rounded-2xl border border-[var(--studio-border)] bg-[var(--studio-bg-panel)] p-5 shadow-2xl">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Trash2 size={16} className="text-[#FF6B6B]" />
+                <h2 className="text-sm font-semibold text-[#FF6B6B]">Delete chat?</h2>
+              </div>
+              <button aria-label="Close" onClick={() => setDeleteConfirmSession(null)} className="rounded-lg p-1 text-[var(--studio-text-secondary)] hover:bg-[var(--studio-bg-hover)] hover:text-[var(--studio-text-primary)]"><X size={16} /></button>
+            </div>
+            <p className="text-xs text-[var(--studio-text-secondary)] leading-relaxed">
+              Are you sure you want to delete &ldquo;{deleteConfirmSession.title}&rdquo;? This action cannot be undone.
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button type="button" onClick={() => setDeleteConfirmSession(null)} className="rounded-xl px-3 py-2 text-xs font-semibold text-[var(--studio-text-secondary)] hover:bg-[var(--studio-bg-hover)]">Cancel</button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const target = deleteConfirmSession;
+                  setDeleteConfirmSession(null);
+                  try {
+                    await mutateConversation(target, "DELETE");
+                  } catch {}
+                  setChatSessions((items) => items.filter((current) => current.id !== target.id));
+                  if (activeSessionId === target.id) startNewChat();
+                  setToast(`Deleted "${target.title}".`);
+                }}
+                className="rounded-xl bg-[#FF6B6B] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#fa5252]"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {toast && <div role="status" className="fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 rounded-lg border border-[var(--studio-border)] bg-[var(--studio-bg-panel)] px-4 py-2 text-xs text-[var(--studio-text-primary)] shadow-xl">{toast}<button aria-label="Dismiss notification" onClick={() => setToast(null)} className="ml-3">×</button></div>}
       {previewImage && (
         <div
@@ -1381,17 +1652,49 @@ export default function AIChatPage() {
   );
 }
 
-function ConversationMenu({ onAction: handleAction, pinned, disabled }: { onAction: (action: string) => void; pinned?: boolean; disabled?: boolean }) {
+function ConversationMenu({
+  onAction: handleAction,
+  pinned,
+  unread,
+  inProject,
+  disabled,
+}: {
+  onAction: (action: string) => void;
+  pinned?: boolean;
+  unread?: boolean;
+  inProject?: boolean;
+  disabled?: boolean;
+}) {
   const onAction = (action: string) => { if (!disabled) handleAction(action); };
   const items = [
-    { action: "pin", label: pinned ? "Unpin" : "Pin", icon: Target },
-    { action: "project", label: "Add to project", icon: FolderPlus, arrow: true },
-    { action: "unread", label: "Mark as unread", icon: EyeOff },
+    { action: "pin", label: pinned ? "Unpin" : "Pin", icon: Pin },
+    { action: "project", label: inProject ? "Change project" : "Add to project", icon: FolderPlus, arrow: true },
+    { action: "unread", label: unread ? "Mark as read" : "Mark as unread", icon: unread ? Eye : EyeOff },
     { action: "rename", label: "Rename", icon: Pencil },
     { action: "share", label: "Share", icon: Share2, arrow: true },
     { action: "delete", label: "Delete", icon: Trash2, danger: true },
   ];
-  return <div data-conversation-menu role="menu" onClick={(event) => event.stopPropagation()} className="absolute right-0 top-10 z-[80] flex h-[218px] w-[195px] flex-col items-center justify-between overflow-hidden rounded-[16px] border-0 bg-[var(--studio-bg-panel)] p-[6px] shadow-2xl">
-    {items.map(({ action, label, icon: Icon, arrow, danger }) => <button key={action} role="menuitem" onClick={() => onAction(action)} className={`flex h-8 min-h-8 w-[182px] shrink-0 items-center gap-3 rounded-[12px] px-3 text-left text-sm font-medium transition hover:bg-[var(--studio-bg-hover)] ${danger ? "text-[#FF6B6B]" : "text-[var(--studio-text-primary)]"}`}><Icon size={20} strokeWidth={2} /><span className="flex-1">{label}</span>{arrow && <span className="text-lg leading-none">›</span>}</button>)}
-  </div>;
+  return (
+    <div
+      data-conversation-menu
+      role="menu"
+      onClick={(event) => event.stopPropagation()}
+      className="absolute right-0 top-10 z-[80] flex w-[195px] flex-col overflow-hidden rounded-[16px] border border-[var(--studio-border)] bg-[var(--studio-bg-panel)] p-[6px] shadow-2xl"
+    >
+      {items.map(({ action, label, icon: Icon, arrow, danger }) => (
+        <button
+          key={action}
+          role="menuitem"
+          onClick={() => onAction(action)}
+          className={`flex h-8 min-h-8 w-full shrink-0 items-center gap-3 rounded-[12px] px-3 text-left text-xs font-medium transition hover:bg-[var(--studio-bg-hover)] ${
+            danger ? "text-[#FF6B6B]" : "text-[var(--studio-text-primary)]"
+          }`}
+        >
+          <Icon size={16} strokeWidth={2} />
+          <span className="flex-1">{label}</span>
+          {arrow && <span className="text-base leading-none opacity-50">›</span>}
+        </button>
+      ))}
+    </div>
+  );
 }

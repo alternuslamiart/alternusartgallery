@@ -1,6 +1,34 @@
 # Verified progress
 
-Last updated: 2026-10-29
+Last updated: 2026-10-30
+
+## AI Chat Recent Conversations: Real Action Handlers (Pin, Add to Project, Mark as Unread, Rename, Share, Delete) (2026-10-30)
+
+- Implemented real actions for Recent chat sessions in `/aichat` (`src/app/aichat/page.tsx`):
+  - **Pin / Unpin**:
+    - Real toggle persisting to `/api/assistant/conversations/[id]` and local state.
+    - Pinned items sort to the top of the Recent list with a rotated `#4284ff` Pin icon badge.
+    - Updated `ConversationMenu` to dynamically show "Unpin" vs "Pin" with `Pin` icon from `lucide-react`.
+  - **Add to project**:
+    - Opens project picker modal with backdrop blur.
+    - Shows current project with checkmark `✓` and an explicit "Remove from project" option.
+    - Added inline "Create new project" input allowing project creation and instant assignment on the fly via `POST /api/projects`.
+    - Shows project name badge (`FolderPlus` icon + project name) in the sidebar.
+  - **Mark as unread / Mark as read**:
+    - Dynamic toggle persisting `unread: boolean` to server and local storage.
+    - Displays unread dot indicator (`h-2 w-2 rounded-full bg-[#4284ff]`) in the sidebar item.
+    - Automatically clears unread state when the chat is opened, or manual "Mark as read" toggle.
+  - **Rename**:
+    - Replaced browser prompt with a styled in-app modal ("Rename chat") with backdrop blur, auto-focused text field, Cancel and Save buttons.
+    - Persists title change to `/api/assistant/conversations/[id]` and updates state.
+  - **Share**:
+    - Uses `shareConversation` (Web Share API with fallback to formatted clipboard copy).
+    - Surfaces toast notification: "Conversation copied to clipboard. Ready to share." / "Conversation shared."
+  - **Delete**:
+    - Added confirmation modal ("Delete chat? Are you sure you want to delete '[title]'? This action cannot be undone.").
+    - On confirmation, calls `DELETE /api/assistant/conversations/[id]` (archives on server), removes from local storage and state, and resets active chat if deleted.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 unit tests passed), `npm run build` (Next.js production build passed with 0 errors).
+
 
 ## Full-Stack Platform Hardening: Account Deletion, Workspace Settings, and Studio Project Lifecycle (2026-10-29)
 
