@@ -2,6 +2,15 @@
 
 Last updated: 2026-10-29
 
+## AI Chat Generated Image Response Frame 6px Gap Border (2026-10-29)
+
+- Added 6px surrounding gap around generated image response card in `/aichat` (`src/app/globals.css`):
+  - `.aichat-generated-image-frame`: Configured `padding: 6px; box-sizing: border-box;` creating a continuous 6px `#161616` inset border around the image on all sides.
+  - `.aichat-generated-image-wrap`: Added `border-radius: 12px; margin-bottom: 6px;` providing smooth rounded inner corners and separating the image from the action bar with the 6px gap.
+  - `.aichat-generated-image-wrap img`: Added `border-radius: 12px;` so all 4 corners of the image stay cleanly rounded.
+  - Action bar: Removed the separator border line for a seamless `#161616` dark frame flow.
+  - Verification: `npx tsc --noEmit` (0 errors), `npm run test` (all 204 unit tests passed), `npm run build` (Next.js production build passed with 0 errors).
+
 ## File and Photo Attachment Support in /aichat (2026-10-29)
 
 - Enabled file and photo attachments in `/aichat` across desktop and mobile layouts:

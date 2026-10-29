@@ -4594,7 +4594,7 @@ textarea {
   height: 9px;
 }
 
-/* AI Chat Generated Image Card (638x484px, #161616 frame, 16px radius) */
+/* AI Chat Generated Image Card (638x484px, #161616 frame, 16px radius, 6px gap around image) */
 .aichat-generated-image-frame {
   width: 100%;
   max-width: 638px;
@@ -4607,6 +4607,8 @@ textarea {
   margin-bottom: 14px;
   display: flex;
   flex-direction: column;
+  padding: 6px;
+  box-sizing: border-box;
 }
 
 .aichat-generated-image-wrap {
@@ -4615,6 +4617,8 @@ textarea {
   background-color: #121212;
   overflow: hidden;
   position: relative;
+  border-radius: 12px;
+  margin-bottom: 6px;
 }
 
 .aichat-generated-image-wrap img {
@@ -4622,8 +4626,7 @@ textarea {
   height: 100%;
   object-fit: cover;
   display: block;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
+  border-radius: 12px;
 }
 
 .aichat-generated-image-actions {
@@ -4632,8 +4635,7 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0 10px;
 }
 
 .aichat-generated-image-actions-left {
