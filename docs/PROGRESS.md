@@ -2,6 +2,28 @@
 
 Last updated: 2026-10-30
 
+## Feature: Tools Intro Frame across Architecture, Sketch, and Infrastructure Studios (2026-10-30)
+
+- Extended interactive tools intro frame (`corner 16px`, `12px video intro`, `412x540px`) to all three studios:
+  - **Architecture Studio (`/casynus`, `/architecture`)**:
+    - Connected `StudioViewportToolbar` in `src/components/scene-studio/SceneWorkbench.tsx` with `studio="architecture"`.
+    - Triggers intro frame on initial toolbar hover, initializing on Architecture Tools slide.
+  - **Sketch Studio (`/sketch`, `/interior`)**:
+    - Connected `StudioViewportToolbar` in `src/components/crystal-studio/Viewport.tsx` with `studio="sketch"`.
+    - Connected `src/components/crystal-studio/SketchWorkspace.tsx` pencil drawing tools bar with `studio="sketch"`.
+    - Triggers intro frame on initial toolbar hover, initializing on Sketch Studio Tools slide.
+  - **Infrastructure Studio (`/infrastructure`, `/infrastructur`)**:
+    - Connected `StudioViewportToolbar` in `src/components/scene-studio/SceneWorkbench.tsx` with `studio="infrastructure"`.
+    - Connected `src/app/infrastructure/ClassicInfrastructure.tsx` top toolbar with `studio="infrastructure"`.
+    - Triggers intro frame on initial toolbar hover, initializing on Infrastructure Tools slide.
+  - **Interactive Tool Cycling**:
+    - All studio instances support cycling across tools via `64x24px` scroll button (`16x16px` circle arrows `< | >`) and "Continue learn another tools" action.
+  - **Automated Verification**:
+    - Extended `tests/tools-intro.test.mjs` verifying studio slide definitions and toolbar hover connections across all studios.
+    - All 209 unit tests passing (`node --test tests/*.test.mjs`).
+    - `npm run typecheck` (tsc --noEmit) passed with 0 errors.
+    - `npm run build` production build completed with 0 errors.
+
 ## Feature: Tools Introduction Frame on Initial Hover (2026-10-30)
 
 - Implemented design tools interactive intro frame triggered on initial hover upon entering website:

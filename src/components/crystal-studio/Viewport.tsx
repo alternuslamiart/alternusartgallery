@@ -1564,6 +1564,7 @@ function FloorPlanViewport({ p, isMobile }: { p: Props; isMobile: boolean }) {
       {sketch.panels}
 
       {!sketch.active&&<StudioViewportToolbar label="Architectural drafting tools"
+        studio="sketch"
         hidePlus
         hidePlay
         apiRef={toolbarAPI}

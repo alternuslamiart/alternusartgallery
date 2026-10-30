@@ -532,6 +532,7 @@ function Editor({ studio, identity, authenticated, projectId }: { studio: Studio
     <section className="scene-view" aria-label={`${names[studio]} 3D viewport`}>
       {(!left || !right) && <div className="scene-panel-toggles">{!left && <button aria-label="Show scene sidebar" onClick={() => setLeft(true)}><PanelLeft size={18} /></button>}{!right && <button aria-label="Show inspector" onClick={() => setRight(true)}><PanelRight size={18} /></button>}</div>}
       <StudioViewportToolbar label="Scene transformation tools"
+        studio={studio}
         apiRef={toolbarAPI}
         materialLibrary={{canApply:!blocked&&selected.length>0&&Boolean(primary&&!primary.kind.endsWith("Light")),activeMap:primary?.material.map,onApply:material=>safely(()=>change(applyLibraryMaterial(docRef.current,selectedRoots,material)))}}
         leading={[

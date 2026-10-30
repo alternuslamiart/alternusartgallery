@@ -1,5 +1,11 @@
 # Next tasks (reviewed 2026-10-30)
 
+- [x] Tools Intro Frame Across Architecture, Sketch, and Infrastructure Studios:
+  - Deployed tools intro frame (`corner 16px`, `12px video intro`, `412x540px`) to Architecture, Sketch, and Infrastructure studios.
+  - Connected `StudioViewportToolbar` (`SceneWorkbench` and `Viewport.tsx`), `SketchWorkspace`, and `ClassicInfrastructure` on hover.
+  - Added slide awareness for `architecture`, `sketch`, and `infrastructure` tools with cycling controls.
+  - Verification: `node --test tests/tools-intro.test.mjs` (4 passing), `npm run test` (all 209 unit tests passed), `npm run typecheck` (0 errors), `npm run build` (0 errors).
+
 - [x] Tools Introduction Frame on Initial Hover:
   - Added interactive introduction modal frame triggering on initial hover over tools upon entering website.
   - Placed `/introduction.png` in `public/` folder.

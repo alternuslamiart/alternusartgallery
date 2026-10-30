@@ -21,9 +21,25 @@ const DEFAULT_TOOL_SLIDES: ToolSlide[] = [
     image: "/introduction.png",
   },
   {
+    id: "sketch",
+    title: "Sketch Studio Tools",
+    subtitle: "Lorem ipsum dolor sit amet consectetur. Augue a est feugiat.",
+    description:
+      "Lorem ipsum dolor sit amet consectetur. Est sit risus duis nunc malesuada amet elementum quis enim. Tempus phasellus lectus elit molestie. Ac habitant pellentesque nulla elementum. Posuere egestas vel ut risus vitae viverra. Amet ipsum iaculis convallis aliquet purus gravida metus nulla cras. Vulputate amet nulla egestas laoreet nam ultrices et mauris. In morbi vel volutpat platea integer vel. Urna fringilla amet enim eu. Mollis ac amet justo posuere. Elementum tortor tristique risus in.",
+    image: "/introduction.png",
+  },
+  {
+    id: "infrastructure",
+    title: "Infrastructure Tools",
+    subtitle: "Lorem ipsum dolor sit amet consectetur. Augue a est feugiat.",
+    description:
+      "Lorem ipsum dolor sit amet consectetur. Est sit risus duis nunc malesuada amet elementum quis enim. Tempus phasellus lectus elit molestie. Ac habitant pellentesque nulla elementum. Posuere egestas vel ut risus vitae viverra. Amet ipsum iaculis convallis aliquet purus gravida metus nulla cras. Vulputate amet nulla egestas laoreet nam ultrices et mauris. In morbi vel volutpat platea integer vel. Urna fringilla amet enim eu. Mollis ac amet justo posuere. Elementum tortor tristique risus in.",
+    image: "/introduction.png",
+  },
+  {
     id: "interior",
     title: "Interior Design Tools",
-    subtitle: "Spatial planning, furniture arrangements, and material palettes.",
+    subtitle: "Lorem ipsum dolor sit amet consectetur. Augue a est feugiat.",
     description:
       "Transform interior concepts into detailed living spaces with comprehensive material palettes, lighting setups, and automated dimension annotations. Seamlessly export floor plans and 3D scenes for client presentations and contractor reviews.",
     image: "/introduction.png",
@@ -31,17 +47,9 @@ const DEFAULT_TOOL_SLIDES: ToolSlide[] = [
   {
     id: "3d-visualization",
     title: "3D Visualization Tools",
-    subtitle: "Precision geometric modeling and asset synchronization.",
+    subtitle: "Lorem ipsum dolor sit amet consectetur. Augue a est feugiat.",
     description:
       "Directly manipulate architectural meshes, procedural walls, parametric roofs, and custom furniture objects. Synchronize bi-directionally with Blender, Unreal Engine, and Unity with one-click export pipelines.",
-    image: "/introduction.png",
-  },
-  {
-    id: "infrastructure",
-    title: "Infrastructure Tools",
-    subtitle: "Large-scale community mapping and spatial terrain systems.",
-    description:
-      "Coordinate building footprints, utility corridors, transportation networks, and environmental topography with intelligent CAD vector integration and scalable cloud scene persistence.",
     image: "/introduction.png",
   },
 ];
@@ -50,14 +58,27 @@ interface ToolsIntroModalProps {
   isOpen: boolean;
   onClose: () => void;
   slides?: ToolSlide[];
+  initialSlideId?: string;
+  studio?: "architecture" | "sketch" | "interior" | "infrastructure" | string;
 }
 
 export function ToolsIntroModal({
   isOpen,
   onClose,
   slides = DEFAULT_TOOL_SLIDES,
+  initialSlideId,
+  studio,
 }: ToolsIntroModalProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const targetId = initialSlideId || (studio === "interior" ? "sketch" : studio);
+  const foundIndex = targetId ? slides.findIndex((s) => s.id === targetId) : -1;
+  const [currentIndex, setCurrentIndex] = useState(foundIndex >= 0 ? foundIndex : 0);
+
+  useEffect(() => {
+    if (isOpen && targetId) {
+      const idx = slides.findIndex((s) => s.id === targetId);
+      if (idx >= 0) setCurrentIndex(idx);
+    }
+  }, [isOpen, targetId, slides]);
 
   useEffect(() => {
     if (!isOpen) return;

@@ -5,6 +5,7 @@ import {createSketch,sketchSvg,hitSketchItem,translateItem,itemBounds,inPolygon,
 import {rasterSketch,sketchSheetSvg} from './sketch-export';
 import type {FloorPlanObject,FloorPlanSettings} from './types';
 import {StudioProfileMenu,StudioSettingsFrame} from './StudioSidebarFooter';
+import { ToolsIntroModal } from '@/components/tools-intro-modal';
 import './sketch.css';
 type Tool=SketchKind|'select'|'lasso'|'picker'|'zoom';
 type View={zoom:number;panX:number;panY:number};
@@ -20,7 +21,7 @@ const topTools:[Tool,string,LucideIcon][]=[
 const presets:Record<Exclude<Preset,'Custom'>,[number,number]>={A4:[11.9,8.4],A3:[16.8,11.9],Square:[10,10]};
 const colors=['#141414','#ffffff','#ff6b6b','#f59e0b','#facc15','#22c55e','#06b6d4','#4284ff','#a855f7','#ec4899'];
 export function useSketchEditor(p:Props){
-  const [active,setActiveState]=useState(false),[tool,setTool]=useState<Tool>('pencil'),[color,setColor]=useState('#141414'),[width,setWidth]=useState(3),[opacity,setOpacity]=useState(1),[colorOpen,setColorOpen]=useState(false),[layersOpen,setLayersOpen]=useState(false),[controlsOpen,setControlsOpen]=useState(false),[projectsOpen,setProjectsOpen]=useState(false),[exportOpen,setExportOpen]=useState(false),[canvasDialogOpen,setCanvasDialogOpen]=useState(false),[profileOpen,setProfileOpen]=useState(false),[studioSettingsOpen,setStudioSettingsOpen]=useState(false),[preset,setPreset]=useState<Preset>('A4'),[orientation,setOrientation]=useState<'landscape'|'portrait'>('landscape'),[draftWidth,setDraftWidth]=useState(11.9),[draftHeight,setDraftHeight]=useState(8.4),[draftBg,setDraftBg]=useState('#ffffff'),[grid,setGrid]=useState(true),[rotation,setRotation]=useState(0),[autoRotate,setAutoRotate]=useState(false),[snap,setSnap]=useState(false),[selected,setSelected]=useState<string[]>([]),[preview,setPreview]=useState<SketchDocument|null>(null),[message,setMessage]=useState(''),[fillBusy,setFillBusy]=useState(false),[offsets,setOffsets]=useState({left:12,right:12,bottom:160});
+  const [active,setActiveState]=useState(false),[tool,setTool]=useState<Tool>('pencil'),[color,setColor]=useState('#141414'),[width,setWidth]=useState(3),[opacity,setOpacity]=useState(1),[colorOpen,setColorOpen]=useState(false),[layersOpen,setLayersOpen]=useState(false),[controlsOpen,setControlsOpen]=useState(false),[projectsOpen,setProjectsOpen]=useState(false),[exportOpen,setExportOpen]=useState(false),[canvasDialogOpen,setCanvasDialogOpen]=useState(false),[profileOpen,setProfileOpen]=useState(false),[studioSettingsOpen,setStudioSettingsOpen]=useState(false),[hasIntroTriggered,setHasIntroTriggered]=useState(false),[isIntroOpen,setIsIntroOpen]=useState(false),[preset,setPreset]=useState<Preset>('A4'),[orientation,setOrientation]=useState<'landscape'|'portrait'>('landscape'),[draftWidth,setDraftWidth]=useState(11.9),[draftHeight,setDraftHeight]=useState(8.4),[draftBg,setDraftBg]=useState('#ffffff'),[grid,setGrid]=useState(true),[rotation,setRotation]=useState(0),[autoRotate,setAutoRotate]=useState(false),[snap,setSnap]=useState(false),[selected,setSelected]=useState<string[]>([]),[preview,setPreview]=useState<SketchDocument|null>(null),[message,setMessage]=useState(''),[fillBusy,setFillBusy]=useState(false),[offsets,setOffsets]=useState({left:12,right:12,bottom:160});
   const gesture=useRef<Gesture|null>(null),frame=useRef(0),previewRef=useRef<SketchDocument|null>(null),current=useRef(p);current.current=p;
   const setActive=(next:boolean|((prev:boolean)=>boolean))=>{setActiveState(prev=>{const resolved=typeof next==='function'?next(prev):next;if(resolved!==prev)current.current.onActiveChange?.(resolved);return resolved;});};
   const doc=p.doc,layer=doc.layers.find(l=>l.id===doc.activeLayerId)!,sheet=doc.sheet;
@@ -142,7 +143,7 @@ export function useSketchEditor(p:Props){
       </div>
       <StudioProfileMenu open={profileOpen} placement="top-left" onClose={()=>setProfileOpen(false)} onOpenSettings={()=>{setProfileOpen(false);setStudioSettingsOpen(true);}} onOpenUpgrade={p.onOpenPricing?()=>{setProfileOpen(false);p.onOpenPricing?.();}:undefined}/>
       <StudioSettingsFrame open={studioSettingsOpen} placement="top-left" onClose={()=>setStudioSettingsOpen(false)} aiModel={p.aiModel} onAiModelChange={p.onAiModelChange} grid={grid} onGridChange={setGrid} snap={snap} onSnapChange={next=>{setSnap(next);p.onSettingsChange?.({snapToGrid:next,snapToPoints:next});}} unit={p.settings.unit} onUnitChange={unit=>p.onSettingsChange?.({unit})} scale={p.settings.scale} onScaleChange={scale=>p.onSettingsChange?.({scale})} onOpenCanvasSetup={openCanvasSetup} onSaveProject={()=>attempt(()=>p.project?.save())} projectStatus={p.project?.status}/>
-      <div role="toolbar" aria-label="Sketch drawing tools" className="sketch-top-toolbar sketch-primary">
+      <div role="toolbar" aria-label="Sketch drawing tools" className="sketch-top-toolbar sketch-primary" onMouseEnter={()=>{if(!hasIntroTriggered){setHasIntroTriggered(true);setIsIntroOpen(true);}}}>
         {toolButton('exit','Exit Pencil mode',ArrowLeft,false,exitPencilMode)}
         <i className="sketch-toolbar-divider" aria-hidden="true"/>
         {topTools.map(([id,label,Icon])=>toolButton(id,label,Icon,tool===id,()=>activate(id)))}
@@ -222,6 +223,7 @@ export function useSketchEditor(p:Props){
       </>}
     </>}
     {(message||fillBusy)&&<div role="status" className="sketch-message">{fillBusy?'Processing drawing…':message}{message&&<button aria-label="Dismiss drawing message" onClick={()=>setMessage('')}>×</button>}</div>}
+    <ToolsIntroModal isOpen={isIntroOpen} onClose={()=>setIsIntroOpen(false)} studio="sketch"/>
   </div>;
   return{active,hasCanvas,toggle,deactivate:exitPencilMode,overlay,panels,grid,rotation,autoRotate,toggleAutoRotate:()=>setAutoRotate(v=>!v),resetRotation:()=>{setAutoRotate(false);setRotation(0);},fit,drawing:Boolean(gesture.current)};
 }

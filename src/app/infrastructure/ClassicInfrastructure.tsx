@@ -2,6 +2,7 @@
 import { useStudioConversation, useStudioDock } from "@/components/crystal-studio/StudioConversation";
 
 import { InspectorSection, StudioPanel, StudioToolbar, StudioHeader, StudioButton, NumberInput } from "@/components/crystal-studio/kit";
+import { ToolsIntroModal } from "@/components/tools-intro-modal";
 
 import {
   Armchair,
@@ -227,6 +228,15 @@ export default function ClassicInfrastructurePage() {
   const [undergroundUtilities, setUndergroundUtilities] = useState(false);
   const [lightingOpen, setLightingOpen] = useState(false);
   const [autoRotate, setAutoRotate] = useState(false);
+  const [hasIntroTriggered, setHasIntroTriggered] = useState(false);
+  const [isIntroOpen, setIsIntroOpen] = useState(false);
+
+  const handleToolbarMouseEnter = () => {
+    if (!hasIntroTriggered) {
+      setHasIntroTriggered(true);
+      setIsIntroOpen(true);
+    }
+  };
   useEffect(() => {
     if (!autoRotate) return;
     const timer = window.setInterval(() => {
@@ -1294,6 +1304,7 @@ export default function ClassicInfrastructurePage() {
             className="ref-top-toolbar"
             role="toolbar"
             aria-label="Object tools"
+            onMouseEnter={handleToolbarMouseEnter}
           >
             <button
               type="button"
@@ -1439,6 +1450,12 @@ export default function ClassicInfrastructurePage() {
               <Play size={13} />
             </button>
           </StudioToolbar>
+
+          <ToolsIntroModal
+            isOpen={isIntroOpen}
+            onClose={() => setIsIntroOpen(false)}
+            studio="infrastructure"
+          />
 
           {lightingOpen && (
             <div className="infra-lighting">

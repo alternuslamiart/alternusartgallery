@@ -47,8 +47,10 @@ test("tools-intro-modal defines required specifications and dimensions", () => {
   assert.ok(content.includes("fontSize: 12"), "Must specify header line 2 font size 12px");
   assert.ok(content.includes("Roboto"), "Must specify Roboto font family for header line 2");
 
-  // Verify Architecture Tools title
+  // Verify Architecture, Sketch, and Infrastructure Tools titles
   assert.ok(content.includes("Architecture Tools"), "Must contain Architecture Tools header");
+  assert.ok(content.includes("Sketch Studio Tools"), "Must contain Sketch Studio Tools header");
+  assert.ok(content.includes("Infrastructure Tools"), "Must contain Infrastructure Tools header");
   assert.ok(content.includes("Continue learn another tools"), "Must contain Continue learn another tools action");
 });
 
@@ -60,4 +62,36 @@ test("home-tool-marquee triggers intro modal on hover", () => {
   assert.ok(content.includes("ToolsIntroModal"), "Must import ToolsIntroModal");
   assert.ok(content.includes("onMouseEnter"), "Must trigger on mouse hover");
   assert.ok(content.includes("handleMouseEnter"), "Must have handleMouseEnter logic");
+});
+
+test("studios (architecture, sketch, infrastructure) trigger intro modal on hover", () => {
+  // StudioViewportToolbar integration
+  const toolbarPath = path.resolve(process.cwd(), "src/components/crystal-studio/StudioViewportToolbar.tsx");
+  assert.ok(fs.existsSync(toolbarPath), "StudioViewportToolbar.tsx must exist");
+  const toolbarContent = fs.readFileSync(toolbarPath, "utf-8");
+  assert.ok(toolbarContent.includes("ToolsIntroModal"), "StudioViewportToolbar must import ToolsIntroModal");
+  assert.ok(toolbarContent.includes("handleToolbarMouseEnter"), "StudioViewportToolbar must have hover trigger");
+  assert.ok(toolbarContent.includes("studio={p.studio}"), "StudioViewportToolbar must forward studio prop");
+
+  // SceneWorkbench forwards studio
+  const workbenchPath = path.resolve(process.cwd(), "src/components/scene-studio/SceneWorkbench.tsx");
+  const workbenchContent = fs.readFileSync(workbenchPath, "utf-8");
+  assert.ok(workbenchContent.includes("studio={studio}"), "SceneWorkbench must pass studio to toolbar");
+
+  // Viewport passes sketch studio
+  const viewportPath = path.resolve(process.cwd(), "src/components/crystal-studio/Viewport.tsx");
+  const viewportContent = fs.readFileSync(viewportPath, "utf-8");
+  assert.ok(viewportContent.includes('studio="sketch"'), "Viewport must pass sketch studio");
+
+  // SketchWorkspace has intro modal
+  const sketchWorkspacePath = path.resolve(process.cwd(), "src/components/crystal-studio/SketchWorkspace.tsx");
+  const sketchContent = fs.readFileSync(sketchWorkspacePath, "utf-8");
+  assert.ok(sketchContent.includes("ToolsIntroModal"), "SketchWorkspace must import ToolsIntroModal");
+  assert.ok(sketchContent.includes('studio="sketch"'), "SketchWorkspace must configure sketch studio");
+
+  // ClassicInfrastructure has intro modal
+  const classicInfraPath = path.resolve(process.cwd(), "src/app/infrastructure/ClassicInfrastructure.tsx");
+  const classicContent = fs.readFileSync(classicInfraPath, "utf-8");
+  assert.ok(classicContent.includes("ToolsIntroModal"), "ClassicInfrastructure must import ToolsIntroModal");
+  assert.ok(classicContent.includes('studio="infrastructure"'), "ClassicInfrastructure must configure infrastructure studio");
 });
