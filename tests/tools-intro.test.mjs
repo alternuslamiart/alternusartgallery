@@ -41,6 +41,9 @@ test("tools-intro-modal defines required specifications and dimensions", () => {
   // Verify scroll button icon 64x24px, circle 16x16px
   assert.ok(content.includes("width: 64") && content.includes("height: 24"), "Must specify scroll button container 64x24px");
   assert.ok(content.includes("width: 16") && content.includes("height: 16"), "Must specify circle buttons 16x16px");
+  assert.ok(content.includes("minHeight: 16") && content.includes("maxHeight: 16"), "Must constrain circle button height to prevent oval stretching");
+  assert.ok(content.includes('aspectRatio: "1 / 1"'), "Must enforce 1:1 aspect ratio on circle buttons");
+  assert.ok(content.includes(".tools-intro-circle-btn"), "Must have scoped circle button class to override external button rules");
 
   // Verify header title 1 (16px), line 2 (12px Roboto)
   assert.ok(content.includes("fontSize: 16"), "Must specify header title 1 font size 16px");

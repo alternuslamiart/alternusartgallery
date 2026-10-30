@@ -2,6 +2,21 @@
 
 Last updated: 2026-10-30
 
+## Fix: Exact 16x16px Circle Buttons for Tools Intro Scroll Navigation (2026-10-30)
+
+- Fixed scroll button chevron circles stretching into vertical ovals inside `64x24px` pill container:
+  - **CSS Isolation & Geometric Hardening (`src/components/tools-intro-modal.tsx`)**:
+    - Created scoped `.tools-intro-circle-btn` rule with `!important` overriding any global studio/dialog button heights or paddings.
+    - Explicitly locked dimensions: `width: 16px`, `height: 16px`, `minWidth: 16px`, `maxWidth: 16px`, `minHeight: 16px`, `maxHeight: 16px`.
+    - Added `aspectRatio: "1 / 1"`, `borderRadius: "50%"`, `padding: 0`, `margin: 0`, `border: none`, `overflow: "hidden"`, and `lineHeight: 1`.
+    - Explicitly bounded chevron icon SVGs (`width: 10px`, `height: 10px`, `flexShrink: 0`).
+    - Pill container strictly bounded to `64x24px` (`minWidth: 64`, `maxWidth: 64`, `minHeight: 24`, `maxHeight: 24`).
+  - **Automated Verification**:
+    - Updated `tests/tools-intro.test.mjs` verifying exact 16x16px circle constraints, 1:1 aspect ratio, and scoped styling.
+    - All 209 unit tests passing (`node --test tests/*.test.mjs`).
+    - `npm run typecheck` (tsc --noEmit) passed with 0 errors.
+    - `npm run build` production build completed with 0 errors.
+
 ## Feature: Tools Intro Frame across Architecture, Sketch, and Infrastructure Studios (2026-10-30)
 
 - Extended interactive tools intro frame (`corner 16px`, `12px video intro`, `412x540px`) to all three studios:

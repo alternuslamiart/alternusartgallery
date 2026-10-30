@@ -1,5 +1,10 @@
 # Next tasks (reviewed 2026-10-30)
 
+- [x] Exact 16x16px Circle Buttons for Tools Intro Scroll Navigation:
+  - Fixed oval deformation on scroll buttons by locking exact 16x16px circle dimensions (`minWidth`, `maxWidth`, `minHeight`, `maxHeight: 16px`, `aspectRatio: 1/1`).
+  - Added scoped `.tools-intro-circle-btn` isolating buttons from global studio/theme button styles.
+  - Verification: `node --test tests/tools-intro.test.mjs` (4 passing), `npm run test` (all 209 unit tests passed), `npm run typecheck` (0 errors), `npm run build` (0 errors).
+
 - [x] Tools Intro Frame Across Architecture, Sketch, and Infrastructure Studios:
   - Deployed tools intro frame (`corner 16px`, `12px video intro`, `412x540px`) to Architecture, Sketch, and Infrastructure studios.
   - Connected `StudioViewportToolbar` (`SceneWorkbench` and `Viewport.tsx`), `SketchWorkspace`, and `ClassicInfrastructure` on hover.

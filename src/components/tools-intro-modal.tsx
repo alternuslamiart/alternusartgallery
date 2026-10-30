@@ -255,38 +255,95 @@ export function ToolsIntroModal({
 
         {/* Bottom controls: scroll button icon (64x24px, circle 16x16px) & Continue learn another tools */}
         <div className="flex items-center gap-[16px] shrink-0 mt-auto pt-[12px]">
+          <style>{`
+            .tools-intro-circle-btn {
+              width: 16px !important;
+              height: 16px !important;
+              min-width: 16px !important;
+              max-width: 16px !important;
+              min-height: 16px !important;
+              max-height: 16px !important;
+              aspect-ratio: 1 / 1 !important;
+              border-radius: 50% !important;
+              padding: 0 !important;
+              margin: 0 !important;
+              border: none !important;
+              outline: none !important;
+              box-shadow: none !important;
+              display: inline-flex !important;
+              align-items: center !important;
+              justify-content: center !important;
+              flex-shrink: 0 !important;
+              overflow: hidden !important;
+              line-height: 1 !important;
+              box-sizing: border-box !important;
+              background-color: #484848 !important;
+              color: #FFFFFF !important;
+            }
+            .tools-intro-circle-btn:hover {
+              background-color: #5a5a5a !important;
+            }
+            .tools-intro-circle-btn svg {
+              width: 10px !important;
+              height: 10px !important;
+              min-width: 10px !important;
+              max-width: 10px !important;
+              min-height: 10px !important;
+              max-height: 10px !important;
+              flex-shrink: 0 !important;
+            }
+          `}</style>
+
           {/* Scroll button icon size: 64x24px */}
           <div
             className="flex items-center justify-between"
             style={{
               width: 64,
+              minWidth: 64,
+              maxWidth: 64,
               height: 24,
+              minHeight: 24,
+              maxHeight: 24,
               borderRadius: 9999,
               backgroundColor: "#333333",
               padding: "0 4px",
               border: "1px solid rgba(255, 255, 255, 0.08)",
               flexShrink: 0,
               boxSizing: "border-box",
+              overflow: "hidden",
             }}
           >
-            {/* Left circle: 16x16px */}
+            {/* Left circle: exact 16x16px circle */}
             <button
               type="button"
               onClick={handlePrev}
               aria-label="Previous tool"
-              className="flex items-center justify-center transition-colors hover:brightness-125"
+              className="tools-intro-circle-btn transition-colors hover:brightness-125"
               style={{
                 width: 16,
                 height: 16,
+                minWidth: 16,
+                maxWidth: 16,
+                minHeight: 16,
+                maxHeight: 16,
+                aspectRatio: "1 / 1",
                 borderRadius: "50%",
                 backgroundColor: "#484848",
                 color: "#FFFFFF",
                 border: "none",
                 cursor: "pointer",
                 padding: 0,
+                margin: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+                boxSizing: "border-box",
+                overflow: "hidden",
+                lineHeight: 1,
               }}
             >
-              <ChevronLeft size={10} strokeWidth={2.5} />
+              <ChevronLeft size={10} strokeWidth={2.5} style={{ width: 10, height: 10, flexShrink: 0 }} />
             </button>
 
             {/* Divider */}
@@ -296,29 +353,45 @@ export function ToolsIntroModal({
                 color: "rgba(255, 255, 255, 0.35)",
                 userSelect: "none",
                 lineHeight: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               |
             </span>
 
-            {/* Right circle: 16x16px */}
+            {/* Right circle: exact 16x16px circle */}
             <button
               type="button"
               onClick={handleNext}
               aria-label="Next tool"
-              className="flex items-center justify-center transition-colors hover:brightness-125"
+              className="tools-intro-circle-btn transition-colors hover:brightness-125"
               style={{
                 width: 16,
                 height: 16,
+                minWidth: 16,
+                maxWidth: 16,
+                minHeight: 16,
+                maxHeight: 16,
+                aspectRatio: "1 / 1",
                 borderRadius: "50%",
                 backgroundColor: "#484848",
                 color: "#FFFFFF",
                 border: "none",
                 cursor: "pointer",
                 padding: 0,
+                margin: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+                boxSizing: "border-box",
+                overflow: "hidden",
+                lineHeight: 1,
               }}
             >
-              <ChevronRight size={10} strokeWidth={2.5} />
+              <ChevronRight size={10} strokeWidth={2.5} style={{ width: 10, height: 10, flexShrink: 0 }} />
             </button>
           </div>
 
