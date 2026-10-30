@@ -1,5 +1,13 @@
 # Next tasks (reviewed 2026-10-30)
 
+- [x] Tools Introduction Frame on Initial Hover:
+  - Added interactive introduction modal frame triggering on initial hover over tools upon entering website.
+  - Placed `/introduction.png` in `public/` folder.
+  - Implemented exact specifications: frame hiri `412x540px` (corner `16px`), intro frame `372x192px` (corner `12px`), frame icon `64x64px`, scroll button `64x24px` with `16x16px` circles, header 1 `16px`, header line 2 `12px Roboto`.
+  - Added previous/next cycling and "Continue learn another tools" action.
+  - Integrated with `HomeToolMarquee` with testing phase hover activation.
+  - Verification: `node --test tests/tools-intro.test.mjs` (3 passing), `npm run test` (all 208 unit tests passed), `npm run typecheck` (0 errors), `npm run build` (0 errors).
+
 - [x] Test Card Checkout & Upgrade Intent Server Error Resolution:
   - Fixed "Unexpected server error" on test card payment in `/pricing` checkout modal and `/api/subscription/upgrade-intent`.
   - Removed PgBouncer-incompatible `Serializable` transaction isolation in `requirePlatformContext`, adding safe upserts for workspace members, subscriptions, and settings.

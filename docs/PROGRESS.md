@@ -2,6 +2,29 @@
 
 Last updated: 2026-10-30
 
+## Feature: Tools Introduction Frame on Initial Hover (2026-10-30)
+
+- Implemented design tools interactive intro frame triggered on initial hover upon entering website:
+  - **Asset Creation (`public/introduction.png`)**:
+    - Cropped and placed `/introduction.png` matching the visual design.
+  - **Tools Intro Modal Component (`src/components/tools-intro-modal.tsx`)**:
+    - Outer frame: `412x540px`, corner `16px` (`#242424` background, subtle border, shadow elevation, backdrop blur).
+    - Intro video/photo frame: `372x192px`, corner `12px` displaying `/introduction.png`.
+    - Frame icon: `64x64px`, corner `12px`, with double-square layer icon (dashed outer and solid white inner).
+    - Header typography: Header title 1 at `16px` font size (e.g. "Architecture Tools"), Header line 2 at `12px Roboto` font.
+    - Description paragraph: Styled in Roboto with line-clamp and readable spacing.
+    - Scroll button icon: `64x24px` pill container with `16x16px` circle chevrons (`< | >`) for cycling through tool intros (Architecture, Interior, 3D Visualization, Infrastructure).
+    - Action link: "Continue learn another tools" in blue.
+    - Keyboard accessibility: Escape key and arrow keys (`ArrowLeft`, `ArrowRight`) supported.
+  - **Tools Marquee Trigger (`src/components/home-tool-marquee.tsx`)**:
+    - Connected `onMouseEnter` on the `home-tools` section to automatically show the intro frame on the first hover upon website entry.
+    - Retains activation capability throughout the testing phase, with manual click to reopen.
+  - **Automated Verification**:
+    - Unit test created in `tests/tools-intro.test.mjs` verifying asset existence, dimension specs, typography, and hover trigger.
+    - All 208 unit tests passing (`node --test tests/*.test.mjs`).
+    - `npm run typecheck` (tsc --noEmit) passed with 0 errors.
+    - `npm run build` production build completed with 0 errors.
+
 ## Fix: Test Card Checkout & Upgrade Intent Server Error Resolution (2026-10-30)
 
 - Fixed "Unexpected server error" on test payment card checkout in `/pricing` modal and `/api/subscription/upgrade-intent`:
