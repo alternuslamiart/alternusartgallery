@@ -1,6 +1,28 @@
 # Verified progress
 
-Last updated: 2026-10-30
+Last updated: 2026-10-31
+
+## Feature: Offline / No-Wifi Overlay and Fallback for Alternus Art (2026-10-31)
+
+- Implemented full-screen offline / no-wifi overlay and fallback when internet/wifi is disconnected:
+  - **Visual Presentation & Background (`public/no-wifi.png`)**:
+    - Utilizes `no-wifi.png` in `/public` featuring the robots, globe with crossed-out wifi, and heading "Reload your internet problem".
+    - Background ambient layer with matching deep blue glow (`#011b6d`).
+    - Responsive layout with aspect-ratio preservation on desktop and touch-friendly scaling on mobile.
+  - **White Reload Button with Dark Blue Hover**:
+    - Text: "Reload" with reload icon (`RotateCw`).
+    - Style: `bg-white`, `text-[#001c6d]`, `rounded-full`, `shadow-2xl`.
+    - Hover state: `hover:bg-[#001035]`, `hover:text-white`, `hover:border-[#002b80]`.
+    - Action: triggers `window.location.reload()` with active/disabled state and reload animation.
+  - **Offline Detection & PWA Fallback**:
+    - React client component `src/components/no-wifi-screen.tsx` listening to `window` `offline` and `online` events, integrated into `src/app/layout.tsx`.
+    - Automatically hides overlay when connectivity is restored.
+    - Added `public/offline.html` and lightweight service worker `public/sw.js` for seamless offline fallback on hard page refreshes/navigation.
+  - **Automated Verification**:
+    - Created unit test `tests/no-wifi-screen.test.mjs` verifying asset presence, component structure, button styling, layout integration, and service worker caching (5 passing tests).
+    - All 214 unit tests passing (`node --test tests/*.test.mjs`).
+    - `npm run typecheck` (tsc --noEmit) passed with 0 errors.
+    - `npm run build` production build completed with 0 errors (88/88 static pages).
 
 ## Fix: Exact 16x16px Circle Buttons for Tools Intro Scroll Navigation (2026-10-30)
 

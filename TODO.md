@@ -1,4 +1,10 @@
-# Next tasks (reviewed 2026-10-30)
+# Next tasks (reviewed 2026-10-31)
+
+- [x] Offline / No-Wifi Screen with White Reload Button & Dark Blue Hover:
+  - Displayed `/no-wifi.png` background overlay with robots and "Reload your internet problem" when wifi/internet connection is lost.
+  - Implemented white "Reload" button with dark blue hover (`bg-white hover:bg-[#001035] hover:text-white`) triggering `window.location.reload()`.
+  - Added responsive desktop/mobile layout, offline/online event listeners, and `sw.js`/`offline.html` fallback.
+  - Verification: `node --test tests/no-wifi-screen.test.mjs` (5 passing), `npm run test` (all 214 tests passed), `npm run typecheck` (0 errors), `npm run build` (0 errors).
 
 - [x] Exact 16x16px Circle Buttons for Tools Intro Scroll Navigation:
   - Fixed oval deformation on scroll buttons by locking exact 16x16px circle dimensions (`minWidth`, `maxWidth`, `minHeight`, `maxHeight: 16px`, `aspectRatio: 1/1`).

@@ -42,6 +42,7 @@ next-env.d.ts
 
 # Local GPU installation, checkpoints and persistent generated assets
 /ai-services/Hunyuan3D-2.1/
+/ai-services/ComfyUI/
 /storage/
 __pycache__/
 *.pyc

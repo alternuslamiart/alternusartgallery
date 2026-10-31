@@ -10,6 +10,7 @@ import { Providers } from "@/components/providers";
 import { CookieModal } from "@/components/cookie-modal";
 import { LayoutShell } from "@/components/layout-shell";
 import { SignInPopup } from "@/components/signin-popup";
+import { NoWifiScreen } from "@/components/no-wifi-screen";
 
 const geistSans = localFont({
  src: "./fonts/GeistVF.woff",
@@ -273,6 +274,7 @@ export default function RootLayout({
  <LayoutShell>{children}</LayoutShell>
  <CookieModal />
  <SignInPopup />
+ <NoWifiScreen />
  </Providers>
  </body>
  </html>
